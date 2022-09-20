@@ -284,6 +284,26 @@ abstract class AbstractJPackageTask @Inject constructor(
         get() = appResourcesDir.map { it.takeIf { it.asFile.exists() } }
 
     @get:Internal
+    val jpackageResourcesDir: DirectoryProperty = objects.directoryProperty()
+
+    /**
+     * Gradle runtime verification fails,
+     * if InputDirectory is not null, but a directory does not exist.
+     * The directory might not exist, because prepareJPackageResources task
+     * does not create output directory if there are no resources.
+     *
+     * To work around this, jpackageResourcesDir is used as a real property,
+     * but it is annotated as @Internal, so it ignored during inputs checking.
+     * This property is used only for inputs checking.
+     * It returns appResourcesDir value if the underlying directory exists.
+     */
+    @Suppress("unused")
+    @get:InputDirectory
+    @get:Optional
+    internal val jpackageResourcesDirInputDirHackForVerification: Provider<Directory>
+        get() = jpackageResourcesDir.map { it.takeIf { it.asFile.exists() } }
+
+    @get:Internal
     private val libsMappingFile: Provider<RegularFile> = workingDir.map {
         it.file("libs-mapping.txt")
     }
@@ -477,24 +497,14 @@ abstract class AbstractJPackageTask @Inject constructor(
         // todo: incremental copy
         cleanDirs(packagedResourcesDir)
         val destResourcesDir = packagedResourcesDir.ioFile
-        val appResourcesDir = appResourcesDir.ioFileOrNull
-        if (appResourcesDir != null) {
-            for (file in appResourcesDir.walk()) {
-                val relPath = file.relativeTo(appResourcesDir).path
-                val destFile = destResourcesDir.resolve(relPath)
-                if (file.isDirectory) {
-                    fileOperations.mkdir(destFile)
-                } else {
-                    file.copyTo(destFile)
-                }
-            }
-        }
+        appResourcesDir.ioFileOrNull?.copyContentsTo(destResourcesDir)
 
         cleanDirs(jpackageResources)
+        val jpackageResources = jpackageResources.ioFile
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
-                .writeToFile(jpackageResources.ioFile.resolve("Info.plist"))
+                .writeToFile(jpackageResources.resolve("Info.plist"))
 
             if (macAppStore.orNull == true) {
                 val productDefPlistXml = """
@@ -504,7 +514,20 @@ abstract class AbstractJPackageTask @Inject constructor(
                     </array>
                 """.trimIndent()
                 InfoPlistBuilder(productDefPlistXml)
-                    .writeToFile(jpackageResources.ioFile.resolve("product-def.plist"))
+                    .writeToFile(jpackageResources.resolve("product-def.plist"))
+            }
+        }
+        jpackageResourcesDir.ioFileOrNull?.copyContentsTo(jpackageResources)
+    }
+
+    private fun File.copyContentsTo(destination: File) {
+        for (file in walk()) {
+            val relPath = file.relativeTo(this).path
+            val destFile = destination.resolve(relPath)
+            if (file.isDirectory) {
+                fileOperations.mkdir(destFile)
+            } else {
+                file.copyTo(destFile)
             }
         }
     }

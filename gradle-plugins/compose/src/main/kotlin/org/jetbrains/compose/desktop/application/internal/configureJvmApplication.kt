@@ -17,7 +17,6 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
-import org.jetbrains.compose.internal.joinDashLowercaseNonEmpty
 import java.io.File
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
@@ -45,6 +44,7 @@ internal class CommonJvmDesktopTasks(
     val checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>,
     val suggestRuntimeModules: TaskProvider<AbstractSuggestModulesTask>,
     val prepareAppResources: TaskProvider<Sync>,
+    val prepareJPackageResources: TaskProvider<Sync>,
     val createRuntimeImage: TaskProvider<AbstractJLinkTask>
 )
 
@@ -89,6 +89,19 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         into(jvmTmpDirForTask())
     }
 
+    val prepareJPackageResources = tasks.register<Sync>(
+        taskNameAction = "prepare",
+        taskNameObject = "JPackageResources"
+    ) {
+        val jpackageResourcesRootDir = app.nativeDistributions.jpackageResourcesRootDir
+        if (jpackageResourcesRootDir.isPresent) {
+            from(jpackageResourcesRootDir.dir("common"))
+            from(jpackageResourcesRootDir.dir(currentOS.id))
+            from(jpackageResourcesRootDir.dir(currentTarget.id))
+        }
+        into(jvmTmpDirForTask())
+    }
+
     val createRuntimeImage = tasks.register<AbstractJLinkTask>(
         taskNameAction = "create",
         taskNameObject = "runtimeImage"
@@ -106,6 +119,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         checkRuntime,
         suggestRuntimeModules,
         prepareAppResources,
+        prepareJPackageResources,
         createRuntimeImage
     )
 }
@@ -131,6 +145,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
             this,
             createRuntimeImage = commonTasks.createRuntimeImage,
             prepareAppResources = commonTasks.prepareAppResources,
+            prepareJPackageResources = commonTasks.prepareJPackageResources,
             checkRuntime = commonTasks.checkRuntime,
             unpackDefaultResources = commonTasks.unpackDefaultResources,
             runProguard = runProguard
@@ -154,6 +169,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
                     this,
                     createRuntimeImage = commonTasks.createRuntimeImage,
                     prepareAppResources = commonTasks.prepareAppResources,
+                    prepareJPackageResources = commonTasks.prepareJPackageResources,
                     checkRuntime = commonTasks.checkRuntime,
                     unpackDefaultResources = commonTasks.unpackDefaultResources,
                     runProguard = runProguard
@@ -217,7 +233,7 @@ private fun JvmApplicationContext.configurePackagingTasks(
     )
 
     val run = tasks.register<JavaExec>(taskNameAction = "run") {
-        configureRunTask(this, commonTasks.prepareAppResources)
+        configureRunTask(this, commonTasks.prepareAppResources, commonTasks.prepareJPackageResources)
     }
 }
 
@@ -248,6 +264,7 @@ private fun JvmApplicationContext.configurePackageTask(
     createAppImage: TaskProvider<AbstractJPackageTask>? = null,
     createRuntimeImage: TaskProvider<AbstractJLinkTask>? = null,
     prepareAppResources: TaskProvider<Sync>? = null,
+    prepareJPackageResources: TaskProvider<Sync>? = null,
     checkRuntime: TaskProvider<AbstractCheckNativeDistributionRuntime>? = null,
     unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>,
     runProguard: Provider<AbstractProguardTask>? = null
@@ -264,10 +281,16 @@ private fun JvmApplicationContext.configurePackageTask(
         packageTask.runtimeImage.set(createRuntimeImage.flatMap { it.destinationDir })
     }
 
-    prepareAppResources?.let { prepareResources ->
-        packageTask.dependsOn(prepareResources)
-        val resourcesDir = packageTask.project.layout.dir(prepareResources.map { it.destinationDir })
+    prepareAppResources?.let { prepareAppResources ->
+        packageTask.dependsOn(prepareAppResources)
+        val resourcesDir = packageTask.project.layout.dir(prepareAppResources.map { it.destinationDir })
         packageTask.appResourcesDir.set(resourcesDir)
+    }
+
+    prepareJPackageResources?.let { prepareJPackageResources ->
+        packageTask.dependsOn(prepareJPackageResources)
+        val resourcesDir = packageTask.project.layout.dir(prepareJPackageResources.map { it.destinationDir })
+        packageTask.jpackageResourcesDir.set(resourcesDir)
     }
 
     checkRuntime?.let { checkRuntime ->
@@ -376,9 +399,11 @@ internal fun JvmApplicationContext.configurePlatformSettings(
 
 private fun JvmApplicationContext.configureRunTask(
     exec: JavaExec,
-    prepareAppResources: TaskProvider<Sync>
+    prepareAppResources: TaskProvider<Sync>,
+    prepareJPackageResources: TaskProvider<Sync>
 ) {
     exec.dependsOn(prepareAppResources)
+    exec.dependsOn(prepareJPackageResources)
 
     exec.mainClass.set(exec.provider { app.mainClass })
     exec.executable(javaExecutable(app.javaHome))
