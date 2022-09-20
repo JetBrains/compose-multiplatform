@@ -782,6 +782,25 @@ package androidx.compose.material3 {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.TextStyle> LocalTextStyle;
   }
 
+  public final class TimePickerKt {
+  }
+
+  @androidx.compose.runtime.Stable public final class TimePickerState {
+    ctor public TimePickerState(int initialHour, int initialMinute, boolean is24Hour);
+    method public int getHour();
+    method public int getMinute();
+    method public boolean is24hour();
+    method public suspend Object? settle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public final int hour;
+    property public final boolean is24hour;
+    property public final int minute;
+    field public static final androidx.compose.material3.TimePickerState.Companion Companion;
+  }
+
+  public static final class TimePickerState.Companion {
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TimePickerState,?> Saver();
+  }
+
   public final class TonalPaletteKt {
   }
 

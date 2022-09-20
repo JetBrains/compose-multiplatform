@@ -21,8 +21,10 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.ReadOnlyComposable
 
 @Immutable
-@kotlin.jvm.JvmInline
-internal value class Strings private constructor(@Suppress("unused") private val value: Int) {
+@JvmInline
+internal value class Strings private constructor(
+    @Suppress("unused") private val value: Int
+) {
     companion object {
         val NavigationMenu = Strings(0)
         val CloseDrawer = Strings(1)
@@ -59,6 +61,14 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val DatePickerSwitchToCalendarMode = Strings(32)
         val DatePickerSwitchToInputMode = Strings(33)
         val TooltipLongPressLabel = Strings(34)
+        val TimePickerAM = Strings(35)
+        val TimePickerPM = Strings(36)
+        val TimePickerPeriodToggle = Strings(37)
+        val TimePickerHourSelection = Strings(38)
+        val TimePickerMinuteSelection = Strings(39)
+        val TimePickerHourSuffix = Strings(40)
+        val TimePicker24HourSuffix = Strings(41)
+        val TimePickerMinuteSuffix = Strings(42)
     }
 }
 

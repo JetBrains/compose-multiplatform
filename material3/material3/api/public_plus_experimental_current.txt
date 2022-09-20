@@ -1163,6 +1163,35 @@ package androidx.compose.material3 {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.TextStyle> LocalTextStyle;
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Immutable public final class TimePickerColors {
+  }
+
+  @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public final class TimePickerDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.TimePickerColors colors(optional long clockDialColor, optional long clockDialSelectedContentColor, optional long clockDialUnselectedContentColor, optional long selectorColor, optional long containerColor, optional long periodSelectorBorderColor, optional long periodSelectorSelectedContainerColor, optional long periodSelectorUnselectedContainerColor, optional long periodSelectorSelectedContentColor, optional long periodSelectorUnselectedContentColor, optional long timeSelectorSelectedContainerColor, optional long timeSelectorUnselectedContainerColor, optional long timeSelectorSelectedContentColor, optional long timeSelectorUnselectedContentColor);
+    field public static final androidx.compose.material3.TimePickerDefaults INSTANCE;
+  }
+
+  public final class TimePickerKt {
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void TimePicker(androidx.compose.material3.TimePickerState state, optional androidx.compose.material3.TimePickerColors colors);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static androidx.compose.material3.TimePickerState rememberTimePickerState(optional int initialHour, optional int initialMinute, optional boolean is24Hour);
+  }
+
+  @androidx.compose.runtime.Stable public final class TimePickerState {
+    ctor public TimePickerState(int initialHour, int initialMinute, boolean is24Hour);
+    method public int getHour();
+    method public int getMinute();
+    method public boolean is24hour();
+    method public suspend Object? settle(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public final int hour;
+    property public final boolean is24hour;
+    property public final int minute;
+    field public static final androidx.compose.material3.TimePickerState.Companion Companion;
+  }
+
+  public static final class TimePickerState.Companion {
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TimePickerState,?> Saver();
+  }
+
   public final class TonalPaletteKt {
   }
 

@@ -347,6 +347,17 @@ private val Tooltips = Component(
     examples = TooltipsExamples
 )
 
+private val TimePickers = Component(
+    id = nextId(),
+    name = "Time Picker",
+    description = "Time picker allows the user to choose time of day.",
+    // No time picker icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/time-picker",
+    docsUrl = "$DocsUrl#time-pickers",
+    sourceUrl = "$Material3SourceUrl/TimePicker.kt",
+    examples = TimePickerExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -386,5 +397,6 @@ val Components = listOf(
     Tabs,
     TextFields,
     Tooltips,
+    TimePickers,
     TopAppBar
 )

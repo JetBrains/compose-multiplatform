@@ -82,9 +82,11 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerNavigateToYearDescription -> resources.getString(
             androidx.compose.material3.R.string.date_picker_navigate_to_year_description
         )
+
         Strings.DatePickerHeadlineDescription -> resources.getString(
             androidx.compose.material3.R.string.date_picker_headline_description
         )
+
         Strings.DatePickerNoSelectionDescription -> resources.getString(
             androidx.compose.material3.R.string.date_picker_no_selection_description
         )
@@ -124,6 +126,22 @@ internal actual fun getString(string: Strings): String {
         Strings.TooltipLongPressLabel -> resources.getString(
             androidx.compose.material3.R.string.tooltip_long_press_label
         )
+        Strings.TimePickerAM -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_am)
+        Strings.TimePickerPM -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_pm)
+        Strings.TimePickerPeriodToggle -> resources.getString(
+                androidx.compose.material3.R.string.time_picker_period_toggle_description)
+        Strings.TimePickerMinuteSelection -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_minute_selection)
+        Strings.TimePickerHourSelection -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_hour_selection)
+        Strings.TimePickerHourSuffix -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_hour_suffix)
+        Strings.TimePickerMinuteSuffix -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_minute_suffix)
+        Strings.TimePicker24HourSuffix -> resources.getString(
+            androidx.compose.material3.R.string.time_picker_hour_24h_suffix)
         else -> ""
     }
 }
@@ -133,5 +151,5 @@ internal actual fun getString(string: Strings, vararg formatArgs: Any): String {
     val raw = getString(string)
     val locale =
         ConfigurationCompat.getLocales(LocalConfiguration.current).get(0) ?: Locale.getDefault()
-    return String.format(raw, locale, *formatArgs)
+    return String.format(locale, raw, *formatArgs)
 }

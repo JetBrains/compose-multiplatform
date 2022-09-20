@@ -60,6 +60,14 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerSwitchToCalendarMode -> "Switch to calendar input mode"
         Strings.DatePickerSwitchToInputMode -> "Switch to text input mode"
         Strings.TooltipLongPressLabel -> "Show tooltip"
+        Strings.TimePickerAM -> "AM"
+        Strings.TimePickerPM -> "PM"
+        Strings.TimePickerPeriodToggle -> "Select AM or PM"
+        Strings.TimePickerMinuteSelection -> "Select minutes"
+        Strings.TimePickerHourSelection -> "Select hour"
+        Strings.TimePickerHourSuffix -> "%1$ o\\'clock"
+        Strings.TimePickerMinuteSuffix -> "%1$ minutes"
+        Strings.TimePicker24HourSuffix -> "%1$ hours"
         else -> ""
     }
 }
