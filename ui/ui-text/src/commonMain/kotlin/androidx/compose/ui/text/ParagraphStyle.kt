@@ -68,7 +68,9 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     val platformStyle: PlatformParagraphStyle? = null,
     val lineHeightStyle: LineHeightStyle? = null,
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi val lineBreak: LineBreak? = null,
+    @get:ExperimentalTextApi
+    @property:ExperimentalTextApi
+    val lineBreak: LineBreak? = null,
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
     @property:ExperimentalTextApi
