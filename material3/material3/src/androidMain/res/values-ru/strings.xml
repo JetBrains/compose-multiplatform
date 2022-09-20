@@ -18,4 +18,6 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
     <string name="dialog" msgid="4057925834421392736">"Диалоговое окно"</string>
+    <string name="expanded" msgid="5974471714631304645">"Развернуто"</string>
+    <string name="collapsed" msgid="5389587048670450460">"Свернуто"</string>
 </resources>
