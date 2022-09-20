@@ -29,8 +29,8 @@
     <string name="tab" msgid="1672349317127674378">"Filă"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Meniu de navigare"</string>
     <string name="dropdown_menu" msgid="1890207353314751437">"Meniu drop-down"</string>
-    <string name="close_drawer" msgid="406453423630273620">"Închideți meniul de navigare"</string>
-    <string name="close_sheet" msgid="7573152094250666567">"Închideți foaia"</string>
+    <string name="close_drawer" msgid="406453423630273620">"Închide meniul de navigare"</string>
+    <string name="close_sheet" msgid="7573152094250666567">"Închide foaia"</string>
     <string name="default_error_message" msgid="8038256446254964252">"Intrare nevalidă"</string>
     <string name="default_popup_window_title" msgid="6312721426453364202">"Fereastră pop-up"</string>
     <string name="range_start" msgid="7097486360902471446">"Început de interval"</string>
