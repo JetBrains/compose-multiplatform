@@ -35,6 +35,7 @@ import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -371,44 +372,154 @@ class LazyStaggeredGridPrefetcherTest(
         rule.runOnIdle { }
     }
 
-//    @Test
-//    fun snappingToOtherPositionWhilePrefetchIsScheduled() {
-//        val composedItems = mutableListOf<Int>()
-//        rule.setContent {
-//            state = rememberLazyGridState()
-//            LazyGrid(
-//                1,
-//                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
-//                state,
-//            ) {
-//                items(1000) {
-//                    composedItems.add(it)
-//                    Spacer(Modifier.mainAxisSize(itemsSizeDp))
-//                }
-//            }
-//        }
-//
-//        rule.runOnIdle {
-//            // now we have items 0 and 1 visible
-//            runBlocking(AutoTestFrameClock()) {
-//                // this will move the viewport so items 1 and 2 are visible
-//                // and schedule a prefetching for 3
-//                state.scrollBy(itemsSizePx.toFloat())
-//                // then we move so that items 100 and 101 are visible.
-//                // this should cancel the prefetch for 3
-//                state.scrollToItem(100)
-//            }
-//        }
-//
-//        // wait a few frames to make sure prefetch happens if was scheduled
-//        rule.waitForIdle()
-//        rule.waitForIdle()
-//        rule.waitForIdle()
-//
-//        rule.runOnIdle {
-//            Truth.assertThat(composedItems).doesNotContain(3)
-//        }
-//    }
+    @Test
+    fun snappingToOtherPositionWhilePrefetchIsScheduled() {
+        val composedItems = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                1,
+                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
+                state,
+            ) {
+                items(1000) {
+                    composedItems.add(it)
+                    Spacer(Modifier.mainAxisSize(itemsSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            // now we have items 0 and 1 visible
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 1 and 2 are visible
+                // and schedule a prefetching for 3
+                state.scrollBy(itemsSizePx.toFloat())
+                // then we move so that items 100 and 101 are visible.
+                // this should cancel the prefetch for 3
+                state.scrollToItem(100)
+            }
+        }
+
+        // wait a few frames to make sure prefetch happens if was scheduled
+        rule.waitForIdle()
+        rule.waitForIdle()
+        rule.waitForIdle()
+
+        rule.runOnIdle {
+            assertThat(composedItems).doesNotContain(3)
+        }
+    }
+
+    @Test
+    fun scrollingByListSizeCancelsPreviousPrefetch() {
+        composeStaggeredGrid()
+
+        // now we have items 0-3 visible
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 2-5 are visible
+                // and schedule a prefetching for 6-7
+                state.scrollBy(itemsSizePx.toFloat())
+
+                // move viewport by screen size to items 8-11, so item 6 is just behind
+                // the first visible item
+                state.scrollBy(itemsSizePx * 3f)
+
+                // move scroll further to items 10-13, so item 6 is reused
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+        }
+
+        waitForPrefetch(13)
+
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // scroll again to ensure item 6 was dropped
+                state.scrollBy(itemsSizePx * 100f)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(activeNodes).doesNotContain(6)
+        }
+    }
+
+    @Test
+    fun scrollingWithStaggeredItemsPrefetchesCorrectly() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                2,
+                Modifier.mainAxisSize(itemsSizeDp * 5f),
+                state,
+            ) {
+                items(100) {
+                    DisposableEffect(it) {
+                        activeNodes.add(it)
+                        onDispose {
+                            activeNodes.remove(it)
+                            activeMeasuredNodes.remove(it)
+                        }
+                    }
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(if (it == 0) itemsSizeDp else itemsSizeDp * 2)
+                            .border(Dp.Hairline, Color.Black)
+                            .testTag("$it")
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                activeMeasuredNodes.add(it)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, 0)
+                                }
+                            }
+                    )
+                }
+            }
+        }
+
+        // ┌─┬─┐
+        // ├─┤1│
+        // │2├─┤
+        // ├─┤3│
+        // │4├─┤
+        // └─┴─┘
+
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so item 6 is visible
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+        }
+
+        waitForPrefetch(7)
+        waitForPrefetch(8)
+
+        // ┌─┬─┐
+        // │2├─┤
+        // ├─┤3│
+        // │4├─┤
+        // ├─┤5│
+        // └─┴─┘
+
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so item 7 is visible
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+            assertThat(activeNodes).contains(8)
+        }
+
+        // ┌─┬─┐
+        // ├─┤3│
+        // │4├─┤
+        // ├─┤5│
+        // │6├─┤
+        // └─┴─┘
+
+        waitForPrefetch(9)
+    }
 
     private fun waitForPrefetch(index: Int) {
         rule.waitUntil {

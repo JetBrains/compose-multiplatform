@@ -359,13 +359,16 @@ class LazyGridState constructor(
 
     private fun cancelPrefetchIfVisibleItemsChanged(info: LazyGridLayoutInfo) {
         if (lineToPrefetch != -1 && info.visibleItemsInfo.isNotEmpty()) {
-            val firstLine = info.visibleItemsInfo.first().let {
-                if (isVertical) it.row else it.column
+            val expectedLineToPrefetch = if (wasScrollingForward) {
+                info.visibleItemsInfo.last().let {
+                    if (isVertical) it.row else it.column
+                } + 1
+            } else {
+                info.visibleItemsInfo.first().let {
+                    if (isVertical) it.row else it.column
+                } - 1
             }
-            val lastLine = info.visibleItemsInfo.last().let {
-                if (isVertical) it.row else it.column
-            }
-            if (lineToPrefetch != firstLine - 1 && lineToPrefetch != lastLine + 1) {
+            if (lineToPrefetch != expectedLineToPrefetch) {
                 lineToPrefetch = -1
                 currentLinePrefetchHandles.forEach { it.cancel() }
                 currentLinePrefetchHandles.clear()
