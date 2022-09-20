@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text
 
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
@@ -100,6 +101,50 @@ class ParagraphStyleTest {
         val newStyle = style.merge(otherStyle)
 
         assertThat(newStyle.textDirection).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge non-null hyphens uses other's hyphens`() {
+        val style = ParagraphStyle(hyphens = Hyphens.Auto)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.None)
+
+        val newStyle = style.merge(otherStyle)
+
+        assertThat(newStyle.hyphens).isEqualTo(otherStyle.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge hyphens other null, returns original`() {
+        val style = ParagraphStyle(hyphens = Hyphens.Auto)
+        val otherStyle = ParagraphStyle(hyphens = null)
+
+        val newStyle = style.merge(otherStyle)
+
+        assertThat(newStyle.hyphens).isEqualTo(style.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge null hyphens other non-null, returns other's hyphens`() {
+        val style = ParagraphStyle(hyphens = null)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        val newStyle = style.merge(otherStyle)
+
+        assertThat(newStyle.hyphens).isEqualTo(otherStyle.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge hyphens both null returns null`() {
+        val style = ParagraphStyle(hyphens = null)
+        val otherStyle = ParagraphStyle(hyphens = null)
+
+        val newStyle = style.merge(otherStyle)
+
+        assertThat(newStyle.hyphens).isNull()
     }
 
     @Test
@@ -292,6 +337,50 @@ class ParagraphStyleTest {
         val newStyle = lerp(start = style1, stop = style2, fraction = 0.6f)
 
         assertThat(newStyle.textDirection).isEqualTo(style2.textDirection)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp hyphens with a null, b not null and t is smaller than half`() {
+        val style1 = ParagraphStyle(hyphens = null)
+        val style2 = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
+
+        assertThat(newStyle.hyphens).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp hyphens with a null, b not null and t is equal to half`() {
+        val style1 = ParagraphStyle(hyphens = null)
+        val style2 = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.5f)
+
+        assertThat(newStyle.hyphens).isEqualTo(style2.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp hyphens with a and b are not null and t is smaller than half`() {
+        val style1 = ParagraphStyle(hyphens = Hyphens.Auto)
+        val style2 = ParagraphStyle(hyphens = Hyphens.None)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.4f)
+
+        assertThat(newStyle.hyphens).isEqualTo(style1.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp hyphens with a and b are not Null and t is larger than half`() {
+        val style1 = ParagraphStyle(hyphens = Hyphens.Auto)
+        val style2 = ParagraphStyle(hyphens = Hyphens.None)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = 0.6f)
+
+        assertThat(newStyle.hyphens).isEqualTo(style2.hyphens)
     }
 
     @Test
@@ -540,6 +629,78 @@ class ParagraphStyleTest {
         val newStyle = style.copy()
 
         assertThat(newStyle.lineHeightStyle).isEqualTo(style.lineHeightStyle)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy with hyphens returns new hyphens`() {
+        val style = ParagraphStyle(hyphens = Hyphens.None)
+        val newStyle = style.copy(hyphens = Hyphens.Auto)
+
+        assertThat(newStyle.hyphens).isEqualTo(Hyphens.Auto)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy without hyphens uses existing hyphens`() {
+        val style = ParagraphStyle(hyphens = Hyphens.Auto)
+        val newStyle = style.copy()
+
+        assertThat(newStyle.hyphens).isEqualTo(style.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `equals return false for different and non-null hyphens behavior`() {
+        val style = ParagraphStyle(hyphens = Hyphens.None)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style == otherStyle).isFalse()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `equals return false for null and non-null hyphens`() {
+        val style = ParagraphStyle(hyphens = null)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style == otherStyle).isFalse()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `equals return true for same and non-null hyphens behavior`() {
+        val style = ParagraphStyle(hyphens = Hyphens.Auto)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style == otherStyle).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `equals return true for both null hyphens`() {
+        val style = ParagraphStyle(hyphens = null)
+        val otherStyle = ParagraphStyle(hyphens = null)
+
+        assertThat(style == otherStyle).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `hashCode is same for same hyphens behavior`() {
+        val style = ParagraphStyle(hyphens = Hyphens.Auto)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style.hashCode()).isEqualTo(otherStyle.hashCode())
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `hashCode is different for different hyphens behavior`() {
+        val style = ParagraphStyle(hyphens = Hyphens.None)
+        val otherStyle = ParagraphStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style.hashCode()).isNotEqualTo(otherStyle.hashCode())
     }
 
     @OptIn(ExperimentalTextApi::class)

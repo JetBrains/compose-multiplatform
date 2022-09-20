@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -73,6 +74,7 @@ class TextStyleResolveDefaultsTest {
             assertThat(it.lineHeight).isEqualTo(DefaultLineHeight)
             assertThat(it.textIndent).isEqualTo(TextIndent.None)
             assertThat(it.platformStyle).isNull()
+            assertThat(it.hyphens).isEqualTo(Hyphens.None)
             assertThat(it.lineBreak).isEqualTo(LineBreak.Simple)
         }
     }
@@ -88,6 +90,17 @@ class TextStyleResolveDefaultsTest {
                 direction = LayoutDirection.Ltr
             ).brush
         ).isEqualTo(brush)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun test_use_provided_values_hyphens() {
+        assertThat(
+            resolveDefaults(
+                TextStyle(hyphens = Hyphens.Auto),
+                direction = LayoutDirection.Ltr
+            ).hyphens
+        ).isEqualTo(Hyphens.Auto)
     }
 
     @OptIn(ExperimentalTextApi::class)

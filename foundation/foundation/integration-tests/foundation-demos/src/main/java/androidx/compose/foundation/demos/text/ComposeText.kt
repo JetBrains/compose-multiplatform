@@ -44,6 +44,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.ListItem
+import androidx.compose.material.Slider
 import androidx.compose.material.RadioButton
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
@@ -93,6 +94,7 @@ import androidx.compose.ui.text.samples.TextOverflowEllipsisSample
 import androidx.compose.ui.text.samples.TextOverflowVisibleFixedSizeSample
 import androidx.compose.ui.text.samples.TextOverflowVisibleMinHeightSample
 import androidx.compose.ui.text.samples.TextStyleSample
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -549,6 +551,28 @@ fun TextDemoSoftWrap() {
     Column(Modifier.fillMaxHeight()) {
         Text(text = text, style = textStyle)
         Text(text = text, style = textStyle, softWrap = false)
+    }
+}
+
+@OptIn(ExperimentalTextApi::class)
+@Composable
+fun TextDemoHyphens() {
+    val text = "Transformation"
+    val textStyleHyphensOn = TextStyle(fontSize = fontSize8, color = Color.Red,
+        hyphens = Hyphens.Auto)
+    val textStyleHyphensOff = TextStyle(fontSize = fontSize8, color = Color.Blue,
+        hyphens = Hyphens.None)
+    Column() {
+        var width by remember { mutableStateOf(30f) }
+        Slider(
+            value = width,
+            onValueChange = { width = it },
+            valueRange = 20f..400f
+        )
+        Column(Modifier.width(width.dp)) {
+            Text(text = text, style = textStyleHyphensOn)
+            Text(text = text, style = textStyleHyphensOff)
+        }
     }
 }
 

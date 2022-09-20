@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.lerp
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
@@ -67,6 +68,15 @@ class TextStyleTest {
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
         assertThat(style.platformStyle).isNull()
+        assertThat(style.hyphens).isNull()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `constructor with customized hyphens`() {
+        val style = TextStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style.hyphens).isEqualTo(Hyphens.Auto)
         assertThat(style.lineBreak).isNull()
     }
 
@@ -126,6 +136,22 @@ class TextStyleTest {
         val style = TextStyle(color = Color.Red)
 
         assertThat(style.copy().color).isEqualTo(Color.Red)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `empty copy with existing hyphens should not remove hyphens`() {
+        val style = TextStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style.copy().hyphens).isEqualTo(Hyphens.Auto)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `copy with hyphens returns new hyphens`() {
+        val style = TextStyle(hyphens = Hyphens.Auto)
+
+        assertThat(style.copy(hyphens = Hyphens.None).hyphens).isEqualTo(Hyphens.None)
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -271,6 +297,28 @@ class TextStyleTest {
         val style = TextStyle(fontFamily = fontFamily)
 
         assertThat(style.fontFamily).isEqualTo(fontFamily)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with other's hyphens is null should use this hyphens`() {
+        val style = TextStyle(hyphens = Hyphens.Auto)
+        val otherStyle = TextStyle(hyphens = null)
+
+        val newStyle = style.merge(otherStyle)
+
+        assertThat(newStyle.hyphens).isEqualTo(style.hyphens)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with other's hyphens is set should use other's hyphens`() {
+        val style = TextStyle(hyphens = Hyphens.Auto)
+        val otherStyle = TextStyle(hyphens = Hyphens.None)
+
+        val newStyle = style.merge(otherStyle)
+
+        assertThat(newStyle.hyphens).isEqualTo(otherStyle.hyphens)
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -822,6 +870,34 @@ class TextStyleTest {
         val newStyle = lerp(start = style1, stop = style2, fraction = t)
 
         assertThat(newStyle.color).isEqualTo(lerp(start = color1, stop = color2, fraction = t))
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp hyphens with a and b are not Null and t is smaller than half`() {
+        val hyphens1 = Hyphens.Auto
+        val hyphens2 = Hyphens.None
+        val t = 0.3f
+        val style1 = TextStyle(hyphens = hyphens1)
+        val style2 = TextStyle(hyphens = hyphens2)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = t)
+
+        assertThat(newStyle.hyphens).isEqualTo(hyphens1)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp hyphens with a and b are not Null and t is larger than half`() {
+        val hyphens1 = Hyphens.Auto
+        val hyphens2 = Hyphens.None
+        val t = 0.8f
+        val style1 = TextStyle(hyphens = hyphens1)
+        val style2 = TextStyle(hyphens = hyphens2)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = t)
+
+        assertThat(newStyle.hyphens).isEqualTo(hyphens2)
     }
 
     @Test
@@ -1448,6 +1524,7 @@ class TextStyleTest {
             alignment = Alignment.Center,
             trim = Trim.None
         )
+        val hyphens = Hyphens.Auto
         val lineBreak = LineBreak(
             strategy = LineBreak.Strategy.Balanced,
             strictness = LineBreak.Strictness.Strict,
@@ -1460,7 +1537,8 @@ class TextStyleTest {
             lineHeight = lineHeight,
             textIndent = textIndent,
             lineHeightStyle = lineHeightStyle,
-            lineBreak = lineBreak
+            lineBreak = lineBreak,
+            hyphens = hyphens
         )
 
         assertThat(style.toParagraphStyle()).isEqualTo(
@@ -1470,6 +1548,7 @@ class TextStyleTest {
                 lineHeight = lineHeight,
                 textIndent = textIndent,
                 lineHeightStyle = lineHeightStyle,
+                hyphens = hyphens,
                 lineBreak = lineBreak
             )
         )

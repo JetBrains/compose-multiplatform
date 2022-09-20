@@ -377,6 +377,7 @@ class TextStyleLayoutAttributesTest {
             getProperty("paragraphStyle"),
             getProperty("spanStyle"),
             getProperty("lineHeightStyle"),
+            getProperty("hyphens"),
             getProperty("lineBreak")
         )
 

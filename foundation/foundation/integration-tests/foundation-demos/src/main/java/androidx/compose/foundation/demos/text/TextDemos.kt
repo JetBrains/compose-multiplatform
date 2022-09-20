@@ -22,6 +22,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 val TextDemos = DemoCategory(
     "Text",
     listOf(
+        ComposableDemo("Hyphens") { TextDemoHyphens() },
         ComposableDemo("Static text") { TextDemo() },
         ComposableDemo("Canvas") { DrawTextDemo() },
         ComposableDemo("Brush") { TextBrushDemo() },
