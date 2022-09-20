@@ -25,7 +25,6 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.util.fastForEach
-import androidx.compose.ui.util.fastForEachIndexed
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import kotlin.math.abs
 
@@ -84,29 +83,29 @@ internal fun setCollectionItemInfo(node: SemanticsNode, info: AccessibilityNodeI
         val groupedChildren = mutableListOf<SemanticsNode>()
 
         // find all siblings to calculate the index
+        var index = 0
         parentNode.replacedChildren.fastForEach { childNode ->
             if (childNode.config.contains(SemanticsProperties.Selected)) {
                 groupedChildren.add(childNode)
+                // Grouped children is ordered preferring zIndex
+                if (childNode.layoutNode.placeOrder < node.layoutNode.placeOrder) {
+                    index++
+                }
             }
         }
 
         if (groupedChildren.isNotEmpty()) {
             val isHorizontal = calculateIfHorizontallyStacked(groupedChildren)
-
-            groupedChildren.fastForEachIndexed { index, tabNode ->
-                if (tabNode.id == node.id) {
-                    val itemInfo = AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(
-                        if (isHorizontal) 0 else index,
-                        1,
-                        if (isHorizontal) index else 0,
-                        1,
-                        false,
-                        tabNode.config.getOrElse(SemanticsProperties.Selected) { false }
-                    )
-                    if (itemInfo != null) {
-                        info.setCollectionItemInfo(itemInfo)
-                    }
-                }
+            val itemInfo = AccessibilityNodeInfoCompat.CollectionItemInfoCompat.obtain(
+                if (isHorizontal) 0 else index,
+                1,
+                if (isHorizontal) index else 0,
+                1,
+                false,
+                node.config.getOrElse(SemanticsProperties.Selected) { false }
+            )
+            if (itemInfo != null) {
+                info.setCollectionItemInfo(itemInfo)
             }
         }
     }
