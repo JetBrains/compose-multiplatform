@@ -381,5 +381,5 @@ private fun circleIcon(color: Color) = object : Icon {
     override fun getIconHeight() = 16
 }
 ```
-<img width="399" alt="image" src="https://user-images.githubusercontent.com/5963351/190508790-1c56f05e-5d60-4f39-8e0f-75818745695f.png">
+<img width="448" alt="image" src="https://user-images.githubusercontent.com/5963351/191312702-f455ab2c-4c47-4e11-b615-fc67af1af3f9.png">
 
