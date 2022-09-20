@@ -198,8 +198,8 @@ abstract class StudioTask : DefaultTask() {
         check(vmOptions.exists()) {
             "Invalid Studio vm options file location: ${vmOptions.canonicalPath}"
         }
-        ProcessBuilder().apply {
-            inheritIO()
+        val processBuilder = ProcessBuilder().apply {
+            redirectErrorStream(true)
             with(platformUtilities) { command(launchCommandArguments) }
 
             val additionalStudioEnvironmentProperties = mapOf(
@@ -218,7 +218,14 @@ abstract class StudioTask : DefaultTask() {
 
             // Append to the existing environment variables set by gradlew and the user.
             environment().putAll(additionalStudioEnvironmentProperties)
-            start()
+        }
+        val process = processBuilder.start()
+        process.waitFor()
+        // Can't just use inheritIO due to https://github.com/gradle/gradle/issues/16719
+        val outputText = process.stdOutText()
+        println(outputText)
+        check(process.exitValue() == 0) {
+            "Studio failed to start:\n$outputText"
         }
     }
 
@@ -311,4 +318,11 @@ abstract class PlaygroundStudioTask : RootStudioTask() {
         get() = supportRootFolder.resolve("playground-common/idea.properties")
     override val vmOptions
         get() = supportRootFolder.resolve("playground-common/studio.vmoptions")
+}
+
+/**
+ * Returns the contents of the process's standard output stream as a string
+ */
+fun Process.stdOutText(): String {
+    return inputStream.bufferedReader().use { it.readText() }
 }
