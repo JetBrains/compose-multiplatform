@@ -20,15 +20,10 @@ import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
 import androidx.build.dackka.GenerateMetadataTask
 import androidx.build.dependencies.KOTLIN_VERSION
-import androidx.build.doclava.DacOptions
-import androidx.build.doclava.DoclavaTask
-import androidx.build.doclava.GENERATE_DOCS_CONFIG
-import androidx.build.doclava.createGenerateSdkApiTask
 import androidx.build.dokka.Dokka
 import androidx.build.enforceKtlintVersion
 import androidx.build.getAndroidJar
 import androidx.build.getBuildId
-import androidx.build.getCheckoutRoot
 import androidx.build.getDistributionDirectory
 import androidx.build.getKeystore
 import androidx.build.getLibraryByName
@@ -151,13 +146,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             unzipDocsTask,
             unzippedSamplesSources,
             unzipSamplesTask,
-            dependencyClasspath,
-            buildOnServer
-        )
-        configureDoclava(
-            project,
-            unzippedDocsSources,
-            unzipDocsTask,
             dependencyClasspath,
             buildOnServer
         )
@@ -493,110 +481,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         buildOnServer.configure { it.dependsOn(zipTask) }
     }
 
-    private fun configureDoclava(
-        project: Project,
-        unzippedDocsSources: File,
-        unzipDocsTask: TaskProvider<Sync>,
-        dependencyClasspath: FileCollection,
-        buildOnServer: TaskProvider<*>
-    ) {
-        // Hack to force tools.jar (required by com.sun.javadoc) to be available on the Doclava
-        // run-time classpath. Note this breaks the ability to use JDK 9+ for compilation.
-        val doclavaConfiguration = project.configurations.create("doclava")
-        doclavaConfiguration.dependencies.add(project.dependencies.create(DOCLAVA_DEPENDENCY))
-        doclavaConfiguration.dependencies.add(
-            project.dependencies.create(
-                project.files(System.getenv("JAVA_TOOLS_JAR"))
-            )
-        )
-
-        val annotationConfiguration = project.configurations.create("annotation")
-        annotationConfiguration.dependencies.add(
-            project.dependencies.project(
-                mapOf("path" to ":fakeannotations")
-            )
-        )
-
-        val generatedSdk = File(project.buildDir, "generatedsdk")
-        val generateSdkApiTask = createGenerateSdkApiTask(
-            project, doclavaConfiguration, annotationConfiguration, generatedSdk
-        )
-
-        val destDir = File(project.buildDir, "javadoc")
-        val offlineOverride = project.findProject("offlineDocs") as String?
-        val offline = if (offlineOverride != null) { offlineOverride == "true" } else false
-        val dacOptions = DacOptions("androidx", "ANDROIDX_DATA")
-
-        val doclavaTask = project.tasks.register("doclavaDocs", DoclavaTask::class.java) {
-            it.apply {
-                dependsOn(unzipDocsTask)
-                dependsOn(generateSdkApiTask)
-                group = JavaBasePlugin.DOCUMENTATION_GROUP
-                description = "Generates Java documentation in the style of d.android.com. To " +
-                    "generate offline docs use \'-PofflineDocs=true\' parameter.  Places the " +
-                    "documentation in $destDir"
-                dependsOn(doclavaConfiguration)
-                setDocletpath(doclavaConfiguration)
-                destinationDir = destDir
-                classpath = project.getAndroidJar() + dependencyClasspath
-                checksConfig = GENERATE_DOCS_CONFIG
-                extraArgumentsBuilder.apply {
-                    addStringOption(
-                        "templatedir",
-                        "${project.getCheckoutRoot()}/external/doclava/res/assets/templates-sdk"
-                    )
-                    // Note, this is pointing to the root checkout directory.
-                    addStringOption(
-                        "samplesdir",
-                        "${project.rootDir}/samples"
-                    )
-                    addStringOption(
-                        "federate",
-                        listOf("Android", "https://developer.android.com")
-                    )
-                    addStringOption(
-                        "federationapi",
-                        listOf(
-                            "Android",
-                            generateSdkApiTask.get().apiFile?.absolutePath.toString()
-                        )
-                    )
-                    addStringOption("hdf", listOf("android.whichdoc", "online"))
-                    addStringOption("hdf", listOf("android.hasSamples", "true"))
-                    addStringOption("hdf", listOf("dac", "true"))
-
-                    // Specific to reference docs.
-                    if (!offline) {
-                        addStringOption("toroot", "/")
-                        addOption("devsite")
-                        addOption("yamlV2")
-                        addStringOption("dac_libraryroot", dacOptions.libraryroot)
-                        addStringOption("dac_dataname", dacOptions.dataname)
-                    }
-                }
-                it.source(project.fileTree(unzippedDocsSources))
-            }
-        }
-        val zipTask = project.tasks.register("zipDoclavaDocs", Zip::class.java) {
-            it.apply {
-                it.dependsOn(doclavaTask)
-                from(doclavaTask.map { it.destinationDir!! })
-                val baseName = "doclava-$docsType-docs"
-                val buildId = getBuildId()
-                archiveBaseName.set(baseName)
-                archiveVersion.set(buildId)
-                destinationDirectory.set(project.getDistributionDirectory())
-                group = JavaBasePlugin.DOCUMENTATION_GROUP
-                val filePath = "${project.getDistributionDirectory().canonicalPath}/"
-                val fileName = "$baseName-$buildId.zip"
-                val destinationFile = filePath + fileName
-                description = "Zips Java documentation (generated via Doclava in the " +
-                    "style of d.android.com) into $destinationFile"
-            }
-        }
-        buildOnServer.configure { it.dependsOn(zipTask) }
-    }
-
     /**
      * Replace all tests etc with empty task, so we don't run anything
      * it is more effective then task.enabled = false, because we avoid executing deps as well
@@ -638,7 +522,6 @@ open class DocsBuildOnServer : DefaultTask() {
     fun getRequiredFiles(): List<File> {
         return listOf(
             File(distributionDirectory, "dackka-$docsType-docs-$buildId.zip"),
-            File(distributionDirectory, "doclava-$docsType-docs-$buildId.zip"),
             File(distributionDirectory, "dokka-$docsType-docs-$buildId.zip")
         )
     }
@@ -687,8 +570,6 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
  */
 private fun getMetadataRegularFile(project: Project): Provider<RegularFile> =
     project.layout.buildDirectory.file("AndroidXLibraryMetadata.json")
-
-private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
 // List of packages to exclude from both Java and Kotlin refdoc generation
 private val hiddenPackages = listOf(
