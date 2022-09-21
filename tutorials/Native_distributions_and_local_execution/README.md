@@ -5,11 +5,18 @@
 In this tutorial, we'll show you how to create native distributions (installers/packages) for all the supported systems.
 We will also demonstrate how to run an application locally with the same settings as for distributions.
 
+## Available tools
+
+There are two tools available for packaging desktop applications:
+
+1. [jpackage](https://openjdk.java.net/jeps/343), which comes with the JDK.
+2. [Conveyor](https://www.hydraulic.software), which is a third party tool.
+
+This tutorial covers how to use jpackage. Conveyor has [its own tutorial](https://conveyor.hydraulic.dev/latest/tutorial/1-get-started/). The choice of which to use boils down to features/ease of use vs price. Conveyor provides support for online updates, cross-building and [various other features](jpackage-conveyor-comparison.md) but requires [a license](https://hydraulic.software/pricing.html) for non-open source projects. jpackage comes with the JDK but doesn't support online updates and will require a multi-platform CI setup to create packages for each OS.
+
 ## Gradle plugin
 
-`org.jetbrains.compose` Gradle plugin simplifies the packaging of applications into native distributions and running an application locally.
-
-Currently, the plugin uses [jpackage](https://openjdk.java.net/jeps/343) for packaging distributable applications. 
+`org.jetbrains.compose` Gradle plugin simplifies the packaging of applications into native distributions using `jpackage` and running an application locally.
 Distributable applications are self-contained, installable binaries which include all the Java runtime components they need, 
 without requiring an installed JDK on the target system.
 
@@ -118,8 +125,7 @@ to run such applications will be faced with an error like this:
 
 <img alt="" src="attrs-error.png" height="462" />
 
-See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) 
-on how to sign and notarize your application. 
+See [our tutorial](/tutorials/Signing_and_notarization_on_macOS/README.md) on how to sign and notarize your application. 
 
 ## Specifying package version
 

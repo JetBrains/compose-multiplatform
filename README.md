@@ -24,8 +24,7 @@ Preview functionality (check your application UI without building/running it) fo
 * [Swing interoperability](tutorials/Swing_Integration)
 * [Navigation](tutorials/Navigation)
 * [Accessibility](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
-* [Building native distribution](tutorials/Native_distributions_and_local_execution)
-* [Signing and notarization](tutorials/Signing_and_notarization_on_macOS)
+* [Building a native distribution](tutorials/Native_distributions_and_local_execution)
 
 Also, see [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) docs from Google. They were originally written for Android, but most of information applies to Compose for Desktop as well.
 
