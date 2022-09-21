@@ -395,9 +395,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
                 libraryMetadataFile.set(getMetadataRegularFile(project))
-
-                // TODO(b/223712700): change to `true` once bug is resolved
-                showLibraryMetadata = false
+                showLibraryMetadata = true
             }
         }
 
