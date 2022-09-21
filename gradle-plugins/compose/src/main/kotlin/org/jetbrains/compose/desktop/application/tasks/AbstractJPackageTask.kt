@@ -511,6 +511,10 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     override fun jvmToolEnvironment(): MutableMap<String, String> =
         super.jvmToolEnvironment().apply {
+            put("GRADLE_PROJECT_DIR", "${project.projectDir}")
+            put("GRADLE_ROOT_PROJECT_DIR", "${project.rootProject.projectDir}")
+            put("GRADLE_BUILD_DIR", "${project.buildDir}")
+            put("GRADLE_ROOT_BUILD_DIR", "${project.rootProject.buildDir}")
             if (currentOS == OS.Windows) {
                 val wixDir = wixToolsetDir.ioFile
                 val wixPath = wixDir.absolutePath
