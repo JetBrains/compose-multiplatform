@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.tooling.animation
 
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.tooling.AnimateAsStatePreview
 import androidx.compose.ui.tooling.AnimateContentSizePreview
@@ -32,6 +33,7 @@ import androidx.compose.ui.tooling.animation.Utils.searchForAnimation
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import org.junit.Assert
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -82,10 +84,20 @@ class AnimationSearchTest {
         val search = AnimationSearch.AnimateXAsStateSearch { callbacks++ }
         rule.searchForAnimation(search) { AnimateAsStatePreview() }
         assertEquals(2, search.animations.size)
+        search.animations.first().let {
+            Assert.assertTrue(it.animationSpec is SpringSpec)
+            Assert.assertNotNull(it.toolingState)
+            Assert.assertNotNull(it.animatable)
+        }
+        search.animations.last().let {
+            Assert.assertTrue(it.animationSpec is SpringSpec)
+            Assert.assertNotNull(it.toolingState)
+            Assert.assertNotNull(it.animatable)
+        }
         search.track()
         assertEquals(2, callbacks)
-        assertEquals(0.dp, search.animations.last().targetValue)
-        assertEquals(2, search.animations.first().targetValue)
+        assertEquals(0.dp, search.animations.last().animatable.targetValue)
+        assertEquals(2, search.animations.first().animatable.targetValue)
     }
 
     @Test

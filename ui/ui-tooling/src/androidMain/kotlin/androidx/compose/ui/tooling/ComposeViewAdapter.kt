@@ -48,8 +48,9 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.text.font.createFontFamilyResolver
-import androidx.compose.ui.tooling.animation.PreviewAnimationClock
+import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation
 import androidx.compose.ui.tooling.animation.AnimationSearch
+import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
@@ -314,23 +315,29 @@ internal class ComposeViewAdapter : FrameLayout {
             clock.trackAnimatedVisibility(it, ::requestLayout)
         }
         // All supported animations.
-        val supportedSearch = setOf(
+        fun supportedSearch() = setOf(
             transitionSearch,
             animatedVisibilitySearch,
         )
 
-        // All unsupported animations, if API is available.
-        val extraSearch = if (UnsupportedComposeAnimation.apiAvailable) setOf(
+        fun unsupportedSearch() = if (UnsupportedComposeAnimation.apiAvailable) setOf(
             animatedContentSearch,
-            AnimationSearch.AnimateXAsStateSearch { clock.trackAnimateXAsState(it) },
             AnimationSearch.AnimateContentSizeSearch { clock.trackAnimateContentSize(it) },
             AnimationSearch.TargetBasedSearch { clock.trackTargetBasedAnimations(it) },
             AnimationSearch.DecaySearch { clock.trackDecayAnimations(it) },
             AnimationSearch.InfiniteTransitionSearch { clock.trackInfiniteTransition(it) }
         ) else emptyList()
 
+        fun animateXAsStateSearch() =
+            if (AnimateXAsStateComposeAnimation.apiAvailable)
+                setOf(AnimationSearch.AnimateXAsStateSearch { clock.trackAnimateXAsState(it) })
+            else emptyList()
+
+        // All unsupported animations, if API is available.
+        val extraSearch = unsupportedSearch() + animateXAsStateSearch()
+
         // Animations to track in PreviewAnimationClock.
-        val setToTrack = supportedSearch + extraSearch
+        val setToTrack = supportedSearch() + extraSearch
 
         // Animations to search. animatedContentSearch is included even if it's not going to be
         // tracked as it should be excluded from transitionSearch.

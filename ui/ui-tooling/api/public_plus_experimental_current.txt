@@ -26,6 +26,13 @@ package androidx.compose.ui.tooling.animation {
   public final class AnimationSearchKt {
   }
 
+  public final class ToolingState<T> implements androidx.compose.runtime.State<T> {
+    ctor public ToolingState(T? default);
+    method public T! getValue();
+    method public void setValue(T!);
+    property public T! value;
+  }
+
   public final class TransitionComposeAnimationKt {
   }
 
