@@ -274,6 +274,15 @@ internal fun measureLazyList(
             density = density,
         )
 
+        placementAnimator.onMeasured(
+            consumedScroll = consumedScroll.toInt(),
+            layoutWidth = layoutWidth,
+            layoutHeight = layoutHeight,
+            reverseLayout = reverseLayout,
+            positionedItems = positionedItems,
+            itemProvider = itemProvider
+        )
+
         val headerItem = if (headerIndexes.isNotEmpty()) {
             findOrComposeLazyListHeader(
                 composedVisibleItems = positionedItems,
@@ -286,15 +295,6 @@ internal fun measureLazyList(
         } else {
             null
         }
-
-        placementAnimator.onMeasured(
-            consumedScroll = consumedScroll.toInt(),
-            layoutWidth = layoutWidth,
-            layoutHeight = layoutHeight,
-            reverseLayout = reverseLayout,
-            positionedItems = positionedItems,
-            itemProvider = itemProvider
-        )
 
         return LazyListMeasureResult(
             firstVisibleItem = firstItem,
