@@ -2,6 +2,7 @@ package org.jetbrains.compose.videoplayer
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -12,7 +13,6 @@ import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import java.util.*
-
 
 @Composable
 internal actual fun VideoPlayerImpl(url: String, width: Int, height: Int) {
