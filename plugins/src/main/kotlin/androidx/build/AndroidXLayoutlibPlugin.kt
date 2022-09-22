@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package androidx.build.paparazzi
+package androidx.build
 
-import androidx.build.getSupportRootFolder
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
@@ -25,12 +24,12 @@ import org.gradle.api.Project
  *
  * The actual implementation is in AndroidXPaparazziImplPlugin.
  */
-class AndroidXPaparazziPlugin : Plugin<Project> {
+class AndroidXLayoutlibPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val supportRoot = project.getSupportRootFolder()
         project.apply(
             mapOf(
-                "from" to "$supportRoot/buildSrc/apply/applyAndroidXPaparazziImplPlugin.gradle"
+                "from" to "$supportRoot/buildSrc/apply/applyAndroidXLayoutlibImplPlugin.gradle"
             )
         )
     }
