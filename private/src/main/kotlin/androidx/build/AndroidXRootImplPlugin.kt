@@ -139,8 +139,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             project.plugins.withType(JavaPlugin::class.java) {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
-
-            project.tasks.register("validateProperties", ValidatePropertiesTask::class.java)
         }
         project.configureRootProjectForLint()
 

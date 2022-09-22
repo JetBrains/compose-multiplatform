@@ -72,7 +72,6 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
         // Set non-path system properties at configuration time, so that changes invalidate caching
         prefixedSystemProperties(
             "compileSdkVersion" to TARGET_SDK_VERSION,
-            "packageName" to packageName,
             "resourcePackageNames" to packageName, // TODO: Transitive resource packages?
             "modulePath" to modulePath
         )
@@ -80,9 +79,9 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
         // Set the remaining system properties at execution time, after the snapshotting, so that
         // the absolute paths don't affect caching
         doFirst {
+            systemProperty("paparazzi.platform.data.root", paparazziNative.singleFile.canonicalPath)
             prefixedSystemProperties(
-                "platformDir" to platformDirectory.canonicalPath,
-                "platformDataDir" to paparazziNative.singleFile.canonicalPath,
+                "platformDir" to platformDirectory,
                 "assetsDir" to ".", // TODO: Merged assets dirs? (needed for compose?)
                 "resDir" to ".", // TODO: Merged resource dirs? (needed for compose?)
                 "reportDir" to reports.junitXml.outputLocation.get().asFile.canonicalPath,

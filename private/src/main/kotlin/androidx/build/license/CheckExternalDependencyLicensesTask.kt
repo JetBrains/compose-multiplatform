@@ -16,7 +16,7 @@
 package androidx.build.license
 
 import androidx.build.enforceKtlintVersion
-import androidx.build.getCheckoutRoot
+import androidx.build.getPrebuiltsRoot
 import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
@@ -109,7 +109,7 @@ fun Project.configureExternalDependencyLicenseCheck() {
         CheckExternalDependencyLicensesTask.TASK_NAME,
         CheckExternalDependencyLicensesTask::class.java
     ) { task ->
-        task.prebuiltsRoot.set(File(project.getCheckoutRoot(), "prebuilts").absolutePath)
+        task.prebuiltsRoot.set(project.getPrebuiltsRoot().absolutePath)
 
         task.filesToCheck.from(
             project.provider {

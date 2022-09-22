@@ -686,7 +686,7 @@ abstract class SourcesVariantRule : ComponentMetadataRule {
  * Location of the library metadata JSON file that's used by Dackka, represented as a [RegularFile]
  */
 private fun getMetadataRegularFile(project: Project): Provider<RegularFile> =
-    project.layout.buildDirectory.file("SampleLibraryMetadata.json")
+    project.layout.buildDirectory.file("AndroidXLibraryMetadata.json")
 
 private const val DOCLAVA_DEPENDENCY = "com.android:doclava:1.0.6"
 
@@ -705,5 +705,6 @@ private val hiddenPackages = listOf(
 
 // Set of packages to exclude from Java refdoc generation
 private val hiddenPackagesJava = setOf(
-    "androidx.*compose.*"
+    "androidx.*compose.*",
+    "androidx.*glance.*",
 )
