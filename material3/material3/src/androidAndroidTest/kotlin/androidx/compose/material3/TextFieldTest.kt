@@ -50,6 +50,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
@@ -896,8 +897,7 @@ class TextFieldTest {
         rule.runOnIdleWithDensity {
             val iconSize = 24.dp // default icon size
             assertThat(labelPosition.value?.x).isEqualTo(
-                (ExpectedPadding.roundToPx() + IconPadding.roundToPx() + iconSize.roundToPx())
-                    .toFloat()
+                (ExpectedPadding + IconPadding + iconSize).roundToPx().toFloat()
             )
         }
     }
@@ -965,6 +965,112 @@ class TextFieldTest {
                 },
                 trailingIcon = {
                     assertThat(LocalContentColor.current).isEqualTo(MaterialTheme.colorScheme.error)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testTextField_supportingText_position() {
+        val tfSize = Ref<IntSize>()
+        val supportingSize = Ref<IntSize>()
+        val supportingPosition = Ref<Offset>()
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.onGloballyPositioned {
+                    tfSize.value = it.size
+                },
+                supportingText = {
+                    Text(
+                        text = "Supporting",
+                        modifier = Modifier.onGloballyPositioned {
+                            supportingSize.value = it.size
+                            supportingPosition.value = it.positionInRoot()
+                        }
+                    )
+                }
+            )
+        }
+
+        rule.runOnIdleWithDensity {
+            assertThat(supportingPosition.value?.x).isEqualTo(
+                ExpectedPadding.roundToPx().toFloat()
+            )
+            assertThat(supportingPosition.value?.y).isEqualTo(
+                tfSize.value!!.height - supportingSize.value!!.height
+            )
+        }
+    }
+
+    @Test
+    fun testTextField_supportingText_contributesToTextFieldMeasurements() {
+        val tfSize = Ref<IntSize>()
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.onGloballyPositioned {
+                    tfSize.value = it.size
+                },
+                supportingText = { Text("Supporting") }
+            )
+        }
+
+        rule.runOnIdleWithDensity {
+            assertThat(tfSize.value!!.height).isGreaterThan(
+                ExpectedDefaultTextFieldHeight.roundToPx()
+            )
+        }
+    }
+
+    @Test
+    fun testTextField_supportingText_clickFocusesTextField() {
+        var focused = false
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                modifier = Modifier.onFocusChanged { focused = it.isFocused },
+                value = "input",
+                onValueChange = {},
+                supportingText = { Text("Supporting") }
+            )
+        }
+
+        rule.onNodeWithText("Supporting").performClick()
+        rule.runOnIdle {
+            assertThat(focused).isTrue()
+        }
+    }
+
+    @Test
+    fun testTextField_supportingText_colorAndStyle() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                supportingText = {
+                    assertThat(LocalTextStyle.current)
+                        .isEqualTo(MaterialTheme.typography.bodySmall)
+                    assertThat(LocalContentColor.current)
+                        .isEqualTo(MaterialTheme.colorScheme.onSurfaceVariant)
+                }
+            )
+        }
+    }
+
+    @Test
+    fun testTextField_supportingText_error_colorAndStyle() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                isError = true,
+                supportingText = {
+                    assertThat(LocalTextStyle.current)
+                        .isEqualTo(MaterialTheme.typography.bodySmall)
+                    assertThat(LocalContentColor.current)
+                        .isEqualTo(MaterialTheme.colorScheme.error)
                 }
             )
         }

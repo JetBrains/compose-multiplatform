@@ -86,7 +86,10 @@ internal class ContentInViewModifier(
         return computeDestination(localRect, oldSize)
     }
 
-    override suspend fun bringChildIntoView(localRect: Rect) {
+    override suspend fun bringChildIntoView(localRect: () -> Rect?) {
+        // TODO(b/241591211) Read the request's bounds lazily in case they change.
+        @Suppress("NAME_SHADOWING")
+        val localRect = localRect() ?: return
         performBringIntoView(
             source = localRect,
             destination = calculateRectForParent(localRect)

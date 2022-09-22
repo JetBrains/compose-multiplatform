@@ -355,8 +355,8 @@ class TextFieldDecorationBoxTest {
                         visualTransformation = VisualTransformation.None,
                         interactionSource = interactionSource,
                         singleLine = singleLine,
-                        border = {
-                            TextFieldDefaults.BorderBox(
+                        container = {
+                            TextFieldDefaults.OutlinedBorderContainerBox(
                                 enabled = true,
                                 isError = false,
                                 colors = colors,

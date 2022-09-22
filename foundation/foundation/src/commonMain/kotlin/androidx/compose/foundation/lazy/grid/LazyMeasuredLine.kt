@@ -53,7 +53,7 @@ internal class LazyMeasuredLine constructor(
             maxMainAxis = maxOf(maxMainAxis, item.mainAxisSize)
         }
         mainAxisSize = maxMainAxis
-        mainAxisSizeWithSpacings = mainAxisSize + mainAxisSpacing
+        mainAxisSizeWithSpacings = (maxMainAxis + mainAxisSpacing).coerceAtLeast(0)
     }
 
     /**

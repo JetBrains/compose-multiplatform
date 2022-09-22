@@ -1152,4 +1152,56 @@ class LambdaMemoizationTransformTests : ComposeIrTransformTest() {
             class Impl(override val content: @Composable () -> Unit) : Delegate
         """
     )
+
+    @Test // Regression validating b/246399235
+    fun testB246399235() {
+        testCompile(
+            """
+            import androidx.compose.runtime.Composable
+            import androidx.compose.ui.Modifier
+            import androidx.compose.foundation.clickable
+            import androidx.compose.ui.composed
+            import androidx.compose.foundation.interaction.MutableInteractionSource
+
+            @Composable
+            fun Something() {
+                Modifier.noRippleClickable { }
+            }
+
+            inline fun Modifier.noRippleClickable(crossinline onClick: () -> Unit): Modifier {
+                return composed {
+                    clickable(MutableInteractionSource(), null, enabled = false) {
+                        onClick()
+                    }
+                }
+            }
+            """
+        )
+    }
+
+    @Test // Regression validating b/246399235 without function returning a value
+    fun testB246399235_noReturn() {
+        testCompile(
+            """
+            import androidx.compose.runtime.Composable
+
+            @Composable
+            fun Something() {
+                noRippleClickable { }
+            }
+
+            inline fun noRippleClickable(crossinline onClick: () -> Unit) {
+                 composed {
+                    clickable {
+                        onClick()
+                    }
+                 }
+            }
+
+            fun composed(block: @Composable () -> Unit) { }
+
+            fun clickable(onClick: () -> Unit) { }
+            """
+        )
+    }
 }

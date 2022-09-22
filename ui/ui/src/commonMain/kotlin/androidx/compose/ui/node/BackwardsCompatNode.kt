@@ -92,13 +92,22 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
 
     var element: Modifier.Element = element
         set(value) {
-            // TODO(lmr): do we need to do a detach type thing with the previous element?
+            if (isAttached) uninitializeModifier()
             field = value
             kindSet = calculateNodeKindSetFrom(value)
-            if (isAttached) onModifierUpdated(false)
+            if (isAttached) initializeModifier(false)
         }
 
+    override fun onAttach() {
+        initializeModifier(true)
+    }
+
     override fun onDetach() {
+        uninitializeModifier()
+    }
+
+    private fun uninitializeModifier() {
+        check(isAttached)
         val element = element
         if (isKind(Nodes.Locals)) {
             if (element is ModifierLocalProvider<*>) {
@@ -123,11 +132,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
         }
     }
 
-    override fun onAttach() {
-        onModifierUpdated(true)
-    }
-
-    private fun onModifierUpdated(duringAttach: Boolean) {
+    private fun initializeModifier(duringAttach: Boolean) {
         check(isAttached)
         val element = element
         if (isKind(Nodes.Locals)) {

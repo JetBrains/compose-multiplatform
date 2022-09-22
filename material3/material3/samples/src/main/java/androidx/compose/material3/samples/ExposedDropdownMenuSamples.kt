@@ -28,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Sampled
@@ -42,6 +43,8 @@ fun ExposedDropdownMenuSample() {
         onExpandedChange = { expanded = !expanded },
     ) {
         TextField(
+            // The `menuAnchor` modifier must be passed to the text field for correctness.
+            modifier = Modifier.menuAnchor(),
             readOnly = true,
             value = selectedOptionText,
             onValueChange = {},
@@ -59,7 +62,8 @@ fun ExposedDropdownMenuSample() {
                     onClick = {
                         selectedOptionText = selectionOption
                         expanded = false
-                    }
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                 )
             }
         }
@@ -78,6 +82,8 @@ fun EditableExposedDropdownMenuSample() {
         onExpandedChange = { expanded = !expanded },
     ) {
         TextField(
+            // The `menuAnchor` modifier must be passed to the text field for correctness.
+            modifier = Modifier.menuAnchor(),
             value = selectedOptionText,
             onValueChange = { selectedOptionText = it },
             label = { Text("Label") },
@@ -97,7 +103,8 @@ fun EditableExposedDropdownMenuSample() {
                         onClick = {
                             selectedOptionText = selectionOption
                             expanded = false
-                        }
+                        },
+                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
                     )
                 }
             }

@@ -155,10 +155,12 @@ fun BringIntoViewResponderSample() {
                         return Rect(Offset.Zero, localRect.size)
                     }
 
-                    override suspend fun bringChildIntoView(localRect: Rect) {
+                    override suspend fun bringChildIntoView(localRect: () -> Rect?) {
                         // Offset the content right and down by the offset of the requested area so
                         // that it will always be aligned to the top-left of the box.
-                        offset = -localRect.topLeft.round()
+                        localRect()?.let {
+                            offset = -it.topLeft.round()
+                        }
                     }
                 }
             })

@@ -2468,7 +2468,7 @@ private class EmptyLayoutModifier : LayoutModifier {
 }
 
 @OptIn(InternalCoreApi::class)
-private class MockOwner(
+internal class MockOwner(
     val position: IntOffset = IntOffset.Zero,
     override val root: LayoutNode = LayoutNode()
 ) : Owner {
@@ -2691,7 +2691,7 @@ private fun LayoutNode.hitTest(
     hitPointerInputFilters.addAll(hitTestResult)
 }
 
-private fun LayoutNode(
+internal fun LayoutNode(
     x: Int,
     y: Int,
     x2: Int,

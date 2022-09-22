@@ -22,6 +22,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 val TextDemos = DemoCategory(
     "Text",
     listOf(
+        ComposableDemo("Hyphens") { TextDemoHyphens() },
         ComposableDemo("Static text") { TextDemo() },
         ComposableDemo("Canvas") { DrawTextDemo() },
         ComposableDemo("Brush") { TextBrushDemo() },
@@ -38,6 +39,7 @@ val TextDemos = DemoCategory(
         ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
         ComposableDemo("Interactive text") { InteractiveTextDemo() },
         ComposableDemo("Ellipsize and letterspacing") { EllipsizeWithLetterSpacing() },
+        ComposableDemo("Line breaking") { TextLineBreakingDemo() },
         DemoCategory(
             "Text Overflow",
             listOf(

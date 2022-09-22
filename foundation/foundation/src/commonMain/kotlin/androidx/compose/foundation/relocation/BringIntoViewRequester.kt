@@ -138,12 +138,12 @@ private class BringIntoViewRequesterModifier(
      * is null) be brought into view by the [parent]&nbsp;[BringIntoViewParent].
      */
     suspend fun bringIntoView(rect: Rect?) {
-        val layoutCoordinates = layoutCoordinates ?: return
-
-        // If the rect is not specified, use a rectangle representing the entire composable.
-        val sourceRect = rect ?: layoutCoordinates.size.toSize().toRect()
-
-        // Convert the rect into parent coordinates.
-        parent.bringChildIntoView(sourceRect, layoutCoordinates)
+        parent.bringChildIntoView(layoutCoordinates ?: return) {
+            // If the rect is not specified, use a rectangle representing the entire composable.
+            // If the coordinates are detached when this call is made, we don't bother even
+            // submitting the request, but if the coordinates become detached while the request
+            // is being handled we just return a null Rect.
+            rect ?: layoutCoordinates?.size?.toSize()?.toRect()
+        }
     }
 }

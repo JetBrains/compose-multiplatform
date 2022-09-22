@@ -687,7 +687,7 @@ private class LazyStaggeredGridMeasuredItem(
         size + if (isVertical) placeable.height else placeable.width
     }
 
-    val sizeWithSpacings: Int = mainAxisSize + spacing
+    val sizeWithSpacings: Int = (mainAxisSize + spacing).coerceAtLeast(0)
 
     val crossAxisSize: Int = placeables.fastMaxOfOrNull {
         if (isVertical) it.width else it.height

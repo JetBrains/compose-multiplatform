@@ -35,9 +35,12 @@ internal actual fun rememberDefaultBringIntoViewParent(): BringIntoViewParent {
  * A [BringIntoViewParent] that delegates to the [View] hosting the composition.
  */
 private class AndroidBringIntoViewParent(private val view: View) : BringIntoViewParent {
-    override suspend fun bringChildIntoView(rect: Rect, childCoordinates: LayoutCoordinates) {
+    override suspend fun bringChildIntoView(
+        childCoordinates: LayoutCoordinates,
+        boundsProvider: () -> Rect?
+    ) {
         val childOffset = childCoordinates.positionInRoot()
-        val rootRect = rect.translate(childOffset)
+        val rootRect = boundsProvider()?.translate(childOffset) ?: return
         view.requestRectangleOnScreen(rootRect.toRect(), false)
     }
 }

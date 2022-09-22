@@ -17,6 +17,7 @@
 package androidx.compose.ui.text
 
 import java.util.Locale as JavaLocale
+import android.os.Build
 import android.text.Spannable
 import android.text.SpannableString
 import android.text.Spanned
@@ -39,10 +40,26 @@ import androidx.compose.ui.text.android.LayoutCompat.ALIGN_LEFT
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_NORMAL
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_OPPOSITE
 import androidx.compose.ui.text.android.LayoutCompat.ALIGN_RIGHT
+import androidx.compose.ui.text.android.LayoutCompat.BREAK_STRATEGY_BALANCED
+import androidx.compose.ui.text.android.LayoutCompat.BREAK_STRATEGY_HIGH_QUALITY
+import androidx.compose.ui.text.android.LayoutCompat.BREAK_STRATEGY_SIMPLE
 import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_ALIGNMENT
+import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_HYPHENATION_FREQUENCY
+import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_BREAK_STRATEGY
 import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_JUSTIFICATION_MODE
 import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_LINESPACING_MULTIPLIER
+import androidx.compose.ui.text.android.LayoutCompat.HYPHENATION_FREQUENCY_NONE
+import androidx.compose.ui.text.android.LayoutCompat.HYPHENATION_FREQUENCY_NORMAL
+import androidx.compose.ui.text.android.LayoutCompat.HYPHENATION_FREQUENCY_NORMAL_FAST
+import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_LINE_BREAK_STYLE
+import androidx.compose.ui.text.android.LayoutCompat.DEFAULT_LINE_BREAK_WORD_STYLE
 import androidx.compose.ui.text.android.LayoutCompat.JUSTIFICATION_MODE_INTER_WORD
+import androidx.compose.ui.text.android.LayoutCompat.LINE_BREAK_STYLE_LOOSE
+import androidx.compose.ui.text.android.LayoutCompat.LINE_BREAK_STYLE_NONE
+import androidx.compose.ui.text.android.LayoutCompat.LINE_BREAK_STYLE_NORMAL
+import androidx.compose.ui.text.android.LayoutCompat.LINE_BREAK_STYLE_STRICT
+import androidx.compose.ui.text.android.LayoutCompat.LINE_BREAK_WORD_STYLE_NONE
+import androidx.compose.ui.text.android.LayoutCompat.LINE_BREAK_WORD_STYLE_PHRASE
 import androidx.compose.ui.text.android.TextLayout
 import androidx.compose.ui.text.android.selection.WordBoundary
 import androidx.compose.ui.text.android.style.IndentationFixSpan
@@ -53,6 +70,8 @@ import androidx.compose.ui.text.platform.AndroidTextPaint
 import androidx.compose.ui.text.platform.extensions.setSpan
 import androidx.compose.ui.text.platform.isIncludeFontPaddingEnabled
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
+import androidx.compose.ui.text.style.Hyphens
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -103,6 +122,7 @@ internal class AndroidParagraph(
 
     @VisibleForTesting
     internal val charSequence: CharSequence
+
     init {
         require(constraints.minHeight == 0 && constraints.minWidth == 0) {
             "Setting Constraints.minWidth and Constraints.minHeight is not supported, " +
@@ -128,6 +148,12 @@ internal class AndroidParagraph(
             else -> DEFAULT_JUSTIFICATION_MODE
         }
 
+        val hyphens = toLayoutHyphenationFrequency(style.paragraphStyle.hyphens)
+
+        val breakStrategy = toLayoutBreakStrategy(style.lineBreak?.strategy)
+        val lineBreakStyle = toLayoutLineBreakStyle(style.lineBreak?.strictness)
+        val lineBreakWordStyle = toLayoutLineBreakWordStyle(style.lineBreak?.wordBreak)
+
         val ellipsize = if (ellipsis) {
             TextUtils.TruncateAt.END
         } else {
@@ -138,7 +164,11 @@ internal class AndroidParagraph(
             alignment = alignment,
             justificationMode = justificationMode,
             ellipsize = ellipsize,
-            maxLines = maxLines
+            maxLines = maxLines,
+            hyphens = hyphens,
+            breakStrategy = breakStrategy,
+            lineBreakStyle = lineBreakStyle,
+            lineBreakWordStyle = lineBreakWordStyle
         )
 
         // Ellipsize if there's not enough vertical space to fit all lines
@@ -154,7 +184,11 @@ internal class AndroidParagraph(
                     // This will allow to have an ellipsis on that single line. If we measured with
                     // 0 maxLines, it would measure all lines with no ellipsis even though the first
                     // line might be partially visible
-                    maxLines = calculatedMaxLines.coerceAtLeast(1)
+                    maxLines = calculatedMaxLines.coerceAtLeast(1),
+                    hyphens = hyphens,
+                    breakStrategy = breakStrategy,
+                    lineBreakStyle = lineBreakStyle,
+                    lineBreakWordStyle = lineBreakWordStyle
                 )
             } else {
                 firstLayout
@@ -484,7 +518,11 @@ internal class AndroidParagraph(
         alignment: Int,
         justificationMode: Int,
         ellipsize: TextUtils.TruncateAt?,
-        maxLines: Int
+        maxLines: Int,
+        hyphens: Int,
+        breakStrategy: Int,
+        lineBreakStyle: Int,
+        lineBreakWordStyle: Int
     ) =
         TextLayout(
             charSequence = charSequence,
@@ -498,7 +536,11 @@ internal class AndroidParagraph(
             justificationMode = justificationMode,
             layoutIntrinsics = paragraphIntrinsics.layoutIntrinsics,
             includePadding = paragraphIntrinsics.style.isIncludeFontPaddingEnabled(),
-            fallbackLineSpacing = true
+            fallbackLineSpacing = true,
+            hyphenationFrequency = hyphens,
+            breakStrategy = breakStrategy,
+            lineBreakStyle = lineBreakStyle,
+            lineBreakWordStyle = lineBreakWordStyle
         )
 }
 
@@ -514,6 +556,43 @@ private fun toLayoutAlign(align: TextAlign?): Int = when (align) {
     TextAlign.End -> ALIGN_OPPOSITE
     else -> DEFAULT_ALIGNMENT
 }
+
+@OptIn(ExperimentalTextApi::class, InternalPlatformTextApi::class)
+private fun toLayoutHyphenationFrequency(hyphens: Hyphens?): Int = when (hyphens) {
+    Hyphens.Auto -> if (Build.VERSION.SDK_INT <= 32) {
+        HYPHENATION_FREQUENCY_NORMAL
+    } else {
+        HYPHENATION_FREQUENCY_NORMAL_FAST
+    }
+    Hyphens.None -> HYPHENATION_FREQUENCY_NONE
+    else -> DEFAULT_HYPHENATION_FREQUENCY
+}
+
+@OptIn(ExperimentalTextApi::class, InternalPlatformTextApi::class)
+private fun toLayoutBreakStrategy(breakStrategy: LineBreak.Strategy?): Int = when (breakStrategy) {
+    LineBreak.Strategy.Simple -> BREAK_STRATEGY_SIMPLE
+    LineBreak.Strategy.HighQuality -> BREAK_STRATEGY_HIGH_QUALITY
+    LineBreak.Strategy.Balanced -> BREAK_STRATEGY_BALANCED
+    else -> DEFAULT_BREAK_STRATEGY
+}
+
+@OptIn(ExperimentalTextApi::class, InternalPlatformTextApi::class)
+private fun toLayoutLineBreakStyle(lineBreakStrictness: LineBreak.Strictness?): Int =
+    when (lineBreakStrictness) {
+        LineBreak.Strictness.Default -> LINE_BREAK_STYLE_NONE
+        LineBreak.Strictness.Loose -> LINE_BREAK_STYLE_LOOSE
+        LineBreak.Strictness.Normal -> LINE_BREAK_STYLE_NORMAL
+        LineBreak.Strictness.Strict -> LINE_BREAK_STYLE_STRICT
+        else -> DEFAULT_LINE_BREAK_STYLE
+    }
+
+@OptIn(ExperimentalTextApi::class, InternalPlatformTextApi::class)
+private fun toLayoutLineBreakWordStyle(lineBreakWordStyle: LineBreak.WordBreak?): Int =
+    when (lineBreakWordStyle) {
+        LineBreak.WordBreak.Default -> LINE_BREAK_WORD_STYLE_NONE
+        LineBreak.WordBreak.Phrase -> LINE_BREAK_WORD_STYLE_PHRASE
+        else -> DEFAULT_LINE_BREAK_WORD_STYLE
+    }
 
 @OptIn(InternalPlatformTextApi::class)
 private fun TextLayout.numberOfLinesThatFitMaxHeight(maxHeight: Int): Int {

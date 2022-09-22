@@ -425,6 +425,55 @@ class OutlinedTextFieldTest {
     }
 
     @Test
+    fun testOutlinedTextField_labelWidth_isNotAffectedByTrailingIcon_whenFocused() {
+        val textFieldWidth = 100.dp
+        val labelRequestedWidth = 65.dp
+        val labelSize = Ref<IntSize>()
+        val trailingSize = Ref<IntSize>()
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                modifier = Modifier.testTag(TextfieldTag).requiredWidth(textFieldWidth),
+                label = {
+                    Text(
+                        text = "Label",
+                        modifier = Modifier.width(labelRequestedWidth).onGloballyPositioned {
+                            labelSize.value = it.size
+                        }
+                    )
+                },
+                trailingIcon = {
+                    Icon(
+                        Icons.Default.Favorite,
+                        null,
+                        modifier = Modifier.onGloballyPositioned {
+                            trailingSize.value = it.size
+                        },
+                    )
+                },
+            )
+        }
+
+        // click to focus
+        rule.onNodeWithTag(TextfieldTag).performClick()
+
+        rule.runOnIdleWithDensity {
+            assertThat(labelSize.value).isNotNull()
+            assertThat(trailingSize.value).isNotNull()
+
+            // First, check that label's requested size would be too wide if it's on the same line
+            // as the icon + padding
+            assertThat((labelRequestedWidth + IconPadding).roundToPx() + trailingSize.value!!.width)
+                .isGreaterThan(textFieldWidth.roundToPx())
+
+            // Next, assert that the requested size is satisfied anyway because the trailing icon
+            // does not affect it.
+            assertThat(labelSize.value?.width).isEqualTo(labelRequestedWidth.roundToPx())
+        }
+    }
+
+    @Test
     fun testOutlinedTextField_labelPosition_whenInput() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()

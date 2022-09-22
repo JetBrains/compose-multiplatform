@@ -448,7 +448,7 @@ class CustomAccessibilityAction(val label: String, val action: () -> Boolean) {
  * Accessibility range information, to represent the status of a progress bar or
  * seekable progress bar.
  *
- * @param current current value in the range
+ * @param current current value in the range. Must not be NaN.
  * @param range range of this node
  * @param steps if greater than `0`, specifies the number of discrete values, evenly distributed
  * between across the whole value range. If `0`, any value from the range specified can be chosen.
@@ -460,6 +460,10 @@ class ProgressBarRangeInfo(
     /*@IntRange(from = 0)*/
     val steps: Int = 0
 ) {
+    init {
+        require(!current.isNaN()) { "current must not be NaN" }
+    }
+
     companion object {
         /**
          * Accessibility range information to present indeterminate progress bar

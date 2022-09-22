@@ -315,11 +315,11 @@ class FocusableTest {
 
     @Test
     fun focusable_requestsBringIntoView_whenFocused() {
-        val requestedRects = mutableListOf<Rect>()
+        val requestedRects = mutableListOf<Rect?>()
         val bringIntoViewResponder = object : BringIntoViewResponder {
             override fun calculateRectForParent(localRect: Rect): Rect = localRect
-            override suspend fun bringChildIntoView(localRect: Rect) {
-                requestedRects += localRect
+            override suspend fun bringChildIntoView(localRect: () -> Rect?) {
+                requestedRects += localRect()
             }
         }
         val focusRequester = FocusRequester()

@@ -51,7 +51,9 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -59,6 +61,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -177,7 +180,7 @@ class LazyStaggeredGridArrangementsTest(
     }
 
     @Test
-    fun arrangement_negative_itemsVisible() {
+    fun negativeSpacing_itemsVisible() {
         state = LazyStaggeredGridState()
         rule.setContent {
             LazyStaggeredGrid(
@@ -216,5 +219,33 @@ class LazyStaggeredGridArrangementsTest(
         rule.onNodeWithTag("2")
             .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
             .assertMainAxisSizeIsEqualTo(itemSizeDp * 2)
+    }
+
+    @Test
+    fun negativeSpacingLargerThanItem_itemsVisible() {
+        val state = LazyStaggeredGridState(initialFirstVisibleItemIndex = 2)
+        val largerThanItemSize = itemSizeDp * 1.5f
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                modifier = Modifier.axisSize(crossAxis = itemSizeDp * 2, mainAxis = itemSizeDp),
+                mainAxisArrangement = Arrangement.spacedBy(-largerThanItemSize),
+                state = state
+            ) {
+                items(8) { index ->
+                    Box(Modifier.size(itemSizeDp).testTag(index.toString()))
+                }
+            }
+        }
+
+        repeat(8) {
+            rule.onNodeWithTag("$it")
+                .assertMainAxisStartPositionInRootIsEqualTo(0.dp)
+        }
+
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            Truth.assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
     }
 }
