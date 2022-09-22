@@ -78,12 +78,14 @@ android {
         main.resources.srcDirs += "src/main/proto"
     }
 
-    externalNativeBuild {
-        cmake {
-            path "src/main/cpp/CMakeLists.txt"
-            version libs.versions.cmake.get()
-        }
-    }
+// We don't need NDK for developing Compose Multiplatform.
+// It is only needed for Layout inspector for Android target.
+//    externalNativeBuild {
+//        cmake {
+//            path "src/main/cpp/CMakeLists.txt"
+//            version libs.versions.cmake.get()
+//        }
+//    }
 
     lintOptions {
         // Restriction not important for inspectors, which only runs at dev-time
