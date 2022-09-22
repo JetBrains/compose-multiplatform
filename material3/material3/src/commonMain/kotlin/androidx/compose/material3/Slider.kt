@@ -44,6 +44,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSizeIn
@@ -737,7 +738,10 @@ object SliderDefaults {
         val activeTrackColor = colors.trackColor(enabled, active = true)
         val inactiveTickColor = colors.tickColor(enabled, active = false)
         val activeTickColor = colors.tickColor(enabled, active = true)
-        Canvas(modifier.fillMaxWidth()) {
+        Canvas(modifier
+            .fillMaxWidth()
+            .height(TrackHeight)
+        ) {
             val isRtl = layoutDirection == LayoutDirection.Rtl
             val sliderLeft = Offset(0f, center.y)
             val sliderRight = Offset(size.width, center.y)
@@ -878,6 +882,10 @@ private fun SliderImpl(
         },
         modifier = modifier
             .minimumTouchTargetSize()
+            .requiredSizeIn(
+                minWidth = SliderTokens.HandleWidth,
+                minHeight = SliderTokens.HandleHeight
+            )
             .sliderSemantics(
                 value,
                 enabled,
@@ -891,29 +899,31 @@ private fun SliderImpl(
             .then(drag)
     ) { measurables, constraints ->
 
-        val thumbPlaceable = measurables.first { it.layoutId == SliderComponents.THUMB }.measure(
-            constraints
+        val thumbPlaceable = measurables.first {
+            it.layoutId == SliderComponents.THUMB
+        }.measure(constraints)
+
+        val maxTrackWidth = constraints.maxWidth - thumbPlaceable.width
+        val trackPlaceable = measurables.first {
+            it.layoutId == SliderComponents.TRACK
+        }.measure(
+            constraints.copy(
+                minWidth = 0,
+                maxWidth = maxTrackWidth,
+                minHeight = 0
+            )
         )
 
-        val maxTrackWidth = max(constraints.minWidth, constraints.maxWidth - thumbPlaceable.width)
-        val trackPlaceable = measurables.first { it.layoutId == SliderComponents.TRACK }.measure(
-            constraints.copy(maxWidth = maxTrackWidth)
-        )
-
-        val sliderWidth = max(SliderTokens.HandleWidth.roundToPx(), constraints.maxWidth)
-        val sliderHeight = maxOf(
-            SliderTokens.HandleHeight.roundToPx(),
-            trackPlaceable.height,
-            thumbPlaceable.height
-        )
+        val sliderWidth = thumbPlaceable.width + trackPlaceable.width
+        val sliderHeight = max(trackPlaceable.height, thumbPlaceable.height)
 
         thumbWidth.value = thumbPlaceable.width.toFloat()
         totalWidth.value = sliderWidth
 
         val trackOffsetX = thumbPlaceable.width / 2
         val thumbOffsetX = ((trackPlaceable.width) * positionFraction).roundToInt()
-        val trackOffsetY = sliderHeight / 2 - trackPlaceable.height / 2
-        val thumbOffsetY = sliderHeight / 2 - thumbPlaceable.height / 2
+        val trackOffsetY = (sliderHeight - trackPlaceable.height) / 2
+        val thumbOffsetY = (sliderHeight - thumbPlaceable.height) / 2
 
         layout(
             sliderWidth,
