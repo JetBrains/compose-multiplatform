@@ -122,6 +122,12 @@ abstract class SdkResourceGenerator : DefaultTask() {
 
         @JvmStatic
         fun generateForHostTest(project: Project) {
+            // We have this error on Windows:
+            // Could not create task ':compose:compiler:compiler:integration-tests:generateSdkResource'.
+            // > this and base files have different roots: ~\.m2\repository and ...\compose-jb\compose\frameworks\support\compose\compiler\compiler\integration-tests.
+            val os = System.getProperty("os.name").lowercase()
+            if (os.startsWith("win")) return
+
             val provider = registerSdkResourceGeneratorTask(project)
             val extension = project.extensions.getByType<JavaPluginExtension>()
             val testSources = extension.sourceSets.getByName("test")
