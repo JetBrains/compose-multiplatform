@@ -119,6 +119,7 @@ class TextFieldTest {
     private val ExpectedDefaultTextFieldWidth = TextFieldDefaults.MinWidth
     private val ExpectedPadding = TextFieldPadding
     private val IconPadding = HorizontalIconPadding
+    private val TextFieldWidth = 300.dp
     private val TextFieldTag = "textField"
 
     @get:Rule
@@ -668,7 +669,6 @@ class TextFieldTest {
     @Test
     fun testTextField_trailingAndLeading_sizeAndPosition_defaultIcon() {
         val textFieldHeight = 60.dp
-        val textFieldWidth = 300.dp
         val leadingPosition = Ref<Offset>()
         val leadingSize = Ref<IntSize>()
         val trailingPosition = Ref<Offset>()
@@ -680,7 +680,7 @@ class TextFieldTest {
                 TextField(
                     value = "text",
                     onValueChange = {},
-                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
                     leadingIcon = {
                         Icon(
                             Icons.Default.Favorite,
@@ -724,7 +724,7 @@ class TextFieldTest {
                 )
                 assertThat(trailingPosition.value?.x).isEqualTo(
                     (
-                        textFieldWidth.roundToPx() - IconPadding.roundToPx() -
+                        TextFieldWidth.roundToPx() - IconPadding.roundToPx() -
                             trailingSize.value!!.width
                         ).toFloat()
                 )
@@ -740,7 +740,6 @@ class TextFieldTest {
     @Test
     fun testTextField_trailingAndLeading_sizeAndPosition_iconButton() {
         val textFieldHeight = 80.dp
-        val textFieldWidth = 300.dp
         val density = Density(2f)
 
         var leadingPosition: Offset? = null
@@ -753,7 +752,7 @@ class TextFieldTest {
                 TextField(
                     value = "text",
                     onValueChange = {},
-                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
                     leadingIcon = {
                         IconButton(
                             onClick = {},
@@ -796,7 +795,7 @@ class TextFieldTest {
                     IntSize(size.roundToPx(), size.roundToPx())
                 )
                 assertThat(trailingPosition?.x).isEqualTo(
-                    (textFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
+                    (TextFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
                 )
                 assertThat(trailingPosition?.y)
                     .isEqualTo(
@@ -810,7 +809,6 @@ class TextFieldTest {
     @Test
     fun testTextField_trailingAndLeading_sizeAndPosition_nonDefaultSizeIcon() {
         val textFieldHeight = 80.dp
-        val textFieldWidth = 300.dp
         val density = Density(2f)
         val size = 70.dp
 
@@ -824,7 +822,7 @@ class TextFieldTest {
                 TextField(
                     value = "text",
                     onValueChange = {},
-                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
                     leadingIcon = {
                         Box(
                             Modifier.size(size).onGloballyPositioned {
@@ -859,7 +857,7 @@ class TextFieldTest {
                     IntSize(size.roundToPx(), size.roundToPx())
                 )
                 assertThat(trailingPosition?.x).isEqualTo(
-                    (textFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
+                    (TextFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
                 )
                 assertThat(trailingPosition?.y)
                     .isEqualTo(

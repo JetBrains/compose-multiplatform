@@ -107,7 +107,7 @@ class SnackbarHostTest {
             }
         }
 
-        rule.waitUntil { parent.children.all { it.isCompleted } }
+        rule.waitUntil(timeoutMillis = 5_000) { parent.children.all { it.isCompleted } }
         Truth.assertThat(resultedInvocation).isEqualTo("0123456789")
     }
 
@@ -139,7 +139,7 @@ class SnackbarHostTest {
             Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
         }
 
-        rule.waitUntil(timeoutMillis = 5_000) { job2.isCompleted }
+        rule.waitUntil(timeoutMillis = 10_000) { job2.isCompleted }
     }
 
     @Test

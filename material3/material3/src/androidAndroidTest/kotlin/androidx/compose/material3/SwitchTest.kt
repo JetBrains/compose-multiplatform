@@ -384,7 +384,7 @@ class SwitchTest {
             ) {
                 Switch(
                     checked = checked,
-                    onCheckedChange = if (clickable) { {} } else null,
+                    onCheckedChange = if (clickable) { {} } else { null },
                     enabled = false
                 )
             }

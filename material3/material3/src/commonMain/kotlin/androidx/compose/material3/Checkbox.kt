@@ -97,7 +97,9 @@ fun Checkbox(
         state = ToggleableState(checked),
         onClick = if (onCheckedChange != null) {
             { onCheckedChange(!checked) }
-        } else null,
+        } else {
+            null
+        },
         modifier = modifier,
         enabled = enabled,
         colors = colors,

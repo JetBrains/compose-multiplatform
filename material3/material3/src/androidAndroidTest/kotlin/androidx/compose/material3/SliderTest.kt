@@ -77,6 +77,7 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class SliderTest {
     private val tag = "slider"
+    private val SliderTolerance = 0.003f
 
     @get:Rule
     val rule = createComposeRule()
@@ -216,7 +217,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX + 100 - slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -251,7 +252,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX + 100 - slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -280,7 +281,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX + 50)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -337,7 +338,7 @@ class SliderTest {
             }
 
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -368,7 +369,7 @@ class SliderTest {
             }
 
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -403,7 +404,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 100 + slop)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.003f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -434,7 +435,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 50)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value).isWithin(0.002f).of(expected)
+            Truth.assertThat(state.value).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -749,7 +750,7 @@ class SliderTest {
             }
         rule.runOnIdle {
             Truth.assertThat(state.value.start).isEqualTo(0f)
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -787,7 +788,7 @@ class SliderTest {
             }
         rule.runOnIdle {
             Truth.assertThat(state.value.start).isEqualTo(0f)
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -855,7 +856,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX + 50)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
             Truth.assertThat(state.value.start).isEqualTo(0f)
         }
     }
@@ -889,7 +890,7 @@ class SliderTest {
             }
 
         rule.runOnIdle {
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -927,7 +928,7 @@ class SliderTest {
             }
         rule.runOnIdle {
             Truth.assertThat(state.value.start).isEqualTo(0f)
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -968,7 +969,7 @@ class SliderTest {
             }
         rule.runOnIdle {
             Truth.assertThat(state.value.start).isEqualTo(0f)
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -1004,7 +1005,7 @@ class SliderTest {
             }
         rule.runOnIdle {
             Truth.assertThat(state.value.start).isEqualTo(0.5f)
-            Truth.assertThat(state.value.endInclusive).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.endInclusive).isWithin(SliderTolerance).of(expected)
         }
     }
 
@@ -1039,7 +1040,7 @@ class SliderTest {
                 expected = calculateFraction(left, right, centerX - 100)
             }
         rule.runOnIdle {
-            Truth.assertThat(state.value.start).isWithin(0.001f).of(expected)
+            Truth.assertThat(state.value.start).isWithin(SliderTolerance).of(expected)
             Truth.assertThat(state.value.endInclusive).isEqualTo(0.5f)
         }
     }
