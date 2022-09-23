@@ -4,6 +4,9 @@ sourceSets {
     main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
 
+    main.java.srcDirs += "${supportRootFolder}/benchmark/benchmark-darwin-gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}/benchmark/benchmark-darwin-gradle-plugin/src/main/resources"
+
     main.java.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
             "/resources"
@@ -15,6 +18,11 @@ sourceSets {
             "src/main/kotlin"
 }
 
+dependencies {
+    // This is for androidx.benchmark.darwin
+    implementation(libs.apacheCommonsMath)
+}
+
 gradlePlugin {
     plugins {
         benchmark {
@@ -24,6 +32,10 @@ gradlePlugin {
         inspection {
             id = "androidx.inspection"
             implementationClass = "androidx.inspection.gradle.InspectionPlugin"
+        }
+        darwinBenchmark {
+            id = "androidx.benchmark.darwin"
+            implementationClass = "androidx.benchmark.darwin.gradle.DarwinBenchmarkPlugin"
         }
     }
 }
