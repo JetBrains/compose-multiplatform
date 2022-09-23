@@ -22,7 +22,6 @@ import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.VectorConverter
 import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,7 +30,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
-import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -44,13 +42,10 @@ import kotlinx.coroutines.launch
  * This class is responsible for detecting when item position changed, figuring our start/end
  * offsets and starting the animations.
  */
-@OptIn(ExperimentalFoundationApi::class)
 internal class LazyGridItemPlacementAnimator(
     private val scope: CoroutineScope,
     private val isVertical: Boolean
 ) {
-    private var slotsPerLine = 0
-
     // state containing an animation and all relevant info for each item.
     private val keyToItemInfoMap = mutableMapOf<Any, ItemInfo>()
 
@@ -75,18 +70,16 @@ internal class LazyGridItemPlacementAnimator(
         consumedScroll: Int,
         layoutWidth: Int,
         layoutHeight: Int,
-        slotsPerLine: Int,
         reverseLayout: Boolean,
         positionedItems: MutableList<LazyGridPositionedItem>,
         measuredItemProvider: LazyMeasuredItemProvider,
+        spanLayoutProvider: LazyGridSpanLayoutProvider
     ) {
         if (!positionedItems.fastAny { it.hasAnimations }) {
             // no animations specified - no work needed
             reset()
             return
         }
-
-        this.slotsPerLine = slotsPerLine
 
         val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
 
@@ -171,7 +164,9 @@ internal class LazyGridItemPlacementAnimator(
                             scrolledBy = notAnimatableDelta,
                             fallback = fallback,
                             reverseLayout = reverseLayout,
-                            mainAxisLayoutSize = mainAxisLayoutSize
+                            mainAxisLayoutSize = mainAxisLayoutSize,
+                            visibleItems = positionedItems,
+                            spanLayoutProvider = spanLayoutProvider
                         )
                     }
                     val targetPlaceableOffset = if (isVertical) {
@@ -273,7 +268,9 @@ internal class LazyGridItemPlacementAnimator(
                         scrolledBy = notAnimatableDelta,
                         fallback = mainAxisLayoutSize,
                         reverseLayout = reverseLayout,
-                        mainAxisLayoutSize = mainAxisLayoutSize
+                        mainAxisLayoutSize = mainAxisLayoutSize,
+                        visibleItems = positionedItems,
+                        spanLayoutProvider = spanLayoutProvider
                     )
                     val targetOffset = if (reverseLayout) {
                         mainAxisLayoutSize - absoluteTargetOffset - measuredItem.mainAxisSize
@@ -354,27 +351,54 @@ internal class LazyGridItemPlacementAnimator(
         scrolledBy: IntOffset,
         reverseLayout: Boolean,
         mainAxisLayoutSize: Int,
-        fallback: Int
+        fallback: Int,
+        visibleItems: List<LazyGridPositionedItem>,
+        spanLayoutProvider: LazyGridSpanLayoutProvider
     ): Int {
-        require(slotsPerLine != 0)
-        val beforeViewportStart =
-            if (!reverseLayout) viewportEndItemIndex < index else viewportEndItemIndex > index
         val afterViewportEnd =
+            if (!reverseLayout) viewportEndItemIndex < index else viewportEndItemIndex > index
+        val beforeViewportStart =
             if (!reverseLayout) viewportStartItemIndex > index else viewportStartItemIndex < index
         return when {
-            beforeViewportStart -> {
-                val diff = ((index - viewportEndItemIndex).absoluteValue + slotsPerLine - 1) /
-                    slotsPerLine
-                mainAxisLayoutSize + viewportEndItemNotVisiblePartSize +
-                    averageLineMainAxisSize * (diff - 1) +
-                    scrolledBy.mainAxis
-            }
             afterViewportEnd -> {
-                val diff = ((viewportStartItemIndex - index).absoluteValue + slotsPerLine - 1) /
-                    slotsPerLine
-                viewportStartItemNotVisiblePartSize - mainAxisSizeWithSpacings -
-                    averageLineMainAxisSize * (diff - 1) +
-                    scrolledBy.mainAxis
+                val fromIndex = if (!reverseLayout) {
+                    // viewportEndItemIndex is the last item in the line already
+                    viewportEndItemIndex + 1
+                } else {
+                    spanLayoutProvider.firstIndexInNextLineAfter(index)
+                }
+                val toIndex = spanLayoutProvider.lastIndexInPreviousLineBefore(
+                    if (!reverseLayout) index else viewportEndItemIndex
+                )
+                mainAxisLayoutSize + viewportEndItemNotVisiblePartSize + scrolledBy.mainAxis +
+                    // add sizes of the lines between the last visible one and this one.
+                    spanLayoutProvider.getLinesMainAxisSizesSum(
+                        fromIndex = fromIndex,
+                        toIndex = toIndex,
+                        averageLineMainAxisSize = averageLineMainAxisSize,
+                        visibleItems = visibleItems
+                    )
+            }
+            beforeViewportStart -> {
+                val fromIndex = spanLayoutProvider.firstIndexInNextLineAfter(
+                    if (!reverseLayout) index else viewportStartItemIndex
+                )
+                val toIndex = if (!reverseLayout) {
+                    // viewportStartItemIndex is the first item in the line already
+                    viewportStartItemIndex - 1
+                } else {
+                    spanLayoutProvider.lastIndexInPreviousLineBefore(index)
+                }
+                viewportStartItemNotVisiblePartSize + scrolledBy.mainAxis +
+                    // minus the size of this item as we are looking for the start offset of it.
+                    -mainAxisSizeWithSpacings +
+                    // minus sizes of the lines between the first visible one and this one.
+                    -spanLayoutProvider.getLinesMainAxisSizesSum(
+                        fromIndex = fromIndex,
+                        toIndex = toIndex,
+                        averageLineMainAxisSize = averageLineMainAxisSize,
+                        visibleItems = visibleItems
+                    )
             }
             else -> {
                 fallback
@@ -460,3 +484,51 @@ private val InterruptionSpec = spring(
     stiffness = Spring.StiffnessMediumLow,
     visibilityThreshold = IntOffset.VisibilityThreshold
 )
+
+private fun LazyGridSpanLayoutProvider.lastIndexInPreviousLineBefore(index: Int): Int {
+    val lineIndex = getLineIndexOfItem(index)
+    val lineConfiguration = getLineConfiguration(lineIndex.value)
+    return lineConfiguration.firstItemIndex - 1
+}
+
+private fun LazyGridSpanLayoutProvider.firstIndexInNextLineAfter(index: Int): Int {
+    val lineIndex = getLineIndexOfItem(index)
+    val lineConfiguration = getLineConfiguration(lineIndex.value)
+    return lineConfiguration.firstItemIndex + lineConfiguration.spans.size
+}
+
+private fun LazyGridSpanLayoutProvider.getLinesMainAxisSizesSum(
+    fromIndex: Int,
+    toIndex: Int,
+    averageLineMainAxisSize: Int,
+    visibleItems: List<LazyGridPositionedItem>
+): Int {
+    var index = fromIndex
+    var sizes = 0
+    while (index <= toIndex) {
+        val lastItemInTheLine = firstIndexInNextLineAfter(index) - 1
+        if (lastItemInTheLine <= toIndex) {
+            sizes += visibleItems.getLineSize(lastItemInTheLine, averageLineMainAxisSize)
+        }
+        index = lastItemInTheLine + 1
+    }
+    return sizes
+}
+
+private fun List<LazyGridPositionedItem>.getLineSize(itemIndex: Int, fallback: Int): Int {
+    if (isEmpty() || itemIndex < first().index || itemIndex > last().index) return fallback
+    if ((itemIndex - first().index) < (last().index - itemIndex)) {
+        for (index in indices) {
+            val item = get(index)
+            if (item.index == itemIndex) return item.lineMainAxisSizeWithSpacings
+            if (item.index > itemIndex) break
+        }
+    } else {
+        for (index in lastIndex downTo 0) {
+            val item = get(index)
+            if (item.index == itemIndex) return item.lineMainAxisSizeWithSpacings
+            if (item.index < itemIndex) break
+        }
+    }
+    return fallback
+}

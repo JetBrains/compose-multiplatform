@@ -37,13 +37,11 @@ import kotlin.math.sign
  * Measures and calculates the positions for the currently visible items. The result is produced
  * as a [LazyGridMeasureResult] which contains all the calculations.
  */
-@OptIn(ExperimentalFoundationApi::class)
 internal fun measureLazyGrid(
     itemsCount: Int,
     measuredLineProvider: LazyMeasuredLineProvider,
     measuredItemProvider: LazyMeasuredItemProvider,
     mainAxisAvailableSize: Int,
-    slotsPerLine: Int,
     beforeContentPadding: Int,
     afterContentPadding: Int,
     spaceBetweenLines: Int,
@@ -57,6 +55,7 @@ internal fun measureLazyGrid(
     reverseLayout: Boolean,
     density: Density,
     placementAnimator: LazyGridItemPlacementAnimator,
+    spanLayoutProvider: LazyGridSpanLayoutProvider,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyGridMeasureResult {
     require(beforeContentPadding >= 0)
@@ -243,10 +242,10 @@ internal fun measureLazyGrid(
             consumedScroll = consumedScroll.toInt(),
             layoutWidth = layoutWidth,
             layoutHeight = layoutHeight,
-            slotsPerLine = slotsPerLine,
             reverseLayout = reverseLayout,
             positionedItems = positionedItems,
-            measuredItemProvider = measuredItemProvider
+            measuredItemProvider = measuredItemProvider,
+            spanLayoutProvider = spanLayoutProvider
         )
 
         return LazyGridMeasureResult(
