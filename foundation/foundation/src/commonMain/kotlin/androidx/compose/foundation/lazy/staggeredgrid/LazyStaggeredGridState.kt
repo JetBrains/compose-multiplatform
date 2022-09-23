@@ -29,7 +29,6 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchH
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -158,11 +157,10 @@ class LazyStaggeredGridState private constructor(
     internal var measurePassCount = 0
 
     /** states required for prefetching **/
-    private var wasScrollingForward = true
     internal var isVertical = false
     internal var laneWidthsPrefixSum: IntArray = IntArray(0)
     private var prefetchBaseIndex: Int = -1
-    private val currentItemPrefetchHandles = mutableVectorOf<PrefetchHandle>()
+    private val currentItemPrefetchHandles = mutableMapOf<Int, PrefetchHandle>()
 
     /** state required for implementing [animateScrollScope] **/
     internal var density: Density = Density(1f, 1f)
@@ -296,15 +294,6 @@ class LazyStaggeredGridState private constructor(
         if (info.visibleItemsInfo.isNotEmpty()) {
             val scrollingForward = delta < 0
 
-            if (wasScrollingForward != scrollingForward) {
-                // the scrolling direction has been changed which means the last prefetched item
-                // is not going to be reached anytime soon so it is safer to dispose it.
-                // if this item is already visible it is safe to call the method anyway
-                // as it will be a no-op
-                currentItemPrefetchHandles.forEach { it.cancel() }
-            }
-
-            wasScrollingForward = scrollingForward
             val prefetchIndex = if (scrollingForward) {
                 info.visibleItemsInfo.last().index
             } else {
@@ -316,8 +305,8 @@ class LazyStaggeredGridState private constructor(
                 return
             }
             prefetchBaseIndex = prefetchIndex
-            currentItemPrefetchHandles.clear()
 
+            val prefetchHandlesUsed = mutableSetOf<Int>()
             var targetIndex = prefetchIndex
             for (lane in laneWidthsPrefixSum.indices) {
                 val previousIndex = targetIndex
@@ -330,9 +319,14 @@ class LazyStaggeredGridState private constructor(
                 }
                 if (
                     targetIndex !in (0 until info.totalItemsCount) ||
-                        previousIndex == targetIndex
+                    previousIndex == targetIndex
                 ) {
                     return
+                }
+
+                prefetchHandlesUsed += targetIndex
+                if (targetIndex in currentItemPrefetchHandles) {
+                    continue
                 }
 
                 val crossAxisSize = laneWidthsPrefixSum[lane] -
@@ -344,12 +338,23 @@ class LazyStaggeredGridState private constructor(
                     Constraints.fixedHeight(crossAxisSize)
                 }
 
-                currentItemPrefetchHandles.add(
-                    prefetchState.schedulePrefetch(
-                        index = targetIndex,
-                        constraints = constraints
-                    )
+                currentItemPrefetchHandles[targetIndex] = prefetchState.schedulePrefetch(
+                    index = targetIndex,
+                    constraints = constraints
                 )
+            }
+
+            clearLeftoverPrefetchHandles(prefetchHandlesUsed)
+        }
+    }
+
+    private fun clearLeftoverPrefetchHandles(prefetchHandlesUsed: Set<Int>) {
+        val iterator = currentItemPrefetchHandles.iterator()
+        while (iterator.hasNext()) {
+            val entry = iterator.next()
+            if (entry.key !in prefetchHandlesUsed) {
+                entry.value.cancel()
+                iterator.remove()
             }
         }
     }
@@ -359,7 +364,7 @@ class LazyStaggeredGridState private constructor(
         if (prefetchBaseIndex != -1 && items.isNotEmpty()) {
             if (prefetchBaseIndex !in items.first().index..items.last().index) {
                 prefetchBaseIndex = -1
-                currentItemPrefetchHandles.forEach { it.cancel() }
+                currentItemPrefetchHandles.values.forEach { it.cancel() }
                 currentItemPrefetchHandles.clear()
             }
         }

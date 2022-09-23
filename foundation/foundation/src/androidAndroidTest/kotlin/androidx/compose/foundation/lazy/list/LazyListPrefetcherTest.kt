@@ -417,6 +417,40 @@ class LazyListPrefetcherTest(
         }
     }
 
+    @Test
+    fun scrollingByListSizeCancelsPreviousPrefetch() {
+        composeList()
+
+        // now we have items 0-1 visible
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 1-2 are visible
+                // and schedule a prefetching for 3
+                state.scrollBy(itemsSizePx.toFloat())
+
+                // move viewport by screen size to items 4-5, so item 3 is just behind
+                // the first visible item
+                state.scrollBy(itemsSizePx * 3f)
+
+                // move scroll further to items 5-6, so item 3 is reused
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+        }
+
+        waitForPrefetch(7)
+
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // scroll again to ensure item 3 was dropped
+                state.scrollBy(itemsSizePx * 100f)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(activeNodes).doesNotContain(3)
+        }
+    }
+
     private fun waitForPrefetch(index: Int) {
         rule.waitUntil {
             activeNodes.contains(index) && activeMeasuredNodes.contains(index)
