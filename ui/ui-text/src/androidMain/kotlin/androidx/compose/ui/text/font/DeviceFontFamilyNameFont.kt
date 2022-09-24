@@ -41,9 +41,15 @@ import androidx.compose.ui.text.ExperimentalTextApi
  * This Font can not describe the system-installed [Typeface.DEFAULT]. All other system-installed
  * fonts are allowed.
  *
+ * Note: When setting [variationSettings] any unset axis may be reset to the font default, ignoring
+ * any axis restrictions in `fonts.xml` or `font_customizations.xml`. This may have surprising
+ * side-effects when named fonts differ only by the default axis settings in XML. When setting
+ * variation axis for device fonts, ensure you set all possible settings for the font.
+ *
  * @param familyName Android system-installed font family name
  * @param weight weight to load
  * @param style style to load
+ * @param variationSettings font variation settings, unset by default to load default VF from system
  *
  * @throws IllegalArgumentException if familyName is empty
  */
@@ -52,13 +58,15 @@ fun Font(
     familyName: DeviceFontFamilyName,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal,
-    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
+    variationSettings: FontVariation.Settings = FontVariation.Settings()
 ): Font {
     return DeviceFontFamilyNameFont(familyName, weight, style, variationSettings)
 }
 
 /**
  * An Android system installed font family name as used by [Typeface.create].
+ *
+ * See `/system/etc/fonts.xml` and `/product/etc/fonts_customization.xml` on a device.
  *
  * @see Typeface
  * @param name System fontFamilyName as passed to [Typeface.create]
