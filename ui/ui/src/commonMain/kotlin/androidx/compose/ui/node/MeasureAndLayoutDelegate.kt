@@ -356,10 +356,8 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         remeasureOnly(layoutNode)
 
         layoutNode._children.forEach { child ->
-            if (child.canAffectParent) {
-                if (relayoutNodes.contains(child)) {
-                    recurseRemeasure(child)
-                }
+            if (child.measureAffectsParent) {
+                recurseRemeasure(child)
             }
         }
         // The child measurement may have invalidated layoutNode's measurement
@@ -545,10 +543,12 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         relayoutNodes.remove(node)
     }
 
+    private val LayoutNode.measureAffectsParent
+        get() = (measuredByParent == InMeasureBlock ||
+            layoutDelegate.alignmentLinesOwner.alignmentLines.required)
+
     private val LayoutNode.canAffectParent
-        get() = measurePending &&
-            (measuredByParent == InMeasureBlock ||
-                layoutDelegate.alignmentLinesOwner.alignmentLines.required)
+        get() = measurePending && measureAffectsParent
 
     private val LayoutNode.canAffectParentInLookahead
         get() = lookaheadLayoutPending &&
