@@ -135,10 +135,10 @@ inline fun Layout(
 }
 
 /**
- * [Layout] is the main core component for layout for "leaf" nodes. It can be used to measure and
- * position zero children.
+ * [Layout] is the main core component for layout. It can be used to measure and position
+ * zero or more layout children.
  *
- * This overload accepts a list of multiple composable content lambdas, which allows to threat
+ * This overload accepts a list of multiple composable content lambdas, which allows treating
  * measurables put into different content lambdas differently - measure policy will provide
  * a list of lists of Measurables, not just a single list. Such list has the same size
  * as the list of contents passed into [Layout] and contains the list of measurables
