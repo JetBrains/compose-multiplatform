@@ -25,11 +25,22 @@ import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Deactivated
-import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyInputModifierNode
+import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.NodeKind
+import androidx.compose.ui.node.Nodes
+import androidx.compose.ui.node.ancestors
+import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.node.nearestAncestor
+import androidx.compose.ui.node.visitLocalChildren
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastForEachReversed
 
 @JvmDefaultWithCompatibility
 interface FocusManager {
@@ -60,45 +71,54 @@ interface FocusManager {
 /**
  * The focus manager is used by different [Owner][androidx.compose.ui.node.Owner] implementations
  * to control focus.
- *
- * @param focusModifier The modifier that will be used as the root focus modifier.
  */
-internal class FocusManagerImpl(
-    private val focusModifier: FocusModifier = FocusModifier(Inactive)
-) : FocusManager {
+internal class FocusOwnerImpl(onRequestApplyChangesListener: (() -> Unit) -> Unit) : FocusOwner {
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    internal var rootFocusNode = FocusTargetModifierNode()
+
+    private val focusInvalidationManager = FocusInvalidationManager(onRequestApplyChangesListener)
 
     /**
      * A [Modifier] that can be added to the [Owners][androidx.compose.ui.node.Owner] modifier
      * list that contains the modifiers required by the focus system. (Eg, a root focus modifier).
      */
     // TODO(b/168831247): return an empty Modifier when there are no focusable children.
-    val modifier: Modifier = Modifier.focusTarget(focusModifier)
+    @Suppress("ModifierInspectorInfo") // b/251831790.
+    @OptIn(ExperimentalComposeUiApi::class)
+    override val modifier: Modifier = modifierElementOf(
+        create = { rootFocusNode },
+        definitions = { name = "RootFocusTarget" }
+    )
 
-    lateinit var layoutDirection: LayoutDirection
+    override lateinit var layoutDirection: LayoutDirection
 
     /**
      * The [Owner][androidx.compose.ui.node.Owner] calls this function when it gains focus. This
-     * informs the [focus manager][FocusManagerImpl] that the
+     * informs the [focus manager][FocusOwnerImpl] that the
      * [Owner][androidx.compose.ui.node.Owner] gained focus, and that it should propagate this
      * focus to one of the focus modifiers in the component hierarchy.
      */
-    fun takeFocus() {
+    override fun takeFocus() {
         // If the focus state is not Inactive, it indicates that the focus state is already
         // set (possibly by dispatchWindowFocusChanged). So we don't update the state.
-        if (focusModifier.focusState == Inactive) {
-            focusModifier.focusState = Active
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (rootFocusNode.focusStateImpl == Inactive) {
+            rootFocusNode.focusStateImpl = Active
             // TODO(b/152535715): propagate focus to children based on child focusability.
+            //  moveFocus(FocusDirection.Enter)
         }
     }
 
     /**
      * The [Owner][androidx.compose.ui.node.Owner] calls this function when it loses focus. This
-     * informs the [focus manager][FocusManagerImpl] that the
+     * informs the [focus manager][FocusOwnerImpl] that the
      * [Owner][androidx.compose.ui.node.Owner] lost focus, and that it should clear focus from
      * all the focus modifiers in the component hierarchy.
      */
-    fun releaseFocus() {
-        focusModifier.clearFocus(forcedClear = true)
+    override fun releaseFocus() {
+        @OptIn(ExperimentalComposeUiApi::class)
+        rootFocusNode.clearFocus(forced = true, refreshFocusEvents = true)
     }
 
     /**
@@ -111,14 +131,18 @@ internal class FocusManagerImpl(
      * component.
      */
     override fun clearFocus(force: Boolean) {
+        clearFocus(force, refreshFocusEvents = true)
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun clearFocus(force: Boolean, refreshFocusEvents: Boolean) {
         // If this hierarchy had focus before clearing it, it indicates that the host view has
         // focus. So after clearing focus within the compose hierarchy, we should restore focus to
         // the root focus modifier to maintain consistency with the host view.
-        val rootInitialState = focusModifier.focusState
-        if (focusModifier.clearFocus(force)) {
-            focusModifier.focusState = when (rootInitialState) {
+        val rootInitialState = rootFocusNode.focusStateImpl
+        if (rootFocusNode.clearFocus(force, refreshFocusEvents)) {
+            rootFocusNode.focusStateImpl = when (rootInitialState) {
                 Active, ActiveParent, Captured -> Active
-                Deactivated, DeactivatedParent -> Deactivated
                 Inactive -> Inactive
             }
         }
@@ -129,22 +153,23 @@ internal class FocusManagerImpl(
      *
      * @return true if focus was moved successfully. false if the focused item is unchanged.
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     override fun moveFocus(focusDirection: FocusDirection): Boolean {
 
         // If there is no active node in this sub-hierarchy, we can't move focus.
-        val source = focusModifier.findActiveFocusNode() ?: return false
+        val source = rootFocusNode.findActiveFocusNode() ?: return false
 
         // Check if a custom focus traversal order is specified.
-        val nextFocusRequester = source.customFocusSearch(focusDirection, layoutDirection)
-
-        return when (nextFocusRequester) {
+        return when (val next = source.customFocusSearch(focusDirection, layoutDirection)) {
             @OptIn(ExperimentalComposeUiApi::class)
             Cancel -> false
             Default -> {
                 val foundNextItem =
-                    focusModifier.focusSearch(focusDirection, layoutDirection) { destination ->
+                    rootFocusNode.focusSearch(focusDirection, layoutDirection) { destination ->
                         if (destination == source) return@focusSearch false
-                        checkNotNull(destination.parent) { "Focus search landed at the root." }
+                        checkNotNull(destination.nearestAncestor(Nodes.FocusTarget)) {
+                            "Focus search landed at the root."
+                        }
                         // If we found a potential next item, move focus to it.
                         destination.requestFocus()
                         true
@@ -154,33 +179,98 @@ internal class FocusManagerImpl(
             }
             else -> {
                 // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to
-                //  something that is visible and focusable in the current mode (Touch/Non-Touch mode).
-                nextFocusRequester.requestFocus()
+                //  something that is visible and focusable in the current mode (Touch/Non-Touch
+                //  mode).
+                next.requestFocus()
                 true
             }
         }
     }
 
     /**
-     * Runs the focus properties block for all [focusProperties] modifiers to fetch updated
-     * [FocusProperties].
-     *
-     * The [focusProperties] block is run automatically whenever the properties change, and you
-     * rarely need to invoke this function manually. However, if you have a situation where you want
-     * to change a property, and need to see the change in the current snapshot, use this API.
+     * Dispatches a key event through the compose hierarchy.
      */
-    fun fetchUpdatedFocusProperties() {
-        focusModifier.updateProperties()
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun dispatchKeyEvent(keyEvent: KeyEvent): Boolean {
+        val activeFocusTarget = rootFocusNode.findActiveFocusNode()
+        checkNotNull(activeFocusTarget) {
+            "Event can't be processed because we do not have an active focus target."
+        }
+        val focusedKeyInputNode = activeFocusTarget.lastLocalKeyInputNode()
+            ?: activeFocusTarget.nearestAncestor(Nodes.KeyInput)
+
+        focusedKeyInputNode?.traverseAncestors(
+            type = Nodes.KeyInput,
+            onPreVisit = { if (it.onPreKeyEvent(keyEvent)) return true },
+            onVisit = { if (it.onKeyEvent(keyEvent)) return true }
+        )
+
+        return false
     }
 
     /**
-     * Searches for the currently focused item.
-     *
-     * @return the currently focused item.
+     * Dispatches a rotary scroll event through the compose hierarchy.
      */
-    @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-    internal fun getActiveFocusModifier(): FocusModifier? {
-        return focusModifier.findActiveItem()
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun dispatchRotaryEvent(event: RotaryScrollEvent): Boolean {
+        val focusedRotaryInputNode = rootFocusNode.findActiveFocusNode()
+            ?.nearestAncestor(Nodes.RotaryInput)
+
+        focusedRotaryInputNode?.traverseAncestors(
+            type = Nodes.RotaryInput,
+            onPreVisit = { if (it.onPreRotaryScrollEvent(event)) return true },
+            onVisit = { if (it.onRotaryScrollEvent(event)) return true }
+        )
+
+        return false
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun scheduleInvalidation(node: FocusTargetModifierNode) {
+        focusInvalidationManager.scheduleInvalidation(node)
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun scheduleInvalidation(node: FocusEventModifierNode) {
+        focusInvalidationManager.scheduleInvalidation(node)
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    override fun scheduleInvalidation(node: FocusPropertiesModifierNode) {
+        focusInvalidationManager.scheduleInvalidation(node)
+    }
+
+    @ExperimentalComposeUiApi
+    private inline fun <reified T : DelegatableNode> T.traverseAncestors(
+        type: NodeKind<T>,
+        onPreVisit: (T) -> Unit,
+        onVisit: (T) -> Unit
+    ) {
+        val ancestors = ancestors(type)
+        ancestors?.fastForEachReversed(onPreVisit)
+        onPreVisit(this)
+        onVisit(this)
+        ancestors?.fastForEach(onVisit)
+    }
+
+    /**
+     * Searches for the currently focused item, and returns its coordinates as a rect.
+     */
+    override fun getFocusRect(): Rect? {
+        @OptIn(ExperimentalComposeUiApi::class)
+        return rootFocusNode.findActiveFocusNode()?.focusRect()
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun DelegatableNode.lastLocalKeyInputNode(): KeyInputModifierNode? {
+        var focusedKeyInputNode: KeyInputModifierNode? = null
+        visitLocalChildren(Nodes.FocusTarget or Nodes.KeyInput) { modifierNode ->
+            if (modifierNode.isKind(Nodes.FocusTarget)) return focusedKeyInputNode
+
+            check(modifierNode is KeyInputModifierNode)
+            focusedKeyInputNode = modifierNode
+        }
+        return focusedKeyInputNode
     }
 
     // TODO(b/144116848): This is a hack to make Next/Previous wrap around. This must be
@@ -188,14 +278,16 @@ internal class FocusManagerImpl(
     //  will then pass focus to other views, and ultimately return back to this compose view.
     private fun wrapAroundFocus(focusDirection: FocusDirection): Boolean {
         // Wrap is not supported when this sub-hierarchy doesn't have focus.
-        if (!focusModifier.focusState.hasFocus || focusModifier.focusState.isFocused) return false
+        @OptIn(ExperimentalComposeUiApi::class)
+        if (!rootFocusNode.focusState.hasFocus || rootFocusNode.focusState.isFocused) return false
 
         // Next and Previous wraps around.
         when (focusDirection) {
             Next, Previous -> {
                 // Clear Focus to send focus the root node.
                 clearFocus(force = false)
-                if (!focusModifier.focusState.isFocused) return false
+                @OptIn(ExperimentalComposeUiApi::class)
+                if (!rootFocusNode.focusState.isFocused) return false
 
                 // Wrap around by calling moveFocus after the root gains focus.
                 return moveFocus(focusDirection)
@@ -203,27 +295,5 @@ internal class FocusManagerImpl(
             // We only wrap-around for 1D Focus search.
             else -> return false
         }
-    }
-}
-
-private fun FocusModifier.updateProperties() {
-    // Update the focus node with the current focus properties.
-    refreshFocusProperties()
-
-    // Update the focus properties for all children.
-    children.forEach { it.updateProperties() }
-}
-
-/**
- * Find the focus modifier in this sub-hierarchy that is currently focused.
- */
-@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-private fun FocusModifier.findActiveItem(): FocusModifier? {
-    return when (focusState) {
-        Active, Captured -> this
-        ActiveParent, DeactivatedParent -> {
-            focusedChild?.findActiveItem() ?: error("no child")
-        }
-        Deactivated, Inactive -> null
     }
 }

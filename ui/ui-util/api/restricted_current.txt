@@ -20,6 +20,7 @@ package androidx.compose.ui.util {
     method public static inline <T> T? fastFirstOrNull(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
     method public static inline <T> void fastForEach(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> action);
     method public static inline <T> void fastForEachIndexed(java.util.List<? extends T>, kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,kotlin.Unit> action);
+    method public static inline <T> void fastForEachReversed(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> action);
     method public static inline <T, R> java.util.List<R> fastMap(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,? extends R> transform);
     method public static inline <T, R, C extends java.util.Collection<? super R>> C fastMapTo(java.util.List<? extends T>, C destination, kotlin.jvm.functions.Function1<? super T,? extends R> transform);
     method public static inline <T, R extends java.lang.Comparable<? super R>> T? fastMaxBy(java.util.List<? extends T>, kotlin.jvm.functions.Function1<? super T,? extends R> selector);

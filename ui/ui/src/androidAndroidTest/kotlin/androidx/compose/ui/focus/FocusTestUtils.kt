@@ -21,10 +21,8 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -39,7 +37,7 @@ import com.google.common.truth.IterableSubject
  */
 internal fun ComposeContentTestRule.setFocusableContent(content: @Composable () -> Unit) {
     setContent {
-        Box(modifier = Modifier.requiredSize(10.dp, 10.dp)) { content() }
+        Box(modifier = Modifier.requiredSize(100.dp, 100.dp)) { content() }
     }
 }
 
@@ -90,14 +88,4 @@ internal fun FocusableBox(
  */
 fun IterableSubject.isExactly(vararg expected: Any?) {
     return containsExactlyElementsIn(expected).inOrder()
-}
-
-/**
- * focusTarget needs a SideEffect to work.
- */
-internal fun Modifier.focusTarget(focusModifier: FocusModifier) = composed {
-    SideEffect {
-        focusModifier.sendOnFocusEvent()
-    }
-    this.then(focusModifier).then(ResetFocusModifierLocals)
 }

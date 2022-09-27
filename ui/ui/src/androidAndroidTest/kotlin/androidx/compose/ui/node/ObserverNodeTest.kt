@@ -44,7 +44,7 @@ class ObserverNodeTest {
         var callbackInvoked = false
         val observerNode = TestObserverNode { callbackInvoked = true }
         rule.setContent {
-            Box(Modifier.modifierElementOf { observerNode })
+            Box(Modifier.modifierElementOf(observerNode))
         }
 
         // Act.
@@ -66,7 +66,7 @@ class ObserverNodeTest {
         var callbackInvoked = false
         val observerNode = TestObserverNode { callbackInvoked = true }
         rule.setContent {
-            Box(Modifier.modifierElementOf { observerNode })
+            Box(Modifier.modifierElementOf(observerNode))
         }
 
         // Act.
@@ -114,7 +114,7 @@ class ObserverNodeTest {
         val observerNode = TestObserverNode { callbackInvoked = true }
         var attached by mutableStateOf(true)
         rule.setContent {
-            Box(if (attached) modifierElementOf { observerNode } else Modifier)
+            Box(if (attached) Modifier.modifierElementOf(observerNode) else Modifier)
         }
 
         // Act.
@@ -139,7 +139,7 @@ class ObserverNodeTest {
         val observerNode = TestObserverNode { callbackInvoked = true }
         var attached by mutableStateOf(true)
         rule.setContent {
-            Box(if (attached) modifierElementOf { observerNode } else Modifier)
+            Box(if (attached) Modifier.modifierElementOf(observerNode) else Modifier)
         }
 
         // Act.
@@ -161,10 +161,8 @@ class ObserverNodeTest {
     }
 
     @ExperimentalComposeUiApi
-    private inline fun <reified T : Modifier.Node> Modifier.modifierElementOf(
-        crossinline create: () -> T,
-    ): Modifier {
-        return this.then(modifierElementOf(create) { name = "testNode" })
+    private inline fun <reified T : Modifier.Node> Modifier.modifierElementOf(node: T): Modifier {
+        return this.then(modifierElementOf(create = { node }, definitions = { name = "testNode" }))
     }
 
     class TestObserverNode(

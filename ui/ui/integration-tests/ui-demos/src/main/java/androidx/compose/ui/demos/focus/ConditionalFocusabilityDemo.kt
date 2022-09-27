@@ -81,8 +81,7 @@ fun ConditionalFocusabilityDemo() {
         Row {
             var item2active by remember { mutableStateOf(false) }
             Text(
-                text = "focusable item that is " +
-                    "${if (item2active) "activated" else "deactivated"}",
+                text = "focusable item that is " + if (item2active) "activated" else "deactivated",
                 modifier = Modifier
                     .focusAwareBackground()
                     .focusRequester(item2)

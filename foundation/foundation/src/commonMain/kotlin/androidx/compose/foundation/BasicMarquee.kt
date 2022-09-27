@@ -39,7 +39,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.DrawModifier
-import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.clipRect
@@ -181,7 +180,10 @@ private class MarqueeModifier(
     private val initialDelayMillis: Int,
     private val velocity: Dp,
     private val density: Density,
-) : Modifier.Element, LayoutModifier, DrawModifier, FocusEventModifier {
+) : Modifier.Element,
+    LayoutModifier,
+    DrawModifier,
+    @Suppress("DEPRECATION") androidx.compose.ui.focus.FocusEventModifier {
 
     private var contentWidth by mutableStateOf(0)
     private var containerWidth by mutableStateOf(0)

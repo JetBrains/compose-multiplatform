@@ -21,10 +21,9 @@ import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusModifier
-import androidx.compose.ui.focus.FocusStateImpl
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.focusTarget
-import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.PointerInteropFilter
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,32 +43,20 @@ class NodeCoordinatorInitializationTest {
     @Test
     fun initializeIsCalledWhenFocusNodeIsCreated() {
         // Arrange.
-        val focusModifier = FocusModifier(FocusStateImpl.Inactive)
+        var focusState: FocusState? = null
 
         // Act.
         rule.setContent {
-            Box(Modifier.focusTarget(focusModifier))
+            Box(
+                Modifier
+                    .onFocusChanged { focusState = it }
+                    .focusTarget()
+            )
         }
 
         // Assert.
         rule.runOnIdle {
-            assertThat(focusModifier).isNotNull()
-        }
-    }
-
-    @Test
-    fun initializeIsCalledWhenKeyInputNodeIsCreated() {
-        // Arrange.
-        val keyInputModifier = KeyInputModifier(null, null)
-
-        // Act.
-        rule.setContent {
-            Box(modifier = keyInputModifier)
-        }
-
-        // Assert.
-        rule.runOnIdle {
-            assertThat(keyInputModifier.layoutNode).isNotNull()
+            assertThat(focusState).isNotNull()
         }
     }
 
@@ -87,44 +74,6 @@ class NodeCoordinatorInitializationTest {
         // Assert.
         rule.runOnIdle {
             assertThat(pointerInputModifier.pointerInputFilter.layoutCoordinates).isNotNull()
-        }
-    }
-
-    @Test
-    fun initializeIsCalledWhenFocusNodeIsReused() {
-        // Arrange.
-        lateinit var focusModifier: FocusModifier
-        lateinit var scope: RecomposeScope
-        rule.setContent {
-            scope = currentRecomposeScope
-            focusModifier = FocusModifier(FocusStateImpl.Inactive)
-            Box(Modifier.focusTarget(focusModifier))
-        }
-
-        // Act.
-        rule.runOnIdle { scope.invalidate() }
-
-        // Assert.
-        rule.runOnIdle { assertThat(focusModifier).isNotNull() }
-    }
-
-    @Test
-    fun initializeIsCalledWhenKeyInputNodeIsReused() {
-        // Arrange.
-        lateinit var keyInputModifier: KeyInputModifier
-        lateinit var scope: RecomposeScope
-        rule.setContent {
-            scope = currentRecomposeScope
-            keyInputModifier = KeyInputModifier(null, null)
-            Box(modifier = keyInputModifier)
-        }
-
-        // Act.
-        rule.runOnIdle { scope.invalidate() }
-
-        // Assert.
-        rule.runOnIdle {
-            assertThat(keyInputModifier.layoutNode).isNotNull()
         }
     }
 

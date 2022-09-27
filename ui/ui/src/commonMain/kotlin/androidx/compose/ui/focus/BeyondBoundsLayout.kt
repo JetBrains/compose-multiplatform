@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.layout.BeyondBoundsLayout.BeyondBoundsScope
 import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.Above
 import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.After
@@ -24,7 +25,8 @@ import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.B
 import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.Left
 import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.Right
 
-internal fun <T> FocusModifier.searchBeyondBounds(
+@ExperimentalComposeUiApi
+internal fun <T> FocusTargetModifierNode.searchBeyondBounds(
     direction: FocusDirection,
     block: BeyondBoundsScope.() -> T?
 ): T? {
