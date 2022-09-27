@@ -793,6 +793,7 @@ package androidx.compose.ui.text.font {
   public final class FontFamilyResolver_androidKt {
     method public static androidx.compose.ui.text.font.FontFamily.Resolver createFontFamilyResolver(android.content.Context context);
     method @androidx.compose.ui.text.ExperimentalTextApi public static androidx.compose.ui.text.font.FontFamily.Resolver createFontFamilyResolver(android.content.Context context, kotlin.coroutines.CoroutineContext coroutineContext);
+    method public static androidx.compose.runtime.State<android.graphics.Typeface> resolveAsTypeface(androidx.compose.ui.text.font.FontFamily.Resolver, optional androidx.compose.ui.text.font.FontFamily? fontFamily, optional androidx.compose.ui.text.font.FontWeight fontWeight, optional int fontStyle, optional int fontSynthesis);
   }
 
   public final class FontKt {
