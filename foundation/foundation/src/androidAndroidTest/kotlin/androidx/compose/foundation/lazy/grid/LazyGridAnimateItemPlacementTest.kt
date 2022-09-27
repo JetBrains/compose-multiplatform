@@ -20,6 +20,7 @@ import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -58,7 +59,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runners.Parameterized
 import kotlin.math.roundToInt
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
 import org.junit.runner.RunWith
 
@@ -273,22 +273,22 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
 
     @Test
     fun itemSizeChangeAnimatesNextItems() {
-        var height by mutableStateOf(itemSizeDp)
+        var size by mutableStateOf(itemSizeDp)
         rule.setContent {
             LazyGrid(1, minSize = itemSizeDp * 5, maxSize = itemSizeDp * 5) {
                 items(listOf(0, 1, 2, 3), key = { it }) {
-                    Item(it, height = if (it == 1) height else itemSizeDp)
+                    Item(it, size = if (it == 1) size else itemSizeDp)
                 }
             }
         }
 
         rule.runOnIdle {
-            height = itemSizeDp * 2
+            size = itemSizeDp * 2
         }
         rule.mainClock.advanceTimeByFrame()
 
         rule.onNodeWithTag("1")
-            .assertMainAxisSizeIsEqualTo(height)
+            .assertMainAxisSizeIsEqualTo(size)
 
         onAnimationFrame { fraction ->
             if (!reverseLayout) {
@@ -745,7 +745,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                             if (it % 2 == 0) itemSizeDp else itemSize3Dp / 2
                         }
                     }
-                    Item(it, height = height)
+                    Item(it, size = height)
                 }
             }
         }
@@ -823,7 +823,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                             if (it % 2 == 0) itemSizeDp else itemSize3Dp / 2
                         }
                     }
-                    Item(it, height = height)
+                    Item(it, size = height)
                 }
             }
         }
@@ -1143,6 +1143,432 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
     }
 
+    @Test
+    fun noAnimationWhenScrollForwardBySmallOffset() {
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, -itemSize / 2),
+                1 to AxisIntOffset(0, itemSize / 2),
+                2 to AxisIntOffset(0, itemSize * 3 / 2),
+                3 to AxisIntOffset(0, itemSize * 5 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardBySmallOffset() {
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3, startIndex = 2) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                1 to AxisIntOffset(0, -itemSize / 2),
+                2 to AxisIntOffset(0, itemSize / 2),
+                3 to AxisIntOffset(0, itemSize * 3 / 2),
+                4 to AxisIntOffset(0, itemSize * 5 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset() {
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                2 to AxisIntOffset(0, -itemSize / 2),
+                3 to AxisIntOffset(0, itemSize / 2),
+                4 to AxisIntOffset(0, itemSize * 3 / 2),
+                5 to AxisIntOffset(0, itemSize * 5 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset() {
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3, startIndex = 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, -itemSize / 2),
+                1 to AxisIntOffset(0, itemSize / 2),
+                2 to AxisIntOffset(0, itemSize * 3 / 2),
+                3 to AxisIntOffset(0, itemSize * 5 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset_differentSizes() {
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it, size = if (it % 2 == 0) itemSizeDp else itemSize2Dp)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize + itemSize2 + itemSize / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                2 to AxisIntOffset(0, -itemSize / 2),
+                3 to AxisIntOffset(0, itemSize / 2),
+                4 to AxisIntOffset(0, itemSize2 + itemSize / 2),
+                5 to AxisIntOffset(0, itemSize2 + itemSize * 3 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset_differentSizes() {
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3, startIndex = 3) {
+                items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
+                    Item(it, size = if (it % 2 == 0) itemSizeDp else itemSize2Dp)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-(itemSize + itemSize2 + itemSize / 2f))
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, -itemSize / 2),
+                1 to AxisIntOffset(0, itemSize / 2),
+                2 to AxisIntOffset(0, itemSize2 + itemSize / 2),
+                3 to AxisIntOffset(0, itemSize2 + itemSize * 3 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset_multipleCells() {
+        rule.setContent {
+            LazyGrid(3, maxSize = itemSizeDp * 2) {
+                items(List(20) { it }, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(itemSize, 0),
+            2 to AxisIntOffset(itemSize * 2, 0),
+            3 to AxisIntOffset(0, itemSize),
+            4 to AxisIntOffset(itemSize, itemSize),
+            5 to AxisIntOffset(itemSize * 2, itemSize)
+        )
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                6 to AxisIntOffset(0, -itemSize / 2),
+                7 to AxisIntOffset(itemSize, -itemSize / 2),
+                8 to AxisIntOffset(itemSize * 2, -itemSize / 2),
+                9 to AxisIntOffset(0, itemSize / 2),
+                10 to AxisIntOffset(itemSize, itemSize / 2),
+                11 to AxisIntOffset(itemSize * 2, itemSize / 2),
+                12 to AxisIntOffset(0, itemSize * 3 / 2),
+                13 to AxisIntOffset(itemSize, itemSize * 3 / 2),
+                14 to AxisIntOffset(itemSize * 2, itemSize * 3 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset_multipleCells() {
+        rule.setContent {
+            LazyGrid(3, maxSize = itemSizeDp * 2, startIndex = 9) {
+                items(List(20) { it }, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            9 to AxisIntOffset(0, 0),
+            10 to AxisIntOffset(itemSize, 0),
+            11 to AxisIntOffset(itemSize * 2, 0),
+            12 to AxisIntOffset(0, itemSize),
+            13 to AxisIntOffset(itemSize, itemSize),
+            14 to AxisIntOffset(itemSize * 2, itemSize)
+        )
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, -itemSize / 2),
+                1 to AxisIntOffset(itemSize, -itemSize / 2),
+                2 to AxisIntOffset(itemSize * 2, -itemSize / 2),
+                3 to AxisIntOffset(0, itemSize / 2),
+                4 to AxisIntOffset(itemSize, itemSize / 2),
+                5 to AxisIntOffset(itemSize * 2, itemSize / 2),
+                6 to AxisIntOffset(0, itemSize * 3 / 2),
+                7 to AxisIntOffset(itemSize, itemSize * 3 / 2),
+                8 to AxisIntOffset(itemSize * 2, itemSize * 3 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset_differentSpans() {
+        rule.setContent {
+            LazyGrid(3, maxSize = itemSizeDp * 2) {
+                items(
+                    List(20) { it },
+                    key = { it },
+                    span = { GridItemSpan(if (it == 9) 3 else if (it == 10) 2 else 1) }
+                ) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(itemSize, 0),
+            2 to AxisIntOffset(itemSize * 2, 0),
+            3 to AxisIntOffset(0, itemSize),
+            4 to AxisIntOffset(itemSize, itemSize),
+            5 to AxisIntOffset(itemSize * 2, itemSize)
+        )
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                6 to AxisIntOffset(0, -itemSize / 2),
+                7 to AxisIntOffset(itemSize, -itemSize / 2),
+                8 to AxisIntOffset(itemSize * 2, -itemSize / 2),
+                9 to AxisIntOffset(0, itemSize / 2), // 3 spans
+                10 to AxisIntOffset(0, itemSize * 3 / 2), // 2 spans
+                11 to AxisIntOffset(itemSize * 2, itemSize * 3 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset_differentSpans() {
+        rule.setContent {
+            LazyGrid(3, maxSize = itemSizeDp * 2, startIndex = 6) {
+                items(
+                    List(20) { it },
+                    key = { it },
+                    span = { GridItemSpan(if (it == 3) 3 else if (it == 4) 2 else 1) }
+                ) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            6 to AxisIntOffset(0, 0),
+            7 to AxisIntOffset(itemSize, 0),
+            8 to AxisIntOffset(itemSize * 2, 0),
+            9 to AxisIntOffset(0, itemSize),
+            10 to AxisIntOffset(itemSize, itemSize),
+            11 to AxisIntOffset(itemSize * 2, itemSize)
+        )
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, -itemSize / 2),
+                1 to AxisIntOffset(itemSize, -itemSize / 2),
+                2 to AxisIntOffset(itemSize * 2, -itemSize / 2),
+                3 to AxisIntOffset(0, itemSize / 2), // 3 spans
+                4 to AxisIntOffset(0, itemSize * 3 / 2), // 2 spans
+                5 to AxisIntOffset(itemSize * 2, itemSize * 3 / 2),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollForwardByLargeOffset_differentSpansAndDifferentSizes() {
+        rule.setContent {
+            LazyGrid(3, maxSize = itemSizeDp * 2) {
+                items(
+                    List(20) { it },
+                    key = { it },
+                    span = { GridItemSpan(if (it == 9) 3 else if (it == 10) 2 else 1) }
+                ) {
+                    Item(
+                        it, size = when (it) {
+                            in 6..8 -> itemSize2Dp
+                            9 -> itemSize3Dp
+                            else -> itemSizeDp
+                        }
+                    )
+                }
+            }
+        }
+
+        assertPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(itemSize, 0),
+            2 to AxisIntOffset(itemSize * 2, 0),
+            3 to AxisIntOffset(0, itemSize),
+            4 to AxisIntOffset(itemSize, itemSize),
+            5 to AxisIntOffset(itemSize * 2, itemSize)
+        )
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(itemSize * 2.5f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            val startOffset = -itemSize / 2
+            assertPositions(
+                6 to AxisIntOffset(0, startOffset),
+                7 to AxisIntOffset(itemSize, startOffset),
+                8 to AxisIntOffset(itemSize * 2, startOffset),
+                9 to AxisIntOffset(0, startOffset + itemSize2), // 3 spans
+                10 to AxisIntOffset(0, startOffset + itemSize2 + itemSize3), // 2 spans
+                11 to AxisIntOffset(itemSize * 2, startOffset + itemSize2 + itemSize3),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenScrollBackwardByLargeOffset_differentSpansAndDifferentSizes() {
+        rule.setContent {
+            LazyGrid(3, maxSize = itemSizeDp * 2, startIndex = 6) {
+                items(
+                    List(20) { it },
+                    key = { it },
+                    span = { GridItemSpan(if (it == 3) 3 else if (it == 4) 2 else 1) }
+                ) {
+                    Item(
+                        it, size = when (it) {
+                            in 0..2 -> itemSize2Dp
+                            3 -> itemSize3Dp
+                            else -> itemSizeDp
+                        }
+                    )
+                }
+            }
+        }
+
+        assertPositions(
+            6 to AxisIntOffset(0, 0),
+            7 to AxisIntOffset(itemSize, 0),
+            8 to AxisIntOffset(itemSize * 2, 0),
+            9 to AxisIntOffset(0, itemSize),
+            10 to AxisIntOffset(itemSize, itemSize),
+            11 to AxisIntOffset(itemSize * 2, itemSize)
+        )
+
+        rule.runOnIdle {
+            runBlocking {
+                state.scrollBy(-itemSize - itemSize3 - itemSize2 / 2f)
+            }
+        }
+
+        onAnimationFrame { fraction ->
+            val startOffset = -itemSize2 / 2
+            assertPositions(
+                0 to AxisIntOffset(0, startOffset),
+                1 to AxisIntOffset(itemSize, startOffset),
+                2 to AxisIntOffset(itemSize * 2, startOffset),
+                3 to AxisIntOffset(0, startOffset + itemSize2), // 3 spans
+                4 to AxisIntOffset(0, startOffset + itemSize2 + itemSize3), // 2 spans
+                5 to AxisIntOffset(itemSize * 2, startOffset + itemSize2 + itemSize3),
+                fraction = fraction
+            )
+        }
+    }
+
     private fun AxisIntOffset(crossAxis: Int, mainAxis: Int) =
         if (isVertical) IntOffset(crossAxis, mainAxis) else IntOffset(mainAxis, crossAxis)
 
@@ -1249,7 +1675,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
 
     @Composable
     private fun LazyGrid(
-        columns: Int,
+        cells: Int,
         arrangement: Arrangement.HorizontalOrVertical? = null,
         minSize: Dp = 0.dp,
         maxSize: Dp = containerSizeDp,
@@ -1261,10 +1687,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         state = rememberLazyGridState(startIndex)
         if (isVertical) {
             LazyVerticalGrid(
-                GridCells.Fixed(columns),
+                GridCells.Fixed(cells),
                 Modifier
                     .requiredHeightIn(minSize, maxSize)
-                    .requiredWidth(itemSizeDp * columns)
+                    .requiredWidth(itemSizeDp * cells)
                     .testTag(ContainerTag),
                 state = state,
                 verticalArrangement = arrangement as? Arrangement.Vertical
@@ -1275,10 +1701,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
             )
         } else {
             LazyHorizontalGrid(
-                GridCells.Fixed(columns),
+                GridCells.Fixed(cells),
                 Modifier
                     .requiredWidthIn(minSize, maxSize)
-                    .requiredHeight(itemSizeDp * columns)
+                    .requiredHeight(itemSizeDp * cells)
                     .testTag(ContainerTag),
                 state = state,
                 horizontalArrangement = arrangement as? Arrangement.Horizontal
@@ -1293,16 +1719,16 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Composable
     private fun LazyGridItemScope.Item(
         tag: Int,
-        height: Dp = itemSizeDp,
+        size: Dp = itemSizeDp,
         animSpec: FiniteAnimationSpec<IntOffset>? = AnimSpec
     ) {
         Box(
             Modifier
                 .then(
                     if (isVertical) {
-                        Modifier.requiredHeight(height)
+                        Modifier.requiredHeight(size)
                     } else {
-                        Modifier.requiredWidth(height)
+                        Modifier.requiredWidth(size)
                     }
                 )
                 .testTag(tag.toString())
