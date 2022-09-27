@@ -17,14 +17,26 @@
 package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.getOrNull
 
+/**
+ * A [Modifier.Node] that adds semantics key/value for use in testing,
+ * accessibility, and similar use cases.
+ *
+ * This is the [androidx.compose.ui.Modifier.Node] equivalent of
+ * [androidx.compose.ui.semantics.SemanticsModifier]
+ */
 @ExperimentalComposeUiApi
 interface SemanticsModifierNode : DelegatableNode {
+    /**
+     * The SemanticsConfiguration holds substantive data, especially a list of key/value pairs
+     * such as (label -> "buttonName").
+     */
     val semanticsConfiguration: SemanticsConfiguration
 }
 
