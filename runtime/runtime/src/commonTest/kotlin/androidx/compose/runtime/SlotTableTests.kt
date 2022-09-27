@@ -3309,6 +3309,12 @@ class SlotTableTests {
     }
 
     @Test
+    fun canCheckAnEmptyTableForAMark() {
+        val table = SlotTable()
+        assertFalse(table.containsMark())
+    }
+
+    @Test
     fun canMarkAGroup() {
         val table = SlotTable()
         table.write { writer ->

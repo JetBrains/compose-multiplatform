@@ -354,7 +354,7 @@ internal class SlotTable : CompositionData, Iterable<CompositionGroup> {
      * Turns true if the first group (considered the root group) contains a mark.
      */
     fun containsMark(): Boolean {
-        return groupsSize >= 0 && groups.containsMark(0)
+        return groupsSize > 0 && groups.containsMark(0)
     }
 
     /**
