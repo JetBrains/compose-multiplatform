@@ -341,8 +341,12 @@ class LazyListState constructor(
 
     private fun cancelPrefetchIfVisibleItemsChanged(info: LazyListLayoutInfo) {
         if (indexToPrefetch != -1 && info.visibleItemsInfo.isNotEmpty()) {
-            if (indexToPrefetch != info.visibleItemsInfo.first().index - 1 &&
-                indexToPrefetch != info.visibleItemsInfo.last().index + 1) {
+            val expectedPrefetchIndex = if (wasScrollingForward) {
+                info.visibleItemsInfo.last().index + 1
+            } else {
+                info.visibleItemsInfo.first().index - 1
+            }
+            if (indexToPrefetch != expectedPrefetchIndex) {
                 indexToPrefetch = -1
                 currentPrefetchHandle?.cancel()
                 currentPrefetchHandle = null
