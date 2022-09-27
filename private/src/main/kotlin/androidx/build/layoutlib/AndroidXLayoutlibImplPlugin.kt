@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.build.paparazzi
+package androidx.build.layoutlib
 
 import androidx.build.OperatingSystem
 import androidx.build.SupportConfig.COMPILE_SDK_VERSION
@@ -38,7 +38,7 @@ import org.gradle.process.JavaForkOptions
 /**
  * Configures screenshot testing using Paparazzi for AndroidX projects.
  */
-class AndroidXPaparazziImplPlugin : Plugin<Project> {
+class AndroidXLayoutlibImplPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val paparazziNative = project.createUnzippedPaparazziNativeDependency()
         project.afterEvaluate {
@@ -121,7 +121,7 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
 
     private companion object {
         /** Package name of the test library, used to namespace system properties */
-        const val PACKAGE_NAME = "androidx.test.screenshot.paparazzi"
+        const val PACKAGE_NAME = "androidx.test.screenshot.layoutlib"
 
         /** Artifact type attribute for unzipped Paparazzi layoutlib unzipped artifacts */
         const val UNZIPPED_PAPARAZZI_NATIVE = "unzipped-paparazzi-native"
