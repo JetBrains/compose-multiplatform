@@ -56,21 +56,22 @@ internal val NodeKind<*>.includeSelfInTraversal: Boolean get() {
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal object Nodes {
-    val Layout = NodeKind<LayoutModifierNode>(0b1 shl 0)
-    val Draw = NodeKind<DrawModifierNode>(0b1 shl 1)
-    val Semantics = NodeKind<SemanticsModifierNode>(0b1 shl 2)
-    val PointerInput = NodeKind<PointerInputModifierNode>(0b1 shl 3)
-    val Locals = NodeKind<ModifierLocalNode>(0b1 shl 6)
-    val ParentData = NodeKind<ParentDataModifierNode>(0b1 shl 7)
-    val LayoutAware = NodeKind<LayoutAwareModifierNode>(0b1 shl 8)
-    val GlobalPositionAware = NodeKind<GlobalPositionAwareModifierNode>(0b1 shl 9)
-    val IntermediateMeasure = NodeKind<IntermediateLayoutModifierNode>(0b1 shl 10)
+    val Any = NodeKind<Modifier.Node>(0b1)
+    val Layout = NodeKind<LayoutModifierNode>(0b1 shl 1)
+    val Draw = NodeKind<DrawModifierNode>(0b1 shl 2)
+    val Semantics = NodeKind<SemanticsModifierNode>(0b1 shl 3)
+    val PointerInput = NodeKind<PointerInputModifierNode>(0b1 shl 4)
+    val Locals = NodeKind<ModifierLocalNode>(0b1 shl 5)
+    val ParentData = NodeKind<ParentDataModifierNode>(0b1 shl 6)
+    val LayoutAware = NodeKind<LayoutAwareModifierNode>(0b1 shl 7)
+    val GlobalPositionAware = NodeKind<GlobalPositionAwareModifierNode>(0b1 shl 8)
+    val IntermediateMeasure = NodeKind<IntermediateLayoutModifierNode>(0b1 shl 9)
     // ...
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun calculateNodeKindSetFrom(element: Modifier.Element): Int {
-    var mask = 0
+    var mask = Nodes.Any.mask
     if (element is LayoutModifier) {
         mask = mask or Nodes.Layout
     }
@@ -113,7 +114,7 @@ internal fun calculateNodeKindSetFrom(element: Modifier.Element): Int {
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun calculateNodeKindSetFrom(node: Modifier.Node): Int {
-    var mask = 0
+    var mask = Nodes.Any.mask
     if (node is LayoutModifierNode) {
         mask = mask or Nodes.Layout
     }
