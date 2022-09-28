@@ -27,7 +27,6 @@ interface ClipboardManager {
      *
      * @param annotatedString The [AnnotatedString] to be put into Clipboard.
      */
-    @Suppress("GetterSetterNames")
     fun setText(annotatedString: AnnotatedString)
 
     /**
@@ -38,9 +37,4 @@ interface ClipboardManager {
      * [CharSequence] text in Clipboard to [AnnotatedString].
      */
     fun getText(): AnnotatedString?
-
-    /**
-     * This method returns true if there is a text in the Clipboard, false otherwise.
-     */
-    fun hasText(): Boolean = getText()?.isNotEmpty() == true
 }
