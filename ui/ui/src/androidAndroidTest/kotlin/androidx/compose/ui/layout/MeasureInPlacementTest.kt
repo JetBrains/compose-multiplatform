@@ -20,10 +20,19 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.TestActivity
+import androidx.compose.ui.test.assertIsDisplayed
+import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -166,5 +175,55 @@ class MeasureInPlacementTest {
         rule.waitForIdle()
         assertThat(childSize.width).isGreaterThan(0)
         assertThat(childSize.height).isGreaterThan(0)
+    }
+
+    @Test
+    fun remeasureRequestForANodeWhichIsNotYetPlacedButMeasuredAlready() {
+        var needToMeasureTopBar by mutableStateOf(false)
+        var topBoxSize by mutableStateOf(0.dp)
+        val stateBasedSize = Modifier.layout { measurable, _ ->
+            val sizePx = topBoxSize.roundToPx()
+            val placeable = measurable.measure(Constraints.fixed(sizePx, sizePx))
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
+            }
+        }
+        rule.setContent {
+            Layout(
+                content = {
+                    Box(stateBasedSize.testTag("top"))
+                    Box(Modifier.size(10.dp).testTag("bottom"))
+                }
+            ) { measurables, constraints ->
+                layout(constraints.maxWidth, constraints.maxHeight) {
+                    val topBarHeight = if (needToMeasureTopBar) {
+                        val placeable = measurables[0].measure(Constraints())
+                        if (Snapshot.withoutReadObservation { topBoxSize } == 0.dp) {
+                            topBoxSize = 10.dp
+                            // it will synchronously request one more remeasure for measurables[0]
+                            // while it is still not placed. such requests were ignored previously
+                            // meaning that given remeasure will never happen.
+                            Snapshot.sendApplyNotifications()
+                        }
+                        placeable.place(0, 0)
+                        placeable.height
+                    } else {
+                        0
+                    }
+                    measurables[1].measure(Constraints()).place(0, topBarHeight)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            needToMeasureTopBar = true
+        }
+
+        rule.onNodeWithTag("bottom")
+            .assertIsDisplayed()
+            .assertPositionInRootIsEqualTo(0.dp, 10.dp)
+        rule.onNodeWithTag("top")
+            .assertIsDisplayed()
+            .assertPositionInRootIsEqualTo(0.dp, 0.dp)
     }
 }
