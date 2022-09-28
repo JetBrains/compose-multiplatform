@@ -1028,7 +1028,7 @@ AndroidParagraphTest {
             )
 
             for (i in 0 until paragraph.lineCount) {
-                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+                assertThat(paragraph.isLineEllipsized(i)).isFalse()
             }
         }
     }
@@ -1051,7 +1051,7 @@ AndroidParagraphTest {
                 width = paragraphWidth
             )
 
-            assertThat(paragraph.isEllipsisApplied(0)).isTrue()
+            assertThat(paragraph.isLineEllipsized(0)).isTrue()
         }
     }
 
@@ -1074,7 +1074,7 @@ AndroidParagraphTest {
             )
 
             for (i in 0 until paragraph.lineCount) {
-                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+                assertThat(paragraph.isLineEllipsized(i)).isFalse()
             }
         }
     }
@@ -1096,7 +1096,7 @@ AndroidParagraphTest {
             )
 
             for (i in 0 until paragraph.lineCount) {
-                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+                assertThat(paragraph.isLineEllipsized(i)).isFalse()
             }
         }
     }
@@ -1118,7 +1118,7 @@ AndroidParagraphTest {
             )
 
             assertThat(paragraph.lineCount).isEqualTo(2)
-            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+            assertThat(paragraph.isLineEllipsized(paragraph.lineCount - 1)).isTrue()
         }
     }
 
@@ -1139,7 +1139,7 @@ AndroidParagraphTest {
             )
 
             for (i in 0 until paragraph.lineCount) {
-                assertThat(paragraph.isEllipsisApplied(i)).isFalse()
+                assertThat(paragraph.isLineEllipsized(i)).isFalse()
             }
         }
     }
@@ -1162,7 +1162,7 @@ AndroidParagraphTest {
             )
 
             assertThat(paragraph.lineCount).isEqualTo(2)
-            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+            assertThat(paragraph.isLineEllipsized(paragraph.lineCount - 1)).isTrue()
         }
     }
 
@@ -1184,7 +1184,7 @@ AndroidParagraphTest {
             )
 
             assertThat(paragraph.lineCount).isEqualTo(2)
-            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+            assertThat(paragraph.isLineEllipsized(paragraph.lineCount - 1)).isTrue()
         }
     }
 
@@ -1206,7 +1206,7 @@ AndroidParagraphTest {
 
             assertThat(paragraph.didExceedMaxLines).isTrue()
             assertThat(paragraph.lineCount).isEqualTo(1)
-            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+            assertThat(paragraph.isLineEllipsized(paragraph.lineCount - 1)).isTrue()
         }
     }
 
@@ -1230,7 +1230,7 @@ AndroidParagraphTest {
             )
 
             assertThat(paragraph.lineCount).isEqualTo(1)
-            assertThat(paragraph.isEllipsisApplied(paragraph.lineCount - 1)).isTrue()
+            assertThat(paragraph.isLineEllipsized(paragraph.lineCount - 1)).isTrue()
         }
     }
     @Test

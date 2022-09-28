@@ -434,13 +434,6 @@ internal class AndroidParagraph(
             ResolvedTextDirection.Ltr
     }
 
-    /**
-     * @return true if the given line is ellipsized, else false.
-     */
-    @VisibleForTesting
-    internal fun isEllipsisApplied(lineIndex: Int): Boolean =
-        layout.isEllipsisApplied(lineIndex)
-
     private fun TextLayout.getShaderBrushSpans(): Array<ShaderBrushSpan> {
         if (text !is Spanned) return emptyArray()
         val brushSpans = (text as Spanned).getSpans(
