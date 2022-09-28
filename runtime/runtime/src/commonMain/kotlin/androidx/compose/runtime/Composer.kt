@@ -19,6 +19,7 @@
 )
 package androidx.compose.runtime
 
+import androidx.compose.runtime.Composer.Companion.equals
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
@@ -916,6 +917,21 @@ sealed interface Composer {
     @ComposeCompilerApi
     fun changed(value: Double): Boolean = changed(value)
 
+    /**
+     * A Compose compiler plugin API. DO NOT call directly.
+     *
+     * Check [value] is different than the value used in the previous composition using `===`
+     * instead of `==` equality. This is used,  for example, to check parameter values to determine
+     * if they have changed for values that use value equality but, for correct behavior, the
+     * composer needs reference equality.
+     *
+     * @param value the value to check
+     * @return `true` if the value is === equal to the previous value and returns `false` when
+     * [value] is different.
+     */
+    @ComposeCompilerApi
+    fun changedInstance(value: Any?): Boolean = changed(value)
+
     // Scopes
 
     /**
@@ -1654,6 +1670,16 @@ internal class ComposerImpl(
     @ComposeCompilerApi
     override fun changed(value: Any?): Boolean {
         return if (nextSlot() != value) {
+            updateValue(value)
+            true
+        } else {
+            false
+        }
+    }
+
+    @ComposeCompilerApi
+    override fun changedInstance(value: Any?): Boolean {
+        return if (nextSlot() !== value) {
             updateValue(value)
             true
         } else {
