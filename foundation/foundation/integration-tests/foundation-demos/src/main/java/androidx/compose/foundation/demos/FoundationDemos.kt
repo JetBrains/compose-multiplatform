@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.demos
 
+import androidx.compose.foundation.demos.pager.PagerDemos
 import androidx.compose.foundation.demos.relocation.BringIntoViewAndroidInteropDemo
 import androidx.compose.foundation.demos.relocation.BringIntoViewDemo
 import androidx.compose.foundation.demos.relocation.BringIntoViewResponderDemo
@@ -59,6 +60,7 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("Draw Modifiers") { DrawModifiersDemo() },
         DemoCategory("Lazy lists", LazyListDemos),
         DemoCategory("Snapping", SnappingDemos),
+        DemoCategory("Pagers", PagerDemos),
         ComposableDemo("Simple InteractionSource") { SimpleInteractionSourceSample() },
         ComposableDemo("Flow InteractionSource") { InteractionSourceFlowSample() },
         DemoCategory("Suspending Gesture Detectors", CoroutineGestureDemos),

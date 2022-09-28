@@ -66,8 +66,18 @@ import kotlinx.coroutines.flow.filter
 
 /**
  * A Pager that scrolls horizontally. Pages are lazily placed in accordance to the available
- * viewport size. You can use [beyondBoundsPageCount] to place more pages before and after the
- * visible pages.
+ * viewport size. By definition, pages in a [Pager] have the same size, defined by [pageSize] and
+ * use a snap animation (provided by [flingBehavior] to scroll pages into a specific position). You
+ * can use [beyondBoundsPageCount] to place more pages before and after the visible pages.
+ *
+ * If you need snapping with pages of different size, you can use a [SnapFlingBehavior] with a
+ * [SnapLayoutInfoProvider] adapted to a LazyList.
+ * @see androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider for the implementation
+ * of a [SnapLayoutInfoProvider] that uses [LazyListState].
+ *
+ * Please refer to the sample to learn how to use this API.
+ * @sample androidx.compose.foundation.samples.SimpleHorizontalPagerSample
+ *
  * @param pageCount The number of pages this Pager will contain
  * @param modifier A modifier instance to be applied to this Pager outer layout
  * @param state The state to control this pager
@@ -78,7 +88,7 @@ import kotlinx.coroutines.flow.filter
  * @param pageSize Use this to change how the pages will look like inside this pager.
  * @param beyondBoundsPageCount Pages to load before and after the list of visible
  * pages. Note: Be aware that using a large value for [beyondBoundsPageCount] will cause a lot of
- * pages to be composed, measured and placed which will defeat the purpose of using Lazy loading.
+ * pages to be composed, measured and placed which will defeat the purpose of using lazy loading.
  * This should be used as an optimization to pre-load a couple of pages before and after the visible
  * ones.
  * @param pageSpacing The amount of space to be used to separate the pages in this Pager
@@ -97,7 +107,7 @@ import kotlinx.coroutines.flow.filter
  */
 @Composable
 @ExperimentalFoundationApi
-internal fun HorizontalPager(
+fun HorizontalPager(
     pageCount: Int,
     modifier: Modifier = Modifier,
     state: PagerState = rememberPagerState(),
@@ -135,9 +145,18 @@ internal fun HorizontalPager(
 }
 
 /**
- * A Pager that scrolls vertically. Tha backing mechanism for this is a LazyList, therefore
- * pages are lazily placed in accordance to the available viewport size. You can use
- * [beyondBoundsPageCount] to place more pages before and after the visible pages.
+ * A Pager that scrolls vertically. Pages are lazily placed in accordance to the available
+ * viewport size. By definition, pages in a [Pager] have the same size, defined by [pageSize] and
+ * use a snap animation (provided by [flingBehavior] to scroll pages into a specific position). You
+ * can use [beyondBoundsPageCount] to place more pages before and after the visible pages.
+ *
+ * If you need snapping with pages of different size, you can use a [SnapFlingBehavior] with a
+ * [SnapLayoutInfoProvider] adapted to a LazyList.
+ * @see androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider for the implementation
+ * of a [SnapLayoutInfoProvider] that uses [LazyListState].
+ *
+ * Please refer to the sample to learn how to use this API.
+ * @sample androidx.compose.foundation.samples.SimpleVerticalPagerSample
  *
  * @param pageCount The number of pages this Pager will contain
  * @param modifier A modifier instance to be apply to this Pager outer layout
@@ -149,7 +168,7 @@ internal fun HorizontalPager(
  * @param pageSize Use this to change how the pages will look like inside this pager.
  * @param beyondBoundsPageCount Pages to load before and after the list of visible
  * pages. Note: Be aware that using a large value for [beyondBoundsPageCount] will cause a lot of
- * pages to be composed, measured and placed which will defeat the purpose of using Lazy loading.
+ * pages to be composed, measured and placed which will defeat the purpose of using lazy loading.
  * This should be used as an optimization to pre-load a couple of pages before and after the visible
  * ones.
  * @param pageSpacing The amount of space to be used to separate the pages in this Pager
@@ -168,7 +187,7 @@ internal fun HorizontalPager(
  */
 @Composable
 @ExperimentalFoundationApi
-internal fun VerticalPager(
+fun VerticalPager(
     pageCount: Int,
     modifier: Modifier = Modifier,
     state: PagerState = rememberPagerState(),
@@ -354,9 +373,14 @@ private fun calculateContentPaddings(
 /**
  * This is used to determine how Pages are laid out in [Pager]. By changing the size of the pages
  * one can change how many pages are shown.
+ *
+ * Please refer to the sample to learn how to use this API.
+ * @sample androidx.compose.foundation.samples.CustomPageSizeSample
+ *
  */
 @ExperimentalFoundationApi
-internal interface PageSize {
+@Stable
+interface PageSize {
 
     /**
      * Based on [availableSpace] pick a size for the pages
@@ -387,10 +411,18 @@ internal interface PageSize {
     }
 }
 
+/**
+ * Contains the default values used by [Pager].
+ */
 @ExperimentalFoundationApi
-internal object PagerDefaults {
+object PagerDefaults {
 
     /**
+     * A [SnapFlingBehavior] that will snap pages to the start of the layout. One can use the
+     * given parameters to control how the snapping animation will happen.
+     * @see androidx.compose.foundation.gestures.snapping.SnapFlingBehavior for more information
+     * on what which parameter controls in the overall snapping animation.
+     *
      * @param state The [PagerState] that controls the which to which this FlingBehavior will
      * be applied to.
      * @param pagerSnapDistance A way to control the snapping destination for this [Pager].
@@ -404,8 +436,8 @@ internal object PagerDefaults {
      * the fling velocity is large enough. Large enough means large enough to naturally decay.
      * @param snapAnimationSpec The animation spec used to finally snap to the position.
      *
-     * @return An instance of [FlingBehavior] that will perform Snapping to the next page. The
-     * animation will be governed by the post scroll velocity and we'll use either
+     * @return An instance of [FlingBehavior] that will perform Snapping to the next page by
+     * default. The animation will be governed by the post scroll velocity and we'll use either
      * [lowVelocityAnimationSpec] or [highVelocityAnimationSpec] to approach the snapped position
      * and the last step of the animation will be performed by [snapAnimationSpec].
      */
@@ -460,7 +492,7 @@ internal object PagerDefaults {
  */
 @ExperimentalFoundationApi
 @Stable
-internal interface PagerSnapDistance {
+interface PagerSnapDistance {
 
     /** Provides a chance to change where the [Pager] fling will settle.
      *

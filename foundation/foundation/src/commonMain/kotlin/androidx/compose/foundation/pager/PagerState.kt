@@ -31,6 +31,7 @@ import androidx.compose.foundation.lazy.LazyListItemInfo
 import androidx.compose.foundation.lazy.LazyListLayoutInfo
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -53,6 +54,9 @@ import kotlinx.coroutines.flow.emptyFlow
 /**
  * Creates and remember a [PagerState] to be used with a [Pager]
  *
+ * Please refer to the sample to learn how to use this API.
+ * @sample androidx.compose.foundation.samples.PagerWithStateSample
+ *
  * @param initialPage The pager that should be shown first.
  * @param initialPageOffsetFraction The offset of the initial page as a fraction of the page size.
  * This should vary between -0.5 and 0.5 and indicates how to offset the initial page from the
@@ -60,7 +64,7 @@ import kotlinx.coroutines.flow.emptyFlow
  */
 @ExperimentalFoundationApi
 @Composable
-internal fun rememberPagerState(
+fun rememberPagerState(
     initialPage: Int = 0,
     initialPageOffsetFraction: Float = 0f
 ): PagerState {
@@ -76,7 +80,8 @@ internal fun rememberPagerState(
  * the layout.
  */
 @ExperimentalFoundationApi
-internal class PagerState(
+@Stable
+class PagerState(
     val initialPage: Int = 0,
     val initialPageOffsetFraction: Float = 0f
 ) : ScrollableState {
@@ -153,7 +158,12 @@ internal class PagerState(
         get() = lazyListState?.interactionSource ?: EmptyInteractionSources
 
     /**
-     * The page that sits closest to the snapped position.
+     * The page that sits closest to the snapped position. This is an observable value and will
+     * change as the pager scrolls either by gesture or animation.
+     *
+     * Please refer to the sample to learn how to use this API.
+     * @sample androidx.compose.foundation.samples.ObservingStateChangesInPagerStateSample
+     *
      */
     val currentPage: Int by derivedStateOf { closestPageToSnappedPosition?.index ?: 0 }
 
@@ -165,6 +175,9 @@ internal class PagerState(
      * The page that is currently "settled". This is an animation/gesture unaware page in the sense
      * that it will not be updated while the pages are being scrolled, but rather when the
      * animation/scroll settles.
+     *
+     * Please refer to the sample to learn how to use this API.
+     * @sample androidx.compose.foundation.samples.ObservingStateChangesInPagerStateSample
      */
     val settledPage: Int by derivedStateOf {
         if (pageCount == 0) 0 else settledPageState.coerceInPageRange()
@@ -175,6 +188,9 @@ internal class PagerState(
      * During fling or animated scroll (from [animateScrollToPage] this will represent the page
      * this pager intends to settle to. When no scroll is ongoing, this will be equal to
      * [currentPage].
+     *
+     * Please refer to the sample to learn how to use this API.
+     * @sample androidx.compose.foundation.samples.ObservingStateChangesInPagerStateSample
      */
     val targetPage: Int by derivedStateOf {
         if (!isScrollInProgress) {
@@ -201,6 +217,14 @@ internal class PagerState(
      * -0.5 (page is offset towards the start of the layout) to 0.5 (page is offset towards the end
      * of the layout). This is 0.0 if the [currentPage] is in the snapped position. The value will
      * flip once the current page changes.
+     *
+     * This property is observable and shouldn't be used as is in a composable function due to
+     * potential performance issues. To use it in the composition, please consider using a
+     * derived state (e.g [derivedStateOf]) to only have recompositions when the derived
+     * value changes.
+     *
+     * Please refer to the sample to learn how to use this API.
+     * @sample androidx.compose.foundation.samples.ObservingStateChangesInPagerStateSample
      */
     val currentPageOffsetFraction: Float by derivedStateOf {
         val currentPagePositionOffset = closestPageToSnappedPosition?.offset ?: 0
@@ -211,7 +235,11 @@ internal class PagerState(
     }
 
     /**
-     * Scroll (jump immediately) to a given [page]
+     * Scroll (jump immediately) to a given [page].
+     *
+     * Please refer to the sample to learn how to use this API.
+     * @sample androidx.compose.foundation.samples.ScrollToPageSample
+     *
      * @param page The destination page to scroll to
      * @param pageOffsetFraction A fraction of the page size that indicates the offset the
      * destination page will be offset from its snapped position.
@@ -230,6 +258,10 @@ internal class PagerState(
      * Scroll animate to a given [page]. If the [page] is too far away from [currentPage] we will
      * not compose all pages in the way. We will pre-jump to a nearer page, compose and animate
      * the rest of the pages until [page].
+     *
+     * Please refer to the sample to learn how to use this API.
+     * @sample androidx.compose.foundation.samples.AnimateScrollPageSample
+     *
      * @param page The destination page to scroll to
      * @param pageOffsetFraction A fraction of the page size that indicates the offset the
      * destination page will be offset from its snapped position.
