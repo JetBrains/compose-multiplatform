@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.tokens.SliderTokens
 import androidx.compose.runtime.Composable
@@ -454,6 +455,28 @@ class SliderTest {
             ) { Slider(value = state.value, onValueChange = { state.value = it }) }
             .assertHeightIsEqualTo(48.dp)
             .assertWidthIsEqualTo(100.dp)
+    }
+
+    @Test
+    fun slider_sizes_within_row() {
+        val rowWidth = 100.dp
+        val spacerWidth = 10.dp
+
+        rule.setMaterialContent(lightColorScheme()) {
+            Row(modifier = Modifier.requiredWidth(rowWidth)) {
+                Spacer(Modifier.width(spacerWidth))
+                Slider(
+                    modifier = Modifier.testTag(tag).weight(1f),
+                    value = 0f,
+                    onValueChange = {}
+                )
+                Spacer(Modifier.width(spacerWidth))
+            }
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertWidthIsEqualTo(rowWidth - spacerWidth.times(2))
+            .assertHeightIsEqualTo(SliderTokens.HandleHeight)
     }
 
     @Test
