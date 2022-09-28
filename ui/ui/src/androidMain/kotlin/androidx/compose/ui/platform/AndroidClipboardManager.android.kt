@@ -17,6 +17,7 @@
 package androidx.compose.ui.platform
 
 import android.content.ClipData
+import android.content.ClipDescription.MIMETYPE_TEXT_PLAIN
 import android.content.Context
 import android.os.Parcel
 import android.text.Annotation
@@ -74,8 +75,8 @@ internal class AndroidClipboardManager internal constructor(
         }
     }
 
-    override fun hasText() =
-        clipboardManager.primaryClipDescription?.hasMimeType("text/*") ?: false
+    fun hasText() =
+        clipboardManager.primaryClipDescription?.hasMimeType(MIMETYPE_TEXT_PLAIN) ?: false
 }
 
 internal fun CharSequence?.convertToAnnotatedString(): AnnotatedString? {

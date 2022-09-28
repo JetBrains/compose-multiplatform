@@ -2359,7 +2359,6 @@ package androidx.compose.ui.platform {
 
   public interface ClipboardManager {
     method public androidx.compose.ui.text.AnnotatedString? getText();
-    method public default boolean hasText();
     method public void setText(androidx.compose.ui.text.AnnotatedString annotatedString);
   }
 
