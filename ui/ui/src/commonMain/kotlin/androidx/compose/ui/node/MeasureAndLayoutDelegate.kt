@@ -81,9 +81,7 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
      * during the previous measure/layout pass and they were already measured as part of it.
      * See [requestRemeasure] for more details.
      */
-    private val postponedMeasureRequests = mutableVectorOf<LayoutNode>()
-
-    private val postponedLookaheadMeasureRequests = mutableVectorOf<LayoutNode>()
+    private val postponedMeasureRequests = mutableVectorOf<PostponedRequest>()
 
     private var rootConstraints: Constraints? = null
 
@@ -105,7 +103,6 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
                 root,
                 relayoutNodes,
                 postponedMeasureRequests.asMutableList(),
-                postponedLookaheadMeasureRequests.asMutableList(),
             )
         } else {
             null
@@ -135,7 +132,9 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             Measuring, LookaheadLayingOut, LayingOut -> {
                 // requestLookaheadRemeasure is currently laying out and it is incorrect to
                 // request lookahead remeasure now, let's postpone it.
-                postponedLookaheadMeasureRequests.add(layoutNode)
+                postponedMeasureRequests.add(
+                    PostponedRequest(node = layoutNode, isLookahead = true, isForced = forced)
+                )
                 consistencyChecker?.assertConsistent()
                 false
             }
@@ -176,7 +175,9 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             LookaheadLayingOut, LayingOut -> {
                 // requestMeasure is currently laying out and it is incorrect to request remeasure
                 // now, let's postpone it.
-                postponedMeasureRequests.add(layoutNode)
+                postponedMeasureRequests.add(
+                    PostponedRequest(node = layoutNode, isLookahead = false, isForced = forced)
+                )
                 consistencyChecker?.assertConsistent()
                 false
             }
@@ -450,20 +451,16 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
             }
             // execute postponed `onRequestMeasure`
             if (postponedMeasureRequests.isNotEmpty()) {
-                postponedMeasureRequests.forEach {
-                    if (it.isAttached) {
-                        requestRemeasure(it)
+                postponedMeasureRequests.forEach { request ->
+                    if (request.node.isAttached) {
+                        if (!request.isLookahead) {
+                            requestRemeasure(request.node, request.isForced)
+                        } else {
+                            requestLookaheadRemeasure(request.node, request.isForced)
+                        }
                     }
                 }
                 postponedMeasureRequests.clear()
-            }
-            if (postponedLookaheadMeasureRequests.isNotEmpty()) {
-                postponedLookaheadMeasureRequests.forEach {
-                    if (it.isAttached) {
-                        requestLookaheadRemeasure(it)
-                    }
-                }
-                postponedLookaheadMeasureRequests.clear()
             }
         }
         return sizeChanged
@@ -554,4 +551,6 @@ internal class MeasureAndLayoutDelegate(private val root: LayoutNode) {
         get() = lookaheadLayoutPending &&
             (measuredByParentInLookahead == InMeasureBlock ||
                 layoutDelegate.lookaheadAlignmentLinesOwner?.alignmentLines?.required == true)
+
+    class PostponedRequest(val node: LayoutNode, val isLookahead: Boolean, val isForced: Boolean)
 }
