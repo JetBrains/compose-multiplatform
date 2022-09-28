@@ -121,6 +121,44 @@ interface Modifier {
         override fun all(predicate: (Element) -> Boolean): Boolean = predicate(this)
     }
 
+    /**
+     * The longer-lived object that is created for each [Modifier.Element] applied to a
+     * [androidx.compose.ui.layout.Layout]. Most [Modifier.Node] implementations will have a
+     * corresponding "Modifier Factory" extension method on Modifier that will allow them to be used
+     * indirectly, without ever implementing a [Modifier.Node] subclass directly. In some cases it
+     * may be useful to define a custom [Modifier.Node] subclass in order to efficiently implement
+     * some collection of behaviors that requires maintaining state over time and over many
+     * recompositions where the various provided Modifier factories are not sufficient.
+     *
+     * When a [Modifier] is set on a [androidx.compose.ui.layout.Layout], each [Modifier.Element]
+     * contained in that linked list will result in a corresponding [Modifier.Node] instance in a
+     * matching linked list of [Modifier.Node]s that the [androidx.compose.ui.layout.Layout] will
+     * hold on to. As subsequent [Modifier] chains get set on the
+     * [androidx.compose.ui.layout.Layout], the linked list of [Modifier.Node]s will be diffed and
+     * updated as appropriate, even though the [Modifier] instance might be completely new. As a
+     * result, the lifetime of a [Modifier.Node] is the intersection of the lifetime of the
+     * [androidx.compose.ui.layout.Layout] that it lives on and a corresponding [Modifier.Element]
+     * being present in the [androidx.compose.ui.layout.Layout]'s [Modifier].
+     *
+     * If one creates a subclass of [Modifier.Node], it is expected that it will implement one or
+     * more interfaces that interact with the various Compose UI subsystems. To use the
+     * [Modifier.Node] subclass, it is expected that it will be instantiated by adding a
+     * [androidx.compose.ui.node.ModifierNodeElement] to a [Modifier] chain.
+     *
+     * @see androidx.compose.ui.node.modifierElementOf
+     * @see androidx.compose.ui.node.ModifierNodeElement
+     * @see androidx.compose.ui.node.DelegatableNode
+     * @see androidx.compose.ui.node.DelegatingNode
+     * @see androidx.compose.ui.node.LayoutModifierNode
+     * @see androidx.compose.ui.node.DrawModifierNode
+     * @see androidx.compose.ui.node.SemanticsModifierNode
+     * @see androidx.compose.ui.node.PointerInputModifierNode
+     * @see androidx.compose.ui.modifier.ModifierLocalNode
+     * @see androidx.compose.ui.node.ParentDataModifierNode
+     * @see androidx.compose.ui.node.LayoutAwareModifierNode
+     * @see androidx.compose.ui.node.GlobalPositionAwareModifierNode
+     * @see androidx.compose.ui.node.IntermediateLayoutModifierNode
+     */
     @ExperimentalComposeUiApi
     abstract class Node : DelegatableNode {
         @Suppress("LeakingThis")
@@ -135,6 +173,15 @@ interface Modifier {
         internal var child: Node? = null
         internal var coordinator: NodeCoordinator? = null
             private set
+        /**
+         * Indicates that the node is attached and part of the tree. This will get set to true
+         * right before [onAttach] is called, and set to false right after [onDetach] is called.
+         *
+         * A Node will never be attached more than once.
+         *
+         * @see onAttach
+         * @see onDetach
+         */
         var isAttached: Boolean = false
             private set
 
@@ -176,7 +223,10 @@ interface Modifier {
         open fun onDetach() {}
 
         /**
+         * This can be called to register [effect] as a function to be executed after all of the
+         * changes to the tree are applied.
          *
+         * This API can only be called if the node [isAttached].
          */
         fun sideEffect(effect: () -> Unit) {
             requireOwner().registerOnEndApplyChangesListener(effect)

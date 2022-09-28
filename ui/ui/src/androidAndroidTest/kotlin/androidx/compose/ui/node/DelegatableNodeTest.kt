@@ -299,3 +299,11 @@ class DelegatableNodeTest {
 
     private fun Modifier.otherModifier(): Modifier = this.then(Modifier)
 }
+
+@ExperimentalComposeUiApi
+internal inline fun <reified T : Modifier.Node> modifierElementOf(
+    crossinline create: () -> T,
+): Modifier = object : ModifierNodeElement<T>(null, {}) {
+    override fun create(): T = create()
+    override fun update(node: T): T = node
+}

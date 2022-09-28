@@ -2465,11 +2465,11 @@ package androidx.compose.ui.node {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface LayoutModifierNode extends androidx.compose.ui.layout.Remeasurement androidx.compose.ui.node.DelegatableNode {
     method public default void forceRemeasure();
-    method public int maxIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int width);
-    method public int maxIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int height);
+    method public default int maxIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int width);
+    method public default int maxIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int height);
     method public androidx.compose.ui.layout.MeasureResult measure(androidx.compose.ui.layout.MeasureScope, androidx.compose.ui.layout.Measurable measurable, long constraints);
-    method public int minIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int width);
-    method public int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int height);
+    method public default int minIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int width);
+    method public default int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int height);
   }
 
   public final class LayoutModifierNodeCoordinatorKt {
@@ -2490,15 +2490,15 @@ package androidx.compose.ui.node {
   public final class MeasureScopeWithLayoutNodeKt {
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> implements androidx.compose.ui.Modifier.Element {
-    ctor public ModifierNodeElement(optional Object? params);
+  @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> extends androidx.compose.ui.platform.InspectorValueInfo implements androidx.compose.ui.Modifier.Element {
+    ctor public ModifierNodeElement(optional Object? params, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo);
     method public abstract N create();
     method public abstract N update(N node);
   }
 
   public final class ModifierNodeElementKt {
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(Object? params, kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> update);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(kotlin.jvm.functions.Function0<? extends T> create);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(Object? params, kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
   }
 
   public final class MyersDiffKt {

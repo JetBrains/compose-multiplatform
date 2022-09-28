@@ -34,7 +34,11 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
 
 @Sampled
@@ -183,6 +187,36 @@ fun LayoutModifierSample() {
         }
     }
     Box(Modifier.background(Color.Gray).then(verticalPadding)) {
+        Box(Modifier.fillMaxSize().background(Color.DarkGray))
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Sampled
+@Composable
+fun LayoutModifierNodeSample() {
+    class VerticalPadding(var padding: Dp) : LayoutModifierNode, Modifier.Node() {
+        override fun MeasureScope.measure(
+            measurable: Measurable,
+            constraints: Constraints
+        ): MeasureResult {
+            val paddingPx = padding.roundToPx()
+            val placeable = measurable.measure(constraints.offset(vertical = -paddingPx))
+            return layout(placeable.width, placeable.height + paddingPx) {
+                placeable.placeRelative(0, paddingPx)
+            }
+        }
+    }
+    fun Modifier.verticalPadding(padding: Dp) = this then modifierElementOf(
+        params = padding,
+        create = { VerticalPadding(padding) },
+        update = { it.padding = padding },
+        definitions = {
+            name = "verticalPadding"
+            properties["padding"] = padding
+        }
+    )
+    Box(Modifier.background(Color.Gray).verticalPadding(50.dp)) {
         Box(Modifier.fillMaxSize().background(Color.DarkGray))
     }
 }
