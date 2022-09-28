@@ -117,11 +117,6 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":hilt:hilt-navigation-compose:kaptGenerateStubsReleaseKotlin",
     ":lint-checks:integration-tests:copyDebugAndroidLintReports",
 
-    // https://github.com/gradle/gradle/issues/17262
-    ":doclava:compileJava",
-    ":doclava:processResources",
-    ":doclava:jar",
-
     // https://youtrack.jetbrains.com/issue/KT-49933
     "generateProjectStructureMetadata"
 )
@@ -137,9 +132,6 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "dokkaKotlinDocs",
     "zipDokkaDocs",
     "dackkaDocs",
-
-    // Flakily not up-to-date, b/176120659
-    "doclavaDocs",
 
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
