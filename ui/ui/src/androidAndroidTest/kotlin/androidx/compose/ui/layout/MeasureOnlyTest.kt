@@ -18,6 +18,7 @@ package androidx.compose.ui.layout
 import android.view.View
 import android.view.View.MeasureSpec
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -28,11 +29,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.RootMeasurePolicy.measure
+import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
+import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -242,6 +245,38 @@ class MeasureOnlyTest {
             Snapshot.sendApplyNotifications()
             view.measure(widthSpec, heightSpec)
             assertThat(childMeasured).isFalse()
+        }
+    }
+
+    /**
+     * When a descendant affects the root size, the root should resize when the
+     * descendant changes size.
+     */
+    @Test
+    fun remeasureRoot() {
+        lateinit var view: View
+        var showContent by mutableStateOf(false)
+        rule.setContent {
+            view = LocalView.current
+            AndroidView(factory = { context ->
+                ComposeView(context).apply {
+                    setContent {
+                        Box {
+                            Layout { _, _ ->
+                                val size = if (showContent) 10 else 0
+                                layout(size, size) {}
+                            }
+                        }
+                    }
+                }
+            })
+        }
+        rule.runOnIdle {
+            assertThat(view.height).isEqualTo(0)
+            showContent = true
+        }
+        rule.runOnIdle {
+            assertThat(view.height).isEqualTo(10)
         }
     }
 }
