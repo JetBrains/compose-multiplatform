@@ -47,6 +47,8 @@ sealed class FontFamily(canLoadSynchronously: Boolean) {
         /**
          * Preloading resolves and caches all fonts reachable in a [FontFamily].
          *
+         * It checks the cache first, and if there is a miss, it will fetch from the network.
+         *
          * Fonts are consider reachable if they are the first entry in the fallback chain for any
          * call to [resolve].
          *
