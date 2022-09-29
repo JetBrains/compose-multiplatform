@@ -33,13 +33,13 @@ import androidx.compose.ui.geometry.Rect
 @OptIn(ExperimentalFoundationApi::class)
 internal fun Modifier.fakeScrollable(
     parentOffset: Offset = Offset.Zero,
-    onBringIntoView: suspend (Rect) -> Unit
+    onBringIntoView: suspend (() -> Rect?) -> Unit
 ): Modifier = bringIntoViewResponder(
     object : BringIntoViewResponder {
         override fun calculateRectForParent(localRect: Rect): Rect =
             localRect.translate(parentOffset)
 
-        override suspend fun bringChildIntoView(localRect: Rect) {
+        override suspend fun bringChildIntoView(localRect: () -> Rect?) {
             onBringIntoView(localRect)
         }
     })

@@ -28,6 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.LayoutCoordinates
+import androidx.compose.ui.node.NodeCoordinator
+import androidx.compose.ui.node.PointerInputModifierNode
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.FailureMetadata
 import com.google.common.truth.Subject
@@ -46,6 +48,7 @@ internal fun PointerInputEventData(
         position,
         position,
         down,
+        pressure = 1.0f,
         PointerType.Touch
     )
 }
@@ -252,17 +255,63 @@ internal fun InternalPointerEvent(
     motionEvent: MotionEvent
 ): InternalPointerEvent {
     val pointers = changes.values.map {
+        @OptIn(ExperimentalComposeUiApi::class)
         PointerInputEventData(
             id = it.id,
             uptime = it.uptimeMillis,
             positionOnScreen = it.position,
             position = it.position,
             down = it.pressed,
+            pressure = it.pressure,
             type = it.type
         )
     }
     val pointer = PointerInputEvent(pointers[0].uptime, pointers, motionEvent)
     return InternalPointerEvent(changes, pointer)
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal class PointerInputNodeMock(
+    val log: MutableList<LogEntry> = mutableListOf(),
+    val pointerEventHandler: PointerEventHandler? = null,
+    coordinator: NodeCoordinator = LayoutCoordinatesStub(true)
+) : PointerInputModifierNode, Modifier.Node() {
+    init {
+        updateCoordinator(coordinator)
+        if (coordinator.isAttached) {
+            attach()
+        }
+    }
+
+    fun remove() {
+        val coordinator = coordinator as LayoutCoordinatesStub
+        if (coordinator.isAttached) {
+            coordinator.isAttached = false
+        }
+        if (isAttached) {
+            detach()
+        }
+    }
+
+    override fun onPointerEvent(
+        pointerEvent: PointerEvent,
+        pass: PointerEventPass,
+        bounds: IntSize
+    ) {
+        log.add(
+            OnPointerEventEntry(
+                this,
+                pointerEvent.deepCopy(),
+                pass,
+                bounds
+            )
+        )
+        pointerEventHandler?.invokeOverPass(pointerEvent, pass, bounds)
+    }
+
+    override fun onCancelPointerInput() {
+        log.add(OnCancelEntry(this))
+    }
 }
 
 internal class PointerInputFilterMock(
@@ -283,7 +332,7 @@ internal class PointerInputFilterMock(
         bounds: IntSize
     ) {
         log.add(
-            OnPointerEventEntry(
+            OnPointerEventFilterEntry(
                 this,
                 pointerEvent.deepCopy(),
                 pass,
@@ -294,24 +343,40 @@ internal class PointerInputFilterMock(
     }
 
     override fun onCancel() {
-        log.add(OnCancelEntry(this))
+        log.add(OnCancelFilterEntry(this))
     }
 }
 
 internal fun List<LogEntry>.getOnPointerEventLog() = filterIsInstance<OnPointerEventEntry>()
+internal fun List<LogEntry>.getOnPointerEventFilterLog() =
+    filterIsInstance<OnPointerEventFilterEntry>()
 
 internal fun List<LogEntry>.getOnCancelLog() = filterIsInstance<OnCancelEntry>()
+internal fun List<LogEntry>.getOnCancelFilterLog() = filterIsInstance<OnCancelFilterEntry>()
 
 internal sealed class LogEntry
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal data class OnPointerEventEntry(
+    val pointerInputNode: PointerInputModifierNode,
+    val pointerEvent: PointerEvent,
+    val pass: PointerEventPass,
+    val bounds: IntSize
+) : LogEntry()
+
+internal data class OnPointerEventFilterEntry(
     val pointerInputFilter: PointerInputFilter,
     val pointerEvent: PointerEvent,
     val pass: PointerEventPass,
     val bounds: IntSize
 ) : LogEntry()
 
+@OptIn(ExperimentalComposeUiApi::class)
 internal class OnCancelEntry(
+    val pointerInputNode: PointerInputModifierNode
+) : LogEntry()
+
+internal class OnCancelFilterEntry(
     val pointerInputFilter: PointerInputFilter
 ) : LogEntry()
 
@@ -330,6 +395,7 @@ internal fun internalPointerEventOf(vararg changes: PointerInputChange): Interna
             positionOnScreen = it.position,
             position = it.position,
             down = it.pressed,
+            pressure = it.pressure,
             type = it.type,
             issuesEnterExit = false,
             historical = emptyList()
@@ -363,6 +429,7 @@ internal fun hoverInternalPointerEvent(
         positionOnScreen = change.position,
         position = change.position,
         down = change.pressed,
+        pressure = change.pressure,
         type = change.type,
         issuesEnterExit = true,
         historical = emptyList()

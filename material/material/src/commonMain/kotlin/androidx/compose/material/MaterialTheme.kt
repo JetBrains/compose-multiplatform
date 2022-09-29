@@ -123,11 +123,12 @@ object MaterialTheme {
 
 @Immutable
 private object MaterialRippleTheme : RippleTheme {
+
     @Composable
     override fun defaultColor() = RippleTheme.defaultRippleColor(
-        contentColor = LocalContentColor.current,
-        lightTheme = MaterialTheme.colors.isLight
-    )
+            contentColor = LocalContentColor.current,
+            lightTheme = MaterialTheme.colors.isLight
+        )
 
     @Composable
     override fun rippleAlpha() = RippleTheme.defaultRippleAlpha(

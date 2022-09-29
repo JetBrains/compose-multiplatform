@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -26,7 +27,7 @@ import androidx.compose.ui.util.fastForEach
 internal class LayoutTreeConsistencyChecker(
     private val root: LayoutNode,
     private val relayoutNodes: DepthSortedSet,
-    private val postponedMeasureRequests: List<LayoutNode>
+    private val postponedMeasureRequests: List<MeasureAndLayoutDelegate.PostponedRequest>
 ) {
     fun assertConsistent() {
         val inconsistencyFound = !isTreeConsistent(root)
@@ -50,18 +51,18 @@ internal class LayoutTreeConsistencyChecker(
 
     private fun LayoutNode.consistentLayoutState(): Boolean {
         val parent = this.parent
+        val parentLayoutState = parent?.layoutState
         if (isPlaced ||
             placeOrder != LayoutNode.NotPlacedPlaceOrder && parent?.isPlaced == true
         ) {
-            if (measurePending &&
-                postponedMeasureRequests.contains(this)
+            if (measurePending && postponedMeasureRequests
+                    .fastFirstOrNull { it.node == this && !it.isLookahead } != null
             ) {
                 // this node is waiting to be measured by parent or if this will not happen
                 // `onRequestMeasure` will be called for all items in `postponedMeasureRequests`
                 return true
             }
             // remeasure or relayout is scheduled
-            val parentLayoutState = parent?.layoutState
             if (measurePending) {
                 return relayoutNodes.contains(this) ||
                     parent?.measurePending == true ||
@@ -69,10 +70,36 @@ internal class LayoutTreeConsistencyChecker(
             }
             if (layoutPending) {
                 return relayoutNodes.contains(this) ||
-                    parent?.measurePending == true ||
-                    parent?.layoutPending == true ||
+                    parent == null ||
+                    parent.measurePending ||
+                    parent.layoutPending ||
                     parentLayoutState == LayoutNode.LayoutState.Measuring ||
                     parentLayoutState == LayoutNode.LayoutState.LayingOut
+            }
+        }
+        if (isPlacedInLookahead == true) {
+            if (lookaheadMeasurePending && postponedMeasureRequests
+                    .fastFirstOrNull { it.node == this && it.isLookahead } != null
+            ) {
+                // this node is waiting to be lookahead measured by parent or if this will not
+                // happen `onRequestLookaheadMeasure` will be called for all items in
+                // `postponedLookaheadMeasureRequests`
+                return true
+            }
+            if (lookaheadMeasurePending) {
+                return relayoutNodes.contains(this) ||
+                    parent?.lookaheadMeasurePending == true ||
+                    parentLayoutState == LayoutNode.LayoutState.LookaheadMeasuring ||
+                    (parent?.measurePending == true && mLookaheadScope!!.root == this)
+            }
+            if (lookaheadLayoutPending) {
+                return relayoutNodes.contains(this) ||
+                    parent == null ||
+                    parent.lookaheadMeasurePending ||
+                    parent.lookaheadLayoutPending ||
+                    parentLayoutState == LayoutNode.LayoutState.LookaheadMeasuring ||
+                    parentLayoutState == LayoutNode.LayoutState.LookaheadLayingOut ||
+                    (parent.layoutPending && mLookaheadScope!!.root == this)
             }
         }
         return true

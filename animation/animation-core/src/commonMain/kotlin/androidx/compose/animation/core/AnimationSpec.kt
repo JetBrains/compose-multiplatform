@@ -22,6 +22,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.unit.IntOffset
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 object AnimationConstants {
     /**
@@ -402,6 +403,7 @@ class SnapSpec<T>(val delay: Int = 0) : DurationBasedAnimationSpec<T> {
  * You can also provide a custom [Easing] for the interval with use of [with] function applied
  * for the interval starting keyframe.
  * @sample androidx.compose.animation.core.samples.KeyframesBuilderWithEasing
+
  */
 @Immutable
 class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimationSpec<T> {
@@ -444,6 +446,17 @@ class KeyframesSpec<T>(val config: KeyframesSpecConfig<T>) : DurationBasedAnimat
             return KeyframeEntity(this).also {
                 keyframes[timeStamp] = it
             }
+        }
+
+        /**
+         * Adds a keyframe so that the animation value will be the value specified at a fraction of the total
+         * [durationMillis] set. For example:
+         *      0.8f atFraction 0.50f // half of the overall duration set
+         *  @param fraction The fraction when the animation should reach specified value.
+         *  @return an [KeyframeEntity] so a custom [Easing] can be added by [with] method
+         */
+        infix fun T.atFraction(fraction: Float): KeyframeEntity<T> {
+            return at((durationMillis * fraction).roundToInt())
         }
 
         /**

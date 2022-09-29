@@ -26,9 +26,10 @@ import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
-import androidx.compose.ui.text.platform.AndroidParagraph
+import androidx.compose.ui.text.matchers.isZero
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Constraints
@@ -40,7 +41,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
-import androidx.test.filters.Suppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -590,20 +590,21 @@ class MultiParagraphIntegrationTest {
         assertThat(paragraph.getLineForOffset(3)).isEqualTo(2)
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
-    fun getLineForOffset_negative_throw_exception() {
+    @Test
+    fun getLineForOffset_negative_returnsZero() {
         val text = "abc"
         val paragraph = simpleMultiParagraph(text = text)
 
-        paragraph.getLineForOffset(-1)
+        assertThat(paragraph.getLineForOffset(-1)).isZero()
     }
 
-    @Test(expected = java.lang.IllegalArgumentException::class)
-    fun getLineForOffset_larger_than_length_throw_exception() {
-        val text = "abc"
+    @Test
+    fun getLineForOffset_larger_than_length_returnsLastLine() {
+        val text = "abc\ndef"
         val paragraph = simpleMultiParagraph(text = text)
 
-        paragraph.getLineForOffset(text.length + 1)
+        assertThat(paragraph.getLineForOffset(text.length + 1))
+            .isEqualTo(1)
     }
 
     @Test
@@ -1152,6 +1153,35 @@ class MultiParagraphIntegrationTest {
     }
 
     @Test
+    fun drawText_withUnderlineStyle_equalToUnderlinePaint() = with(defaultDensity) {
+        val fontSize = 30.sp
+        val fontSizeInPx = fontSize.toPx()
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
+                    append("レンズ(単焦点)")
+                }
+            },
+            style = TextStyle(fontSize = fontSize),
+            width = fontSizeInPx * 20
+        )
+
+        val multiParagraph2 = simpleMultiParagraph(
+            text = AnnotatedString("レンズ(単焦点)"),
+            style = TextStyle(
+                fontSize = fontSize,
+                textDecoration = TextDecoration.Underline
+            ),
+            width = fontSizeInPx * 20
+        )
+
+        val bitmapWithSpan = multiParagraph.bitmap()
+        val bitmapNoSpan = multiParagraph2.bitmap()
+
+        assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
+    }
+
+    @Test
     fun textIndent_onFirstLine() {
         with(defaultDensity) {
             val text = createAnnotatedString("aaa", "\u05D0\u05D0\u05D0")
@@ -1511,6 +1541,45 @@ class MultiParagraphIntegrationTest {
 
         assertThat(multiParagraph.bitmap(brush))
             .isEqualToBitmap(multiParagraph2.bitmap(brush))
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun multiParagraph_overridesAlphaDuringDraw() = with(defaultDensity) {
+        val fontSize = 20.sp
+        val fontSizeInPx = fontSize.toPx()
+        val brush = Brush.verticalGradient(listOf(Color.Blue, Color.Red))
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            },
+            style = TextStyle(
+                brush = brush,
+                alpha = 0.5f,
+                fontSize = fontSize
+            ),
+            width = fontSizeInPx * 5
+        ).apply { disableAntialias() }
+
+        val multiParagraph2 = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                append("Lorem\n")
+                append("Ipsum")
+            },
+            style = TextStyle(
+                brush = brush,
+                fontSize = fontSize
+            ),
+            width = fontSizeInPx * 5
+        ).apply { disableAntialias() }
+
+        assertThat(multiParagraph.bitmap(brush))
+            .isEqualToBitmap(multiParagraph2.bitmap(brush, 0.5f))
     }
 
     private fun MultiParagraph.disableAntialias() {

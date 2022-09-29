@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -32,6 +33,8 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInParent
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.test.assertHeightIsEqualTo
@@ -39,6 +42,7 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -47,6 +51,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -60,6 +65,7 @@ class ScaffoldTest {
     val rule = createComposeRule()
 
     private val scaffoldTag = "Scaffold"
+    private val roundingError = 0.5.dp
 
     @Test
     fun scaffold_onlyContent_takesWholeScreen() {
@@ -230,12 +236,13 @@ class ScaffoldTest {
                 Modifier
                     .requiredSize(10.dp, 20.dp)
                     .semantics(mergeDescendants = true) {}
-                    .testTag("Scaffold")
+                    .testTag(scaffoldTag)
             ) {
                 Scaffold(
                     topBar = {
                         Box(
-                            Modifier.requiredSize(10.dp)
+                            Modifier
+                                .requiredSize(10.dp)
                                 .shadow(4.dp)
                                 .zIndex(4f)
                                 .background(color = Color.White)
@@ -243,14 +250,15 @@ class ScaffoldTest {
                     }
                 ) {
                     Box(
-                        Modifier.requiredSize(10.dp)
+                        Modifier
+                            .requiredSize(10.dp)
                             .background(color = Color.White)
                     )
                 }
             }
         }
 
-        rule.onNodeWithTag("Scaffold")
+        rule.onNodeWithTag(scaffoldTag)
             .captureToImage().asAndroidBitmap().apply {
                 // asserts the appbar(top half part) has the shadow
                 val yPos = height / 2 + 2
@@ -258,5 +266,156 @@ class ScaffoldTest {
                 assertThat(Color(getPixel(width / 2, yPos))).isNotEqualTo(Color.White)
                 assertThat(Color(getPixel(width - 1, yPos))).isNotEqualTo(Color.White)
             }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun scaffold_providesInsets_respectTopAppBar() {
+        rule.setContent {
+            Box(Modifier.requiredSize(10.dp, 20.dp)) {
+                Scaffold(
+                    contentWindowInsets = WindowInsets(top = 5.dp, bottom = 3.dp),
+                    topBar = {
+                        Box(Modifier.requiredSize(10.dp))
+                    }
+                ) { paddingValues ->
+                    // top is like top app bar + rounding error
+                    assertThat(paddingValues.calculateTopPadding() - 10.dp)
+                        .isLessThan(roundingError)
+                    // bottom is like the insets
+                    assertThat(paddingValues.calculateBottomPadding() - 30.dp).isLessThan(
+                        roundingError
+                    )
+                    Box(
+                        Modifier
+                            .requiredSize(10.dp)
+                            .background(color = Color.White)
+                    )
+                }
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun scaffold_providesInsets_respectCollapsedTopAppBar() {
+        rule.setContent {
+            Box(Modifier.requiredSize(10.dp, 20.dp)) {
+                Scaffold(
+                    contentWindowInsets = WindowInsets(top = 5.dp, bottom = 3.dp),
+                    topBar = {
+                        Box(Modifier.requiredSize(0.dp))
+                    }
+                ) { paddingValues ->
+                    // top is like the collapsed top app bar (i.e. 0dp) + rounding error
+                    assertThat(paddingValues.calculateTopPadding()).isLessThan(roundingError)
+                    // bottom is like the insets
+                    assertThat(paddingValues.calculateBottomPadding() - 30.dp).isLessThan(
+                        roundingError
+                    )
+                    Box(
+                        Modifier
+                            .requiredSize(10.dp)
+                            .background(color = Color.White)
+                    )
+                }
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun scaffold_providesInsets_respectsBottomAppBar() {
+        rule.setContent {
+            Box(Modifier.requiredSize(10.dp, 20.dp)) {
+                Scaffold(
+                    contentWindowInsets = WindowInsets(top = 5.dp, bottom = 3.dp),
+                    bottomBar = {
+                        Box(Modifier.requiredSize(10.dp))
+                    }
+                ) { paddingValues ->
+                    // bottom is like bottom app bar + rounding error
+                    assertThat(paddingValues.calculateBottomPadding() - 10.dp).isLessThan(
+                        roundingError
+                    )
+                    // top is like the insets
+                    assertThat(paddingValues.calculateTopPadding() - 5.dp).isLessThan(roundingError)
+                    Box(
+                        Modifier
+                            .requiredSize(10.dp)
+                            .background(color = Color.White)
+                    )
+                }
+            }
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun scaffold_insetsTests_snackbarRespectsInsets() {
+        val hostState = SnackbarHostState()
+        var snackbarSize: IntSize? = null
+        var snackbarPosition: Offset? = null
+        var density: Density? = null
+        rule.setContent {
+            Box(Modifier.requiredSize(10.dp, 20.dp)) {
+                density = LocalDensity.current
+                Scaffold(
+                    contentWindowInsets = WindowInsets(top = 5.dp, bottom = 3.dp),
+                    snackbarHost = {
+                        SnackbarHost(hostState = hostState,
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    snackbarSize = it.size
+                                    snackbarPosition = it.positionInRoot()
+                                })
+                    }
+                ) {
+                    Box(
+                        Modifier
+                            .requiredSize(10.dp)
+                            .background(color = Color.White)
+                    )
+                }
+            }
+        }
+        val snackbarBottomOffsetDp =
+            with(density!!) { (snackbarPosition!!.y.roundToInt() + snackbarSize!!.height).toDp() }
+        assertThat(rule.rootHeight() - snackbarBottomOffsetDp - 3.dp).isLessThan(1.dp)
+    }
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    @Test
+    fun scaffold_insetsTests_FabRespectsInsets() {
+        var fabSize: IntSize? = null
+        var fabPosition: Offset? = null
+        var density: Density? = null
+        rule.setContent {
+            Box(Modifier.requiredSize(10.dp, 20.dp)) {
+                density = LocalDensity.current
+                Scaffold(
+                    contentWindowInsets = WindowInsets(top = 5.dp, bottom = 3.dp),
+                    floatingActionButton = {
+                        FloatingActionButton(onClick = {},
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    fabSize = it.size
+                                    fabPosition = it.positionInRoot()
+                                }) {
+                            Text("Fab")
+                        }
+                    },
+                ) {
+                    Box(
+                        Modifier
+                            .requiredSize(10.dp)
+                            .background(color = Color.White)
+                    )
+                }
+            }
+        }
+        val fabBottomOffsetDp =
+            with(density!!) { (fabPosition!!.y.roundToInt() + fabSize!!.height).toDp() }
+        assertThat(rule.rootHeight() - fabBottomOffsetDp - 3.dp).isLessThan(1.dp)
     }
 }

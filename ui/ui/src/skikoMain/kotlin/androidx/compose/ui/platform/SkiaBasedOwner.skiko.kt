@@ -60,6 +60,7 @@ import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
 import androidx.compose.ui.layout.RootMeasurePolicy
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
@@ -78,6 +79,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 
 private typealias Command = () -> Unit
 
@@ -114,7 +116,6 @@ internal class SkiaBasedOwner(
     override val sharedDrawScope = LayoutNodeDrawScope()
 
     private val semanticsModifier = SemanticsModifierCore(
-        id = SemanticsModifierCore.generateSemanticsId(),
         mergeDescendants = false,
         clearAndSetSemantics = false,
         properties = {}
@@ -139,6 +140,8 @@ internal class SkiaBasedOwner(
     override val inputModeManager: InputModeManager
         get() = _inputModeManager
 
+    override val modifierLocalManager: ModifierLocalManager = ModifierLocalManager(this)
+
     // TODO: set/clear _windowInfo.isWindowFocused when the window gains/loses focus.
     private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
     override val windowInfo: WindowInfo
@@ -156,6 +159,11 @@ internal class SkiaBasedOwner(
         },
         onPreviewKeyEvent = null
     )
+
+    @Suppress("unused") // to be used in JB fork (not all prerequisite changes added yet)
+    internal fun setCurrentKeyboardModifiers(modifiers: PointerKeyboardModifiers) {
+        _windowInfo.keyboardModifiers = modifiers
+    }
 
     var constraints: Constraints = Constraints()
         set(value) {
@@ -298,8 +306,8 @@ internal class SkiaBasedOwner(
 
         // Don't use mainOwner.root.width here, as it strictly coerced by [constraints]
         contentSize = IntSize(
-            root.children.maxOfOrNull { it.outerLayoutNodeWrapper.measuredWidth } ?: 0,
-            root.children.maxOfOrNull { it.outerLayoutNodeWrapper.measuredHeight } ?: 0,
+            root.children.maxOfOrNull { it.outerCoordinator.measuredWidth } ?: 0,
+            root.children.maxOfOrNull { it.outerCoordinator.measuredHeight } ?: 0,
         )
     }
 
@@ -312,16 +320,37 @@ internal class SkiaBasedOwner(
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRemeasure(layoutNode, forceRequest)) {
+                requestLayout()
+            }
+        } else if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             requestLayout()
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRelayout(layoutNode, forceRequest)) {
+                requestLayout()
+            }
+        } else if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
             requestLayout()
         }
+    }
+
+    override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+        measureAndLayoutDelegate.requestOnPositionedCallback(layoutNode)
+        requestLayout()
     }
 
     override fun createLayer(

@@ -63,7 +63,6 @@ fun OverscrollSample() {
         private val overscrollOffset = Animatable(0f)
         override fun consumePreScroll(
             scrollDelta: Offset,
-            pointerPosition: Offset?,
             source: NestedScrollSource
         ): Offset {
             // in pre scroll we relax the overscroll if needed
@@ -91,7 +90,6 @@ fun OverscrollSample() {
         override fun consumePostScroll(
             initialDragDelta: Offset,
             overscrollDelta: Offset,
-            pointerPosition: Offset?,
             source: NestedScrollSource
         ) {
             // if it is a drag, not a fling, add the delta left to our over scroll value

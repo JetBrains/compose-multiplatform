@@ -44,10 +44,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -157,6 +159,7 @@ class BitmapCapturingTest(val config: TestConfig) {
     }
 
     @Test
+    @FlakyTest(bugId = 238872517)
     fun captureRootContainer_checkSizeAndColors_multiWindow() {
         composeCheckerboard()
 
@@ -218,6 +221,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
     }
 
+    @Ignore("b/235839078")
     @Test
     fun capturePopup_verifyBackground_multiWindow() {
         setContent {

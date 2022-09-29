@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -45,6 +46,28 @@ class ListItemScreenshotTest {
 
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
+
+    @Test
+    fun listItem_customColor() {
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            Column(Modifier.testTag(Tag)) {
+                ListItem(
+                    headlineText = { Text("One line list item with 24x24 icon") },
+                    leadingContent = {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = null
+                        )
+                    },
+                    colors = ListItemDefaults.colors(containerColor = Color.Red)
+                )
+                Divider()
+            }
+        }
+        composeTestRule.onNodeWithTag(Tag)
+            .captureToImage()
+            .assertAgainstGolden(screenshotRule, "list_oneLine_customColor")
+    }
 
     @Test
     fun oneLine_lightTheme() {

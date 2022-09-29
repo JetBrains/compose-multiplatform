@@ -106,15 +106,23 @@ internal class IdentityArrayMap<Key : Any, Value : Any?>(capacity: Int = 16) {
         return false
     }
 
-    @Suppress("UNCHECKED_CAST")
-    inline fun removeValueIf(block: (value: Value) -> Boolean) {
+    fun clear() {
+        size = 0
+        keys.fill(null)
+        values.fill(null)
+    }
+
+    inline fun removeIf(block: (key: Key, value: Value) -> Boolean) {
         var current = 0
         for (index in 0 until size) {
+            @Suppress("UNCHECKED_CAST")
+            val key = keys[index] as Key
+            @Suppress("UNCHECKED_CAST")
             val value = values[index] as Value
-            if (!block(value)) {
+            if (!block(key, value)) {
                 if (current != index) {
-                    keys[current] = keys[index]
-                    values[current] = value
+                    keys[current] = key
+                    values[current] = values[index]
                 }
                 current++
             }
@@ -126,6 +134,10 @@ internal class IdentityArrayMap<Key : Any, Value : Any?>(capacity: Int = 16) {
             }
             size = current
         }
+    }
+
+    inline fun removeValueIf(block: (value: Value) -> Boolean) {
+        removeIf { _, value -> block(value) }
     }
 
     inline fun forEach(block: (key: Key, value: Value) -> Unit) {

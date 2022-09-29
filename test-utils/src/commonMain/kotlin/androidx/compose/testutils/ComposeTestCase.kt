@@ -17,6 +17,7 @@
 package androidx.compose.testutils
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.UiComposable
 
 /**
  * To be implemented to provide a test case that is then executed by [ComposeTestRule] or can be
@@ -72,6 +73,7 @@ abstract class LayeredComposeTestCase : ComposeTestCase {
      * The lifecycle rules for this method are same as for [Content]
      */
     @Composable
+    @UiComposable
     open fun ContentWrappers(content: @Composable () -> Unit) {
         content()
     }

@@ -93,6 +93,7 @@ class ComposeTapIntegrationBenchmark {
 
             val rootView = getHostView()
 
+            // Simple Events
             val down = MotionEvent(
                 0,
                 android.view.MotionEvent.ACTION_DOWN,

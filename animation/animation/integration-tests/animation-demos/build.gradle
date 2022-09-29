@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -6,8 +8,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
-
     implementation(libs.kotlinStdlib)
 
     implementation(project(":compose:foundation:foundation-layout"))
@@ -23,6 +23,10 @@ dependencies {
     implementation(project(":compose:material:material"))
     implementation(project(":compose:ui:ui-tooling-preview"))
     debugImplementation(project(":compose:ui:ui-tooling"))
+}
+
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions.freeCompilerArgs += "-Xcontext-receivers"
 }
 
 android {

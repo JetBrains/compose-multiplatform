@@ -403,10 +403,11 @@ class MultiParagraph(
     fun paint(
         canvas: Canvas,
         brush: Brush,
+        alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         decoration: TextDecoration? = null
     ) {
-        drawMultiParagraph(canvas, brush, shadow, decoration)
+        drawMultiParagraph(canvas, brush, alpha, shadow, decoration)
     }
 
     /** Returns path that enclose the given text range. */
@@ -620,10 +621,10 @@ class MultiParagraph(
      * beyond the end of the text, you get the last line.
      */
     fun getLineForOffset(offset: Int): Int {
-        requireIndexInRangeInclusiveEnd(offset)
-
-        val paragraphIndex = if (offset == annotatedString.length) {
+        val paragraphIndex = if (offset >= annotatedString.length) {
             paragraphInfoList.lastIndex
+        } else if (offset < 0) {
+            0
         } else {
             findParagraphByIndex(paragraphInfoList, offset)
         }
@@ -732,10 +733,10 @@ class MultiParagraph(
     }
 
     /**
-     * Returns true if ellipsis happens on the given line, otherwise returns false
+     * Returns true if the given line is ellipsized, otherwise returns false.
      *
      * @param lineIndex a 0 based line index
-     * @return true if ellipsis happens on the given line, otherwise false
+     * @return true if the given line is ellipsized, otherwise false
      */
     fun isLineEllipsized(lineIndex: Int): Boolean {
         requireLineIndexInRange(lineIndex)

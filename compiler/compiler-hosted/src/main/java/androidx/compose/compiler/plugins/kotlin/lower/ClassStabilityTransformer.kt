@@ -23,6 +23,7 @@ import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.analysis.forEach
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -44,7 +45,6 @@ import org.jetbrains.kotlin.ir.util.isFileClass
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.platform.jvm.isJvm
-import org.jetbrains.kotlin.resolve.BindingTrace
 
 enum class StabilityBits(val bits: Int) {
     UNSTABLE(0b100),
@@ -59,9 +59,8 @@ enum class StabilityBits(val bits: Int) {
 class ClassStabilityTransformer(
     context: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
-    bindingTrace: BindingTrace,
     metrics: ModuleMetrics,
-) : AbstractComposeLowering(context, symbolRemapper, bindingTrace, metrics),
+) : AbstractComposeLowering(context, symbolRemapper, metrics),
     ClassLoweringPass,
     ModuleLoweringPass {
 
@@ -95,7 +94,7 @@ class ClassStabilityTransformer(
             cls.isInner ||
             cls.isFileClass ||
             cls.isCompanion ||
-            cls.isInline
+            cls.defaultType.isInlineClassType()
         ) return cls
 
         if (declaration.hasStableMarker()) {

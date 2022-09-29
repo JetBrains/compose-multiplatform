@@ -22,6 +22,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.platform.ViewConfiguration
 import kotlinx.coroutines.flow.collect
 
 // An interface, not a sealed class, to allow adding new types here in a safe way (and not break
@@ -39,7 +40,9 @@ interface PressInteraction : Interaction {
      * An interaction representing a press event on a component.
      *
      * @property pressPosition the [Offset] describing where this press event occurred within the
-     * component
+     * component. The [Offset] can be outside the actual component bounds meaning the [Offset]
+     * can be negative or larger than the component bounds if the touch target is smaller than
+     * the [ViewConfiguration.minimumTouchTargetSize].
      *
      * @see androidx.compose.foundation.clickable
      * @see Release

@@ -19,6 +19,8 @@ package androidx.compose.ui.test.partialgesturescope
 import android.os.SystemClock.sleep
 import androidx.compose.testutils.expectError
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerEventType.Companion.Press
+import androidx.compose.ui.input.pointer.PointerType.Companion.Touch
 import androidx.compose.ui.test.down
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.partialgesturescope.Common.partialGesture
@@ -67,7 +69,7 @@ class SendDownTest {
                 assertTimestampsAreIncreasing()
                 assertThat(events).hasSize(1)
                 assertThat(events[0].pointerCount).isEqualTo(1)
-                events[0].getPointer(0).verify(null, null, true, position1)
+                events[0].getPointer(0).verify(null, null, true, position1, Touch, Press)
             }
         }
     }
@@ -87,14 +89,14 @@ class SendDownTest {
                 assertThat(events).hasSize(2)
 
                 assertThat(events[0].pointerCount).isEqualTo(1)
-                events[0].getPointer(0).verify(null, null, true, position1)
+                events[0].getPointer(0).verify(null, null, true, position1, Touch, Press)
 
                 val t = events[0].getPointer(0).timestamp
                 val pointerId1 = events[0].getPointer(0).id
 
                 assertThat(events[1].pointerCount).isEqualTo(2)
-                events[1].getPointer(0).verify(t, pointerId1, true, position1)
-                events[1].getPointer(1).verify(t, null, true, position2)
+                events[1].getPointer(0).verify(t, pointerId1, true, position1, Touch, Press)
+                events[1].getPointer(1).verify(t, null, true, position2, Touch, Press)
 
                 val pointerId2 = events[1].getPointer(1).id
                 assertThat(pointerId2).isNotEqualTo(pointerId1)

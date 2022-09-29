@@ -711,12 +711,13 @@ private object GestureAndAnimationSimple {
                     coroutineScope {
                         while (true) {
                             // Detect a tap event and obtain its position.
-                            val position = awaitPointerEventScope {
-                                awaitFirstDown().position
-                            }
-                            launch {
-                                // Animate to the tap position.
-                                offset.animateTo(position)
+                            awaitPointerEventScope {
+                                val position = awaitFirstDown().position
+
+                                launch {
+                                    // Animate to the tap position.
+                                    offset.animateTo(position)
+                                }
                             }
                         }
                     }
@@ -740,12 +741,13 @@ private object GestureAndAnimationSwipeToDismiss {
             // Use suspend functions for touch events and the Animatable.
             coroutineScope {
                 while (true) {
-                    // Detect a touch down event.
-                    val pointerId = awaitPointerEventScope { awaitFirstDown().id }
                     val velocityTracker = VelocityTracker()
                     // Stop any ongoing animation.
                     offsetX.stop()
                     awaitPointerEventScope {
+                        // Detect a touch down event.
+                        val pointerId = awaitFirstDown().id
+
                         horizontalDrag(pointerId) { change ->
                             // Update the animation value with touch events.
                             launch {

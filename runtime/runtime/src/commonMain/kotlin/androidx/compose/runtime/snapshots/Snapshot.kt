@@ -28,7 +28,7 @@ import androidx.compose.runtime.synchronized
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.InvocationKind
 import kotlin.contracts.contract
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.runtime.internal.JvmDefaultWithCompatibility
 
 /**
  * A snapshot of the values return by mutable states and other state objects. All state object
@@ -215,8 +215,8 @@ sealed class Snapshot(
 
     /**
      * Notify the snapshot that all objects created in this snapshot to this point should be
-     * considered initialized. If any state object is are modified passed this point it will
-     * appear as modified in the snapshot and any applicable snapshot write observer will be
+     * considered initialized. If any state object is modified after this point it will
+     * appear as modified in the snapshot. Any applicable snapshot write observer will be
      * called for the object and the object will be part of the a set of mutated objects sent to
      * any applicable snapshot apply observer.
      *
@@ -474,6 +474,7 @@ sealed class Snapshot(
         /**
          * Passed [block] will be run with all the currently set snapshot read observers disabled.
          */
+        @Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
         @OptIn(ExperimentalContracts::class)
         inline fun <T> withoutReadObservation(block: @DisallowComposableCalls () -> T): T {
             contract { callsInPlace(block, InvocationKind.EXACTLY_ONCE) }
@@ -1749,8 +1750,9 @@ private fun <T> takeNewGlobalSnapshot(
 }
 
 private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
-    val previousGlobalSnapshot = currentGlobalSnapshot.get()
+    var previousGlobalSnapshot = snapshotInitializer as GlobalSnapshot
     val result = sync {
+        previousGlobalSnapshot = currentGlobalSnapshot.get()
         takeNewGlobalSnapshot(previousGlobalSnapshot, block)
     }
 
@@ -1826,8 +1828,19 @@ private fun <T : StateRecord> readable(r: T, id: Int, invalid: SnapshotIdSet): T
  * Return the current readable state record for the current snapshot. It is assumed that [this]
  * is the first record of [state]
  */
-fun <T : StateRecord> T.readable(state: StateObject): T =
-    readable(state, currentSnapshot())
+fun <T : StateRecord> T.readable(state: StateObject): T {
+    val snapshot = Snapshot.current
+    snapshot.readObserver?.invoke(state)
+    return readable(this, snapshot.id, snapshot.invalid) ?: sync {
+        // Readable can return null when the global snapshot has been advanced by another thread
+        // and state written to the object was overwritten while this thread was paused. Repeating
+        // the read is valid here as either this will return the same result as the previous call
+        // or will find a valid record. Being in a sync block prevents other threads from writing
+        // to this state object until the read completes.
+        val syncSnapshot = Snapshot.current
+        readable(this, syncSnapshot.id, syncSnapshot.invalid)
+    } ?: readError()
+}
 
 /**
  * Return the current readable state record for the [snapshot]. It is assumed that [this]
@@ -2087,13 +2100,23 @@ private fun reportReadonlySnapshotWrite(): Nothing {
 internal fun <T : StateRecord> current(r: T, snapshot: Snapshot) =
     readable(r, snapshot.id, snapshot.invalid) ?: readError()
 
+@PublishedApi
+internal fun <T : StateRecord> current(r: T) =
+    Snapshot.current.let { snapshot ->
+        readable(r, snapshot.id, snapshot.invalid) ?: sync {
+            Snapshot.current.let { syncSnapshot ->
+                readable(r, syncSnapshot.id, syncSnapshot.invalid)
+            }
+        } ?: readError()
+    }
+
 /**
  * Provides a [block] with the current record, without notifying any read observers.
  *
  * @see readable
  */
 inline fun <T : StateRecord, R> T.withCurrent(block: (r: T) -> R): R =
-    block(current(this, Snapshot.current))
+    block(current(this))
 
 /**
  * Helper routine to add a range of values ot a snapshot set

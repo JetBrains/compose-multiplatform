@@ -26,6 +26,8 @@ Filled.AddChart
 Filled.AddCircle
 Filled.AddCircleOutline
 Filled.AddComment
+Filled.AddHome
+Filled.AddHomeWork
 Filled.AddIcCall
 Filled.AddLink
 Filled.AddLocation
@@ -111,6 +113,7 @@ Filled.ArrowDropUp
 Filled.ArrowForward
 Filled.ArrowForwardIos
 Filled.ArrowLeft
+Filled.ArrowOutward
 Filled.ArrowRight
 Filled.ArrowRightAlt
 Filled.ArrowUpward
@@ -124,6 +127,7 @@ Filled.AssignmentLate
 Filled.AssignmentReturn
 Filled.AssignmentReturned
 Filled.AssignmentTurnedIn
+Filled.AssistWalker
 Filled.Assistant
 Filled.AssistantDirection
 Filled.AssistantPhoto
@@ -190,6 +194,7 @@ Filled.Bento
 Filled.BikeScooter
 Filled.Biotech
 Filled.Blender
+Filled.Blind
 Filled.Blinds
 Filled.BlindsClosed
 Filled.Block
@@ -378,6 +383,7 @@ Filled.ConnectWithoutContact
 Filled.ConnectedTv
 Filled.ConnectingAirports
 Filled.Construction
+Filled.ContactEmergency
 Filled.ContactMail
 Filled.ContactPage
 Filled.ContactPhone
@@ -445,6 +451,8 @@ Filled.DataSaverOff
 Filled.DataSaverOn
 Filled.DataThresholding
 Filled.DataUsage
+Filled.Dataset
+Filled.DatasetLinked
 Filled.DateRange
 Filled.Deblur
 Filled.Deck
@@ -504,6 +512,9 @@ Filled.DisabledVisible
 Filled.DiscFull
 Filled.Discount
 Filled.DisplaySettings
+Filled.Diversity1
+Filled.Diversity2
+Filled.Diversity3
 Filled.Dns
 Filled.DoDisturb
 Filled.DoDisturbAlt
@@ -629,6 +640,11 @@ Filled.ExposureZero
 Filled.Extension
 Filled.ExtensionOff
 Filled.Face
+Filled.Face2
+Filled.Face3
+Filled.Face4
+Filled.Face5
+Filled.Face6
 Filled.FaceRetouchingNatural
 Filled.FaceRetouchingOff
 Filled.Facebook
@@ -687,6 +703,8 @@ Filled.FindInPage
 Filled.FindReplace
 Filled.Fingerprint
 Filled.FireExtinguisher
+Filled.FireHydrantAlt
+Filled.FireTruck
 Filled.Fireplace
 Filled.FirstPage
 Filled.FitScreen
@@ -713,6 +731,7 @@ Filled.FlipToBack
 Filled.FlipToFront
 Filled.Flood
 Filled.Flourescent
+Filled.Fluorescent
 Filled.FlutterDash
 Filled.FmdBad
 Filled.FmdGood
@@ -809,6 +828,8 @@ Filled.GroupOff
 Filled.GroupRemove
 Filled.GroupWork
 Filled.Groups
+Filled.Groups2
+Filled.Groups3
 Filled.HMobiledata
 Filled.HPlusMobiledata
 Filled.Hail
@@ -1054,11 +1075,15 @@ Filled.LtePlusMobiledata
 Filled.Luggage
 Filled.LunchDining
 Filled.Lyrics
+Filled.MacroOff
 Filled.Mail
 Filled.MailLock
 Filled.MailOutline
 Filled.Male
 Filled.Man
+Filled.Man2
+Filled.Man3
+Filled.Man4
 Filled.ManageAccounts
 Filled.ManageHistory
 Filled.ManageSearch
@@ -1289,6 +1314,9 @@ Filled.PermMedia
 Filled.PermPhoneMsg
 Filled.PermScanWifi
 Filled.Person
+Filled.Person2
+Filled.Person3
+Filled.Person4
 Filled.PersonAdd
 Filled.PersonAddAlt
 Filled.PersonAddAlt1
@@ -1395,6 +1423,7 @@ Filled.ProductionQuantityLimits
 Filled.Propane
 Filled.PropaneTank
 Filled.Psychology
+Filled.PsychologyAlt
 Filled.Public
 Filled.PublicOff
 Filled.Publish
@@ -1449,6 +1478,7 @@ Filled.RemoveRedEye
 Filled.RemoveRoad
 Filled.RemoveShoppingCart
 Filled.Reorder
+Filled.Repartition
 Filled.Repeat
 Filled.RepeatOn
 Filled.RepeatOne
@@ -1585,6 +1615,7 @@ Filled.SettingsSuggest
 Filled.SettingsSystemDaydream
 Filled.SettingsVoice
 Filled.SevereCold
+Filled.ShapeLine
 Filled.Share
 Filled.ShareLocation
 Filled.Shield
@@ -1858,6 +1889,7 @@ Filled.TrackChanges
 Filled.Traffic
 Filled.Train
 Filled.Tram
+Filled.Transcribe
 Filled.TransferWithinAStation
 Filled.Transform
 Filled.Transgender
@@ -1868,6 +1900,7 @@ Filled.TrendingDown
 Filled.TrendingFlat
 Filled.TrendingUp
 Filled.TripOrigin
+Filled.Troubleshoot
 Filled.Try
 Filled.Tsunami
 Filled.Tty
@@ -1884,13 +1917,16 @@ Filled.TurnedInNot
 Filled.Tv
 Filled.TvOff
 Filled.TwoWheeler
+Filled.TypeSpecimen
 Filled.UTurnLeft
 Filled.UTurnRight
 Filled.Umbrella
 Filled.Unarchive
 Filled.Undo
 Filled.UnfoldLess
+Filled.UnfoldLessDouble
 Filled.UnfoldMore
+Filled.UnfoldMoreDouble
 Filled.Unpublished
 Filled.Unsubscribe
 Filled.Upcoming
@@ -1917,6 +1953,7 @@ Filled.Vibration
 Filled.VideoCall
 Filled.VideoCameraBack
 Filled.VideoCameraFront
+Filled.VideoChat
 Filled.VideoFile
 Filled.VideoLabel
 Filled.VideoLibrary
@@ -1989,6 +2026,7 @@ Filled.Wc
 Filled.Web
 Filled.WebAsset
 Filled.WebAssetOff
+Filled.WebStories
 Filled.Webhook
 Filled.Weekend
 Filled.West
@@ -2019,6 +2057,7 @@ Filled.WindPower
 Filled.Window
 Filled.WineBar
 Filled.Woman
+Filled.Woman2
 Filled.Work
 Filled.WorkHistory
 Filled.WorkOff
@@ -2119,6 +2158,8 @@ Outlined.AddChart
 Outlined.AddCircle
 Outlined.AddCircleOutline
 Outlined.AddComment
+Outlined.AddHome
+Outlined.AddHomeWork
 Outlined.AddIcCall
 Outlined.AddLink
 Outlined.AddLocation
@@ -2204,6 +2245,7 @@ Outlined.ArrowDropUp
 Outlined.ArrowForward
 Outlined.ArrowForwardIos
 Outlined.ArrowLeft
+Outlined.ArrowOutward
 Outlined.ArrowRight
 Outlined.ArrowRightAlt
 Outlined.ArrowUpward
@@ -2217,6 +2259,7 @@ Outlined.AssignmentLate
 Outlined.AssignmentReturn
 Outlined.AssignmentReturned
 Outlined.AssignmentTurnedIn
+Outlined.AssistWalker
 Outlined.Assistant
 Outlined.AssistantDirection
 Outlined.AssistantPhoto
@@ -2283,6 +2326,7 @@ Outlined.Bento
 Outlined.BikeScooter
 Outlined.Biotech
 Outlined.Blender
+Outlined.Blind
 Outlined.Blinds
 Outlined.BlindsClosed
 Outlined.Block
@@ -2471,6 +2515,7 @@ Outlined.ConnectWithoutContact
 Outlined.ConnectedTv
 Outlined.ConnectingAirports
 Outlined.Construction
+Outlined.ContactEmergency
 Outlined.ContactMail
 Outlined.ContactPage
 Outlined.ContactPhone
@@ -2538,6 +2583,8 @@ Outlined.DataSaverOff
 Outlined.DataSaverOn
 Outlined.DataThresholding
 Outlined.DataUsage
+Outlined.Dataset
+Outlined.DatasetLinked
 Outlined.DateRange
 Outlined.Deblur
 Outlined.Deck
@@ -2597,6 +2644,9 @@ Outlined.DisabledVisible
 Outlined.DiscFull
 Outlined.Discount
 Outlined.DisplaySettings
+Outlined.Diversity1
+Outlined.Diversity2
+Outlined.Diversity3
 Outlined.Dns
 Outlined.DoDisturb
 Outlined.DoDisturbAlt
@@ -2722,6 +2772,11 @@ Outlined.ExposureZero
 Outlined.Extension
 Outlined.ExtensionOff
 Outlined.Face
+Outlined.Face2
+Outlined.Face3
+Outlined.Face4
+Outlined.Face5
+Outlined.Face6
 Outlined.FaceRetouchingNatural
 Outlined.FaceRetouchingOff
 Outlined.Facebook
@@ -2780,6 +2835,8 @@ Outlined.FindInPage
 Outlined.FindReplace
 Outlined.Fingerprint
 Outlined.FireExtinguisher
+Outlined.FireHydrantAlt
+Outlined.FireTruck
 Outlined.Fireplace
 Outlined.FirstPage
 Outlined.FitScreen
@@ -2806,6 +2863,7 @@ Outlined.FlipToBack
 Outlined.FlipToFront
 Outlined.Flood
 Outlined.Flourescent
+Outlined.Fluorescent
 Outlined.FlutterDash
 Outlined.FmdBad
 Outlined.FmdGood
@@ -2902,6 +2960,8 @@ Outlined.GroupOff
 Outlined.GroupRemove
 Outlined.GroupWork
 Outlined.Groups
+Outlined.Groups2
+Outlined.Groups3
 Outlined.HMobiledata
 Outlined.HPlusMobiledata
 Outlined.Hail
@@ -3147,11 +3207,15 @@ Outlined.LtePlusMobiledata
 Outlined.Luggage
 Outlined.LunchDining
 Outlined.Lyrics
+Outlined.MacroOff
 Outlined.Mail
 Outlined.MailLock
 Outlined.MailOutline
 Outlined.Male
 Outlined.Man
+Outlined.Man2
+Outlined.Man3
+Outlined.Man4
 Outlined.ManageAccounts
 Outlined.ManageHistory
 Outlined.ManageSearch
@@ -3382,6 +3446,9 @@ Outlined.PermMedia
 Outlined.PermPhoneMsg
 Outlined.PermScanWifi
 Outlined.Person
+Outlined.Person2
+Outlined.Person3
+Outlined.Person4
 Outlined.PersonAdd
 Outlined.PersonAddAlt
 Outlined.PersonAddAlt1
@@ -3488,6 +3555,7 @@ Outlined.ProductionQuantityLimits
 Outlined.Propane
 Outlined.PropaneTank
 Outlined.Psychology
+Outlined.PsychologyAlt
 Outlined.Public
 Outlined.PublicOff
 Outlined.Publish
@@ -3542,6 +3610,7 @@ Outlined.RemoveRedEye
 Outlined.RemoveRoad
 Outlined.RemoveShoppingCart
 Outlined.Reorder
+Outlined.Repartition
 Outlined.Repeat
 Outlined.RepeatOn
 Outlined.RepeatOne
@@ -3678,6 +3747,7 @@ Outlined.SettingsSuggest
 Outlined.SettingsSystemDaydream
 Outlined.SettingsVoice
 Outlined.SevereCold
+Outlined.ShapeLine
 Outlined.Share
 Outlined.ShareLocation
 Outlined.Shield
@@ -3951,6 +4021,7 @@ Outlined.TrackChanges
 Outlined.Traffic
 Outlined.Train
 Outlined.Tram
+Outlined.Transcribe
 Outlined.TransferWithinAStation
 Outlined.Transform
 Outlined.Transgender
@@ -3961,6 +4032,7 @@ Outlined.TrendingDown
 Outlined.TrendingFlat
 Outlined.TrendingUp
 Outlined.TripOrigin
+Outlined.Troubleshoot
 Outlined.Try
 Outlined.Tsunami
 Outlined.Tty
@@ -3977,13 +4049,16 @@ Outlined.TurnedInNot
 Outlined.Tv
 Outlined.TvOff
 Outlined.TwoWheeler
+Outlined.TypeSpecimen
 Outlined.UTurnLeft
 Outlined.UTurnRight
 Outlined.Umbrella
 Outlined.Unarchive
 Outlined.Undo
 Outlined.UnfoldLess
+Outlined.UnfoldLessDouble
 Outlined.UnfoldMore
+Outlined.UnfoldMoreDouble
 Outlined.Unpublished
 Outlined.Unsubscribe
 Outlined.Upcoming
@@ -4010,6 +4085,7 @@ Outlined.Vibration
 Outlined.VideoCall
 Outlined.VideoCameraBack
 Outlined.VideoCameraFront
+Outlined.VideoChat
 Outlined.VideoFile
 Outlined.VideoLabel
 Outlined.VideoLibrary
@@ -4082,6 +4158,7 @@ Outlined.Wc
 Outlined.Web
 Outlined.WebAsset
 Outlined.WebAssetOff
+Outlined.WebStories
 Outlined.Webhook
 Outlined.Weekend
 Outlined.West
@@ -4112,6 +4189,7 @@ Outlined.WindPower
 Outlined.Window
 Outlined.WineBar
 Outlined.Woman
+Outlined.Woman2
 Outlined.Work
 Outlined.WorkHistory
 Outlined.WorkOff
@@ -4212,6 +4290,8 @@ Rounded.AddChart
 Rounded.AddCircle
 Rounded.AddCircleOutline
 Rounded.AddComment
+Rounded.AddHome
+Rounded.AddHomeWork
 Rounded.AddIcCall
 Rounded.AddLink
 Rounded.AddLocation
@@ -4297,6 +4377,7 @@ Rounded.ArrowDropUp
 Rounded.ArrowForward
 Rounded.ArrowForwardIos
 Rounded.ArrowLeft
+Rounded.ArrowOutward
 Rounded.ArrowRight
 Rounded.ArrowRightAlt
 Rounded.ArrowUpward
@@ -4310,6 +4391,7 @@ Rounded.AssignmentLate
 Rounded.AssignmentReturn
 Rounded.AssignmentReturned
 Rounded.AssignmentTurnedIn
+Rounded.AssistWalker
 Rounded.Assistant
 Rounded.AssistantDirection
 Rounded.AssistantPhoto
@@ -4376,6 +4458,7 @@ Rounded.Bento
 Rounded.BikeScooter
 Rounded.Biotech
 Rounded.Blender
+Rounded.Blind
 Rounded.Blinds
 Rounded.BlindsClosed
 Rounded.Block
@@ -4564,6 +4647,7 @@ Rounded.ConnectWithoutContact
 Rounded.ConnectedTv
 Rounded.ConnectingAirports
 Rounded.Construction
+Rounded.ContactEmergency
 Rounded.ContactMail
 Rounded.ContactPage
 Rounded.ContactPhone
@@ -4631,6 +4715,8 @@ Rounded.DataSaverOff
 Rounded.DataSaverOn
 Rounded.DataThresholding
 Rounded.DataUsage
+Rounded.Dataset
+Rounded.DatasetLinked
 Rounded.DateRange
 Rounded.Deblur
 Rounded.Deck
@@ -4690,6 +4776,9 @@ Rounded.DisabledVisible
 Rounded.DiscFull
 Rounded.Discount
 Rounded.DisplaySettings
+Rounded.Diversity1
+Rounded.Diversity2
+Rounded.Diversity3
 Rounded.Dns
 Rounded.DoDisturb
 Rounded.DoDisturbAlt
@@ -4815,6 +4904,11 @@ Rounded.ExposureZero
 Rounded.Extension
 Rounded.ExtensionOff
 Rounded.Face
+Rounded.Face2
+Rounded.Face3
+Rounded.Face4
+Rounded.Face5
+Rounded.Face6
 Rounded.FaceRetouchingNatural
 Rounded.FaceRetouchingOff
 Rounded.Facebook
@@ -4873,6 +4967,8 @@ Rounded.FindInPage
 Rounded.FindReplace
 Rounded.Fingerprint
 Rounded.FireExtinguisher
+Rounded.FireHydrantAlt
+Rounded.FireTruck
 Rounded.Fireplace
 Rounded.FirstPage
 Rounded.FitScreen
@@ -4899,6 +4995,7 @@ Rounded.FlipToBack
 Rounded.FlipToFront
 Rounded.Flood
 Rounded.Flourescent
+Rounded.Fluorescent
 Rounded.FlutterDash
 Rounded.FmdBad
 Rounded.FmdGood
@@ -4995,6 +5092,8 @@ Rounded.GroupOff
 Rounded.GroupRemove
 Rounded.GroupWork
 Rounded.Groups
+Rounded.Groups2
+Rounded.Groups3
 Rounded.HMobiledata
 Rounded.HPlusMobiledata
 Rounded.Hail
@@ -5240,11 +5339,15 @@ Rounded.LtePlusMobiledata
 Rounded.Luggage
 Rounded.LunchDining
 Rounded.Lyrics
+Rounded.MacroOff
 Rounded.Mail
 Rounded.MailLock
 Rounded.MailOutline
 Rounded.Male
 Rounded.Man
+Rounded.Man2
+Rounded.Man3
+Rounded.Man4
 Rounded.ManageAccounts
 Rounded.ManageHistory
 Rounded.ManageSearch
@@ -5475,6 +5578,9 @@ Rounded.PermMedia
 Rounded.PermPhoneMsg
 Rounded.PermScanWifi
 Rounded.Person
+Rounded.Person2
+Rounded.Person3
+Rounded.Person4
 Rounded.PersonAdd
 Rounded.PersonAddAlt
 Rounded.PersonAddAlt1
@@ -5581,6 +5687,7 @@ Rounded.ProductionQuantityLimits
 Rounded.Propane
 Rounded.PropaneTank
 Rounded.Psychology
+Rounded.PsychologyAlt
 Rounded.Public
 Rounded.PublicOff
 Rounded.Publish
@@ -5635,6 +5742,7 @@ Rounded.RemoveRedEye
 Rounded.RemoveRoad
 Rounded.RemoveShoppingCart
 Rounded.Reorder
+Rounded.Repartition
 Rounded.Repeat
 Rounded.RepeatOn
 Rounded.RepeatOne
@@ -5771,6 +5879,7 @@ Rounded.SettingsSuggest
 Rounded.SettingsSystemDaydream
 Rounded.SettingsVoice
 Rounded.SevereCold
+Rounded.ShapeLine
 Rounded.Share
 Rounded.ShareLocation
 Rounded.Shield
@@ -6044,6 +6153,7 @@ Rounded.TrackChanges
 Rounded.Traffic
 Rounded.Train
 Rounded.Tram
+Rounded.Transcribe
 Rounded.TransferWithinAStation
 Rounded.Transform
 Rounded.Transgender
@@ -6054,6 +6164,7 @@ Rounded.TrendingDown
 Rounded.TrendingFlat
 Rounded.TrendingUp
 Rounded.TripOrigin
+Rounded.Troubleshoot
 Rounded.Try
 Rounded.Tsunami
 Rounded.Tty
@@ -6070,13 +6181,16 @@ Rounded.TurnedInNot
 Rounded.Tv
 Rounded.TvOff
 Rounded.TwoWheeler
+Rounded.TypeSpecimen
 Rounded.UTurnLeft
 Rounded.UTurnRight
 Rounded.Umbrella
 Rounded.Unarchive
 Rounded.Undo
 Rounded.UnfoldLess
+Rounded.UnfoldLessDouble
 Rounded.UnfoldMore
+Rounded.UnfoldMoreDouble
 Rounded.Unpublished
 Rounded.Unsubscribe
 Rounded.Upcoming
@@ -6103,6 +6217,7 @@ Rounded.Vibration
 Rounded.VideoCall
 Rounded.VideoCameraBack
 Rounded.VideoCameraFront
+Rounded.VideoChat
 Rounded.VideoFile
 Rounded.VideoLabel
 Rounded.VideoLibrary
@@ -6175,6 +6290,7 @@ Rounded.Wc
 Rounded.Web
 Rounded.WebAsset
 Rounded.WebAssetOff
+Rounded.WebStories
 Rounded.Webhook
 Rounded.Weekend
 Rounded.West
@@ -6205,6 +6321,7 @@ Rounded.WindPower
 Rounded.Window
 Rounded.WineBar
 Rounded.Woman
+Rounded.Woman2
 Rounded.Work
 Rounded.WorkHistory
 Rounded.WorkOff
@@ -6305,6 +6422,8 @@ Sharp.AddChart
 Sharp.AddCircle
 Sharp.AddCircleOutline
 Sharp.AddComment
+Sharp.AddHome
+Sharp.AddHomeWork
 Sharp.AddIcCall
 Sharp.AddLink
 Sharp.AddLocation
@@ -6390,6 +6509,7 @@ Sharp.ArrowDropUp
 Sharp.ArrowForward
 Sharp.ArrowForwardIos
 Sharp.ArrowLeft
+Sharp.ArrowOutward
 Sharp.ArrowRight
 Sharp.ArrowRightAlt
 Sharp.ArrowUpward
@@ -6403,6 +6523,7 @@ Sharp.AssignmentLate
 Sharp.AssignmentReturn
 Sharp.AssignmentReturned
 Sharp.AssignmentTurnedIn
+Sharp.AssistWalker
 Sharp.Assistant
 Sharp.AssistantDirection
 Sharp.AssistantPhoto
@@ -6469,6 +6590,7 @@ Sharp.Bento
 Sharp.BikeScooter
 Sharp.Biotech
 Sharp.Blender
+Sharp.Blind
 Sharp.Blinds
 Sharp.BlindsClosed
 Sharp.Block
@@ -6657,6 +6779,7 @@ Sharp.ConnectWithoutContact
 Sharp.ConnectedTv
 Sharp.ConnectingAirports
 Sharp.Construction
+Sharp.ContactEmergency
 Sharp.ContactMail
 Sharp.ContactPage
 Sharp.ContactPhone
@@ -6724,6 +6847,8 @@ Sharp.DataSaverOff
 Sharp.DataSaverOn
 Sharp.DataThresholding
 Sharp.DataUsage
+Sharp.Dataset
+Sharp.DatasetLinked
 Sharp.DateRange
 Sharp.Deblur
 Sharp.Deck
@@ -6783,6 +6908,9 @@ Sharp.DisabledVisible
 Sharp.DiscFull
 Sharp.Discount
 Sharp.DisplaySettings
+Sharp.Diversity1
+Sharp.Diversity2
+Sharp.Diversity3
 Sharp.Dns
 Sharp.DoDisturb
 Sharp.DoDisturbAlt
@@ -6908,6 +7036,11 @@ Sharp.ExposureZero
 Sharp.Extension
 Sharp.ExtensionOff
 Sharp.Face
+Sharp.Face2
+Sharp.Face3
+Sharp.Face4
+Sharp.Face5
+Sharp.Face6
 Sharp.FaceRetouchingNatural
 Sharp.FaceRetouchingOff
 Sharp.Facebook
@@ -6966,6 +7099,8 @@ Sharp.FindInPage
 Sharp.FindReplace
 Sharp.Fingerprint
 Sharp.FireExtinguisher
+Sharp.FireHydrantAlt
+Sharp.FireTruck
 Sharp.Fireplace
 Sharp.FirstPage
 Sharp.FitScreen
@@ -6992,6 +7127,7 @@ Sharp.FlipToBack
 Sharp.FlipToFront
 Sharp.Flood
 Sharp.Flourescent
+Sharp.Fluorescent
 Sharp.FlutterDash
 Sharp.FmdBad
 Sharp.FmdGood
@@ -7088,6 +7224,8 @@ Sharp.GroupOff
 Sharp.GroupRemove
 Sharp.GroupWork
 Sharp.Groups
+Sharp.Groups2
+Sharp.Groups3
 Sharp.HMobiledata
 Sharp.HPlusMobiledata
 Sharp.Hail
@@ -7333,11 +7471,15 @@ Sharp.LtePlusMobiledata
 Sharp.Luggage
 Sharp.LunchDining
 Sharp.Lyrics
+Sharp.MacroOff
 Sharp.Mail
 Sharp.MailLock
 Sharp.MailOutline
 Sharp.Male
 Sharp.Man
+Sharp.Man2
+Sharp.Man3
+Sharp.Man4
 Sharp.ManageAccounts
 Sharp.ManageHistory
 Sharp.ManageSearch
@@ -7568,6 +7710,9 @@ Sharp.PermMedia
 Sharp.PermPhoneMsg
 Sharp.PermScanWifi
 Sharp.Person
+Sharp.Person2
+Sharp.Person3
+Sharp.Person4
 Sharp.PersonAdd
 Sharp.PersonAddAlt
 Sharp.PersonAddAlt1
@@ -7674,6 +7819,7 @@ Sharp.ProductionQuantityLimits
 Sharp.Propane
 Sharp.PropaneTank
 Sharp.Psychology
+Sharp.PsychologyAlt
 Sharp.Public
 Sharp.PublicOff
 Sharp.Publish
@@ -7728,6 +7874,7 @@ Sharp.RemoveRedEye
 Sharp.RemoveRoad
 Sharp.RemoveShoppingCart
 Sharp.Reorder
+Sharp.Repartition
 Sharp.Repeat
 Sharp.RepeatOn
 Sharp.RepeatOne
@@ -7864,6 +8011,7 @@ Sharp.SettingsSuggest
 Sharp.SettingsSystemDaydream
 Sharp.SettingsVoice
 Sharp.SevereCold
+Sharp.ShapeLine
 Sharp.Share
 Sharp.ShareLocation
 Sharp.Shield
@@ -8137,6 +8285,7 @@ Sharp.TrackChanges
 Sharp.Traffic
 Sharp.Train
 Sharp.Tram
+Sharp.Transcribe
 Sharp.TransferWithinAStation
 Sharp.Transform
 Sharp.Transgender
@@ -8147,6 +8296,7 @@ Sharp.TrendingDown
 Sharp.TrendingFlat
 Sharp.TrendingUp
 Sharp.TripOrigin
+Sharp.Troubleshoot
 Sharp.Try
 Sharp.Tsunami
 Sharp.Tty
@@ -8163,13 +8313,16 @@ Sharp.TurnedInNot
 Sharp.Tv
 Sharp.TvOff
 Sharp.TwoWheeler
+Sharp.TypeSpecimen
 Sharp.UTurnLeft
 Sharp.UTurnRight
 Sharp.Umbrella
 Sharp.Unarchive
 Sharp.Undo
 Sharp.UnfoldLess
+Sharp.UnfoldLessDouble
 Sharp.UnfoldMore
+Sharp.UnfoldMoreDouble
 Sharp.Unpublished
 Sharp.Unsubscribe
 Sharp.Upcoming
@@ -8196,6 +8349,7 @@ Sharp.Vibration
 Sharp.VideoCall
 Sharp.VideoCameraBack
 Sharp.VideoCameraFront
+Sharp.VideoChat
 Sharp.VideoFile
 Sharp.VideoLabel
 Sharp.VideoLibrary
@@ -8268,6 +8422,7 @@ Sharp.Wc
 Sharp.Web
 Sharp.WebAsset
 Sharp.WebAssetOff
+Sharp.WebStories
 Sharp.Webhook
 Sharp.Weekend
 Sharp.West
@@ -8298,6 +8453,7 @@ Sharp.WindPower
 Sharp.Window
 Sharp.WineBar
 Sharp.Woman
+Sharp.Woman2
 Sharp.Work
 Sharp.WorkHistory
 Sharp.WorkOff
@@ -8398,6 +8554,8 @@ TwoTone.AddChart
 TwoTone.AddCircle
 TwoTone.AddCircleOutline
 TwoTone.AddComment
+TwoTone.AddHome
+TwoTone.AddHomeWork
 TwoTone.AddIcCall
 TwoTone.AddLink
 TwoTone.AddLocation
@@ -8483,6 +8641,7 @@ TwoTone.ArrowDropUp
 TwoTone.ArrowForward
 TwoTone.ArrowForwardIos
 TwoTone.ArrowLeft
+TwoTone.ArrowOutward
 TwoTone.ArrowRight
 TwoTone.ArrowRightAlt
 TwoTone.ArrowUpward
@@ -8496,6 +8655,7 @@ TwoTone.AssignmentLate
 TwoTone.AssignmentReturn
 TwoTone.AssignmentReturned
 TwoTone.AssignmentTurnedIn
+TwoTone.AssistWalker
 TwoTone.Assistant
 TwoTone.AssistantDirection
 TwoTone.AssistantPhoto
@@ -8562,6 +8722,7 @@ TwoTone.Bento
 TwoTone.BikeScooter
 TwoTone.Biotech
 TwoTone.Blender
+TwoTone.Blind
 TwoTone.Blinds
 TwoTone.BlindsClosed
 TwoTone.Block
@@ -8750,6 +8911,7 @@ TwoTone.ConnectWithoutContact
 TwoTone.ConnectedTv
 TwoTone.ConnectingAirports
 TwoTone.Construction
+TwoTone.ContactEmergency
 TwoTone.ContactMail
 TwoTone.ContactPage
 TwoTone.ContactPhone
@@ -8817,6 +8979,8 @@ TwoTone.DataSaverOff
 TwoTone.DataSaverOn
 TwoTone.DataThresholding
 TwoTone.DataUsage
+TwoTone.Dataset
+TwoTone.DatasetLinked
 TwoTone.DateRange
 TwoTone.Deblur
 TwoTone.Deck
@@ -8876,6 +9040,9 @@ TwoTone.DisabledVisible
 TwoTone.DiscFull
 TwoTone.Discount
 TwoTone.DisplaySettings
+TwoTone.Diversity1
+TwoTone.Diversity2
+TwoTone.Diversity3
 TwoTone.Dns
 TwoTone.DoDisturb
 TwoTone.DoDisturbAlt
@@ -9001,6 +9168,11 @@ TwoTone.ExposureZero
 TwoTone.Extension
 TwoTone.ExtensionOff
 TwoTone.Face
+TwoTone.Face2
+TwoTone.Face3
+TwoTone.Face4
+TwoTone.Face5
+TwoTone.Face6
 TwoTone.FaceRetouchingNatural
 TwoTone.FaceRetouchingOff
 TwoTone.Facebook
@@ -9059,6 +9231,8 @@ TwoTone.FindInPage
 TwoTone.FindReplace
 TwoTone.Fingerprint
 TwoTone.FireExtinguisher
+TwoTone.FireHydrantAlt
+TwoTone.FireTruck
 TwoTone.Fireplace
 TwoTone.FirstPage
 TwoTone.FitScreen
@@ -9085,6 +9259,7 @@ TwoTone.FlipToBack
 TwoTone.FlipToFront
 TwoTone.Flood
 TwoTone.Flourescent
+TwoTone.Fluorescent
 TwoTone.FlutterDash
 TwoTone.FmdBad
 TwoTone.FmdGood
@@ -9181,6 +9356,8 @@ TwoTone.GroupOff
 TwoTone.GroupRemove
 TwoTone.GroupWork
 TwoTone.Groups
+TwoTone.Groups2
+TwoTone.Groups3
 TwoTone.HMobiledata
 TwoTone.HPlusMobiledata
 TwoTone.Hail
@@ -9426,11 +9603,15 @@ TwoTone.LtePlusMobiledata
 TwoTone.Luggage
 TwoTone.LunchDining
 TwoTone.Lyrics
+TwoTone.MacroOff
 TwoTone.Mail
 TwoTone.MailLock
 TwoTone.MailOutline
 TwoTone.Male
 TwoTone.Man
+TwoTone.Man2
+TwoTone.Man3
+TwoTone.Man4
 TwoTone.ManageAccounts
 TwoTone.ManageHistory
 TwoTone.ManageSearch
@@ -9661,6 +9842,9 @@ TwoTone.PermMedia
 TwoTone.PermPhoneMsg
 TwoTone.PermScanWifi
 TwoTone.Person
+TwoTone.Person2
+TwoTone.Person3
+TwoTone.Person4
 TwoTone.PersonAdd
 TwoTone.PersonAddAlt
 TwoTone.PersonAddAlt1
@@ -9767,6 +9951,7 @@ TwoTone.ProductionQuantityLimits
 TwoTone.Propane
 TwoTone.PropaneTank
 TwoTone.Psychology
+TwoTone.PsychologyAlt
 TwoTone.Public
 TwoTone.PublicOff
 TwoTone.Publish
@@ -9821,6 +10006,7 @@ TwoTone.RemoveRedEye
 TwoTone.RemoveRoad
 TwoTone.RemoveShoppingCart
 TwoTone.Reorder
+TwoTone.Repartition
 TwoTone.Repeat
 TwoTone.RepeatOn
 TwoTone.RepeatOne
@@ -9957,6 +10143,7 @@ TwoTone.SettingsSuggest
 TwoTone.SettingsSystemDaydream
 TwoTone.SettingsVoice
 TwoTone.SevereCold
+TwoTone.ShapeLine
 TwoTone.Share
 TwoTone.ShareLocation
 TwoTone.Shield
@@ -10230,6 +10417,7 @@ TwoTone.TrackChanges
 TwoTone.Traffic
 TwoTone.Train
 TwoTone.Tram
+TwoTone.Transcribe
 TwoTone.TransferWithinAStation
 TwoTone.Transform
 TwoTone.Transgender
@@ -10240,6 +10428,7 @@ TwoTone.TrendingDown
 TwoTone.TrendingFlat
 TwoTone.TrendingUp
 TwoTone.TripOrigin
+TwoTone.Troubleshoot
 TwoTone.Try
 TwoTone.Tsunami
 TwoTone.Tty
@@ -10256,13 +10445,16 @@ TwoTone.TurnedInNot
 TwoTone.Tv
 TwoTone.TvOff
 TwoTone.TwoWheeler
+TwoTone.TypeSpecimen
 TwoTone.UTurnLeft
 TwoTone.UTurnRight
 TwoTone.Umbrella
 TwoTone.Unarchive
 TwoTone.Undo
 TwoTone.UnfoldLess
+TwoTone.UnfoldLessDouble
 TwoTone.UnfoldMore
+TwoTone.UnfoldMoreDouble
 TwoTone.Unpublished
 TwoTone.Unsubscribe
 TwoTone.Upcoming
@@ -10289,6 +10481,7 @@ TwoTone.Vibration
 TwoTone.VideoCall
 TwoTone.VideoCameraBack
 TwoTone.VideoCameraFront
+TwoTone.VideoChat
 TwoTone.VideoFile
 TwoTone.VideoLabel
 TwoTone.VideoLibrary
@@ -10361,6 +10554,7 @@ TwoTone.Wc
 TwoTone.Web
 TwoTone.WebAsset
 TwoTone.WebAssetOff
+TwoTone.WebStories
 TwoTone.Webhook
 TwoTone.Weekend
 TwoTone.West
@@ -10391,6 +10585,7 @@ TwoTone.WindPower
 TwoTone.Window
 TwoTone.WineBar
 TwoTone.Woman
+TwoTone.Woman2
 TwoTone.Work
 TwoTone.WorkHistory
 TwoTone.WorkOff

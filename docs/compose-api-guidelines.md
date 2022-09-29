@@ -387,7 +387,7 @@ fun FancyButton(
 
 ### Elements accept and respect a Modifier parameter
 
-Element functions MUST accept a parameter of type `Modifier`. This parameter MUST be named "`modifier`" and MUST appear as the first optional parameter in the element function's parameter list.
+Element functions MUST accept a parameter of type `Modifier`. This parameter MUST be named "`modifier`" and MUST appear as the first optional parameter in the element function's parameter list. Element functions MUST NOT accept multiple `Modifier` parameters.
 
 If the element function's content has a natural minimum size - that is, if it would ever measure with a non-zero size given constraints of minWidth and minHeight of zero - the default value of the `modifier` parameter MUST be `Modifier` - the `Modifier` type's `companion object` that represents the empty `Modifier`. Element functions without a measurable content size (e.g. Canvas, which draws arbitrary user content in the size available) MAY require the `modifier` parameter and omit the default value.
 

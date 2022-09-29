@@ -34,10 +34,8 @@ import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasureLayout
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -133,12 +131,9 @@ private class ChangingConstraintsTestCase : ComposeTestCase, ToggleableTestCase 
 private fun ChangingConstraintsLayout(size: State<Int>, content: @Composable () -> Unit) {
     Layout(content) { measurables, _ ->
         val constraints = Constraints.fixed(size.value, size.value)
-        with(PlacementScope) { measurables.first().measure(constraints).placeRelative(0, 0) }
-        layout(100, 100) {}
+        val placeable = measurables.first().measure(constraints)
+        layout(100, 100) {
+            placeable.placeRelative(0, 0)
+        }
     }
-}
-
-private object PlacementScope : Placeable.PlacementScope() {
-    override val parentWidth = 0
-    override val parentLayoutDirection = LayoutDirection.Ltr
 }

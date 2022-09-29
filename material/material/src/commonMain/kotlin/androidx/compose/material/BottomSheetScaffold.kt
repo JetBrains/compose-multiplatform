@@ -18,6 +18,8 @@ package androidx.compose.material
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -40,17 +42,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.SubcomposeLayout
-import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 /**
  * Possible values of [BottomSheetState].
@@ -96,27 +98,25 @@ class BottomSheetState(
      * Whether the bottom sheet is collapsed.
      */
     val isCollapsed: Boolean
-        get() = currentValue == Collapsed
+        get() = currentValue == BottomSheetValue.Collapsed
 
     /**
-     * Expand the bottom sheet with an animation and suspend until the animation finishes or is
-     * cancelled.
-     * Note: If the peek height is equal to the sheet height, this method will animate to the
-     * [Collapsed] state.
+     * Expand the bottom sheet with animation and suspend until it if fully expanded or animation
+     * has been cancelled. This method will throw [CancellationException] if the animation is
+     * interrupted
      *
-     * This method will throw [CancellationException] if the animation is interrupted.
+     * @return the reason the expand animation ended
      */
-    suspend fun expand() {
-        val target = if (hasExpandedState) Expanded else Collapsed
-        animateTo(target)
-    }
+    suspend fun expand() = animateTo(Expanded)
 
     /**
      * Collapse the bottom sheet with animation and suspend until it if fully collapsed or animation
      * has been cancelled. This method will throw [CancellationException] if the animation is
-     * interrupted.
+     * interrupted
+     *
+     * @return the reason the collapse animation ended
      */
-    suspend fun collapse() = animateTo(Collapsed)
+    suspend fun collapse() = animateTo(BottomSheetValue.Collapsed)
 
     companion object {
         /**
@@ -138,13 +138,6 @@ class BottomSheetState(
     }
 
     internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
-
-    /**
-     * Whether the bottom sheet can expand to the [Expanded] state.
-     * The sheet does not have an expanded state if its peek height is equal to its full height.
-     */
-    internal val hasExpandedState: Boolean
-        get() = anchors.containsValue(Expanded)
 }
 
 /**
@@ -202,7 +195,7 @@ class BottomSheetScaffoldState(
 @ExperimentalMaterialApi
 fun rememberBottomSheetScaffoldState(
     drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed),
-    bottomSheetState: BottomSheetState = rememberBottomSheetState(Collapsed),
+    bottomSheetState: BottomSheetState = rememberBottomSheetState(BottomSheetValue.Collapsed),
     snackbarHostState: SnackbarHostState = remember { SnackbarHostState() }
 ): BottomSheetScaffoldState {
     return remember(drawerState, bottomSheetState, snackbarHostState) {
@@ -248,8 +241,7 @@ fun rememberBottomSheetScaffoldState(
  * @param sheetContentColor The preferred content color provided by the bottom sheet to its
  * children. Defaults to the matching content color for [sheetBackgroundColor], or if that is
  * not a color from the theme, this will keep the same content color set above the bottom sheet.
- * @param sheetPeekHeight The height of the bottom sheet when it is collapsed. If the peek height
- * equals the sheet's full height, the sheet will only have a collapsed state.
+ * @param sheetPeekHeight The height of the bottom sheet when it is collapsed.
  * @param drawerContent The content of the drawer sheet.
  * @param drawerGesturesEnabled Whether the drawer sheet can be interacted with by gestures.
  * @param drawerShape The shape of the drawer sheet.
@@ -290,94 +282,85 @@ fun BottomSheetScaffold(
     content: @Composable (PaddingValues) -> Unit
 ) {
     val scope = rememberCoroutineScope()
-    val peekHeightPx = with(LocalDensity.current) { sheetPeekHeight.toPx() }
-    var bottomSheetHeight by remember { mutableStateOf<Float?>(null) }
+    BoxWithConstraints(modifier) {
+        val fullHeight = constraints.maxHeight.toFloat()
+        val peekHeightPx = with(LocalDensity.current) { sheetPeekHeight.toPx() }
+        var bottomSheetHeight by remember { mutableStateOf(fullHeight) }
 
-    val semantics = if (peekHeightPx != bottomSheetHeight) {
-        Modifier.semantics {
-            if (scaffoldState.bottomSheetState.isCollapsed) {
-                expand {
-                    if (scaffoldState.bottomSheetState.confirmStateChange(Expanded)) {
-                        scope.launch { scaffoldState.bottomSheetState.expand() }
+        val swipeable = Modifier
+            .nestedScroll(scaffoldState.bottomSheetState.nestedScrollConnection)
+            .swipeable(
+                state = scaffoldState.bottomSheetState,
+                anchors = mapOf(
+                    fullHeight - peekHeightPx to BottomSheetValue.Collapsed,
+                    fullHeight - bottomSheetHeight to Expanded
+                ),
+                orientation = Orientation.Vertical,
+                enabled = sheetGesturesEnabled,
+                resistance = null
+            )
+            .semantics {
+                if (peekHeightPx != bottomSheetHeight) {
+                    if (scaffoldState.bottomSheetState.isCollapsed) {
+                        expand {
+                            if (scaffoldState.bottomSheetState.confirmStateChange(Expanded)) {
+                                scope.launch { scaffoldState.bottomSheetState.expand() }
+                            }
+                            true
+                        }
+                    } else {
+                        collapse {
+                            if (scaffoldState.bottomSheetState.confirmStateChange(Collapsed)) {
+                                scope.launch { scaffoldState.bottomSheetState.collapse() }
+                            }
+                            true
+                        }
                     }
-                    true
-                }
-            } else {
-                collapse {
-                    if (scaffoldState.bottomSheetState.confirmStateChange(Collapsed)) {
-                        scope.launch { scaffoldState.bottomSheetState.collapse() }
-                    }
-                    true
                 }
             }
-        }
-    } else Modifier
 
-    val child = @Composable {
-        BottomSheetScaffoldLayout(
-            topBar = topBar,
-            body = content,
-            bottomSheet = { layoutHeight ->
-                val swipeable = when (val sheetHeight = bottomSheetHeight) {
-                    null -> Modifier
-                    else -> {
-                        // If the sheet height and the peek height are the same, the sheet can
-                        // only ever be in the collapsed state. Since our anchors are a map, we
-                        // can only have unique keys so we are explicit about this here. We
-                        // prefer the collapsed state because that is the default initial value
-                        // of BottomSheetState.
-                        val anchors =
-                            if (sheetHeight.roundToInt() == peekHeightPx.roundToInt()) {
-                                mapOf(layoutHeight - sheetHeight to Collapsed)
-                            } else {
-                                mapOf(
-                                    layoutHeight - bottomSheetHeight!! to Expanded,
-                                    layoutHeight - peekHeightPx to Collapsed
-                                )
-                            }
-                        Modifier.swipeable(
-                            state = scaffoldState.bottomSheetState,
-                            anchors = anchors,
-                            orientation = Orientation.Vertical,
-                            enabled = sheetGesturesEnabled,
-                            resistance = null
-                        )
+        val child = @Composable {
+            BottomSheetScaffoldStack(
+                body = {
+                    Surface(
+                        color = backgroundColor,
+                        contentColor = contentColor
+                    ) {
+                        Column(Modifier.fillMaxSize()) {
+                            topBar?.invoke()
+                            content(PaddingValues(bottom = sheetPeekHeight))
+                        }
                     }
-                }
-
-                Surface(
-                    Modifier
-                        .nestedScroll(scaffoldState.bottomSheetState.nestedScrollConnection)
-                        .then(swipeable)
-                        .then(semantics)
-                        .fillMaxWidth()
-                        .requiredHeightIn(min = sheetPeekHeight)
-                        .onSizeChanged {
-                            bottomSheetHeight = it.height.toFloat()
-                        },
-                    shape = sheetShape,
-                    elevation = sheetElevation,
-                    color = sheetBackgroundColor,
-                    contentColor = sheetContentColor,
-                    content = { Column(content = sheetContent) })
-            },
-            floatingActionButton = floatingActionButton,
-            snackbarHost = {
-                snackbarHost(scaffoldState.snackbarHostState)
-            },
-            sheetOffset = scaffoldState.bottomSheetState.offset,
-            sheetPeekHeight = sheetPeekHeight,
-            sheetState = scaffoldState.bottomSheetState,
-            floatingActionButtonPosition = floatingActionButtonPosition
-        )
-    }
-
-    Surface(
-        modifier
-            .fillMaxSize(),
-        color = backgroundColor,
-        contentColor = contentColor
-    ) {
+                },
+                bottomSheet = {
+                    Surface(
+                        swipeable
+                            .fillMaxWidth()
+                            .requiredHeightIn(min = sheetPeekHeight)
+                            .onGloballyPositioned {
+                                bottomSheetHeight = it.size.height.toFloat()
+                            },
+                        shape = sheetShape,
+                        elevation = sheetElevation,
+                        color = sheetBackgroundColor,
+                        contentColor = sheetContentColor,
+                        content = { Column(content = sheetContent) }
+                    )
+                },
+                floatingActionButton = {
+                    Box {
+                        floatingActionButton?.invoke()
+                    }
+                },
+                snackbarHost = {
+                    Box {
+                        snackbarHost(scaffoldState.snackbarHostState)
+                    }
+                },
+                bottomSheetOffset = scaffoldState.bottomSheetState.offset,
+                floatingActionButtonPosition = floatingActionButtonPosition
+            )
+        }
         if (drawerContent == null) {
             child()
         } else {
@@ -396,6 +379,55 @@ fun BottomSheetScaffold(
     }
 }
 
+@Composable
+private fun BottomSheetScaffoldStack(
+    body: @Composable () -> Unit,
+    bottomSheet: @Composable () -> Unit,
+    floatingActionButton: @Composable () -> Unit,
+    snackbarHost: @Composable () -> Unit,
+    bottomSheetOffset: State<Float>,
+    floatingActionButtonPosition: FabPosition
+) {
+    Layout(
+        content = {
+            body()
+            bottomSheet()
+            floatingActionButton()
+            snackbarHost()
+        }
+    ) { measurables, constraints ->
+        val placeable = measurables.first().measure(constraints)
+
+        layout(placeable.width, placeable.height) {
+            placeable.placeRelative(0, 0)
+
+            val (sheetPlaceable, fabPlaceable, snackbarPlaceable) =
+                measurables.drop(1).map {
+                    it.measure(constraints.copy(minWidth = 0, minHeight = 0))
+                }
+
+            val sheetOffsetY = bottomSheetOffset.value.roundToInt()
+
+            sheetPlaceable.placeRelative(0, sheetOffsetY)
+
+            val fabOffsetX = when (floatingActionButtonPosition) {
+                FabPosition.Center -> (placeable.width - fabPlaceable.width) / 2
+                else -> placeable.width - fabPlaceable.width - FabEndSpacing.roundToPx()
+            }
+            val fabOffsetY = sheetOffsetY - fabPlaceable.height / 2
+
+            fabPlaceable.placeRelative(fabOffsetX, fabOffsetY)
+
+            val snackbarOffsetX = (placeable.width - snackbarPlaceable.width) / 2
+            val snackbarOffsetY = placeable.height - snackbarPlaceable.height
+
+            snackbarPlaceable.placeRelative(snackbarOffsetX, snackbarOffsetY)
+        }
+    }
+}
+
+private val FabEndSpacing = 16.dp
+
 /**
  * Contains useful defaults for [BottomSheetScaffold].
  */
@@ -411,77 +443,3 @@ object BottomSheetScaffoldDefaults {
      */
     val SheetPeekHeight = 56.dp
 }
-
-private enum class BottomSheetScaffoldLayoutSlot { TopBar, Body, Sheet, Fab, Snackbar }
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-private fun BottomSheetScaffoldLayout(
-    topBar: @Composable (() -> Unit)?,
-    body: @Composable (innerPadding: PaddingValues) -> Unit,
-    bottomSheet: @Composable (layoutHeight: Int) -> Unit,
-    floatingActionButton: (@Composable () -> Unit)?,
-    snackbarHost: @Composable () -> Unit,
-    sheetPeekHeight: Dp,
-    floatingActionButtonPosition: FabPosition,
-    sheetOffset: State<Float>,
-    sheetState: BottomSheetState,
-) {
-    SubcomposeLayout { constraints ->
-        val layoutWidth = constraints.maxWidth
-        val layoutHeight = constraints.maxHeight
-        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
-
-        val sheetPlaceable = subcompose(BottomSheetScaffoldLayoutSlot.Sheet) {
-            bottomSheet(layoutHeight)
-        }[0].measure(looseConstraints)
-        val sheetOffsetY = sheetOffset.value.roundToInt()
-
-        val topBarPlaceable = topBar?.let {
-            subcompose(BottomSheetScaffoldLayoutSlot.TopBar) { topBar() }[0]
-                .measure(looseConstraints)
-        }
-        val topBarHeight = topBarPlaceable?.height ?: 0
-
-        val bodyConstraints = looseConstraints.copy(maxHeight = layoutHeight - topBarHeight)
-        val bodyPlaceable = subcompose(BottomSheetScaffoldLayoutSlot.Body) {
-            body(PaddingValues(bottom = sheetPeekHeight))
-        }[0].measure(bodyConstraints)
-
-        val fabPlaceable = floatingActionButton?.let { fab ->
-            subcompose(BottomSheetScaffoldLayoutSlot.Fab, fab)[0].measure(looseConstraints)
-        }
-
-        val fabWidth = fabPlaceable?.width ?: 0
-        val fabHeight = fabPlaceable?.height ?: 0
-        val fabOffsetX = when (floatingActionButtonPosition) {
-            FabPosition.Center -> (layoutWidth - fabWidth) / 2
-            else -> layoutWidth - fabWidth - FabSpacing.roundToPx()
-        }
-        // In case sheet peek height < (FAB height / 2), give the FAB some minimum space
-        val fabOffsetY = if (sheetPeekHeight.toPx() < fabHeight / 2) {
-            sheetOffsetY - fabHeight - FabSpacing.roundToPx()
-        } else sheetOffsetY - (fabHeight / 2)
-
-        val snackbarPlaceable = subcompose(BottomSheetScaffoldLayoutSlot.Snackbar, snackbarHost)[0]
-            .measure(looseConstraints)
-
-        val snackbarOffsetX = (layoutWidth - snackbarPlaceable.width) / 2
-
-        val snackbarOffsetY = when (sheetState.currentValue) {
-            Collapsed -> fabOffsetY - snackbarPlaceable.height
-            Expanded -> layoutHeight - snackbarPlaceable.height
-        }
-
-        layout(layoutWidth, layoutHeight) {
-            // Placement order is important for elevation
-            bodyPlaceable.placeRelative(0, topBarHeight)
-            topBarPlaceable?.placeRelative(0, 0)
-            sheetPlaceable.placeRelative(0, sheetOffsetY)
-            fabPlaceable?.placeRelative(fabOffsetX, fabOffsetY)
-            snackbarPlaceable.placeRelative(snackbarOffsetX, snackbarOffsetY)
-        }
-    }
-}
-
-private val FabSpacing = 16.dp

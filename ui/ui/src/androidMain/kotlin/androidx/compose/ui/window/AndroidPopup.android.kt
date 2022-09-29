@@ -406,7 +406,9 @@ internal class PopupLayout(
         parentLayoutCoordinates != null && popupContentSize != null
     }
 
-    private val maxSupportedElevation = 30.dp
+    // On systems older than Android S, there is a bug in the surface insets matrix math used by
+    // elevation, so high values of maxSupportedElevation break accessibility services: b/232788477.
+    private val maxSupportedElevation = 8.dp
 
     // The window visible frame used for the last popup position calculation.
     private val previousWindowVisibleFrame = Rect()

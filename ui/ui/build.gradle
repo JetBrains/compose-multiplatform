@@ -29,7 +29,6 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
@@ -47,7 +46,7 @@ dependencies {
         api(project(":compose:ui:ui-graphics"))
         api(project(":compose:ui:ui-text"))
         api(project(":compose:ui:ui-unit"))
-        api("androidx.annotation:annotation:1.1.0")
+        api("androidx.annotation:annotation:1.5.0")
 
         // This has stub APIs for access to legacy Android APIs, so we don't want
         // any dependency on this module.
@@ -58,6 +57,7 @@ dependencies {
         implementation("androidx.autofill:autofill:1.0.0")
         implementation(libs.kotlinCoroutinesAndroid)
 
+        implementation("androidx.activity:activity-ktx:1.5.1")
         implementation("androidx.core:core:1.5.0")
         implementation('androidx.collection:collection:1.0.0')
         implementation("androidx.customview:customview-poolingcontainer:1.0.0")
@@ -97,10 +97,11 @@ dependencies {
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
         androidTestImplementation(project(":compose:material:material"))
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":internal-testutils-fonts"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
+        androidTestImplementation(project(":internal-testutils-runtime"))
         androidTestImplementation(project(":test:screenshot:screenshot"))
-        androidTestImplementation("androidx.recyclerview:recyclerview:1.1.0")
+        androidTestImplementation("androidx.recyclerview:recyclerview:1.3.0-alpha02")
         androidTestImplementation("androidx.core:core-ktx:1.1.0")
         androidTestImplementation("androidx.activity:activity-compose:1.3.1")
         androidTestImplementation("androidx.appcompat:appcompat:1.3.0")
@@ -147,10 +148,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 // This has stub APIs for access to legacy Android APIs, so we don't want
                 // any dependency on this module.
                 compileOnly(project(":compose:ui:ui-android-stubs"))
-                api("androidx.annotation:annotation:1.1.0")
+                api("androidx.annotation:annotation:1.5.0")
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
+                implementation("androidx.activity:activity-ktx:1.5.1")
+                implementation("androidx.core:core:1.5.0")
+                implementation('androidx.collection:collection:1.0.0')
                 implementation("androidx.customview:customview-poolingcontainer:1.0.0")
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
@@ -189,7 +193,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(project(":compose:test-utils"))
             }
 
@@ -214,12 +218,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:test-utils"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(project(":internal-testutils-runtime"))
                 implementation(project(":test:screenshot:screenshot"))
-                implementation("androidx.recyclerview:recyclerview:1.1.0")
+                implementation("androidx.recyclerview:recyclerview:1.3.0-alpha02")
                 implementation("androidx.core:core-ktx:1.1.0")
-                implementation("androidx.activity:activity-compose:1.3.1")
+                implementation("androidx.activity:activity-compose:1.5.1")
             }
 
             desktopTest.dependencies {
@@ -260,7 +265,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 tasks.withType(KotlinCompile).configureEach {
     kotlinOptions {
         freeCompilerArgs += [
-            "-opt-in=kotlin.Experimental",
             "-Xjvm-default=all"
         ]
     }

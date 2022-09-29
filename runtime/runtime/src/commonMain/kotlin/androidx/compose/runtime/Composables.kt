@@ -21,7 +21,7 @@ package androidx.compose.runtime
  * Recomposition will always return the value produced by composition.
  */
 @Composable
-inline fun <T> remember(calculation: @DisallowComposableCalls () -> T): T =
+inline fun <T> remember(crossinline calculation: @DisallowComposableCalls () -> T): T =
     currentComposer.cache(false, calculation)
 
 /**
@@ -31,7 +31,7 @@ inline fun <T> remember(calculation: @DisallowComposableCalls () -> T): T =
 @Composable
 inline fun <T> remember(
     key1: Any?,
-    calculation: @DisallowComposableCalls () -> T
+    crossinline calculation: @DisallowComposableCalls () -> T
 ): T {
     return currentComposer.cache(currentComposer.changed(key1), calculation)
 }
@@ -44,7 +44,7 @@ inline fun <T> remember(
 inline fun <T> remember(
     key1: Any?,
     key2: Any?,
-    calculation: @DisallowComposableCalls () -> T
+    crossinline calculation: @DisallowComposableCalls () -> T
 ): T {
     return currentComposer.cache(
         currentComposer.changed(key1) or currentComposer.changed(key2),
@@ -61,7 +61,7 @@ inline fun <T> remember(
     key1: Any?,
     key2: Any?,
     key3: Any?,
-    calculation: @DisallowComposableCalls () -> T
+    crossinline calculation: @DisallowComposableCalls () -> T
 ): T {
     return currentComposer.cache(
         currentComposer.changed(key1) or
@@ -78,7 +78,7 @@ inline fun <T> remember(
 @Composable
 inline fun <T> remember(
     vararg keys: Any?,
-    calculation: @DisallowComposableCalls () -> T
+    crossinline calculation: @DisallowComposableCalls () -> T
 ): T {
     var invalid = false
     for (key in keys) invalid = invalid or currentComposer.changed(key)

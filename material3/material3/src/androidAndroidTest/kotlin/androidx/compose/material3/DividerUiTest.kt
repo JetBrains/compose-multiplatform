@@ -20,6 +20,7 @@ import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
@@ -79,7 +80,7 @@ class DividerUiTest {
 
         rule
             .setMaterialContentForSizeAssertions {
-                Divider(startIndent = indent, thickness = height)
+                Divider(modifier = Modifier.padding(start = indent), thickness = height)
             }
             .assertHeightIsEqualTo(height)
             .assertWidthIsEqualTo(rule.rootWidth())
@@ -95,7 +96,7 @@ class DividerUiTest {
         rule.setContent {
             sizePx = with(LocalDensity.current) { size.toPx().roundToInt() }
             dividerColor =
-                MaterialTheme.colorScheme.onSurfaceVariant
+                MaterialTheme.colorScheme.outlineVariant
             Box(modifier = Modifier.size(size).background(Color.Black)) {
                 Divider(
                     modifier = Modifier.testTag(testTag).fillMaxWidth(),

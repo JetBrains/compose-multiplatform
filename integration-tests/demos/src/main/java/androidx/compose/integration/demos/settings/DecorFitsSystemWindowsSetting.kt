@@ -17,10 +17,13 @@
 package androidx.compose.integration.demos.settings
 
 import android.content.Context
+import android.view.View
 import android.view.Window
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat.setDecorFitsSystemWindows
+import androidx.core.view.WindowInsetsCompat
 import androidx.preference.CheckBoxPreference
 
 /**
@@ -53,9 +56,17 @@ internal object DecorFitsSystemWindowsSetting : DemoSetting<Boolean> {
  * [decorFitsSystemWindows] as long as this function is composed.
  */
 @Composable
-internal fun DecorFitsSystemWindowsEffect(decorFitsSystemWindows: Boolean, window: Window) {
+internal fun DecorFitsSystemWindowsEffect(
+    decorFitsSystemWindows: Boolean,
+    view: View,
+    window: Window
+) {
     DisposableEffect(decorFitsSystemWindows, window) {
         setDecorFitsSystemWindows(window, decorFitsSystemWindows)
+        ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
+            if (!decorFitsSystemWindows) WindowInsetsCompat.CONSUMED
+            else insets
+        }
         onDispose {
             setDecorFitsSystemWindows(window, true)
         }

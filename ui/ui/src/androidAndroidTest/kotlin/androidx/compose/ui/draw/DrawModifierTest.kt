@@ -17,6 +17,7 @@
 package androidx.compose.ui.draw
 
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -40,6 +41,10 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
@@ -49,6 +54,7 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -214,6 +220,40 @@ class DrawModifierTest {
                 assertEquals(Color.Blue.toArgb(), getPixel(size - 2, size - 2))
                 assertEquals(Color.Blue.toArgb(), getPixel(1, size - 2))
             }
+        }
+    }
+
+    @Test
+    fun combinedModifiers_drawingSizesAreUsingTheSizeDefinedByLayoutModifier() {
+        var drawingSize: Size = Size.Unspecified
+        var drawingCacheSize: Size = Size.Unspecified
+        val modifier = object : LayoutModifier, DrawCacheModifier {
+            override fun onBuildCache(params: BuildDrawCacheParams) {
+                drawingCacheSize = params.size
+            }
+
+            override fun ContentDrawScope.draw() {
+                drawingSize = size
+            }
+
+            override fun MeasureScope.measure(
+                measurable: Measurable,
+                constraints: Constraints
+            ): MeasureResult {
+                val placeable = measurable.measure(Constraints.fixed(10, 10))
+                return layout(20, 20) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+        rule.setContent {
+            Box(modifier)
+        }
+
+        rule.runOnIdle {
+            val expectedSize = Size(10f, 10f)
+            assertThat(drawingSize).isEqualTo(expectedSize)
+            assertThat(drawingCacheSize).isEqualTo(expectedSize)
         }
     }
 
@@ -629,5 +669,7 @@ class DrawModifierTest {
         }
     }
 
-    fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()
+    // captureToImage() requires API level 26
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun SemanticsNodeInteraction.captureToBitmap() = captureToImage().asAndroidBitmap()
 }

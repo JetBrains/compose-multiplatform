@@ -26,6 +26,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection.Companion.Enter
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -205,7 +206,7 @@ class FocusSearchNonPlacedItemsTest {
     }
 
     @Test
-    fun moveFocusIn_skipsUnplacedItem() {
+    fun moveFocusEnter_skipsUnplacedItem() {
         // Arrange.
         val (parent, item1, item2) = List(3) { mutableStateOf(false) }
         rule.setContentForTest {
@@ -218,7 +219,7 @@ class FocusSearchNonPlacedItemsTest {
         // Act.
         rule.runOnIdle {
             @OptIn(ExperimentalComposeUiApi::class)
-            focusManager.moveFocus(FocusDirection.In)
+            focusManager.moveFocus(Enter)
         }
 
         // Assert.

@@ -23,17 +23,6 @@ import android.text.Layout
 import android.text.TextPaint
 import androidx.compose.ui.text.android.InternalPlatformTextApi
 import androidx.compose.ui.text.android.TextLayout
-import kotlin.math.ceil
-
-internal fun AndroidParagraph.bitmap(): Bitmap {
-    val bitmap = Bitmap.createBitmap(
-        ceil(this.width).toInt(),
-        ceil(this.height).toInt(),
-        Bitmap.Config.ARGB_8888
-    )
-    this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
-    return bitmap
-}
 
 fun Layout.bitmap(): Bitmap {
     val bitmap = Bitmap.createBitmap(

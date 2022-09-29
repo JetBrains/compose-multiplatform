@@ -78,6 +78,7 @@ import org.jetbrains.kotlin.ir.util.explicitParameters
 import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.findAnnotation
 import org.jetbrains.kotlin.ir.util.functions
+import org.jetbrains.kotlin.ir.util.getInlineClassUnderlyingType
 import org.jetbrains.kotlin.ir.util.isFakeOverride
 import org.jetbrains.kotlin.ir.util.isVararg
 import org.jetbrains.kotlin.ir.util.module
@@ -88,20 +89,17 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.java.JvmAbi
 import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
-import org.jetbrains.kotlin.resolve.BindingTrace
 import org.jetbrains.kotlin.resolve.DescriptorUtils
 import org.jetbrains.kotlin.resolve.multiplatform.findCompatibleExpectsForActual
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
-@Suppress("DEPRECATION")
 class ComposerParamTransformer(
     context: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
-    bindingTrace: BindingTrace,
     private val decoysEnabled: Boolean,
     metrics: ModuleMetrics,
 ) :
-    AbstractComposeLowering(context, symbolRemapper, bindingTrace, metrics),
+    AbstractComposeLowering(context, symbolRemapper, metrics),
     ModuleLoweringPass {
 
     /**
@@ -112,7 +110,6 @@ class ComposerParamTransformer(
 
     private var inlineLambdaInfo = ComposeInlineLambdaLocator(context)
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun lower(module: IrModuleFragment) {
         currentModule = module
 
@@ -125,7 +122,6 @@ class ComposerParamTransformer(
         val typeRemapper = ComposerTypeRemapper(
             context,
             symbolRemapper,
-            typeTranslator,
             composerType
         )
         // for each declaration, we create a deepCopy transformer It is important here that we
@@ -134,8 +130,7 @@ class ComposerParamTransformer(
         val transformer = DeepCopyIrTreeWithSymbolsPreservingMetadata(
             context,
             symbolRemapper,
-            typeRemapper,
-            typeTranslator
+            typeRemapper
         ).also { typeRemapper.deepCopy = it }
         module.transformChildren(
             transformer,
@@ -279,7 +274,7 @@ class ComposerParamTransformer(
         endOffset: Int = UNDEFINED_OFFSET
     ): IrExpression {
         val classSymbol = classOrNull
-        if (this !is IrSimpleType || hasQuestionMark || classSymbol?.owner?.isInline != true) {
+        if (this !is IrSimpleType || isMarkedNullable() || !isInlineClassType()) {
             return if (isMarkedNullable()) {
                 IrConstImpl.constNull(startOffset, endOffset, context.irBuiltIns.nothingNType)
             } else {
@@ -295,8 +290,8 @@ class ComposerParamTransformer(
                 this
             )
         } else {
-            val ctor = classSymbol.constructors.first()
-            val underlyingType = getUnderlyingType(classSymbol.owner)
+            val ctor = classSymbol!!.constructors.first()
+            val underlyingType = getInlineClassUnderlyingType(classSymbol.owner)
 
             // TODO(lmr): We should not be calling the constructor here, but this seems like a
             //  reasonable interim solution.

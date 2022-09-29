@@ -515,6 +515,138 @@ class LazyArrangementsTest {
         assertArrangementForTwoItems(Arrangement.End, LayoutDirection.Ltr)
     }
 
+    @Test
+    fun column_negativeSpacing_itemsVisible() {
+        val state = LazyListState()
+        val halfItemSize = itemSize / 2
+        rule.setContent {
+            LazyColumn(
+                modifier = Modifier.requiredSize(itemSize),
+                verticalArrangement = Arrangement.spacedBy(-halfItemSize),
+                state = state
+            ) {
+                items(100) { index ->
+                    Box(Modifier.size(itemSize).testTag(index.toString()))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(halfItemSize)
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+
+            runBlocking {
+                state.scrollBy(with(rule.density) { halfItemSize.toPx() })
+            }
+
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("0")
+            .assertTopPositionInRootIsEqualTo(-halfItemSize)
+        rule.onNodeWithTag("1")
+            .assertTopPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun row_negativeSpacing_itemsVisible() {
+        val state = LazyListState()
+        val halfItemSize = itemSize / 2
+        rule.setContent {
+            LazyRow(
+                modifier = Modifier.requiredSize(itemSize),
+                horizontalArrangement = Arrangement.spacedBy(-halfItemSize),
+                state = state
+            ) {
+                items(100) { index ->
+                    Box(Modifier.size(itemSize).testTag(index.toString()))
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(halfItemSize)
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+
+            runBlocking {
+                state.scrollBy(with(rule.density) { halfItemSize.toPx() })
+            }
+
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+
+        rule.onNodeWithTag("0")
+            .assertLeftPositionInRootIsEqualTo(-halfItemSize)
+        rule.onNodeWithTag("1")
+            .assertLeftPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun column_negativeSpacingLargerThanItem_itemsVisible() {
+        val state = LazyListState(firstVisibleItemIndex = 2)
+        val largerThanItemSize = itemSize * 1.5f
+        rule.setContent {
+            LazyColumn(
+                modifier = Modifier.requiredSize(itemSize),
+                verticalArrangement = Arrangement.spacedBy(-largerThanItemSize),
+                state = state
+            ) {
+                items(4) { index ->
+                    Box(Modifier.size(itemSize).testTag(index.toString()))
+                }
+            }
+        }
+
+        repeat(4) {
+            rule.onNodeWithTag("$it")
+                .assertTopPositionInRootIsEqualTo(0.dp)
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun row_negativeSpacingLargerThanItem_itemsVisible() {
+        val state = LazyListState(firstVisibleItemIndex = 2)
+        val largerThanItemSize = itemSize * 1.5f
+        rule.setContent {
+            LazyRow(
+                modifier = Modifier.requiredSize(itemSize),
+                horizontalArrangement = Arrangement.spacedBy(-largerThanItemSize),
+                state = state
+            ) {
+                items(4) { index ->
+                    Box(Modifier.size(itemSize).testTag(index.toString()))
+                }
+            }
+        }
+
+        repeat(4) {
+            rule.onNodeWithTag("$it")
+                .assertLeftPositionInRootIsEqualTo(0.dp)
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+    }
+
     fun composeColumnWith(arrangement: Arrangement.Vertical) {
         rule.setContent {
             LazyColumn(

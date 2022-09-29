@@ -18,8 +18,8 @@ package androidx.compose.foundation.text
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.test.R
 import androidx.compose.ui.text.font.toFontFamily
+import androidx.testutils.fonts.R
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 

@@ -40,4 +40,11 @@ internal interface InputEventCallback2 {
      * Called when IME triggered a KeyEvent
      */
     fun onKeyEvent(event: KeyEvent)
+
+    /**
+     * Called when IME closed the input connection.
+     *
+     * @param ic a closed input connection
+     */
+    fun onConnectionClosed(ic: RecordingInputConnection)
 }

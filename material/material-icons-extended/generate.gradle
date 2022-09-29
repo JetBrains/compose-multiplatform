@@ -28,10 +28,6 @@ apply plugin: "AndroidXComposePlugin"
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 apply from: "${buildscript.sourceFile.parentFile}/shared-dependencies.gradle"
 
-dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
-}
-
 if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     // We're not sure how to merge icons jars when multiplatform is enabled
     IconGenerationTask.registerExtendedIconThemeProject(

@@ -25,7 +25,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.foundation.layout.internal.JvmDefaultWithCompatibility
 /**
  * Used to specify the arrangement of the layout's children in layouts like [Row] or [Column] in
  * the main axis direction (horizontal and vertical, respectively).

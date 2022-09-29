@@ -22,7 +22,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     implementation(libs.kotlinStdlib)
 
@@ -39,6 +38,7 @@ dependencies {
     implementation(project(":paging:paging-compose:integration-tests:paging-demos"))
     implementation(project(":compose:ui:ui-tooling-preview"))
     debugImplementation(project(":compose:ui:ui-tooling"))
+    implementation(project(":internal-testutils-fonts"))
 }
 
 android {

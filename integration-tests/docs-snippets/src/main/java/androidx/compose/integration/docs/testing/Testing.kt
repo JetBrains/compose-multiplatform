@@ -19,20 +19,30 @@
 
 package androidx.compose.integration.docs.testing
 
+import android.view.KeyEvent as AndroidKeyEvent
+import android.view.KeyEvent.ACTION_DOWN as ActionDown
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.integration.docs.testing.CreateSemanticsPropertySnippet.PickedDateKey
+import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -49,7 +59,9 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.hasParent
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onFirst
@@ -57,23 +69,24 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.printToLog
 import androidx.compose.ui.test.swipeLeft
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withText
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.UiObject2
 import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import android.view.KeyEvent as AndroidKeyEvent
-import android.view.KeyEvent.ACTION_DOWN as ActionDown
-import android.view.KeyEvent.KEYCODE_A as KeyCodeA
 
 /**
  * This file lets DevRel track changes to snippets present in
@@ -252,6 +265,26 @@ private fun AdvanceWaitSnippets() {
     composeTestRule.waitUntil(timeoutMs) { condition }
 }
 
+private object ComponentActivitySnippet {
+    class MyComposeTest {
+
+        @get:Rule
+        val composeTestRule = createAndroidComposeRule<ComponentActivity>()
+
+        @Test
+        fun myTest() {
+            // Start the app
+            composeTestRule.setContent {
+                MyAppTheme {
+                    MainScreen(uiState = exampleUiState, /*...*/)
+                }
+            }
+            val continueLabel = composeTestRule.activity.resources.getString(R.string.next)
+            composeTestRule.onNodeWithText(continueLabel).performClick()
+        }
+    }
+}
+
 private object CreateSemanticsPropertySnippet {
     // Creates a Semantics property of type boolean
     val PickedDateKey = SemanticsPropertyKey<Long>("PickedDate")
@@ -264,6 +297,29 @@ private fun UseSemanticsPropertySnippet() {
         .assertExists()
 }
 
+private object StateRestorationSnippet {
+    @OptIn(ExperimentalTestApi::class)
+    class MyStateRestorationTests {
+
+        @get:Rule
+        val composeTestRule = createComposeRule()
+
+        @Test
+        fun onRecreation_stateIsRestored() {
+            val restorationTester = StateRestorationTester(composeTestRule)
+
+            restorationTester.setContent { MainScreen() }
+
+            // TODO: Run actions that modify the state
+
+            // Trigger a recreation
+            restorationTester.emulateSavedInstanceStateRestore()
+
+            // TODO: Verify that state has been correctly restored.
+        }
+    }
+}
+
 private object InteropTestSnippet {
     @Test fun androidViewInteropTest() {
         // Check the initial state of a TextView that depends on a Compose state:
@@ -273,6 +329,30 @@ private object InteropTestSnippet {
         // Check the new value
         Espresso.onView(withText("Hello Compose")).check(matches(isDisplayed()))
     }
+}
+
+@ExperimentalComposeUiApi
+@Composable
+fun UiAutomatorInteropTestSnippet() {
+    Scaffold(
+        // Enables for all composables in the hierarchy.
+        modifier = Modifier.semantics {
+            testTagsAsResourceId = true
+        }
+    ) { padding ->
+        // Modifier.testTag is accessible from UiAutomator for composables nested here.
+        LazyColumn(
+            modifier = Modifier
+                .testTag("myLazyColumn")
+                .padding(padding),
+        ) {
+            // content
+        }
+    }
+
+    val device = UiDevice.getInstance(getInstrumentation())
+    val lazyColumn: UiObject2 = device.findObject(By.res("myLazyColumn"))
+    // some interaction with the lazyColumn
 }
 
 private object TestingSnippets13 {
@@ -326,3 +406,8 @@ private val idlingResource = object : IdlingResource {
         get() = TODO("Stub!")
 }
 private val condition = true
+private object R {
+    object string {
+        const val next = 1
+    }
+}

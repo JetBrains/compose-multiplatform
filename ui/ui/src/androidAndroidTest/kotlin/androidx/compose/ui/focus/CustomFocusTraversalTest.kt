@@ -29,6 +29,7 @@ import androidx.compose.ui.input.key.Key.Companion.DirectionUp
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
 import androidx.compose.ui.input.key.Key.Companion.DirectionLeft
 import androidx.compose.ui.input.key.Key.Companion.DirectionRight
+import androidx.compose.ui.input.key.Key.Companion.Enter
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.nativeKeyCode
 import androidx.compose.ui.platform.LocalFocusManager
@@ -468,6 +469,131 @@ class CustomFocusTraversalTest(
 
         // Assert.
         rule.runOnIdle {
+            assertThat(item1Focused).isFalse()
+            assertThat(item2Focused).isFalse()
+            assertThat(item3Focused).isTrue()
+        }
+    }
+
+    @Test
+    fun focusProperties_enter() {
+        // Arrange.
+        var item1Focused = false
+        var item2Focused = false
+        var item3Focused = false
+        val (parent, item2) = FocusRequester.createRefs()
+        var directionThatTriggeredEnter: FocusDirection? = null
+        lateinit var focusManager: FocusManager
+        rule.setFocusableContent {
+            focusManager = LocalFocusManager.current
+            Row(
+                Modifier
+                    .focusRequester(parent)
+                    .focusProperties {
+                        enter = {
+                            directionThatTriggeredEnter = it
+                            item2
+                        }
+                    }
+                    .focusTarget()
+            ) {
+                Box(
+                    Modifier
+                        .onFocusChanged { item1Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .focusRequester(item2)
+                        .onFocusChanged { item2Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .onFocusChanged { item3Focused = it.isFocused }
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle { parent.requestFocus() }
+
+        // Act.
+        if (moveFocusProgrammatically) {
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Enter)
+            }
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, Enter.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(directionThatTriggeredEnter).isEqualTo(FocusDirection.Enter)
+            assertThat(item1Focused).isFalse()
+            assertThat(item2Focused).isTrue()
+            assertThat(item3Focused).isFalse()
+        }
+    }
+
+    @Test
+    fun focusProperties_exit() {
+        // Arrange.
+        var parentFocused = false
+        var item1Focused = false
+        var item2Focused = false
+        var item3Focused = false
+        val (item1, item3) = FocusRequester.createRefs()
+        var directionThatTriggeredEnter: FocusDirection? = null
+        lateinit var focusManager: FocusManager
+        rule.setFocusableContent {
+            focusManager = LocalFocusManager.current
+            Row(
+                Modifier
+                    .onFocusChanged { parentFocused = it.isFocused }
+                    .focusTarget()
+            ) {
+                Box(
+                    Modifier
+                        .focusRequester(item1)
+                        .onFocusChanged { item1Focused = it.isFocused }
+                        .focusProperties {
+                            enter = {
+                                directionThatTriggeredEnter = it
+                                item3
+                            }
+                        }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .onFocusChanged { item2Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .focusRequester(item3)
+                        .onFocusChanged { item3Focused = it.isFocused }
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle { item1.requestFocus() }
+
+        // Act.
+        if (moveFocusProgrammatically) {
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Enter)
+            }
+        } else {
+            val nativeKeyEvent = AndroidKeyEvent(KeyDown, Enter.nativeKeyCode)
+            rule.onRoot().performKeyPress(KeyEvent(nativeKeyEvent))
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(directionThatTriggeredEnter).isEqualTo(FocusDirection.Enter)
+            assertThat(parentFocused).isFalse()
             assertThat(item1Focused).isFalse()
             assertThat(item2Focused).isFalse()
             assertThat(item3Focused).isTrue()

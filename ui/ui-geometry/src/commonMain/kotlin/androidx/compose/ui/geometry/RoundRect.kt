@@ -122,7 +122,7 @@ data class RoundRect(
      * using this method, prefer to reuse existing [RoundRect]s rather than
      * recreating the object each time.
      */
-    fun contains(point: Offset): Boolean {
+    operator fun contains(point: Offset): Boolean {
         if (point.x < left || point.x >= right || point.y < top || point.y >= bottom) {
             return false; // outside bounding box
         }

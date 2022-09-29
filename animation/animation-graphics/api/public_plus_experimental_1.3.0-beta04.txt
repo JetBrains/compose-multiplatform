@@ -1,0 +1,57 @@
+// Signature format: 4.0
+package androidx.compose.animation.graphics {
+
+  @kotlin.RequiresOptIn(message="This is an experimental animation graphics API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY}) public @interface ExperimentalAnimationGraphicsApi {
+  }
+
+}
+
+package androidx.compose.animation.graphics.res {
+
+  public final class AnimatedVectorPainterResources_androidKt {
+    method @androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi @androidx.compose.runtime.Composable public static androidx.compose.ui.graphics.painter.Painter rememberAnimatedVectorPainter(androidx.compose.animation.graphics.vector.AnimatedImageVector animatedImageVector, boolean atEnd);
+  }
+
+  public final class AnimatedVectorResources_androidKt {
+    method @androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi @androidx.compose.runtime.Composable public static androidx.compose.animation.graphics.vector.AnimatedImageVector animatedVectorResource(androidx.compose.animation.graphics.vector.AnimatedImageVector.Companion, @DrawableRes int id);
+  }
+
+  public final class AnimatorResources_androidKt {
+  }
+
+}
+
+package androidx.compose.animation.graphics.vector {
+
+  @androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi @androidx.compose.runtime.Immutable public final class AnimatedImageVector {
+    method public androidx.compose.ui.graphics.vector.ImageVector getImageVector();
+    method public int getTotalDuration();
+    property public final androidx.compose.ui.graphics.vector.ImageVector imageVector;
+    property public final int totalDuration;
+    field public static final androidx.compose.animation.graphics.vector.AnimatedImageVector.Companion Companion;
+  }
+
+  public static final class AnimatedImageVector.Companion {
+  }
+
+  public final class AnimatorAnimationSpecsKt {
+  }
+
+  public final class AnimatorKt {
+  }
+
+}
+
+package androidx.compose.animation.graphics.vector.compat {
+
+  public final class XmlAnimatedVectorParser_androidKt {
+  }
+
+  public final class XmlAnimatorParser_androidKt {
+  }
+
+  public final class XmlPullParserUtils_androidKt {
+  }
+
+}
+

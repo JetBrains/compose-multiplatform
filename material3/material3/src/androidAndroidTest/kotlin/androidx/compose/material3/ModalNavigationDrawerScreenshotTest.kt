@@ -19,6 +19,7 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.testutils.assertAgainstGolden
@@ -55,7 +56,11 @@ class ModalNavigationDrawerScreenshotTest {
             Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
                 ModalNavigationDrawer(
                     drawerState = rememberDrawerState(drawerValue),
-                    drawerContent = {},
+                    drawerContent = {
+                        ModalDrawerSheet {
+                          Spacer(modifier = Modifier.fillMaxSize())
+                        }
+                    },
                     content = {
                         Box(
                             Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)
@@ -72,7 +77,11 @@ class ModalNavigationDrawerScreenshotTest {
                 Box(Modifier.requiredSize(400.dp, 32.dp).testTag(ContainerTestTag)) {
                     ModalNavigationDrawer(
                         drawerState = rememberDrawerState(drawerValue),
-                        drawerContent = {},
+                        drawerContent = {
+                            ModalDrawerSheet {
+                              Spacer(modifier = Modifier.fillMaxSize())
+                            }
+                        },
                         content = {
                             Box(
                                 Modifier.fillMaxSize()

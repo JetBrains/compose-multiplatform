@@ -27,13 +27,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.integration.demos.common.Demo
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -70,8 +71,9 @@ fun DemoFilter(launchableDemos: List<Demo>, filterText: String, onNavigate: (Dem
 }
 
 /**
- * [SmallTopAppBar] with a text field allowing filtering all the demos.
+ * [TopAppBar] with a text field allowing filtering all the demos.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterAppBar(
     filterText: String,
@@ -79,7 +81,7 @@ fun FilterAppBar(
     onClose: () -> Unit,
     scrollBehavior: TopAppBarScrollBehavior
 ) {
-    SmallTopAppBar(
+    TopAppBar(
         navigationIcon = {
             IconButton(onClick = onClose) {
                 Icon(Icons.Filled.Close, null)
@@ -154,7 +156,9 @@ private fun FilteredDemoListItem(
         ListItem(
             onClick = { onNavigate(demo) }) {
             Text(
-                modifier = Modifier.height(56.dp).wrapContentSize(Alignment.Center),
+                modifier = Modifier
+                    .height(56.dp)
+                    .wrapContentSize(Alignment.Center),
                 text = annotatedString
             )
         }

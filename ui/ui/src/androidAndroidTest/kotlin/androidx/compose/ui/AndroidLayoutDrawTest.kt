@@ -186,6 +186,7 @@ class AndroidLayoutDrawTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
     @Test
     fun testLayerCameraDistance() {
         val targetCameraDistance = 15f
@@ -221,6 +222,7 @@ class AndroidLayoutDrawTest {
         assertTrue(cameraDistanceApplied)
     }
 
+    @RequiresApi(Build.VERSION_CODES.Q)
     private fun verifyRenderNode29CameraDistance(cameraDistance: Float): Boolean =
         // Verify that the internal render node has the camera distance property
         // given to the wrapper
@@ -228,6 +230,7 @@ class AndroidLayoutDrawTest {
             this.cameraDistance = cameraDistance
         }.dumpRenderNodeData().cameraDistance == cameraDistance
 
+    @RequiresApi(Build.VERSION_CODES.M)
     private fun verifyRenderNode23CameraDistance(cameraDistance: Float): Boolean =
         // Verify that the internal render node has the camera distance property
         // given to the wrapper
@@ -2775,7 +2778,7 @@ class AndroidLayoutDrawTest {
         assertSame(firstMeasurable, m)
     }
 
-    // LayoutNodeWrappers remain even when there are multiple for a modifier
+    // NodeCoordinators remain even when there are multiple for a modifier
     @Test
     fun replaceMultiImplementationModifier() {
         var color by mutableStateOf(Color.Red)
@@ -3565,6 +3568,7 @@ class AndroidLayoutDrawTest {
         assertTrue(composeView.isTransitionGroup)
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun drawnInCorrectLayer() {
         var innerDrawLatch = CountDownLatch(1)
@@ -3771,6 +3775,7 @@ class AndroidLayoutDrawTest {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun validateSquareColors(
         outerColor: Color,
         innerColor: Color,
@@ -3856,6 +3861,7 @@ fun Bitmap.assertRect(
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Suppress("DEPRECATION")
 fun androidx.test.rule.ActivityTestRule<*>.validateSquareColors(
     drawLatch: CountDownLatch,

@@ -37,7 +37,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Color.Companion.Blue
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ParagraphStyle
@@ -222,6 +225,24 @@ private object TextOverflowSnippet {
     @Composable
     fun OverflowedText() {
         Text("Hello Compose ".repeat(50), maxLines = 2, overflow = TextOverflow.Ellipsis)
+    }
+}
+
+private object TextShadowSnippet {
+    @Composable
+    fun TextShadow() {
+        val offset = Offset(5.0f, 10.0f)
+        Text(
+            text = "Hello world!",
+            style = TextStyle(
+                fontSize = 24.sp,
+                shadow = Shadow(
+                    color = Color.Blue,
+                    offset = offset,
+                    blurRadius = 3f
+                )
+            )
+        )
     }
 }
 

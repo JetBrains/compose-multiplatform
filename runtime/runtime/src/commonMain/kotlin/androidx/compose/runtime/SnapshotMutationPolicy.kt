@@ -22,7 +22,7 @@ import androidx.compose.runtime.snapshots.MutableSnapshot
 // Explicit imports for these needed in common source sets.
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmMultifileClass
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.runtime.internal.JvmDefaultWithCompatibility
 
 /**
  * A policy to control how the result of [mutableStateOf] report and merge changes to

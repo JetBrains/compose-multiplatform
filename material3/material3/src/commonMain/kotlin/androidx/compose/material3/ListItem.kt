@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.heightIn
@@ -27,7 +28,6 @@ import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
@@ -37,11 +37,13 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// TODO: Provide M3 ListItem asset and doc link when available
+// TODO: Provide M3 ListItem doc link when available
 /**
  * Material Design list item.
  *
  * Lists are continuous, vertical indexes of text or images.
+ *
+ * ![Lists image](https://developer.android.com/images/reference/androidx/compose/material3/lists.png)
  *
  * This component can be used to achieve the list item templates existing in the spec. One-line list
  * items have a singular line of headline text. Two-line list items additionally have either
@@ -81,14 +83,13 @@ fun ListItem(
     if (overlineText == null && supportingText == null) {
         // One-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = ListTokens.ListItemContainerHeight)
-                .padding(
-                    vertical = ListItemVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor().value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = ListTokens.ListItemContainerHeight,
+            paddingValues = PaddingValues(ListItemHorizontalPadding, ListItemVerticalPadding)
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -119,14 +120,13 @@ fun ListItem(
     } else if (overlineText == null) {
         // Two-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = TwoLineListItemContainerHeight)
-                .padding(
-                    vertical = ListItemVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor().value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = TwoLineListItemContainerHeight,
+            paddingValues = PaddingValues(ListItemHorizontalPadding, ListItemVerticalPadding)
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -147,7 +147,7 @@ fun ListItem(
                         headlineText
                     )
                     ProvideTextStyleFromToken(
-                        colors.supportingColor(enabled = true).value,
+                        colors.supportingColor().value,
                         ListTokens.ListItemSupportingTextFont,
                         supportingText!!
                     )
@@ -164,14 +164,13 @@ fun ListItem(
     } else if (supportingText == null) {
         // Two-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = TwoLineListItemContainerHeight)
-                .padding(
-                    vertical = ListItemVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor().value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = TwoLineListItemContainerHeight,
+            paddingValues = PaddingValues(ListItemHorizontalPadding, ListItemVerticalPadding)
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -187,7 +186,7 @@ fun ListItem(
             ) {
                 Column {
                     ProvideTextStyleFromToken(
-                        colors.overlineColor(enabled = true).value,
+                        colors.overlineColor().value,
                         ListTokens.ListItemOverlineFont,
                         overlineText
                     )
@@ -209,14 +208,16 @@ fun ListItem(
     } else {
         // Three-Line List Item
         ListItem(
-            modifier = modifier
-                .heightIn(min = ThreeLineListItemContainerHeight)
-                .padding(
-                    vertical = ListItemThreeLineVerticalPadding,
-                    horizontal = ListItemHorizontalPadding
-                ),
+            modifier = modifier,
+            containerColor = colors.containerColor().value,
+            contentColor = colors.headlineColor(enabled = true).value,
             tonalElevation = tonalElevation,
             shadowElevation = shadowElevation,
+            minHeight = ThreeLineListItemContainerHeight,
+            paddingValues = PaddingValues(
+                ListItemHorizontalPadding,
+                ListItemThreeLineVerticalPadding
+            )
         ) {
             if (leadingContent != null) {
                 leadingContent(
@@ -232,7 +233,7 @@ fun ListItem(
             ) {
                 Column {
                     ProvideTextStyleFromToken(
-                        colors.overlineColor(enabled = true).value,
+                        colors.overlineColor().value,
                         ListTokens.ListItemOverlineFont,
                         overlineText
                     )
@@ -242,7 +243,7 @@ fun ListItem(
                         headlineText
                     )
                     ProvideTextStyleFromToken(
-                        colors.supportingColor(enabled = true).value,
+                        colors.supportingColor().value,
                         ListTokens.ListItemSupportingTextFont,
                         supportingText
                     )
@@ -279,11 +280,13 @@ fun ListItem(
 @ExperimentalMaterial3Api
 private fun ListItem(
     modifier: Modifier = Modifier,
-    shape: Shape = ListItemDefaults.Shape,
-    containerColor: Color = ListItemDefaults.ContainerColor,
-    contentColor: Color = ListItemDefaults.ContentColor,
+    shape: Shape = ListItemDefaults.shape,
+    containerColor: Color = ListItemDefaults.containerColor,
+    contentColor: Color = ListItemDefaults.contentColor,
     tonalElevation: Dp = ListItemDefaults.Elevation,
     shadowElevation: Dp = ListItemDefaults.Elevation,
+    minHeight: Dp,
+    paddingValues: PaddingValues,
     content: @Composable RowScope.() -> Unit,
 ) {
     Surface(
@@ -294,7 +297,12 @@ private fun ListItem(
         tonalElevation = tonalElevation,
         shadowElevation = shadowElevation,
     ) {
-        Row(content = content)
+        Row(
+            modifier = Modifier
+            .heightIn(min = minHeight)
+            .padding(paddingValues),
+            content = content
+        )
     }
 }
 
@@ -358,18 +366,19 @@ private fun trailingContent(
 /**
  * Contains the default values used by list items.
  */
+@ExperimentalMaterial3Api
 object ListItemDefaults {
-    /** The default shape of a list item */
-    val Shape: Shape @Composable get() = ListTokens.ListItemContainerShape.toShape()
-
     /** The default elevation of a list item */
     val Elevation: Dp = ListTokens.ListItemContainerElevation
 
+    /** The default shape of a list item */
+    val shape: Shape @Composable get() = ListTokens.ListItemContainerShape.toShape()
+
     /** The container color of a list item */
-    val ContainerColor: Color @Composable get() = ListTokens.ListItemContainerColor.toColor()
+    val containerColor: Color @Composable get() = ListTokens.ListItemContainerColor.toColor()
 
     /** The content color of a list item */
-    val ContentColor: Color @Composable get() = ListTokens.ListItemLabelTextColor.toColor()
+    val contentColor: Color @Composable get() = ListTokens.ListItemLabelTextColor.toColor()
 
     /**
      * Creates a [ListItemColors] that represents the default container and content colors used in a
@@ -403,7 +412,7 @@ object ListItemDefaults {
         disabledTrailingIconColor: Color = ListTokens.ListItemDisabledTrailingIconColor.toColor()
             .copy(alpha = ListTokens.ListItemDisabledTrailingIconOpacity)
     ): ListItemColors =
-        DefaultListItemColors(
+        ListItemColors(
             containerColor = containerColor,
             headlineColor = headlineColor,
             leadingIconColor = leadingIconColor,
@@ -421,37 +430,9 @@ object ListItemDefaults {
  *
  * - See [ListItemDefaults.colors] for the default colors used in a [ListItem].
  */
-@Stable
-interface ListItemColors {
-
-    /** The container color of this [ListItem] based on enabled state */
-    @Composable
-    fun containerColor(enabled: Boolean): State<Color>
-
-    /** The color of this [ListItem]'s headline text based on enabled state */
-    @Composable
-    fun headlineColor(enabled: Boolean): State<Color>
-
-    /** The color of this [ListItem]'s leading content based on enabled state */
-    @Composable
-    fun leadingIconColor(enabled: Boolean): State<Color>
-
-    /** The color of this [ListItem]'s overline text based on enabled state */
-    @Composable
-    fun overlineColor(enabled: Boolean): State<Color>
-
-    /** The color of this [ListItem]'s supporting text based on enabled state */
-    @Composable
-    fun supportingColor(enabled: Boolean): State<Color>
-
-    /** The color of this [ListItem]'s trailing content based on enabled state */
-    @Composable
-    fun trailingIconColor(enabled: Boolean): State<Color>
-}
-
-/** Default [ListItemColors] implementation. */
+@ExperimentalMaterial3Api
 @Immutable
-private class DefaultListItemColors(
+class ListItemColors internal constructor(
     private val containerColor: Color,
     private val headlineColor: Color,
     private val leadingIconColor: Color,
@@ -461,38 +442,44 @@ private class DefaultListItemColors(
     private val disabledHeadlineColor: Color,
     private val disabledLeadingIconColor: Color,
     private val disabledTrailingIconColor: Color,
-) : ListItemColors {
+) {
+    /** The container color of this [ListItem] based on enabled state */
     @Composable
-    override fun containerColor(enabled: Boolean): State<Color> {
+    internal fun containerColor(): State<Color> {
         return rememberUpdatedState(containerColor)
     }
 
+    /** The color of this [ListItem]'s headline text based on enabled state */
     @Composable
-    override fun headlineColor(enabled: Boolean): State<Color> {
+    internal fun headlineColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) headlineColor else disabledHeadlineColor
         )
     }
 
+    /** The color of this [ListItem]'s leading content based on enabled state */
     @Composable
-    override fun leadingIconColor(enabled: Boolean): State<Color> {
+    internal fun leadingIconColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) leadingIconColor else disabledLeadingIconColor
         )
     }
 
+    /** The color of this [ListItem]'s overline text based on enabled state */
     @Composable
-    override fun overlineColor(enabled: Boolean): State<Color> {
+    internal fun overlineColor(): State<Color> {
         return rememberUpdatedState(overlineColor)
     }
 
+    /** The color of this [ListItem]'s supporting text based on enabled state */
     @Composable
-    override fun supportingColor(enabled: Boolean): State<Color> {
+    internal fun supportingColor(): State<Color> {
         return rememberUpdatedState(supportingTextColor)
     }
 
+    /** The color of this [ListItem]'s trailing content based on enabled state */
     @Composable
-    override fun trailingIconColor(enabled: Boolean): State<Color> {
+    internal fun trailingIconColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) trailingIconColor else disabledTrailingIconColor
         )

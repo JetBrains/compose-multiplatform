@@ -32,7 +32,6 @@ android {
 }
 
 dependencies {
-    kotlinPlugin(projectOrArtifact(":compose:compiler:compiler"))
 
     androidTestImplementation(projectOrArtifact(":compose:ui:ui"))
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
@@ -42,6 +41,8 @@ dependencies {
     androidTestImplementation(projectOrArtifact(":compose:runtime:runtime"))
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-text"))
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-util"))
+    androidTestImplementation(projectOrArtifact(":compose:test-utils"))
+    androidTestImplementation(projectOrArtifact(":compose:benchmark-utils"))
 
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.testExtJunit)

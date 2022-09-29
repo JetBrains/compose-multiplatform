@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"نه علامت‌گذاری شده و نه علامت‌گذاری آن لغو شده"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"برخی موارد علامت‌گذاری شده است"</string>
     <string name="on" msgid="8655164131929253426">"روشن"</string>
     <string name="off" msgid="875452955155264703">"خاموش"</string>
     <string name="selected" msgid="6043586758067023">"انتخاب شد"</string>

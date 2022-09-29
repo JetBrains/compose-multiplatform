@@ -16,24 +16,29 @@
 
 package androidx.compose.material3.samples
 
+import androidx.activity.compose.BackHandler
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.Button
+import androidx.compose.material3.DismissibleDrawerSheet
 import androidx.compose.material3.DismissibleNavigationDrawer
-import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.NavigationDrawerItem
 import androidx.compose.material3.NavigationDrawerItemDefaults
+import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.PermanentNavigationDrawer
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
@@ -58,22 +63,27 @@ fun ModalNavigationDrawerSample() {
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            items.forEach { item ->
-                NavigationDrawerItem(
-                    icon = { Icon(item, contentDescription = null) },
-                    label = { Text(item.name) },
-                    selected = item == selectedItem.value,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        selectedItem.value = item
-                    },
-                    modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
-                )
+            ModalDrawerSheet {
+                Spacer(Modifier.height(12.dp))
+                items.forEach { item ->
+                    NavigationDrawerItem(
+                        icon = { Icon(item, contentDescription = null) },
+                        label = { Text(item.name) },
+                        selected = item == selectedItem.value,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            selectedItem.value = item
+                        },
+                        modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding)
+                    )
+                }
             }
         },
         content = {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")
@@ -95,21 +105,26 @@ fun PermanentNavigationDrawerSample() {
     val selectedItem = remember { mutableStateOf(items[0]) }
     PermanentNavigationDrawer(
         drawerContent = {
-            items.forEach { item ->
-                NavigationDrawerItem(
-                    icon = { Icon(item, contentDescription = null) },
-                    label = { Text(item.name) },
-                    selected = item == selectedItem.value,
-                    onClick = {
-                        selectedItem.value = item
-                    },
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                )
+            PermanentDrawerSheet(Modifier.width(240.dp)) {
+                Spacer(Modifier.height(12.dp))
+                items.forEach { item ->
+                    NavigationDrawerItem(
+                        icon = { Icon(item, contentDescription = null) },
+                        label = { Text(item.name) },
+                        selected = item == selectedItem.value,
+                        onClick = {
+                            selectedItem.value = item
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+                }
             }
         },
         content = {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = "Application content")
@@ -127,25 +142,36 @@ fun DismissibleNavigationDrawerSample() {
     // icons to mimic drawer destinations
     val items = listOf(Icons.Default.Favorite, Icons.Default.Face, Icons.Default.Email)
     val selectedItem = remember { mutableStateOf(items[0]) }
+    BackHandler(enabled = drawerState.isOpen) {
+        scope.launch {
+            drawerState.close()
+        }
+    }
+
     DismissibleNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            items.forEach { item ->
-                NavigationDrawerItem(
-                    icon = { Icon(item, contentDescription = null) },
-                    label = { Text(item.name) },
-                    selected = item == selectedItem.value,
-                    onClick = {
-                        scope.launch { drawerState.close() }
-                        selectedItem.value = item
-                    },
-                    modifier = Modifier.padding(horizontal = 12.dp)
-                )
+            DismissibleDrawerSheet {
+                Spacer(Modifier.height(12.dp))
+                items.forEach { item ->
+                    NavigationDrawerItem(
+                        icon = { Icon(item, contentDescription = null) },
+                        label = { Text(item.name) },
+                        selected = item == selectedItem.value,
+                        onClick = {
+                            scope.launch { drawerState.close() }
+                            selectedItem.value = item
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+                }
             }
         },
         content = {
             Column(
-                modifier = Modifier.fillMaxSize().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(text = if (drawerState.isClosed) ">>> Swipe >>>" else "<<< Swipe <<<")

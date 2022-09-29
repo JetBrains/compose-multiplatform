@@ -15,6 +15,7 @@
  */
 package androidx.compose.material
 
+import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -54,6 +55,7 @@ import androidx.compose.ui.unit.max
 import androidx.compose.ui.unit.width
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
 import org.junit.Rule
 import org.junit.Test
@@ -113,6 +115,7 @@ class BadgeTest {
     }
 
     @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O) // captureToImage() requires API level 26
     fun badge_noContent_shape() {
         var errorColor = Color.Unspecified
         rule.setMaterialContent {

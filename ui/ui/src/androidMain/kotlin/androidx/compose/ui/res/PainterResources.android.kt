@@ -56,17 +56,17 @@ import androidx.compose.ui.platform.LocalImageVectorCache
 @Composable
 fun painterResource(@DrawableRes id: Int): Painter {
     val context = LocalContext.current
-    val res = context.resources
+    val res = resources()
     val value = remember { TypedValue() }
     res.getValue(id, value, true)
     val path = value.string
     // Assume .xml suffix implies loading a VectorDrawable resource
     return if (path?.endsWith(".xml") == true) {
-        val imageVector = loadVectorResource(context.theme, res, id)
+        val imageVector = loadVectorResource(context.theme, res, id, value.changingConfigurations)
         rememberVectorPainter(imageVector)
     } else {
         // Otherwise load the bitmap resource
-        val imageBitmap = remember(path, id) {
+        val imageBitmap = remember(path, id, context.theme) {
             loadImageBitmapResource(res, id)
         }
         BitmapPainter(imageBitmap)
@@ -82,7 +82,8 @@ fun painterResource(@DrawableRes id: Int): Painter {
 private fun loadVectorResource(
     theme: Resources.Theme,
     res: Resources,
-    id: Int
+    id: Int,
+    changingConfigurations: Int
 ): ImageVector {
     val imageVectorCache = LocalImageVectorCache.current
     val key = ImageVectorCache.Key(theme, id)
@@ -92,7 +93,7 @@ private fun loadVectorResource(
         if (parser.seekToStartTag().name != "vector") {
             throw IllegalArgumentException(errorMessage)
         }
-        imageVectorEntry = loadVectorResourceInner(theme, res, parser)
+        imageVectorEntry = loadVectorResourceInner(theme, res, parser, changingConfigurations)
         imageVectorCache[key] = imageVectorEntry
     }
     return imageVectorEntry.imageVector

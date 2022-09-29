@@ -168,6 +168,7 @@ internal class RecordingInputConnection(
         editCommands.clear()
         batchDepth = 0
         isActive = false
+        eventCallback.onConnectionClosed(this)
     }
 
     // /////////////////////////////////////////////////////////////////////////////////////////////
@@ -276,7 +277,8 @@ internal class RecordingInputConnection(
         if (DEBUG) {
             with(extractedText) {
                 logDebug(
-                    "getExtractedText() return: text: $text" +
+
+                    "getExtractedText() return: text: \"$text\"" +
                         ",partialStartOffset $partialStartOffset" +
                         ",partialEndOffset $partialEndOffset" +
                         ",selectionStart $selectionStart" +

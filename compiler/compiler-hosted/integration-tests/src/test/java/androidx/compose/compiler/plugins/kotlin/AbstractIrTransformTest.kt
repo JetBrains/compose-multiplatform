@@ -64,6 +64,8 @@ import org.jetbrains.kotlin.resolve.AnalyzingUtils
 import org.jetbrains.kotlin.serialization.deserialization.descriptors.DeserializedContainerSource
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import java.io.File
+import org.jetbrains.kotlin.backend.common.serialization.DescriptorByIdSignatureFinderImpl
+import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
 
 @Suppress("LeakingThis")
 abstract class ComposeIrTransformTest : AbstractIrTransformTest() {
@@ -75,25 +77,31 @@ abstract class ComposeIrTransformTest : AbstractIrTransformTest() {
     open val decoysEnabled get() = false
     open val metricsDestination: String? get() = null
 
-    protected val extension = ComposeIrGenerationExtension(
-        liveLiteralsEnabled,
-        liveLiteralsV2Enabled,
-        generateFunctionKeyMetaClasses,
-        sourceInformationEnabled,
-        intrinsicRememberEnabled,
-        decoysEnabled,
-        metricsDestination
-    )
+    protected var extension: ComposeIrGenerationExtension? = null
     // Some tests require the plugin context in order to perform assertions, for example, a
     // context is required to determine the stability of a type using the StabilityInferencer.
     var pluginContext: IrPluginContext? = null
+
+    override fun setUp() {
+        super.setUp()
+        extension = ComposeIrGenerationExtension(
+            myEnvironment!!.configuration,
+            liveLiteralsEnabled,
+            liveLiteralsV2Enabled,
+            generateFunctionKeyMetaClasses,
+            sourceInformationEnabled,
+            intrinsicRememberEnabled,
+            decoysEnabled,
+            metricsDestination
+        )
+    }
 
     override fun postProcessingStep(
         module: IrModuleFragment,
         context: IrPluginContext
     ) {
         pluginContext = context
-        extension.generate(
+        extension!!.generate(
             module,
             context
         )
@@ -101,6 +109,7 @@ abstract class ComposeIrTransformTest : AbstractIrTransformTest() {
 
     override fun tearDown() {
         pluginContext = null
+        extension = null
         super.tearDown()
     }
 }
@@ -162,7 +171,7 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
         extra: String = "",
         validator: (element: IrElement) -> Unit = { },
         dumpTree: Boolean = false,
-        truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_ALL,
+        truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
         compilation: Compilation = JvmCompilation()
     ) {
         if (!compilation.enabled) {
@@ -208,15 +217,16 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
             // replace traceEventStart values with a token
             // TODO(174715171): capture actual values for testing
             .replace(
-                Regex("traceEventStart\\(-?\\d+, (-?\\d+, -?\\d+), (.*)")
+                Regex(
+                    "traceEventStart\\(-?\\d+, (%dirty|%changed|-1), (%dirty1|%changed1|-1), (.*)"
+                )
             ) {
                 when (truncateTracingInfoMode) {
-                    TruncateTracingInfoMode.TRUNCATE_ALL ->
-                        "traceEventStart(<>)"
                     TruncateTracingInfoMode.TRUNCATE_KEY ->
-                        "traceEventStart(<>, ${it.groupValues[1]}, ${it.groupValues[2]}"
+                        "traceEventStart(<>, ${it.groupValues[1]}, ${it.groupValues[2]}, <>)"
                     TruncateTracingInfoMode.KEEP_INFO_STRING ->
-                        "traceEventStart(<>, ${it.groupValues[2]}"
+                        "traceEventStart(<>, ${it.groupValues[1]}, ${it.groupValues[2]}, " +
+                            it.groupValues[3]
                 }
             }
             // replace source information with source it references
@@ -400,6 +410,8 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
             configuration.languageVersionSettings =
                 configuration.languageVersionSettings.setFeatures(specificFeature)
 
+            configuration.configureJdkClasspathRoots()
+
             val environment = KotlinCoreEnvironment.createForTests(
                 myTestRootDisposable, configuration, EnvironmentConfigFiles.JVM_CONFIG_FILES
             ).also { setupEnvironment(it) }
@@ -433,6 +445,7 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
                 generatorContext.moduleDescriptor,
                 generatorContext.symbolTable,
                 generatorContext.irBuiltIns,
+                DescriptorByIdSignatureFinderImpl(generatorContext.moduleDescriptor, mangler),
                 extensions
             )
             val frontEndContext = object : TranslationPluginContext {
@@ -452,7 +465,8 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
                 generatorContext.symbolTable,
                 frontEndContext,
                 stubGenerator,
-                mangler
+                mangler,
+                true
             )
 
             generatorContext.moduleDescriptor.allDependencyModules.map {
@@ -517,7 +531,6 @@ abstract class AbstractIrTransformTest : AbstractCodegenTest() {
     }
 
     enum class TruncateTracingInfoMode {
-        TRUNCATE_ALL, // truncates all trace information replacing it with a token
         TRUNCATE_KEY, // truncates only the `key` parameter
         KEEP_INFO_STRING, // truncates everything except for the `info` string
     }

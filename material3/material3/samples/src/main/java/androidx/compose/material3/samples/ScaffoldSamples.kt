@@ -20,6 +20,8 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.consumedWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,7 +38,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SmallTopAppBar
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
@@ -45,6 +46,7 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.SnackbarVisuals
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -56,11 +58,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Sampled
 @Composable
 fun SimpleScaffoldWithTopBar() {
@@ -74,7 +75,7 @@ fun SimpleScaffoldWithTopBar() {
 
     Scaffold(
         topBar = {
-            SmallTopAppBar(
+            TopAppBar(
                 title = { Text("Simple Scaffold Screen") },
                 navigationIcon = {
                     IconButton(
@@ -94,7 +95,11 @@ fun SimpleScaffoldWithTopBar() {
             }
         },
         content = { innerPadding ->
-            LazyColumn(contentPadding = innerPadding) {
+            LazyColumn(
+                // consume insets as scaffold doesn't do it by default
+                modifier = Modifier.consumedWindowInsets(innerPadding),
+                contentPadding = innerPadding
+            ) {
                 items(count = 100) {
                     Box(
                         Modifier
@@ -132,7 +137,10 @@ fun ScaffoldWithSimpleSnackbar() {
         content = { innerPadding ->
             Text(
                 text = "Body content",
-                modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize()
             )
         }
     )
@@ -165,7 +173,10 @@ fun ScaffoldWithIndefiniteSnackbar() {
         content = { innerPadding ->
             Text(
                 text = "Body content",
-                modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize()
             )
         }
     )
@@ -184,7 +195,7 @@ fun ScaffoldWithCustomSnackbar() {
         override val withDismissAction: Boolean
             get() = false
         override val duration: SnackbarDuration
-            get() = SnackbarDuration.Long
+            get() = SnackbarDuration.Indefinite
     }
 
     val snackbarHostState = remember { SnackbarHostState() }
@@ -239,7 +250,10 @@ fun ScaffoldWithCustomSnackbar() {
         content = { innerPadding ->
             Text(
                 text = "Custom Snackbar Demo",
-                modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize()
             )
         }
     )
@@ -284,7 +298,10 @@ fun ScaffoldWithCoroutinesSnackbar() {
         content = { innerPadding ->
             Text(
                 "Snackbar demo",
-                modifier = Modifier.padding(innerPadding).fillMaxSize().wrapContentSize()
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .fillMaxSize()
+                    .wrapContentSize()
             )
         }
     )

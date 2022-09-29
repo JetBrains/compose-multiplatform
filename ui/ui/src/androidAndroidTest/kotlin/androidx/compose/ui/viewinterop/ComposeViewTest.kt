@@ -31,12 +31,18 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInWindow
@@ -54,6 +60,8 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.core.view.setPadding
@@ -76,6 +84,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -253,20 +262,214 @@ class ComposeViewTest {
             activity.setContentView(composeView, ViewGroup.LayoutParams(100, 100))
             composeView.setContent {
                 Box(
-                    Modifier.testTag("box").fillMaxSize().onGloballyPositioned {
-                        val position = IntArray(2)
-                        composeView.getLocationOnScreen(position)
-                        globalBounds = it.boundsInWindow().translate(
-                            -position[0].toFloat(), -position[1].toFloat()
-                        )
-                        latch.countDown()
-                    }
+                    Modifier
+                        .testTag("box")
+                        .fillMaxSize()
+                        .onGloballyPositioned {
+                            val position = IntArray(2)
+                            composeView.getLocationOnScreen(position)
+                            globalBounds = it
+                                .boundsInWindow()
+                                .translate(
+                                    -position[0].toFloat(), -position[1].toFloat()
+                                )
+                            latch.countDown()
+                        }
                 )
             }
         }
 
         assertTrue(latch.await(1, TimeUnit.SECONDS))
         assertEquals(Rect(10f, 20f, 70f, 60f), globalBounds)
+    }
+
+    @Test
+    fun boundsInWindow() {
+        var boundsInWindow = IntRect.Zero
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                with(LocalDensity.current) {
+                    Box(
+                        Modifier
+                            .size(10.toDp())
+                            .offset(1.toDp(), 2.toDp())
+                            .align(AbsoluteAlignment.TopLeft)
+                            .onGloballyPositioned {
+                                val rect = it.boundsInWindow()
+                                boundsInWindow = IntRect(
+                                    rect.left.roundToInt(),
+                                    rect.top.roundToInt(),
+                                    rect.right.roundToInt(),
+                                    rect.bottom.roundToInt()
+                                )
+                            }
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        var offsetFromRoot = IntOffset.Zero
+        rule.activityRule.scenario.onActivity {
+            val content = it.findViewById<View>(android.R.id.content)
+            val position = IntArray(2)
+            content.getLocationInWindow(position)
+            offsetFromRoot = IntOffset(position[0], position[1])
+        }
+
+        assertEquals(
+            IntRect(
+                offsetFromRoot.x + 1,
+                offsetFromRoot.y + 2,
+                offsetFromRoot.x + 11,
+                offsetFromRoot.y + 12
+            ),
+            boundsInWindow
+        )
+    }
+
+    @Test
+    fun boundsInWindowPartiallyObstructed() {
+        var boundsInWindow = IntRect.Zero
+
+        // Offset to the left
+        var offset by mutableStateOf(IntOffset(-3, 0))
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                with(LocalDensity.current) {
+                    Box(
+                        Modifier
+                            .size(10.toDp())
+                            .offset(offset.x.toDp(), offset.y.toDp())
+                            .align(AbsoluteAlignment.TopLeft)
+                            .onGloballyPositioned {
+                                val rect = it.boundsInWindow()
+                                boundsInWindow = IntRect(
+                                    rect.left.roundToInt(),
+                                    rect.top.roundToInt(),
+                                    rect.right.roundToInt(),
+                                    rect.bottom.roundToInt()
+                                )
+                            }
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        var offsetFromRoot = IntOffset.Zero
+        var rootSize = IntSize.Zero
+        rule.activityRule.scenario.onActivity {
+            val content = it.findViewById<View>(android.R.id.content)
+            val position = IntArray(2)
+            content.getLocationInWindow(position)
+            offsetFromRoot = IntOffset(position[0], position[1])
+            rootSize = IntSize(content.width, content.height)
+        }
+
+        assertEquals(
+            IntRect(
+                offsetFromRoot.x,
+                offsetFromRoot.y,
+                offsetFromRoot.x + 7,
+                offsetFromRoot.y + 10
+            ),
+            boundsInWindow
+        )
+
+        // Offset to the top
+        offset = IntOffset(0, -4)
+        rule.waitForIdle()
+        assertEquals(
+            IntRect(
+                offsetFromRoot.x,
+                offsetFromRoot.y,
+                offsetFromRoot.x + 10,
+                offsetFromRoot.y + 6
+            ),
+            boundsInWindow
+        )
+
+        // Offset to the right
+        offset = IntOffset(rootSize.width - 5, 0)
+        rule.waitForIdle()
+        assertEquals(
+            IntRect(
+                offsetFromRoot.x + rootSize.width - 5,
+                offsetFromRoot.y,
+                offsetFromRoot.x + rootSize.width,
+                offsetFromRoot.y + 10
+            ),
+            boundsInWindow
+        )
+
+        // Offset to the bottom
+        offset = IntOffset(0, rootSize.height - 6)
+        rule.waitForIdle()
+        assertEquals(
+            IntRect(
+                offsetFromRoot.x,
+                offsetFromRoot.y + rootSize.height - 6,
+                offsetFromRoot.x + 10,
+                offsetFromRoot.y + rootSize.height
+            ),
+            boundsInWindow
+        )
+    }
+
+    @Test
+    fun boundsInWindowFullyObstructed() {
+        var boundsInWindow = IntRect.Zero
+
+        // Offset to the left
+        var offset by mutableStateOf(IntOffset(-10, 0))
+        rule.setContent {
+            Box(Modifier.fillMaxSize()) {
+                with(LocalDensity.current) {
+                    Box(
+                        Modifier
+                            .size(10.toDp())
+                            .offset(offset.x.toDp(), offset.y.toDp())
+                            .align(AbsoluteAlignment.TopLeft)
+                            .onGloballyPositioned {
+                                val rect = it.boundsInWindow()
+                                boundsInWindow = IntRect(
+                                    rect.left.roundToInt(),
+                                    rect.top.roundToInt(),
+                                    rect.right.roundToInt(),
+                                    rect.bottom.roundToInt()
+                                )
+                            }
+                    )
+                }
+            }
+        }
+        rule.waitForIdle()
+
+        var rootSize = IntSize.Zero
+        rule.activityRule.scenario.onActivity {
+            val content = it.findViewById<View>(android.R.id.content)
+            val position = IntArray(2)
+            content.getLocationInWindow(position)
+            rootSize = IntSize(content.width, content.height)
+        }
+
+        assertEquals(IntRect.Zero, boundsInWindow)
+
+        // Offset to the top
+        offset = IntOffset(0, -10)
+        rule.waitForIdle()
+        assertEquals(IntRect.Zero, boundsInWindow)
+
+        // Offset to the right
+        offset = IntOffset(rootSize.width, 0)
+        rule.waitForIdle()
+        assertEquals(IntRect.Zero, boundsInWindow)
+
+        // Offset to the bottom
+        offset = IntOffset(0, rootSize.height)
+        rule.waitForIdle()
+        assertEquals(IntRect.Zero, boundsInWindow)
     }
 
     @Test
@@ -615,11 +818,17 @@ private fun ScrollableAndNonScrollable(vertical: Boolean) {
     fun layout(size: Dp, content: @Composable (Modifier) -> Unit) {
         if (vertical) {
             Column(Modifier.requiredSize(size)) {
-                content(Modifier.weight(1f).fillMaxWidth())
+                content(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxWidth())
             }
         } else {
             Row(Modifier.requiredSize(100.dp)) {
-                content(Modifier.weight(1f).fillMaxHeight())
+                content(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight())
             }
         }
     }

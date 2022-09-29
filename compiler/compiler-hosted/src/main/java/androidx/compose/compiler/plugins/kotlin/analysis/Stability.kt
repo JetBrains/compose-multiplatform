@@ -264,6 +264,8 @@ class StabilityInferencer(val context: IrPluginContext) {
         "kotlinx.collections.immutable.ImmutableList" to 0b1,
         "kotlinx.collections.immutable.ImmutableSet" to 0b1,
         "kotlinx.collections.immutable.ImmutableMap" to 0b11,
+        // Dagger
+        "dagger.Lazy" to 0b1,
     )
 
     // TODO: buildList, buildMap, buildSet, etc.
@@ -498,7 +500,7 @@ class StabilityInferencer(val context: IrPluginContext) {
 
 private fun IrType.getInlinedClass(): IrClass? {
     val erased = erase(this) ?: return null
-    if (this is IrSimpleType && erased.isInline) {
+    if (this is IrSimpleType && isInlineClassType()) {
         val fieldType = getInlineClassUnderlyingType(erased)
         return fieldType.getInlinedClass()
     }

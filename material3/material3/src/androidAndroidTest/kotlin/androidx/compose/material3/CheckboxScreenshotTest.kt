@@ -21,10 +21,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -45,7 +48,7 @@ import org.junit.runners.Parameterized
 @MediumTest
 @RunWith(Parameterized::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalTestApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalTestApi::class)
 class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @get:Rule
@@ -241,14 +244,13 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
     @Test
     fun checkBox_focus() {
         val focusRequester = FocusRequester()
+        var localInputModeManager: InputModeManager? = null
 
         rule.setMaterialContent(scheme.colorScheme) {
+            localInputModeManager = LocalInputModeManager.current
             Box(wrap.testTag(wrapperTestTag)) {
                 Checkbox(
                     modifier = wrap
-                        // Normally this is only focusable in non-touch mode, so let's force it to
-                        // always be focusable so we can test how it appears
-                        .focusProperties { canFocus = true }
                         .focusRequester(focusRequester),
                     checked = true,
                     onCheckedChange = { }
@@ -257,6 +259,8 @@ class CheckboxScreenshotTest(private val scheme: ColorSchemeWrapper) {
         }
 
         rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            localInputModeManager!!.requestInputMode(InputMode.Keyboard)
             focusRequester.requestFocus()
         }
 

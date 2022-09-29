@@ -19,13 +19,17 @@ package androidx.compose.foundation.demos.text
 import androidx.compose.material.Text
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.UrlAnnotation
 import androidx.compose.ui.text.VerbatimTtsAnnotation
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.tooling.preview.Preview
 
+@OptIn(ExperimentalTextApi::class)
 @Preview
 @Composable
 fun TextAccessibilityDemo() {
@@ -63,6 +67,18 @@ fun TextAccessibilityDemo() {
                 append("hello\n")
                 pop()
                 append("This word is read normally: hello")
+            },
+            style = TextStyle(fontSize = fontSize8)
+        )
+
+        TagLine("UrlAnnotation")
+        Text(
+            text = buildAnnotatedString {
+                append("This word is a link: ")
+                withAnnotation(UrlAnnotation("https://google.com")) {
+                    append("Google\n")
+                }
+                append("This word is not a link: google.com")
             },
             style = TextStyle(fontSize = fontSize8)
         )

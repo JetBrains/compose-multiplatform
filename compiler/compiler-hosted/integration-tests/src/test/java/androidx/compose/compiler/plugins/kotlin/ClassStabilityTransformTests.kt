@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrReturn
+import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.statements
 import org.junit.Test
@@ -299,6 +300,23 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             class Foo(val x: kotlinx.collections.immutable.ImmutableMap<A, B>)
         """,
         "Runtime(A),Runtime(B)"
+    )
+
+    @Test
+    fun testDaggerLazyIsStableIfItsTypeIs() = assertStability(
+        """
+            class Foo<T>(val x: dagger.Lazy<T>)
+        """,
+        "Parameter(T)"
+    )
+
+    @Test
+    fun testDaggerLazyOfCrossModuleTypeIsRuntimeStable() = assertStability(
+        """
+            class A
+        """,
+        "class Foo(val x: dagger.Lazy<A>)",
+        "Runtime(A)"
     )
 
     @Test
@@ -735,6 +753,9 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
                 if (%default and 0b0001 !== 0) {
                   y = null
                 }
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %changed, -1, <>)
+                }
                 used(y)
                 A(null, %composer, 0, 0b0001)
                 A(EmptyClass(), %composer, EmptyClass.%stable, 0)
@@ -754,6 +775,9 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
                 A(NonBackingFieldUnstableVar(), %composer, NonBackingFieldUnstableVar.%stable, 0)
                 A(StableDelegateProp(), %composer, StableDelegateProp.%stable, 0)
                 A(UnstableDelegateProp(), %composer, UnstableDelegateProp.%stable, 0)
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
               } else {
                 %composer.skipToGroupEnd()
               }
@@ -859,10 +883,16 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun A(y: Any, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(A)<A(X(li...>,<A(Stab...>,<A(Unst...>:Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               used(y)
               A(X(listOf(StableClass())), %composer, 0b1000)
               A(StableDelegateProp(), %composer, 0)
               A(UnstableDelegateProp(), %composer, UnstableDelegate.%stable)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 A(y, %composer, %changed or 0b0001)
               }
@@ -894,8 +924,14 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun A(y: Any, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(A)<A(Wrap...>:Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               used(y)
               A(Wrapper(Foo()), %composer, Wrapper.%stable)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 A(y, %composer, %changed or 0b0001)
               }
@@ -938,7 +974,13 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
                 %dirty = %dirty or if (%composer.changed(value)) 0b0100 else 0b0010
               }
               if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %dirty, -1, <>)
+                }
                 A(Wrapper(value), %composer, Wrapper.%stable or 0b1000 and %dirty)
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
               } else {
                 %composer.skipToGroupEnd()
               }
@@ -952,10 +994,16 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(X)P(1)*<itemCo...>:Test.kt")
               val %dirty = %changed
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %dirty, -1, <>)
+              }
               val tmp0_iterator = items.iterator()
               while (tmp0_iterator.hasNext()) {
                 val item = tmp0_iterator.next()
                 itemContent(item, %composer, 0b01110000 and %dirty)
+              }
+              if (isTraceInProgress()) {
+                traceEventEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 X(items, itemContent, %composer, %changed or 0b0001)
@@ -965,7 +1013,13 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun C(items: List<String>, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(C)<X(item...>:Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               X(items, ComposableSingletons%TestKt.lambda-1, %composer, 0b00111000)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 C(items, %composer, %changed or 0b0001)
               }
@@ -978,8 +1032,14 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
                   %dirty = %dirty or if (%composer.changed(item)) 0b0100 else 0b0010
                 }
                 if (%dirty and 0b01011011 !== 0b00010010 || !%composer.skipping) {
+                  if (isTraceInProgress()) {
+                    traceEventStart(<>, %dirty, -1, <>)
+                  }
                   A(item, %composer, 0b1110 and %dirty)
                   A(Wrapper(item), %composer, Wrapper.%stable or 0)
+                  if (isTraceInProgress()) {
+                    traceEventEnd()
+                  }
                 } else {
                   %composer.skipToGroupEnd()
                 }
@@ -1029,8 +1089,14 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun A(y: Int, x: Any, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(A)P(1)<B(x)>:Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               used(y)
               B(x, %composer, 0b1000)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 A(y, x, %composer, %changed or 0b0001)
               }
@@ -1039,7 +1105,13 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun B(x: Any, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(B):Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               used(x)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 B(x, %composer, %changed or 0b0001)
               }
@@ -1070,8 +1142,14 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun A(y: Int, x: Foo, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(A)P(1)<B(x)>:Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               used(y)
               B(x, %composer, 0b1000)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 A(y, x, %composer, %changed or 0b0001)
               }
@@ -1080,7 +1158,13 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
             fun B(x: Any, %composer: Composer?, %changed: Int) {
               %composer = %composer.startRestartGroup(<>)
               sourceInformation(%composer, "C(B):Test.kt")
+              if (isTraceInProgress()) {
+                traceEventStart(<>, %changed, -1, <>)
+              }
               used(x)
+              if (isTraceInProgress()) {
+                traceEventEnd()
+              }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
                 B(x, %composer, %changed or 0b0001)
               }
@@ -1112,7 +1196,8 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
         )
         val irModule = JvmCompilation().compile(files)
         val irClass = irModule.files.last().declarations.first() as IrClass
-        val classStability = StabilityInferencer(pluginContext!!).stabilityOf(irClass.defaultType)
+        val classStability = StabilityInferencer(pluginContext!!)
+            .stabilityOf(irClass.defaultType as IrType)
 
         assertEquals(
             stability,
@@ -1130,7 +1215,8 @@ class ClassStabilityTransformTests : ComposeIrTransformTest() {
     ) {
         val irModule = buildModule(externalSrc, classDefSrc, dumpClasses)
         val irClass = irModule.files.last().declarations.first() as IrClass
-        val classStability = StabilityInferencer(pluginContext!!).stabilityOf(irClass.defaultType)
+        val classStability = StabilityInferencer(pluginContext!!)
+            .stabilityOf(irClass.defaultType as IrType)
 
         assertEquals(
             stability,

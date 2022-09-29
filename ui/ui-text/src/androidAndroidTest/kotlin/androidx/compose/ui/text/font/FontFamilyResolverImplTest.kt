@@ -468,7 +468,11 @@ class FontFamilyResolverImplTest {
             }
         }
         val fontFamily = FontFamily(
-            object : AndroidFont(FontLoadingStrategy.Blocking, unstableLoader) {
+            object : AndroidFont(
+                FontLoadingStrategy.Blocking,
+                unstableLoader,
+                FontVariation.Settings()
+            ) {
                 override val weight: FontWeight = FontWeight.Normal
                 override val style: FontStyle = FontStyle.Normal
             }
@@ -495,14 +499,12 @@ class FontFamilyResolverImplTest {
     }
 
     @Test(expected = IllegalStateException::class)
-    @OptIn(ExperimentalTextApi::class)
     fun throwsExceptionIfFontIsNotIncludedInTheApp() {
         val fontFamily = FontFamily(Font(resId = -1))
         resolveAsTypeface(fontFamily)
     }
 
     @Test(expected = IllegalStateException::class)
-    @OptIn(ExperimentalTextApi::class)
     fun throwsExceptionIfFontIsNotReadable() {
         val fontFamily = FontFamily(FontTestData.FONT_INVALID)
         resolveAsTypeface(fontFamily)
@@ -621,19 +623,24 @@ class FontFamilyResolverImplTest {
     @Test
     fun androidFontResolveInterceptor_affectsTheFontWeight() {
         initializeSubject(AndroidFontResolveInterceptor(accessibilityFontWeightAdjustment))
+
+        val typefaceLoader = AsyncTestTypefaceLoader()
+
+        val w700Font = BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W700)
         val fontFamily = FontFamily(
-            FontTestData.FONT_400_REGULAR,
-            FontTestData.FONT_500_REGULAR,
-            FontTestData.FONT_600_REGULAR,
-            FontTestData.FONT_700_REGULAR,
-            FontTestData.FONT_800_REGULAR
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W400),
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W500),
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W600),
+            w700Font,
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W800),
+            BlockingFauxFont(typefaceLoader, Typeface.DEFAULT, weight = FontWeight.W900),
         )
-        val typeface = resolveAsTypeface(
+        resolveAsTypeface(
             fontFamily = fontFamily,
             fontWeight = FontWeight.W400
         )
 
-        assertThat(typeface).hasWeightAndStyle(FontWeight.W700, FontStyle.Normal)
+        assertThat(typefaceLoader.blockingRequests).containsExactly(w700Font)
     }
 
     @Test

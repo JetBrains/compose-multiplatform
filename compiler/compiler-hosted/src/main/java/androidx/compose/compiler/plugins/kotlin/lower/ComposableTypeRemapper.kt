@@ -61,21 +61,18 @@ import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.SymbolRemapper
 import org.jetbrains.kotlin.ir.util.SymbolRenamer
 import org.jetbrains.kotlin.ir.util.TypeRemapper
-import org.jetbrains.kotlin.ir.util.TypeTranslator
 import org.jetbrains.kotlin.ir.util.fqNameForIrSerialization
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.types.KotlinType
 import org.jetbrains.kotlin.types.Variance
 
 class DeepCopyIrTreeWithSymbolsPreservingMetadata(
     private val context: IrPluginContext,
     private val symbolRemapper: DeepCopySymbolRemapper,
-    private val typeRemapper: TypeRemapper,
-    private val typeTranslator: TypeTranslator,
+    typeRemapper: TypeRemapper,
     symbolRenamer: SymbolRenamer = SymbolRenamer.DEFAULT
 ) : DeepCopyIrTreeWithSymbols(symbolRemapper, typeRemapper, symbolRenamer) {
 
@@ -180,7 +177,6 @@ class DeepCopyIrTreeWithSymbolsPreservingMetadata(
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun visitCall(expression: IrCall): IrCall {
         val ownerFn = expression.symbol.owner as? IrSimpleFunction
-        @Suppress("DEPRECATION")
         val containingClass = expression.symbol.descriptor.containingDeclaration as? ClassDescriptor
 
         // Any virtual calls on composable functions we want to make sure we update the call to
@@ -349,15 +345,11 @@ class DeepCopyIrTreeWithSymbolsPreservingMetadata(
     private fun IrType.isComposable(): Boolean {
         return annotations.hasAnnotation(ComposeFqNames.Composable)
     }
-
-    private fun KotlinType.toIrType(): IrType = typeTranslator.translateType(this)
 }
 
-@Suppress("DEPRECATION")
 class ComposerTypeRemapper(
     private val context: IrPluginContext,
     private val symbolRemapper: SymbolRemapper,
-    private val typeTranslator: TypeTranslator,
     private val composerType: IrType
 ) : TypeRemapper {
 
@@ -377,14 +369,11 @@ class ComposerTypeRemapper(
         return annotations.hasAnnotation(ComposeFqNames.Composable)
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private val IrConstructorCall.annotationClass
         get() = this.symbol.owner.returnType.classifierOrNull
 
     private fun List<IrConstructorCall>.hasAnnotation(fqName: FqName): Boolean =
         any { it.annotationClass?.isClassWithFqName(fqName.toUnsafe()) ?: false }
-
-    private fun KotlinType.toIrType(): IrType = typeTranslator.translateType(this)
 
     @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrType.isFunction(): Boolean {
@@ -428,7 +417,7 @@ class ComposerTypeRemapper(
         return IrSimpleTypeImpl(
             null,
             functionCls,
-            type.hasQuestionMark,
+            type.nullability,
             newIrArguments.map { remapTypeArgument(it) },
             type.annotations.filter { !it.isComposableAnnotation() }.map {
                 it.transform(deepCopy, null) as IrConstructorCall
@@ -441,7 +430,7 @@ class ComposerTypeRemapper(
         return IrSimpleTypeImpl(
             null,
             symbolRemapper.getReferencedClassifier(type.classifier),
-            type.hasQuestionMark,
+            type.nullability,
             type.arguments.map { remapTypeArgument(it) },
             type.annotations.map { it.transform(deepCopy, null) as IrConstructorCall },
             type.abbreviation?.remapTypeAbbreviation()

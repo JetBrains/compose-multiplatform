@@ -17,7 +17,7 @@
 package androidx.compose.ui.input.rotary
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.focus.FocusAwareEvent
+import androidx.compose.ui.input.focus.FocusDirectedInputEvent
 
 /**
  * This event represents a rotary input event.
@@ -44,7 +44,7 @@ class RotaryScrollEvent internal constructor(
      * platform-dependent.
      */
     val uptimeMillis: Long
-) : FocusAwareEvent {
+) : FocusDirectedInputEvent {
     override fun equals(other: Any?): Boolean = other is RotaryScrollEvent &&
         other.verticalScrollPixels == verticalScrollPixels &&
         other.horizontalScrollPixels == horizontalScrollPixels &&

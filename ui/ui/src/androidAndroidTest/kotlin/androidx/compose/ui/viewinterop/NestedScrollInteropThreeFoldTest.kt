@@ -241,7 +241,7 @@ class NestedScrollInteropThreeFoldTest {
         // assert
         rule.runOnIdle {
             assertThat(secondaryInspectableConnection.velocityOfferedFromChild).isEqualTo(
-                connection.velocityConsumedDownChain
+                connection.velocityConsumedDownChain + connection.velocityNotConsumedByChild
             )
         }
     }

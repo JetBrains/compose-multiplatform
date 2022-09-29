@@ -16,10 +16,15 @@
 
 package androidx.compose.ui.text.font
 
+import android.content.Context
+import android.graphics.Paint
 import android.graphics.Typeface
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.annotation.VisibleForTesting
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.fastJoinToString
+import androidx.compose.ui.unit.Density
 
 /**
  * Primary internal interface for resolving typefaces from Android platform
@@ -53,15 +58,18 @@ internal interface PlatformTypefaces {
      * @return typeface from system cache if available, or null if the system doesn't know this font
      * name
      */
+    @OptIn(ExperimentalTextApi::class)
     fun optionalOnDeviceFontFamilyByName(
         familyName: String,
         weight: FontWeight,
-        style: FontStyle
+        style: FontStyle,
+        variationSettings: FontVariation.Settings,
+        context: Context
     ): Typeface?
 }
 
 internal fun PlatformTypefaces(): PlatformTypefaces {
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+    return if (Build.VERSION.SDK_INT >= 28) {
         PlatformTypefacesApi28()
     } else {
         PlatformTypefacesApi()
@@ -85,20 +93,24 @@ private class PlatformTypefacesApi : PlatformTypefaces {
         ) ?: createAndroidTypefaceUsingTypefaceStyle(name.name, fontWeight, fontStyle)
     }
 
+    @OptIn(ExperimentalTextApi::class)
     override fun optionalOnDeviceFontFamilyByName(
         familyName: String,
         weight: FontWeight,
-        style: FontStyle
+        style: FontStyle,
+        variationSettings: FontVariation.Settings,
+        context: Context
     ): Typeface? {
         // if the developer specified one of the named fonts, behave identically to the
         // GenericFontFamily behavior, return the same as createNamed always
-        return when (familyName) {
+        val typeface = when (familyName) {
             FontFamily.SansSerif.name -> createNamed(FontFamily.SansSerif, weight, style)
             FontFamily.Serif.name -> createNamed(FontFamily.Serif, weight, style)
             FontFamily.Monospace.name -> createNamed(FontFamily.Monospace, weight, style)
             FontFamily.Cursive.name -> createNamed(FontFamily.Cursive, weight, style)
             else -> loadNamedFromTypefaceCacheOrNull(familyName, weight, style)
         }
+        return typeface.setFontVariationSettings(variationSettings, context)
     }
 
     private fun loadNamedFromTypefaceCacheOrNull(
@@ -139,20 +151,24 @@ private class PlatformTypefacesApi : PlatformTypefaces {
 @VisibleForTesting
 @RequiresApi(28)
 private class PlatformTypefacesApi28 : PlatformTypefaces {
+    @OptIn(ExperimentalTextApi::class)
     override fun optionalOnDeviceFontFamilyByName(
         familyName: String,
         weight: FontWeight,
-        style: FontStyle
+        style: FontStyle,
+        variationSettings: FontVariation.Settings,
+        context: Context
     ): Typeface? {
         // if the developer specified one of the named fonts, behave identically to the
         // GenericFontFamily behavior, return the same as createNamed always
-        return when (familyName) {
+        val result = when (familyName) {
             FontFamily.SansSerif.name -> createNamed(FontFamily.SansSerif, weight, style)
             FontFamily.Serif.name -> createNamed(FontFamily.Serif, weight, style)
             FontFamily.Monospace.name -> createNamed(FontFamily.Monospace, weight, style)
             FontFamily.Cursive.name -> createNamed(FontFamily.Cursive, weight, style)
             else -> loadNamedFromTypefaceCacheOrNull(familyName, weight, style)
         }
+        return result.setFontVariationSettings(variationSettings, context)
     }
 
     override fun createDefault(fontWeight: FontWeight, fontStyle: FontStyle) =
@@ -206,6 +222,54 @@ private class PlatformTypefacesApi28 : PlatformTypefaces {
             fontWeight.weight,
             fontStyle == FontStyle.Italic
         )
+    }
+}
+
+/**
+ * Apply font variation settings to a typeface on supported API levels (26+)
+ */
+@ExperimentalTextApi
+internal fun Typeface?.setFontVariationSettings(
+    variationSettings: FontVariation.Settings,
+    context: Context,
+): Typeface? {
+    return if (Build.VERSION.SDK_INT >= 26) {
+        TypefaceCompatApi26.setFontVariationSettings(this, variationSettings, context)
+    } else {
+        this
+    }
+}
+
+@RequiresApi(26)
+private object TypefaceCompatApi26 {
+    private var threadLocalPaint: ThreadLocal<Paint> = ThreadLocal()
+
+    @ExperimentalTextApi
+    fun setFontVariationSettings(
+        typeface: Typeface?,
+        variationSettings: FontVariation.Settings,
+        context: Context,
+    ): Typeface? {
+        if (typeface == null) return null
+        if (variationSettings.settings.isEmpty()) {
+            return typeface
+        }
+        var localPaint = threadLocalPaint.get()
+        if (localPaint == null) {
+            localPaint = Paint()
+            this.threadLocalPaint.set(localPaint)
+        }
+        localPaint.typeface = typeface
+        localPaint.fontVariationSettings = variationSettings.toAndroidString(context)
+        return localPaint.typeface
+    }
+
+    @ExperimentalTextApi
+    private fun FontVariation.Settings.toAndroidString(context: Context): String {
+        val density = Density(context)
+        return settings.fastJoinToString { setting ->
+            "'${setting.axisName}' ${setting.toVariationValue(density)}"
+        }
     }
 }
 

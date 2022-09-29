@@ -22,8 +22,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.testutils.assertShape
@@ -311,26 +313,59 @@ class TextFieldCursorTest {
 
         focusAndWait()
 
-        // cursor visible first 500 ms
+        // hide the cursor
         rule.mainClock.advanceTimeBy(500)
+        rule.mainClock.advanceTimeByFrame()
 
         // TODO(b/170298051) check here that cursor is visible when we have a way to control
         //  cursor position when sending a text
 
-        // change text field value
         rule.runOnIdle {
             textValue.value = textValue.value.copy(selection = TextRange(0))
         }
 
-        // cursor would have been invisible during next 500 ms if cursor blinks when selection
-        // changes.
-        // To prevent blinking when selection changes we restart animation when new symbol is typed.
-        rule.mainClock.advanceTimeBy(400)
+        // necessary for animation to start (shows cursor again)
+        rule.mainClock.advanceTimeByFrame()
+
         with(rule.density) {
             rule.onNode(hasSetTextAction())
                 .captureToImage()
                 .assertCursor(2.dp, this, cursorRect)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun brushChanged_doesntResetTimer() {
+        var cursorBrush by mutableStateOf(SolidColor(cursorColor))
+        rule.setContent {
+            Box(Modifier.padding(boxPadding)) {
+                BasicTextField(
+                    value = "",
+                    onValueChange = {},
+                    textStyle = textStyle,
+                    modifier = textFieldModifier,
+                    cursorBrush = cursorBrush,
+                    onTextLayout = onTextLayout
+                )
+            }
+        }
+
+        focusAndWait()
+
+        rule.mainClock.advanceTimeBy(800)
+        cursorBrush = SolidColor(Color.Green)
+        rule.mainClock.advanceTimeByFrame()
+
+        rule.onNode(hasSetTextAction())
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.White,
+                backgroundColor = Color.White,
+                shapeOverlapPixelCount = 0.0f
+            )
     }
 
     private fun focusAndWait() {

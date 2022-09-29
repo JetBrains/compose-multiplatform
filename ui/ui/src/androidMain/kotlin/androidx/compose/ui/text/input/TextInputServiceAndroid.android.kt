@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.S
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.StartInput
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.StopInput
 import androidx.core.view.inputmethod.EditorInfoCompat
+import java.lang.ref.WeakReference
 import kotlin.math.roundToInt
 import kotlinx.coroutines.channels.Channel
 
@@ -72,7 +73,12 @@ internal class TextInputServiceAndroid(
     internal var state = TextFieldValue(text = "", selection = TextRange.Zero)
         private set
     private var imeOptions = ImeOptions.Default
-    private var ic: RecordingInputConnection? = null
+
+    // RecordingInputConnection has strong reference to the View through TextInputServiceAndroid and
+    // event callback. The connection should be closed when IME has changed and removed from this
+    // list in onConnectionClosed callback, but not clear it is guaranteed the close connection is
+    // called any time. So, keep it in WeakReference just in case.
+    private var ics = mutableListOf<WeakReference<RecordingInputConnection>>()
 
     // used for sendKeyEvent delegation
     private val baseInputConnection by lazy(LazyThreadSafetyMode.NONE) {
@@ -120,10 +126,19 @@ internal class TextInputServiceAndroid(
                 override fun onKeyEvent(event: KeyEvent) {
                     baseInputConnection.sendKeyEvent(event)
                 }
+
+                override fun onConnectionClosed(ic: RecordingInputConnection) {
+                    for (i in 0 until ics.size) {
+                        if (ics[i].get() == ic) {
+                            ics.removeAt(i)
+                            return // No duplicated instances should be in the list.
+                        }
+                    }
+                }
             }
         ).also {
-            ic = it
-            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.createInputConnection: $ic") }
+            ics.add(WeakReference(it))
+            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.createInputConnection: $ics") }
         }
     }
 
@@ -298,7 +313,9 @@ internal class TextInputServiceAndroid(
             this.state.composition != newValue.composition
         this.state = newValue
         // update the latest TextFieldValue in InputConnection
-        ic?.mTextFieldValue = newValue
+        for (i in 0 until ics.size) {
+            ics[i].get()?.mTextFieldValue = newValue
+        }
 
         if (oldValue == newValue) {
             if (DEBUG) {
@@ -330,7 +347,9 @@ internal class TextInputServiceAndroid(
         if (restartInput) {
             restartInputImmediately()
         } else {
-            ic?.updateInputState(this.state, inputMethodManager, view)
+            for (i in 0 until ics.size) {
+                ics[i].get()?.updateInputState(this.state, inputMethodManager, view)
+            }
         }
     }
 
@@ -349,7 +368,7 @@ internal class TextInputServiceAndroid(
         // use, i.e. InputConnection has created.
         // Even if we miss all the timing of requesting rectangle during initial text field focus,
         // focused rectangle will be requested when software keyboard has shown.
-        if (ic == null) {
+        if (ics.isEmpty()) {
             focusedRect?.let {
                 // Notice that view.requestRectangleOnScreen may modify the input Rect, we have to
                 // create another Rect and then pass it.

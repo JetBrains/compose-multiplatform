@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy.list
 
 import android.os.Build
 import androidx.compose.foundation.AutoTestFrameClock
+import androidx.compose.foundation.VelocityTrackerCalculationThreshold
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
@@ -26,16 +27,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.savePointerInputEvents
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -43,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.testutils.assertPixels
@@ -57,6 +62,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.util.VelocityTracker
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -81,8 +89,10 @@ import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeLeft
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.test.filters.LargeTest
@@ -92,6 +102,10 @@ import com.google.common.truth.IntegerSubject
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import java.util.concurrent.CountDownLatch
+import kotlin.math.abs
+import kotlin.math.roundToInt
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1921,6 +1935,153 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         rule.onNodeWithTag("10")
             .assertStartPositionInRootIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun assertVelocityCalculationIsSimilar_witHistoricalValues() {
+        // arrange
+        val tracker = VelocityTracker()
+        var velocity = Velocity.Zero
+        val capturingScrollConnection = object : NestedScrollConnection {
+            override suspend fun onPreFling(available: Velocity): Velocity {
+                velocity += available
+                return Velocity.Zero
+            }
+        }
+        rule.setContent {
+            Box(modifier = Modifier
+                .background(Color.Yellow)
+                .nestedScroll(capturingScrollConnection)
+                .fillMaxWidth()
+                .pointerInput(Unit) {
+                    savePointerInputEvents(tracker, this)
+                }) {
+                LazyColumnOrRow {
+                    items(200) {
+                        Box(modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp)
+                            .padding(8.dp)
+                            .background(Color.Blue))
+                    }
+                }
+            }
+        }
+
+        // act
+        composeViewSwipeForward()
+
+        // assert
+        rule.runOnIdle {
+            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
+        }
+        tracker.resetTracking()
+        velocity = Velocity.Zero
+
+        // act
+        composeViewSwipeBackward()
+
+        // assert
+        rule.runOnIdle {
+            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
+        }
+    }
+
+    @Test
+    fun itemsComposedInOrderDuringAnimatedScroll() {
+        // for the Paging use case it is important that during such long scrolls we do not
+        // accidentally compose an item from completely other part of the list as it will break
+        // the logic defining what page to load. this issue was happening right after the
+        // teleporting during the animated scrolling happens (for example we were on item 100
+        // and we immediately snap to item 400). the prefetching logic was not detecting such
+        // moves and were continuing prefetching item 101 even if it is not needed anymore.
+        val state = LazyListState()
+        var previousItem = -1
+        // initialize lambda here so it is not recreated when items block is rerun causing
+        // extra recompositions
+        val itemContent: @Composable LazyItemScope.(index: Int) -> Unit = {
+            assertWithMessage("Item $it should be larger than $previousItem")
+                .that(it > previousItem).isTrue()
+            previousItem = it
+            BasicText("$it", Modifier.size(10.dp))
+        }
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            LazyColumnOrRow(Modifier.size(30.dp), state = state) {
+                items(500, itemContent = itemContent)
+            }
+        }
+
+        var animationFinished by mutableStateOf(false)
+        rule.runOnIdle {
+            scope.launch {
+                state.animateScrollToItem(500)
+                animationFinished = true
+            }
+        }
+        rule.waitUntil(timeoutMillis = 10000) { animationFinished }
+    }
+
+    @Test
+    fun increasingConstraintsWhenParentMaxSizeIsUsed_correctlyMaintainsThePosition() {
+        val state = LazyListState(1, 10)
+        var constraints by mutableStateOf(Constraints.fixed(100, 100))
+        rule.setContentWithTestViewConfiguration {
+            Layout(content = {
+                LazyColumnOrRow(state = state) {
+                    items(3) {
+                        Box(Modifier.fillParentMaxSize())
+                    }
+                }
+            }) { measurables, _ ->
+                val placeable = measurables.first().measure(constraints)
+                layout(constraints.maxWidth, constraints.maxHeight) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            constraints = Constraints.fixed(500, 500)
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+        }
+    }
+
+    @Test
+    fun usingFillParentMaxSizeOnInfinityConstraintsIsIgnored() {
+        rule.setContentWithTestViewConfiguration {
+            Layout(content = {
+                LazyColumnOrRow {
+                    items(1) {
+                        Box(
+                            Modifier
+                                .fillParentMaxSize(0.95f)
+                                .testTag("item"))
+                    }
+                }
+            }) { measurables, _ ->
+                val crossInfinityConstraints = if (vertical) {
+                    Constraints(maxWidth = Constraints.Infinity, maxHeight = 100)
+                } else {
+                    Constraints(maxWidth = 100, maxHeight = Constraints.Infinity)
+                }
+                val placeable = measurables.first().measure(crossInfinityConstraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
+            }
+        }
+
+        rule.onNodeWithTag("item")
+            .assertMainAxisSizeIsEqualTo(with(rule.density) { (100 * 0.95f).roundToInt().toDp() })
+            .assertCrossAxisSizeIsEqualTo(0.dp)
     }
 
     // ********************* END OF TESTS *********************

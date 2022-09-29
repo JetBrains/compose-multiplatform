@@ -360,13 +360,6 @@ class ChipTest {
                         "Filter chip",
                         Modifier.testTag(TestChipTag)
                     )
-                },
-                selectedIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Done,
-                        contentDescription = "Localized Description",
-                        modifier = Modifier.size(FilterChipDefaults.IconSize)
-                    )
                 })
         }
 
@@ -395,7 +388,7 @@ class ChipTest {
                         Modifier.testTag(TestChipTag)
                     )
                 },
-                selectedIcon = {
+                leadingIcon = {
                     Icon(
                         imageVector = Icons.Filled.Done,
                         contentDescription = "Localized Description",
@@ -509,6 +502,7 @@ class ChipTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 InputChip(
+                    selected = false,
                     onClick = {},
                     modifier = Modifier.testTag(TestChipTag),
                     label = { Text(TestChipTag) })
@@ -516,9 +510,47 @@ class ChipTest {
         }
 
         rule.onNodeWithTag(TestChipTag)
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsEnabled()
             .assertHasClickAction()
+    }
+
+    @Test
+    fun unselectedSemantics_inputChip() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box {
+                InputChip(
+                    selected = false,
+                    onClick = {},
+                    modifier = Modifier.testTag(TestChipTag),
+                    label = { Text(TestChipTag) })
+            }
+        }
+
+        rule.onNodeWithTag(TestChipTag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
+            .assertIsEnabled()
+            .assertHasClickAction()
+            .assertIsNotSelected()
+    }
+
+    @Test
+    fun selectedSemantics_inputChip() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box {
+                InputChip(
+                    selected = true,
+                    onClick = {},
+                    modifier = Modifier.testTag(TestChipTag),
+                    label = { Text(TestChipTag) })
+            }
+        }
+
+        rule.onNodeWithTag(TestChipTag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
+            .assertIsEnabled()
+            .assertHasClickAction()
+            .assertIsSelected()
     }
 
     @Test
@@ -526,6 +558,7 @@ class ChipTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 InputChip(
+                    selected = false,
                     modifier = Modifier.testTag(TestChipTag),
                     onClick = {},
                     label = { Text(TestChipTag) },
@@ -535,31 +568,31 @@ class ChipTest {
         }
 
         rule.onNodeWithTag(TestChipTag)
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
             .assertIsNotEnabled()
             .assertHasClickAction()
+            .assertIsNotSelected()
     }
 
     @Test
-    fun onClick_inputChip() {
-        var counter = 0
-        val onClick: () -> Unit = { ++counter }
-
+    fun toggle_inputChip() {
         rule.setMaterialContent(lightColorScheme()) {
+            val selected = remember { mutableStateOf(false) }
             Box {
                 InputChip(
-                    onClick = onClick,
+                    selected = selected.value,
+                    onClick = { selected.value = !selected.value },
                     modifier = Modifier.testTag(TestChipTag),
                     label = { Text("Test chip") })
             }
         }
 
         rule.onNodeWithTag(TestChipTag)
+            .assertIsNotSelected()
             .performClick()
-
-        rule.runOnIdle {
-            assertThat(counter).isEqualTo(1)
-        }
+            .assertIsSelected()
+            .performClick()
+            .assertIsNotSelected()
     }
 
     @Test
@@ -568,7 +601,7 @@ class ChipTest {
         // so lets skip it.
         Assume.assumeTrue(rule.density.fontScale <= 1f)
         rule.setMaterialContent(lightColorScheme()) {
-            InputChip(onClick = {}, label = { Text("Test chip") })
+            InputChip(selected = false, onClick = {}, label = { Text("Test chip") })
         }
 
         rule.onNode(hasClickAction())
@@ -580,6 +613,7 @@ class ChipTest {
         var chipCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent(lightColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 modifier = Modifier.onGloballyPositioned { chipCoordinates = it },
                 label = {
@@ -607,6 +641,7 @@ class ChipTest {
         var chipCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent(lightColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 modifier = Modifier.onGloballyPositioned { chipCoordinates = it },
                 label = {
@@ -642,6 +677,7 @@ class ChipTest {
         var chipCoordinates: LayoutCoordinates? = null
         rule.setMaterialContent(lightColorScheme()) {
             InputChip(
+                selected = false,
                 onClick = {},
                 modifier = Modifier.onGloballyPositioned { chipCoordinates = it },
                 label = {
@@ -674,17 +710,31 @@ class ChipTest {
 
     @Test
     fun labelContentColor_inputChip() {
-        var expectedLabelColor = Color.Unspecified
+        var selectedLabelColor = Color.Unspecified
+        var unselectedLabelColor = Color.Unspecified
         var contentColor = Color.Unspecified
         rule.setMaterialContent(lightColorScheme()) {
-            expectedLabelColor = InputChipTokens.LabelTextColor.toColor()
-            InputChip(onClick = {}, label = {
-                contentColor = LocalContentColor.current
-            })
+            val selected = remember { mutableStateOf(false) }
+            selectedLabelColor = InputChipTokens.SelectedLabelTextColor.toColor()
+            unselectedLabelColor = InputChipTokens.UnselectedLabelTextColor.toColor()
+            InputChip(
+                selected = selected.value,
+                onClick = { selected.value = !selected.value },
+                label = {
+                    contentColor = LocalContentColor.current
+                },
+                modifier = Modifier.testTag(TestChipTag)
+            )
         }
 
         rule.runOnIdle {
-            assertThat(contentColor).isEqualTo(expectedLabelColor)
+            assertThat(contentColor).isEqualTo(unselectedLabelColor)
+        }
+
+        rule.onNodeWithTag(TestChipTag).performClick()
+
+        rule.runOnIdle {
+            assertThat(contentColor).isEqualTo(selectedLabelColor)
         }
     }
 
@@ -932,12 +982,16 @@ class ChipTest {
                 },
                 label = {
                     Spacer(
-                        Modifier.requiredSize(10.dp).onGloballyPositioned {
-                            item1Bounds = it.boundsInRoot()
-                        }
+                        Modifier
+                            .requiredSize(10.dp)
+                            .onGloballyPositioned {
+                                item1Bounds = it.boundsInRoot()
+                            }
                     )
                     Spacer(
-                        Modifier.requiredWidth(10.dp).requiredHeight(5.dp)
+                        Modifier
+                            .requiredWidth(10.dp)
+                            .requiredHeight(5.dp)
                             .onGloballyPositioned {
                                 item2Bounds = it.boundsInRoot()
                             }
@@ -958,7 +1012,9 @@ class ChipTest {
         rule.setMaterialContent(lightColorScheme()) {
             Box(Modifier.fillMaxSize()) {
                 SuggestionChip(
-                    modifier = Modifier.align(Alignment.Center).testTag(TestChipTag)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .testTag(TestChipTag)
                         .requiredSize(10.dp),
                     onClick = { clicked = !clicked },
                     label = { Box(Modifier.size(10.dp)) }

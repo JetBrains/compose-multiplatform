@@ -201,9 +201,8 @@ class DerivedSnapshotStateTests {
             assertEquals(0, result)
             // 1 for derived, 1 for state
             assertEquals(2, readStates.size)
-            // NOTE: the first calculation will cause two reads of all dependencies: one for the
-            // calculation, and one for the hash calculation, 3 reads total
-            assertEquals(3, readCount)
+            // 1 for derived, 1 for state
+            assertEquals(2, readCount)
             assertEquals(true, readStates.contains(state))
             assertEquals(true, readStates.contains(derived))
         } finally {
@@ -243,6 +242,44 @@ class DerivedSnapshotStateTests {
         assertEquals(1, runs)
         assertNull(a.value)
         assertEquals(1, runs)
+    }
+
+    @Test
+    fun stateUpdatedInSnapshotIsNotRecalculated() {
+        var runs = 0
+        val dependency = mutableStateOf(0)
+        val a = derivedStateOf {
+            runs++
+            dependency.value
+        }
+        val b = derivedStateOf {
+            a.value
+        }
+
+        Snapshot.takeMutableSnapshot().apply {
+            enter {
+                b.value
+            }
+            apply()
+        }
+
+        dependency.value++
+
+        Snapshot.takeMutableSnapshot().apply {
+            enter {
+                b.value
+            }
+            apply()
+        }
+
+        Snapshot.takeMutableSnapshot().apply {
+            enter {
+                b.value
+            }
+            apply()
+        }
+
+        assertEquals(2, runs)
     }
 
     private var count = 0

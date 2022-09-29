@@ -19,13 +19,10 @@ package androidx.compose.ui.text.font
 import android.content.Context
 import android.content.res.AssetManager
 import android.graphics.Typeface
-import android.os.Build
 import android.os.ParcelFileDescriptor
-import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Blocking
 import java.io.File
 
 /**
@@ -51,7 +48,13 @@ fun Font(
     path: String,
     weight: FontWeight = FontWeight.Normal,
     style: FontStyle = FontStyle.Normal
-): Font = AndroidAssetFont(assetManager, path, weight, style)
+): Font = AndroidAssetFont(
+    assetManager,
+    path,
+    weight,
+    style,
+    FontVariation.Settings(weight, style)
+)
 
 /**
  * Create a Font declaration from a file in the assets directory. The content of the [File] is
@@ -64,6 +67,8 @@ fun Font(
  * that is given in a [androidx.compose.ui.text.SpanStyle].
  * @param style The style of the font, normal or italic. The system uses this to match a font to a
  * font request that is given in a [androidx.compose.ui.text.SpanStyle].
+ * @param variationSettings on API 26 and above these settings are applied to a variable font when
+ * the font is loaded
  */
 @ExperimentalTextApi
 @Stable
@@ -71,8 +76,9 @@ fun Font(
     path: String,
     assetManager: AssetManager,
     weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = AndroidAssetFont(assetManager, path, weight, style)
+    style: FontStyle = FontStyle.Normal,
+    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
+): Font = AndroidAssetFont(assetManager, path, weight, style, variationSettings)
 
 /**
  * Create a Font declaration from a file. The content of the [File] is read during construction.
@@ -82,6 +88,8 @@ fun Font(
  * that is given in a [androidx.compose.ui.text.SpanStyle].
  * @param style The style of the font, normal or italic. The system uses this to match a font to a
  * font request that is given in a [androidx.compose.ui.text.SpanStyle].
+ * @param variationSettings on API 26 and above these settings are applied to a variable font when
+ * the font is loaded
  */
 @ExperimentalTextApi
 @Stable
@@ -89,8 +97,9 @@ fun Font(
 fun Font(
     file: File,
     weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = AndroidFileFont(file, weight, style)
+    style: FontStyle = FontStyle.Normal,
+    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
+): Font = AndroidFileFont(file, weight, style, variationSettings)
 
 /**
  * Create a Font declaration from a [ParcelFileDescriptor]. The content of the
@@ -101,6 +110,7 @@ fun Font(
  * that is given in a [androidx.compose.ui.text.SpanStyle].
  * @param style The style of the font, normal or italic. The system uses this to match a font to a
  * font request that is given in a [androidx.compose.ui.text.SpanStyle].
+ * @param variationSettings these settings are applied to a variable font when the font is loaded
  */
 @RequiresApi(26)
 @ExperimentalTextApi
@@ -108,8 +118,9 @@ fun Font(
 fun Font(
     fileDescriptor: ParcelFileDescriptor,
     weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = AndroidFileDescriptorFont(fileDescriptor, weight, style)
+    style: FontStyle = FontStyle.Normal,
+    variationSettings: FontVariation.Settings = FontVariation.Settings(weight, style)
+): Font = AndroidFileDescriptorFont(fileDescriptor, weight, style, variationSettings)
 
 /**
  * Font for use on Android.
@@ -148,10 +159,25 @@ fun Font(
  * @param typefaceLoader a loader that knows how to load this [AndroidFont], may be shared between
  * several fonts
  */
-abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
+abstract class AndroidFont
+@ExperimentalTextApi
+constructor(
     final override val loadingStrategy: FontLoadingStrategy,
-    val typefaceLoader: TypefaceLoader
+    val typefaceLoader: TypefaceLoader,
+    variationSettings: FontVariation.Settings,
 ) : Font {
+
+    @OptIn(ExperimentalTextApi::class)
+    // TODO(b/241016309) deprecate this once FontVariation is non-experimental
+    constructor(
+        loadingStrategy: FontLoadingStrategy,
+        typefaceLoader: TypefaceLoader,
+    ) : this(loadingStrategy, typefaceLoader, FontVariation.Settings())
+
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalTextApi
+    @get:ExperimentalTextApi
+    val variationSettings: FontVariation.Settings = variationSettings
 
     /**
      * Loader for loading an [AndroidFont] and producing an [android.graphics.Typeface].
@@ -233,88 +259,5 @@ abstract class AndroidFont @OptIn(ExperimentalTextApi::class) constructor(
     }
 }
 
-internal abstract class AndroidPreloadedFont : AndroidFont(
-    Blocking,
-    AndroidPreloadedFontTypefaceLoader
-) {
-    abstract val typefaceInternal: Typeface?
-    abstract val cacheKey: String?
-}
-
-private object AndroidPreloadedFontTypefaceLoader : AndroidFont.TypefaceLoader {
-    override fun loadBlocking(context: Context, font: AndroidFont): Typeface? =
-        (font as? AndroidPreloadedFont)?.typefaceInternal
-
-    override suspend fun awaitLoad(context: Context, font: AndroidFont): Nothing {
-        throw UnsupportedOperationException("All preloaded fonts are blocking.")
-    }
-}
-
-private class AndroidAssetFont constructor(
-    @Suppress("CanBeParameter") val assetManager: AssetManager,
-    val path: String,
-    override val weight: FontWeight = FontWeight.Normal,
-    override val style: FontStyle = FontStyle.Normal
-) : AndroidPreloadedFont() {
-    override val typefaceInternal: Typeface? = Typeface.createFromAsset(assetManager, path)
-    override val cacheKey: String = "asset:$path"
-
-    override fun toString(): String {
-        return "Font(assetManager, path=$path, weight=$weight, style=$style)"
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as AndroidAssetFont
-
-        if (path != other.path) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        return path.hashCode()
-    }
-}
-
-private class AndroidFileFont constructor(
-    val file: File,
-    override val weight: FontWeight = FontWeight.Normal,
-    override val style: FontStyle = FontStyle.Normal
-) : AndroidPreloadedFont() {
-    override val typefaceInternal: Typeface? = Typeface.createFromFile(file)
-    override val cacheKey: String? = null
-
-    override fun toString(): String {
-        return "Font(file=$file, weight=$weight, style=$style)"
-    }
-}
-
-@RequiresApi(26)
-private class AndroidFileDescriptorFont constructor(
-    val fileDescriptor: ParcelFileDescriptor,
-    override val weight: FontWeight = FontWeight.Normal,
-    override val style: FontStyle = FontStyle.Normal
-) : AndroidPreloadedFont() {
-    override val typefaceInternal = if (Build.VERSION.SDK_INT >= 26) {
-        AndroidFileDescriptorHelper.create(fileDescriptor)
-    } else {
-        throw IllegalArgumentException("Cannot create font from file descriptor for SDK < 26")
-    }
-    override val cacheKey: String? = null
-
-    override fun toString(): String {
-        return "Font(fileDescriptor=$fileDescriptor, weight=$weight, style=$style)"
-    }
-}
-
-@RequiresApi(26)
-private object AndroidFileDescriptorHelper {
-    @RequiresApi(26)
-    @DoNotInline
-    fun create(fileDescriptor: ParcelFileDescriptor): Typeface {
-        return Typeface.Builder(fileDescriptor.fileDescriptor).build()
-    }
-}
+// keep generating AndroidFontKt to avoid API change
+private fun generateAndroidFontKtForApiCompatibility() {}

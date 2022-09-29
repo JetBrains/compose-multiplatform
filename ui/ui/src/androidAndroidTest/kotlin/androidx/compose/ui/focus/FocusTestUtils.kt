@@ -56,11 +56,12 @@ internal fun FocusableBox(
     height: Int,
     focusRequester: FocusRequester? = null,
     deactivated: Boolean = false,
+    modifier: Modifier = Modifier,
     content: @Composable () -> Unit = {}
 ) {
     Layout(
         content = content,
-        modifier = Modifier
+        modifier = modifier
             .offset { IntOffset(x, y) }
             .focusRequester(focusRequester ?: remember { FocusRequester() })
             .onFocusChanged { isFocused.value = it.isFocused }

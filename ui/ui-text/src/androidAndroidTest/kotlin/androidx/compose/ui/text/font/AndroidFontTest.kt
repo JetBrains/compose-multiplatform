@@ -36,9 +36,9 @@ import java.io.File
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalTextApi::class)
 class AndroidFontTest {
+    private var tempFile: File? = null
     private val context = InstrumentationRegistry.getInstrumentation().context
     private val assetFontPath = "subdirectory/asset_font.ttf"
-    private val tmpFontPath = "tmp_file_font.ttf"
 
     @Before
     fun setup() {
@@ -52,16 +52,16 @@ class AndroidFontTest {
     }
 
     private fun deleteFile() {
-        val fontFile = File(context.filesDir, tmpFontPath)
-        if (fontFile.exists()) {
-            fontFile.delete()
+        if (tempFile?.exists() == true) {
+            tempFile?.delete()
         }
     }
 
     private fun writeFile() {
+        tempFile = File.createTempFile("tmp_file_font", ".ttf", context.filesDir)
         context.assets.open(assetFontPath).use { input ->
             val bytes = input.readBytes()
-            context.openFileOutput(tmpFontPath, Context.MODE_PRIVATE).use { output ->
+            context.openFileOutput(tempFile?.name, Context.MODE_PRIVATE).use { output ->
                 output.write(bytes)
             }
         }
@@ -121,8 +121,7 @@ class AndroidFontTest {
     }
 
     private fun makeFileFont(): AndroidFont {
-        val fontFile = File(context.filesDir, tmpFontPath)
-        return Font(file = fontFile) as AndroidFont
+        return Font(tempFile!!) as AndroidFont
     }
 
     @Test
@@ -164,7 +163,7 @@ class AndroidFontTest {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun makeFileDescriptorFont(): AndroidFont {
-        return context.openFileInput(tmpFontPath).use { inputStream ->
+        return context.openFileInput(tempFile?.name).use { inputStream ->
             Font(ParcelFileDescriptor.dup(inputStream.fd)) as AndroidFont
         }
     }

@@ -16,7 +16,11 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.GraphicsLayerScope
+import androidx.compose.ui.node.LayoutNodeLayoutDelegate
+import androidx.compose.ui.node.NodeCoordinator
+import androidx.compose.ui.node.LookaheadCapablePlaceable
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -146,6 +150,22 @@ abstract class Placeable : Measured {
          * RTL support in custom layouts.
          */
         protected abstract val parentLayoutDirection: LayoutDirection
+
+        /**
+         * The [LayoutCoordinates] of this layout, if known or `null` if the layout hasn't been
+         * placed yet. [coordinates] will be `null` when determining alignment lines, preventing
+         * alignment lines from depending on absolute coordinates.
+         *
+         * When [coordinates] is `null`, there will always be a follow-up placement call in which
+         * [coordinates] is not-`null`.
+         *
+         * @sample androidx.compose.ui.samples.PlacementScopeCoordinatesSample
+         */
+        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+        @ExperimentalComposeUiApi
+        @get:ExperimentalComposeUiApi
+        open val coordinates: LayoutCoordinates?
+            get() = null
 
         /**
          * Place a [Placeable] at [position] in its parent's coordinate system.
@@ -299,7 +319,7 @@ abstract class Placeable : Measured {
                 placeApparentToRealOffset(position, zIndex, layerBlock)
             } else {
                 placeApparentToRealOffset(
-                    IntOffset(parentWidth - measuredSize.width - position.x, position.y),
+                    IntOffset((parentWidth - width - position.x), position.y),
                     zIndex,
                     layerBlock
                 )
@@ -320,19 +340,74 @@ abstract class Placeable : Measured {
                 private set
             override var parentWidth = 0
                 private set
+            private var _coordinates: LayoutCoordinates? = null
+
+            @ExperimentalComposeUiApi
+            override val coordinates: LayoutCoordinates?
+                get() {
+                    layoutDelegate?.coordinatesAccessedDuringPlacement = true
+                    return _coordinates
+                }
+
+            private var layoutDelegate: LayoutNodeLayoutDelegate? = null
 
             inline fun executeWithRtlMirroringValues(
                 parentWidth: Int,
                 parentLayoutDirection: LayoutDirection,
+                lookaheadCapablePlaceable: LookaheadCapablePlaceable?,
                 crossinline block: PlacementScope.() -> Unit
             ) {
+                val previousLayoutCoordinates = _coordinates
                 val previousParentWidth = Companion.parentWidth
                 val previousParentLayoutDirection = Companion.parentLayoutDirection
+                val previousLayoutDelegate = layoutDelegate
                 Companion.parentWidth = parentWidth
                 Companion.parentLayoutDirection = parentLayoutDirection
+                val wasPlacingForAlignment =
+                    configureForPlacingForAlignment(lookaheadCapablePlaceable)
                 this.block()
+                lookaheadCapablePlaceable?.isPlacingForAlignment = wasPlacingForAlignment
                 Companion.parentWidth = previousParentWidth
                 Companion.parentLayoutDirection = previousParentLayoutDirection
+                _coordinates = previousLayoutCoordinates
+                layoutDelegate = previousLayoutDelegate
+            }
+
+            /**
+             * Configures [_coordinates] and [layoutDelegate] based on the [scope].
+             * When it is [NodeCoordinator.isPlacingForAlignment], then [_coordinates] should
+             * be `null`, and when [coordinates] is accessed, it indicates that the placement
+             * should not be finalized. When [NodeCoordinator.isShallowPlacing], then
+             * [_coordinates] should be `null`, but we don't have to do anything else
+             * to trigger relayout because shallow placing will replace again anyway.
+             *
+             * [NodeCoordinator.isPlacingForAlignment] will be set to true if its parent's
+             * value is `true`.
+             *
+             * @return the value for [NodeCoordinator.isPlacingForAlignment] that should
+             * be set after completing the lambda.
+             */
+            private fun configureForPlacingForAlignment(
+                scope: LookaheadCapablePlaceable?
+            ): Boolean {
+                val wasPlacingForAlignment: Boolean
+                if (scope == null) {
+                    _coordinates = null
+                    layoutDelegate = null
+                    wasPlacingForAlignment = false
+                } else {
+                    wasPlacingForAlignment = scope.isPlacingForAlignment
+                    if (scope.parent?.isPlacingForAlignment == true) {
+                        scope.isPlacingForAlignment = true
+                    }
+                    layoutDelegate = scope.layoutNode.layoutDelegate
+                    if (scope.isPlacingForAlignment || scope.isShallowPlacing) {
+                        _coordinates = null
+                    } else {
+                        _coordinates = scope.coordinates
+                    }
+                }
+                return wasPlacingForAlignment
             }
         }
     }

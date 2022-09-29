@@ -20,13 +20,14 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
@@ -34,9 +35,12 @@ import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.unit.dp
 
 /**
@@ -125,4 +129,25 @@ fun DrawWithCacheContentSample() {
             }
         }
     )
+}
+
+@ExperimentalComposeUiApi
+@Sampled
+@Composable
+fun DrawModifierNodeSample() {
+    class CircleNode(var color: Color) : DrawModifierNode, Modifier.Node() {
+        override fun ContentDrawScope.draw() {
+            drawCircle(color)
+        }
+    }
+    fun Modifier.circle(color: Color) = this then modifierElementOf(
+        params = color,
+        create = { CircleNode(color) },
+        update = { it.color = color },
+        definitions = {
+            name = "circle"
+            properties["color"] = color
+        }
+    )
+    Box(Modifier.fillMaxSize().circle(Color.Blue))
 }

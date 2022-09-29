@@ -231,3 +231,55 @@ fun FocusPropertiesSample() {
         )
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Sampled
+@Composable
+fun CancelFocusMoveSample() {
+    // If Box 2 is focused, pressing Up will not take focus to Box 1,
+    // But pressing Down will move focus to Box 3.
+    Column {
+        // Box 1.
+        Box(Modifier.focusTarget())
+        // Box 2.
+        Box(modifier = Modifier
+            .focusProperties { up = FocusRequester.Cancel }
+            .focusTarget()
+        )
+        // Box 3.
+        Box(Modifier.focusTarget())
+    }
+}
+
+@ExperimentalComposeUiApi
+@Sampled
+@Composable
+fun CustomFocusEnterSample() {
+    // If the row is focused, performing a moveFocus(Enter) will move focus to item2.
+    val item2 = remember { FocusRequester() }
+    Row(Modifier.focusProperties { enter = { item2 } }.focusable()) {
+        Box(Modifier.focusable())
+        Box(Modifier.focusRequester(item2).focusable())
+        Box(Modifier.focusable())
+    }
+}
+
+@ExperimentalComposeUiApi
+@Sampled
+@Composable
+fun CustomFocusExitSample() {
+    // If one of the boxes in Row1 is focused, performing a moveFocus(Exit)
+    // will move focus to the specified next item instead of moving focus to row1.
+    val nextItem = remember { FocusRequester() }
+    Column {
+        Row(Modifier.focusProperties { exit = { nextItem } }.focusable()) {
+            Box(Modifier.focusable())
+            Box(Modifier.focusable())
+            Box(Modifier.focusable())
+        }
+        Row(Modifier.focusable()) {
+            Box(Modifier.focusable())
+            Box(Modifier.focusRequester(nextItem).focusable())
+        }
+    }
+}

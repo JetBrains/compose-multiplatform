@@ -2701,7 +2701,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached() {
+    fun testSemanticsSort_doesNotThrow_whenCoordinatorNotAttached() {
         container.setContent {
             with(LocalDensity.current) {
                 Box(Modifier.size(100.toDp()).testTag("parent")) {
@@ -2714,8 +2714,7 @@ class AndroidAccessibilityTest {
         val child = rule.onNodeWithTag("child").fetchSemanticsNode()
 
         rule.runOnIdle {
-            child.layoutNode.innerLayoutNodeWrapper.detach()
-            child.outerSemanticsEntity.onDetach()
+            child.layoutNode.innerCoordinator.detach()
         }
 
         rule.runOnIdle {
@@ -2725,7 +2724,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testSemanticsSort_doesNotThrow_whenLayoutNodeWrapperNotAttached_compare() {
+    fun testSemanticsSort_doesNotThrow_whenCoordinatorNotAttached_compare() {
         container.setContent {
             with(LocalDensity.current) {
                 Box(Modifier.size(100.toDp()).testTag("parent")) {
@@ -2743,10 +2742,8 @@ class AndroidAccessibilityTest {
         val grandChild1 = rule.onNodeWithTag("grandChild1").fetchSemanticsNode()
         val grandChild2 = rule.onNodeWithTag("grandChild2").fetchSemanticsNode()
         rule.runOnIdle {
-            grandChild1.layoutNode.innerLayoutNodeWrapper.detach()
-            grandChild1.outerSemanticsEntity.onDetach()
-            grandChild2.layoutNode.innerLayoutNodeWrapper.detach()
-            grandChild2.outerSemanticsEntity.onDetach()
+            grandChild1.layoutNode.innerCoordinator.detach()
+            grandChild2.layoutNode.innerCoordinator.detach()
         }
 
         rule.runOnIdle {
@@ -2853,6 +2850,48 @@ class AndroidAccessibilityTest {
         }
 
         rule.onNodeWithTag(testTag).assertContentDescriptionEquals("Hello", "World")
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun testScreenReaderFocusable_notSet_whenAncestorMergesDescendants() {
+        container.setContent {
+            Column(Modifier.semantics(true) { }) {
+                BasicText("test", Modifier.testTag("child"))
+            }
+        }
+
+        val childNode = rule.onNodeWithTag("child", useUnmergedTree = true).fetchSemanticsNode()
+        val childInfo = provider.createAccessibilityNodeInfo(childNode.id)!!
+        assertEquals(childInfo.isScreenReaderFocusable, false)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun testScreenReaderFocusable_set_whenAncestorDoesNotMerge() {
+        container.setContent {
+            Column(Modifier.semantics(false) { }) {
+                BasicText("test", Modifier.testTag("child"))
+            }
+        }
+
+        val childNode = rule.onNodeWithTag("child", useUnmergedTree = true).fetchSemanticsNode()
+        val childInfo = provider.createAccessibilityNodeInfo(childNode.id)!!
+        assertEquals(childInfo.isScreenReaderFocusable, true)
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun testScreenReaderFocusable_notSet_whenChildNotSpeakable() {
+        container.setContent {
+            Column(Modifier.semantics(false) { }) {
+                Box(Modifier.testTag("child").size(100.dp))
+            }
+        }
+
+        val childNode = rule.onNodeWithTag("child", useUnmergedTree = true).fetchSemanticsNode()
+        val childInfo = provider.createAccessibilityNodeInfo(childNode.id)!!
+        assertEquals(childInfo.isScreenReaderFocusable, false)
     }
 
     @Test
@@ -2992,24 +3031,36 @@ class AndroidAccessibilityTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
     fun progressSemantics_mergesSemantics_forTalkback() {
         container.setContent {
-            Box(Modifier.progressSemantics(0.5f).testTag("box"))
+            Box(Modifier.progressSemantics(0.5f).testTag("box")) {
+                 BasicText("test", Modifier.testTag("child"))
+            }
         }
 
-        val node = rule.onNodeWithTag("box").fetchSemanticsNode()
+        val node = rule.onNodeWithTag("box", useUnmergedTree = true).fetchSemanticsNode()
         val info = provider.createAccessibilityNodeInfo(node.id)!!
         assertEquals(info.isScreenReaderFocusable, true)
+
+        val childNode = rule.onNodeWithTag("child", useUnmergedTree = true).fetchSemanticsNode()
+        val childInfo = provider.createAccessibilityNodeInfo(childNode.id)!!
+        assertEquals(childInfo.isScreenReaderFocusable, false)
     }
 
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
     fun indeterminateProgressSemantics_mergesSemantics_forTalkback() {
         container.setContent {
-            Box(Modifier.progressSemantics().testTag("box"))
+            Box(Modifier.progressSemantics().testTag("box")) {
+                 BasicText("test", Modifier.testTag("child"))
+            }
         }
 
-        val node = rule.onNodeWithTag("box").fetchSemanticsNode()
+        val node = rule.onNodeWithTag("box", useUnmergedTree = true).fetchSemanticsNode()
         val info = provider.createAccessibilityNodeInfo(node.id)!!
         assertEquals(info.isScreenReaderFocusable, true)
+
+        val childNode = rule.onNodeWithTag("child", useUnmergedTree = true).fetchSemanticsNode()
+        val childInfo = provider.createAccessibilityNodeInfo(childNode.id)!!
+        assertEquals(childInfo.isScreenReaderFocusable, false)
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {

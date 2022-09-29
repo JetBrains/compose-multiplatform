@@ -54,7 +54,7 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-class MaterialTextSelectionColorsScreenshotTest {
+class TextSelectionColorsScreenshotTest {
 
     @get:Rule
     val rule = createComposeRule()
@@ -217,6 +217,7 @@ private fun TextTestContent(colorScheme: ColorScheme) {
 private fun FilledTextFieldTestContent(colorScheme: ColorScheme) {
     MaterialTheme(colorScheme) {
         Surface(Modifier.testTag(Tag)) {
+            @OptIn(ExperimentalMaterial3Api::class)
             TextField(
                 value = TextFieldText,
                 onValueChange = {},
@@ -230,6 +231,7 @@ private fun FilledTextFieldTestContent(colorScheme: ColorScheme) {
 private fun OutlinedTextFieldTestContent(colorScheme: ColorScheme) {
     MaterialTheme(colorScheme) {
         Surface(Modifier.testTag(Tag)) {
+            @OptIn(ExperimentalMaterial3Api::class)
             OutlinedTextField(
                 value = TextFieldText,
                 onValueChange = {},

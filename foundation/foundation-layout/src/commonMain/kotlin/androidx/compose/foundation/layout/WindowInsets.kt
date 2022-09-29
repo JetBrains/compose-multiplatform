@@ -67,6 +67,31 @@ interface WindowInsets {
 }
 
 /**
+ * A [WindowInsets] whose values can change without changing the instance. This is useful
+ * to avoid recomposition when [WindowInsets] can change.
+ *
+ * @sample androidx.compose.foundation.layout.samples.withConsumedInsetsSample
+ */
+@ExperimentalLayoutApi
+class MutableWindowInsets(initialInsets: WindowInsets = WindowInsets(0, 0, 0, 0)) : WindowInsets {
+    /**
+     * The [WindowInsets] that are used for [left][getLeft], [top][getTop], [right][getRight],
+     * and [bottom][getBottom] values.
+     */
+    var insets by mutableStateOf(initialInsets)
+
+    override fun getLeft(density: Density, layoutDirection: LayoutDirection): Int =
+        insets.getLeft(density, layoutDirection)
+
+    override fun getTop(density: Density): Int = insets.getTop(density)
+
+    override fun getRight(density: Density, layoutDirection: LayoutDirection): Int =
+        insets.getRight(density, layoutDirection)
+
+    override fun getBottom(density: Density): Int = insets.getBottom(density)
+}
+
+/**
  * [WindowInsetsSides] is used in [WindowInsets.only] to define which sides of the
  * [WindowInsets] should apply.
  */

@@ -16,7 +16,7 @@
 
 package androidx.compose.animation.core
 
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.animation.core.internal.JvmDefaultWithCompatibility
 
 /**
  * This interface provides a convenient way to query from an [VectorizedAnimationSpec] or
@@ -233,12 +233,19 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
     override val isInfinite: Boolean get() = animationSpec.isInfinite
     override fun getValueFromNanos(playTimeNanos: Long): T {
         return if (!isFinishedFromNanos(playTimeNanos)) {
-            typeConverter.convertFromVector(
-                animationSpec.getValueFromNanos(
-                    playTimeNanos, initialValueVector,
-                    targetValueVector, initialVelocityVector
-                )
-            )
+            animationSpec.getValueFromNanos(
+                playTimeNanos, initialValueVector,
+                targetValueVector, initialVelocityVector
+            ).let {
+                // TODO: Remove after b/232030217
+                for (i in 0 until it.size) {
+                    check(!it.get(i).isNaN()) {
+                        "AnimationVector cannot contain a NaN. $it. Animation: $this," +
+                            " playTimeNanos: $playTimeNanos"
+                    }
+                }
+                typeConverter.convertFromVector(it)
+            }
         } else {
             targetValue
         }
@@ -272,7 +279,8 @@ class TargetBasedAnimation<T, V : AnimationVector> internal constructor(
 
     override fun toString(): String {
         return "TargetBasedAnimation: $initialValue -> $targetValue," +
-            "initial velocity: $initialVelocityVector, duration: $durationMillis ms"
+            "initial velocity: $initialVelocityVector, duration: $durationMillis ms," +
+            "animationSpec: $animationSpec"
     }
 }
 

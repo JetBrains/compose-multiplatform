@@ -6,7 +6,7 @@
     android:tint="?attr/colorControlNormal">
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M16.9552,8.662l2.1207,-2.1222l1.4148,1.4138l-2.1207,2.1222z"/>
+      android:pathData="M16.955,8.662l2.121,-2.122l1.415,1.414l-2.121,2.122z"/>
   <path
       android:fillColor="@android:color/white"
       android:pathData="M2,18h20v2h-20z"/>
@@ -15,7 +15,7 @@
       android:pathData="M11,4h2v3h-2z"/>
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M3.5425,7.9248l1.4142,-1.4142l2.1213,2.1213l-1.4142,1.4142z"/>
+      android:pathData="M3.543,7.925l1.414,-1.414l2.121,2.121l-1.414,1.414z"/>
   <path
       android:fillColor="@android:color/white"
       android:pathData="M5,16h14c0,-3.87 -3.13,-7 -7,-7S5,12.13 5,16z"/>

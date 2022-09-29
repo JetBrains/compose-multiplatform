@@ -21,7 +21,7 @@
       android:fillAlpha="0.3"/>
   <path
       android:fillColor="@android:color/white"
-      android:pathData="M16.0207,6.5581l1.4142,-1.4142l1.4142,1.4142l-1.4142,1.4142z"
+      android:pathData="M16.021,6.558l1.414,-1.414l1.414,1.414l-1.414,1.414z"
       android:strokeAlpha="0.3"
       android:fillAlpha="0.3"/>
   <path

@@ -16,30 +16,39 @@
 
 package androidx.compose.material.catalog.ui.specification
 
+import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SpecificationTopAppBar(
     title: String,
     scrollBehavior: TopAppBarScrollBehavior? = null,
 ) {
-    val backgroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors()
-    val backgroundColor = backgroundColors.containerColor(
-        scrollFraction = scrollBehavior?.scrollFraction ?: 0f
-    ).value
+    val backgroundColor = lerp(
+        MaterialTheme.colorScheme.surface,
+        MaterialTheme.colorScheme.surfaceColorAtElevation(elevation = 3.dp),
+        FastOutLinearInEasing.transform(scrollBehavior?.state?.overlappedFraction ?: 0f)
+    )
+
     val foregroundColors = TopAppBarDefaults.centerAlignedTopAppBarColors(
         containerColor = Color.Transparent,
         scrolledContainerColor = Color.Transparent

@@ -19,6 +19,8 @@ package androidx.compose.ui.platform
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.node.requireCoordinator
+import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.semantics.AccessibilityAction
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsActions
@@ -317,7 +319,7 @@ internal class ComposeAccessible(
         @OptIn(ExperimentalComposeUiApi::class)
         override fun isVisible(): Boolean = with(semanticsNode) {
             !config.contains(SemanticsProperties.InvisibleToUser) &&
-            !outerSemanticsEntity.layoutNodeWrapper.isTransparent()
+            !outerSemanticsNode.requireCoordinator(Nodes.Semantics).isTransparent()
         }
 
         override fun isEnabled(): Boolean =

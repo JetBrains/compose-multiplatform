@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"টিক চিহ্ন দিয়াও নাই আঁতৰোৱাও নাই"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"আংশিকভাৱে পৰীক্ষা কৰা হৈছে"</string>
     <string name="on" msgid="8655164131929253426">"অন কৰা আছে"</string>
     <string name="off" msgid="875452955155264703">"অফ আছে"</string>
     <string name="selected" msgid="6043586758067023">"বাছনি কৰা হৈছে"</string>

@@ -57,7 +57,6 @@ class ExposedDropdownMenuTest {
     @get:Rule
     val rule = createComposeRule()
 
-    private val EDMBoxTag = "ExposedDropdownMenuBoxTag"
     private val TFTag = "TextFieldTag"
     private val TrailingIconTag = "TrailingIconTag"
     private val EDMTag = "ExposedDropdownMenuTag"
@@ -193,7 +192,7 @@ class ExposedDropdownMenuTest {
                             setContent {
                                 Box {
                                     ExposedDropdownMenuBox(expanded = true, onExpandedChange = {}) {
-                                        Box(Modifier.size(20.dp))
+                                        Box(Modifier.menuAnchor().size(20.dp))
                                     }
                                 }
                             }
@@ -222,12 +221,12 @@ class ExposedDropdownMenuTest {
         var selectedOptionText by remember { mutableStateOf("") }
         Box(Modifier.fillMaxSize()) {
             ExposedDropdownMenuBox(
-                modifier = Modifier.testTag(EDMBoxTag).align(Alignment.Center),
+                modifier = Modifier.align(Alignment.Center),
                 expanded = expanded,
                 onExpandedChange = { onExpandChange(!expanded) }
             ) {
                 TextField(
-                    modifier = Modifier.testTag(TFTag)
+                    modifier = Modifier.menuAnchor().testTag(TFTag)
                         .onGloballyPositioned {
                             onTextFieldBoundsChanged?.invoke(it.boundsInRoot())
                         },

@@ -30,6 +30,9 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val ExposedDropdownMenu = Strings(4)
         val SliderRangeStart = Strings(5)
         val SliderRangeEnd = Strings(6)
+        val Dialog = Strings(7)
+        val MenuExpanded = Strings(8)
+        val MenuCollapsed = Strings(9)
     }
 }
 

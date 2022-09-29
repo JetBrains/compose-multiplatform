@@ -50,12 +50,3 @@ interface IntrinsicMeasurable {
      */
     fun maxIntrinsicHeight(width: Int): Int
 }
-
-/**
- * A function for performing intrinsic measurement.
- */
-@Deprecated(
-    "IntrinsicMeasureBlock was deprecated. See MeasurePolicy and the new Layout overloads."
-)
-internal typealias IntrinsicMeasureBlock =
-    IntrinsicMeasureScope.(List<IntrinsicMeasurable>, Int) -> Int

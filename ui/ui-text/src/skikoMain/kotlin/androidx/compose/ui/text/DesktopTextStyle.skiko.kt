@@ -134,7 +134,6 @@ actual fun lerp(
  * between [start] and [stop]. The interpolation can be extrapolated beyond 0.0 and
  * 1.0, so negative values and values greater than 1.0 are valid.
  */
-@ExperimentalTextApi
 actual fun lerp(
     start: PlatformSpanStyle,
     stop: PlatformSpanStyle,

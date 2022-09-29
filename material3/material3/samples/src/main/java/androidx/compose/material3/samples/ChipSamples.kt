@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Person
@@ -94,12 +93,16 @@ fun FilterChipSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Filter chip") },
-        selectedIcon = {
-            Icon(
-                imageVector = Icons.Filled.Done,
-                contentDescription = "Localized Description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            null
         }
     )
 }
@@ -113,12 +116,16 @@ fun ElevatedFilterChipSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Filter chip") },
-        selectedIcon = {
-            Icon(
-                imageVector = Icons.Filled.Done,
-                contentDescription = "Localized Description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            null
         }
     )
 }
@@ -132,19 +139,22 @@ fun FilterChipWithLeadingIconSample() {
         selected = selected,
         onClick = { selected = !selected },
         label = { Text("Filter chip") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Filled.Home,
-                contentDescription = "Localized description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
-        },
-        selectedIcon = {
-            Icon(
-                imageVector = Icons.Filled.Done,
-                contentDescription = "Localized Description",
-                modifier = Modifier.size(FilterChipDefaults.IconSize)
-            )
+        leadingIcon = if (selected) {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Done,
+                    contentDescription = "Localized Description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
+        } else {
+            {
+                Icon(
+                    imageVector = Icons.Filled.Home,
+                    contentDescription = "Localized description",
+                    modifier = Modifier.size(FilterChipDefaults.IconSize)
+                )
+            }
         }
     )
 }
@@ -153,16 +163,11 @@ fun FilterChipWithLeadingIconSample() {
 @Sampled
 @Composable
 fun InputChipSample() {
+    var selected by remember { mutableStateOf(false) }
     InputChip(
-        onClick = { /* Do something! */ },
+        selected = selected,
+        onClick = { selected = !selected },
         label = { Text("Input Chip") },
-        trailingIcon = {
-            Icon(
-                Icons.Filled.Close,
-                contentDescription = "Localized description",
-                Modifier.size(InputChipDefaults.IconSize)
-            )
-        }
     )
 }
 
@@ -170,21 +175,16 @@ fun InputChipSample() {
 @Sampled
 @Composable
 fun InputChipWithAvatarSample() {
+    var selected by remember { mutableStateOf(false) }
     InputChip(
-        onClick = { /* Do something! */ },
+        selected = selected,
+        onClick = { selected = !selected },
         label = { Text("Input Chip") },
         avatar = {
             Icon(
                 Icons.Filled.Person,
                 contentDescription = "Localized description",
                 Modifier.size(InputChipDefaults.AvatarSize)
-            )
-        },
-        trailingIcon = {
-            Icon(
-                Icons.Filled.Close,
-                contentDescription = "Localized description",
-                Modifier.size(InputChipDefaults.IconSize)
             )
         }
     )
@@ -217,7 +217,7 @@ fun ChipGroupSingleLineSample() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Row(modifier = Modifier.horizontalScroll(rememberScrollState())) {
             repeat(9) { index ->
-                InputChip(
+                AssistChip(
                     modifier = Modifier.padding(horizontal = 4.dp),
                     onClick = { /* do something*/ },
                     label = { Text("Chip $index") }

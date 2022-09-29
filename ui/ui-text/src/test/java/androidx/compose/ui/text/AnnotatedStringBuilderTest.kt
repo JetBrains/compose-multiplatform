@@ -769,6 +769,67 @@ class AnnotatedStringBuilderTest {
         assertThat(buildResult.getStringAnnotations(tag, 10, 11)).isEmpty()
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun getAnnotation_separates_urlAnnotation_and_stringAnnotation() {
+        val annotation1 = UrlAnnotation("abc")
+        val annotation2 = "annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushUrlAnnotation(annotation1)
+            append("Hello")
+            pushStringAnnotation(tag, annotation2)
+            append("world")
+            pop()
+            append("!")
+            pop()
+        }.toAnnotatedString()
+
+        // The final result is Helloworld!
+        //                     [         ] UrlAnnotation
+        //                          [   ]  Range<String>
+        assertThat(buildResult.getUrlAnnotations(0, 5)).isEqualTo(
+            listOf(Range(annotation1, 0, 11, ""))
+        )
+        assertThat(buildResult.getUrlAnnotations(5, 6)).isEqualTo(
+            listOf(Range(annotation1, 0, 11, ""))
+        )
+
+        assertThat(buildResult.getStringAnnotations(0, 5)).isEmpty()
+        assertThat(buildResult.getStringAnnotations(5, 6)).isEqualTo(
+            listOf(Range(annotation2, 5, 10, tag))
+        )
+        assertThat(buildResult.getStringAnnotations(10, 11)).isEmpty()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun getAnnotation_withTag_withUrlAnnotation_withStringAnnotation() {
+        val annotation1 = UrlAnnotation("abc")
+        val annotation2 = "annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushUrlAnnotation(annotation1)
+            append("Hello")
+            pushStringAnnotation(tag, annotation2)
+            append("world")
+            pop()
+            append("!")
+            pop()
+        }.toAnnotatedString()
+
+        // The final result is Helloworld!
+        //                     [         ] UrlAnnotation
+        //                          [   ]  Range<String>
+        assertThat(buildResult.getStringAnnotations(tag, 0, 5)).isEmpty()
+        assertThat(buildResult.getStringAnnotations(tag, 5, 6)).isEqualTo(
+            listOf(Range(annotation2, 5, 10, tag))
+        )
+        // The tag doesn't match, return empty list.
+        assertThat(buildResult.getStringAnnotations("tag1", 5, 6)).isEmpty()
+        assertThat(buildResult.getStringAnnotations(tag, 10, 11)).isEmpty()
+    }
+
     private fun createAnnotatedString(
         text: String,
         color: Color = Color.Red,

@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
@@ -30,6 +31,7 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Up
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -58,9 +60,10 @@ class TwoDimensionalFocusTraversalTest(param: Param) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
-        fun initParameters() = listOf(Param(Left), Param(Right), Param(Up), Param(Down))
+        fun initParameters() = listOf(Left, Right, Up, Down).map { Param(it) }
     }
 
+    @FlakyTest(bugId = 233373546)
     @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun movesFocusAmongSiblingsDeepInTheFocusHierarchy() {
@@ -422,7 +425,7 @@ private fun FocusableBox(
     deactivated: Boolean = false,
     content: @Composable () -> Unit = {}
 ) {
-    FocusableBox(isFocused, x, y, width, height, focusRequester, deactivated, content)
+    FocusableBox(isFocused, x, y, width, height, focusRequester, deactivated, Modifier, content)
 }
 
 private val MutableList<MutableState<Boolean>>.values get() = this.map { it.value }

@@ -44,11 +44,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextOverflow
@@ -64,7 +64,6 @@ private fun Float.format(digits: Int = 2) = "%.${digits}f".format(this)
 private val FontSize = 60.sp
 
 @Preview
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun TextLineHeightDemo() {
     Column(
@@ -172,7 +171,6 @@ private fun LineHeightConfiguration(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightStyleConfiguration(
     lineHeightStyleEnabled: MutableState<Boolean>,
@@ -194,7 +192,6 @@ private fun LineHeightStyleConfiguration(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightAlignmentOptions(
     lineHeightAlignment: MutableState<LineHeightStyle.Alignment>,
@@ -235,7 +232,6 @@ private fun LineHeightAlignmentOptions(
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun LineHeightTrimOptions(
     lineHeightTrim: MutableState<Trim>,
@@ -362,7 +358,6 @@ private fun SnappingSlider(
 }
 
 @Suppress("DEPRECATION")
-@OptIn(ExperimentalTextApi::class)
 @Composable
 private fun TextWithLineHeight(
     lineHeightEnabled: Boolean,
@@ -431,5 +426,21 @@ private fun TextWithLineHeight(
                 softWrap = !singleLine
             )
         }
+        Spacer(Modifier.padding(16.dp))
+
+        Column(Modifier.width(width)) {
+            var textFieldValue by remember(text) { mutableStateOf(TextFieldValue(text)) }
+
+            TextFieldWithMetrics(
+                value = textFieldValue,
+                onValueChange = {
+                    textFieldValue = it
+                },
+                style = style,
+                maxLines = maxLines,
+                softWrap = !singleLine
+            )
+        }
+        Spacer(Modifier.padding(16.dp))
     }
 }

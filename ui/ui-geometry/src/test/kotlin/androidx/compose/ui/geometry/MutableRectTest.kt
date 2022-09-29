@@ -51,18 +51,18 @@ class MutableRectTest {
     @Test
     fun contains() {
         val r = MutableRect(1f, 3f, 5f, 9f)
-        assertTrue(r.contains(Offset(1f, 3f)))
-        assertTrue(r.contains(Offset(3f, 3f)))
-        assertFalse(r.contains(Offset(5f, 3f)))
-        assertTrue(r.contains(Offset(1f, 6f)))
-        assertTrue(r.contains(Offset(3f, 6f)))
-        assertFalse(r.contains(Offset(5f, 6f)))
-        assertFalse(r.contains(Offset(1f, 9f)))
-        assertFalse(r.contains(Offset(3f, 9f)))
-        assertFalse(r.contains(Offset(5f, 9f)))
-        assertFalse(r.contains(Offset(0f, 0f)))
-        assertFalse(r.contains(Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY)))
-        assertFalse(r.contains(Offset(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY)))
+        assertTrue(Offset(1f, 3f) in r)
+        assertTrue(Offset(3f, 3f) in r)
+        assertFalse(Offset(5f, 3f) in r)
+        assertTrue(Offset(1f, 6f) in r)
+        assertTrue(Offset(3f, 6f) in r)
+        assertFalse(Offset(5f, 6f) in r)
+        assertFalse(Offset(1f, 9f) in r)
+        assertFalse(Offset(3f, 9f) in r)
+        assertFalse(Offset(5f, 9f) in r)
+        assertFalse(Offset(0f, 0f) in r)
+        assertFalse(Offset(Float.POSITIVE_INFINITY, Float.POSITIVE_INFINITY) in r)
+        assertFalse(Offset(Float.NEGATIVE_INFINITY, Float.NEGATIVE_INFINITY) in r)
     }
 
     @Test

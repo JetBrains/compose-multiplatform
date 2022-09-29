@@ -20,6 +20,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -61,6 +62,16 @@ class ParametersTestActivity : ComponentActivity() {
                     Column {
                         Text("five")
                     }
+                }
+                Row(modifier = Modifier.semantics(true) {}) {
+                    Text("Text1")
+                    Text("Text2")
+                    Text("Text3")
+                    Text("Text4")
+                    Text("Text5")
+                    Text("Text6")
+                    Text("Text7")
+                    Text("Text8")
                 }
             }
         }

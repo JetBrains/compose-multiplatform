@@ -20,6 +20,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
@@ -33,6 +34,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -78,7 +80,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -95,7 +103,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -112,7 +126,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("content"))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
                 },
                 content = {}
             )
@@ -123,6 +143,30 @@ class ModalNavigationDrawerTest {
     }
 
     @Test
+    fun navigationDrawer_sheet_respectsContentPadding() {
+        rule.setMaterialContent(lightColorScheme()) {
+            val drawerState = rememberDrawerState(DrawerValue.Open)
+            ModalNavigationDrawer(
+                drawerState = drawerState,
+                drawerContent = {
+                    ModalDrawerSheet(windowInsets = WindowInsets(10.dp, 10.dp, 10.dp, 10.dp)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag("content")
+                        )
+                    }
+                },
+                content = {}
+            )
+        }
+
+        rule.onNodeWithTag("content")
+            .assertTopPositionInRootIsEqualTo(10.dp)
+            .assertLeftPositionInRootIsEqualTo(10.dp)
+    }
+
+    @Test
     @SmallTest
     fun navigationDrawer_hasPaneTitle() {
         lateinit var navigationMenu: String
@@ -130,7 +174,12 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag("navigationDrawerTag"))
+                    ModalDrawerSheet(Modifier.testTag("navigationDrawerTag")) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                        )
+                    }
                 },
                 content = {}
             )
@@ -151,7 +200,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -180,7 +235,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -209,7 +270,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -238,7 +305,13 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {}
             )
@@ -270,10 +343,19 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().clickable { drawerClicks += 1 })
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .clickable { drawerClicks += 1 })
+                    }
                 },
                 content = {
-                    Box(Modifier.testTag(DrawerTestTag).fillMaxSize().clickable { bodyClicks += 1 })
+                    Box(
+                        Modifier
+                            .testTag(DrawerTestTag)
+                            .fillMaxSize()
+                            .clickable { bodyClicks += 1 })
                 }
             )
         }
@@ -310,10 +392,19 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {
-                    Box(Modifier.fillMaxSize().clickable { bodyClicks += 1 })
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .clickable { bodyClicks += 1 })
                 }
             )
         }
@@ -346,10 +437,20 @@ class ModalNavigationDrawerTest {
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        Box(Modifier.fillMaxSize().background(color = Color.Magenta))
+                        ModalDrawerSheet {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.Magenta)
+                            )
+                        }
                     },
                     content = {
-                        Box(Modifier.fillMaxSize().background(color = Color.Red))
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(color = Color.Red)
+                        )
                     }
                 )
             }
@@ -385,14 +486,20 @@ class ModalNavigationDrawerTest {
                 ModalNavigationDrawer(
                     drawerState = drawerState,
                     drawerContent = {
-                        Box(
-                            Modifier.fillMaxSize()
-                                .testTag("content")
-                                .background(color = Color.Magenta)
-                        )
+                        ModalDrawerSheet(Modifier.testTag("content")) {
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.Magenta)
+                            )
+                        }
                     },
                     content = {
-                        Box(Modifier.fillMaxSize().background(color = Color.Red))
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(color = Color.Red)
+                        )
                     }
                 )
             }
@@ -427,10 +534,20 @@ class ModalNavigationDrawerTest {
                     ModalNavigationDrawer(
                         drawerState = drawerState,
                         drawerContent = {
-                            Box(Modifier.fillMaxSize().background(color = Color.Magenta))
+                            ModalDrawerSheet {
+                                Box(
+                                    Modifier
+                                        .fillMaxSize()
+                                        .background(color = Color.Magenta)
+                                )
+                            }
                         },
                         content = {
-                            Box(Modifier.fillMaxSize().background(color = Color.Red))
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color = Color.Red)
+                            )
                         }
                     )
                 }
@@ -463,7 +580,12 @@ class ModalNavigationDrawerTest {
             ModalNavigationDrawer(
                 drawerState = drawerState,
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet(Modifier.testTag(DrawerTestTag)) {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                        )
+                    }
                 },
                 content = {}
             )
@@ -500,10 +622,20 @@ class ModalNavigationDrawerTest {
                 modifier = Modifier.testTag(topTag),
                 drawerState = rememberDrawerState(DrawerValue.Open),
                 drawerContent = {
-                    Box(Modifier.fillMaxSize().testTag(DrawerTestTag))
+                    ModalDrawerSheet {
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .testTag(DrawerTestTag)
+                        )
+                    }
                 },
                 content = {
-                    Box(Modifier.fillMaxSize().testTag("body"))
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .testTag("body")
+                    )
                 }
             )
             closeDrawer = getString(Strings.CloseDrawer)

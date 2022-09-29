@@ -209,7 +209,7 @@ class TextLayoutInput private constructor(
         )
     }
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextLayoutInput) return false
 
@@ -366,7 +366,16 @@ class TextLayoutResult constructor(
     val lineCount: Int get() = multiParagraph.lineCount
 
     /**
-     * Returns the end offset of the given line, inclusive.
+     * Returns the start offset of the given line, inclusive.
+     *
+     * The start offset represents a position in text before the first character in the given line.
+     * For example, `getLineStart(1)` will return 4 for the text below
+     * <pre>
+     * ┌────┐
+     * │abcd│
+     * │efg │
+     * └────┘
+     * </pre>
      *
      * @param lineIndex the line number
      * @return the start offset of the line
@@ -374,10 +383,19 @@ class TextLayoutResult constructor(
     fun getLineStart(lineIndex: Int): Int = multiParagraph.getLineStart(lineIndex)
 
     /**
-     * Returns the end offset of the given line
+     * Returns the end offset of the given line.
+     *
+     * The end offset represents a position in text after the last character in the given line.
+     * For example, `getLineEnd(0)` will return 4 for the text below
+     * <pre>
+     * ┌────┐
+     * │abcd│
+     * │efg │
+     * └────┘
+     * </pre>
      *
      * Characters being ellipsized are treated as invisible characters. So that if visibleEnd is
-     * false, it will return line end including the ellipsized characters and vice verse.
+     * false, it will return line end including the ellipsized characters and vice versa.
      *
      * @param lineIndex the line number
      * @param visibleEnd if true, the returned line end will not count trailing whitespaces or
@@ -389,10 +407,10 @@ class TextLayoutResult constructor(
         multiParagraph.getLineEnd(lineIndex, visibleEnd)
 
     /**
-     * Returns true if ellipsis happens on the given line, otherwise returns false
+     * Returns true if the given line is ellipsized, otherwise returns false.
      *
      * @param lineIndex a 0 based line index
-     * @return true if ellipsis happens on the given line, otherwise false
+     * @return true if the given line is ellipsized, otherwise false
      */
     fun isLineEllipsized(lineIndex: Int): Boolean = multiParagraph.isLineEllipsized(lineIndex)
 
@@ -548,7 +566,7 @@ class TextLayoutResult constructor(
         )
     }
 
-    override operator fun equals(other: Any?): Boolean {
+    override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextLayoutResult) return false
 

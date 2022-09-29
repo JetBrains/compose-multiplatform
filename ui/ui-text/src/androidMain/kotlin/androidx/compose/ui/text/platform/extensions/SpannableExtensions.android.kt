@@ -126,14 +126,17 @@ internal fun Spannable.setLineHeight(
 ) {
     val resolvedLineHeight = resolveLineHeightInPx(lineHeight, contextFontSize, density)
     if (!resolvedLineHeight.isNaN()) {
+        // in order to handle empty lines (including empty text) better, change endIndex so that
+        // it won't apply trimLastLineBottom rule
+        val endIndex = if (isEmpty() || last() == '\n') length + 1 else length
         setSpan(
             span = LineHeightStyleSpan(
                 lineHeight = resolvedLineHeight,
                 startIndex = 0,
-                endIndex = length,
+                endIndex = endIndex,
                 trimFirstLineTop = lineHeightStyle.trim.isTrimFirstLineTop(),
                 trimLastLineBottom = lineHeightStyle.trim.isTrimLastLineBottom(),
-                topPercentage = lineHeightStyle.alignment.topPercentage
+                topRatio = lineHeightStyle.alignment.topRatio
             ),
             start = 0,
             end = length
@@ -218,7 +221,7 @@ private fun Spannable.setSpanStyle(
 
     setColor(style.color, start, end)
 
-    setBrush(style.brush, start, end)
+    setBrush(style.brush, style.alpha, start, end)
 
     setTextDecoration(style.textDecoration, start, end)
 
@@ -400,7 +403,12 @@ private fun createLetterSpacingSpan(
 private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {
     shadow?.let {
         setSpan(
-            ShadowSpan(it.color.toArgb(), it.offset.x, it.offset.y, it.blurRadius),
+            ShadowSpan(
+                it.color.toArgb(),
+                it.offset.x,
+                it.offset.y,
+                correctBlurRadius(it.blurRadius)
+            ),
             start,
             end
         )
@@ -495,6 +503,7 @@ private fun Spannable.setBaselineShift(baselineShift: BaselineShift?, start: Int
 
 private fun Spannable.setBrush(
     brush: Brush?,
+    alpha: Float,
     start: Int,
     end: Int
 ) {
@@ -504,7 +513,7 @@ private fun Spannable.setBrush(
                 setColor(brush.value, start, end)
             }
             is ShaderBrush -> {
-                setSpan(ShaderBrushSpan(brush), start, end)
+                setSpan(ShaderBrushSpan(brush, alpha), start, end)
             }
         }
     }

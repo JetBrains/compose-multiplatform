@@ -107,7 +107,15 @@ class EditProcessor {
      * @return the [TextFieldValue] representation of the final buffer state.
      */
     fun apply(editCommands: List<EditCommand>): TextFieldValue {
-        editCommands.fastForEach { it.applyTo(mBuffer) }
+        var lastCommand: EditCommand? = null
+        try {
+            editCommands.fastForEach {
+                lastCommand = it
+                it.applyTo(mBuffer)
+            }
+        } catch (e: Exception) {
+            throw RuntimeException(generateBatchErrorMessage(editCommands, lastCommand), e)
+        }
 
         val newState = TextFieldValue(
             annotatedString = mBuffer.toAnnotatedString(),
@@ -123,4 +131,43 @@ class EditProcessor {
      * Returns the current state of the internal editing buffer as a [TextFieldValue].
      */
     fun toTextFieldValue(): TextFieldValue = mBufferState
+
+    private fun generateBatchErrorMessage(
+        editCommands: List<EditCommand>,
+        failedCommand: EditCommand?,
+    ): String = buildString {
+        appendLine(
+            "Error while applying EditCommand batch to buffer (" +
+                "length=${mBuffer.length}, " +
+                "composition=${mBuffer.composition}, " +
+                "selection=${mBuffer.selection}):"
+        )
+        @Suppress("ListIterator")
+        editCommands.joinTo(this, separator = "\n") {
+            val prefix = if (failedCommand === it) " > " else "   "
+            prefix + it.toStringForLog()
+        }
+    }
+
+    /**
+     * Generate a description of the command that is suitable for logging – this should not include
+     * any user-entered text, which may be sensitive.
+     */
+    private fun EditCommand.toStringForLog(): String = when (this) {
+        is CommitTextCommand ->
+            "CommitTextCommand(text.length=${text.length}, newCursorPosition=$newCursorPosition)"
+        is SetComposingTextCommand ->
+            "SetComposingTextCommand(text.length=${text.length}, " +
+                "newCursorPosition=$newCursorPosition)"
+        is SetComposingRegionCommand -> toString()
+        is DeleteSurroundingTextCommand -> toString()
+        is DeleteSurroundingTextInCodePointsCommand -> toString()
+        is SetSelectionCommand -> toString()
+        is FinishComposingTextCommand -> toString()
+        is BackspaceCommand -> toString()
+        is MoveCursorCommand -> toString()
+        is DeleteAllCommand -> toString()
+        // Do not return toString() by default, since that might contain sensitive text.
+        else -> "Unknown EditCommand: " + (this::class.simpleName ?: "{anonymous EditCommand}")
+    }
 }

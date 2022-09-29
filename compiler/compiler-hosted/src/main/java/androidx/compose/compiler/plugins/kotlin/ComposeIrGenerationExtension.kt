@@ -29,6 +29,7 @@ import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import androidx.compose.compiler.plugins.kotlin.lower.KlibAssignableParamTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableFunctionKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.LiveLiteralTransformer
+import androidx.compose.compiler.plugins.kotlin.lower.WrapJsComposableLambdaLowering
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.CreateDecoysTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.RecordDecoySignaturesTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.SubstituteDecoyCallsTransformer
@@ -37,15 +38,16 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.serialization.DeclarationTable
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
 import org.jetbrains.kotlin.backend.common.serialization.signature.PublicIdSignatureComputer
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
+import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsGlobalDeclarationTable
 import org.jetbrains.kotlin.ir.backend.js.lower.serialization.ir.JsManglerIr
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
-import org.jetbrains.kotlin.resolve.DelegatingBindingTrace
 
 class ComposeIrGenerationExtension(
+    private val configuration: CompilerConfiguration,
     @Suppress("unused") private val liveLiteralsEnabled: Boolean = false,
     @Suppress("unused") private val liveLiteralsV2Enabled: Boolean = false,
     private val generateFunctionKeyMetaClasses: Boolean = false,
@@ -56,7 +58,7 @@ class ComposeIrGenerationExtension(
     private val reportsDestination: String? = null
 ) : IrGenerationExtension {
     var metrics: ModuleMetrics = EmptyModuleMetrics
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
+
     override fun generate(
         moduleFragment: IrModuleFragment,
         pluginContext: IrPluginContext
@@ -64,12 +66,10 @@ class ComposeIrGenerationExtension(
         val isKlibTarget = !pluginContext.platform.isJvm()
         VersionChecker(pluginContext).check()
 
-        // TODO: refactor transformers to work with just BackendContext
-        val bindingTrace = DelegatingBindingTrace(
-            pluginContext.bindingContext,
-            "trace in " +
-                "ComposeIrGenerationExtension"
-        )
+        // Input check.  This should always pass, else something is horribly wrong upstream.
+        // Necessary because oftentimes the issue is upstream (compiler bug, prior plugin, etc)
+        if (configuration.getBoolean(JVMConfigurationKeys.VALIDATE_IR))
+            validateIr(moduleFragment, pluginContext.irBuiltIns)
 
         // create a symbol remapper to be used across all transforms
         val symbolRemapper = ComposableSymbolRemapper()
@@ -84,7 +84,6 @@ class ComposeIrGenerationExtension(
         ClassStabilityTransformer(
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             metrics
         ).lower(moduleFragment)
 
@@ -94,7 +93,6 @@ class ComposeIrGenerationExtension(
             DurableKeyVisitor(),
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             metrics
         ).lower(moduleFragment)
 
@@ -103,7 +101,6 @@ class ComposeIrGenerationExtension(
         val functionKeyTransformer = DurableFunctionKeyTransformer(
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             metrics
         )
 
@@ -113,7 +110,6 @@ class ComposeIrGenerationExtension(
         ComposerLambdaMemoization(
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             metrics
         ).lower(moduleFragment)
 
@@ -139,7 +135,6 @@ class ComposeIrGenerationExtension(
             CreateDecoysTransformer(
                 pluginContext,
                 symbolRemapper,
-                bindingTrace,
                 idSignatureBuilder,
                 metrics,
             ).lower(moduleFragment)
@@ -147,7 +142,6 @@ class ComposeIrGenerationExtension(
             SubstituteDecoyCallsTransformer(
                 pluginContext,
                 symbolRemapper,
-                bindingTrace,
                 idSignatureBuilder,
                 metrics,
             ).lower(moduleFragment)
@@ -159,7 +153,6 @@ class ComposeIrGenerationExtension(
         ComposerParamTransformer(
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             decoysEnabled,
             metrics,
         ).lower(moduleFragment)
@@ -167,7 +160,6 @@ class ComposeIrGenerationExtension(
         ComposableTargetAnnotationsTransformer(
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             metrics
         ).lower(moduleFragment)
 
@@ -178,7 +170,6 @@ class ComposeIrGenerationExtension(
         ComposableFunctionBodyTransformer(
             pluginContext,
             symbolRemapper,
-            bindingTrace,
             metrics,
             sourceInformationEnabled,
             intrinsicRememberEnabled
@@ -192,7 +183,6 @@ class ComposeIrGenerationExtension(
             RecordDecoySignaturesTransformer(
                 pluginContext,
                 symbolRemapper,
-                bindingTrace,
                 idSignatureBuilder,
                 metrics,
                 mangler!!
@@ -203,8 +193,16 @@ class ComposeIrGenerationExtension(
             KlibAssignableParamTransformer(
                 pluginContext,
                 symbolRemapper,
-                bindingTrace,
                 metrics,
+            ).lower(moduleFragment)
+        }
+
+        if (pluginContext.platform.isJs()) {
+            WrapJsComposableLambdaLowering(
+                pluginContext,
+                symbolRemapper,
+                metrics,
+                idSignatureBuilder!!
             ).lower(moduleFragment)
         }
 
@@ -220,5 +218,9 @@ class ComposeIrGenerationExtension(
         if (reportsDestination != null) {
             metrics.saveReportsTo(reportsDestination)
         }
+
+        // Verify that our transformations didn't break something
+        if (configuration.getBoolean(JVMConfigurationKeys.VALIDATE_IR))
+            validateIr(moduleFragment, pluginContext.irBuiltIns)
     }
 }

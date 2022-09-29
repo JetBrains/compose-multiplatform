@@ -88,7 +88,7 @@ internal class IdentityScopeMap<T : Any> {
     inline fun forEachScopeOf(value: Any, block: (scope: T) -> Unit) {
         val index = find(value)
         if (index >= 0) {
-            scopeSetAt(index).forEach(block)
+            scopeSetAt(index).fastForEach(block)
         }
     }
 

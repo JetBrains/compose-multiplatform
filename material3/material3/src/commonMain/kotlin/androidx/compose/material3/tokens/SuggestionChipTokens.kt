@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -47,4 +47,12 @@ internal object SuggestionChipTokens {
     val LabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val LabelTextFont = TypographyKeyTokens.LabelLarge
     val PressedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val DisabledLeadingIconColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledLeadingIconOpacity = 0.38f
+    val DraggedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val FocusLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val HoverLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val LeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val LeadingIconSize = 18.0.dp
+    val PressedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
 }

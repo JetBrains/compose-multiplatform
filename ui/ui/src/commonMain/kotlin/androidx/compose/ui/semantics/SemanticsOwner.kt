@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.semantics
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.util.fastForEach
 
@@ -23,6 +24,7 @@ import androidx.compose.ui.util.fastForEach
  * Owns [SemanticsNode] objects and notifies listeners of changes to the
  * semantics tree
  */
+@OptIn(ExperimentalComposeUiApi::class)
 class SemanticsOwner internal constructor(private val rootNode: LayoutNode) {
     /**
      * The root node of the semantics tree.  Does not contain any unmerged data.

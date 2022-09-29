@@ -44,8 +44,12 @@ open class View {
     }
 
     fun addAt(index: Int, view: View) {
-        if (view.parent != null) {
-            error("View named $name already has a parent")
+        val parent = view.parent
+        if (parent != null) {
+            error(
+                "Inserting a view named ${view.name} into a view named $name which already has " +
+                    "a parent named ${parent.name}"
+            )
         }
         view.parent = this
         children.add(index, view)
@@ -75,6 +79,11 @@ open class View {
             itemsToMove.clear()
             children.addAll(insertLocation, copyOfItems)
         }
+    }
+
+    fun removeAllChildren() {
+        children.fastForEach { child -> child.parent = null }
+        children.clear()
     }
 
     fun attribute(name: String, value: Any) { attributes[name] = value }

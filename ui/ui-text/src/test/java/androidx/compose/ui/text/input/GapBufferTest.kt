@@ -18,10 +18,12 @@ package androidx.compose.ui.text.input
 
 import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.matchers.assertThat
+import com.google.common.truth.Truth.assertThat
+import kotlin.random.Random
+import kotlin.test.assertFailsWith
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import kotlin.random.Random
 
 @OptIn(InternalTextApi::class)
 @RunWith(JUnit4::class)
@@ -559,6 +561,26 @@ class GapBufferTest {
                 replace(0, 3, "XY")
             }
         ).hasChars("XY")
+    }
+
+    @Test
+    fun replace_throws_whenStartGreaterThanEnd() {
+        val buffer = PartialGapBuffer("ABCD")
+
+        val error = assertFailsWith<IllegalArgumentException> {
+            buffer.replace(3, 2, "")
+        }
+        assertThat(error).hasMessageThat().contains("3 > 2")
+    }
+
+    @Test
+    fun replace_throws_whenStartNegative() {
+        val buffer = PartialGapBuffer("ABCD")
+
+        val error = assertFailsWith<IllegalArgumentException> {
+            buffer.replace(-1, 2, "XY")
+        }
+        assertThat(error).hasMessageThat().contains("-1")
     }
 
     // Compare with the result of StringBuffer. We trust the StringBuffer works correctly

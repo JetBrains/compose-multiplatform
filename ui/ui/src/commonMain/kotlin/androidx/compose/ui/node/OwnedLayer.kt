@@ -121,4 +121,16 @@ internal interface OwnedLayer {
      * as new after this call.
      */
     fun reuseLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit)
+
+    /**
+     * Calculates the transform from the parent to the local coordinates and multiplies
+     * [matrix] by the transform.
+     */
+    fun transform(matrix: Matrix)
+
+    /**
+     * Calculates the transform from the layer to the parent and multiplies [matrix] by
+     * the transform.
+     */
+    fun inverseTransform(matrix: Matrix)
 }

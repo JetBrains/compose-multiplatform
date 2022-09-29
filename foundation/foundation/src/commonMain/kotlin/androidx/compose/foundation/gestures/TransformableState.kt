@@ -30,7 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
 import kotlinx.coroutines.coroutineScope
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.foundation.internal.JvmDefaultWithCompatibility
 
 /**
  * State of [transformable]. Allows for a granular control of how different gesture

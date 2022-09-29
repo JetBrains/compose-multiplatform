@@ -520,6 +520,52 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
     }
 
     @Test
+    fun moveItemToTheTopOutsideOfBounds_withStickyHeader() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4))
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 2f, startIndex = 4) {
+                // the existence of this header shouldn't affect the animation aside from
+                // the fact that we need to adjust startIndex because of it`s existence.
+                stickyHeader {}
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            3 to 0,
+            4 to itemSize
+        )
+
+        rule.runOnIdle {
+            list = listOf(2, 4, 0, 3, 1)
+        }
+
+        onAnimationFrame { fraction ->
+            val item1Offset = itemSize * -2 + (itemSize * 3 * fraction).roundToInt()
+            val item4Offset = itemSize - (itemSize * 3 * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, Int>>().apply {
+                if (item4Offset > -itemSize) {
+                    add(4 to item4Offset)
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                }
+                add(3 to 0)
+                if (item1Offset > -itemSize) {
+                    add(1 to item1Offset)
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
     fun moveFirstItemToEndCausingAllItemsToAnimate_withSpacing() {
         var list by mutableStateOf(listOf(0, 1, 2, 3))
         rule.setContent {

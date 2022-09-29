@@ -28,7 +28,6 @@ import org.jetbrains.kotlin.backend.common.ir.remapTypeParameters
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.builders.declarations.IrFunctionBuilder
 import org.jetbrains.kotlin.ir.builders.declarations.buildConstructor
 import org.jetbrains.kotlin.ir.builders.declarations.buildFun
@@ -61,7 +60,6 @@ import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.resolve.BindingTrace
 
 /**
  * Copies each IR declaration that won't match descriptors after Compose transforms (see [shouldBeRemapped]).
@@ -90,13 +88,11 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 class CreateDecoysTransformer(
     pluginContext: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
-    bindingTrace: BindingTrace,
     signatureBuilder: IdSignatureSerializer,
     metrics: ModuleMetrics,
 ) : AbstractDecoysLowering(
     pluginContext = pluginContext,
     symbolRemapper = symbolRemapper,
-    bindingTrace = bindingTrace,
     metrics = metrics,
     signatureBuilder = signatureBuilder
 ), ModuleLoweringPass {
@@ -168,14 +164,12 @@ class CreateDecoysTransformer(
         }
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.decoyImplementationName(): Name {
         return dexSafeName(
             Name.identifier(name.asString() + IMPLEMENTATION_FUNCTION_SUFFIX)
         )
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun IrFunction.copyWithName(
         newName: Name,
         factory: (IrFunctionBuilder.() -> Unit) -> IrFunction = context.irFactory::buildFun

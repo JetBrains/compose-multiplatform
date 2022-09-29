@@ -25,7 +25,6 @@ plugins {
 }
 
 dependencies {
-    kotlinPlugin project(":compose:compiler:compiler")
     implementation(libs.kotlinStdlib)
     implementation project(":core:core")
     implementation project(":compose:runtime:runtime")

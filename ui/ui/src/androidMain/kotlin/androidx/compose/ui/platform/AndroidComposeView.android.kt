@@ -67,10 +67,9 @@ import androidx.compose.ui.autofill.performAutofill
 import androidx.compose.ui.autofill.populateViewStructure
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
-import androidx.compose.ui.focus.FocusDirection.Companion.In
+import androidx.compose.ui.focus.FocusDirection.Companion.Exit
 import androidx.compose.ui.focus.FocusDirection.Companion.Left
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
-import androidx.compose.ui.focus.FocusDirection.Companion.Out
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
@@ -111,6 +110,7 @@ import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
+import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
@@ -121,6 +121,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
@@ -188,7 +189,6 @@ internal class AndroidComposeView(context: Context) :
         private set
 
     private val semanticsModifier = SemanticsModifierCore(
-        id = SemanticsModifierCore.generateSemanticsId(),
         mergeDescendants = false,
         clearAndSetSemantics = false,
         properties = {}
@@ -224,13 +224,13 @@ internal class AndroidComposeView(context: Context) :
 
     override val root = LayoutNode().also {
         it.measurePolicy = RootMeasurePolicy
+        it.density = density
         // Composed modifiers cannot be added here directly
         it.modifier = Modifier
             .then(semanticsModifier)
             .then(rotaryInputModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
-        it.density = density
     }
 
     override val rootForTest: RootForTest = this
@@ -323,7 +323,7 @@ internal class AndroidComposeView(context: Context) :
     override val hasPendingMeasureOrLayout
         get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
 
-    private var globalPosition: IntOffset = IntOffset.Zero
+    private var globalPosition: IntOffset = IntOffset(Int.MAX_VALUE, Int.MAX_VALUE)
 
     private val tmpPositionArray = intArrayOf(0, 0)
     private val viewToWindowMatrix = Matrix()
@@ -433,6 +433,8 @@ internal class AndroidComposeView(context: Context) :
     )
     override val inputModeManager: InputModeManager get() = _inputModeManager
 
+    override val modifierLocalManager: ModifierLocalManager = ModifierLocalManager(this)
+
     /**
      * Provide textToolbar to the user, for text-related operation. Use the Android version of
      * floating toolbar(post-M) and primary toolbar(pre-M).
@@ -535,6 +537,17 @@ internal class AndroidComposeView(context: Context) :
         CalculateMatrixToWindowApi21()
     }
 
+    /**
+     * Keyboard modifiers state might be changed when window is not focused, so window doesn't
+     * receive any key events.
+     * This flag is set when window focus changes. Then we can rely on it when handling the
+     * first movementEvent to get the actual keyboard modifiers state from it.
+     * After window gains focus, the first motionEvent.metaState (after focus gained) is used
+     * to update windowInfo.keyboardModifiers.
+     * See [onWindowFocusChanged] and [sendMotionEvent]
+     */
+    private var keyboardModifiersRequireUpdate = false
+
     init {
         setWillNotDraw(false)
         isFocusable = true
@@ -585,6 +598,7 @@ internal class AndroidComposeView(context: Context) :
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
         _windowInfo.isWindowFocused = hasWindowFocus
+        keyboardModifiersRequireUpdate = true
         super.onWindowFocusChanged(hasWindowFocus)
 
         if (hasWindowFocus) {
@@ -609,6 +623,7 @@ internal class AndroidComposeView(context: Context) :
         if (isFocused) {
             // Focus lies within the Compose hierarchy, so we dispatch the key event to the
             // appropriate place.
+            _windowInfo.keyboardModifiers = PointerKeyboardModifiers(event.metaState)
             sendKeyEvent(KeyEvent(event))
         } else {
             // This Owner has a focused child view, which is a view interop use case,
@@ -709,14 +724,16 @@ internal class AndroidComposeView(context: Context) :
      * from the hierarchy.
      */
     fun removeAndroidView(view: AndroidViewHolder) {
-        androidViewsHandler.removeView(view)
-        androidViewsHandler.layoutNodeToHolder.remove(
-            androidViewsHandler.holderToLayoutNode.remove(view)
-        )
-        ViewCompat.setImportantForAccessibility(
-            view,
-            ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_AUTO
-        )
+        registerOnEndApplyChangesListener {
+            androidViewsHandler.removeViewInLayout(view)
+            androidViewsHandler.layoutNodeToHolder.remove(
+                androidViewsHandler.holderToLayoutNode.remove(view)
+            )
+            ViewCompat.setImportantForAccessibility(
+                view,
+                ViewCompat.IMPORTANT_FOR_ACCESSIBILITY_AUTO
+            )
+        }
     }
 
     /**
@@ -773,16 +790,39 @@ internal class AndroidComposeView(context: Context) :
         measureAndLayoutDelegate.forceMeasureTheSubtree(layoutNode)
     }
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRemeasure(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout(layoutNode)
+            }
+        } else if (measureAndLayoutDelegate.requestRemeasure(layoutNode, forceRequest)) {
             scheduleMeasureAndLayout(layoutNode)
         }
     }
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) {
-        if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
-            scheduleMeasureAndLayout()
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            if (measureAndLayoutDelegate.requestLookaheadRelayout(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout()
+            }
+        } else {
+            if (measureAndLayoutDelegate.requestRelayout(layoutNode, forceRequest)) {
+                scheduleMeasureAndLayout()
+            }
         }
+    }
+
+    override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
+        measureAndLayoutDelegate.requestOnPositionedCallback(layoutNode)
+        scheduleMeasureAndLayout()
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -803,7 +843,7 @@ internal class AndroidComposeView(context: Context) :
                 wasMeasuredWithMultipleConstraints = true
             }
             measureAndLayoutDelegate.updateRootConstraints(constraints)
-            measureAndLayoutDelegate.measureAndLayout(resendMotionEventOnLayout)
+            measureAndLayoutDelegate.measureOnly()
             setMeasuredDimension(root.width, root.height)
             if (_androidViewsHandler != null) {
                 androidViewsHandler.measure(
@@ -826,6 +866,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        measureAndLayoutDelegate.measureAndLayout(resendMotionEventOnLayout)
         onMeasureConstraints = null
         // we postpone onPositioned callbacks until onLayout as LayoutCoordinates
         // are currently wrong if you try to get the global(activity) coordinates -
@@ -848,9 +889,13 @@ internal class AndroidComposeView(context: Context) :
     private fun updatePositionCacheAndDispatch() {
         var positionChanged = false
         getLocationOnScreen(tmpPositionArray)
-        if (globalPosition.x != tmpPositionArray[0] || globalPosition.y != tmpPositionArray[1]) {
+        val (globalX, globalY) = globalPosition
+        if (globalX != tmpPositionArray[0] || globalY != tmpPositionArray[1]) {
             globalPosition = IntOffset(tmpPositionArray[0], tmpPositionArray[1])
-            positionChanged = true
+            if (globalX != Int.MAX_VALUE && globalY != Int.MAX_VALUE) {
+                positionChanged = true
+                root.layoutDelegate.measurePassDelegate.notifyChildrenUsingCoordinatesWhilePlacing()
+            }
         }
         measureAndLayoutDelegate.dispatchOnPositionedCallbacks(forceDispatch = positionChanged)
     }
@@ -941,8 +986,8 @@ internal class AndroidComposeView(context: Context) :
             DirectionLeft -> Left
             DirectionUp -> Up
             DirectionDown -> Down
-            DirectionCenter, Enter, NumPadEnter -> In
-            Back, Escape -> Out
+            DirectionCenter, Enter, NumPadEnter -> FocusDirection.Enter
+            Back, Escape -> Exit
             else -> null
         }
     }
@@ -1040,7 +1085,7 @@ internal class AndroidComposeView(context: Context) :
      */
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
         measureAndLayoutDelegate.requestRemeasure(node)
-        node._children.forEach { invalidateLayoutNodeMeasurement(it) }
+        node.forEachChild { invalidateLayoutNodeMeasurement(it) }
     }
 
     /**
@@ -1048,7 +1093,7 @@ internal class AndroidComposeView(context: Context) :
      */
     private fun invalidateLayers(node: LayoutNode) {
         node.invalidateLayers()
-        node._children.forEach { invalidateLayers(it) }
+        node.forEachChild { invalidateLayers(it) }
     }
 
     override fun invalidateDescendants() {
@@ -1265,6 +1310,10 @@ internal class AndroidComposeView(context: Context) :
     }
 
     private fun sendMotionEvent(motionEvent: MotionEvent): ProcessResult {
+        if (keyboardModifiersRequireUpdate) {
+            keyboardModifiersRequireUpdate = false
+            _windowInfo.keyboardModifiers = PointerKeyboardModifiers(motionEvent.metaState)
+        }
         val pointerInputEvent =
             motionEventAdapter.convertToPointerInputEvent(motionEvent, this)
         return if (pointerInputEvent != null) {

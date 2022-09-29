@@ -32,6 +32,8 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -59,7 +61,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun notPrefetchingForwardInitially() {
-        composeList()
+        composeGrid()
 
         rule.onNodeWithTag("4")
             .assertDoesNotExist()
@@ -67,7 +69,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun notPrefetchingBackwardInitially() {
-        composeList(firstItem = 4)
+        composeGrid(firstItem = 4)
 
         rule.onNodeWithTag("0")
             .assertDoesNotExist()
@@ -75,7 +77,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun prefetchingForwardAfterSmallScroll() {
-        composeList()
+        composeGrid()
 
         rule.runOnIdle {
             runBlocking {
@@ -95,7 +97,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun prefetchingBackwardAfterSmallScroll() {
-        composeList(firstItem = 4, itemOffset = 10)
+        composeGrid(firstItem = 4, itemOffset = 10)
 
         rule.runOnIdle {
             runBlocking {
@@ -115,7 +117,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun prefetchingForwardAndBackward() {
-        composeList(firstItem = 2)
+        composeGrid(firstItem = 2)
 
         rule.runOnIdle {
             runBlocking {
@@ -151,7 +153,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun prefetchingForwardTwice() {
-        composeList()
+        composeGrid()
 
         rule.runOnIdle {
             runBlocking {
@@ -180,7 +182,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun prefetchingBackwardTwice() {
-        composeList(firstItem = 8)
+        composeGrid(firstItem = 8)
 
         rule.runOnIdle {
             runBlocking {
@@ -211,7 +213,7 @@ class LazyGridPrefetcherTest(
 
     @Test
     fun prefetchingForwardAndBackwardReverseLayout() {
-        composeList(firstItem = 2, reverseLayout = true)
+        composeGrid(firstItem = 2, reverseLayout = true)
 
         rule.runOnIdle {
             runBlocking {
@@ -252,7 +254,7 @@ class LazyGridPrefetcherTest(
     @Test
     fun prefetchingForwardAndBackwardWithContentPadding() {
         val halfItemSize = itemsSizeDp / 2f
-        composeList(
+        composeGrid(
             firstItem = 4,
             itemOffset = 5,
             contentPadding = PaddingValues(mainAxis = halfItemSize)
@@ -343,6 +345,79 @@ class LazyGridPrefetcherTest(
         rule.runOnIdle { }
     }
 
+    @Test
+    fun snappingToOtherPositionWhilePrefetchIsScheduled() {
+        val composedItems = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyGridState()
+            LazyGrid(
+                1,
+                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
+                state,
+            ) {
+                items(1000) {
+                    composedItems.add(it)
+                    Spacer(Modifier.mainAxisSize(itemsSizeDp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            // now we have items 0 and 1 visible
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 1 and 2 are visible
+                // and schedule a prefetching for 3
+                state.scrollBy(itemsSizePx.toFloat())
+                // then we move so that items 100 and 101 are visible.
+                // this should cancel the prefetch for 3
+                state.scrollToItem(100)
+            }
+        }
+
+        // wait a few frames to make sure prefetch happens if was scheduled
+        rule.waitForIdle()
+        rule.waitForIdle()
+        rule.waitForIdle()
+
+        rule.runOnIdle {
+            Truth.assertThat(composedItems).doesNotContain(3)
+        }
+    }
+
+    @Test
+    fun scrollingByListSizeCancelsPreviousPrefetch() {
+        composeGrid()
+
+        // now we have items 0-3 visible
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 2-5 are visible
+                // and schedule a prefetching for 6-7
+                state.scrollBy(itemsSizePx.toFloat())
+
+                // move viewport by screen size to items 8-11, so item 6 is just behind
+                // the first visible item
+                state.scrollBy(itemsSizePx * 3f)
+
+                // move scroll further to items 10-13, so item 6 is reused
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+        }
+
+        waitForPrefetch(13)
+
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // scroll again to ensure item 6 was dropped
+                state.scrollBy(itemsSizePx * 100f)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(activeNodes).doesNotContain(6)
+        }
+    }
+
     private fun waitForPrefetch(index: Int) {
         rule.waitUntil {
             activeNodes.contains(index) && activeMeasuredNodes.contains(index)
@@ -352,7 +427,7 @@ class LazyGridPrefetcherTest(
     private val activeNodes = mutableSetOf<Int>()
     private val activeMeasuredNodes = mutableSetOf<Int>()
 
-    private fun composeList(
+    private fun composeGrid(
         firstItem: Int = 0,
         itemOffset: Int = 0,
         reverseLayout: Boolean = false,

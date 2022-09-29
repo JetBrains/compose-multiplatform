@@ -24,7 +24,7 @@ import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.RecomposeScopeImpl
 import androidx.compose.runtime.Stable
 
-private const val SLOTS_PER_INT = 10
+internal const val SLOTS_PER_INT = 10
 private const val BITS_PER_SLOT = 3
 
 internal fun bitsForSlot(bits: Int, slot: Int): Int {

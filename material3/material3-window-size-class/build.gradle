@@ -28,7 +28,6 @@ plugins {
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
@@ -36,10 +35,10 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
-        api(project(":compose:runtime:runtime"))
-        api(project(":compose:ui:ui"))
-        api(project(":compose:ui:ui-unit"))
-        implementation("androidx.window:window:1.1.0-alpha02")
+        api("androidx.compose.runtime:runtime:1.2.0")
+        api("androidx.compose.ui:ui:1.2.0")
+        api("androidx.compose.ui:ui-unit:1.2.0")
+        implementation("androidx.window:window:1.0.0")
 
         testImplementation(libs.kotlinTest)
         testImplementation(libs.truth)
@@ -77,7 +76,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
 
             androidMain.dependencies {
-                implementation("androidx.window:window:1.1.0-alpha02")
+                implementation("androidx.window:window:1.0.0")
             }
 
             androidMain.dependsOn(jvmMain)

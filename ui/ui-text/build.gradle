@@ -40,15 +40,14 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api("androidx.annotation:annotation:1.1.0")
 
         // when updating the runtime version please also update the runtime-saveable version
-        implementation(project(":compose:runtime:runtime"))
-        implementation(project(":compose:runtime:runtime-saveable"))
+        implementation("androidx.compose.runtime:runtime:1.2.0")
+        implementation("androidx.compose.runtime:runtime-saveable:1.2.0")
 
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlib)
-        implementation("androidx.core:core:1.5.0")
+        implementation("androidx.core:core:1.7.0")
         implementation('androidx.collection:collection:1.0.0')
 
-        testImplementation(project(":compose:ui:ui-test-font"))
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.junit)
@@ -58,7 +57,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         testImplementation(libs.kotlinTest)
         testImplementation(libs.mockitoKotlin)
 
-        androidTestImplementation(project(":compose:ui:ui-test-font"))
+        androidTestImplementation(project(":internal-testutils-fonts"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.testRules)
@@ -76,7 +75,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     android {
         sourceSets {
             main {
-                java.srcDirs += "../../../text/text/src/main/java"
+                java.srcDirs += "${supportRootFolder}/text/text/src/main/java"
             }
         }
     }
@@ -124,20 +123,24 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 dependsOn(jvmMain)
             }
 
+            androidMain {
+                dependsOn(commonMain)
+            }
+
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
-                implementation("androidx.core:core:1.5.0")
+                implementation("androidx.core:core:1.7.0")
                 implementation('androidx.collection:collection:1.0.0')
             }
 
-            androidMain.kotlin.srcDirs("../../../text/text/src/main/java")
+            androidMain.kotlin.srcDirs("${supportRootFolder}/text/text/src/main/java")
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
             //  level dependencies block instead:
             //  `dependencies { testImplementation(libs.robolectric) }`
             androidTest.dependencies {
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
@@ -150,7 +153,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:ui:ui-test-font"))
+                implementation(project(":internal-testutils-fonts"))
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.espressoCore)
@@ -168,7 +171,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.skikoCurrentOs)
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":compose:ui:ui-test-font"))
             }
         }
     }

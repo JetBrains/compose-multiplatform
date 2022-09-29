@@ -26,7 +26,7 @@ import androidx.compose.ui.input.pointer.PointerEventPass.Initial
 import androidx.compose.ui.input.pointer.PointerEventPass.Main
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.unit.IntSize
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that can interact with pointer input.
@@ -44,13 +44,15 @@ interface PointerInputModifier : Modifier.Element {
 abstract class PointerInputFilter {
 
     /**
-     * Invoked when pointers that previously hit this [PointerInputFilter] have changed.
+     * Invoked when pointers that previously hit this [PointerInputFilter] have changed. It is
+     * expected that any [PointerInputChange]s that are used during this event and should not be
+     * considered valid to be used in other filters should be marked as consumed by calling
+     * [PointerInputChange.consume].
      *
      * @param pointerEvent The list of [PointerInputChange]s with positions relative to this
      * [PointerInputFilter].
      * @param pass The [PointerEventPass] in which this function is being called.
      * @param bounds The width and height associated with this [PointerInputFilter].
-     * @return The list of [PointerInputChange]s after any aspect of the changes have been consumed.
      *
      * @see PointerInputChange
      * @see PointerEventPass
@@ -93,7 +95,7 @@ abstract class PointerInputFilter {
     /**
      * If `false`, then this [PointerInputFilter] will not allow siblings under it to respond
      * to events. If `true`, this will have the first chance to respond and the next sibling
-     * under will then get a chance to respond as well. This trigger acts as at the Layout
+     * under will then get a chance to respond as well. This trigger acts at the Layout
      * level, so if any [PointerInputFilter]s on a Layout has [shareWithSiblings] set to `true`
      * then the Layout will share with siblings.
      */
@@ -208,6 +210,9 @@ expect fun PointerButtons.indexOfLastPressed(): Int
  */
 @kotlin.jvm.JvmInline
 value class PointerKeyboardModifiers(internal val packedValue: NativePointerKeyboardModifiers)
+
+// helps initialize `WindowInfo.keyboardModifiers` with a non-null value
+internal expect fun EmptyPointerKeyboardModifiers(): PointerKeyboardModifiers
 
 /**
  * `true` when the Control key is pressed.
@@ -373,6 +378,9 @@ value class PointerEventType private constructor(internal val value: Int) {
  * The [position] represents the position of the pointer relative to the element that
  * this [PointerInputChange] is being dispatched to.
  *
+ * Note: The [position] values can be outside the actual bounds of the element itself meaning the
+ * numbers can be negative or larger than the element bounds.
+ *
  * The [previousPosition] represents the position of the pointer offset to the current
  * position of the pointer relative to the screen.
  *
@@ -389,7 +397,7 @@ value class PointerEventType private constructor(internal val value: Int) {
  * @param uptimeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
  * is platform-dependent
  * @param position The [Offset] of the current pointer event, relative to the containing
- * element
+ * element (values can be negative or larger than the element bounds).
  * @param pressed `true` if the pointer event is considered "pressed." For example, finger
  * touching the screen or a mouse button is pressed [pressed] would be `true`.
  * @param previousUptimeMillis The [uptimeMillis] of the previous pointer event
@@ -445,6 +453,7 @@ class PointerInputChange(
         uptimeMillis,
         position,
         pressed,
+        pressure = 1.0f,
         previousUptimeMillis,
         previousPosition,
         previousPressed,
@@ -470,6 +479,38 @@ class PointerInputChange(
         uptimeMillis,
         position,
         pressed,
+        pressure = 1.0f,
+        previousUptimeMillis,
+        previousPosition,
+        previousPressed,
+        isInitiallyConsumed,
+        type,
+        historical,
+        scrollDelta
+    ) {
+        _historical = historical
+    }
+
+    @ExperimentalComposeUiApi
+    internal constructor(
+        id: PointerId,
+        uptimeMillis: Long,
+        position: Offset,
+        pressed: Boolean,
+        pressure: Float,
+        previousUptimeMillis: Long,
+        previousPosition: Offset,
+        previousPressed: Boolean,
+        isInitiallyConsumed: Boolean,
+        type: PointerType,
+        historical: List<HistoricalChange>,
+        scrollDelta: Offset,
+    ) : this(
+        id,
+        uptimeMillis,
+        position,
+        pressed,
+        pressure,
         previousUptimeMillis,
         previousPosition,
         previousPressed,
@@ -479,6 +520,44 @@ class PointerInputChange(
     ) {
         _historical = historical
     }
+
+    @ExperimentalComposeUiApi
+    constructor(
+        id: PointerId,
+        uptimeMillis: Long,
+        position: Offset,
+        pressed: Boolean,
+        pressure: Float,
+        previousUptimeMillis: Long,
+        previousPosition: Offset,
+        previousPressed: Boolean,
+        isInitiallyConsumed: Boolean,
+        type: PointerType = PointerType.Touch,
+        scrollDelta: Offset = Offset.Zero
+    ) : this (
+        id,
+        uptimeMillis,
+        position,
+        pressed,
+        previousUptimeMillis,
+        previousPosition,
+        previousPressed,
+        isInitiallyConsumed,
+        type,
+        scrollDelta
+    ) {
+        _pressure = pressure
+    }
+
+    /**
+     * Pressure for pointer event
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalComposeUiApi
+    @get:ExperimentalComposeUiApi
+    val pressure: Float
+        get() = _pressure ?: 0.0f
+    private var _pressure: Float? = null
 
     /**
      * Optional high-frequency pointer moves in between the last two dispatched events.
@@ -546,6 +625,7 @@ class PointerInputChange(
         currentTime,
         currentPosition,
         currentPressed,
+        this.pressure,
         previousTime,
         previousPosition,
         previousPressed,
@@ -581,6 +661,7 @@ class PointerInputChange(
         currentTime,
         currentPosition,
         currentPressed,
+        this.pressure,
         previousTime,
         previousPosition,
         previousPressed,
@@ -618,6 +699,7 @@ class PointerInputChange(
         currentTime,
         currentPosition,
         currentPressed,
+        this.pressure,
         previousTime,
         previousPosition,
         previousPressed,
@@ -655,6 +737,46 @@ class PointerInputChange(
         currentTime,
         currentPosition,
         currentPressed,
+        this.pressure,
+        previousTime,
+        previousPosition,
+        previousPressed,
+        isInitiallyConsumed = false, // doesn't matter, we will pass a holder anyway
+        type,
+        historical,
+        scrollDelta
+    ).also {
+        it.consumed = this.consumed
+    }
+
+    /**
+     * Make a shallow copy of the [PointerInputChange]
+     *
+     * **NOTE:** Due to the need of the inner contract of the [PointerInputChange], this method
+     * performs a shallow copy of the [PointerInputChange]. Any [consume] call between any of the
+     * copies will consume any other copy automatically. Therefore, copy with the new [isConsumed]
+     * is not possible. Consider creating a new [PointerInputChange].
+     */
+    @ExperimentalComposeUiApi
+    @Suppress("DEPRECATION")
+    fun copy(
+        id: PointerId = this.id,
+        currentTime: Long = this.uptimeMillis,
+        currentPosition: Offset = this.position,
+        currentPressed: Boolean = this.pressed,
+        pressure: Float = this.pressure,
+        previousTime: Long = this.previousUptimeMillis,
+        previousPosition: Offset = this.previousPosition,
+        previousPressed: Boolean = this.previousPressed,
+        type: PointerType = this.type,
+        historical: List<HistoricalChange>,
+        scrollDelta: Offset = this.scrollDelta
+    ): PointerInputChange = PointerInputChange(
+        id,
+        currentTime,
+        currentPosition,
+        currentPressed,
+        pressure,
         previousTime,
         previousPosition,
         previousPressed,
@@ -671,6 +793,7 @@ class PointerInputChange(
             "uptimeMillis=$uptimeMillis, " +
             "position=$position, " +
             "pressed=$pressed, " +
+            "pressure=$pressure, " +
             "previousUptimeMillis=$previousUptimeMillis, " +
             "previousPosition=$previousPosition, " +
             "previousPressed=$previousPressed, " +

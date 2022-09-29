@@ -27,7 +27,7 @@ import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.ProvidableModifierLocal
 import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.debugInspectorInfo
-import kotlin.jvm.JvmDefaultWithCompatibility
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * A [modifier][Modifier.Element] that is used to pass in a [FocusRequester] that can be used to
@@ -98,8 +98,8 @@ internal class FocusRequesterModifierLocal(
     fun findFocusNode(): FocusModifier? {
         // find the first child:
         val first = focusModifiers.fold(null as FocusModifier?) { mod1, mod2 ->
-            var layoutNode1 = mod1?.layoutNodeWrapper?.layoutNode ?: return@fold mod2
-            var layoutNode2 = mod2.layoutNodeWrapper?.layoutNode ?: return@fold mod1
+            var layoutNode1 = mod1?.coordinator?.layoutNode ?: return@fold mod2
+            var layoutNode2 = mod2.coordinator?.layoutNode ?: return@fold mod1
 
             while (layoutNode1.depth > layoutNode2.depth) {
                 layoutNode1 = layoutNode1.parent!!
@@ -113,7 +113,7 @@ internal class FocusRequesterModifierLocal(
                 layoutNode1 = layoutNode1.parent!!
                 layoutNode2 = layoutNode2.parent!!
             }
-            val children = layoutNode1.parent!!._children
+            val children = layoutNode1.parent!!.children
             val index1 = children.indexOf(layoutNode1)
             val index2 = children.indexOf(layoutNode2)
             if (index1 < index2) mod1 else mod2

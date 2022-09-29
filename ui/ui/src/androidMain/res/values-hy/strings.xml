@@ -17,7 +17,7 @@
 
 <resources xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
-    <string name="indeterminate" msgid="2486394087603402002">"Նշումը ո՛չ դրված է, ո՛չ էլ հանված"</string>
+    <string name="indeterminate" msgid="7933458017204019916">"Մասնակի նշված"</string>
     <string name="on" msgid="8655164131929253426">"Միացված է"</string>
     <string name="off" msgid="875452955155264703">"Անջատված է"</string>
     <string name="selected" msgid="6043586758067023">"Ընտրված է"</string>

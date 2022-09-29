@@ -23,6 +23,7 @@ import androidx.compose.material3.tokens.BadgeTokens
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -56,6 +57,7 @@ class BadgeTest {
     @get:Rule
     val rule = createComposeRule()
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badge_noContent_size() {
         rule
@@ -66,6 +68,7 @@ class BadgeTest {
             .assertWidthIsEqualTo(BadgeTokens.Size)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badge_shortContent_size() {
         rule
@@ -76,6 +79,7 @@ class BadgeTest {
             .assertWidthIsEqualTo(BadgeTokens.LargeSize)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badge_longContent_size() {
         rule
@@ -86,6 +90,7 @@ class BadgeTest {
             .assertWidthIsAtLeast(BadgeTokens.LargeSize)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badge_shortContent_customSizeModifier_size() {
         val customWidth = 24.dp
@@ -100,10 +105,11 @@ class BadgeTest {
             .assertWidthIsEqualTo(customWidth)
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun badge_noContent_shape() {
-        var shape = Shapes.None
+        var shape = RectangleShape
         var errorColor = Color.Unspecified
         rule.setMaterialContent(lightColorScheme()) {
             shape = BadgeTokens.Shape.toShape()
@@ -122,6 +128,7 @@ class BadgeTest {
             )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badgeBox_noContent_position() {
         rule
@@ -145,6 +152,7 @@ class BadgeTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badgeBox_shortContent_position() {
         rule
@@ -172,6 +180,7 @@ class BadgeTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badgeBox_longContent_position() {
         rule
@@ -196,6 +205,7 @@ class BadgeTest {
         )
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badge_notMergingDescendants_withOwnContentDescription() {
         rule.setMaterialContent(lightColorScheme()) {
@@ -220,6 +230,7 @@ class BadgeTest {
         rule.onNodeWithTag(TestAnchorTag).assertContentDescriptionEquals("inbox")
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @Test
     fun badgeBox_size() {
         rule.setMaterialContentForSizeAssertions {

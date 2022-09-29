@@ -82,11 +82,14 @@ interface BringIntoViewResponder {
      * `Animatable` you get this for free, since it will cancel the previous animation when a new
      * one is started while preserving velocity.
      *
-     * @param localRect The rectangle that should be brought into view, relative to this node. This
-     * is the same rectangle that will have been passed to [calculateRectForParent].
+     * @param localRect A function returning the rectangle that should be brought into view,
+     * relative to this node. This is the same rectangle that will have been passed to
+     * [calculateRectForParent]. The function may return a different value over time, if the bounds
+     * of the request change while the request is being processed. If the rectangle cannot be
+     * calculated, e.g. because the [LayoutCoordinates] are not attached, return null.
      */
     @ExperimentalFoundationApi
-    suspend fun bringChildIntoView(localRect: Rect)
+    suspend fun bringChildIntoView(localRect: () -> Rect?)
 }
 
 /**
@@ -185,14 +188,21 @@ private class BringIntoViewResponderModifier(
     private var newestDispatchedRequest: Pair<Rect, Job>? = null
 
     /**
-     * Responds to a child's request by first converting [rect] into this node's [LayoutCoordinates]
+     * Responds to a child's request by first converting [boundsProvider] into this node's [LayoutCoordinates]
      * and then, concurrently, calling the [responder] and the [parent] to handle the request.
      */
-    override suspend fun bringChildIntoView(rect: Rect, childCoordinates: LayoutCoordinates) {
+    override suspend fun bringChildIntoView(
+        childCoordinates: LayoutCoordinates,
+        boundsProvider: () -> Rect?
+    ) {
         coroutineScope {
             val layoutCoordinates = layoutCoordinates ?: return@coroutineScope
             if (!childCoordinates.isAttached) return@coroutineScope
-            val localRect = layoutCoordinates.localRectOf(childCoordinates, rect)
+            // TODO(b/241591211) Read the request's bounds lazily in case they change.
+            val localRect = layoutCoordinates.localRectOf(
+                sourceCoordinates = childCoordinates,
+                rect = boundsProvider() ?: return@coroutineScope
+            )
 
             // Immediately make this request the tail of the queue, before suspending, so that
             // any requests that come in while suspended will join on this one.
@@ -264,12 +274,14 @@ private class BringIntoViewResponderModifier(
             // parent, or parent before the child).
             launch {
                 // Bring the requested Child into this parent's view.
-                responder.bringChildIntoView(localRect)
+                // TODO(b/241591211) Read the request's bounds lazily in case they change.
+                responder.bringChildIntoView { localRect }
             }
 
             // TODO I think this needs to be in launch, since if the parent is cancelled (this
             //  throws a CE) due to animation interruption, the child should continue animating.
-            parent.bringChildIntoView(parentRect, layoutCoordinates)
+            // TODO(b/241591211) Read the request's bounds lazily in case they change.
+            parent.bringChildIntoView(layoutCoordinates) { parentRect }
         }
         // Don't try to null out newestDispatchedRequest here, bringChildIntoView will take care of
         // that.

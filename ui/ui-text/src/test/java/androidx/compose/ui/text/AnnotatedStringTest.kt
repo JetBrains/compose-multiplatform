@@ -498,4 +498,65 @@ class AnnotatedStringTest {
         val text = "abc"
         assertThat(AnnotatedString(text).toString()).isEqualTo(text)
     }
+
+    @Test
+    fun toUpperCase_andAnnotatedString_dontCrash() {
+        val annotatedString = buildAnnotatedString {
+            append("non-empty something")
+            pushStringAnnotation("tag", "annotation")
+            append("non-empty anything")
+            pop()
+        }
+        annotatedString.toUpperCase()
+    }
+
+    @Test
+    fun toUpperCase_andAnnotatedString_annotationAtStart_dontCrash() {
+        val annotatedString = buildAnnotatedString {
+            pushStringAnnotation("tag", "annotation")
+            append("non-empty anything")
+            pop()
+            append("non-empty something")
+        }
+        annotatedString.toUpperCase()
+    }
+
+    @Test
+    fun toUpperCase_andAnnotatedString_annotationInMiddle_dontCrash() {
+        val annotatedString = buildAnnotatedString {
+            append("non-empty before")
+            pushStringAnnotation("tag", "annotation")
+            append("non-empty anything")
+            pop()
+            append("non-empty after")
+        }
+        annotatedString.toUpperCase()
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun subSequence_throws_exception_for_overlapping_paragraphStyles() {
+        buildAnnotatedString {
+            append("1234")
+            addStyle(ParagraphStyle(), 0, 2)
+            addStyle(ParagraphStyle(), 1, 3)
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun subSequence_throws_exception_for_overlapping_paragraphStyles_when_not_sorted() {
+        buildAnnotatedString {
+            append("1234")
+            addStyle(ParagraphStyle(), 1, 3)
+            addStyle(ParagraphStyle(), 0, 2)
+        }
+    }
+
+    @Test
+    fun doesNot_throw_exception_if_paragraphStyles_are_not_sorted() {
+        buildAnnotatedString {
+            append("1234")
+            addStyle(ParagraphStyle(), 3, 4)
+            addStyle(ParagraphStyle(), 0, 2)
+        }
+    }
 }

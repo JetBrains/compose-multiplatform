@@ -23,6 +23,9 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.foundation.EdgeEffectCompat.distanceCompat
 import androidx.compose.foundation.EdgeEffectCompat.onAbsorbCompat
 import androidx.compose.foundation.EdgeEffectCompat.onPullDistanceCompat
+import androidx.compose.foundation.EdgeEffectCompat.onReleaseWithOppositeDelta
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
@@ -39,6 +42,8 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.InspectorInfo
@@ -49,6 +54,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.util.fastAny
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.roundToInt
 
@@ -99,6 +105,8 @@ internal class AndroidEdgeEffectOverscrollEffect(
     context: Context,
     private val overscrollConfig: OverscrollConfiguration
 ) : OverscrollEffect {
+    private var pointerPosition: Offset? = null
+
     private val topEffect = EdgeEffectCompat.create(context, null)
     private val bottomEffect = EdgeEffectCompat.create(context, null)
     private val leftEffect = EdgeEffectCompat.create(context, null)
@@ -126,9 +134,11 @@ internal class AndroidEdgeEffectOverscrollEffect(
 
     override fun consumePreScroll(
         scrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset {
+        if (containerSize.isEmpty()) {
+            return Offset.Zero
+        }
         if (!scrollCycleInProgress) {
             stopOverscrollAnimation()
             scrollCycleInProgress = true
@@ -170,9 +180,11 @@ internal class AndroidEdgeEffectOverscrollEffect(
     override fun consumePostScroll(
         initialDragDelta: Offset,
         overscrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
+        if (containerSize.isEmpty()) {
+            return
+        }
         var needsInvalidation = false
         if (source == NestedScrollSource.Drag) {
             val pointer = pointerPosition ?: containerSize.center
@@ -193,6 +205,9 @@ internal class AndroidEdgeEffectOverscrollEffect(
     }
 
     override suspend fun consumePreFling(velocity: Velocity): Velocity {
+        if (containerSize.isEmpty()) {
+            return Velocity.Zero
+        }
         val consumedX = if (velocity.x > 0f && leftEffect.distanceCompat != 0f) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
             velocity.x
@@ -217,6 +232,9 @@ internal class AndroidEdgeEffectOverscrollEffect(
     }
 
     override suspend fun consumePostFling(velocity: Velocity) {
+        if (containerSize.isEmpty()) {
+            return
+        }
         scrollCycleInProgress = false
         if (velocity.x > 0) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
@@ -296,8 +314,34 @@ internal class AndroidEdgeEffectOverscrollEffect(
         }
     }
 
+    private var pointerId: PointerId? = null
+
     override val effectModifier: Modifier = Modifier
         .then(StretchOverscrollNonClippingLayer)
+        .pointerInput(Unit) {
+            forEachGesture {
+                awaitPointerEventScope {
+                    val down = awaitFirstDown(requireUnconsumed = false)
+                    pointerId = down.id
+                    pointerPosition = down.position
+                    do {
+                        val pressedChanges = awaitPointerEvent().changes.fastFilter { it.pressed }
+                        // If the same ID we are already tracking is down, use that. Otherwise, use
+                        // the next down, to move the overscroll to the next pointer.
+                        val change = pressedChanges
+                            .fastFirstOrNull { it.id == pointerId } ?: pressedChanges.firstOrNull()
+                        if (change != null) {
+                            // Update the id if we are now tracking a new down
+                            pointerId = change.id
+                            pointerPosition = change.position
+                        }
+                    } while (pressedChanges.isNotEmpty())
+                    pointerId = null
+                    // Explicitly not resetting the pointer position until the next down, so we
+                    // don't change any existing effects
+                }
+            }
+        }
         .onSizeChanged(onNewSize)
         .then(
             DrawOverscrollModifier(
@@ -309,7 +353,10 @@ internal class AndroidEdgeEffectOverscrollEffect(
         )
 
     fun DrawScope.drawOverscroll() {
-        this.drawIntoCanvas { it ->
+        if (containerSize.isEmpty()) {
+            return
+        }
+        this.drawIntoCanvas {
             redrawSignal.value // <-- value read to redraw if needed
             val canvas = it.nativeCanvas
             var needsInvalidate = false
@@ -413,19 +460,19 @@ internal class AndroidEdgeEffectOverscrollEffect(
     private fun releaseOppositeOverscroll(delta: Offset): Boolean {
         var needsInvalidation = false
         if (!leftEffect.isFinished && delta.x < 0) {
-            leftEffect.onRelease()
+            leftEffect.onReleaseWithOppositeDelta(delta = delta.x)
             needsInvalidation = leftEffect.isFinished
         }
         if (!rightEffect.isFinished && delta.x > 0) {
-            rightEffect.onRelease()
+            rightEffect.onReleaseWithOppositeDelta(delta = delta.x)
             needsInvalidation = needsInvalidation || rightEffect.isFinished
         }
         if (!topEffect.isFinished && delta.y < 0) {
-            topEffect.onRelease()
+            topEffect.onReleaseWithOppositeDelta(delta = delta.y)
             needsInvalidation = needsInvalidation || topEffect.isFinished
         }
         if (!bottomEffect.isFinished && delta.y > 0) {
-            bottomEffect.onRelease()
+            bottomEffect.onReleaseWithOppositeDelta(delta = delta.y)
             needsInvalidation = needsInvalidation || bottomEffect.isFinished
         }
         return needsInvalidation
@@ -464,14 +511,12 @@ private val NoOpOverscrollEffect = object : OverscrollEffect {
 
     override fun consumePreScroll(
         scrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ): Offset = Offset.Zero
 
     override fun consumePostScroll(
         initialDragDelta: Offset,
         overscrollDelta: Offset,
-        pointerPosition: Offset?,
         source: NestedScrollSource
     ) {
     }

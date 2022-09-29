@@ -41,7 +41,6 @@ android {
 }
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
 
     if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api("androidx.compose.runtime:runtime:1.1.1")

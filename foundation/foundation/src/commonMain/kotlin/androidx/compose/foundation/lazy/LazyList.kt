@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
 import androidx.compose.foundation.lazy.layout.LazyLayout
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
+import androidx.compose.foundation.lazy.layout.lazyLayoutSemantics
 import androidx.compose.foundation.overscroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -41,7 +42,6 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.offset
@@ -75,7 +75,9 @@ internal fun LazyList(
     content: LazyListScope.() -> Unit
 ) {
     val overscrollEffect = ScrollableDefaults.overscrollEffect()
-    val itemProvider = rememberItemProvider(state, content)
+    val itemProvider = rememberLazyListItemProvider(state, content)
+    val semanticState =
+        rememberLazyListSemanticState(state, itemProvider, reverseLayout, isVertical)
     val beyondBoundsInfo = remember { LazyListBeyondBoundsInfo() }
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
@@ -105,12 +107,10 @@ internal fun LazyList(
         modifier = modifier
             .then(state.remeasurementModifier)
             .then(state.awaitLayoutModifier)
-            .lazyListSemantics(
+            .lazyLayoutSemantics(
                 itemProvider = itemProvider,
-                state = state,
-                coroutineScope = scope,
-                isVertical = isVertical,
-                reverseScrolling = reverseLayout,
+                state = semanticState,
+                orientation = orientation,
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(orientation)
@@ -119,17 +119,11 @@ internal fun LazyList(
             .overscroll(overscrollEffect)
             .scrollable(
                 orientation = orientation,
-                reverseDirection = run {
-                    // A finger moves with the content, not with the viewport. Therefore,
-                    // always reverse once to have "natural" gesture that goes reversed to layout
-                    var reverseDirection = !reverseLayout
-                    // But if rtl and horizontal, things move the other way around
-                    val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-                    if (isRtl && !isVertical) {
-                        reverseDirection = !reverseDirection
-                    }
-                    reverseDirection
-                },
+                reverseDirection = ScrollableDefaults.reverseDirection(
+                    LocalLayoutDirection.current,
+                    orientation,
+                    reverseLayout
+                ),
                 interactionSource = state.internalInteractionSource,
                 flingBehavior = flingBehavior,
                 state = state,
@@ -237,8 +231,10 @@ private fun rememberLazyListMeasurePolicy(
         state.density = this
 
         // this will update the scope used by the item composables
-        itemProvider.itemScope.maxWidth = contentConstraints.maxWidth.toDp()
-        itemProvider.itemScope.maxHeight = contentConstraints.maxHeight.toDp()
+        itemProvider.itemScope.setMaxSize(
+            width = contentConstraints.maxWidth,
+            height = contentConstraints.maxHeight
+        )
 
         val spaceBetweenItemsDp = if (isVertical) {
             requireNotNull(verticalArrangement).spacing
@@ -307,6 +303,7 @@ private fun rememberLazyListMeasurePolicy(
             mainAxisAvailableSize = mainAxisAvailableSize,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
+            spaceBetweenItems = spaceBetweenItems,
             firstVisibleItemIndex = firstVisibleItemIndex,
             firstVisibleItemScrollOffset = firstVisibleScrollOffset,
             scrollToBeConsumed = state.scrollToBeConsumed,

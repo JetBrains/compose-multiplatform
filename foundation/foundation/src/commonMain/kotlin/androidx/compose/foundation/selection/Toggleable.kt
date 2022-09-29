@@ -17,31 +17,16 @@
 package androidx.compose.foundation.selection
 
 import androidx.compose.foundation.Indication
-import androidx.compose.foundation.PressedInteractionSourceDisposableEffect
 import androidx.compose.foundation.LocalIndication
-import androidx.compose.foundation.focusableInNonTouchMode
-import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
-import androidx.compose.foundation.gestures.detectTapAndPress
-import androidx.compose.foundation.handlePressInteraction
-import androidx.compose.foundation.hoverable
-import androidx.compose.foundation.indication
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
-import androidx.compose.foundation.isComposeRootInScrollableContainer
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.disabled
-import androidx.compose.ui.semantics.onClick
-import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.toggleableState
 import androidx.compose.ui.state.ToggleableState
@@ -79,13 +64,13 @@ fun Modifier.toggleable(
         properties["onValueChange"] = onValueChange
     }
 ) {
-    toggleableImpl(
-        state = ToggleableState(value),
-        onClick = { onValueChange(!value) },
+    Modifier.toggleable(
+        value = value,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = LocalIndication.current,
         enabled = enabled,
         role = role,
-        interactionSource = remember { MutableInteractionSource() },
-        indication = LocalIndication.current
+        onValueChange = onValueChange
     )
 }
 
@@ -128,18 +113,17 @@ fun Modifier.toggleable(
         properties["enabled"] = enabled
         properties["role"] = role
         properties["onValueChange"] = onValueChange
-    },
-    factory = {
-        toggleableImpl(
-            state = ToggleableState(value),
-            onClick = { onValueChange(!value) },
-            enabled = enabled,
-            role = role,
-            interactionSource = interactionSource,
-            indication = indication
-        )
     }
-)
+) {
+    Modifier.triStateToggleable(
+        state = ToggleableState(value),
+        enabled = enabled,
+        interactionSource = interactionSource,
+        indication = indication,
+        role = role,
+        onClick = { onValueChange(!value) }
+    )
+}
 
 /**
  * Configure component to make it toggleable via input and accessibility events with three
@@ -177,13 +161,13 @@ fun Modifier.triStateToggleable(
         properties["onClick"] = onClick
     }
 ) {
-    toggleableImpl(
-        state,
-        enabled,
-        role,
-        remember { MutableInteractionSource() },
-        LocalIndication.current,
-        onClick
+    Modifier.triStateToggleable(
+        state = state,
+        interactionSource = remember { MutableInteractionSource() },
+        indication = LocalIndication.current,
+        enabled = enabled,
+        role = role,
+        onClick = onClick
     )
 }
 
@@ -229,74 +213,15 @@ fun Modifier.triStateToggleable(
         properties["interactionSource"] = interactionSource
         properties["indication"] = indication
         properties["onClick"] = onClick
-    },
-    factory = {
-        toggleableImpl(state, enabled, role, interactionSource, indication, onClick)
     }
-)
-
-@Suppress("ModifierInspectorInfo")
-private fun Modifier.toggleableImpl(
-    state: ToggleableState,
-    enabled: Boolean,
-    role: Role? = null,
-    interactionSource: MutableInteractionSource,
-    indication: Indication?,
-    onClick: () -> Unit
-): Modifier = composed {
-    val pressedInteraction = remember { mutableStateOf<PressInteraction.Press?>(null) }
-    // TODO(pavlis): Handle multiple states for Semantics
-    val semantics = Modifier.semantics(mergeDescendants = true) {
-        if (role != null) {
-            this.role = role
-        }
+) {
+    clickable(
+        interactionSource = interactionSource,
+        indication = indication,
+        enabled = enabled,
+        role = role,
+        onClick = onClick
+    ).semantics {
         this.toggleableState = state
-
-        onClick(action = { onClick(); true })
-        if (!enabled) {
-            disabled()
-        }
     }
-    val onClickState = rememberUpdatedState(onClick)
-    if (enabled) {
-        PressedInteractionSourceDisposableEffect(interactionSource, pressedInteraction)
-    }
-    val isRootInScrollableContainer = isComposeRootInScrollableContainer()
-    val isToggleableInScrollableContainer = remember { mutableStateOf(true) }
-    val delayPressInteraction = rememberUpdatedState {
-        isToggleableInScrollableContainer.value || isRootInScrollableContainer()
-    }
-    val gestures = Modifier.pointerInput(interactionSource, enabled) {
-        detectTapAndPress(
-            onPress = { offset ->
-                if (enabled) {
-                    handlePressInteraction(
-                        offset,
-                        interactionSource,
-                        pressedInteraction,
-                        delayPressInteraction
-                    )
-                }
-            },
-            onTap = { if (enabled) onClickState.value.invoke() }
-        )
-    }
-    this
-        .then(
-            remember {
-                object : ModifierLocalConsumer {
-                    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
-                        with(scope) {
-                            isToggleableInScrollableContainer.value =
-                                ModifierLocalScrollableContainer.current
-                        }
-                    }
-                }
-            }
-        )
-        .then(semantics)
-        .indication(interactionSource, indication)
-        .hoverable(enabled = enabled, interactionSource = interactionSource)
-        .focusableInNonTouchMode(enabled = enabled, interactionSource = interactionSource)
-        .then(gestures)
 }

@@ -33,6 +33,12 @@ class DeviceFontFamilyNameFontTest {
 
     val context = InstrumentationRegistry.getInstrumentation().context
 
+    @Test
+    fun variationSettings_arEmpty() {
+        val font = Font(DeviceFontFamilyName("any name")) as AndroidFont
+        assertThat(font.variationSettings.settings).isEmpty()
+    }
+
     @Test(expected = IllegalArgumentException::class)
     fun emptyFamilyName_throwsIllegalArgumentException() {
         Font(DeviceFontFamilyName(""))

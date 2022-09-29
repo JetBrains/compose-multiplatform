@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.grid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent
 import androidx.compose.foundation.lazy.layout.MutableIntervalList
 import androidx.compose.runtime.Composable
 
@@ -67,8 +68,8 @@ internal class LazyGridScopeImpl : LazyGridScope {
 
 @OptIn(ExperimentalFoundationApi::class)
 internal class LazyGridIntervalContent(
-    val key: ((index: Int) -> Any)?,
+    override val key: ((index: Int) -> Any)?,
     val span: LazyGridItemSpanScope.(Int) -> GridItemSpan,
-    val type: ((index: Int) -> Any?),
+    override val type: ((index: Int) -> Any?),
     val item: @Composable LazyGridItemScope.(Int) -> Unit
-)
+) : LazyLayoutIntervalContent

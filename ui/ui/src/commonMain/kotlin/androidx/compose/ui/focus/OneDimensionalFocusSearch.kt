@@ -17,6 +17,7 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.runtime.collection.MutableVector
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusStateImpl.Active
@@ -25,6 +26,7 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Deactivated
 import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
+import androidx.compose.ui.node.LayoutNode
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 
@@ -118,7 +120,7 @@ private fun FocusModifier.searchChildren(
     check(focusState == ActiveParent || focusState == DeactivatedParent) {
         "This function should only be used within a parent that has focus."
     }
-    children.sort()
+    children.sortWith(FocusableChildrenComparator)
     when (direction) {
         Next -> children.forEachItemAfter(focusedItem) { child ->
             if (child.isEligibleForFocusSearch && child.forwardFocusSearch(onFound)) return true
@@ -141,14 +143,14 @@ private fun FocusModifier.searchChildren(
 private fun FocusModifier.pickChildForForwardSearch(
     onFound: (FocusModifier) -> Boolean
 ): Boolean {
-    children.sort()
+    children.sortWith(FocusableChildrenComparator)
     return children.any { it.isEligibleForFocusSearch && it.forwardFocusSearch(onFound) }
 }
 
 private fun FocusModifier.pickChildForBackwardSearch(
     onFound: (FocusModifier) -> Boolean
 ): Boolean {
-    children.sort()
+    children.sortWith(FocusableChildrenComparator)
     children.forEachReversed {
         if (it.isEligibleForFocusSearch && it.backwardFocusSearch(onFound)) {
             return true
@@ -190,7 +192,7 @@ private inline fun <T> MutableVector<T>.forEachItemBefore(item: T, action: (T) -
 }
 
 /**
- * Sort the focus modifiers. in place order
+ * We use this comparator to sort the focus modifiers in place order.
  *
  * We want to visit the nodes in placement order instead of composition order.
  * This is because components like LazyList reuse nodes without re-composing them, but it always
@@ -202,6 +204,42 @@ private inline fun <T> MutableVector<T>.forEachItemBefore(item: T, action: (T) -
  * order index. This would be more expensive than sorting the items. In addition to this, sorting
  * the items makes the next focus search more efficient.
  */
-private fun MutableVector<FocusModifier>.sort() {
-    sortWith(compareBy { it.layoutNodeWrapper?.layoutNode?.placeOrder })
+private object FocusableChildrenComparator : Comparator<FocusModifier> {
+    override fun compare(focusModifier1: FocusModifier?, focusModifier2: FocusModifier?): Int {
+        requireNotNull(focusModifier1)
+        requireNotNull(focusModifier2)
+
+        // Ignore focus modifiers that won't be considered during focus search.
+        if (!focusModifier1.isEligibleForFocusSearch) return 0
+        if (!focusModifier2.isEligibleForFocusSearch) return 0
+
+        val layoutNode1 = checkNotNull(focusModifier1.coordinator?.layoutNode)
+        val layoutNode2 = checkNotNull(focusModifier2.coordinator?.layoutNode)
+
+        // Use natural order for focus modifiers within the same layout node.
+        if (layoutNode1 == layoutNode2) return 0
+
+        // Compare the place order of the children of the least common ancestor.
+        val pathFromRoot1 = pathFromRoot(layoutNode1)
+        val pathFromRoot2 = pathFromRoot(layoutNode2)
+        for (depth in 0..minOf(pathFromRoot1.lastIndex, pathFromRoot2.lastIndex)) {
+            // If the items from the two paths are not equal, we have
+            // found the first two children after the least common ancestor.
+            // We use the place order of these two parents to compare the focus modifiers.
+            if (pathFromRoot1[depth] != pathFromRoot2[depth]) {
+                return pathFromRoot1[depth].placeOrder.compareTo(pathFromRoot2[depth].placeOrder)
+            }
+        }
+        error("Could not find a common ancestor between the two FocusModifiers.")
+    }
+
+    private fun pathFromRoot(layoutNode: LayoutNode): MutableVector<LayoutNode> {
+        val path = mutableVectorOf<LayoutNode>()
+        var current: LayoutNode? = layoutNode
+        while (current != null) {
+            path.add(0, current)
+            current = current.parent
+        }
+        return path
+    }
 }

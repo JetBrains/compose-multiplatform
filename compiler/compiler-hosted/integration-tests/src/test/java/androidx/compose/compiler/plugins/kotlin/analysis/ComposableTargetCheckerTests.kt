@@ -22,6 +22,7 @@ import com.intellij.openapi.util.Disposer
 import org.jetbrains.kotlin.cli.jvm.compiler.EnvironmentConfigFiles
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
+import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
 
 class ComposableTargetCheckerTests : AbstractComposeDiagnosticsTest() {
     override fun setUp() {
@@ -42,6 +43,7 @@ class ComposableTargetCheckerTests : AbstractComposeDiagnosticsTest() {
         val classPath = createClasspath()
         val configuration = newConfiguration()
         configuration.addJvmClasspathRoots(classPath)
+        configuration.configureJdkClasspathRoots()
 
         val environment =
             KotlinCoreEnvironment.createForTests(
@@ -415,4 +417,73 @@ class ComposableTargetCheckerTests : AbstractComposeDiagnosticsTest() {
         }
         """
     )
+
+    fun testOpenOverrideAttributesInheritTarget() = check(
+        """
+        import androidx.compose.runtime.Composable
+        import androidx.compose.runtime.ComposableTarget
+
+        @Composable @ComposableTarget("N") fun N() { }
+        @Composable @ComposableTarget("M") fun M() { }
+
+        abstract class Base {
+          @Composable @ComposableTarget("N") abstract fun Compose()
+        }
+
+        class Invalid : Base() {
+          @Composable override fun Compose() {
+            <!COMPOSE_APPLIER_CALL_MISMATCH!>M<!>()
+          }
+        }
+
+        class Valid : Base () {
+          @Composable override fun Compose() {
+            N()
+          }
+        }
+        """
+    )
+
+    fun testOpenOverrideTargetsMustAgree() = check(
+        """
+        import androidx.compose.runtime.Composable
+        import androidx.compose.runtime.ComposableTarget
+
+        @Composable @ComposableTarget("N") fun N() { }
+        @Composable @ComposableTarget("M") fun M() { }
+
+        abstract class Base {
+          @Composable @ComposableTarget("N") abstract fun Compose()
+        }
+
+        class Invalid : Base() {
+          <!COMPOSE_APPLIER_DECLARATION_MISMATCH!>@Composable @ComposableTarget("M") override fun Compose() { }<!>
+        }
+
+        class Valid : Base () {
+          @Composable override fun Compose() {
+            N()
+          }
+        }
+        """
+    )
+
+    fun testOpenOverrideInferredToAgree() = check(
+        """
+        import androidx.compose.runtime.Composable
+        import androidx.compose.runtime.ComposableTarget
+
+        @Composable @ComposableTarget("N") fun N() { }
+        @Composable @ComposableTarget("M") fun M() { }
+
+        abstract class Base {
+          @Composable @ComposableTarget("N") abstract fun Compose()
+        }
+
+        class Invalid : Base() {
+          @Composable override fun Compose() {
+            N()
+          }
+        }
+        """)
 }

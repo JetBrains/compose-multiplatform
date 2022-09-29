@@ -99,6 +99,24 @@ interface RecomposerInfo {
 }
 
 /**
+ * Read only information about [Recomposer] error state.
+ */
+@InternalComposeApi
+internal interface RecomposerErrorInfo {
+    /**
+     * Exception which forced recomposition to halt.
+     */
+    val cause: Exception
+
+    /**
+     * Whether composition can recover from the error by itself.
+     * If the error is not recoverable, recomposer will not react to invalidate calls
+     * until state is reloaded.
+     */
+    val recoverable: Boolean
+}
+
+/**
  * The scheduler for performing recomposition and applying updates to one or more [Composition]s.
  */
 // RedundantVisibilityModifier suppressed because metalava picks up internal function overrides
@@ -243,9 +261,11 @@ class Recomposer(
         mutableMapOf<MovableContent<Any?>, MutableList<MovableContentStateReference>>()
     private val compositionValueStatesAvailable =
         mutableMapOf<MovableContentStateReference, MovableContentState>()
+    private var failedCompositions: MutableList<ControlledComposition>? = null
     private var workContinuation: CancellableContinuation<Unit>? = null
     private var concurrentCompositionsOutstanding = 0
     private var isClosed: Boolean = false
+    private var errorState: RecomposerErrorState? = null
     // End properties guarded by stateLock
 
     private val _state = MutableStateFlow(State.Inactive)
@@ -261,12 +281,17 @@ class Recomposer(
             compositionInvalidations.clear()
             compositionsAwaitingApply.clear()
             compositionValuesAwaitingInsert.clear()
+            failedCompositions = null
             workContinuation?.cancel()
             workContinuation = null
+            errorState = null
             return null
         }
 
         val newState = when {
+            errorState != null -> {
+                State.Inactive
+            }
             runnerJob == null -> {
                 snapshotInvalidations.clear()
                 compositionInvalidations.clear()
@@ -318,6 +343,11 @@ class Recomposer(
             get() = this@Recomposer.hasPendingWork
         override val changeCount: Long
             get() = this@Recomposer.changeCount
+        val currentError: RecomposerErrorInfo?
+            get() = synchronized(stateLock) {
+                this@Recomposer.errorState
+            }
+
         fun invalidateGroupsWithKey(key: Int) {
             val compositions: List<ControlledComposition> = synchronized(stateLock) {
                 knownCompositions.toMutableList()
@@ -334,6 +364,12 @@ class Recomposer(
                 .fastMapNotNull { it as? CompositionImpl }
                 .fastMap { HotReloadable(it).apply { clearContent() } }
         }
+
+        fun resetErrorState(): RecomposerErrorState? =
+            this@Recomposer.resetErrorState()
+
+        fun retryFailedCompositions() =
+            this@Recomposer.retryFailedCompositions()
     }
 
     private class HotReloadable(
@@ -356,6 +392,11 @@ class Recomposer(
             }
         }
     }
+
+    private class RecomposerErrorState(
+        override val recoverable: Boolean,
+        override val cause: Exception
+    ) : RecomposerErrorInfo
 
     private val recomposerInfo = RecomposerInfoImpl()
 
@@ -424,6 +465,14 @@ class Recomposer(
         val toLateApply = mutableSetOf<ControlledComposition>()
         val toComplete = mutableSetOf<ControlledComposition>()
 
+        fun clearRecompositionState() {
+            toRecompose.clear()
+            toInsert.clear()
+            toApply.clear()
+            toLateApply.clear()
+            toComplete.clear()
+        }
+
         fun fillToInsert() {
             toInsert.clear()
             synchronized(stateLock) {
@@ -486,6 +535,10 @@ class Recomposer(
                                     toApply += it
                                 }
                             }
+                        } catch (e: Exception) {
+                            processCompositionError(e, recoverable = true)
+                            clearRecompositionState()
+                            return@withFrameNanos
                         } finally {
                             toRecompose.clear()
                         }
@@ -508,10 +561,16 @@ class Recomposer(
                         }
 
                         if (toRecompose.isEmpty()) {
-                            fillToInsert()
-                            while (toInsert.isNotEmpty()) {
-                                toLateApply += performInsertValues(toInsert, modifiedValues)
+                            try {
                                 fillToInsert()
+                                while (toInsert.isNotEmpty()) {
+                                    toLateApply += performInsertValues(toInsert, modifiedValues)
+                                    fillToInsert()
+                                }
+                            } catch (e: Exception) {
+                                processCompositionError(e, recoverable = true)
+                                clearRecompositionState()
+                                return@withFrameNanos
                             }
                         }
                     }
@@ -525,6 +584,10 @@ class Recomposer(
                             toApply.fastForEach { composition ->
                                 composition.applyChanges()
                             }
+                        } catch (e: Exception) {
+                            processCompositionError(e)
+                            clearRecompositionState()
+                            return@withFrameNanos
                         } finally {
                             toApply.clear()
                         }
@@ -536,6 +599,10 @@ class Recomposer(
                             toLateApply.forEach { composition ->
                                 composition.applyLateChanges()
                             }
+                        } catch (e: Exception) {
+                            processCompositionError(e)
+                            clearRecompositionState()
+                            return@withFrameNanos
                         } finally {
                             toLateApply.clear()
                         }
@@ -546,17 +613,88 @@ class Recomposer(
                             toComplete.forEach { composition ->
                                 composition.changesApplied()
                             }
+                        } catch (e: Exception) {
+                            processCompositionError(e)
+                            clearRecompositionState()
+                            return@withFrameNanos
                         } finally {
                             toComplete.clear()
                         }
                     }
 
-                    discardUnusedValues()
-
                     synchronized(stateLock) {
                         deriveStateLocked()
                     }
                 }
+            }
+
+            discardUnusedValues()
+        }
+    }
+
+    private fun processCompositionError(
+        e: Exception,
+        failedInitialComposition: ControlledComposition? = null,
+        recoverable: Boolean = false,
+    ) {
+        if (_hotReloadEnabled.get() && e !is ComposeRuntimeError) {
+            synchronized(stateLock) {
+                compositionsAwaitingApply.clear()
+                compositionInvalidations.clear()
+                snapshotInvalidations.clear()
+
+                compositionValuesAwaitingInsert.clear()
+                compositionValuesRemoved.clear()
+                compositionValueStatesAvailable.clear()
+
+                errorState = RecomposerErrorState(
+                    recoverable = recoverable,
+                    cause = e
+                )
+
+                if (failedInitialComposition != null) {
+                    val failedCompositions = failedCompositions
+                        ?: mutableListOf<ControlledComposition>().also {
+                            failedCompositions = it
+                        }
+
+                    if (failedInitialComposition !in failedCompositions) {
+                        failedCompositions += failedInitialComposition
+                    }
+                    knownCompositions -= failedInitialComposition
+                }
+
+                deriveStateLocked()
+            }
+        } else {
+            throw e
+        }
+    }
+
+    private fun resetErrorState(): RecomposerErrorState? {
+        val errorState = synchronized(stateLock) {
+            val error = errorState
+            if (error != null) {
+                errorState = null
+                deriveStateLocked()
+            }
+            error
+        }
+        return errorState
+    }
+
+    private fun retryFailedCompositions() {
+        synchronized(stateLock) {
+            val failedCompositions = failedCompositions ?: return
+
+            while (failedCompositions.isNotEmpty()) {
+                val composition = failedCompositions.removeLast()
+                if (composition !is CompositionImpl) continue
+
+                composition.invalidateAll()
+                composition.setContent(composition.composable)
+
+                if (errorState != null) break
             }
         }
     }
@@ -807,9 +945,15 @@ class Recomposer(
         content: @Composable () -> Unit
     ) {
         val composerWasComposing = composition.isComposing
-        composing(composition, null) {
-            composition.composeContent(content)
+        try {
+            composing(composition, null) {
+                composition.composeContent(content)
+            }
+        } catch (e: Exception) {
+            processCompositionError(e, composition, recoverable = true)
+            return
         }
+
         // TODO(b/143755743)
         if (!composerWasComposing) {
             Snapshot.notifyObjectsInitialized()
@@ -823,9 +967,20 @@ class Recomposer(
             }
         }
 
-        performInitialMovableContentInserts(composition)
-        composition.applyChanges()
-        composition.applyLateChanges()
+        try {
+            performInitialMovableContentInserts(composition)
+        } catch (e: Exception) {
+            processCompositionError(e, composition, recoverable = true)
+            return
+        }
+
+        try {
+            composition.applyChanges()
+            composition.applyLateChanges()
+        } catch (e: Exception) {
+            processCompositionError(e)
+            return
+        }
 
         if (!composerWasComposing) {
             // Ensure that any state objects created during applyChanges are seen as changed
@@ -870,7 +1025,7 @@ class Recomposer(
                     // Record write performed by a previous composition as if they happened during
                     // composition.
                     composition.prepareCompose {
-                        modifiedValues.forEach { composition.recordWriteOf(it) }
+                        modifiedValues.fastForEach { composition.recordWriteOf(it) }
                     }
                 }
                 composition.recompose()
@@ -887,7 +1042,6 @@ class Recomposer(
             runtimeCheck(!composition.isComposing)
             composing(composition, modifiedValues) {
                 // Map insert movable content to movable content states that have been released
-                // during `performRecompose`.
                 // during `performRecompose`.
                 val pairs = synchronized(stateLock) {
                     refs.fastMap { reference ->
@@ -1077,6 +1231,8 @@ class Recomposer(
 
         private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfoImpl>())
 
+        private val _hotReloadEnabled = AtomicReference(false)
+
         /**
          * An observable [Set] of [RecomposerInfo]s for currently
          * [running][runRecomposeAndApplyChanges] [Recomposer]s.
@@ -1084,6 +1240,10 @@ class Recomposer(
          */
         val runningRecomposers: StateFlow<Set<RecomposerInfo>>
             get() = _runningRecomposers
+
+        internal fun setHotReloadEnabled(value: Boolean) {
+            _hotReloadEnabled.set(value)
+        }
 
         private fun addRunning(info: RecomposerInfoImpl) {
             while (true) {
@@ -1104,21 +1264,52 @@ class Recomposer(
         internal fun saveStateAndDisposeForHotReload(): Any {
             // NOTE: when we move composition/recomposition onto multiple threads, we will want
             // to ensure that we pause recompositions before this call.
+            _hotReloadEnabled.set(true)
             return _runningRecomposers.value.flatMap { it.saveStateAndDisposeForHotReload() }
         }
 
         internal fun loadStateAndComposeForHotReload(token: Any) {
             // NOTE: when we move composition/recomposition onto multiple threads, we will want
             // to ensure that we pause recompositions before this call.
+            _hotReloadEnabled.set(true)
+
+            _runningRecomposers.value.forEach {
+                it.resetErrorState()
+            }
+
             @Suppress("UNCHECKED_CAST")
             val holders = token as List<HotReloadable>
             holders.fastForEach { it.resetContent() }
             holders.fastForEach { it.recompose() }
+
+            _runningRecomposers.value.forEach {
+                it.retryFailedCompositions()
+            }
         }
 
         internal fun invalidateGroupsWithKey(key: Int) {
+            _hotReloadEnabled.set(true)
             _runningRecomposers.value.forEach {
+                if (it.currentError?.recoverable == false) {
+                    return@forEach
+                }
+
+                it.resetErrorState()
+
                 it.invalidateGroupsWithKey(key)
+
+                it.retryFailedCompositions()
+            }
+        }
+
+        internal fun getCurrentErrors(): List<RecomposerErrorInfo> =
+            _runningRecomposers.value.mapNotNull {
+                it.currentError
+            }
+
+        internal fun clearErrors() {
+            _runningRecomposers.value.mapNotNull {
+                it.resetErrorState()
             }
         }
     }

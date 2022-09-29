@@ -64,6 +64,7 @@ fun AnnotatedString.toAccessibilitySpannableString(
     return toAccessibilitySpannableString(density, createFontFamilyResolver(resourceLoader))
 }
 
+@OptIn(ExperimentalTextApi::class)
 @RestrictTo(RestrictTo.Scope.LIBRARY_GROUP)
 @InternalTextApi // used in ui:ui
 fun AnnotatedString.toAccessibilitySpannableString(
@@ -81,6 +82,15 @@ fun AnnotatedString.toAccessibilitySpannableString(
     getTtsAnnotations(0, length).fastForEach { (ttsAnnotation, start, end) ->
         spannableString.setSpan(
             ttsAnnotation.toSpan(),
+            start,
+            end,
+            Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+    }
+
+    getUrlAnnotations(0, length).fastForEach { (urlAnnotation, start, end) ->
+        spannableString.setSpan(
+            urlAnnotation.toSpan(),
             start,
             end,
             Spanned.SPAN_EXCLUSIVE_EXCLUSIVE

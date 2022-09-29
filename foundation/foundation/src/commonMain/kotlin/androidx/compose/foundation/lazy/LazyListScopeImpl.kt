@@ -18,6 +18,7 @@ package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.IntervalList
+import androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent
 import androidx.compose.foundation.lazy.layout.MutableIntervalList
 import androidx.compose.runtime.Composable
 
@@ -72,8 +73,9 @@ internal class LazyListScopeImpl : LazyListScope {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 internal class LazyListIntervalContent(
-    val key: ((index: Int) -> Any)?,
-    val type: ((index: Int) -> Any?),
+    override val key: ((index: Int) -> Any)?,
+    override val type: ((index: Int) -> Any?),
     val item: @Composable LazyItemScope.(index: Int) -> Unit
-)
+) : LazyLayoutIntervalContent

@@ -30,11 +30,19 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.AndroidTextPaint
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 
+/**
+ * Applies given SpanStyle to this AndroidTextPaint.
+ *
+ * Although most attributes in SpanStyle can be applied to TextPaint, some are only applicable as
+ * regular platform spans such as background, baselineShift. This function also returns a new
+ * SpanStyle that consists of attributes that were not applied to the TextPaint.
+ */
 @OptIn(ExperimentalTextApi::class)
 internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
@@ -96,9 +104,9 @@ internal fun AndroidTextPaint.applySpanStyle(
     // setBrush draws the text with given Brush. ShaderBrush requires Size to
     // create a Shader. However, Size is unavailable at this stage of the layout.
     // Paragraph.paint will receive a proper Size after layout is completed.
-    setBrush(style.brush, Size.Unspecified)
+    setBrush(style.brush, Size.Unspecified, style.alpha)
     setShadow(style.shadow)
-    setTextDecoration(style.textDecoration)
+    // Skip textDecoration (b/199939617). TextDecoration should be applied as a span.
 
     // letterSpacing with unit Sp needs to be handled by span.
     // baselineShift and bgColor is reset in the Android Layout constructor,
@@ -120,6 +128,9 @@ internal fun AndroidTextPaint.applySpanStyle(
             null
         } else {
             style.baselineShift
+        },
+        textDecoration = style.textDecoration.takeIf {
+            style.textDecoration != TextDecoration.None
         }
     )
 }
@@ -129,4 +140,16 @@ internal fun AndroidTextPaint.applySpanStyle(
  */
 internal fun SpanStyle.hasFontAttributes(): Boolean {
     return fontFamily != null || fontStyle != null || fontWeight != null
+}
+
+/**
+ * Platform shadow layer turns off shadow when blur is zero. Where as developers expect when blur
+ * is zero, the shadow is still visible but without any blur. This utility function is used
+ * while setting shadow on spans or paint in order to replace 0 with Float.MIN_VALUE so that the
+ * shadow will still be visible and the blur is practically 0.
+ */
+internal fun correctBlurRadius(blurRadius: Float) = if (blurRadius == 0f) {
+    Float.MIN_VALUE
+} else {
+    blurRadius
 }

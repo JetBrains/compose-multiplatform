@@ -35,6 +35,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -372,6 +373,82 @@ class LazyListPrefetcherTest(
         }
 
         rule.runOnIdle { }
+    }
+
+    @Test
+    fun snappingToOtherPositionWhilePrefetchIsScheduled() {
+        val composedItems = mutableListOf<Int>()
+        rule.setContent {
+            state = rememberLazyListState()
+            LazyColumnOrRow(
+                Modifier.mainAxisSize(itemsSizeDp * 1.5f),
+                state,
+            ) {
+                items(1000) {
+                    composedItems.add(it)
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(itemsSizeDp)
+                            .then(fillParentMaxCrossAxis())
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            // now we have items 0 and 1 visible
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 1 and 2 are visible
+                // and schedule a prefetching for 3
+                state.scrollBy(itemsSizePx.toFloat())
+                // then we move so that items 100 and 101 are visible.
+                // this should cancel the prefetch for 3
+                state.scrollToItem(100)
+            }
+        }
+
+        // wait a few frames to make sure prefetch happens if was scheduled
+        rule.waitForIdle()
+        rule.waitForIdle()
+        rule.waitForIdle()
+
+        rule.runOnIdle {
+            assertThat(composedItems).doesNotContain(3)
+        }
+    }
+
+    @Test
+    fun scrollingByListSizeCancelsPreviousPrefetch() {
+        composeList()
+
+        // now we have items 0-1 visible
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // this will move the viewport so items 1-2 are visible
+                // and schedule a prefetching for 3
+                state.scrollBy(itemsSizePx.toFloat())
+
+                // move viewport by screen size to items 4-5, so item 3 is just behind
+                // the first visible item
+                state.scrollBy(itemsSizePx * 3f)
+
+                // move scroll further to items 5-6, so item 3 is reused
+                state.scrollBy(itemsSizePx.toFloat())
+            }
+        }
+
+        waitForPrefetch(7)
+
+        rule.runOnIdle {
+            runBlocking(AutoTestFrameClock()) {
+                // scroll again to ensure item 3 was dropped
+                state.scrollBy(itemsSizePx * 100f)
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(activeNodes).doesNotContain(3)
+        }
     }
 
     private fun waitForPrefetch(index: Int) {

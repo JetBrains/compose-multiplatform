@@ -38,6 +38,7 @@ internal interface ComposeUiNode {
      */
     companion object {
         val Constructor: () -> ComposeUiNode = LayoutNode.Constructor
+        val VirtualConstructor: () -> ComposeUiNode = { LayoutNode(isVirtual = true) }
         val SetModifier: ComposeUiNode.(Modifier) -> Unit = { this.modifier = it }
         val SetDensity: ComposeUiNode.(Density) -> Unit = { this.density = it }
         val SetMeasurePolicy: ComposeUiNode.(MeasurePolicy) -> Unit =

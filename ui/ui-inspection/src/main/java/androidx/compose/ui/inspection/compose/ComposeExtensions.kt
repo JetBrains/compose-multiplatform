@@ -32,6 +32,7 @@ import layoutinspector.compose.inspection.LayoutInspectorComposeProtocol.Paramet
  * Convert parameters and semantics from [InspectorNode] into a [ParameterGroup].
  */
 fun InspectorNode.convertToParameterGroup(
+    semanticsNode: InspectorNode,
     layoutInspectorTree: LayoutInspectorTree,
     rootId: Long,
     maxRecursions: Int,
@@ -45,12 +46,12 @@ fun InspectorNode.convertToParameterGroup(
         ).convertAll(stringTable)
     )
     addAllMergedSemantics(
-        convertParameters(
+        semanticsNode.convertParameters(
             layoutInspectorTree, MergedSemantics, rootId, maxRecursions, maxInitialIterableSize
         ).convertAll(stringTable)
     )
     addAllUnmergedSemantics(
-        convertParameters(
+        semanticsNode.convertParameters(
             layoutInspectorTree, UnmergedSemantics, rootId, maxRecursions, maxInitialIterableSize
         ).convertAll(stringTable)
     )

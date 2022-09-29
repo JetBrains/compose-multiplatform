@@ -25,6 +25,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.AwaitFirstLayoutModifier
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
+import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collection.mutableVectorOf
@@ -222,6 +223,8 @@ class LazyGridState constructor(
 
     internal var placementAnimator by mutableStateOf<LazyGridItemPlacementAnimator?>(null)
 
+    private val animateScrollScope = LazyGridAnimateScrollScope(this)
+
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
      * pixels.
@@ -318,7 +321,6 @@ class LazyGridState constructor(
         }
         val info = layoutInfo
         if (info.visibleItemsInfo.isNotEmpty()) {
-            // check(isActive)
             val scrollingForward = delta < 0
             val lineToPrefetch: Int
             val closestNextItemToPrefetch: Int
@@ -355,6 +357,25 @@ class LazyGridState constructor(
         }
     }
 
+    private fun cancelPrefetchIfVisibleItemsChanged(info: LazyGridLayoutInfo) {
+        if (lineToPrefetch != -1 && info.visibleItemsInfo.isNotEmpty()) {
+            val expectedLineToPrefetch = if (wasScrollingForward) {
+                info.visibleItemsInfo.last().let {
+                    if (isVertical) it.row else it.column
+                } + 1
+            } else {
+                info.visibleItemsInfo.first().let {
+                    if (isVertical) it.row else it.column
+                } - 1
+            }
+            if (lineToPrefetch != expectedLineToPrefetch) {
+                lineToPrefetch = -1
+                currentLinePrefetchHandles.forEach { it.cancel() }
+                currentLinePrefetchHandles.clear()
+            }
+        }
+    }
+
     internal val prefetchState = LazyLayoutPrefetchState()
 
     /**
@@ -370,7 +391,7 @@ class LazyGridState constructor(
         index: Int,
         scrollOffset: Int = 0
     ) {
-        doSmoothScrollToItem(index, scrollOffset, slotsPerLine)
+        animateScrollScope.animateScrollToItem(index, scrollOffset)
     }
 
     /**
@@ -386,6 +407,8 @@ class LazyGridState constructor(
             result.firstVisibleLineScrollOffset != 0
 
         numMeasurePasses++
+
+        cancelPrefetchIfVisibleItemsChanged(result)
     }
 
     /**

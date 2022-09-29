@@ -93,6 +93,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlin.math.abs
+import kotlin.math.floor
 import kotlin.math.max
 import kotlin.math.min
 import kotlinx.coroutines.CancellationException
@@ -162,7 +163,14 @@ fun Slider(
         modifier
             .minimumTouchTargetSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
-            .sliderSemantics(value, tickFractions, enabled, onValueChange, valueRange, steps)
+            .sliderSemantics(
+                value,
+                enabled,
+                onValueChange,
+                onValueChangeFinished,
+                valueRange,
+                steps
+            )
             .focusable(enabled, interactionSource)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -261,12 +269,12 @@ fun Slider(
  *
  * @sample androidx.compose.material.samples.StepRangeSliderSample
  *
- * @param values current values of the RangeSlider. If either value is outside of [valueRange]
+ * @param value current values of the RangeSlider. If either value is outside of [valueRange]
  * provided, it will be coerced to this range.
  * @param onValueChange lambda in which values should be updated
  * @param modifier modifiers for the Range Slider layout
  * @param enabled whether or not component is enabled and can we interacted with or not
- * @param valueRange range of values that Range Slider values can take. Passed [values] will be
+ * @param valueRange range of values that Range Slider values can take. Passed [value] will be
  * coerced to this range
  * @param steps if greater than 0, specifies the amounts of discrete values, evenly distributed
  * between across the whole value range. If 0, range slider will behave as a continuous slider and
@@ -280,7 +288,7 @@ fun Slider(
 @Composable
 @ExperimentalMaterialApi
 fun RangeSlider(
-    values: ClosedFloatingPointRange<Float>,
+    value: ClosedFloatingPointRange<Float>,
     onValueChange: (ClosedFloatingPointRange<Float>) -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -320,22 +328,22 @@ fun RangeSlider(
         fun scaleToOffset(userValue: Float) =
             scale(valueRange.start, valueRange.endInclusive, userValue, minPx, maxPx)
 
-        val rawOffsetStart = remember { mutableStateOf(scaleToOffset(values.start)) }
-        val rawOffsetEnd = remember { mutableStateOf(scaleToOffset(values.endInclusive)) }
+        val rawOffsetStart = remember { mutableStateOf(scaleToOffset(value.start)) }
+        val rawOffsetEnd = remember { mutableStateOf(scaleToOffset(value.endInclusive)) }
 
         CorrectValueSideEffect(
             ::scaleToOffset,
             valueRange,
             minPx..maxPx,
             rawOffsetStart,
-            values.start
+            value.start
         )
         CorrectValueSideEffect(
             ::scaleToOffset,
             valueRange,
             minPx..maxPx,
             rawOffsetEnd,
-            values.endInclusive
+            value.endInclusive
         )
 
         val scope = rememberCoroutineScope()
@@ -366,13 +374,13 @@ fun RangeSlider(
         val onDrag = rememberUpdatedState<(Boolean, Float) -> Unit> { isStart, offset ->
             val offsetRange = if (isStart) {
                 rawOffsetStart.value = (rawOffsetStart.value + offset)
-                rawOffsetEnd.value = scaleToOffset(values.endInclusive)
+                rawOffsetEnd.value = scaleToOffset(value.endInclusive)
                 val offsetEnd = rawOffsetEnd.value
                 val offsetStart = rawOffsetStart.value.coerceIn(minPx, offsetEnd)
                 offsetStart..offsetEnd
             } else {
                 rawOffsetEnd.value = (rawOffsetEnd.value + offset)
-                rawOffsetStart.value = scaleToOffset(values.start)
+                rawOffsetStart.value = scaleToOffset(value.start)
                 val offsetStart = rawOffsetStart.value
                 val offsetEnd = rawOffsetEnd.value.coerceIn(offsetStart, maxPx)
                 offsetStart..offsetEnd
@@ -395,25 +403,28 @@ fun RangeSlider(
         )
 
         // The positions of the thumbs are dependant on each other.
-        val coercedStart = values.start.coerceIn(valueRange.start, values.endInclusive)
-        val coercedEnd = values.endInclusive.coerceIn(values.start, valueRange.endInclusive)
+        val coercedStart = value.start.coerceIn(valueRange.start, value.endInclusive)
+        val coercedEnd = value.endInclusive.coerceIn(value.start, valueRange.endInclusive)
         val fractionStart = calcFraction(valueRange.start, valueRange.endInclusive, coercedStart)
         val fractionEnd = calcFraction(valueRange.start, valueRange.endInclusive, coercedEnd)
+        val startSteps = floor(steps * fractionEnd).toInt()
+        val endSteps = floor(steps * (1f - fractionStart)).toInt()
+
         val startThumbSemantics = Modifier.sliderSemantics(
             coercedStart,
-            tickFractions,
             enabled,
             { value -> onValueChangeState.value.invoke(value..coercedEnd) },
+            onValueChangeFinished,
             valueRange.start..coercedEnd,
-            steps
+            startSteps
         )
         val endThumbSemantics = Modifier.sliderSemantics(
             coercedEnd,
-            tickFractions,
             enabled,
             { value -> onValueChangeState.value.invoke(coercedStart..value) },
+            onValueChangeFinished,
             coercedStart..valueRange.endInclusive,
-            steps
+            endSteps
         )
 
         RangeSliderImpl(
@@ -632,7 +643,9 @@ private fun RangeSliderImpl(
         val offsetStart = widthDp * positionFractionStart
         val offsetEnd = widthDp * positionFractionEnd
         Track(
-            Modifier.align(Alignment.CenterStart).fillMaxSize(),
+            Modifier
+                .align(Alignment.CenterStart)
+                .fillMaxSize(),
             colors,
             enabled,
             positionFractionStart,
@@ -676,7 +689,10 @@ private fun BoxScope.SliderThumb(
     enabled: Boolean,
     thumbSize: Dp
 ) {
-    Box(Modifier.padding(start = offset).align(Alignment.CenterStart)) {
+    Box(
+        Modifier
+            .padding(start = offset)
+            .align(Alignment.CenterStart)) {
         val interactions = remember { mutableStateListOf<Interaction>() }
         LaunchedEffect(interactionSource) {
             interactionSource.interactions.collect { interaction ->
@@ -833,9 +849,9 @@ private fun CorrectValueSideEffect(
 
 private fun Modifier.sliderSemantics(
     value: Float,
-    tickFractions: List<Float>,
     enabled: Boolean,
     onValueChange: (Float) -> Unit,
+    onValueChangeFinished: (() -> Unit)? = null,
     valueRange: ClosedFloatingPointRange<Float> = 0f..1f,
     steps: Int = 0
 ): Modifier {
@@ -844,11 +860,21 @@ private fun Modifier.sliderSemantics(
         if (!enabled) disabled()
         setProgress(
             action = { targetValue ->
-                val newValue = targetValue.coerceIn(valueRange.start, valueRange.endInclusive)
+                var newValue = targetValue.coerceIn(valueRange.start, valueRange.endInclusive)
+                val originalVal = newValue
                 val resolvedValue = if (steps > 0) {
-                    tickFractions
-                        .map { lerp(valueRange.start, valueRange.endInclusive, it) }
-                        .minByOrNull { abs(it - newValue) } ?: newValue
+                    var distance: Float = newValue
+                    for (i in 0..steps + 1) {
+                        val stepValue = lerp(
+                            valueRange.start,
+                            valueRange.endInclusive,
+                            i.toFloat() / (steps + 1))
+                        if (abs(stepValue - originalVal) <= distance) {
+                            distance = abs(stepValue - originalVal)
+                            newValue = stepValue
+                        }
+                    }
+                    newValue
                 } else {
                     newValue
                 }
@@ -858,6 +884,7 @@ private fun Modifier.sliderSemantics(
                     false
                 } else {
                     onValueChange(resolvedValue)
+                    onValueChangeFinished?.invoke()
                     true
                 }
             }
@@ -1130,7 +1157,8 @@ internal val TrackHeight = 4.dp
 private val SliderHeight = 48.dp
 private val SliderMinWidth = 144.dp // TODO: clarify min width
 private val DefaultSliderConstraints =
-    Modifier.widthIn(min = SliderMinWidth)
+    Modifier
+        .widthIn(min = SliderMinWidth)
         .heightIn(max = SliderHeight)
 
 private val SliderToTickAnimation = TweenSpec<Float>(durationMillis = 100)

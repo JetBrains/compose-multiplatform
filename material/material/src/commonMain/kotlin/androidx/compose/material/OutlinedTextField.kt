@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -160,7 +161,11 @@ fun OutlinedTextField(
     BasicTextField(
         value = value,
         modifier = if (label != null) {
-            modifier.padding(top = OutlinedTextFieldTopPadding)
+            modifier
+                // Merge semantics at the beginning of the modifier chain to ensure padding is
+                // considered part of the text field.
+                .semantics(mergeDescendants = true) {}
+                .padding(top = OutlinedTextFieldTopPadding)
         } else {
             modifier
         }
@@ -304,7 +309,11 @@ fun OutlinedTextField(
     BasicTextField(
         value = value,
         modifier = if (label != null) {
-            modifier.padding(top = OutlinedTextFieldTopPadding)
+            modifier
+                // Merge semantics at the beginning of the modifier chain to ensure padding is
+                // considered part of the text field.
+                .semantics(mergeDescendants = true) {}
+                .padding(top = OutlinedTextFieldTopPadding)
         } else {
             modifier
         }
@@ -474,10 +483,16 @@ private class OutlinedTextFieldMeasurePolicy(
         )
 
         // measure label
+        val isLabelInMiddleSection = animationProgress < 1f
+        val labelHorizontalPaddingOffset =
+            paddingValues.calculateLeftPadding(layoutDirection).roundToPx() +
+                paddingValues.calculateRightPadding(layoutDirection).roundToPx()
         val labelConstraints = relaxedConstraints.offset(
-            horizontal = -occupiedSpaceHorizontally -
-                paddingValues.calculateLeftPadding(layoutDirection).roundToPx() -
-                paddingValues.calculateRightPadding(layoutDirection).roundToPx(),
+            horizontal = if (isLabelInMiddleSection) {
+                -occupiedSpaceHorizontally - labelHorizontalPaddingOffset
+            } else {
+                -labelHorizontalPaddingOffset
+            },
             vertical = -bottomPadding
         )
         val labelPlaceable =
@@ -507,12 +522,15 @@ private class OutlinedTextFieldMeasurePolicy(
 
         val width =
             calculateWidth(
-                widthOrZero(leadingPlaceable),
-                widthOrZero(trailingPlaceable),
-                textFieldPlaceable.width,
-                widthOrZero(labelPlaceable),
-                widthOrZero(placeholderPlaceable),
-                constraints
+                leadingPlaceableWidth = widthOrZero(leadingPlaceable),
+                trailingPlaceableWidth = widthOrZero(trailingPlaceable),
+                textFieldPlaceableWidth = textFieldPlaceable.width,
+                labelPlaceableWidth = widthOrZero(labelPlaceable),
+                placeholderPlaceableWidth = widthOrZero(placeholderPlaceable),
+                isLabelInMiddleSection = isLabelInMiddleSection,
+                constraints = constraints,
+                density = density,
+                paddingValues = paddingValues,
             )
         val height =
             calculateHeight(
@@ -589,7 +607,7 @@ private class OutlinedTextFieldMeasurePolicy(
         }
     }
 
-    private fun intrinsicWidth(
+    private fun IntrinsicMeasureScope.intrinsicWidth(
         measurables: List<IntrinsicMeasurable>,
         height: Int,
         intrinsicMeasurer: (IntrinsicMeasurable, Int) -> Int
@@ -614,7 +632,10 @@ private class OutlinedTextFieldMeasurePolicy(
             textFieldPlaceableWidth = textFieldWidth,
             labelPlaceableWidth = labelWidth,
             placeholderPlaceableWidth = placeholderWidth,
-            constraints = ZeroConstraints
+            isLabelInMiddleSection = animationProgress < 1f,
+            constraints = ZeroConstraints,
+            density = density,
+            paddingValues = paddingValues,
         )
     }
 
@@ -660,16 +681,28 @@ private fun calculateWidth(
     textFieldPlaceableWidth: Int,
     labelPlaceableWidth: Int,
     placeholderPlaceableWidth: Int,
-    constraints: Constraints
+    isLabelInMiddleSection: Boolean,
+    constraints: Constraints,
+    density: Float,
+    paddingValues: PaddingValues,
 ): Int {
     val middleSection = maxOf(
         textFieldPlaceableWidth,
-        labelPlaceableWidth,
+        if (isLabelInMiddleSection) labelPlaceableWidth else 0,
         placeholderPlaceableWidth
     )
     val wrappedWidth =
         leadingPlaceableWidth + middleSection + trailingPlaceableWidth
-    return max(wrappedWidth, constraints.minWidth)
+    val focusedLabelWidth =
+        if (!isLabelInMiddleSection) {
+            // Actual LayoutDirection doesn't matter; we only need the sum
+            val labelHorizontalPadding = (paddingValues.calculateLeftPadding(LayoutDirection.Ltr) +
+                paddingValues.calculateRightPadding(LayoutDirection.Ltr)).value * density
+            labelPlaceableWidth + labelHorizontalPadding.roundToInt()
+        } else {
+            0
+        }
+    return maxOf(wrappedWidth, focusedLabelWidth, constraints.minWidth)
 }
 
 /**

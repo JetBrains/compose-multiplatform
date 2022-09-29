@@ -27,6 +27,9 @@ import androidx.compose.material.samples.ModalBottomSheetSample
 import androidx.compose.material.samples.ModalDrawerSample
 import androidx.compose.material.samples.BottomSheetScaffoldSample
 import androidx.compose.material.samples.ContentAlphaSample
+import androidx.compose.material.samples.CustomPullRefreshSample
+import androidx.compose.material.samples.PullRefreshIndicatorTransformSample
+import androidx.compose.material.samples.PullRefreshSample
 import androidx.compose.material.samples.ScaffoldWithBottomBarAndCutout
 import androidx.compose.material.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material.samples.ScaffoldWithSimpleSnackbar
@@ -108,6 +111,14 @@ val MaterialDemos = DemoCategory(
                 ComposableDemo("Multiple text fields") { TextFieldsDemo() },
                 ComposableDemo("Textfield decoration box") { DecorationBoxDemos() },
                 ComposableDemo("Alignment inside text fields") { VerticalAlignmentsInTextField() }
+            )
+        ),
+        DemoCategory(
+            "PullRefresh",
+            listOf(
+                ComposableDemo("PullRefresh") { PullRefreshSample() },
+                ComposableDemo("Custom PullRefresh") { CustomPullRefreshSample() },
+                ComposableDemo("Custom Indicator") { PullRefreshIndicatorTransformSample() }
             )
         )
     )

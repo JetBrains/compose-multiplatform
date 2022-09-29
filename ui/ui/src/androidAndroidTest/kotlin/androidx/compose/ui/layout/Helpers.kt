@@ -26,6 +26,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerIconService
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
@@ -71,8 +72,16 @@ private class FakeOwner(
     override val measureIteration: Long
         get() = delegate.measureIteration
 
-    override fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean) {
-        delegate.requestRemeasure(layoutNode)
+    override fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) {
+        if (affectsLookahead) {
+            delegate.requestLookaheadRemeasure(layoutNode)
+        } else {
+            delegate.requestRemeasure(layoutNode)
+        }
     }
 
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
@@ -88,6 +97,9 @@ private class FakeOwner(
     }
 
     override val snapshotObserver: OwnerSnapshotObserver = OwnerSnapshotObserver { it.invoke() }
+
+    override val modifierLocalManager: ModifierLocalManager = ModifierLocalManager(this)
+
     override fun registerOnEndApplyChangesListener(listener: () -> Unit) {
         TODO("Not yet implemented")
     }
@@ -156,8 +168,15 @@ private class FakeOwner(
     override fun createLayer(drawBlock: (Canvas) -> Unit, invalidateParentLayer: () -> Unit) =
         TODO("Not yet implemented")
 
-    override fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean) =
+    override fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean,
+        forceRequest: Boolean
+    ) = TODO("Not yet implemented")
+
+    override fun requestOnPositionedCallback(layoutNode: LayoutNode) {
         TODO("Not yet implemented")
+    }
 
     override fun calculatePositionInWindow(localPosition: Offset) = TODO("Not yet implemented")
     override fun calculateLocalPosition(positionInWindow: Offset) = TODO("Not yet implemented")

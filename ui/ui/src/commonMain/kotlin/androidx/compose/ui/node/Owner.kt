@@ -27,6 +27,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerIconService
+import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.platform.AccessibilityManager
 import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
@@ -143,15 +144,34 @@ internal interface Owner {
      * Called by [LayoutNode] to request the Owner a new measurement+layout. [forceRequest] defines
      * whether the node should bypass the logic that would reject measure requests, and therefore
      * force the measure request to be evaluated even when it's already pending measure.
+     *
+     * [affectsLookahead] specifies whether this measure request is for the lookahead pass.
      */
-    fun onRequestMeasure(layoutNode: LayoutNode, forceRequest: Boolean = false)
+    fun onRequestMeasure(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean = false,
+        forceRequest: Boolean = false
+    )
 
     /**
      * Called by [LayoutNode] to request the Owner a new layout. [forceRequest] defines
      * whether the node should bypass the logic that would reject relayout requests, and therefore
      * force the relayout request to be evaluated even when it's already pending measure/layout.
+     *
+     * [affectsLookahead] specifies whether this relayout request is for the lookahead pass
+     * pass.
      */
-    fun onRequestRelayout(layoutNode: LayoutNode, forceRequest: Boolean = false)
+    fun onRequestRelayout(
+        layoutNode: LayoutNode,
+        affectsLookahead: Boolean = false,
+        forceRequest: Boolean = false
+    )
+
+    /**
+     * Called when graphics layers have changed the position of children and the
+     * OnGloballyPositionedModifiers must be called.
+     */
+    fun requestOnPositionedCallback(layoutNode: LayoutNode)
 
     /**
      * Called by [LayoutNode] when it is attached to the view system and now has an owner.
@@ -240,6 +260,8 @@ internal interface Owner {
      * automatically when the snapshot value has been changed.
      */
     val snapshotObserver: OwnerSnapshotObserver
+
+    val modifierLocalManager: ModifierLocalManager
 
     /**
      * Registers a call to be made when the [Applier.onEndChanges] is called. [listener]

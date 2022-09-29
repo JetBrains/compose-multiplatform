@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_92
+// VERSION: v0_117
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -30,12 +30,10 @@ internal object DialogTokens {
     val ContainerElevation = ElevationTokens.Level3
     val ContainerShape = ShapeKeyTokens.CornerExtraLarge
     val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
-    val SubheadColor = ColorSchemeKeyTokens.OnSurface
-    val SubheadFont = TypographyKeyTokens.HeadlineSmall
+    val HeadlineColor = ColorSchemeKeyTokens.OnSurface
+    val HeadlineFont = TypographyKeyTokens.HeadlineSmall
     val SupportingTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val SupportingTextFont = TypographyKeyTokens.BodyMedium
-    val DividerColor = ColorSchemeKeyTokens.Outline
-    val DividerHeight = 1.0.dp
     val IconColor = ColorSchemeKeyTokens.Secondary
     val IconSize = 24.0.dp
 }

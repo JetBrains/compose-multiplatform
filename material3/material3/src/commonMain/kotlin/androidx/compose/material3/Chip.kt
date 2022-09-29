@@ -42,7 +42,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
@@ -79,8 +78,7 @@ import androidx.compose.ui.unit.dp
  * Example of a flat AssistChip:
  * @sample androidx.compose.material3.samples.AssistChipSample
  *
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
@@ -88,19 +86,19 @@ import androidx.compose.ui.unit.dp
  * services.
  * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [AssistChipDefaults.assistChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [AssistChipDefaults.assistChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [AssistChipDefaults.assistChipBorder].
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [AssistChipDefaults.assistChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -111,11 +109,11 @@ fun AssistChip(
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = AssistChipDefaults.shape,
+    colors: ChipColors = AssistChipDefaults.assistChipColors(),
     elevation: ChipElevation? = AssistChipDefaults.assistChipElevation(),
-    shape: Shape = AssistChipTokens.ContainerShape.toShape(),
     border: ChipBorder? = AssistChipDefaults.assistChipBorder(),
-    colors: ChipColors = AssistChipDefaults.assistChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -124,17 +122,13 @@ fun AssistChip(
     labelTextStyle = MaterialTheme.typography.fromToken(AssistChipTokens.LabelTextFont),
     labelColor = colors.labelColor(enabled).value,
     leadingIcon = leadingIcon,
-    avatar = null,
     trailingIcon = trailingIcon,
-    leadingIconColor = colors.leadingIconContentColor(enabled).value,
-    trailingIconColor = colors.trailingIconContentColor(enabled).value,
-    containerColor = colors.containerColor(enabled).value,
-    tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp,
-    shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp,
+    shape = shape,
+    colors = colors,
+    elevation = elevation,
+    border = border?.borderStroke(enabled)?.value,
     minHeight = AssistChipDefaults.Height,
     paddingValues = AssistChipPadding,
-    shape = shape,
-    border = border?.borderStroke(enabled)?.value,
     interactionSource = interactionSource
 )
 
@@ -157,8 +151,7 @@ fun AssistChip(
  * Example of an elevated AssistChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedAssistChipSample
  *
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
@@ -166,18 +159,18 @@ fun AssistChip(
  * services.
  * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [AssistChipDefaults.elevatedAssistChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [AssistChipDefaults.elevatedAssistChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [AssistChipDefaults.elevatedAssistChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -188,11 +181,11 @@ fun ElevatedAssistChip(
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = AssistChipDefaults.shape,
+    colors: ChipColors = AssistChipDefaults.elevatedAssistChipColors(),
     elevation: ChipElevation? = AssistChipDefaults.elevatedAssistChipElevation(),
-    shape: Shape = AssistChipTokens.ContainerShape.toShape(),
     border: ChipBorder? = null,
-    colors: ChipColors = AssistChipDefaults.elevatedAssistChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -201,13 +194,9 @@ fun ElevatedAssistChip(
     labelTextStyle = MaterialTheme.typography.fromToken(AssistChipTokens.LabelTextFont),
     labelColor = colors.labelColor(enabled).value,
     leadingIcon = leadingIcon,
-    avatar = null,
     trailingIcon = trailingIcon,
-    leadingIconColor = colors.leadingIconContentColor(enabled).value,
-    trailingIconColor = colors.trailingIconContentColor(enabled).value,
-    containerColor = colors.containerColor(enabled).value,
-    tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp,
-    shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp,
+    elevation = elevation,
+    colors = colors,
     minHeight = AssistChipDefaults.Height,
     paddingValues = AssistChipPadding,
     shape = shape,
@@ -230,8 +219,8 @@ fun ElevatedAssistChip(
  * This filter chip is applied with a flat style. If you want an elevated style, use the
  * [ElevatedFilterChip].
  *
- * Tapping on a filter chip selects it, and in case a [selectedIcon] is provided (e.g. a checkmark),
- * it's appended to the starting edge of the chip's label, drawn instead of any given [leadingIcon].
+ * Tapping on a filter chip toggles its selection state. A selection state [leadingIcon] can be
+ * provided (e.g. a checkmark) to be appended at the starting edge of the chip's label.
  *
  * Example of a flat FilterChip with a trailing icon:
  * @sample androidx.compose.material3.samples.FilterChipSample
@@ -240,30 +229,29 @@ fun ElevatedAssistChip(
  * @sample androidx.compose.material3.samples.FilterChipWithLeadingIconSample
  *
  * @param selected whether this chip is selected or not
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
- * @param selectedIcon optional icon at the start of the chip, preceding the [label] text, which is
- * displayed when the chip is selected, instead of any given [leadingIcon]
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text. When
+ * [selected] is true, this icon may visually indicate that the chip is selected (for example, via a
+ * checkmark icon).
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
+ * in different states. See [FilterChipDefaults.filterChipColors].
  * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip in
  * different states. This controls the size of the shadow below the chip. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See [FilterChipDefaults.filterChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [FilterChipDefaults.filterChipBorder].
- * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
- * in different states. See [FilterChipDefaults.filterChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -274,13 +262,12 @@ fun FilterChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
-    selectedIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = FilterChipDefaults.shape,
+    colors: SelectableChipColors = FilterChipDefaults.filterChipColors(),
     elevation: SelectableChipElevation? = FilterChipDefaults.filterChipElevation(),
-    shape: Shape = FilterChipTokens.ContainerShape.toShape(),
     border: SelectableChipBorder? = FilterChipDefaults.filterChipBorder(),
-    colors: SelectableChipColors = FilterChipDefaults.filterChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = SelectableChip(
     selected = selected,
     modifier = modifier,
@@ -288,7 +275,8 @@ fun FilterChip(
     enabled = enabled,
     label = label,
     labelTextStyle = MaterialTheme.typography.fromToken(FilterChipTokens.LabelTextFont),
-    leadingIcon = if (selected) selectedIcon else leadingIcon,
+    leadingIcon = leadingIcon,
+    avatar = null,
     trailingIcon = trailingIcon,
     elevation = elevation,
     colors = colors,
@@ -314,37 +302,36 @@ fun FilterChip(
  * This filter chip is applied with an elevated style. If you want a flat style, use the
  * [FilterChip].
  *
- * Tapping on a filter chip selects it, and in case a [selectedIcon] is provided (e.g. a checkmark),
- * it's appended to the starting edge of the chip's label, drawn instead of any given [leadingIcon].
+ * Tapping on a filter chip toggles its selection state. A selection state [leadingIcon] can be
+ * provided (e.g. a checkmark) to be appended at the starting edge of the chip's label.
  *
  * Example of an elevated FilterChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedFilterChipSample
  *
  * @param selected whether this chip is selected or not
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
- * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
- * @param selectedIcon optional icon at the start of the chip, preceding the [label] text, which is
- * displayed when the chip is selected, instead of any given [leadingIcon]
+ * @param leadingIcon optional icon at the start of the chip, preceding the [label] text. When
+ * [selected] is true, this icon may visually indicate that the chip is selected (for example, via a
+ * checkmark icon).
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
+ * in different states. See [FilterChipDefaults.elevatedFilterChipColors].
  * @param elevation [SelectableChipElevation] used to resolve the elevation for this chip in
  * different states. This controls the size of the shadow below the chip. Additionally, when the
  * container color is [ColorScheme.surface], this controls the amount of primary color applied as an
  * overlay. See [FilterChipDefaults.filterChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [FilterChipDefaults.filterChipBorder].
- * @param colors [SelectableChipColors] that will be used to resolve the colors used for this chip
- * in different states. See [FilterChipDefaults.elevatedFilterChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -355,13 +342,12 @@ fun ElevatedFilterChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     leadingIcon: @Composable (() -> Unit)? = null,
-    selectedIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = FilterChipDefaults.shape,
+    colors: SelectableChipColors = FilterChipDefaults.elevatedFilterChipColors(),
     elevation: SelectableChipElevation? = FilterChipDefaults.elevatedFilterChipElevation(),
-    shape: Shape = FilterChipTokens.ContainerShape.toShape(),
     border: SelectableChipBorder? = null,
-    colors: SelectableChipColors = FilterChipDefaults.elevatedFilterChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) = SelectableChip(
     selected = selected,
     modifier = modifier,
@@ -369,7 +355,8 @@ fun ElevatedFilterChip(
     enabled = enabled,
     label = label,
     labelTextStyle = MaterialTheme.typography.fromToken(FilterChipTokens.LabelTextFont),
-    leadingIcon = if (selected) selectedIcon else leadingIcon,
+    leadingIcon = leadingIcon,
+    avatar = null,
     trailingIcon = trailingIcon,
     elevation = elevation,
     colors = colors,
@@ -406,8 +393,8 @@ fun ElevatedFilterChip(
  * Alternatively, use Accompanist's [Flow Layouts](https://google.github.io/accompanist/flowlayout/)
  * to wrap chips to a new line.
  *
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param selected whether this chip is selected or not
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
@@ -416,23 +403,24 @@ fun ElevatedFilterChip(
  * @param leadingIcon optional icon at the start of the chip, preceding the [label] text
  * @param avatar optional avatar at the start of the chip, preceding the [label] text
  * @param trailingIcon optional icon at the end of the chip
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [InputChipDefaults.inputChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [InputChipDefaults.inputChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [InputChipDefaults.inputChipBorder].
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [InputChipDefaults.inputChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
 fun InputChip(
+    selected: Boolean,
     onClick: () -> Unit,
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -440,11 +428,11 @@ fun InputChip(
     leadingIcon: @Composable (() -> Unit)? = null,
     avatar: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    shape: Shape = InputChipDefaults.shape,
+    colors: SelectableChipColors = InputChipDefaults.inputChipColors(),
+    elevation: SelectableChipElevation? = InputChipDefaults.inputChipElevation(),
+    border: SelectableChipBorder? = InputChipDefaults.inputChipBorder(),
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    elevation: ChipElevation? = InputChipDefaults.inputChipElevation(),
-    shape: Shape = InputChipTokens.ContainerShape.toShape(),
-    border: ChipBorder? = InputChipDefaults.inputChipBorder(),
-    colors: ChipColors = InputChipDefaults.inputChipColors()
 ) {
     // If given, place the avatar in an InputChipTokens.AvatarShape shape before passing it into the
     // Chip function.
@@ -465,29 +453,26 @@ fun InputChip(
             }
         }
     }
-    Chip(
+    SelectableChip(
+        selected = selected,
         modifier = modifier,
         onClick = onClick,
         enabled = enabled,
         label = label,
         labelTextStyle = MaterialTheme.typography.fromToken(InputChipTokens.LabelTextFont),
-        labelColor = colors.labelColor(enabled).value,
         leadingIcon = leadingIcon,
         avatar = shapedAvatar,
         trailingIcon = trailingIcon,
-        leadingIconColor = colors.leadingIconContentColor(enabled).value,
-        trailingIconColor = colors.trailingIconContentColor(enabled).value,
-        containerColor = colors.containerColor(enabled).value,
-        tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp,
-        shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp,
+        shape = shape,
+        colors = colors,
+        elevation = elevation,
+        border = border?.borderStroke(enabled, selected)?.value,
         minHeight = InputChipDefaults.Height,
         paddingValues = inputChipPadding(
             hasAvatar = shapedAvatar != null,
             hasLeadingIcon = leadingIcon != null,
             hasTrailingIcon = trailingIcon != null
         ),
-        shape = shape,
-        border = border?.borderStroke(enabled)?.value,
         interactionSource = interactionSource
     )
 }
@@ -510,27 +495,26 @@ fun InputChip(
  * Example of a flat SuggestionChip with a trailing icon:
  * @sample androidx.compose.material3.samples.SuggestionChipSample
  *
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
  * @param icon optional icon at the start of the chip, preceding the [label] text
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
+ * different states. See [SuggestionChipDefaults.suggestionChipColors].
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [SuggestionChipDefaults.suggestionChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip. Pass `null` for no border.
  * See [SuggestionChipDefaults.suggestionChipBorder].
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
- * different states. See [SuggestionChipDefaults.suggestionChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -540,11 +524,11 @@ fun SuggestionChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = SuggestionChipDefaults.shape,
+    colors: ChipColors = SuggestionChipDefaults.suggestionChipColors(),
     elevation: ChipElevation? = SuggestionChipDefaults.suggestionChipElevation(),
-    shape: Shape = SuggestionChipTokens.ContainerShape.toShape(),
     border: ChipBorder? = SuggestionChipDefaults.suggestionChipBorder(),
-    colors: ChipColors = SuggestionChipDefaults.suggestionChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -553,17 +537,13 @@ fun SuggestionChip(
     labelTextStyle = MaterialTheme.typography.fromToken(SuggestionChipTokens.LabelTextFont),
     labelColor = colors.labelColor(enabled).value,
     leadingIcon = icon,
-    avatar = null,
     trailingIcon = null,
-    leadingIconColor = colors.leadingIconContentColor(enabled).value,
-    trailingIconColor = colors.trailingIconContentColor(enabled).value,
-    containerColor = colors.containerColor(enabled).value,
-    tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp,
-    shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp,
+    shape = shape,
+    colors = colors,
+    elevation = elevation,
+    border = border?.borderStroke(enabled)?.value,
     minHeight = SuggestionChipDefaults.Height,
     paddingValues = SuggestionChipPadding,
-    shape = shape,
-    border = border?.borderStroke(enabled)?.value,
     interactionSource = interactionSource
 )
 
@@ -585,26 +565,25 @@ fun SuggestionChip(
  * Example of an elevated SuggestionChip with a trailing icon:
  * @sample androidx.compose.material3.samples.ElevatedSuggestionChipSample
  *
- * @param onClick called when this chip is clicked. If `null`, then this chip will not be
- * interactable, unless something else handles its input events and updates its state.
+ * @param onClick called when this chip is clicked
  * @param label text label for this chip
  * @param modifier the [Modifier] to be applied to this chip
  * @param enabled controls the enabled state of this chip. When `false`, this component will not
  * respond to user input, and it will appear visually disabled and disabled to accessibility
  * services.
  * @param icon optional icon at the start of the chip, preceding the [label] text
- * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
- * for this chip. You can create and pass in your own `remember`ed instance to observe
- * [Interaction]s and customize the appearance / behavior of this chip in different states.
+ * @param shape defines the shape of this chip's container, border (when [border] is not null), and
+ * shadow (when using [elevation])
+ * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
  * @param elevation [ChipElevation] used to resolve the elevation for this chip in different states.
  * This controls the size of the shadow below the chip. Additionally, when the container color is
  * [ColorScheme.surface], this controls the amount of primary color applied as an overlay. See
  * [Surface] and [SuggestionChipDefaults.elevatedSuggestionChipElevation].
- * @param shape defines the shape of this chip's container, border (when [border] is not null), and
- * shadow (when using [elevation])
  * @param border the border to draw around the container of this chip
- * @param colors [ChipColors] that will be used to resolve the colors used for this chip in
  * different states. See [SuggestionChipDefaults.elevatedSuggestionChipColors].
+ * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
+ * for this chip. You can create and pass in your own `remember`ed instance to observe
+ * [Interaction]s and customize the appearance / behavior of this chip in different states.
  */
 @ExperimentalMaterial3Api
 @Composable
@@ -614,11 +593,11 @@ fun ElevatedSuggestionChip(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     icon: @Composable (() -> Unit)? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = SuggestionChipDefaults.shape,
+    colors: ChipColors = SuggestionChipDefaults.elevatedSuggestionChipColors(),
     elevation: ChipElevation? = SuggestionChipDefaults.elevatedSuggestionChipElevation(),
-    shape: Shape = SuggestionChipTokens.ContainerShape.toShape(),
     border: ChipBorder? = null,
-    colors: ChipColors = SuggestionChipDefaults.elevatedSuggestionChipColors()
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) = Chip(
     modifier = modifier,
     onClick = onClick,
@@ -627,224 +606,15 @@ fun ElevatedSuggestionChip(
     labelTextStyle = MaterialTheme.typography.fromToken(SuggestionChipTokens.LabelTextFont),
     labelColor = colors.labelColor(enabled).value,
     leadingIcon = icon,
-    avatar = null,
     trailingIcon = null,
-    leadingIconColor = colors.leadingIconContentColor(enabled).value,
-    trailingIconColor = colors.trailingIconContentColor(enabled).value,
-    containerColor = colors.containerColor(enabled).value,
-    tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp,
-    shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp,
+    elevation = elevation,
+    colors = colors,
     minHeight = SuggestionChipDefaults.Height,
     paddingValues = SuggestionChipPadding,
     shape = shape,
     border = border?.borderStroke(enabled)?.value,
     interactionSource = interactionSource
 )
-
-/**
- * Represents the elevation for a chip in different states.
- */
-@Stable
-@ExperimentalMaterial3Api
-interface ChipElevation {
-    /**
-     * Represents the tonal elevation used in a chip, depending on its [enabled] state and
-     * [interactionSource]. This should typically be the same value as the [shadowElevation].
-     *
-     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
-     * color in light theme and lighter color in dark theme.
-     *
-     * See [shadowElevation] which controls the elevation of the shadow drawn around the chip.
-     *
-     * @param enabled whether the chip is enabled
-     * @param interactionSource the [InteractionSource] for this chip
-     */
-    @Composable
-    fun tonalElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp>
-
-    /**
-     * Represents the shadow elevation used in a chip, depending on its [enabled] state and
-     * [interactionSource]. This should typically be the same value as the [tonalElevation].
-     *
-     * Shadow elevation is used to apply a shadow around the chip to give it higher emphasis.
-     *
-     * See [tonalElevation] which controls the elevation with a color shift to the surface.
-     *
-     * @param enabled whether the chip is enabled
-     * @param interactionSource the [InteractionSource] for this chip
-     */
-    @Composable
-    fun shadowElevation(enabled: Boolean, interactionSource: InteractionSource): State<Dp>
-}
-
-/**
- * Represents the elevation used in a selectable chip in different states.
- */
-@Stable
-@ExperimentalMaterial3Api
-interface SelectableChipElevation {
-    /**
-     * Represents the tonal elevation used in a chip, depending on [enabled], [selected], and
-     * [interactionSource]. This should typically be the same value as the [shadowElevation].
-     *
-     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
-     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
-     * color in light theme and lighter color in dark theme.
-     *
-     * See [shadowElevation] which controls the elevation of the shadow drawn around the Chip.
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     * @param interactionSource the [InteractionSource] for this chip
-     */
-    @Composable
-    fun tonalElevation(
-        enabled: Boolean,
-        selected: Boolean,
-        interactionSource: InteractionSource
-    ): State<Dp>
-
-    /**
-     * Represents the shadow elevation used in a chip, depending on [enabled], [selected], and
-     * [interactionSource]. This should typically be the same value as the [tonalElevation].
-     *
-     * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
-     *
-     * See [tonalElevation] which controls the elevation with a color shift to the surface.
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     * @param interactionSource the [InteractionSource] for this chip
-     */
-    @Composable
-    fun shadowElevation(
-        enabled: Boolean,
-        selected: Boolean,
-        interactionSource: InteractionSource
-    ): State<Dp>
-}
-
-/**
- * Represents the container and content colors used in a clickable chip in different states.
- *
- * See [AssistChipDefaults], [InputChipDefaults], and [SuggestionChipDefaults] for the default
- * colors used in the various Chip configurations.
- */
-@Stable
-@ExperimentalMaterial3Api
-interface ChipColors {
-    /**
-     * Represents the container color for this chip, depending on [enabled].
-     *
-     * @param enabled whether the chip is enabled
-     */
-    @Composable
-    fun containerColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the label color for this chip, depending on [enabled].
-     *
-     * @param enabled whether the chip is enabled
-     */
-    @Composable
-    fun labelColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the leading icon's content color for this chip, depending on [enabled].
-     *
-     * @param enabled whether the chip is enabled
-     */
-    @Composable
-    fun leadingIconContentColor(enabled: Boolean): State<Color>
-
-    /**
-     * Represents the trailing icon's content color for this chip, depending on [enabled].
-     *
-     * @param enabled whether the chip is enabled
-     */
-    @Composable
-    fun trailingIconContentColor(enabled: Boolean): State<Color>
-}
-
-/**
- * Represents the container and content colors used in a selectable chip in different states.
- *
- * See [FilterChipDefaults.filterChipColors] and [FilterChipDefaults.elevatedFilterChipColors] for
- * the default colors used in [FilterChip].
- */
-@Stable
-@ExperimentalMaterial3Api
-interface SelectableChipColors {
-    /**
-     * Represents the container color for this chip, depending on [enabled] and [selected].
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     */
-    @Composable
-    fun containerColor(enabled: Boolean, selected: Boolean): State<Color>
-
-    /**
-     * Represents the label color for this chip, depending on [enabled] and [selected].
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     */
-    @Composable
-    fun labelColor(enabled: Boolean, selected: Boolean): State<Color>
-
-    /**
-     * Represents the leading icon color for this chip, depending on [enabled] and [selected].
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     */
-    @Composable
-    fun leadingIconContentColor(enabled: Boolean, selected: Boolean): State<Color>
-
-    /**
-     * Represents the trailing icon color for this chip, depending on [enabled] and [selected].
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     */
-    @Composable
-    fun trailingIconContentColor(enabled: Boolean, selected: Boolean): State<Color>
-}
-
-/**
- * Represents the border stroke used in a chip in different states.
- */
-@Stable
-@ExperimentalMaterial3Api
-interface ChipBorder {
-
-    /**
-     * Represents the [BorderStroke] for this chip, depending on [enabled].
-     *
-     * @param enabled whether the chip is enabled
-     */
-    @Composable
-    fun borderStroke(enabled: Boolean): State<BorderStroke?>
-}
-
-/**
- * Represents the border stroke used used in a selectable chip in different states.
- */
-@Stable
-@ExperimentalMaterial3Api
-interface SelectableChipBorder {
-    /**
-     * Represents the [BorderStroke] stroke used for this chip, depending on [enabled] and
-     * [selected].
-     *
-     * @param enabled whether the chip is enabled
-     * @param selected whether the chip is selected
-     */
-    @Composable
-    fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke?>
-}
 
 /**
  * Contains the baseline values used by [AssistChip].
@@ -870,7 +640,7 @@ object AssistChipDefaults {
      * @param labelColor the label color of this chip when enabled
      * @param leadingIconContentColor the color of this chip's start icon when enabled
      * @param trailingIconContentColor the color of this chip's end icon when enabled
-     * @param disabledContainerColor the container  color of this chip when not enabled
+     * @param disabledContainerColor the container color of this chip when not enabled
      * @param disabledLabelColor the label color of this chip when not enabled
      * @param disabledLeadingIconContentColor the color of this chip's start icon when not enabled
      * @param disabledTrailingIconContentColor the color of this chip's end icon when not enabled
@@ -888,7 +658,7 @@ object AssistChipDefaults {
             AssistChipTokens.DisabledIconColor.toColor()
                 .copy(alpha = AssistChipTokens.DisabledIconOpacity),
         disabledTrailingIconContentColor: Color = disabledLeadingIconContentColor,
-    ): ChipColors = DefaultChipColors(
+    ): ChipColors = ChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
         leadingIconContentColor = leadingIconContentColor,
@@ -919,25 +689,14 @@ object AssistChipDefaults {
         hoveredElevation: Dp = defaultElevation,
         draggedElevation: Dp = AssistChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = defaultElevation
-    ): ChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): ChipElevation = ChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
 
     /**
      * Creates a [ChipBorder] that represents the default border used in a flat [AssistChip].
@@ -952,19 +711,11 @@ object AssistChipDefaults {
         disabledBorderColor: Color = AssistChipTokens.FlatDisabledOutlineColor.toColor()
             .copy(alpha = AssistChipTokens.FlatDisabledOutlineOpacity),
         borderWidth: Dp = AssistChipTokens.FlatOutlineWidth,
-    ): ChipBorder {
-        return remember(
-            borderColor,
-            disabledBorderColor,
-            borderWidth
-        ) {
-            DefaultChipBorder(
-                borderColor = borderColor,
-                disabledBorderColor = disabledBorderColor,
-                borderWidth = borderWidth
-            )
-        }
-    }
+    ): ChipBorder = ChipBorder(
+        borderColor = borderColor,
+        disabledBorderColor = disabledBorderColor,
+        borderWidth = borderWidth
+    )
 
     /**
      * Creates a [ChipColors] that represents the default container, label, and icon colors used in
@@ -974,7 +725,7 @@ object AssistChipDefaults {
      * @param labelColor the label color of this chip when enabled
      * @param leadingIconContentColor the color of this chip's start icon when enabled
      * @param trailingIconContentColor the color of this chip's end icon when enabled
-     * @param disabledContainerColor the container  color of this chip when not enabled
+     * @param disabledContainerColor the container color of this chip when not enabled
      * @param disabledLabelColor the label color of this chip when not enabled
      * @param disabledLeadingIconContentColor the color of this chip's start icon when not enabled
      * @param disabledTrailingIconContentColor the color of this chip's end icon when not enabled
@@ -993,7 +744,7 @@ object AssistChipDefaults {
             AssistChipTokens.DisabledIconColor.toColor()
                 .copy(alpha = AssistChipTokens.DisabledIconOpacity),
         disabledTrailingIconContentColor: Color = disabledLeadingIconContentColor,
-    ): ChipColors = DefaultChipColors(
+    ): ChipColors = ChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
         leadingIconContentColor = leadingIconContentColor,
@@ -1024,25 +775,17 @@ object AssistChipDefaults {
         hoveredElevation: Dp = AssistChipTokens.ElevatedHoverContainerElevation,
         draggedElevation: Dp = AssistChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = AssistChipTokens.ElevatedDisabledContainerElevation
-    ): ChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): ChipElevation = ChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
+
+    /** Default shape of an assist chip. */
+    val shape: Shape @Composable get() = AssistChipTokens.ContainerShape.toShape()
 }
 
 /**
@@ -1050,7 +793,6 @@ object AssistChipDefaults {
  */
 @ExperimentalMaterial3Api
 object FilterChipDefaults {
-
     /**
      * The height applied for a filter chip.
      * Note that you can override it by applying Modifier.height directly on a chip.
@@ -1058,7 +800,7 @@ object FilterChipDefaults {
     val Height = FilterChipTokens.ContainerHeight
 
     /**
-     * The size of an filter chip leading icon.
+     * The size of a filter chip leading icon.
      */
     val IconSize = FilterChipTokens.IconSize
 
@@ -1074,6 +816,8 @@ object FilterChipDefaults {
      * @param disabledLeadingIconColor the color of this chip's start icon when not enabled
      * @param disabledTrailingIconColor the color of this chip's end icon when not enabled
      * @param selectedContainerColor the container color of this chip when selected
+     * @param disabledSelectedContainerColor the container color of this chip when not enabled and
+     * selected
      * @param selectedLabelColor the label color of this chip when selected
      * @param selectedLeadingIconColor the color of this chip's start icon when selected
      * @param selectedTrailingIconColor the color of this chip's end icon when selected
@@ -1090,10 +834,13 @@ object FilterChipDefaults {
             .copy(alpha = FilterChipTokens.DisabledIconOpacity),
         disabledTrailingIconColor: Color = disabledLeadingIconColor,
         selectedContainerColor: Color = FilterChipTokens.FlatSelectedContainerColor.toColor(),
+        disabledSelectedContainerColor: Color =
+            FilterChipTokens.FlatDisabledSelectedContainerColor.toColor()
+                .copy(alpha = FilterChipTokens.FlatDisabledSelectedContainerOpacity),
         selectedLabelColor: Color = FilterChipTokens.SelectedLabelTextColor.toColor(),
         selectedLeadingIconColor: Color = FilterChipTokens.SelectedIconColor.toColor(),
         selectedTrailingIconColor: Color = selectedLeadingIconColor
-    ): SelectableChipColors = DefaultSelectableChipColors(
+    ): SelectableChipColors = SelectableChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
         leadingIconColor = iconColor,
@@ -1103,14 +850,15 @@ object FilterChipDefaults {
         disabledLeadingIconColor = disabledLeadingIconColor,
         disabledTrailingIconColor = disabledTrailingIconColor,
         selectedContainerColor = selectedContainerColor,
+        disabledSelectedContainerColor = disabledSelectedContainerColor,
         selectedLabelColor = selectedLabelColor,
         selectedLeadingIconColor = selectedLeadingIconColor,
         selectedTrailingIconColor = selectedTrailingIconColor
     )
 
     /**
-     * Creates a [ChipElevation] that will animate between the provided values according to the
-     * Material specification for a flat [FilterChip].
+     * Creates a [SelectableChipElevation] that will animate between the provided values according
+     * to the Material specification for a flat [FilterChip].
      *
      * @param defaultElevation the elevation used when the [FilterChip] is has no other
      * [Interaction]s
@@ -1128,28 +876,18 @@ object FilterChipDefaults {
         hoveredElevation: Dp = FilterChipTokens.FlatSelectedHoverContainerElevation,
         draggedElevation: Dp = FilterChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = defaultElevation
-    ): SelectableChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultSelectableChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): SelectableChipElevation = SelectableChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
 
     /**
-     * Creates a [ChipBorder] that represents the default border used in a flat [FilterChip].
+     * Creates a [SelectableChipBorder] that represents the default border used in a flat
+     * [FilterChip].
      *
      * @param borderColor the border color of this chip when enabled and not selected
      * @param selectedBorderColor the border color of this chip when enabled and selected
@@ -1169,25 +907,14 @@ object FilterChipDefaults {
         disabledSelectedBorderColor: Color = Color.Transparent,
         borderWidth: Dp = FilterChipTokens.FlatUnselectedOutlineWidth,
         selectedBorderWidth: Dp = FilterChipTokens.FlatSelectedOutlineWidth,
-    ): SelectableChipBorder {
-        return remember(
-            borderColor,
-            selectedBorderColor,
-            disabledBorderColor,
-            disabledSelectedBorderColor,
-            borderWidth,
-            selectedBorderWidth
-        ) {
-            DefaultSelectableChipBorder(
-                borderColor = borderColor,
-                selectedBorderColor = selectedBorderColor,
-                disabledBorderColor = disabledBorderColor,
-                disabledSelectedBorderColor = disabledSelectedBorderColor,
-                borderWidth = borderWidth,
-                selectedBorderWidth = selectedBorderWidth
-            )
-        }
-    }
+    ): SelectableChipBorder = SelectableChipBorder(
+        borderColor = borderColor,
+        selectedBorderColor = selectedBorderColor,
+        disabledBorderColor = disabledBorderColor,
+        disabledSelectedBorderColor = disabledSelectedBorderColor,
+        borderWidth = borderWidth,
+        selectedBorderWidth = selectedBorderWidth
+    )
 
     /**
      * Creates a [SelectableChipColors] that represents the default container and content colors
@@ -1200,7 +927,9 @@ object FilterChipDefaults {
      * @param disabledLabelColor the label color of this chip when not enabled
      * @param disabledLeadingIconColor the color of this chip's start icon when not enabled
      * @param disabledTrailingIconColor the color of this chip's end icon when not enabled
-     * @param selectedContainerColor the container  color of this chip when selected
+     * @param selectedContainerColor the container color of this chip when selected
+     * @param disabledSelectedContainerColor the container color of this chip when not enabled and
+     * selected
      * @param selectedLabelColor the label color of this chip when selected
      * @param selectedLeadingIconColor the color of this chip's start icon when selected
      * @param selectedTrailingIconColor the color of this chip's end icon when selected
@@ -1218,10 +947,11 @@ object FilterChipDefaults {
             .copy(alpha = FilterChipTokens.DisabledIconOpacity),
         disabledTrailingIconColor: Color = disabledLeadingIconColor,
         selectedContainerColor: Color = FilterChipTokens.ElevatedSelectedContainerColor.toColor(),
+        disabledSelectedContainerColor: Color = disabledContainerColor,
         selectedLabelColor: Color = FilterChipTokens.SelectedLabelTextColor.toColor(),
         selectedLeadingIconColor: Color = FilterChipTokens.SelectedIconColor.toColor(),
         selectedTrailingIconColor: Color = selectedLeadingIconColor
-    ): SelectableChipColors = DefaultSelectableChipColors(
+    ): SelectableChipColors = SelectableChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
         leadingIconColor = iconColor,
@@ -1231,14 +961,15 @@ object FilterChipDefaults {
         disabledLeadingIconColor = disabledLeadingIconColor,
         disabledTrailingIconColor = disabledTrailingIconColor,
         selectedContainerColor = selectedContainerColor,
+        disabledSelectedContainerColor = disabledSelectedContainerColor,
         selectedLabelColor = selectedLabelColor,
         selectedLeadingIconColor = selectedLeadingIconColor,
         selectedTrailingIconColor = selectedTrailingIconColor
     )
 
     /**
-     * Creates a [ChipElevation] that will animate between the provided values according to the
-     * Material specification for an elevated [FilterChip].
+     * Creates a [SelectableChipElevation] that will animate between the provided values according
+     * to the Material specification for an elevated [FilterChip].
      *
      * @param defaultElevation the elevation used when the chip is has no other
      * [Interaction]s
@@ -1256,25 +987,17 @@ object FilterChipDefaults {
         hoveredElevation: Dp = FilterChipTokens.ElevatedHoverContainerElevation,
         draggedElevation: Dp = FilterChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = FilterChipTokens.ElevatedDisabledContainerElevation
-    ): SelectableChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultSelectableChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): SelectableChipElevation = SelectableChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
+
+    /** Default shape of a filter chip. */
+    val shape: Shape @Composable get() = FilterChipTokens.ContainerShape.toShape()
 }
 
 /**
@@ -1283,7 +1006,7 @@ object FilterChipDefaults {
 @ExperimentalMaterial3Api
 object InputChipDefaults {
     /**
-     * The height applied for a input chip.
+     * The height applied for an input chip.
      * Note that you can override it by applying Modifier.height directly on a chip.
      */
     val Height = InputChipTokens.ContainerHeight
@@ -1299,49 +1022,65 @@ object InputChipDefaults {
     val AvatarSize = InputChipTokens.AvatarSize
 
     /**
-     * Creates a [ChipColors] that represents the default container, label, and icon colors used in
-     * an [InputChip].
+     * Creates a [SelectableChipColors] that represents the default container, label, and icon
+     * colors used in an [InputChip].
      *
      * @param containerColor the container color of this chip when enabled
      * @param labelColor the label color of this chip when enabled
-     * @param leadingIconContentColor the color of this chip's start icon when enabled
-     * @param trailingIconContentColor the color of this chip's end icon when enabled
+     * @param leadingIconColor the color of this chip's start icon when enabled
+     * @param trailingIconColor the color of this chip's start end icon when enabled
      * @param disabledContainerColor the container color of this chip when not enabled
      * @param disabledLabelColor the label color of this chip when not enabled
-     * @param disabledLeadingIconContentColor the color of this chip's start icon when not enabled
-     * @param disabledTrailingIconContentColor the color of this chip's end icon when not enabled
+     * @param disabledLeadingIconColor the color of this chip's start icon when not enabled
+     * @param disabledTrailingIconColor the color of this chip's end icon when not enabled
+     * @param selectedContainerColor the container color of this chip when selected
+     * @param disabledSelectedContainerColor the container color of this chip when not enabled and
+     * selected
+     * @param selectedLabelColor the label color of this chip when selected
+     * @param selectedLeadingIconColor the color of this chip's start icon when selected
+     * @param selectedTrailingIconColor the color of this chip's end icon when selected
      */
     @Composable
     fun inputChipColors(
         containerColor: Color = Color.Transparent,
-        labelColor: Color = InputChipTokens.LabelTextColor.toColor(),
-        leadingIconContentColor: Color = InputChipTokens.LeadingIconColor.toColor(),
-        trailingIconContentColor: Color = InputChipTokens.TrailingIconColor.toColor(),
+        labelColor: Color = InputChipTokens.UnselectedLabelTextColor.toColor(),
+        leadingIconColor: Color = InputChipTokens.UnselectedLeadingIconColor.toColor(),
+        trailingIconColor: Color = InputChipTokens.UnselectedTrailingIconColor.toColor(),
         disabledContainerColor: Color = Color.Transparent,
         disabledLabelColor: Color = InputChipTokens.DisabledLabelTextColor.toColor()
             .copy(alpha = InputChipTokens.DisabledLabelTextOpacity),
-        disabledLeadingIconContentColor: Color =
-            InputChipTokens.DisabledLeadingIconColor.toColor()
-                .copy(alpha = InputChipTokens.DisabledLeadingIconOpacity),
-        disabledTrailingIconContentColor: Color =
-            InputChipTokens.DisabledTrailingIconColor.toColor()
-                .copy(alpha = InputChipTokens.DisabledTrailingIconOpacity),
-    ): ChipColors = DefaultChipColors(
+        disabledLeadingIconColor: Color = InputChipTokens.DisabledLeadingIconColor.toColor()
+            .copy(alpha = InputChipTokens.DisabledLeadingIconOpacity),
+        disabledTrailingIconColor: Color = InputChipTokens.DisabledTrailingIconColor.toColor()
+            .copy(alpha = InputChipTokens.DisabledTrailingIconOpacity),
+        selectedContainerColor: Color = InputChipTokens.SelectedContainerColor.toColor(),
+        disabledSelectedContainerColor: Color =
+            InputChipTokens.DisabledSelectedContainerColor.toColor()
+                .copy(alpha = InputChipTokens.DisabledSelectedContainerOpacity),
+        selectedLabelColor: Color = InputChipTokens.SelectedLabelTextColor.toColor(),
+        selectedLeadingIconColor: Color = InputChipTokens.SelectedLeadingIconColor.toColor(),
+        selectedTrailingIconColor: Color = InputChipTokens.SelectedTrailingIconColor.toColor()
+    ): SelectableChipColors = SelectableChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
-        leadingIconContentColor = leadingIconContentColor,
-        trailingIconContentColor = trailingIconContentColor,
+        leadingIconColor = leadingIconColor,
+        trailingIconColor = trailingIconColor,
         disabledContainerColor = disabledContainerColor,
         disabledLabelColor = disabledLabelColor,
-        disabledLeadingIconContentColor = disabledLeadingIconContentColor,
-        disabledTrailingIconContentColor = disabledTrailingIconContentColor
+        disabledLeadingIconColor = disabledLeadingIconColor,
+        disabledTrailingIconColor = disabledTrailingIconColor,
+        selectedContainerColor = selectedContainerColor,
+        disabledSelectedContainerColor = disabledSelectedContainerColor,
+        selectedLabelColor = selectedLabelColor,
+        selectedLeadingIconColor = selectedLeadingIconColor,
+        selectedTrailingIconColor = selectedTrailingIconColor
     )
 
     /**
-     * Creates a [ChipElevation] that will animate between the provided values according to the
-     * Material specification for an [InputChip].
+     * Creates a [SelectableChipElevation] that will animate between the provided values according
+     * to the Material specification for an [InputChip].
      *
-     * @param defaultElevation the elevation used when the [InputChip] is has no other
+     * @param defaultElevation the elevation used when the [FilterChip] is has no other
      * [Interaction]s
      * @param pressedElevation the elevation used when the chip is pressed
      * @param focusedElevation the elevation used when the chip is focused
@@ -1357,52 +1096,47 @@ object InputChipDefaults {
         hoveredElevation: Dp = defaultElevation,
         draggedElevation: Dp = InputChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = defaultElevation
-    ): ChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): SelectableChipElevation = SelectableChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
 
     /**
-     * Creates a [ChipBorder] that represents the default border used in an [InputChip].
+     * Creates a [SelectableChipBorder] that represents the default border used in an [InputChip].
      *
-     * @param borderColor the border color of this chip when enabled
-     * @param disabledBorderColor the border color of this chip when not enabled
-     * @param borderWidth the border stroke width of this chip
+     * @param borderColor the border color of this chip when enabled and not selected
+     * @param selectedBorderColor the border color of this chip when enabled and selected
+     * @param disabledBorderColor the border color of this chip when not enabled and not
+     * selected
+     * @param disabledSelectedBorderColor the border color of this chip when not enabled
+     * but selected
+     * @param borderWidth the border stroke width of this chip when not selected
+     * @param selectedBorderWidth the border stroke width of this chip when selected
      */
     @Composable
     fun inputChipBorder(
-        borderColor: Color = InputChipTokens.OutlineColor.toColor(),
-        disabledBorderColor: Color = InputChipTokens.DisabledOutlineColor.toColor()
-            .copy(alpha = InputChipTokens.DisabledOutlineOpacity),
-        borderWidth: Dp = InputChipTokens.OutlineWidth,
-    ): ChipBorder {
-        return remember(
-            borderColor,
-            disabledBorderColor,
-            borderWidth
-        ) {
-            DefaultChipBorder(
-                borderColor = borderColor,
-                disabledBorderColor = disabledBorderColor,
-                borderWidth = borderWidth
-            )
-        }
-    }
+        borderColor: Color = InputChipTokens.UnselectedOutlineColor.toColor(),
+        selectedBorderColor: Color = Color.Transparent,
+        disabledBorderColor: Color = InputChipTokens.DisabledUnselectedOutlineColor.toColor()
+            .copy(alpha = InputChipTokens.DisabledUnselectedOutlineOpacity),
+        disabledSelectedBorderColor: Color = Color.Transparent,
+        borderWidth: Dp = InputChipTokens.UnselectedOutlineWidth,
+        selectedBorderWidth: Dp = InputChipTokens.SelectedOutlineWidth,
+    ): SelectableChipBorder = SelectableChipBorder(
+        borderColor = borderColor,
+        selectedBorderColor = selectedBorderColor,
+        disabledBorderColor = disabledBorderColor,
+        disabledSelectedBorderColor = disabledSelectedBorderColor,
+        borderWidth = borderWidth,
+        selectedBorderWidth = selectedBorderWidth
+    )
+
+    /** Default shape of an input chip. */
+    val shape: Shape @Composable get() = InputChipTokens.ContainerShape.toShape()
 }
 
 /**
@@ -1417,10 +1151,9 @@ object SuggestionChipDefaults {
     val Height = SuggestionChipTokens.ContainerHeight
 
     /**
-     * The size of an suggestion chip icon.
+     * The size of a suggestion chip icon.
      */
-    // TODO(b/229778210): Read from the tokens when available.
-    val IconSize = 18.dp
+    val IconSize = SuggestionChipTokens.LeadingIconSize
 
     /**
      * Creates a [ChipColors] that represents the default container, label, and icon colors used in
@@ -1437,15 +1170,13 @@ object SuggestionChipDefaults {
     fun suggestionChipColors(
         containerColor: Color = Color.Transparent,
         labelColor: Color = SuggestionChipTokens.LabelTextColor.toColor(),
-        // TODO(b/229778210): Read from the tokens when available
-        //  (i.e. SuggestionChipTokens.IconColor.toColor()).
-        iconContentColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+        iconContentColor: Color = SuggestionChipTokens.LeadingIconColor.toColor(),
         disabledContainerColor: Color = Color.Transparent,
         disabledLabelColor: Color = SuggestionChipTokens.DisabledLabelTextColor.toColor()
             .copy(alpha = SuggestionChipTokens.DisabledLabelTextOpacity),
-        // TODO(b/229778210): Read from the tokens when available.
-        disabledIconContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    ): ChipColors = DefaultChipColors(
+        disabledIconContentColor: Color = SuggestionChipTokens.DisabledLeadingIconColor.toColor()
+            .copy(alpha = SuggestionChipTokens.DisabledLeadingIconOpacity)
+    ): ChipColors = ChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
         leadingIconContentColor = iconContentColor,
@@ -1476,25 +1207,14 @@ object SuggestionChipDefaults {
         hoveredElevation: Dp = defaultElevation,
         draggedElevation: Dp = SuggestionChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = defaultElevation
-    ): ChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): ChipElevation = ChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
 
     /**
      * Creates a [ChipBorder] that represents the default border used in a flat [SuggestionChip].
@@ -1509,17 +1229,11 @@ object SuggestionChipDefaults {
         disabledBorderColor: Color = SuggestionChipTokens.FlatDisabledOutlineColor.toColor()
             .copy(alpha = SuggestionChipTokens.FlatDisabledOutlineOpacity),
         borderWidth: Dp = SuggestionChipTokens.FlatOutlineWidth,
-    ): ChipBorder {
-        return remember(
-            borderColor, disabledBorderColor, borderWidth
-        ) {
-            DefaultChipBorder(
-                borderColor = borderColor,
-                disabledBorderColor = disabledBorderColor,
-                borderWidth = borderWidth
-            )
-        }
-    }
+    ): ChipBorder = ChipBorder(
+        borderColor = borderColor,
+        disabledBorderColor = disabledBorderColor,
+        borderWidth = borderWidth
+    )
 
     /**
      * Creates a [ChipColors] that represents the default container, label, and icon colors used in
@@ -1546,7 +1260,7 @@ object SuggestionChipDefaults {
             .copy(alpha = SuggestionChipTokens.DisabledLabelTextOpacity),
         // TODO(b/229778210): Read from the tokens when available.
         disabledIconContentColor: Color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
-    ): ChipColors = DefaultChipColors(
+    ): ChipColors = ChipColors(
         containerColor = containerColor,
         labelColor = labelColor,
         leadingIconContentColor = iconContentColor,
@@ -1577,25 +1291,17 @@ object SuggestionChipDefaults {
         hoveredElevation: Dp = SuggestionChipTokens.ElevatedHoverContainerElevation,
         draggedElevation: Dp = SuggestionChipTokens.DraggedContainerElevation,
         disabledElevation: Dp = SuggestionChipTokens.ElevatedDisabledContainerElevation
-    ): ChipElevation {
-        return remember(
-            defaultElevation,
-            pressedElevation,
-            focusedElevation,
-            hoveredElevation,
-            draggedElevation,
-            disabledElevation
-        ) {
-            DefaultChipElevation(
-                defaultElevation = defaultElevation,
-                pressedElevation = pressedElevation,
-                focusedElevation = focusedElevation,
-                hoveredElevation = hoveredElevation,
-                draggedElevation = draggedElevation,
-                disabledElevation = disabledElevation
-            )
-        }
-    }
+    ): ChipElevation = ChipElevation(
+        defaultElevation = defaultElevation,
+        pressedElevation = pressedElevation,
+        focusedElevation = focusedElevation,
+        hoveredElevation = hoveredElevation,
+        draggedElevation = draggedElevation,
+        disabledElevation = disabledElevation
+    )
+
+    /** Default shape of a suggestion chip. */
+    val shape: Shape @Composable get() = SuggestionChipTokens.ContainerShape.toShape()
 }
 
 @ExperimentalMaterial3Api
@@ -1608,17 +1314,13 @@ private fun Chip(
     labelTextStyle: TextStyle,
     labelColor: Color,
     leadingIcon: @Composable (() -> Unit)?,
-    avatar: @Composable (() -> Unit)?,
     trailingIcon: @Composable (() -> Unit)?,
-    leadingIconColor: Color,
-    trailingIconColor: Color,
-    containerColor: Color,
-    tonalElevation: Dp,
-    shadowElevation: Dp,
+    shape: Shape,
+    colors: ChipColors,
+    elevation: ChipElevation?,
+    border: BorderStroke?,
     minHeight: Dp,
     paddingValues: PaddingValues,
-    shape: Shape,
-    border: BorderStroke?,
     interactionSource: MutableInteractionSource,
 ) {
     Surface(
@@ -1626,9 +1328,9 @@ private fun Chip(
         modifier = modifier,
         enabled = enabled,
         shape = shape,
-        color = containerColor,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
+        color = colors.containerColor(enabled).value,
+        tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp,
+        shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value ?: 0.dp,
         border = border,
         interactionSource = interactionSource,
     ) {
@@ -1637,10 +1339,10 @@ private fun Chip(
             labelTextStyle = labelTextStyle,
             labelColor = labelColor,
             leadingIcon = leadingIcon,
-            avatar = avatar,
+            avatar = null,
             trailingIcon = trailingIcon,
-            leadingIconColor = leadingIconColor,
-            trailingIconColor = trailingIconColor,
+            leadingIconColor = colors.leadingIconContentColor(enabled).value,
+            trailingIconColor = colors.trailingIconContentColor(enabled).value,
             minHeight = minHeight,
             paddingValues = paddingValues
         )
@@ -1657,13 +1359,14 @@ private fun SelectableChip(
     label: @Composable () -> Unit,
     labelTextStyle: TextStyle,
     leadingIcon: @Composable (() -> Unit)?,
+    avatar: @Composable (() -> Unit)?,
     trailingIcon: @Composable (() -> Unit)?,
-    elevation: SelectableChipElevation?,
+    shape: Shape,
     colors: SelectableChipColors,
+    elevation: SelectableChipElevation?,
+    border: BorderStroke?,
     minHeight: Dp,
     paddingValues: PaddingValues,
-    shape: Shape,
-    border: BorderStroke?,
     interactionSource: MutableInteractionSource
 ) {
     // TODO(b/229794614): Animate transition between unselected and selected.
@@ -1674,9 +1377,9 @@ private fun SelectableChip(
         enabled = enabled,
         shape = shape,
         color = colors.containerColor(enabled, selected).value,
-        tonalElevation = elevation?.tonalElevation(enabled, selected, interactionSource)?.value
+        tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value
             ?: 0.dp,
-        shadowElevation = elevation?.shadowElevation(enabled, selected, interactionSource)?.value
+        shadowElevation = elevation?.shadowElevation(enabled, interactionSource)?.value
             ?: 0.dp,
         border = border,
         interactionSource = interactionSource,
@@ -1685,7 +1388,7 @@ private fun SelectableChip(
             label = label,
             labelTextStyle = labelTextStyle,
             leadingIcon = leadingIcon,
-            avatar = null,
+            avatar = avatar,
             labelColor = colors.labelColor(enabled, selected).value,
             trailingIcon = trailingIcon,
             leadingIconColor = colors.leadingIconContentColor(enabled, selected).value,
@@ -1714,7 +1417,9 @@ private fun ChipContent(
         LocalTextStyle provides labelTextStyle
     ) {
         Row(
-            Modifier.defaultMinSize(minHeight = minHeight).padding(paddingValues),
+            Modifier
+                .defaultMinSize(minHeight = minHeight)
+                .padding(paddingValues),
             horizontalArrangement = Arrangement.Start,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -1737,27 +1442,53 @@ private fun ChipContent(
     }
 }
 
-/** Default [ChipElevation] implementation. */
+/**
+ * Represents the elevation for a chip in different states.
+ */
 @ExperimentalMaterial3Api
 @Immutable
-private class DefaultChipElevation(
+class ChipElevation internal constructor(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
     private val focusedElevation: Dp,
     private val hoveredElevation: Dp,
     private val draggedElevation: Dp,
     private val disabledElevation: Dp
-) : ChipElevation {
+) {
+    /**
+     * Represents the tonal elevation used in a chip, depending on its [enabled] state and
+     * [interactionSource]. This should typically be the same value as the [shadowElevation].
+     *
+     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
+     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
+     *
+     * See [shadowElevation] which controls the elevation of the shadow drawn around the chip.
+     *
+     * @param enabled whether the chip is enabled
+     * @param interactionSource the [InteractionSource] for this chip
+     */
     @Composable
-    override fun tonalElevation(
+    internal fun tonalElevation(
         enabled: Boolean,
         interactionSource: InteractionSource
     ): State<Dp> {
         return animateElevation(enabled = enabled, interactionSource = interactionSource)
     }
 
+    /**
+     * Represents the shadow elevation used in a chip, depending on its [enabled] state and
+     * [interactionSource]. This should typically be the same value as the [tonalElevation].
+     *
+     * Shadow elevation is used to apply a shadow around the chip to give it higher emphasis.
+     *
+     * See [tonalElevation] which controls the elevation with a color shift to the surface.
+     *
+     * @param enabled whether the chip is enabled
+     * @param interactionSource the [InteractionSource] for this chip
+     */
     @Composable
-    override fun shadowElevation(
+    internal fun shadowElevation(
         enabled: Boolean,
         interactionSource: InteractionSource
     ): State<Dp> {
@@ -1843,10 +1574,32 @@ private class DefaultChipElevation(
 
         return animatable.asState()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is ChipElevation) return false
+
+        if (defaultElevation != other.defaultElevation) return false
+        if (pressedElevation != other.pressedElevation) return false
+        if (focusedElevation != other.focusedElevation) return false
+        if (hoveredElevation != other.hoveredElevation) return false
+        if (disabledElevation != other.disabledElevation) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = defaultElevation.hashCode()
+        result = 31 * result + pressedElevation.hashCode()
+        result = 31 * result + focusedElevation.hashCode()
+        result = 31 * result + hoveredElevation.hashCode()
+        result = 31 * result + disabledElevation.hashCode()
+        return result
+    }
 }
 
 /**
- * Default [SelectableChipElevation] implementation.
+ * Represents the elevation used in a selectable chip in different states.
  *
  * Note that this default implementation does not take into consideration the `selectable` state
  * passed into its [tonalElevation] and [shadowElevation]. If you wish to apply that state, use a
@@ -1854,27 +1607,49 @@ private class DefaultChipElevation(
  */
 @ExperimentalMaterial3Api
 @Immutable
-private class DefaultSelectableChipElevation(
+class SelectableChipElevation internal constructor(
     private val defaultElevation: Dp,
     private val pressedElevation: Dp,
     private val focusedElevation: Dp,
     private val hoveredElevation: Dp,
     private val draggedElevation: Dp,
     private val disabledElevation: Dp
-) : SelectableChipElevation {
+) {
+    /**
+     * Represents the tonal elevation used in a chip, depending on [enabled] and
+     * [interactionSource]. This should typically be the same value as the [shadowElevation].
+     *
+     * Tonal elevation is used to apply a color shift to the surface to give the it higher emphasis.
+     * When surface's color is [ColorScheme.surface], a higher elevation will result in a darker
+     * color in light theme and lighter color in dark theme.
+     *
+     * See [shadowElevation] which controls the elevation of the shadow drawn around the Chip.
+     *
+     * @param enabled whether the chip is enabled
+     * @param interactionSource the [InteractionSource] for this chip
+     */
     @Composable
-    override fun tonalElevation(
+    internal fun tonalElevation(
         enabled: Boolean,
-        selected: Boolean,
         interactionSource: InteractionSource
     ): State<Dp> {
         return animateElevation(enabled = enabled, interactionSource = interactionSource)
     }
 
+    /**
+     * Represents the shadow elevation used in a chip, depending on [enabled] and
+     * [interactionSource]. This should typically be the same value as the [tonalElevation].
+     *
+     * Shadow elevation is used to apply a shadow around the surface to give it higher emphasis.
+     *
+     * See [tonalElevation] which controls the elevation with a color shift to the surface.
+     *
+     * @param enabled whether the chip is enabled
+     * @param interactionSource the [InteractionSource] for this chip
+     */
     @Composable
-    override fun shadowElevation(
+    internal fun shadowElevation(
         enabled: Boolean,
-        selected: Boolean,
         interactionSource: InteractionSource
     ): State<Dp> {
         return animateElevation(enabled = enabled, interactionSource = interactionSource)
@@ -1959,14 +1734,39 @@ private class DefaultSelectableChipElevation(
 
         return animatable.asState()
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || other !is SelectableChipElevation) return false
+
+        if (defaultElevation != other.defaultElevation) return false
+        if (pressedElevation != other.pressedElevation) return false
+        if (focusedElevation != other.focusedElevation) return false
+        if (hoveredElevation != other.hoveredElevation) return false
+        if (disabledElevation != other.disabledElevation) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = defaultElevation.hashCode()
+        result = 31 * result + pressedElevation.hashCode()
+        result = 31 * result + focusedElevation.hashCode()
+        result = 31 * result + hoveredElevation.hashCode()
+        result = 31 * result + disabledElevation.hashCode()
+        return result
+    }
 }
 
 /**
- * Default [ChipColors] implementation.
+ * Represents the container and content colors used in a clickable chip in different states.
+ *
+ * See [AssistChipDefaults], [InputChipDefaults], and [SuggestionChipDefaults] for the default
+ * colors used in the various Chip configurations.
  */
 @ExperimentalMaterial3Api
 @Immutable
-private class DefaultChipColors(
+class ChipColors internal constructor(
     private val containerColor: Color,
     private val labelColor: Color,
     private val leadingIconContentColor: Color,
@@ -1976,26 +1776,46 @@ private class DefaultChipColors(
     private val disabledLeadingIconContentColor: Color,
     private val disabledTrailingIconContentColor: Color
     // TODO(b/113855296): Support other states: hover, focus, drag
-) : ChipColors {
+) {
+    /**
+     * Represents the container color for this chip, depending on [enabled].
+     *
+     * @param enabled whether the chip is enabled
+     */
     @Composable
-    override fun containerColor(enabled: Boolean): State<Color> {
+    internal fun containerColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) containerColor else disabledContainerColor)
     }
 
+    /**
+     * Represents the label color for this chip, depending on [enabled].
+     *
+     * @param enabled whether the chip is enabled
+     */
     @Composable
-    override fun labelColor(enabled: Boolean): State<Color> {
+    internal fun labelColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(if (enabled) labelColor else disabledLabelColor)
     }
 
+    /**
+     * Represents the leading icon's content color for this chip, depending on [enabled].
+     *
+     * @param enabled whether the chip is enabled
+     */
     @Composable
-    override fun leadingIconContentColor(enabled: Boolean): State<Color> {
+    internal fun leadingIconContentColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) leadingIconContentColor else disabledLeadingIconContentColor
         )
     }
 
+    /**
+     * Represents the trailing icon's content color for this chip, depending on [enabled].
+     *
+     * @param enabled whether the chip is enabled
+     */
     @Composable
-    override fun trailingIconContentColor(enabled: Boolean): State<Color> {
+    internal fun trailingIconContentColor(enabled: Boolean): State<Color> {
         return rememberUpdatedState(
             if (enabled) trailingIconContentColor else disabledTrailingIconContentColor
         )
@@ -2003,9 +1823,7 @@ private class DefaultChipColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultChipColors
+        if (other == null || other !is ChipColors) return false
 
         if (containerColor != other.containerColor) return false
         if (labelColor != other.labelColor) return false
@@ -2034,11 +1852,14 @@ private class DefaultChipColors(
 }
 
 /**
- * Default [SelectableChipColors] implementation.
+ * Represents the container and content colors used in a selectable chip in different states.
+ *
+ * See [FilterChipDefaults.filterChipColors] and [FilterChipDefaults.elevatedFilterChipColors] for
+ * the default colors used in [FilterChip].
  */
 @ExperimentalMaterial3Api
 @Immutable
-private class DefaultSelectableChipColors(
+class SelectableChipColors internal constructor(
     private val containerColor: Color,
     private val labelColor: Color,
     private val leadingIconColor: Color,
@@ -2048,23 +1869,36 @@ private class DefaultSelectableChipColors(
     private val disabledLeadingIconColor: Color,
     private val disabledTrailingIconColor: Color,
     private val selectedContainerColor: Color,
+    private val disabledSelectedContainerColor: Color,
     private val selectedLabelColor: Color,
     private val selectedLeadingIconColor: Color,
     private val selectedTrailingIconColor: Color
     // TODO(b/113855296): Support other states: hover, focus, drag
-) : SelectableChipColors {
+) {
+    /**
+     * Represents the container color for this chip, depending on [enabled] and [selected].
+     *
+     * @param enabled whether the chip is enabled
+     * @param selected whether the chip is selected
+     */
     @Composable
-    override fun containerColor(enabled: Boolean, selected: Boolean): State<Color> {
+    internal fun containerColor(enabled: Boolean, selected: Boolean): State<Color> {
         val target = when {
-            !enabled -> disabledContainerColor
+            !enabled -> if (selected) disabledSelectedContainerColor else disabledContainerColor
             !selected -> containerColor
             else -> selectedContainerColor
         }
         return rememberUpdatedState(target)
     }
 
+    /**
+     * Represents the label color for this chip, depending on [enabled] and [selected].
+     *
+     * @param enabled whether the chip is enabled
+     * @param selected whether the chip is selected
+     */
     @Composable
-    override fun labelColor(enabled: Boolean, selected: Boolean): State<Color> {
+    internal fun labelColor(enabled: Boolean, selected: Boolean): State<Color> {
         val target = when {
             !enabled -> disabledLabelColor
             !selected -> labelColor
@@ -2073,8 +1907,14 @@ private class DefaultSelectableChipColors(
         return rememberUpdatedState(target)
     }
 
+    /**
+     * Represents the leading icon color for this chip, depending on [enabled] and [selected].
+     *
+     * @param enabled whether the chip is enabled
+     * @param selected whether the chip is selected
+     */
     @Composable
-    override fun leadingIconContentColor(enabled: Boolean, selected: Boolean): State<Color> {
+    internal fun leadingIconContentColor(enabled: Boolean, selected: Boolean): State<Color> {
         val target = when {
             !enabled -> disabledLeadingIconColor
             !selected -> leadingIconColor
@@ -2083,8 +1923,14 @@ private class DefaultSelectableChipColors(
         return rememberUpdatedState(target)
     }
 
+    /**
+     * Represents the trailing icon color for this chip, depending on [enabled] and [selected].
+     *
+     * @param enabled whether the chip is enabled
+     * @param selected whether the chip is selected
+     */
     @Composable
-    override fun trailingIconContentColor(enabled: Boolean, selected: Boolean): State<Color> {
+    internal fun trailingIconContentColor(enabled: Boolean, selected: Boolean): State<Color> {
         val target = when {
             !enabled -> disabledTrailingIconColor
             !selected -> trailingIconColor
@@ -2095,9 +1941,7 @@ private class DefaultSelectableChipColors(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultSelectableChipColors
+        if (other == null || other !is SelectableChipColors) return false
 
         if (containerColor != other.containerColor) return false
         if (labelColor != other.labelColor) return false
@@ -2108,6 +1952,7 @@ private class DefaultSelectableChipColors(
         if (disabledLeadingIconColor != other.disabledLeadingIconColor) return false
         if (disabledTrailingIconColor != other.disabledTrailingIconColor) return false
         if (selectedContainerColor != other.selectedContainerColor) return false
+        if (disabledSelectedContainerColor != other.disabledSelectedContainerColor) return false
         if (selectedLabelColor != other.selectedLabelColor) return false
         if (selectedLeadingIconColor != other.selectedLeadingIconColor) return false
         if (selectedTrailingIconColor != other.selectedTrailingIconColor) return false
@@ -2125,6 +1970,7 @@ private class DefaultSelectableChipColors(
         result = 31 * result + disabledLeadingIconColor.hashCode()
         result = 31 * result + disabledTrailingIconColor.hashCode()
         result = 31 * result + selectedContainerColor.hashCode()
+        result = 31 * result + disabledSelectedContainerColor.hashCode()
         result = 31 * result + selectedLabelColor.hashCode()
         result = 31 * result + selectedLeadingIconColor.hashCode()
         result = 31 * result + selectedTrailingIconColor.hashCode()
@@ -2134,20 +1980,27 @@ private class DefaultSelectableChipColors(
 }
 
 /**
- * Default [SelectableChipBorder] implementation.
+ * Represents the border stroke used used in a selectable chip in different states.
  */
 @ExperimentalMaterial3Api
 @Immutable
-private class DefaultSelectableChipBorder(
+class SelectableChipBorder internal constructor(
     private val borderColor: Color,
     private val selectedBorderColor: Color,
     private val disabledBorderColor: Color,
     private val disabledSelectedBorderColor: Color,
     private val borderWidth: Dp,
     private val selectedBorderWidth: Dp
-) : SelectableChipBorder {
+) {
+    /**
+     * Represents the [BorderStroke] stroke used for this chip, depending on [enabled] and
+     * [selected].
+     *
+     * @param enabled whether the chip is enabled
+     * @param selected whether the chip is selected
+     */
     @Composable
-    override fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke?> {
+    internal fun borderStroke(enabled: Boolean, selected: Boolean): State<BorderStroke?> {
         val color = if (enabled) {
             if (selected) selectedBorderColor else borderColor
         } else {
@@ -2160,9 +2013,7 @@ private class DefaultSelectableChipBorder(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultSelectableChipBorder
+        if (other == null || other !is SelectableChipBorder) return false
 
         if (borderColor != other.borderColor) return false
         if (selectedBorderColor != other.selectedBorderColor) return false
@@ -2187,17 +2038,22 @@ private class DefaultSelectableChipBorder(
 }
 
 /**
- * Default [ChipBorder] implementation.
+ * Represents the border stroke used in a chip in different states.
  */
 @ExperimentalMaterial3Api
 @Immutable
-private class DefaultChipBorder(
+class ChipBorder internal constructor(
     private val borderColor: Color,
     private val disabledBorderColor: Color,
     private val borderWidth: Dp,
-) : ChipBorder {
+) {
+    /**
+     * Represents the [BorderStroke] for this chip, depending on [enabled].
+     *
+     * @param enabled whether the chip is enabled
+     */
     @Composable
-    override fun borderStroke(enabled: Boolean): State<BorderStroke?> {
+    internal fun borderStroke(enabled: Boolean): State<BorderStroke?> {
         return rememberUpdatedState(
             BorderStroke(borderWidth, if (enabled) borderColor else disabledBorderColor)
         )
@@ -2205,9 +2061,7 @@ private class DefaultChipBorder(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (other == null || this::class != other::class) return false
-
-        other as DefaultChipBorder
+        if (other == null || other !is ChipBorder) return false
 
         if (borderColor != other.borderColor) return false
         if (disabledBorderColor != other.disabledBorderColor) return false

@@ -100,7 +100,8 @@ class SnackbarHostState {
         message: String,
         actionLabel: String? = null,
         withDismissAction: Boolean = false,
-        duration: SnackbarDuration = SnackbarDuration.Short
+        duration: SnackbarDuration =
+            if (actionLabel == null) SnackbarDuration.Short else SnackbarDuration.Indefinite
     ): SnackbarResult =
         showSnackbar(SnackbarVisualsImpl(message, actionLabel, withDismissAction, duration))
 
