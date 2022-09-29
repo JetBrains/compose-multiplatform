@@ -186,6 +186,15 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     }
 
     private fun configureTestTask(project: Project, task: Test) {
+        val ignoreFailuresProperty = project.providers.gradleProperty(
+            TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
+        )
+        val ignoreFailures = ignoreFailuresProperty.isPresent
+        if (ignoreFailures) {
+            task.ignoreFailures = true
+        }
+        task.inputs.property("ignoreFailures", ignoreFailures)
+
         // Robolectric 1.7 increased heap size requirements, see b/207169653.
         task.maxHeapSize = "3g"
 
@@ -243,12 +252,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                     it.destinationDirectory.set(xmlReportDestDir)
                     it.archiveFileName.set(archiveName)
                     it.from(project.file(xmlReport.outputLocation))
-                }
-                val ignoreFailuresProperty = project.providers.gradleProperty(
-                    TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
-                )
-                if (ignoreFailuresProperty.isPresent) {
-                    task.ignoreFailures = true
                 }
                 task.finalizedBy(zipXmlTask)
             }
