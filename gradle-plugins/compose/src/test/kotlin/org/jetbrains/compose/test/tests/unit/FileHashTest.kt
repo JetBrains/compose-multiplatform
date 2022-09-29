@@ -1,14 +1,15 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose
+package org.jetbrains.compose.test.tests.unit
 
-import org.gradle.internal.impldep.org.testng.Assert
 import org.jetbrains.compose.desktop.application.internal.OS
 import org.jetbrains.compose.desktop.application.internal.currentOS
 import org.jetbrains.compose.desktop.application.internal.files.contentHash
+
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -40,7 +41,7 @@ class FileHashTest {
 
         val initHash = initJar.contentHash()
         val modifiedHash = modifiedJar.contentHash()
-        Assert.assertNotEquals(modifiedHash, initHash)
+        assertNotEquals(modifiedHash, initHash)
     }
 
     private fun createJar(outputFileName: String, vararg files: File): File {

@@ -1,21 +1,22 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.gradle
+package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.test.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assumptions
-import org.junit.jupiter.api.Test
+import org.jetbrains.compose.test.utils.*
+
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
 import kotlin.collections.HashSet
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Test
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -53,6 +54,17 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             check.taskOutcome(":createDistributable", TaskOutcome.SUCCESS)
             check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
             check.logContains(logLine)
+        }
+    }
+
+    @Test
+    fun testAndroidxCompiler() = with(testProject(TestProjects.androidxCompiler, defaultAndroidxCompilerEnvironment)) {
+        gradle(":runDistributable").build().checks { check ->
+            val actualMainImage = file("main-image.actual.png")
+            val expectedMainImage = file("main-image.expected.png")
+            assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
+                "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
+            }
         }
     }
 

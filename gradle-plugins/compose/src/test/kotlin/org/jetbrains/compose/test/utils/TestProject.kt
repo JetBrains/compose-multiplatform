@@ -1,9 +1,9 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.test
+package org.jetbrains.compose.test.utils
 
 import org.gradle.testkit.runner.GradleRunner
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
@@ -12,7 +12,8 @@ import java.io.File
 data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: TestKotlinVersion = TestKotlinVersion.Default,
-    val composeVersion: String = TestProperties.composeVersion
+    val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
+    val composeCompilerArtifact: String? = null
 )
 
 class TestProject(
@@ -38,9 +39,12 @@ class TestProject(
 
             if (orig.name.endsWith(".gradle") || orig.name.endsWith(".gradle.kts")) {
                 val origContent = orig.readText()
-                val newContent = origContent
-                    .replace("COMPOSE_VERSION_PLACEHOLDER", testEnvironment.composeVersion)
+                var newContent = origContent
+                    .replace("COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER", testEnvironment.composeGradlePluginVersion)
                     .replace("KOTLIN_VERSION_PLACEHOLDER", testEnvironment.kotlinVersion.versionString)
+                if (testEnvironment.composeCompilerArtifact != null) {
+                    newContent = newContent.replace("COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER", testEnvironment.composeCompilerArtifact)
+                }
                 target.writeText(newContent)
             } else {
                 orig.copyTo(target)
