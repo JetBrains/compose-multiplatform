@@ -50,20 +50,6 @@ def addMavenRepositories(RepositoryHandler handler) {
             excludeGroupByRegex "androidx.databinding.*"
         }
     }
-    handler.ivy {
-        // TODO: maybe we can move this no-group ivy repo directly into prebuilts/androidx/external
-        // once https://youtrack.jetbrains.com/issue/KT-35049 gets resolved */
-        url("${repos.prebuiltsRoot}/androidx/external/no-group")
-        patternLayout {
-            artifact("[artifact]/[revision]/[artifact]-[revision].[ext]")
-        }
-        metadataSources {
-            it.artifact()
-        }
-        content {
-            includeGroup("")
-        }
-    }
     handler.maven {
         url("${repos.prebuiltsRoot}/androidx/external")
         metadataSources {

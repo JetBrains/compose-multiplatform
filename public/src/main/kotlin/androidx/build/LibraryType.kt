@@ -55,78 +55,109 @@ package androidx.build
  * IDE_PLUGIN
  *
  */
-enum class LibraryType(
+sealed class LibraryType(
     val publish: Publish = Publish.NONE,
     val sourceJars: Boolean = false,
     val checkApi: RunApiTasks = RunApiTasks.No("Unknown Library Type"),
-    val compilationTarget: CompilationTarget = CompilationTarget.DEVICE
+    val compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
+    val allowCallingVisibleForTestsApis: Boolean = false
 ) {
-    PUBLISHED_LIBRARY(
+    val name: String
+        get() = javaClass.simpleName
+
+    companion object {
+        val PUBLISHED_LIBRARY = PublishedLibrary()
+        val PUBLISHED_TEST_LIBRARY = PublishedTestLibrary()
+        val PUBLISHED_NATIVE_LIBRARY = PublishedNativeLibrary()
+        val INTERNAL_TEST_LIBRARY = InternalTestLibrary()
+        val INTERNAL_HOST_TEST_LIBRARY = InternalHostTestLibrary()
+        val SAMPLES = Samples()
+        val LINT = Lint()
+        val COMPILER_DAEMON = CompilerDaemon()
+        val COMPILER_DAEMON_TEST = CompilerDaemonTest()
+        val COMPILER_PLUGIN = CompilerPlugin()
+        val GRADLE_PLUGIN = GradlePlugin()
+        val ANNOTATION_PROCESSOR = AnnotationProcessor()
+        val ANNOTATION_PROCESSOR_UTILS = AnnotationProcessorUtils()
+        val OTHER_CODE_PROCESSOR = OtherCodeProcessor()
+        val IDE_PLUGIN = IdePlugin()
+        val KMP_LIBRARY = KmpLibrary()
+        val UNSET = Unset()
+    }
+    open class PublishedLibrary(allowCallingVisibleForTestsApis: Boolean = false) : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
-        checkApi = RunApiTasks.Yes()
-    ),
-    PUBLISHED_TEST_LIBRARY(
-        publish = Publish.SNAPSHOT_AND_RELEASE,
-        sourceJars = true,
-        checkApi = RunApiTasks.Yes()
-    ),
-    INTERNAL_TEST_LIBRARY(
-        checkApi = RunApiTasks.No("Internal Library")
-    ),
-    PUBLISHED_NATIVE_LIBRARY(
-        publish = Publish.SNAPSHOT_AND_RELEASE,
-        sourceJars = true,
-        checkApi = RunApiTasks.Yes()
-    ),
-    SAMPLES(
+        checkApi = RunApiTasks.Yes(),
+        allowCallingVisibleForTestsApis = allowCallingVisibleForTestsApis
+    )
+    open class InternalLibrary(
+        compilationTarget: CompilationTarget = CompilationTarget.DEVICE,
+        allowCallingVisibleForTestsApis: Boolean = false
+    ) : LibraryType(
+        checkApi = RunApiTasks.No("Internal Library"),
+        compilationTarget = compilationTarget,
+        allowCallingVisibleForTestsApis = allowCallingVisibleForTestsApis
+    )
+
+    class PublishedTestLibrary() : PublishedLibrary(allowCallingVisibleForTestsApis = true)
+    class InternalTestLibrary() : InternalLibrary(allowCallingVisibleForTestsApis = true)
+    class InternalHostTestLibrary() : InternalLibrary(CompilationTarget.HOST)
+    class PublishedNativeLibrary : PublishedLibrary()
+    class Samples : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
         checkApi = RunApiTasks.No("Sample Library")
-    ),
-    LINT(
+    )
+    class Lint : LibraryType(
         publish = Publish.NONE,
         sourceJars = false,
         checkApi = RunApiTasks.No("Lint Library"),
         compilationTarget = CompilationTarget.HOST
-    ),
-    COMPILER_DAEMON(
+    )
+    class CompilerDaemon : LibraryType(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
         RunApiTasks.No("Compiler Daemon (Host-only)"),
         CompilationTarget.HOST
-    ),
-    COMPILER_PLUGIN(
+    )
+    class CompilerDaemonTest : LibraryType(
+        Publish.NONE,
+        sourceJars = false,
+        RunApiTasks.No("Compiler Daemon (Host-only) Test"),
+        CompilationTarget.HOST
+    )
+
+    class CompilerPlugin : LibraryType(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
         RunApiTasks.No("Compiler Plugin (Host-only)"),
         CompilationTarget.HOST
-    ),
-    GRADLE_PLUGIN(
+    )
+    class GradlePlugin : LibraryType(
         Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
         RunApiTasks.No("Gradle Plugin (Host-only)"),
         CompilationTarget.HOST
-    ),
-    ANNOTATION_PROCESSOR(
+    )
+    class AnnotationProcessor : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = false,
         checkApi = RunApiTasks.No("Annotation Processor"),
         compilationTarget = CompilationTarget.HOST
-    ),
-    ANNOTATION_PROCESSOR_UTILS(
+    )
+    class AnnotationProcessorUtils : LibraryType(
         publish = Publish.SNAPSHOT_AND_RELEASE,
         sourceJars = true,
         checkApi = RunApiTasks.No("Annotation Processor Helper Library"),
         compilationTarget = CompilationTarget.HOST
-    ),
-    OTHER_CODE_PROCESSOR(
-        publish = Publish.SNAPSHOT_AND_RELEASE,
+    )
+    class OtherCodeProcessor(publish: Publish = Publish.SNAPSHOT_AND_RELEASE) : LibraryType(
+        publish = publish,
         sourceJars = false,
         checkApi = RunApiTasks.No("Code Processor (Host-only)"),
         compilationTarget = CompilationTarget.HOST
-    ),
-    IDE_PLUGIN(
+    )
+    class IdePlugin : LibraryType(
         publish = Publish.NONE,
         sourceJars = false,
         // TODO: figure out a way to make sure we don't break Studio
@@ -134,8 +165,14 @@ enum class LibraryType(
         // This is a bit complicated. IDE plugins usually have an on-device component installed by
         // Android Studio, rather than by a client of the library, but also a host-side component.
         compilationTarget = CompilationTarget.DEVICE
-    ),
-    UNSET()
+    )
+    class KmpLibrary : LibraryType(
+        publish = Publish.SNAPSHOT_AND_RELEASE,
+        sourceJars = true,
+        checkApi = RunApiTasks.Yes(),
+        compilationTarget = CompilationTarget.DEVICE
+    )
+    class Unset : LibraryType()
 }
 
 enum class CompilationTarget {
@@ -147,7 +184,7 @@ enum class CompilationTarget {
 
 /**
  * Publish Enum:
- * Publish.NONE -> Generates no aritfacts; does not generate snapshot artifacts
+ * Publish.NONE -> Generates no artifacts; does not generate snapshot artifacts
  *                 or releasable maven artifacts
  * Publish.SNAPSHOT_ONLY -> Only generates snapshot artifacts
  * Publish.SNAPSHOT_AND_RELEASE -> Generates both snapshot artifacts and releasable maven artifact
@@ -161,7 +198,7 @@ enum class Publish {
     NONE, SNAPSHOT_ONLY, SNAPSHOT_AND_RELEASE, UNSET;
 
     fun shouldRelease() = this == SNAPSHOT_AND_RELEASE
-    fun shouldPublish() = this == SNAPSHOT_ONLY || this == SNAPSHOT_AND_RELEASE
+    fun shouldPublish() = shouldRelease() || this == SNAPSHOT_ONLY
 }
 
 sealed class RunApiTasks {

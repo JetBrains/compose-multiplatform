@@ -38,4 +38,5 @@
     <issue id="NewApi" severity="fatal" />
     <issue id="WrongThread" severity="fatal" />
     <issue id="MissingTestSizeAnnotation" severity="fatal" />
+    <issue id="IgnoreClassLevelDetector" severity="fatal" />
 </lint>

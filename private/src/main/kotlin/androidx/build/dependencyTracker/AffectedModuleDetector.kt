@@ -627,7 +627,11 @@ class AffectedModuleDetectorImpl constructor(
 
         val IGNORED_PATHS = setOf(
             "docs/",
-            "development/"
+            "development/",
+            "playground-common/",
+            ".github/",
+            // since we only used AMD for device tests, versions do not affect test outcomes.
+            "libraryversions.toml",
         )
     }
 }

@@ -17,6 +17,8 @@
 package androidx.build
 
 import androidx.build.checkapi.shouldConfigureApiTasks
+import androidx.build.transform.configureAarAsJarForConfiguration
+import com.android.build.gradle.internal.crash.afterEvaluate
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -166,8 +168,38 @@ open class AndroidXExtension(val project: Project) {
 
     // Should only be used to override LibraryType.publish, if a library isn't ready to publish yet
     var publish: Publish = Publish.UNSET
-        // Allow gradual transition from publish to library type
-        get() = if (field == Publish.UNSET && type != LibraryType.UNSET) type.publish else field
+
+    internal fun shouldPublish(): Boolean =
+        if (publish != Publish.UNSET) {
+            publish.shouldPublish()
+        } else if (type != LibraryType.UNSET) {
+            type.publish.shouldPublish()
+        } else {
+            false
+        }
+
+    internal fun shouldRelease(): Boolean =
+        if (publish != Publish.UNSET) {
+            publish.shouldRelease()
+        } else if (type != LibraryType.UNSET) {
+            type.publish.shouldRelease()
+        } else {
+            false
+        }
+
+    internal fun ifReleasing(action: () -> Unit) {
+        project.afterEvaluate {
+            if (shouldRelease()) {
+                action()
+            }
+        }
+    }
+
+    internal fun isPublishConfigured(): Boolean = (
+            publish != Publish.UNSET ||
+            type.publish != Publish.UNSET
+        )
+
     /**
      * Whether to run API tasks such as tracking and linting. The default value is
      * [RunApiTasks.Auto], which automatically picks based on the project's properties.
@@ -177,6 +209,14 @@ open class AndroidXExtension(val project: Project) {
     var runApiTasks: RunApiTasks = RunApiTasks.Auto
         get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
     var type: LibraryType = LibraryType.UNSET
+        set(value) {
+            // don't disable multiplatform if it's already enabled, because sometimes it's enabled
+            // through flags and we don't want setting `type =` to disable it accidentally.
+            if (value.shouldEnableMultiplatform()) {
+                multiplatform = true
+            }
+            field = value
+        }
     var failOnDeprecationWarnings = true
 
     var legacyDisableKotlinStrictApiMode = false
@@ -186,24 +226,9 @@ open class AndroidXExtension(val project: Project) {
     var bypassCoordinateValidation = false
 
     /**
-     * Which KMP platforms are published by this project, as a list of artifact suffixes or an empty
-     * list for non-KMP projects.
-     *
-     * Setting this property to a non-empty list also sets the [multiplatform] property to `true`.
-     */
-    var publishPlatforms: List<String> = emptyList()
-        set(value) {
-            multiplatform = value.isNotEmpty()
-            field = value
-        }
-
-    /**
      * Whether this project uses KMP.
-     *
-     * Consider setting the [publishPlatforms] property instead to ensure KMP artifacts are
-     * published.
      */
-    var multiplatform: Boolean = false
+    private var multiplatform: Boolean = false
         set(value) {
             Multiplatform.setEnabledForProject(project, value)
             field = value
@@ -224,6 +249,10 @@ open class AndroidXExtension(val project: Project) {
         return licenses
     }
 
+    fun configureAarAsJarForConfiguration(name: String) {
+        configureAarAsJarForConfiguration(project, name)
+    }
+
     companion object {
         const val DEFAULT_UNSPECIFIED_VERSION = "unspecified"
     }
@@ -233,3 +262,5 @@ class License {
     var name: String? = null
     var url: String? = null
 }
+
+private fun LibraryType.shouldEnableMultiplatform() = this is LibraryType.KmpLibrary

@@ -42,6 +42,9 @@ abstract class ListTaskOutputsTask : DefaultTask() {
     init {
         group = "Help"
         outputs.upToDateWhen { false }
+        notCompatibleWithConfigurationCache(
+            "This task uses project object to inspect outputs of all tasks"
+        )
     }
 
     fun setOutput(f: File) {
@@ -122,37 +125,6 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "generateReleaseProtos",
     // Release APKs
     "copyReleaseApk",
-    // b/223733695
-    "pixel2api31DebugAndroidTest",
-    "pixel2api31ReleaseAndroidTest",
-    "pixel2api31WithExpandProjectionDebugAndroidTest",
-    "pixel2api31WithNullAwareTypeConverterDebugAndroidTest",
-    "pixel2api31WithoutExpandProjectionDebugAndroidTest",
-    "pixel2api31WithKaptDebugAndroidTest",
-    "pixel2api31WithKspDebugAndroidTest",
-    "pixel2api31TargetSdk29DebugAndroidTest",
-    "pixel2api31TargetSdk30DebugAndroidTest",
-    "pixel2api31TargetSdkLatestDebugAndroidTest",
-    "pixel2api30DebugAndroidTest",
-    "pixel2api30ReleaseAndroidTest",
-    "pixel2api30WithExpandProjectionDebugAndroidTest",
-    "pixel2api30WithNullAwareTypeConverterDebugAndroidTest",
-    "pixel2api30WithoutExpandProjectionDebugAndroidTest",
-    "pixel2api30WithKaptDebugAndroidTest",
-    "pixel2api30WithKspDebugAndroidTest",
-    "pixel2api30TargetSdk29DebugAndroidTest",
-    "pixel2api30TargetSdk30DebugAndroidTest",
-    "pixel2api30TargetSdkLatestDebugAndroidTest",
-    "pixel2api29DebugAndroidTest",
-    "pixel2api29ReleaseAndroidTest",
-    "pixel2api29WithExpandProjectionDebugAndroidTest",
-    "pixel2api29WithNullAwareTypeConverterDebugAndroidTest",
-    "pixel2api29WithoutExpandProjectionDebugAndroidTest",
-    "pixel2api29WithKaptDebugAndroidTest",
-    "pixel2api29WithKspDebugAndroidTest",
-    "pixel2api29TargetSdk29DebugAndroidTest",
-    "pixel2api29TargetSdk30DebugAndroidTest",
-    "pixel2api29TargetSdkLatestDebugAndroidTest",
 )
 
 val taskTypesKnownToDuplicateOutputs = setOf(

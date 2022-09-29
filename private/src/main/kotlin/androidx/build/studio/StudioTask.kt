@@ -198,8 +198,13 @@ abstract class StudioTask : DefaultTask() {
         check(vmOptions.exists()) {
             "Invalid Studio vm options file location: ${vmOptions.canonicalPath}"
         }
+        val logFile = File(System.getProperty("user.home"), ".AndroidXStudioLog")
         ProcessBuilder().apply {
-            inheritIO()
+            // Can't just use inheritIO due to https://github.com/gradle/gradle/issues/16719
+            // Also can't use waitFor because it causes Studio to get stuck: b/241386076
+            // So, we save this output in a file and display the path to the user
+            redirectOutput(logFile)
+            redirectError(logFile)
             with(platformUtilities) { command(launchCommandArguments) }
 
             val additionalStudioEnvironmentProperties = mapOf(
@@ -220,6 +225,7 @@ abstract class StudioTask : DefaultTask() {
             environment().putAll(additionalStudioEnvironmentProperties)
             start()
         }
+        println("Studio log at $logFile")
     }
 
     private fun checkLicenseAgreement(services: ServiceRegistry): Boolean {

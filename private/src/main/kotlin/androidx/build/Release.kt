@@ -154,21 +154,21 @@ object Release {
      * Registers the project to be included in its group's zip file as well as the global zip files.
      */
     fun register(project: Project, extension: AndroidXExtension) {
-        if (extension.publish == Publish.NONE) {
+        if (!extension.shouldPublish()) {
             project.logger.info(
                 "project ${project.name} isn't part of release," +
                     " because its \"publish\" property is explicitly set to Publish.NONE"
             )
             return
         }
-        if (extension.publish == Publish.UNSET) {
+        if (!extension.isPublishConfigured()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because" +
-                    " it does not set the \"publish\" property or the \"type\" property"
+                    " it does not set the \"publish\" property."
             )
             return
         }
-        if (extension.publish == Publish.SNAPSHOT_ONLY && !isSnapshotBuild()) {
+        if (!extension.shouldRelease() && !isSnapshotBuild()) {
             project.logger.info(
                 "project ${project.name} isn't part of release, because its" +
                     " \"publish\" property is SNAPSHOT_ONLY, but it is not a snapshot build"
@@ -355,6 +355,14 @@ val AndroidXExtension.publishedArtifacts: List<Artifact>
         }
 
         return artifacts
+    }
+
+private val AndroidXExtension.publishPlatforms: List<String>
+    get() {
+        val declaredTargets = project.multiplatformExtension?.targets?.asMap?.keys?.map {
+            it.lowercase()
+        } ?: emptySet()
+        return declaredTargets.toList()
     }
 
 /**
