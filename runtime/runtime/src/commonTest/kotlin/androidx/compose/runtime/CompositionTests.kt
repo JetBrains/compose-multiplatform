@@ -3214,6 +3214,31 @@ class CompositionTests {
             Text("Hello!")
         }
     }
+
+    @Test // Regression test for b/249050560
+    fun testFunctionInstances() = compositionTest {
+        var state by mutableStateOf(0)
+        functionInstance = { -1 }
+
+        compose {
+            val localStateCopy = state
+            fun localStateReader() = localStateCopy
+            updateInstance(::localStateReader)
+        }
+
+        assertEquals(state, functionInstance())
+
+        state = 10
+        advance()
+        assertEquals(state, functionInstance())
+    }
+}
+
+var functionInstance: () -> Int = { 0 }
+
+@Composable
+fun updateInstance(newInstance: () -> Int) {
+    functionInstance = newInstance
 }
 
 var stateA by mutableStateOf(1000)
