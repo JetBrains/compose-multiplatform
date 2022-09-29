@@ -22,9 +22,21 @@ import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 
+/**
+ * Represents a [Modifier.Node] which can be a delegate of another [Modifier.Node]. Since
+ * [Modifier.Node] implements this interface, in practice any [Modifier.Node] can be delegated.
+ *
+ * @see DelegatingNode
+ * @see DelegatingNode.delegated
+ */
 // TODO(lmr): this interface needs a better name
 @ExperimentalComposeUiApi
 interface DelegatableNode {
+    /**
+     * A reference of the [Modifier.Node] that holds this node's position in the node hierarchy. If
+     * the node is a delegate of another node, this will point to that node. Otherwise, this will
+     * point to itself.
+     */
     val node: Modifier.Node
 }
 
@@ -135,7 +147,7 @@ internal inline fun DelegatableNode.visitSubtree(mask: Int, block: (Modifier.Nod
 
 @OptIn(ExperimentalComposeUiApi::class)
 private fun MutableVector<Modifier.Node>.addLayoutNodeChildren(node: Modifier.Node) {
-    node.requireLayoutNode()._children.forEach {
+    node.requireLayoutNode()._children.forEachReversed {
         add(it.nodes.head)
     }
 }
@@ -150,7 +162,7 @@ internal inline fun DelegatableNode.visitChildren(mask: Int, block: (Modifier.No
     else
         branches.add(child)
     while (branches.isNotEmpty()) {
-        val branch = branches.removeAt(branches.size)
+        val branch = branches.removeAt(branches.lastIndex)
         if (branch.aggregateChildKindSet and mask == 0) {
             branches.addLayoutNodeChildren(branch)
             // none of these nodes match the mask, so don't bother traversing them

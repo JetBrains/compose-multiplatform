@@ -44,13 +44,15 @@ interface PointerInputModifier : Modifier.Element {
 abstract class PointerInputFilter {
 
     /**
-     * Invoked when pointers that previously hit this [PointerInputFilter] have changed.
+     * Invoked when pointers that previously hit this [PointerInputFilter] have changed. It is
+     * expected that any [PointerInputChange]s that are used during this event and should not be
+     * considered valid to be used in other filters should be marked as consumed by calling
+     * [PointerInputChange.consume].
      *
      * @param pointerEvent The list of [PointerInputChange]s with positions relative to this
      * [PointerInputFilter].
      * @param pass The [PointerEventPass] in which this function is being called.
      * @param bounds The width and height associated with this [PointerInputFilter].
-     * @return The list of [PointerInputChange]s after any aspect of the changes have been consumed.
      *
      * @see PointerInputChange
      * @see PointerEventPass
@@ -93,7 +95,7 @@ abstract class PointerInputFilter {
     /**
      * If `false`, then this [PointerInputFilter] will not allow siblings under it to respond
      * to events. If `true`, this will have the first chance to respond and the next sibling
-     * under will then get a chance to respond as well. This trigger acts as at the Layout
+     * under will then get a chance to respond as well. This trigger acts at the Layout
      * level, so if any [PointerInputFilter]s on a Layout has [shareWithSiblings] set to `true`
      * then the Layout will share with siblings.
      */

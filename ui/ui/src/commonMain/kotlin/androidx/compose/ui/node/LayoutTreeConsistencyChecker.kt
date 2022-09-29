@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 
 /**
@@ -26,8 +27,7 @@ import androidx.compose.ui.util.fastForEach
 internal class LayoutTreeConsistencyChecker(
     private val root: LayoutNode,
     private val relayoutNodes: DepthSortedSet,
-    private val postponedMeasureRequests: List<LayoutNode>,
-    private val postponedLookaheadMeasureRequests: List<LayoutNode>
+    private val postponedMeasureRequests: List<MeasureAndLayoutDelegate.PostponedRequest>
 ) {
     fun assertConsistent() {
         val inconsistencyFound = !isTreeConsistent(root)
@@ -55,8 +55,8 @@ internal class LayoutTreeConsistencyChecker(
         if (isPlaced ||
             placeOrder != LayoutNode.NotPlacedPlaceOrder && parent?.isPlaced == true
         ) {
-            if (measurePending &&
-                postponedMeasureRequests.contains(this)
+            if (measurePending && postponedMeasureRequests
+                    .fastFirstOrNull { it.node == this && !it.isLookahead } != null
             ) {
                 // this node is waiting to be measured by parent or if this will not happen
                 // `onRequestMeasure` will be called for all items in `postponedMeasureRequests`
@@ -78,8 +78,8 @@ internal class LayoutTreeConsistencyChecker(
             }
         }
         if (isPlacedInLookahead == true) {
-            if (lookaheadMeasurePending &&
-                postponedLookaheadMeasureRequests.contains(this)
+            if (lookaheadMeasurePending && postponedMeasureRequests
+                    .fastFirstOrNull { it.node == this && it.isLookahead } != null
             ) {
                 // this node is waiting to be lookahead measured by parent or if this will not
                 // happen `onRequestLookaheadMeasure` will be called for all items in

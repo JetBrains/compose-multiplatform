@@ -336,7 +336,6 @@ private fun rememberLazyGridMeasurePolicy(
             measuredLineProvider = measuredLineProvider,
             measuredItemProvider = measuredItemProvider,
             mainAxisAvailableSize = mainAxisAvailableSize,
-            slotsPerLine = resolvedSlotSizesSums.size,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
             spaceBetweenLines = spaceBetweenLines,
@@ -350,6 +349,7 @@ private fun rememberLazyGridMeasurePolicy(
             reverseLayout = reverseLayout,
             density = this,
             placementAnimator = placementAnimator,
+            spanLayoutProvider = itemProvider.spanLayoutProvider,
             layout = { width, height, placement ->
                 layout(
                     containerConstraints.constrainWidth(width + totalHorizontalPadding),

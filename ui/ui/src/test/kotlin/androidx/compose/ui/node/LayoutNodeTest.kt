@@ -1381,8 +1381,8 @@ class LayoutNodeTest {
         val semanticsModifier2 = object : SemanticsModifierNode, Modifier.Node() {
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
-        val semanticsModifierElement1 = modifierElementOf(null, { semanticsModifier1 }, { })
-        val semanticsModifierElement2 = modifierElementOf(null, { semanticsModifier2 }, { })
+        val semanticsModifierElement1 = modifierElementOf(null, { semanticsModifier1 }, { }, { })
+        val semanticsModifierElement2 = modifierElementOf(null, { semanticsModifier2 }, { }, { })
         val layoutNode1 = LayoutNode(0, 0, 5, 5, semanticsModifierElement1, DpSize(48.dp, 48.dp))
         val layoutNode2 = LayoutNode(6, 6, 11, 11, semanticsModifierElement2, DpSize(48.dp, 48.dp))
         val outerNode = LayoutNode(0, 0, 11, 11).apply { attach(MockOwner()) }

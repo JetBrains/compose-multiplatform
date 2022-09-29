@@ -961,7 +961,16 @@ internal class LayoutNode(
     }
 
     private fun markNodeAndSubtreeAsPlaced() {
+        val wasPlaced = isPlaced
         isPlaced = true
+        if (!wasPlaced) {
+            // if the node was not placed previous remeasure request could have been ignored
+            if (measurePending) {
+                requestRemeasure(forceRequest = true)
+            } else if (lookaheadMeasurePending) {
+                requestLookaheadRemeasure(forceRequest = true)
+            }
+        }
         // invalidate all the nodes layers that were invalidated while the node was not placed
         forEachCoordinatorIncludingInner {
             if (it.lastLayerDrawingWasSkipped) {

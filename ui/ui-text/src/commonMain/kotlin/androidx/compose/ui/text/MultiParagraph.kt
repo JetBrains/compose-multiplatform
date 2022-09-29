@@ -733,10 +733,10 @@ class MultiParagraph(
     }
 
     /**
-     * Returns true if ellipsis happens on the given line, otherwise returns false
+     * Returns true if the given line is ellipsized, otherwise returns false.
      *
      * @param lineIndex a 0 based line index
-     * @return true if ellipsis happens on the given line, otherwise false
+     * @return true if the given line is ellipsized, otherwise false
      */
     fun isLineEllipsized(lineIndex: Int): Boolean {
         requireLineIndexInRange(lineIndex)
