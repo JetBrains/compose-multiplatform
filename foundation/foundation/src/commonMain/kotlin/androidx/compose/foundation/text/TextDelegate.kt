@@ -63,7 +63,10 @@ import kotlin.math.roundToInt
  *
  * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it is truncated such that subsequent
- * lines are dropped.
+ * lines are dropped. It is required that 1 <= [minLines] <= [maxLines].
+ *
+ * @param minLines The minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
  *
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space. If [softWrap] is false,
@@ -86,6 +89,7 @@ class TextDelegate(
     val text: AnnotatedString,
     val style: TextStyle,
     val maxLines: Int = Int.MAX_VALUE,
+    val minLines: Int = DefaultMinLines,
     val softWrap: Boolean = true,
     val overflow: TextOverflow = TextOverflow.Clip,
     val density: Density,
@@ -118,6 +122,8 @@ class TextDelegate(
 
     init {
         check(maxLines > 0)
+        check(minLines > 0)
+        check(minLines <= maxLines)
     }
 
     fun layoutIntrinsics(layoutDirection: LayoutDirection) {

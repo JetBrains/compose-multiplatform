@@ -462,7 +462,7 @@ internal class TextController(val state: TextState) : RememberObserver {
             }
             state.previousGlobalPosition = newGlobalPosition
         }
-    }
+    }.heightInLines(state.textDelegate.style, state.textDelegate.minLines)
 
     /*@VisibleForTesting*/
     internal var semanticsModifier = createSemanticsModifierFor(state.textDelegate.text)
@@ -560,6 +560,7 @@ internal fun updateTextDelegate(
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = DefaultMinLines,
     placeholders: List<AnnotatedString.Range<Placeholder>>
 ): TextDelegate {
     // NOTE(text-perf-review): whenever we have remember intrinsic implemented, this might be a
@@ -569,6 +570,7 @@ internal fun updateTextDelegate(
         current.softWrap != softWrap ||
         current.overflow != overflow ||
         current.maxLines != maxLines ||
+        current.minLines != minLines ||
         current.density != density ||
         current.placeholders != placeholders ||
         current.fontFamilyResolver !== fontFamilyResolver
@@ -579,6 +581,7 @@ internal fun updateTextDelegate(
             softWrap = softWrap,
             overflow = overflow,
             maxLines = maxLines,
+            minLines = minLines,
             density = density,
             fontFamilyResolver = fontFamilyResolver,
             placeholders = placeholders,
@@ -598,6 +601,7 @@ internal fun updateTextDelegate(
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = DefaultMinLines,
 ): TextDelegate {
     // NOTE(text-perf-review): whenever we have remember intrinsic implemented, this might be a
     // lot slower than the equivalent `remember(a, b, c, ...) { ... }` call.
@@ -606,6 +610,7 @@ internal fun updateTextDelegate(
         current.softWrap != softWrap ||
         current.overflow != overflow ||
         current.maxLines != maxLines ||
+        current.minLines != minLines ||
         current.density != density ||
         current.fontFamilyResolver !== fontFamilyResolver
     ) {
@@ -615,6 +620,7 @@ internal fun updateTextDelegate(
             softWrap = softWrap,
             overflow = overflow,
             maxLines = maxLines,
+            minLines = minLines,
             density = density,
             fontFamilyResolver = fontFamilyResolver,
         )

@@ -227,14 +227,14 @@ fun Text(
         )
     )
     BasicText(
-        text,
-        modifier,
-        mergedStyle,
-        onTextLayout,
-        overflow,
-        softWrap,
-        maxLines,
-        inlineContent
+        text = text,
+        modifier = modifier,
+        style = mergedStyle,
+        onTextLayout = onTextLayout,
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        inlineContent = inlineContent
     )
 }
 
