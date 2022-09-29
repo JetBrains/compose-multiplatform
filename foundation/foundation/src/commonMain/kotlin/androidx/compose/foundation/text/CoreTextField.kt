@@ -548,7 +548,10 @@ internal fun CoreTextField(
                 // min height is set for maxLines == 1 in order to prevent text cuts for single line
                 // TextFields
                 .heightIn(min = state.minHeightForSingleLineField)
-                .maxLinesHeight(maxLines, textStyle)
+                .heightInLines(
+                    textStyle = textStyle,
+                    maxLines = maxLines
+                )
                 .textFieldScroll(
                     scrollerPosition,
                     value,

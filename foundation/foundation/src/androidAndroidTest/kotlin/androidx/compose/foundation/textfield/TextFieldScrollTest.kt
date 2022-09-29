@@ -33,7 +33,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.TextLayoutResultProxy
-import androidx.compose.foundation.text.maxLinesHeight
+import androidx.compose.foundation.text.heightInLines
 import androidx.compose.foundation.text.selection.isSelectionHandle
 import androidx.compose.foundation.text.textFieldScroll
 import androidx.compose.foundation.text.textFieldScrollable
@@ -706,7 +706,7 @@ class TextFieldScrollTest {
             softWrap = isVertical,
             modifier = modifier
                 .testTag(TextfieldTag)
-                .maxLinesHeight(resolvedMaxLines, TextStyle.Default)
+                .heightInLines(textStyle = TextStyle.Default, maxLines = resolvedMaxLines)
                 .textFieldScrollable(scrollerPosition)
                 .textFieldScroll(
                     remember { scrollerPosition },
