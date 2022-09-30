@@ -53,9 +53,10 @@ class SwipeableV2AnchorTest {
         rule.mainClock.autoAdvance = false
 
         var compositionCounter = 0
-        val state = SwipeableV2State(initialState = A)
+        lateinit var state: SwipeableV2State<TestState>
 
         rule.setContent {
+            state = rememberSwipeableV2State(initialState = A)
             compositionCounter++
             Box(
                 Modifier
@@ -82,7 +83,7 @@ class SwipeableV2AnchorTest {
 
     @Test
     fun swipeable_swipeAnchors_calculatedCorrectlyFromLayoutSize() {
-        val state = SwipeableV2State(initialState = A)
+        lateinit var state: SwipeableV2State<TestState>
 
         fun anchorA() = 0f
         fun anchorB(layoutHeight: Float) = layoutHeight / 2
@@ -91,6 +92,7 @@ class SwipeableV2AnchorTest {
         val swipeableSize = 200.dp
 
         rule.setContent {
+            state = rememberSwipeableV2State(initialState = A)
             Box(
                 Modifier
                     .requiredHeight(swipeableSize)

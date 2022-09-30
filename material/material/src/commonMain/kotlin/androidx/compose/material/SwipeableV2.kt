@@ -17,6 +17,7 @@
 package androidx.compose.material
 
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animate
 import androidx.compose.foundation.gestures.DraggableState
 import androidx.compose.foundation.gestures.Orientation
@@ -33,7 +34,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
@@ -115,32 +120,49 @@ internal fun <T> Modifier.swipeAnchors(
  *
  * This contains necessary information about any ongoing swipe or animation and provides methods
  * to change the state either immediately or by starting an animation. To create and remember a
- * [SwipeableState] use [rememberSwipeableState].
+ * [SwipeableV2State] use [rememberSwipeableV2State].
  *
  * @param initialState The initial value of the state.
+ * @param density The density used to convert thresholds from px to dp.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
+ * @param positionalThreshold The positional threshold to be used when calculating the target state
+ * while a swipe is in progress and when settling after the swipe ends. This is the distance from
+ * the start of a transition. It will be, depending on the direction of the interaction, added or
+ * subtracted from/to the origin offset. It should always be a positive value. See the
+ * [fractionalPositionalThreshold] and [fixedPositionalThreshold] methods.
+ * @param velocityThreshold The velocity threshold (in dp per second) that the end velocity has to
+ * exceed in order to animate to the next state, even if the [positionalThreshold] has not been
+ * reached.
  */
 @Stable
 @ExperimentalMaterialApi
 internal class SwipeableV2State<T>(
     initialState: T,
-    val animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
-    val confirmStateChange: (newValue: T) -> Boolean = { true },
+    internal val density: Density,
+    internal val animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec,
+    internal val confirmStateChange: (newValue: T) -> Boolean = { true },
+    internal val positionalThreshold: Density.(totalDistance: Float) -> Float =
+        SwipeableV2Defaults.PositionalThreshold,
+    internal val velocityThreshold: Dp = SwipeableV2Defaults.VelocityThreshold,
 ) {
 
     /**
-     * The current state of the [SwipeableState].
+     * The current state of the [SwipeableV2State].
      */
     var currentState: T by mutableStateOf(initialState)
         private set
 
     /**
      * The target state. This is the closest state to the current offset (taking into account
-     * positional thresholds). If no animation is in progress, this will be the current state.
+     * positional thresholds). If no interactions like animations or drags are in progress, this
+     * will be the current state.
      */
     val targetState: T by derivedStateOf {
-        if (offset != null) anchors.closestState(offset!!) else currentState
+        val currentOffset = offset
+        if (currentOffset != null) {
+            computeTarget(currentOffset, currentState, velocity = 0f)
+        } else currentState
     }
 
     /**
@@ -205,11 +227,7 @@ internal class SwipeableV2State<T>(
     private val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
     private val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
 
-    private var positionalThresholds: (lower: T, upper: T) -> Float by mutableStateOf(
-        { _, _ -> 0f } // TODO
-    )
-
-    private var velocityThreshold by mutableStateOf(0f)
+    private val velocityThresholdPx = with(density) { velocityThreshold.toPx() }
 
     internal val draggableState = DraggableState {
         dragPosition = (dragPosition ?: 0f) + it
@@ -276,8 +294,10 @@ internal class SwipeableV2State<T>(
             }
             lastVelocity = 0f
         } finally {
-            val endOffset = requireNotNull(dragPosition) { "The drag position was in an " +
-                "invalid state. Please report this issue." }
+            val endOffset = requireNotNull(dragPosition) {
+                "The drag position was in an " +
+                    "invalid state. Please report this issue."
+            }
             val endState = anchors
                 .entries
                 .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
@@ -294,9 +314,7 @@ internal class SwipeableV2State<T>(
         val targetState = computeTarget(
             offset = requireOffset(),
             currentState = previousState,
-            thresholds = positionalThresholds,
-            velocity = velocity,
-            velocityThreshold = velocityThreshold
+            velocity = velocity
         )
         if (confirmStateChange(targetState)) {
             animateTo(targetState, velocity)
@@ -325,28 +343,31 @@ internal class SwipeableV2State<T>(
     private fun computeTarget(
         offset: Float,
         currentState: T,
-        thresholds: (lower: T, upper: T) -> Float,
-        velocity: Float,
-        velocityThreshold: Float
+        velocity: Float
     ): T {
         val currentAnchors = anchors
-        return if (currentAnchors.requireAnchor(currentState) <= offset) {
+        val currentAnchor = currentAnchors.requireAnchor(currentState)
+        return if (currentAnchor <= offset) {
             // Swiping from lower to upper (positive).
-            if (velocity >= velocityThreshold) {
+            if (velocity >= velocityThresholdPx) {
                 currentAnchors.closestState(offset, true)
             } else {
                 val upper = currentAnchors.closestState(offset, true)
-                val threshold = thresholds(currentState, upper)
-                if (offset < threshold) currentState else upper
+                val distance = abs(currentAnchors.getValue(upper) - currentAnchor)
+                val relativeThreshold = abs(positionalThreshold(density, distance))
+                val absoluteThreshold = abs(currentAnchor + relativeThreshold)
+                if (offset < absoluteThreshold) currentState else upper
             }
         } else {
             // Swiping from upper to lower (negative).
-            if (velocity <= -velocityThreshold) {
+            if (velocity <= -velocityThresholdPx) {
                 currentAnchors.closestState(offset, false)
             } else {
                 val lower = currentAnchors.closestState(offset, false)
-                val threshold = thresholds(currentState, lower)
-                if (offset > threshold) currentState else lower
+                val distance = abs(currentAnchor - currentAnchors.getValue(lower))
+                val relativeThreshold = abs(positionalThreshold(density, distance))
+                val absoluteThreshold = abs(currentAnchor - relativeThreshold)
+                if (offset > absoluteThreshold) currentState else lower
             }
         }
     }
@@ -355,9 +376,13 @@ internal class SwipeableV2State<T>(
         /**
          * The default [Saver] implementation for [SwipeableV2State].
          */
+        @ExperimentalMaterialApi
         fun <T : Any> Saver(
             animationSpec: AnimationSpec<Float>,
             confirmStateChange: (T) -> Boolean,
+            positionalThreshold: Density.(distance: Float) -> Float,
+            velocityThreshold: Dp,
+            density: Density
         ) = Saver<SwipeableV2State<T>, T>(
             save = { it.currentState },
             restore = {
@@ -365,6 +390,9 @@ internal class SwipeableV2State<T>(
                     initialState = it,
                     animationSpec = animationSpec,
                     confirmStateChange = confirmStateChange,
+                    positionalThreshold = positionalThreshold,
+                    velocityThreshold = velocityThreshold,
+                    density = density
                 )
             }
         )
@@ -382,28 +410,78 @@ internal class SwipeableV2State<T>(
 @ExperimentalMaterialApi
 internal fun <T : Any> rememberSwipeableV2State(
     initialState: T,
-    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
-    confirmStateChange: (newValue: T) -> Boolean = { true },
+    animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec,
+    confirmStateChange: (newValue: T) -> Boolean = { true }
 ): SwipeableV2State<T> {
+    val density = LocalDensity.current
     return rememberSaveable(
+        initialState, animationSpec, confirmStateChange, density,
         saver = SwipeableV2State.Saver(
             animationSpec = animationSpec,
-            confirmStateChange = confirmStateChange
-        )
+            confirmStateChange = confirmStateChange,
+            positionalThreshold = SwipeableV2Defaults.PositionalThreshold,
+            velocityThreshold = SwipeableV2Defaults.VelocityThreshold,
+            density = density
+        ),
     ) {
         SwipeableV2State(
             initialState = initialState,
             animationSpec = animationSpec,
-            confirmStateChange = confirmStateChange
+            confirmStateChange = confirmStateChange,
+            positionalThreshold = SwipeableV2Defaults.PositionalThreshold,
+            velocityThreshold = SwipeableV2Defaults.VelocityThreshold,
+            density = density
         )
     }
 }
 
-private fun <T> Map<T, Float>.closestState(offset: Float = 0f): T {
-    require(isNotEmpty()) { "The anchors were empty when trying to find the closest state" }
-    return minBy { (_, anchor) ->
-        abs(anchor - offset)
-    }.key
+/**
+ * Expresses a fixed positional threshold of [threshold] dp. This will be the distance from an
+ * anchor that needs to be reached for [SwipeableV2State] to settle to the next closest anchor.
+ *
+ * @see [fractionalPositionalThreshold] for a fractional positional threshold
+ */
+@ExperimentalMaterialApi
+internal fun fixedPositionalThreshold(threshold: Dp): Density.(distance: Float) -> Float = {
+    threshold.toPx()
+}
+
+/**
+ * Expresses a relative positional threshold of the [fraction] of the distance to the closest anchor
+ * in the current direction. This will be the distance from an anchor that needs to be reached for
+ * [SwipeableV2State] to settle to the next closest anchor.
+ *
+ * @see [fixedPositionalThreshold] for a fixed positional threshold
+ */
+@ExperimentalMaterialApi
+internal fun fractionalPositionalThreshold(
+    fraction: Float
+): Density.(distance: Float) -> Float = { distance -> distance * fraction }
+
+/**
+ * Contains useful defaults for [swipeableV2] and [SwipeableV2State].
+ */
+@Stable
+@ExperimentalMaterialApi
+internal object SwipeableV2Defaults {
+    /**
+     * The default animation used by [SwipeableV2State].
+     */
+    @ExperimentalMaterialApi
+    val AnimationSpec = SpringSpec<Float>()
+
+    /**
+     * The default velocity threshold (1.8 dp per millisecond) used by [rememberSwipeableV2State].
+     */
+    @ExperimentalMaterialApi
+    val VelocityThreshold: Dp = 125.dp
+
+    /**
+     * The default positional threshold (56 dp) used by [rememberSwipeableV2State]
+     */
+    @ExperimentalMaterialApi
+    val PositionalThreshold: Density.(totalDistance: Float) -> Float =
+        fixedPositionalThreshold(56.dp)
 }
 
 private fun <T> Map<T, Float>.closestState(
