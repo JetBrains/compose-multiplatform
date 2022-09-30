@@ -25,6 +25,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.pointerInput
@@ -39,7 +41,7 @@ import androidx.compose.ui.input.pointer.pointerInput
  * declaring required properties for them, such as: required button (primary, secondary, etc.).
  *
  * Consider using [clickable] if it's necessary to handle only primary clicks. Unlike [clickable],
- * [onClick] doesn't add [Modifier.indication], [Modifier.hoverable], click by Enter key, etc.
+ * [onClick] doesn't add [Modifier.indication], [Modifier.hoverable], [Modifier.focusable], click by Enter key, etc.
  * If necessary, one has to add those manually when using [onClick].
  *
  * @param enabled Controls the enabled state. When `false`, [onClick], [onLongClick] or
@@ -80,7 +82,7 @@ fun Modifier.onClick(
  * declaring required properties for them, such as: required button (primary, secondary, etc.).
  *
  * Consider using [clickable] if it's necessary to handle only primary clicks. Unlike [clickable],
- * [onClick] doesn't add [Modifier.indication], [Modifier.hoverable], click by Enter key, etc.
+ * [onClick] doesn't add [Modifier.indication], [Modifier.hoverable], [Modifier.focusable], click by Enter key, etc.
  * If necessary, one has to add those manually when using [onClick].
  *
  * @param interactionSource [MutableInteractionSource] that will be used to emit
@@ -122,6 +124,7 @@ fun Modifier.onClick(
             val on2xClickState = rememberUpdatedState(onDoubleClick)
             val onLongClickState = rememberUpdatedState(onLongClick)
             val keyboardModifiersState = rememberUpdatedState(keyboardModifiers)
+            val focusRequester = remember { FocusRequester() }
 
             val hasLongClick = onLongClick != null
             val hasDoubleClick = onDoubleClick != null
@@ -148,16 +151,23 @@ fun Modifier.onClick(
                         keyboardModifiersState.value(this)
                     },
                     onDoubleTap = if (hasDoubleClick) {
-                        { on2xClickState.value!!.invoke() }
+                        {
+                            focusRequester.requestFocus()
+                            on2xClickState.value!!.invoke()
+                        }
                     } else {
                         null
                     },
                     onLongPress = if (hasLongClick) {
-                        { onLongClickState.value!!.invoke() }
+                        {
+                            focusRequester.requestFocus()
+                            onLongClickState.value!!.invoke()
+                        }
                     } else {
                         null
                     },
                     onTap = {
+                        focusRequester.requestFocus()
                         onClickState.value()
                     },
                     onPress = {
@@ -169,7 +179,7 @@ fun Modifier.onClick(
                         )
                     }
                 )
-            }
+            }.focusRequester(focusRequester)
         } else {
             Modifier
         }
