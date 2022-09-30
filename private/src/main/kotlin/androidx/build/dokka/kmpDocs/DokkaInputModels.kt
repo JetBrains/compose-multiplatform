@@ -162,7 +162,7 @@ internal object DokkaInputModels {
             /**
              * File name used when this is serialized into a gradle artifact.
              */
-            val FILE_NAME = "androidXPartialDocsMetadata.json"
+            const val FILE_NAME = "androidXPartialDocsMetadata.json"
         }
     }
 }

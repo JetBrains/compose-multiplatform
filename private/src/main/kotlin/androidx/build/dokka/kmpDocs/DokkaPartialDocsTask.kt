@@ -32,15 +32,16 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.Nested
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.kotlin.dsl.the
 import org.gradle.workers.WorkerExecutor
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
@@ -84,17 +85,26 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
+    @get:Input
+    abstract val moduleName: Property<String>
+
+    @get:Input
+    abstract val uniqueArtifactKey: Property<String>
+
+    @get:Nested
+    abstract val sourceSets: ListProperty<SourceSet>
+
     /**
      * The parameters we pass into dokka, also defining the inputs of this task.
      */
     @get:Nested
     val dokkaCliInput by lazy {
         PartialDocsInput(
-            moduleName = project.name,
+            moduleName = moduleName.get(),
             outputDir = outputDir.asFile.get(),
             pluginsClasspath = pluginsClasspath.get(),
             globalLinks = buildExternalDocLinks(project),
-            sourceSets = buildSourceSets(),
+            sourceSets = sourceSets.get(),
             pluginsConfiguration = listOf(
                 PluginsConfiguration.ANDROIDX_COPYRIGHT
             )
@@ -122,88 +132,16 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
             gson.toJson(
                 DokkaInputModels.PartialDocsMetadata(
                     moduleName = dokkaCliInput.moduleName,
-                    artifactKey = project.group.toString() + "/" + project.name
+                    artifactKey = uniqueArtifactKey.get()
                 )
             )
         )
-        logger.lifecycle(
-            "Written partial docs to $outputDir"
-        )
-    }
-
-    private fun buildSourceSets(): List<SourceSet> {
-        val targets = when (val kotlinExtension = project.the<KotlinProjectExtension>()) {
-            is KotlinSingleTargetExtension<*> -> listOf(kotlinExtension.target)
-            is KotlinMultiplatformExtension -> kotlinExtension.targets
-            else -> error("unsupported kotlin extension")
-        }
-
-        // Find source sets that are used in compilations that we are interested in.
-        // Also associate them with the classpath of the compilation to be able to resolve
-        // dependencies.
-        val sourceSets = IdentityHashMap<KotlinSourceSet, DokkaSourceSetInput>()
-        targets.forEach { target ->
-            val platform = target.docsPlatform()
-            val compilation =
-                target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)
-                    // Android projects use "debug"
-                    ?: target.compilations.findByName("debug")
-            compilation?.allKotlinSourceSets?.forEach { kotlinSourceSet ->
-                val existing = sourceSets.getOrPut(kotlinSourceSet) {
-                    DokkaSourceSetInput(
-                        platform = platform,
-                        classpath = project.files()
-                    )
-                }
-                existing.platform += platform
-
-                val additionalClasspath =
-                    if (compilation.target.platformType == KotlinPlatformType.androidJvm) {
-                        // This is a workaround for https://youtrack.jetbrains.com/issue/KT-33893
-                        @Suppress("DEPRECATION") // for compatibility
-                        (compilation.compileKotlinTask as
-                            org.jetbrains.kotlin.gradle.tasks.KotlinCompile).classpath
-                    } else {
-                        compilation.compileDependencyFiles
-                    }
-                existing.classpath.from(
-                    additionalClasspath
-                )
-            }
-        }
-
-        return sourceSets.map { (sourceSet, docsPlatform) ->
-            val sourceDirectories = sourceSet.kotlin.sourceDirectories.filter {
-                it.exists()
-            }
-            SourceSet(
-                displayName = sourceSet.displayName(),
-                id = sourceSet.dokkaId(),
-                classpath = docsPlatform.classpath,
-                sourceRoots = sourceDirectories,
-                analysisPlatform = docsPlatform.platform.jsonName,
-                noStdlibLink = false,
-                noJdkLink = !docsPlatform.platform.androidOrJvm(),
-                noAndroidSdkLink = docsPlatform.platform != DokkaAnalysisPlatform.ANDROID,
-                dependentSourceSets = sourceSet.dependsOn.map {
-                    it.dokkaId()
-                },
-                externalDocumentationLinks = buildExternalDocLinks(project),
-                sourceLinks = sourceDirectories.map {
-                    SrcLink(
-                        localDirectory = it,
-                        remoteUrl = CS_ANDROID_SRC_ROOT +
-                            it.relativeTo(project.getSupportRootFolder()).path
-                    )
-                }
-            )
-        }
     }
 
     companion object {
         private const val TASK_NAME = "generateKmpDocs"
 
-        private val CS_ANDROID_SRC_ROOT =
+        private const val CS_ANDROID_SRC_ROOT =
             "https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:"
 
         private fun buildExternalDocLinks(project: Project): List<GlobalDocsLink> {
@@ -243,10 +181,6 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
          */
         fun register(
             project: Project,
-            // Task requires it but we cannot pass it as a parameter to the task because it breaks
-            // the configuration cache. Hence, we require it to call register but don't use it
-            // inside the method. ¯\_(ツ)_/¯
-            @Suppress("UNUSED_PARAMETER")
             kotlinProjectExtension: KotlinProjectExtension
         ): TaskProvider<DokkaPartialDocsTask> {
             // these configurations are created eagerly due to
@@ -261,6 +195,19 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
                 TASK_NAME,
                 DokkaPartialDocsTask::class.java
             ) { docsTask ->
+                docsTask.sourceSets.set(
+                    project.provider {
+                        buildSourceSets(project, kotlinProjectExtension)
+                    }
+                )
+                docsTask.moduleName.set(
+                    project.name
+                )
+                docsTask.uniqueArtifactKey.set(
+                    project.provider {
+                        project.group.toString() + "/" + project.name
+                    }
+                )
                 docsTask.dokkaCliClasspath.set(
                     cliJarConfiguration
                 )
@@ -275,55 +222,129 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
                 )
             }
         }
-    }
 
-    private enum class DokkaAnalysisPlatform(val jsonName: String) {
-        JVM("jvm"),
-        ANDROID("jvm"), // intentionally same as JVM as dokka only support jvm
-        JS("js"),
-        NATIVE("native"),
-        COMMON("common");
+        private fun buildSourceSets(
+            project: Project,
+            kotlinExtension: KotlinProjectExtension
+        ): List<SourceSet> {
+            val targets = when (kotlinExtension) {
+                is KotlinSingleTargetExtension<*> -> listOf(kotlinExtension.target)
+                is KotlinMultiplatformExtension -> kotlinExtension.targets
+                else -> error("unsupported kotlin extension")
+            }
 
-        fun androidOrJvm() = this == JVM || this == ANDROID
-    }
+            // Find source sets that are used in compilations that we are interested in.
+            // Also associate them with the classpath of the compilation to be able to resolve
+            // dependencies.
+            val sourceSets = IdentityHashMap<KotlinSourceSet, DokkaSourceSetInput>()
+            targets.forEach { target ->
+                val platform = target.docsPlatform()
+                val compilation =
+                    target.compilations.findByName(KotlinCompilation.MAIN_COMPILATION_NAME)
+                    // Android projects use "debug"
+                        ?: target.compilations.findByName("debug")
+                compilation?.allKotlinSourceSets?.forEach { kotlinSourceSet ->
+                    val existing = sourceSets.getOrPut(kotlinSourceSet) {
+                        DokkaSourceSetInput(
+                            platform = platform,
+                            classpath = project.files()
+                        )
+                    }
+                    existing.platform += platform
 
-    private class DokkaSourceSetInput(
-        var platform: DokkaAnalysisPlatform,
-        val classpath: ConfigurableFileCollection
-    )
+                    val additionalClasspath =
+                        if (compilation.target.platformType == KotlinPlatformType.androidJvm) {
+                            // This is a workaround for https://youtrack.jetbrains.com/issue/KT-33893
+                            @Suppress("DEPRECATION") // for compatibility
+                            (compilation.compileKotlinTask as
+                                org.jetbrains.kotlin.gradle.tasks.KotlinCompile).classpath
+                        } else {
+                            compilation.compileDependencyFiles
+                        }
+                    existing.classpath.from(
+                        additionalClasspath
+                    )
+                }
+            }
 
-    private fun KotlinSourceSet.dokkaId() = SourceSetId(
-        sourceSetName = name,
-        scopeId = this@DokkaPartialDocsTask.path
-    )
-
-    private fun KotlinSourceSet.displayName() = if (name.endsWith("Main")) {
-        name.substringBeforeLast("Main")
-    } else {
-        name
-    }
-
-    private fun KotlinTarget.docsPlatform() = when (platformType) {
-        KotlinPlatformType.common -> DokkaAnalysisPlatform.COMMON
-        KotlinPlatformType.jvm -> DokkaAnalysisPlatform.JVM
-        KotlinPlatformType.js -> DokkaAnalysisPlatform.JS
-        KotlinPlatformType.wasm -> DokkaAnalysisPlatform.JS
-        KotlinPlatformType.androidJvm -> DokkaAnalysisPlatform.ANDROID
-        KotlinPlatformType.native -> DokkaAnalysisPlatform.NATIVE
-    }
-
-    private operator fun DokkaAnalysisPlatform?.plus(
-        other: DokkaAnalysisPlatform
-    ): DokkaAnalysisPlatform {
-        if (this == null) {
-            return other
+            return sourceSets.map { (sourceSet, docsPlatform) ->
+                val sourceDirectories = sourceSet.kotlin.sourceDirectories.filter {
+                    it.exists()
+                }
+                SourceSet(
+                    displayName = sourceSet.displayName(),
+                    id = sourceSet.dokkaId(project),
+                    classpath = docsPlatform.classpath,
+                    sourceRoots = sourceDirectories,
+                    analysisPlatform = docsPlatform.platform.jsonName,
+                    noStdlibLink = false,
+                    noJdkLink = !docsPlatform.platform.androidOrJvm(),
+                    noAndroidSdkLink = docsPlatform.platform != DokkaAnalysisPlatform.ANDROID,
+                    dependentSourceSets = sourceSet.dependsOn.map {
+                        it.dokkaId(project)
+                    }.sortedBy { it.sourceSetName },
+                    externalDocumentationLinks = buildExternalDocLinks(project),
+                    sourceLinks = sourceDirectories.map {
+                        SrcLink(
+                            localDirectory = it,
+                            remoteUrl = CS_ANDROID_SRC_ROOT +
+                                it.relativeTo(project.getSupportRootFolder()).path
+                        )
+                    }.sortedBy {
+                        it.localDirectory
+                    }
+                )
+            }.sortedBy { it.displayName }
         }
-        if (this == other) {
-            return this
-        }
-        if (this.androidOrJvm() && other.androidOrJvm()) {
-            return DokkaAnalysisPlatform.JVM
-        }
-        return DokkaAnalysisPlatform.COMMON
     }
+}
+
+private enum class DokkaAnalysisPlatform(val jsonName: String) {
+    JVM("jvm"),
+    ANDROID("jvm"), // intentionally same as JVM as dokka only support jvm
+    JS("js"),
+    NATIVE("native"),
+    COMMON("common");
+
+    fun androidOrJvm() = this == JVM || this == ANDROID
+}
+
+private class DokkaSourceSetInput(
+    var platform: DokkaAnalysisPlatform,
+    val classpath: ConfigurableFileCollection
+)
+
+private fun KotlinSourceSet.dokkaId(project: Project) = SourceSetId(
+    sourceSetName = name,
+    scopeId = project.path
+)
+
+private fun KotlinSourceSet.displayName() = if (name.endsWith("Main")) {
+    name.substringBeforeLast("Main")
+} else {
+    name
+}
+
+private fun KotlinTarget.docsPlatform() = when (platformType) {
+    KotlinPlatformType.common -> DokkaAnalysisPlatform.COMMON
+    KotlinPlatformType.jvm -> DokkaAnalysisPlatform.JVM
+    KotlinPlatformType.js -> DokkaAnalysisPlatform.JS
+    KotlinPlatformType.wasm -> DokkaAnalysisPlatform.JS
+    KotlinPlatformType.androidJvm -> DokkaAnalysisPlatform.ANDROID
+    KotlinPlatformType.native -> DokkaAnalysisPlatform.NATIVE
+}
+
+private operator fun DokkaAnalysisPlatform?.plus(
+    other: DokkaAnalysisPlatform
+): DokkaAnalysisPlatform {
+    if (this == null) {
+        return other
+    }
+    if (this == other) {
+        return this
+    }
+    if (this.androidOrJvm() && other.androidOrJvm()) {
+        return DokkaAnalysisPlatform.JVM
+    }
+    return DokkaAnalysisPlatform.COMMON
 }

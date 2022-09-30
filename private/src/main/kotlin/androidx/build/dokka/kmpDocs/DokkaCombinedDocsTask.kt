@@ -139,9 +139,6 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
             classpath = dokkaCliClasspath.get(),
             inputJson = docsJsonOutput.get().asFile
         )
-        logger.lifecycle(
-            "Written combined docs to $outputDir"
-        )
     }
 
     companion object {

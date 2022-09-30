@@ -16,8 +16,10 @@
 
 package androidx.build.dokka.kmpDocs
 
+import java.io.ByteArrayOutputStream
 import java.io.File
 import javax.inject.Inject
+import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFileProperty
@@ -51,9 +53,16 @@ internal abstract class DokkaWorkAction @Inject constructor(
     private val execOperations: ExecOperations
 ) : WorkAction<DokkaParams> {
     override fun execute() {
-        execOperations.javaexec {
+        val outputStream = ByteArrayOutputStream()
+        val errorStream = ByteArrayOutputStream()
+        val result = execOperations.javaexec {
+            it.standardOutput = outputStream
+            it.errorOutput = errorStream
             it.classpath = parameters.classpath
             it.args(parameters.inputFile.get().asFile.canonicalPath)
+        }
+        if (result.exitValue != 0) {
+            throw GradleException("Failed to run Dokka.\n ${errorStream.toString(Charsets.UTF_8)}")
         }
     }
 }
