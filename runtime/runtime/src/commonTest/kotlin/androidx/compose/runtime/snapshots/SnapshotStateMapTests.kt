@@ -494,6 +494,25 @@ class SnapshotStateMapTests {
     }
 
     @Test
+    fun currentValueOfTheMap() {
+        val map = mutableStateMapOf<Int, String>()
+        val maps = mutableListOf<Map<Int, String>>()
+        repeat(100) {
+            Snapshot.withMutableSnapshot {
+                map[it] = it.toString()
+                maps.add(map.toMap())
+            }
+        }
+        repeat(100) { index ->
+            val current = maps[index]
+            assertEquals(index + 1, current.size)
+            repeat(index) {
+                assertEquals(current[it], it.toString())
+            }
+        }
+    }
+
+    @Test
     @IgnoreJsTarget
     @OptIn(ExperimentalCoroutinesApi::class)
     fun concurrentModificationInGlobal_put_new() = runTest {
