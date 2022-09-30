@@ -140,18 +140,34 @@ internal class SwipeableV2State<T>(
      * positional thresholds). If no animation is in progress, this will be the current state.
      */
     val targetState: T by derivedStateOf {
-        if (unsafeOffset.isNaN()) currentState else anchors.closestState(unsafeOffset)
+        if (offset != null) anchors.closestState(offset!!) else currentState
     }
 
     /**
-     * The current offset.
+     * The current offset, or null if it has not been initialized yet.
+     *
+     * The offset will be initialized during the first measurement phase of the node that the
+     * [swipeableV2] modifier is attached to. These are the phases:
+     * Composition { -> Effects } -> Layout { Measurement -> Placement } -> Drawing
+     * During the first composition, the offset will be null. In subsequent compositions, the offset
+     * will be derived from the anchors of the previous pass.
+     * Always prefer accessing the offset from a LaunchedEffect as it will be scheduled to be
+     * executed the next frame, after layout.
+     *
+     * To guarantee stricter semantics, consider using [requireOffset].
      */
-    val offset = derivedStateOf {
-        if (unsafeOffset.isNaN()) error(
-            "The offset was read before being initialized. Did you access the offset in a phase " +
-                "before layout, like effects or composition?"
-        )
-        unsafeOffset
+    val offset: Float? by derivedStateOf {
+        dragPosition?.coerceIn(minBound, maxBound)
+    }
+
+    /**
+     * Require the current offset.
+     *
+     * @throws IllegalStateException If the offset has not been initialized yet
+     */
+    fun requireOffset(): Float = checkNotNull(offset) {
+        "The offset was read before being initialized. Did you access the offset in a phase " +
+            "before layout, like effects or composition?"
     }
 
     /**
@@ -169,7 +185,7 @@ internal class SwipeableV2State<T>(
         val b = anchors[targetState] ?: 0f
         val distance = abs(b - a)
         if (distance > 1e-6f) {
-            val progress = (this.offset.value - a) / (b - a)
+            val progress = (this.requireOffset() - a) / (b - a)
             // If we are very close to 0f or 1f, we round to the closest
             if (progress < 1e-6f) 0f else if (progress > 1 - 1e-6f) 1f else progress
         } else 1f
@@ -184,11 +200,7 @@ internal class SwipeableV2State<T>(
     var lastVelocity: Float by mutableStateOf(0f)
         private set
 
-    private val dragPosition = mutableStateOf(Float.NaN)
-
-    private val unsafeOffset by derivedStateOf {
-        dragPosition.value.coerceIn(minBound, maxBound)
-    }
+    private var dragPosition by mutableStateOf<Float?>(null)
 
     private val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
     private val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
@@ -199,7 +211,9 @@ internal class SwipeableV2State<T>(
 
     private var velocityThreshold by mutableStateOf(0f)
 
-    internal val draggableState = DraggableState { dragPosition.value = dragPosition.value + it }
+    internal val draggableState = DraggableState {
+        dragPosition = (dragPosition ?: 0f) + it
+    }
 
     internal var anchors by mutableStateOf(emptyMap<T, Float>())
 
@@ -207,7 +221,7 @@ internal class SwipeableV2State<T>(
         val previousAnchorsEmpty = anchors.isEmpty()
         anchors = newAnchors
         if (previousAnchorsEmpty) {
-            dragPosition.value = anchors.requireAnchor(this.currentState)
+            dragPosition = anchors.requireAnchor(this.currentState)
         }
     }
 
@@ -227,7 +241,7 @@ internal class SwipeableV2State<T>(
     suspend fun snapTo(targetState: T) {
         val targetOffset = anchors.requireAnchor(targetState)
         draggableState.drag {
-            dragBy(targetOffset - offset.value)
+            dragBy(targetOffset - requireOffset())
         }
         this.currentState = targetState
     }
@@ -249,7 +263,7 @@ internal class SwipeableV2State<T>(
         try {
             draggableState.drag {
                 isAnimationRunning = true
-                var prev = dragPosition.value
+                var prev = dragPosition ?: 0f
                 try {
                     animate(prev, targetOffset, velocity, animationSpec) { value, velocity ->
                         dragBy(value - prev)
@@ -262,7 +276,8 @@ internal class SwipeableV2State<T>(
             }
             lastVelocity = 0f
         } finally {
-            val endOffset = dragPosition.value
+            val endOffset = requireNotNull(dragPosition) { "The drag position was in an " +
+                "invalid state. Please report this issue." }
             val endState = anchors
                 .entries
                 .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
@@ -277,7 +292,7 @@ internal class SwipeableV2State<T>(
     suspend fun settle(velocity: Float) {
         val previousState = this.currentState
         val targetState = computeTarget(
-            offset = this.offset.value,
+            offset = requireOffset(),
             currentState = previousState,
             thresholds = positionalThresholds,
             velocity = velocity,
@@ -297,9 +312,10 @@ internal class SwipeableV2State<T>(
      * @return The delta the [draggableState] will consume
      */
     fun dispatchRawDelta(delta: Float): Float {
-        val potentiallyConsumed = dragPosition.value + delta
+        val currentDragPosition = dragPosition ?: 0f
+        val potentiallyConsumed = currentDragPosition + delta
         val clamped = potentiallyConsumed.coerceIn(minBound, maxBound)
-        val deltaToConsume = clamped - dragPosition.value
+        val deltaToConsume = clamped - currentDragPosition
         if (abs(deltaToConsume) > 0) {
             draggableState.dispatchRawDelta(deltaToConsume)
         }

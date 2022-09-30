@@ -41,6 +41,7 @@ import com.google.common.truth.Truth.assertWithMessage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -243,5 +244,31 @@ class SwipeableV2StateTest {
         }
 
         assertThat(progress).isEqualTo(1f)
+    }
+
+    @Test
+    fun swipeable_requireOffset_accessedInInitialComposition_throws() {
+        var exception: Throwable? = null
+        rule.setContent {
+            val state = rememberSwipeableV2State(initialState = B)
+            exception = runCatching { state.requireOffset() }.exceptionOrNull()
+        }
+
+        assertThat(exception).isNotNull()
+        assertThat(exception).isInstanceOf(IllegalStateException::class.java)
+    }
+
+    @Test
+    @Ignore("LaunchedEffects execute instantly in tests. How can we delay?")
+    fun swipeable_requireOffset_accessedInEffect_doesntThrow() {
+        var exception: Throwable? = null
+        rule.setContent {
+            val state = rememberSwipeableV2State(initialState = B)
+            LaunchedEffect(Unit) {
+                exception = runCatching { state.requireOffset() }.exceptionOrNull()
+            }
+        }
+
+        assertThat(exception).isNull()
     }
 }
