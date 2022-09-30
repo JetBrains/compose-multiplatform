@@ -132,13 +132,13 @@ class ComposePanel @ExperimentalComposeUiApi constructor(
             return component
         }
         val clipComponent = ClipComponent(component)
-        clipMap.put(component, clipComponent)
+        clipMap[component] = clipComponent
         layer!!.component.clipComponents.add(clipComponent)
         return super.add(component, Integer.valueOf(0))
     }
 
     override fun remove(component: Component) {
-        layer!!.component.clipComponents.remove(clipMap.get(component)!!)
+        layer!!.component.clipComponents.remove(clipMap[component]!!)
         clipMap.remove(component)
         super.remove(component)
     }
@@ -161,13 +161,12 @@ class ComposePanel @ExperimentalComposeUiApi constructor(
                     // The focus can be switched from the child component inside SwingPanel.
                     // In that case, SwingPanel will take care of it.
                     if (!isParentOf(e.oppositeComponent)) {
+                        layer?.scene?.requestFocus()
                         when (e.cause) {
                             FocusEvent.Cause.TRAVERSAL_FORWARD -> {
-                                layer?.scene?.requestFocus()
                                 layer?.scene?.moveFocus(FocusDirection.Next)
                             }
                             FocusEvent.Cause.TRAVERSAL_BACKWARD -> {
-                                layer?.scene?.requestFocus()
                                 layer?.scene?.moveFocus(FocusDirection.Previous)
                             }
                             else -> Unit

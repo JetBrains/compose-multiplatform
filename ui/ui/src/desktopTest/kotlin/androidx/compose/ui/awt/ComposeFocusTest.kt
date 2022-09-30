@@ -30,9 +30,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.performClick
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import com.google.common.truth.BooleanSubject
 import com.google.common.truth.Truth.assertThat
-import com.google.common.truth.Truth.assertWithMessage
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
@@ -47,7 +45,6 @@ import org.jetbrains.skiko.MainUIDispatcher
 import org.jetbrains.skiko.hostOs
 import org.junit.Assume
 import org.junit.Test
-import org.junit.experimental.categories.Categories
 
 class ComposeFocusTest {
     @Test
@@ -523,6 +520,77 @@ class ComposeFocusTest {
         testRandomFocus(
             window, composeButton3, composeButton4
         )
+    }
+
+    @Test
+    fun `initial focus in ComposeWindow`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            composeButton1.Content()
+        }
+        window.pack()
+        window.isVisible = true
+
+        assertThat(composeButton1.isFocused).isFalse()
+
+        awaitEDT()
+        pressNextFocusKey()
+        awaitEDT()
+        assertThat(composeButton1.isFocused).isTrue()
+    }
+
+    @Test
+    fun `initial focus in ComposePanel`() = runFocusTest {
+        val window = JFrame().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.contentPane.add(javax.swing.Box.createVerticalBox().apply {
+            add(ComposePanel().apply {
+                setContent {
+                    composeButton1.Content()
+                }
+            })
+        })
+        window.pack()
+        window.isVisible = true
+
+        assertThat(composeButton1.isFocused).isFalse()
+
+        awaitEDT()
+        pressNextFocusKey()
+        awaitEDT()
+        assertThat(composeButton1.isFocused).isTrue()
+    }
+
+    @Test
+    fun `change focus in empty ComposeWindow`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+        window.setContent { }
+        window.pack()
+        window.isVisible = true
+
+        awaitEDT()
+        pressNextFocusKey()
+    }
+
+    @Test
+    fun `change focus in empty ComposePanel`() = runFocusTest {
+        val window = JFrame().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.contentPane.add(javax.swing.Box.createVerticalBox().apply {
+            add(ComposePanel().apply {
+                setContent { }
+            })
+        })
+        window.pack()
+        window.isVisible = true
+
+        awaitEDT()
+        pressNextFocusKey()
     }
 
     private val outerButton1 = TestJButton("outerButton1")
