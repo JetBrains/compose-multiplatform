@@ -1040,7 +1040,10 @@ internal class AndroidComposeView(context: Context) :
         if (!isDirty) {
             // It is correct to remove the layer here regardless of this if, but for performance
             // we are hackily not doing the removal here in order to just do clear() a bit later.
-            if (!isDrawingContent) require(dirtyLayers.remove(layer))
+            if (!isDrawingContent) {
+                dirtyLayers.remove(layer)
+                postponedDirtyLayers?.remove(layer)
+            }
         } else if (!isDrawingContent) {
             dirtyLayers += layer
         } else {
