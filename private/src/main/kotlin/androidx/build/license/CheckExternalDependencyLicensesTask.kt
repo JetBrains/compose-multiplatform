@@ -109,7 +109,9 @@ fun Project.configureExternalDependencyLicenseCheck() {
         CheckExternalDependencyLicensesTask.TASK_NAME,
         CheckExternalDependencyLicensesTask::class.java
     ) { task ->
-        task.prebuiltsRoot.set(project.getPrebuiltsRoot().absolutePath)
+        task.prebuiltsRoot.set(project.provider {
+            project.getPrebuiltsRoot().absolutePath
+        })
 
         task.filesToCheck.from(
             project.provider {
