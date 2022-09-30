@@ -22,7 +22,9 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
@@ -36,6 +38,8 @@ import androidx.compose.runtime.withFrameMillis
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
@@ -433,6 +437,55 @@ class AnimatedContentTest {
             assertEquals(2, list.size)
             assertEquals(1, list[0])
             assertEquals(2, list[1])
+        }
+    }
+
+    @OptIn(ExperimentalAnimationApi::class)
+    @Test
+    fun AnimatedContentWithInterruption() {
+        var flag by mutableStateOf(true)
+        var rootCoords: LayoutCoordinates? = null
+        rule.setContent {
+            AnimatedContent(targetState = flag,
+                modifier = Modifier.onGloballyPositioned { rootCoords = it },
+                transitionSpec = {
+                if (targetState) {
+                    fadeIn(tween(2000)) with slideOut(
+                        tween(2000)) { fullSize ->
+                        IntOffset(0, fullSize.height / 2) } + fadeOut(
+                        tween(2000))
+                } else {
+                    fadeIn(tween(2000)) with fadeOut(tween(2000))
+                }
+            }) { state ->
+                if (state) {
+                    Box(modifier = Modifier
+                        .onGloballyPositioned {
+                            assertEquals(Offset.Zero, rootCoords!!.localPositionOf(it, Offset.Zero))
+                        }
+                        .fillMaxSize()
+                        .background(Color.Green)
+                    )
+                } else {
+                    LaunchedEffect(key1 = Unit) {
+                        delay(200)
+                        assertFalse(flag)
+                        assertTrue(transition.isRunning)
+                        // Interrupt
+                        flag = true
+                    }
+                    Box(modifier = Modifier
+                        .onGloballyPositioned {
+                            assertEquals(Offset.Zero, rootCoords!!.localPositionOf(it, Offset.Zero))
+                        }
+                        .fillMaxSize()
+                        .background(Color.Red)
+                    )
+                }
+            }
+        }
+        rule.runOnIdle {
+            flag = false
         }
     }
 }

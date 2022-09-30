@@ -628,7 +628,11 @@ fun <S> Transition<S>.AnimatedContent(
                 // naturally.
                 val exit =
                     remember(segment.targetState == stateForContent) {
-                        rootScope.transitionSpec().initialContentExit
+                        if (segment.targetState == stateForContent) {
+                            ExitTransition.None
+                        } else {
+                            rootScope.transitionSpec().initialContentExit
+                        }
                     }
                 val childData = remember {
                     AnimatedContentScope.ChildData(stateForContent == targetState)
