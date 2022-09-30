@@ -18,7 +18,6 @@ import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.isOutOfBounds
 import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
@@ -26,7 +25,6 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.sync.Mutex
 
 /**
  * Detects tap, double-tap, and long press gestures and calls [onTap], [onDoubleTap], and
@@ -67,6 +65,20 @@ suspend fun PointerInputScope.detectTapGestures(
         matcher.matches(it) && keyboardModifiers(it.keyboardModifiers)
     }
 
+    // After long click was detected and dispatched, we should wait for the pointer button release.
+    // In this case the event has been already dispatched, therefore, the release event is not required to
+    // have the matching keyboard modifiers.
+    val longClickReleaseFilter: (PointerEvent) -> Boolean = {
+        matcher.matches(it)
+    }
+
+    // keyboardModifiersDontMatch is used in `cancelIf` of `awaitReleaseOrCancelled to cancel the await.
+    // It prevents an infinite suspension when we wait for a release event. An infinite suspension might occur when
+    // a user depresses a keyboard modifier button before releasing a pointer button.
+    val keyboardModifiersDontMatch: (PointerEvent) -> Boolean = {
+        !keyboardModifiers(it.keyboardModifiers)
+    }
+
     while (currentCoroutineContext().isActive) {
         awaitPointerEventScope {
             pressScope.reset()
@@ -85,7 +97,7 @@ suspend fun PointerInputScope.detectTapGestures(
             // use `cancelled` flag to distinguish between two cases
 
             val firstRelease = withTimeoutOrNull(longPressTimeout) {
-                awaitReleaseOrCancelled(filter = filter).apply {
+                awaitReleaseOrCancelled(filter = filter, cancelIf = keyboardModifiersDontMatch).apply {
                     this?.changes?.fastForEach { it.consume() }
                     cancelled = this == null
                 }
@@ -93,6 +105,7 @@ suspend fun PointerInputScope.detectTapGestures(
 
             if (cancelled) {
                 pressScope.cancel()
+                return@awaitPointerEventScope
             } else if (firstRelease != null) {
                 pressScope.release()
             }
@@ -100,7 +113,10 @@ suspend fun PointerInputScope.detectTapGestures(
             if (firstRelease == null) {
                 if (onLongPress != null && !cancelled) {
                     onLongPress(down.changes[0].position)
-                    awaitReleaseOrCancelled(consumeUntilRelease = true, filter = filter)
+                    awaitReleaseOrCancelled(
+                        consumeUntilRelease = true,
+                        filter = longClickReleaseFilter
+                    )
                     pressScope.release()
                 }
             } else if (onDoubleTap == null) {
@@ -121,7 +137,7 @@ suspend fun PointerInputScope.detectTapGestures(
                     cancelled = false
 
                     val secondRelease = withTimeoutOrNull(longPressTimeout) {
-                        awaitReleaseOrCancelled(filter = filter).apply {
+                        awaitReleaseOrCancelled(filter = filter, cancelIf = keyboardModifiersDontMatch).apply {
                             this?.changes?.fastForEach { it.consume() }
                             cancelled = this == null
                         }
@@ -129,6 +145,7 @@ suspend fun PointerInputScope.detectTapGestures(
 
                     if (cancelled) {
                         pressScope.cancel()
+                        return@awaitPointerEventScope
                     } else if (secondRelease != null) {
                         pressScope.release()
                     }
@@ -136,7 +153,10 @@ suspend fun PointerInputScope.detectTapGestures(
                     if (secondRelease == null) {
                         if (onLongPress != null && !cancelled) {
                             onLongPress(secondPress.changes[0].position)
-                            awaitReleaseOrCancelled(consumeUntilRelease = true, filter = filter)
+                            awaitReleaseOrCancelled(
+                                consumeUntilRelease = true,
+                                filter = longClickReleaseFilter
+                            )
                             pressScope.release()
                         }
                     } else if (!cancelled) {
@@ -183,6 +203,7 @@ private suspend fun AwaitPointerEventScope.awaitSecondPressUnconsumed(
 
 private suspend fun AwaitPointerEventScope.awaitReleaseOrCancelled(
     consumeUntilRelease: Boolean = false,
+    cancelIf: (PointerEvent) -> Boolean = { false },
     filter: (PointerEvent) -> Boolean
 ): PointerEvent? {
     var event: PointerEvent? = null
@@ -194,7 +215,7 @@ private suspend fun AwaitPointerEventScope.awaitReleaseOrCancelled(
             it.isOutOfBounds(size, Size.Zero)
         }
 
-        if (cancelled) return null
+        if (cancelled || cancelIf(event)) return null
 
         event = event.takeIf {
             it.isAllPressedUp(requireUnconsumed = true) && filter(it)
