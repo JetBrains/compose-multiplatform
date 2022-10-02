@@ -612,6 +612,15 @@ internal class TextFieldSelectionManager(
         )
     }
 
+    internal fun getHandleLineHeight(isStartHandle: Boolean): Float {
+        val layoutResult = state?.layoutResult ?: return 0f
+        val offset = if (isStartHandle) value.selection.start else value.selection.end
+        val line = layoutResult.value.getLineForOffset(
+            offset = offsetMapping.originalToTransformed(offset)
+        )
+        return layoutResult.value.multiParagraph.getLineHeight(line)
+    }
+
     internal fun getCursorPosition(density: Density): Offset {
         val offset = offsetMapping.originalToTransformed(value.selection.start)
         val layoutResult = state?.layoutResult!!.value
@@ -819,6 +828,7 @@ internal fun TextFieldSelectionHandle(
         isStartHandle = isStartHandle,
         direction = direction,
         handlesCrossed = manager.value.selection.reversed,
+        lineHeight = manager.getHandleLineHeight(isStartHandle),
         modifier = Modifier.pointerInput(observer) {
             detectDownAndDragGesturesWithObserver(observer)
         },

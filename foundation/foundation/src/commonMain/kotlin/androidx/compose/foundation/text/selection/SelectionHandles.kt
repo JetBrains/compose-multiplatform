@@ -53,6 +53,7 @@ internal expect fun SelectionHandle(
     isStartHandle: Boolean,
     direction: ResolvedTextDirection,
     handlesCrossed: Boolean,
+    lineHeight: Float = 0f,
     modifier: Modifier,
     content: @Composable (() -> Unit)?
 )
