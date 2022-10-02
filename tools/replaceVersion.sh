@@ -15,11 +15,18 @@ declare -a folders=(
     "tutorials"
 )
 
-if [ -z "$@" ]; then
-echo "Specify Compose version. For example: ./replace.sh 1.0.0-rc6"
+if [ -z "$1" ]; then
+echo "Specify Compose version. For example: ./replace.sh 1.2.0-beta02 1.7.10"
 exit 1
 fi
-COMPOSE_VERSION=$@
+
+if [ -z "$2" ]; then
+echo "Specify Kotlin version. For example: ./replace.sh 1.2.0-beta02 1.7.10"
+exit 1
+fi
+
+COMPOSE_VERSION=$1
+KOTLIN_VERSION=$2
 
 if [[ $OSTYPE == 'darwin'* ]]; then
     SED=gsed
@@ -27,25 +34,26 @@ else
     SED=sed
 fi
 
-replaceCompose() {
+replaceVersion() {
     $SED -i -e "s/$1/$2/g" $3
 }
 
-replaceComposeInFile() {
+replaceVersionInFile() {
     echo "Replace in $1"
-    replaceCompose '^compose.version=.*' 'compose.version='"$COMPOSE_VERSION"'' $1
-    replaceCompose '^COMPOSE_CORE_VERSION=.*' 'COMPOSE_CORE_VERSION='"$COMPOSE_VERSION"'' $1
-    replaceCompose '^COMPOSE_WEB_VERSION=.*' 'COMPOSE_WEB_VERSION='"$COMPOSE_VERSION"'' $1
-    replaceCompose 'id("org.jetbrains.compose") version ".*"' 'id("org.jetbrains.compose") version "'"$COMPOSE_VERSION"'"' $1
-    replaceCompose '"org.jetbrains.compose:compose-gradle-plugin:.*"' '"org.jetbrains.compose:compose-gradle-plugin:'"$COMPOSE_VERSION"'"' $1
+    replaceVersion '^compose.version=.*' 'compose.version='"$COMPOSE_VERSION"'' $1
+    replaceVersion '^COMPOSE_CORE_VERSION=.*' 'COMPOSE_CORE_VERSION='"$COMPOSE_VERSION"'' $1
+    replaceVersion '^COMPOSE_WEB_VERSION=.*' 'COMPOSE_WEB_VERSION='"$COMPOSE_VERSION"'' $1
+    replaceVersion 'id("org.jetbrains.compose") version ".*"' 'id("org.jetbrains.compose") version "'"$COMPOSE_VERSION"'"' $1
+    replaceVersion '"org.jetbrains.compose:compose-gradle-plugin:.*"' '"org.jetbrains.compose:compose-gradle-plugin:'"$COMPOSE_VERSION"'"' $1
+    replaceVersion '^kotlin.version=.*' 'kotlin.version='"$KOTLIN_VERSION"'' $1
 }
 
-replaceComposeInFolder() {
-    find $ROOT/$1 -wholename $2 -not -path "**/build**" -not -path "**/.gradle**" | while read file; do replaceComposeInFile "$file"; done
+replaceVersionInFolder() {
+    find $ROOT/$1 -wholename $2 -not -path "**/build**" -not -path "**/.gradle**" | while read file; do replaceVersionInFile "$file"; done
 }
 
 for folder in "${folders[@]}"
 do
-   replaceComposeInFolder $folder "**gradle.properties"
-   replaceComposeInFolder $folder "**README.md"
+   replaceVersionInFolder $folder "**gradle.properties"
+   replaceVersionInFolder $folder "**README.md"
 done
