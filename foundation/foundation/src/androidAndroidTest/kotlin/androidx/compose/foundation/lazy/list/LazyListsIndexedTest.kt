@@ -43,11 +43,10 @@ class LazyListsIndexedTest {
     val rule = createComposeRule()
 
     @Test
-    fun lazyColumnShowsIndexedItems() {
+    fun lazyColumnShowsIndexedItems_zeroBeyondBoundsItemCount() {
         val items = (1..4).map { it.toString() }
-
         rule.setContent {
-            LazyColumn(Modifier.height(200.dp)) {
+            LazyColumn(Modifier.height(200.dp), beyondBoundsItemCount = 0) {
                 itemsIndexed(items) { index, item ->
                     Spacer(
                         Modifier.height(101.dp).fillParentMaxWidth()
@@ -71,9 +70,35 @@ class LazyListsIndexedTest {
     }
 
     @Test
+    fun lazyColumnShowsIndexedItems_withBeyondBoundsItemCount() {
+        val items = (1..4).map { it.toString() }
+        rule.setContent {
+            LazyColumn(Modifier.height(200.dp), beyondBoundsItemCount = 1) {
+                itemsIndexed(items) { index, item ->
+                    Spacer(
+                        Modifier.height(101.dp).fillParentMaxWidth()
+                            .testTag("$index-$item")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0-1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1-2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2-3")
+            .assertExists()
+
+        rule.onNodeWithTag("3-4")
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun columnWithIndexesComposedWithCorrectIndexAndItem() {
         val items = (0..1).map { it.toString() }
-
         rule.setContent {
             LazyColumn(Modifier.height(200.dp)) {
                 itemsIndexed(items) { index, item ->
@@ -92,11 +117,10 @@ class LazyListsIndexedTest {
     }
 
     @Test
-    fun lazyRowShowsIndexedItems() {
+    fun lazyRowShowsIndexedItems_zeroBeyondBoundsItemCount() {
         val items = (1..4).map { it.toString() }
-
         rule.setContent {
-            LazyRow(Modifier.width(200.dp)) {
+            LazyRow(Modifier.width(200.dp), beyondBoundsItemCount = 0) {
                 itemsIndexed(items) { index, item ->
                     Spacer(
                         Modifier.width(101.dp).fillParentMaxHeight()
@@ -114,6 +138,33 @@ class LazyListsIndexedTest {
 
         rule.onNodeWithTag("2-3")
             .assertDoesNotExist()
+
+        rule.onNodeWithTag("3-4")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun lazyRowShowsIndexedItems_withBeyondBoundsItemCount() {
+        val items = (1..4).map { it.toString() }
+        rule.setContent {
+            LazyRow(Modifier.width(200.dp), beyondBoundsItemCount = 1) {
+                itemsIndexed(items) { index, item ->
+                    Spacer(
+                        Modifier.width(101.dp).fillParentMaxHeight()
+                            .testTag("$index-$item")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0-1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1-2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2-3")
+            .assertExists()
 
         rule.onNodeWithTag("3-4")
             .assertDoesNotExist()

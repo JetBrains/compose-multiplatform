@@ -63,6 +63,8 @@ internal fun LazyList(
     flingBehavior: FlingBehavior,
     /** Whether scrolling via the user gestures is allowed. */
     userScrollEnabled: Boolean,
+    /** Number of items to layout before and after the visible items */
+    beyondBoundsItemCount: Int = 0,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
     /** The vertical arrangement for items. Required when isVertical is true */
@@ -93,11 +95,12 @@ internal fun LazyList(
         contentPadding,
         reverseLayout,
         isVertical,
+        beyondBoundsItemCount,
         horizontalAlignment,
         verticalAlignment,
         horizontalArrangement,
         verticalArrangement,
-        placementAnimator
+        placementAnimator,
     )
 
     ScrollPositionUpdater(itemProvider, state)
@@ -165,6 +168,8 @@ private fun rememberLazyListMeasurePolicy(
     reverseLayout: Boolean,
     /** The layout orientation of the list */
     isVertical: Boolean,
+    /** Number of items to layout before and after the visible items */
+    beyondBoundsItemCount: Int,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
     /** The alignment to align items vertically. Required when isVertical is false */
@@ -316,6 +321,7 @@ private fun rememberLazyListMeasurePolicy(
             density = this,
             placementAnimator = placementAnimator,
             beyondBoundsInfo = beyondBoundsInfo,
+            beyondBoundsItemCount = beyondBoundsItemCount,
             layout = { width, height, placement ->
                 layout(
                     containerConstraints.constrainWidth(width + totalHorizontalPadding),

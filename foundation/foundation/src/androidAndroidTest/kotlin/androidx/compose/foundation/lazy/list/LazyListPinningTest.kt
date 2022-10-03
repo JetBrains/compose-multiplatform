@@ -53,7 +53,7 @@ class LazyListPinningTest {
     private var itemCount by mutableStateOf(100)
 
     @Test
-    fun UnpinnedBeyondBoundsItems() {
+    fun UnpinnedBeyondBoundsItems_withoutBeyondBoundsItemCount() {
         // Arrange.
         rule.setContent {
             LazyRow(Modifier.size(10.dp)) {
@@ -86,6 +86,43 @@ class LazyListPinningTest {
         rule.waitForIdle()
         rule.onNodeWithTag("0").assertPlaced()
         rule.assertNotPlaced(1..itemCount)
+    }
+
+    @Test
+    fun UnpinnedBeyondBoundsItems_withBeyondBoundsItemCount() {
+        // Arrange.
+        rule.setContent {
+            LazyRow(Modifier.size(10.dp), beyondBoundsItemCount = 1) {
+                item {
+                    Box(Modifier
+                        .size(10.dp)
+                        .testTag("0")
+                        .modifierLocalConsumer {
+                            beyondBoundsLayout = ModifierLocalBeyondBoundsLayout.current
+                            pinnableParent = ModifierLocalPinnableParent.current
+                        }
+                    )
+                }
+                items(itemCount - 1) { index ->
+                    Box(Modifier.size(10.dp).testTag("${index + 1}"))
+                }
+            }
+        }
+
+        // Act - Add 10 items beyond bounds.
+        var extraItemCount = 10
+        rule.runOnIdle {
+            beyondBoundsLayout!!.layout(Right) {
+                // Return null to continue the search, and true to stop.
+                if (--extraItemCount > 0) null else true
+            }
+        }
+
+        // Assert.
+        rule.waitForIdle()
+        rule.onNodeWithTag("0").assertPlaced() // Visible Item
+        rule.onNodeWithTag("1").assertPlaced() // Non Visible Item
+        rule.assertNotPlaced(2..itemCount)
     }
 
     @Test
@@ -140,10 +177,62 @@ class LazyListPinningTest {
     }
 
     @Test
-    fun pinnedBeyondBoundsItems_reduceItemCount_greaterThanBeyondBoundsItems() {
+    fun pinnedBeyondBoundsItems_BeyoundBoundsItemCountShouldNotInfluence() {
         // Arrange.
         rule.setContent {
-            LazyRow(Modifier.size(10.dp)) {
+            LazyRow(Modifier.size(10.dp), beyondBoundsItemCount = 1) {
+                item {
+                    Box(Modifier
+                        .size(10.dp)
+                        .testTag("0")
+                        .modifierLocalConsumer {
+                            beyondBoundsLayout = ModifierLocalBeyondBoundsLayout.current
+                            pinnableParent = ModifierLocalPinnableParent.current
+                        }
+                    )
+                }
+                items(itemCount - 1) { index ->
+                    Box(Modifier.size(10.dp).testTag("${index + 1}"))
+                }
+            }
+        }
+
+        // Act - Add 10 items beyond bounds, and pin them.
+        var extraItemCount = 10
+        lateinit var pinnedItemsHandle: PinnableParent.PinnedItemsHandle
+        rule.runOnIdle {
+            beyondBoundsLayout!!.layout(Right) {
+                if (--extraItemCount > 0) {
+                    // Return null to continue the search.
+                    null
+                } else {
+                    pinnedItemsHandle = pinnableParent!!.pinItems()
+                    // Return true to stop the search.
+                    true
+                }
+            }
+        }
+
+        // Assert - The beyond bounds items are not disposed.
+        rule.waitForIdle()
+        rule.assertPlaced(0..11) // Visible + non visible items
+        rule.assertNotPlaced(12..itemCount)
+
+        // Act - Unpin the items.
+        rule.runOnIdle { pinnedItemsHandle.unpin() }
+
+        // Assert - The beyond bounds items are disposed.
+        rule.waitForIdle()
+        rule.onNodeWithTag("0").assertPlaced() // Visible item
+        rule.onNodeWithTag("1").assertPlaced() // Non Visible Item
+        rule.assertNotPlaced(2..itemCount)
+    }
+
+    @Test
+    fun pinnedBeyondBoundsItems_reduceItemCount_withoutExtraItems_greaterThanBeyondBoundsItems() {
+        // Arrange.
+        rule.setContent {
+            LazyRow(Modifier.size(10.dp), beyondBoundsItemCount = 0) {
                 item {
                     Box(Modifier
                         .size(10.dp)
@@ -183,6 +272,56 @@ class LazyListPinningTest {
         rule.waitForIdle()
         rule.assertPlaced(0..10)
         rule.assertNotPlaced(11..itemCount)
+
+        // Cleanup - Unpin the items.
+        rule.runOnIdle { pinnedItemsHandle.unpin() }
+    }
+
+    @Test
+    fun pinnedBeyondBoundsItems_reduceItemCount_withExtraItems_greaterThanBeyondBoundsItems() {
+        // Arrange.
+        val beyondBoundsItemCount = 1
+        rule.setContent {
+            LazyRow(Modifier.size(10.dp), beyondBoundsItemCount = beyondBoundsItemCount) {
+                item {
+                    Box(Modifier
+                        .size(10.dp)
+                        .testTag("0")
+                        .modifierLocalConsumer {
+                            beyondBoundsLayout = ModifierLocalBeyondBoundsLayout.current
+                            pinnableParent = ModifierLocalPinnableParent.current
+                        }
+                    )
+                }
+                items(itemCount - 1) { index ->
+                    Box(Modifier.size(10.dp).testTag("${index + 1}"))
+                }
+            }
+        }
+
+        // Act - Add 10 items beyond bounds, and pin them.
+        var extraItemCount = 10
+        lateinit var pinnedItemsHandle: PinnableParent.PinnedItemsHandle
+        rule.runOnIdle {
+            beyondBoundsLayout!!.layout(Right) {
+                if (--extraItemCount > 0) {
+                    // Return null to continue the search.
+                    null
+                } else {
+                    pinnedItemsHandle = pinnableParent!!.pinItems()
+                    // Return true to stop the search.
+                    true
+                }
+            }
+        }
+
+        // Act - Reduce the number of items.
+        rule.runOnIdle { itemCount = 50 }
+
+        // Assert - The beyond bounds items are not disposed.
+        rule.waitForIdle()
+        rule.assertPlaced(0..(10 + beyondBoundsItemCount))
+        rule.assertNotPlaced((11 + beyondBoundsItemCount)..itemCount)
 
         // Cleanup - Unpin the items.
         rule.runOnIdle { pinnedItemsHandle.unpin() }

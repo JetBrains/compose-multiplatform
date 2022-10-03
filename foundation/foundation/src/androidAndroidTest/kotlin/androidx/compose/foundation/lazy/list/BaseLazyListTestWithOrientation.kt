@@ -107,6 +107,7 @@ open class BaseLazyListTestWithOrientation(
         flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
         userScrollEnabled: Boolean = true,
         spacedBy: Dp = 0.dp,
+        beyondBoundsItemCount: Int = 0,
         content: LazyListScope.() -> Unit
     ) {
         if (vertical) {
@@ -123,6 +124,7 @@ open class BaseLazyListTestWithOrientation(
                 flingBehavior = flingBehavior,
                 userScrollEnabled = userScrollEnabled,
                 verticalArrangement = verticalArrangement,
+                beyondBoundsItemCount = beyondBoundsItemCount,
                 content = content
             )
         } else {
@@ -139,6 +141,7 @@ open class BaseLazyListTestWithOrientation(
                 flingBehavior = flingBehavior,
                 userScrollEnabled = userScrollEnabled,
                 horizontalArrangement = horizontalArrangement,
+                beyondBoundsItemCount = beyondBoundsItemCount,
                 content = content
             )
         }

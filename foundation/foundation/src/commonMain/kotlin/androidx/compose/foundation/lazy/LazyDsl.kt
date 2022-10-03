@@ -283,6 +283,11 @@ inline fun <T> LazyListScope.itemsIndexed(
  * @param flingBehavior logic describing fling behavior.
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
  * is allowed. You can still scroll programmatically using the state even when it is disabled.
+ * @param beyondBoundsItemCount Non visible items to load before and after the list of visible
+ * items. Note: Be aware that using a large value for beyondBoundsItemCount will cause a lot of
+ * items to be composed, measured and placed which will defeat the purpose of using Lazy loading.
+ * This should be used as an optimization to pre-load a couple of items before and after the visible
+ * ones.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
@@ -297,6 +302,7 @@ fun LazyRow(
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
+    beyondBoundsItemCount: Int = 0,
     content: LazyListScope.() -> Unit
 ) {
     LazyList(
@@ -309,6 +315,7 @@ fun LazyRow(
         flingBehavior = flingBehavior,
         reverseLayout = reverseLayout,
         userScrollEnabled = userScrollEnabled,
+        beyondBoundsItemCount = beyondBoundsItemCount,
         content = content
     )
 }
@@ -339,9 +346,44 @@ fun LazyRow(
  * @param flingBehavior logic describing fling behavior.
  * @param userScrollEnabled whether the scrolling via the user gestures or accessibility actions
  * is allowed. You can still scroll programmatically using the state even when it is disabled.
+ * @param beyondBoundsItemCount Non visible items to load before and after the list of visible
+ * items. Note: Be aware that using a large value for beyondBoundsItemCount will cause a lot of
+ * items to be composed, measured and placed which will defeat the purpose of using Lazy loading.
+ * This should be used as an optimization to pre-load a couple of items before and after the visible
+ * ones.
  * @param content a block which describes the content. Inside this block you can use methods like
  * [LazyListScope.item] to add a single item or [LazyListScope.items] to add a list of items.
  */
+@Composable
+fun LazyColumn(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    beyondBoundsItemCount: Int = 0,
+    content: LazyListScope.() -> Unit
+) {
+    LazyList(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        flingBehavior = flingBehavior,
+        horizontalAlignment = horizontalAlignment,
+        verticalArrangement = verticalArrangement,
+        isVertical = true,
+        reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        beyondBoundsItemCount = beyondBoundsItemCount,
+        content = content
+    )
+}
+
+@Deprecated("Use the non deprecated overload", level = DeprecationLevel.HIDDEN)
 @Composable
 fun LazyColumn(
     modifier: Modifier = Modifier,
@@ -395,6 +437,33 @@ fun LazyColumn(
     )
 }
 
+@Deprecated("Use the non deprecated overload", level = DeprecationLevel.HIDDEN)
+@Composable
+fun LazyRow(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    content: LazyListScope.() -> Unit
+) {
+    LazyList(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        isVertical = false,
+        flingBehavior = flingBehavior,
+        reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        content = content
+    )
+}
 @Deprecated("Use the non deprecated overload", level = DeprecationLevel.HIDDEN)
 @Composable
 fun LazyRow(

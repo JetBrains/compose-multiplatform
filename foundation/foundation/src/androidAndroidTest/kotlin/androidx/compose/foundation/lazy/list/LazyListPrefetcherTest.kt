@@ -44,16 +44,26 @@ import org.junit.runners.Parameterized
 @LargeTest
 @RunWith(Parameterized::class)
 class LazyListPrefetcherTest(
-    orientation: Orientation
-) : BaseLazyListTestWithOrientation(orientation) {
+    val config: Config
+) : BaseLazyListTestWithOrientation(config.orientation) {
 
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "{0}")
         fun initParameters(): Array<Any> = arrayOf(
-            Orientation.Vertical,
-            Orientation.Horizontal,
+            Config(Orientation.Vertical, 0),
+            Config(Orientation.Vertical, 1),
+            Config(Orientation.Horizontal, 0),
+            Config(Orientation.Horizontal, 1)
         )
+
+        class Config(
+            val orientation: Orientation,
+            val beyondBoundsItemCount: Int
+        ) {
+            override fun toString() = "orientation=$orientation with" +
+                " $beyondBoundsItemCount non-visible items"
+        }
     }
 
     val itemsSizePx = 30
@@ -65,7 +75,7 @@ class LazyListPrefetcherTest(
     fun notPrefetchingForwardInitially() {
         composeList()
 
-        rule.onNodeWithTag("2")
+        rule.onNodeWithTag("${config.beyondBoundsItemCount + 2}")
             .assertDoesNotExist()
     }
 
@@ -80,18 +90,18 @@ class LazyListPrefetcherTest(
     @Test
     fun prefetchingForwardAfterSmallScroll() {
         composeList()
-
+        val preFetchIndex = 2
         rule.runOnIdle {
             runBlocking {
                 state.scrollBy(5f)
             }
         }
 
-        waitForPrefetch(2)
+        waitForPrefetch(preFetchIndex)
 
-        rule.onNodeWithTag("2")
+        rule.onNodeWithTag("$preFetchIndex")
             .assertExists()
-        rule.onNodeWithTag("3")
+        rule.onNodeWithTag("${config.beyondBoundsItemCount + preFetchIndex + 1}")
             .assertDoesNotExist()
     }
 
@@ -115,19 +125,20 @@ class LazyListPrefetcherTest(
 
     @Test
     fun prefetchingForwardAndBackward() {
-        composeList(firstItem = 1)
+        val initialIndex = 5
+        composeList(firstItem = initialIndex)
 
         rule.runOnIdle {
             runBlocking {
                 state.scrollBy(5f)
             }
         }
+        var prefetchIndex = initialIndex + 2
+        waitForPrefetch(prefetchIndex)
 
-        waitForPrefetch(3)
-
-        rule.onNodeWithTag("3")
+        rule.onNodeWithTag("$prefetchIndex")
             .assertExists()
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("${prefetchIndex - config.beyondBoundsItemCount - 3}")
             .assertDoesNotExist()
 
         rule.runOnIdle {
@@ -137,11 +148,12 @@ class LazyListPrefetcherTest(
             }
         }
 
-        waitForPrefetch(0)
+        prefetchIndex -= 3
+        waitForPrefetch(prefetchIndex)
 
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("$prefetchIndex")
             .assertExists()
-        rule.onNodeWithTag("3")
+        rule.onNodeWithTag("${prefetchIndex + config.beyondBoundsItemCount + 3}")
             .assertDoesNotExist()
     }
 
@@ -164,13 +176,15 @@ class LazyListPrefetcherTest(
             }
         }
 
-        waitForPrefetch(3)
+        val prefetchIndex = 3
 
-        rule.onNodeWithTag("2")
+        waitForPrefetch(prefetchIndex)
+
+        rule.onNodeWithTag("${prefetchIndex - 1}")
             .assertIsDisplayed()
-        rule.onNodeWithTag("3")
+        rule.onNodeWithTag("$prefetchIndex")
             .assertExists()
-        rule.onNodeWithTag("4")
+        rule.onNodeWithTag("${prefetchIndex + config.beyondBoundsItemCount + 1}")
             .assertDoesNotExist()
     }
 
@@ -205,7 +219,8 @@ class LazyListPrefetcherTest(
 
     @Test
     fun prefetchingForwardAndBackwardReverseLayout() {
-        composeList(firstItem = 1, reverseLayout = true)
+        val initialIndex = 5
+        composeList(firstItem = initialIndex, reverseLayout = true)
 
         rule.runOnIdle {
             runBlocking {
@@ -213,11 +228,13 @@ class LazyListPrefetcherTest(
             }
         }
 
-        waitForPrefetch(3)
+        var prefetchIndex = initialIndex + 2
 
-        rule.onNodeWithTag("3")
+        waitForPrefetch(prefetchIndex)
+
+        rule.onNodeWithTag("$prefetchIndex")
             .assertExists()
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("${prefetchIndex - config.beyondBoundsItemCount - 3}")
             .assertDoesNotExist()
 
         rule.runOnIdle {
@@ -227,32 +244,34 @@ class LazyListPrefetcherTest(
             }
         }
 
-        waitForPrefetch(0)
+        prefetchIndex -= 3
+        waitForPrefetch(prefetchIndex)
 
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("$prefetchIndex")
             .assertExists()
-        rule.onNodeWithTag("3")
+        rule.onNodeWithTag("${prefetchIndex + config.beyondBoundsItemCount + 3}")
             .assertDoesNotExist()
     }
 
     @Test
     fun prefetchingForwardAndBackwardWithContentPadding() {
         val halfItemSize = itemsSizeDp / 2f
+        val initialIndex = 5
         composeList(
-            firstItem = 2,
+            firstItem = initialIndex,
             itemOffset = 5,
             contentPadding = PaddingValues(mainAxis = halfItemSize)
         )
 
-        rule.onNodeWithTag("1")
+        rule.onNodeWithTag("${initialIndex - 1}")
             .assertIsDisplayed()
-        rule.onNodeWithTag("2")
+        rule.onNodeWithTag("$initialIndex")
             .assertIsDisplayed()
-        rule.onNodeWithTag("3")
+        rule.onNodeWithTag("${initialIndex + 1}")
             .assertIsDisplayed()
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("${initialIndex - config.beyondBoundsItemCount - 2}")
             .assertDoesNotExist()
-        rule.onNodeWithTag("4")
+        rule.onNodeWithTag("${initialIndex + config.beyondBoundsItemCount + 2}")
             .assertDoesNotExist()
 
         rule.runOnIdle {
@@ -261,11 +280,12 @@ class LazyListPrefetcherTest(
             }
         }
 
-        waitForPrefetch(3)
+        var prefetchIndex = initialIndex + 1
+        waitForPrefetch(prefetchIndex)
 
-        rule.onNodeWithTag("4")
+        rule.onNodeWithTag("${prefetchIndex + 1}")
             .assertExists()
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("${prefetchIndex - config.beyondBoundsItemCount - 3}")
             .assertDoesNotExist()
 
         rule.runOnIdle {
@@ -274,9 +294,10 @@ class LazyListPrefetcherTest(
             }
         }
 
-        waitForPrefetch(0)
+        prefetchIndex -= 3
+        waitForPrefetch(prefetchIndex)
 
-        rule.onNodeWithTag("0")
+        rule.onNodeWithTag("$prefetchIndex")
             .assertExists()
     }
 
@@ -475,7 +496,8 @@ class LazyListPrefetcherTest(
                 Modifier.mainAxisSize(itemsSizeDp * 1.5f),
                 state,
                 reverseLayout = reverseLayout,
-                contentPadding = contentPadding
+                contentPadding = contentPadding,
+                beyondBoundsItemCount = config.beyondBoundsItemCount
             ) {
                 items(100) {
                     DisposableEffect(it) {

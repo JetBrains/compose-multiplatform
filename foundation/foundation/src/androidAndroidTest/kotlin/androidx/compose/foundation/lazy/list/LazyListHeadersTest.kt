@@ -55,13 +55,13 @@ class LazyListHeadersTest {
     val rule = createComposeRule()
 
     @Test
-    fun lazyColumnShowsHeader() {
+    fun lazyColumnShowsHeader_withoutBeyondBoundsItemCount() {
         val items = (1..2).map { it.toString() }
         val firstHeaderTag = "firstHeaderTag"
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContent {
-            LazyColumn(Modifier.height(300.dp)) {
+            LazyColumn(Modifier.height(300.dp), beyondBoundsItemCount = 0) {
                 stickyHeader {
                     Spacer(
                         Modifier.height(101.dp).fillParentMaxWidth()
@@ -93,6 +93,47 @@ class LazyListHeadersTest {
 
         rule.onNodeWithTag(secondHeaderTag)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun lazyColumnPlaceSecondHeader_ifBeyondBoundsItemCountIsUsed() {
+        val items = (1..2).map { it.toString() }
+        val firstHeaderTag = "firstHeaderTag"
+        val secondHeaderTag = "secondHeaderTag"
+
+        rule.setContent {
+            LazyColumn(Modifier.height(300.dp), beyondBoundsItemCount = 1) {
+                stickyHeader {
+                    Spacer(
+                        Modifier.height(101.dp).fillParentMaxWidth()
+                            .testTag(firstHeaderTag)
+                    )
+                }
+
+                items(items) {
+                    Spacer(Modifier.height(101.dp).fillParentMaxWidth().testTag(it))
+                }
+
+                stickyHeader {
+                    Spacer(
+                        Modifier.height(101.dp).fillParentMaxWidth()
+                            .testTag(secondHeaderTag)
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(firstHeaderTag)
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag(secondHeaderTag)
+            .assertExists()
     }
 
     @Test
@@ -191,13 +232,13 @@ class LazyListHeadersTest {
     }
 
     @Test
-    fun lazyRowShowsHeader() {
+    fun lazyRowShowsHeader_withoutOffscreenItens() {
         val items = (1..2).map { it.toString() }
         val firstHeaderTag = "firstHeaderTag"
         val secondHeaderTag = "secondHeaderTag"
 
         rule.setContent {
-            LazyRow(Modifier.width(300.dp)) {
+            LazyRow(Modifier.width(300.dp), beyondBoundsItemCount = 0) {
                 stickyHeader {
                     Spacer(
                         Modifier.width(101.dp).fillParentMaxHeight()
@@ -229,6 +270,47 @@ class LazyListHeadersTest {
 
         rule.onNodeWithTag(secondHeaderTag)
             .assertDoesNotExist()
+    }
+
+    @Test
+    fun lazyRowPlaceSecondHeader_ifBeyondBoundsItemCountIsUsed() {
+        val items = (1..2).map { it.toString() }
+        val firstHeaderTag = "firstHeaderTag"
+        val secondHeaderTag = "secondHeaderTag"
+
+        rule.setContent {
+            LazyRow(Modifier.width(300.dp), beyondBoundsItemCount = 1) {
+                stickyHeader {
+                    Spacer(
+                        Modifier.width(101.dp).fillParentMaxHeight()
+                            .testTag(firstHeaderTag)
+                    )
+                }
+
+                items(items) {
+                    Spacer(Modifier.width(101.dp).fillParentMaxHeight().testTag(it))
+                }
+
+                stickyHeader {
+                    Spacer(
+                        Modifier.width(101.dp).fillParentMaxHeight()
+                            .testTag(secondHeaderTag)
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(firstHeaderTag)
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag(secondHeaderTag)
+            .assertExists()
     }
 
     @Test
