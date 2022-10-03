@@ -47,8 +47,7 @@ Note that when you use Compose Multiplatform, you setup your project differently
    * [codeviewer](examples/codeviewer) - File Browser and Code Viewer application for Android and Desktop
    * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
    * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
-   * [game](examples/falling-balls) - Simple game
-   * [game](experimental/examples/falling-balls-mpp) - Simple game for web target
+   * [game](examples/falling-balls) - Falling-balls game
    * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
    * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
    * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens
