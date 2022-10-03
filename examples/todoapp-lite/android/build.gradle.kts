@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 32
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 31
+        minSdk = 26
+        targetSdk = 32
         versionCode = 1
         versionName = "1.0"
     }
@@ -23,7 +23,7 @@ android {
 dependencies {
     implementation(project(":common"))
     implementation(compose.material)
-    implementation("androidx.appcompat:appcompat:1.3.0")
-    implementation("androidx.activity:activity-compose:1.3.0")
+    implementation("androidx.appcompat:appcompat:1.5.1")
+    implementation("androidx.activity:activity-compose:1.5.0")
 }
 

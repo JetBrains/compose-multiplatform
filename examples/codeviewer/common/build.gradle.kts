@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     id("com.android.library")
     kotlin("multiplatform")
@@ -22,8 +20,8 @@ kotlin {
         named("androidMain") {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                api("androidx.appcompat:appcompat:1.4.1")
-                api("androidx.core:core-ktx:1.7.0")
+                api("androidx.appcompat:appcompat:1.5.1")
+                api("androidx.core:core-ktx:1.8.0")
             }
         }
         named("desktopMain") {
@@ -36,16 +34,11 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 32
 
     defaultConfig {
-        minSdkVersion(21)
-        targetSdkVersion(31)
-    }
-
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        minSdk = 26
+        targetSdk = 32
     }
 
     sourceSets {

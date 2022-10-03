@@ -4,6 +4,9 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -26,7 +29,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.demo.widgets.platform.VerticalScrollbar
-import org.jetbrains.compose.demo.widgets.platform.pointerMoveFilter
 import org.jetbrains.compose.demo.widgets.theme.WidgetGalleryTheme
 import org.jetbrains.compose.demo.widgets.ui.utils.PanelState
 import org.jetbrains.compose.demo.widgets.ui.utils.ResizablePanel
@@ -132,7 +134,8 @@ private fun WidgetsListItemViewImpl(
             .height(height)
             .padding(start = 16.dp)
     ) {
-        var inFocus by remember { mutableStateOf(false) }
+        val inFocusInteractionSource = remember { MutableInteractionSource() }
+        val inFocus by inFocusInteractionSource.collectIsHoveredAsState()
         val textColor = LocalContentColor.current.let {
             when {
                 isCurrent -> it
@@ -147,16 +150,7 @@ private fun WidgetsListItemViewImpl(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .clipToBounds()
-                .pointerMoveFilter(
-                    onEnter = {
-                        inFocus = true
-                        true
-                    },
-                    onExit = {
-                        inFocus = false
-                        true
-                    }
-                ),
+                .hoverable(inFocusInteractionSource),
             softWrap = true,
             fontSize = fontSize,
             overflow = TextOverflow.Ellipsis,

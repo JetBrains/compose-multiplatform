@@ -21,8 +21,8 @@ kotlin {
         }
         named("androidMain") {
             dependencies {
-                api("androidx.appcompat:appcompat:1.3.1")
-                api("androidx.core:core-ktx:1.3.1")
+                api("androidx.appcompat:appcompat:1.5.1")
+                api("androidx.core:core-ktx:1.8.0")
             }
         }
         named("desktopMain") {
@@ -34,11 +34,11 @@ kotlin {
 }
 
 android {
-    compileSdk = 30
+    compileSdk = 32
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 30
+        minSdk = 26
+        targetSdk = 32
     }
 
     compileOptions {
