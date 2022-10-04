@@ -89,6 +89,8 @@ import androidx.compose.material3.samples.OutlinedTextFieldSample
 import androidx.compose.material3.samples.PasswordTextField
 import androidx.compose.material3.samples.PermanentNavigationDrawerSample
 import androidx.compose.material3.samples.PinnedTopAppBar
+import androidx.compose.material3.samples.PlainTooltipSample
+import androidx.compose.material3.samples.PlainTooltipWithManualInvocationSample
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
 import androidx.compose.material3.samples.RangeSliderSample
@@ -920,3 +922,22 @@ val TextFieldsExamples = listOf(
         ) { it.content() }
     })
 }
+
+private const val TooltipsExampleDescription = "Tooltips examples"
+private const val TooltipsExampleSourceUrl = "$SampleSourceUrl/TooltipSamples.kt"
+val TooltipsExamples = listOf(
+    Example(
+        name = ::PlainTooltipSample.name,
+        description = TooltipsExampleDescription,
+        sourceUrl = TooltipsExampleSourceUrl
+    ) {
+        PlainTooltipSample()
+    },
+    Example(
+        name = ::PlainTooltipWithManualInvocationSample.name,
+        description = TooltipsExampleDescription,
+        sourceUrl = TooltipsExampleSourceUrl
+    ) {
+        PlainTooltipWithManualInvocationSample()
+    }
+)

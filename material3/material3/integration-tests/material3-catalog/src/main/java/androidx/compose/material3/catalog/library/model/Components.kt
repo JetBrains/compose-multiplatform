@@ -301,6 +301,17 @@ private val TextFields = Component(
     examples = TextFieldsExamples
 )
 
+private val Tooltips = Component(
+    id = nextId(),
+    name = "Tooltips",
+    description = "Tooltips call user attention to an anchor component.",
+    // no tooltips icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/tooltips",
+    docsUrl = "$PackageSummaryUrl#tooltip",
+    sourceUrl = "$Material3SourceUrl/Tooltip.kt",
+    examples = TooltipsExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -336,5 +347,6 @@ val Components = listOf(
     Switches,
     Tabs,
     TextFields,
+    Tooltips,
     TopAppBar
 )
