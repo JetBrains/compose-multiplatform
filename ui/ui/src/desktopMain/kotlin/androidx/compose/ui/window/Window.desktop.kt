@@ -158,7 +158,8 @@ fun Window(
         onPreviewKeyEvent = onPreviewKeyEvent,
         onKeyEvent = onKeyEvent,
         create = {
-            ComposeWindow().apply {
+            val graphicsConfiguration = WindowLocationTracker.lastActiveGraphicsConfiguration
+            ComposeWindow(graphicsConfiguration = graphicsConfiguration).apply {
                 // close state is controlled by WindowState.isOpen
                 defaultCloseOperation = JFrame.DO_NOTHING_ON_CLOSE
                 addWindowListener(object : WindowAdapter() {
@@ -188,9 +189,13 @@ fun Window(
                         appliedState.position = currentState.position
                     }
                 })
+                WindowLocationTracker.onWindowCreated(this)
             }
         },
-        dispose = ComposeWindow::dispose,
+        dispose = {
+            WindowLocationTracker.onWindowDisposed(it)
+            it.dispose()
+        },
         update = { window ->
             updater.update {
                 set(currentTitle, window::setTitle)
@@ -207,7 +212,10 @@ fun Window(
                 appliedState.size = state.size
             }
             if (state.position != appliedState.position) {
-                window.setPositionSafely(state.position)
+                window.setPositionSafely(
+                    state.position,
+                    platformDefaultPosition = { WindowLocationTracker.getCascadeLocationFor(window) }
+                )
                 appliedState.position = state.position
             }
             if (state.placement != appliedState.placement) {

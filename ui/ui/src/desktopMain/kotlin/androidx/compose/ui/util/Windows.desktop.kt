@@ -32,6 +32,7 @@ import androidx.compose.ui.window.layoutDirection
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Frame
+import java.awt.Point
 import java.awt.Toolkit
 import java.awt.Window
 import kotlin.math.roundToInt
@@ -51,10 +52,11 @@ internal fun ComposeWindow.setSizeSafely(size: DpSize) {
  * Otherwise we will reset maximized / fullscreen state.
  */
 internal fun ComposeWindow.setPositionSafely(
-    position: WindowPosition
+    position: WindowPosition,
+    platformDefaultPosition: () -> Point?
 ) {
     if (placement == WindowPlacement.Floating) {
-        (this as Window).setPositionSafely(position)
+        (this as Window).setPositionSafely(position, platformDefaultPosition)
     }
 }
 
@@ -94,9 +96,10 @@ internal fun Window.setSizeSafely(size: DpSize) {
 }
 
 internal fun Window.setPositionSafely(
-    position: WindowPosition
+    position: WindowPosition,
+    platformDefaultPosition: () -> Point?
 ) = when (position) {
-    WindowPosition.PlatformDefault -> setLocationByPlatformSafely(true)
+    WindowPosition.PlatformDefault -> location = platformDefaultPosition()
     is WindowPosition.Aligned -> align(position.alignment)
     is WindowPosition.Absolute -> setLocation(
         position.x.value.roundToInt(),
@@ -108,24 +111,16 @@ internal fun Window.align(alignment: Alignment) {
     val screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration)
     val screenBounds = graphicsConfiguration.bounds
     val size = IntSize(size.width, size.height)
-    val screenSize = IntSize(screenBounds.width, screenBounds.height)
+    val screenSize = IntSize(
+        screenBounds.width - screenInsets.left - screenInsets.right,
+        screenBounds.height - screenInsets.top - screenInsets.bottom
+    )
     val location = alignment.align(size, screenSize, LayoutDirection.Ltr)
 
     setLocation(
-        screenInsets.left + location.x,
-        screenInsets.top + location.y
+        screenBounds.x + screenInsets.left + location.x,
+        screenBounds.y + screenInsets.top + location.y
     )
-}
-
-/**
- * We cannot call [Frame.setLocation] if window is showing - AWT will throw an
- * exception.
- * But we can call [Frame.setLocationByPlatform] if isLocationByPlatform isn't changed.
- */
-internal fun Window.setLocationByPlatformSafely(isLocationByPlatform: Boolean) {
-    if (this.isLocationByPlatform != isLocationByPlatform) {
-        this.isLocationByPlatform = isLocationByPlatform
-    }
 }
 
 /**
@@ -159,10 +154,14 @@ internal fun Window.setIcon(painter: Painter?) {
 
 internal fun Window.makeDisplayable() {
     val oldPreferredSize = preferredSize
+    val oldLocation = location
     preferredSize = size
     try {
         pack()
     } finally {
         preferredSize = oldPreferredSize
+        // pack() messes with location in case of multiple displays with different densities,
+        // so we restore it to the value before pack()
+        location = oldLocation
     }
 }

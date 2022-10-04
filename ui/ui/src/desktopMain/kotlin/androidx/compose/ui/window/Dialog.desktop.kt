@@ -142,10 +142,11 @@ fun Dialog(
         onPreviewKeyEvent = onPreviewKeyEvent,
         onKeyEvent = onKeyEvent,
         create = {
+            val graphicsConfiguration = WindowLocationTracker.lastActiveGraphicsConfiguration
             val dialog = if (owner != null) {
-                ComposeDialog(owner, ModalityType.DOCUMENT_MODAL)
+                ComposeDialog(owner, ModalityType.DOCUMENT_MODAL, graphicsConfiguration = graphicsConfiguration)
             } else {
-                ComposeDialog()
+                ComposeDialog(graphicsConfiguration = graphicsConfiguration)
             }
             dialog.apply {
                 // close state is controlled by DialogState.isOpen
@@ -166,9 +167,13 @@ fun Dialog(
                         appliedState.position = currentState.position
                     }
                 })
+                WindowLocationTracker.onWindowCreated(this)
             }
         },
-        dispose = ComposeDialog::dispose,
+        dispose = {
+            WindowLocationTracker.onWindowDisposed(it)
+            it.dispose()
+        },
         update = { dialog ->
             updater.update {
                 set(currentTitle, dialog::setTitle)
@@ -184,7 +189,10 @@ fun Dialog(
                 appliedState.size = state.size
             }
             if (state.position != appliedState.position) {
-                dialog.setPositionSafely(state.position)
+                dialog.setPositionSafely(
+                    state.position,
+                    platformDefaultPosition = { WindowLocationTracker.getCascadeLocationFor(dialog) }
+                )
                 appliedState.position = state.position
             }
         },

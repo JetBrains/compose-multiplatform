@@ -58,7 +58,8 @@ sealed class WindowPosition {
 
     /**
      * Initial position of the window that depends on the platform.
-     * Usually every new window will be positioned in a cascade mode.
+     * Usually every new window will be positioned in a cascade mode,
+     * on the same display where the previous focused window was.
      *
      * This value should be used only before window will be visible.
      * After window will be visible, it cannot change its position to the PlatformDefault
@@ -73,7 +74,7 @@ sealed class WindowPosition {
     }
 
     /**
-     * Window will be aligned when it will be shown on the screen. [alignment] defines how the
+     * Window will be aligned when it will be shown on the current screen. [alignment] defines how the
      * window will be aligned (in the center, or in some of the corners). Window
      * will be aligned in the area that is not occupied by the screen insets (taskbar, OS menubar)
      */

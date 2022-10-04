@@ -24,6 +24,8 @@ import androidx.compose.ui.window.WindowExceptionHandler
 import org.jetbrains.skiko.GraphicsApi
 import java.awt.Component
 import java.awt.Dialog
+import java.awt.Frame
+import java.awt.GraphicsConfiguration
 import java.awt.Window
 import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
@@ -40,8 +42,9 @@ class ComposeDialog : JDialog {
 
     constructor(
         owner: Window?,
-        modalityType: ModalityType = ModalityType.MODELESS
-    ) : super(owner, modalityType)
+        modalityType: ModalityType = ModalityType.MODELESS,
+        graphicsConfiguration: GraphicsConfiguration? = null
+    ) : super(owner, "", modalityType, graphicsConfiguration)
 
     /**
      * ComposeDialog is a dialog for building UI using Compose for Desktop.
@@ -55,8 +58,9 @@ class ComposeDialog : JDialog {
     constructor(
         owner: Window?,
         modalityType: ModalityType = ModalityType.MODELESS,
+        graphicsConfiguration: GraphicsConfiguration? = null,
         skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
-    ) : super(owner, modalityType) {
+    ) : super(owner, "", modalityType, graphicsConfiguration) {
         this.skiaLayerAnalytics = skiaLayerAnalytics
     }
 
@@ -65,7 +69,11 @@ class ComposeDialog : JDialog {
         modalityType: ModalityType = ModalityType.MODELESS
     ) : super(null, modalityType)
 
-    constructor() : super()
+    // don't replace super() by super(null, ModalityType.MODELESS), because
+    // this constructor creates an icon in the taskbar.
+    // Dialog's shouldn't be appeared in the taskbar.
+    constructor(graphicsConfiguration: GraphicsConfiguration? = null) :
+        super(null as Frame?, "", false, graphicsConfiguration)
 
     private val delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
 
