@@ -87,6 +87,9 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
             it.mkdirs()
         }
         val gson = DokkaUtils.createGson()
+        // sub directory to contain library docs to avoid possible conflicts with the
+        // generate folders from docs.
+        val libsDir = outputDir.resolve("libs")
         val partialModules = partialDocs.get().files.map { partialDoc ->
             val metadataFile = partialDoc.resolve(
                 DokkaInputModels.PartialDocsMetadata.FILE_NAME
@@ -99,7 +102,7 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
             }
 
             // move the rest of docs files into a separate directory
-            val exportDir = outputDir.resolve(metadata.artifactKey).also {
+            val exportDir = libsDir.resolve(metadata.artifactKey).also {
                 it.parentFile.mkdirs()
             }
             check(!exportDir.exists()) {
