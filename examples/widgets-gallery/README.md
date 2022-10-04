@@ -9,9 +9,9 @@ An example of Compose application for Desktop and Android platforms,
 demonstrating how to use various Material widgets.
 
 ### Running desktop application
-```
-./gradlew :desktop:run
-```
+ * To run, launch command: `./gradlew :desktop:run`
+ * Or choose **desktop** configuration in IDE and run it.  
+  ![desktop-run-configuration.png](desktop-run-configuration.png)
 
 ### Building native desktop distribution
 ```
