@@ -34,8 +34,6 @@ replaceCompose() {
 replaceComposeInFile() {
     echo "Replace in $1"
     replaceCompose '^compose.version=.*' 'compose.version='"$COMPOSE_VERSION"'' $1
-    replaceCompose '^COMPOSE_CORE_VERSION=.*' 'COMPOSE_CORE_VERSION='"$COMPOSE_VERSION"'' $1
-    replaceCompose '^COMPOSE_WEB_VERSION=.*' 'COMPOSE_WEB_VERSION='"$COMPOSE_VERSION"'' $1
     replaceCompose 'id("org.jetbrains.compose") version ".*"' 'id("org.jetbrains.compose") version "'"$COMPOSE_VERSION"'"' $1
     replaceCompose '"org.jetbrains.compose:compose-gradle-plugin:.*"' '"org.jetbrains.compose:compose-gradle-plugin:'"$COMPOSE_VERSION"'"' $1
 }

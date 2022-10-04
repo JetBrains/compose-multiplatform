@@ -1,5 +1,5 @@
 pluginManagement {
-    val COMPOSE_CORE_VERSION: String by settings
+    val COMPOSE_CORE_VERSION = extra["compose.version"] as String
     println("[build] compose core version: $COMPOSE_CORE_VERSION")
 
     // pluginManagement section won't see outer scope, hence the FQ names
