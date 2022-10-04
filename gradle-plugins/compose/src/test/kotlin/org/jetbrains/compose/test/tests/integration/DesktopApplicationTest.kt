@@ -1,21 +1,23 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.gradle
+package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.test.*
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assumptions
-import org.junit.jupiter.api.Test
+import org.jetbrains.compose.internal.uppercaseFirstChar
+import org.jetbrains.compose.test.utils.*
+
 import java.io.File
 import java.util.*
 import java.util.jar.JarFile
 import kotlin.collections.HashSet
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Test
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -57,8 +59,20 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testAndroidxCompiler() = with(testProject(TestProjects.androidxCompiler, defaultAndroidxCompilerEnvironment)) {
+        gradle(":runDistributable").build().checks { check ->
+            val actualMainImage = file("main-image.actual.png")
+            val expectedMainImage = file("main-image.expected.png")
+            assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
+                "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
+            }
+        }
+    }
+
+    @Test
     fun kotlinDsl(): Unit = with(testProject(TestProjects.jvmKotlinDsl)) {
-        gradle(":package", "--dry-run").build()
+        gradle(":packageDistributionForCurrentOS", "--dry-run").build()
+        gradle(":packageReleaseDistributionForCurrentOS", "--dry-run").build()
     }
 
     @Test
@@ -78,16 +92,16 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun packageJvm() = with(testProject(TestProjects.jvm)) {
-        testPackageNativeExecutables()
+        testPackageJvmDistributions()
     }
 
     @Test
     fun packageMpp() = with(testProject(TestProjects.mpp)) {
-        testPackageNativeExecutables()
+        testPackageJvmDistributions()
     }
 
-    private fun TestProject.testPackageNativeExecutables() {
-        val result = gradle(":package").build()
+    private fun TestProject.testPackageJvmDistributions() {
+        val result = gradle(":packageDistributionForCurrentOS").build()
         val ext = when (currentOS) {
             OS.Linux -> "deb"
             OS.Windows -> "msi"
@@ -108,8 +122,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         } else {
             Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
         }
-        assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
+        assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.uppercaseFirstChar()}")?.outcome)
+        assertEquals(TaskOutcome.SUCCESS, result.task(":packageDistributionForCurrentOS")?.outcome)
     }
 
     @Test
@@ -252,8 +266,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":package").build().checks { check ->
-                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").build().checks { check ->
+                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
             }
         }
     }
@@ -271,8 +285,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":package").build().checks { check ->
-                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").build().checks { check ->
+                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
             }
         }
     }
@@ -290,8 +304,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":package").build().checks { check ->
-                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").build().checks { check ->
+                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
             }
         }
     }

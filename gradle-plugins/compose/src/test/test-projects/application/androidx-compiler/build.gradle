@@ -1,0 +1,31 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.compose"
+}
+
+repositories {
+    google()
+    jetbrainsCompose()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation compose.desktop.currentOs
+}
+
+compose {
+    kotlinCompilerPlugin.set("COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER")
+
+    desktop {
+        application {
+            mainClass = "Main"
+            args(project.projectDir.absolutePath)
+            nativeDistributions {
+                targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            }
+            args(project.projectDir.absolutePath)
+        }
+    }
+}

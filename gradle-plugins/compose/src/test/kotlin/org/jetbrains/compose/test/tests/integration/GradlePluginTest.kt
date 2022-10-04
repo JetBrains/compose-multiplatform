@@ -1,25 +1,23 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2022 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.gradle
+package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.PreviewLogger
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.RemoteConnection
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.receiveConfigFromGradle
-import org.jetbrains.compose.test.GradlePluginTestBase
-import org.jetbrains.compose.test.TestKotlinVersion
-import org.jetbrains.compose.test.TestProjects
-import org.jetbrains.compose.test.checks
-import org.junit.jupiter.api.Test
+import org.jetbrains.compose.test.utils.*
+
 import java.net.ServerSocket
 import java.net.Socket
 import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
+import org.gradle.testkit.runner.TaskOutcome
+import org.junit.jupiter.api.Test
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
