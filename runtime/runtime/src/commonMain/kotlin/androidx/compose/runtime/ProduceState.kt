@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalTypeInference::class)
 @file:JvmName("SnapshotStateKt")
 @file:JvmMultifileClass
 package androidx.compose.runtime
@@ -22,7 +21,6 @@ package androidx.compose.runtime
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.CoroutineContext
-import kotlin.experimental.ExperimentalTypeInference
 // Explicit imports for these needed in common source sets.
 import kotlin.jvm.JvmName
 import kotlin.jvm.JvmMultifileClass
@@ -79,7 +77,7 @@ private class ProduceStateScopeImpl<T>(
 @Composable
 fun <T> produceState(
     initialValue: T,
-    @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
+    producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
     LaunchedEffect(Unit) {
@@ -112,7 +110,7 @@ fun <T> produceState(
 fun <T> produceState(
     initialValue: T,
     key1: Any?,
-    @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
+    producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
     LaunchedEffect(key1) {
@@ -146,7 +144,7 @@ fun <T> produceState(
     initialValue: T,
     key1: Any?,
     key2: Any?,
-    @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
+    producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
     LaunchedEffect(key1, key2) {
@@ -181,7 +179,7 @@ fun <T> produceState(
     key1: Any?,
     key2: Any?,
     key3: Any?,
-    @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
+    producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
     LaunchedEffect(key1, key2, key3) {
@@ -214,7 +212,7 @@ fun <T> produceState(
 fun <T> produceState(
     initialValue: T,
     vararg keys: Any?,
-    @BuilderInference producer: suspend ProduceStateScope<T>.() -> Unit
+    producer: suspend ProduceStateScope<T>.() -> Unit
 ): State<T> {
     val result = remember { mutableStateOf(initialValue) }
     @Suppress("CHANGING_ARGUMENTS_EXECUTION_ORDER_FOR_NAMED_VARARGS")
