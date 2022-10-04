@@ -1,20 +1,39 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
+    id "com.android.application"
     id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.compose"
 }
 
+repositories {
+    jetbrainsCompose()
+    google()
+}
+
 kotlin {
-    jvm {
-    }
+    // empty stub (no actual android app) to detect configuration conflicts
+    // like https://github.com/JetBrains/compose-jb/issues/2345
+    android()
+
+    jvm("desktop")
     sourceSets {
-        named("jvmMain") {
+        desktopMain {
+            dependsOn(commonMain)
+
             dependencies {
-                implementation("org.jetbrains.kotlin:kotlin-stdlib")
                 implementation(compose.desktop.currentOs)
             }
         }
+    }
+}
+
+android {
+    compileSdk = 31
+
+    defaultConfig {
+        minSdk = 21
+        targetSdk = 31
     }
 }
 

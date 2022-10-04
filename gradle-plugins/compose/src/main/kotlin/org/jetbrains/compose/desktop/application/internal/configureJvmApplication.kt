@@ -17,7 +17,6 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
-import org.jetbrains.compose.internal.joinDashLowercaseNonEmpty
 import java.io.File
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")
@@ -197,10 +196,24 @@ private fun JvmApplicationContext.configurePackagingTasks(
         packageFormat
     }
 
-    val packageAll = tasks.register<DefaultTask>(
-        taskNameAction = "package"
+    val packageForCurrentOS = tasks.register<DefaultTask>(
+        taskNameAction = "package",
+        taskNameObject = "distributionForCurrentOS"
     ) {
         dependsOn(packageFormats)
+    }
+
+    if (buildType === app.buildTypes.default) {
+        // todo: remove
+        tasks.register<DefaultTask>("package") {
+            dependsOn(packageForCurrentOS)
+
+            doLast {
+                it.logger.error(
+                    "'${it.name}' task is deprecated and will be removed in next releases. " +
+                    "Use '${packageForCurrentOS.get().name}' task instead")
+            }
+        }
     }
 
     val packageUberJarForCurrentOS = tasks.register<Jar>(
