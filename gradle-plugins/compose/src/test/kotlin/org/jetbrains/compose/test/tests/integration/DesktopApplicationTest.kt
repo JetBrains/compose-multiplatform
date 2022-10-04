@@ -8,6 +8,7 @@ package org.jetbrains.compose.test.tests.integration
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.*
+import org.jetbrains.compose.internal.uppercaseFirstChar
 import org.jetbrains.compose.test.utils.*
 
 import java.io.File
@@ -70,7 +71,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun kotlinDsl(): Unit = with(testProject(TestProjects.jvmKotlinDsl)) {
-        gradle(":package", "--dry-run").build()
+        gradle(":packageDistributionForCurrentOS", "--dry-run").build()
+        gradle(":packageReleaseDistributionForCurrentOS", "--dry-run").build()
     }
 
     @Test
@@ -90,16 +92,16 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun packageJvm() = with(testProject(TestProjects.jvm)) {
-        testPackageNativeExecutables()
+        testPackageJvmDistributions()
     }
 
     @Test
     fun packageMpp() = with(testProject(TestProjects.mpp)) {
-        testPackageNativeExecutables()
+        testPackageJvmDistributions()
     }
 
-    private fun TestProject.testPackageNativeExecutables() {
-        val result = gradle(":package").build()
+    private fun TestProject.testPackageJvmDistributions() {
+        val result = gradle(":packageDistributionForCurrentOS").build()
         val ext = when (currentOS) {
             OS.Linux -> "deb"
             OS.Windows -> "msi"
@@ -120,8 +122,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         } else {
             Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
         }
-        assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.capitalize()}")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":package")?.outcome)
+        assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.uppercaseFirstChar()}")?.outcome)
+        assertEquals(TaskOutcome.SUCCESS, result.task(":packageDistributionForCurrentOS")?.outcome)
     }
 
     @Test
@@ -264,8 +266,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":package").build().checks { check ->
-                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").build().checks { check ->
+                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
             }
         }
     }
@@ -283,8 +285,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":package").build().checks { check ->
-                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").build().checks { check ->
+                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
             }
         }
     }
@@ -302,8 +304,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":package").build().checks { check ->
-                check.taskOutcome(":package", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").build().checks { check ->
+                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
             }
         }
     }
