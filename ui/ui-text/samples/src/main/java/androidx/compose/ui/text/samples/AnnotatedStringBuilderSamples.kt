@@ -64,6 +64,17 @@ fun AnnotatedStringBuilderSample() {
 }
 
 @Sampled
+fun AnnotatedStringBuilderAppendableSample() {
+    val words = listOf("Hello", "World")
+    buildAnnotatedString {
+        // joinTo is a Kotlin stdlib function that takes an Appendable
+        words.joinTo(this, separator = " ", postfix = "!")
+
+        toAnnotatedString()
+    }
+}
+
+@Sampled
 fun AnnotatedStringBuilderPushSample() {
     buildAnnotatedString {
         // push green text color so that any appended text will be rendered green

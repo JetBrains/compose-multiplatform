@@ -32,7 +32,7 @@ package androidx.compose.ui.text {
     property public final String text;
   }
 
-  public static final class AnnotatedString.Builder {
+  public static final class AnnotatedString.Builder implements java.lang.Appendable {
     ctor public AnnotatedString.Builder(optional int capacity);
     ctor public AnnotatedString.Builder(String text);
     ctor public AnnotatedString.Builder(androidx.compose.ui.text.AnnotatedString text);
@@ -42,8 +42,12 @@ package androidx.compose.ui.text {
     method @androidx.compose.ui.text.ExperimentalTextApi public void addTtsAnnotation(androidx.compose.ui.text.TtsAnnotation ttsAnnotation, int start, int end);
     method @androidx.compose.ui.text.ExperimentalTextApi public void addUrlAnnotation(androidx.compose.ui.text.UrlAnnotation urlAnnotation, int start, int end);
     method public void append(String text);
-    method public void append(char char);
+    method public androidx.compose.ui.text.AnnotatedString.Builder append(CharSequence? text);
+    method public androidx.compose.ui.text.AnnotatedString.Builder append(CharSequence? text, int start, int end);
+    method public androidx.compose.ui.text.AnnotatedString.Builder append(char char);
     method public void append(androidx.compose.ui.text.AnnotatedString text);
+    method public void append(androidx.compose.ui.text.AnnotatedString text, int start, int end);
+    method @Deprecated public void deprecated_append_returning_void(char char);
     method public int getLength();
     method public void pop();
     method public void pop(int index);
