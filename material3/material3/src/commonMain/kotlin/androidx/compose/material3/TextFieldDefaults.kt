@@ -44,7 +44,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.layout.LastBaseline
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Dp
@@ -199,19 +198,18 @@ object TextFieldDefaults {
     /**
      * Default content padding applied to [TextField] when there is a label.
      *
-     * Note that when label is present, the "top" padding (unlike rest of the paddings) is a
-     * distance between the label's last baseline and the top edge of the [TextField]. If the "top"
-     * value is smaller than the last baseline of the label, then there will be no space between
-     * the label and top edge of the [TextField].
+     * Note that when the label is present, the "top" padding is a distance between the top edge of
+     * the [TextField] and the top of the label, not to the top of the input field. The input field
+     * is placed directly beneath the label.
      *
-     * See [PaddingValues]
+     * See [PaddingValues] for more details.
      */
     @ExperimentalMaterial3Api
     fun textFieldWithLabelPadding(
         start: Dp = TextFieldPadding,
         end: Dp = TextFieldPadding,
-        top: Dp = FirstBaselineOffset,
-        bottom: Dp = TextFieldBottomPadding
+        top: Dp = TextFieldWithLabelVerticalPadding,
+        bottom: Dp = TextFieldWithLabelVerticalPadding
     ): PaddingValues = PaddingValues(start, top, end, bottom)
 
     /**
@@ -515,11 +513,12 @@ object TextFieldDefaults {
      * @param contentPadding the spacing values to apply internally between the internals of text
      * field and the decoration box container. You can use it to implement dense text fields or
      * simply to control horizontal padding. See [TextFieldDefaults.textFieldWithLabelPadding] and
-     * [TextFieldDefaults.textFieldWithoutLabelPadding]
+     * [TextFieldDefaults.textFieldWithoutLabelPadding].
      * Note that if there's a label in the text field, the [top][PaddingValues.calculateTopPadding]
-     * padding will mean the distance from label's [last baseline][LastBaseline] to the top edge of
-     * the container. All other paddings mean the distance from the corresponding edge of the
-     * container to the corresponding edge of the closest to it element
+     * padding represents the distance from the top edge of the container to the top of the label.
+     * Otherwise if label is null, it represents the distance from the top edge of the container to
+     * the top of the input field. All other paddings represent the distance from the corresponding
+     * edge of the container to the corresponding edge of the closest element.
      * @param container the container to be drawn behind the text field. By default, this includes
      * the bottom indicator line. Default colors for the container come from the [colors].
      */
