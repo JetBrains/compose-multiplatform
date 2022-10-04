@@ -5,6 +5,15 @@
 
 package org.jetbrains.compose
 
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
+import org.gradle.api.provider.Property
+import org.jetbrains.compose.desktop.application.internal.nullableProperty
+import javax.inject.Inject
 
-abstract class ComposeExtension : ExtensionAware
+abstract class ComposeExtension @Inject constructor(
+    objects: ObjectFactory
+) : ExtensionAware {
+    val kotlinCompilerPlugin: Property<String?> = objects.nullableProperty()
+}
+

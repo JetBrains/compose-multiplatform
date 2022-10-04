@@ -5,25 +5,32 @@
 
 package org.jetbrains.compose
 
+import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
+    private var composeCompilerArtifactProvider = ComposeCompilerArtifactProvider { null }
+
+    override fun apply(target: Project) {
+        super.apply(target)
+        target.plugins.withType(ComposePlugin::class.java) {
+            val composeExt = target.extensions.getByType(ComposeExtension::class.java)
+            composeCompilerArtifactProvider = ComposeCompilerArtifactProvider { composeExt.kotlinCompilerPlugin.orNull }
+        }
+    }
+
     override fun getCompilerPluginId(): String =
         "androidx.compose.compiler.plugins.kotlin"
 
-    override fun getPluginArtifactForNative(): SubpluginArtifact =
-        composeCompilerArtifact("compiler-hosted")
-
     override fun getPluginArtifact(): SubpluginArtifact =
-        composeCompilerArtifact("compiler")
+        composeCompilerArtifactProvider.compilerArtifact
 
-    private fun composeCompilerArtifact(artifactId: String) =
-        SubpluginArtifact(
-            groupId = "org.jetbrains.compose.compiler", artifactId = artifactId, version = ComposeBuildConfig.composeCompilerVersion
-        )
+    override fun getPluginArtifactForNative(): SubpluginArtifact =
+        composeCompilerArtifactProvider.compilerHostedArtifact
 
     override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean =
         when (kotlinCompilation.target.platformType) {

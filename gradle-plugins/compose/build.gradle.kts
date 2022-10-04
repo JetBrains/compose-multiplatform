@@ -66,6 +66,7 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(platform("org.junit:junit-bom:5.7.0"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(kotlin("gradle-plugin-api"))
 
     // include relocated download task to avoid potential runtime conflicts
     embedded("de.undercouch:gradle-download-task:4.1.1")
@@ -105,7 +106,7 @@ val javaHomeForTests: String? = when {
 }
 val isWindows = getCurrentOperatingSystem().isWindows
 
-val gradleTestsPattern = "org.jetbrains.compose.gradle.*"
+val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 
 // check we don't accidentally including unexpected classes (e.g. from embedded dependencies)
 val checkJar by tasks.registering {
@@ -161,7 +162,7 @@ fun testGradleVersion(gradleVersion: String) {
         tasks.test.get().let { defaultTest ->
             classpath = defaultTest.classpath
         }
-        systemProperty("gradle.version.for.tests", gradleVersion)
+        systemProperty("compose.tests.gradle.version", gradleVersion)
         filter {
             includeTestsMatching(gradleTestsPattern)
         }
@@ -177,8 +178,13 @@ tasks.withType<Test>().configureEach {
     configureJavaForComposeTest()
 
     dependsOn(":publishToMavenLocal")
-    systemProperty("compose.plugin.version", BuildProperties.deployVersion(project))
-    systemProperty("kotlin.version", project.property("kotlin.version").toString())
+
+    systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
+    for ((k, v) in project.properties) {
+        if (k.startsWith("compose.")) {
+            systemProperty(k, v.toString())
+        }
+    }
 }
 
 task("printAllAndroidxReplacements") {
