@@ -32,7 +32,7 @@ dependencies {
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation(libs.kotlinStdlib)
         api("androidx.annotation:annotation:1.2.0")
-        api("androidx.compose.runtime:runtime:1.1.1")
+        api("androidx.compose.runtime:runtime:1.2.1")
         testImplementation(libs.junit)
     }
 }

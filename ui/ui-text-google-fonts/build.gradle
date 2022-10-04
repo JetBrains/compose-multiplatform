@@ -28,7 +28,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
 
-    implementation("androidx.compose.runtime:runtime:1.2.0")
+    implementation("androidx.compose.runtime:runtime:1.2.1")
     implementation(project(":compose:ui:ui-text"))
     implementation("androidx.core:core:1.8.0")
 

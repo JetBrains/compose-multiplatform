@@ -35,9 +35,9 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
-        api("androidx.compose.runtime:runtime:1.2.0")
-        api("androidx.compose.ui:ui:1.2.0")
-        api("androidx.compose.ui:ui-unit:1.2.0")
+        api("androidx.compose.runtime:runtime:1.2.1")
+        api("androidx.compose.ui:ui:1.2.1")
+        api("androidx.compose.ui:ui-unit:1.2.1")
         implementation("androidx.window:window:1.0.0")
 
         testImplementation(libs.kotlinTest)
