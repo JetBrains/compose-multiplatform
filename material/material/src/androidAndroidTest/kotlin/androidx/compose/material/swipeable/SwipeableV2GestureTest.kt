@@ -83,7 +83,7 @@ class SwipeableV2GestureTest {
     )
 
     private fun verifyOffset0() = { state: SwipeableV2State<TestState>, _: TestState ->
-        assertThat(state.offset.value).isEqualTo(0f)
+        assertThat(state.offset).isEqualTo(0f)
     }
 
     private fun verifyOffsetMatchesAnchor() =
@@ -94,7 +94,7 @@ class SwipeableV2GestureTest {
                 B -> swipeableSizePx / 2
                 C -> swipeableSizePx
             }
-            assertThat(state.offset.value).isEqualTo(targetOffset)
+            assertThat(state.offset).isEqualTo(targetOffset)
         }
 
     private fun directionalSwipeTest(
