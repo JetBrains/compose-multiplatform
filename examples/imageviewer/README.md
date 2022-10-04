@@ -1,9 +1,9 @@
 An example of image gallery for remote server image viewing, based on Jetpack Compose UI library (desktop and android).
 
 ### Running desktop application
-```
-./gradlew :desktop:run
-```
+ * To run, launch command: `./gradlew :desktop:run`
+ * Or choose **desktop** configuration in IDE and run it.  
+  ![desktop-run-configuration.png](desktop-run-configuration.png)
 
 ### Building native desktop distribution
 ```

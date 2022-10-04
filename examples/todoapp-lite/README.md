@@ -3,9 +3,9 @@ A simplified version of the [TodoApp example](https://github.com/JetBrains/compo
 Supported targets: Android and Desktop.
 
 ### Running desktop application
-```
-./gradlew :desktop:run
-```
+ * To run, launch command: `./gradlew :desktop:run`
+ * Or choose **desktop** configuration in IDE and run it.  
+  ![desktop-run-configuration.png](desktop-run-configuration.png)
 
 ### Building native desktop distribution
 ```

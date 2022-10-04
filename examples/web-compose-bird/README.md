@@ -12,12 +12,13 @@
 ## ▶️ Play
 
 - https://theapache64.github.io/compose-bird/
+- Use arrow **Up** key to fly
 
 ## 🏃 Run
 
-```
-./gradlew jsBrowserRun
-```
+* To run, launch command: `./gradlew jsBrowserRun`
+* Or choose **browser** configuration in IDE and run it.  
+  ![browser-run-configuration.png](browser-run-configuration.png)
 
 ## 📦 Distribute
 
