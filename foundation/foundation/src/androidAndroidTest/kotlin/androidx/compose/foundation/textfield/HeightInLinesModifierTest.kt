@@ -22,7 +22,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.text.CoreTextField
 import androidx.compose.foundation.text.TEST_FONT
-import androidx.compose.foundation.text.maxLinesHeight
+import androidx.compose.foundation.text.heightInLines
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
@@ -63,7 +63,7 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-class MaxLinesHeightModifierTest {
+class HeightInLinesModifierTest {
 
     private val longText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do " +
         "eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam," +
@@ -87,40 +87,7 @@ class MaxLinesHeightModifierTest {
     }
 
     @Test
-    fun maxLinesHeight_shortInputText() {
-        val (textLayoutResult, height) = setTextFieldWithMaxLines(TextFieldValue("abc"), 5)
-
-        rule.runOnIdle {
-            assertThat(textLayoutResult).isNotNull()
-            assertThat(textLayoutResult!!.lineCount).isEqualTo(1)
-            assertThat(textLayoutResult.size.height).isEqualTo(height)
-        }
-    }
-
-    @Test
-    fun maxLinesHeight_notApplied_infiniteMaxLines() {
-        val (textLayoutResult, height) =
-            setTextFieldWithMaxLines(TextFieldValue(longText), Int.MAX_VALUE)
-
-        rule.runOnIdle {
-            assertThat(textLayoutResult).isNotNull()
-            assertThat(textLayoutResult!!.size.height).isEqualTo(height)
-        }
-    }
-
-    @Test(expected = IllegalArgumentException::class)
-    fun maxLinesHeight_invalidValue() {
-        rule.setContent {
-            CoreTextField(
-                value = TextFieldValue(),
-                onValueChange = {},
-                modifier = Modifier.maxLinesHeight(0, TextStyle.Default)
-            )
-        }
-    }
-
-    @Test
-    fun maxLinesHeight_longInputText() {
+    fun minLines_shortInputText() {
         var subjectLayout: TextLayoutResult? = null
         var subjectHeight: Int? = null
         var twoLineHeight: Int? = null
@@ -136,8 +103,8 @@ class MaxLinesHeightModifierTest {
                 onTextLayoutResult = {
                     subjectLayout = it
                 },
-                TextFieldValue(longText),
-                2
+                textFieldValue = TextFieldValue("abc"),
+                minLines = 2
             )
             HeightObservingText(
                 onGlobalHeightPositioned = {
@@ -145,8 +112,125 @@ class MaxLinesHeightModifierTest {
                     twoLinePositionedLatch.countDown()
                 },
                 onTextLayoutResult = {},
-                TextFieldValue("1\n2"),
-                2
+                textFieldValue = TextFieldValue("1\n2"),
+                minLines = 2
+            )
+        }
+        assertThat(positionedLatch.await(1, TimeUnit.SECONDS)).isTrue()
+        assertThat(twoLinePositionedLatch.await(1, TimeUnit.SECONDS)).isTrue()
+
+        rule.runOnIdle {
+            assertThat(subjectLayout).isNotNull()
+            assertThat(subjectLayout!!.lineCount).isEqualTo(1)
+            assertThat(subjectHeight!!).isEqualTo(twoLineHeight)
+        }
+    }
+
+    @Test
+    fun maxLines_shortInputText() {
+        val (textLayoutResult, height) = setTextFieldWithMaxLines(
+            TextFieldValue("abc"),
+            maxLines = 5
+        )
+
+        rule.runOnIdle {
+            assertThat(textLayoutResult).isNotNull()
+            assertThat(textLayoutResult!!.lineCount).isEqualTo(1)
+            assertThat(textLayoutResult.size.height).isEqualTo(height)
+        }
+    }
+
+    @Test
+    fun maxLines_notApplied_infiniteMaxLines() {
+        val (textLayoutResult, height) =
+            setTextFieldWithMaxLines(TextFieldValue(longText), Int.MAX_VALUE)
+
+        rule.runOnIdle {
+            assertThat(textLayoutResult).isNotNull()
+            assertThat(textLayoutResult!!.size.height).isEqualTo(height)
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun minLines_invalidValue() {
+        rule.setContent {
+            CoreTextField(
+                value = TextFieldValue(),
+                onValueChange = {},
+                modifier = Modifier.heightInLines(textStyle = TextStyle.Default, minLines = 0)
+            )
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun maxLines_invalidValue() {
+        rule.setContent {
+            CoreTextField(
+                value = TextFieldValue(),
+                onValueChange = {},
+                modifier = Modifier.heightInLines(textStyle = TextStyle.Default, maxLines = 0)
+            )
+        }
+    }
+
+    @Test(expected = IllegalArgumentException::class)
+    fun minLines_greaterThan_maxLines_invalidValue() {
+        rule.setContent {
+            CoreTextField(
+                value = TextFieldValue(),
+                onValueChange = {},
+                modifier = Modifier.heightInLines(
+                    textStyle = TextStyle.Default,
+                    minLines = 2,
+                    maxLines = 1
+                )
+            )
+        }
+    }
+
+    @Test
+    fun minLines_longInputText() {
+        val (textLayoutResult, height) = setTextFieldWithMaxLines(
+            TextFieldValue(longText),
+            minLines = 2
+        )
+
+        rule.runOnIdle {
+            assertThat(textLayoutResult).isNotNull()
+            // should be in the 20s, but use this to create invariant for the next assertion
+            assertThat(textLayoutResult!!.lineCount).isGreaterThan(2)
+            assertThat(textLayoutResult.size.height).isEqualTo(height)
+        }
+    }
+
+    @Test
+    fun maxLines_longInputText() {
+        var subjectLayout: TextLayoutResult? = null
+        var subjectHeight: Int? = null
+        var twoLineHeight: Int? = null
+        val positionedLatch = CountDownLatch(1)
+        val twoLinePositionedLatch = CountDownLatch(1)
+
+        rule.setContent {
+            HeightObservingText(
+                onGlobalHeightPositioned = {
+                    subjectHeight = it
+                    positionedLatch.countDown()
+                },
+                onTextLayoutResult = {
+                    subjectLayout = it
+                },
+                textFieldValue = TextFieldValue(longText),
+                maxLines = 2
+            )
+            HeightObservingText(
+                onGlobalHeightPositioned = {
+                    twoLineHeight = it
+                    twoLinePositionedLatch.countDown()
+                },
+                onTextLayoutResult = {},
+                textFieldValue = TextFieldValue("1\n2"),
+                maxLines = 2
             )
         }
         assertThat(positionedLatch.await(1, TimeUnit.SECONDS)).isTrue()
@@ -216,9 +300,14 @@ class MaxLinesHeightModifierTest {
 
     @Test
     fun testInspectableValue() {
-        val modifier = Modifier.maxLinesHeight(10, TextStyle.Default) as InspectableValue
-        assertThat(modifier.nameFallback).isEqualTo("maxLinesHeight")
+        val modifier = Modifier.heightInLines(
+            textStyle = TextStyle.Default,
+            minLines = 5,
+            maxLines = 10
+        ) as InspectableValue
+        assertThat(modifier.nameFallback).isEqualTo("heightInLines")
         assertThat(modifier.inspectableElements.asIterable()).containsExactly(
+            ValueElement("minLines", 5),
             ValueElement("maxLines", 10),
             ValueElement("textStyle", TextStyle.Default)
         )
@@ -226,7 +315,8 @@ class MaxLinesHeightModifierTest {
 
     private fun setTextFieldWithMaxLines(
         textFieldValue: TextFieldValue,
-        maxLines: Int
+        minLines: Int = 1,
+        maxLines: Int = Int.MAX_VALUE
     ): Pair<TextLayoutResult?, Int?> {
         var textLayoutResult: TextLayoutResult? = null
         var height: Int? = null
@@ -241,8 +331,9 @@ class MaxLinesHeightModifierTest {
                 onTextLayoutResult = {
                     textLayoutResult = it
                 },
-                textFieldValue,
-                maxLines
+                textFieldValue = textFieldValue,
+                minLines = minLines,
+                maxLines = maxLines
             )
         }
         assertThat(positionedLatch.await(1, TimeUnit.SECONDS)).isTrue()
@@ -255,7 +346,8 @@ class MaxLinesHeightModifierTest {
         onGlobalHeightPositioned: (Int) -> Unit,
         onTextLayoutResult: (TextLayoutResult) -> Unit,
         textFieldValue: TextFieldValue,
-        maxLines: Int,
+        minLines: Int = 1,
+        maxLines: Int = Int.MAX_VALUE,
         textStyle: TextStyle = TextStyle.Default
     ) {
         Box(
@@ -269,7 +361,11 @@ class MaxLinesHeightModifierTest {
                 textStyle = textStyle,
                 modifier = Modifier
                     .requiredWidth(100.dp)
-                    .maxLinesHeight(maxLines, textStyle),
+                    .heightInLines(
+                        textStyle = textStyle,
+                        minLines = minLines,
+                        maxLines = maxLines
+                    ),
                 onTextLayout = onTextLayoutResult
             )
         }

@@ -30,26 +30,39 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.resolveDefaults
+import androidx.compose.ui.unit.Dp
 
 /**
- * Constraint the height of the text field so that it vertically occupies no more than [maxLines]
- * number of lines.
+ * The default minimum height in terms of minimum number of visible lines.
  */
-internal fun Modifier.maxLinesHeight(
-    /*@IntRange(from = 1)*/
-    maxLines: Int,
-    textStyle: TextStyle
+internal const val DefaultMinLines: Int = 1
+
+/**
+ * Constraint the height of the text field so that it vertically occupies at least [minLines]
+ * number of lines and at most [maxLines] number of lines.
+ */
+internal fun Modifier.heightInLines(
+    textStyle: TextStyle,
+    minLines: Int = DefaultMinLines,
+    maxLines: Int = Int.MAX_VALUE
 ) = composed(
     inspectorInfo = debugInspectorInfo {
-        name = "maxLinesHeight"
+        name = "heightInLines"
+        properties["minLines"] = minLines
         properties["maxLines"] = maxLines
         properties["textStyle"] = textStyle
     }
 ) {
+    require(minLines > 0) {
+        "minLines must be greater than 0"
+    }
     require(maxLines > 0) {
         "maxLines must be greater than 0"
     }
-    if (maxLines == Int.MAX_VALUE) return@composed Modifier
+    require(minLines <= maxLines) {
+        "minLines $minLines must be lower than or equal to maxLines $maxLines"
+    }
+    if (minLines == DefaultMinLines && maxLines == Int.MAX_VALUE) return@composed Modifier
 
     val density = LocalDensity.current
     val fontFamilyResolver = LocalFontFamilyResolver.current
@@ -61,7 +74,7 @@ internal fun Modifier.maxLinesHeight(
         resolveDefaults(textStyle, layoutDirection)
     }
     val typeface by remember(fontFamilyResolver, resolvedStyle) {
-         fontFamilyResolver.resolve(
+        fontFamilyResolver.resolve(
             resolvedStyle.fontFamily,
             resolvedStyle.fontWeight ?: FontWeight.Normal,
             resolvedStyle.fontStyle ?: FontStyle.Normal,
@@ -102,9 +115,15 @@ internal fun Modifier.maxLinesHeight(
         ).height
     }
     val lineHeight = firstTwoLinesHeight - firstLineHeight
-    val precomputedMaxLinesHeight = firstLineHeight + lineHeight * (maxLines - 1)
+    val precomputedMinLinesHeight =
+        if (minLines == DefaultMinLines) null else firstLineHeight + lineHeight * (minLines - 1)
+    val precomputedMaxLinesHeight =
+        if (maxLines == Int.MAX_VALUE) null else firstLineHeight + lineHeight * (maxLines - 1)
 
-    Modifier.heightIn(
-        max = with(density) { precomputedMaxLinesHeight.toDp() }
-    )
+    with(density) {
+        Modifier.heightIn(
+            min = precomputedMinLinesHeight?.toDp() ?: Dp.Unspecified,
+            max = precomputedMaxLinesHeight?.toDp() ?: Dp.Unspecified
+        )
+    }
 }
