@@ -111,7 +111,8 @@ abstract class DackkaTask @Inject constructor(
                 to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
             "android" to "https://developer.android.com/reference",
             "guava" to "https://guava.dev/releases/18.0/api/docs/",
-            "kotlin" to "https://kotlinlang.org/api/latest/jvm/stdlib/"
+            "kotlin" to "https://kotlinlang.org/api/latest/jvm/stdlib/",
+            "junit" to "https://junit.org/junit4/javadoc/4.12/"
         )
         val includes = sourcesDir.walkTopDown()
             .filter { it.name.endsWith("documentation.md") }.map { it.path }.toHashSet<String>()
