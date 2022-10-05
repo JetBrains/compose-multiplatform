@@ -21,7 +21,7 @@ import android.view.ViewTreeObserver
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -63,7 +63,6 @@ import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.util.fastAll
-import kotlinx.coroutines.coroutineScope
 import kotlin.math.max
 
 /**
@@ -513,18 +512,14 @@ private fun Modifier.expandable(
     onExpandedChange: () -> Unit,
     menuLabel: String
 ) = pointerInput(Unit) {
-    forEachGesture {
-        coroutineScope {
-            awaitPointerEventScope {
-                var event: PointerEvent
-                do {
-                    event = awaitPointerEvent(PointerEventPass.Initial)
-                } while (
-                    !event.changes.fastAll { it.changedToUp() }
-                )
-                onExpandedChange.invoke()
-            }
-        }
+    awaitEachGesture {
+        var event: PointerEvent
+        do {
+            event = awaitPointerEvent(PointerEventPass.Initial)
+        } while (
+            !event.changes.fastAll { it.changedToUp() }
+        )
+        onExpandedChange.invoke()
     }
 }.semantics {
     contentDescription = menuLabel // this should be a localised string

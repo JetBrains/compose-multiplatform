@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -107,14 +107,12 @@ private fun Modifier.contextMenuDetector(
         enabled && state.status == ContextMenuState.Status.Closed
     ) {
         this.pointerInput(state) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    val event = awaitEventFirstDown()
-                    if (event.buttons.isSecondaryPressed) {
-                        event.changes.forEach { it.consume() }
-                        state.status =
-                            ContextMenuState.Status.Open(Rect(event.changes[0].position, 0f))
-                    }
+            awaitEachGesture {
+                val event = awaitEventFirstDown()
+                if (event.buttons.isSecondaryPressed) {
+                    event.changes.forEach { it.consume() }
+                    state.status =
+                        ContextMenuState.Status.Open(Rect(event.changes[0].position, 0f))
                 }
             }
         }

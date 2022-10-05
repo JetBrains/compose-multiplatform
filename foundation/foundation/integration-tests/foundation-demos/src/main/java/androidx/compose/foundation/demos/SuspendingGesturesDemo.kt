@@ -21,11 +21,11 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.detectDragGestures
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -461,15 +461,13 @@ fun PointerTypeInput() {
     var pointerType by remember { mutableStateOf<PointerType?>(null) }
     Box(
         Modifier.pointerInput(Unit) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    val pointer = awaitPointerEvent().changes.first()
-                    pointerType = pointer.type
-                    do {
-                        val event = awaitPointerEvent()
-                    } while (event.changes.first().pressed)
-                    pointerType = null
-                }
+            awaitEachGesture {
+                val pointer = awaitPointerEvent().changes.first()
+                pointerType = pointer.type
+                do {
+                    val event = awaitPointerEvent()
+                } while (event.changes.first().pressed)
+                pointerType = null
             }
         }
     ) {

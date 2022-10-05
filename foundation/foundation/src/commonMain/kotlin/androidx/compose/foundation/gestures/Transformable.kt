@@ -68,6 +68,14 @@ fun Modifier.transformable(
         val updatePanZoomLock = rememberUpdatedState(lockRotationOnZoomPan)
         val block: suspend PointerInputScope.() -> Unit = remember {
             {
+                /**
+                 * This cannot be converted to awaitEachGesture() because
+                 * [TransformableState.transform] is a suspend function. Unfortunately, this means
+                 * that events can be lost in the middle of a gesture.
+                 *
+                 * TODO(b/251826790) Convert to awaitEachGesture()
+                 */
+                @Suppress("DEPRECATION")
                 forEachGesture {
                     detectZoom(updatePanZoomLock, updatedState)
                 }

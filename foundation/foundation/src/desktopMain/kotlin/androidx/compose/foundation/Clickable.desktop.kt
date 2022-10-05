@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.runtime.Composable
@@ -51,7 +51,6 @@ import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.util.fastAll
 import java.awt.event.KeyEvent.VK_ENTER
-import kotlinx.coroutines.coroutineScope
 
 @Composable
 internal actual fun isComposeRootInScrollableContainer(): () -> Boolean = { false }
@@ -146,20 +145,15 @@ fun Modifier.mouseClickable(
 internal suspend fun PointerInputScope.detectTapWithContext(
     onTap: ((PointerEvent, PointerEvent) -> Unit)? = null
 ) {
-    forEachGesture {
-        coroutineScope {
-            awaitPointerEventScope {
+    awaitEachGesture {
+        val down = awaitEventFirstDown().also {
+            it.changes.forEach { it.consume() }
+        }
 
-                val down = awaitEventFirstDown().also {
-                    it.changes.forEach { it.consume() }
-                }
-
-                val up = waitForFirstInboundUp()
-                if (up != null) {
-                    up.changes.forEach { it.consume() }
-                    onTap?.invoke(down, up)
-                }
-            }
+        val up = waitForFirstInboundUp()
+        if (up != null) {
+            up.changes.forEach { it.consume() }
+            onTap?.invoke(down, up)
         }
     }
 }

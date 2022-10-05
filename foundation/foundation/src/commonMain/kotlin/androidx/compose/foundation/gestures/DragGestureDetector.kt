@@ -172,34 +172,32 @@ suspend fun PointerInputScope.detectDragGestures(
     onDragCancel: () -> Unit = { },
     onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            var drag: PointerInputChange?
-            var overSlop = Offset.Zero
-            do {
-                drag = awaitPointerSlopOrCancellation(
-                    down.id,
-                    down.type,
-                    triggerOnMainAxisSlop = false
-                ) { change, over ->
-                    change.consume()
-                    overSlop = over
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        var drag: PointerInputChange?
+        var overSlop = Offset.Zero
+        do {
+            drag = awaitPointerSlopOrCancellation(
+                down.id,
+                down.type,
+                triggerOnMainAxisSlop = false
+            ) { change, over ->
+                change.consume()
+                overSlop = over
+            }
+        } while (drag != null && !drag.isConsumed)
+        if (drag != null) {
+            onDragStart.invoke(drag.position)
+            onDrag(drag, overSlop)
+            if (
+                !drag(drag.id) {
+                    onDrag(it, it.positionChange())
+                    it.consume()
                 }
-            } while (drag != null && !drag.isConsumed)
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-                onDrag(drag, overSlop)
-                if (
-                    !drag(drag.id) {
-                        onDrag(it, it.positionChange())
-                        it.consume()
-                    }
-                ) {
-                    onDragCancel()
-                } else {
-                    onDragEnd()
-                }
+            ) {
+                onDragCancel()
+            } else {
+                onDragEnd()
             }
         }
     }
@@ -232,28 +230,26 @@ suspend fun PointerInputScope.detectDragGesturesAfterLongPress(
     onDragCancel: () -> Unit = { },
     onDrag: (change: PointerInputChange, dragAmount: Offset) -> Unit
 ) {
-    forEachGesture {
+    awaitEachGesture {
         try {
-            awaitPointerEventScope {
-                val down = awaitFirstDown(requireUnconsumed = false)
-                val drag = awaitLongPressOrCancellation(down.id)
-                if (drag != null) {
-                    onDragStart.invoke(drag.position)
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val drag = awaitLongPressOrCancellation(down.id)
+            if (drag != null) {
+                onDragStart.invoke(drag.position)
 
-                    if (
-                        drag(drag.id) {
-                            onDrag(it, it.positionChange())
-                            it.consume()
-                        }
-                    ) {
-                        // consume up if we quit drag gracefully with the up
-                        currentEvent.changes.fastForEach {
-                            if (it.changedToUp()) it.consume()
-                        }
-                        onDragEnd()
-                    } else {
-                        onDragCancel()
+                if (
+                    drag(drag.id) {
+                        onDrag(it, it.positionChange())
+                        it.consume()
                     }
+                ) {
+                    // consume up if we quit drag gracefully with the up
+                    currentEvent.changes.fastForEach {
+                        if (it.changedToUp()) it.consume()
+                    }
+                    onDragEnd()
+                } else {
+                    onDragCancel()
                 }
             }
         } catch (c: CancellationException) {
@@ -391,27 +387,25 @@ suspend fun PointerInputScope.detectVerticalDragGestures(
     onDragCancel: () -> Unit = { },
     onVerticalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            var overSlop = 0f
-            val drag = awaitVerticalPointerSlopOrCancellation(down.id, down.type) { change, over ->
-                change.consume()
-                overSlop = over
-            }
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-                onVerticalDrag.invoke(drag, overSlop)
-                if (
-                    verticalDrag(drag.id) {
-                        onVerticalDrag(it, it.positionChange().y)
-                        it.consume()
-                    }
-                ) {
-                    onDragEnd()
-                } else {
-                    onDragCancel()
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        var overSlop = 0f
+        val drag = awaitVerticalPointerSlopOrCancellation(down.id, down.type) { change, over ->
+            change.consume()
+            overSlop = over
+        }
+        if (drag != null) {
+            onDragStart.invoke(drag.position)
+            onVerticalDrag.invoke(drag, overSlop)
+            if (
+                verticalDrag(drag.id) {
+                    onVerticalDrag(it, it.positionChange().y)
+                    it.consume()
                 }
+            ) {
+                onDragEnd()
+            } else {
+                onDragCancel()
             }
         }
     }
@@ -541,30 +535,28 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
     onDragCancel: () -> Unit = { },
     onHorizontalDrag: (change: PointerInputChange, dragAmount: Float) -> Unit
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val down = awaitFirstDown(requireUnconsumed = false)
-            var overSlop = 0f
-            val drag = awaitHorizontalPointerSlopOrCancellation(
-                down.id,
-                down.type
-            ) { change, over ->
-                change.consume()
-                overSlop = over
-            }
-            if (drag != null) {
-                onDragStart.invoke(drag.position)
-                onHorizontalDrag(drag, overSlop)
-                if (
-                    horizontalDrag(drag.id) {
-                        onHorizontalDrag(it, it.positionChange().x)
-                        it.consume()
-                    }
-                ) {
-                    onDragEnd()
-                } else {
-                    onDragCancel()
+    awaitEachGesture {
+        val down = awaitFirstDown(requireUnconsumed = false)
+        var overSlop = 0f
+        val drag = awaitHorizontalPointerSlopOrCancellation(
+            down.id,
+            down.type
+        ) { change, over ->
+            change.consume()
+            overSlop = over
+        }
+        if (drag != null) {
+            onDragStart.invoke(drag.position)
+            onHorizontalDrag(drag, overSlop)
+            if (
+                horizontalDrag(drag.id) {
+                    onHorizontalDrag(it, it.positionChange().x)
+                    it.consume()
                 }
+            ) {
+                onDragEnd()
+            } else {
+                onDragCancel()
             }
         }
     }

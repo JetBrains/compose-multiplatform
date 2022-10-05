@@ -25,8 +25,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -112,17 +112,15 @@ private fun ColorPicker(onColorChange: (Color) -> Unit) {
                 }
             }
 
-            forEachGesture {
-                awaitPointerEventScope {
-                    val down = awaitFirstDown()
-                    hasInput = true
-                    updateColorWheel(down.position)
-                    drag(down.id) { change ->
-                        change.consume()
-                        updateColorWheel(change.position)
-                    }
-                    hasInput = false
+            awaitEachGesture {
+                val down = awaitFirstDown()
+                hasInput = true
+                updateColorWheel(down.position)
+                drag(down.id) { change ->
+                    change.consume()
+                    updateColorWheel(change.position)
                 }
+                hasInput = false
             }
         }
 

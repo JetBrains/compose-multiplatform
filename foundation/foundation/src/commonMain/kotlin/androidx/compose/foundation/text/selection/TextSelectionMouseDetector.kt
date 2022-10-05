@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -83,36 +83,34 @@ private class ClicksCounter(
 internal suspend fun PointerInputScope.mouseSelectionDetector(
     observer: MouseSelectionObserver
 ) {
-    forEachGesture {
-        awaitPointerEventScope {
-            val clicksCounter = ClicksCounter(viewConfiguration)
-            while (true) {
-                val down = awaitMouseEventDown()
-                clicksCounter.update(down)
-                val downChange = down.changes[0]
-                if (down.isShiftPressed) {
-                    val started = observer.onExtend(downChange.position)
-                    if (started) {
-                        downChange.consume()
-                        drag(downChange.id) {
-                            if (observer.onExtendDrag(it.position)) {
-                                it.consume()
-                            }
+    awaitEachGesture {
+        val clicksCounter = ClicksCounter(viewConfiguration)
+        while (true) {
+            val down = awaitMouseEventDown()
+            clicksCounter.update(down)
+            val downChange = down.changes[0]
+            if (down.isShiftPressed) {
+                val started = observer.onExtend(downChange.position)
+                if (started) {
+                    downChange.consume()
+                    drag(downChange.id) {
+                        if (observer.onExtendDrag(it.position)) {
+                            it.consume()
                         }
                     }
-                } else {
-                    val selectionMode = when (clicksCounter.clicks) {
-                        1 -> SelectionAdjustment.None
-                        2 -> SelectionAdjustment.Word
-                        else -> SelectionAdjustment.Paragraph
-                    }
-                    val started = observer.onStart(downChange.position, selectionMode)
-                    if (started) {
-                        downChange.consume()
-                        drag(downChange.id) {
-                            if (observer.onDrag(it.position, selectionMode)) {
-                                it.consume()
-                            }
+                }
+            } else {
+                val selectionMode = when (clicksCounter.clicks) {
+                    1 -> SelectionAdjustment.None
+                    2 -> SelectionAdjustment.Word
+                    else -> SelectionAdjustment.Paragraph
+                }
+                val started = observer.onStart(downChange.position, selectionMode)
+                if (started) {
+                    downChange.consume()
+                    drag(downChange.id) {
+                        if (observer.onDrag(it.position, selectionMode)) {
+                            it.consume()
                         }
                     }
                 }

@@ -133,99 +133,93 @@ class DragGestureDetectorTest(dragType: GestureType) {
     }
 
     private val AwaitVerticalDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        forEachGesture {
-            awaitPointerEventScope {
-                val down = awaitFirstDown()
-                val slopChange = awaitVerticalTouchSlopOrCancellation(down.id) { change, overSlop ->
-                    if (change.positionChange().y > 0f || !consumePositiveOnly) {
-                        dragged = true
-                        dragDistance = overSlop
+        awaitEachGesture {
+            val down = awaitFirstDown()
+            val slopChange = awaitVerticalTouchSlopOrCancellation(down.id) { change, overSlop ->
+                if (change.positionChange().y > 0f || !consumePositiveOnly) {
+                    dragged = true
+                    dragDistance = overSlop
+                    change.consume()
+                }
+            }
+            if (slopChange != null || sloppyDetector) {
+                gestureStarted = true
+                var pointer = if (sloppyDetector) down.id else slopChange!!.id
+                do {
+                    val change = awaitVerticalDragOrCancellation(pointer)
+                    if (change == null) {
+                        gestureCanceled = true
+                    } else {
+                        dragDistance += change.positionChange().y
                         change.consume()
-                    }
-                }
-                if (slopChange != null || sloppyDetector) {
-                    gestureStarted = true
-                    var pointer = if (sloppyDetector) down.id else slopChange!!.id
-                    do {
-                        val change = awaitVerticalDragOrCancellation(pointer)
-                        if (change == null) {
-                            gestureCanceled = true
-                        } else {
-                            dragDistance += change.positionChange().y
-                            change.consume()
-                            if (change.changedToUpIgnoreConsumed()) {
-                                gestureEnded = true
-                            }
-                            pointer = change.id
+                        if (change.changedToUpIgnoreConsumed()) {
+                            gestureEnded = true
                         }
-                    } while (!gestureEnded && !gestureCanceled)
-                }
+                        pointer = change.id
+                    }
+                } while (!gestureEnded && !gestureCanceled)
             }
         }
     }
 
     private val AwaitHorizontalDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        forEachGesture {
-            awaitPointerEventScope {
-                val down = awaitFirstDown()
-                val slopChange =
-                    awaitHorizontalTouchSlopOrCancellation(down.id) { change, overSlop ->
-                        if (change.positionChange().x > 0f || !consumePositiveOnly) {
-                            dragged = true
-                            dragDistance = overSlop
-                            change.consume()
-                        }
+        awaitEachGesture {
+            val down = awaitFirstDown()
+            val slopChange =
+                awaitHorizontalTouchSlopOrCancellation(down.id) { change, overSlop ->
+                    if (change.positionChange().x > 0f || !consumePositiveOnly) {
+                        dragged = true
+                        dragDistance = overSlop
+                        change.consume()
                     }
-                if (slopChange != null || sloppyDetector) {
-                    gestureStarted = true
-                    var pointer = if (sloppyDetector) down.id else slopChange!!.id
-                    do {
-                        val change = awaitHorizontalDragOrCancellation(pointer)
-                        if (change == null) {
-                            gestureCanceled = true
-                        } else {
-                            dragDistance += change.positionChange().x
-                            change.consume()
-                            if (change.changedToUpIgnoreConsumed()) {
-                                gestureEnded = true
-                            }
-                            pointer = change.id
-                        }
-                    } while (!gestureEnded && !gestureCanceled)
                 }
+            if (slopChange != null || sloppyDetector) {
+                gestureStarted = true
+                var pointer = if (sloppyDetector) down.id else slopChange!!.id
+                do {
+                    val change = awaitHorizontalDragOrCancellation(pointer)
+                    if (change == null) {
+                        gestureCanceled = true
+                    } else {
+                        dragDistance += change.positionChange().x
+                        change.consume()
+                        if (change.changedToUpIgnoreConsumed()) {
+                            gestureEnded = true
+                        }
+                        pointer = change.id
+                    }
+                } while (!gestureEnded && !gestureCanceled)
             }
         }
     }
 
     private val AwaitDragUtil = SuspendingGestureTestUtil(width = 100, height = 100) {
-        forEachGesture {
-            awaitPointerEventScope {
-                val down = awaitFirstDown()
-                val slopChange = awaitTouchSlopOrCancellation(down.id) { change, overSlop ->
-                    val positionChange = change.positionChange()
-                    if (positionChange.x > 0f || positionChange.y > 0f || !consumePositiveOnly) {
-                        dragged = true
-                        dragDistance = overSlop.getDistance()
+        awaitEachGesture {
+            val down = awaitFirstDown()
+            val slopChange = awaitTouchSlopOrCancellation(down.id) { change, overSlop ->
+                val positionChange = change.positionChange()
+                if (positionChange.x > 0f || positionChange.y > 0f || !consumePositiveOnly) {
+                    dragged = true
+                    dragDistance = overSlop.getDistance()
+                    change.consume()
+                }
+            }
+            if (slopChange != null || sloppyDetector) {
+                gestureStarted = true
+                var pointer = if (sloppyDetector) down.id else slopChange!!.id
+                do {
+                    val change = awaitDragOrCancellation(pointer)
+                    if (change == null) {
+                        gestureCanceled = true
+                    } else {
+                        dragDistance += change.positionChange().getDistance()
                         change.consume()
-                    }
-                }
-                if (slopChange != null || sloppyDetector) {
-                    gestureStarted = true
-                    var pointer = if (sloppyDetector) down.id else slopChange!!.id
-                    do {
-                        val change = awaitDragOrCancellation(pointer)
-                        if (change == null) {
-                            gestureCanceled = true
-                        } else {
-                            dragDistance += change.positionChange().getDistance()
-                            change.consume()
-                            if (change.changedToUpIgnoreConsumed()) {
-                                gestureEnded = true
-                            }
-                            pointer = change.id
+                        if (change.changedToUpIgnoreConsumed()) {
+                            gestureEnded = true
                         }
-                    } while (!gestureEnded && !gestureCanceled)
-                }
+                        pointer = change.id
+                    }
+                } while (!gestureEnded && !gestureCanceled)
             }
         }
     }

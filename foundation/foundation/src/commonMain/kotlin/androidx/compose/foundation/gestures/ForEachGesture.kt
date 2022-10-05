@@ -33,7 +33,14 @@ class GestureCancellationException(message: String? = null) : CancellationExcept
  * Repeatedly calls [block] to handle gestures. If there is a [CancellationException],
  * it will wait until all pointers are raised before another gesture is detected, or it
  * exits if [isActive] is `false`.
+ *
+ * [awaitEachGesture] does the same thing without the possibility of missing events between
+ * gestures, but also lacks the ability to call arbitrary suspending functions within [block].
  */
+@Deprecated(
+    message = "Use awaitEachGesture instead. forEachGesture() can drop events between gestures.",
+    replaceWith = ReplaceWith("awaitEachGesture(block)")
+)
 suspend fun PointerInputScope.forEachGesture(block: suspend PointerInputScope.() -> Unit) {
     val currentContext = currentCoroutineContext()
     while (currentContext.isActive) {
@@ -78,5 +85,37 @@ internal suspend fun AwaitPointerEventScope.awaitAllPointersUp() {
         do {
             val events = awaitPointerEvent(PointerEventPass.Final)
         } while (events.changes.fastAny { it.pressed })
+    }
+}
+
+/**
+ * Repeatedly calls [block] to handle gestures. If there is a [CancellationException],
+ * it will wait until all pointers are raised before another gesture is detected, or it
+ * exits if [isActive] is `false`.
+ *
+ * [block] is run within [PointerInputScope.awaitPointerEventScope] and will loop entirely
+ * within the [AwaitPointerEventScope] so events will not be lost between gestures.
+ */
+suspend fun PointerInputScope.awaitEachGesture(block: suspend AwaitPointerEventScope.() -> Unit) {
+    val currentContext = currentCoroutineContext()
+    awaitPointerEventScope {
+        while (currentContext.isActive) {
+            try {
+                block()
+
+                // Wait for all pointers to be up. Gestures start when a finger goes down.
+                awaitAllPointersUp()
+            } catch (e: CancellationException) {
+                if (currentContext.isActive) {
+                    // The current gesture was canceled. Wait for all fingers to be "up" before
+                    // looping again.
+                    awaitAllPointersUp()
+                } else {
+                    // detectGesture was cancelled externally. Rethrow the cancellation exception to
+                    // propagate it upwards.
+                    throw e
+                }
+            }
+        }
     }
 }

@@ -20,7 +20,7 @@ import android.graphics.Rect
 import android.view.View
 import android.view.ViewTreeObserver
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -66,7 +66,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastAll
 import kotlin.math.max
-import kotlinx.coroutines.coroutineScope
 
 /**
  * <a href="https://m3.material.io/components/menus/overview" class="external" target="_blank">Material Design Exposed Dropdown Menu</a>.
@@ -527,18 +526,14 @@ private fun Modifier.expandable(
     expandedDescription: String = getString(Strings.MenuExpanded),
     collapsedDescription: String = getString(Strings.MenuCollapsed),
 ) = pointerInput(Unit) {
-    forEachGesture {
-        coroutineScope {
-            awaitPointerEventScope {
-                var event: PointerEvent
-                do {
-                    event = awaitPointerEvent(PointerEventPass.Initial)
-                } while (
-                    !event.changes.fastAll { it.changedToUp() }
-                )
-                onExpandedChange()
-            }
-        }
+    awaitEachGesture {
+        var event: PointerEvent
+        do {
+            event = awaitPointerEvent(PointerEventPass.Initial)
+        } while (
+            !event.changes.fastAll { it.changedToUp() }
+        )
+        onExpandedChange()
     }
 }.semantics {
     stateDescription = if (expanded) expandedDescription else collapsedDescription

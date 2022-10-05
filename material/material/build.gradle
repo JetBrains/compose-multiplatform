@@ -33,7 +33,7 @@ dependencies {
          * corresponding block below
          */
         api("androidx.compose.animation:animation-core:1.2.1")
-        api("androidx.compose.foundation:foundation:1.2.1")
+        api(project(":compose:foundation:foundation"))
         api(project(":compose:material:material-icons-core"))
         api(project(":compose:material:material-ripple"))
         api("androidx.compose.runtime:runtime:1.2.1")
