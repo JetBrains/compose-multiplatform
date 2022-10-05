@@ -51,7 +51,7 @@ import kotlin.math.pow
  * primaries and white point in the CIE XYZ space. The tristimulus XYZ values
  * are internally converted to xyY.
  *
- * [sRGB primaries and white point]({@docRoot}reference/android/images/graphics/colorspace_srgb.png)
+ * [sRGB primaries and white point](https://developer.android.com/reference/android/images/graphics/colorspace_srgb.png)
  *
  * ### Transfer functions
  *
@@ -113,7 +113,7 @@ import kotlin.math.pow
  * range `[-0.5..7.5]` while [ACES][ColorSpaces.Aces] can be used throughout
  * the range `[-65504, 65504]`.
  *
- * [Extended sRGB and its large range]({@docRoot}reference/android/images/graphics/colorspace_scrgb.png)
+ * [Extended sRGB and its large range](https://developer.android.com/reference/android/images/graphics/colorspace_scrgb.png)
  *
  * ### Converting between RGB color spaces
  *
