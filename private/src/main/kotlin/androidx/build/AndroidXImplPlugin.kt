@@ -160,7 +160,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 KotlinClosure1<String, Project>(
                     function = {
                         // this refers to the first parameter of the closure.
-                        project(this)
+                        project.resolveProject(this)
                     }
                 )
             )
