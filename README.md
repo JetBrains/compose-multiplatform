@@ -65,6 +65,7 @@ Note that when you use Compose Multiplatform, you setup your project differently
 * [components](components) - custom components of Compose Multiplatform
    * [Split Pane](components/SplitPane)
 * [experimental](experimental) - experimental components and examples
+   * [examples](experimental/examples) - examples that use new experimental functionality
    * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
    * [Video Player](experimental/components/VideoPlayer)
    * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
