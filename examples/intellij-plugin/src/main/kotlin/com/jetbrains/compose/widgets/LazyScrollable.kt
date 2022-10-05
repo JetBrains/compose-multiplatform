@@ -1,6 +1,5 @@
 package com.jetbrains.compose.widgets
 
-import androidx.compose.desktop.DesktopTheme
 import androidx.compose.foundation.background
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,28 +26,26 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun LazyScrollable() {
     MaterialTheme {
-        DesktopTheme {
-            Box(
-                modifier = Modifier.fillMaxSize()
-                    .padding(10.dp)
-            ) {
+        Box(
+            modifier = Modifier.fillMaxSize()
+                .padding(10.dp)
+        ) {
 
-                val state = rememberLazyListState()
-                val itemCount = 100
+            val state = rememberLazyListState()
+            val itemCount = 100
 
-                LazyColumn(Modifier.fillMaxSize().padding(end = 12.dp), state) {
-                    items(itemCount) { x ->
-                        TextBox("Item in ScrollableColumn #$x")
-                        Spacer(modifier = Modifier.height(5.dp))
-                    }
+            LazyColumn(Modifier.fillMaxSize().padding(end = 12.dp), state) {
+                items(itemCount) { x ->
+                    TextBox("Item in ScrollableColumn #$x")
+                    Spacer(modifier = Modifier.height(5.dp))
                 }
-                VerticalScrollbar(
-                    modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
-                    adapter = rememberScrollbarAdapter(
-                        scrollState = state
-                    )
-                )
             }
+            VerticalScrollbar(
+                modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+                adapter = rememberScrollbarAdapter(
+                    scrollState = state
+                )
+            )
         }
     }
 }
