@@ -220,7 +220,7 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         registerStudioTask()
 
-        if (!StudioType.isPlayground(project)) {
+        if (!ProjectLayoutType.isPlayground(project)) {
             whenChangingOutputTextValidationMustInvalidateAllTasks()
         }
 

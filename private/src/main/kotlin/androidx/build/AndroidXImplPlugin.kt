@@ -148,7 +148,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     private fun Project.registerProjectOrArtifact() {
         // Add a method for each sub project where they can declare an optional
         // dependency on a project or its latest snapshot artifact.
-        if (!StudioType.isPlayground(this)) {
+        if (!ProjectLayoutType.isPlayground(this)) {
             // In AndroidX build, this is always enforced to the project
             extra.set(
                 PROJECT_OR_ARTIFACT_EXT_NAME,
@@ -257,7 +257,8 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 task.finalizedBy(zipXmlTask)
             }
         }
-        if (!StudioType.isPlayground(project)) { // For non-playground setup use robolectric offline
+        // For non-playground setup, use robolectric offline
+        if (!ProjectLayoutType.isPlayground(project)) {
             task.systemProperty("robolectric.offline", "true")
             val robolectricDependencies =
                 File(
@@ -732,7 +733,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
      * Sets the konan distribution url to the prebuilts directory.
      */
     private fun Project.configureKonanDirectory() {
-        if (StudioType.isPlayground(this)) {
+        if (ProjectLayoutType.isPlayground(this)) {
             return // playground does not use prebuilts
         }
         overrideKotlinNativeDistributionUrlToLocalDirectory()
