@@ -1,5 +1,4 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
-import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")

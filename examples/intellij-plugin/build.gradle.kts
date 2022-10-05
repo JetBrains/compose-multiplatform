@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     id("org.jetbrains.intellij") version "1.9.0"
     java
