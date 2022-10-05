@@ -11,7 +11,7 @@ demonstrating how to use various Material widgets.
 ### Running desktop application
  * To run, launch command: `./gradlew :desktop:run`
  * Or choose **desktop** configuration in IDE and run it.  
-  ![desktop-run-configuration.png](desktop-run-configuration.png)
+  ![desktop-run-configuration.png](screenshots/desktop-run-configuration.png)
 
 ### Building native desktop distribution
 ```

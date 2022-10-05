@@ -36,7 +36,7 @@ Features:
 ### Running desktop application
  * To run, launch command: `./gradlew :desktop:run`
  * Or choose **desktop** configuration in IDE and run it.  
-  ![desktop-run-configuration.png](desktop-run-configuration.png)
+  ![desktop-run-configuration.png](screenshots/desktop-run-configuration.png)
 
 #### Building native desktop distribution
 ```
@@ -51,7 +51,7 @@ Open project in Intellij IDEA or Android Studio and run "android" configuration.
 ### Running Web browser application
  * To run, launch command: `./gradlew :web:jsBrowserDevelopmentRun`
  * Or choose **browser** configuration in IDE and run it.  
-  ![browser-run-configuration.png](browser-run-configuration.png)
+  ![browser-run-configuration.png](screenshots/browser-run-configuration.png)
 
 ### Running iOS application
 

@@ -12,7 +12,7 @@ and allows sharing Compose runtime between multiple plugins
 1. Start test IDE:
    * Run the following command in terminal: `./gradlew runIde`
    * Or choose **runIde** configuration in IDE and run it.   
-     ![ide-run-configuration.png](ide-run-configuration.png)
+     ![ide-run-configuration.png](screenshots/ide-run-configuration.png)
 2. Create a new project or open any existing;
 3. Select `Show Compose Demo...` from the `Tools` menu.
 
