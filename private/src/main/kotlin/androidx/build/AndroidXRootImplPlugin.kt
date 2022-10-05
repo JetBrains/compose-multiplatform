@@ -220,11 +220,28 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         registerStudioTask()
 
+        if (!StudioType.isPlayground(project)) {
+            whenChangingOutputTextValidationMustInvalidateAllTasks()
+        }
+
         TaskUpToDateValidator.setup(project, registry)
 
         project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
             task.removePrefix(project.getCheckoutRoot().path)
+        }
+    }
+
+    // If our output message validation configuration changes, invalidate all tasks to make sure
+    // all output messages get regenerated and re-validated
+    private fun Project.whenChangingOutputTextValidationMustInvalidateAllTasks() {
+        val configFile = project.file("development/build_log_simplifier/messages.ignore")
+        if (configFile.exists()) {
+            subprojects { subproject ->
+                subproject.tasks.configureEach { task ->
+                    task.inputs.file(configFile)
+                }
+            }
         }
     }
 
