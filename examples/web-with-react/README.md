@@ -21,4 +21,4 @@ Here is a good tutorial - [Using packages from NPM](https://play.kotlinlang.org/
 ### Running web application
 * To run, launch command: `./gradlew :jsBrowserRun`
 * Or choose **browser** configuration in IDE and run it.  
-  ![browser-run-configuration.png](browser-run-configuration.png)
+  ![browser-run-configuration.png](screenshots/browser-run-configuration.png)
