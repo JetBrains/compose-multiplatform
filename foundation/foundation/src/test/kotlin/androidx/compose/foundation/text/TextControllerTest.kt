@@ -18,8 +18,8 @@ package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

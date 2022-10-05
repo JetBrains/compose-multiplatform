@@ -20,8 +20,8 @@ import androidx.compose.ui.geometry.Offset
 
 import androidx.compose.ui.layout.LayoutCoordinates
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4

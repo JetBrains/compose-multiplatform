@@ -18,7 +18,7 @@ package androidx.compose.foundation.text
 
 import androidx.compose.runtime.snapshots.Snapshot
 import com.google.common.truth.Truth
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
