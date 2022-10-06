@@ -61,7 +61,7 @@ fun build(
 ) {
     val isWin = System.getProperty("os.name").startsWith("Win")
     val arguments = buildCmd.toMutableList().also {
-        it.add("-PCOMPOSE_CORE_VERSION=$composeVersion")
+        it.add("-Pcompose.version=$composeVersion")
         it.add("-Pkotlin.version=$kotlinVersion")
     }.toTypedArray()
 
@@ -176,7 +176,7 @@ fun runCasesInDirectory(
 tasks.register("checkComposeCases") {
     doLast {
         val filterCases = project.findProperty("FILTER_CASES")?.toString() ?: ""
-        val composeVersion = project.findProperty("COMPOSE_CORE_VERSION")?.toString() ?: "0.0.0-SNASPHOT"
+        val composeVersion = project.findProperty("compose.version")?.toString() ?: "0.0.0-SNASPHOT"
         val kotlinVersion = kotlin.coreLibrariesVersion
 
         val expectedFailingCasesDir = File("${projectDir.absolutePath}/testcases/failing")
