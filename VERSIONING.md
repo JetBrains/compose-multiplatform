@@ -6,8 +6,6 @@
    * Linux (x86-64, arm64)
    * Web browsers
 
-Follow individual tutorials to understand how to use particular feature.
-
 ### Limitations
 
 Following limitations apply to 1.0 release.
