@@ -344,12 +344,14 @@ class OnGloballyPositionedTest {
         rule.setContent {
             Layout(
                 {},
-                modifier = Modifier.graphicsLayer {
-                    translationX = offsetX
-                }.onGloballyPositioned {
-                    coordinates = it
-                    positionedLatch.countDown()
-                }
+                modifier = Modifier
+                    .graphicsLayer {
+                        translationX = offsetX
+                    }
+                    .onGloballyPositioned {
+                        coordinates = it
+                        positionedLatch.countDown()
+                    }
             ) { _, _ ->
                 layout(100, 200) {}
             }
@@ -864,6 +866,63 @@ class OnGloballyPositionedTest {
             remeasurementObj!!.forceRemeasure()
 
             assertNotNull(coords)
+        }
+    }
+
+    @Test
+    fun coordinatesAreNotAttachedWhenNodeIsRemovedFromHierarchy() {
+        var nodeIsNeeded by mutableStateOf(true)
+        lateinit var coordindates: LayoutCoordinates
+        rule.setContent {
+            if (nodeIsNeeded) {
+                Box(
+                    Modifier
+                        .onGloballyPositioned {
+                            // onGloballyPositioned is "attached" to the layout node itself
+                            // as there are no layout modifiers added after it
+                            coordindates = it
+                        }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertTrue(coordindates.isAttached)
+            nodeIsNeeded = false
+        }
+
+        rule.runOnIdle {
+            assertFalse(coordindates.isAttached)
+        }
+    }
+
+    @Test
+    fun coordinatesAreNotAttachedWhenModifierIsNotUsedAnymore() {
+        lateinit var coordindates: LayoutCoordinates
+        var modifier by mutableStateOf(
+            Modifier
+                .onGloballyPositioned {
+                    // onGloballyPositioned is "attached" to the next layout modifier
+                    coordindates = it
+                }
+                .layout { measurable, constraints ->
+                    val placeable = measurable.measure(constraints)
+                    layout(placeable.width, placeable.height) {
+                        placeable.place(0, 0)
+                    }
+                }
+        )
+        rule.setContent {
+            Box(modifier)
+        }
+
+        rule.runOnIdle {
+            assertTrue(coordindates.isAttached)
+            modifier = Modifier
+        }
+
+        rule.runOnIdle {
+            assertFalse(coordindates.isAttached)
         }
     }
 }
