@@ -243,4 +243,16 @@ fun Project.usingMaxDepVersions(): Boolean {
 fun Project.allowMissingLintProject() =
     findBooleanProperty(ALLOW_MISSING_LINT_CHECKS_PROJECT) ?: false
 
+/**
+ * Returns whether we export compose compiler metrics
+ */
+fun Project.enableComposeCompilerMetrics() =
+    findBooleanProperty(ENABLE_COMPOSE_COMPILER_METRICS) ?: false
+
+/**
+ * Returns whether we export compose compiler reports
+ */
+fun Project.enableComposeCompilerReports() =
+    findBooleanProperty(ENABLE_COMPOSE_COMPILER_REPORTS) ?: false
+
 fun Project.findBooleanProperty(propName: String) = (findProperty(propName) as? String)?.toBoolean()
