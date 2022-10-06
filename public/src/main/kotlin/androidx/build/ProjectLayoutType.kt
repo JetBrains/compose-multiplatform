@@ -18,20 +18,20 @@ package androidx.build
 
 import org.gradle.api.Project
 
-enum class StudioType {
+enum class ProjectLayoutType {
     ANDROIDX,
     PLAYGROUND;
 
     companion object {
         /**
-         * Returns the Studio type for the project's studio task
+         * Returns the project layout type for the project (PLAYGROUND or ANDROIDX)
          */
         @JvmStatic
-        fun from(project: Project): StudioType {
+        fun from(project: Project): ProjectLayoutType {
             val value = project.findProperty(STUDIO_TYPE)?.toString()
             return when (value) {
-                "playground" -> StudioType.PLAYGROUND
-                null, "androidx" -> StudioType.ANDROIDX
+                "playground" -> ProjectLayoutType.PLAYGROUND
+                null, "androidx" -> ProjectLayoutType.ANDROIDX
                 else -> error("Invalid project type $value")
             }
         }
@@ -41,7 +41,7 @@ enum class StudioType {
          */
         @JvmStatic
         fun isPlayground(project: Project): Boolean {
-            return StudioType.from(project) == StudioType.PLAYGROUND
+            return ProjectLayoutType.from(project) == ProjectLayoutType.PLAYGROUND
         }
     }
 }

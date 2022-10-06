@@ -340,7 +340,7 @@ private fun configureComposeCompilerPlugin(
         // for Playground builds as well
         project.dependencies.add(
             COMPILER_PLUGIN_CONFIGURATION,
-            if (StudioType.isPlayground(project)) {
+            if (ProjectLayoutType.isPlayground(project)) {
                 AndroidXPlaygroundRootImplPlugin.projectOrArtifact(
                     project.rootProject,
                     ":compose:compiler:compiler"
