@@ -38,18 +38,35 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import kotlin.coroutines.cancellation.CancellationException
+import org.jetbrains.skia.Image
 import org.jetbrains.skia.Surface
 
 @ExperimentalTestApi
-@OptIn(InternalTestApi::class)
 actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
     DesktopComposeUiTest().runTest(block)
 }
 
-@InternalTestApi
+/**
+ * Variant of [runComposeUiTest] that allows you to specify the size of the surface.
+ *
+ * @param width the desired width of the surface
+ * @param height the desired height of the surface
+ */
 @ExperimentalTestApi
-@OptIn(ExperimentalCoroutinesApi::class)
-class DesktopComposeUiTest : ComposeUiTest {
+fun runDesktopComposeUiTest(
+    width: Int = 1024,
+    height: Int = 768,
+    block: DesktopComposeUiTest.() -> Unit
+) {
+    DesktopComposeUiTest(width, height).runTest(block)
+}
+
+@ExperimentalTestApi
+@OptIn(ExperimentalCoroutinesApi::class, InternalTestApi::class)
+class DesktopComposeUiTest(
+    width: Int = 1024,
+    height: Int = 768
+) : ComposeUiTest {
 
     override val density = Density(1f, 1f)
 
@@ -92,14 +109,15 @@ class DesktopComposeUiTest : ComposeUiTest {
     }
     private val coroutineContext =
         coroutineDispatcher + uncaughtExceptionHandler + infiniteAnimationPolicy
-    private val surface = Surface.makeRasterN32Premul(1024, 768)
+    private val surface = Surface.makeRasterN32Premul(width, height)
 
     lateinit var scene: ComposeScene
+        internal set
 
     private val testOwner = DesktopTestOwner()
     private val testContext = createTestContext(testOwner)
 
-    fun <R> runTest(block: ComposeUiTest.() -> R): R {
+    fun <R> runTest(block: DesktopComposeUiTest.() -> R): R {
         scene = runOnUiThread(::createUi)
         try {
             return block()
@@ -212,6 +230,11 @@ class DesktopComposeUiTest : ComposeUiTest {
         useUnmergedTree: Boolean
     ): SemanticsNodeInteractionCollection {
         return SemanticsNodeInteractionCollection(testContext, useUnmergedTree, matcher)
+    }
+
+    fun captureToImage(): Image {
+        waitForIdle()
+        return surface.makeImageSnapshot()
     }
 
     private inner class DesktopTestOwner : TestOwner {
