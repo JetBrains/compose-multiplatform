@@ -20,8 +20,13 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Indication
+import androidx.compose.foundation.IndicationInstance
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.InteractionSource
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -50,6 +55,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
@@ -274,7 +280,13 @@ class ComposeSceneTest {
     @Test(timeout = 5000)
     fun `rendering of clickable`() = renderingTest(width = 40, height = 40) {
         setContent {
-            Box(Modifier.size(20.dp).background(Color.Blue).clickable {})
+            val interactionSource = remember { MutableInteractionSource() }
+            Box(
+                Modifier
+                    .size(20.dp)
+                    .background(Color.Blue)
+                    .clickable(indication = PressTestIndication, interactionSource = interactionSource) {}
+            )
         }
         awaitNextRender()
         screenshotRule.snap(surface, "frame1_initial")
@@ -282,9 +294,6 @@ class ComposeSceneTest {
 
         scene.sendPointerEvent(PointerEventType.Enter, Offset(2f, 2f))
         scene.sendPointerEvent(PointerEventType.Move, Offset(2f, 2f))
-        // TODO(demin): why we need extra frame when we send hover + press?
-        //  maybe a race between hoverable and clickable?
-        awaitNextRender()
 
         scene.sendPointerEvent(PointerEventType.Press, Offset(2f, 2f))
         awaitNextRender()
@@ -296,10 +305,6 @@ class ComposeSceneTest {
 
         scene.sendPointerEvent(PointerEventType.Release, Offset(1f, 1f))
 
-        // TODO(demin): why we need extra frame when we send hover + press?
-        //  maybe a race between hoverable and clickable?
-        awaitNextRender()
-
         scene.sendPointerEvent(PointerEventType.Move, Offset(-1f, -1f))
         scene.sendPointerEvent(PointerEventType.Exit, Offset(-1f, -1f))
         awaitNextRender()
@@ -307,10 +312,6 @@ class ComposeSceneTest {
 
         scene.sendPointerEvent(PointerEventType.Enter, Offset(1f, 1f))
         scene.sendPointerEvent(PointerEventType.Move, Offset(1f, 1f))
-
-        // TODO(demin): why we need extra frame when we send hover + press?
-        //  maybe a race between hoverable and clickable?
-        awaitNextRender()
 
         scene.sendPointerEvent(PointerEventType.Press, Offset(3f, 3f))
         awaitNextRender()
@@ -615,6 +616,23 @@ class ComposeSceneTest {
         composeRule.runOnIdle {
             assertThat(field1FocusState!!.isFocused).isTrue()
             assertThat(field2FocusState!!.isFocused).isFalse()
+        }
+    }
+}
+
+private object PressTestIndication : Indication {
+    @Composable
+    override fun rememberUpdatedInstance(interactionSource: InteractionSource): IndicationInstance {
+        val isPressed by interactionSource.collectIsPressedAsState()
+        return remember(interactionSource) {
+            object : IndicationInstance {
+                override fun ContentDrawScope.drawIndication() {
+                    drawContent()
+                    if (isPressed) {
+                        drawRect(color = Color.Black.copy(alpha = 0.3f), size = size)
+                    }
+                }
+            }
         }
     }
 }

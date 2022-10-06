@@ -66,7 +66,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton1, composeButton2, composeButton3, composeButton4
+            composeButton1, composeButton2, composeButton3, composeButton4
         )
     }
 
@@ -93,7 +93,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton1, composeButton2, composeButton3, composeButton4
+            composeButton1, composeButton2, composeButton3, composeButton4
         )
     }
 
@@ -123,7 +123,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, outerButton1, outerButton2, composeButton1, composeButton2, composeButton3, composeButton4
+            outerButton1, outerButton2, composeButton1, composeButton2, composeButton3, composeButton4
         )
     }
 
@@ -152,7 +152,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton1, composeButton2, composeButton3, composeButton4, outerButton3, outerButton4
+            composeButton1, composeButton2, composeButton3, composeButton4, outerButton3, outerButton4
         )
     }
 
@@ -185,7 +185,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, innerButton1, composeButton4,
+            composeButton3, innerButton1, composeButton4,
         )
     }
 
@@ -214,7 +214,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, innerButton1, composeButton4
+            composeButton3, innerButton1, composeButton4
         )
     }
 
@@ -252,8 +252,8 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, outerButton1, outerButton2, composeButton1, composeButton2,
-            innerButton1, innerButton2, innerButton3
+            outerButton1, outerButton2, composeButton1, composeButton2, innerButton1,
+            innerButton2, innerButton3
         )
     }
 
@@ -290,8 +290,8 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window,
-            innerButton1, innerButton2, innerButton3, composeButton3, composeButton4, outerButton3, outerButton4
+            innerButton1,
+            innerButton2, innerButton3, composeButton3, composeButton4, outerButton3, outerButton4
         )
     }
 
@@ -323,7 +323,7 @@ class ComposeFocusTest {
         window.pack()
         window.isVisible = true
 
-        testRandomFocus(window, innerButton1, innerButton2, innerButton3)
+        testRandomFocus(innerButton1, innerButton2, innerButton3)
     }
 
     @Test
@@ -344,7 +344,7 @@ class ComposeFocusTest {
         window.pack()
         window.isVisible = true
 
-        testRandomFocus(window, outerButton1, outerButton2, outerButton3, outerButton4)
+        testRandomFocus(outerButton1, outerButton2, outerButton3, outerButton4)
     }
 
     @Test
@@ -370,7 +370,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, composeButton4
+            composeButton3, composeButton4
         )
     }
 
@@ -407,7 +407,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, composeButton4
+            composeButton3, composeButton4
         )
     }
 
@@ -444,7 +444,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, innerButton1, composeButton4
+            composeButton3, innerButton1, composeButton4
         )
     }
 
@@ -481,7 +481,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, composeButton4
+            composeButton3, composeButton4
         )
     }
 
@@ -518,7 +518,7 @@ class ComposeFocusTest {
         window.isVisible = true
 
         testRandomFocus(
-            window, composeButton3, composeButton4
+            composeButton3, composeButton4
         )
     }
 
@@ -607,7 +607,7 @@ class ComposeFocusTest {
     private val composeButton5 = ComposeButton("composeButton5")
     private val composeButton6 = ComposeButton("composeButton6")
 
-    private suspend fun FocusTestScope.testRandomFocus(window: Window, vararg buttons: Any) {
+    private suspend fun FocusTestScope.testRandomFocus(vararg buttons: Any) {
         fun Any.validateIsFocused() {
             assertThat(
                 buttons.filter { it.isFocused() }

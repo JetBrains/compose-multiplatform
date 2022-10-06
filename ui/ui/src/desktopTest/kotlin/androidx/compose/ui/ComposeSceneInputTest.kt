@@ -18,11 +18,11 @@ package androidx.compose.ui
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.unit.IntRect
+import kotlinx.coroutines.runBlocking
+import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Test
 
-@OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
 class ComposeSceneInputTest {
     @Test
     fun move() = ImageComposeScene(100, 100).use { scene ->
@@ -144,7 +144,7 @@ class ComposeSceneInputTest {
     fun `pressed popup should own received moves outside popup`() = ImageComposeScene(
         100,
         100
-    ).use { scene ->
+    ).useInUIThread { scene ->
         val background = FillBox()
         val cutPopup = PopupState(IntRect(-20, -20, 40, 40))
         val overlappedPopup = PopupState(IntRect(20, 20, 60, 60))
@@ -160,8 +160,9 @@ class ComposeSceneInputTest {
         scene.sendPointerEvent(PointerEventType.Enter, Offset(-10f, -10f))
         scene.sendPointerEvent(PointerEventType.Press, Offset(-10f, -10f))
         background.events.assertReceivedNoEvents()
-        cutPopup.events.assertReceived(
-            PointerEventType.Enter, Offset(-10f, -10f) - cutPopup.origin)
+        cutPopup.events.assertReceived(PointerEventType.Enter, Offset(-10f, -10f) - cutPopup.origin)
+        // synthetic event
+        cutPopup.events.assertReceived(PointerEventType.Move, Offset(-10f, -10f) - cutPopup.origin)
         cutPopup.events.assertReceivedLast(
             PointerEventType.Press, Offset(-10f, -10f) - cutPopup.origin)
         overlappedPopup.events.assertReceivedNoEvents()
@@ -243,9 +244,22 @@ class ComposeSceneInputTest {
         background.events.assertReceivedNoEvents()
         cutPopup.events.assertReceivedNoEvents()
         overlappedPopup.events.assertReceivedLast(
-            PointerEventType.Release, Offset(-10f, -10f) - overlappedPopup.origin)
+            PointerEventType.Release, Offset(-10f, -10f) - overlappedPopup.origin
+        )
         overlappedPopup.events.assertReceivedNoEvents()
         independentPopup.events.assertReceivedNoEvents()
+    }
+
+    // TODO(https://github.com/JetBrains/compose-jb/issues/1396):
+    //  ImageComposeScene should be able to run in the test thread.
+    //  Now we have interference with GlobalSnapshotManager, that can alter behaviour of the test because
+    //  it commits states in another thread
+    // workaround for flakiness of ImageComposeScene.
+    // Some tests can behave differently from run to run if they run in the not UI thread
+    private inline fun <R> ImageComposeScene.useInUIThread(
+        crossinline block: (ImageComposeScene) -> R
+    ): R = runBlocking(MainUIDispatcher) {
+        use(block)
     }
 
     @Test

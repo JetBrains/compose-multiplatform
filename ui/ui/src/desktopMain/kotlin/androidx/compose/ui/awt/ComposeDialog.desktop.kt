@@ -69,11 +69,13 @@ class ComposeDialog : JDialog {
         modalityType: ModalityType = ModalityType.MODELESS
     ) : super(null, modalityType)
 
+    constructor(graphicsConfiguration: GraphicsConfiguration? = null) :
+        super(null as Frame?, "", false, graphicsConfiguration)
+
     // don't replace super() by super(null, ModalityType.MODELESS), because
     // this constructor creates an icon in the taskbar.
     // Dialog's shouldn't be appeared in the taskbar.
-    constructor(graphicsConfiguration: GraphicsConfiguration? = null) :
-        super(null as Frame?, "", false, graphicsConfiguration)
+    constructor() : super()
 
     private val delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
 

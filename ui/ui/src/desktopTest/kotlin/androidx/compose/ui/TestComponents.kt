@@ -56,7 +56,7 @@ class Events {
     fun receivedLast(): PointerEvent {
         require(list.isNotEmpty()) { "The were no events" }
         val event = list.removeFirst()
-        require(list.isEmpty()) { "The event $event isn't the last" }
+        require(list.isEmpty()) { "The event $event isn't the last.\nAlso received:\n${list.joinToString("\n")}" }
         return event
     }
 
