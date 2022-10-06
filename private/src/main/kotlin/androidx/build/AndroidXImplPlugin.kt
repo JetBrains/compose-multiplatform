@@ -77,7 +77,6 @@ import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
-import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -91,10 +90,11 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
+import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
+import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -132,12 +132,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.tasks.withType(Copy::class.java).configureEach { it.configureForHermeticBuild() }
 
         // copy host side test results to DIST
-        project.tasks.withType(AbstractTestTask::class.java) {
-                task -> configureTestTask(project, task)
-        }
-        project.tasks.withType(Test::class.java) {
-                task -> configureJvmTestTask(project, task)
-        }
+        project.tasks.withType(Test::class.java) { task -> configureTestTask(project, task) }
 
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension, componentFactory)
@@ -191,26 +186,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         duplicatesStrategy = DuplicatesStrategy.FAIL
     }
 
-    private fun configureJvmTestTask(project: Project, task: Test) {
-        // Robolectric 1.7 increased heap size requirements, see b/207169653.
-        task.maxHeapSize = "3g"
-
-        // For non-playground setup use robolectric offline
-        if (!StudioType.isPlayground(project)) {
-            task.systemProperty("robolectric.offline", "true")
-            val robolectricDependencies =
-                File(
-                    project.getPrebuiltsRoot(),
-                    "androidx/external/org/robolectric/android-all-instrumented"
-                )
-            task.systemProperty(
-                "robolectric.dependency.dir",
-                robolectricDependencies.relativeTo(project.projectDir)
-            )
-        }
-    }
-
-    private fun configureTestTask(project: Project, task: AbstractTestTask) {
+    private fun configureTestTask(project: Project, task: Test) {
         val ignoreFailuresProperty = project.providers.gradleProperty(
             TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
         )
@@ -219,6 +195,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             task.ignoreFailures = true
         }
         task.inputs.property("ignoreFailures", ignoreFailures)
+
+        // Robolectric 1.7 increased heap size requirements, see b/207169653.
+        task.maxHeapSize = "3g"
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
         val archiveName = "${project.path}:${task.name}.zip"
@@ -278,6 +257,18 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 task.finalizedBy(zipXmlTask)
             }
         }
+        if (!StudioType.isPlayground(project)) { // For non-playground setup use robolectric offline
+            task.systemProperty("robolectric.offline", "true")
+            val robolectricDependencies =
+                File(
+                    project.getPrebuiltsRoot(),
+                    "androidx/external/org/robolectric/android-all-instrumented"
+                )
+            task.systemProperty(
+                "robolectric.dependency.dir",
+                robolectricDependencies.relativeTo(project.projectDir)
+            )
+        }
     }
 
     private fun configureWithKotlinPlugin(
@@ -327,7 +318,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
-            project.configureKmpTests()
+            project.configureKmpBuildOnServer()
         }
     }
 
@@ -775,7 +766,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         extensions.extraProperties["kotlin.native.distribution.baseDownloadUrl"] = url
     }
 
-    private fun Project.configureKmpTests() {
+    private fun Project.configureKmpBuildOnServer() {
         val kmpExtension = checkNotNull(
             project.extensions.findByType<KotlinMultiplatformExtension>()
         ) {
@@ -784,12 +775,17 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             KotlinMultiplatformExtension.
             """.trimIndent()
         }
+        // Add all "configured" native tests to the buildOnServer task.
+        // Note that we don't check if platform is enabled in flags because it wouldn't be
+        // configured in the first place if the target is not enabled
         kmpExtension.testableTargets.all { kotlinTarget ->
-            if (kotlinTarget is KotlinNativeTargetWithSimulatorTests) {
-                kotlinTarget.binaries.all {
-                    // Use std allocator to avoid the following warning:
-                    // w: Mimalloc allocator isn't supported on target <target>. Used standard mode.
-                    it.freeCompilerArgs += "-Xallocator=std"
+            kotlinTarget.testRuns.all { kotlinTestRun ->
+                // Need to check for both KotlinNativeHostTest (to ensure it runs on host, not on
+                // an emulator or simulator) and also KotlinTaskTestRun to ensure it has a task.
+                // Unfortunately, there is no parent interface/class that covers both cases.
+                if (kotlinTestRun is KotlinNativeHostTestRun &&
+                    kotlinTestRun is KotlinTaskTestRun<*, *>) {
+                    project.addToBuildOnServer(kotlinTestRun.executionTask)
                 }
             }
         }
