@@ -23,12 +23,13 @@ Knowing issues on older versions:
 
 ### Kotlin compatibility
 
+When the new version of Kotlin is released, the latest Compose Multiplatform version isn't supported yet.
+
+But after some time we will release a version which supports the latest Kotlin.
+Starting from 1.2.0, Compose Multiplatform supports multiple versions of Kotlin.
+
 Compose version | Kotlin version
 --- | ---
-1.0.0+ | 1.5.31
-1.0.1-rc2+ | 1.6.10
-
-
-### Gradle plugin compatibility
-
-* 1.0.0 works with Gradle 6.7 or later (7.2 is the latest tested version).
+1.0.0 | 1.5.31
+1.1.1 | 1.6.20
+1.2.0 | 1.7.10 - 1.7.20 (Desktop, Android), 1.7.10 (JS)

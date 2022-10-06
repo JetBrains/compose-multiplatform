@@ -11,7 +11,7 @@ import java.io.File
 
 data class TestEnvironment(
     val workingDir: File,
-    val kotlinVersion: TestKotlinVersion = TestKotlinVersion.Default,
+    val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
     val composeCompilerArtifact: String? = null
 )
@@ -41,7 +41,7 @@ class TestProject(
                 val origContent = orig.readText()
                 var newContent = origContent
                     .replace("COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER", testEnvironment.composeGradlePluginVersion)
-                    .replace("KOTLIN_VERSION_PLACEHOLDER", testEnvironment.kotlinVersion.versionString)
+                    .replace("KOTLIN_VERSION_PLACEHOLDER", testEnvironment.kotlinVersion)
                 if (testEnvironment.composeCompilerArtifact != null) {
                     newContent = newContent.replace("COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER", testEnvironment.composeCompilerArtifact)
                 }

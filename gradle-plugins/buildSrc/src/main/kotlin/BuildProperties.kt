@@ -15,10 +15,6 @@ object BuildProperties {
     fun composeVersion(project: Project): String =
         System.getenv("COMPOSE_GRADLE_PLUGIN_COMPOSE_VERSION")
             ?: project.findProperty("compose.version") as String
-    fun composeCompilerVersion(project: Project): String =
-        project.findProperty("compose.compiler.version") as String
-    fun composeCompilerCompatibleKotlinVersion(project: Project): String =
-        project.findProperty("compose.compiler.compatible.kotlin.version") as String
     fun testsAndroidxCompilerVersion(project: Project): String =
         project.findProperty("compose.tests.androidx.compiler.version") as String
     fun testsAndroidxCompilerCompatibleVersion(project: Project): String =

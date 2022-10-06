@@ -72,4 +72,6 @@ Note that when you use Compose Multiplatform, you setup your project differently
        
 ## Getting latest version of Compose Multiplatform ##
 
-See https://github.com/JetBrains/compose-jb/releases/latest for the latest stable release or https://github.com/JetBrains/compose-jb/releases for all stable and dev releases.
+See [this page](https://github.com/JetBrains/compose-jb/releases/latest) to know the latest stable release or [this](https://github.com/JetBrains/compose-jb/releases) to know all stable and dev releases.
+
+See also [more information](VERSIONING.md) about compatability and versioning. The changelog you can find [here](CHANGELOG.md).

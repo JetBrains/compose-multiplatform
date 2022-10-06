@@ -13,13 +13,18 @@ import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
-    private var composeCompilerArtifactProvider = ComposeCompilerArtifactProvider { null }
+    private lateinit var composeCompilerArtifactProvider: ComposeCompilerArtifactProvider
 
     override fun apply(target: Project) {
         super.apply(target)
         target.plugins.withType(ComposePlugin::class.java) {
             val composeExt = target.extensions.getByType(ComposeExtension::class.java)
-            composeCompilerArtifactProvider = ComposeCompilerArtifactProvider { composeExt.kotlinCompilerPlugin.orNull }
+
+            composeCompilerArtifactProvider = ComposeCompilerArtifactProvider(
+                kotlinVersion = target.getKotlinPluginVersion()
+            ) {
+                composeExt.kotlinCompilerPlugin.orNull
+            }
         }
     }
 
@@ -52,6 +57,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val target = kotlinCompilation.target
+        composeCompilerArtifactProvider.checkTargetSupported(target)
         return target.project.provider {
             platformPluginOptions[target.platformType] ?: emptyList()
         }

@@ -5,33 +5,69 @@
 
 package org.jetbrains.compose.internal
 
-import org.jetbrains.compose.ComposeBuildConfig
+import org.jetbrains.compose.ComposeCompilerCompatability
+import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 
-internal class ComposeCompilerArtifactProvider(private val customPluginString: () -> String?) {
+private const val KOTLIN_COMPATABILITY_LINK =
+    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#kotlin-compatibility"
+
+internal class ComposeCompilerArtifactProvider(
+    private val kotlinVersion: String,
+    customPluginString: () -> String?
+) {
+    fun checkTargetSupported(target: KotlinTarget) {
+        if (target.platformType == KotlinPlatformType.js) {
+            require(isJsSupported) {
+                "This version of Compose Multiplatform doesn't support Kotlin " +
+                    "$kotlinVersion for ${target.platformType} target. " +
+                    "Please see $KOTLIN_COMPATABILITY_LINK " +
+                    "to know the latest supported version of Kotlin."
+            }
+        }
+    }
+
+    private var isJsSupported = true
+
     val compilerArtifact: SubpluginArtifact
-        get() {
-            val customPlugin = customPluginString()
-            val customCoordinates = customPlugin?.split(":")
-            return when (customCoordinates?.size) {
-                null -> DefaultCompiler.pluginArtifact
-                1 -> {
-                    val customVersion = customCoordinates[0]
-                    check(customVersion.isNotBlank()) { "'compose.kotlinCompilerPlugin' cannot be blank!" }
-                    DefaultCompiler.pluginArtifact.copy(version = customVersion)
+
+    init {
+        val customPlugin = customPluginString()
+        val customCoordinates = customPlugin?.split(":")
+        when (customCoordinates?.size) {
+            null -> {
+                val version = requireNotNull(
+                    ComposeCompilerCompatability.compilerVersionFor(kotlinVersion)
+                ) {
+                    "This version of Compose Multiplatform doesn't support Kotlin " +
+                        "$kotlinVersion. " +
+                        "Please see $KOTLIN_COMPATABILITY_LINK " +
+                        "to know the latest supported version of Kotlin."
                 }
-                3 -> DefaultCompiler.pluginArtifact.copy(
-                    groupId = customCoordinates[0],
-                    artifactId = customCoordinates[1],
-                    version = customCoordinates[2]
+
+                compilerArtifact = DefaultCompiler.pluginArtifact(
+                    version = version.version
                 )
-                else -> error("""
+                isJsSupported = version.isJsSupported
+            }
+            1 -> {
+                val customVersion = customCoordinates[0]
+                check(customVersion.isNotBlank()) { "'compose.kotlinCompilerPlugin' cannot be blank!" }
+                compilerArtifact = DefaultCompiler.pluginArtifact(version = customVersion)
+            }
+            3 -> compilerArtifact = DefaultCompiler.pluginArtifact(
+                version = customCoordinates[2],
+                groupId = customCoordinates[0],
+                artifactId = customCoordinates[1],
+            )
+            else -> error("""
                         Illegal format of 'compose.kotlinCompilerPlugin' property.
                         Expected format: either '<VERSION>' or '<GROUP_ID>:<ARTIFACT_ID>:<VERSION>'
                         Actual value: '$customPlugin'
                 """.trimIndent())
-            }
         }
+    }
 
     val compilerHostedArtifact: SubpluginArtifact
         get() = compilerArtifact.run {
@@ -47,10 +83,13 @@ internal class ComposeCompilerArtifactProvider(private val customPluginString: (
         const val GROUP_ID = "org.jetbrains.compose.compiler"
         const val ARTIFACT_ID = "compiler"
         const val HOSTED_ARTIFACT_ID = "compiler-hosted"
-        const val VERSION = ComposeBuildConfig.composeCompilerVersion
 
-        val pluginArtifact: SubpluginArtifact
-            get() = SubpluginArtifact(groupId = GROUP_ID, artifactId = ARTIFACT_ID, version = VERSION)
+        fun pluginArtifact(
+            version: String,
+            groupId: String = GROUP_ID,
+            artifactId: String = ARTIFACT_ID,
+        ): SubpluginArtifact =
+            SubpluginArtifact(groupId = groupId, artifactId = artifactId, version = version)
     }
 }
 
