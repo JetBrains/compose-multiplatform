@@ -51,11 +51,11 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.junit)
-        testImplementation(libs.mockitoCore)
+        testImplementation(libs.mockitoCore4)
         testImplementation(libs.truth)
         testImplementation(libs.kotlinReflect)
         testImplementation(libs.kotlinTest)
-        testImplementation(libs.mockitoKotlin)
+        testImplementation(libs.mockitoKotlin4)
 
         androidTestImplementation(project(":internal-testutils-fonts"))
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
@@ -144,11 +144,11 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
-                implementation(libs.mockitoCore)
+                implementation(libs.mockitoCore4)
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
                 implementation(libs.kotlinTest)
-                implementation(libs.mockitoKotlin)
+                implementation(libs.mockitoKotlin4)
             }
 
             androidAndroidTest.dependencies {

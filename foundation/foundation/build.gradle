@@ -52,9 +52,9 @@ dependencies {
         testImplementation(libs.truth)
         testImplementation(libs.kotlinCoroutinesTest)
         testImplementation(libs.kotlinTest)
-        testImplementation(libs.mockitoCore)
+        testImplementation(libs.mockitoCore4)
         testImplementation(libs.kotlinReflect)
-        testImplementation(libs.mockitoKotlin)
+        testImplementation(libs.mockitoKotlin4)
 
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":internal-testutils-fonts"))
@@ -116,10 +116,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
-                implementation(libs.mockitoCore)
+                implementation(libs.mockitoCore4)
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
-                implementation(libs.mockitoKotlin)
+                implementation(libs.mockitoKotlin4)
             }
 
             commonTest.dependencies {
