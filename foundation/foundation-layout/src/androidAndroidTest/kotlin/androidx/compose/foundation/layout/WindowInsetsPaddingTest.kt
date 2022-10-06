@@ -171,9 +171,7 @@ class WindowInsetsPaddingTest {
             WindowInsetsCompat.Type.navigationBars(),
             Modifier.navigationBarsPadding(),
             sentInsets = AndroidXInsets.of(10, 0, 0, 0)
-        ) { width, height ->
-            Rect(10f, 0f, width.toFloat(), height.toFloat())
-        }
+        )
     }
 
     @Test
@@ -182,9 +180,7 @@ class WindowInsetsPaddingTest {
             WindowInsetsCompat.Type.navigationBars(),
             Modifier.navigationBarsPadding(),
             sentInsets = AndroidXInsets.of(0, 0, 12, 0)
-        ) { width, height ->
-            Rect(0f, 0f, width - 12f, height.toFloat())
-        }
+        )
     }
 
     @Test
@@ -193,9 +189,7 @@ class WindowInsetsPaddingTest {
             WindowInsetsCompat.Type.navigationBars(),
             Modifier.navigationBarsPadding(),
             sentInsets = AndroidXInsets.of(0, 0, 0, 13)
-        ) { width, height ->
-            Rect(0f, 0f, width.toFloat(), height - 13f)
-        }
+        )
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.R)
@@ -338,12 +332,11 @@ class WindowInsetsPaddingTest {
 
         dispatchApplyWindowInsets(insets)
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = insetsView.findComposeView()
             val width = view.width
             val height = view.height
-            assertThat(coordinates.boundsInRoot())
-                .isEqualTo(Rect(0f, 10f, width.toFloat(), height - 15f))
+            coordinates.boundsInRoot() == Rect(0f, 10f, width.toFloat(), height - 15f)
         }
     }
 
@@ -373,12 +366,11 @@ class WindowInsetsPaddingTest {
 
         dispatchApplyWindowInsets(insets)
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = insetsView.findComposeView()
             val width = view.width
             val height = view.height
-            assertThat(coordinates.boundsInRoot())
-                .isEqualTo(Rect(10f, 11f, width - 12f, height - 13f))
+            coordinates.boundsInRoot() == Rect(10f, 11f, width - 12f, height - 13f)
         }
     }
 
@@ -406,12 +398,11 @@ class WindowInsetsPaddingTest {
 
         dispatchApplyWindowInsets(insets)
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = insetsView.findComposeView()
             val width = view.width
             val height = view.height
-            assertThat(coordinates.boundsInRoot())
-                .isEqualTo(Rect(10f, 11f, width - 12f, height - 13f))
+            coordinates.boundsInRoot() == Rect(10f, 11f, width - 12f, height - 13f)
         }
     }
 
@@ -456,7 +447,12 @@ class WindowInsetsPaddingTest {
         modifier: Modifier,
         sentInsets: AndroidXInsets = AndroidXInsets.of(10, 11, 12, 13),
         expected: (Int, Int) -> Rect = { width, height ->
-            Rect(10f, 11f, width - 12f, height - 13f)
+            Rect(
+                sentInsets.left.toFloat(),
+                sentInsets.top.toFloat(),
+                width - sentInsets.right.toFloat(),
+                height - sentInsets.bottom.toFloat()
+            )
         }
     ) {
         testInsetsPadding(type, sentInsets, expected) { modifier }
@@ -475,12 +471,12 @@ class WindowInsetsPaddingTest {
         val insets = sendInsets(type, sentInsets)
         insets.assertIsConsumed(type)
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = insetsView.findComposeView()
             val width = view.width
             val height = view.height
             val expectedRect = expected(width, height)
-            assertThat(coordinates.boundsInRoot()).isEqualTo(expectedRect)
+            coordinates.boundsInRoot() == expectedRect
         }
     }
 
@@ -526,7 +522,12 @@ class WindowInsetsPaddingTest {
             sendInsets(WindowInsetsCompat.Type.systemBars())
 
             val view = insetsView.findComposeView()
-            val animation = sendImeStart(view)
+            val animation =
+                sendImeStart(
+                    view,
+                    AndroidXInsets.of(10, 11, 12, 13),
+                    WindowInsetsCompat.Type.systemBars()
+                )
 
             val width = view.width
             val height = view.height
@@ -578,12 +579,12 @@ class WindowInsetsPaddingTest {
         val insets = sendInsets(WindowInsetsCompat.Type.systemBars())
         insets.assertIsConsumed(WindowInsetsCompat.Type.systemBars())
 
-        rule.runOnIdle {
+        rule.waitUntil {
             val view = insetsView.findComposeView()
             val width = view.width
             val height = view.height
             val expectedRect = Rect(10f, 11f, width - 12f, height - 13f)
-            assertThat(coordinates.boundsInRoot()).isEqualTo(expectedRect)
+            coordinates.boundsInRoot() == expectedRect
         }
     }
 
@@ -882,7 +883,7 @@ class WindowInsetsPaddingTest {
 private class Api30Methods(
     val rule: AndroidComposeTestRule<ActivityScenarioRule<ComponentActivity>, ComponentActivity>
 ) {
-    fun sendImeStart(view: View): WindowInsetsAnimation {
+    fun sendImeStart(view: View, otherInsets: AndroidXInsets, type: Int): WindowInsetsAnimation {
         return rule.runOnIdle {
             val animation =
                 WindowInsetsAnimation(AndroidWindowInsets.Type.ime(), LinearInterpolator(), 100L)
@@ -894,6 +895,11 @@ private class Api30Methods(
                 imeInsets
             )
             view.dispatchWindowInsetsAnimationStart(animation, bounds)
+            val targetInsets = android.view.WindowInsets.Builder()
+                .setInsets(android.view.WindowInsets.Type.ime(), imeInsets)
+                .setInsets(type, otherInsets.toPlatformInsets())
+                .build()
+            view.dispatchApplyWindowInsets(targetInsets)
             animation
         }
     }

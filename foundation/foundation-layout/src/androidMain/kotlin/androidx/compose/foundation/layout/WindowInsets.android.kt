@@ -457,11 +457,7 @@ internal class WindowInsetsHolder private constructor(insets: WindowInsetsCompat
             }
             view.addOnAttachStateChangeListener(insetsListener)
 
-            // We don't need animation callbacks on earlier versions, so don't bother adding
-            // the listener. ViewCompat calls the animation callbacks superfluously.
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                ViewCompat.setWindowInsetsAnimationCallback(view, insetsListener)
-            }
+            ViewCompat.setWindowInsetsAnimationCallback(view, insetsListener)
         }
         accessCount++
     }
@@ -619,10 +615,16 @@ private class InsetsListener(
      */
     var prepared = false
 
+    /**
+     * `true` if there is an animation in progress.
+     */
+    var runningAnimation = false
+
     var savedInsets: WindowInsetsCompat? = null
 
     override fun onPrepare(animation: WindowInsetsAnimationCompat) {
         prepared = true
+        runningAnimation = true
         super.onPrepare(animation)
     }
 
@@ -644,18 +646,20 @@ private class InsetsListener(
 
     override fun onEnd(animation: WindowInsetsAnimationCompat) {
         prepared = false
+        runningAnimation = false
         val insets = savedInsets
         if (animation.durationMillis != 0L && insets != null) {
-            composeInsets.update(insets, animation.typeMask)
+            composeInsets.update(insets)
         }
         savedInsets = null
         super.onEnd(animation)
     }
 
     override fun onApplyWindowInsets(view: View, insets: WindowInsetsCompat): WindowInsetsCompat {
+        // Keep track of the most recent insets we've seen, to ensure onEnd will always use the
+        // most recently acquired insets
+        savedInsets = insets
         if (prepared) {
-            savedInsets = insets
-
             // There may be no callback on R if the animation is canceled after onPrepare(),
             // so we won't know if the onPrepare() was canceled or if this is an
             // onApplyWindowInsets() after the cancelation. We'll just post the value
@@ -663,9 +667,12 @@ private class InsetsListener(
             if (Build.VERSION.SDK_INT == Build.VERSION_CODES.R) {
                 view.post(this)
             }
-            return insets
+        } else if (!runningAnimation) {
+            // If an animation is running, rely on onProgress() to update the insets
+            // On APIs less than 30 where the IME animation is backported, this avoids reporting
+            // the final insets for a frame while the animation is running.
+            composeInsets.update(insets)
         }
-        composeInsets.update(insets)
         return if (composeInsets.consumes) WindowInsetsCompat.CONSUMED else insets
     }
 
@@ -679,6 +686,7 @@ private class InsetsListener(
     override fun run() {
         if (prepared) {
             prepared = false
+            runningAnimation = false
             savedInsets?.let {
                 composeInsets.update(it)
                 savedInsets = null

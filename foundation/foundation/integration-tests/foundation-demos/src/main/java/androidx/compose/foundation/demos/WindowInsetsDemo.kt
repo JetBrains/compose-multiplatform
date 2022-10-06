@@ -20,8 +20,9 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.wrapContentSize
@@ -52,11 +53,13 @@ fun WindowInsetsDemo() {
                 " Note that IME insets are only supported on API 23 and above."
         )
 
+        Spacer(Modifier.weight(1f))
+
         BasicTextField(
             value = "Click to show keyboard",
             onValueChange = {},
             modifier = Modifier
-                .fillMaxSize()
+                .fillMaxWidth()
                 .wrapContentSize(),
             textStyle = TextStyle(color = Color.Black.copy(alpha = 0.5f))
         ) { field ->
