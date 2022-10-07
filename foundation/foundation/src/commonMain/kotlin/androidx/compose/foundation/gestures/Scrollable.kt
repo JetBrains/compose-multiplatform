@@ -34,6 +34,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -59,6 +60,7 @@ import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 /**
  * Configure touch scrolling and flinging for the UI element in a single [Orientation].
@@ -541,28 +543,37 @@ private fun scrollableNestedScrollConnection(
     }
 }
 
-private class DefaultFlingBehavior(
-    private val flingDecay: DecayAnimationSpec<Float>
+internal class DefaultFlingBehavior(
+    private val flingDecay: DecayAnimationSpec<Float>,
+    private val motionDurationScale: MotionDurationScale = DefaultScrollMotionDurationScale
 ) : FlingBehavior {
+
+    // For Testing
+    var lastAnimationCycleCount = 0
+
     override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        lastAnimationCycleCount = 0
         // come up with the better threshold, but we need it since spline curve gives us NaNs
-        return if (abs(initialVelocity) > 1f) {
-            var velocityLeft = initialVelocity
-            var lastValue = 0f
-            AnimationState(
-                initialValue = 0f,
-                initialVelocity = initialVelocity,
-            ).animateDecay(flingDecay) {
-                val delta = value - lastValue
-                val consumed = scrollBy(delta)
-                lastValue = value
-                velocityLeft = this.velocity
-                // avoid rounding errors and stop if anything is unconsumed
-                if (abs(delta - consumed) > 0.5f) this.cancelAnimation()
+        return withContext(motionDurationScale) {
+            if (abs(initialVelocity) > 1f) {
+                var velocityLeft = initialVelocity
+                var lastValue = 0f
+                AnimationState(
+                    initialValue = 0f,
+                    initialVelocity = initialVelocity,
+                ).animateDecay(flingDecay) {
+                    val delta = value - lastValue
+                    val consumed = scrollBy(delta)
+                    lastValue = value
+                    velocityLeft = this.velocity
+                    // avoid rounding errors and stop if anything is unconsumed
+                    if (abs(delta - consumed) > 0.5f) this.cancelAnimation()
+                    lastAnimationCycleCount++
+                }
+                velocityLeft
+            } else {
+                initialVelocity
             }
-            velocityLeft
-        } else {
-            initialVelocity
         }
     }
 }
@@ -577,4 +588,11 @@ internal val ModifierLocalScrollableContainer = modifierLocalOf { false }
 private object ModifierLocalScrollableContainerProvider : ModifierLocalProvider<Boolean> {
     override val key = ModifierLocalScrollableContainer
     override val value = true
+}
+
+private const val DefaultScrollMotionDurationScaleFactor = 1f
+
+private val DefaultScrollMotionDurationScale = object : MotionDurationScale {
+    override val scaleFactor: Float
+        get() = DefaultScrollMotionDurationScaleFactor
 }
