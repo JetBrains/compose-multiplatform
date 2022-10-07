@@ -34,7 +34,7 @@ dependencies {
         api("androidx.annotation:annotation:1.1.0")
         implementation(project(":compose:animation:animation"))
 
-        api("androidx.compose.runtime:runtime:1.1.1")
+        api("androidx.compose.runtime:runtime:1.2.1")
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
