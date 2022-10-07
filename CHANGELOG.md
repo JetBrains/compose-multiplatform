@@ -2,78 +2,77 @@
 ## Common
 
 ### Features
-https://github.com/JetBrains/compose-jb/pull/2366
-https://github.com/JetBrains/compose-jb/pull/2215
+[Allow to use Compose on multiple Kotlin versions](https://github.com/JetBrains/compose-jb/pull/2366)
+[gradle-plugin: Let Gradle provide its Kotlin DSL for compose](https://github.com/JetBrains/compose-jb/pull/2215)
 
 ## Desktop
 
 ### Features
-https://github.com/JetBrains/skiko/pull/586
-https://github.com/JetBrains/compose-jb/pull/2357
-https://github.com/JetBrains/compose-jb/pull/2347
-https://github.com/JetBrains/compose-jb/pull/2317
-https://github.com/JetBrains/compose-jb/pull/2315
-https://github.com/JetBrains/compose-jb/pull/2313
-https://github.com/JetBrains/compose-jb/pull/2303
-https://github.com/JetBrains/compose-jb/pull/2015
-https://github.com/JetBrains/androidx/pull/312
-https://github.com/JetBrains/androidx/pull/296
-https://github.com/JetBrains/androidx/pull/295
-https://github.com/JetBrains/androidx/pull/278
-https://github.com/JetBrains/androidx/pull/262
-https://github.com/JetBrains/androidx/pull/260
-https://github.com/JetBrains/androidx/pull/259
-https://github.com/JetBrains/androidx/pull/257
-https://github.com/JetBrains/androidx/pull/254
-https://github.com/JetBrains/androidx/pull/251
-https://github.com/JetBrains/androidx/pull/238
-https://github.com/JetBrains/androidx/pull/229
-https://github.com/JetBrains/androidx/pull/228
-https://github.com/JetBrains/androidx/pull/227
+[Support Kotlin 1.7.20](https://github.com/JetBrains/compose-jb/pull/2357)
+[Allow customizing Compose compiler plugin](https://github.com/JetBrains/compose-jb/pull/2347)
+[Add a tutorial about a new experimental onClick and onDrag modifiers](https://github.com/JetBrains/compose-jb/pull/2317)
+[Tutorial for context menu interop with Swing](https://github.com/JetBrains/compose-jb/pull/2315)
+[Introduce ProGuard integration for Compose/Desktop packaging](https://github.com/JetBrains/compose-jb/pull/2313)
+[Documentation for how to package apps using Conveyor](https://github.com/JetBrains/compose-jb/pull/2303)
+[Added animated image component](https://github.com/JetBrains/compose-jb/pull/2015)
+[Show new window/dialog on the same display](https://github.com/JetBrains/androidx/pull/312)
+[https://github.com/JetBrains/androidx/pull/296](https://github.com/JetBrains/androidx/pull/296)
+[Support overriding context menus for selectable texts and text fields](https://github.com/JetBrains/androidx/pull/295)
+[implement enqueueDown and enqueueUp for key inputs in DesktopInputDispatcher.desktop.kt in ui-test module](https://github.com/JetBrains/androidx/pull/278)
+[Toggle on space key](https://github.com/JetBrains/androidx/pull/262)
+[Implement test input methods for desktop](https://github.com/JetBrains/androidx/pull/260)
+[navigate drop down menu items using up and down arrows](https://github.com/JetBrains/androidx/pull/259)
+[Make clickable, mouseClickable, toggleable request focus onClick when the InputMode is Keyboard](https://github.com/JetBrains/androidx/pull/257)
+[Make Slider change the value with onKeyEvent for: all arrows, PgDn, PdUp, Home, End buttons](https://github.com/JetBrains/androidx/pull/254)
+[Support font features](https://github.com/JetBrains/androidx/pull/251)
+[new API (in skikoMain): onClick and onDrag with PointerMatcher](https://github.com/JetBrains/androidx/pull/238)
+[Focus Swing interop. Move focus from Compose to SwingPanel](https://github.com/JetBrains/androidx/pull/229)
+[Focus Swing interop. Move focus from Swing component to Compose compoonent inside ComposePanel](https://github.com/JetBrains/androidx/pull/228)
+[Focus Swing interop. Move focus from Compose component to Swing component](https://github.com/JetBrains/androidx/pull/227)
 
 ### Fixes
-https://github.com/JetBrains/skiko/pull/599
-https://github.com/JetBrains/compose-jb/pull/2175
-https://github.com/JetBrains/compose-jb/pull/2174
-https://github.com/JetBrains/compose-jb/pull/2318
-https://github.com/JetBrains/compose-jb/pull/2130
-https://github.com/JetBrains/androidx/pull/286
-https://github.com/JetBrains/androidx/pull/285
-https://github.com/JetBrains/androidx/pull/284
-https://github.com/JetBrains/androidx/pull/279
-https://github.com/JetBrains/androidx/pull/277
-https://github.com/JetBrains/androidx/pull/268
-https://github.com/JetBrains/androidx/pull/267
-https://github.com/JetBrains/androidx/pull/265
-https://github.com/JetBrains/androidx/pull/264
-https://github.com/JetBrains/androidx/pull/256
-https://github.com/JetBrains/androidx/pull/249
-https://github.com/JetBrains/androidx/pull/248
-https://github.com/JetBrains/androidx/pull/231
-https://github.com/JetBrains/androidx/pull/225
+[Fix clipboard](https://github.com/JetBrains/skiko/pull/586)
+[fix SOFTWARE renderApi parsing on macOS](https://github.com/JetBrains/skiko/pull/599)
+[Fix split panel](https://github.com/JetBrains/compose-jb/pull/2175)
+[Fix idea plugin compatability](https://github.com/JetBrains/compose-jb/pull/2318)
+[Workaround for empty jvmTarget](https://github.com/JetBrains/compose-jb/pull/2130)
+[Fix cursor visual position at BiDi transition](https://github.com/JetBrains/androidx/pull/286)
+[Fix rtl selection when multilines](https://github.com/JetBrains/androidx/pull/285)
+[Fix the cursor position when clicking at a position after a line-break](https://github.com/JetBrains/androidx/pull/284)
+[Fix selection with end home](https://github.com/JetBrains/androidx/pull/279)
+[fix the cursor height on a new empty line](https://github.com/JetBrains/androidx/pull/277)
+[Fix the cursor position after the '\n' character in RTL](https://github.com/JetBrains/androidx/pull/268)
+[In placeAutoMirrored for RTL, calculate the placement position using the placeable width respecting the constraints](https://github.com/JetBrains/androidx/pull/267)
+[Make RootMeasurePolicy place the content properly for RTL layout](https://github.com/JetBrains/androidx/pull/265)
+[Implement layoutDirection initialization Ltr and Rtl on desktop](https://github.com/JetBrains/androidx/pull/264)
+[fix DesktopMenu and DesktopAlertDialog to invoke dismiss callback once](https://github.com/JetBrains/androidx/pull/256)
+[Fix hover in LazyColumn](https://github.com/JetBrains/androidx/pull/249)
+[Fix a large icon in macOs menu](https://github.com/JetBrains/androidx/pull/248)
+[fix pointerHoverIcon: update icon when it's changed conditionally](https://github.com/JetBrains/androidx/pull/231)
+[Fix focusable parameter for Window and Dialog](https://github.com/JetBrains/androidx/pull/225)
 
 ### API changes
-https://github.com/JetBrains/androidx/pull/247
-https://github.com/JetBrains/androidx/pull/243
+[Fix hover in some cases, deprecate pointerMoveFilter in favor onPointerEvent](https://github.com/JetBrains/androidx/pull/247)
+[Deprecate Modifier.mouseClickable. It should be replaced by Modifier.onClick](https://github.com/JetBrains/androidx/pull/243)
 
 
 ## Web
 
 ### Features
-https://github.com/JetBrains/compose-jb/pull/2228
-https://github.com/JetBrains/compose-jb/pull/2128
-https://github.com/JetBrains/compose-jb/pull/2127
-https://github.com/JetBrains/compose-jb/pull/2126
-https://github.com/JetBrains/compose-jb/pull/2094
-https://github.com/JetBrains/compose-jb/pull/1922
+[Add support for transition in CSS api](https://github.com/JetBrains/compose-jb/pull/2228)
+[Add missing `background-blend-mode` property](https://github.com/JetBrains/compose-jb/pull/2128)
+[SVG: Publish custom attr functions](https://github.com/JetBrains/compose-jb/pull/2127)
+[Support attrs extension functions in sub elements too](https://github.com/JetBrains/compose-jb/pull/2126)
+[Add list overload for classes](https://github.com/JetBrains/compose-jb/pull/2094)
+[Add support of dl, dt and dd](https://github.com/JetBrains/compose-jb/pull/1922)
 
 ### Fixes
-https://github.com/JetBrains/compose-jb/pull/2302
-https://github.com/JetBrains/compose-jb/pull/2195
+[SVG - Fix Compile Error](https://github.com/JetBrains/compose-jb/pull/2302)
+[Add pom information and license to Web artifacts](https://github.com/JetBrains/compose-jb/pull/2195)
 
 ### API changes
-https://github.com/JetBrains/compose-jb/pull/2297
-https://github.com/JetBrains/compose-jb/pull/2294
+[Deprecate 3 overloads of StyleScope.borderWidth with wrong parameter names](https://github.com/JetBrains/compose-jb/pull/2297)
+[remove deprecated compose.web.web-widgets from the source code](https://github.com/JetBrains/compose-jb/pull/2294)
 
 
 # 1.1.1 (Mar 2022)
