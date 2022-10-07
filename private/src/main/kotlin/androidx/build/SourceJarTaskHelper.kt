@@ -93,14 +93,14 @@ fun Project.configureSourceJarForJava() {
             // not to have "main".  Eventually, we should stop expecting to grab sourceSets by name
             // (b/235828421)
             extension.sourceSets.findByName("main")?.let {
-                task.from(it.allSource.srcDirs)
+                task.from(it.allSource.sourceDirectories)
             }
         }
 
         extensions.findByType(KotlinMultiplatformExtension::class.java)?.let { extension ->
             for (sourceSetName in listOf("commonMain", "jvmMain")) {
                 extension.sourceSets.findByName(sourceSetName)?.let { sourceSet ->
-                    task.from(sourceSet.kotlin.srcDirs)
+                    task.from(sourceSet.kotlin.sourceDirectories)
                 }
             }
         }
