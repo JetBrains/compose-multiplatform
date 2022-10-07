@@ -16,7 +16,7 @@
 * [Documentation for how to package apps using Conveyor](https://github.com/JetBrains/compose-jb/pull/2303)
 * [Added animated image component](https://github.com/JetBrains/compose-jb/pull/2015)
 * [Show new window/dialog on the same display](https://github.com/JetBrains/androidx/pull/312)
-* [https://github.com/JetBrains/androidx/pull/296](https://github.com/JetBrains/androidx/pull/296)
+* [Change default Font on MacOs to San Francisco](https://github.com/JetBrains/androidx/pull/296)
 * [Support overriding context menus for selectable texts and text fields](https://github.com/JetBrains/androidx/pull/295)
 * [implement enqueueDown and enqueueUp for key inputs in DesktopInputDispatcher.desktop.kt in ui-test module](https://github.com/JetBrains/androidx/pull/278)
 * [Toggle on space key](https://github.com/JetBrains/androidx/pull/262)
