@@ -1,3 +1,81 @@
+# 1.2.0 (October 2022)
+## Common
+
+### Features
+https://github.com/JetBrains/compose-jb/pull/2366
+https://github.com/JetBrains/compose-jb/pull/2215
+
+## Desktop
+
+### Features
+https://github.com/JetBrains/skiko/pull/586
+https://github.com/JetBrains/compose-jb/pull/2357
+https://github.com/JetBrains/compose-jb/pull/2347
+https://github.com/JetBrains/compose-jb/pull/2317
+https://github.com/JetBrains/compose-jb/pull/2315
+https://github.com/JetBrains/compose-jb/pull/2313
+https://github.com/JetBrains/compose-jb/pull/2303
+https://github.com/JetBrains/compose-jb/pull/2015
+https://github.com/JetBrains/androidx/pull/312
+https://github.com/JetBrains/androidx/pull/296
+https://github.com/JetBrains/androidx/pull/295
+https://github.com/JetBrains/androidx/pull/278
+https://github.com/JetBrains/androidx/pull/262
+https://github.com/JetBrains/androidx/pull/260
+https://github.com/JetBrains/androidx/pull/259
+https://github.com/JetBrains/androidx/pull/257
+https://github.com/JetBrains/androidx/pull/254
+https://github.com/JetBrains/androidx/pull/251
+https://github.com/JetBrains/androidx/pull/238
+https://github.com/JetBrains/androidx/pull/229
+https://github.com/JetBrains/androidx/pull/228
+https://github.com/JetBrains/androidx/pull/227
+
+### Fixes
+https://github.com/JetBrains/skiko/pull/599
+https://github.com/JetBrains/compose-jb/pull/2175
+https://github.com/JetBrains/compose-jb/pull/2174
+https://github.com/JetBrains/compose-jb/pull/2318
+https://github.com/JetBrains/compose-jb/pull/2130
+https://github.com/JetBrains/androidx/pull/286
+https://github.com/JetBrains/androidx/pull/285
+https://github.com/JetBrains/androidx/pull/284
+https://github.com/JetBrains/androidx/pull/279
+https://github.com/JetBrains/androidx/pull/277
+https://github.com/JetBrains/androidx/pull/268
+https://github.com/JetBrains/androidx/pull/267
+https://github.com/JetBrains/androidx/pull/265
+https://github.com/JetBrains/androidx/pull/264
+https://github.com/JetBrains/androidx/pull/256
+https://github.com/JetBrains/androidx/pull/249
+https://github.com/JetBrains/androidx/pull/248
+https://github.com/JetBrains/androidx/pull/231
+https://github.com/JetBrains/androidx/pull/225
+
+### API changes
+https://github.com/JetBrains/androidx/pull/247
+https://github.com/JetBrains/androidx/pull/243
+
+
+## Web
+
+### Features
+https://github.com/JetBrains/compose-jb/pull/2228
+https://github.com/JetBrains/compose-jb/pull/2128
+https://github.com/JetBrains/compose-jb/pull/2127
+https://github.com/JetBrains/compose-jb/pull/2126
+https://github.com/JetBrains/compose-jb/pull/2094
+https://github.com/JetBrains/compose-jb/pull/1922
+
+### Fixes
+https://github.com/JetBrains/compose-jb/pull/2302
+https://github.com/JetBrains/compose-jb/pull/2195
+
+### API changes
+https://github.com/JetBrains/compose-jb/pull/2297
+https://github.com/JetBrains/compose-jb/pull/2294
+
+
 # 1.1.1 (Mar 2022)
 ## Desktop
 
