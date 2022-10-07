@@ -4,10 +4,9 @@
 
 # Compose Multiplatform, by JetBrains
 ![](artwork/readme/apps.png)
-Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows) and Web, components outside of the core Compose repository
-at https://android.googlesource.com/platform/frameworks/support.
+Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows) and Web, components outside of the core [Compose repository](https://android.googlesource.com/platform/frameworks/support).
 
-Preview functionality (check your application UI without building/running it) for desktop platforms is available via IDEA plugin (https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support).
+Preview functionality (check your application UI without building/running it) for desktop platforms is available via [IDEA plugin](https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support).
 
 ## Tutorials
 ### Compose for Desktop
@@ -70,8 +69,9 @@ Note that when you use Compose Multiplatform, you setup your project differently
    * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
    * [CLI example](experimental/build_from_cli) - An example showing how to build Compose without Gradle
        
-## Getting latest version of Compose Multiplatform ##
+## Versions ##
 
-See [this page](https://github.com/JetBrains/compose-jb/releases/latest) to know the latest stable release or [this](https://github.com/JetBrains/compose-jb/releases) to know all stable and dev releases.
-
-See also [more information](VERSIONING.md) about compatability and versioning. The changelog you can find [here](CHANGELOG.md).
+* [The latest stable release](https://github.com/JetBrains/compose-jb/releases/latest)
+* [The latest dev release](https://github.com/JetBrains/compose-jb/releases)
+* [Compatability and versioning overview](VERSIONING.md)
+* [Changelog](CHANGELOG.md)

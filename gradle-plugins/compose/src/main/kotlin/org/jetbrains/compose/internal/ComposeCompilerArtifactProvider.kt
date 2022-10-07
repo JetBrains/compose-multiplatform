@@ -18,17 +18,15 @@ internal class ComposeCompilerArtifactProvider(
     customPluginString: () -> String?
 ) {
     fun checkTargetSupported(target: KotlinTarget) {
-        if (target.platformType == KotlinPlatformType.js) {
-            require(isJsSupported) {
-                "This version of Compose Multiplatform doesn't support Kotlin " +
-                    "$kotlinVersion for ${target.platformType} target. " +
-                    "Please see $KOTLIN_COMPATABILITY_LINK " +
-                    "to know the latest supported version of Kotlin."
-            }
+        require(!unsupportedPlatforms.contains(target.platformType)) {
+            "This version of Compose Multiplatform doesn't support Kotlin " +
+                "$kotlinVersion for ${target.platformType} target. " +
+                "Please see $KOTLIN_COMPATABILITY_LINK " +
+                "to know the latest supported version of Kotlin."
         }
     }
 
-    private var isJsSupported = true
+    private var unsupportedPlatforms: Set<KotlinPlatformType> = emptySet()
 
     val compilerArtifact: SubpluginArtifact
 
@@ -49,7 +47,7 @@ internal class ComposeCompilerArtifactProvider(
                 compilerArtifact = DefaultCompiler.pluginArtifact(
                     version = version.version
                 )
-                isJsSupported = version.isJsSupported
+                unsupportedPlatforms = version.unsupportedPlatforms
             }
             1 -> {
                 val customVersion = customCoordinates[0]
