@@ -8,7 +8,7 @@
 ## Desktop
 
 ### Features
-* * [Support Kotlin 1.7.20](https://github.com/JetBrains/compose-jb/pull/2357)
+* [Support Kotlin 1.7.20](https://github.com/JetBrains/compose-jb/pull/2357)
 * [Allow customizing Compose compiler plugin](https://github.com/JetBrains/compose-jb/pull/2347)
 * [Add a tutorial about a new experimental onClick and onDrag modifiers](https://github.com/JetBrains/compose-jb/pull/2317)
 * [Tutorial for context menu interop with Swing](https://github.com/JetBrains/compose-jb/pull/2315)
@@ -59,20 +59,21 @@
 ## Web
 
 ### Features
-[Add support for transition in CSS api](https://github.com/JetBrains/compose-jb/pull/2228)
-[Add missing `background-blend-mode` property](https://github.com/JetBrains/compose-jb/pull/2128)
-[SVG: Publish custom attr functions](https://github.com/JetBrains/compose-jb/pull/2127)
-[Support attrs extension functions in sub elements too](https://github.com/JetBrains/compose-jb/pull/2126)
-[Add list overload for classes](https://github.com/JetBrains/compose-jb/pull/2094)
-[Add support of dl, dt and dd](https://github.com/JetBrains/compose-jb/pull/1922)
+* Support Kotlin 1.7.10
+* [Add support for transition in CSS api](https://github.com/JetBrains/compose-jb/pull/2228)
+* [Add missing `background-blend-mode` property](https://github.com/JetBrains/compose-jb/pull/2128)
+* [SVG: Publish custom attr functions](https://github.com/JetBrains/compose-jb/pull/2127)
+* [Support attrs extension functions in sub elements too](https://github.com/JetBrains/compose-jb/pull/2126)
+* [Add list overload for classes](https://github.com/JetBrains/compose-jb/pull/2094)
+* [Add support of dl, dt and dd](https://github.com/JetBrains/compose-jb/pull/1922)
 
 ### Fixes
-[SVG - Fix Compile Error](https://github.com/JetBrains/compose-jb/pull/2302)
-[Add pom information and license to Web artifacts](https://github.com/JetBrains/compose-jb/pull/2195)
+* [SVG - Fix Compile Error](https://github.com/JetBrains/compose-jb/pull/2302)
+* [Add pom information and license to Web artifacts](https://github.com/JetBrains/compose-jb/pull/2195)
 
 ### API changes
-[Deprecate 3 overloads of StyleScope.borderWidth with wrong parameter names](https://github.com/JetBrains/compose-jb/pull/2297)
-[remove deprecated compose.web.web-widgets from the source code](https://github.com/JetBrains/compose-jb/pull/2294)
+* [Deprecate 3 overloads of StyleScope.borderWidth with wrong parameter names](https://github.com/JetBrains/compose-jb/pull/2297)
+* [remove deprecated compose.web.web-widgets from the source code](https://github.com/JetBrains/compose-jb/pull/2294)
 
 
 # 1.1.1 (Mar 2022)
