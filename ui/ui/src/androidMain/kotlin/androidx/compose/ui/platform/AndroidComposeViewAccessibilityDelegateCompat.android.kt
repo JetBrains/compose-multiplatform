@@ -404,11 +404,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             if (semanticsNode.isFake || semanticsNode.replacedChildren.isEmpty()) {
                 if (role == Role.Tab) {
                     info.roleDescription = view.context.resources.getString(R.string.tab)
+                } else if (role == Role.Switch) {
+                    info.roleDescription = view.context.resources.getString(R.string.switch_role)
                 } else {
                     val className = when (it) {
                         Role.Button -> "android.widget.Button"
                         Role.Checkbox -> "android.widget.CheckBox"
-                        Role.Switch -> "android.widget.Switch"
                         Role.RadioButton -> "android.widget.RadioButton"
                         Role.Image -> "android.widget.ImageView"
                         else -> null

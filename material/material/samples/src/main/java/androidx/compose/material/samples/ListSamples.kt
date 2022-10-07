@@ -36,6 +36,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 
 @Sampled
@@ -54,6 +55,7 @@ fun ClickableListItems() {
                 )
             },
             modifier = Modifier.toggleable(
+                role = Role.Switch,
                 value = switched,
                 onValueChange = onSwitchedChange
             )
@@ -70,6 +72,7 @@ fun ClickableListItems() {
                 )
             },
             modifier = Modifier.toggleable(
+                role = Role.Checkbox,
                 value = checked,
                 onValueChange = onCheckedChange
             )
