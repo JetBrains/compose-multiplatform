@@ -42,7 +42,8 @@ internal object DokkaInputModels {
         val moduleName: String,
         val pluginsClasspath: FileCollection,
         val modules: List<Module>,
-        val pluginsConfiguration: List<PluginsConfiguration>
+        val pluginsConfiguration: List<PluginsConfiguration>,
+        val includes: Set<File>
     )
 
     class Module(
