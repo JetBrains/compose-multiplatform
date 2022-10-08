@@ -5,8 +5,7 @@
 
 package org.jetbrains.compose.test.utils
 
-@Suppress("EnumEntryName")
-enum class TestKotlinVersion(val versionString: String) {
-    Default(TestProperties.composeCompilerCompatibleKotlinVersion),
-    AndroidxCompatible(TestProperties.androidxCompilerCompatibleKotlinVersion)
+object TestKotlinVersions {
+    val Default = TestProperties.composeCompilerCompatibleKotlinVersion
+    val AndroidxCompatible =  TestProperties.androidxCompilerCompatibleKotlinVersion
 }

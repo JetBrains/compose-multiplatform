@@ -6,7 +6,7 @@
 set -euo pipefail
 
 if [ "$#" -ne 2 ]; then
-echo "Specify Compose and Kotlin version. For example: ./validateExamples.sh 1.1.1 1.6.10"
+echo "Specify Compose and Kotlin version. For example: ./validateExamplesWithJs.sh 1.1.1 1.6.10"
 exit 1
 fi
 COMPOSE_VERSION=$1
@@ -19,10 +19,6 @@ runGradle() {
     popd
 }
 
-runGradle codeviewer package
-runGradle imageviewer package
-runGradle issues package
-runGradle notepad package
-runGradle todoapp-lite package
-runGradle visual-effects package
-runGradle widgets-gallery package
+runGradle web-compose-bird build
+runGradle web-landing build
+runGradle web-with-react build
