@@ -17,7 +17,7 @@ abstract class GradlePluginTestBase {
 
     val defaultAndroidxCompilerEnvironment: TestEnvironment
         get() = defaultTestEnvironment.copy(
-            kotlinVersion = TestKotlinVersion.AndroidxCompatible,
+            kotlinVersion = TestKotlinVersions.AndroidxCompatible,
             composeCompilerArtifact = "androidx.compose.compiler:compiler:${TestProperties.androidxCompilerVersion}"
         )
 

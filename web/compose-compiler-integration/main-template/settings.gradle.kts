@@ -12,8 +12,8 @@ pluginManagement {
         println("KotlinVersion=[$kotlinVersion]")
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
-                val useVersion = if (extra.has("COMPOSE_CORE_VERSION")) {
-                    extra["COMPOSE_CORE_VERSION"].toString()
+                val useVersion = if (extra.has("compose.version")) {
+                    extra["compose.version"].toString()
                 } else {
                     "0.0.0-SNASPHOT"
                 }

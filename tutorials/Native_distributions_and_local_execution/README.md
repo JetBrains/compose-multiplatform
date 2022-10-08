@@ -447,7 +447,7 @@ The following platform-specific options are available
       for details;
     * `appStore = true` — build and sign for the Apple App Store. Requires at least JDK 17;
     * `appCategory` — category of the app for the Apple App Store. 
-      Default value is `utilities` when building for the App Store, `Unknown` otherwise. 
+      Default value is `public.app-category.utilities` when building for the App Store, `Unknown` otherwise. 
       See [LSApplicationCategoryType](https://developer.apple.com/documentation/bundleresources/information_property_list/lsapplicationcategorytype) for a list of valid categories;
     * `entitlementsFile.set(File("PATH_TO_ENTITLEMENTS"))` — a path to file containing entitlements to use when signing.
       When a custom file is provided, make sure to add the entitlements that are required for Java apps.

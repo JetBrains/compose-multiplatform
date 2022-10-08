@@ -8,7 +8,7 @@ plugins {
     kotlin("multiplatform") apply false
 }
 
-val COMPOSE_WEB_VERSION: String by project
+val COMPOSE_WEB_VERSION: String = extra["compose.version"] as String
 val COMPOSE_REPO_USERNAME: String? by project
 val COMPOSE_REPO_KEY: String? by project
 val COMPOSE_WEB_BUILD_WITH_SAMPLES = project.property("compose.web.buildSamples")!!.toString().toBoolean()

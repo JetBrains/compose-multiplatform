@@ -70,7 +70,7 @@ fun maybeFail(tutorial: String, message: String) {
 }
 
 @OptIn(ExperimentalStdlibApi::class)
-fun checkDirs(dirs: List<String>, template: String, buildCmd: String = "build") {
+fun checkDirs(dirs: List<String>, template: String, buildCmd: String, kotlinVersion: String?) {
   val snippets = findSnippets(dirs)
   snippets.forEachIndexed { index, snippet ->
     println("process snippet $index at ${snippet.file}:${snippet.lineNumber} with $template")
@@ -86,7 +86,7 @@ fun checkDirs(dirs: List<String>, template: String, buildCmd: String = "build") 
 
         add(buildCmd)
 
-        project.findProperty("kotlin.version")?.also {
+        kotlinVersion?.also {
             add("-Pkotlin.version=$it")
         }
         project.findProperty("compose.version")?.also {
@@ -110,7 +110,7 @@ fun checkDirs(dirs: List<String>, template: String, buildCmd: String = "build") 
 // NOTICE: currently we use a bit hacky approach, when "```kotlin" marks code that shall be checked, while "``` kotlin"
 // with whitespace marks code that shall not be checked.
 tasks.register("check") {
-  val checks = CheckSpec.createCheckSpecs(
+  val checks = createCheckSpecs(
     checkTargets = (project.property("CHECK_TARGET")?.toString() ?: "all").toLowerCase()
   )
 
@@ -129,29 +129,36 @@ tasks.register("check") {
       checkDirs(
         dirs = subdirs.map { "${check.dir}/$it" },
         template = check.template,
-        buildCmd = check.gradleCmd
+        buildCmd = check.gradleCmd,
+        kotlinVersion = check.kotlinVersion
       )
     }
+  }
+}
+
+
+fun createCheckSpecs(checkTargets: String = "all"): List<CheckSpec> {
+  fun desktop() = CheckSpec(
+    gradleCmd = "build", dir = ".", template = "desktop-template",
+    kotlinVersion = project.findProperty("kotlin.version")?.toString()
+  )
+  fun web() = CheckSpec(
+    gradleCmd = "compileKotlinJs", dir = "Web", template = "web-template",
+    kotlinVersion = project.findProperty("kotlin.js.version")?.toString() ?:
+      project.findProperty("kotlin.version")?.toString()
+  )
+  fun all() = listOf(desktop(), web())
+
+  return when (checkTargets) {
+    "web" -> listOf(web())
+    "desktop" -> listOf(desktop())
+    else -> all()
   }
 }
 
 data class CheckSpec(
   val gradleCmd: String,
   val dir: String,
-  val template: String
-) {
-
-  companion object {
-    fun desktop() = CheckSpec(gradleCmd = "build", dir = ".", template = "desktop-template")
-    fun web() = CheckSpec(gradleCmd = "compileKotlinJs", dir = "Web", template = "web-template")
-    fun all() = listOf(desktop(), web())
-
-    fun createCheckSpecs(checkTargets: String = "all"): List<CheckSpec> {
-      return when (checkTargets) {
-        "web" -> listOf(web())
-        "desktop" -> listOf(desktop())
-        else -> all()
-      }
-    }
-  }
-}
+  val template: String,
+  val kotlinVersion: String?
+)

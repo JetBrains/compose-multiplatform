@@ -69,60 +69,6 @@ class ComposePlugin : Plugin<Project> {
                 }
             }
 
-            //redirecting all android artifacts to androidx.compose
-            project.dependencies.modules {
-                if (!androidExtension.useAndroidX && !ComposeBuildConfig.experimentalOELPublication) {
-                    // Replace 'androidx.compose' artifacts by 'org.jetbrains.compose' artifacts.
-                    // It is needed, because 'org.jetbrains.compose' artifacts are the same artifacts as 'androidx.compose'
-                    // (but with different version).
-                    // And Gradle will throw an error when it cannot determine which class from which artifact should it use.
-                    //
-                    // Note that we don't provide a configuration parameter to disable dependency replacement,
-                    // because without replacement, gradle will fail anyway because classpath contains two incompatible artifacts.
-                    //
-                    // We should define all replacements, even for transitive dependencies.
-                    // For example, a library can depend on androidx.compose.foundation:foundation-layout
-                    //
-                    // List of all org.jetbrains.compose libraries is here:
-                    // https://maven.pkg.jetbrains.space/public/p/compose/dev/org/jetbrains/compose/
-                    //
-                    // (use ./gradle printAllAndroidxReplacements to know what dependencies should be here)
-                    //
-                    // It is temporarily solution until we will be publishing all MPP artifacts in Google Maven repository.
-                    // Or align versions with androidx artifacts and point MPP-android artifacts to androidx artifacts (is it possible?)
-
-                    listOf(
-                        "androidx.compose.animation:animation",
-                        "androidx.compose.animation:animation-core",
-                        "androidx.compose.animation:animation-graphics",
-                        "androidx.compose.compiler:compiler",
-                        "androidx.compose.compiler:compiler-hosted",
-                        "androidx.compose.foundation:foundation",
-                        "androidx.compose.foundation:foundation-layout",
-                        "androidx.compose.material:material",
-                        "androidx.compose.material:material-icons-core",
-                        "androidx.compose.material:material-icons-extended",
-                        "androidx.compose.material:material-ripple",
-                        "androidx.compose.material:material3",
-                        "androidx.compose.runtime:runtime",
-                        "androidx.compose.runtime:runtime-saveable",
-                        "androidx.compose.ui:ui",
-                        "androidx.compose.ui:ui-geometry",
-                        "androidx.compose.ui:ui-graphics",
-                        "androidx.compose.ui:ui-test",
-                        "androidx.compose.ui:ui-test-junit4",
-                        "androidx.compose.ui:ui-text",
-                        "androidx.compose.ui:ui-unit",
-                        "androidx.compose.ui:ui-util"
-                    ).forEach() { module ->
-                        it.replaceAndroidx(
-                            module,
-                            module.replace("androidx.compose", "org.jetbrains.compose")
-                        )
-                    }
-                }
-            }
-
             val overrideDefaultJvmTarget = ComposeProperties.overrideKotlinJvmTarget(project.providers).get()
             project.tasks.withType(KotlinCompile::class.java) {
                 it.kotlinOptions.apply {

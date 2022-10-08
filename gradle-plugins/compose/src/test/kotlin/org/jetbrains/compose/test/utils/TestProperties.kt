@@ -7,10 +7,13 @@ package org.jetbrains.compose.test.utils
 
 object TestProperties {
     val composeCompilerVersion: String
-        get() = notNullSystemProperty("compose.compiler.version")
+        get() = notNullSystemProperty("compose.tests.compiler.version")
 
     val composeCompilerCompatibleKotlinVersion: String
-        get() = notNullSystemProperty("compose.compiler.compatible.kotlin.version")
+        get() = notNullSystemProperty("compose.tests.compiler.compatible.kotlin.version")
+
+    val composeJsCompilerCompatibleKotlinVersion: String
+        get() = notNullSystemProperty("compose.tests.js.compiler.compatible.kotlin.version")
 
     val androidxCompilerVersion: String
         get() = notNullSystemProperty("compose.tests.androidx.compiler.version")
