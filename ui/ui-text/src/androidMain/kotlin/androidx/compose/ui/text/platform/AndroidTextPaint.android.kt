@@ -139,7 +139,7 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     }
 }
 
-private fun StrokeJoin.toAndroidJoin(): Paint.Join {
+internal fun StrokeJoin.toAndroidJoin(): Paint.Join {
     return when (this) {
         StrokeJoin.Miter -> Paint.Join.MITER
         StrokeJoin.Round -> Paint.Join.ROUND
@@ -148,7 +148,7 @@ private fun StrokeJoin.toAndroidJoin(): Paint.Join {
     }
 }
 
-private fun StrokeCap.toAndroidCap(): Paint.Cap {
+internal fun StrokeCap.toAndroidCap(): Paint.Cap {
     return when (this) {
         StrokeCap.Butt -> Paint.Cap.BUTT
         StrokeCap.Round -> Paint.Cap.ROUND

@@ -19,6 +19,7 @@ package androidx.compose.ui.text.platform
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.style.TextDecoration
 
@@ -36,5 +37,6 @@ internal expect fun MultiParagraph.drawMultiParagraph(
     brush: Brush,
     alpha: Float = Float.NaN,
     shadow: Shadow? = null,
-    decoration: TextDecoration? = null
+    decoration: TextDecoration? = null,
+    drawStyle: DrawStyle? = null
 )

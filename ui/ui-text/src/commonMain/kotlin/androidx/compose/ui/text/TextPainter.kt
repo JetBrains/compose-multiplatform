@@ -64,14 +64,16 @@ object TextPainter {
                     brush,
                     textLayoutResult.layoutInput.style.alpha,
                     textLayoutResult.layoutInput.style.shadow,
-                    textLayoutResult.layoutInput.style.textDecoration
+                    textLayoutResult.layoutInput.style.textDecoration,
+                    textLayoutResult.layoutInput.style.drawStyle
                 )
             } else {
                 textLayoutResult.multiParagraph.paint(
                     canvas,
                     textLayoutResult.layoutInput.style.color,
                     textLayoutResult.layoutInput.style.shadow,
-                    textLayoutResult.layoutInput.style.textDecoration
+                    textLayoutResult.layoutInput.style.textDecoration,
+                    textLayoutResult.layoutInput.style.drawStyle
                 )
             }
         } finally {

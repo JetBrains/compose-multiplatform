@@ -24,8 +24,14 @@ val TextDemos = DemoCategory(
     listOf(
         ComposableDemo("Hyphens") { TextDemoHyphens() },
         ComposableDemo("Static text") { TextDemo() },
-        ComposableDemo("Canvas") { DrawTextDemo() },
-        ComposableDemo("Brush") { TextBrushDemo() },
+        DemoCategory(
+            "Text Canvas",
+            listOf(
+                ComposableDemo("Brush") { TextBrushDemo() },
+                ComposableDemo("drawText") { DrawTextDemo() },
+                ComposableDemo("Stroke") { TextStrokeDemo() }
+            )
+        ),
         ComposableDemo("Ellipsize") { EllipsizeDemo() },
         ComposableDemo("Typeface") { TypefaceDemo() },
         ComposableDemo("Variable Fonts") { VariableFontsDemo() },

@@ -21,6 +21,9 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -32,8 +35,8 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.Hyphens
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.LineHeightStyle
-import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.LineHeightStyle.Alignment
+import androidx.compose.ui.text.style.LineHeightStyle.Trim
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
@@ -65,6 +68,7 @@ class TextStyleTest {
         assertThat(style.letterSpacing.isUnspecified).isTrue()
         assertThat(style.localeList).isNull()
         assertThat(style.background).isEqualTo(Color.Unspecified)
+        assertThat(style.drawStyle).isNull()
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
         assertThat(style.platformStyle).isNull()
@@ -329,6 +333,16 @@ class TextStyleTest {
         assertThat(style.lineBreak).isEqualTo(LineBreak.Heading)
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `constructor with customized drawStyle`() {
+        val stroke = Stroke(width = 8f)
+
+        val style = TextStyle(drawStyle = stroke)
+
+        assertThat(style.drawStyle).isEqualTo(stroke)
+    }
+
     @Test
     fun `merge with empty other should return this`() {
         val style = TextStyle()
@@ -545,6 +559,30 @@ class TextStyleTest {
         val newStyle = style.merge(otherStyle)
 
         assertThat(newStyle.textDecoration).isEqualTo(otherStyle.textDecoration)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with other's drawStyle is null should use this' drawStyle`() {
+        val drawStyle1 = Stroke(cap = StrokeCap.Butt)
+        val style = TextStyle(drawStyle = drawStyle1)
+
+        val newTextStyle = style.merge(TextStyle(drawStyle = null))
+
+        assertThat(newTextStyle.drawStyle).isEqualTo(drawStyle1)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `merge with other's drawStyle is set should use other's drawStyle`() {
+        val drawStyle1 = Stroke(cap = StrokeCap.Butt)
+        val drawStyle2 = Fill
+        val style = TextStyle(drawStyle = drawStyle1)
+        val otherStyle = TextStyle(drawStyle = drawStyle2)
+
+        val newTextStyle = style.merge(otherStyle)
+
+        assertThat(newTextStyle.drawStyle).isEqualTo(otherStyle.drawStyle)
     }
 
     @Test
@@ -1183,6 +1221,34 @@ class TextStyleTest {
         assertThat(newStyle.textDecoration).isEqualTo(decoration2)
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp drawStyle with a and b are not null and fraction is smaller than half`() {
+        val drawStyle1 = Fill
+        val drawStyle2 = Stroke(width = 8f)
+        val t = 0.2f
+        val style1 = TextStyle(drawStyle = drawStyle1)
+        val style2 = TextStyle(drawStyle = drawStyle2)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = t)
+
+        assertThat(newStyle.drawStyle).isEqualTo(drawStyle1)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun `lerp drawStyle with a and b are not null and fraction is larger than half`() {
+        val drawStyle1 = Fill
+        val drawStyle2 = Stroke(width = 8f)
+        val t = 0.8f
+        val style1 = TextStyle(drawStyle = drawStyle1)
+        val style2 = TextStyle(drawStyle = drawStyle2)
+
+        val newStyle = lerp(start = style1, stop = style2, fraction = t)
+
+        assertThat(newStyle.drawStyle).isEqualTo(drawStyle2)
+    }
+
     @Test
     fun `lerp textAlign with a null, b not null and t is smaller than half`() {
         val style1 = TextStyle(textAlign = null)
@@ -1475,6 +1541,7 @@ class TextStyleTest {
         val background = Color.Yellow
         val decoration = TextDecoration.Underline
         val shadow = Shadow(color = Color.Green, offset = Offset(2f, 4f))
+        val drawStyle = Stroke(width = 8f)
 
         val style = TextStyle(
             brush = brush,
@@ -1490,7 +1557,8 @@ class TextStyleTest {
             localeList = localeList,
             background = background,
             textDecoration = decoration,
-            shadow = shadow
+            shadow = shadow,
+            drawStyle = drawStyle
         )
 
         assertThat(style.toSpanStyle()).isEqualTo(
@@ -1508,7 +1576,8 @@ class TextStyleTest {
                 localeList = localeList,
                 background = background,
                 textDecoration = decoration,
-                shadow = shadow
+                shadow = shadow,
+                drawStyle = drawStyle
             )
         )
     }
