@@ -46,7 +46,7 @@ fun TodoEditContent(component: TodoEdit) {
             onValueChange = component::onTextChanged
         )
 
-        Row(modifier = Modifier.padding(8.dp)) {
+        Row(modifier = Modifier.padding(8.dp), verticalAlignment = Alignment.CenterVertically) {
             Text(text = "Completed")
 
             Spacer(modifier = Modifier.width(8.dp))
