@@ -1,3 +1,8 @@
+
+**Run in browser:**
+
+`./gradlew jsRun`
+
 ### How to use HTML based @Composable functions in JS?
 
 Useful links:
