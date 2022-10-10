@@ -104,8 +104,8 @@ kotlin {
             dependsOn(commonMain)
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                api("androidx.appcompat:appcompat:1.4.1")
-                implementation("androidx.activity:activity-compose:1.4.0")
+                implementation("androidx.appcompat:appcompat:1.5.1")
+                implementation("androidx.activity:activity-compose:1.5.0")
             }
         }
 
@@ -223,11 +223,11 @@ project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.ja
 }
 
 android {
-    compileSdk = 31
+    compileSdk = 32
 
     defaultConfig {
-        minSdk = 21
-        targetSdk = 31
+        minSdk = 26
+        targetSdk = 32
     }
 
     compileOptions {
