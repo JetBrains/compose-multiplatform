@@ -51,13 +51,20 @@ internal fun String.checkContains(substring: String) {
 }
 
 internal fun assertEqualTextFiles(actual: File, expected: File) {
-    fun File.normalizedText() = readLines().joinToString("\n") { it.trim() }
-
-    val actualText = actual.normalizedText()
-    val expectedText = expected.normalizedText()
     Assertions.assertEquals(
-        expectedText,
-        actualText,
-        "Expected file '$expected' differs from actual file '$actual'"
+        expected.normalizedText(),
+        actual.normalizedText(),
+        "Content of '$expected' is not equal to content of '$actual'"
     )
 }
+
+internal fun assertNotEqualTextFiles(actual: File, expected: File) {
+    Assertions.assertNotEquals(
+        expected.normalizedText(),
+        actual.normalizedText(),
+        "Content of '$expected' is equal to content of '$actual'"
+    )
+}
+
+private fun File.normalizedText() =
+    readLines().joinToString("\n") { it.trim() }
