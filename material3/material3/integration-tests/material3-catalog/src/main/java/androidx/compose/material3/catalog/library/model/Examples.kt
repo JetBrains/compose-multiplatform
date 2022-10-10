@@ -101,6 +101,8 @@ import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
 import androidx.compose.material3.samples.RangeSliderSample
 import androidx.compose.material3.samples.RangeSliderWithCustomComponents
+import androidx.compose.material3.samples.RichTooltipSample
+import androidx.compose.material3.samples.RichTooltipWithManualInvocationSample
 import androidx.compose.material3.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
@@ -1013,5 +1015,19 @@ val TooltipsExamples = listOf(
         sourceUrl = TooltipsExampleSourceUrl
     ) {
         PlainTooltipWithManualInvocationSample()
+    },
+    Example(
+        name = ::RichTooltipSample.name,
+        description = TooltipsExampleDescription,
+        sourceUrl = TooltipsExampleSourceUrl
+    ) {
+        RichTooltipSample()
+    },
+    Example(
+        name = ::RichTooltipWithManualInvocationSample.name,
+        description = TooltipsExampleDescription,
+        sourceUrl = TooltipsExampleSourceUrl
+    ) {
+        RichTooltipWithManualInvocationSample()
     }
 )

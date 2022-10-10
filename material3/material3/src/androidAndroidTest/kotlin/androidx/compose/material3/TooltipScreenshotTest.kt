@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
@@ -45,28 +46,58 @@ class TooltipScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
-    private val tooltipState = TooltipState()
-
     @Test
     fun plainTooltip_lightTheme() {
-        rule.setMaterialContent(lightColorScheme()) { TestTooltips() }
+        rule.setMaterialContent(lightColorScheme()) { TestPlainTooltips() }
         assertAgainstGolden("plainTooltip_lightTheme")
     }
 
     @Test
     fun plainTooltip_darkTheme() {
-        rule.setMaterialContent(darkColorScheme()) { TestTooltips() }
+        rule.setMaterialContent(darkColorScheme()) { TestPlainTooltips() }
         assertAgainstGolden("plainTooltip_darkTheme")
     }
 
-    @Composable
-    private fun TestTooltips() {
-        val scope = rememberCoroutineScope()
+    @Test
+    fun richTooltip_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) { TestRichTooltips() }
+        assertAgainstGolden("richTooltip_lightTheme")
+    }
 
+    @Test
+    fun richTooltip_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) { TestRichTooltips() }
+        assertAgainstGolden("richTooltip_darkTheme")
+    }
+
+    @Composable
+    private fun TestPlainTooltips() {
+        val scope = rememberCoroutineScope()
+        val tooltipState = remember { PlainTooltipState() }
         PlainTooltipBox(
             tooltip = { Text("Tooltip Text") },
             modifier = Modifier.testTag(TooltipTestTag),
             tooltipState = tooltipState
+        ) {}
+
+        scope.launch { tooltipState.show() }
+    }
+
+    @Composable
+    private fun TestRichTooltips() {
+        val scope = rememberCoroutineScope()
+        val tooltipState = remember { RichTooltipState() }
+        RichTooltipBox(
+            title = { Text("Title") },
+            text = {
+                Text(
+                    "Area for supportive text, providing a descriptive " +
+                        "message for the composable that the tooltip is anchored to."
+                )
+            },
+            action = { Text("Action Text") },
+            tooltipState = tooltipState,
+            modifier = Modifier.testTag(TooltipTestTag)
         ) {}
 
         scope.launch { tooltipState.show() }
