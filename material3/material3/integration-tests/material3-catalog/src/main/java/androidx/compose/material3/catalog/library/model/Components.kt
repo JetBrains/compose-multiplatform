@@ -243,6 +243,18 @@ private val RadioButtons = Component(
     examples = RadioButtonsExamples
 )
 
+private val SearchBars = Component(
+    id = nextId(),
+    name = "Search bars",
+    description = "Search bars allow users to enter a keyword or phrase and get relevant " +
+        "information.",
+    // No search bar icon
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/SearchBar.kt",
+    examples = SearchBarExamples
+)
+
 private val Sliders = Component(
     id = nextId(),
     name = "Sliders",
@@ -342,6 +354,7 @@ val Components = listOf(
     NavigationRail,
     ProgressIndicators,
     RadioButtons,
+    SearchBars,
     Sliders,
     Snackbars,
     Switches,

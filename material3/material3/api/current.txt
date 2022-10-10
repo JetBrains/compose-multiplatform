@@ -463,6 +463,25 @@ package androidx.compose.material3 {
   public final class ScaffoldKt {
   }
 
+  public final class SearchBarDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getDockedShape();
+    method public float getElevation();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getFullScreenShape();
+    method public float getInputFieldHeight();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getInputFieldShape();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
+    property public final float Elevation;
+    property public final float InputFieldHeight;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape dockedShape;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape fullScreenShape;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape inputFieldShape;
+    property @androidx.compose.runtime.Composable public final androidx.compose.foundation.layout.WindowInsets windowInsets;
+    field public static final androidx.compose.material3.SearchBarDefaults INSTANCE;
+  }
+
+  public final class SearchBarKt {
+  }
+
   public final class ShapeDefaults {
     method public androidx.compose.foundation.shape.CornerBasedShape getExtraLarge();
     method public androidx.compose.foundation.shape.CornerBasedShape getExtraSmall();

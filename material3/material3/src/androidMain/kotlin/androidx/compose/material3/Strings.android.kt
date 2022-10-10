@@ -37,6 +37,9 @@ internal actual fun getString(string: Strings): String {
         Strings.MenuExpanded -> resources.getString(androidx.compose.material3.R.string.expanded)
         Strings.MenuCollapsed -> resources.getString(androidx.compose.material3.R.string.collapsed)
         Strings.Dismiss -> resources.getString(androidx.compose.material3.R.string.dismiss)
+        Strings.Search -> resources.getString(androidx.compose.material3.R.string.search)
+        Strings.SuggestionsAvailable ->
+            resources.getString(androidx.compose.material3.R.string.suggestions_available)
         else -> ""
     }
 }

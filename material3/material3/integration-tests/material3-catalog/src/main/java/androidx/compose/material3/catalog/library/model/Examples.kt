@@ -39,6 +39,7 @@ import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
 import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
+import androidx.compose.material3.samples.DockedSearchBarSample
 import androidx.compose.material3.samples.EditableExposedDropdownMenuSample
 import androidx.compose.material3.samples.ElevatedAssistChipSample
 import androidx.compose.material3.samples.ElevatedButtonSample
@@ -62,6 +63,7 @@ import androidx.compose.material3.samples.FilledTonalIconToggleButtonSample
 import androidx.compose.material3.samples.FilterChipSample
 import androidx.compose.material3.samples.FilterChipWithLeadingIconSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
+import androidx.compose.material3.samples.SearchBarSample
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.IconToggleButtonSample
@@ -659,6 +661,25 @@ val RadioButtonsExamples = listOf(
         sourceUrl = RadioButtonsExampleSourceUrl
     ) {
         RadioGroupSample()
+    },
+)
+
+private const val SearchBarExampleDescription = "Search bar examples"
+private const val SearchBarExampleSourceUrl = "$SampleSourceUrl/SearchBarSamples.kt"
+val SearchBarExamples = listOf(
+    Example(
+        name = ::SearchBarSample.name,
+        description = SearchBarExampleDescription,
+        sourceUrl = SearchBarExampleSourceUrl
+    ) {
+        SearchBarSample()
+    },
+    Example(
+        name = ::DockedSearchBarSample.name,
+        description = SearchBarExampleDescription,
+        sourceUrl = SearchBarExampleSourceUrl
+    ) {
+        DockedSearchBarSample()
     },
 )
 

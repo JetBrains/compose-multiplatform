@@ -31,6 +31,8 @@ internal actual fun getString(string: Strings): String {
         Strings.MenuExpanded -> "Expanded"
         Strings.MenuCollapsed -> "Collapsed"
         Strings.Dismiss -> "Dismiss"
+        Strings.Search -> "Search"
+        Strings.SuggestionsAvailable -> "Suggestions below"
         else -> ""
     }
 }

@@ -24,4 +24,8 @@
     <string name="collapsed">Collapsed</string>
     <!-- Spoken description of a generic dismiss action item -->
     <string name="dismiss">Dismiss</string>
+    <!-- Spoken description of a search bar -->
+    <string name="search">Search</string>
+    <!-- Spoken description when search suggestions are available -->
+    <string name="suggestions_available">Suggestions below</string>
 </resources>
