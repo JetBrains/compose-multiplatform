@@ -4,9 +4,9 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 
 internal object ComposeCompilerCompatability {
     fun compilerVersionFor(kotlinVersion: String): ComposeCompilerVersion? = when (kotlinVersion) {
-        "1.7.10" -> ComposeCompilerVersion("1.3.0-alpha01")
+        "1.7.10" -> ComposeCompilerVersion("1.3.0")
         "1.7.20" -> ComposeCompilerVersion(
-            "1.3.2-alpha01",
+            "1.3.2",
             unsupportedPlatforms = setOf(KotlinPlatformType.js)
         )
         else -> null
