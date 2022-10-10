@@ -1,5 +1,5 @@
 
-**Run an example in a browser:**
+**Run in browser:**
 
 `./gradlew jsRun`
 
