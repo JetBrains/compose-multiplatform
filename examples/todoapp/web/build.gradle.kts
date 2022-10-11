@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
+import org.jetbrains.compose.compose
 
 plugins {
     kotlin("multiplatform")
@@ -17,7 +18,7 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(compose.runtime)
-                implementation(compose.web.widgets)
+                implementation(compose.web.core)
                 implementation(project(":common:utils"))
                 implementation(project(":common:database"))
                 implementation(project(":common:root"))
@@ -37,6 +38,6 @@ kotlin {
 afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.9.0"
+        versions.webpackCli.version = "4.10.0"
     }
 }
