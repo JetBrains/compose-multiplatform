@@ -69,6 +69,7 @@ import androidx.compose.ui.demos.keyinput.KeyInputDemo
 import androidx.compose.ui.demos.modifier.CommunicatingModifierDemo
 import androidx.compose.ui.demos.recyclerview.RecyclerViewDemos
 import androidx.compose.ui.demos.viewinterop.AndroidInComposeDemos
+import androidx.compose.ui.demos.viewinterop.BottomSheetFragmentNestedScrollInteropDemo
 import androidx.compose.ui.demos.viewinterop.ComplexTouchInterop
 import androidx.compose.ui.demos.viewinterop.ComposeInAndroidCoordinatorLayout
 import androidx.compose.ui.demos.viewinterop.ComposeInAndroidDemos
@@ -192,6 +193,10 @@ private val NestedScrollInteropDemos = DemoCategory(
         ActivityDemo(
             "(Collaborating) View -> Compose -> View",
             ViewComposeViewNestedScrollInteropDemo::class
+        ),
+        ActivityDemo(
+            "Material Bottom Sheet Interop",
+            BottomSheetFragmentNestedScrollInteropDemo::class
         ),
         ComposableDemo("Compose -> View") {
             NestedScrollInteropComposeParentWithAndroidChild()
