@@ -41,6 +41,22 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
         firstStateRecord = value as StateMapStateRecord<K, V>
     }
 
+    /**
+     * Returns an immutable map containing all key-value pairs from the original map.
+     *
+     * The content of the map returned will not change even if the content of the map is changed in
+     * the same snapshot. It also will be the same instance until the content is changed. It is not,
+     * however, guaranteed to be the same instance for the same content as adding and removing the
+     * same item from the this map might produce a different instance with the same content.
+     *
+     * This operation is O(1) and does not involve a physically copying the map. It instead
+     * returns the underlying immutable map used internally to store the content of the map.
+     *
+     * It is recommended to use [toMap] when using returning the value of this map from
+     * [androidx.compose.runtime.snapshotFlow].
+     */
+    fun toMap(): Map<K, V> = readable.map
+
     override val size get() = readable.map.size
     override fun containsKey(key: K) = readable.map.containsKey(key)
     override fun containsValue(value: V) = readable.map.containsValue(value)

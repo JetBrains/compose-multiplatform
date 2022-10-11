@@ -947,6 +947,7 @@ package androidx.compose.runtime.snapshots {
     method public boolean retainAll(java.util.Collection<E!> elements);
     method public T! set(int index, T? element);
     method public java.util.List<T> subList(int fromIndex, int toIndex);
+    method public java.util.List<T> toList();
     property public androidx.compose.runtime.snapshots.StateRecord firstStateRecord;
     property public int size;
   }
@@ -970,6 +971,7 @@ package androidx.compose.runtime.snapshots {
     method public V? put(K? key, V? value);
     method public void putAll(java.util.Map<? extends K,? extends V> from);
     method public V? remove(Object? key);
+    method public java.util.Map<K,V> toMap();
     property public java.util.Set<java.util.Map.Entry<K,V>> entries;
     property public androidx.compose.runtime.snapshots.StateRecord firstStateRecord;
     property public java.util.Set<K> keys;
