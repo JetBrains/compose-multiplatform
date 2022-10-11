@@ -2513,6 +2513,18 @@ package androidx.compose.ui.node {
   public final class NodeKindKt {
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface ObserverNode extends androidx.compose.ui.node.DelegatableNode {
+    method public void onObservedReadsChanged();
+    field public static final androidx.compose.ui.node.ObserverNode.Companion Companion;
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public static final class ObserverNode.Companion {
+  }
+
+  public final class ObserverNodeKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static <T extends androidx.compose.ui.Modifier.Node & androidx.compose.ui.node.ObserverNode> void observeReads(T, kotlin.jvm.functions.Function0<kotlin.Unit> block);
+  }
+
   @androidx.compose.ui.ExperimentalComposeUiApi public interface ParentDataModifierNode extends androidx.compose.ui.node.DelegatableNode {
     method public Object? modifyParentData(androidx.compose.ui.unit.Density, Object? parentData);
   }
