@@ -23,11 +23,11 @@ import java.lang.Math.random
 import kotlin.math.*
 import kotlin.random.Random
 
-val width = 1200
-val height = 800
-val snowCount = 80
-val starCount = 60
-val rocketPartsCount = 30
+const val width = 1200
+const val height = 800
+const val snowCount = 80
+const val starCount = 60
+const val rocketPartsCount = 30
 
 data class SnowFlake(
     var x: Dp,
@@ -42,14 +42,14 @@ data class SnowFlake(
 
 data class Star(val x: Dp, val y: Dp, val color: Color, val size: Dp)
 
-val HNYString = "Happy New Year!"
+const val HNYString = "Happy New Year!"
 
 class DoubleRocket(val particle: Particle) {
-    val STATE_ROCKET = 0
-    val STATE_SMALL_ROCKETS = 1
+    private val STATE_ROCKET = 0
+    private val STATE_SMALL_ROCKETS = 1
     var state = STATE_ROCKET
     var rockets: Array<Rocket> = emptyArray()
-    fun checkState(time: Long) {
+    private fun checkState(time: Long) {
         if (particle.vy > -3.0 && state == STATE_ROCKET) {
             explode(time)
         }
@@ -69,7 +69,7 @@ class DoubleRocket(val particle: Particle) {
         }
     }
 
-    fun reset() {
+    private fun reset() {
         if (particle.vx < 0) return //to stop drawing after the second rocket. This could be commented out
         state = STATE_ROCKET
         particle.x = if (particle.vx > 0) width - 0.0 else 0.0
@@ -78,9 +78,9 @@ class DoubleRocket(val particle: Particle) {
         particle.vy = -12.5
     }
 
-    fun explode(time: Long) {
+    private fun explode(time: Long) {
         val colors = arrayOf(Color(0xff, 0, 0), Color(192, 255, 192), Color(192, 212, 255))
-        rockets = Array<Rocket>(7) {
+        rockets = Array(7) {
             val v = 1.2f + 1.0 * random()
             val angle = 2 * PI * random()
             Rocket(
@@ -131,8 +131,8 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
         }
     }
 
-    fun explode() {
-        parts = Array<Particle>(rocketPartsCount) {
+    private fun explode() {
+        parts = Array(rocketPartsCount) {
             val v = 0.5f + 1.5 * random()
             val angle = 2 * PI * random()
             Particle(particle.x, particle.y, v * sin(angle) + particle.vx, v * cos(angle) + particle.vy, color, 1)
@@ -202,7 +202,7 @@ val rocket = DoubleRocket(Particle(0.0, 1000.0, 2.1, -12.5, Color.White))
 @Composable
 fun NYWindow(onCloseRequest: () -> Unit) {
     val windowState = remember { WindowState(width = width.dp, height = height.dp) }
-    Window(onCloseRequest = {}, undecorated = true, transparent = true, state = windowState) {
+    Window(onCloseRequest = onCloseRequest, undecorated = true, transparent = true, state = windowState) {
         NYContent()
     }
 }
@@ -249,9 +249,7 @@ fun NYContent() {
     remember { prepareStarsAndSnowFlakes(stars, snowFlakes) }
 
     Surface(
-        modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp))
-            .pointerMoveFilter(onMove = { false; },
-                onEnter = { false; }, onExit = { false; }),
+        modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp)),
         color = Color.Black,
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -266,7 +264,7 @@ fun NYContent() {
         }
 
         if (!started) { //animation starts with delay, so there is some time to start recording
-            if (time - startTime > 7000000000 && time - startTime < 7100000000) println("ready!")
+            if (time - startTime in 7000000001..7099999999) println("ready!")
             if (time - startTime > 10000000000) {
                 startTime = time //restarting timer
                 started = true
@@ -303,7 +301,7 @@ fun NYContent() {
                     color = Color.White
                 )
 
-                if (started) { //delay to be able start recording
+                if (started) { //delay to be able to start recording
                     //HNY
                     var i = 0
                     val angle = (HNYString.length / 2 * 5) * -1.0f
@@ -370,7 +368,7 @@ fun flickeringAlpha(time: Long): Float {
     val time = (time / 10000000) % 100
     var result = 0.2f
     if (time > 75) {
-        result = result + 0.6f * ((time - 75) % 3) / 3
+        result += 0.6f * ((time - 75) % 3) / 3
     }
     return result
 }
