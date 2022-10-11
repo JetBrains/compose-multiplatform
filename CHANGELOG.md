@@ -68,6 +68,7 @@
 ### API changes
 * [Deprecate 3 overloads of StyleScope.borderWidth with wrong parameter names](https://github.com/JetBrains/compose-jb/pull/2297)
 * [Remove deprecated compose.web.web-widgets from the source code](https://github.com/JetBrains/compose-jb/pull/2294)
+* [Remove unnecessary parameter for `required` attribute](https://github.com/JetBrains/compose-jb/pull/1988)
 
 ## Updated dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
