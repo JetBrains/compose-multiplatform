@@ -7,7 +7,7 @@ Notepad example for desktop written in Compose for Desktop library, using Compos
 
 ### Building native desktop distribution
 ```
-./gradlew package
+./gradlew packageDistributionForCurrentOS
 # outputs are written to build/compose/binaries
 ```
 ![Desktop](screenshots/notepad.gif)

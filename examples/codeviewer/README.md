@@ -8,7 +8,7 @@ MPP Code Viewer example for desktop/android written in Multiplatform Compose lib
 
 ### Building native desktop distribution
 ```
-./gradlew :desktop:package
+./gradlew :desktop:packageDistributionForCurrentOS
 # outputs are written to desktop/build/compose/binaries
 ```
 

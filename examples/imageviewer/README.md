@@ -7,7 +7,7 @@ An example of image gallery for remote server image viewing, based on Jetpack Co
 
 ### Building native desktop distribution
 ```
-./gradlew :desktop:package
+./gradlew :desktop:packageDistributionForCurrentOS
 # outputs are written to desktop/build/compose/binaries
 ```
 

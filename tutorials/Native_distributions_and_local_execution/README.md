@@ -62,7 +62,7 @@ The plugin creates the following tasks:
 Note, that there is no cross-compilation support available at the moment,
 so the formats can only be built using the specific OS (e.g. to build `.dmg` you have to use macOS).
 Tasks that are not compatible with the current OS are skipped by default.
-* `package` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
+* `packageDistributionForCurrentOS` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
 aggregating all package tasks for an application.
 * `packageUberJarForCurrentOS` is used to create a single jar file, containing all dependencies for current OS. 
 The task is available starting from the M2 release.
