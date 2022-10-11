@@ -115,15 +115,6 @@ fun main() = application {
 }
 ```
 
-## Updated dependencies
-This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
-* [Compiler 1.1.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.1.0-beta04)
-* [Runtime 1.1.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.1.0-beta04)
-* [UI 1.1.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.1.0-beta04)
-* [Foundation 1.1.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.1.0-beta04)
-* [Material 1.1.0-beta04](https://developer.android.com/jetpack/androidx/releases/compose-material#1.1.0-beta04)
-* [Material3 1.0.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha03)
-
 # 1.1.0 (Feb 2022)
 ## Desktop
 
