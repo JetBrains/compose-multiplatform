@@ -21,4 +21,5 @@ abstract class ProguardSettings @Inject constructor(
     val maxHeapSize: Property<String?> = objects.nullableProperty()
     val configurationFiles: ConfigurableFileCollection = objects.fileCollection()
     val isEnabled: Property<Boolean> = objects.notNullProperty(false)
+    val obfuscate: Property<Boolean> = objects.notNullProperty(false)
 }

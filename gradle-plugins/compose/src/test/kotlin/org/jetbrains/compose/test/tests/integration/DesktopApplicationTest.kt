@@ -16,6 +16,7 @@ import java.util.*
 import java.util.jar.JarFile
 import kotlin.collections.HashSet
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 
@@ -77,16 +78,42 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun proguard(): Unit = with(testProject(TestProjects.proguard)) {
-        gradle(":runReleaseDistributable").build().checks { check ->
-            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+        val enableObfuscation = """
+                compose.desktop {
+                    application {
+                        buildTypes.release.proguard {
+                            obfuscate.set(true)
+                        }
+                    }
+                }
+            """.trimIndent()
 
-            assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
+        val actualMainImage = file("main-image.actual.png")
+        val expectedMainImage = file("main-image.expected.png")
 
-            val actualMainImage = file("main-image.actual.png")
-            val expectedMainImage = file("main-image.expected.png")
+        fun checkImageBeforeBuild() {
+            assertFalse(actualMainImage.exists(), "'$actualMainImage' exists")
+        }
+        fun checkImageAfterBuild() {
             assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
                 "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
             }
+        }
+
+        checkImageBeforeBuild()
+        gradle(":runReleaseDistributable").build().checks { check ->
+            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+            checkImageAfterBuild()
+            assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
+        }
+
+        file("build.gradle").modify { "$it\n$enableObfuscation" }
+        actualMainImage.delete()
+        checkImageBeforeBuild()
+        gradle(":runReleaseDistributable").build().checks { check ->
+            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+            checkImageAfterBuild()
+            assertNotEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
     }
 
