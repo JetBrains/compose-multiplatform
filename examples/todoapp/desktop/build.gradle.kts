@@ -18,6 +18,7 @@ kotlin {
                 implementation(project(":common:database"))
                 implementation(project(":common:root"))
                 implementation(project(":common:compose-ui"))
+                implementation(Deps.JetBrains.Coroutines.swing)
                 implementation(Deps.ArkIvanov.Decompose.decompose)
                 implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
                 implementation(Deps.ArkIvanov.MVIKotlin.mvikotlin)
