@@ -17,7 +17,7 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(compose.runtime)
-                implementation(compose.web.widgets)
+                implementation("org.jetbrains.compose.web:web-widgets:1.1.0")
                 implementation(project(":common:utils"))
                 implementation(project(":common:database"))
                 implementation(project(":common:root"))
