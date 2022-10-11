@@ -15,7 +15,7 @@ demonstrating how to use various Material widgets.
 
 ### Building native desktop distribution
 ```
-./gradlew :desktop:package
+./gradlew :desktop:packageDistributionForCurrentOS
 # outputs are written to desktop/build/compose/binaries
 ```
 

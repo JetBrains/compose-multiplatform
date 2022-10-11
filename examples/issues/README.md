@@ -8,7 +8,7 @@ Github Issues viewer example written in Jetpack Compose UI library.
 
 ### Building native desktop distribution
 ```
-./gradlew :desktop:package
+./gradlew :desktop:packageDistributionForCurrentOS
 # outputs are written to desktop/build/compose/binaries
 ```
 
