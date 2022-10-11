@@ -79,6 +79,10 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val additionalDocumentation: Property<FileCollection>
+
     @TaskAction
     fun buildCombinedDocs() {
         // create output dir before calling dokka to make sure relative links work.
@@ -114,7 +118,7 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
             metadata to exportDir
         }
         val input = MergeDocsInputs(
-            moduleName = "AndroidX KMP EAP Docs",
+            moduleName = "Jetpack Multiplatform Preview Reference Documentation",
             outputDir = outputDir,
             pluginsClasspath = pluginsClasspath.get(),
             modules = partialModules.map { (module, docsDir) ->
@@ -127,7 +131,8 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
             },
             pluginsConfiguration = listOf(
                 PluginsConfiguration.ANDROIDX_COPYRIGHT
-            )
+            ),
+            includes = additionalDocumentation.get().files
         )
         docsJsonOutput.get().asFile.let {
             it.parentFile.mkdirs()
@@ -176,6 +181,9 @@ internal abstract class DokkaCombinedDocsTask @Inject constructor(
                 )
                 it.dokkaCliClasspath.set(
                     DokkaUtils.createCliJarConfiguration(project)
+                )
+                it.additionalDocumentation.set(
+                    project.files("homepage.md")
                 )
             }
         }
