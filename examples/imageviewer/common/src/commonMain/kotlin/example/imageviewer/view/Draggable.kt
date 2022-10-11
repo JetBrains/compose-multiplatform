@@ -4,7 +4,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.input.pointer.consumePositionChange
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -28,7 +27,7 @@ fun Draggable(
             ) { change, dragAmount ->
                 dragHandler.drag(dragAmount)
                 onUpdate?.invoke()
-                change.consumePositionChange()
+                change.consume()
             }
         }
     ) {

@@ -1,8 +1,6 @@
 package example.todo.web
 
 import androidx.compose.runtime.Composable
-import org.jetbrains.compose.common.material.Text
-import org.jetbrains.compose.common.ui.ExperimentalComposeWebWidgetsApi
 import org.jetbrains.compose.web.attributes.InputType
 import org.jetbrains.compose.web.css.AlignItems
 import org.jetbrains.compose.web.css.DisplayStyle
@@ -66,7 +64,6 @@ fun Card(attrs: AttrBuilderContext<*> = {}, content: @Composable () -> Unit) {
     }
 }
 
-@OptIn(ExperimentalComposeWebWidgetsApi::class)
 @Composable
 fun MaterialTextArea(
     id: String,
@@ -95,7 +92,7 @@ fun MaterialTextArea(
         )
 
         Label(forId = id) {
-            Text(text = label)
+            Text(value = label)
         }
     }
 }

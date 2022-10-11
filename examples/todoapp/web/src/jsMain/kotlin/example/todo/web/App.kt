@@ -8,9 +8,7 @@ import example.todo.common.database.DefaultTodoSharedDatabase
 import example.todo.common.database.todoDatabaseDriver
 import example.todo.common.root.integration.TodoRootComponent
 import kotlinx.browser.document
-import org.jetbrains.compose.web.css.Style
 import org.jetbrains.compose.web.renderComposable
-import org.jetbrains.compose.web.ui.Styles
 import org.w3c.dom.HTMLElement
 
 fun main() {
@@ -28,8 +26,6 @@ fun main() {
     lifecycle.resume()
 
     renderComposable(root = rootElement) {
-        Style(Styles)
-
         TodoRootUi(root)
     }
 }

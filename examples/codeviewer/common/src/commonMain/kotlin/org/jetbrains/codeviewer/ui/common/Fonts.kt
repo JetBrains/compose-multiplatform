@@ -4,57 +4,57 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import org.jetbrains.codeviewer.platform.Font
+import org.jetbrains.codeviewer.platform.font
 
 object Fonts {
     @Composable
     fun jetbrainsMono() = FontFamily(
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_regular",
             FontWeight.Normal,
             FontStyle.Normal
         ),
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_italic",
             FontWeight.Normal,
             FontStyle.Italic
         ),
 
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_bold",
             FontWeight.Bold,
             FontStyle.Normal
         ),
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_bold_italic",
             FontWeight.Bold,
             FontStyle.Italic
         ),
 
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_extrabold",
             FontWeight.ExtraBold,
             FontStyle.Normal
         ),
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_extrabold_italic",
             FontWeight.ExtraBold,
             FontStyle.Italic
         ),
 
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_medium",
             FontWeight.Medium,
             FontStyle.Normal
         ),
-        Font(
+        font(
             "JetBrains Mono",
             "jetbrainsmono_medium_italic",
             FontWeight.Medium,

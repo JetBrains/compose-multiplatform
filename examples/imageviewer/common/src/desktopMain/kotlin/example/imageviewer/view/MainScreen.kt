@@ -1,9 +1,6 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.VerticalScrollbar
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,32 +9,26 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.rememberScrollbarAdapter
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Divider
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ResString
@@ -81,7 +72,8 @@ fun TopContent(content: ContentState) {
 
 @Composable
 fun TitleBar(text: String, content: ContentState) {
-    val refreshButtonHover = remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val refreshButtonHover by interactionSource.collectIsHoveredAsState()
     TopAppBar(
         backgroundColor = DarkGreen,
         title = {
@@ -98,17 +90,9 @@ fun TitleBar(text: String, content: ContentState) {
             ) {
                 Tooltip(ResString.refresh) {
                     Clickable(
-                        modifier = Modifier.hover(
-                            onEnter = {
-                                refreshButtonHover.value = true
-                                false
-                            },
-                            onExit = {
-                                refreshButtonHover.value = false
-                                false
-                            }
-                        )
-                        .background(color = if (refreshButtonHover.value) TranslucentBlack else Transparent),
+                        modifier = Modifier
+                            .hoverable(interactionSource)
+                            .background(color = if (refreshButtonHover) TranslucentBlack else Transparent),
                         onClick = {
                             if (content.isContentReady()) {
                                 content.refresh()
@@ -160,20 +144,15 @@ fun Miniature(
     picture: Picture,
     content: ContentState
 ) {
-    val cardHover = remember { mutableStateOf(false) }
-    val infoButtonHover = remember { mutableStateOf(false) }
+    val cardHoverInteractionSource = remember { MutableInteractionSource() }
+    val cardHover by cardHoverInteractionSource.collectIsHoveredAsState()
+    val infoButtonInteractionSource = remember { MutableInteractionSource() }
+    val infoButtonHover by infoButtonInteractionSource.collectIsHoveredAsState()
     Card(
-        backgroundColor = if (cardHover.value) MiniatureHoverColor else MiniatureColor,
+        backgroundColor = if (cardHover) MiniatureHoverColor else MiniatureColor,
         modifier = Modifier.padding(start = 10.dp, end = 18.dp).height(70.dp)
             .fillMaxWidth()
-            .hover(onEnter = {
-                cardHover.value = true
-                false
-            },
-            onExit = {
-                cardHover.value = false
-                false
-            })
+            .hoverable(cardHoverInteractionSource)
             .clickable {
                 content.setMainImage(picture)
             },
@@ -188,7 +167,7 @@ fun Miniature(
                 Image(
                     org.jetbrains.skia.Image.makeFromEncoded(
                         toByteArray(picture.image)
-                    ).asImageBitmap(),
+                    ).toComposeImageBitmap(),
                     contentDescription = null,
                     modifier = Modifier.height(70.dp)
                         .width(90.dp)
@@ -209,16 +188,8 @@ fun Miniature(
             Clickable(
                 modifier = Modifier.height(70.dp)
                     .width(30.dp)
-                    .hover(
-                        onEnter = {
-                            infoButtonHover.value = true
-                            false
-                        },
-                        onExit = {
-                            infoButtonHover.value = false
-                            false
-                    })
-                    .background(color = if (infoButtonHover.value) TranslucentWhite else Transparent),
+                    .hoverable(infoButtonInteractionSource)
+                    .background(color = if (infoButtonHover) TranslucentWhite else Transparent),
                 onClick = {
                     showPopUpMessage(
                         "${ResString.picture} " +

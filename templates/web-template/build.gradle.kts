@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
@@ -36,7 +35,7 @@ afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
         nodeVersion = "16.0.0"
         versions.webpackDevServer.version = "4.0.0"
-        versions.webpackCli.version = "4.9.0"
+        versions.webpackCli.version = "4.10.0"
     }
 }
 

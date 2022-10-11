@@ -20,6 +20,11 @@ object Deps {
             val testAnnotationsCommon get() = "org.jetbrains.kotlin:kotlin-test-annotations-common:$VERSION"
         }
 
+        object Coroutines {
+            private val VERSION get() = "1.6.4"
+            val swing get() = "org.jetbrains.kotlinx:kotlinx-coroutines-swing:$VERSION"
+        }
+
         object Compose {
             private val VERSION get() = properties["compose.version"]
             val gradlePlugin get() = "org.jetbrains.compose:compose-gradle-plugin:$VERSION"
