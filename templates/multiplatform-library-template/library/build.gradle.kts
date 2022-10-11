@@ -4,10 +4,15 @@ plugins {
     id("com.android.library")
     kotlin("multiplatform")
     id("org.jetbrains.compose")
+    id("maven-publish")
 }
 
+group = "com.mylibrary"
+
 kotlin {
-    android()
+    android {
+        publishLibraryVariants("release")
+    }
     jvm("desktop")
 
     sourceSets {
@@ -16,7 +21,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-                // Needed only for preview.
+                // Needed only for preview
                 implementation(compose.preview)
             }
         }
@@ -46,6 +51,34 @@ android {
         named("main") {
             manifest.srcFile("src/androidMain/AndroidManifest.xml")
             res.srcDirs("src/androidMain/res")
+        }
+    }
+}
+
+configure<PublishingExtension> {
+    publications {
+        all {
+            this as MavenPublication
+
+            pom {
+                this.name.set("Library for Compose Multiplatform")
+                licenses {
+                    license {
+                        this.name.set("The Apache License, Version 2.0")
+                        url.set("http://www.apache.org/licenses/LICENSE-2.0.txt")
+                    }
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            setUrl(findProperty("publish.url")?.toString().orEmpty())
+            credentials {
+                username = findProperty("publish.username")?.toString().orEmpty()
+                password = findProperty("publish.password")?.toString().orEmpty()
+            }
         }
     }
 }
