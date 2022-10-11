@@ -24,6 +24,7 @@ kotlin {
                 implementation(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
                 implementation(Deps.Badoo.Reaktive.reaktive)
                 implementation(Deps.Badoo.Reaktive.coroutinesInterop)
+                implementation(Deps.JetBrains.Kotlinx.coroutinesSwing)
             }
         }
     }
