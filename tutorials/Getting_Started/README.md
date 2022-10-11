@@ -45,7 +45,7 @@ For the latest versions, see the [latest versions](https://github.com/JetBrains/
 ```
 plugins {
     kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.compose") version "1.2.0-rc02"
+    id("org.jetbrains.compose") version "1.2.0"
 }
 ```
 
@@ -81,7 +81,7 @@ import org.jetbrains.compose.compose
 
 plugins {
     kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.compose") version "1.2.0-rc02"
+    id("org.jetbrains.compose") version "1.2.0"
 }
 
 repositories {
