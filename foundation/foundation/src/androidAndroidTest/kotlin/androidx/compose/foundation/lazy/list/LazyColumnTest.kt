@@ -48,6 +48,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
@@ -500,6 +501,49 @@ class LazyColumnTest {
 
             rule.onNodeWithText("$item")
                 .assertIsDisplayed()
+        }
+    }
+
+    @Test
+    fun nestedLazyRowChildrenAreReused() {
+        lateinit var state: LazyListState
+        var remeasuresCount = 0
+        val measureModifier = Modifier.layout { _, constraints ->
+            remeasuresCount++
+            layout(constraints.maxWidth, constraints.maxHeight) {}
+        }
+        rule.setContentWithTestViewConfiguration {
+            state = rememberLazyListState()
+            LazyColumn(
+                Modifier
+                    .fillMaxWidth()
+                    .height(10.dp),
+                state = state
+            ) {
+                items(100) {
+                    LazyRow {
+                        item {
+                            Box(Modifier.size(25.dp).then(measureModifier))
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            state.prefetchingEnabled = false
+            runBlocking {
+                state.scrollToItem(1) // now item 0 should be kept for reuse
+                assertThat(remeasuresCount).isEqualTo(2)
+                remeasuresCount = 0
+                state.scrollToItem(2) // item 2 should reuse item 0 slot
+            }
+        }
+
+        rule.runOnIdle {
+            // no remeasures are expected as the LayoutNode should be reused and modifiers
+            // didn't change.
+            assertThat(remeasuresCount).isEqualTo(0)
         }
     }
 
