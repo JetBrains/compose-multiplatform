@@ -44,8 +44,8 @@ The Compose plugin version used in the wizard above might not be the latest. Upd
 For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
 ```
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.2.0-rc01"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.compose") version "1.2.0-rc02"
 }
 ```
 
@@ -80,8 +80,8 @@ Then create `build.gradle.kts` with the following content:
 import org.jetbrains.compose.compose
 
 plugins {
-    kotlin("jvm") version "1.6.10"
-    id("org.jetbrains.compose") version "1.2.0-rc01"
+    kotlin("jvm") version "1.7.20"
+    id("org.jetbrains.compose") version "1.2.0-rc02"
 }
 
 repositories {
