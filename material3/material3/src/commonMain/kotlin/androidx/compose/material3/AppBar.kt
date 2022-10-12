@@ -111,7 +111,7 @@ import kotlin.math.roundToInt
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
- * bar in different states. See [TopAppBarDefaults.smallTopAppBarColors].
+ * bar in different states. See [TopAppBarDefaults.topAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
@@ -125,7 +125,7 @@ fun TopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
-    colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(),
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     SingleRowTopAppBar(
@@ -165,7 +165,7 @@ fun TopAppBar(
  * [IconButton]s. The default layout here is a [Row], so icons inside will be placed horizontally.
  * @param windowInsets a window insets that app bar will respect.
  * @param colors [TopAppBarColors] that will be used to resolve the colors used for this top app
- * bar in different states. See [TopAppBarDefaults.smallTopAppBarColors].
+ * bar in different states. See [TopAppBarDefaults.topAppBarColors].
  * @param scrollBehavior a [TopAppBarScrollBehavior] which holds various offset values that will be
  * applied by this top app bar to set up its height and colors. A scroll behavior is designed to
  * work in conjunction with a scrolled content to change the top app bar appearance as the content
@@ -188,7 +188,7 @@ fun SmallTopAppBar(
     navigationIcon: @Composable () -> Unit = {},
     actions: @Composable RowScope.() -> Unit = {},
     windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
-    colors: TopAppBarColors = TopAppBarDefaults.smallTopAppBarColors(),
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
     scrollBehavior: TopAppBarScrollBehavior? = null
 ) = TopAppBar(title, modifier, navigationIcon, actions, windowInsets, colors, scrollBehavior)
 
@@ -533,7 +533,7 @@ interface TopAppBarScrollBehavior {
 object TopAppBarDefaults {
 
     /**
-     * Creates a [TopAppBarColors] for small top app bars. The default implementation animates
+     * Creates a [TopAppBarColors] for small [TopAppBar]. The default implementation animates
      * between the provided colors according to the Material Design specification.
      *
      * @param containerColor the container color
@@ -544,7 +544,7 @@ object TopAppBarDefaults {
      * @return the resulting [TopAppBarColors] used for the top app bar
      */
     @Composable
-    fun smallTopAppBarColors(
+    fun topAppBarColors(
         containerColor: Color = TopAppBarSmallTokens.ContainerColor.toColor(),
         scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
             backgroundColor = containerColor,
@@ -563,6 +563,45 @@ object TopAppBarDefaults {
         )
 
     /**
+     * Creates a [TopAppBarColors] for small [TopAppBar]s. The default implementation animates
+     * between the provided colors according to the Material Design specification.
+     *
+     * @param containerColor the container color
+     * @param scrolledContainerColor the container color when content is scrolled behind it
+     * @param navigationIconContentColor the content color used for the navigation icon
+     * @param titleContentColor the content color used for the title
+     * @param actionIconContentColor the content color used for actions
+     * @return the resulting [TopAppBarColors] used for the top app bar
+     * @deprecated use [topAppBarColors] instead
+     */
+    @Deprecated(
+        message = "Use topAppBarColors instead.",
+        replaceWith = ReplaceWith(
+            "topAppBarColors(containerColor, scrolledContainerColor, " +
+                "navigationIconContentColor, titleContentColor, actionIconContentColor)"
+        ),
+        level = DeprecationLevel.WARNING
+    )
+    @Composable
+    fun smallTopAppBarColors(
+        containerColor: Color = TopAppBarSmallTokens.ContainerColor.toColor(),
+        scrolledContainerColor: Color = MaterialTheme.colorScheme.applyTonalElevation(
+            backgroundColor = containerColor,
+            elevation = TopAppBarSmallTokens.OnScrollContainerElevation
+        ),
+        navigationIconContentColor: Color = TopAppBarSmallTokens.LeadingIconColor.toColor(),
+        titleContentColor: Color = TopAppBarSmallTokens.HeadlineColor.toColor(),
+        actionIconContentColor: Color = TopAppBarSmallTokens.TrailingIconColor.toColor(),
+    ): TopAppBarColors =
+        topAppBarColors(
+            containerColor,
+            scrolledContainerColor,
+            navigationIconContentColor,
+            titleContentColor,
+            actionIconContentColor
+        )
+
+    /**
      * Default insets to be used and consumed by the top app bars
      */
     val windowInsets: WindowInsets
@@ -571,7 +610,7 @@ object TopAppBarDefaults {
             .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
 
     /**
-     * Creates a [TopAppBarColors] for center aligned top app bars. The default implementation
+     * Creates a [TopAppBarColors] for [CenterAlignedTopAppBar]s. The default implementation
      * animates between the provided colors according to the Material Design specification.
      *
      * @param containerColor the container color
@@ -601,7 +640,7 @@ object TopAppBarDefaults {
         )
 
     /**
-     * Creates a [TopAppBarColors] for medium top app bars. The default implementation interpolates
+     * Creates a [TopAppBarColors] for [MediumTopAppBar]s. The default implementation interpolates
      * between the provided colors as the top app bar scrolls according to the Material Design
      * specification.
      *
@@ -632,7 +671,7 @@ object TopAppBarDefaults {
         )
 
     /**
-     * Creates a [TopAppBarColors] for large top app bars. The default implementation interpolates
+     * Creates a [TopAppBarColors] for [LargeTopAppBar]s. The default implementation interpolates
      * between the provided colors as the top app bar scrolls according to the Material Design
      * specification.
      *

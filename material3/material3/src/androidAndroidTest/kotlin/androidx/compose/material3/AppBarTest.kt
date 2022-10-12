@@ -183,23 +183,23 @@ class AppBarTest {
                     FakeIcon(Modifier.testTag(NavigationIconTestTag))
                     navigationIconColor = LocalContentColor.current
                     expectedNavigationIconColor =
-                        TopAppBarDefaults.smallTopAppBarColors().navigationIconContentColor
+                        TopAppBarDefaults.topAppBarColors().navigationIconContentColor
                     // fraction = 0f to indicate no scroll.
                     expectedContainerColor = TopAppBarDefaults
-                        .smallTopAppBarColors()
+                        .topAppBarColors()
                         .containerColor(colorTransitionFraction = 0f)
                 },
                 title = {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     titleColor = LocalContentColor.current
                     expectedTitleColor = TopAppBarDefaults
-                        .smallTopAppBarColors().titleContentColor
+                        .topAppBarColors().titleContentColor
                 },
                 actions = {
                     FakeIcon(Modifier.testTag(ActionsTestTag))
                     actionsColor = LocalContentColor.current
                     expectedActionsColor = TopAppBarDefaults
-                        .smallTopAppBarColors().actionIconContentColor
+                        .topAppBarColors().actionIconContentColor
                 }
             )
         }
@@ -227,7 +227,7 @@ class AppBarTest {
                     Text("Title", Modifier.testTag(TitleTestTag))
                     // fraction = 1f to indicate a scroll.
                     expectedScrolledContainerColor =
-                        TopAppBarDefaults.smallTopAppBarColors()
+                        TopAppBarDefaults.topAppBarColors()
                             .containerColor(colorTransitionFraction = 1f)
                 },
                 modifier = Modifier.testTag(TopAppBarTestTag),
@@ -289,7 +289,7 @@ class AppBarTest {
                         Text("Title", Modifier.testTag(TitleTestTag))
                     },
                     colors =
-                    TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent),
+                    TopAppBarDefaults.topAppBarColors(containerColor = Color.Transparent),
                     scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(),
                 )
             }
