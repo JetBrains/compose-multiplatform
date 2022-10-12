@@ -28,8 +28,18 @@ Only one `ref` can be used per element. Calling it more than once will dismiss e
 
 For example, `ref` can be used to add and remove some event listeners not provided by compose-web from the box.
 
-### DisposableRefEffect
+### DisposableRefEffect (deprecated)
 
+**Deprecated:** 
+
+Consider using `DisposableEffect`. Its scope provides `scopeElement` - a reference to the underlying HTML element:
+``` kotlin
+DisposableEffect(key) {
+    scopeElement.innerText = key
+    onDispose { scopeElement.innerText = "" }
+}
+```
+---
 Under the hood, `DisposableRefEffect` uses [DisposableEffect](https://developer.android.com/jetpack/compose/side-effects#disposableeffect)
 
 `DisposableRefEffect` is similar to `ref`, since it also provides a reference to an element. At the same time it has few differences.
@@ -65,8 +75,14 @@ Div {
 }
 ```
 
-### DomSideEffect
+### DomSideEffect (deprecated)
 
+**Deprecated:**
+
+Consider using [SideEffect](https://developer.android.com/jetpack/compose/side-effects#sideeffect-publish).
+If a reference to an underlying HTML element is needed, consider using `DisposableEffect` and `scopeElement` within its scope.
+
+---
 Under the hood, `DomSideEffect` uses [SideEffect](https://developer.android.com/jetpack/compose/side-effects#sideeffect-publish)
 
 `DomSideEffect` as well as `DisposableRefEffect` can be used with a key and without it.
