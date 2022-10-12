@@ -230,6 +230,9 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
             task.removePrefix(project.getCheckoutRoot().path)
         }
+
+        project.zipComposeCompilerMetrics()
+        project.zipComposeCompilerReports()
     }
 
     // If our output message validation configuration changes, invalidate all tasks to make sure
