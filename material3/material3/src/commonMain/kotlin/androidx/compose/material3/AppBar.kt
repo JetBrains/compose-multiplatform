@@ -68,6 +68,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -1269,10 +1270,11 @@ private fun TopAppBarLayout(
                     .layoutId("title")
                     .padding(horizontal = TopAppBarHorizontalPadding)
                     .then(if (hideTitleSemantics) Modifier.clearAndSetSemantics { } else Modifier)
+                    .graphicsLayer(alpha = titleAlpha)
             ) {
                 ProvideTextStyle(value = titleTextStyle) {
                     CompositionLocalProvider(
-                        LocalContentColor provides titleContentColor.copy(alpha = titleAlpha),
+                        LocalContentColor provides titleContentColor,
                         content = title
                     )
                 }
