@@ -624,7 +624,7 @@ compose.desktop {
     }
 }
 ```
-See the Guardsquare's [comprehencive manual](https://www.guardsquare.com/manual/configuration/usage)
+See the Guardsquare's [comprehensive manual](https://www.guardsquare.com/manual/configuration/usage)
 on ProGuard's rules & configuration options.
 
 Obfuscation is disabled by default. To enable it, set the following property via Gradle DSL:
