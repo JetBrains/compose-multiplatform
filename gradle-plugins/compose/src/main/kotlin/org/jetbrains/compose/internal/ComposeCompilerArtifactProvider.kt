@@ -62,7 +62,7 @@ internal class ComposeCompilerArtifactProvider(
     }
 
     private val unsupportedPlatforms: Set<KotlinPlatformType> by lazy {
-        if (customCompilerArtifact == null) autoCompilerVersion.unsupportedPlatforms else emptySet()
+        if (customCompilerArtifact != null) emptySet() else autoCompilerVersion.unsupportedPlatforms
     }
 
     val compilerArtifact: SubpluginArtifact get() {
