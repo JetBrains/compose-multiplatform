@@ -128,9 +128,7 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "listTaskOutputs",
     "tasks",
 
-    // More information about the fact that these dokka tasks rerun can be found at b/167569304
-    "dokkaKotlinDocs",
-    "zipDokkaDocs",
+    // More information about the fact that these dackka tasks rerun can be found at b/167569304
     "dackkaDocs",
 
     // We know that these tasks are never up to date due to maven-metadata.xml changing

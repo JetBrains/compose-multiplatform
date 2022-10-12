@@ -20,7 +20,6 @@ import androidx.build.SupportConfig
 import androidx.build.dackka.DackkaTask
 import androidx.build.dackka.GenerateMetadataTask
 import androidx.build.dependencies.KOTLIN_VERSION
-import androidx.build.dokka.Dokka
 import androidx.build.enforceKtlintVersion
 import androidx.build.getAndroidJar
 import androidx.build.getBuildId
@@ -66,8 +65,6 @@ import org.gradle.kotlin.dsl.getByType
 import org.gradle.kotlin.dsl.named
 import org.gradle.kotlin.dsl.register
 import org.gradle.work.DisableCachingByDefault
-import org.jetbrains.dokka.gradle.DokkaAndroidTask
-import org.jetbrains.dokka.gradle.PackageOptions
 
 /**
  * Plugin that allows to build documentation for a given set of prebuilt and tip of tree projects.
@@ -115,13 +112,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             unzippedSamplesSources,
             samplesSourcesConfiguration
         )
-        val unzippedDocsSources = File(project.buildDir, "srcs")
-        val unzipDocsTask = configureUnzipTask(
-            project,
-            "unzipDocsSources",
-            unzippedDocsSources,
-            docsSourcesConfiguration
-        )
 
         val unzippedSourcesForDackka = File(project.buildDir, "unzippedSourcesForDackka")
         val unzipSourcesForDackkaTask = configureDackkaUnzipTask(
@@ -140,15 +130,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             buildOnServer,
             docsSourcesConfiguration,
         )
-        configureDokka(
-            project,
-            unzippedDocsSources,
-            unzipDocsTask,
-            unzippedSamplesSources,
-            unzipSamplesTask,
-            dependencyClasspath,
-            buildOnServer
-        )
     }
 
     /**
@@ -161,7 +142,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         destinationDirectory: File,
         docsConfiguration: Configuration
     ): TaskProvider<Sync> {
-        @Suppress("UnstableApiUsage")
         return project.tasks.register(
             taskName,
             Sync::class.java
@@ -409,76 +389,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         buildOnServer.configure { it.dependsOn(zipTask) }
     }
 
-    private fun configureDokka(
-        project: Project,
-        unzippedDocsSources: File,
-        unzipDocsTask: TaskProvider<Sync>,
-        unzippedSamplesSources: File,
-        unzipSamplesTask: TaskProvider<Sync>,
-        dependencyClasspath: FileCollection,
-        buildOnServer: TaskProvider<*>
-    ) {
-        val dokkaTask = Dokka.createDokkaTask(
-            project,
-            hiddenPackages,
-            "Kotlin",
-            "dac",
-            "/reference/kotlin"
-        )
-        dokkaTask.configure { task ->
-            task.sourceDirs += unzippedDocsSources
-            task.sourceDirs += unzippedSamplesSources
-            task.dependsOn(unzipDocsTask)
-            task.dependsOn(unzipSamplesTask)
-
-            val androidJar = project.getAndroidJar()
-            val dokkaClasspath = project.provider {
-                project.files(androidJar).plus(dependencyClasspath)
-            }
-            // DokkaTask tries to resolve DokkaTask#classpath right away for jars that might not
-            // be there yet. Delay the setting of this property to before we run the task.
-            task.inputs.files(androidJar, dependencyClasspath)
-            task.doFirst { dokkaTask ->
-                dokkaTask as DokkaAndroidTask
-                val packages =
-                    unzippedSamplesSources.walkTopDown().filter { it.isFile }.mapNotNull { file ->
-                        val lines = file.readLines()
-                        lines.find { line ->
-                            line.startsWith("package ")
-                        }?.replace("package ", "")
-                    }.distinct()
-
-                packages.forEach { packageName ->
-                    val opts = PackageOptions()
-                    opts.prefix = packageName
-                    opts.suppress = true
-                    dokkaTask.perPackageOptions.add(opts)
-                }
-                dokkaTask.classpath = dokkaClasspath.get()
-            }
-        }
-        val zipTask = project.tasks.register("zipDokkaDocs", Zip::class.java) {
-            it.apply {
-                it.dependsOn(dokkaTask)
-                from(dokkaTask.map { it.outputDirectory }) { copySpec ->
-                    copySpec.into("reference/kotlin")
-                }
-                val baseName = "dokka-$docsType-docs"
-                val buildId = getBuildId()
-                archiveBaseName.set(baseName)
-                archiveVersion.set(buildId)
-                destinationDirectory.set(project.getDistributionDirectory())
-                group = JavaBasePlugin.DOCUMENTATION_GROUP
-                val filePath = "${project.getDistributionDirectory().canonicalPath}/"
-                val fileName = "$baseName-$buildId.zip"
-                val destinationFile = filePath + fileName
-                description = "Zips Kotlin documentation (generated via Dokka in the " +
-                    "style of d.android.com) into $destinationFile"
-            }
-        }
-        buildOnServer.configure { it.dependsOn(zipTask) }
-    }
-
     /**
      * Replace all tests etc with empty task, so we don't run anything
      * it is more effective then task.enabled = false, because we avoid executing deps as well
@@ -520,7 +430,6 @@ open class DocsBuildOnServer : DefaultTask() {
     fun getRequiredFiles(): List<File> {
         return listOf(
             File(distributionDirectory, "dackka-$docsType-docs-$buildId.zip"),
-            File(distributionDirectory, "dokka-$docsType-docs-$buildId.zip")
         )
     }
 
