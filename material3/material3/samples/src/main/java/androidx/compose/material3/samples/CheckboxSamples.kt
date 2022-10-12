@@ -36,8 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Sampled
 @Composable
 fun CheckboxSample() {
@@ -48,6 +50,7 @@ fun CheckboxSample() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun CheckboxWithTextSample() {
@@ -76,6 +79,7 @@ fun CheckboxWithTextSample() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun TriStateCheckboxSample() {

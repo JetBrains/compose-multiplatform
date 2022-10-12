@@ -26,7 +26,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,6 +47,7 @@ fun OneLineListItem() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
@@ -65,6 +68,7 @@ fun TwoLineListItem() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)

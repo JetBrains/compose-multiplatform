@@ -56,8 +56,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Sampled
 @Composable
 fun TextTabs() {
@@ -190,6 +192,7 @@ fun ScrollingTextTabs() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun FancyTabs() {
@@ -209,6 +212,7 @@ fun FancyTabs() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun FancyIndicatorTabs() {
@@ -244,6 +248,7 @@ fun FancyIndicatorTabs() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun FancyIndicatorContainerTabs() {
@@ -315,6 +320,7 @@ fun ScrollingFancyIndicatorContainerTabs() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun FancyTab(title: String, onClick: () -> Unit, selected: Boolean) {
@@ -339,6 +345,7 @@ fun FancyTab(title: String, onClick: () -> Unit, selected: Boolean) {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun FancyIndicator(color: Color, modifier: Modifier = Modifier) {
@@ -352,6 +359,7 @@ fun FancyIndicator(color: Color, modifier: Modifier = Modifier) {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun FancyAnimatedIndicator(tabPositions: List<TabPosition>, selectedTabIndex: Int) {

@@ -38,7 +38,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Sampled
 @Composable
 fun SliderSample() {
@@ -53,6 +55,7 @@ fun SliderSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun StepsSliderSample() {
@@ -74,6 +77,7 @@ fun StepsSliderSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun RangeSliderSample() {
@@ -94,6 +98,7 @@ fun RangeSliderSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun StepRangeSliderSample() {
@@ -115,6 +120,7 @@ fun StepRangeSliderSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun SliderWithCustomThumbSample() {
@@ -144,6 +150,7 @@ fun SliderWithCustomThumbSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun SliderWithCustomTrackAndThumb() {
