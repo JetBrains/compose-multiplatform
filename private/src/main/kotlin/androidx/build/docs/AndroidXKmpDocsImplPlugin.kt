@@ -70,7 +70,7 @@ class AndroidXKmpDocsImplPlugin @Inject constructor(
             project: Project
         ) {
             val kotlinExtension = project.the<KotlinProjectExtension>()
-            val docsTask = DokkaPartialDocsTask.register(
+            val docsWithPlaceholderSourceLinks = DokkaPartialDocsTask.register(
                 project,
                 kotlinExtension
             )
@@ -80,9 +80,11 @@ class AndroidXKmpDocsImplPlugin @Inject constructor(
                 config.isCanBeConsumed = true
             }
             project.artifacts { artifactHandler ->
-                artifactHandler.add(PRODUCER_CONFIGURATION_NAME, docsTask.map {
-                    it.outputDir
-                })
+                artifactHandler.add(
+                    PRODUCER_CONFIGURATION_NAME,
+                    docsWithPlaceholderSourceLinks.map {
+                        it.outputDir
+                    })
             }
         }
 
