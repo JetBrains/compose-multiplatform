@@ -586,6 +586,38 @@ fun main() {
 3. Run `./gradlew runDistributable`.
 4. Links like `compose://foo/bar` are now redirected from a browser to your application.
 
+## Customizing data passed to `jpackage` via `--resource-dir`
+
+In some cases it can be useful to pass files to `jpackage` via the `--resource-dir`
+option. For example on Windows, it is possible to customize the generated install
+wizard that way as the Wix toolchain used to build the installer uses that directory
+for looking for custom configuration files.
+
+To do so, specify a root resource directory via DSL:
+```
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+            packageVersion = "1.0.0"
+
+            jpackageResourcesRootDir.set(project.layout.projectDirectory.dir("jpackage-resources"))
+        }
+    }
+}
+```
+In the example above a root resource directory is set to `<PROJECT_DIR>/jpackage-resources`.
+
+Compose Gradle plugin will include all files under the following subdirectories:
+1. Files from `<RESOURCES_ROOT_DIR>/common` will be included into all packages.
+2. Files from `<RESOURCES_ROOT_DIR>/<OS_NAME>` will be included only into packages for
+a specific OS. Possible values for `<OS_NAME>` are: `windows`, `macos`, `linux`.
+3. Files from `<RESOURCES_ROOT_DIR>/<OS_NAME>-<ARCH_NAME>` will be included only into packages for
+   a specific combination of OS and CPU architecture. Possible values for `<ARCH_NAME>` are: `x64` and `arm64`.
+For example, files from `<RESOURCES_ROOT_DIR>/macos-arm64` will be included only into packages built for Apple Silicon
+Macs.
+
 ## Obfuscation
     
 To obfuscate Compose Multiplatform JVM applications the standard approach for JVM applications works.
