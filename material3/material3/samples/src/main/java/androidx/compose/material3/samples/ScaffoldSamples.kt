@@ -56,12 +56,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Preview
 @Sampled
 @Composable
 fun SimpleScaffoldWithTopBar() {
@@ -114,6 +116,7 @@ fun SimpleScaffoldWithTopBar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithSimpleSnackbar() {
@@ -147,6 +150,7 @@ fun ScaffoldWithSimpleSnackbar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithIndefiniteSnackbar() {
@@ -183,6 +187,7 @@ fun ScaffoldWithIndefiniteSnackbar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithCustomSnackbar() {
@@ -260,6 +265,7 @@ fun ScaffoldWithCustomSnackbar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithCoroutinesSnackbar() {

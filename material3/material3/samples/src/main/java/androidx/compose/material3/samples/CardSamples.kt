@@ -28,8 +28,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Sampled
 @Composable
 fun CardSample() {
@@ -39,6 +41,7 @@ fun CardSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ClickableCardSample() {
@@ -52,6 +55,7 @@ fun ClickableCardSample() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun ElevatedCardSample() {
@@ -61,6 +65,7 @@ fun ElevatedCardSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ClickableElevatedCardSample() {
@@ -74,6 +79,7 @@ fun ClickableElevatedCardSample() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun OutlinedCardSample() {
@@ -83,6 +89,7 @@ fun OutlinedCardSample() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ClickableOutlinedCardSample() {
