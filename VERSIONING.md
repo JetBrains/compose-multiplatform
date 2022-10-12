@@ -32,21 +32,22 @@ Kotlin version | Minimal Compose version | Notes
 1.7.10 | 1.2.0
 1.7.20 | 1.2.0 | JS is not supported (will be fixed in the next versions)
 
-### Relation to Jetpack Compose and Compose Multiplatform release cycle
+### Relationship between the Jetpack Compose and Compose Multiplatform release cycles
 
-Compose Multiplatform shares a lot of code with [Jetpack Compose](https://developer.android.com/jetpack/compose) for Android developed by Google.
-We keep our release cycles aligned, so the common part is properly tested and stabilized.
+Compose Multiplatform shares a lot of code with [Jetpack Compose](https://developer.android.com/jetpack/compose) for Android, a framework developed by Google.
+We keep our release cycles aligned, making sure that the common part is properly tested and stabilized.
 
-When a new version of Jetpack Compose is released, we pick the release commit, use it as a base for the next [Compose Multiplatform](https://github.com/JetBrains/androidx) version, finish new platform features, stabilize all platforms, and release Compose Multiplatform after some time.
-A gap between a Compose Multiplatform release and a Jetpack Compose release is usually 1-3 months.
+When a new version of Jetpack Compose is released, we pick the release commit, use it as a base for the next [Compose Multiplatform](https://github.com/JetBrains/androidx) version, finish new platform features, stabilize all platforms, and release Compose Multiplatform.
+The gap between a Compose Multiplatform release and a Jetpack Compose release is usually 1 to 3 months.
 
-When you build your application for Android, the artifacts published by Google are used. For example, if you applied Compose Multiplatform 1.2.0 Gradle plugin, and added `implementation(compose.material3)` into your `dependencies`, then you project uses the `androidx.compose.material3:material3:1.0.0-alpha14` artifact in Android target (but `org.jetbrains.compose.material3:material3:1.2.0` in the other targets). See `Updated dependencies` sections in [CHANGELOG](https://github.com/JetBrains/compose-jb/blob/master/CHANGELOG.md) to know exactly what version of the Jetpack Compose artifact is used.
+When you build your application for Android, the artifacts published by Google are used. For example, if you apply the Compose Multiplatform 1.2.0 Gradle plugin and add `implementation(compose.material3)` to your `dependencies`, then your project will use the `androidx.compose.material3:material3:1.0.0-alpha14` artifact in the Android target (but `org.jetbrains.compose.material3:material3:1.2.0` in the other targets). See the `Updated dependencies` sections in the [CHANGELOG](https://github.com/JetBrains/compose-jb/blob/master/CHANGELOG.md) to know exactly which version of the Jetpack Compose artifact will be used.
 
-The Compose Compiler version can be changed independently of other Compose libraries. In order to support newer versions of Kotlin, you may want to use [a cutting edge Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility) published by Google in your Compose Multiplatform project. For example, when the new version of Kotlin is released, a corresponding Compose Multiplatform release may not yet have been published, but manually specifying a newer Compose Compiler version can allow you to build your Compose Multiplatform app using the latest Kotlin release. In that case you can set `kotlinCompilerPlugin` in the `compose` section of your `build.gradle.kts` file:
+The Compose Compiler version can be changed independently of other Compose libraries. In order to support newer versions of Kotlin, you may want to use [the cutting-edge Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility) published by Google in your Compose Multiplatform project. For example, when a new version of Kotlin is released, the corresponding Compose Multiplatform release may not yet have been published, but manually specifying a newer Compose Compiler version can allow you to build your Compose Multiplatform app using the latest Kotlin release. To do so, set `kotlinCompilerPlugin` in the `compose` section of your `build.gradle.kts` file as follows:
 
 ```kotlin
 compose {
     kotlinCompilerPlugin.set("androidx.compose.compiler:compiler:1.3.1")
 }
 ```
-But because it isn't tested with Compose Multiplatform, stability isn't guaranteed.
+However, keep in mind that this compiler version isn't tested with Compose Multiplatform, so stability isn't guaranteed.
+
