@@ -18,7 +18,6 @@ package androidx.compose.integration.macrobenchmark
 
 import android.content.Intent
 import android.graphics.Point
-import androidx.benchmark.macro.ExperimentalBaselineProfilesApi
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -28,7 +27,6 @@ import org.junit.Rule
 import org.junit.Test
 
 @LargeTest
-@OptIn(ExperimentalBaselineProfilesApi::class)
 @SdkSuppress(minSdkVersion = 28)
 class SmallListBaselineProfile {
 
