@@ -38,7 +38,7 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                 platform: iOS
                 deploymentTarget: "12.0"
                 prebuildScripts:
-                  - script: cd "${rootDir.absolutePath}" && ./gradlew -i -p . packComposeUikitApplicationForXCode
+                  - script: env && cd "${rootDir.absolutePath}" && ./gradlew -i packComposeUikitApplicationForXCode
                     name: GradleCompile
                 info:
                   path: plists/Ios/Info.plist
@@ -46,12 +46,7 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                     UILaunchStoryboardName: ""
                     method: "development"
                 sources:
-                  - path: "../../../src/"
-                    excludes:
-                      - "jvm*/**"
-                      - "desktop*/**"
-                      - "android*/**"
-                      - "*Test/**"
+                  - "empty-src"
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"
@@ -59,6 +54,7 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                   VALID_ARCHS: "arm64"
             """.trimIndent()
         )
+        buildIosDir.resolve("empty-src").mkdir()
         runExternalTool(xcodeGenExecutable, emptyList(), workingDir = buildIosDir)
     }
 }
