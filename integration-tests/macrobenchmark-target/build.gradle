@@ -37,6 +37,7 @@ dependencies {
     implementation(project(":compose:runtime:runtime-tracing"))
     implementation(project(":compose:ui:ui"))
     implementation(project(":compose:ui:ui-tooling"))
+    implementation(project(":profileinstaller:profileinstaller"))
 }
 
 android.defaultConfig.minSdkVersion 21
