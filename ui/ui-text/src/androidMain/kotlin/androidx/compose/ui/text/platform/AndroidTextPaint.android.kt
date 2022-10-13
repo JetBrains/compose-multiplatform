@@ -45,7 +45,9 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     }
 
     private var textDecoration: TextDecoration = TextDecoration.None
-    private var shadow: Shadow = Shadow.None
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    internal var shadow: Shadow = Shadow.None
 
     @VisibleForTesting
     internal var brush: Brush? = null
