@@ -46,7 +46,6 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                     UILaunchStoryboardName: ""
                     method: "development"
                 sources:
-                  - "empty-src"
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"
@@ -54,7 +53,6 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                   VALID_ARCHS: "arm64"
             """.trimIndent()
         )
-        buildIosDir.resolve("empty-src").mkdir()
         runExternalTool(xcodeGenExecutable, emptyList(), workingDir = buildIosDir)
     }
 }
