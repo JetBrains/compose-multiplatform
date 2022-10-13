@@ -21,6 +21,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertSame
 import org.junit.Assert.fail
 
 @SmallTest
@@ -59,5 +61,32 @@ class PaintTest {
     @Test
     fun testFilterBitmapEnabledByDefault() {
         assertTrue(Paint().asFrameworkPaint().isFilterBitmap)
+    }
+
+    @Test
+    fun testToComposePaintForColor() {
+        val nativePaint = android.graphics.Paint()
+        val composePaint = nativePaint.toComposePaint()
+        composePaint.color = Color(android.graphics.Color.GREEN)
+        assertEquals(nativePaint.color, android.graphics.Color.GREEN)
+    }
+
+    @Test
+    fun testToComposePaintForShader() {
+        val nativePaint = android.graphics.Paint()
+        val composePaint = nativePaint.toComposePaint()
+        val green = android.graphics.Color.GREEN
+        val red = android.graphics.Color.RED
+        val shader = android.graphics.LinearGradient(
+            0f,
+            0f,
+            1f,
+            1f,
+            green,
+            red,
+            android.graphics.Shader.TileMode.MIRROR
+        )
+        composePaint.shader = shader
+        assertSame(composePaint.shader, nativePaint.shader)
     }
 }

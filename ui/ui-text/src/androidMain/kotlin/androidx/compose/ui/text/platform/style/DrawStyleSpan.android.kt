@@ -21,12 +21,12 @@ import android.text.TextPaint
 import android.text.style.CharacterStyle
 import android.text.style.UpdateAppearance
 import androidx.compose.ui.graphics.ShaderBrush
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.asAndroidPathEffect
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.text.platform.toAndroidCap
-import androidx.compose.ui.text.platform.toAndroidJoin
 
 /**
  * A span that applies [ShaderBrush] to TextPaint after receiving a specified size
@@ -47,6 +47,24 @@ internal class DrawStyleSpan(
                     pathEffect = drawStyle.pathEffect?.asAndroidPathEffect()
                 }
             }
+        }
+    }
+
+    private fun StrokeJoin.toAndroidJoin(): Paint.Join {
+        return when (this) {
+            StrokeJoin.Miter -> Paint.Join.MITER
+            StrokeJoin.Round -> Paint.Join.ROUND
+            StrokeJoin.Bevel -> Paint.Join.BEVEL
+            else -> Paint.Join.MITER
+        }
+    }
+
+    private fun StrokeCap.toAndroidCap(): Paint.Cap {
+        return when (this) {
+            StrokeCap.Butt -> Paint.Cap.BUTT
+            StrokeCap.Round -> Paint.Cap.ROUND
+            StrokeCap.Square -> Paint.Cap.SQUARE
+            else -> Paint.Cap.BUTT
         }
     }
 }
