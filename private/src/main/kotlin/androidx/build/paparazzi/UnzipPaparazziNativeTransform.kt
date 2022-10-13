@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.build.layoutlib
+package androidx.build.paparazzi
 
 import java.util.zip.ZipInputStream
 import org.gradle.api.artifacts.transform.CacheableTransform
