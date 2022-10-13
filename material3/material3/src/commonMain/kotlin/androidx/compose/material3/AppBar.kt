@@ -27,7 +27,6 @@ import androidx.compose.animation.core.animateDecay
 import androidx.compose.animation.core.animateTo
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.rememberSplineBasedDecay
-import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
@@ -1163,11 +1162,10 @@ private fun TwoRowsTopAppBar(
         Modifier
     }
 
-    Surface(modifier = modifier.then(appBarDragModifier)) {
+    Surface(modifier = modifier.then(appBarDragModifier), color = appBarContainerColor) {
         Column {
             TopAppBarLayout(
                 modifier = Modifier
-                    .background(color = appBarContainerColor)
                     .windowInsetsPadding(windowInsets)
                     // clip after padding so we don't show the title over the inset area
                     .clipToBounds(),
