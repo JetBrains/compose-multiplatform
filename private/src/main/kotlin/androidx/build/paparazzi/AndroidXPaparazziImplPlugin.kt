@@ -71,6 +71,7 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
 
         // Set non-path system properties at configuration time, so that changes invalidate caching
         prefixedSystemProperties(
+            "gradlePluginApplied" to "true",
             "compileSdkVersion" to TARGET_SDK_VERSION,
             "resourcePackageNames" to packageName, // TODO: Transitive resource packages?
             "modulePath" to modulePath
