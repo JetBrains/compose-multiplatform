@@ -37,9 +37,6 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                 type: application
                 platform: iOS
                 deploymentTarget: "12.0"
-                prebuildScripts:
-                  - script: cd "${rootDir.absolutePath}" && ./gradlew -i -p . packComposeUikitApplicationForXCode
-                    name: GradleCompile
                 info:
                   path: plists/Ios/Info.plist
                   properties:

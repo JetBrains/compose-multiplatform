@@ -20,6 +20,7 @@ fun Project.registerSimulatorTasks(
     projectName: String,
     bundleIdPrefix: String,
     taskInstallXcodeGen: TaskProvider<*>,
+    taskPackageUiKitAppFoxXcode: TaskProvider<*>,
     configurations: List<UiKitConfiguration>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
@@ -98,6 +99,7 @@ fun Project.registerSimulatorTasks(
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBuild$id$configName") {
             dependsOn(taskGenerateXcodeProject)
+            dependsOn(taskPackageUiKitAppFoxXcode)
             doLast {
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIFX_SIMULATOR + getSimctlListData().runtimes.first().version
