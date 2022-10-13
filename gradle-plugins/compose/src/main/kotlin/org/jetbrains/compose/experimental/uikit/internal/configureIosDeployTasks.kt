@@ -18,7 +18,10 @@ const val RELATIVE_PRODUCTS_PATH = "build/Build/Products"
 
 fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 
-internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitApplication) {
+internal fun Project.configureIosDeployTasks(
+    application: ExperimentalUiKitApplication,
+    taskPackageUiKitAppFoxXcode: TaskProvider<*>,
+) {
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
 
@@ -35,6 +38,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
+                    taskPackageUiKitAppFoxXcode = taskPackageUiKitAppFoxXcode,
                     configurations = application.configurations,
                 )
             }
@@ -48,6 +52,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
+                    taskPackageUiKitAppFoxXcode = taskPackageUiKitAppFoxXcode,
                     taskInstallIosDeploy = taskInstallIosDeploy,
                     configurations = application.configurations,
                 )

@@ -22,7 +22,7 @@ internal fun Project.configureExperimentalUikitApplication(
 ) {
     if (currentOS != OS.MacOS) return
 
-    tasks.register(
+    val taskPackageUiKitAppFoxXcode = tasks.register(
         "packComposeUikitApplicationForXCode",
         ExperimentalPackComposeApplicationForXCodeTask::class.java
     ) { packTask ->
@@ -48,5 +48,8 @@ internal fun Project.configureExperimentalUikitApplication(
         packTask.executablePath.set(executablePath)
     }
 
-    configureIosDeployTasks(application)
+    configureIosDeployTasks(
+        application = application,
+        taskPackageUiKitAppFoxXcode = taskPackageUiKitAppFoxXcode
+    )
 }

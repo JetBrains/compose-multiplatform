@@ -20,6 +20,7 @@ fun Project.registerConnectedDeviceTasks(
     projectName: String,
     bundleIdPrefix: String,
     taskInstallXcodeGen: TaskProvider<*>,
+    taskPackageUiKitAppFoxXcode: TaskProvider<*>,
     taskInstallIosDeploy: TaskProvider<*>,
     configurations: List<UiKitConfiguration>,
 ) {
@@ -49,6 +50,7 @@ fun Project.registerConnectedDeviceTasks(
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIphoneOs$id$configName") {
             dependsOn(taskGenerateXcodeProject)
+            dependsOn(taskPackageUiKitAppFoxXcode)
             doLast {
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIX_IPHONEOS + getSimctlListData().runtimes.first().version
