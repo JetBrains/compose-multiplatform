@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import com.google.common.truth.Truth.assertThat
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
@@ -31,10 +32,12 @@ class TextControllerTest {
     fun `semantics modifier recreated when TextDelegate is set`() {
         val textDelegateBefore = mock<TextDelegate>() {
             whenever(it.text).thenReturn(AnnotatedString("Example Text String 1"))
+            whenever(it.style).thenReturn(TextStyle.Default)
         }
 
         val textDelegateAfter = mock<TextDelegate>() {
             whenever(it.text).thenReturn(AnnotatedString("Example Text String 2"))
+            whenever(it.style).thenReturn(TextStyle.Default)
         }
 
         // Make sure that mock doesn't do smart memory management:
