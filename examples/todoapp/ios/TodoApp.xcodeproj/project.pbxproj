@@ -18,7 +18,7 @@
 		1F00F3B02575ADB500CFAF97 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3AF2575ADB500CFAF97 /* MainView.swift */; };
 		1F00F3B22575B07700CFAF97 /* EditView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B12575B07700CFAF97 /* EditView.swift */; };
 		1F00F3B42575B18200CFAF97 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B32575B18200CFAF97 /* RootView.swift */; };
-		1F00F3B62575B41900CFAF97 /* SimpleRouterState.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B52575B41900CFAF97 /* SimpleRouterState.swift */; };
+		1F00F3B62575B41900CFAF97 /* SimpleChildStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B52575B41900CFAF97 /* SimpleChildStack.swift */; };
 		1F00F3B82575B4F800CFAF97 /* ComponentHolder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1F00F3B72575B4F800CFAF97 /* ComponentHolder.swift */; };
 /* End PBXBuildFile section */
 
@@ -37,7 +37,7 @@
 		1F00F3AF2575ADB500CFAF97 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
 		1F00F3B12575B07700CFAF97 /* EditView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EditView.swift; sourceTree = "<group>"; };
 		1F00F3B32575B18200CFAF97 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
-		1F00F3B52575B41900CFAF97 /* SimpleRouterState.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleRouterState.swift; sourceTree = "<group>"; };
+		1F00F3B52575B41900CFAF97 /* SimpleChildStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SimpleChildStack.swift; sourceTree = "<group>"; };
 		1F00F3B72575B4F800CFAF97 /* ComponentHolder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ComponentHolder.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -84,7 +84,7 @@
 				1F00F3AF2575ADB500CFAF97 /* MainView.swift */,
 				1F00F3B12575B07700CFAF97 /* EditView.swift */,
 				1F00F3B32575B18200CFAF97 /* RootView.swift */,
-				1F00F3B52575B41900CFAF97 /* SimpleRouterState.swift */,
+				1F00F3B52575B41900CFAF97 /* SimpleChildStack.swift */,
 				1F00F3B72575B4F800CFAF97 /* ComponentHolder.swift */,
 			);
 			path = ios;
@@ -187,7 +187,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode";
+			shellScript = "cd $SRCROOT/..\n./gradlew :common:root:embedAndSignAppleFrameworkForXcode\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -203,7 +203,7 @@
 				1F00F3AC2575AA4500CFAF97 /* ListView.swift in Sources */,
 				1F00F3B82575B4F800CFAF97 /* ComponentHolder.swift in Sources */,
 				1F00F3B42575B18200CFAF97 /* RootView.swift in Sources */,
-				1F00F3B62575B41900CFAF97 /* SimpleRouterState.swift in Sources */,
+				1F00F3B62575B41900CFAF97 /* SimpleChildStack.swift in Sources */,
 				1F00F3AE2575AC6A00CFAF97 /* InputView.swift in Sources */,
 				1F00F3AA2575A71000CFAF97 /* MutableStateBuilder.swift in Sources */,
 				1F00F3A82575A16400CFAF97 /* ObservableValue.swift in Sources */,

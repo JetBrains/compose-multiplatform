@@ -1,3 +1,6 @@
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.konan.target.Family
+
 plugins {
     id("multiplatform-setup")
     id("android-setup")
@@ -5,20 +8,23 @@ plugins {
 }
 
 kotlin {
-    iosWorkaroundSupportArm64Simulator {
-        binaries {
-            framework {
-                baseName = "Todo"
-                linkerOpts.add("-lsqlite3")
-                export(project(":common:database"))
-                export(project(":common:main"))
-                export(project(":common:edit"))
-                export(Deps.ArkIvanov.Decompose.decompose)
-                export(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
-                export(Deps.ArkIvanov.Essenty.lifecycle)
+    targets
+        .filterIsInstance<KotlinNativeTarget>()
+        .filter { it.konanTarget.family == Family.IOS }
+        .forEach { target ->
+            target.binaries {
+                framework {
+                    baseName = "Todo"
+                    linkerOpts.add("-lsqlite3")
+                    export(project(":common:database"))
+                    export(project(":common:main"))
+                    export(project(":common:edit"))
+                    export(Deps.ArkIvanov.Decompose.decompose)
+                    export(Deps.ArkIvanov.MVIKotlin.mvikotlinMain)
+                    export(Deps.ArkIvanov.Essenty.lifecycle)
+                }
             }
         }
-    }
 
     sourceSets {
         named("commonMain") {
