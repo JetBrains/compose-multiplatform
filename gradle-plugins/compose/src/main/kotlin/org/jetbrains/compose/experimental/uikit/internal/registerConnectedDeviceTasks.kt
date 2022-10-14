@@ -5,22 +5,24 @@
 
 package org.jetbrains.compose.experimental.uikit.internal
 
-import org.gradle.api.*
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.desktop.application.internal.MacUtils
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
+import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
 import org.jetbrains.compose.internal.getLocalProperty
 import org.jetbrains.compose.internal.localPropertiesFile
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 fun Project.registerConnectedDeviceTasks(
+    mppExt: KotlinMultiplatformExtension,
     id: String,
     deploy: DeployTarget.ConnectedDevice,
     projectName: String,
     bundleIdPrefix: String,
     taskInstallXcodeGen: TaskProvider<*>,
-    taskPackageUiKitAppFoxXcode: TaskProvider<*>,
     taskInstallIosDeploy: TaskProvider<*>,
     configurations: List<UiKitConfiguration>,
 ) {
@@ -45,8 +47,19 @@ fun Project.registerConnectedDeviceTasks(
 
     for (configuration in configurations) {
         val configName = configuration.name
+        val targetBuildPath = xcodeProjectDir.resolve(RELATIVE_PRODUCTS_PATH)
+            .resolve("$configName-iphoneos")
         val iosCompiledAppDir = xcodeProjectDir.resolve(RELATIVE_PRODUCTS_PATH)
-            .resolve("$configName-iphoneos/${projectName}.app")
+            .resolve("${projectName}.app")
+
+        val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
+            mppExt = mppExt,
+            id = id,
+            configName = configName,
+            projectName = projectName,
+            targetBuildPath = targetBuildPath,
+            targetType = ExperimentalPackComposeApplicationForXCodeTask.UikitTarget.Arm64,
+        )
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIphoneOs$id$configName") {
             dependsOn(taskGenerateXcodeProject)
