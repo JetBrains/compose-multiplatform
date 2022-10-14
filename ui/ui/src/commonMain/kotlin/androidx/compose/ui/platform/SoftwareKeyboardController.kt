@@ -28,7 +28,7 @@ interface SoftwareKeyboardController {
     /**
      * Request that the system show a software keyboard.
      *
-     * This request is best effort, if the system is can currently show a software keyboard it
+     * This request is best effort. If the system can currently show a software keyboard, it
      * will be shown. However, there is no guarantee that the system will be able to show a
      * software keyboard. If the system cannot show a software keyboard currently,
      * this call will be silently ignored.
