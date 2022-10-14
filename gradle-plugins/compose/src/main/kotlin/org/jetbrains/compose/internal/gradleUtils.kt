@@ -36,6 +36,7 @@ internal inline fun <reified T : Task> Project.registerTask(
 
 internal fun Provider<String>.toDir(project: Project): Provider<Directory> =
     map { File(it) }.toDir(project)
+
 internal fun Provider<File>.toDir(project: Project): Provider<Directory> =
     project.layout.dir(this)
 

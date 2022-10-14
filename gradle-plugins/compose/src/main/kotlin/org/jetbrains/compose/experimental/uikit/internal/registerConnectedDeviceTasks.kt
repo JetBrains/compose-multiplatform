@@ -49,8 +49,7 @@ fun Project.registerConnectedDeviceTasks(
         val configName = configuration.name
         val targetBuildPath = xcodeProjectDir.resolve(RELATIVE_PRODUCTS_PATH)
             .resolve("$configName-iphoneos")
-        val iosCompiledAppDir = xcodeProjectDir.resolve(RELATIVE_PRODUCTS_PATH)
-            .resolve("${projectName}.app")
+        val iosCompiledAppDir = targetBuildPath.resolve("${projectName}.app")
 
         val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
             mppExt = mppExt,
