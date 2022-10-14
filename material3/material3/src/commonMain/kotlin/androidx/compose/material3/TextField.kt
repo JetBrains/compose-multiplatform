@@ -141,9 +141,10 @@ import kotlin.math.roundToInt
  * instead of wrapping onto multiple lines. The keyboard will be informed to not show the return key
  * as the [ImeAction]. Note that [maxLines] parameter will be ignored as the maxLines attribute will
  * be automatically set to 1.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true.
+ * @param maxLines the maximum height in terms of maximum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
+ * @param minLines the minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this text field. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this text field in different states.
@@ -170,7 +171,8 @@ fun TextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = TextFieldDefaults.filledShape,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
@@ -201,6 +203,7 @@ fun TextField(
             interactionSource = interactionSource,
             singleLine = singleLine,
             maxLines = maxLines,
+            minLines = minLines,
             decorationBox = @Composable { innerTextField ->
                 // places leading icon, text field with label and placeholder, trailing icon
                 TextFieldDefaults.TextFieldDecorationBox(
@@ -278,9 +281,10 @@ fun TextField(
  * instead of wrapping onto multiple lines. The keyboard will be informed to not show the return key
  * as the [ImeAction]. Note that [maxLines] parameter will be ignored as the maxLines attribute will
  * be automatically set to 1.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true.
+ * @param maxLines the maximum height in terms of maximum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
+ * @param minLines the minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this text field. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this text field in different states.
@@ -307,7 +311,8 @@ fun TextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = TextFieldDefaults.filledShape,
     colors: TextFieldColors = TextFieldDefaults.textFieldColors()
@@ -338,6 +343,7 @@ fun TextField(
             interactionSource = interactionSource,
             singleLine = singleLine,
             maxLines = maxLines,
+            minLines = minLines,
             decorationBox = @Composable { innerTextField ->
                 // places leading icon, text field with label and placeholder, trailing icon
                 TextFieldDefaults.TextFieldDecorationBox(
