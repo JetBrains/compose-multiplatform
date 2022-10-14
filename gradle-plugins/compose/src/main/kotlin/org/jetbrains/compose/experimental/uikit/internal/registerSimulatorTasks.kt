@@ -49,7 +49,7 @@ fun Project.registerSimulatorTasks(
                 )
             }
         }
-    }
+
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {
         dependsOn(taskSimulatorDeleteUnavailable)
