@@ -1,0 +1,13 @@
+# Bug component: 856887
+andreykulikov@google.com
+malkov@google.com
+lpf@google.com
+tianliu@google.com
+soboleva@google.com
+ashikov@google.com
+
+# Text
+include /TEXT_OWNERS
+
+# AdapterList
+ryanmentley@google.com
