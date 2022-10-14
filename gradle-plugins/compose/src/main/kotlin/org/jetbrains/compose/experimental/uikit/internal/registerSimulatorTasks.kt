@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.experimental.uikit.internal
 
-import org.gradle.api.*
+import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.desktop.application.internal.Arch
 import org.jetbrains.compose.desktop.application.internal.MacUtils
@@ -13,8 +13,11 @@ import org.jetbrains.compose.desktop.application.internal.currentArch
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
+import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 fun Project.registerSimulatorTasks(
+    mppExt: KotlinMultiplatformExtension,
     id: String,
     deploy: DeployTarget.Simulator,
     projectName: String,
@@ -93,8 +96,18 @@ fun Project.registerSimulatorTasks(
 
     for (configuration in configurations) {
         val configName = configuration.name
-        val iosCompiledAppDir = xcodeProjectDir.resolve(RELATIVE_PRODUCTS_PATH)
-                .resolve("$configName-iphonesimulator/${projectName}.app")
+        val targetBuildPath = xcodeProjectDir.resolve(RELATIVE_PRODUCTS_PATH)
+            .resolve("$configName-iphonesimulator")
+        val iosCompiledAppDir = targetBuildPath.resolve("${projectName}.app")
+
+        val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
+            mppExt = mppExt,
+            id = id,
+            configName = configName,
+            projectName = projectName,
+            targetBuildPath = targetBuildPath,
+            targetType = ExperimentalPackComposeApplicationForXCodeTask.UikitTarget.X64,
+        )
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBuild$id$configName") {
             dependsOn(taskGenerateXcodeProject)

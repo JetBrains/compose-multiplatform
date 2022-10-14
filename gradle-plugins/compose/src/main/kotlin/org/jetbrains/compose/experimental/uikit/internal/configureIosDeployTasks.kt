@@ -5,11 +5,13 @@
 
 package org.jetbrains.compose.experimental.uikit.internal
 
-import org.gradle.api.*
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
@@ -19,8 +21,8 @@ const val RELATIVE_PRODUCTS_PATH = "build/Build/Products"
 fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 
 internal fun Project.configureIosDeployTasks(
+    mppExt: KotlinMultiplatformExtension,
     application: ExperimentalUiKitApplication,
-    taskPackageUiKitAppFoxXcode: TaskProvider<*>,
 ) {
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
@@ -33,12 +35,12 @@ internal fun Project.configureIosDeployTasks(
         when (target.deploy) {
             is DeployTarget.Simulator -> {
                 registerSimulatorTasks(
+                    mppExt = mppExt,
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
-                    taskPackageUiKitAppFoxXcode = taskPackageUiKitAppFoxXcode,
                     configurations = application.configurations,
                 )
             }
@@ -47,12 +49,12 @@ internal fun Project.configureIosDeployTasks(
             }
             is DeployTarget.ConnectedDevice -> {
                 registerConnectedDeviceTasks(
+                    mppExt = mppExt,
                     id = id,
                     deploy = target.deploy,
                     projectName = projectName,
                     bundleIdPrefix = bundleIdPrefix,
                     taskInstallXcodeGen = taskInstallXcodeGen,
-                    taskPackageUiKitAppFoxXcode = taskPackageUiKitAppFoxXcode,
                     taskInstallIosDeploy = taskInstallIosDeploy,
                     configurations = application.configurations,
                 )
