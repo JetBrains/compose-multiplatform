@@ -2238,6 +2238,9 @@ package androidx.compose.ui.node {
   public final class NodeKindKt {
   }
 
+  public final class ObserverNodeKt {
+  }
+
   public final class PointerInputModifierNodeKt {
   }
 
