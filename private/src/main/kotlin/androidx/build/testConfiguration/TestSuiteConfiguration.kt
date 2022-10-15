@@ -39,6 +39,7 @@ import com.android.build.api.variant.HasAndroidTest
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.tasks.PackageAndroidArtifact
 import org.gradle.api.Project
+import org.gradle.api.UnknownTaskException
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
@@ -294,18 +295,16 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
 private fun Project.getOrCreateMacrobenchmarkConfigTask(variantName: String):
     TaskProvider<GenerateTestConfigurationTask> {
         val parentProject = this.parent!!
-        return if (
-            parentProject.tasks.withType(GenerateTestConfigurationTask::class.java).isEmpty()
-        ) {
-            parentProject.tasks.register(
-                "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
-                GenerateTestConfigurationTask::class.java
-            )
-        } else {
-            parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
-                .named("${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
-        }
+    return try {
+        parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
+            .named("${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
+    } catch (e: UnknownTaskException) {
+        parentProject.tasks.register(
+            "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+            GenerateTestConfigurationTask::class.java
+        )
     }
+}
 
 private fun Project.configureMacrobenchmarkConfigTask(
     variantName: String,
