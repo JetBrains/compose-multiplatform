@@ -5,7 +5,8 @@
 
 package org.jetbrains.compose.experimental.uikit.internal
 
-import org.gradle.api.*
+import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.experimental.dsl.DeployTarget
@@ -54,6 +55,7 @@ internal fun Project.configureIosDeployTasks(application: ExperimentalUiKitAppli
             }
         }
     }
+    createOpenXcodeTask(projectName, bundleIdPrefix, taskInstallXcodeGen)
 }
 
 inline fun <reified T : Task> TaskContainer.composeIosTask(
