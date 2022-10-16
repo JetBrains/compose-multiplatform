@@ -33,7 +33,11 @@ fun Project.registerSimulatorTasks(
     )
 
     val taskSimulatorDeleteUnavailable = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorDeleteUnavailable$id") {
-        val condition = { device: DeviceData -> device.name == deviceName && device.state.contains("unavailable") }
+        val condition = { device: DeviceData ->
+            val xcode13Condition = device.state.contains("unavailable")
+            val xcode14Condition = device.isAvailable == false
+            device.name == deviceName && (xcode13Condition || xcode14Condition)
+        }
         onlyIf {
             getSimctlListData().devices.map { it.value }.flatten().any(condition)
         }
