@@ -83,7 +83,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.round
-import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 
 private typealias Command = () -> Unit
 
@@ -97,7 +96,7 @@ internal class SkiaBasedOwner(
     private val platform: Platform,
     parentFocusManager: FocusManager = EmptyFocusManager,
     private val pointerPositionUpdater: PointerPositionUpdater,
-    density: Density = Density(1f, 1f),
+    initDensity: Density = Density(1f, 1f),
     bounds: IntRect = IntRect.Zero,
     val isFocusable: Boolean = true,
     val onDismissRequest: (() -> Unit)? = null,
@@ -113,7 +112,7 @@ internal class SkiaBasedOwner(
 
     var bounds by mutableStateOf(bounds)
 
-    override var density by mutableStateOf(density)
+    override var density by mutableStateOf(initDensity)
 
     override val layoutDirection: LayoutDirection = platform.layoutDirection
 
@@ -219,7 +218,7 @@ internal class SkiaBasedOwner(
 
     override val autofill: Autofill? get() = null
 
-    override val viewConfiguration: ViewConfiguration = DefaultViewConfiguration(density)
+    override val viewConfiguration = platform.viewConfiguration
 
     init {
         snapshotObserver.startObserving()

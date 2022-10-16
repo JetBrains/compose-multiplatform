@@ -40,6 +40,11 @@ import platform.UIKit.reloadInputViews
 import platform.UIKit.setClipsToBounds
 import platform.UIKit.setNeedsDisplay
 import platform.darwin.NSObject
+import androidx.compose.ui.platform.Platform
+import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.text.input.PlatformTextInputService
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 
 // The only difference with macos' Window is that
 // it has return type of UIViewController rather than unit.
@@ -60,6 +65,7 @@ internal actual class ComposeWindow : UIViewController {
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
+    private val density: Density = Density(1f) //todo get and update density from UIKit Platform
     private lateinit var layer: ComposeLayer
     private lateinit var content: @Composable () -> Unit
     private val keyboardVisibilityListener = object : NSObject() {
@@ -112,7 +118,7 @@ internal actual class ComposeWindow : UIViewController {
         val skiaLayer = createSkiaLayer()
         val skikoUIView = SkikoUIView(skiaLayer).load()
         view = skikoUIView
-        val textInputService = UIKitTextInputService(
+        val uiKitTextInputService = UIKitTextInputService(
             showSoftwareKeyboard = {
                 skikoUIView.showScreenKeyboard()
             },
@@ -129,11 +135,21 @@ internal actual class ComposeWindow : UIViewController {
             selectionWillChange = { skikoUIView.selectionWillChange() },
             selectionDidChange = { skikoUIView.selectionDidChange() },
         )
+        val uiKitPlatform = object : Platform by Platform.Empty {
+            override val textInputService: PlatformTextInputService = uiKitTextInputService
+            override val viewConfiguration =
+                object : ViewConfiguration {
+                    override val longPressTimeoutMillis: Long get() = 500
+                    override val doubleTapTimeoutMillis: Long get() = 300
+                    override val doubleTapMinTimeMillis: Long get() = 40
+                    override val touchSlop: Float get() = with(density) { 3.dp.toPx() }
+                }
+        }
         layer = ComposeLayer(
             layer = skiaLayer,
-            inputService = textInputService,
+            platform = uiKitPlatform,
             getTopLeftOffset = ::getTopLeftOffset,
-            input = textInputService.skikoInput
+            input = uiKitTextInputService.skikoInput
         )
         layer.setContent(content = content)
     }

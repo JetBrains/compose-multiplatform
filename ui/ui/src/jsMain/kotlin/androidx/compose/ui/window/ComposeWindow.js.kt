@@ -21,18 +21,31 @@ import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.JSTextInputService
+import androidx.compose.ui.platform.Platform
+import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import kotlinx.browser.document
 import org.w3c.dom.HTMLCanvasElement
 
-internal actual class ComposeWindow actual constructor(){
+internal actual class ComposeWindow actual constructor() {
 
-    private val textInputService = JSTextInputService()
-
+    private val density: Density = Density(1f) //todo get and update density from Browser platform
+    private val jsTextInputService = JSTextInputService()
+    val platform = object : Platform by Platform.Empty {
+        override val textInputService = jsTextInputService
+        override val viewConfiguration = object : ViewConfiguration {
+            override val longPressTimeoutMillis: Long = 500
+            override val doubleTapTimeoutMillis: Long = 300
+            override val doubleTapMinTimeMillis: Long = 40
+            override val touchSlop: Float get() = with(density) { 18.dp.toPx() }
+        }
+    }
     private val layer = ComposeLayer(
         layer = createSkiaLayer(),
+        platform = platform,
         getTopLeftOffset = { Offset.Zero },
-        inputService = textInputService,
-        input = textInputService.input
+        input = jsTextInputService.input
     )
 
     val title: String

@@ -43,14 +43,12 @@ import org.jetbrains.skiko.currentNanoTime
 
 internal class ComposeLayer(
     internal val layer: SkiaLayer,
-    private val inputService: PlatformTextInputService,
+    platform: Platform,
     private val getTopLeftOffset: () -> Offset,
     private val input: SkikoInput,
 ) {
     private var isDisposed = false
-
-    inner class ComponentImpl : SkikoView, Platform by Platform.Empty {
-        override val textInputService = inputService
+    inner class ComponentImpl : SkikoView {
         override val input = this@ComposeLayer.input
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
             val contentScale = layer.contentScale
@@ -73,7 +71,7 @@ internal class ComposeLayer(
                     scene.sendPointerEvent(
                         eventType = event.kind.toCompose(),
                         // TODO: account for the proper density.
-                        position = Offset(event.x.toFloat(), event.y.toFloat()) - getTopLeftOffset(), // * density,
+                        position = Offset(event.x.toFloat(), event.y.toFloat()) - getTopLeftOffset(), // * scene.density
                         timeMillis = currentMillis(),
                         type = PointerType.Touch,
                         nativeEvent = event
@@ -106,7 +104,7 @@ internal class ComposeLayer(
 
     private val scene = ComposeScene(
         getMainDispatcher(),
-        view,
+        platform,
         Density(1f),
         layer::needRedraw
     )

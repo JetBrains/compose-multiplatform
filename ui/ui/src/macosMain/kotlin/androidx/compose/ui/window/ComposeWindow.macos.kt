@@ -17,25 +17,26 @@
 package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionContext
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.MacosTextInputService
 
+import androidx.compose.ui.platform.Platform
 import platform.AppKit.*
-import platform.Cocoa.*
 import platform.Foundation.*
-import platform.CoreGraphics.*
 import kotlinx.cinterop.*
 
 internal actual class ComposeWindow actual constructor() {
-    val inputService = MacosTextInputService()
+    private val macosTextInputService = MacosTextInputService()
+    val platform: Platform = object : Platform by Platform.Empty {
+        override val textInputService = macosTextInputService
+    }
     val layer = ComposeLayer(
         layer = createSkiaLayer(),
+        platform = platform,
         getTopLeftOffset = { Offset.Zero },
-        inputService = inputService,
-        input = inputService.input
+        input = macosTextInputService.input
     )
 
     val title: String

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,6 +39,7 @@ internal interface Platform {
     val textInputService: PlatformTextInputService
     fun accessibilityController(owner: SemanticsOwner): AccessibilityController
     fun setPointerIcon(pointerIcon: PointerIcon)
+    val viewConfiguration: ViewConfiguration
 
     companion object {
         @OptIn(ExperimentalComposeUiApi::class)
@@ -75,6 +76,12 @@ internal interface Platform {
             }
 
             override fun setPointerIcon(pointerIcon: PointerIcon) = Unit
+            override val viewConfiguration = object : ViewConfiguration {
+                override val longPressTimeoutMillis: Long = 500
+                override val doubleTapTimeoutMillis: Long = 300
+                override val doubleTapMinTimeMillis: Long = 40
+                override val touchSlop: Float = 18f
+            }
         }
     }
 }

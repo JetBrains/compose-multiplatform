@@ -71,7 +71,7 @@ internal fun PopupLayout(
             scene = scene,
             platform = scene.platform,
             pointerPositionUpdater = scene.pointerPositionUpdater,
-            density = density,
+            initDensity = density,
             isFocusable = focusable,
             onDismissRequest = onDismissRequest,
             onPreviewKeyEvent = onPreviewKeyEvent,
