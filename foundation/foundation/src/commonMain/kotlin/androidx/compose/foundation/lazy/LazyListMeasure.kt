@@ -55,6 +55,7 @@ internal fun measureLazyList(
     density: Density,
     placementAnimator: LazyListItemPlacementAnimator,
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
+    beyondBoundsItemCount: Int,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyListMeasureResult {
     require(beforeContentPadding >= 0)
@@ -223,31 +224,33 @@ internal fun measureLazyList(
             }
         }
 
-        // Compose extra items before or after the visible items.
-        fun LazyListBeyondBoundsInfo.startIndex() = min(start, itemsCount - 1)
-        fun LazyListBeyondBoundsInfo.endIndex() = min(end, itemsCount - 1)
-        val extraItemsBefore =
-            if (beyondBoundsInfo.hasIntervals() &&
-                visibleItems.first().index > beyondBoundsInfo.startIndex()) {
-                mutableListOf<LazyMeasuredItem>().apply {
-                    for (i in visibleItems.first().index - 1 downTo beyondBoundsInfo.startIndex()) {
-                        add(itemProvider.getAndMeasure(DataIndex(i)))
-                    }
-                }
-            } else {
-                emptyList()
-            }
-        val extraItemsAfter =
-            if (beyondBoundsInfo.hasIntervals() &&
-                visibleItems.last().index < beyondBoundsInfo.endIndex()) {
-                mutableListOf<LazyMeasuredItem>().apply {
-                    for (i in visibleItems.last().index until beyondBoundsInfo.endIndex()) {
-                        add(itemProvider.getAndMeasure(DataIndex(i + 1)))
-                    }
-                }
-            } else {
-                emptyList()
-            }
+        // Compose extra items before
+        val extraItemsBefore = createItemsBeforeList(
+            beyondBoundsInfo = beyondBoundsInfo,
+            currentFirstItemIndex = currentFirstItemIndex,
+            itemProvider = itemProvider,
+            itemsCount = itemsCount,
+            beyondBoundsItemCount = beyondBoundsItemCount
+        )
+
+        // Update maxCrossAxis with extra items
+        extraItemsBefore.fastForEach {
+            maxCrossAxis = maxOf(maxCrossAxis, it.crossAxisSize)
+        }
+
+        // Compose items after last item
+        val extraItemsAfter = createItemsAfterList(
+            beyondBoundsInfo = beyondBoundsInfo,
+            visibleItems = visibleItems,
+            itemProvider = itemProvider,
+            itemsCount = itemsCount,
+            beyondBoundsItemCount = beyondBoundsItemCount
+        )
+
+        // Update maxCrossAxis with extra items
+        extraItemsAfter.fastForEach {
+            maxCrossAxis = maxOf(maxCrossAxis, it.crossAxisSize)
+        }
 
         val noExtraItems = firstItem == visibleItems.first() &&
             extraItemsBefore.isEmpty() &&
@@ -321,6 +324,109 @@ internal fun measureLazyList(
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
             afterContentPadding = afterContentPadding
         )
+    }
+}
+
+private fun createItemsAfterList(
+    beyondBoundsInfo: LazyListBeyondBoundsInfo,
+    visibleItems: MutableList<LazyMeasuredItem>,
+    itemProvider: LazyMeasuredItemProvider,
+    itemsCount: Int,
+    beyondBoundsItemCount: Int
+): List<LazyMeasuredItem> {
+
+    fun LazyListBeyondBoundsInfo.endIndex() = min(end, itemsCount - 1)
+
+    fun addItemsAfter(startIndex: Int, endIndex: Int): List<LazyMeasuredItem> {
+        return mutableListOf<LazyMeasuredItem>().apply {
+            for (i in startIndex until endIndex) {
+                val item = itemProvider.getAndMeasure(DataIndex(i + 1))
+                add(item)
+            }
+        }
+    }
+
+    val (startNonVisibleItems, endNonVisibleItems) = if (beyondBoundsItemCount != 0 &&
+        visibleItems.last().index + beyondBoundsItemCount <= itemsCount - 1
+    ) {
+        visibleItems.last().index to visibleItems.last().index + beyondBoundsItemCount
+    } else {
+        EmptyRange
+    }
+
+    val (startBeyondBoundItems, endBeyondBoundItems) = if (beyondBoundsInfo.hasIntervals() &&
+        visibleItems.last().index < beyondBoundsInfo.endIndex()
+    ) {
+        val start = (visibleItems.last().index + beyondBoundsItemCount).coerceAtMost(itemsCount - 1)
+        val end =
+            (beyondBoundsInfo.endIndex() + beyondBoundsItemCount).coerceAtMost(itemsCount - 1)
+        start to end
+    } else {
+        EmptyRange
+    }
+
+    return if (startNonVisibleItems.notInEmptyRange && startBeyondBoundItems.notInEmptyRange) {
+        addItemsAfter(
+            startNonVisibleItems,
+            endBeyondBoundItems
+        )
+    } else if (startNonVisibleItems.notInEmptyRange) {
+        addItemsAfter(startNonVisibleItems, endNonVisibleItems)
+    } else if (startBeyondBoundItems.notInEmptyRange) {
+        addItemsAfter(startBeyondBoundItems, endBeyondBoundItems)
+    } else {
+        emptyList()
+    }
+}
+
+private fun createItemsBeforeList(
+    beyondBoundsInfo: LazyListBeyondBoundsInfo,
+    currentFirstItemIndex: DataIndex,
+    itemProvider: LazyMeasuredItemProvider,
+    itemsCount: Int,
+    beyondBoundsItemCount: Int
+): List<LazyMeasuredItem> {
+
+    fun LazyListBeyondBoundsInfo.startIndex() = min(start, itemsCount - 1)
+
+    fun addItemsBefore(startIndex: Int, endIndex: Int): List<LazyMeasuredItem> {
+        return mutableListOf<LazyMeasuredItem>().apply {
+            for (i in startIndex downTo endIndex) {
+                val item = itemProvider.getAndMeasure(DataIndex(i))
+                add(item)
+            }
+        }
+    }
+
+    val (startNonVisibleItems, endNonVisibleItems) =
+        if (beyondBoundsItemCount != 0 && currentFirstItemIndex.value - beyondBoundsItemCount > 0) {
+            currentFirstItemIndex.value - 1 to currentFirstItemIndex.value - beyondBoundsItemCount
+        } else {
+            EmptyRange
+        }
+
+    val (startBeyondBoundItems, endBeyondBoundItems) = if (beyondBoundsInfo.hasIntervals() &&
+        currentFirstItemIndex.value > beyondBoundsInfo.startIndex()
+    ) {
+        val start =
+            (currentFirstItemIndex.value - beyondBoundsItemCount - 1).coerceAtLeast(0)
+        val end = (beyondBoundsInfo.startIndex() - beyondBoundsItemCount).coerceAtLeast(0)
+        start to end
+    } else {
+        EmptyRange
+    }
+
+    return if (startNonVisibleItems.notInEmptyRange && startBeyondBoundItems.notInEmptyRange) {
+        addItemsBefore(
+            startNonVisibleItems,
+            endBeyondBoundItems
+        )
+    } else if (startNonVisibleItems.notInEmptyRange) {
+        addItemsBefore(startNonVisibleItems, endNonVisibleItems)
+    } else if (startBeyondBoundItems.notInEmptyRange) {
+        addItemsBefore(startBeyondBoundItems, endBeyondBoundItems)
+    } else {
+        emptyList()
     }
 }
 
@@ -407,3 +513,7 @@ private fun calculateItemsOffsets(
     }
     return positionedItems
 }
+
+private val EmptyRange = Int.MIN_VALUE to Int.MIN_VALUE
+private val Int.notInEmptyRange
+    get() = this != Int.MIN_VALUE
