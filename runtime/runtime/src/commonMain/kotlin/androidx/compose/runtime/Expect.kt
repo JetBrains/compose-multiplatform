@@ -125,3 +125,5 @@ internal expect fun <T> invokeComposableForResult(
 internal expect class SnapshotContextElementImpl(
     snapshot: Snapshot
 ) : SnapshotContextElement
+
+internal expect fun logError(message: String, e: Throwable)

@@ -17,6 +17,7 @@
 package androidx.compose.runtime
 
 import android.os.Looper
+import android.util.Log
 import android.view.Choreographer
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import kotlinx.coroutines.Dispatchers
@@ -90,3 +91,9 @@ internal actual fun <T> createSnapshotMutableState(
     value: T,
     policy: SnapshotMutationPolicy<T>
 ): SnapshotMutableState<T> = ParcelableSnapshotMutableState(value, policy)
+
+private const val LogTag = "ComposeInternal"
+
+internal actual fun logError(message: String, e: Throwable) {
+    Log.e(LogTag, message, e)
+}
