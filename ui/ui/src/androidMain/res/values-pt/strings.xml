@@ -20,8 +20,7 @@
     <string name="indeterminate" msgid="7933458017204019916">"Parcialmente selecionada"</string>
     <string name="on" msgid="8655164131929253426">"Ativado"</string>
     <string name="off" msgid="875452955155264703">"Desativado"</string>
-    <!-- no translation found for switch_role (2561197295334830845) -->
-    <skip />
+    <string name="switch_role" msgid="2561197295334830845">"Chave"</string>
     <string name="selected" msgid="6043586758067023">"Selecionado"</string>
     <string name="not_selected" msgid="6610465462668679431">"Não selecionado"</string>
     <!-- String.format failed for translation -->
