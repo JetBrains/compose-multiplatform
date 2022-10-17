@@ -17,16 +17,23 @@
 package androidx.compose.foundation.lazy.list
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyList
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -449,4 +456,62 @@ class LazyListHeadersTest {
         rule.onNodeWithTag("0")
             .assertTopPositionInRootIsEqualTo(itemIndexDp * 3 / 2)
     }
+}
+
+@Composable
+private fun LazyColumn(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    beyondBoundsItemCount: Int,
+    content: LazyListScope.() -> Unit
+) {
+    LazyList(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        flingBehavior = flingBehavior,
+        horizontalAlignment = horizontalAlignment,
+        verticalArrangement = verticalArrangement,
+        isVertical = true,
+        reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        beyondBoundsItemCount = beyondBoundsItemCount,
+        content = content
+    )
+}
+
+@Composable
+private fun LazyRow(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    beyondBoundsItemCount: Int,
+    content: LazyListScope.() -> Unit
+) {
+    LazyList(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        isVertical = false,
+        flingBehavior = flingBehavior,
+        reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        beyondBoundsItemCount = beyondBoundsItemCount,
+        content = content
+    )
 }
