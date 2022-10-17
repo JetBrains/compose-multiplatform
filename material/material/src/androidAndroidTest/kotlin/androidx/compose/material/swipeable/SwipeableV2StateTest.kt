@@ -21,23 +21,31 @@ import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeableV2State
 import androidx.compose.material.fractionalPositionalThreshold
 import androidx.compose.material.rememberSwipeableV2State
+import androidx.compose.material.swipeAnchors
 import androidx.compose.material.swipeable.TestState.A
 import androidx.compose.material.swipeable.TestState.B
 import androidx.compose.material.swipeable.TestState.C
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.testutils.WithTouchSlop
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -346,5 +354,45 @@ class SwipeableV2StateTest {
             rule.mainClock.advanceTimeBy(16)
         }
         assertThat(highestOffset).isGreaterThan(anchors.getValue(C))
+    }
+
+    @Test
+    fun swipeable_bounds_minBoundIsSmallestAnchor() {
+        var minBound = 0f
+        var maxBound = 500f
+        var anchors = mapOf(
+            A to minBound,
+            B to maxBound / 2,
+            C to maxBound
+        )
+        val state = SwipeableV2State(initialValue = A)
+        var size by mutableStateOf(100.dp)
+
+        rule.setContent {
+            Box(
+                Modifier
+                    .size(size)
+                    .swipeAnchors(
+                        state = state,
+                        possibleValues = anchors.keys,
+                        calculateAnchor = { state, _ -> anchors[state] }
+                    )
+            )
+        }
+
+        assertThat(state.minOffset).isEqualTo(minBound)
+        assertThat(state.maxOffset).isEqualTo(maxBound)
+
+        minBound *= 3
+        maxBound *= 10
+        anchors = mapOf(
+            A to minBound,
+            C to maxBound
+        )
+        size = 200.dp
+        rule.waitForIdle()
+
+        assertThat(state.minOffset).isEqualTo(minBound)
+        assertThat(state.maxOffset).isEqualTo(maxBound)
     }
 }
