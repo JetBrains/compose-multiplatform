@@ -60,6 +60,18 @@ internal object DokkaUtils {
         "dokkaCli"
     )
 
+    private const val CS_ANDROID_SRC_ROOT =
+        "https://cs.android.com/androidx/platform/frameworks/support/+/"
+
+    /**
+     * Placeholder URL that use used by the first step of partial docs generation.
+     * This placeholder is later replaced by the HEAD sha of the repository.
+     * It needs to look like a URL because Dokka parses it as URL.
+     */
+    internal const val CS_ANDROID_PLACEHOLDER = "https://__DOKKA_REPLACE_WITH_SRC_LINK__.com/"
+
+    fun createCsAndroidUrl(sha: String) = "$CS_ANDROID_SRC_ROOT$sha:"
+
     /**
      * Creates a configuration for the [project] from the given set of dokka plugin libraries.
      * These libraries are defined in the Gradle Version catalog.

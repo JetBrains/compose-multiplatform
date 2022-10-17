@@ -39,6 +39,30 @@ interface GitClient {
     ): List<Commit>
 
     /**
+     * Returns the full commit sha for the HEAD of the given git root directory.
+     *
+     * @param projectDir Root directory of the git project
+     */
+    fun getHeadSha(
+        projectDir: File
+    ): String {
+        val commitList: List<Commit> =
+            getGitLog(
+                GitCommitRange(
+                    fromExclusive = "",
+                    untilInclusive = "HEAD",
+                    n = 1
+                ),
+                keepMerges = true,
+                fullProjectDir = projectDir
+            )
+        if (commitList.isEmpty()) {
+            throw RuntimeException("Failed to find git commit for HEAD!")
+        }
+        return commitList.first().sha
+    }
+
+    /**
      * Abstraction for running execution commands for testability
      */
     interface CommandRunner {

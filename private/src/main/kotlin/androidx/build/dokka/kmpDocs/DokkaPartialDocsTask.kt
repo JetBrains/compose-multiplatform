@@ -52,7 +52,8 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
 /**
- * Creates partial docs for a Kotlin project.
+ * Creates partial docs for a Kotlin project with placeholder source links that will be replaced
+ * with HEAD sha in the [DokkaCombinedDocsTask] task.
  * @see DokkaCombinedDocsTask
  * @see androidx.build.docs.AndroidXKmpDocsImplPlugin
  */
@@ -140,9 +141,6 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
 
     companion object {
         private const val TASK_NAME = "generateKmpDocs"
-
-        private const val CS_ANDROID_SRC_ROOT =
-            "https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:"
 
         private fun buildExternalDocLinks(project: Project): List<GlobalDocsLink> {
             val docsUrl = project.getSupportRootFolder().resolve("docs-public/package-lists")
@@ -287,7 +285,7 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
                     sourceLinks = sourceDirectories.map {
                         SrcLink(
                             localDirectory = it,
-                            remoteUrl = CS_ANDROID_SRC_ROOT +
+                            remoteUrl = DokkaUtils.CS_ANDROID_PLACEHOLDER +
                                 it.relativeTo(project.getSupportRootFolder()).path
                         )
                     }.sortedBy {
