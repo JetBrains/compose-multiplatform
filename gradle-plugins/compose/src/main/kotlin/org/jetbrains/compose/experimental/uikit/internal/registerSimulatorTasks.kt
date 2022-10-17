@@ -36,9 +36,7 @@ fun Project.registerSimulatorTasks(
         doLast {
             val device = getSimctlListData().devices.map { it.value }.flatten()
                 .firstOrNull { device: DeviceData ->
-                    val xcode13Condition = device.state.contains("unavailable")
-                    val xcode14Condition = device.isAvailable == false
-                    device.name == deviceName && (xcode13Condition || xcode14Condition)
+                    device.name == deviceName && !device.isAvailable
                 }
             if (device != null) {
                 runExternalTool(
