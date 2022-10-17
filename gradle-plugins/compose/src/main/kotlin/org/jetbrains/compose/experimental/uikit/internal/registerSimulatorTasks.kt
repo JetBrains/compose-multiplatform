@@ -33,24 +33,21 @@ fun Project.registerSimulatorTasks(
     )
 
     val taskSimulatorDeleteUnavailable = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorDeleteUnavailable$id") {
-        val condition = { device: DeviceData ->
-            val xcode13Condition = device.state.contains("unavailable")
-            val xcode14Condition = device.isAvailable == false
-            device.name == deviceName && (xcode13Condition || xcode14Condition)
-        }
-        onlyIf {
-            getSimctlListData().devices.map { it.value }.flatten().any(condition)
-        }
         doLast {
-            val device = getSimctlListData().devices.map { it.value }.flatten().first(condition)
-
-            runExternalTool(
-                MacUtils.xcrun,
-                listOf("simctl", "delete", device.udid)
-            )
+            val device = getSimctlListData().devices.map { it.value }.flatten()
+                .firstOrNull { device: DeviceData ->
+                    val xcode13Condition = device.state.contains("unavailable")
+                    val xcode14Condition = device.isAvailable == false
+                    device.name == deviceName && (xcode13Condition || xcode14Condition)
+                }
+            if (device != null) {
+                runExternalTool(
+                    MacUtils.xcrun,
+                    listOf("simctl", "delete", device.udid)
+                )
+            }
         }
     }
-
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {
         dependsOn(taskSimulatorDeleteUnavailable)
