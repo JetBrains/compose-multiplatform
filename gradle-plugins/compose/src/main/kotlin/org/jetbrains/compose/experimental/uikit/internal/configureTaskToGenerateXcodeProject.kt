@@ -42,16 +42,6 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                     name: GradleCompile
                 info:
                   path: plists/Ios/Info.plist
-                  properties:
-                    UILaunchStoryboardName: ""
-                    method: "development"
-                sources:
-                  - path: "../../../src/"
-                    excludes:
-                      - "jvm*/**"
-                      - "desktop*/**"
-                      - "android*/**"
-                      - "*Test/**"
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"
