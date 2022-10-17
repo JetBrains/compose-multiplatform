@@ -117,7 +117,7 @@ internal fun LazyList(
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(orientation)
-            .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout)
+            .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout, orientation)
             .lazyListPinningModifier(state, beyondBoundsInfo)
             .overscroll(overscrollEffect)
             .scrollable(
