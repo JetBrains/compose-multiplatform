@@ -253,7 +253,7 @@ class Recomposer(
     private var runnerJob: Job? = null
     private var closeCause: Throwable? = null
     private val knownCompositions = mutableListOf<ControlledComposition>()
-    private val snapshotInvalidations = mutableListOf<Set<Any>>()
+    private var snapshotInvalidations = mutableSetOf<Any>()
     private val compositionInvalidations = mutableListOf<ControlledComposition>()
     private val compositionsAwaitingApply = mutableListOf<ControlledComposition>()
     private val compositionValuesAwaitingInsert = mutableListOf<MovableContentStateReference>()
@@ -277,7 +277,7 @@ class Recomposer(
     private fun deriveStateLocked(): CancellableContinuation<Unit>? {
         if (_state.value <= State.ShuttingDown) {
             knownCompositions.clear()
-            snapshotInvalidations.clear()
+            snapshotInvalidations = mutableSetOf()
             compositionInvalidations.clear()
             compositionsAwaitingApply.clear()
             compositionValuesAwaitingInsert.clear()
@@ -293,7 +293,7 @@ class Recomposer(
                 State.Inactive
             }
             runnerJob == null -> {
-                snapshotInvalidations.clear()
+                snapshotInvalidations = mutableSetOf()
                 compositionInvalidations.clear()
                 if (broadcastFrameClock.hasAwaiters) State.InactivePendingWork else State.Inactive
             }
@@ -406,13 +406,12 @@ class Recomposer(
     fun asRecomposerInfo(): RecomposerInfo = recomposerInfo
 
     private fun recordComposerModificationsLocked() {
-        if (snapshotInvalidations.isNotEmpty()) {
-            snapshotInvalidations.fastForEach { changes ->
-                knownCompositions.fastForEach { composition ->
-                    composition.recordModificationsOf(changes)
-                }
+        val changes = snapshotInvalidations
+        if (changes.isNotEmpty()) {
+            knownCompositions.fastForEach { composition ->
+                composition.recordModificationsOf(changes)
             }
-            snapshotInvalidations.clear()
+            snapshotInvalidations = mutableSetOf()
             if (deriveStateLocked() != null) {
                 error("called outside of runRecomposeAndApplyChanges")
             }
@@ -422,13 +421,12 @@ class Recomposer(
     private inline fun recordComposerModificationsLocked(
         onEachInvalidComposition: (ControlledComposition) -> Unit
     ) {
-        if (snapshotInvalidations.isNotEmpty()) {
-            snapshotInvalidations.fastForEach { changes ->
-                knownCompositions.fastForEach { composition ->
-                    composition.recordModificationsOf(changes)
-                }
+        val changes = snapshotInvalidations
+        if (changes.isNotEmpty()) {
+            knownCompositions.fastForEach { composition ->
+                composition.recordModificationsOf(changes)
             }
-            snapshotInvalidations.clear()
+            snapshotInvalidations = mutableSetOf()
         }
         compositionInvalidations.fastForEach(onEachInvalidComposition)
         compositionInvalidations.clear()
@@ -641,7 +639,7 @@ class Recomposer(
             synchronized(stateLock) {
                 compositionsAwaitingApply.clear()
                 compositionInvalidations.clear()
-                snapshotInvalidations.clear()
+                snapshotInvalidations = mutableSetOf()
 
                 compositionValuesAwaitingInsert.clear()
                 compositionValuesRemoved.clear()
@@ -863,7 +861,7 @@ class Recomposer(
             val unregisterApplyObserver = Snapshot.registerApplyObserver { changed, _ ->
                 synchronized(stateLock) {
                     if (_state.value >= State.Idle) {
-                        snapshotInvalidations += changed
+                        snapshotInvalidations.addAll(changed)
                         deriveStateLocked()
                     } else null
                 }?.resume(Unit)
@@ -1185,7 +1183,7 @@ class Recomposer(
 
     internal override fun invalidateScope(scope: RecomposeScopeImpl) {
         synchronized(stateLock) {
-            snapshotInvalidations += setOf(scope)
+            snapshotInvalidations.add(scope)
             deriveStateLocked()
         }?.resume(Unit)
     }
