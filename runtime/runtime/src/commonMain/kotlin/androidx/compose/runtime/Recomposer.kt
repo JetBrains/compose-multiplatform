@@ -637,6 +637,8 @@ class Recomposer(
     ) {
         if (_hotReloadEnabled.get() && e !is ComposeRuntimeError) {
             synchronized(stateLock) {
+                logError("Error was captured in composition while live edit was enabled.", e)
+
                 compositionsAwaitingApply.clear()
                 compositionInvalidations.clear()
                 snapshotInvalidations = mutableSetOf()
