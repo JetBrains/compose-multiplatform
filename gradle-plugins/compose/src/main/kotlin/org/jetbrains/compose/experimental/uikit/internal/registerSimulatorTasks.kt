@@ -100,7 +100,7 @@ fun Project.registerSimulatorTasks(
             .resolve("$configName-iphonesimulator")
         val iosCompiledAppDir = targetBuildPath.resolve("${projectName}.app")
 
-        val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
+        val taskPackageUiKitAppForXcode = configurePackComposeUiKitApplicationForXCodeTask(
             mppExt = mppExt,
             id = id,
             configName = configName,
@@ -111,7 +111,7 @@ fun Project.registerSimulatorTasks(
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBuild$id$configName") {
             dependsOn(taskGenerateXcodeProject)
-            dependsOn(taskPackageUiKitAppFoxXcode)
+            dependsOn(taskPackageUiKitAppForXcode)
             doLast {
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIFX_SIMULATOR + getSimctlListData().runtimes.first().version

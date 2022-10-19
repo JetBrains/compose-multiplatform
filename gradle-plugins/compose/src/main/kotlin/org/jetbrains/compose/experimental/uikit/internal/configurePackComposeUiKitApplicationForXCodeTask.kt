@@ -7,7 +7,7 @@ package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
 import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
-import org.jetbrains.compose.internal.toDir
+import org.jetbrains.compose.internal.fileToDir
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
@@ -30,7 +30,7 @@ internal fun Project.configurePackComposeUiKitApplicationForXCodeTask(
     }.orElse(NativeBuildType.DEBUG)
     val target = mppExt.targets.getByName(targetType.targetName) as KotlinNativeTarget
     val kotlinBinary = target.binaries.getExecutable(buildType.get())
-    val targetBuildDir = project.provider { targetBuildPath }.toDir(project)
+    val targetBuildDir = project.provider { targetBuildPath }.fileToDir(project)
     val executablePath = "${projectName}.app/${projectName}"
 
     packTask.targetType.set(targetType)
