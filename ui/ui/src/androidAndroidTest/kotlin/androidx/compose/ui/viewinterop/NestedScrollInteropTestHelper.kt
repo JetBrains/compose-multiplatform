@@ -35,7 +35,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -293,7 +292,6 @@ internal fun NestedScrollDeepNested(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun ComposeInViewWithNestedScrollInterop() {
     LazyColumn(
@@ -352,7 +350,6 @@ internal fun NestedScrollInteropWithView(
     }
 }
 
-@ExperimentalComposeUiApi
 internal fun ActivityScenario<*>.createActivityWithComposeContent(
     @LayoutRes layout: Int,
     enableInterop: Boolean,

@@ -2796,7 +2796,7 @@ package androidx.compose.ui.platform {
   }
 
   public final class NestedScrollInteropConnectionKt {
-    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.input.nestedscroll.NestedScrollConnection rememberNestedScrollInteropConnection();
+    method @androidx.compose.runtime.Composable public static androidx.compose.ui.input.nestedscroll.NestedScrollConnection rememberNestedScrollInteropConnection(optional android.view.View rootView);
   }
 
   public final class ShapeContainingUtilKt {

@@ -56,6 +56,11 @@
             android:label="Coordinator Layout Activity with Compose > View" />
 
         <activity
+            android:name=".viewinterop.BottomSheetFragmentNestedScrollInteropDemo"
+            android:configChanges="orientation|screenSize"
+            android:label="Material Bottom Sheet Fragment" />
+
+        <activity
             android:name=".PainterResourcesDemoActivity"
             android:configChanges="colorMode|density|fontScale|keyboard|keyboardHidden|
             layoutDirection|locale|mcc|mnc|navigation|orientation|screenLayout|screenSize|

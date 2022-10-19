@@ -38,7 +38,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -54,7 +53,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Sampled
 @Composable
 fun ComposeInCooperatingViewNestedScrollInteropSample() {
@@ -153,7 +151,6 @@ private fun AndroidViewWithCompose(context: Context): View {
         }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun LazyColumnWithNestedScrollInteropEnabled() {
     LazyColumn(

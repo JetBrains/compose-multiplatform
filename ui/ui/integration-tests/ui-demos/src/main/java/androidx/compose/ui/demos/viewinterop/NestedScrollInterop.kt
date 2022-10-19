@@ -22,6 +22,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
@@ -39,7 +40,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.demos.R
 import androidx.compose.ui.geometry.Offset
@@ -54,8 +54,10 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.view.ViewCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import kotlin.math.roundToInt
 
 private val ToolbarHeight = 48.dp
@@ -119,7 +121,6 @@ internal fun NestedScrollInteropComposeParentWithAndroidChild() {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun LazyColumnWithNestedScrollInteropEnabled() {
     LazyColumn(
@@ -190,7 +191,6 @@ private class NestedScrollInteropAdapter :
     }
 }
 
-@ExperimentalComposeUiApi
 internal class ComposeInAndroidCoordinatorLayout : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -202,7 +202,6 @@ internal class ComposeInAndroidCoordinatorLayout : ComponentActivity() {
     }
 }
 
-@ExperimentalComposeUiApi
 internal class ViewComposeViewNestedScrollInteropDemo : ComponentActivity() {
     @SuppressLint("SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -218,5 +217,41 @@ internal class ViewComposeViewNestedScrollInteropDemo : ComponentActivity() {
                 }
             }
         }
+    }
+}
+
+internal class BottomSheetFragmentNestedScrollInteropDemo : FragmentActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.bottom_sheet_fragment_nestedscrollinterop_demo)
+
+        findViewById<Button>(R.id.button).setOnClickListener {
+            openFragment()
+        }
+    }
+
+    private fun openFragment() {
+        val addPhotoBottomDialogFragment = LazyListBottomSheetDialogFragment()
+        addPhotoBottomDialogFragment.show(supportFragmentManager, "tag")
+    }
+}
+
+internal class LazyListBottomSheetDialogFragment : BottomSheetDialogFragment() {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        val view = inflater.inflate(R.layout.fragment_bottom_sheet, container)
+        view.findViewById<ComposeView>(R.id.compose_view).setContent {
+            Box(Modifier.nestedScroll(rememberNestedScrollInteropConnection())) {
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(100) {
+                        Text("Item $it", Modifier.fillMaxWidth(), Color.Black)
+                    }
+                }
+            }
+        }
+        return view
     }
 }
