@@ -22,7 +22,6 @@ include ":public"
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
-            from(files("../gradle/libs.versions.toml"))
             def agpOverride = System.getenv("GRADLE_PLUGIN_VERSION")
             if (agpOverride != null) {
                 logger.warn("Using custom version ${agpOverride} of AGP due to GRADLE_PLUGIN_VERSION being set.")
