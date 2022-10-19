@@ -15,12 +15,13 @@ git config --global submodule.recurse true
 - Java 11 (should be specified in JAVA_HOME)
 - [macOs/Linux] Android SDK downloaded via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
 - [Windows] Android SDK downloaded from Android Studio and specified in ANDROID_SDK_ROOT
+- [Optional, macOs] For AppCode IDE, specify environment variable ANDROID_SDK_ROOT=[YOUR_PATH]/compose-jb/compose/frameworks/support/jbdeps/android-sdk/darwin (in ~/.zshrc)
 
 ## Developing in IDE
 1. Download Android Studio from [the official site](https://developer.android.com/studio/archive) (it is mandatory to use the version, written [here](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L11)). As an alternative you can use IDEA, which is compatible with [this AGP version](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L5), or you can disable Android plugin in IDEA plugins, to develop non-Android targets.
 2. [macOs/Linux] Download Android SDK via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
 2. [Windows] Download Android SDK via [Android Studio](https://developer.android.com/studio/intro/update#sdk-manager) and specify it in ANDROID_SDK_ROOT environment variable. Components, their versions and folder structure should be the same as in downloaded via script `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk` SDK for other platforms.
-3. Open `compose/frameworks/support` folder in Android Studio or in IDEA.
+3. Open `compose/frameworks/support` folder either in Android Studio or in IDEA or in AppCode with KMM plugin.
 4. Specify Gradle JVM to use JDK 11 in InteliJ IDEA Preferences (`Build, Execution, Deployment -> Build Tools -> Gradle`)
 
 ## Scripts
@@ -76,14 +77,13 @@ Run native macos sample:
 ./scripts/runGradle runMppMacos
 ```
 
-## Multiplatform build
+## Multiplatform build to mavenLocal
 
-```console
-./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk
-export COMPOSE_CUSTOM_VERSION=1.1.0-beta04
-./scripts/publishToMavenLocal -Pcompose.platforms=all
-./scripts/publishGradlePluginToMavenLocal
+```bash
+export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version &&\
+./scripts/publishToMavenLocal -Pcompose.platforms=all &&\
+./scripts/publishGradlePluginToMavenLocal &&\
 ./scripts/publishWebComponentsToMavenLocal
 ```
-`-Pcompose.platforms=all` could be replace with comma-separated list of platforms, such as `js,jvm,androidDebug,androidRelease,macosx64,uikitx64`.
+`-Pcompose.platforms=all` could be replace with comma-separated list of platforms, such as `js,jvm,androidDebug,androidRelease,macosx64,uikit`.
 

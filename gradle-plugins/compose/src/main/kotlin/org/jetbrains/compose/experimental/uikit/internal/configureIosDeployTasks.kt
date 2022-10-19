@@ -16,7 +16,8 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
 const val SDK_PREFIX_IPHONEOS = "iphoneos"
 const val TEAM_ID_PROPERTY_KEY = "compose.ios.teamId"
-const val RELATIVE_PRODUCTS_PATH = "build/Build/Products"
+const val BUILD_DIR_NAME = "build"
+const val RELATIVE_PRODUCTS_PATH = "$BUILD_DIR_NAME/Build/Products"
 
 fun Project.getBuildIosDir(id: String) = buildDir.resolve("ios").resolve(id)
 

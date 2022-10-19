@@ -10,6 +10,11 @@ fun initDeps(project: Project) {
 }
 
 object Deps {
+    object JetpackComposeWorkaround {
+        // Workaround for https://github.com/JetBrains/compose-jb/issues/2340
+        val VERSION: String = "1.2.1"
+    }
+
     object JetBrains {
         object Kotlin {
             private val VERSION get() = properties["kotlin.version"]
@@ -34,7 +39,7 @@ object Deps {
     object Android {
         object Tools {
             object Build {
-                const val gradlePlugin = "com.android.tools.build:gradle:7.0.4"
+                const val gradlePlugin = "com.android.tools.build:gradle:7.2.0"
             }
         }
     }
@@ -51,7 +56,7 @@ object Deps {
 
     object ArkIvanov {
         object MVIKotlin {
-            private const val VERSION = "3.0.0-beta01"
+            private const val VERSION = "3.0.0"
             const val rx = "com.arkivanov.mvikotlin:rx:$VERSION"
             const val mvikotlin = "com.arkivanov.mvikotlin:mvikotlin:$VERSION"
             const val mvikotlinMain = "com.arkivanov.mvikotlin:mvikotlin-main:$VERSION"
@@ -61,13 +66,13 @@ object Deps {
         }
 
         object Decompose {
-            private const val VERSION = "0.5.1"
+            private const val VERSION = "1.0.0-alpha-05"
             const val decompose = "com.arkivanov.decompose:decompose:$VERSION"
             const val extensionsCompose = "com.arkivanov.decompose:extensions-compose-jetbrains:$VERSION"
         }
 
         object Essenty {
-            private const val VERSION = "0.2.2"
+            private const val VERSION = "0.6.0"
             const val lifecycle = "com.arkivanov.essenty:lifecycle:$VERSION"
         }
     }

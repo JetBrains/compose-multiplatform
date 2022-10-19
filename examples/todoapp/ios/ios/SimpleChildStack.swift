@@ -1,9 +1,9 @@
 import Todo
 
-func simpleRouterState<T : AnyObject>(_ child: T) -> Value<RouterState<AnyObject, T>> {
+func simpleChildStack<T : AnyObject>(_ child: T) -> Value<ChildStack<AnyObject, T>> {
     return valueOf(
-        RouterState(
-            activeChild: ChildCreated(
+        ChildStack(
+            active: ChildCreated(
                 configuration: "config" as AnyObject,
                 instance: child
             ),

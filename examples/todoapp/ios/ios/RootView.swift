@@ -3,14 +3,14 @@ import Todo
 
 struct RootView: View {
     @ObservedObject
-    private var routerStates: ObservableValue<RouterState<AnyObject, TodoRootChild>>
+    private var childStack: ObservableValue<ChildStack<AnyObject, TodoRootChild>>
     
     init(_ component: TodoRoot) {
-        self.routerStates = ObservableValue(component.routerState)
+        self.childStack = ObservableValue(component.childStack)
     }
     
     var body: some View {
-        let child = self.routerStates.value.activeChild.instance
+        let child = self.childStack.value.active.instance
         
         switch child {
         case let main as TodoRootChild.Main:
@@ -37,7 +37,7 @@ struct RootView_Previews: PreviewProvider {
     }
     
     class StubTodoRoot : TodoRoot {
-        let routerState: Value<RouterState<AnyObject, TodoRootChild>> =
-            simpleRouterState(TodoRootChild.Main(component: MainView_Previews.StubTodoMain()))
+        let childStack: Value<ChildStack<AnyObject, TodoRootChild>> =
+            simpleChildStack(.Main(component: MainView_Previews.StubTodoMain()))
     }
 }

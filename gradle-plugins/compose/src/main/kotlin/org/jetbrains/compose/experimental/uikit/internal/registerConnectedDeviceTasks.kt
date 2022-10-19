@@ -51,7 +51,7 @@ fun Project.registerConnectedDeviceTasks(
             .resolve("$configName-iphoneos")
         val iosCompiledAppDir = targetBuildPath.resolve("${projectName}.app")
 
-        val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
+        val taskPackageUiKitAppForXcode = configurePackComposeUiKitApplicationForXCodeTask(
             mppExt = mppExt,
             id = id,
             configName = configName,
@@ -62,31 +62,27 @@ fun Project.registerConnectedDeviceTasks(
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIphoneOs$id$configName") {
             dependsOn(taskGenerateXcodeProject)
-            dependsOn(taskPackageUiKitAppFoxXcode)
+            dependsOn(taskPackageUiKitAppForXcode)
             doLast {
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIX_IPHONEOS + getSimctlListData().runtimes.first().version
                 val scheme = projectName // xcrun xcodebuild -list -project . (list all schemes)
-                repeat(2) {
-                    // todo repeat(2) is workaround of error (domain=NSPOSIXErrorDomain, code=22)
-                    //  The bundle identifier of the application could not be determined
-                    //  Ensure that the application's Info.plist contains a value for CFBundleIdentifier.
-                    runExternalTool(
-                        MacUtils.xcrun,
-                        listOf(
-                            "xcodebuild",
-                            "-scheme", scheme,
-                            "-project", ".",
-                            "-configuration", configName,
-                            "-derivedDataPath", "build",
-                            "-arch", "arm64",
-                            "-sdk", sdk,
-                            "-allowProvisioningUpdates",
-                            "-allowProvisioningDeviceRegistration",
-                        ),
-                        workingDir = xcodeProjectDir
-                    )
-                }
+
+                runExternalTool(
+                    MacUtils.xcrun,
+                    listOf(
+                        "xcodebuild",
+                        "-scheme", scheme,
+                        "-project", ".",
+                        "-configuration", configName,
+                        "-derivedDataPath", BUILD_DIR_NAME,
+                        "-arch", "arm64",
+                        "-sdk", sdk,
+                        "-allowProvisioningUpdates",
+                        "-allowProvisioningDeviceRegistration",
+                    ),
+                    workingDir = xcodeProjectDir
+                )
             }
         }
 

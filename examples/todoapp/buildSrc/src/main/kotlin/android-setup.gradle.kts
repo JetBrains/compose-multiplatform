@@ -5,11 +5,11 @@ plugins {
 initDeps(project)
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 33
 
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(31)
+        minSdk = 23
+        targetSdk = 33
     }
 
     compileOptions {

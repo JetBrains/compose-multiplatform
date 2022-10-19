@@ -36,20 +36,19 @@ fun Project.registerSimulatorTasks(
     )
 
     val taskSimulatorDeleteUnavailable = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorDeleteUnavailable$id") {
-        val condition = { device: DeviceData -> device.name == deviceName && device.state.contains("unavailable") }
-        onlyIf {
-            getSimctlListData().devices.map { it.value }.flatten().any(condition)
-        }
         doLast {
-            val device = getSimctlListData().devices.map { it.value }.flatten().first(condition)
-
-            runExternalTool(
-                MacUtils.xcrun,
-                listOf("simctl", "delete", device.udid)
-            )
+            val device = getSimctlListData().devices.map { it.value }.flatten()
+                .firstOrNull { device: DeviceData ->
+                    device.name == deviceName && !device.isAvailable
+                }
+            if (device != null) {
+                runExternalTool(
+                    MacUtils.xcrun,
+                    listOf("simctl", "delete", device.udid)
+                )
+            }
         }
     }
-
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {
         dependsOn(taskSimulatorDeleteUnavailable)
@@ -100,7 +99,7 @@ fun Project.registerSimulatorTasks(
             .resolve("$configName-iphonesimulator")
         val iosCompiledAppDir = targetBuildPath.resolve("${projectName}.app")
 
-        val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
+        val taskPackageUiKitAppForXcode = configurePackComposeUiKitApplicationForXCodeTask(
             mppExt = mppExt,
             id = id,
             configName = configName,
@@ -111,29 +110,24 @@ fun Project.registerSimulatorTasks(
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorBuild$id$configName") {
             dependsOn(taskGenerateXcodeProject)
-            dependsOn(taskPackageUiKitAppFoxXcode)
+            dependsOn(taskPackageUiKitAppForXcode)
             doLast {
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIFX_SIMULATOR + getSimctlListData().runtimes.first().version
                 val scheme = projectName // xcrun xcodebuild -list -project . (list all schemes)
-                repeat(2) {
-                    // todo repeat(2) is workaround of error (domain=NSPOSIXErrorDomain, code=22)
-                    //  The bundle identifier of the application could not be determined
-                    //  Ensure that the application's Info.plist contains a value for CFBundleIdentifier.
-                    runExternalTool(
-                        MacUtils.xcrun,
-                        listOf(
-                            "xcodebuild",
-                            "-scheme", scheme,
-                            "-project", ".",
-                            "-configuration", configName,
-                            "-derivedDataPath", "build",
-                            "-arch", simulatorArch,
-                            "-sdk", sdk
-                        ),
-                        workingDir = xcodeProjectDir
-                    )
-                }
+                runExternalTool(
+                    MacUtils.xcrun,
+                    listOf(
+                        "xcodebuild",
+                        "-scheme", scheme,
+                        "-project", ".",
+                        "-configuration", configName,
+                        "-derivedDataPath", BUILD_DIR_NAME,
+                        "-arch", simulatorArch,
+                        "-sdk", sdk
+                    ),
+                    workingDir = xcodeProjectDir
+                )
             }
         }
 
