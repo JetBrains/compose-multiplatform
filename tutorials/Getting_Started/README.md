@@ -77,8 +77,6 @@ pluginManagement {
 ```
 Then create `build.gradle.kts` with the following content:
 ``` kotlin
-import org.jetbrains.compose.compose
-
 plugins {
     kotlin("jvm") version "1.7.20"
     id("org.jetbrains.compose") version "1.2.0"
