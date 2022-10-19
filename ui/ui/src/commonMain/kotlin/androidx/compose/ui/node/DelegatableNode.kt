@@ -306,3 +306,17 @@ internal fun DelegatableNode.requireLayoutNode(): LayoutNode = node.coordinator!
 
 @ExperimentalComposeUiApi
 internal fun DelegatableNode.requireOwner(): Owner = requireLayoutNode().owner!!
+
+/**
+ * Invalidates the subtree of this layout, including layout, drawing, parent data, etc.
+ *
+ * Calling this method can be a relatively expensive operation as it will cause the
+ * entire subtree to relayout and redraw instead of just parts that
+ * are otherwise invalidated. Its use should be limited to structural changes.
+ */
+@ExperimentalComposeUiApi
+fun DelegatableNode.invalidateSubtree() {
+    if (node.isAttached) {
+        requireLayoutNode().invalidateSubtree()
+    }
+}
