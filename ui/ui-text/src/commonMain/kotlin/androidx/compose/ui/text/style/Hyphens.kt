@@ -78,4 +78,10 @@ class Hyphens private constructor() {
          */
         val Auto = Hyphens()
     }
+
+    override fun toString() = when (this) {
+        None -> "Hyphens.None"
+        Auto -> "Hyphens.Auto"
+        else -> "Invalid"
+    }
 }
