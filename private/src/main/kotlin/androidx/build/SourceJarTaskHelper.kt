@@ -125,7 +125,7 @@ fun Project.configureSourceJarForMultiplatform() {
         "Unable to find multiplatform extension while configuring multiplatform source JAR"
     )
     val metadataFile = buildDir.resolve(
-        PROJECT_STRUCTURE_METADATA_FILENAME
+        PROJECT_STRUCTURE_METADATA_FILEPATH
     )
     val multiplatformMetadataTask = tasks.register(
         "createMultiplatformMetadata",
@@ -264,5 +264,7 @@ fun createSourceSetMetadata(extension: KotlinMultiplatformExtension): String {
     return gson.toJson(sourceSetMetadata)
 }
 
-internal const val PROJECT_STRUCTURE_METADATA_FILENAME =
-    "project_structure_metadata/kotlin-project-structure-metadata.json"
+internal const val PROJECT_STRUCTURE_METADATA_FILENAME = "kotlin-project-structure-metadata.json"
+
+private const val PROJECT_STRUCTURE_METADATA_FILEPATH =
+    "project_structure_metadata/$PROJECT_STRUCTURE_METADATA_FILENAME"

@@ -83,6 +83,12 @@ internal object DokkaInputModels {
         @get:InputFiles
         @PathSensitive(PathSensitivity.RELATIVE)
         val sourceRoots: FileCollection,
+        @get:InputFiles
+        @PathSensitive(PathSensitivity.RELATIVE)
+        val samples: FileCollection,
+        @get:InputFiles
+        @PathSensitive(PathSensitivity.RELATIVE)
+        val includes: FileCollection,
         @get:Input
         val analysisPlatform: String,
         @get:Input

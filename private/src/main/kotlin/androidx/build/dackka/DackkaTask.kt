@@ -16,6 +16,11 @@
 
 package androidx.build.dackka
 
+import androidx.build.docs.ProjectStructureMetadata
+import androidx.build.dokka.kmpDocs.DokkaAnalysisPlatform
+import androidx.build.dokka.kmpDocs.DokkaInputModels
+import androidx.build.dokka.kmpDocs.DokkaUtils
+import com.google.gson.GsonBuilder
 import java.io.File
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
@@ -23,6 +28,7 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
@@ -39,12 +45,15 @@ import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
 import org.gradle.workers.WorkParameters
 import org.gradle.workers.WorkerExecutor
-import org.json.JSONObject
 
 @CacheableTask
 abstract class DackkaTask @Inject constructor(
-    private val workerExecutor: WorkerExecutor
+    private val workerExecutor: WorkerExecutor,
+    private val objects: ObjectFactory
 ) : DefaultTask() {
+
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
+    lateinit var projectStructureMetadataFile: File
 
     // Classpath containing Dackka
     @get:Classpath
@@ -62,9 +71,13 @@ abstract class DackkaTask @Inject constructor(
     @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     lateinit var samplesDir: File
 
-    // Directory containing the source code for Dackka to process
+    // Directory containing the JVM source code for Dackka to process
     @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
-    lateinit var sourcesDir: File
+    lateinit var jvmSourcesDir: File
+
+    // Directory containing the multiplatform source code for Dackka to process
+    @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
+    lateinit var multiplatformSourcesDir: File
 
     // Directory containing the docs project and package-lists
     @get:[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
@@ -98,56 +111,82 @@ abstract class DackkaTask @Inject constructor(
     @Input
     var showLibraryMetadata: Boolean = false
 
+    private fun sourceSets(): List<DokkaInputModels.SourceSet> {
+        val externalDocs = externalLinks.map { (name, url) ->
+            DokkaInputModels.GlobalDocsLink(
+                url = url,
+                packageListUrl =
+                    "file://${docsProjectDir.toPath()}/package-lists/$name/package-list"
+            )
+        }
+        val gson = GsonBuilder().create()
+        val multiplatformSourceSets = projectStructureMetadataFile
+            .takeIf { it.exists() }
+            ?.let { metadataFile ->
+                val metadata = gson.fromJson(
+                    metadataFile.readText(),
+                    ProjectStructureMetadata::class.java
+                )
+                metadata.sourceSets.map { sourceSet ->
+                    val analysisPlatform = DokkaAnalysisPlatform.valueOf(
+                        sourceSet.analysisPlatform.uppercase()
+                    )
+                    val sourceDir = multiplatformSourcesDir.resolve(sourceSet.name)
+                    DokkaInputModels.SourceSet(
+                        id = sourceSetIdForSourceSet(sourceSet.name),
+                        displayName = sourceSet.name,
+                        analysisPlatform = analysisPlatform.jsonName,
+                        sourceRoots = objects.fileCollection().from(sourceDir),
+                        samples = objects.fileCollection(),
+                        includes = objects.fileCollection().from(includesFiles(sourceDir)),
+                        classpath = dependenciesClasspath,
+                        externalDocumentationLinks = externalDocs,
+                        dependentSourceSets = sourceSet.dependencies.map {
+                            sourceSetIdForSourceSet(it)
+                        },
+                        noJdkLink = !analysisPlatform.androidOrJvm(),
+                        noAndroidSdkLink = analysisPlatform != DokkaAnalysisPlatform.ANDROID,
+                        noStdlibLink = false,
+                        sourceLinks = emptyList()
+                    )
+                }
+        } ?: emptyList()
+        return listOf(
+            DokkaInputModels.SourceSet(
+                id = sourceSetIdForSourceSet("main"),
+                displayName = "main",
+                analysisPlatform = "jvm",
+                sourceRoots = objects.fileCollection().from(jvmSourcesDir),
+                samples = objects.fileCollection().from(samplesDir, frameworkSamplesDir),
+                includes = objects.fileCollection().from(includesFiles(jvmSourcesDir)),
+                classpath = dependenciesClasspath,
+                externalDocumentationLinks = externalDocs,
+                dependentSourceSets = emptyList(),
+                noJdkLink = false,
+                noAndroidSdkLink = false,
+                noStdlibLink = false,
+                sourceLinks = emptyList()
+            )
+        ) + multiplatformSourceSets
+    }
+
     // Documentation for Dackka command line usage and arguments can be found at
     // https://kotlin.github.io/dokka/1.6.0/user_guide/cli/usage/
     private fun computeArguments(): File {
-
-        // path comes with colons but dokka json expects an ArrayList
-        val classPath = dependenciesClasspath.asPath.split(':').toMutableList()
-
         val linksConfiguration = ""
-        val linksMap = mapOf(
-            "coroutinesCore"
-                to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
-            "android" to "https://developer.android.com/reference",
-            "guava" to "https://guava.dev/releases/18.0/api/docs/",
-            "kotlin" to "https://kotlinlang.org/api/latest/jvm/stdlib/",
-            "junit" to "https://junit.org/junit4/javadoc/4.12/"
-        )
-        val includes = sourcesDir.walkTopDown()
-            .filter { it.name.endsWith("documentation.md") }.map { it.path }.toHashSet<String>()
-
         val jsonMap = mapOf(
             "moduleName" to "",
             "outputDir" to destinationDir.path,
             "globalLinks" to linksConfiguration,
-            "sourceSets" to listOf(mutableMapOf(
-                "sourceSetID" to mapOf(
-                    "scopeId" to "androidx",
-                    "sourceSetName" to "main"
-                    ),
-                "sourceRoots" to listOf(sourcesDir.path),
-                "samples" to listOf(samplesDir.path, frameworkSamplesDir.path),
-                "classpath" to classPath,
-                "documentedVisibilities" to listOf("PUBLIC", "PROTECTED"),
-                "externalDocumentationLinks" to linksMap.map { (name, url) -> mapOf(
-                    "url" to url,
-                    "packageListUrl" to
-                        "file://${docsProjectDir.toPath()}/package-lists/$name/package-list"
-                    ) },
-                )),
+            "sourceSets" to sourceSets(),
             "offlineMode" to "true",
             "noJdkLink" to "true"
             )
-        @Suppress("UNCHECKED_CAST")
-        if (includes.isNotEmpty())
-            ((jsonMap["sourceSets"]as List<*>).single() as MutableMap<String, Any>)["includes"] =
-                includes
-
-        val json = JSONObject(jsonMap)
+        val gson = DokkaUtils.createGson()
+        val json = gson.toJson(jsonMap)
         val outputFile = File.createTempFile("dackkaArgs", ".json")
         outputFile.deleteOnExit()
-        outputFile.writeText(json.toString(2))
+        outputFile.writeText(json)
         return outputFile
     }
 
@@ -162,6 +201,18 @@ abstract class DackkaTask @Inject constructor(
             excludedPackagesForKotlin = excludedPackagesForKotlin,
             libraryMetadataFile = libraryMetadataFile,
             showLibraryMetadata = showLibraryMetadata,
+        )
+    }
+
+    companion object {
+        private val externalLinks = mapOf(
+            "coroutinesCore"
+                to "https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core",
+            "android" to "https://developer.android.com/reference",
+            "guava" to "https://guava.dev/releases/18.0/api/docs/",
+            "kotlin" to "https://kotlinlang.org/api/latest/jvm/stdlib/",
+            "junit" to "https://junit.org/junit4/javadoc/4.12/",
+            "okio" to "https://square.github.io/okio/3.x/okio/"
         )
     }
 }
@@ -231,4 +282,14 @@ abstract class DackkaWorkAction @Inject constructor(
                 )
         }
     }
+}
+
+private fun includesFiles(sourceRoot: File): List<File> {
+    return sourceRoot.walkTopDown().filter {
+        it.name.endsWith("documentation.md")
+    }.toList()
+}
+
+private fun sourceSetIdForSourceSet(name: String): DokkaInputModels.SourceSetId {
+    return DokkaInputModels.SourceSetId(scopeId = "androidx", sourceSetName = name)
 }

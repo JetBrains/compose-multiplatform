@@ -290,7 +290,9 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
                         )
                     }.sortedBy {
                         it.localDirectory
-                    }
+                    },
+                    samples = project.files(),
+                    includes = project.files()
                 )
             }.sortedBy { it.displayName }
         }
