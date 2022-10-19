@@ -561,6 +561,9 @@ package androidx.compose.material3 {
   public final class SwipeableKt {
   }
 
+  public final class SwipeableV2Kt {
+  }
+
   @androidx.compose.runtime.Immutable public final class SwitchColors {
   }
 
