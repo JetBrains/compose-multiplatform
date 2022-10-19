@@ -51,7 +51,7 @@ fun Project.registerConnectedDeviceTasks(
             .resolve("$configName-iphoneos")
         val iosCompiledAppDir = targetBuildPath.resolve("${projectName}.app")
 
-        val taskPackageUiKitAppFoxXcode = configurePackComposeUiKitApplicationForXCodeTask(
+        val taskPackageUiKitAppForXcode = configurePackComposeUiKitApplicationForXCodeTask(
             mppExt = mppExt,
             id = id,
             configName = configName,
@@ -62,16 +62,11 @@ fun Project.registerConnectedDeviceTasks(
 
         val taskBuild = tasks.composeIosTask<AbstractComposeIosTask>("iosBuildIphoneOs$id$configName") {
             dependsOn(taskGenerateXcodeProject)
-            dependsOn(taskPackageUiKitAppFoxXcode)
+            dependsOn(taskPackageUiKitAppForXcode)
             doLast {
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIX_IPHONEOS + getSimctlListData().runtimes.first().version
                 val scheme = projectName // xcrun xcodebuild -list -project . (list all schemes)
-
-                val buildDir = "build"
-
-                // cleanup build directory as xcodebuild does not do it (provoking unexpected side effects).
-                project.delete(xcodeProjectDir.resolve(buildDir))
 
                 runExternalTool(
                     MacUtils.xcrun,
@@ -80,7 +75,7 @@ fun Project.registerConnectedDeviceTasks(
                         "-scheme", scheme,
                         "-project", ".",
                         "-configuration", configName,
-                        "-derivedDataPath", buildDir,
+                        "-derivedDataPath", BUILD_DIR_NAME,
                         "-arch", "arm64",
                         "-sdk", sdk,
                         "-allowProvisioningUpdates",

@@ -34,6 +34,8 @@ abstract class ExperimentalPackComposeApplicationForXCodeTask : DefaultTask() {
     @TaskAction
     fun run() {
         val destinationDir = destinationDir.get().asFile
+        project.delete(destinationDir)
+        project.mkdir(destinationDir)
 
         val executableSource = kotlinBinary.get().asFile
         val dsymSource = File(executableSource.absolutePath + ".dSYM")
@@ -52,6 +54,7 @@ abstract class ExperimentalPackComposeApplicationForXCodeTask : DefaultTask() {
             }
         }
 
+        executableDestination.parentFile.mkdirs()
         // We need to preserve executable flag for resulting executable, "FileKt.copyTo" extension method does not allow this.
         Files.copy(executableSource.toPath(), executableDestination.toPath(), StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING)
     }

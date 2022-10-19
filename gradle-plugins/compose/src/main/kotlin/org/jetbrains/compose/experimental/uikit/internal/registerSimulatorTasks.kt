@@ -23,7 +23,6 @@ fun Project.registerSimulatorTasks(
     projectName: String,
     bundleIdPrefix: String,
     taskInstallXcodeGen: TaskProvider<*>,
-    taskPackageUiKitAppFoxXcode: TaskProvider<*>,
     configurations: List<UiKitConfiguration>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")
@@ -49,7 +48,7 @@ fun Project.registerSimulatorTasks(
                 )
             }
         }
-
+    }
 
     val taskCreateSimulator = tasks.composeIosTask<AbstractComposeIosTask>("iosSimulatorCreate$id") {
         dependsOn(taskSimulatorDeleteUnavailable)
@@ -116,24 +115,19 @@ fun Project.registerSimulatorTasks(
                 // xcrun xcodebuild -showsdks (list all sdk)
                 val sdk = SDK_PREFIFX_SIMULATOR + getSimctlListData().runtimes.first().version
                 val scheme = projectName // xcrun xcodebuild -list -project . (list all schemes)
-                repeat(2) {
-                    // todo repeat(2) is workaround of error (domain=NSPOSIXErrorDomain, code=22)
-                    //  The bundle identifier of the application could not be determined
-                    //  Ensure that the application's Info.plist contains a value for CFBundleIdentifier.
-                    runExternalTool(
-                        MacUtils.xcrun,
-                        listOf(
-                            "xcodebuild",
-                            "-scheme", scheme,
-                            "-project", ".",
-                            "-configuration", configName,
-                            "-derivedDataPath", "build",
-                            "-arch", simulatorArch,
-                            "-sdk", sdk
-                        ),
-                        workingDir = xcodeProjectDir
-                    )
-                }
+                runExternalTool(
+                    MacUtils.xcrun,
+                    listOf(
+                        "xcodebuild",
+                        "-scheme", scheme,
+                        "-project", ".",
+                        "-configuration", configName,
+                        "-derivedDataPath", BUILD_DIR_NAME,
+                        "-arch", simulatorArch,
+                        "-sdk", sdk
+                    ),
+                    workingDir = xcodeProjectDir
+                )
             }
         }
 
