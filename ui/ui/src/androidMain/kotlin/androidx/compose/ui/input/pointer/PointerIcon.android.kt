@@ -21,7 +21,8 @@ import android.view.PointerIcon.TYPE_HAND
 import android.view.PointerIcon.TYPE_DEFAULT
 import android.view.PointerIcon.TYPE_TEXT
 
-internal class AndroidPointerIconType(val type: Int) : PointerIcon {
+internal class AndroidPointerIconType(val type: Int) :
+    PointerIcon {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
@@ -42,7 +43,8 @@ internal class AndroidPointerIconType(val type: Int) : PointerIcon {
     }
 }
 
-internal class AndroidPointerIcon(val pointerIcon: android.view.PointerIcon) : PointerIcon {
+internal class AndroidPointerIcon(val pointerIcon: android.view.PointerIcon) :
+    PointerIcon {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

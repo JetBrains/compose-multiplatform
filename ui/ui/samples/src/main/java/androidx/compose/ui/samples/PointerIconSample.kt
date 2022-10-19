@@ -21,21 +21,19 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.PointerIconDefaults
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Sampled
 @Composable
 fun PointerIconSample() {
-    Column(Modifier.pointerHoverIcon(PointerIconDefaults.Crosshair)) {
+    Column(Modifier.pointerHoverIcon(PointerIcon.Crosshair)) {
         SelectionContainer {
             Column {
                 Text("Selectable text")
                 Text(
-                    modifier = Modifier.pointerHoverIcon(PointerIconDefaults.Hand, true),
+                    modifier = Modifier.pointerHoverIcon(PointerIcon.Hand, true),
                     text = "Selectable text with hand"
                 )
             }
