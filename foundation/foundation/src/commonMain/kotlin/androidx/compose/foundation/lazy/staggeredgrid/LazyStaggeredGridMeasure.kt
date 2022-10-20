@@ -691,7 +691,7 @@ private class LazyStaggeredGridMeasuredItem(
 
     val crossAxisSize: Int = placeables.fastMaxOfOrNull {
         if (isVertical) it.width else it.height
-    }!!
+    } ?: 0
 
     fun position(
         lane: Int,

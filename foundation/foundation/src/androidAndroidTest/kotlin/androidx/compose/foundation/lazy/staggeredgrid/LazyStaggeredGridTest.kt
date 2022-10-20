@@ -30,9 +30,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.junit4.StateRestorationTester
+import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -253,6 +255,27 @@ class LazyStaggeredGridTest(
             .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp * 2)
 
         // [item x 4, item x 7, item x 9]
+    }
+
+    @Test
+    fun itemCanEmitZeroNodes() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                lanes = 3,
+                state = state,
+                modifier = Modifier
+                    .axisSize(itemSizeDp * 3, itemSizeDp)
+                    .testTag(LazyStaggeredGridTag),
+            ) {
+                items(6) { }
+            }
+        }
+
+        rule.onNodeWithTag(LazyStaggeredGridTag)
+            .assertIsDisplayed()
+            .onChildren()
+            .assertCountEquals(0)
     }
 
     @Test
