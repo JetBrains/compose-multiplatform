@@ -17,16 +17,20 @@
 package androidx.compose.integration.macrobenchmark
 
 import androidx.benchmark.macro.CompilationMode
+import androidx.benchmark.macro.ExperimentalMetricApi
 import androidx.benchmark.macro.StartupMode
+import androidx.benchmark.macro.TraceSectionMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.filters.LargeTest
 import androidx.testutils.createStartupCompilationParams
+import androidx.testutils.getStartupMetrics
 import androidx.testutils.measureStartup
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+@OptIn(ExperimentalMetricApi::class)
 @LargeTest
 @RunWith(Parameterized::class)
 class SmallListStartupBenchmark(
@@ -36,10 +40,25 @@ class SmallListStartupBenchmark(
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
+    /**
+     * Temporary, tracking for b/231455742
+     *
+     * Note that this tracing only exists on more recent API levels
+     */
+    private val metrics = getStartupMetrics() + if (startupMode == StartupMode.COLD) {
+        listOf(
+            TraceSectionMetric("cache_hit", TraceSectionMetric.Mode.Sum),
+            TraceSectionMetric("cache_miss", TraceSectionMetric.Mode.Sum)
+        )
+    } else {
+        emptyList()
+    }
+
     @Test
     fun startup() = benchmarkRule.measureStartup(
         compilationMode = compilationMode,
         startupMode = startupMode,
+        metrics = metrics,
         packageName = "androidx.compose.integration.macrobenchmark.target"
     ) {
         action = "androidx.compose.integration.macrobenchmark.target.LAZY_COLUMN_ACTIVITY"
