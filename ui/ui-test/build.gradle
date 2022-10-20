@@ -73,6 +73,7 @@ dependencies {
         androidTestImplementation(libs.mockitoCore)
         androidTestImplementation(libs.dexmakerMockito)
         androidTestImplementation(libs.mockitoKotlin)
+        androidTestImplementation(libs.kotlinTest)
 
         samples(project(":compose:ui:ui-test:ui-test-samples"))
     }
@@ -133,6 +134,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
                 implementation(libs.dexmakerMockito)
+                implementation(libs.kotlinTest)
             }
 
             desktopMain.dependencies {
