@@ -37,6 +37,9 @@ internal inline fun <reified T : Task> Project.registerTask(
 internal fun Provider<String>.toDir(project: Project): Provider<Directory> =
     project.layout.dir(map { File(it) })
 
+internal fun Provider<File>.fileToDir(project: Project): Provider<Directory> =
+    project.layout.dir(this)
+
 val Project.localPropertiesFile get() = project.rootProject.file("local.properties")
 
 fun Project.getLocalProperty(key: String): String? {
