@@ -103,6 +103,7 @@ import org.hamcrest.CoreMatchers.not
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -778,6 +779,7 @@ class AndroidViewCompatTest {
         rule.runOnIdle { assertEquals(invalidatesDuringScroll + 1, view!!.draws) }
     }
 
+    @Ignore // b/254573760
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
     fun testWebViewIsRelaidOut_afterPageLoad() {
