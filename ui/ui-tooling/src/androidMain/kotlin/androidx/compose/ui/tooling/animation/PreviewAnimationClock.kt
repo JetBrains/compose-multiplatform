@@ -136,7 +136,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     }
 
     fun trackAnimatedContent(animation: Transition<*>) {
-        trackUnsupported(animation, "AnimatedContent")
+        trackUnsupported(animation, animation.label ?: "AnimatedContent")
     }
 
     fun trackInfiniteTransition(animation: InfiniteTransition) {
