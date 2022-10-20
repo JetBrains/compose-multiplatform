@@ -14,6 +14,7 @@ plugins {
 version = "1.0-SNAPSHOT"
 
 repositories {
+    mavenLocal()
     google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
@@ -46,6 +47,13 @@ kotlin {
             }
         }
     }
+
+    // Workaround for an issue:
+    //    https://youtrack.jetbrains.com/issue/KT-53561/Invalid-LLVM-module-inlinable-function-call-in-a-function-with-debug-info-must-have-a-dbg-location
+    // Compose comiler produces nodes without line information sometimes that provokes Kotlin native compiler to report errors.
+    // TODO: remove workaround when switch to Kotlin 1.8
+    val disableKonanVerification = "-Xverify-compiler=false"
+
     iosX64("uikitX64") {
         binaries {
             executable() {
@@ -53,7 +61,8 @@ kotlin {
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    disableKonanVerification
                 )
             }
         }
@@ -65,7 +74,8 @@ kotlin {
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    disableKonanVerification
                 )
             }
         }
