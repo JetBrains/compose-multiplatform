@@ -11,6 +11,7 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
+import org.jetbrains.compose.experimental.uikit.tasks.ExtractXcodeGenTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 const val SDK_PREFIFX_SIMULATOR = "iphonesimulator"
@@ -28,7 +29,7 @@ internal fun Project.configureIosDeployTasks(
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
 
-    val taskInstallXcodeGen: TaskProvider<*> = configureInstallXcodeGenTask()
+    val taskInstallXcodeGen: TaskProvider<ExtractXcodeGenTask> = configureInstallXcodeGenTask()
     val taskInstallIosDeploy: TaskProvider<*> = configureInstallIosDeployTask()
 
     application.deployConfigurations.deployTargets.forEach { target ->

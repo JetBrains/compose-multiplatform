@@ -14,6 +14,7 @@ import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
+import org.jetbrains.compose.experimental.uikit.tasks.ExtractXcodeGenTask
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 fun Project.registerSimulatorTasks(
@@ -22,7 +23,7 @@ fun Project.registerSimulatorTasks(
     deploy: DeployTarget.Simulator,
     projectName: String,
     bundleIdPrefix: String,
-    taskInstallXcodeGen: TaskProvider<*>,
+    taskInstallXcodeGen: TaskProvider<ExtractXcodeGenTask>,
     configurations: List<UiKitConfiguration>,
 ) {
     val xcodeProjectDir = getBuildIosDir(id).resolve("$projectName.xcodeproj")

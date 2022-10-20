@@ -12,6 +12,7 @@ import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
+import org.jetbrains.compose.experimental.uikit.tasks.ExtractXcodeGenTask
 import org.jetbrains.compose.internal.getLocalProperty
 import org.jetbrains.compose.internal.localPropertiesFile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
@@ -22,7 +23,7 @@ fun Project.registerConnectedDeviceTasks(
     deploy: DeployTarget.ConnectedDevice,
     projectName: String,
     bundleIdPrefix: String,
-    taskInstallXcodeGen: TaskProvider<*>,
+    taskInstallXcodeGen: TaskProvider<ExtractXcodeGenTask>,
     taskInstallIosDeploy: TaskProvider<*>,
     configurations: List<UiKitConfiguration>,
 ) {
