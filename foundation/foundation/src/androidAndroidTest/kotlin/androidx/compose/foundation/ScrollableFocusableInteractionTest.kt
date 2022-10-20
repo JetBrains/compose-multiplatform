@@ -28,10 +28,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
@@ -214,12 +216,30 @@ class ScrollableFocusableInteractionTest(
     @Test
     fun scrollsFocusedFocusableIntoView_whenViewportAnimatedQuickly() {
         var viewportSize by mutableStateOf(100.toDp())
+        var animate by mutableStateOf(false)
 
         rule.setContent {
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 Spacer(Modifier.size(90.toDp()))
                 TestFocusable(size = 10.toDp(), focusRequester)
+            }
+
+            if (animate) {
+                LaunchedEffect(Unit) {
+                    // Manually execute an "animation" that shrinks the viewport by twice the
+                    // focusable's size on every frame, for a few frames. The underlying bug in
+                    // b/230756508 would lose track of the focusable after the second frame.
+                    withFrameNanos {
+                        viewportSize = 80.toDp()
+                    }
+                    withFrameNanos {
+                        viewportSize = 60.toDp()
+                    }
+                    withFrameNanos {
+                        viewportSize = 40.toDp()
+                    }
+                }
             }
         }
         requestFocusAndScrollToTop()
@@ -228,24 +248,10 @@ class ScrollableFocusableInteractionTest(
             .assertIsDisplayed()
             .assertIsFocused()
 
-        // Manually execute an "animation" that shrinks the viewport by twice the focusable's size
-        // on every frame, for a few frames. The underlying bug in b/230756508 would lose track
-        // of the focusable after the second frame.
-        rule.mainClock.autoAdvance = false
-        viewportSize = 80.toDp()
-        rule.mainClock.advanceTimeByFrame()
-        rule.waitForIdle()
-        viewportSize = 60.toDp()
-        rule.mainClock.advanceTimeByFrame()
-        rule.waitForIdle()
-        viewportSize = 40.toDp()
-        rule.mainClock.advanceTimeByFrame()
-        rule.waitForIdle()
-
-        // Resume the clock. The scroll animation should finish.
-        rule.mainClock.autoAdvance = true
+        animate = true
 
         rule.onNodeWithTag(focusableTag)
+            .assertScrollAxisPositionInRootIsEqualTo(30.toDp())
             .assertIsDisplayed()
     }
 
@@ -618,6 +624,7 @@ class ScrollableFocusableInteractionTest(
                     )
                 ) { content() }
             }
+
             Horizontal -> {
                 Row(
                     // Uses scrollable under the hood.

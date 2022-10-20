@@ -46,11 +46,11 @@ class PhaseOrderingTest {
                 withFrameNanos {
                     counter.expect(6)
                     launch {
-                        // TODO(b/254115946) No continuations resumed during a frame should be
-                        //  dispatched until after the frame callbacks finish running.
-                        counter.expect(7)
+                        // No continuations resumed during a frame should be dispatched until after
+                        // the frame callbacks finish running.
+                        counter.expect(8)
                     }
-                    counter.expect(8)
+                    counter.expect(7)
                 }
                 counter.expect(9)
             }
