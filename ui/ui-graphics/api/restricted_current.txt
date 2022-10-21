@@ -56,6 +56,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class AndroidPaint implements androidx.compose.ui.graphics.Paint {
+    ctor public AndroidPaint(android.graphics.Paint internalPaint);
     ctor public AndroidPaint();
     method public android.graphics.Paint asFrameworkPaint();
     method public float getAlpha();
@@ -101,6 +102,7 @@ package androidx.compose.ui.graphics {
 
   public final class AndroidPaint_androidKt {
     method public static androidx.compose.ui.graphics.Paint Paint();
+    method public static androidx.compose.ui.graphics.Paint toComposePaint(android.graphics.Paint);
   }
 
   public final class AndroidPath implements androidx.compose.ui.graphics.Path {

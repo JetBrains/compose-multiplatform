@@ -1360,8 +1360,7 @@ AndroidParagraphTest {
             width = 0.0f
         )
 
-        assertThat(paragraph.textPaint.brush).isEqualTo(brush)
-        assertThat(paragraph.textPaint.brushSize).isEqualTo(Size(paragraph.width, paragraph.height))
+        assertThat(paragraph.textPaint.shader).isNotNull()
     }
 
     @Test
@@ -1984,6 +1983,32 @@ AndroidParagraphTest {
         val bitmapNoSpan = paragraph2.bitmap(textDecoration = TextDecoration.Underline)
 
         assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun shaderBrushSpan_createsShaderOnlyOnce() {
+        val fontSize = 20
+        val text = "abcdef"
+        val shaderBrush = object : ShaderBrush() {
+            var callCount = 0
+            private val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue)) as ShaderBrush
+            override fun createShader(size: Size): android.graphics.Shader {
+                callCount++
+                return brush.createShader(size)
+            }
+        }
+        val spanStyle = SpanStyle(brush = shaderBrush)
+        val paragraph = simpleParagraph(
+            text = "abcdef",
+            width = 2f * fontSize * text.length,
+            style = TextStyle(fontSize = fontSize.sp),
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, 2))
+        )
+
+        // Call paint on paragraph multiple times
+        repeat(5) { paragraph.bitmap() }
+        assertThat(shaderBrush.callCount).isEqualTo(1)
     }
 
     private fun simpleParagraph(
