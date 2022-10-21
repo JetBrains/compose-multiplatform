@@ -75,7 +75,6 @@ import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.explicitParameters
-import org.jetbrains.kotlin.ir.util.fileOrNull
 import org.jetbrains.kotlin.ir.util.findAnnotation
 import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.getInlineClassUnderlyingType
@@ -164,15 +163,6 @@ class ComposerParamTransformer(
                 symbol.owner.lambdaInvokeWithComposerParam()
             }
             else -> (symbol.owner).withComposerParamIfNeeded()
-        }
-
-        // externally transformed functions are already remapped from decoys, so we only need to
-        // add the parameters to the call
-        if (!ownerFn.externallyTransformed()) {
-            if (!isComposableLambda && !transformedFunctionSet.contains(ownerFn))
-                return this
-            if (symbol.owner == ownerFn)
-                return this
         }
 
         return IrCallImpl(
@@ -672,5 +662,7 @@ class ComposerParamTransformer(
      * different module fragment with the same [ModuleDescriptor]
      */
     private fun IrFunction.externallyTransformed(): Boolean =
-        decoysEnabled && currentModule?.files?.contains(fileOrNull) != true
+        decoysEnabled && valueParameters.firstOrNull {
+            it.name == KtxNameConventions.COMPOSER_PARAMETER
+        } != null
 }
