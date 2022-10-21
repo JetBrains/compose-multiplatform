@@ -16,10 +16,16 @@
 
 package androidx.compose.runtime.mock
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshots.fastForEach
 
 fun indent(indent: Int, builder: StringBuilder) {
     repeat(indent) { builder.append(' ') }
+}
+
+@Stable
+interface Modifier {
+    companion object : Modifier { }
 }
 
 open class View {
@@ -123,7 +129,7 @@ open class View {
         it.toString()
     }
 
-    fun findFirstOrNull(predicate: (view: View) -> Boolean): View? {
+    private fun findFirstOrNull(predicate: (view: View) -> Boolean): View? {
         if (predicate(this)) return this
         for (child in children) {
             child.findFirstOrNull(predicate)?.let { return it }
