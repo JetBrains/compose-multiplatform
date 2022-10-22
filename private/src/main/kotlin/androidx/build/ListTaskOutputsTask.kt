@@ -162,6 +162,9 @@ fun Project.findAllTasksByOutput(): Map<File, Task> {
                             "multiple tasks: " + otherTask + " and " + existingTask
                     )
                 }
+                // if there is an exempt conflict, keep the alphabetically earlier task to ensure consistency
+                if (existingTask.path > otherTask.path)
+                  continue
             }
             tasksByOutput[otherTaskOutput] = otherTask
         }
