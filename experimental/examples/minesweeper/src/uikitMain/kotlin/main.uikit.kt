@@ -14,46 +14,17 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
-import kotlinx.cinterop.*
-import platform.UIKit.*
-import platform.Foundation.*
+import androidx.compose.ui.main.defaultUIKitMain
 
 fun main() {
-    val args = emptyArray<String>()
-    memScoped {
-        val argc = args.size + 1
-        val argv = (arrayOf("skikoApp") + args).map { it.cstr.ptr }.toCValues()
-        autoreleasepool {
-            UIApplicationMain(argc, argv, null, NSStringFromClass(SkikoAppDelegate))
+    defaultUIKitMain("Minesweeper", Application("Minesweeper") {
+        Column {
+            // To skip upper part of screen.
+            Box(modifier = Modifier
+                .height(100.dp))
+            Game()
         }
-    }
-}
-
-class SkikoAppDelegate : UIResponder, UIApplicationDelegateProtocol {
-    companion object : UIResponderMeta(), UIApplicationDelegateProtocolMeta
-
-    @ObjCObjectBase.OverrideInit
-    constructor() : super()
-
-    private var _window: UIWindow? = null
-    override fun window() = _window
-    override fun setWindow(window: UIWindow?) {
-        _window = window
-    }
-
-    override fun application(application: UIApplication, didFinishLaunchingWithOptions: Map<Any?, *>?): Boolean {
-        window = UIWindow(frame = UIScreen.mainScreen.bounds)
-        window!!.rootViewController = Application("Minesweeper") {
-            Column {
-                // To skip upper part of screen.
-                Box(modifier = Modifier
-                    .height(100.dp))
-                Game()
-            }
-        }
-        window!!.makeKeyAndVisible()
-        return true
-    }
+    })
 }
 
 @Composable
