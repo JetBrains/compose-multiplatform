@@ -10,14 +10,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
-import androidx.compose.ui.main.defaultIOSMain
+import androidx.compose.ui.main.defaultUIKitMain
 
 object UikitTime : Time {
     override fun now(): Long = kotlin.system.getTimeNanos()
 }
 
 fun main() {
-    defaultIOSMain("FallingBalls", Application("Falling Balls") {
+    defaultUIKitMain("FallingBalls", Application("Falling Balls") {
         val game = remember { Game(UikitTime) }
         Column {
             // To skip upper part of screen.

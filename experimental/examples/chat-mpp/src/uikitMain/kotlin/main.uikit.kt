@@ -1,8 +1,8 @@
 import androidx.compose.ui.window.Application
-import androidx.compose.ui.main.defaultIOSMain
+import androidx.compose.ui.main.defaultUIKitMain
 
 fun main() {
-    defaultIOSMain("Chat", Application("Chat") {
+    defaultUIKitMain("Chat", Application("Chat") {
         ChatApp()
     })
 }

@@ -14,10 +14,10 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
-import androidx.compose.ui.main.defaultIOSMain
+import androidx.compose.ui.main.defaultUIKitMain
 
 fun main() {
-    defaultIOSMain("Minesweeper", Application("Minesweeper") {
+    defaultUIKitMain("Minesweeper", Application("Minesweeper") {
         Column {
             // To skip upper part of screen.
             Box(modifier = Modifier
