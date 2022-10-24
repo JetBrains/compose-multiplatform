@@ -16,7 +16,6 @@
 
 package androidx.build
 
-import androidx.build.Multiplatform.Companion.isMultiplatformEnabled
 import com.android.build.gradle.LibraryPlugin
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -304,8 +303,6 @@ fun sortGradleMetadataDependencies(metadata: String): String {
 }
 
 private fun Project.isMultiplatformPublicationEnabled(): Boolean {
-    if (!project.isMultiplatformEnabled())
-        return false
     return extensions.findByType<KotlinMultiplatformExtension>() != null
 }
 
