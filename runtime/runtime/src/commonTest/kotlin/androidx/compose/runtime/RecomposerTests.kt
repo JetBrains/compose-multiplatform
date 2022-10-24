@@ -304,6 +304,11 @@ class RecomposerTests {
 
         assertEquals(1, recompostions)
     }
+
+    @Test
+    fun constructRecomposerWithCancelledJob() {
+        Recomposer(Job().apply { cancel() })
+    }
 }
 
 class UnitApplier : Applier<Unit> {

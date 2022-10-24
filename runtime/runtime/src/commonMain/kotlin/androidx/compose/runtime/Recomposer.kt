@@ -147,59 +147,6 @@ class Recomposer(
     }
 
     /**
-     * A [Job] used as a parent of any effects created by this [Recomposer]'s compositions.
-     * Its cleanup is used to advance to [State.ShuttingDown] or [State.ShutDown].
-     */
-    private val effectJob = Job(effectCoroutineContext[Job]).apply {
-        invokeOnCompletion { throwable ->
-            // Since the running recompose job is operating in a disjoint job if present,
-            // kick it out and make sure no new ones start if we have one.
-            val cancellation = CancellationException("Recomposer effect job completed", throwable)
-
-            var continuationToResume: CancellableContinuation<Unit>? = null
-            synchronized(stateLock) {
-                val runnerJob = runnerJob
-                if (runnerJob != null) {
-                    _state.value = State.ShuttingDown
-                    // If the recomposer is closed we will let the runnerJob return from
-                    // runRecomposeAndApplyChanges normally and consider ourselves shut down
-                    // immediately.
-                    if (!isClosed) {
-                        // This is the job hosting frameContinuation; no need to resume it otherwise
-                        runnerJob.cancel(cancellation)
-                    } else if (workContinuation != null) {
-                        continuationToResume = workContinuation
-                    }
-                    workContinuation = null
-                    runnerJob.invokeOnCompletion { runnerJobCause ->
-                        synchronized(stateLock) {
-                            closeCause = throwable?.apply {
-                                runnerJobCause
-                                    ?.takeIf { it !is CancellationException }
-                                    ?.let { addSuppressed(it) }
-                            }
-                            _state.value = State.ShutDown
-                        }
-                    }
-                } else {
-                    closeCause = cancellation
-                    _state.value = State.ShutDown
-                }
-            }
-            continuationToResume?.resume(Unit)
-        }
-    }
-
-    /**
-     * The [effectCoroutineContext] is derived from the parameter of the same name.
-     */
-    internal override val effectCoroutineContext: CoroutineContext =
-        effectCoroutineContext + broadcastFrameClock + effectJob
-
-    internal override val recomposeCoroutineContext: CoroutineContext
-        get() = EmptyCoroutineContext
-
-    /**
      * Valid operational states of a [Recomposer].
      */
     enum class State {
@@ -269,6 +216,63 @@ class Recomposer(
     // End properties guarded by stateLock
 
     private val _state = MutableStateFlow(State.Inactive)
+
+    /**
+     * A [Job] used as a parent of any effects created by this [Recomposer]'s compositions.
+     * Its cleanup is used to advance to [State.ShuttingDown] or [State.ShutDown].
+     *
+     * Initialized after other state above, since it is possible for [Job.invokeOnCompletion]
+     * to run synchronously during construction if the [Recomposer] is constructed with
+     * a completed or cancelled [Job].
+     */
+    private val effectJob = Job(effectCoroutineContext[Job]).apply {
+        invokeOnCompletion { throwable ->
+            // Since the running recompose job is operating in a disjoint job if present,
+            // kick it out and make sure no new ones start if we have one.
+            val cancellation = CancellationException("Recomposer effect job completed", throwable)
+
+            var continuationToResume: CancellableContinuation<Unit>? = null
+            synchronized(stateLock) {
+                val runnerJob = runnerJob
+                if (runnerJob != null) {
+                    _state.value = State.ShuttingDown
+                    // If the recomposer is closed we will let the runnerJob return from
+                    // runRecomposeAndApplyChanges normally and consider ourselves shut down
+                    // immediately.
+                    if (!isClosed) {
+                        // This is the job hosting frameContinuation; no need to resume it otherwise
+                        runnerJob.cancel(cancellation)
+                    } else if (workContinuation != null) {
+                        continuationToResume = workContinuation
+                    }
+                    workContinuation = null
+                    runnerJob.invokeOnCompletion { runnerJobCause ->
+                        synchronized(stateLock) {
+                            closeCause = throwable?.apply {
+                                runnerJobCause
+                                    ?.takeIf { it !is CancellationException }
+                                    ?.let { addSuppressed(it) }
+                            }
+                            _state.value = State.ShutDown
+                        }
+                    }
+                } else {
+                    closeCause = cancellation
+                    _state.value = State.ShutDown
+                }
+            }
+            continuationToResume?.resume(Unit)
+        }
+    }
+
+    /**
+     * The [effectCoroutineContext] is derived from the parameter of the same name.
+     */
+    internal override val effectCoroutineContext: CoroutineContext =
+        effectCoroutineContext + broadcastFrameClock + effectJob
+
+    internal override val recomposeCoroutineContext: CoroutineContext
+        get() = EmptyCoroutineContext
 
     /**
      * Determine the new value of [_state]. Call only while locked on [stateLock].
