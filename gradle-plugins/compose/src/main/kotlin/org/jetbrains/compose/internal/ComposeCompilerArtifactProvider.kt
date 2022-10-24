@@ -6,6 +6,7 @@
 package org.jetbrains.compose.internal
 
 import org.jetbrains.compose.ComposeCompilerCompatability
+import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider.DefaultCompiler.pluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
@@ -15,7 +16,7 @@ private const val KOTLIN_COMPATABILITY_LINK =
 
 internal class ComposeCompilerArtifactProvider(
     private val kotlinVersion: String,
-    customPluginString: () -> String?
+    private val customPluginString: () -> String?
 ) {
     fun checkTargetSupported(target: KotlinTarget) {
         require(!unsupportedPlatforms.contains(target.platformType)) {
@@ -26,35 +27,28 @@ internal class ComposeCompilerArtifactProvider(
         }
     }
 
-    private var unsupportedPlatforms: Set<KotlinPlatformType> = emptySet()
+    private val autoCompilerVersion by lazy {
+        requireNotNull(
+            ComposeCompilerCompatability.compilerVersionFor(kotlinVersion)
+        ) {
+            "This version of Compose Multiplatform doesn't support Kotlin " +
+                    "$kotlinVersion. " +
+                    "Please see $KOTLIN_COMPATABILITY_LINK " +
+                    "to know the latest supported version of Kotlin."
+        }
+    }
 
-    val compilerArtifact: SubpluginArtifact
-
-    init {
+    private val customCompilerArtifact: SubpluginArtifact? by lazy {
         val customPlugin = customPluginString()
         val customCoordinates = customPlugin?.split(":")
         when (customCoordinates?.size) {
-            null -> {
-                val version = requireNotNull(
-                    ComposeCompilerCompatability.compilerVersionFor(kotlinVersion)
-                ) {
-                    "This version of Compose Multiplatform doesn't support Kotlin " +
-                        "$kotlinVersion. " +
-                        "Please see $KOTLIN_COMPATABILITY_LINK " +
-                        "to know the latest supported version of Kotlin."
-                }
-
-                compilerArtifact = DefaultCompiler.pluginArtifact(
-                    version = version.version
-                )
-                unsupportedPlatforms = version.unsupportedPlatforms
-            }
+            null -> null
             1 -> {
                 val customVersion = customCoordinates[0]
                 check(customVersion.isNotBlank()) { "'compose.kotlinCompilerPlugin' cannot be blank!" }
-                compilerArtifact = DefaultCompiler.pluginArtifact(version = customVersion)
+                pluginArtifact(version = customVersion)
             }
-            3 -> compilerArtifact = DefaultCompiler.pluginArtifact(
+            3 -> pluginArtifact(
                 version = customCoordinates[2],
                 groupId = customCoordinates[0],
                 artifactId = customCoordinates[1],
@@ -65,6 +59,14 @@ internal class ComposeCompilerArtifactProvider(
                         Actual value: '$customPlugin'
                 """.trimIndent())
         }
+    }
+
+    private val unsupportedPlatforms: Set<KotlinPlatformType> by lazy {
+        if (customCompilerArtifact != null) emptySet() else autoCompilerVersion.unsupportedPlatforms
+    }
+
+    val compilerArtifact: SubpluginArtifact get() {
+        return customCompilerArtifact ?: pluginArtifact(version = autoCompilerVersion.version)
     }
 
     val compilerHostedArtifact: SubpluginArtifact
