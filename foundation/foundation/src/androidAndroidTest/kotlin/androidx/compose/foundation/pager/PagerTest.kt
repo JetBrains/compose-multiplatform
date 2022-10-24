@@ -144,14 +144,14 @@ internal class PagerTest(val config: ParamConfig) : BasePagerTest(config) {
 
         // Assert
         rule.runOnIdle {
-            val visibleItems = state.lazyListState.layoutInfo.visibleItemsInfo.size
+            val visibleItems = state.layoutInfo.visibleItemsInfo.size
             val pageCount = with(rule.density) {
                 (pagerSize / (pageSize + config.pageSpacing.roundToPx()))
             } + 1
             assertThat(visibleItems).isEqualTo(pageCount)
         }
 
-        for (pageIndex in 5 until state.lazyListState.layoutInfo.visibleItemsInfo.size + 4) {
+        for (pageIndex in 5 until state.layoutInfo.visibleItemsInfo.size + 4) {
             confirmPageIsInCorrectPosition(5, pageIndex)
         }
     }

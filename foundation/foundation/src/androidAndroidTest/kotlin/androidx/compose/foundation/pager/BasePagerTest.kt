@@ -18,6 +18,7 @@ package androidx.compose.foundation.pager
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.layout.Box
@@ -32,10 +33,16 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
@@ -60,6 +67,8 @@ internal open class BasePagerTest(private val config: ParamConfig) {
     var pagerSize: Int = 0
     var placed = mutableSetOf<Int>()
     var pageSize: Int = 0
+    lateinit var focusManager: FocusManager
+    lateinit var firstItemFocusRequester: FocusRequester
 
     @Stable
     fun Modifier.crossAxisSize(size: Dp) =
@@ -82,6 +91,22 @@ internal open class BasePagerTest(private val config: ParamConfig) {
         swipeWithVelocity(layoutStart, end, velocity)
     }
 
+    fun TouchInjectionScope.swipeWithVelocityAcrossCrossAxis(
+        velocity: Float,
+        delta: Float? = null
+    ) {
+        val end = if (delta == null) {
+            layoutEnd
+        } else {
+            if (isVertical) {
+                layoutStart.copy(x = layoutStart.x + delta)
+            } else {
+                layoutStart.copy(y = layoutStart.y + delta)
+            }
+        }
+        swipeWithVelocity(layoutStart, end, velocity)
+    }
+
     internal fun createPager(
         state: PagerState,
         modifier: Modifier = Modifier,
@@ -90,9 +115,12 @@ internal open class BasePagerTest(private val config: ParamConfig) {
         pageSize: PageSize = PageSize.Fill,
         userScrollEnabled: Boolean = true,
         snappingPage: PagerSnapDistance = PagerSnapDistance.atMost(1),
-        effects: @Composable () -> Unit = {}
+        nestedScrollConnection: NestedScrollConnection = object : NestedScrollConnection {},
+        effects: @Composable () -> Unit = {},
+        pageContent: @Composable (page: Int) -> Unit = { Page(index = it) }
     ) {
         rule.setContent {
+            focusManager = LocalFocusManager.current
             val flingBehavior =
                 PagerDefaults.flingBehavior(
                     state = state,
@@ -100,37 +128,47 @@ internal open class BasePagerTest(private val config: ParamConfig) {
                 )
             CompositionLocalProvider(LocalLayoutDirection provides config.layoutDirection) {
                 scope = rememberCoroutineScope()
-                HorizontalOrVerticalPager(
-                    pageCount = pagerCount(),
-                    state = state,
-                    beyondBoundsPageCount = offscreenPageLimit,
-                    modifier = modifier
-                        .testTag(PagerTestTag)
-                        .onSizeChanged { pagerSize = if (isVertical) it.height else it.width },
-                    pageSize = pageSize,
-                    userScrollEnabled = userScrollEnabled,
-                    reverseLayout = config.reverseLayout,
-                    flingBehavior = flingBehavior,
-                    pageSpacing = config.pageSpacing,
-                    contentPadding = config.mainAxisContentPadding
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(nestedScrollConnection)
                 ) {
-                    Page(index = it)
+                    HorizontalOrVerticalPager(
+                        pageCount = pagerCount(),
+                        state = state,
+                        beyondBoundsPageCount = offscreenPageLimit,
+                        modifier = modifier
+                            .testTag(PagerTestTag)
+                            .onSizeChanged { pagerSize = if (isVertical) it.height else it.width },
+                        pageSize = pageSize,
+                        userScrollEnabled = userScrollEnabled,
+                        reverseLayout = config.reverseLayout,
+                        flingBehavior = flingBehavior,
+                        pageSpacing = config.pageSpacing,
+                        contentPadding = config.mainAxisContentPadding,
+                        pageContent = pageContent
+                    )
                 }
-                effects()
             }
+            effects()
         }
     }
 
     @Composable
     internal fun Page(index: Int) {
+        val focusRequester = FocusRequester().also {
+            if (index == 0) firstItemFocusRequester = it
+        }
         Box(modifier = Modifier
+            .focusRequester(focusRequester)
             .onPlaced {
                 placed.add(index)
                 pageSize = if (isVertical) it.size.height else it.size.width
             }
             .fillMaxSize()
             .background(Color.Blue)
-            .testTag("$index"),
+            .testTag("$index")
+            .focusable(),
             contentAlignment = Alignment.Center) {
             BasicText(text = index.toString())
         }
@@ -257,7 +295,8 @@ internal open class BasePagerTest(private val config: ParamConfig) {
 
     internal fun confirmPageIsInCorrectPosition(
         currentPageIndex: Int,
-        pageToVerifyPosition: Int = currentPageIndex
+        pageToVerifyPosition: Int = currentPageIndex,
+        pageOffset: Float = 0f
     ) {
         val leftContentPadding =
             config.mainAxisContentPadding.calculateLeftPadding(config.layoutDirection)
@@ -268,10 +307,12 @@ internal open class BasePagerTest(private val config: ParamConfig) {
             val initialPageOffset = currentPageIndex * (pageSize + spacings)
 
             val position = pageToVerifyPosition * (pageSize + spacings) - initialPageOffset
+            val positionWithOffset =
+                position + (pageSize + spacings) * pageOffset * scrollForwardSign
             if (isVertical) {
-                0.dp to position.toDp()
+                0.dp to positionWithOffset.toDp()
             } else {
-                position.toDp() to 0.dp
+                positionWithOffset.toDp() to 0.dp
             }
         }
         rule.onNodeWithTag("$pageToVerifyPosition")

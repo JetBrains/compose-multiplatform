@@ -20,6 +20,7 @@ import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -56,6 +57,53 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
             }
             confirmPageIsInCorrectPosition(state.currentPage)
         }
+    }
+
+    @Test
+    fun scrollToPage_usedOffset_shouldPlacePagesCorrectly() {
+        // Arrange
+        val state = PagerState()
+        fun scrollToPageWithOffset(page: Int, offset: Float) {
+            rule.runOnIdle {
+                scope.launch {
+                    state.scrollToPage(page, offset)
+                }
+            }
+            rule.waitForIdle()
+        }
+
+        // Arrange
+        createPager(state = state, modifier = Modifier.fillMaxSize())
+
+        // Act
+        scrollToPageWithOffset(10, 0.5f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 10, pageOffset = 0.5f)
+
+        // Act
+        scrollToPageWithOffset(4, 0.2f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 4, pageOffset = 0.2f)
+
+        // Act
+        scrollToPageWithOffset(12, -0.4f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 12, pageOffset = -0.4f)
+
+        // Act
+        scrollToPageWithOffset(DefaultPageCount - 1, 0.5f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, DefaultPageCount - 1)
+
+        // Act
+        scrollToPageWithOffset(0, -0.5f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 0)
     }
 
     @Test
@@ -99,6 +147,53 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
             rule.waitForIdle()
             confirmPageIsInCorrectPosition(state.currentPage)
         }
+    }
+
+    @Test
+    fun animateScrollToPage_usedOffset_shouldPlacePagesCorrectly() {
+        // Arrange
+        val state = PagerState()
+        fun animateScrollToPageWithOffset(page: Int, offset: Float) {
+            rule.runOnIdle {
+                scope.launch {
+                    state.animateScrollToPage(page, offset)
+                }
+            }
+            rule.waitForIdle()
+        }
+
+        // Arrange
+        createPager(state = state, modifier = Modifier.fillMaxSize())
+
+        // Act
+        animateScrollToPageWithOffset(10, 0.5f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 10, pageOffset = 0.5f)
+
+        // Act
+        animateScrollToPageWithOffset(4, 0.2f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 4, pageOffset = 0.2f)
+
+        // Act
+        animateScrollToPageWithOffset(12, -0.4f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 12, pageOffset = -0.4f)
+
+        // Act
+        animateScrollToPageWithOffset(DefaultPageCount - 1, 0.5f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, DefaultPageCount - 1)
+
+        // Act
+        animateScrollToPageWithOffset(0, -0.5f)
+
+        // Assert
+        confirmPageIsInCorrectPosition(state.currentPage, 0)
     }
 
     @Test
@@ -154,6 +249,32 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
     }
 
     @Test
+    fun scrollToPage_usingLaunchedEffect() {
+        val state = PagerState()
+        createPager(state, effects = {
+            LaunchedEffect(state) {
+                state.scrollToPage(10)
+            }
+        })
+        rule.waitForIdle()
+        assertThat(state.currentPage).isEqualTo(10)
+        confirmPageIsInCorrectPosition(10)
+    }
+
+    @Test
+    fun scrollToPageWithOffset_usingLaunchedEffect() {
+        val state = PagerState()
+        createPager(state, effects = {
+            LaunchedEffect(state) {
+                state.scrollToPage(10, 0.4f)
+            }
+        })
+        rule.waitForIdle()
+        assertThat(state.currentPage).isEqualTo(10)
+        confirmPageIsInCorrectPosition(10, pageOffset = 0.4f)
+    }
+
+    @Test
     fun animateScrollToPage_shouldCoerceWithinRange() {
         // Arrange
         val state = PagerState()
@@ -193,12 +314,60 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
             assertThat(state.currentPage).isEqualTo(it)
             rule.runOnIdle {
                 scope.launch {
-                    state.animateScrollToPage(state.currentPage + 1, differentAnimation)
+                    state.animateScrollToPage(
+                        state.currentPage + 1,
+                        animationSpec = differentAnimation
+                    )
                 }
             }
             rule.waitForIdle()
             confirmPageIsInCorrectPosition(state.currentPage)
         }
+    }
+
+    @Test
+    fun animatedScrollToPage_usingLaunchedEffect() {
+        val state = PagerState()
+        createPager(state, effects = {
+            LaunchedEffect(state) {
+                state.animateScrollToPage(10)
+            }
+        })
+        rule.waitForIdle()
+        assertThat(state.currentPage).isEqualTo(10)
+        confirmPageIsInCorrectPosition(10)
+    }
+
+    @Test
+    fun animatedScrollToPageWithOffset_usingLaunchedEffect() {
+        val state = PagerState()
+        createPager(state, effects = {
+            LaunchedEffect(state) {
+                state.animateScrollToPage(10, 0.4f)
+            }
+        })
+        rule.waitForIdle()
+        assertThat(state.currentPage).isEqualTo(10)
+        confirmPageIsInCorrectPosition(10, pageOffset = 0.4f)
+    }
+
+    @Test
+    fun animatedScrollToPage_viewPortNumberOfPages_usingLaunchedEffect_shouldNotPlaceALlPages() {
+        val state = PagerState()
+        createPager(state, effects = {
+            LaunchedEffect(state) {
+                state.animateScrollToPage(DefaultPageCount - 1)
+            }
+        })
+        rule.waitForIdle()
+        // Assert
+        rule.runOnIdle {
+            assertThat(state.currentPage).isEqualTo(DefaultPageCount - 1)
+            assertThat(placed).doesNotContain(DefaultPageCount / 2 - 1)
+            assertThat(placed).doesNotContain(DefaultPageCount / 2)
+            assertThat(placed).doesNotContain(DefaultPageCount / 2 + 1)
+        }
+        confirmPageIsInCorrectPosition(state.currentPage)
     }
 
     @Test
@@ -406,7 +575,7 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
 
         // No offset initially
         rule.runOnIdle {
-            assertThat(state.currentPageOffset).isWithin(0.01f).of(0f)
+            assertThat(state.currentPageOffsetFraction).isWithin(0.01f).of(0f)
         }
 
         // Act
@@ -421,7 +590,7 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
         }
 
         rule.runOnIdle {
-            assertThat(state.currentPageOffset).isWithin(0.1f).of(0.25f)
+            assertThat(state.currentPageOffsetFraction).isWithin(0.1f).of(0.25f)
         }
 
         onPager().performTouchInput { up() }
@@ -436,7 +605,7 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
 
         // No offset initially (again)
         rule.runOnIdle {
-            assertThat(state.currentPageOffset).isWithin(0.01f).of(0f)
+            assertThat(state.currentPageOffsetFraction).isWithin(0.01f).of(0f)
         }
 
         // Act
@@ -451,7 +620,7 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
         }
 
         rule.runOnIdle {
-            assertThat(state.currentPageOffset).isWithin(0.1f).of(-0.25f)
+            assertThat(state.currentPageOffsetFraction).isWithin(0.1f).of(-0.25f)
         }
     }
 
@@ -474,8 +643,9 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
     fun testStateRestoration() {
         // Arrange
         val tester = StateRestorationTester(rule)
-        val state = PagerState()
+        lateinit var state: PagerState
         tester.setContent {
+            state = rememberPagerState()
             scope = rememberCoroutineScope()
             HorizontalOrVerticalPager(
                 state = state,
@@ -498,14 +668,32 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
             }
         }
 
-        // TODO(levima) Update to assert offset as well
         val previousPage = state.currentPage
+        val previousOffset = state.currentPageOffsetFraction
         tester.emulateSavedInstanceStateRestore()
 
         // Assert
         rule.runOnIdle {
             assertThat(state.currentPage).isEqualTo(previousPage)
+            assertThat(state.currentPageOffsetFraction).isEqualTo(previousOffset)
         }
+    }
+
+    @Test
+    fun scrollTo_beforeFirstLayout_shouldWaitForStateAndLayoutSetting() {
+        // Arrange
+        val state = PagerState(0)
+        rule.mainClock.autoAdvance = false
+
+        // Act
+        createPager(state = state, modifier = Modifier.fillMaxSize(), effects = {
+            LaunchedEffect(state) {
+                state.scrollToPage(5)
+            }
+        })
+
+        // Assert
+        assertThat(state.currentPage).isEqualTo(5)
     }
 
     companion object {
