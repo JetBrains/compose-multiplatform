@@ -17,6 +17,8 @@
 package androidx.compose.ui.tooling
 
 import android.util.Log
+import androidx.compose.ui.tooling.data.Group
+import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 
 /**
@@ -72,6 +74,42 @@ internal fun getPreviewProviderParameters(
     } else {
         return emptyArray()
     }
+}
+
+@OptIn(UiToolingDataApi::class)
+internal fun Group.firstOrNull(predicate: (Group) -> Boolean): Group? {
+    return findGroupsThatMatchPredicate(this, predicate, true).firstOrNull()
+}
+
+@OptIn(UiToolingDataApi::class)
+internal fun Group.findAll(predicate: (Group) -> Boolean): List<Group> {
+    return findGroupsThatMatchPredicate(this, predicate)
+}
+
+/**
+ * Search [Group]s that match a given [predicate], starting from a given [root]. An optional
+ * boolean parameter can be set if we're interested in a single occurrence. If it's set, we
+ * return early after finding the first matching [Group].
+ */
+@OptIn(UiToolingDataApi::class)
+private fun findGroupsThatMatchPredicate(
+    root: Group,
+    predicate: (Group) -> Boolean,
+    findOnlyFirst: Boolean = false
+): List<Group> {
+    val result = mutableListOf<Group>()
+    val stack = mutableListOf(root)
+    while (stack.isNotEmpty()) {
+        val current = stack.removeLast()
+        if (predicate(current)) {
+            if (findOnlyFirst) {
+                return listOf(current)
+            }
+            result.add(current)
+        }
+        stack.addAll(current.children)
+    }
+    return result
 }
 
 private fun Sequence<Any?>.toArray(size: Int): Array<Any?> {

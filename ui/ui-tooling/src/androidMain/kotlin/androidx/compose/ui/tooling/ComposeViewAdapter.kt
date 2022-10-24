@@ -33,7 +33,6 @@ import androidx.activity.result.ActivityResultRegistry
 import androidx.activity.result.ActivityResultRegistryOwner
 import androidx.activity.result.contract.ActivityResultContract
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.Transition
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionLocalProvider
@@ -50,6 +49,8 @@ import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
+import androidx.compose.ui.tooling.animation.AnimationSearch
+import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
@@ -69,22 +70,11 @@ import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.DecayAnimation
-import androidx.compose.animation.core.InfiniteTransition
-import androidx.compose.animation.core.TargetBasedAnimation
-import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
-import kotlin.reflect.KClass
-import kotlin.reflect.safeCast
 
 private const val TOOLS_NS_URI = "http://schemas.android.com/tools"
 private const val DESIGN_INFO_METHOD = "getDesignInfo"
-private const val UPDATE_TRANSITION_FUNCTION_NAME = "updateTransition"
-private const val ANIMATED_CONTENT = "AnimatedContent"
-private const val ANIMATED_VISIBILITY = "AnimatedVisibility"
-private const val ANIMATE_VALUE_AS_STATE = "animateValueAsState"
+
 private const val REMEMBER = "remember"
-private const val SIZE_ANIMATION_MODIFIER = "androidx.compose.animation.SizeAnimationModifier"
 
 private val emptyContent: @Composable () -> Unit = @Composable {}
 
@@ -275,125 +265,6 @@ internal class ComposeViewAdapter : FrameLayout {
         )
     }
 
-    /** Find first data with type [T] in group or within all remember calls. */
-    private inline fun <reified T> Collection<Group>.findRememberedData(): List<T> {
-        val selfData = mapNotNull {
-            it.data.firstOrNull { data ->
-                data is T
-            } as? T
-        }
-        val rememberCalls = mapNotNull { it.firstOrNull { call -> call.name == "remember" } }
-        return selfData + rememberCalls.mapNotNull {
-            it.data.firstOrNull { data ->
-                data is T
-            } as? T
-        }
-    }
-
-    /** Search for animations with type [T]. */
-    private open class Search<T : Any>(val trackAnimation: (Any) -> Unit) {
-        val animations = mutableSetOf<T>()
-        open fun parse(treeWithLocation: Collection<Group>) {}
-        fun hasAnimations() = animations.isNotEmpty()
-        fun track() {
-            // Animations are found in reversed order in the tree,
-            // reverse it back so they are tracked in the order they appear in the code.
-            animations.reversed().forEach { trackAnimation(it) }
-        }
-    }
-
-    /** Search for animations with type [T]. */
-    private open class RememberSearch<T : Any>(
-        private val clazz: KClass<T>,
-        trackAnimation: (Any) -> Unit
-    ) : Search<T>(trackAnimation) {
-        override fun parse(treeWithLocation: Collection<Group>) {
-            animations.addAll(treeWithLocation.findRememberCallWithType(clazz).toSet())
-        }
-
-        protected fun <T : Any> Collection<Group>.findRememberCallWithType(clazz: KClass<T>):
-            List<T> {
-            return mapNotNull {
-                clazz.safeCast(
-                    it.data.firstOrNull { data -> data?.javaClass?.kotlin == clazz })
-            }
-        }
-    }
-
-    /** Search for animateXAsState() and animateValueAsState() animations. */
-    private inner class AnimateXAsStateSearch(trackAnimation: (Any) -> Unit) :
-        Search<Animatable<*, *>>(trackAnimation) {
-        override fun parse(treeWithLocation: Collection<Group>) {
-            // How "animateXAsState" calls organized:
-            // Group with name "animateXAsState", for example animateDpAsState, animateIntAsState
-            //    children
-            //    * Group with name "animateValueAsState"
-            //          children
-            //          * Group with name "remember" and data with type Animatable
-            //
-            // To distinguish Animatable within "animateXAsState" calls from other Animatables,
-            // first "animateValueAsState" calls are found.
-            //  Find Animatable within "animateValueAsState" call.
-            animations.addAll(
-                treeWithLocation.filter { call -> call.name == ANIMATE_VALUE_AS_STATE }
-                    .mapNotNull { animateValue ->
-                        animateValue.children.findRememberedData<Animatable<*, *>>().firstOrNull()
-                    }.toSet()
-            )
-        }
-    }
-
-    /** Search for animateContentSize() animations. */
-    private class AnimateContentSizeSearch(trackAnimation: (Any) -> Unit) :
-        Search<Any>(trackAnimation) {
-        override fun parse(treeWithLocation: Collection<Group>) {
-            animations.addAll(treeWithLocation.filter { call -> call.name == REMEMBER }.mapNotNull {
-                // SizeAnimationModifier is currently private.
-                it.data.firstOrNull { data ->
-                    data?.javaClass?.name == SIZE_ANIMATION_MODIFIER
-                }
-            }.toSet())
-        }
-    }
-
-    /** Search for updateTransition() animations. */
-    private inner class TransitionSearch(trackAnimation: (Any) -> Unit) :
-        Search<Transition<Any>>(trackAnimation) {
-        override fun parse(treeWithLocation: Collection<Group>) {
-            // Find `updateTransition` calls.
-            animations.addAll(treeWithLocation.filter { it.name == UPDATE_TRANSITION_FUNCTION_NAME }
-                .findRememberedData())
-        }
-    }
-
-    /** Search for AnimatedVisibility animations. */
-    private inner class AnimatedVisibilitySearch(trackAnimation: (Any) -> Unit) :
-        Search<Transition<Any>>(trackAnimation) {
-        override fun parse(treeWithLocation: Collection<Group>) {
-            // Find `AnimatedVisibility` calls.
-            // Then, find the underlying `updateTransition` it uses.
-            animations.addAll(treeWithLocation.filter { it.name == ANIMATED_VISIBILITY }
-                .mapNotNull {
-                    it.children.firstOrNull { updateTransitionCall ->
-                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
-                    }
-                }.findRememberedData())
-        }
-    }
-
-    /** Search for AnimatedContent animations. */
-    private inner class AnimatedContentSearch(trackAnimation: (Any) -> Unit) :
-        Search<Transition<Any>>(trackAnimation) {
-        override fun parse(treeWithLocation: Collection<Group>) {
-            animations.addAll(treeWithLocation.filter { it.name == ANIMATED_CONTENT }
-                .mapNotNull {
-                    it.children.firstOrNull { updateTransitionCall ->
-                        updateTransitionCall.name == UPDATE_TRANSITION_FUNCTION_NAME
-                    }
-                }.findRememberedData())
-        }
-    }
-
     /**
      * Processes the recorded slot table and re-generates the [viewInfos] attribute.
      */
@@ -436,11 +307,11 @@ internal class ComposeViewAdapter : FrameLayout {
     @Suppress("UNCHECKED_CAST")
     private fun findAndTrackAnimations() {
         val slotTrees = slotTableRecord.store.map { it.asTree() }
-        val transitionSearch = TransitionSearch { clock.trackTransition(it as Transition<Any>) }
+        val transitionSearch = AnimationSearch.TransitionSearch { clock.trackTransition(it) }
         val animatedContentSearch =
-            AnimatedContentSearch { clock.trackAnimatedContent(it as Transition<*>) }
-        val animatedVisibilitySearch = AnimatedVisibilitySearch {
-            clock.trackAnimatedVisibility(it as Transition<Any>, ::requestLayout)
+            AnimationSearch.AnimatedContentSearch { clock.trackAnimatedContent(it) }
+        val animatedVisibilitySearch = AnimationSearch.AnimatedVisibilitySearch {
+            clock.trackAnimatedVisibility(it, ::requestLayout)
         }
         // All supported animations.
         val supportedSearch = setOf(
@@ -451,17 +322,11 @@ internal class ComposeViewAdapter : FrameLayout {
         // All unsupported animations, if API is available.
         val extraSearch = if (UnsupportedComposeAnimation.apiAvailable) setOf(
             animatedContentSearch,
-            AnimateXAsStateSearch { clock.trackAnimateXAsState(it as Animatable<*, *>) },
-            AnimateContentSizeSearch { clock.trackAnimateContentSize(it) },
-            RememberSearch(TargetBasedAnimation::class) {
-                clock.trackTargetBasedAnimations(it as TargetBasedAnimation<*, *>)
-            },
-            RememberSearch(DecayAnimation::class) {
-                clock.trackDecayAnimations(it as DecayAnimation<*, *>)
-            },
-            RememberSearch(InfiniteTransition::class) {
-                clock.trackInfiniteTransition(it as InfiniteTransition)
-            }
+            AnimationSearch.AnimateXAsStateSearch { clock.trackAnimateXAsState(it) },
+            AnimationSearch.AnimateContentSizeSearch { clock.trackAnimateContentSize(it) },
+            AnimationSearch.TargetBasedSearch { clock.trackTargetBasedAnimations(it) },
+            AnimationSearch.DecaySearch { clock.trackDecayAnimations(it) },
+            AnimationSearch.InfiniteTransitionSearch { clock.trackInfiniteTransition(it) }
         ) else emptyList()
 
         // Animations to track in PreviewAnimationClock.
@@ -475,8 +340,8 @@ internal class ComposeViewAdapter : FrameLayout {
         // table as the one containing the `@Composable` being previewed, e.g. when they're
         // defined using sub-composition.
         slotTrees.forEach { tree ->
-            val treeWithLocation = tree.findAll { it.location != null }
-            setToSearch.forEach { it.parse(treeWithLocation) }
+            val groupsWithLocation = tree.findAll { it.location != null }
+            setToSearch.forEach { it.addAnimations(groupsWithLocation) }
 
             // Remove all AnimatedVisibility parent transitions from the transitions list,
             // otherwise we'd duplicate them in the Android Studio Animation Preview because we
@@ -556,39 +421,6 @@ internal class ComposeViewAdapter : FrameLayout {
                 null
             }
         }
-    }
-
-    private fun Group.firstOrNull(predicate: (Group) -> Boolean): Group? {
-        return findGroupsThatMatchPredicate(this, predicate, true).firstOrNull()
-    }
-
-    private fun Group.findAll(predicate: (Group) -> Boolean): List<Group> {
-        return findGroupsThatMatchPredicate(this, predicate)
-    }
-
-    /**
-     * Search [Group]s that match a given [predicate], starting from a given [root]. An optional
-     * boolean parameter can be set if we're interested in a single occurrence. If it's set, we
-     * return early after finding the first matching [Group].
-     */
-    private fun findGroupsThatMatchPredicate(
-        root: Group,
-        predicate: (Group) -> Boolean,
-        findOnlyFirst: Boolean = false
-    ): List<Group> {
-        val result = mutableListOf<Group>()
-        val stack = mutableListOf(root)
-        while (stack.isNotEmpty()) {
-            val current = stack.removeLast()
-            if (predicate(current)) {
-                if (findOnlyFirst) {
-                    return listOf(current)
-                }
-                result.add(current)
-            }
-            stack.addAll(current.children)
-        }
-        return result
     }
 
     private fun invalidateComposition() {
