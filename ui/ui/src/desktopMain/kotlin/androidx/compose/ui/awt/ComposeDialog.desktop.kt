@@ -64,6 +64,21 @@ class ComposeDialog : JDialog {
         this.skiaLayerAnalytics = skiaLayerAnalytics
     }
 
+    /**
+     * ComposeDialog is a dialog for building UI using Compose for Desktop.
+     * ComposeDialog inherits javax.swing.JDialog.
+     *
+     * @param skiaLayerAnalytics Analytics that helps to know more about SkiaLayer behaviour.
+     * SkiaLayer is underlying class used internally to draw Compose content.
+     * Implementation usually uses third-party solution to send info to some centralized analytics gatherer.
+     */
+    @ExperimentalComposeUiApi
+    constructor(
+        skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
+    ) : super() {
+        this.skiaLayerAnalytics = skiaLayerAnalytics
+    }
+
     @Deprecated("Use the constructor with setting owner explicitly. Will be remove in 1.3")
     constructor(
         modalityType: ModalityType = ModalityType.MODELESS
