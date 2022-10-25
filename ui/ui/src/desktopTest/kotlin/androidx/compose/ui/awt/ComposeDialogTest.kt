@@ -52,12 +52,14 @@ import org.jetbrains.skiko.SkiaLayerAnalytics
 import org.junit.Assume
 import org.junit.Test
 
+// A copy of ComposeWindowTest adapted for ComposeDialog. Don't change it, if it isn't specific for ComposeDialog.
+// A copy because it is better to keep tests less abstract, and we can't properly abstract away from JFrame/JDialog.
 @OptIn(ExperimentalComposeUiApi::class)
-class ComposeWindowTest {
+class ComposeDialogTest {
     @Test
     fun `catch exception on setContent`() = runApplicationTest {
         val caughtExceptions = mutableListOf<Throwable>()
-        val window = ComposeWindow()
+        val window = ComposeDialog()
         try {
             window.isUndecorated = true
             window.size = Dimension(200, 200)
@@ -81,7 +83,7 @@ class ComposeWindowTest {
     @Test
     fun `catch exception on render`() = runApplicationTest {
         val caughtExceptions = mutableListOf<Throwable>()
-        val window = ComposeWindow()
+        val window = ComposeDialog()
         try {
             window.isUndecorated = true
             window.size = Dimension(200, 200)
@@ -108,7 +110,7 @@ class ComposeWindowTest {
     @Test
     fun `catch exception on event`() = runApplicationTest {
         val caughtExceptions = mutableListOf<Throwable>()
-        val window = ComposeWindow()
+        val window = ComposeDialog()
         try {
             window.isUndecorated = true
             window.size = Dimension(200, 200)
@@ -145,7 +147,7 @@ class ComposeWindowTest {
         Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
         runBlocking(MainUIDispatcher) {
-            val window = ComposeWindow()
+            val window = ComposeDialog()
             try {
                 window.preferredSize = Dimension(234, 345)
                 window.isUndecorated = true
@@ -163,7 +165,7 @@ class ComposeWindowTest {
         Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
         runBlocking(MainUIDispatcher) {
-            val window = ComposeWindow()
+            val window = ComposeDialog()
             try {
                 window.setContent {
                     Box(Modifier.requiredSize(300.dp, 400.dp))
@@ -190,7 +192,7 @@ class ComposeWindowTest {
         val layoutPassConstraints = mutableListOf<Constraints>()
 
         runBlocking(MainUIDispatcher) {
-            val window = ComposeWindow()
+            val window = ComposeDialog()
             try {
                 window.size = Dimension(300, 400)
                 window.setContent {
@@ -220,7 +222,7 @@ class ComposeWindowTest {
     // bug https://github.com/JetBrains/compose-jb/issues/1448
     @Test
     fun `dispose window in event handler`() = runApplicationTest {
-        val window = ComposeWindow()
+        val window = ComposeDialog()
         try {
             var isClickHappened = false
             window.size = Dimension(300, 400)
@@ -259,7 +261,7 @@ class ComposeWindowTest {
                 return super.renderer(skikoVersion, os, api)
             }
         }
-        val window = ComposeWindow(graphicsConfiguration = null, skiaLayerAnalytics = analytics)
+        val window = ComposeDialog(skiaLayerAnalytics = analytics)
         try {
             window.size = Dimension(100, 100)
             window.isVisible = true

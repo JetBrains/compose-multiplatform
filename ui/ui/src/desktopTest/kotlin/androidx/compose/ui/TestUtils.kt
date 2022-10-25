@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import java.awt.AWTEvent
 import java.awt.Component
+import java.awt.Container
 import java.awt.EventQueue
 import java.awt.Image
 import java.awt.Toolkit
@@ -87,7 +88,7 @@ fun Window.sendKeyEvent(
     return event.isConsumed
 }
 
-fun JFrame.sendMouseEvent(
+fun Container.sendMouseEvent(
     id: Int,
     x: Int,
     y: Int,
@@ -110,7 +111,7 @@ fun JFrame.sendMouseEvent(
     return event.isConsumed
 }
 
-fun JFrame.sendMouseWheelEvent(
+fun Container.sendMouseWheelEvent(
     x: Int,
     y: Int,
     scrollType: Int = MouseWheelEvent.WHEEL_UNIT_SCROLL,

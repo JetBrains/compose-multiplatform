@@ -38,13 +38,18 @@ import org.jetbrains.skiko.SkiaLayerAnalytics
  * ComposeDialog inherits javax.swing.JDialog.
  */
 class ComposeDialog : JDialog {
-    private var skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
+    private val skiaLayerAnalytics: SkiaLayerAnalytics
+    private val delegate: ComposeWindowDelegate
 
     constructor(
         owner: Window?,
         modalityType: ModalityType = ModalityType.MODELESS,
         graphicsConfiguration: GraphicsConfiguration? = null
-    ) : super(owner, "", modalityType, graphicsConfiguration)
+    ) : super(owner, "", modalityType, graphicsConfiguration) {
+        skiaLayerAnalytics = SkiaLayerAnalytics.Empty
+        delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
+        contentPane.add(delegate.pane)
+    }
 
     /**
      * ComposeDialog is a dialog for building UI using Compose for Desktop.
@@ -62,6 +67,8 @@ class ComposeDialog : JDialog {
         skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
     ) : super(owner, "", modalityType, graphicsConfiguration) {
         this.skiaLayerAnalytics = skiaLayerAnalytics
+        delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
+        contentPane.add(delegate.pane)
     }
 
     /**
@@ -77,24 +84,32 @@ class ComposeDialog : JDialog {
         skiaLayerAnalytics: SkiaLayerAnalytics = SkiaLayerAnalytics.Empty
     ) : super() {
         this.skiaLayerAnalytics = skiaLayerAnalytics
+        delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
+        contentPane.add(delegate.pane)
     }
 
-    @Deprecated("Use the constructor with setting owner explicitly. Will be remove in 1.3")
+    @Deprecated("Use the constructor with setting owner explicitly. Will be removed in 1.3")
     constructor(
         modalityType: ModalityType = ModalityType.MODELESS
-    ) : super(null, modalityType)
+    ) : super(null, modalityType) {
+        skiaLayerAnalytics = SkiaLayerAnalytics.Empty
+        delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
+        contentPane.add(delegate.pane)
+    }
 
     constructor(graphicsConfiguration: GraphicsConfiguration? = null) :
-        super(null as Frame?, "", false, graphicsConfiguration)
+        super(null as Frame?, "", false, graphicsConfiguration) {
+        skiaLayerAnalytics = SkiaLayerAnalytics.Empty
+        delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
+        contentPane.add(delegate.pane)
+    }
 
     // don't replace super() by super(null, ModalityType.MODELESS), because
     // this constructor creates an icon in the taskbar.
     // Dialog's shouldn't be appeared in the taskbar.
-    constructor() : super()
-
-    private val delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
-
-    init {
+    constructor() : super() {
+        skiaLayerAnalytics = SkiaLayerAnalytics.Empty
+        delegate = ComposeWindowDelegate(this, ::isUndecorated, skiaLayerAnalytics)
         contentPane.add(delegate.pane)
     }
 
@@ -122,14 +137,22 @@ class ComposeDialog : JDialog {
      * further up the call stack.
      */
     @ExperimentalComposeUiApi
-    var exceptionHandler: WindowExceptionHandler? by delegate::exceptionHandler
+    var exceptionHandler: WindowExceptionHandler?
+        get() = delegate.exceptionHandler
+        set(value) {
+            delegate.exceptionHandler = value
+        }
 
     /**
      * Top-level composition locals, which will be provided for the Composable content, which is set by [setContent].
      *
      * `null` if no composition locals should be provided.
      */
-    var compositionLocalContext: CompositionLocalContext? by delegate::compositionLocalContext
+    var compositionLocalContext: CompositionLocalContext?
+        get() = delegate.compositionLocalContext
+        set(value) {
+            delegate.compositionLocalContext = value
+        }
 
     /**
      * Composes the given composable into the ComposeDialog.
@@ -181,7 +204,11 @@ class ComposeDialog : JDialog {
      * Transparency should be set only if window is not showing and `isUndecorated` is set to
      * `true`, otherwise AWT will throw an exception.
      */
-    var isTransparent: Boolean by delegate::isTransparent
+    var isTransparent: Boolean
+        get() = delegate.isTransparent
+        set(value) {
+            delegate.isTransparent = value
+        }
 
     /**
      * Registers a task to run when the rendering API changes.
