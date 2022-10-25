@@ -24,11 +24,13 @@ import androidx.build.getOperatingSystem
 import androidx.build.getSdkPath
 import androidx.build.getSupportRootFolder
 import com.android.build.gradle.BaseExtension
+import javax.inject.Inject
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition.ARTIFACT_TYPE_ATTRIBUTE
 import org.gradle.api.artifacts.type.ArtifactTypeDefinition.JAR_TYPE
 import org.gradle.api.file.FileCollection
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.testing.Test
 import org.gradle.kotlin.dsl.the
@@ -38,7 +40,9 @@ import org.gradle.process.JavaForkOptions
 /**
  * Configures screenshot testing using Paparazzi for AndroidX projects.
  */
-class AndroidXPaparazziImplPlugin : Plugin<Project> {
+class AndroidXPaparazziImplPlugin @Inject constructor(
+    private val fileSystemOperations: FileSystemOperations
+) : Plugin<Project> {
     override fun apply(project: Project) {
         val paparazziNative = project.createUnzippedPaparazziNativeDependency()
         project.afterEvaluate {
@@ -53,6 +57,7 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
     private fun Test.configureTestTask(paparazziNative: FileCollection) {
         val platformDirectory = project.getSdkPath().resolve("platforms/$COMPILE_SDK_VERSION")
         val goldenRootDirectory = project.getSupportRootFolder().resolve("../../golden")
+        val reportDirectory = project.buildDir.resolve("paparazzi").resolve(name)
         val modulePath = project.path.replace(':', '/').trim('/')
         val android = project.the<BaseExtension>()
         val packageName = requireNotNull(android.namespace) {
@@ -69,6 +74,13 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
             .withPathSensitivity(PathSensitivity.RELATIVE)
             .withPropertyName("goldenDirectory")
 
+        // Mark report directory as an output directory
+        outputs.dir(reportDirectory)
+            .withPropertyName("paparazziReportDir")
+
+        // Clean the contents of the report directory before each test run
+        doFirst { fileSystemOperations.delete { it.delete(reportDirectory.listFiles()) } }
+
         // Set non-path system properties at configuration time, so that changes invalidate caching
         prefixedSystemProperties(
             "gradlePluginApplied" to "true",
@@ -82,10 +94,10 @@ class AndroidXPaparazziImplPlugin : Plugin<Project> {
         doFirst {
             systemProperty("paparazzi.platform.data.root", paparazziNative.singleFile.canonicalPath)
             prefixedSystemProperties(
-                "platformDir" to platformDirectory,
+                "platformDir" to platformDirectory.canonicalPath,
                 "assetsDir" to ".", // TODO: Merged assets dirs? (needed for compose?)
                 "resDir" to ".", // TODO: Merged resource dirs? (needed for compose?)
-                "reportDir" to reports.junitXml.outputLocation.get().asFile.canonicalPath,
+                "reportDir" to reportDirectory.canonicalPath,
                 "goldenRootDir" to goldenRootDirectory.canonicalPath,
             )
         }
