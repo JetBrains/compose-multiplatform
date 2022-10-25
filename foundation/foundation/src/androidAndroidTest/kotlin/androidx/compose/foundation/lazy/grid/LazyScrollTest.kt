@@ -243,6 +243,33 @@ class LazyScrollTest { // (private val orientation: Orientation)
         assertSpringAnimation(toIndex = 0, toOffset = 40, fromIndex = 8)
     }
 
+    @Test
+    fun canScrollForward() = runBlocking {
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        assertThat(state.canScrollForward).isTrue()
+        assertThat(state.canScrollBackward).isFalse()
+    }
+
+    @Test
+    fun canScrollBackward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(itemsCount)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(itemsCount - 6)
+        assertThat(state.canScrollForward).isFalse()
+        assertThat(state.canScrollBackward).isTrue()
+    }
+
+    @Test
+    fun canScrollForwardAndBackward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(10)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(10)
+        assertThat(state.canScrollForward).isTrue()
+        assertThat(state.canScrollBackward).isTrue()
+    }
+
     private fun assertSpringAnimation(
         toIndex: Int,
         toOffset: Int = 0,

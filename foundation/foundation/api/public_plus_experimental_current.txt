@@ -190,6 +190,8 @@ package androidx.compose.foundation {
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? scrollTo(int value, kotlin.coroutines.Continuation<? super java.lang.Float>);
+    property public boolean canScrollBackward;
+    property public boolean canScrollForward;
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
     property public boolean isScrollInProgress;
     property public final int maxValue;
@@ -298,8 +300,12 @@ package androidx.compose.foundation.gestures {
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ScrollableState {
     method public float dispatchRawDelta(float delta);
+    method public default boolean getCanScrollBackward();
+    method public default boolean getCanScrollForward();
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(optional androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public default boolean canScrollBackward;
+    property public default boolean canScrollForward;
     property public abstract boolean isScrollInProgress;
   }
 
@@ -583,6 +589,8 @@ package androidx.compose.foundation.lazy {
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public boolean canScrollBackward;
+    property public boolean canScrollForward;
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
@@ -728,6 +736,8 @@ package androidx.compose.foundation.lazy.grid {
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public boolean canScrollBackward;
+    property public boolean canScrollForward;
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;
@@ -944,6 +954,8 @@ package androidx.compose.foundation.lazy.staggeredgrid {
     method public boolean isScrollInProgress();
     method public suspend Object? scroll(androidx.compose.foundation.MutatePriority scrollPriority, kotlin.jvm.functions.Function2<? super androidx.compose.foundation.gestures.ScrollScope,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> block, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public suspend Object? scrollToItem(int index, optional int scrollOffset, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public boolean canScrollBackward;
+    property public boolean canScrollForward;
     property public final int firstVisibleItemIndex;
     property public final int firstVisibleItemScrollOffset;
     property public final androidx.compose.foundation.interaction.InteractionSource interactionSource;

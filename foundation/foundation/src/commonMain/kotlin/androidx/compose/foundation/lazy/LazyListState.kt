@@ -268,8 +268,9 @@ class LazyListState constructor(
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
 
-    private var canScrollBackward: Boolean = false
-    internal var canScrollForward: Boolean = false
+    override var canScrollForward: Boolean by mutableStateOf(false)
+        private set
+    override var canScrollBackward: Boolean by mutableStateOf(false)
         private set
 
     // TODO: Coroutine scrolling APIs will allow this to be private again once we have more

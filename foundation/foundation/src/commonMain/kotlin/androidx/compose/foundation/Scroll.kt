@@ -30,6 +30,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -147,6 +148,10 @@ class ScrollState(initial: Int) : ScrollableState {
 
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
+
+    override val canScrollForward: Boolean by derivedStateOf { value < maxValue }
+
+    override val canScrollBackward: Boolean by derivedStateOf { value > 0 }
 
     /**
      * Scroll to position in pixels with animation.
