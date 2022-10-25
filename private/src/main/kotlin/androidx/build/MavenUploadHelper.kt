@@ -42,6 +42,7 @@ import org.gradle.api.component.SoftwareComponent
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.internal.component.SoftwareComponentInternal
 import org.gradle.api.internal.component.UsageContext
+import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.provider.Provider
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPom
@@ -53,6 +54,7 @@ import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.findByType
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinAndroidTarget
 import org.xml.sax.InputSource
 import org.xml.sax.XMLReader
@@ -62,137 +64,132 @@ fun Project.configureMavenArtifactUpload(
     componentFactory: SoftwareComponentFactory
 ) {
     apply(mapOf("plugin" to "maven-publish"))
-
     var registered = false
-    fun registerOnFirstPublishableArtifact() {
+    fun registerOnFirstPublishableArtifact(component: SoftwareComponent) {
         if (!registered) {
+            configureComponentPublishing(extension, component, componentFactory)
             Release.register(this, extension)
             registered = true
         }
     }
     afterEvaluate {
-        components.all { component ->
-            if (configureJvmComponentPublishing(extension, component))
-                registerOnFirstPublishableArtifact()
+        if (!extension.shouldPublish()) {
+            return@afterEvaluate
         }
-
-        if (project.isMultiplatformPublicationEnabled()) {
-            configureMultiplatformPublication(componentFactory)
-            registerOnFirstPublishableArtifact()
+        components.all { component ->
+            if (isValidReleaseComponent(component)) {
+                registerOnFirstPublishableArtifact(component)
+            }
         }
     }
 }
 
 /**
- * Configure publishing for a JVM-based component.
- *
- * @return true iff a valid publication is created
+ * Configure publishing for a [SoftwareComponent].
  */
-private fun Project.configureJvmComponentPublishing(
+private fun Project.configureComponentPublishing(
     extension: AndroidXExtension,
-    component: SoftwareComponent
-): Boolean {
-    val publishThisComponent =
-        extension.shouldPublish() && component.isAndroidOrJavaReleaseComponent()
-    if (publishThisComponent) {
-        val androidxGroup = validateCoordinatesAndGetGroup(extension)
-        val projectArchiveDir = File(
-            getRepositoryDirectory(),
-            "${androidxGroup.group.replace('.', '/')}/$name"
-        )
-        group = androidxGroup.group
+    component: SoftwareComponent,
+    componentFactory: SoftwareComponentFactory
+) {
+    val androidxGroup = validateCoordinatesAndGetGroup(extension)
+    val projectArchiveDir = File(
+        getRepositoryDirectory(),
+        "${androidxGroup.group.replace('.', '/')}/$name"
+    )
+    group = androidxGroup.group
 
-        /*
-         * Provides a set of maven coordinates (groupId:artifactId) of artifacts in AndroidX
-         * that are Android Libraries.
-         */
-        val androidLibrariesSetProvider: Provider<Set<String>> = provider {
-            val androidxAndroidProjects = mutableSetOf<String>()
-            // Check every project is the project map to see if they are an Android Library
-            val projectModules = project.getProjectsMap()
-            for ((mavenCoordinates, projectPath) in projectModules) {
-                project.findProject(projectPath)?.plugins?.hasPlugin(
-                    LibraryPlugin::class.java
-                )?.let { hasLibraryPlugin ->
-                    if (hasLibraryPlugin) {
-                        androidxAndroidProjects.add(mavenCoordinates)
-                    }
+    /*
+     * Provides a set of maven coordinates (groupId:artifactId) of artifacts in AndroidX
+     * that are Android Libraries.
+     */
+    val androidLibrariesSetProvider: Provider<Set<String>> = provider {
+        val androidxAndroidProjects = mutableSetOf<String>()
+        // Check every project is the project map to see if they are an Android Library
+        val projectModules = project.getProjectsMap()
+        for ((mavenCoordinates, projectPath) in projectModules) {
+            project.findProject(projectPath)?.plugins?.hasPlugin(
+                LibraryPlugin::class.java
+            )?.let { hasLibraryPlugin ->
+                if (hasLibraryPlugin) {
+                    androidxAndroidProjects.add(mavenCoordinates)
                 }
             }
-            androidxAndroidProjects
         }
+        androidxAndroidProjects
+    }
 
-        configure<PublishingExtension> {
-            repositories {
-                it.maven { repo ->
-                    repo.setUrl(getRepositoryDirectory())
-                }
+    configure<PublishingExtension> {
+        repositories {
+            it.maven { repo ->
+                repo.setUrl(getRepositoryDirectory())
             }
-            publications {
-                if (appliesJavaGradlePluginPlugin()) {
-                    // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
-                    it.create<MavenPublication>("pluginMaven")
-                    tasks.getByName("publishPluginMavenPublicationToMavenRepository").doFirst {
+        }
+        publications {
+            if (appliesJavaGradlePluginPlugin()) {
+                // The 'java-gradle-plugin' will also add to the 'pluginMaven' publication
+                it.create<MavenPublication>("pluginMaven")
+                tasks.getByName("publishPluginMavenPublicationToMavenRepository").doFirst {
+                    removePreviouslyUploadedArchives(projectArchiveDir)
+                }
+            } else {
+                if (project.isMultiplatformPublicationEnabled()) {
+                    configureMultiplatformPublication(componentFactory)
+                } else {
+                    it.create<MavenPublication>("maven") {
+                        from(component)
+                    }
+                    tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
                         removePreviouslyUploadedArchives(projectArchiveDir)
                     }
-                } else {
-                    if (!project.isMultiplatformPublicationEnabled()) {
-                        it.create<MavenPublication>("maven") {
-                            from(component)
-                        }
-                        tasks.getByName("publishMavenPublicationToMavenRepository").doFirst {
-                            removePreviouslyUploadedArchives(projectArchiveDir)
-                        }
-                    }
-                }
-            }
-            publications.withType(MavenPublication::class.java).all {
-                it.pom { pom ->
-                    addInformativeMetadata(extension, pom)
-                    tweakDependenciesMetadata(androidxGroup, pom, androidLibrariesSetProvider)
                 }
             }
         }
-
-        // Workarounds for https://github.com/gradle/gradle/issues/20011
-        project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
-            task.doLast {
-                val metadataFile = task.outputFile.asFile.get()
-                val metadata = metadataFile.readText()
-                val sortedMetadata = sortGradleMetadataDependencies(metadata)
-
-                if (metadata != sortedMetadata) {
-                    metadataFile.writeText(sortedMetadata)
-                }
-            }
-        }
-        project.tasks.withType(GenerateMavenPom::class.java).configureEach { task ->
-            task.doLast {
-                val pomFile = task.destination
-                val pom = pomFile.readText()
-                val sortedPom = sortPomDependencies(pom)
-
-                if (pom != sortedPom) {
-                    pomFile.writeText(sortedPom)
-                }
-            }
-        }
-
-        // Workaround for https://github.com/gradle/gradle/issues/11717
-        project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
-            task.doLast {
-                val metadata = task.outputFile.asFile.get()
-                val text = metadata.readText()
-                metadata.writeText(
-                    text.replace(
-                        "\"buildId\": .*".toRegex(),
-                        "\"buildId:\": \"${getBuildId()}\""
-                    )
-                )
+        publications.withType(MavenPublication::class.java).all {
+            it.pom { pom ->
+                addInformativeMetadata(extension, pom)
+                tweakDependenciesMetadata(androidxGroup, pom, androidLibrariesSetProvider)
             }
         }
     }
-    return publishThisComponent
+
+    // Workarounds for https://github.com/gradle/gradle/issues/20011
+    project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
+        task.doLast {
+            val metadataFile = task.outputFile.asFile.get()
+            val metadata = metadataFile.readText()
+            val sortedMetadata = sortGradleMetadataDependencies(metadata)
+
+            if (metadata != sortedMetadata) {
+                metadataFile.writeText(sortedMetadata)
+            }
+        }
+    }
+    project.tasks.withType(GenerateMavenPom::class.java).configureEach { task ->
+        task.doLast {
+            val pomFile = task.destination
+            val pom = pomFile.readText()
+            val sortedPom = sortPomDependencies(pom)
+
+            if (pom != sortedPom) {
+                pomFile.writeText(sortedPom)
+            }
+        }
+    }
+
+    // Workaround for https://github.com/gradle/gradle/issues/11717
+    project.tasks.withType(GenerateModuleMetadata::class.java).configureEach { task ->
+        task.doLast {
+            val metadata = task.outputFile.asFile.get()
+            val text = metadata.readText()
+            metadata.writeText(
+                text.replace(
+                    "\"buildId\": .*".toRegex(),
+                    "\"buildId:\": \"${getBuildId()}\""
+                )
+            )
+        }
+    }
 }
 
 /**
@@ -407,8 +404,14 @@ private fun Project.disableBaseKmpPublications() {
     }
 }
 
-private fun SoftwareComponent.isAndroidOrJavaReleaseComponent() =
-    name == "release" || name == "java"
+private fun Project.isValidReleaseComponent(component: SoftwareComponent) =
+    component.name == releaseComponentName()
+
+private fun Project.releaseComponentName() = when {
+    plugins.hasPlugin(KotlinMultiplatformPluginWrapper::class.java) -> "kotlin"
+    plugins.hasPlugin(JavaPlugin::class.java) -> "java"
+    else -> "release"
+}
 
 private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension): LibraryGroup {
     val mavenGroup = extension.mavenGroup

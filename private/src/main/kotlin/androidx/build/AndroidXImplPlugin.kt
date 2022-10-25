@@ -145,6 +145,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
         project.registerProjectOrArtifact()
+        project.addCreateLibraryBuildInfoFileTasks(extension)
 
         project.configurations.create("samples")
         project.validateMultiplatformPluginHasNotBeenApplied()
@@ -437,7 +438,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.configurePublicResourcesStub(libraryExtension)
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
-        project.addCreateLibraryBuildInfoFileTasks(androidXExtension)
         project.configureJavaCompilationWarnings(androidXExtension)
 
         project.configureDependencyVerification(androidXExtension) { taskProvider ->
@@ -500,8 +500,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 task.dependsOn(project.tasks.named(JavaPlugin.COMPILE_JAVA_TASK_NAME))
             }
         }
-
-        project.addCreateLibraryBuildInfoFileTasks(extension)
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
