@@ -310,7 +310,7 @@ private suspend fun AwaitPointerEventScope.awaitDownAndSlop(
     orientation: Orientation
 ): Pair<PointerInputChange, Offset>? {
     val initialDown =
-        awaitFirstDownOnPass(requireUnconsumed = false, pass = PointerEventPass.Initial)
+        awaitFirstDown(requireUnconsumed = false, pass = PointerEventPass.Initial)
     return if (!canDrag.value.invoke(initialDown)) {
         null
     } else if (startDragImmediately.value.invoke()) {
