@@ -18,7 +18,6 @@ package androidx.compose.ui.tooling.animation
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.DecayAnimation
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.TargetBasedAnimation
@@ -26,6 +25,8 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.tooling.ComposeAnimatedProperty
 import androidx.compose.animation.tooling.ComposeAnimation
 import androidx.compose.animation.tooling.TransitionInfo
+import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation.Companion.parse
+import androidx.compose.ui.tooling.animation.clock.AnimateXAsStateClock
 import androidx.compose.ui.tooling.animation.clock.AnimatedVisibilityClock
 import androidx.compose.ui.tooling.animation.clock.ComposeAnimationClock
 import androidx.compose.ui.tooling.animation.clock.TransitionClock
@@ -72,12 +73,19 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     internal val animatedVisibilityClocks =
         mutableMapOf<AnimatedVisibilityComposeAnimation, AnimatedVisibilityClock>()
 
+    /** Map of subscribed [AnimateXAsStateComposeAnimation]s and corresponding [AnimateXAsStateClock]s. */
+    @VisibleForTesting
+    internal val animateXAsStateClocks =
+        mutableMapOf<AnimateXAsStateComposeAnimation<*, *>, AnimateXAsStateClock<*, *>>()
+
     /** All subscribed animations clocks. */
     private val allClocks: List<ComposeAnimationClock<*, *>>
-        get() = transitionClocks.values + animatedVisibilityClocks.values
+        get() = transitionClocks.values +
+            animatedVisibilityClocks.values + animateXAsStateClocks.values
 
     private fun findClock(animation: ComposeAnimation): ComposeAnimationClock<*, *>? {
         return transitionClocks[animation] ?: animatedVisibilityClocks[animation]
+        ?: animateXAsStateClocks[animation]
     }
 
     fun trackTransition(animation: Transition<*>) {
@@ -106,8 +114,13 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         }
     }
 
-    fun trackAnimateXAsState(animation: Animatable<*, *>) {
-        trackUnsupported(animation, animation.label)
+    fun trackAnimateXAsState(animation: AnimationSearch.AnimateXAsStateSearchInfo<*, *>) {
+        trackAnimation(animation.animatable) {
+            animation.parse()?.let {
+                animateXAsStateClocks[it] = AnimateXAsStateClock(it)
+                notifySubscribe(it)
+            }
+        }
     }
 
     fun trackAnimateContentSize(animation: Any) {
@@ -185,7 +198,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * Expected to be called via reflection from Android Studio.
      */
     fun updateFromAndToStates(composeAnimation: ComposeAnimation, fromState: Any, toState: Any) {
-        transitionClocks[composeAnimation]?.setStateParameters(fromState, toState)
+        findClock(composeAnimation)?.setStateParameters(fromState, toState)
     }
 
     /**

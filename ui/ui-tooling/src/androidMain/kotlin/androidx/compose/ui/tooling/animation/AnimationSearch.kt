@@ -17,10 +17,15 @@
 package androidx.compose.ui.tooling.animation
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.DecayAnimation
 import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.core.Transition
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.State
+import androidx.compose.ui.tooling.data.CallGroup
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.firstOrNull
@@ -32,6 +37,7 @@ private const val ANIMATED_CONTENT = "AnimatedContent"
 private const val ANIMATED_VISIBILITY = "AnimatedVisibility"
 private const val ANIMATE_VALUE_AS_STATE = "animateValueAsState"
 private const val REMEMBER = "remember"
+private const val REMEMBER_UPDATED_STATE = "rememberUpdatedState"
 private const val SIZE_ANIMATION_MODIFIER = "androidx.compose.animation.SizeAnimationModifier"
 
 /** Find first data with type [T] within all remember calls. */
@@ -93,10 +99,21 @@ internal class AnimationSearch {
     class InfiniteTransitionSearch(trackAnimation: (InfiniteTransition) -> Unit) :
         RememberSearch<InfiniteTransition>(InfiniteTransition::class, trackAnimation)
 
+    data class AnimateXAsStateSearchInfo<T, V : AnimationVector>(
+        val animatable: Animatable<T, V>,
+        val animationSpec: AnimationSpec<T>,
+        val toolingState: ToolingState<T>
+    )
+
     /** Search for animateXAsState() and animateValueAsState() animations. */
-    class AnimateXAsStateSearch(trackAnimation: (Animatable<*, *>) -> Unit) :
-        Search<Animatable<*, *>>(trackAnimation) {
+    class AnimateXAsStateSearch(trackAnimation: (AnimateXAsStateSearchInfo<*, *>) -> Unit) :
+        Search<AnimateXAsStateSearchInfo<*, *>>(trackAnimation) {
         override fun addAnimations(groupsWithLocation: Collection<Group>) {
+            animations.addAll(findAnimations<Any?>(groupsWithLocation))
+        }
+
+        private fun <T> findAnimations(groupsWithLocation: Collection<Group>):
+            List<AnimateXAsStateSearchInfo<T, AnimationVector>> {
             // How "animateXAsState" calls organized:
             // Group with name "animateXAsState", for example animateDpAsState, animateIntAsState
             //    children
@@ -107,12 +124,37 @@ internal class AnimationSearch {
             // To distinguish Animatable within "animateXAsState" calls from other Animatables,
             // first "animateValueAsState" calls are found.
             //  Find Animatable within "animateValueAsState" call.
-            animations.addAll(
-                groupsWithLocation.filter { call -> call.name == ANIMATE_VALUE_AS_STATE }
-                    .mapNotNull { animateValue ->
-                        animateValue.children.findRememberedData<Animatable<*, *>>().firstOrNull()
-                    }.toSet()
-            )
+            val groups = groupsWithLocation.filter { group -> group.name == ANIMATE_VALUE_AS_STATE }
+                .filterIsInstance<CallGroup>()
+            return groups.mapNotNull {
+                val animatable = findAnimatable<T>(it)
+                val spec = findAnimationSpec<T>(it)
+                val toolingOverride =
+                    it.children.findRememberedData<MutableState<State<T>?>>().firstOrNull()
+                if (animatable != null && spec != null && toolingOverride != null) {
+                    if (toolingOverride.value == null) {
+                        toolingOverride.value = ToolingState(animatable.value)
+                    }
+                    AnimateXAsStateSearchInfo(
+                        animatable,
+                        spec,
+                        toolingOverride.value as ToolingState<T>
+                    )
+                } else null
+            }
+        }
+
+        @Suppress("UNCHECKED_CAST")
+        private fun <T> findAnimationSpec(group: CallGroup): AnimationSpec<T>? {
+            return group.children.filter { it.name == REMEMBER_UPDATED_STATE }
+                .flatMap { it.data }
+                .filterIsInstance<State<T>>().map { it.value }
+                .filterIsInstance<AnimationSpec<T>>().firstOrNull()
+        }
+
+        private fun <T> findAnimatable(group: CallGroup): Animatable<T, AnimationVector>? {
+            return group.children.findRememberedData<Animatable<T, AnimationVector>>()
+                .firstOrNull()
         }
     }
 

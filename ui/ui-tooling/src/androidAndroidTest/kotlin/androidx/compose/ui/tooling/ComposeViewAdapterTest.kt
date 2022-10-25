@@ -20,6 +20,7 @@ import android.app.Activity
 import android.os.Build
 import android.os.Bundle
 import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
@@ -173,8 +174,26 @@ class ComposeViewAdapterTest {
     fun animateXAsStateIsSubscribed() {
         checkAnimationsAreSubscribed(
             "AnimateAsStatePreview",
-            listOf("DpAnimation", "IntAnimation")
+            animateXAsState = listOf("DpAnimation", "IntAnimation")
         )
+    }
+
+    @Test
+    fun animateXAsStateIsNotSubscribed() {
+        AnimateXAsStateComposeAnimation.testOverrideAvailability(false)
+        checkAnimationsAreSubscribed(
+            "AllAnimations",
+            unsupported = listOf(
+                "AnimatedContent",
+                "animateContentSize",
+                "TargetBasedAnimation",
+                "DecayAnimation",
+                "InfiniteTransition"
+            ),
+            transitions = listOf("checkBoxAnim", "Crossfade"),
+            animateXAsState = emptyList()
+        )
+        AnimateXAsStateComposeAnimation.testOverrideAvailability(true)
     }
 
     @Test
@@ -208,7 +227,8 @@ class ComposeViewAdapterTest {
         checkAnimationsAreSubscribed(
             "AllAnimations",
             emptyList(),
-            listOf("checkBoxAnim", "Crossfade")
+            listOf("checkBoxAnim", "Crossfade"),
+            animateXAsState = listOf("DpAnimation", "IntAnimation")
         )
         UnsupportedComposeAnimation.testOverrideAvailability(true)
     }
@@ -224,8 +244,9 @@ class ComposeViewAdapterTest {
 
     private fun checkAnimationsAreSubscribed(
         preview: String,
-        unsupported: List<String>,
-        transitions: List<String> = emptyList()
+        unsupported: List<String> = emptyList(),
+        transitions: List<String> = emptyList(),
+        animateXAsState: List<String> = emptyList()
     ) {
         val clock = PreviewAnimationClock()
 
@@ -251,6 +272,8 @@ class ComposeViewAdapterTest {
         activityTestRule.runOnUiThread {
             assertEquals(unsupported, clock.trackedUnsupportedAnimations.map { it.label })
             assertEquals(transitions, clock.transitionClocks.values.map { it.animation.label })
+            assertEquals(animateXAsState,
+                clock.animateXAsStateClocks.values.map { it.animation.label })
             assertEquals(0, clock.animatedVisibilityClocks.size)
         }
     }

@@ -18,7 +18,10 @@ package androidx.compose.ui.tooling.animation
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.AnimationVector
+import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.Transition
+import androidx.compose.animation.core.TwoWayConverter
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -34,6 +37,40 @@ import androidx.compose.ui.tooling.findAll
 import org.junit.Assert
 
 object Utils {
+
+    enum class EnumState { One, Two, Three }
+
+    val nullableFloatConverter = TwoWayConverter<Float?, AnimationVector1D>({
+        AnimationVector1D(it ?: 0f)
+    }, { it.value })
+
+    val stringConverter = TwoWayConverter<String, AnimationVector1D>(
+        { AnimationVector1D(it.toFloat()) }, { it.value.toString() })
+
+    val enumConverter = object : TwoWayConverter<EnumState, AnimationVector> {
+        override val convertFromVector: (AnimationVector) -> EnumState
+            get() = { EnumState.One }
+
+        override val convertToVector: (EnumState) -> AnimationVector
+            get() = { AnimationVector(1f) }
+    }
+
+    val nullableEnumConverter = object :
+        TwoWayConverter<EnumState?, AnimationVector> {
+        override val convertFromVector: (AnimationVector) -> EnumState?
+            get() = { EnumState.One }
+
+        override val convertToVector: (EnumState?) -> AnimationVector
+            get() = { AnimationVector(1f) }
+    }
+
+    val booleanConverter = object : TwoWayConverter<Boolean, AnimationVector1D> {
+        override val convertFromVector: (AnimationVector1D) -> Boolean
+            get() = { it.value == 1f }
+
+        override val convertToVector: (Boolean) -> AnimationVector1D
+            get() = { AnimationVector(if (it) 1f else 0f) }
+    }
 
     @OptIn(UiToolingDataApi::class)
     internal fun ComposeContentTestRule.searchForAnimation(

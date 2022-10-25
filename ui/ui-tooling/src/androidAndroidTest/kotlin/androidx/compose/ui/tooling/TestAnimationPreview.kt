@@ -220,6 +220,36 @@ fun AnimateAsStatePreview() {
 
 @Preview
 @Composable
+fun AnimateAsStateWithLabelsPreview() {
+    var showMenu by remember { mutableStateOf(true) }
+    var message by remember { mutableStateOf("Hello") }
+
+    val size: Dp by animateDpAsState(
+        targetValue = if (showMenu) 0.dp else 10.dp,
+        animationSpec = spring(Spring.DampingRatioHighBouncy, Spring.StiffnessHigh),
+        label = "CustomDpLabel"
+    )
+    val offset by animateIntAsState(
+        targetValue = if (showMenu) 2 else 1,
+        label = "CustomIntLabel"
+    )
+
+    Box(
+        Modifier
+            .padding(size)
+            .offset(offset.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    showMenu = !showMenu
+                    message += "!"
+                }
+            }) {
+        Text(text = message)
+    }
+}
+
+@Preview
+@Composable
 fun CrossFadePreview() {
     var currentPage by remember { mutableStateOf("A") }
     Row {
@@ -233,6 +263,29 @@ fun CrossFadePreview() {
             Text("Switch Page")
         }
         Crossfade(targetState = currentPage) { screen ->
+            when (screen) {
+                "A" -> Text("Page A")
+                "B" -> Text("Page B")
+            }
+        }
+    }
+}
+
+@Preview
+@Composable
+fun CrossFadeWithLabelPreview() {
+    var currentPage by remember { mutableStateOf("A") }
+    Row {
+        Button(onClick = {
+            currentPage = when (currentPage) {
+                "A" -> "B"
+                "B" -> "A"
+                else -> "A"
+            }
+        }) {
+            Text("Switch Page")
+        }
+        Crossfade(targetState = currentPage, label = "CrossfadeWithLabel") { screen ->
             when (screen) {
                 "A" -> Text("Page A")
                 "B" -> Text("Page B")

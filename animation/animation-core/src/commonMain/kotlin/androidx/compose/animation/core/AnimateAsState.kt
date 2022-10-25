@@ -21,6 +21,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.geometry.Offset
@@ -396,6 +397,7 @@ fun <T, V : AnimationVector> animateValueAsState(
     finishedListener: ((T) -> Unit)? = null
 ): State<T> {
 
+    val toolingOverride = remember { mutableStateOf<State<T>?>(null) }
     val animatable = remember { Animatable(targetValue, typeConverter, visibilityThreshold, label) }
     val listener by rememberUpdatedState(finishedListener)
     val animSpec: AnimationSpec<T> by rememberUpdatedState(
@@ -429,7 +431,7 @@ fun <T, V : AnimationVector> animateValueAsState(
             }
         }
     }
-    return animatable.asState()
+    return toolingOverride.value ?: animatable.asState()
 }
 
 @Deprecated(
