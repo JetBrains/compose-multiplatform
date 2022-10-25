@@ -58,7 +58,7 @@ class SwipeableV2StateTest {
     fun swipeable_state_canSkipStateByFling() {
         lateinit var state: SwipeableV2State<TestState>
         rule.setContent {
-            state = rememberSwipeableV2State(initialState = A)
+            state = rememberSwipeableV2State(initialValue = A)
             SwipeableBox(
                 swipeableState = state,
                 orientation = Orientation.Vertical,
@@ -71,14 +71,14 @@ class SwipeableV2StateTest {
 
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(C)
+        assertThat(state.currentValue).isEqualTo(C)
     }
 
     @Test
     fun swipeable_targetState_updatedOnSwipe() {
         lateinit var state: SwipeableV2State<TestState>
         rule.setContent {
-            state = rememberSwipeableV2State(initialState = A)
+            state = rememberSwipeableV2State(initialValue = A)
             SwipeableBox(
                 swipeableState = state,
                 orientation = Orientation.Vertical,
@@ -89,17 +89,17 @@ class SwipeableV2StateTest {
         rule.onNodeWithTag(swipeableTestTag)
             .performTouchInput { swipeDown(endY = bottom * 0.45f) }
         rule.waitForIdle()
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(B)
 
         rule.onNodeWithTag(swipeableTestTag)
             .performTouchInput { swipeDown(endY = bottom * 0.9f) }
         rule.waitForIdle()
-        assertThat(state.targetState).isEqualTo(C)
+        assertThat(state.targetValue).isEqualTo(C)
 
         rule.onNodeWithTag(swipeableTestTag)
             .performTouchInput { swipeUp(endY = top * 1.1f) }
         rule.waitForIdle()
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
     }
 
     @Test
@@ -110,7 +110,7 @@ class SwipeableV2StateTest {
         lateinit var scope: CoroutineScope
         rule.setContent {
             state = rememberSwipeableV2State(
-                initialState = A,
+                initialValue = A,
                 animationSpec = tween(animationDuration, easing = LinearEasing)
             )
             scope = rememberCoroutineScope()
@@ -122,24 +122,24 @@ class SwipeableV2StateTest {
         }
 
         scope.launch {
-            state.animateTo(targetState = B)
+            state.animateTo(targetValue = B)
         }
         rule.mainClock.advanceTimeBy((animationDuration * 0.6).toLong())
 
         assertWithMessage("Current state")
-            .that(state.currentState)
+            .that(state.currentValue)
             .isEqualTo(A)
         assertWithMessage("Target state")
-            .that(state.targetState)
+            .that(state.targetValue)
             .isEqualTo(B)
 
         rule.mainClock.advanceTimeBy((animationDuration * 0.4).toLong())
 
         assertWithMessage("Current state")
-            .that(state.currentState)
+            .that(state.currentValue)
             .isEqualTo(B)
         assertWithMessage("Target state")
-            .that(state.targetState)
+            .that(state.targetValue)
             .isEqualTo(B)
     }
 
@@ -147,7 +147,7 @@ class SwipeableV2StateTest {
     fun swipeable_progress_matchesSwipePosition() {
         lateinit var state: SwipeableV2State<TestState>
         rule.setContent {
-            state = rememberSwipeableV2State(initialState = A)
+            state = rememberSwipeableV2State(initialValue = A)
             WithTouchSlop(touchSlop = 0f) {
                 SwipeableBox(
                     swipeableState = state,
@@ -164,7 +164,7 @@ class SwipeableV2StateTest {
         rule.onNodeWithTag(swipeableTestTag)
             .performTouchInput { swipeDown(endY = almostAnchorB) }
 
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(B)
         assertThat(state.progress).isEqualTo(expectedProgress)
 
         val almostAnchorA = anchorA + ((anchorB - anchorA) * 0.1f)
@@ -173,7 +173,7 @@ class SwipeableV2StateTest {
         rule.onNodeWithTag(swipeableTestTag)
             .performTouchInput { swipeUp(startY = anchorB, endY = almostAnchorA) }
 
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
         assertThat(state.progress).isEqualTo(expectedProgress)
     }
 
@@ -181,7 +181,7 @@ class SwipeableV2StateTest {
     fun swipeable_snapTo_updatesImmediately() = runBlocking {
         lateinit var state: SwipeableV2State<TestState>
         rule.setContent {
-            state = rememberSwipeableV2State(initialState = A)
+            state = rememberSwipeableV2State(initialValue = A)
             SwipeableBox(
                 swipeableState = state,
                 orientation = Orientation.Vertical
@@ -189,7 +189,7 @@ class SwipeableV2StateTest {
         }
 
         state.snapTo(C)
-        assertThat(state.currentState)
+        assertThat(state.currentValue)
             .isEqualTo(C)
     }
 
@@ -210,26 +210,26 @@ class SwipeableV2StateTest {
 
         restorationTester.emulateSavedInstanceStateRestore()
 
-        assertThat(state.currentState).isEqualTo(initialState)
+        assertThat(state.currentValue).isEqualTo(initialState)
         assertThat(state.animationSpec).isEqualTo(animationSpec)
 
         scope.launch {
             state.animateTo(B)
         }
         rule.waitForIdle()
-        assertThat(state.currentState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
 
         restorationTester.emulateSavedInstanceStateRestore()
-        assertThat(state.currentState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
     }
 
     @Test
     fun swipeable_targetState_accessedInInitialComposition() {
         lateinit var targetState: TestState
         rule.setContent {
-            val state = rememberSwipeableV2State(initialState = B)
-            LaunchedEffect(state.targetState) {
-                targetState = state.targetState
+            val state = rememberSwipeableV2State(initialValue = B)
+            LaunchedEffect(state.targetValue) {
+                targetState = state.targetValue
             }
             SwipeableBox(state)
         }
@@ -241,7 +241,7 @@ class SwipeableV2StateTest {
     fun swipeable_progress_accessedInInitialComposition() {
         var progress = Float.NaN
         rule.setContent {
-            val state = rememberSwipeableV2State(initialState = B)
+            val state = rememberSwipeableV2State(initialValue = B)
             LaunchedEffect(state.progress) {
                 progress = state.progress
             }
@@ -258,7 +258,7 @@ class SwipeableV2StateTest {
         lateinit var state: SwipeableV2State<TestState>
         var offset: Float? = null
         rule.setContent {
-            state = rememberSwipeableV2State(initialState = B)
+            state = rememberSwipeableV2State(initialValue = B)
             SwipeableBox(state)
             exception = runCatching { offset = state.requireOffset() }.exceptionOrNull()
         }
@@ -275,7 +275,7 @@ class SwipeableV2StateTest {
     fun swipeable_requireOffset_accessedInEffect_doesntThrow() {
         var exception: Throwable? = null
         rule.setContent {
-            val state = rememberSwipeableV2State(initialState = B)
+            val state = rememberSwipeableV2State(initialValue = B)
             LaunchedEffect(Unit) {
                 exception = runCatching { state.requireOffset() }.exceptionOrNull()
             }

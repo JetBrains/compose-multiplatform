@@ -70,7 +70,7 @@ internal fun SwipeableBox(
             )
             .swipeAnchors(
                 state = swipeableState,
-                possibleStates = possibleStates,
+                possibleValues = possibleStates,
                 calculateAnchor = calculateAnchor
             )
             .offset {
