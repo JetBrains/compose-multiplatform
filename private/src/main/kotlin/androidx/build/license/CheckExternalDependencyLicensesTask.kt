@@ -15,7 +15,6 @@
  */
 package androidx.build.license
 
-import androidx.build.enforceKtlintVersion
 import androidx.build.getPrebuiltsRoot
 import java.io.File
 import org.gradle.api.DefaultTask
@@ -115,45 +114,49 @@ fun Project.configureExternalDependencyLicenseCheck() {
 
         task.filesToCheck.from(
             project.provider {
-                val checkerConfig = project.configurations.detachedConfiguration()
-                checkerConfig.isCanBeConsumed = false
-                checkerConfig.attributes {
-                    it.attribute(
-                        Usage.USAGE_ATTRIBUTE,
-                        project.objects.named<Usage>(Usage.JAVA_RUNTIME)
-                    )
-                    it.attribute(
-                        Category.CATEGORY_ATTRIBUTE,
-                        project.objects.named<Category>(Category.LIBRARY)
-                    )
-                    it.attribute(
-                        GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
-                        project.objects.named<GradlePluginApiVersion>(
-                            GradleVersion.current().getVersion()
-                        )
-                    )
-                }
-                // workaround for b/234884534
-                project.enforceKtlintVersion(checkerConfig)
 
-                project
-                    .configurations
-                    .flatMap {
-                        it.allDependencies
-                            .filterIsInstance(ExternalDependency::class.java)
-                            .filterNot {
-                                it.group?.startsWith("com.android") == true
-                            }
-                            .filterNot {
-                                it.group?.startsWith("android.arch") == true
-                            }
-                            .filterNot {
-                                it.group?.startsWith("androidx") == true
-                            }
+                val configName = "CheckExternalLicences"
+                val container = project.configurations
+                val checkerConfig =
+                container.findByName(configName) ?: container.create(configName) { checkerConfig ->
+
+                    checkerConfig.isCanBeConsumed = false
+                    checkerConfig.attributes {
+                        it.attribute(
+                            Usage.USAGE_ATTRIBUTE,
+                            project.objects.named<Usage>(Usage.JAVA_RUNTIME)
+                        )
+                        it.attribute(
+                            Category.CATEGORY_ATTRIBUTE,
+                            project.objects.named<Category>(Category.LIBRARY)
+                        )
+                        it.attribute(
+                            GradlePluginApiVersion.GRADLE_PLUGIN_API_VERSION_ATTRIBUTE,
+                            project.objects.named<GradlePluginApiVersion>(
+                                GradleVersion.current().getVersion()
+                            )
+                        )
                     }
-                    .forEach {
-                        checkerConfig.dependencies.add(it)
-                    }
+
+                    project
+                        .configurations
+                        .flatMap {
+                            it.allDependencies
+                                .filterIsInstance(ExternalDependency::class.java)
+                                .filterNot {
+                                    it.group?.startsWith("com.android") == true
+                                }
+                                .filterNot {
+                                    it.group?.startsWith("android.arch") == true
+                                }
+                                .filterNot {
+                                    it.group?.startsWith("androidx") == true
+                                }
+                        }
+                        .forEach {
+                            checkerConfig.dependencies.add(it)
+                        }
+                }
 
                 val localArtifactRepositories = project.findLocalMavenRepositories()
                 val dependencyArtifacts = checkerConfig.incoming.artifacts.artifacts.mapNotNull {
