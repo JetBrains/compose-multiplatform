@@ -167,36 +167,36 @@ class SwipeableV2GestureTest {
         state.dispatchRawDelta(positionOfA + distance * (absThreshold * 0.9f))
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(A)
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
 
         state.dispatchRawDelta(distance * 0.2f)
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(A)
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(B)
 
         runBlocking(AutoTestFrameClock()) { state.settle(velocity = 0f) }
 
-        assertThat(state.currentState).isEqualTo(B)
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(B)
 
         state.dispatchRawDelta(-distance * (absThreshold * 0.9f))
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(B)
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(B)
 
         state.dispatchRawDelta(-distance * 0.2f)
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(B)
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(A)
 
         runBlocking(AutoTestFrameClock()) { state.settle(velocity = 0f) }
 
-        assertThat(state.currentState).isEqualTo(A)
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
     }
 
     @Test
@@ -220,39 +220,39 @@ class SwipeableV2GestureTest {
         state.dispatchRawDelta(initialOffset + (absThreshold * 0.9f))
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(A)
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
 
         // Swipe towards B, close after threshold
         state.dispatchRawDelta(absThreshold * 0.2f)
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(A)
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(B)
 
         runBlocking(AutoTestFrameClock()) { state.settle(velocity = 0f) }
 
-        assertThat(state.currentState).isEqualTo(B)
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(B)
 
         // Swipe towards A, close before threshold
         state.dispatchRawDelta(-(absThreshold * 0.9f))
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(B)
-        assertThat(state.targetState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(B)
 
         // Swipe towards A, close after threshold
         state.dispatchRawDelta(-(absThreshold * 0.2f))
         rule.waitForIdle()
 
-        assertThat(state.currentState).isEqualTo(B)
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(B)
+        assertThat(state.targetValue).isEqualTo(A)
 
         runBlocking(AutoTestFrameClock()) { state.settle(velocity = 0f) }
 
-        assertThat(state.currentState).isEqualTo(A)
-        assertThat(state.targetState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
     }
 
     @Test
@@ -273,7 +273,7 @@ class SwipeableV2GestureTest {
             }
             state.dispatchRawDelta(60f)
             state.settle(velocityPx)
-            assertThat(state.currentState).isEqualTo(B)
+            assertThat(state.currentValue).isEqualTo(B)
         }
 
     @Test
@@ -293,7 +293,7 @@ class SwipeableV2GestureTest {
             )
             state.dispatchRawDelta(60f)
             state.settle(velocityPx / 2)
-            assertThat(state.currentState).isEqualTo(A)
+            assertThat(state.currentValue).isEqualTo(A)
         }
 
     @Test
@@ -315,7 +315,7 @@ class SwipeableV2GestureTest {
             }
 
         rule.waitForIdle()
-        assertThat(state.currentState).isEqualTo(B)
+        assertThat(state.currentValue).isEqualTo(B)
     }
 
     @Test
@@ -338,7 +338,7 @@ class SwipeableV2GestureTest {
             }
 
         rule.waitForIdle()
-        assertThat(state.currentState).isEqualTo(A)
+        assertThat(state.currentValue).isEqualTo(A)
     }
 
     private fun SwipeableTestState(
@@ -348,7 +348,7 @@ class SwipeableV2GestureTest {
         velocityThreshold: Dp = 125.dp,
         anchors: Map<TestState, Float>? = null
     ) = SwipeableV2State(
-        initialState = initialState,
+        initialValue = initialState,
         positionalThreshold = positionalThreshold,
         velocityThreshold = velocityThreshold,
         density = density

@@ -44,12 +44,12 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 
 /**
- * Enable swipe gestures between a set of predefined states.
+ * Enable swipe gestures between a set of predefined values.
  *
  * When a swipe is detected, the offset of the [SwipeableV2State] will be updated with the swipe
  * delta. You should use this offset to move your content accordingly (see [Modifier.offset]).
  * When the swipe ends, the offset will be animated to one of the anchors and when that anchor is
- * reached, the value of the [SwipeableV2State] will also be updated to the state corresponding to
+ * reached, the value of the [SwipeableV2State] will also be updated to the value corresponding to
  * the new anchor.
  *
  * Swiping is constrained between the minimum and maximum anchors.
@@ -84,24 +84,24 @@ internal fun <T> Modifier.swipeableV2(
  * the state with them.
  *
  * @param state The associated [SwipeableV2State]
- * @param possibleStates All possible states the [SwipeableV2State] could be in.
+ * @param possibleValues All possible values the [SwipeableV2State] could be in.
  * @param anchorsChanged A callback to be invoked when the anchors have changed, `null` by default.
  * Components with custom reconciliation logic should implement this callback, i.e. to re-target an
  * in-progress animation.
  * @param calculateAnchor This method will be invoked to calculate the position of all
- * [possibleStates], given this node's layout size. Return the anchor's offset from the initial
- * anchor, or `null` to indicate that a state does not exist.
+ * [possibleValues], given this node's layout size. Return the anchor's offset from the initial
+ * anchor, or `null` to indicate that a value does not have an anchor.
  */
 @ExperimentalMaterialApi
 internal fun <T> Modifier.swipeAnchors(
     state: SwipeableV2State<T>,
-    possibleStates: Set<T>,
+    possibleValues: Set<T>,
     anchorsChanged: ((oldAnchors: Map<T, Float>, newAnchors: Map<T, Float>) -> Unit)? = null,
-    calculateAnchor: (state: T, layoutSize: IntSize) -> Float?,
+    calculateAnchor: (value: T, layoutSize: IntSize) -> Float?,
 ) = onSizeChanged { layoutSize ->
     val previousAnchors = state.anchors
     val newAnchors = mutableMapOf<T, Float>()
-    possibleStates.forEach {
+    possibleValues.forEach {
         val anchorValue = calculateAnchor(it, layoutSize)
         if (anchorValue != null) {
             newAnchors[it] = anchorValue
@@ -122,10 +122,10 @@ internal fun <T> Modifier.swipeAnchors(
  * to change the state either immediately or by starting an animation. To create and remember a
  * [SwipeableV2State] use [rememberSwipeableV2State].
  *
- * @param initialState The initial value of the state.
+ * @param initialValue The initial value of the state.
  * @param density The density used to convert thresholds from px to dp.
  * @param animationSpec The default animation that will be used to animate to a new state.
- * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  * @param positionalThreshold The positional threshold to be used when calculating the target state
  * while a swipe is in progress and when settling after the swipe ends. This is the distance from
  * the start of a transition. It will be, depending on the direction of the interaction, added or
@@ -138,31 +138,31 @@ internal fun <T> Modifier.swipeAnchors(
 @Stable
 @ExperimentalMaterialApi
 internal class SwipeableV2State<T>(
-    initialState: T,
+    initialValue: T,
     internal val density: Density,
     internal val animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec,
-    internal val confirmStateChange: (newValue: T) -> Boolean = { true },
+    internal val confirmValueChange: (newValue: T) -> Boolean = { true },
     internal val positionalThreshold: Density.(totalDistance: Float) -> Float =
         SwipeableV2Defaults.PositionalThreshold,
     internal val velocityThreshold: Dp = SwipeableV2Defaults.VelocityThreshold,
 ) {
 
     /**
-     * The current state of the [SwipeableV2State].
+     * The current value of the [SwipeableV2State].
      */
-    var currentState: T by mutableStateOf(initialState)
+    var currentValue: T by mutableStateOf(initialValue)
         private set
 
     /**
-     * The target state. This is the closest state to the current offset (taking into account
+     * The target value. This is the closest value to the current offset (taking into account
      * positional thresholds). If no interactions like animations or drags are in progress, this
-     * will be the current state.
+     * will be the current value.
      */
-    val targetState: T by derivedStateOf {
+    val targetValue: T by derivedStateOf {
         val currentOffset = offset
         if (currentOffset != null) {
-            computeTarget(currentOffset, currentState, velocity = 0f)
-        } else currentState
+            computeTarget(currentOffset, currentValue, velocity = 0f)
+        } else currentValue
     }
 
     /**
@@ -199,12 +199,13 @@ internal class SwipeableV2State<T>(
         private set
 
     /**
-     * The fraction of the progress going from currentState to targetState, within [0f..1f] bounds.
+     * The fraction of the progress going from [currentValue] to [targetValue], within [0f..1f]
+     * bounds.
      */
     /*@FloatRange(from = 0f, to = 1f)*/
     val progress: Float by derivedStateOf {
-        val a = anchors[currentState] ?: 0f
-        val b = anchors[targetState] ?: 0f
+        val a = anchors[currentValue] ?: 0f
+        val b = anchors[targetValue] ?: 0f
         val distance = abs(b - a)
         if (distance > 1e-6f) {
             val progress = (this.requireOffset() - a) / (b - a)
@@ -239,45 +240,45 @@ internal class SwipeableV2State<T>(
         val previousAnchorsEmpty = anchors.isEmpty()
         anchors = newAnchors
         if (previousAnchorsEmpty) {
-            dragPosition = anchors.requireAnchor(this.currentState)
+            dragPosition = anchors.requireAnchor(this.currentValue)
         }
     }
 
     /**
-     * Whether the [state] has an anchor associated with it.
+     * Whether the [value] has an anchor associated with it.
      */
-    fun hasAnchorForState(state: T): Boolean = anchors.containsKey(state)
+    fun hasAnchorForValue(value: T): Boolean = anchors.containsKey(value)
 
     /**
-     * Snap to a [targetState] without any animation.
+     * Snap to a [targetValue] without any animation.
      *
      * @throws CancellationException if the interaction interrupted by another interaction like a
      * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
      *
-     * @param targetState The target state of the animation
+     * @param targetValue The target value of the animation
      */
-    suspend fun snapTo(targetState: T) {
-        val targetOffset = anchors.requireAnchor(targetState)
+    suspend fun snapTo(targetValue: T) {
+        val targetOffset = anchors.requireAnchor(targetValue)
         draggableState.drag {
             dragBy(targetOffset - requireOffset())
         }
-        this.currentState = targetState
+        this.currentValue = targetValue
     }
 
     /**
-     * Animate to a [targetState].
+     * Animate to a [targetValue].
      *
      * @throws CancellationException if the interaction interrupted by another interaction like a
      * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
      *
-     * @param targetState The target state of the animation
+     * @param targetValue The target value of the animation
      * @param velocity The velocity the animation should start with, [lastVelocity] by default
      */
     suspend fun animateTo(
-        targetState: T,
+        targetValue: T,
         velocity: Float = lastVelocity,
     ) {
-        val targetOffset = anchors.requireAnchor(targetState)
+        val targetOffset = anchors.requireAnchor(targetValue)
         try {
             draggableState.drag {
                 isAnimationRunning = true
@@ -302,7 +303,7 @@ internal class SwipeableV2State<T>(
                 .entries
                 .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
                 ?.key
-            this.currentState = endState ?: currentState
+            this.currentValue = endState ?: currentValue
         }
     }
 
@@ -310,17 +311,17 @@ internal class SwipeableV2State<T>(
      * Find the closest anchor taking into account the velocity and settle at it with an animation.
      */
     suspend fun settle(velocity: Float) {
-        val previousState = this.currentState
-        val targetState = computeTarget(
+        val previousValue = this.currentValue
+        val targetValue = computeTarget(
             offset = requireOffset(),
-            currentState = previousState,
+            currentValue = previousValue,
             velocity = velocity
         )
-        if (confirmStateChange(targetState)) {
-            animateTo(targetState, velocity)
+        if (confirmValueChange(targetValue)) {
+            animateTo(targetValue, velocity)
         } else {
             // If the user vetoed the state change, rollback to the previous state.
-            animateTo(previousState, velocity)
+            animateTo(previousValue, velocity)
         }
     }
 
@@ -342,32 +343,32 @@ internal class SwipeableV2State<T>(
 
     private fun computeTarget(
         offset: Float,
-        currentState: T,
+        currentValue: T,
         velocity: Float
     ): T {
         val currentAnchors = anchors
-        val currentAnchor = currentAnchors.requireAnchor(currentState)
+        val currentAnchor = currentAnchors.requireAnchor(currentValue)
         return if (currentAnchor <= offset) {
             // Swiping from lower to upper (positive).
             if (velocity >= velocityThresholdPx) {
-                currentAnchors.closestState(offset, true)
+                currentAnchors.closestAnchor(offset, true)
             } else {
-                val upper = currentAnchors.closestState(offset, true)
+                val upper = currentAnchors.closestAnchor(offset, true)
                 val distance = abs(currentAnchors.getValue(upper) - currentAnchor)
                 val relativeThreshold = abs(positionalThreshold(density, distance))
                 val absoluteThreshold = abs(currentAnchor + relativeThreshold)
-                if (offset < absoluteThreshold) currentState else upper
+                if (offset < absoluteThreshold) currentValue else upper
             }
         } else {
             // Swiping from upper to lower (negative).
             if (velocity <= -velocityThresholdPx) {
-                currentAnchors.closestState(offset, false)
+                currentAnchors.closestAnchor(offset, false)
             } else {
-                val lower = currentAnchors.closestState(offset, false)
+                val lower = currentAnchors.closestAnchor(offset, false)
                 val distance = abs(currentAnchor - currentAnchors.getValue(lower))
                 val relativeThreshold = abs(positionalThreshold(density, distance))
                 val absoluteThreshold = abs(currentAnchor - relativeThreshold)
-                if (offset > absoluteThreshold) currentState else lower
+                if (offset > absoluteThreshold) currentValue else lower
             }
         }
     }
@@ -379,17 +380,17 @@ internal class SwipeableV2State<T>(
         @ExperimentalMaterialApi
         fun <T : Any> Saver(
             animationSpec: AnimationSpec<Float>,
-            confirmStateChange: (T) -> Boolean,
+            confirmValueChange: (T) -> Boolean,
             positionalThreshold: Density.(distance: Float) -> Float,
             velocityThreshold: Dp,
             density: Density
         ) = Saver<SwipeableV2State<T>, T>(
-            save = { it.currentState },
+            save = { it.currentValue },
             restore = {
                 SwipeableV2State(
-                    initialState = it,
+                    initialValue = it,
                     animationSpec = animationSpec,
-                    confirmStateChange = confirmStateChange,
+                    confirmValueChange = confirmValueChange,
                     positionalThreshold = positionalThreshold,
                     velocityThreshold = velocityThreshold,
                     density = density
@@ -402,32 +403,32 @@ internal class SwipeableV2State<T>(
 /**
  * Create and remember a [SwipeableV2State].
  *
- * @param initialState The initial state.
- * @param animationSpec The default animation that will be used to animate to a new state.
- * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
+ * @param initialValue The initial value.
+ * @param animationSpec The default animation that will be used to animate to a new value.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending value change.
  */
 @Composable
 @ExperimentalMaterialApi
 internal fun <T : Any> rememberSwipeableV2State(
-    initialState: T,
+    initialValue: T,
     animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec,
-    confirmStateChange: (newValue: T) -> Boolean = { true }
+    confirmValueChange: (newValue: T) -> Boolean = { true }
 ): SwipeableV2State<T> {
     val density = LocalDensity.current
     return rememberSaveable(
-        initialState, animationSpec, confirmStateChange, density,
+        initialValue, animationSpec, confirmValueChange, density,
         saver = SwipeableV2State.Saver(
             animationSpec = animationSpec,
-            confirmStateChange = confirmStateChange,
+            confirmValueChange = confirmValueChange,
             positionalThreshold = SwipeableV2Defaults.PositionalThreshold,
             velocityThreshold = SwipeableV2Defaults.VelocityThreshold,
             density = density
         ),
     ) {
         SwipeableV2State(
-            initialState = initialState,
+            initialValue = initialValue,
             animationSpec = animationSpec,
-            confirmStateChange = confirmStateChange,
+            confirmValueChange = confirmValueChange,
             positionalThreshold = SwipeableV2Defaults.PositionalThreshold,
             velocityThreshold = SwipeableV2Defaults.VelocityThreshold,
             density = density
@@ -484,11 +485,11 @@ internal object SwipeableV2Defaults {
         fixedPositionalThreshold(56.dp)
 }
 
-private fun <T> Map<T, Float>.closestState(
+private fun <T> Map<T, Float>.closestAnchor(
     offset: Float = 0f,
     searchUpwards: Boolean = false
 ): T {
-    require(isNotEmpty()) { "The anchors were empty when trying to find the closest state" }
+    require(isNotEmpty()) { "The anchors were empty when trying to find the closest anchor" }
     return minBy { (_, anchor) ->
         val delta = if (searchUpwards) anchor - offset else offset - anchor
         if (delta < 0) Float.POSITIVE_INFINITY else delta
@@ -497,6 +498,6 @@ private fun <T> Map<T, Float>.closestState(
 
 private fun <T> Map<T, Float>.minOrNull() = minOfOrNull { (_, offset) -> offset }
 private fun <T> Map<T, Float>.maxOrNull() = maxOfOrNull { (_, offset) -> offset }
-private fun <T> Map<T, Float>.requireAnchor(state: T) = requireNotNull(this[state]) {
-    "Required anchor $state was not found in anchors. Current anchors: ${this.toMap()}"
+private fun <T> Map<T, Float>.requireAnchor(value: T) = requireNotNull(this[value]) {
+    "Required anchor $value was not found in anchors. Current anchors: ${this.toMap()}"
 }
