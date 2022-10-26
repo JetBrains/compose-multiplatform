@@ -628,6 +628,10 @@ class AffectedModuleDetectorImpl constructor(
                 ":glance:glance-appwidget:integration-tests:macrobenchmark",
                 ":glance:glance-appwidget:integration-tests:macrobenchmark-target"
             ),
+            setOf(
+                ":constraintlayout:constraintlayout-compose:integration-tests:macrobenchmark",
+                ":constraintlayout:constraintlayout-compose:integration-tests:macrobenchmark-target"
+            )
         )
 
         val IGNORED_PATHS = setOf(
