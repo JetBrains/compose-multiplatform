@@ -391,9 +391,7 @@ private fun configureComposeCompilerPlugin(
             // Gradle hack ahead, we use of absolute paths, but is OK here because we do it in
             // doFirst which happens after Gradle task input snapshotting. AGP does the same.
             compile.doFirst {
-                if (compile !is KotlinNativeCompile) {
-                    compile.kotlinOptions.freeCompilerArgs += "-Xplugin=${kotlinPlugin.first()}"
-                }
+                compile.kotlinOptions.freeCompilerArgs += "-Xplugin=${kotlinPlugin.first()}"
 
                 if (enableMetricsProvider.orNull == "true") {
                     val metricsDest = File(libraryMetricsDirectory, "compose")
