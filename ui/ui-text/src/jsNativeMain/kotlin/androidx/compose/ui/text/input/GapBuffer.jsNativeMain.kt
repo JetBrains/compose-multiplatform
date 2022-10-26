@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.ui.text.input
 
-import org.jetbrains.skiko.SkiaLayer
-
-internal actual fun createSkiaLayer(): SkiaLayer = SkiaLayer()
-
-internal actual fun areObjectsOfSameType(a: Any, b: Any): Boolean {
-    return js(
-        "Object.getPrototypeOf(a).constructor == Object.getPrototypeOf(b).constructor"
-    ) as Boolean
+internal actual fun String.toCharArray(
+    destination: CharArray,
+    destinationOffset: Int,
+    startIndex: Int,
+    endIndex: Int
+) {
+    (startIndex..endIndex).forEach {
+        destination[destinationOffset + it] = get(it)
+    }
 }

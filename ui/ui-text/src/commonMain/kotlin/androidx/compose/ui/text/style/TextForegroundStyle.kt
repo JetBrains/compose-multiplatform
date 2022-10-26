@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.lerp as lerpColor
 import androidx.compose.ui.text.lerpDiscrete
 import androidx.compose.ui.util.lerp
+import kotlin.jvm.JvmName
 
 /**
  * An internal interface to represent possible ways to draw Text e.g. color, brush. This interface

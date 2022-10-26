@@ -48,7 +48,6 @@ import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.SpecialNames
-import org.jetbrains.kotlin.resolve.BindingTrace
 
 /**
  * This lowering is necessary for k/js:
@@ -77,10 +76,9 @@ import org.jetbrains.kotlin.resolve.BindingTrace
 class WrapJsComposableLambdaLowering(
     context: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
-    bindingTrace: BindingTrace,
     metrics: ModuleMetrics,
     signatureBuilder: IdSignatureSerializer
-) : AbstractDecoysLowering(context, symbolRemapper, bindingTrace, metrics, signatureBuilder) {
+) : AbstractDecoysLowering(context, symbolRemapper, metrics, signatureBuilder) {
 
     private val composableLambdaSymbol = symbolRemapper.getReferencedSimpleFunction(
         getTopLevelFunctions(ComposeFqNames.composableLambda).first()

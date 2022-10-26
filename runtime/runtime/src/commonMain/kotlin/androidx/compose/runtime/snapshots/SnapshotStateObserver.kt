@@ -57,7 +57,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      */
     private val readObserver: (Any) -> Unit = { state ->
         if (!isPaused) {
-            synchronized(observedScopeMaps) {
+            synchronized(applyMapsLock) {
                 currentMap!!.recordRead(state)
             }
         }
@@ -76,7 +76,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      * synchronization.
      */
     private inline fun forEachScopeMap(block: (ObservedScopeMap) -> Unit) {
-        synchronized(observedScopeMaps) {
+        synchronized(applyMapsLock) {
             observedScopeMaps.forEach(block)
         }
     }
@@ -115,7 +115,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
      * @param block to observe reads within.
      */
     fun <T : Any> observeReads(scope: T, onValueChangedForScope: (T) -> Unit, block: () -> Unit) {
-        val scopeMap = synchronized(observedScopeMaps) {
+        val scopeMap = synchronized(applyMapsLock) {
             ensureMap(onValueChangedForScope)
         }
 

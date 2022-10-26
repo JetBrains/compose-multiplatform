@@ -17,6 +17,7 @@
 
 package androidx.compose.ui.node
 
+import kotlin.jvm.JvmInline
 import kotlin.math.abs
 import kotlin.math.min
 

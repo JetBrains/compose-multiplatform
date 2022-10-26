@@ -14,14 +14,12 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui
+package androidx.compose.material3
 
-import org.jetbrains.skiko.SkiaLayer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
 
-internal actual fun createSkiaLayer(): SkiaLayer = SkiaLayer()
-
-internal actual fun areObjectsOfSameType(a: Any, b: Any): Boolean {
-    return js(
-        "Object.getPrototypeOf(a).constructor == Object.getPrototypeOf(b).constructor"
-    ) as Boolean
-}
+internal actual val WindowInsets.Companion.systemBarsForVisualComponents: WindowInsets
+    @Composable
+    get() = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)

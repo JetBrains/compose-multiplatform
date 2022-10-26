@@ -2,6 +2,7 @@ import androidx.build.AndroidXComposePlugin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
+    id("AndroidXPlugin")
     id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
     id("org.jetbrains.gradle.apple.applePlugin") version "222.3345.143-0.16"
@@ -12,8 +13,7 @@ val RUN_ON_DEVICE = false
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
-    kotlinPlugin(project(":compose:compiler:compiler"))
-    kotlinNativeCompilerPluginClasspath(project(":compose:compiler:compiler-hosted"))
+
 }
 
 repositories {

@@ -39,3 +39,9 @@ internal actual val KeyEvent.isClick: Boolean
         SkikoKey.KEY_ENTER -> true
         else -> false
     }
+
+internal actual val KeyEvent.isPress: Boolean
+    get() = type == KeyEventType.KeyUp && when (nativeKeyEvent.key) {
+        SkikoKey.KEY_ENTER -> true
+        else -> false
+    }

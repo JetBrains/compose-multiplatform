@@ -34,6 +34,7 @@ import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalNode
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.semantics.SemanticsModifier
+import kotlin.jvm.JvmInline
 
 @JvmInline
 internal value class NodeKind<T>(val mask: Int) {

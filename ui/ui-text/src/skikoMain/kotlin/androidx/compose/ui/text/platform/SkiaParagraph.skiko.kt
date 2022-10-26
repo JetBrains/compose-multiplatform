@@ -31,7 +31,7 @@ import org.jetbrains.skia.paragraph.Shadow as SkShadow
 import org.jetbrains.skia.paragraph.StrutStyle
 import org.jetbrains.skia.paragraph.TextBox
 import org.jetbrains.skia.paragraph.TextStyle as SkTextStyle
-import org.jetbrains.skia.paragraph.Rect as SkRect
+import org.jetbrains.skia.paragraph.TextIndent as SkTextIndent
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.isSpecified
@@ -66,6 +66,7 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.isSpecified
 import androidx.compose.ui.unit.isUnspecified
 import androidx.compose.ui.unit.sp
+import org.jetbrains.skia.FontFeature
 import org.jetbrains.skia.Paint
 
 private val DefaultFontSize = 16.sp

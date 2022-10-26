@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.pointerInput
@@ -125,6 +126,7 @@ fun Modifier.onClick(
             val onLongClickState = rememberUpdatedState(onLongClick)
             val keyboardModifiersState = rememberUpdatedState(keyboardModifiers)
             val focusRequester = remember { FocusRequester() }
+            val currentKeyPressInteractions = remember { mutableMapOf<Key, PressInteraction.Press>() }
 
             val hasLongClick = onLongClick != null
             val hasDoubleClick = onDoubleClick != null
@@ -139,7 +141,9 @@ fun Modifier.onClick(
                 }
             }
             PressedInteractionSourceDisposableEffect(
-                interactionSource = interactionSource, pressedInteraction = pressedInteraction
+                interactionSource = interactionSource,
+                pressedInteraction = pressedInteraction,
+                currentKeyPressInteractions = currentKeyPressInteractions
             )
 
             val matcherState = rememberUpdatedState(matcher)

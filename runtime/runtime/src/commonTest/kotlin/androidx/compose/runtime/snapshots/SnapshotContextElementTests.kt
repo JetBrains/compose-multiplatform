@@ -30,7 +30,6 @@ import kotlinx.test.IgnoreJsAndNative
 @OptIn(ExperimentalComposeApi::class, ExperimentalCoroutinesApi::class)
 class SnapshotContextElementTests {
     @Test
-    fun coroutineEntersExpectedSnapshot() = runTest(UnconfinedTestDispatcher()) {
     @IgnoreJsAndNative
     fun coroutineEntersExpectedSnapshot() = runTest(UnconfinedTestDispatcher()) {
         val snapshot = Snapshot.takeSnapshot()

@@ -19,7 +19,6 @@ package androidx.compose.desktop.ui.tooling.preview.runtime
 import androidx.compose.runtime.currentComposer
 import androidx.compose.ui.renderComposeScene
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.platform.TestComposeWindow
 import androidx.compose.ui.unit.Density
 
 /**
