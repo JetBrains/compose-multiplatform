@@ -141,7 +141,7 @@ class DialogProperties @ExperimentalComposeUiApi constructor(
  *
  * The dialog is visible as long as it is part of the composition hierarchy.
  * In order to let the user dismiss the Dialog, the implementation of [onDismissRequest] should
- * contain a way to remove to remove the dialog from the composition hierarchy.
+ * contain a way to remove the dialog from the composition hierarchy.
  *
  * Example usage:
  *
