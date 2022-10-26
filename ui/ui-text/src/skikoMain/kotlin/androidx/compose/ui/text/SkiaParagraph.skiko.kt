@@ -34,10 +34,12 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.floor
+import org.jetbrains.skia.paragraph.Direction
 import org.jetbrains.skia.paragraph.LineMetrics
 import org.jetbrains.skia.paragraph.RectHeightMode
 import org.jetbrains.skia.paragraph.RectWidthMode
 import org.jetbrains.skia.paragraph.TextBox
+import org.jetbrains.skia.paragraph.Direction
 
 internal class SkiaParagraph(
     intrinsics: ParagraphIntrinsics,
@@ -220,12 +222,14 @@ internal class SkiaParagraph(
         val prevBox = getBoxBackwardByOffset(offset)
         val nextBox = getBoxForwardByOffset(offset)
         val isRtl = paragraphIntrinsics.textDirection == ResolvedTextDirection.Rtl
+        val isLtr = !isRtl
         return when {
             prevBox == null && nextBox == null -> if (isRtl) width else 0f
-            prevBox == null && nextBox == null -> 0f
             prevBox == null -> nextBox!!.cursorHorizontalPosition(true)
             nextBox == null -> prevBox.cursorHorizontalPosition()
             nextBox.direction == prevBox.direction -> nextBox.cursorHorizontalPosition(true)
+            isLtr && prevBox.direction == Direction.LTR -> nextBox.cursorHorizontalPosition(opposite = true)
+            isRtl && prevBox.direction == Direction.RTL -> nextBox.cursorHorizontalPosition(opposite = true)
             // BiDi transition offset, we need to resolve ambiguity with usePrimaryDirection
             // for details see comment for MultiParagraph.getHorizontalPosition
             usePrimaryDirection -> prevBox.cursorHorizontalPosition()
