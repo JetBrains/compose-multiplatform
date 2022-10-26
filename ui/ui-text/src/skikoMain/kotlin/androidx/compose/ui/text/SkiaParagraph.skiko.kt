@@ -213,7 +213,7 @@ internal class SkiaParagraph(
             ?: 0
 
     override fun getLineForVerticalPosition(vertical: Float): Int {
-        return 0
+        return lineMetrics.firstOrNull { vertical < it.baseline + it.descent }?.lineNumber ?: 0
     }
 
     override fun getHorizontalPosition(offset: Int, usePrimaryDirection: Boolean): Float {
@@ -335,7 +335,20 @@ internal class SkiaParagraph(
         }
 
     override fun getOffsetForPosition(position: Offset): Int {
-        return para.getGlyphPositionAtCoordinate(position.x, position.y).position
+        val glyphPosition = para.getGlyphPositionAtCoordinate(position.x, position.y).position
+
+        // It's expected that this method should return the glyph position that lays in the line at `position.y`.
+        // When the `position` is on a line-break, glyphPosition will reference the first glyph on a next line.
+        // This will make cursor go on the next line (not a line that corresponds `position.y` coordinate).
+        // TODO: consider fixing it in skiko
+
+        val lineMetrics = lineMetricsForOffset(glyphPosition) ?: return glyphPosition
+        val expectedLine = getLineForVerticalPosition(position.y)
+        return if (expectedLine == lineMetrics.lineNumber) {
+            glyphPosition
+        } else {
+            glyphPosition - 1
+        }
     }
 
     override fun getBoundingBox(offset: Int): Rect {
