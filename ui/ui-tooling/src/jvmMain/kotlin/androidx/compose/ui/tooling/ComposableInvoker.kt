@@ -200,7 +200,10 @@ object ComposableInvoker {
                 method.invokeComposableMethod(instance, composer, *args)
             }
         } catch (e: ReflectiveOperationException) {
-            throw ClassNotFoundException("Composable Method '$className.$methodName' not found", e)
+            PreviewLogger.logWarning(
+                "Failed to invoke Composable Method '$className.$methodName'"
+            )
+            throw e
         }
     }
 }

@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.tooling
 
-import android.util.Log
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -29,7 +28,7 @@ internal fun String.asPreviewProviderClass(): Class<out PreviewParameterProvider
         @Suppress("UNCHECKED_CAST")
         return Class.forName(this) as? Class<out PreviewParameterProvider<*>>
     } catch (e: ClassNotFoundException) {
-        Log.e("PreviewProvider", "Unable to find provider '$this'", e)
+        PreviewLogger.logError("Unable to find PreviewProvider '$this'", e)
         return null
     }
 }
