@@ -130,6 +130,12 @@ const val KMP_GITHUB_BUILD = "androidx.github.build"
  */
 const val ALLOW_MISSING_LINT_CHECKS_PROJECT = "androidx.allow.missing.lint"
 
+/**
+ * If set to a uri, this is the location that will be used to download `xcodegen` when running
+ * Darwin benchmarks.
+ */
+const val XCODEGEN_DOWNLOAD_URI = "androidx.benchmark.darwin.xcodeGenDownloadUri"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
@@ -155,7 +161,8 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     ENABLED_KMP_TARGET_PLATFORMS,
-    ALLOW_MISSING_LINT_CHECKS_PROJECT
+    ALLOW_MISSING_LINT_CHECKS_PROJECT,
+    XCODEGEN_DOWNLOAD_URI
 )
 
 /**
