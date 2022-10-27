@@ -65,6 +65,8 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -80,6 +82,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.ClassName
@@ -558,6 +561,116 @@ class AndroidAccessibilityTest {
             )
         )
         @Suppress("DEPRECATION") accessibilityNodeInfo.recycle()
+    }
+
+    @Composable
+    fun LastElementOverLaidColumn(
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit,
+    ) {
+        var yPosition = 0
+
+        Layout(modifier = modifier, content = content) { measurables, constraints ->
+            val placeables = measurables.map { measurable ->
+                measurable.measure(constraints)
+            }
+
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                placeables.forEach { placeable ->
+                    if (placeable != placeables[placeables.lastIndex]) {
+                        placeable.placeRelative(x = 0, y = yPosition)
+                        yPosition += placeable.height
+                    } else {
+                        // if the element is our last element (our overlaid node)
+                        // then we'll put it over the middle of our previous elements
+                        placeable.placeRelative(x = 0, y = yPosition / 2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTraversalOrder_layout() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row {
+                    Column {
+                        Row { Text(text1) }
+                        Row { Text(text2) }
+                        Row { Text(text3) }
+                    }
+                }
+                Row {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val overlaidNode = rule.onNodeWithText(overlaidText).fetchSemanticsNode()
+
+        val ani3 = provider.createAccessibilityNodeInfo(node3.id)
+        val ani3TraversalBeforeVal = ani3?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode should be read last
+        assertNotEquals(ani3TraversalBeforeVal, 0)
+        if (ani3TraversalBeforeVal != null) {
+            assertEquals(ani3TraversalBeforeVal, overlaidNode.id)
+        }
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTraversalOrder_layoutTestTags() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row(modifier = Modifier
+                    .semantics(true) { contentDescription = "Row1" }
+                    .testTag("Row1")
+                ) {
+                    Column(modifier = Modifier.testTag("Column1")) {
+                        Row(modifier = Modifier.testTag("Text1")) { Text(text1) }
+                        Row(modifier = Modifier.testTag("Text2")) { Text(text2) }
+                        Row(modifier = Modifier.testTag("Text3")) { Text(text3) }
+                    }
+                }
+                Row(modifier = Modifier
+                    .semantics(true) { contentDescription = "Row2" }
+                    .testTag("Row2")
+                ) {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val row2 = rule.onNodeWithTag("Row2").fetchSemanticsNode()
+
+        val ani3 = provider.createAccessibilityNodeInfo(node3.id)
+        val ani3TraversalBeforeVal = ani3?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode and its row should be read last
+        assertNotEquals(ani3TraversalBeforeVal, 0)
+        if (ani3TraversalBeforeVal != null) {
+            assertTrue(ani3TraversalBeforeVal < row2.id)
+        }
+    }
+
+    companion object {
+        private const val EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL =
+            "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL"
     }
 
     @Test

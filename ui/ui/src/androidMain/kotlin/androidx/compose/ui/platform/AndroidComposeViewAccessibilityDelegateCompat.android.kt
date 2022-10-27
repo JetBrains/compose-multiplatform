@@ -49,6 +49,7 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.LayoutNode
@@ -228,13 +229,17 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      */
     private var currentSemanticsNodes: Map<Int, SemanticsNodeWithAdjustedBounds> = mapOf()
         get() {
-            if (currentSemanticsNodesInvalidated) {
-                field = view.semanticsOwner.getAllUncoveredSemanticsNodesToMap()
+            if (currentSemanticsNodesInvalidated) { // first instance of retrieving all nodes
                 currentSemanticsNodesInvalidated = false
+                field = view.semanticsOwner.getAllUncoveredSemanticsNodesToMap()
+                setTraversalValues()
             }
             return field
         }
     private var paneDisplayed = ArraySet<Int>()
+    private var idToBeforeMap = HashMap<Int, Int>()
+    private val EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL =
+        "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL"
 
     /**
      * A snapshot of the semantics node. The children here is fixed and are taken from the time
@@ -381,6 +386,44 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         return info.unwrap()
     }
 
+    private fun setTraversalValues() {
+        idToBeforeMap.clear()
+        var idToCoordinatesList = mutableListOf<Pair<Int, Rect>>()
+
+        fun depthFirstSearch(currNode: SemanticsNode) {
+            if (currNode.parent?.layoutNode?.innerCoordinator?.isAttached == true &&
+                currNode.layoutNode.innerCoordinator.isAttached
+            ) {
+                idToCoordinatesList.add(
+                    Pair(
+                        currNode.id,
+                        currNode.layoutNode.coordinates.boundsInWindow()
+                    )
+                )
+            }
+            // This retrieves the children in the order that we want (respecting child/parent
+            // hierarchies)
+            currNode.replacedChildrenSortedByBounds.fastForEach { child ->
+                depthFirstSearch(child)
+            }
+        }
+
+        currentSemanticsNodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]?.semanticsNode
+            ?.replacedChildrenSortedByBounds?.fastForEach { node ->
+                depthFirstSearch(node)
+            }
+
+        // Iterate through our ordered list, and creating a mapping of current node to next node ID
+        // We'll later read through this and set traversal order with IdToBeforeMap
+        for (i in 1..idToCoordinatesList.lastIndex) {
+            val prevId = idToCoordinatesList[i - 1].first
+            val currId = idToCoordinatesList[i].first
+            idToBeforeMap[prevId] = currId
+        }
+
+        return
+    }
+
     @VisibleForTesting
     @OptIn(ExperimentalComposeUiApi::class)
     fun populateAccessibilityNodeInfoProperties(
@@ -440,7 +483,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // "important".
         info.isImportantForAccessibility = true
 
-        semanticsNode.replacedChildrenSortedByBounds.fastForEach { child ->
+        semanticsNode.replacedChildren.fastForEach { child ->
             if (currentSemanticsNodes.contains(child.id)) {
                 val holder = view.androidViewsHandler.layoutNodeToHolder[child.layoutNode]
                 if (holder != null) {
@@ -925,6 +968,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         info.isScreenReaderFocusable =
             semanticsNode.unmergedConfig.isMergingSemanticsOfDescendants ||
             isUnmergedLeafNode && isSpeakingNode
+
+        if (idToBeforeMap[virtualViewId] != null) {
+            idToBeforeMap[virtualViewId]?.let { info.setTraversalBefore(view, it) }
+            addExtraDataToAccessibilityNodeInfoHelper(
+                virtualViewId, info.unwrap(), EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL, null)
+        }
     }
 
     /** Set the error text for this node */
@@ -1404,7 +1453,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     ) {
         val node = currentSemanticsNodes[virtualViewId]?.semanticsNode ?: return
         val text = getIterableTextForAccessibility(node)
-        if (node.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult) &&
+
+        // This extra is just for testing: needed a way to retrieve `traversalBefore` from
+        // non-sealed instance of ANI
+        if (extraDataKey == EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL) {
+            idToBeforeMap[virtualViewId]?.let {
+                info.extras.putInt(extraDataKey, it)
+            }
+        } else if (node.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult) &&
             arguments != null && extraDataKey == EXTRA_DATA_TEXT_CHARACTER_LOCATION_KEY
         ) {
             val positionInfoStartIndex = arguments.getInt(

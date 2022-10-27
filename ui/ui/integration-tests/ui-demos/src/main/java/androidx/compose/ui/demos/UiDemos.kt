@@ -228,6 +228,13 @@ private val ModifierDemos = DemoCategory(
     )
 )
 
+private val AccessibilityDemos = DemoCategory(
+    "Accessibility",
+    listOf(
+        ComposableDemo("Overlaid Nodes") { OverlaidNodeLayoutDemo() }
+    )
+)
+
 val CoreDemos = DemoCategory(
     "Framework",
     listOf(
@@ -243,6 +250,7 @@ val CoreDemos = DemoCategory(
         GestureDemos,
         ViewInteropDemos,
         ComposableDemo("Software Keyboard Controller") { SoftwareKeyboardControllerDemo() },
-        RecyclerViewDemos
+        RecyclerViewDemos,
+        AccessibilityDemos
     )
 )
