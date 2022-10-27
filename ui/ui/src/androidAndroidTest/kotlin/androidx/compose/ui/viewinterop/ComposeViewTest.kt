@@ -70,6 +70,7 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.hamcrest.CoreMatchers.instanceOf
@@ -92,6 +93,7 @@ class ComposeViewTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
+    @FlakyTest(bugId = 256017578)
     @Test
     fun composeViewComposedContent() {
         rule.activityRule.scenario.onActivity { activity ->
