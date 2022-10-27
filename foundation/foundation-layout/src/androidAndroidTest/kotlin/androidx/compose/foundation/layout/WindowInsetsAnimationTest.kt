@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import java.util.concurrent.TimeUnit
 import org.junit.After
@@ -89,6 +90,7 @@ class WindowInsetsAnimationTest {
     }
 
     @OptIn(ExperimentalLayoutApi::class)
+    @FlakyTest(bugId = 256020254)
     @Test
     fun imeAnimationWhenHidingIme() {
         val imeAnimationSourceValues = mutableListOf<Int>()
