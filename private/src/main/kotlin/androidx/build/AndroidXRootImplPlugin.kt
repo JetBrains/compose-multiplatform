@@ -220,10 +220,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
 
         registerStudioTask()
 
-        if (!ProjectLayoutType.isPlayground(project)) {
-            whenChangingOutputTextValidationMustInvalidateAllTasks()
-        }
-
         TaskUpToDateValidator.setup(project, registry)
 
         project.tasks.register("listTaskOutputs", ListTaskOutputsTask::class.java) { task ->
@@ -232,19 +228,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
         }
         tasks.matching { it.name == "commonizeNativeDistribution" }.configureEach {
             it.notCompatibleWithConfigurationCache("https://youtrack.jetbrains.com/issue/KT-54627")
-        }
-    }
-
-    // If our output message validation configuration changes, invalidate all tasks to make sure
-    // all output messages get regenerated and re-validated
-    private fun Project.whenChangingOutputTextValidationMustInvalidateAllTasks() {
-        val configFile = project.file("development/build_log_simplifier/messages.ignore")
-        if (configFile.exists()) {
-            subprojects { subproject ->
-                subproject.tasks.configureEach { task ->
-                    task.inputs.file(configFile)
-                }
-            }
         }
     }
 

@@ -148,6 +148,10 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
         project.configurations.create("samples")
         project.validateMultiplatformPluginHasNotBeenApplied()
+
+        if (!ProjectLayoutType.isPlayground(project)) {
+            project.whenChangingOutputTextValidationMustInvalidateAllTasks()
+        }
     }
 
     private fun Project.registerProjectOrArtifact() {
@@ -1080,6 +1084,17 @@ fun Project.validateMultiplatformPluginHasNotBeenApplied() {
         throw GradleException(
             "The Kotlin multiplatform plugin should only be applied by the AndroidX plugin."
         )
+    }
+}
+
+// If our output message validation configuration changes, invalidate all tasks to make sure
+// all output messages get regenerated and re-validated
+private fun Project.whenChangingOutputTextValidationMustInvalidateAllTasks() {
+    val configFile = project.rootProject.file("development/build_log_simplifier/messages.ignore")
+    if (configFile.exists()) {
+        project.tasks.configureEach { task ->
+            task.inputs.file(configFile)
+        }
     }
 }
 
