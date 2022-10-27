@@ -28,6 +28,7 @@ import androidx.compose.ui.test.setViewLayerTypeForApi28
 import androidx.core.view.doOnLayout
 import androidx.test.ext.junit.rules.activityScenarioRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.LargeTest
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.uiautomator.UiDevice
@@ -92,6 +93,7 @@ class AndroidUiDispatcherTest {
      * [MonotonicFrameClock.withFrameNanos] will resume in time to make the current frame if called
      * from the situation described above, and that subsequent calls will wait until the next frame.
      */
+    @FlakyTest(bugId = 255972660)
     @Test
     fun runsBeforeFrameDispatchedByInput() = runBlocking {
         val ranInputJobOnFrame = CompletableDeferred<Int>()
