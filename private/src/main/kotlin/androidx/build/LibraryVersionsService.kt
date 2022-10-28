@@ -22,6 +22,7 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.tomlj.Toml
 import org.tomlj.TomlParseResult
+import org.tomlj.TomlTable
 
 /**
  * Loads Library groups and versions from a specified TOML file.
@@ -31,6 +32,7 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         var tomlFile: Provider<String>
         var composeCustomVersion: Provider<String>
         var composeCustomGroup: Provider<String>
+        var useMultiplatformGroupVersions: Provider<Boolean>
     }
 
     private val parsedTomlFile: TomlParseResult by lazy {
@@ -59,6 +61,25 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
     val libraryGroups: Map<String, LibraryGroup> by lazy {
         val groups = parsedTomlFile.getTable("groups")
             ?: throw GradleException("Library versions toml file is missing [groups] table")
+        val useMultiplatformGroupVersion =
+            parameters.useMultiplatformGroupVersions.orElse(false).get()
+
+        fun readGroupVersion(groupDefinition: TomlTable, groupName: String, key: String): Version? {
+            val versionRef = groupDefinition.getString(key) ?: return null
+            if (!versionRef.startsWith(VersionReferencePrefix)) {
+                throw GradleException(
+                    "Group entry $key is expected to start with $VersionReferencePrefix"
+                )
+            }
+            // name without `versions.`
+            val atomicGroupVersionName = versionRef.removePrefix(
+                VersionReferencePrefix
+            )
+            return libraryVersions[atomicGroupVersionName] ?: error(
+                "Group entry $groupName specifies $atomicGroupVersionName, but such version " +
+                    "doesn't exist"
+            )
+        }
         groups.keySet().associateWith { name ->
             val groupDefinition = groups.getTable(name)!!
             val groupName = groupDefinition.getString("group")!!
@@ -68,29 +89,31 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
                 groupName.replace("androidx.compose", parameters.composeCustomGroup.get())
             } else groupName
 
-            if (groupDefinition.contains(AtomicGroupVersion)) {
-                val atomicGroupVersionReference = groupDefinition.getString(AtomicGroupVersion)!!
-                if (!atomicGroupVersionReference.startsWith(VersionReferencePrefix)) {
-                    throw GradleException(
-                        "Group entry $AtomicGroupVersion is expected to start with " +
-                            VersionReferencePrefix
-                    )
-                }
-                // name without `versions.`
-                val atomicGroupVersionName = atomicGroupVersionReference.removePrefix(
-                    VersionReferencePrefix
-                )
-                check(libraryVersions.containsKey(atomicGroupVersionName)) {
-                    "Group entry $name specifies $atomicGroupVersionName, but such version " +
-                        "doesn't exist"
-                }
-                LibraryGroup(finalGroupName, libraryVersions[atomicGroupVersionName])
-            } else {
-                LibraryGroup(finalGroupName, null)
+            val atomicGroupVersion = readGroupVersion(
+                groupDefinition = groupDefinition,
+                groupName = groupName,
+                key = AtomicGroupVersion
+            )
+            val multiplatformGroupVersion = readGroupVersion(
+                groupDefinition = groupDefinition,
+                groupName = groupName,
+                key = MultiplatformGroupVersion
+            )
+            check(
+                multiplatformGroupVersion == null || atomicGroupVersion != null
+            ) {
+                "Cannot specify $MultiplatformGroupVersion for $name without specifying an " +
+                    AtomicGroupVersion
             }
+            val groupVersion = when {
+                useMultiplatformGroupVersion -> multiplatformGroupVersion ?: atomicGroupVersion
+                else -> atomicGroupVersion
+            }
+            LibraryGroup(finalGroupName, groupVersion)
         }
     }
 }
 
 private const val VersionReferencePrefix = "versions."
 private const val AtomicGroupVersion = "atomicGroupVersion"
+private const val MultiplatformGroupVersion = "multiplatformGroupVersion"
