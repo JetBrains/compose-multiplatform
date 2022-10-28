@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2022 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation
+package androidx.compose.foundation.text.selection
 
-actual class AtomicLong actual constructor(value: Long) {
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.key.KeyEvent
 
-    private val atomic = kotlin.native.concurrent.AtomicLong(value)
+internal actual fun isCopyKeyEvent(keyEvent: KeyEvent): Boolean =
+    false //TODO implement copy key event for iPad
 
-    actual fun get(): Long = atomic.value
-
-    actual fun set(value: Long) {
-        atomic.value = value
-    }
-
-    actual fun getAndIncrement(): Long = atomic.addAndGet(1) - 1
-}
+internal actual fun Modifier.selectionMagnifier(manager: SelectionManager): Modifier =
+    this //TODO support magnifier for uikit

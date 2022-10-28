@@ -413,7 +413,7 @@ internal class SkiaParagraph(
 
     override fun getWordBoundary(offset: Int): TextRange {
         return when {
-            (text[offset].isLetterOrDigit()) -> para.getWordBoundary(offset).let {
+            (text.getOrNull(offset)?.isLetterOrDigit() ?: false) -> para.getWordBoundary(offset).let {
                 TextRange(it.start, it.end)
             }
             (text.getOrNull(offset - 1)?.isLetterOrDigit() ?: false) ->
