@@ -2450,7 +2450,6 @@ package androidx.compose.ui.node {
   @androidx.compose.ui.ExperimentalComposeUiApi public abstract class DelegatingNode extends androidx.compose.ui.Modifier.Node {
     ctor public DelegatingNode();
     method public final <T extends androidx.compose.ui.Modifier.Node> T delegated(kotlin.jvm.functions.Function0<? extends T> fn);
-    method public final <T extends androidx.compose.ui.Modifier.Node> kotlin.Lazy<T> lazyDelegated(kotlin.jvm.functions.Function0<? extends T> fn);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface DrawModifierNode extends androidx.compose.ui.node.DelegatableNode {
@@ -2459,6 +2458,7 @@ package androidx.compose.ui.node {
   }
 
   public final class DrawModifierNodeKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateDraw(androidx.compose.ui.node.DrawModifierNode);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface GlobalPositionAwareModifierNode extends androidx.compose.ui.node.DelegatableNode {
@@ -2496,6 +2496,9 @@ package androidx.compose.ui.node {
   }
 
   public final class LayoutModifierNodeKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateLayer(androidx.compose.ui.node.LayoutModifierNode);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateLayout(androidx.compose.ui.node.LayoutModifierNode);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateMeasurements(androidx.compose.ui.node.LayoutModifierNode);
   }
 
   public final class LayoutNodeDrawScopeKt {
@@ -2511,13 +2514,13 @@ package androidx.compose.ui.node {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> extends androidx.compose.ui.platform.InspectorValueInfo implements androidx.compose.ui.Modifier.Element {
-    ctor public ModifierNodeElement(optional Object? params, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo);
+    ctor public ModifierNodeElement(optional Object? params, optional boolean autoInvalidate, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo);
     method public abstract N create();
     method public abstract N update(N node);
   }
 
   public final class ModifierNodeElementKt {
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(Object? params, kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(Object? key, kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier! modifierElementOf(kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
   }
 
@@ -2547,6 +2550,10 @@ package androidx.compose.ui.node {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface ParentDataModifierNode extends androidx.compose.ui.node.DelegatableNode {
     method public Object? modifyParentData(androidx.compose.ui.unit.Density, Object? parentData);
+  }
+
+  public final class ParentDataModifierNodeKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateParentData(androidx.compose.ui.node.ParentDataModifierNode);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface PointerInputModifierNode extends androidx.compose.ui.node.DelegatableNode {

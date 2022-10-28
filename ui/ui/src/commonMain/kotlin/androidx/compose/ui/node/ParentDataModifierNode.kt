@@ -38,3 +38,10 @@ interface ParentDataModifierNode : DelegatableNode {
      */
     fun Density.modifyParentData(parentData: Any?): Any?
 }
+
+/**
+ * This invalidates the current node's parent data, and ensures that layouts that utilize it will be
+ * scheduled to relayout for the next frame.
+ */
+@ExperimentalComposeUiApi
+fun ParentDataModifierNode.invalidateParentData() = requireLayoutNode().invalidateParentData()

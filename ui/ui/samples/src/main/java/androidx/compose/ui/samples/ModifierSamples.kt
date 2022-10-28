@@ -163,7 +163,7 @@ fun ModifierElementOfSample() {
         }
     }
     fun Modifier.circle(color: Color) = this then modifierElementOf(
-        params = color,
+        key = color,
         create = { Circle(color) },
         update = { it.color = color },
         definitions = {
@@ -213,7 +213,7 @@ fun PointerInputModifierNodeSample() {
     }
 
     fun Modifier.onPointerEvent(callback: (PointerEvent) -> Unit) = this then modifierElementOf(
-        params = callback,
+        key = callback,
         create = { OnPointerEventNode(callback) },
         update = { it.callback = callback },
         definitions = {
@@ -234,7 +234,7 @@ fun LayoutAwareModifierNodeSample() {
     }
 
     fun Modifier.logSize(id: String) = this then modifierElementOf(
-        params = id,
+        key = id,
         create = { SizeLoggerNode(id) },
         update = { it.id = id },
         definitions = {
@@ -264,7 +264,7 @@ fun GlobalPositionAwareModifierNodeSample() {
     }
 
     fun Modifier.logPosition(id: String) = this then modifierElementOf(
-        params = id,
+        key = id,
         create = { PositionLoggerNode(id) },
         update = { it.id = id },
         definitions = {
@@ -294,7 +294,7 @@ fun JustReadingOrProvidingModifierLocalNodeSample() {
     }
 
     fun Modifier.logSize(id: String) = this then modifierElementOf(
-        params = id,
+        key = id,
         create = { SizeLoggerNode(id) },
         update = { it.id = id },
         definitions = {
@@ -304,7 +304,7 @@ fun JustReadingOrProvidingModifierLocalNodeSample() {
     )
 
     fun Modifier.provideLogger(logger: Logger) = this then modifierElementOf(
-        params = logger,
+        key = logger,
         create = { ProvideLoggerNode(logger) },
         update = { it.provide(loggerLocal, logger) },
         definitions = {

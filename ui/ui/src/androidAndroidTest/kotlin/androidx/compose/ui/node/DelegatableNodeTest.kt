@@ -18,6 +18,7 @@ package androidx.compose.ui.node
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -277,6 +278,36 @@ class DelegatableNodeTest {
     }
 
     @Test
+    fun visitAncestors_sameLayoutNode_calledDuringOnDetach() {
+        // Arrange.
+        val (node1, node2) = List(5) { object : Modifier.Node() {} }
+        val visitedAncestors = mutableListOf<Modifier.Node>()
+        val detachableNode = DetachableNode {
+            it.visitAncestors(Nodes.Any) { node ->
+                visitedAncestors.add(node)
+            }
+        }
+        val removeNode = mutableStateOf(false)
+        rule.setContent {
+            Box(
+                modifier = modifierElementOf { node1 }
+                    .then(modifierElementOf { node2 })
+                    .then(if (removeNode.value) Modifier else modifierElementOf { detachableNode })
+            )
+        }
+
+        // Act.
+        rule.runOnIdle { removeNode.value = true }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(visitedAncestors)
+                .containsAtLeastElementsIn(arrayOf(node2, node1))
+                .inOrder()
+        }
+    }
+
+    @Test
     fun nearestAncestorInDifferentLayoutNode_nonContiguousParentLayoutNode() {
         // Arrange.
         val (node1, node2) = List(2) { object : Modifier.Node() {} }
@@ -297,13 +328,42 @@ class DelegatableNodeTest {
         assertThat(parent).isEqualTo(node1)
     }
 
+    @Test
+    fun delegatedNodeGetsCoordinator() {
+        val node = object : DelegatingNode() {
+            val inner = delegated {
+                object : Modifier.Node() { }
+            }
+        }
+
+        rule.setContent {
+            Box(modifier = modifierElementOf { node })
+        }
+
+        rule.runOnIdle {
+            assertThat(node.isAttached).isTrue()
+            assertThat(node.coordinator).isNotNull()
+            assertThat(node.inner.isAttached).isTrue()
+            assertThat(node.inner.coordinator).isNotNull()
+            assertThat(node.inner.coordinator).isEqualTo(node.coordinator)
+        }
+    }
+
     private fun Modifier.otherModifier(): Modifier = this.then(Modifier)
 }
 
 @ExperimentalComposeUiApi
 internal inline fun <reified T : Modifier.Node> modifierElementOf(
     crossinline create: () -> T,
-): Modifier = object : ModifierNodeElement<T>(null, {}) {
+): Modifier = object : ModifierNodeElement<T>(null, true, {}) {
     override fun create(): T = create()
     override fun update(node: T): T = node
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+private class DetachableNode(val onDetach: (DetachableNode) -> Unit) : Modifier.Node() {
+    override fun onDetach() {
+        onDetach.invoke(this)
+        super.onDetach()
+    }
 }

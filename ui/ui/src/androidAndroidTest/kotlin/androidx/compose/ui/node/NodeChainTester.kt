@@ -213,7 +213,7 @@ class A : Modifier.Node() {
 }
 
 fun modifierA(params: Any? = null): Modifier.Element {
-    return object : ModifierNodeElement<A>(params, {}) {
+    return object : ModifierNodeElement<A>(params, true, {}) {
         override fun create(): A = A()
         override fun update(node: A): A = node
         override fun toString(): String = "a"
@@ -225,7 +225,7 @@ class B : Modifier.Node() {
 }
 
 fun modifierB(params: Any? = null): Modifier.Element {
-    return object : ModifierNodeElement<B>(params, {}) {
+    return object : ModifierNodeElement<B>(params, true, {}) {
         override fun create(): B = B()
         override fun update(node: B): B = node
         override fun toString(): String = "b"
@@ -237,7 +237,7 @@ class C : Modifier.Node() {
 }
 
 fun modifierC(params: Any? = null): Modifier.Element {
-    return object : ModifierNodeElement<C>(params, {}) {
+    return object : ModifierNodeElement<C>(params, true, {}) {
         override fun create(): C = C()
         override fun update(node: C): C = node
         override fun toString(): String = "c"
@@ -248,7 +248,7 @@ fun modifierD(params: Any? = null): Modifier.Element {
     class N : Modifier.Node() {
         override fun toString(): String = "d"
     }
-    return object : ModifierNodeElement<N>(params, {}) {
+    return object : ModifierNodeElement<N>(params, true, {}) {
         override fun create(): N = N()
         override fun update(node: N): N = node
         override fun toString(): String = "d"
@@ -258,7 +258,7 @@ fun modifierD(params: Any? = null): Modifier.Element {
 fun managedModifier(
     name: String,
     params: Any? = null
-): ModifierNodeElement<*> = object : ModifierNodeElement<Modifier.Node>(params, {}) {
+): ModifierNodeElement<*> = object : ModifierNodeElement<Modifier.Node>(params, true, {}) {
     override fun create(): Modifier.Node = object : Modifier.Node() {}
     override fun update(node: Modifier.Node): Modifier.Node = node
     override fun toString(): String = name

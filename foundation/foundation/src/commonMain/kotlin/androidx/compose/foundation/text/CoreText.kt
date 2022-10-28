@@ -307,6 +307,16 @@ internal class TextController(val state: TextState) : RememberObserver {
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {
+            // Reading this state here ensures that we invalidate measure every time we update the
+            // text delegate. That is effectively what was happening before, by accident of how
+            // setting the modifier always invalidated measure, but this CL changes that so we have
+            // to do it manually.
+            // In the future, we shouldn't always invalidate measure just because the delegate
+            // changes – we should only do so when specific things change that actually require
+            // re-measuring. But that's part of the text effort to rewrite all this code with
+            // Modifier.Node. Since the old code was already "over-invalidating", this change keeps
+            // that behavior and is no worse (except for the additional state write/read).
+            state.layoutInvalidation
             // NOTE(text-perf-review): current implementation of layout means that layoutResult
             // will _never_ be the same instance. We should try and fast path case where
             // everything is the same and return same instance in that case.
@@ -462,7 +472,7 @@ internal class TextController(val state: TextState) : RememberObserver {
             }
             state.previousGlobalPosition = newGlobalPosition
         }
-    }.heightInLines(state.textDelegate.style, state.textDelegate.minLines)
+    }
 
     /*@VisibleForTesting*/
     internal var semanticsModifier = createSemanticsModifierFor(state.textDelegate.text)
@@ -487,6 +497,11 @@ internal class TextController(val state: TextState) : RememberObserver {
 
     val modifiers: Modifier
         get() = coreModifiers
+            // This is more correct here since before this modifier was created once, with the
+            // initial style and minLines, and then never got updates to those values. Here it gets
+            // created every time it's read, i.e. every recomposition, so it will always have the
+            // latest values.
+            .heightInLines(state.textDelegate.style, state.textDelegate.minLines)
             .then(semanticsModifier)
             .then(selectionModifiers)
 
@@ -515,8 +530,7 @@ internal class TextController(val state: TextState) : RememberObserver {
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
-    /** Should *NEVER* be set directly, only through [TextController.setTextDelegate] */
-    var textDelegate: TextDelegate,
+    textDelegate: TextDelegate,
     /** The selectable Id assigned to the [selectable] */
     val selectableId: Long
 ) {
@@ -527,6 +541,13 @@ internal class TextState(
 
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null
+
+    /** Should *NEVER* be set directly, only through [TextController.setTextDelegate] */
+    var textDelegate: TextDelegate = textDelegate
+        set(value) {
+            layoutInvalidation = Unit
+            field = value
+        }
 
     /** The latest TextLayoutResult calculated in the measure block.*/
     var layoutResult: TextLayoutResult? = null
@@ -543,6 +564,8 @@ internal class TextState(
 
     /** Read in draw scopes to invalidate when layoutResult  */
     var drawScopeInvalidation by mutableStateOf(Unit, neverEqualPolicy())
+        private set
+    var layoutInvalidation by mutableStateOf(Unit, neverEqualPolicy())
         private set
 }
 

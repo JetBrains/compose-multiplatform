@@ -141,7 +141,7 @@ fun DrawModifierNodeSample() {
         }
     }
     fun Modifier.circle(color: Color) = this then modifierElementOf(
-        params = color,
+        key = color,
         create = { CircleNode(color) },
         update = { it.color = color },
         definitions = {
