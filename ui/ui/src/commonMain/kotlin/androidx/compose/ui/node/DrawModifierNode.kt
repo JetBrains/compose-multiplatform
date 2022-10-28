@@ -35,4 +35,8 @@ interface DrawModifierNode : DelegatableNode {
 }
 
 @ExperimentalComposeUiApi
-internal fun DrawModifierNode.requestDraw() = requireLayoutNode().invalidateLayer()
+internal fun DrawModifierNode.requestDraw() {
+    if (node.isAttached) {
+        requireCoordinator(Nodes.Any).invalidateLayer()
+    }
+}

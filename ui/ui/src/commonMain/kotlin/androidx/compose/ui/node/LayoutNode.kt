@@ -1178,6 +1178,22 @@ internal class LayoutNode(
      */
     internal fun markLookaheadLayoutPending() = layoutDelegate.markLookaheadLayoutPending()
 
+    @OptIn(ExperimentalComposeUiApi::class)
+    fun invalidateSubtree(isRootOfInvalidation: Boolean = true) {
+        if (isRootOfInvalidation) {
+            parent?.invalidateLayer()
+            // Invalidate semantics. We can do this once because there isn't a node-by-node
+            // invalidation mechanism.
+            requireOwner().onSemanticsChange()
+        }
+        requestRemeasure()
+        nodes.headToTail(Nodes.Layout) {
+            it.requireCoordinator(Nodes.Layout).layer?.invalidate()
+        }
+        // TODO: invalidate parent data
+        _children.forEach { it.invalidateSubtree(false) }
+    }
+
     /**
      * Marks the layoutNode dirty for another lookahead measure pass.
      */

@@ -2425,6 +2425,7 @@ package androidx.compose.ui.node {
   }
 
   public final class DelegatableNodeKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateSubtree(androidx.compose.ui.node.DelegatableNode);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public abstract class DelegatingNode extends androidx.compose.ui.Modifier.Node {
