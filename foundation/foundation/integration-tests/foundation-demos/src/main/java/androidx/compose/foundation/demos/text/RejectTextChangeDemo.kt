@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.sp
 
 @Preview
 @Composable
-fun InputFieldTrickyUseCase() {
+fun RejectTextChangeDemo() {
     LazyColumn {
         item {
             TagLine(tag = "don't set if non number is added")

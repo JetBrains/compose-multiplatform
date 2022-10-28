@@ -22,8 +22,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 val TextDemos = DemoCategory(
     "Text",
     listOf(
-        ComposableDemo("Hyphens") { TextDemoHyphens() },
-        ComposableDemo("Static text") { TextDemo() },
+        ComposableDemo("Text Accessibility") { TextAccessibilityDemo() },
         DemoCategory(
             "Text Canvas",
             listOf(
@@ -32,57 +31,89 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Stroke") { TextStrokeDemo() }
             )
         ),
-        ComposableDemo("Ellipsize") { EllipsizeDemo() },
-        ComposableDemo("Typeface") { TypefaceDemo() },
-        ComposableDemo("Variable Fonts") { VariableFontsDemo() },
-        ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
-        ComposableDemo("All system font families") { SystemFontFamilyDemo() },
-        ComposableDemo("Text selection") { TextSelectionDemo() },
-        ComposableDemo("Text selection sample") { TextSelectionSample() },
-        ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
-        ComposableDemo("IncludeFontPadding & Clip") { TextFontPaddingDemo() },
-        ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
-        ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
-        ComposableDemo("Interactive text") { InteractiveTextDemo() },
-        ComposableDemo("Min/max lines") { BasicTextMinMaxLinesDemo() },
-        ComposableDemo("Ellipsize and letterspacing") { EllipsizeWithLetterSpacing() },
-        ComposableDemo("Line breaking") { TextLineBreakingDemo() },
         DemoCategory(
-            "Text Overflow",
+            "Text Layout",
             listOf(
-                ComposableDemo("TextOverflow demo") { TextOverflowDemo() },
-                ComposableDemo("Visible overflow in drawText") {
-                    TextOverflowVisibleInDrawText()
-                },
-                ComposableDemo("Visible overflow in Popup") { TextOverflowVisibleInPopupDemo() }
+                ComposableDemo("Static text") { TextDemo() },
+                DemoCategory(
+                    "Line breaking",
+                    listOf(
+                        ComposableDemo("Line breaking") { TextLineBreakingDemo() },
+                        ComposableDemo("Hyphens") { TextDemoHyphens() },
+                        ComposableDemo("Ellipsize") { EllipsizeDemo() },
+                        ComposableDemo("Ellipsize and letterspacing") {
+                            EllipsizeWithLetterSpacing()
+                        },
+                    )
+                ),
+                DemoCategory(
+                    "Text Overflow",
+                    listOf(
+                        ComposableDemo("TextOverflow demo") { TextOverflowDemo() },
+                        ComposableDemo("Visible overflow in drawText") {
+                            TextOverflowVisibleInDrawText()
+                        },
+                        ComposableDemo("Visible overflow in Popup") {
+                            TextOverflowVisibleInPopupDemo()
+                        },
+                        ComposableDemo("Min/max lines") { BasicTextMinMaxLinesDemo() },
+                    )
+                ),
+                ComposableDemo("IncludeFontPadding & Clip") { TextFontPaddingDemo() },
+                ComposableDemo("Line Height Behavior") { TextLineHeightDemo() },
+                ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
+                ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
+                ComposableDemo("Interactive text") { InteractiveTextDemo() },
             )
         ),
         DemoCategory(
-            "Input fields",
+            "Fonts",
+            listOf(
+                ComposableDemo("Typeface") { TypefaceDemo() },
+                ComposableDemo("Variable Fonts") { VariableFontsDemo() },
+                ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
+                ComposableDemo("All system font families") { SystemFontFamilyDemo() },
+            )
+        ),
+        DemoCategory(
+            "Text Input",
             listOf(
                 ComposableDemo("Basic input fields") { InputFieldDemo() },
-                ComposableDemo("Keyboard Types") { KeyboardTypeDemo() },
-                ComposableDemo("Ime Action") { ImeActionDemo() },
-                ComposableDemo("Various input fields") { VariousInputFieldDemo() },
-                ComposableDemo("Tricky input field") { InputFieldTrickyUseCase() },
-                ComposableDemo("Focus transition") { TextFieldFocusTransition() },
-                ComposableDemo("Focus keyboard interaction") {
-                    TextFieldFocusKeyboardInteraction()
+                ComposableDemo("Capitalization/AutoCorrect") {
+                    CapitalizationAutoCorrectDemo()
                 },
-                ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
-                ComposableDemo("Scrollable text fields") { ScrollableTextFieldDemo() },
-                ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
+                ComposableDemo("Cursor configuration") { TextFieldCursorBlinkingDemo() },
+                DemoCategory(
+                    "Focus",
+                    listOf(
+                        ComposableDemo("Focus transition") { TextFieldFocusTransition() },
+                        ComposableDemo("Focus keyboard interaction") {
+                            TextFieldFocusKeyboardInteraction()
+                        },
+                    )
+                ),
+                ComposableDemo("Full-screen field") { FullScreenTextFieldDemo() },
+                ComposableDemo("Ime Action") { ImeActionDemo() },
                 ComposableDemo("Ime SingleLine") { ImeSingleLineDemo() },
-                ComposableDemo("Capitalization/AutoCorrect") { CapitalizationAutoCorrectDemo() },
-                ComposableDemo("TextFieldValue") { TextFieldValueDemo() },
                 ComposableDemo("Inside Dialog") { onNavigateUp ->
                     DialogInputFieldDemo(onNavigateUp)
                 },
                 ComposableDemo("Inside scrollable") { TextFieldsInScrollableDemo() },
-                ComposableDemo("Cursor configuration") { TextFieldCursorBlinkingDemo() },
-                ComposableDemo("Full-screen field") { FullScreenTextFieldDemo() },
+                ComposableDemo("Keyboard Types") { KeyboardTypeDemo() },
+                ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
+                ComposableDemo("Reject Text Change") { RejectTextChangeDemo() },
+                ComposableDemo("Scrollable text fields") { ScrollableTextFieldDemo() },
+                ComposableDemo("Visual Transformation") { VisualTransformationDemo() },
+                ComposableDemo("TextFieldValue") { TextFieldValueDemo() },
+                ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
             )
         ),
-        ComposableDemo("Text Accessibility") { TextAccessibilityDemo() }
+        DemoCategory(
+            "Selection",
+            listOf(
+                ComposableDemo("Text selection") { TextSelectionDemo() },
+                ComposableDemo("Text selection sample") { TextSelectionSample() },
+            )
+        )
     )
 )

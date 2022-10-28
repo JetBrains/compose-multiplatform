@@ -86,7 +86,7 @@ private fun DefaultCursor() {
         text = "Normal blink",
         selection = TextRange(3)
     )
-    BasicTextField(value = textFieldValue, onValueChange = {})
+    BasicTextField(value = textFieldValue, modifier = demoTextFieldModifiers, onValueChange = {})
 }
 
 @Composable
@@ -97,6 +97,7 @@ private fun ColorCursor() {
     )
     BasicTextField(
         value = textFieldValue,
+        modifier = demoTextFieldModifiers,
         onValueChange = {},
         cursorBrush = SolidColor(Color.Red)
     )
@@ -130,7 +131,7 @@ private fun RainbowCursor() {
         value = textFieldValue,
         onValueChange = {},
         cursorBrush = SolidColor(color.value),
-        modifier = Modifier.onFocusChanged { shouldAnimate = it.isFocused }
+        modifier = demoTextFieldModifiers.onFocusChanged { shouldAnimate = it.isFocused }
     )
 }
 
@@ -143,6 +144,7 @@ private fun GradientCursor() {
 
     BasicTextField(
         value = textFieldValue,
+        modifier = demoTextFieldModifiers,
         onValueChange = {},
         cursorBrush = Brush.verticalGradient(colors = Rainbow),
     )
@@ -168,7 +170,7 @@ fun TypingCursorNeverBlinks() {
     BasicTextField(
         value = textFieldValue,
         onValueChange = {},
-        modifier = Modifier.onFocusChanged { animate = it.isFocused }
+        modifier = demoTextFieldModifiers.onFocusChanged { animate = it.isFocused }
     )
 }
 
@@ -190,6 +192,7 @@ fun ChangingSelectionShowsCursor() {
     Column {
         BasicTextField(
             value = textFieldValue,
+            modifier = demoTextFieldModifiers,
             onValueChange = {},
             textStyle = TextStyle.Default.copy(fontFamily = FontFamily.Monospace)
         )
