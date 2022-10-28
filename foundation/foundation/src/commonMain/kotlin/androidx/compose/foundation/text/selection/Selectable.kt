@@ -120,4 +120,6 @@ internal interface Selectable {
      * actual text if the selectable contains other types of content.
      */
     fun getRangeOfLineContaining(offset: Int): TextRange
+
+    fun getLineHeight(offset: Int): Float = 0f
 }

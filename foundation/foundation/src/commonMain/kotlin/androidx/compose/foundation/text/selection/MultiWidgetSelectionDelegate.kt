@@ -130,6 +130,14 @@ internal class MultiWidgetSelectionDelegate(
             end = textLayoutResult.getLineEnd(line, visibleEnd = true)
         )
     }
+
+    override fun getLineHeight(offset: Int): Float {
+        val textLayoutResult = layoutResultCallback() ?: return 0f
+        val textLength = textLayoutResult.layoutInput.text.length
+        if (textLength < 1) return 0f
+        val line = textLayoutResult.getLineForOffset(offset.coerceIn(0, textLength - 1))
+        return textLayoutResult.multiParagraph.getLineHeight(line)
+    }
 }
 
 /**

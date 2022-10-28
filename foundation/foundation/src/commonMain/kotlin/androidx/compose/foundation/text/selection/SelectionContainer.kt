@@ -117,11 +117,17 @@ internal fun SelectionContainer(
                             }
 
                             if (position != null) {
+                                val lineHeight = if (isStartHandle) {
+                                    manager.startHandleLineHeight
+                                } else {
+                                    manager.endHandleLineHeight
+                                }
                                 SelectionHandle(
                                     position = position,
                                     isStartHandle = isStartHandle,
                                     direction = direction,
                                     handlesCrossed = it.handlesCrossed,
+                                    lineHeight = lineHeight,
                                     modifier = Modifier.pointerInput(observer) {
                                         detectDownAndDragGesturesWithObserver(observer)
                                     },
