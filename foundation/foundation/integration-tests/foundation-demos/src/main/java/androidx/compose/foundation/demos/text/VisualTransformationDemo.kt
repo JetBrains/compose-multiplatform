@@ -153,7 +153,7 @@ private fun emailOffsetTranslator(text: String) = object : OffsetMapping {
 
 @Preview
 @Composable
-fun VariousInputFieldDemo() {
+fun VisualTransformationDemo() {
     LazyColumn {
         item {
             TagLine(tag = "Capitalization")
