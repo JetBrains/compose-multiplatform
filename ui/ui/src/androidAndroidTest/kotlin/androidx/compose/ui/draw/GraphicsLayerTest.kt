@@ -18,6 +18,8 @@ package androidx.compose.ui.draw
 
 import android.os.Build
 import android.view.View
+import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -43,8 +45,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.BlurEffect
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.OffsetEffect
 import androidx.compose.ui.graphics.Outline
@@ -1147,6 +1151,125 @@ class GraphicsLayerTest {
 
         rule.runOnIdle {
             assertEquals(2f, valueReadInGraphicsLayer)
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Test
+    fun testCompositingStrategyModulateAlpha() {
+        val tag = "testTag"
+        val dimen = 200
+        rule.setContent {
+            Canvas(
+                modifier =
+                Modifier.testTag(tag)
+                    .size((dimen / LocalDensity.current.density).dp)
+                    .background(Color.Black)
+                    .graphicsLayer(
+                        alpha = 0.5f,
+                        compositingStrategy = CompositingStrategy.ModulateAlpha
+                    )
+            ) {
+                inset(0f, 0f, size.width / 3, size.height / 3) {
+                    drawRect(color = Color.Red)
+                }
+                inset(size.width / 3, size.height / 3, 0f, 0f) {
+                    drawRect(color = Color.Blue)
+                }
+            }
+        }
+
+        rule.onNodeWithTag(tag).captureToImage().apply {
+            with(toPixelMap()) {
+                val redWithAlpha = Color.Red.copy(alpha = 0.5f)
+                val blueWithAlpha = Color.Blue.copy(alpha = 0.5f)
+                val bg = Color.Black
+                val expectedTopLeft = redWithAlpha.compositeOver(bg)
+                val expectedBottomRight = blueWithAlpha.compositeOver(bg)
+                val expectedCenter = blueWithAlpha.compositeOver(redWithAlpha).compositeOver(bg)
+                assertPixelColor(expectedTopLeft, 0, 0)
+                assertPixelColor(Color.Black, width - 1, 0)
+                assertPixelColor(expectedBottomRight, width - 1, height - 1)
+                assertPixelColor(Color.Black, 0, height - 1)
+                assertPixelColor(expectedCenter, width / 2, height / 2)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Test
+    fun testCompositingStrategyAlways() {
+        val tag = "testTag"
+        val dimen = 200
+        rule.setContent {
+            Canvas(
+                modifier =
+                Modifier.testTag(tag)
+                    .size((dimen / LocalDensity.current.density).dp)
+                    .background(Color.LightGray)
+                    .graphicsLayer(
+                        compositingStrategy = CompositingStrategy.Always
+                    )
+            ) {
+                inset(0f, 0f, size.width / 3, size.height / 3) {
+                    drawRect(color = Color.Red)
+                }
+                inset(size.width / 3, size.height / 3, 0f, 0f) {
+                    drawRect(color = Color.Blue, blendMode = BlendMode.Xor)
+                }
+            }
+        }
+
+        rule.onNodeWithTag(tag).captureToImage().apply {
+            with(toPixelMap()) {
+                assertPixelColor(Color.Red, 0, 0)
+                assertPixelColor(Color.LightGray, width - 1, 0)
+                assertPixelColor(Color.Blue, width - 1, height - 1)
+                assertPixelColor(Color.LightGray, 0, height - 1)
+                assertPixelColor(Color.LightGray, width / 2, height / 2)
+            }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Test
+    fun testCompositingStrategyAuto() {
+        val tag = "testTag"
+        val dimen = 200
+        rule.setContent {
+            Canvas(
+                modifier =
+                Modifier.testTag(tag)
+                    .size((dimen / LocalDensity.current.density).dp)
+                    .background(Color.Black)
+                    .graphicsLayer(
+                        alpha = 0.5f,
+                        compositingStrategy = CompositingStrategy.Auto
+                    )
+            ) {
+                inset(0f, 0f, size.width / 3, size.height / 3) {
+                    drawRect(color = Color.Red)
+                }
+                inset(size.width / 3, size.height / 3, 0f, 0f) {
+                    drawRect(color = Color.Blue)
+                }
+            }
+        }
+
+        rule.onNodeWithTag(tag).captureToImage().apply {
+            with(toPixelMap()) {
+                val redWithAlpha = Color.Red.copy(alpha = 0.5f)
+                val blueWithAlpha = Color.Blue.copy(alpha = 0.5f)
+                val bg = Color.Black
+                val expectedTopLeft = redWithAlpha.compositeOver(bg)
+                val expectedBottomRight = blueWithAlpha.compositeOver(bg)
+                val expectedCenter = blueWithAlpha.compositeOver(bg)
+                assertPixelColor(expectedTopLeft, 0, 0)
+                assertPixelColor(Color.Black, width - 1, 0)
+                assertPixelColor(expectedBottomRight, width - 1, height - 1)
+                assertPixelColor(Color.Black, 0, height - 1)
+                assertPixelColor(expectedCenter, width / 2, height / 2)
+            }
         }
     }
 }

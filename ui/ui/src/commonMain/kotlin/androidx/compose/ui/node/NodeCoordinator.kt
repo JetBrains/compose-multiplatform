@@ -469,6 +469,7 @@ internal abstract class NodeCoordinator(
                 shape = graphicsLayerScope.shape,
                 clip = graphicsLayerScope.clip,
                 renderEffect = graphicsLayerScope.renderEffect,
+                compositingStrategy = graphicsLayerScope.compositingStrategy,
                 layoutDirection = layoutNode.layoutDirection,
                 density = layoutNode.density
             )

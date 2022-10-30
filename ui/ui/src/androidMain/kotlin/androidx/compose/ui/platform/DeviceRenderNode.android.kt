@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import android.graphics.Outline
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RenderEffect
 
@@ -52,6 +53,7 @@ internal interface DeviceRenderNode {
     var alpha: Float
     var renderEffect: RenderEffect?
     val hasDisplayList: Boolean
+    var compositingStrategy: CompositingStrategy
 
     fun setOutline(outline: Outline?)
     fun setPosition(left: Int, top: Int, right: Int, bottom: Int): Boolean
@@ -109,5 +111,6 @@ internal data class DeviceRenderNodeData(
     var clipToOutline: Boolean,
     var clipToBounds: Boolean,
     var alpha: Float,
-    var renderEffect: RenderEffect?
+    var renderEffect: RenderEffect?,
+    var compositingStrategy: CompositingStrategy
 )

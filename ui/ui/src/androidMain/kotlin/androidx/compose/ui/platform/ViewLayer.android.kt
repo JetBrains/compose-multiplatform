@@ -27,6 +27,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RectangleShape
@@ -84,6 +85,8 @@ internal class ViewLayer(
      */
     private var mTransformOrigin: TransformOrigin = TransformOrigin.Center
 
+    private var mHasOverlappingRendering = true
+
     init {
         setWillNotDraw(false) // we WILL draw
         id = generateViewId()
@@ -140,6 +143,7 @@ internal class ViewLayer(
         renderEffect: RenderEffect?,
         ambientShadowColor: Color,
         spotShadowColor: Color,
+        compositingStrategy: CompositingStrategy,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -187,6 +191,26 @@ internal class ViewLayer(
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             ViewLayerVerificationHelper31.setRenderEffect(this, renderEffect)
         }
+
+        mHasOverlappingRendering = when (compositingStrategy) {
+            CompositingStrategy.Always -> {
+                setLayerType(LAYER_TYPE_HARDWARE, null)
+                true
+            }
+
+            CompositingStrategy.ModulateAlpha -> {
+                setLayerType(LAYER_TYPE_NONE, null)
+                false
+            }
+            else -> { // CompositingStrategy.Auto
+                setLayerType(LAYER_TYPE_NONE, null)
+                true
+            }
+        }
+    }
+
+    override fun hasOverlappingRendering(): Boolean {
+        return mHasOverlappingRendering
     }
 
     override fun isInLayer(position: Offset): Boolean {

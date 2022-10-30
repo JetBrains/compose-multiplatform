@@ -560,11 +560,25 @@ package androidx.compose.ui.focus {
 
 package androidx.compose.ui.graphics {
 
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class CompositingStrategy {
+    field public static final androidx.compose.ui.graphics.CompositingStrategy.Companion Companion;
+  }
+
+  public static final class CompositingStrategy.Companion {
+    method public int getAlways();
+    method public int getAuto();
+    method public int getModulateAlpha();
+    property public final int Always;
+    property public final int Auto;
+    property public final int ModulateAlpha;
+  }
+
   public final class GraphicsLayerModifierKt {
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional androidx.compose.ui.graphics.RenderEffect? renderEffect, optional long ambientShadowColor, optional long spotShadowColor);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional androidx.compose.ui.graphics.RenderEffect? renderEffect, optional long ambientShadowColor, optional long spotShadowColor, optional int compositingStrategy);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier graphicsLayer(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> block);
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier! graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip);
     method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier! graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional androidx.compose.ui.graphics.RenderEffect? renderEffect);
+    method @Deprecated @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier! graphicsLayer(androidx.compose.ui.Modifier, optional float scaleX, optional float scaleY, optional float alpha, optional float translationX, optional float translationY, optional float shadowElevation, optional float rotationX, optional float rotationY, optional float rotationZ, optional float cameraDistance, optional long transformOrigin, optional androidx.compose.ui.graphics.Shape shape, optional boolean clip, optional androidx.compose.ui.graphics.RenderEffect? renderEffect, optional long ambientShadowColor, optional long spotShadowColor);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier toolingGraphicsLayer(androidx.compose.ui.Modifier);
   }
 
@@ -573,6 +587,7 @@ package androidx.compose.ui.graphics {
     method public default long getAmbientShadowColor();
     method public float getCameraDistance();
     method public boolean getClip();
+    method public default int getCompositingStrategy();
     method public default androidx.compose.ui.graphics.RenderEffect? getRenderEffect();
     method public float getRotationX();
     method public float getRotationY();
@@ -589,6 +604,7 @@ package androidx.compose.ui.graphics {
     method public default void setAmbientShadowColor(long);
     method public void setCameraDistance(float);
     method public void setClip(boolean);
+    method public default void setCompositingStrategy(int);
     method public default void setRenderEffect(androidx.compose.ui.graphics.RenderEffect?);
     method public void setRotationX(float);
     method public void setRotationY(float);
@@ -605,6 +621,7 @@ package androidx.compose.ui.graphics {
     property public default long ambientShadowColor;
     property public abstract float cameraDistance;
     property public abstract boolean clip;
+    property public default int compositingStrategy;
     property public default androidx.compose.ui.graphics.RenderEffect? renderEffect;
     property public abstract float rotationX;
     property public abstract float rotationY;
