@@ -347,7 +347,7 @@ class InspectableTests : ToolingTest() {
         assertEquals(
             "text, modifier, color, fontSize, fontStyle, fontWeight, fontFamily, " +
                 "letterSpacing, textDecoration, textAlign, lineHeight, overflow, softWrap, " +
-                "maxLines, onTextLayout, style",
+                "maxLines, minLines, onTextLayout, style",
             names.joinToString()
         )
     }
