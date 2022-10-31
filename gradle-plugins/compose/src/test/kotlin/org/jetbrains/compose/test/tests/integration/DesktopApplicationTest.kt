@@ -123,6 +123,32 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun gradleBuildCache() = with(testProject(TestProjects.jvm)) {
+        modifyGradleProperties {
+            setProperty("org.gradle.caching", "true")
+        }
+        modifyTextFile("settings.gradle") {
+            it + "\n" + """
+                buildCache {
+                    local {
+                        directory = new File(rootDir, 'build-cache')
+                    }
+                }
+            """.trimIndent()
+        }
+
+        val packagingTask = ":packageDistributionForCurrentOS"
+        gradle(packagingTask).build().checks { check ->
+            check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
+        }
+
+        gradle("clean", packagingTask).build().checks { check ->
+            check.taskOutcome(":checkRuntime", TaskOutcome.FROM_CACHE)
+            check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
+        }
+    }
+
+    @Test
     fun packageMpp() = with(testProject(TestProjects.mpp)) {
         testPackageJvmDistributions()
     }

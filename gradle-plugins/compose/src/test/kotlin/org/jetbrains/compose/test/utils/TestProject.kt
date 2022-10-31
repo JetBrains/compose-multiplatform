@@ -8,6 +8,7 @@ package org.jetbrains.compose.test.utils
 import org.gradle.testkit.runner.GradleRunner
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import java.io.File
+import java.util.Properties
 
 data class TestEnvironment(
     val workingDir: File,
@@ -77,5 +78,29 @@ class TestProject(
 
     fun file(path: String): File =
         testEnvironment.workingDir.resolve(path)
+
+    fun modifyTextFile(path: String, fn: (String) -> String) {
+        val file = file(path)
+        val oldContent = file.readText()
+        val newContent = fn(oldContent)
+        file.writeText(newContent)
+    }
+    fun modifyGradleProperties(fn: Properties.() -> Unit) {
+        val propertiesFile = file("gradle.properties")
+        val properties = Properties()
+        if (propertiesFile.exists()) {
+            propertiesFile.bufferedReader().use { reader ->
+                properties.load(reader)
+            }
+        }
+        fn(properties)
+        propertiesFile.delete()
+
+        if (properties.isNotEmpty()) {
+            propertiesFile.bufferedWriter().use { writer ->
+                properties.store(writer, null)
+            }
+        }
+    }
 }
 

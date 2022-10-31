@@ -58,7 +58,6 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         javaHome.set(app.javaHomeProvider)
-        javaRuntimePropertiesFile.set(jvmTmpDirForTask().file("properties.bin"))
     }
 
     val suggestRuntimeModules = tasks.register<AbstractSuggestModulesTask>(
