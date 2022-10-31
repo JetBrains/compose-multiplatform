@@ -53,10 +53,26 @@ internal expect fun SelectionHandle(
     isStartHandle: Boolean,
     direction: ResolvedTextDirection,
     handlesCrossed: Boolean,
-    lineHeight: Float = 0f,
+    lineHeight: Float,
     modifier: Modifier,
     content: @Composable (() -> Unit)?
 )
+
+@Composable
+internal fun SelectionHandle(
+    position: Offset,
+    isStartHandle: Boolean,
+    direction: ResolvedTextDirection,
+    handlesCrossed: Boolean,
+    modifier: Modifier,
+    content: @Composable (() -> Unit)?
+) {
+    SelectionHandle(
+        position, isStartHandle, direction,
+        handlesCrossed, 0f, modifier,
+        content
+    )
+}
 
 /**
  * Adjust coordinates for given text offset.
