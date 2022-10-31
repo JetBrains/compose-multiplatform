@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
@@ -206,6 +207,14 @@ interface GraphicsLayerScope : Density {
         // Keep the parameter name so current.txt maintains it for named parameter usage
         @Suppress("UNUSED_PARAMETER")
         set(compositingStrategy) {}
+
+    /**
+     * [Size] of the graphicsLayer represented in pixels. Drawing commands can extend beyond
+     * the size specified, however, if the graphicsLayer is promoted to an offscreen rasterization
+     * layer, any content rendered outside of the specified size will be clipped.
+     */
+    val size: Size
+        get() = Size.Zero
 }
 
 /**
@@ -230,6 +239,7 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
     override var shape: Shape = RectangleShape
     override var clip: Boolean = false
     override var compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
+    override var size: Size = Size.Zero
 
     internal var graphicsDensity: Density = Density(1.0f)
 
@@ -259,5 +269,6 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
         clip = false
         renderEffect = null
         compositingStrategy = CompositingStrategy.Auto
+        size = Size.Zero
     }
 }
