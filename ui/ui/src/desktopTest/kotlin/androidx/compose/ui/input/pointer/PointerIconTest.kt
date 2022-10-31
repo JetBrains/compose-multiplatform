@@ -261,7 +261,9 @@ class PointerIconTest {
             scene.sendPointerEvent(PointerEventType.Move, Offset(90f, 95f))
             assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Default)
         } finally {
-            scene.close()
+            val toClose = scene
+            scene = null // otherwise, invalidate (scene?.render...) crashes
+            toClose.close()
         }
     }
 
