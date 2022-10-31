@@ -26,8 +26,10 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation
 import androidx.compose.ui.tooling.animation.states.TargetState
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 
 /**
  * [ComposeAnimationClock] for [AnimateXAsStateComposeAnimation].
@@ -126,6 +128,14 @@ internal class AnimateXAsStateClock<T, V : AnimationVector>(
                             par2[3] as Float
                         ),
                     )
+
+                    is Dp -> {
+                        if (parametersHasTheSameType(currentValue!!, par1[0]!!, par2[0]!!))
+                            TargetState(par1[0], par2[0]) else TargetState(
+                            (par1[0] as Float).dp, (par2[0] as Float).dp
+                        )
+                    }
+
                     else -> {
                         if (parametersAreValid(par1[0], par2[0]) &&
                             parametersHasTheSameType(currentValue!!, par1[0]!!, par2[0]!!)
