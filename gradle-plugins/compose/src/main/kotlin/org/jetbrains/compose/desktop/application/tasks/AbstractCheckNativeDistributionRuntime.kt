@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.Directory
+import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -23,14 +24,17 @@ internal const val MIN_JAVA_RUNTIME_VERSION = 15
 
 @CacheableTask
 abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTask() {
-    @get:Input
+    @get:PathSensitive(PathSensitivity.ABSOLUTE)
+    @get:InputDirectory
     val javaHome: Property<String> = objects.notNullProperty()
 
+    private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
+
     @get:OutputFile
-    val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
+    val javaRuntimePropertiesFile: Provider<RegularFile> = taskDir.map { it.file("properties.bin") }
 
     @get:LocalState
-    val workingDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/$name")
+    val workingDir: Provider<Directory> = taskDir.map { it.dir("localState") }
 
     private val javaExec: File
         get() = getTool("java")
@@ -47,6 +51,8 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
 
     @TaskAction
     fun run() {
+        taskDir.ioFile.mkdirs()
+
         val javaRuntimeVersion = try {
             getJavaRuntimeVersionUnsafe()?.toIntOrNull() ?: -1
         } catch (e: Exception) {
