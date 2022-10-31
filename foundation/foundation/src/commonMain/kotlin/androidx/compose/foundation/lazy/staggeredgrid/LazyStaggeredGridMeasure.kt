@@ -81,7 +81,9 @@ internal fun LazyLayoutMeasureScope.measureStaggeredGrid(
                 IntArray(resolvedSlotSums.size).apply {
                     // Try to adjust indices in case grid got resized
                     for (lane in indices) {
-                        this[lane] = if (lane < firstVisibleIndices.size) {
+                        this[lane] = if (
+                            lane < firstVisibleIndices.size && firstVisibleIndices[lane] != -1
+                        ) {
                             firstVisibleIndices[lane]
                         } else {
                             if (lane == 0) {

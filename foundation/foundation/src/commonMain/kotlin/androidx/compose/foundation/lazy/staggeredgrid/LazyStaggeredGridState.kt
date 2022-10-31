@@ -93,7 +93,11 @@ class LazyStaggeredGridState private constructor(
      * each scroll, potentially causing performance issues.
      */
     val firstVisibleItemIndex: Int
-        get() = scrollPosition.indices.minOrNull() ?: 0
+        get() = scrollPosition.indices.minOfOrNull {
+            // index array can contain -1, indicating lane being empty (cell number > itemCount)
+            // if any of the lanes are empty, we always on 0th item index
+            if (it == -1) 0 else it
+        } ?: 0
 
     /**
      * Current offset of the item with [firstVisibleItemIndex] relative to the container start.
