@@ -1569,6 +1569,110 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
     }
 
+    @Test
+    fun animatingItemsWithPreviousIndexLargerThanTheNewItemCount() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6, 7))
+        val gridSize = itemSize * 2 - 1
+        rule.setContent {
+            LazyGrid(2, maxSize = with(rule.density) { gridSize.toDp() }) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertLayoutInfoPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(itemSize, 0),
+            2 to AxisIntOffset(0, itemSize),
+            3 to AxisIntOffset(itemSize, itemSize)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 2, 4, 6)
+        }
+
+        onAnimationFrame { fraction ->
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                add(0 to AxisIntOffset(0, 0))
+                add(
+                    2 to AxisIntOffset(
+                        (itemSize * fraction).roundToInt(),
+                        (itemSize * (1f - fraction)).roundToInt()
+                    )
+                )
+                    val item4MainAxis = itemSize + (itemSize * (1f - fraction)).roundToInt()
+                if (item4MainAxis < gridSize) {
+                    add(
+                        4 to AxisIntOffset(0, item4MainAxis)
+                    )
+                }
+                val item6MainAxis = itemSize + (itemSize * 2 * (1f - fraction)).roundToInt()
+                if (item6MainAxis < gridSize) {
+                    add(
+                        6 to AxisIntOffset(itemSize, item6MainAxis)
+                    )
+                }
+            }
+
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun animatingItemsWithPreviousIndexLargerThanTheNewItemCount_differentSpans() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6))
+        val gridSize = itemSize * 2 - 1
+        rule.setContent {
+            LazyGrid(2, maxSize = with(rule.density) { gridSize.toDp() }) {
+                items(list, key = { it }, span = {
+                    GridItemSpan(if (it == 6) maxLineSpan else 1)
+                }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertLayoutInfoPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(itemSize, 0),
+            2 to AxisIntOffset(0, itemSize),
+            3 to AxisIntOffset(itemSize, itemSize)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 4, 6)
+        }
+
+        onAnimationFrame { fraction ->
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                add(0 to AxisIntOffset(0, 0))
+                val item4MainAxis = (itemSize * 2 * (1f - fraction)).roundToInt()
+                if (item4MainAxis < gridSize) {
+                    add(
+                        4 to AxisIntOffset(itemSize, item4MainAxis)
+                    )
+                }
+                if (fraction == 1f) {
+                    val item6MainAxis = itemSize + (itemSize * 2 * (1f - fraction)).roundToInt()
+                    if (item6MainAxis < gridSize) {
+                        add(
+                            6 to AxisIntOffset(0, item6MainAxis)
+                        )
+                    }
+                }
+            }
+
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
     private fun AxisIntOffset(crossAxis: Int, mainAxis: Int) =
         if (isVertical) IntOffset(crossAxis, mainAxis) else IntOffset(mainAxis, crossAxis)
 
