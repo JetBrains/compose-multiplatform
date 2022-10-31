@@ -1,0 +1,34 @@
+import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.compose"
+}
+
+repositories {
+    jetbrainsCompose()
+}
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+    implementation compose.desktop.currentOs
+}
+
+compose.desktop {
+    application {
+        mainClass = "MainKt"
+        nativeDistributions {
+            targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
+
+            packageVersion = "1.0.0"
+            packageName = "TestPackage"
+            description = "Test description"
+            copyright = "Test Copyright Holder"
+            vendor = "Test Vendor"
+
+            javaHome = javaToolchains.launcherFor {
+                languageVersion.set(JavaLanguageVersion.of(CUSTOM_JAVA_TOOLCHAIN_VERSION_PLACEHOLDER))
+            }.get().metadata.installationPath.asFile.absolutePath
+        }
+    }
+}
