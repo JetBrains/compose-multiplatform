@@ -13,8 +13,26 @@ data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
-    val composeCompilerArtifact: String? = null
-)
+    val composeCompilerArtifact: String? = null,
+    val customJavaToolchainVersion: Int? = null
+) {
+    private val placeholders = linkedMapOf(
+        "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
+        "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
+        "COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER" to composeCompilerArtifact,
+        "CUSTOM_JAVA_TOOLCHAIN_VERSION_PLACEHOLDER" to customJavaToolchainVersion?.toString()
+    )
+
+    fun replacePlaceholdersInFile(file: File) {
+        var content = file.readText()
+        for ((placeholder, value) in placeholders.entries) {
+            if (value != null) {
+                content = content.replace(placeholder, value)
+            }
+        }
+        file.writeText(content)
+    }
+}
 
 class TestProject(
     private val name: String,
@@ -36,18 +54,10 @@ class TestProject(
 
             val target = testEnvironment.workingDir.resolve(orig.relativeTo(originalTestRoot))
             target.parentFile.mkdirs()
+            orig.copyTo(target)
 
             if (orig.name.endsWith(".gradle") || orig.name.endsWith(".gradle.kts")) {
-                val origContent = orig.readText()
-                var newContent = origContent
-                    .replace("COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER", testEnvironment.composeGradlePluginVersion)
-                    .replace("KOTLIN_VERSION_PLACEHOLDER", testEnvironment.kotlinVersion)
-                if (testEnvironment.composeCompilerArtifact != null) {
-                    newContent = newContent.replace("COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER", testEnvironment.composeCompilerArtifact)
-                }
-                target.writeText(newContent)
-            } else {
-                orig.copyTo(target)
+                testEnvironment.replacePlaceholdersInFile(target)
             }
         }
     }

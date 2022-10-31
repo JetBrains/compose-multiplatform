@@ -231,6 +231,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Optional
     val javaRuntimePropertiesFile: RegularFileProperty = objects.fileProperty()
 
+    private lateinit var jvmRuntimeInfo: JvmRuntimeProperties
+
     @get:Optional
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
@@ -339,7 +341,7 @@ abstract class AbstractJPackageTask @Inject constructor(
 
         if (targetFormat != TargetFormat.AppImage) {
             // Args, that can only be used, when creating an installer
-            if (currentOS == OS.MacOS && macAppStore.orNull == true) {
+            if (currentOS == OS.MacOS && jvmRuntimeInfo.majorVersion >= 18) {
                 // This is needed to prevent a directory does not exist error.
                 cliArg("--app-image", appImage.dir("${packageName.get()}.app"))
             } else {
@@ -444,7 +446,6 @@ abstract class AbstractJPackageTask @Inject constructor(
                 fileOperations.delete(tmpDirForSign)
                 tmpDirForSign.mkdirs()
 
-                val jvmRuntimeInfo = JvmRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
                 MacJarSignFileCopyingProcessor(
                     signer,
                     tmpDirForSign,
@@ -543,6 +544,8 @@ abstract class AbstractJPackageTask @Inject constructor(
     }
 
     override fun initState() {
+        jvmRuntimeInfo = JvmRuntimeProperties.readFromFile(javaRuntimePropertiesFile.ioFile)
+
         val mappingFile = libsMappingFile.ioFile
         if (mappingFile.exists()) {
             try {

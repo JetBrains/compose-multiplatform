@@ -127,6 +127,26 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageJvmDistributions()
     }
 
+    private fun customJavaHomeProject(javaVersion: Int): TestProject =
+        testProject(
+            TestProjects.customJavaHome,
+            defaultTestEnvironment.copy(customJavaToolchainVersion = javaVersion)
+        )
+
+    @Test
+    fun testJdk15() = with(customJavaHomeProject(15)) {
+        testPackageJvmDistributions()
+    }
+    @Test
+    fun testJdk18() = with(customJavaHomeProject(18)) {
+        testPackageJvmDistributions()
+    }
+
+    @Test
+    fun testJdk19() = with(customJavaHomeProject(19)) {
+        testPackageJvmDistributions()
+    }
+
     private fun TestProject.testPackageJvmDistributions() {
         val result = gradle(":packageDistributionForCurrentOS").build()
         val ext = when (currentOS) {
