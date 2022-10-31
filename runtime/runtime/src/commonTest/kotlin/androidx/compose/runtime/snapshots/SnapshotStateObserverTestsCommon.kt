@@ -447,7 +447,7 @@ class SnapshotStateObserverTestsCommon {
         runSimpleTest { stateObserver, state ->
             val derivedState = derivedStateOf { state.value }
 
-            stateObserver.observeReads("scope", { changes++ }) {
+            stateObserver.observeReads(ValueWrapper("scope"), { changes++ }) {
                 // read
                 derivedState.value
             }
@@ -463,7 +463,7 @@ class SnapshotStateObserverTestsCommon {
             val state = mutableStateOf(mutableListOf(42), referentialEqualityPolicy())
             val derivedState = derivedStateOf { state.value }
 
-            stateObserver.observeReads("scope", { changes++ }) {
+            stateObserver.observeReads(ValueWrapper("scope"), { changes++ }) {
                 // read
                 derivedState.value
             }
@@ -481,7 +481,7 @@ class SnapshotStateObserverTestsCommon {
             val derivedState = derivedStateOf { state.value }
             val derivedState2 = derivedStateOf { derivedState.value }
 
-            stateObserver.observeReads("scope", { changes++ }) {
+            stateObserver.observeReads(ValueWrapper("scope"), { changes++ }) {
                 // read
                 derivedState2.value
             }
@@ -497,7 +497,7 @@ class SnapshotStateObserverTestsCommon {
             val state = mutableStateOf(mutableListOf(1), referentialEqualityPolicy())
             val derivedState = derivedStateOf(referentialEqualityPolicy()) { state.value }
 
-            stateObserver.observeReads("scope", { changes++ }) {
+            stateObserver.observeReads(ValueWrapper("scope"), { changes++ }) {
                 // read
                 derivedState.value
             }
@@ -515,7 +515,7 @@ class SnapshotStateObserverTestsCommon {
             val state = mutableStateOf(mutableListOf(1), referentialEqualityPolicy())
             val derivedState = derivedStateOf(structuralEqualityPolicy()) { state.value }
 
-            stateObserver.observeReads("scope", { changes++ }) {
+            stateObserver.observeReads(ValueWrapper("scope"), { changes++ }) {
                 // read
                 derivedState.value
             }
@@ -532,7 +532,7 @@ class SnapshotStateObserverTestsCommon {
         runSimpleTest { stateObserver, state ->
             val derivedState = derivedStateOf { state.value >= 0 }
 
-            stateObserver.observeReads("scope", { changes++ }) {
+            stateObserver.observeReads(ValueWrapper("scope"), { changes++ }) {
                 // read derived state
                 derivedState.value
                 // read dependency
@@ -555,9 +555,10 @@ class SnapshotStateObserverTestsCommon {
                     null
                 }
             }
-            val onChange: (String) -> Unit = { changes++ }
+            val onChange: (ValueWrapper) -> Unit = { changes++ }
 
-            stateObserver.observeReads("scope", onChange) {
+            val scope = ValueWrapper("scope")
+            stateObserver.observeReads(scope, onChange) {
                 // read derived state
                 derivedState.value
             }
@@ -567,7 +568,7 @@ class SnapshotStateObserverTestsCommon {
             Snapshot.sendApplyNotifications()
             Snapshot.notifyObjectsInitialized()
 
-            stateObserver.observeReads("scope", onChange) {
+            stateObserver.observeReads(scope, onChange) {
                 // read derived state
                 derivedState.value
             }
@@ -582,14 +583,15 @@ class SnapshotStateObserverTestsCommon {
         runSimpleTest { stateObserver, state ->
             val derivedState = derivedStateOf { state.value }
 
-            val onChange: (String) -> Unit = { changes++ }
-            stateObserver.observeReads("scope", onChange) {
+            val onChange: (ValueWrapper) -> Unit = { changes++ }
+            stateObserver.observeReads(ValueWrapper("scope"), onChange) {
                 // read derived state
                 derivedState.value
             }
 
+            val scope2 = ValueWrapper("other scope")
             // read the same state in other scope
-            stateObserver.observeReads("other scope", onChange) {
+            stateObserver.observeReads(scope2, onChange) {
                 derivedState.value
             }
 
@@ -597,7 +599,7 @@ class SnapshotStateObserverTestsCommon {
             Snapshot.notifyObjectsInitialized()
 
             // stop observing state in other scope
-            stateObserver.observeReads("other scope", onChange) {
+            stateObserver.observeReads(scope2, onChange) {
                 /* no-op */
             }
         }
