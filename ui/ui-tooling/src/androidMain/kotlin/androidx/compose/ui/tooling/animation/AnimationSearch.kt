@@ -146,7 +146,8 @@ internal class AnimationSearch {
 
         @Suppress("UNCHECKED_CAST")
         private fun <T> findAnimationSpec(group: CallGroup): AnimationSpec<T>? {
-            return group.children.filter { it.name == REMEMBER_UPDATED_STATE }
+            val rememberStates = group.children.filter { it.name == REMEMBER_UPDATED_STATE }
+            return (rememberStates + rememberStates.flatMap { it.children })
                 .flatMap { it.data }
                 .filterIsInstance<State<T>>().map { it.value }
                 .filterIsInstance<AnimationSpec<T>>().firstOrNull()
