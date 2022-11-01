@@ -258,18 +258,21 @@ internal suspend fun PointerInputScope.detectTapAndPress(
     }
 }
 
-/**
- * Reads events until the first down is received. If [requireUnconsumed] is `true` and the first
- * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
- */
+@Deprecated(
+    "Maintained for binary compatibility. Use version with PointerEventPass instead.",
+    level = DeprecationLevel.HIDDEN)
 suspend fun AwaitPointerEventScope.awaitFirstDown(
     requireUnconsumed: Boolean = true
 ): PointerInputChange =
-    awaitFirstDownOnPass(pass = PointerEventPass.Main, requireUnconsumed = requireUnconsumed)
+    awaitFirstDown(requireUnconsumed = requireUnconsumed, pass = PointerEventPass.Main)
 
-internal suspend fun AwaitPointerEventScope.awaitFirstDownOnPass(
-    pass: PointerEventPass,
-    requireUnconsumed: Boolean
+/**
+ * Reads events until the first down is received in the given [pass]. If [requireUnconsumed] is
+ * `true` and the first down is already consumed in the pass, that gesture is ignored.
+ */
+suspend fun AwaitPointerEventScope.awaitFirstDown(
+    requireUnconsumed: Boolean = true,
+    pass: PointerEventPass = PointerEventPass.Main,
 ): PointerInputChange {
     var event: PointerEvent
     do {
@@ -282,16 +285,24 @@ internal suspend fun AwaitPointerEventScope.awaitFirstDownOnPass(
     return event.changes[0]
 }
 
+@Deprecated(
+    "Maintained for binary compatibility. Use version with PointerEventPass instead.",
+    level = DeprecationLevel.HIDDEN)
+suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange? =
+    waitForUpOrCancellation(PointerEventPass.Main)
+
 /**
- * Reads events until all pointers are up or the gesture was canceled. The gesture
- * is considered canceled when a pointer leaves the event region, a position change
- * has been consumed or a pointer down change event was consumed in the [PointerEventPass.Main]
+ * Reads events in the given [pass] until all pointers are up or the gesture was canceled.
+ * The gesture is considered canceled when a pointer leaves the event region, a position
+ * change has been consumed or a pointer down change event was already consumed in the given
  * pass. If the gesture was not canceled, the final up change is returned or `null` if the
  * event was canceled.
  */
-suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange? {
+suspend fun AwaitPointerEventScope.waitForUpOrCancellation(
+    pass: PointerEventPass = PointerEventPass.Main
+): PointerInputChange? {
     while (true) {
-        val event = awaitPointerEvent(PointerEventPass.Main)
+        val event = awaitPointerEvent(pass)
         if (event.changes.fastAll { it.changedToUp() }) {
             // All pointers are up
             return event.changes[0]
@@ -305,7 +316,7 @@ suspend fun AwaitPointerEventScope.waitForUpOrCancellation(): PointerInputChange
         }
 
         // Check for cancel by position consumption. We can look on the Final pass of the
-        // existing pointer event because it comes after the Main pass we checked above.
+        // existing pointer event because it comes after the pass we checked above.
         val consumeCheck = awaitPointerEvent(PointerEventPass.Final)
         if (consumeCheck.changes.fastAny { it.isConsumed }) {
             return null
