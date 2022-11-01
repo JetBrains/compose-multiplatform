@@ -19,6 +19,7 @@ package androidx.compose.ui.draw
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.DefaultShadowColor
@@ -65,7 +66,8 @@ class GraphicsLayerModifierTest {
             ValueElement("cameraDistance", DefaultCameraDistance),
             ValueElement("transformOrigin", TransformOrigin.Center),
             ValueElement("shape", RectangleShape),
-            ValueElement("clip", false)
+            ValueElement("clip", false),
+            ValueElement("compositingStrategy", CompositingStrategy.Auto)
         )
     }
 

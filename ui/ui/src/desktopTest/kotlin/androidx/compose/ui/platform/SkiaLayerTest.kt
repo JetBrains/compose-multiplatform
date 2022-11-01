@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
@@ -391,12 +392,14 @@ class SkiaLayerTest {
         transformOrigin: TransformOrigin = TransformOrigin.Center,
         shape: Shape = RectangleShape,
         clip: Boolean = false,
-        renderEffect: RenderEffect? = null
+        renderEffect: RenderEffect? = null,
+        compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
             rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, renderEffect,
-            ambientShadowColor, spotShadowColor, LayoutDirection.Ltr, Density(1f, 1f)
+            ambientShadowColor, spotShadowColor, compositingStrategy, LayoutDirection.Ltr,
+            Density(1f, 1f)
         )
     }
 }

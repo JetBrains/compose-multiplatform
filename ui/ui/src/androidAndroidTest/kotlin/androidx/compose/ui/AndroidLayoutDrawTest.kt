@@ -57,6 +57,7 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
@@ -186,7 +187,132 @@ class AndroidLayoutDrawTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.Q)
+    @Test
+    fun testCompositingStrategyAuto() {
+        drawLatch = CountDownLatch(1)
+        var compositingApplied = false
+        activity.runOnUiThread {
+            compositingApplied = when (Build.VERSION.SDK_INT) {
+                // Use public RenderNode API
+                in Build.VERSION_CODES.Q..Int.MAX_VALUE ->
+                    verifyRenderNode29CompositingStrategy(
+                        CompositingStrategy.Auto,
+                        expectedCompositing = false,
+                        expectedOverlappingRendering = true
+                    )
+                // Cannot access private APIs on P
+                Build.VERSION_CODES.P ->
+                    verifyViewLayerCompositingStrategy(
+                        CompositingStrategy.Auto,
+                        View.LAYER_TYPE_NONE,
+                        true
+                    )
+                // Use stub access to framework RenderNode API
+                in Build.VERSION_CODES.M..Int.MAX_VALUE ->
+                    verifyRenderNode23CompositingStrategy(
+                        CompositingStrategy.Auto,
+                        expectedLayerType = View.LAYER_TYPE_NONE,
+                        expectedOverlappingRendering = true
+                    )
+                // No RenderNodes, use Views instead
+                else ->
+                    verifyViewLayerCompositingStrategy(
+                        CompositingStrategy.Auto,
+                        View.LAYER_TYPE_NONE,
+                    true
+                    )
+            }
+            drawLatch.countDown()
+        }
+
+        drawLatch.await(1, TimeUnit.SECONDS)
+        assertTrue(compositingApplied)
+    }
+
+    @Test
+    fun testCompositingStrategyModulateAlpha() {
+        drawLatch = CountDownLatch(1)
+        var compositingApplied = false
+        activity.runOnUiThread {
+            compositingApplied = when (Build.VERSION.SDK_INT) {
+                // Use public RenderNode API
+                in Build.VERSION_CODES.Q..Int.MAX_VALUE ->
+                    verifyRenderNode29CompositingStrategy(
+                        CompositingStrategy.ModulateAlpha,
+                        expectedCompositing = false,
+                        expectedOverlappingRendering = false
+                    )
+                // Cannot access private APIs on P
+                Build.VERSION_CODES.P ->
+                    verifyViewLayerCompositingStrategy(
+                        CompositingStrategy.ModulateAlpha,
+                        View.LAYER_TYPE_NONE,
+                        false
+                    )
+                // Use stub access to framework RenderNode API
+                in Build.VERSION_CODES.M..Int.MAX_VALUE ->
+                    verifyRenderNode23CompositingStrategy(
+                        CompositingStrategy.ModulateAlpha,
+                        expectedLayerType = View.LAYER_TYPE_NONE,
+                        expectedOverlappingRendering = false
+                    )
+                // No RenderNodes, use Views instead
+                else ->
+                    verifyViewLayerCompositingStrategy(
+                        CompositingStrategy.ModulateAlpha,
+                        View.LAYER_TYPE_NONE,
+                        false
+                    )
+            }
+            drawLatch.countDown()
+        }
+
+        drawLatch.await(1, TimeUnit.SECONDS)
+        assertTrue(compositingApplied)
+    }
+
+    @Test
+    fun testCompositingStrategyAlways() {
+        drawLatch = CountDownLatch(1)
+        var compositingApplied = false
+        activity.runOnUiThread {
+            compositingApplied = when (Build.VERSION.SDK_INT) {
+                // Use public RenderNode API
+                in Build.VERSION_CODES.Q..Int.MAX_VALUE ->
+                    verifyRenderNode29CompositingStrategy(
+                        CompositingStrategy.Always,
+                        expectedCompositing = true,
+                        expectedOverlappingRendering = true
+                    )
+                // Cannot access private APIs on P
+                Build.VERSION_CODES.P ->
+                    verifyViewLayerCompositingStrategy(
+                        CompositingStrategy.Always,
+                        View.LAYER_TYPE_HARDWARE,
+                        true
+                    )
+                // Use stub access to framework RenderNode API
+                in Build.VERSION_CODES.M..Int.MAX_VALUE ->
+                    verifyRenderNode23CompositingStrategy(
+                        CompositingStrategy.Always,
+                        expectedLayerType = View.LAYER_TYPE_HARDWARE,
+                        expectedOverlappingRendering = true
+                    )
+                // No RenderNodes, use Views instead
+                else ->
+                    verifyViewLayerCompositingStrategy(
+                        CompositingStrategy.Always,
+                        View.LAYER_TYPE_HARDWARE,
+                        true
+                    )
+            }
+            drawLatch.countDown()
+        }
+
+        drawLatch.await(1, TimeUnit.SECONDS)
+        assertTrue(compositingApplied)
+    }
+
     @Test
     fun testLayerCameraDistance() {
         val targetCameraDistance = 15f
@@ -220,6 +346,68 @@ class AndroidLayoutDrawTest {
         drawLatch.await(1, TimeUnit.SECONDS)
 
         assertTrue(cameraDistanceApplied)
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private fun verifyRenderNode29CompositingStrategy(
+        compositingStrategy: CompositingStrategy,
+        expectedCompositing: Boolean,
+        expectedOverlappingRendering: Boolean
+    ): Boolean {
+        val node = RenderNodeApi29(AndroidComposeView(activity)).apply {
+            this.compositingStrategy = compositingStrategy
+        }
+        return expectedCompositing == node.isUsingCompositingLayer() &&
+            expectedOverlappingRendering == node.hasOverlappingRendering()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun verifyRenderNode23CompositingStrategy(
+        compositingStrategy: CompositingStrategy,
+        expectedLayerType: Int,
+        expectedOverlappingRendering: Boolean
+    ): Boolean {
+        val node = RenderNodeApi23(AndroidComposeView(activity)).apply {
+            this.compositingStrategy = compositingStrategy
+        }
+        return expectedLayerType == node.getLayerType() &&
+            expectedOverlappingRendering == node.hasOverlappingRendering()
+    }
+
+    private fun verifyViewLayerCompositingStrategy(
+        compositingStrategy: CompositingStrategy,
+        expectedLayerType: Int,
+        expectedOverlappingRendering: Boolean
+    ): Boolean {
+        val view = ViewLayer(
+            AndroidComposeView(activity),
+            ViewLayerContainer(activity),
+            {},
+            {}).apply {
+            updateLayerProperties(
+                scaleX = 1f,
+                scaleY = 1f,
+                alpha = 1f,
+                translationX = 0f,
+                translationY = 0f,
+                shadowElevation = 0f,
+                rotationX = 0f,
+                rotationY = 0f,
+                rotationZ = 0f,
+                cameraDistance = cameraDistance,
+                transformOrigin = TransformOrigin.Center,
+                shape = RectangleShape,
+                clip = true,
+                layoutDirection = LayoutDirection.Ltr,
+                density = Density(1f),
+                renderEffect = null,
+                ambientShadowColor = DefaultShadowColor,
+                spotShadowColor = DefaultShadowColor,
+                compositingStrategy = compositingStrategy
+            )
+        }
+        return expectedLayerType == view.layerType &&
+            expectedOverlappingRendering == view.hasOverlappingRendering()
     }
 
     @RequiresApi(Build.VERSION_CODES.Q)
@@ -263,7 +451,8 @@ class AndroidLayoutDrawTest {
                 density = Density(1f),
                 renderEffect = null,
                 ambientShadowColor = DefaultShadowColor,
-                spotShadowColor = DefaultShadowColor
+                spotShadowColor = DefaultShadowColor,
+                compositingStrategy = CompositingStrategy.Auto
             )
         }
         // Verify that the camera distance is applied properly even after accounting for
