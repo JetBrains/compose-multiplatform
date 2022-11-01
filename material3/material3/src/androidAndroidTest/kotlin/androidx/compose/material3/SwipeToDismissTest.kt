@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.material
+package androidx.compose.material3
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,15 +34,13 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 class SwipeToDismissTest {
 
     @get:Rule
@@ -112,53 +110,6 @@ class SwipeToDismissTest {
 
         rule.onNodeWithTag(backgroundTag)
             .assertIsSquareWithSize(100.dp)
-    }
-
-    @Ignore("Fix test in a follow-up CL. b/179501119")
-    @Test
-    fun swipeToDismiss_dismissAndReset(): Unit = runBlocking {
-        lateinit var dismissState: DismissState
-        rule.setContent {
-            dismissState = rememberDismissState(DismissValue.Default)
-            SwipeToDismiss(
-                state = dismissState,
-                background = { },
-                dismissContent = { Box(Modifier.fillMaxSize().testTag(dismissContentTag)) }
-            )
-        }
-
-        val width = rule.rootWidth()
-
-        rule.onNodeWithTag(dismissContentTag)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-
-        dismissState.dismiss(DismissDirection.StartToEnd)
-
-        advanceClock()
-
-        rule.onNodeWithTag(dismissContentTag)
-            .assertLeftPositionInRootIsEqualTo(width)
-
-        dismissState.reset()
-
-        advanceClock()
-
-        rule.onNodeWithTag(dismissContentTag)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
-
-        dismissState.dismiss(DismissDirection.EndToStart)
-
-        advanceClock()
-
-        rule.onNodeWithTag(dismissContentTag)
-            .assertLeftPositionInRootIsEqualTo(-width)
-
-        dismissState.reset()
-
-        advanceClock()
-
-        rule.onNodeWithTag(dismissContentTag)
-            .assertLeftPositionInRootIsEqualTo(0.dp)
     }
 
     @Test

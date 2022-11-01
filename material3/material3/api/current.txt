@@ -565,6 +565,9 @@ package androidx.compose.material3 {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.unit.Dp> LocalAbsoluteTonalElevation;
   }
 
+  public final class SwipeToDismissKt {
+  }
+
   public final class SwipeableKt {
   }
 
