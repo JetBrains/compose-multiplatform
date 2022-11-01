@@ -320,7 +320,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
         buildOnServer: TaskProvider<*>,
         docsConfiguration: Configuration
     ) {
-        val generatedDocsDir = project.file("${project.buildDir}/dackkaDocs")
+        val generatedDocsDir = project.file("${project.buildDir}/docs")
 
         val dackkaConfiguration = project.configurations.create("dackka").apply {
             dependencies.add(project.dependencies.create(project.getLibraryByName("dackka")))
@@ -342,7 +342,7 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.destinationFile.set(getMetadataRegularFile(project))
         }
 
-        val dackkaTask = project.tasks.register("dackkaDocs", DackkaTask::class.java) { task ->
+        val dackkaTask = project.tasks.register("docs", DackkaTask::class.java) { task ->
             task.apply {
                 dependsOn(unzipDocsTask)
                 dependsOn(unzipSamplesTask)
@@ -367,12 +367,12 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             }
         }
 
-        val zipTask = project.tasks.register("zipDackkaDocs", Zip::class.java) { task ->
+        val zipTask = project.tasks.register("zipDocs", Zip::class.java) { task ->
             task.apply {
                 dependsOn(dackkaTask)
                 from(generatedDocsDir)
 
-                val baseName = "dackka-$docsType-docs"
+                val baseName = "docs-$docsType"
                 val buildId = getBuildId()
                 archiveBaseName.set(baseName)
                 archiveVersion.set(buildId)
@@ -429,7 +429,7 @@ open class DocsBuildOnServer : DefaultTask() {
     @[InputFiles PathSensitive(PathSensitivity.RELATIVE)]
     fun getRequiredFiles(): List<File> {
         return listOf(
-            File(distributionDirectory, "dackka-$docsType-docs-$buildId.zip"),
+            File(distributionDirectory, "docs-$docsType-$buildId.zip"),
         )
     }
 
