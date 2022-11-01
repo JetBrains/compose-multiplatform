@@ -18,11 +18,13 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -404,11 +406,12 @@ class MultiParagraph(
         color: Color = Color.Unspecified,
         shadow: Shadow? = null,
         decoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
     ) {
         canvas.save()
         paragraphInfoList.fastForEach {
-            it.paragraph.paint(canvas, color, shadow, decoration, drawStyle)
+            it.paragraph.paint(canvas, color, shadow, decoration, drawStyle, blendMode)
             canvas.translate(0f, it.paragraph.height)
         }
         canvas.restore()
@@ -422,9 +425,10 @@ class MultiParagraph(
         alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         decoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
     ) {
-        drawMultiParagraph(canvas, brush, alpha, shadow, decoration, drawStyle)
+        drawMultiParagraph(canvas, brush, alpha, shadow, decoration, drawStyle, blendMode)
     }
 
     /** Returns path that enclose the given text range. */

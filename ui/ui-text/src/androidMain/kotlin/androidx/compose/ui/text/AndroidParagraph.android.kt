@@ -26,6 +26,7 @@ import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -464,16 +465,21 @@ internal class AndroidParagraph(
         color: Color,
         shadow: Shadow?,
         textDecoration: TextDecoration?,
-        drawStyle: DrawStyle?
+        drawStyle: DrawStyle?,
+        blendMode: BlendMode
     ) {
+        val currBlendMode = textPaint.blendMode
         with(textPaint) {
             setColor(color)
             setShadow(shadow)
             setTextDecoration(textDecoration)
             setDrawStyle(drawStyle)
+            this.blendMode = blendMode
         }
 
         paint(canvas)
+
+        textPaint.blendMode = currBlendMode
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -483,16 +489,21 @@ internal class AndroidParagraph(
         alpha: Float,
         shadow: Shadow?,
         textDecoration: TextDecoration?,
-        drawStyle: DrawStyle?
+        drawStyle: DrawStyle?,
+        blendMode: BlendMode
     ) {
+        val currBlendMode = textPaint.blendMode
         with(textPaint) {
             setBrush(brush, Size(width, height), alpha)
             setShadow(shadow)
             setTextDecoration(textDecoration)
             setDrawStyle(drawStyle)
+            this.blendMode = blendMode
         }
 
         paint(canvas)
+
+        textPaint.blendMode = currBlendMode
     }
 
     private fun paint(canvas: Canvas) {

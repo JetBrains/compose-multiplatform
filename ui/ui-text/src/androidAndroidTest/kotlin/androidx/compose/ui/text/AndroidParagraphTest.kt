@@ -29,6 +29,7 @@ import android.text.style.RelativeSizeSpan
 import android.text.style.ScaleXSpan
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -1638,6 +1639,19 @@ AndroidParagraphTest {
         paragraph.paint(canvas, drawStyle = null)
         assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
         assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+    }
+
+    @Test
+    fun testPaint_cannot_change_blendMode_permanently() {
+        val paragraph = simpleParagraph(
+            text = "",
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.blendMode).isEqualTo(BlendMode.SrcOver)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, blendMode = BlendMode.Multiply)
+        assertThat(paragraph.textPaint.blendMode).isEqualTo(BlendMode.SrcOver)
     }
 
     @SdkSuppress(minSdkVersion = 29)

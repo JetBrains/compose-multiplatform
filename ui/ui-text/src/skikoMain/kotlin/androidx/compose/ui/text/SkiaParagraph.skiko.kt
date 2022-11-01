@@ -17,9 +17,10 @@
 package androidx.compose.ui.text
 
 import org.jetbrains.skia.Rect as SkRect
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -315,7 +316,8 @@ internal class SkiaParagraph(
         color: Color,
         shadow: Shadow?,
         textDecoration: TextDecoration?,
-        drawStyle: DrawStyle?
+        drawStyle: DrawStyle?,
+        blendMode: BlendMode
     ) {
         para = layouter.layoutParagraph(
             width = width,
@@ -337,7 +339,8 @@ internal class SkiaParagraph(
         alpha: Float,
         shadow: Shadow?,
         textDecoration: TextDecoration?,
-        drawStyle: DrawStyle?
+        drawStyle: DrawStyle?,
+        blendMode: BlendMode
     ) {
         throw UnsupportedOperationException(
             "Using brush for painting the paragraph is a separate functionality that " +
