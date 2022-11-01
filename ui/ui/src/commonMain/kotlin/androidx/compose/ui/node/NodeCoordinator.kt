@@ -240,6 +240,7 @@ internal abstract class NodeCoordinator(
         }
         layoutNode.owner?.onLayoutChange(layoutNode)
         measuredSize = IntSize(width, height)
+        graphicsLayerScope.size = measuredSize.toSize()
         visitNodes(Nodes.Draw) {
             it.onMeasureResultChanged()
         }
@@ -446,6 +447,7 @@ internal abstract class NodeCoordinator(
             val layerBlock = requireNotNull(layerBlock)
             graphicsLayerScope.reset()
             graphicsLayerScope.graphicsDensity = layoutNode.density
+            graphicsLayerScope.size = size.toSize()
             snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
                 layerBlock.invoke(graphicsLayerScope)
             }

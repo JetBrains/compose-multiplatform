@@ -90,6 +90,7 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
+import kotlin.math.ceil
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -98,6 +99,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.math.roundToInt
+import org.junit.Assert.assertNotNull
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -1271,5 +1273,80 @@ class GraphicsLayerTest {
                 assertPixelColor(expectedCenter, width / 2, height / 2)
             }
         }
+    }
+
+    @Test
+    fun testGraphicsLayerScopeSize() {
+        val widthDp = 200.dp
+        val heightDp = 500.dp
+
+        var graphicsLayerWidth = 0f
+        var graphicsLayerHeight = 0f
+        var drawScopeWidth = -1f
+        var drawScopeHeight = -1f
+        rule.setContent {
+            Box(
+                modifier = Modifier
+                    .size(widthDp, heightDp)
+                    .graphicsLayer {
+                        graphicsLayerWidth = size.width
+                        graphicsLayerHeight = size.height
+                    }
+                    .drawBehind {
+                        drawScopeWidth = size.width
+                        drawScopeHeight = size.height
+                    }
+            )
+        }
+        rule.runOnIdle {
+            assertEquals(drawScopeWidth, graphicsLayerWidth)
+            assertEquals(drawScopeHeight, graphicsLayerHeight)
+        }
+    }
+
+    @Test
+    fun testGraphicsLayerSizeAfterRelayout() {
+        var composableSize by mutableStateOf(20.dp)
+        var graphicsLayerWidth = -1f
+        var graphicsLayerHeight = -1f
+        var drawScopeWidth = 0f
+        var drawScopeHeight = 0f
+
+        var density: Density? = null
+
+        rule.setContent {
+            density = LocalDensity.current
+            Box(modifier = Modifier
+                .size(composableSize, composableSize)
+                .graphicsLayer {
+                    graphicsLayerWidth = size.width
+                    graphicsLayerHeight = size.height
+                }
+                .drawBehind {
+                    drawScopeWidth = size.width
+                    drawScopeHeight = size.height
+                }
+            )
+        }
+
+        rule.waitForIdle()
+
+        assertNotNull(density)
+
+        var sizePx = with(density!!) { ceil(composableSize.toPx()) }
+        assertEquals(sizePx, graphicsLayerWidth)
+        assertEquals(sizePx, graphicsLayerHeight)
+        assertEquals(sizePx, drawScopeWidth)
+        assertEquals(sizePx, drawScopeHeight)
+
+        composableSize = 40.dp
+
+        rule.waitForIdle()
+
+        sizePx = with(density!!) { ceil(composableSize.toPx()) }
+        assertEquals(sizePx, graphicsLayerWidth)
+        assertEquals(sizePx, graphicsLayerHeight)
+        assertEquals(sizePx, drawScopeWidth)
+        assertEquals(sizePx, drawScopeHeight)
     }
 }

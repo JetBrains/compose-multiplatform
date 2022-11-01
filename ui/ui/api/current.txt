@@ -471,6 +471,7 @@ package androidx.compose.ui.graphics {
     method public float getScaleY();
     method public float getShadowElevation();
     method public androidx.compose.ui.graphics.Shape getShape();
+    method public default long getSize();
     method public default long getSpotShadowColor();
     method public long getTransformOrigin();
     method public float getTranslationX();
@@ -505,6 +506,7 @@ package androidx.compose.ui.graphics {
     property public abstract float scaleY;
     property public abstract float shadowElevation;
     property public abstract androidx.compose.ui.graphics.Shape shape;
+    property public default long size;
     property public default long spotShadowColor;
     property public abstract long transformOrigin;
     property public abstract float translationX;
