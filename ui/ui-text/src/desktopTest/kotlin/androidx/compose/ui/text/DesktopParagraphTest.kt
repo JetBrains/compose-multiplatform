@@ -646,11 +646,11 @@ class DesktopParagraphTest {
         val secondLineTop = paragraph.getLineTop(1)
         val secondLineBottom = paragraph.getLineBottom(1)
 
-        Truth.assertThat(firstLineBottom - firstLineTop).isEqualTo(19.0f)
+        Truth.assertThat(firstLineBottom - firstLineTop).isEqualTo(29.0f)
         Truth.assertThat(paragraphWithoutStyles.getLineTop(0)).isNotEqualTo(firstLineTop)
         Truth.assertThat(paragraphWithoutStyles.getLineBottom(0)).isNotEqualTo(firstLineBottom)
 
-        Truth.assertThat(secondLineBottom - secondLineTop).isEqualTo(19.0f)
+        Truth.assertThat(secondLineBottom - secondLineTop).isEqualTo(29.0f)
         Truth.assertThat(paragraphWithoutStyles.getLineTop(1)).isNotEqualTo(secondLineTop)
         Truth.assertThat(paragraphWithoutStyles.getLineBottom(1)).isNotEqualTo(secondLineBottom)
     }
