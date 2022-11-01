@@ -103,6 +103,9 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void TextButton(kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.ButtonColors colors, optional androidx.compose.material3.ButtonElevation? elevation, optional androidx.compose.foundation.BorderStroke? border, optional androidx.compose.foundation.layout.PaddingValues contentPadding, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
 
+  public final class CalendarModelKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class CardColors {
   }
 
@@ -680,6 +683,9 @@ package androidx.compose.material3 {
 }
 
 package androidx.compose.material3.internal {
+
+  public final class AndroidDatePickerModel_androidKt {
+  }
 
   public final class ExposedDropdownMenuPopupKt {
   }
