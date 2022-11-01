@@ -368,7 +368,13 @@ internal class SwipeableV2State<T>(
                 val distance = abs(currentAnchor - currentAnchors.getValue(lower))
                 val relativeThreshold = abs(positionalThreshold(density, distance))
                 val absoluteThreshold = abs(currentAnchor - relativeThreshold)
-                if (offset > absoluteThreshold) currentValue else lower
+                if (offset < 0) {
+                    // For negative offsets, larger absolute thresholds are closer to lower anchors
+                    // than smaller ones.
+                    if (abs(offset) < absoluteThreshold) currentValue else lower
+                } else {
+                    if (offset > absoluteThreshold) currentValue else lower
+                }
             }
         }
     }

@@ -91,6 +91,18 @@ class SwipeableV2StateTest {
         rule.waitForIdle()
         assertThat(state.targetValue).isEqualTo(B)
 
+        // Assert that swipe below threshold upward settles at current state
+        rule.onNodeWithTag(swipeableTestTag)
+            .performTouchInput { swipeUp(endY = bottom * 0.95f, durationMillis = 1000) }
+        rule.waitForIdle()
+        assertThat(state.targetValue).isEqualTo(B)
+
+        // Assert that swipe below threshold downward settles at current state
+        rule.onNodeWithTag(swipeableTestTag)
+            .performTouchInput { swipeDown(endY = bottom * 0.05f) }
+        rule.waitForIdle()
+        assertThat(state.targetValue).isEqualTo(B)
+
         rule.onNodeWithTag(swipeableTestTag)
             .performTouchInput { swipeDown(endY = bottom * 0.9f) }
         rule.waitForIdle()
