@@ -631,7 +631,7 @@ object DrawerDefaults {
      */
     val windowInsets: WindowInsets
         @Composable
-        get() = WindowInsets.systemBarsForVisualComponents
+        get() = WindowInsets.systemBarsForVisualComponents()
             .only(WindowInsetsSides.Vertical + WindowInsetsSides.Start)
 }
 

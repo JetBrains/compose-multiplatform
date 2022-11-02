@@ -20,6 +20,9 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 
-internal actual val WindowInsets.Companion.systemBarsForVisualComponents: WindowInsets
-    @Composable
-    get() = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+@Composable
+internal actual fun WindowInsets.Companion.systemBarsForVisualComponents(): WindowInsets {
+    return WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)
+}
+//    @Composable
+//    get() = WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)

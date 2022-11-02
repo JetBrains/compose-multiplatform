@@ -280,7 +280,7 @@ object ScaffoldDefaults {
      */
     val contentWindowInsets: WindowInsets
         @Composable
-        get() = WindowInsets.systemBarsForVisualComponents
+        get() = WindowInsets.systemBarsForVisualComponents()
 }
 
 /**
