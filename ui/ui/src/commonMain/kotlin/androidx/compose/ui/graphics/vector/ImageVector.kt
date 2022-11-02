@@ -193,7 +193,7 @@ class ImageVector internal constructor(
             false
         )
 
-        private val nodes = Stack<GroupParams>()
+        private val nodes = ArrayList<GroupParams>()
 
         private var root = GroupParams()
         private var isConsumed = false
@@ -760,11 +760,8 @@ inline fun ImageVector.Builder.group(
     clearGroup()
 }
 
-@kotlin.jvm.JvmInline
-private value class Stack<T>(private val backing: ArrayList<T> = ArrayList<T>()) {
-    val size: Int get() = backing.size
+private fun <T> ArrayList<T>.push(value: T): Boolean = add(value)
 
-    fun push(value: T): Boolean = backing.add(value)
-    fun pop(): T = backing.removeAt(size - 1)
-    fun peek(): T = backing[size - 1]
-}
+private fun <T> ArrayList<T>.pop(): T = this.removeAt(size - 1)
+
+private fun <T> ArrayList<T>.peek(): T = this[size - 1]
