@@ -51,6 +51,8 @@ import androidx.compose.ui.unit.TextUnit
  * @see SpanStyle
  * @see ParagraphStyle
  */
+// Maintainer note: When adding a new constructor or copy parameter, make sure to add a test case to
+// TextStyleInvalidationTest to ensure the correct phase(s) get invalidated.
 @Immutable
 class TextStyle internal constructor(
     internal val spanStyle: SpanStyle,
