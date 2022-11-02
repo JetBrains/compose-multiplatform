@@ -62,9 +62,30 @@ open class BaseLazyStaggeredGridWithOrientation(
         crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
+        LazyStaggeredGrid(
+            StaggeredGridCells.Fixed(lanes),
+            modifier,
+            state,
+            contentPadding,
+            mainAxisArrangement,
+            crossAxisArrangement,
+            content
+        )
+    }
+
+    @Composable
+    internal fun LazyStaggeredGrid(
+        cells: StaggeredGridCells,
+        modifier: Modifier = Modifier,
+        state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        mainAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        content: LazyStaggeredGridScope.() -> Unit,
+    ) {
         if (orientation == Orientation.Vertical) {
             LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(lanes),
+                columns = cells,
                 modifier = modifier,
                 contentPadding = contentPadding,
                 verticalArrangement = mainAxisArrangement,
@@ -74,7 +95,7 @@ open class BaseLazyStaggeredGridWithOrientation(
             )
         } else {
             LazyHorizontalStaggeredGrid(
-                rows = StaggeredGridCells.Fixed(lanes),
+                rows = cells,
                 modifier = modifier,
                 contentPadding = contentPadding,
                 verticalArrangement = crossAxisArrangement,

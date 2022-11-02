@@ -97,12 +97,35 @@ class LazyStaggeredGridTest(
     }
 
     @Test
+    fun showsZeroItems() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+
+            LazyStaggeredGrid(
+                lanes = 3,
+                state = state,
+                modifier = Modifier.testTag(LazyStaggeredGridTag)
+            ) { }
+        }
+
+        rule.onNodeWithTag(LazyStaggeredGridTag)
+            .onChildren()
+            .assertCountEquals(0)
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
     fun showsOneItem() {
         val itemTestTag = "itemTestTag"
 
         rule.setContent {
+            state = rememberLazyStaggeredGridState()
+
             LazyStaggeredGrid(
                 lanes = 3,
+                state = state,
             ) {
                 item {
                     Spacer(
@@ -116,6 +139,9 @@ class LazyStaggeredGridTest(
 
         rule.onNodeWithTag(itemTestTag)
             .assertIsDisplayed()
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
     }
 
     @Test
@@ -1008,6 +1034,120 @@ class LazyStaggeredGridTest(
             assertThat(state.firstVisibleItemIndex).isEqualTo(9)
             assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
         }
+    }
+
+    @Test
+    fun screenRotate_oneItem_withAdaptiveCells_fillsContentCorrectly() {
+        var rotated by mutableStateOf(false)
+
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+
+            val crossAxis = if (!rotated) itemSizeDp * 6 else itemSizeDp * 9
+            val mainAxis = if (!rotated) itemSizeDp * 9 else itemSizeDp * 6
+
+            LazyStaggeredGrid(
+                cells = StaggeredGridCells.Adaptive(itemSizeDp * 3),
+                state = state,
+                modifier = Modifier
+                    .mainAxisSize(mainAxis)
+                    .crossAxisSize(crossAxis)
+                    .testTag(LazyStaggeredGridTag)
+            ) {
+                item {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(itemSizeDp)
+                            .testTag("0")
+                    )
+                }
+            }
+        }
+
+        fun verifyState() {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+            assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        }
+
+        rule.runOnIdle {
+            rotated = true
+        }
+
+        rule.runOnIdle {
+            verifyState()
+        }
+
+        rule.runOnIdle {
+            rotated = false
+        }
+
+        rule.runOnIdle {
+            verifyState()
+        }
+
+        rule.runOnIdle {
+            rotated = true
+        }
+
+        rule.runOnIdle {
+            verifyState()
+        }
+    }
+
+    @Test
+    fun screenRotate_twoItems_withAdaptiveCells_fillsContentCorrectly() {
+        var rotated by mutableStateOf(false)
+
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+
+            val crossAxis = if (!rotated) itemSizeDp * 6 else itemSizeDp * 9
+            val mainAxis = if (!rotated) itemSizeDp * 9 else itemSizeDp * 6
+
+            LazyStaggeredGrid(
+                cells = StaggeredGridCells.Adaptive(itemSizeDp * 3),
+                state = state,
+                modifier = Modifier
+                    .mainAxisSize(mainAxis)
+                    .crossAxisSize(crossAxis)
+                    .testTag(LazyStaggeredGridTag)
+            ) {
+                items(2) {
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(itemSizeDp)
+                            .testTag("$it")
+                    )
+                }
+            }
+        }
+
+        fun verifyState() {
+            rule.runOnIdle {
+                assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+                assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+            }
+            rule.onNodeWithTag("0").assertIsDisplayed()
+            rule.onNodeWithTag("1").assertIsDisplayed()
+        }
+
+        rule.runOnIdle {
+            rotated = true
+        }
+
+        verifyState()
+
+        rule.runOnIdle {
+            rotated = false
+        }
+
+        verifyState()
+
+        rule.runOnIdle {
+            rotated = true
+        }
+
+        verifyState()
     }
 
     @Test
