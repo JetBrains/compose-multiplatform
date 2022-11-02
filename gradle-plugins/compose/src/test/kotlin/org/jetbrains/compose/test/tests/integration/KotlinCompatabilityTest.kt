@@ -24,11 +24,7 @@ class KotlinCompatabilityTest : GradlePluginTestBase() {
     fun testKotlinMpp_1_7_20() = testMpp("1.7.20")
 
     @Test
-    fun testKotlinJsMpp_1_7_20() {
-        assertThrows<UnexpectedBuildFailure> {
-            testJsMpp("1.7.20")
-        }
-    }
+    fun testKotlinJsMpp_1_7_20() = testJsMpp("1.7.20")
 
     private fun testMpp(kotlinVersion: String) = with(
         testProject(
