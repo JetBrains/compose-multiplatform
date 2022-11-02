@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.platform
 
+import android.accessibilityservice.AccessibilityServiceInfo
 import android.content.Context
 import android.graphics.RectF
 import android.graphics.Region
@@ -82,6 +83,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.core.view.AccessibilityDelegateCompat
@@ -188,10 +190,44 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private val accessibilityManager: AccessibilityManager =
         view.context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     internal var accessibilityForceEnabledForTesting = false
-    private val isAccessibilityEnabled
+
+    /**
+     * True if any accessibility service enabled in the system, except the UIAutomator (as it
+     * doesn't appear in the list of enabled services)
+     */
+    private val isEnabled: Boolean
+        get() {
+            // checking the list allows us to filter out the UIAutomator which doesn't appear in it
+            val enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(
+                AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+            )
+            return accessibilityForceEnabledForTesting ||
+                accessibilityManager.isEnabled && enabledServices.isNotEmpty()
+        }
+
+    /**
+     * True if accessibility service with the touch exploration (e.g. Talkback) is enabled in the
+     * system.
+     * Note that UIAutomator doesn't request touch exploration therefore returns false
+     */
+    private val isTouchExplorationEnabled
         get() = accessibilityForceEnabledForTesting ||
-            accessibilityManager.isEnabled &&
-            accessibilityManager.isTouchExplorationEnabled
+                accessibilityManager.isEnabled && accessibilityManager.isTouchExplorationEnabled
+
+    /** True if an accessibility service that listens for the event of type [eventType] is enabled
+     * in the system.
+     * Note that UIAutomator will always return false as it doesn't appear in the list of enabled
+     * services
+     */
+    private fun isEnabledForEvent(eventType: Int): Boolean {
+        val enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(
+            AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+        )
+        return enabledServices.fastFirstOrNull {
+            it.eventTypes.and(eventType) != 0
+        } != null || accessibilityForceEnabledForTesting
+    }
+
     private val handler = Handler(Looper.getMainLooper())
     private var nodeProvider: AccessibilityNodeProviderCompat =
         AccessibilityNodeProviderCompat(MyNodeProvider())
@@ -978,7 +1014,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return Whether this virtual view actually took accessibility focus.
      */
     private fun requestAccessibilityFocus(virtualViewId: Int): Boolean {
-        if (!isAccessibilityEnabled) {
+        if (!isTouchExplorationEnabled) {
             return false
         }
         // TODO: Check virtual view visibility.
@@ -1029,7 +1065,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         contentChangeType: Int? = null,
         contentDescription: List<String>? = null
     ): Boolean {
-        if (virtualViewId == InvalidId || !isAccessibilityEnabled) {
+        if (virtualViewId == InvalidId || !isEnabledForEvent(eventType)) {
             return false
         }
 
@@ -1051,7 +1087,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return true if the event was sent successfully.
      */
     private fun sendEvent(event: AccessibilityEvent): Boolean {
-        if (!isAccessibilityEnabled) {
+        // only send an event if there's an enabled service listening for events of this type
+        if (!isEnabledForEvent(event.eventType)) {
             return false
         }
 
@@ -1499,7 +1536,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      * @return Whether the hover event was handled.
      */
     fun dispatchHoverEvent(event: MotionEvent): Boolean {
-        if (!isAccessibilityEnabled) {
+        if (!isTouchExplorationEnabled) {
             return false
         }
 
@@ -1637,7 +1674,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // later, we can refresh currentSemanticsNodes if currentSemanticsNodes is stale.
         currentSemanticsNodesInvalidated = true
 
-        if (isAccessibilityEnabled && !checkingForSemanticsChanges) {
+        if (isEnabled && !checkingForSemanticsChanges) {
             checkingForSemanticsChanges = true
             handler.post(semanticsChangeChecker)
         }
@@ -1652,7 +1689,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         try {
             val subtreeChangedSemanticsNodesIds = ArraySet<Int>()
             for (notification in boundsUpdateChannel) {
-                if (isAccessibilityEnabled) {
+                if (isEnabled) {
                     for (i in subtreeChangedLayoutNodes.indices) {
                         @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
                         sendSubtreeChangeAccessibilityEvents(
@@ -1693,7 +1730,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         // currentSemanticsNodesInvalidated up to date so that when accessibility is turned on
         // later, we can refresh currentSemanticsNodes if currentSemanticsNodes is stale.
         currentSemanticsNodesInvalidated = true
-        if (!isAccessibilityEnabled) {
+        if (!isEnabled) {
             return
         }
         // The layout change of a LayoutNode will also affect its children, so even if it doesn't
