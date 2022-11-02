@@ -37,9 +37,14 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         Toml.parse(parameters.tomlFile.get())
     }
 
+    private fun getTable(key: String): TomlTable {
+        return parsedTomlFile.getTable(key)
+            ?: throw GradleException("Library versions toml file is missing [$key] table")
+    }
+
+    // map from name of constant to Version
     val libraryVersions: Map<String, Version> by lazy {
-        val versions = parsedTomlFile.getTable("versions")
-            ?: throw GradleException("Library versions toml file is missing [versions] table")
+        val versions = getTable("versions")
         versions.keySet().associateWith { versionName ->
             val versionValue = versions.getString(versionName)!!
             Version.parseOrNull(versionValue)
@@ -49,9 +54,37 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         }
     }
 
+    // map of library groups keyed by their variable name in the toml file
     val libraryGroups: Map<String, LibraryGroup> by lazy {
-        val groups = parsedTomlFile.getTable("groups")
-            ?: throw GradleException("Library versions toml file is missing [groups] table")
+        val result = mutableMapOf<String, LibraryGroup>()
+        for (association in libraryGroupAssociations) {
+          result.put(association.declarationName, association.libraryGroup)
+        }
+        result
+    }
+
+    // map of library groups keyed by group name
+    val libraryGroupsByGroupId: Map<String, LibraryGroup> by lazy {
+        val result = mutableMapOf<String, LibraryGroup>()
+        for (association in libraryGroupAssociations) {
+          result.put(association.libraryGroup.group, association.libraryGroup)
+        }
+        result
+    }
+
+    // map from project name to group override if applicable
+    val overrideLibraryGroupsByProjectPath: Map<String, LibraryGroup> by lazy {
+       val result = mutableMapOf<String, LibraryGroup>()
+       for (association in libraryGroupAssociations) {
+           for (overridePath in association.overrideIncludeInProjectPaths) {
+               result.put(overridePath, association.libraryGroup)
+           }
+       }
+       result
+    }
+
+    private val libraryGroupAssociations: List<LibraryGroupAssociation> by lazy {
+        val groups = getTable("groups")
         val useMultiplatformGroupVersion =
             parameters.useMultiplatformGroupVersions.orElse(false).get()
 
@@ -71,11 +104,14 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
                     "doesn't exist"
             )
         }
-        groups.keySet().associateWith { name ->
+        val result = mutableListOf<LibraryGroupAssociation>()
+        for (name in groups.keySet()) {
+            // get group name
             val groupDefinition = groups.getTable(name)!!
             val groupName = groupDefinition.getString("group")!!
             val finalGroupName = groupName
 
+            // get group version, if any
             val atomicGroupVersion = readGroupVersion(
                 groupDefinition = groupDefinition,
                 groupName = groupName,
@@ -96,10 +132,28 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
                 useMultiplatformGroupVersion -> multiplatformGroupVersion ?: atomicGroupVersion
                 else -> atomicGroupVersion
             }
-            LibraryGroup(finalGroupName, groupVersion)
+
+            val overrideApplyToProjects = (
+                groupDefinition.getArray("overrideInclude")?.toList() ?: listOf()
+            ).map({ it -> it as String })
+
+            val group = LibraryGroup(finalGroupName, groupVersion)
+            val association = LibraryGroupAssociation(name, group, overrideApplyToProjects)
+            result.add(association)
         }
+        result
     }
 }
+
+// a LibraryGroupSpec knows how to associate a LibraryGroup with the appropriate projects
+data class LibraryGroupAssociation(
+    // the name of the variable to which it is assigned in the toml file
+    val declarationName: String,
+    // the group
+    val libraryGroup: LibraryGroup,
+    // the paths of any additional projects that this group should be assigned to
+    val overrideIncludeInProjectPaths: List<String>
+)
 
 private const val VersionReferencePrefix = "versions."
 private const val AtomicGroupVersion = "atomicGroupVersion"

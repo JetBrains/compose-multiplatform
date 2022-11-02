@@ -34,6 +34,18 @@ open class AndroidXExtension(val project: Project) {
     @JvmField
     val LibraryGroups: Map<String, LibraryGroup>
 
+    val libraryGroupsByGroupId: Map<String, LibraryGroup>
+    val overrideLibraryGroupsByProjectPath: Map<String, LibraryGroup>
+
+    var mavenGroup: LibraryGroup? = null
+        set(value) {
+            val expectedValue = getNewLibraryGroup()
+            validateLibraryGroup(value, expectedValue)
+
+            field = value
+            chooseProjectVersion()
+        }
+
     init {
         val toml = project.objects.fileProperty().fileValue(
             File(project.getSupportRootFolder(), "libraryversions.toml")
@@ -50,8 +62,11 @@ open class AndroidXExtension(val project: Project) {
             spec.parameters.tomlFile = content.asText
             spec.parameters.useMultiplatformGroupVersions = useMultiplatformVersions
         }
-        LibraryGroups = serviceProvider.get().libraryGroups
-        LibraryVersions = serviceProvider.get().libraryVersions
+        val service = serviceProvider.get()
+        LibraryGroups = service.libraryGroups
+        LibraryVersions = service.libraryVersions
+        libraryGroupsByGroupId = service.libraryGroupsByGroupId
+        overrideLibraryGroupsByProjectPath = service.overrideLibraryGroupsByProjectPath
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
@@ -61,12 +76,62 @@ open class AndroidXExtension(val project: Project) {
             field = value
             chooseProjectVersion()
         }
-    var mavenGroup: LibraryGroup? = null
-        set(value) {
-            field = value
-            chooseProjectVersion()
+
+    // a temporary method while we migrate from LibraryGroups.${key} to libraryGroup.get()
+    private fun validateLibraryGroup(oldGroup: LibraryGroup?, newGroup: LibraryGroup?) {
+        check(newGroup == oldGroup) {
+            "Error in $project: oldGroup = ${oldGroup?.group} but newGroup = ${newGroup?.group}"
         }
-    private val ALLOWED_EXTRA_PREFIXES = listOf("-alpha", "-beta", "-rc", "-dev", "-SNAPSHOT")
+    }
+
+    private fun getNewLibraryGroup(): LibraryGroup? {
+        val overridden = overrideLibraryGroupsByProjectPath.get(project.path)
+        if (overridden != null)
+            return overridden
+        return getLibraryGroupFromProjectPath()
+    }
+
+    private fun substringBeforeLastColon(projectPath: String): String {
+        val lastColonIndex = projectPath.lastIndexOf(":")
+        return projectPath.substring(0, lastColonIndex)
+    }
+
+    private fun getLibraryGroupFromProjectPath(): LibraryGroup? {
+        // Get the text of the library group, something like "androidx.core"
+        // This currently relies on AndroidXImplPlugin.validateProjectStructure to
+        // enforce these project groups. Later this will become the enforcement
+        val projectPath = project.path
+
+        val result = getLibraryGroupFromProjectPath(projectPath)
+        if (result != null)
+            return result
+
+        // samples are allowed to be nested deeper
+        if (project.path.contains("samples")) {
+            val parentPath = substringBeforeLastColon(projectPath)
+            return getLibraryGroupFromProjectPath(parentPath)
+        }
+        return null
+    }
+
+    private fun getLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+        // Get the text of the library group, something like "androidx.core"
+        // This currently relies on AndroidXImplPlugin.validateProjectStructure to
+        // enforce these project groups. Later this will become the enforcement
+        val parentPath = substringBeforeLastColon(projectPath)
+
+        if (parentPath == "")
+            return null
+        // convert parent project path to groupId
+        val groupIdText = if (projectPath.startsWith(":external")) {
+            projectPath.replace(":external:", "")
+        } else {
+	    "androidx.${parentPath.substring(1).replace(':', '.')}"
+        }
+
+        // get the library group having that text
+        return libraryGroupsByGroupId.get(groupIdText)
+    }
 
     private fun chooseProjectVersion() {
         val version: Version
@@ -101,6 +166,7 @@ open class AndroidXExtension(val project: Project) {
     }
 
     private fun verifyVersionExtraFormat(version: Version) {
+        val ALLOWED_EXTRA_PREFIXES = listOf("-alpha", "-beta", "-rc", "-dev", "-SNAPSHOT")
         val extra = version.extra
         if (extra != null) {
             if (!version.isSnapshot() && project.isVersionExtraCheckEnabled()) {
