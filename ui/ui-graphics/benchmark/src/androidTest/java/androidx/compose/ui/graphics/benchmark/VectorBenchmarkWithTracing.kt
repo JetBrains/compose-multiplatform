@@ -16,7 +16,8 @@
 
 package androidx.compose.ui.graphics.benchmark
 
-import androidx.benchmark.junit4.PerfettoRule
+import androidx.benchmark.junit4.PerfettoTraceRule
+import androidx.benchmark.perfetto.ExperimentalPerfettoCaptureApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import org.junit.Rule
@@ -24,13 +25,12 @@ import org.junit.runner.RunWith
 
 /**
  * Duplicate of [VectorBenchmark], but which adds tracing.
- *
- * Note: Per PerfettoRule, these benchmarks will be ignored < API 29
  */
 @Suppress("ClassName")
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class VectorBenchmarkWithTracing : VectorBenchmark() {
+    @OptIn(ExperimentalPerfettoCaptureApi::class)
     @get:Rule
-    val perfettoRule = PerfettoRule()
+    val perfettoTraceRule = PerfettoTraceRule()
 }
