@@ -314,7 +314,9 @@ private fun Project.configureMultiplatformPublication(componentFactory: Software
 
     multiplatformExtension.targets.all { target ->
         if (target is KotlinAndroidTarget) {
-            target.publishAllLibraryVariants()
+            target.publishLibraryVariants(
+                Release.DEFAULT_PUBLISH_CONFIG
+            )
         }
     }
 
