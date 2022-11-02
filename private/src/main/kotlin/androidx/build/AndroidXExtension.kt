@@ -213,14 +213,6 @@ open class AndroidXExtension(val project: Project) {
     var runApiTasks: RunApiTasks = RunApiTasks.Auto
         get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
     var type: LibraryType = LibraryType.UNSET
-        set(value) {
-            // don't disable multiplatform if it's already enabled, because sometimes it's enabled
-            // through flags and we don't want setting `type =` to disable it accidentally.
-            if (value.shouldEnableMultiplatform()) {
-                multiplatform = true
-            }
-            field = value
-        }
     var failOnDeprecationWarnings = true
 
     var legacyDisableKotlinStrictApiMode = false
@@ -228,15 +220,6 @@ open class AndroidXExtension(val project: Project) {
     var benchmarkRunAlsoInterpreted = false
 
     var bypassCoordinateValidation = false
-
-    /**
-     * Whether this project uses KMP.
-     */
-    private var multiplatform: Boolean = false
-        set(value) {
-            Multiplatform.setEnabledForProject(project, value)
-            field = value
-        }
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
@@ -266,5 +249,3 @@ class License {
     var name: String? = null
     var url: String? = null
 }
-
-private fun LibraryType.shouldEnableMultiplatform() = this is LibraryType.KmpLibrary
