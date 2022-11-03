@@ -21,4 +21,3 @@ pluginManagement {
 }
 
 rootProject.name = "falling-balls-mpp"
-

@@ -5,30 +5,23 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.compose.experimental.dsl.IOSDevices
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-}
-
 plugins {
-    kotlin("multiplatform") version "1.7.10"
-    id("org.jetbrains.compose") version "1.3.0-alpha01-dev827"
+    id("com.android.application")
+    kotlin("multiplatform")
+    id("org.jetbrains.compose")
 }
 
 version = "1.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
+    google()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    google()
 }
 
 kotlin {
+    android()
     jvm("desktop")
     js(IR) {
         browser()
@@ -54,6 +47,13 @@ kotlin {
             }
         }
     }
+
+    // Workaround for an issue:
+    //    https://youtrack.jetbrains.com/issue/KT-53561/Invalid-LLVM-module-inlinable-function-call-in-a-function-with-debug-info-must-have-a-dbg-location
+    // Compose compiler produces nodes without line information sometimes that provokes Kotlin native compiler to report errors.
+    // TODO: remove workaround when switch to Kotlin 1.8
+    val disableKonanVerification = "-Xverify-compiler=false"
+
     iosX64("uikitX64") {
         binaries {
             executable() {
@@ -61,22 +61,22 @@ kotlin {
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    disableKonanVerification
                 )
             }
         }
     }
     iosArm64("uikitArm64") {
-        binaries {
-            executable() {
+         binaries {
+             executable() {
                 entryPoint = "main"
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    disableKonanVerification
                 )
-                // TODO: the current compose binary surprises LLVM, so disable checks for now.
-                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
             }
         }
     }
@@ -88,15 +88,23 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
-
-                //TODO hotfix of issue https://github.com/JetBrains/compose-jb/issues/2113
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
             }
         }
 
         val commonTest by getting {
             dependencies {
-                implementation(kotlin("test"))
+                implementation(kotlin("test-common"))
+                implementation(kotlin("test-annotations-common"))
+            }
+        }
+
+        val androidMain by getting {
+            dependsOn(commonMain)
+            kotlin.srcDirs("src/jvmMain/kotlin")
+            dependencies {
+                implementation("androidx.appcompat:appcompat:1.5.1")
+                implementation("androidx.activity:activity-compose:1.5.0")
             }
         }
 
@@ -180,20 +188,32 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
-kotlin {
-    targets.withType<KotlinNativeTarget> {
-        binaries.all {
-            // TODO: the current compose binary surprises LLVM, so disable checks for now.
-            freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
-        }
-    }
-}
-
 // a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
 afterEvaluate {
     rootProject.extensions.configure<NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
         versions.webpackCli.version = "4.9.0"
         nodeVersion = "16.0.0"
+    }
+}
+
+android {
+    compileSdk = 32
+
+    defaultConfig {
+        minSdk = 26
+        targetSdk = 32
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    sourceSets {
+        named("main") {
+            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+            res.srcDirs("src/androidMain/res", "src/commonMain/resources")
+        }
     }
 }

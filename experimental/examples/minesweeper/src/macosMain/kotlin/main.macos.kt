@@ -30,21 +30,6 @@ fun main() {
 }
 
 @Composable
-actual fun loadImage(src: String): Painter {
-    // TODO Bundle pics and show images properly
-    val color = when (src) {
-        "assets/clock.png" -> Color.Blue
-        "assets/flag.png" -> Color.Green
-        "assets/mine.png" -> Color.Red
-        else -> Color.White
-    }
+actual fun loadImage(src: String): Painter = loadImageAsColoredRect(src)
 
-    return object : Painter() {
-        override val intrinsicSize: Size
-            get() = Size(16f, 16f)
-
-        override fun DrawScope.onDraw() {
-            drawRect(color = color)
-        }
-    }
-}
+actual fun isMobileDevice() = false
