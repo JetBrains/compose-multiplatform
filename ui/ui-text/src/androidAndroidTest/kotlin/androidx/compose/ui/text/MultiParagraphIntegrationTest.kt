@@ -31,6 +31,7 @@ import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.matchers.isZero
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Constraints
@@ -1152,6 +1153,39 @@ class MultiParagraphIntegrationTest {
             assertThat(paragraph.getLineHeight(1)).isEqualTo(lineHeightInPx)
             assertThat(paragraph.getLineHeight(4)).isEqualTo(lineHeightInPx)
         }
+    }
+
+    @Test
+    fun drawText_withUnderlineStyle_equalToUnderlinePaint() = with(defaultDensity) {
+        val fontSize = 30.sp
+        val fontSizeInPx = fontSize.toPx()
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(SpanStyle(textDecoration = TextDecoration.Underline)) {
+                    append("レンズ(単焦点)")
+                }
+            },
+            style = TextStyle(fontSize = fontSize),
+            width = fontSizeInPx * 20
+        )
+
+        val multiParagraph2 = simpleMultiParagraph(
+            text = AnnotatedString("レンズ(単焦点)"),
+            style = TextStyle(
+                fontSize = fontSize,
+                textDecoration = TextDecoration.Underline
+            ),
+            width = fontSizeInPx * 20
+        )
+
+        val bitmapWithSpan = multiParagraph.bitmap()
+        // Our text rendering stack relies on the fact that given textstyle is also passed to draw
+        // functions of TextLayoutResult, MultiParagraph, Paragraph. If Underline is not specified
+        // here, it would be removed while drawing the MultiParagraph. We are simply mimicking
+        // what TextPainter does.
+        val bitmapNoSpan = multiParagraph2.bitmap(textDecoration = TextDecoration.Underline)
+
+        assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
     }
 
     @Test

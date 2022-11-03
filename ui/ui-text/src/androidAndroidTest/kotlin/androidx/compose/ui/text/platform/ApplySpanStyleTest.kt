@@ -28,6 +28,7 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
 import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
@@ -257,8 +258,8 @@ class ApplySpanStyleTest {
         assertThat(notApplied.background).isEqualTo(Color.Unspecified)
     }
 
-    /*@Test
-    fun textDecorationUnderline_shouldBeLeftAsSpan() {
+    @Test
+    fun textDecorationUnderline_shouldBeAppliedToPaint() {
         val textDecoration = TextDecoration.Underline
         val spanStyle = SpanStyle(textDecoration = textDecoration)
         val tp = AndroidTextPaint(0, density.density)
@@ -266,12 +267,12 @@ class ApplySpanStyleTest {
 
         val notApplied = tp.applySpanStyle(spanStyle, resolveTypeface, density)
 
-        assertThat(tp.isUnderlineText).isEqualTo(false)
-        assertThat(notApplied.textDecoration).isEqualTo(textDecoration)
+        assertThat(tp.isUnderlineText).isEqualTo(true)
+        assertThat(notApplied.textDecoration).isEqualTo(null)
     }
 
     @Test
-    fun textDecorationLineThrough_shouldBeLeftAsSpan() {
+    fun textDecorationLineThrough_shouldBeAppliedToPaint() {
         val textDecoration = TextDecoration.LineThrough
         val spanStyle = SpanStyle(textDecoration = textDecoration)
         val tp = AndroidTextPaint(0, density.density)
@@ -279,13 +280,14 @@ class ApplySpanStyleTest {
 
         val notApplied = tp.applySpanStyle(spanStyle, resolveTypeface, density)
 
-        assertThat(tp.isStrikeThruText).isEqualTo(false)
-        assertThat(notApplied.textDecoration).isEqualTo(textDecoration)
+        assertThat(tp.isStrikeThruText).isEqualTo(true)
+        assertThat(notApplied.textDecoration).isEqualTo(null)
     }
 
     @Test
-    fun textDecorationNone_shouldNotBeLeftAsSpan() {
-        val textDecoration = TextDecoration.None
+    fun textDecorationCombined_shouldBeAppliedToPaint() {
+        val textDecoration =
+            TextDecoration.combine(listOf(TextDecoration.LineThrough, TextDecoration.Underline))
         val spanStyle = SpanStyle(textDecoration = textDecoration)
         val tp = AndroidTextPaint(0, density.density)
         tp.isUnderlineText = false
@@ -293,10 +295,10 @@ class ApplySpanStyleTest {
 
         val notApplied = tp.applySpanStyle(spanStyle, resolveTypeface, density)
 
-        assertThat(tp.isUnderlineText).isEqualTo(false)
-        assertThat(tp.isStrikeThruText).isEqualTo(false)
-        assertThat(notApplied.textDecoration).isNull()
-    }*/
+        assertThat(tp.isUnderlineText).isEqualTo(true)
+        assertThat(tp.isStrikeThruText).isEqualTo(true)
+        assertThat(notApplied.textDecoration).isEqualTo(null)
+    }
 
     @Test
     fun shadow_shouldBeAppliedTo_shadowLayer() {
