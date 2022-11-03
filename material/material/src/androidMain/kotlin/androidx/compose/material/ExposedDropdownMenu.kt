@@ -190,6 +190,7 @@ private class OnGlobalLayoutListener(
     }
 }
 
+@JvmDefaultWithCompatibility
 /**
  * Scope for [ExposedDropdownMenuBox].
  */

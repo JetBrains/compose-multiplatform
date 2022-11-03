@@ -141,6 +141,7 @@ interface TextFieldColors {
     fun cursorColor(isError: Boolean): State<Color>
 }
 
+@JvmDefaultWithCompatibility
 /**
  * Temporary experimental interface, to expose interactionSource to
  * leadingIconColor and trailingIconColor.

@@ -416,7 +416,7 @@ package androidx.compose.material {
   @kotlin.RequiresOptIn(message="This material API is experimental and is likely to change or to be removed in" + " the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalMaterialApi {
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi public interface ExposedDropdownMenuBoxScope {
+  @androidx.compose.material.ExperimentalMaterialApi @kotlin.jvm.JvmDefaultWithCompatibility public interface ExposedDropdownMenuBoxScope {
     method @androidx.compose.runtime.Composable public default void ExposedDropdownMenu(boolean expanded, kotlin.jvm.functions.Function0<kotlin.Unit> onDismissRequest, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
     method public androidx.compose.ui.Modifier exposedDropdownSize(androidx.compose.ui.Modifier, optional boolean matchTextFieldWidth);
   }
@@ -844,7 +844,7 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconColor(boolean enabled, boolean isError);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi public interface TextFieldColorsWithIcons extends androidx.compose.material.TextFieldColors {
+  @androidx.compose.material.ExperimentalMaterialApi @kotlin.jvm.JvmDefaultWithCompatibility public interface TextFieldColorsWithIcons extends androidx.compose.material.TextFieldColors {
     method @androidx.compose.runtime.Composable public default androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> leadingIconColor(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource);
     method @androidx.compose.runtime.Composable public default androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> trailingIconColor(boolean enabled, boolean isError, androidx.compose.foundation.interaction.InteractionSource interactionSource);
   }
