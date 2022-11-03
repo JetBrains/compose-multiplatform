@@ -119,6 +119,12 @@ class ComposableMethod internal constructor(
         get() = method.parameters.copyOfRange(0, composableInfo.realParamsCount)
 
     /**
+     * Returns method parameters types excluding the utility Compose-specific parameters.
+     */
+    val parameterTypes: Array<Class<*>>
+        get() = method.parameterTypes.copyOfRange(0, composableInfo.realParamsCount)
+
+    /**
      * Calls the Composable method on the given [instance]. If the method accepts default values,
      * this function will call it with the correct options set.
      */

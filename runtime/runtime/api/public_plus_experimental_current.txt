@@ -833,9 +833,11 @@ package androidx.compose.runtime.reflect {
   public final class ComposableMethod {
     method public java.lang.reflect.Method asMethod();
     method public int getParameterCount();
+    method public Class<?>![] getParameterTypes();
     method public java.lang.reflect.Parameter![] getParameters();
     method public operator Object? invoke(androidx.compose.runtime.Composer composer, Object? instance, java.lang.Object?... args);
     property public final int parameterCount;
+    property public final Class<?>![] parameterTypes;
     property public final java.lang.reflect.Parameter![] parameters;
   }
 
