@@ -350,6 +350,9 @@ private class ScrollingLogic(
 
     fun Offset.reverseIfNeeded(): Offset = if (reverseDirection) this * -1f else this
 
+    /**
+     * @return the amount of scroll that was consumed
+     */
     fun ScrollScope.dispatchScroll(availableDelta: Offset, source: NestedScrollSource): Offset {
         val scrollDelta = availableDelta.singleAxisOffset()
         val overscrollPreConsumed = overscrollPreConsumeDelta(scrollDelta, source)
@@ -376,7 +379,7 @@ private class ScrollingLogic(
             source
         )
 
-        return leftForParent - parentConsumed
+        return overscrollPreConsumed + preConsumedByParent + axisConsumed + parentConsumed
     }
 
     fun overscrollPreConsumeDelta(
@@ -447,8 +450,7 @@ private class ScrollingLogic(
         var result: Velocity = available
         scrollableState.scroll {
             val outerScopeScroll: (Offset) -> Offset = { delta ->
-                val consumed = this.dispatchScroll(delta.reverseIfNeeded(), Fling)
-                delta - consumed.reverseIfNeeded()
+                dispatchScroll(delta.reverseIfNeeded(), Fling).reverseIfNeeded()
             }
             val scope = object : ScrollScope {
                 override fun scrollBy(pixels: Float): Float {
