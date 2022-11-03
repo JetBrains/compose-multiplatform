@@ -298,9 +298,14 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 } else {
                     task.kotlinOptions.jvmTarget = "1.8"
                 }
-                task.kotlinOptions.freeCompilerArgs += listOf(
-                    "-Xskip-metadata-version-check"
+                val kotlinCompilerArgs = mutableListOf(
+                    "-Xskip-metadata-version-check",
                 )
+                // TODO (b/259578592): enable -Xjvm-default=all for camera-camera2-pipe projects
+                if (!project.name.contains("camera-camera2-pipe")) {
+                    kotlinCompilerArgs += "-Xjvm-default=all"
+                }
+                task.kotlinOptions.freeCompilerArgs += kotlinCompilerArgs
             }
 
             // If no one else is going to register a source jar, then we should.
