@@ -193,6 +193,7 @@ internal class SwipeableV2State<T>(
      *
      * To guarantee stricter semantics, consider using [requireOffset].
      */
+    @get:Suppress("AutoBoxing")
     val offset: Float? by derivedStateOf {
         dragPosition?.coerceIn(minBound, maxBound)
     }
