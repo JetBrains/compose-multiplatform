@@ -50,11 +50,3 @@ androidx {
     inceptionYear = "2022"
     description = "Additional tracing in Compose"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

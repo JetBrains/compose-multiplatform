@@ -55,11 +55,3 @@ androidx {
 android {
     namespace "androidx.compose.ui.viewbinding"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

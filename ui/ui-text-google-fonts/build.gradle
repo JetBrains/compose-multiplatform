@@ -52,11 +52,3 @@ androidx {
 android {
     namespace "androidx.compose.ui.text.googlefonts"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

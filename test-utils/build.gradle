@@ -122,11 +122,3 @@ androidx {
 android {
     namespace "androidx.compose.testutils"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

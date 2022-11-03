@@ -139,11 +139,3 @@ androidx {
 android {
     namespace "androidx.compose.ui.tooling"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

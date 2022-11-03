@@ -144,11 +144,3 @@ androidx {
 android {
     namespace "androidx.compose.animation.core"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all"
-        ]
-    }
-}

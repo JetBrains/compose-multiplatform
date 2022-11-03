@@ -103,11 +103,3 @@ tasks.withType(KotlinCompile).configureEach {
 inspection {
     name = "compose-ui-inspection.jar"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}
