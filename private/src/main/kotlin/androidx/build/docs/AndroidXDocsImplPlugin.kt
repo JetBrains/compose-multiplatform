@@ -460,6 +460,9 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 libraryMetadataFile.set(getMetadataRegularFile(project))
                 showLibraryMetadata = true
                 projectStructureMetadataFile = mergedProjectMetadata
+                // See go/dackka-source-link for details on this link.
+                baseSourceLink = "https://cs.android.com/search?" +
+                    "q=file:%s+class:%s&ss=androidx/platform/frameworks/support"
             }
         }
 

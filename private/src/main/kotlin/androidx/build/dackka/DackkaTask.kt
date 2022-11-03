@@ -111,6 +111,11 @@ abstract class DackkaTask @Inject constructor(
     @Input
     var showLibraryMetadata: Boolean = false
 
+    // The base URL to create source links for classes, as a format string with placeholders for the
+    // file path and qualified class name.
+    @Input
+    lateinit var baseSourceLink: String
+
     private fun sourceSets(): List<DokkaInputModels.SourceSet> {
         val externalDocs = externalLinks.map { (name, url) ->
             DokkaInputModels.GlobalDocsLink(
@@ -119,6 +124,13 @@ abstract class DackkaTask @Inject constructor(
                     "file://${docsProjectDir.toPath()}/package-lists/$name/package-list"
             )
         }
+        val sourceLinks = listOf(
+            DokkaInputModels.SrcLink(
+                // This is part of dokka source links but isn't needed by dackka
+                File("/"),
+                baseSourceLink
+            )
+        )
         val gson = GsonBuilder().create()
         val multiplatformSourceSets = projectStructureMetadataFile
             .takeIf { it.exists() }
@@ -147,7 +159,7 @@ abstract class DackkaTask @Inject constructor(
                         noJdkLink = !analysisPlatform.androidOrJvm(),
                         noAndroidSdkLink = analysisPlatform != DokkaAnalysisPlatform.ANDROID,
                         noStdlibLink = false,
-                        sourceLinks = emptyList()
+                        sourceLinks = sourceLinks
                     )
                 }
         } ?: emptyList()
@@ -165,7 +177,7 @@ abstract class DackkaTask @Inject constructor(
                 noJdkLink = false,
                 noAndroidSdkLink = false,
                 noStdlibLink = false,
-                sourceLinks = emptyList()
+                sourceLinks = sourceLinks
             )
         ) + multiplatformSourceSets
     }
