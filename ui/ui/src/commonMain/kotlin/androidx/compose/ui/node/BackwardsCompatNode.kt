@@ -242,7 +242,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
 
     override fun onMeasureResultChanged() {
         invalidateCache = true
-        requestDraw()
+        invalidateDraw()
     }
 
     private fun updateDrawCache() {
@@ -259,7 +259,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
 
     internal fun onDrawCacheReadsChanged() {
         invalidateCache = true
-        requestDraw()
+        invalidateDraw()
     }
 
     private var focusOrderElement: FocusPropertiesModifier? = null

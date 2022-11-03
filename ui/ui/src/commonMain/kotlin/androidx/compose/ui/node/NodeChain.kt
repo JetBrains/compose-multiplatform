@@ -27,6 +27,8 @@ import androidx.compose.ui.layout.ModifierInfo
 
 private val SentinelHead = object : Modifier.Node() {
     override fun toString() = "<Head>"
+}.apply {
+    aggregateChildKindSet = 0.inv()
 }
 
 internal class NodeChain(val layoutNode: LayoutNode) {
@@ -196,7 +198,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             syncCoordinators()
         }
         if (attachNeeded && layoutNode.isAttached) {
-            attach()
+            attach(performInvalidations = true)
         }
     }
 
@@ -228,9 +230,12 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         outerCoordinator = coordinator
     }
 
-    fun attach() {
+    fun attach(performInvalidations: Boolean) {
         headToTail {
-            if (!it.isAttached) it.attach()
+            if (!it.isAttached) {
+                it.attach()
+                if (performInvalidations) autoInvalidateNode(it)
+            }
         }
     }
 
@@ -423,7 +428,13 @@ internal class NodeChain(val layoutNode: LayoutNode) {
     }
 
     private fun disposeAndRemoveNode(node: Modifier.Node): Modifier.Node {
-        if (node.isAttached) node.detach()
+        if (node.isAttached) {
+            // for removing nodes, we always do the autoInvalidateNode call,
+            // regardless of whether or not it was a ModifierNodeElement with autoInvalidate
+            // true, or a BackwardsCompatNode, etc.
+            autoInvalidateNode(node)
+            node.detach()
+        }
         return removeNode(node)
     }
 
@@ -498,6 +509,8 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         if (prev !is ModifierNodeElement<*> || next !is ModifierNodeElement<*>) {
             check(node is BackwardsCompatNode)
             node.element = next
+            // we always autoInvalidate BackwardsCompatNode
+            autoInvalidateNode(node)
             return node
         }
         val updated = next.updateUnsafe(node)
@@ -508,6 +521,11 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         } else {
             // the node was updated. we are done.
             updated
+        }
+        if (next.autoInvalidate) {
+            // the modifier element is labeled as "auto invalidate", which means that since the
+            // node was updated, we need to invalidate everything relevant to it
+            autoInvalidateNode(result)
         }
         return result
     }

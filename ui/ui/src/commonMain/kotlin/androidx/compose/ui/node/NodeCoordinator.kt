@@ -256,11 +256,13 @@ internal abstract class NodeCoordinator(
         get() {
             var data: Any? = null
             val thisNode = tail
-            with(layoutNode.density) {
-                layoutNode.nodes.tailToHead {
-                    if (it === thisNode) return@tailToHead
-                    if (it.isKind(Nodes.ParentData) && it is ParentDataModifierNode) {
-                        data = with(it) { modifyParentData(data) }
+            if (layoutNode.nodes.has(Nodes.ParentData)) {
+                with(layoutNode.density) {
+                    layoutNode.nodes.tailToHead {
+                        if (it === thisNode) return@tailToHead
+                        if (it.isKind(Nodes.ParentData) && it is ParentDataModifierNode) {
+                            data = with(it) { modifyParentData(data) }
+                        }
                     }
                 }
             }
@@ -310,15 +312,6 @@ internal abstract class NodeCoordinator(
                 }
             }
         }
-    }
-
-    /**
-     * An initialization function that is called when the [NodeCoordinator] is initially created,
-     * and also called when the [NodeCoordinator] is re-used.
-     */
-    // TODO(lmr): we should try and get rid of this since it isn't always needed!
-    fun onInitialize() {
-        layer?.invalidate()
     }
 
     /**

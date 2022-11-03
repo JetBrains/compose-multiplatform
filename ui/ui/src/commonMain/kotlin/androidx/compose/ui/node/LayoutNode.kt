@@ -384,7 +384,7 @@ internal class LayoutNode(
         mLookaheadScope =
             parent?.mLookaheadScope ?: if (isLookaheadRoot) LookaheadScope(this) else null
 
-        nodes.attach()
+        nodes.attach(performInvalidations = false)
         _foldedChildren.forEach { child ->
             child.attach(owner)
         }
@@ -732,37 +732,20 @@ internal class LayoutNode(
                 "Modifiers are not supported on virtual LayoutNodes"
             }
             field = value
-            val oldShouldInvalidateParentLayer = shouldInvalidateParentLayer()
-            val oldOuterCoordinator = outerCoordinator
-
             nodes.updateFrom(value)
 
             // TODO(lmr): we don't need to do this every time and should attempt to avoid it
             //  whenever possible!
             forEachCoordinatorIncludingInner {
-                it.onInitialize()
                 it.updateLookaheadScope(mLookaheadScope)
             }
 
-            // TODO(lmr): lets move this to the responsibility of the nodes
             layoutDelegate.updateParentData()
-
-            // TODO(lmr): lets move this to the responsibility of the nodes
-            if (oldShouldInvalidateParentLayer || shouldInvalidateParentLayer())
-                parent?.invalidateLayer()
-
-            // TODO(lmr): this logic is not clear to me, but we want to move all invalidate* calls
-            //  to the responsibility of the nodes to avoid unnecessary work. Let's try to include
-            //  this one as well since it looks like it will be hit quite a bit
-            // Optimize the case where the layout itself is not modified. A common reason for
-            // this is if no wrapping actually occurs above because no LayoutModifiers are
-            // present in the modifier chain.
-            if (oldOuterCoordinator != innerCoordinator ||
-                outerCoordinator != innerCoordinator
-            ) {
-                invalidateMeasurements()
-            }
         }
+
+    internal fun invalidateParentData() {
+        layoutDelegate.invalidateParentData()
+    }
 
     /**
      * Coordinates of just the contents of the [LayoutNode], after being affected by all modifiers.

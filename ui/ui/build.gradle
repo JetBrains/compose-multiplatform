@@ -30,6 +30,20 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
 
+    constraints {
+        // In 1.4.0-alpha02 there was a change made in :compose:ui:ui which fixed an issue where
+        // we were over-invalidating layout. This change caused a corresponding regression in
+        // foundation's CoreText, where it was expecting a layout to happen but with this change
+        // it would not. A corresponding fix for this was added in 1.4.0-alpha02 of
+        // :compose:foundation:foundation. By adding this constraint, we are ensuring that the
+        // if an app has this ui module _and_ the foundation module as a dependency, then the
+        // version of foundation will be at least this version. This will prevent the bug in
+        // foundation from occurring. This does _NOT_ require that the app have foundation as
+        // a dependency.
+        implementation(project(":compose:foundation:foundation")) {
+            because 'prevents a critical bug in Text'
+        }
+    }
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
