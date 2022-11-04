@@ -24,7 +24,6 @@ import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.SkippableUpdater
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
 import androidx.compose.ui.graphics.GraphicsLayerScope
@@ -157,7 +156,6 @@ inline fun Layout(
  *
  * @see Layout for a simpler use case when you have only one content lambda.
  */
-@ExperimentalComposeUiApi
 @Suppress("ComposableLambdaParameterPosition", "NOTHING_TO_INLINE")
 @UiComposable
 @Composable

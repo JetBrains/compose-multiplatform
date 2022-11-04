@@ -17,7 +17,6 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.getChildrenOfVirtualChildren
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.util.fastMap
@@ -56,7 +55,6 @@ import androidx.compose.ui.util.fastMap
  * @see MeasurePolicy
  */
 @Stable
-@ExperimentalComposeUiApi
 fun interface MultiContentMeasurePolicy {
     /**
      * The function that defines the measurement and layout. Each [Measurable] in the [measurables]
@@ -196,11 +194,9 @@ fun interface MultiContentMeasurePolicy {
     }
 }
 
-@ExperimentalComposeUiApi
 @PublishedApi
 internal fun createMeasurePolicy(
-    // metalava thinks experimental MultiContentMeasurePolicy is hidden b/244423074
-    @Suppress("HiddenTypeParameter") measurePolicy: MultiContentMeasurePolicy
+    measurePolicy: MultiContentMeasurePolicy
 ): MeasurePolicy =
     with(measurePolicy) {
         object : MeasurePolicy {
