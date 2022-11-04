@@ -18,17 +18,14 @@ package androidx.compose.ui.text
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
-import androidx.compose.ui.text.style.TextDecoration
 import kotlin.math.ceil
 
-internal fun AndroidParagraph.bitmap(
-    textDecoration: TextDecoration? = null
-): Bitmap {
+internal fun AndroidParagraph.bitmap(): Bitmap {
     val bitmap = Bitmap.createBitmap(
         ceil(this.width).toInt(),
         ceil(this.height).toInt(),
         Bitmap.Config.ARGB_8888
     )
-    this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)), textDecoration = textDecoration)
+    this.paint(androidx.compose.ui.graphics.Canvas(Canvas(bitmap)))
     return bitmap
 }

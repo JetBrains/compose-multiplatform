@@ -57,24 +57,27 @@ object TextPainter {
             canvas.save()
             canvas.clipRect(bounds)
         }
+        val resolvedSpanStyle = resolveSpanStyleDefaults(
+            textLayoutResult.layoutInput.style.spanStyle
+        )
         try {
-            val brush = textLayoutResult.layoutInput.style.brush
+            val brush = resolvedSpanStyle.brush
             if (brush != null) {
                 textLayoutResult.multiParagraph.paint(
-                    canvas,
-                    brush,
-                    textLayoutResult.layoutInput.style.alpha,
-                    textLayoutResult.layoutInput.style.shadow,
-                    textLayoutResult.layoutInput.style.textDecoration,
-                    textLayoutResult.layoutInput.style.drawStyle
+                    canvas = canvas,
+                    brush = brush,
+                    alpha = resolvedSpanStyle.alpha,
+                    shadow = resolvedSpanStyle.shadow,
+                    decoration = resolvedSpanStyle.textDecoration,
+                    drawStyle = resolvedSpanStyle.drawStyle
                 )
             } else {
                 textLayoutResult.multiParagraph.paint(
-                    canvas,
-                    textLayoutResult.layoutInput.style.color,
-                    textLayoutResult.layoutInput.style.shadow,
-                    textLayoutResult.layoutInput.style.textDecoration,
-                    textLayoutResult.layoutInput.style.drawStyle
+                    canvas = canvas,
+                    color = resolvedSpanStyle.color,
+                    shadow = resolvedSpanStyle.shadow,
+                    decoration = resolvedSpanStyle.textDecoration,
+                    drawStyle = resolvedSpanStyle.drawStyle
                 )
             }
         } finally {
@@ -323,7 +326,8 @@ fun DrawScope.drawText(
 
 private fun DrawTransform.clip(textLayoutResult: TextLayoutResult) {
     if (textLayoutResult.hasVisualOverflow &&
-        textLayoutResult.layoutInput.overflow != TextOverflow.Visible) {
+        textLayoutResult.layoutInput.overflow != TextOverflow.Visible
+    ) {
         clipRect(
             left = 0f,
             top = 0f,

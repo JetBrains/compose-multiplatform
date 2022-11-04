@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
 import androidx.compose.ui.text.style.BaselineShift
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
@@ -258,7 +257,7 @@ class ApplySpanStyleTest {
         assertThat(notApplied.background).isEqualTo(Color.Unspecified)
     }
 
-    @Test
+    /*@Test
     fun textDecorationUnderline_shouldBeLeftAsSpan() {
         val textDecoration = TextDecoration.Underline
         val spanStyle = SpanStyle(textDecoration = textDecoration)
@@ -297,7 +296,7 @@ class ApplySpanStyleTest {
         assertThat(tp.isUnderlineText).isEqualTo(false)
         assertThat(tp.isStrikeThruText).isEqualTo(false)
         assertThat(notApplied.textDecoration).isNull()
-    }
+    }*/
 
     @Test
     fun shadow_shouldBeAppliedTo_shadowLayer() {
