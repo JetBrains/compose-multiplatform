@@ -127,7 +127,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         modifyGradleProperties {
             setProperty("org.gradle.caching", "true")
         }
-        modifyTextFile("settings.gradle") {
+        modifyText("settings.gradle") {
             it + "\n" + """
                 buildCache {
                     local {
@@ -150,26 +150,6 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun packageMpp() = with(testProject(TestProjects.mpp)) {
-        testPackageJvmDistributions()
-    }
-
-    private fun customJavaHomeProject(javaVersion: Int): TestProject =
-        testProject(
-            TestProjects.customJavaHome,
-            defaultTestEnvironment.copy(customJavaToolchainVersion = javaVersion)
-        )
-
-    @Test
-    fun testJdk15() = with(customJavaHomeProject(15)) {
-        testPackageJvmDistributions()
-    }
-    @Test
-    fun testJdk18() = with(customJavaHomeProject(18)) {
-        testPackageJvmDistributions()
-    }
-
-    @Test
-    fun testJdk19() = with(customJavaHomeProject(19)) {
         testPackageJvmDistributions()
     }
 
@@ -198,6 +178,33 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.uppercaseFirstChar()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":packageDistributionForCurrentOS")?.outcome)
     }
+
+    @Test
+    fun testJdk15() = with(customJdkProject(15)) {
+        testPackageJvmDistributions()
+    }
+    @Test
+    fun testJdk18() = with(customJdkProject(18)) {
+        testPackageJvmDistributions()
+    }
+
+    @Test
+    fun testJdk19() = with(customJdkProject(19)) {
+        testPackageJvmDistributions()
+    }
+
+    private fun customJdkProject(javaVersion: Int): TestProject =
+        testProject(TestProjects.jvm).apply {
+            appendText("build.gradle") {
+                """
+                    compose.desktop.application {
+                        javaHome = javaToolchains.launcherFor {
+                            languageVersion.set(JavaLanguageVersion.of($javaVersion))
+                        }.get().metadata.installationPath.asFile.absolutePath
+                    }
+                """.trimIndent()
+            }
+        }
 
     @Test
     fun packageUberJarForCurrentOSJvm() = with(testProject(TestProjects.jvm)) {

@@ -15,13 +15,11 @@ data class TestEnvironment(
     val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
     val composeCompilerArtifact: String? = null,
-    val customJavaToolchainVersion: Int? = null
 ) {
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
         "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
         "COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER" to composeCompilerArtifact,
-        "CUSTOM_JAVA_TOOLCHAIN_VERSION_PLACEHOLDER" to customJavaToolchainVersion?.toString()
     )
 
     fun replacePlaceholdersInFile(file: File) {
@@ -79,12 +77,20 @@ class TestProject(
     fun file(path: String): File =
         testEnvironment.workingDir.resolve(path)
 
-    fun modifyTextFile(path: String, fn: (String) -> String) {
+    fun modifyText(path: String, fn: (String) -> String) {
         val file = file(path)
         val oldContent = file.readText()
         val newContent = fn(oldContent)
         file.writeText(newContent)
     }
+
+    fun appendText(path: String, fn: () -> String) {
+        val file = file(path)
+        val oldContent = file.readText()
+        val newContent = oldContent + "\n" + fn()
+        file.writeText(newContent)
+    }
+
     fun modifyGradleProperties(fn: Properties.() -> Unit) {
         val propertiesFile = file("gradle.properties")
         val properties = Properties()
