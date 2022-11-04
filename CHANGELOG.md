@@ -1,83 +1,111 @@
+# 1.2.1 (November 2022)
+## Common
+
+### Fixes
+- [Fix `kotlinCompilerPlugin` property](https://github.com/JetBrains/compose-jb/pull/2396)
+- Fix [runDistributable fails in v1.2.0-beta01](https://github.com/JetBrains/compose-jb/issues/2329)
+- Fix [Packaging fails on JDK-19](https://github.com/JetBrains/compose-jb/issues/2328)
+
+## Desktop
+
+### Fixes
+- Fix [`duplicate definition of resource file` when running packageRelease](https://github.com/JetBrains/compose-jb/issues/2393)
+- [Fix support of GPU's which don't support DirectX 12](https://github.com/JetBrains/skiko/pull/603)
+
+## Web
+
+### Fixes
+- [Support Kotlin 1.7.20](https://github.com/JetBrains/compose-jb/issues/2349)
+
+## Updated dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.3.2)
+- [Runtime 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.2.1)
+- [UI 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.2.1)
+- [Foundation 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.2.1)
+- [Material 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.2.1)
+- [Material3 1.0.0-alpha14](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha14)
+
 # 1.2.0 (October 2022)
 ## Common
 
 ### Features
-* [Allow to use Compose on multiple Kotlin versions](https://github.com/JetBrains/compose-jb/pull/2366)
-* [`import org.jetbrains.compose.compose` is no longer needed in build.gradle.kts](https://github.com/JetBrains/compose-jb/pull/2215)
-* [Allow to use a custom Compose Compiler](https://github.com/JetBrains/compose-jb/pull/2347)
+- [Allow to use Compose on multiple Kotlin versions](https://github.com/JetBrains/compose-jb/pull/2366)
+- [`import org.jetbrains.compose.compose` is no longer needed in build.gradle.kts](https://github.com/JetBrains/compose-jb/pull/2215)
+- [Allow to use a custom Compose Compiler](https://github.com/JetBrains/compose-jb/pull/2347)
 
 ## Desktop
 
 ### Features
-* [Support Kotlin 1.7.20](https://github.com/JetBrains/compose-jb/pull/2357)
-* [ProGuard integration for packaging](https://github.com/JetBrains/compose-jb/pull/2313)
-* [New experimental event API (onClick, onDrag, WindowInfo.keyboardModifiers)](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#new-experimental-onclick-handlers-only-for-desktop-jvm-platform)
-* Focus
-    * [Make clickable, mouseClickable, toggleable request focus onClick](https://github.com/JetBrains/androidx/pull/257)
-    * [Toggle a toggleable component on Space key](https://github.com/JetBrains/androidx/pull/262)
-    * [Make Slider change the value with onKeyEvent for: all arrows, PgDn, PdUp, Home, End buttons](https://github.com/JetBrains/androidx/pull/254)
-    * [Navigate drop down menu items using up and down arrows](https://github.com/JetBrains/androidx/pull/259)
-* [Ability to override text context menu globally](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Context_Menu#custom-text-context-menu)
-* [Context menu implementation for integrating into Swing applications](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Context_Menu#swing-interoperability)
-* [Animated image component](https://github.com/JetBrains/compose-jb/pull/2015)
-* [Show a new window/dialog on the same display](https://github.com/JetBrains/androidx/pull/312)
-* [Change default Font on MacOs to San Francisco](https://github.com/JetBrains/androidx/pull/296)
-* Support [performKeyInput](https://github.com/JetBrains/androidx/pull/278), [performMouseInput, performTextInput](https://github.com/JetBrains/androidx/pull/260) in tests.
-* Focus switches seamlessly between Swing and Compose components using [SwingPanel](https://github.com/JetBrains/androidx/pull/229) or [ComposePanel](https://github.com/JetBrains/androidx/pull/228)
-* [Documentation for how to package apps using Conveyor](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#available-tools)
+- [Support Kotlin 1.7.20](https://github.com/JetBrains/compose-jb/pull/2357)
+- [ProGuard integration for packaging](https://github.com/JetBrains/compose-jb/pull/2313)
+- [New experimental event API (onClick, onDrag, WindowInfo.keyboardModifiers)](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Mouse_Events#new-experimental-onclick-handlers-only-for-desktop-jvm-platform)
+- Focus
+    - [Make clickable, mouseClickable, toggleable request focus onClick](https://github.com/JetBrains/androidx/pull/257)
+    - [Toggle a toggleable component on Space key](https://github.com/JetBrains/androidx/pull/262)
+    - [Make Slider change the value with onKeyEvent for: all arrows, PgDn, PdUp, Home, End buttons](https://github.com/JetBrains/androidx/pull/254)
+    - [Navigate drop down menu items using up and down arrows](https://github.com/JetBrains/androidx/pull/259)
+- [Ability to override text context menu globally](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Context_Menu#custom-text-context-menu)
+- [Context menu implementation for integrating into Swing applications](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Context_Menu#swing-interoperability)
+- [Animated image component](https://github.com/JetBrains/compose-jb/pull/2015)
+- [Show a new window/dialog on the same display](https://github.com/JetBrains/androidx/pull/312)
+- [Change default Font on MacOs to San Francisco](https://github.com/JetBrains/androidx/pull/296)
+- Support [performKeyInput](https://github.com/JetBrains/androidx/pull/278), [performMouseInput, performTextInput](https://github.com/JetBrains/androidx/pull/260) in tests.
+- Focus switches seamlessly between Swing and Compose components using [SwingPanel](https://github.com/JetBrains/androidx/pull/229) or [ComposePanel](https://github.com/JetBrains/androidx/pull/228)
+- [Documentation for how to package apps using Conveyor](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#available-tools)
 
 ### Fixes
-* [Fix IDEA plugin compatability](https://github.com/JetBrains/compose-jb/pull/2318)
-* Fixes for Right-to-Left languages support
-    * [LayoutDirection is detected from the system settings](https://github.com/JetBrains/androidx/pull/264)
-    * [Fix RTL selection in a multiline text](https://github.com/JetBrains/androidx/pull/285)
-    * [Fix cursor visual position at BiDi transition](https://github.com/JetBrains/androidx/pull/286)
-    * [Fix the cursor position after the '\n' character in RTL](https://github.com/JetBrains/androidx/pull/268)
-    * [In placeAutoMirrored for RTL, calculate the placement position using the placeable width respecting the constraints](https://github.com/JetBrains/androidx/pull/267)
-    * [Placing the root content properly for RTL layout](https://github.com/JetBrains/androidx/pull/265)
-* TextField
-    * [Fix the cursor position when clicking at a position after a line-break](https://github.com/JetBrains/androidx/pull/284)
-    * [Fix selection with End, Home](https://github.com/JetBrains/androidx/pull/279)
-    * [Fix the cursor height on a new empty line](https://github.com/JetBrains/androidx/pull/277)
-* [Fix DesktopMenu and DesktopAlertDialog to invoke dismiss callback once](https://github.com/JetBrains/androidx/pull/256)
-* [Fix a large icon in macOs menu](https://github.com/JetBrains/androidx/pull/248)
-* [Fix hover in LazyColumn](https://github.com/JetBrains/androidx/pull/249)
-* [Fix pointerHoverIcon: update icon when it's changed conditionally](https://github.com/JetBrains/androidx/pull/231)
-* [Fix focusable parameter for Window and Dialog](https://github.com/JetBrains/androidx/pull/225)
-* [Fix 2 SplitPanel minor bugs](https://github.com/JetBrains/compose-jb/pull/2175)
-* [Fix `java.lang.IllegalStateException: cannot open system clipboard` crash](https://github.com/JetBrains/skiko/pull/586)
-* [Fix `System.setProperty("skiko.renderApi", "SOFTWARE"` on macOS](https://github.com/JetBrains/skiko/pull/599)
+- [Fix IDEA plugin compatability](https://github.com/JetBrains/compose-jb/pull/2318)
+- Fixes for Right-to-Left languages support
+    - [LayoutDirection is detected from the system settings](https://github.com/JetBrains/androidx/pull/264)
+    - [Fix RTL selection in a multiline text](https://github.com/JetBrains/androidx/pull/285)
+    - [Fix cursor visual position at BiDi transition](https://github.com/JetBrains/androidx/pull/286)
+    - [Fix the cursor position after the '\n' character in RTL](https://github.com/JetBrains/androidx/pull/268)
+    - [In placeAutoMirrored for RTL, calculate the placement position using the placeable width respecting the constraints](https://github.com/JetBrains/androidx/pull/267)
+    - [Placing the root content properly for RTL layout](https://github.com/JetBrains/androidx/pull/265)
+- TextField
+    - [Fix the cursor position when clicking at a position after a line-break](https://github.com/JetBrains/androidx/pull/284)
+    - [Fix selection with End, Home](https://github.com/JetBrains/androidx/pull/279)
+    - [Fix the cursor height on a new empty line](https://github.com/JetBrains/androidx/pull/277)
+- [Fix DesktopMenu and DesktopAlertDialog to invoke dismiss callback once](https://github.com/JetBrains/androidx/pull/256)
+- [Fix a large icon in macOs menu](https://github.com/JetBrains/androidx/pull/248)
+- [Fix hover in LazyColumn](https://github.com/JetBrains/androidx/pull/249)
+- [Fix pointerHoverIcon: update icon when it's changed conditionally](https://github.com/JetBrains/androidx/pull/231)
+- [Fix focusable parameter for Window and Dialog](https://github.com/JetBrains/androidx/pull/225)
+- [Fix 2 SplitPanel minor bugs](https://github.com/JetBrains/compose-jb/pull/2175)
+- [Fix `java.lang.IllegalStateException: cannot open system clipboard` crash](https://github.com/JetBrains/skiko/pull/586)
+- [Fix `System.setProperty("skiko.renderApi", "SOFTWARE"` on macOS](https://github.com/JetBrains/skiko/pull/599)
 
 ### API changes
-* [Deprecate experimental pointerMoveFilter in favor of onPointerEvent](https://github.com/JetBrains/androidx/pull/247)
-* [Deprecate experimental Modifier.mouseClickable in favor of Modifier.onClick](https://github.com/JetBrains/androidx/pull/243)
+- [Deprecate experimental pointerMoveFilter in favor of onPointerEvent](https://github.com/JetBrains/androidx/pull/247)
+- [Deprecate experimental Modifier.mouseClickable in favor of Modifier.onClick](https://github.com/JetBrains/androidx/pull/243)
 
 ## Web
 
 ### Features
-* Support Kotlin 1.7.10
-* [Add support for transition in CSS api](https://github.com/JetBrains/compose-jb/pull/2228)
-* [Add missing `background-blend-mode` property](https://github.com/JetBrains/compose-jb/pull/2128)
-* [SVG: Publish custom attr functions](https://github.com/JetBrains/compose-jb/pull/2127)
-* [Add list overload for `classes`](https://github.com/JetBrains/compose-jb/pull/2094)
-* [Add support of dl, dt and dd](https://github.com/JetBrains/compose-jb/pull/1922)
+- Support Kotlin 1.7.10
+- [Add support for transition in CSS api](https://github.com/JetBrains/compose-jb/pull/2228)
+- [Add missing `background-blend-mode` property](https://github.com/JetBrains/compose-jb/pull/2128)
+- [SVG: Publish custom attr functions](https://github.com/JetBrains/compose-jb/pull/2127)
+- [Add list overload for `classes`](https://github.com/JetBrains/compose-jb/pull/2094)
+- [Add support of dl, dt and dd](https://github.com/JetBrains/compose-jb/pull/1922)
 
 ### Fixes
-* [Add pom information and license to Web artifacts](https://github.com/JetBrains/compose-jb/pull/2195)
+- [Add pom information and license to Web artifacts](https://github.com/JetBrains/compose-jb/pull/2195)
 
 ### API changes
-* [Deprecate 3 overloads of StyleScope.borderWidth with wrong parameter names](https://github.com/JetBrains/compose-jb/pull/2297)
-* [Remove deprecated compose.web.web-widgets from the source code](https://github.com/JetBrains/compose-jb/pull/2294)
-* [Remove unnecessary parameter for `required` attribute](https://github.com/JetBrains/compose-jb/pull/1988)
+- [Deprecate 3 overloads of StyleScope.borderWidth with wrong parameter names](https://github.com/JetBrains/compose-jb/pull/2297)
+- [Remove deprecated compose.web.web-widgets from the source code](https://github.com/JetBrains/compose-jb/pull/2294)
+- [Remove unnecessary parameter for `required` attribute](https://github.com/JetBrains/compose-jb/pull/1988)
 
 ## Updated dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
-* [Compiler 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.3.2)
-* [Runtime 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.2.1)
-* [UI 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.2.1)
-* [Foundation 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.2.1)
-* [Material 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.2.1)
-* [Material3 1.0.0-alpha14](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha14)
+- [Compiler 1.3.2](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.3.2)
+- [Runtime 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.2.1)
+- [UI 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.2.1)
+- [Foundation 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.2.1)
+- [Material 1.2.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.2.1)
+- [Material3 1.0.0-alpha14](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha14)
 
 # 1.1.1 (Mar 2022)
 ## Desktop
@@ -159,12 +187,12 @@ fun main() = singleWindowApplication {
 
 ## Updated dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
-* [Compiler 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.1.0)
-* [Runtime 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.1.0)
-* [UI 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.1.0)
-* [Foundation 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.1.0)
-* [Material 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.1.0)
-* [Material3 1.0.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha05)
+- [Compiler 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.1.0)
+- [Runtime 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.1.0)
+- [UI 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.1.0)
+- [Foundation 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.1.0)
+- [Material 1.1.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.1.0)
+- [Material3 1.0.0-alpha05](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha05)
 
 # 1.0.1 (Dec 2021)
 This is basically 1.0.0 that works with Kotlin 1.6.10
@@ -194,12 +222,12 @@ This is basically 1.0.0 that works with Kotlin 1.6.10
 
 ## Updated dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
-* [Compiler 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.1.0-beta02)
-* [Runtime 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.1.0-beta02)
-* [UI 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.1.0-beta02)
-* [Foundation 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.1.0-beta02)
-* [Material 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.1.0-beta02)
-* [Material3 1.0.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha03)
+- [Compiler 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.1.0-beta02)
+- [Runtime 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.1.0-beta02)
+- [UI 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.1.0-beta02)
+- [Foundation 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.1.0-beta02)
+- [Material 1.1.0-beta02](https://developer.android.com/jetpack/androidx/releases/compose-material#1.1.0-beta02)
+- [Material3 1.0.0-alpha03](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.0-alpha03)
 
 # 1.0.0-beta (Oct 2021)
 ## Common
@@ -288,49 +316,49 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 
 
 # M4 (Jun 2021)
-  * New experimental [Composable Window API](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)
-  * [Tooltips](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Desktop_Components#tooltips)
-  * Use [Metal renderer for macOS by default](https://github.com/JetBrains/skiko/pull/70)
-  * [Expose a swing mouse event in Modifier.pointerInput](https://github.com/JetBrains/compose-jb/issues/129#issuecomment-784149646)
-  * Improved [keyboard support in TextField](https://android-review.googlesource.com/c/platform/frameworks/support/+/1578803)
-  * Avoid forcing discrete GPU on multi-GPU MacOS machines in [Skiko](https://github.com/JetBrains/skiko/pull/83) and [native distributions](https://github.com/JetBrains/compose-jb/issues/545)
-  * [Make DropdownMenu focusable by default](https://github.com/JetBrains/compose-jb/issues/375)
-  * [Scrollbar. get rid of itemCount and averageItemSize from rememberScrollbarAdapte](https://github.com/JetBrains/compose-jb/issues/181)
-  * [Support scrollbars for LazyColumn with reverseLayout = true](https://github.com/JetBrains/compose-jb/issues/209)
-  * Fix [memory leak](https://github.com/JetBrains/compose-jb/issues/538)
-  * Fix [Scroll NaN rounding bug, desktop version](https://github.com/JetBrains/compose-jb/issues/304)
-  * Fix [Dragging prevents pointer move events](https://github.com/JetBrains/compose-jb/issues/134)
-  * Fix [Dragging window to another display makes Icon show up incorrectly](https://github.com/JetBrains/compose-jb/issues/677)
-  * Fix ["Padding must be non-negative" after resizing window with Slider and Box](https://github.com/JetBrains/compose-jb/issues/367)
-  * Breaking change [old Dialog/Menubar/Tray are moved to androidx.compose.ui.window.v1](https://android-review.googlesource.com/c/platform/frameworks/support/+/1685905)
+  - New experimental [Composable Window API](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Window_API_new)
+  - [Tooltips](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Desktop_Components#tooltips)
+  - Use [Metal renderer for macOS by default](https://github.com/JetBrains/skiko/pull/70)
+  - [Expose a swing mouse event in Modifier.pointerInput](https://github.com/JetBrains/compose-jb/issues/129#issuecomment-784149646)
+  - Improved [keyboard support in TextField](https://android-review.googlesource.com/c/platform/frameworks/support/+/1578803)
+  - Avoid forcing discrete GPU on multi-GPU MacOS machines in [Skiko](https://github.com/JetBrains/skiko/pull/83) and [native distributions](https://github.com/JetBrains/compose-jb/issues/545)
+  - [Make DropdownMenu focusable by default](https://github.com/JetBrains/compose-jb/issues/375)
+  - [Scrollbar. get rid of itemCount and averageItemSize from rememberScrollbarAdapte](https://github.com/JetBrains/compose-jb/issues/181)
+  - [Support scrollbars for LazyColumn with reverseLayout = true](https://github.com/JetBrains/compose-jb/issues/209)
+  - Fix [memory leak](https://github.com/JetBrains/compose-jb/issues/538)
+  - Fix [Scroll NaN rounding bug, desktop version](https://github.com/JetBrains/compose-jb/issues/304)
+  - Fix [Dragging prevents pointer move events](https://github.com/JetBrains/compose-jb/issues/134)
+  - Fix [Dragging window to another display makes Icon show up incorrectly](https://github.com/JetBrains/compose-jb/issues/677)
+  - Fix ["Padding must be non-negative" after resizing window with Slider and Box](https://github.com/JetBrains/compose-jb/issues/367)
+  - Breaking change [old Dialog/Menubar/Tray are moved to androidx.compose.ui.window.v1](https://android-review.googlesource.com/c/platform/frameworks/support/+/1685905)
 
 # M3 (Feb 2021)
-   * Improve [TextField](https://github.com/JetBrains/compose-jb/issues/277)
-   * Support [SVG](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Image_And_Icons_Manipulations#loading-svg-images)
-   * Support [vsync](https://github.com/JetBrains/skiko/pull/44),  [sync composition with rendering frames](https://android-review.googlesource.com/c/platform/frameworks/support/+/1534675)
-   * Support [DirectX on Windows by default](https://github.com/JetBrains/skiko/pull/63)
-   * Support [software rendering fallback](https://github.com/JetBrains/skiko/pull/56)
-   * Implement [signing and notarization for macOS](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Signing_and_notarization_on_macOS)
-   * Improve Swing interoperability support [Swing component in Compose hierarchy](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Swing_Integration#adding-a-swing-component-to-cfd-composition-using-swingpanel)
-   * Support using [Compose in IntelliJ plugins](https://github.com/JetBrains/compose-jb/tree/master/examples/intelliJPlugin)
-   * Skiko native binaries are now signed on macOS (x64 and arm)
-   * Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
-   * Fix [Laggy UI on Linux](https://github.com/JetBrains/compose-jb/issues/23)
-   * Fix [Using AndroidX Compose specific dependencies for Android target](https://github.com/JetBrains/compose-jb/issues/272)
+   - Improve [TextField](https://github.com/JetBrains/compose-jb/issues/277)
+   - Support [SVG](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Image_And_Icons_Manipulations#loading-svg-images)
+   - Support [vsync](https://github.com/JetBrains/skiko/pull/44),  [sync composition with rendering frames](https://android-review.googlesource.com/c/platform/frameworks/support/+/1534675)
+   - Support [DirectX on Windows by default](https://github.com/JetBrains/skiko/pull/63)
+   - Support [software rendering fallback](https://github.com/JetBrains/skiko/pull/56)
+   - Implement [signing and notarization for macOS](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Signing_and_notarization_on_macOS)
+   - Improve Swing interoperability support [Swing component in Compose hierarchy](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Swing_Integration#adding-a-swing-component-to-cfd-composition-using-swingpanel)
+   - Support using [Compose in IntelliJ plugins](https://github.com/JetBrains/compose-jb/tree/master/examples/intelliJPlugin)
+   - Skiko native binaries are now signed on macOS (x64 and arm)
+   - Fix [Ambients are not transferred across pop ups](https://github.com/JetBrains/compose-jb/issues/135)
+   - Fix [Laggy UI on Linux](https://github.com/JetBrains/compose-jb/issues/23)
+   - Fix [Using AndroidX Compose specific dependencies for Android target](https://github.com/JetBrains/compose-jb/issues/272)
 
 # M2 (Dec 2020)
-   * Swing interoperability support (Compose in Swing frame)
-   * Support [XML vector images](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)
-   * [Support for Gradle 6.6 and 6.7](https://github.com/JetBrains/compose-jb/issues/66)
-   * [Support macOS 10.13 and 10.14](https://github.com/JetBrains/compose-jb/issues/76)
-   * Support Apple Silicon (arm64) natively
-   * [Support letter spacing in text](https://github.com/JetBrains/compose-jb/issues/82)
-   * [Implemented desktop "ActualDialog" and "ActualPopup"](https://github.com/JetBrains/compose-jb/issues/19)
-   * [Fix input method bar positioning](https://github.com/JetBrains/compose-jb/issues/67)
-   * [Fix text alignment](https://github.com/JetBrains/compose-jb/issues/92)
-   * [Fix dropdown/popup positioning](https://github.com/JetBrains/compose-jb/issues/139)
-   * [Fix using with Compose in same app as Java FX](https://github.com/JetBrains/compose-jb/issues/17)
-   * [Added screenshots of example apps](https://github.com/JetBrains/compose-jb/issues/90)
+   - Swing interoperability support (Compose in Swing frame)
+   - Support [XML vector images](https://developer.android.com/guide/topics/graphics/vector-drawable-resources)
+   - [Support for Gradle 6.6 and 6.7](https://github.com/JetBrains/compose-jb/issues/66)
+   - [Support macOS 10.13 and 10.14](https://github.com/JetBrains/compose-jb/issues/76)
+   - Support Apple Silicon (arm64) natively
+   - [Support letter spacing in text](https://github.com/JetBrains/compose-jb/issues/82)
+   - [Implemented desktop "ActualDialog" and "ActualPopup"](https://github.com/JetBrains/compose-jb/issues/19)
+   - [Fix input method bar positioning](https://github.com/JetBrains/compose-jb/issues/67)
+   - [Fix text alignment](https://github.com/JetBrains/compose-jb/issues/92)
+   - [Fix dropdown/popup positioning](https://github.com/JetBrains/compose-jb/issues/139)
+   - [Fix using with Compose in same app as Java FX](https://github.com/JetBrains/compose-jb/issues/17)
+   - [Added screenshots of example apps](https://github.com/JetBrains/compose-jb/issues/90)
 
 # M1 (Nov 2020)
-   * Initial release
+   - Initial release
