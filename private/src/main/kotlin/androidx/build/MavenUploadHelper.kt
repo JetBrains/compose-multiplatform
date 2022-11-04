@@ -36,7 +36,6 @@ import org.dom4j.io.XMLWriter
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.XmlProvider
-import org.gradle.api.attributes.DocsType
 import org.gradle.api.component.ComponentWithVariants
 import org.gradle.api.component.SoftwareComponent
 import org.gradle.api.component.SoftwareComponentFactory
@@ -383,10 +382,7 @@ private fun Project.withSourcesComponents(
 ) {
     val targetConfigurations = mutableSetOf<Configuration>()
     configurations.configureEach {
-        if (
-            it.attributes.getAttribute(DocsType.DOCS_TYPE_ATTRIBUTE)?.name == DocsType.SOURCES &&
-            it.name in names
-        ) {
+        if (it.name in names) {
             targetConfigurations.add(it)
             if (targetConfigurations.size == names.size) {
                 action(
