@@ -5,15 +5,6 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 import org.jetbrains.compose.experimental.dsl.IOSDevices
 
-buildscript {
-    repositories {
-        mavenLocal()
-        mavenCentral()
-        google()
-        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    }
-}
-
 plugins {
     id("com.android.application")
     kotlin("multiplatform")
@@ -24,10 +15,10 @@ version = "1.0-SNAPSHOT"
 
 repositories {
     mavenLocal()
+    google()
     mavenCentral()
-    gradlePluginPortal()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    google()}
+}
 
 kotlin {
     android()
@@ -56,6 +47,13 @@ kotlin {
             }
         }
     }
+
+    // Workaround for an issue:
+    //    https://youtrack.jetbrains.com/issue/KT-53561/Invalid-LLVM-module-inlinable-function-call-in-a-function-with-debug-info-must-have-a-dbg-location
+    // Compose compiler produces nodes without line information sometimes that provokes Kotlin native compiler to report errors.
+    // TODO: remove workaround when switch to Kotlin 1.8
+    val disableKonanVerification = "-Xverify-compiler=false"
+
     iosX64("uikitX64") {
         binaries {
             executable() {
@@ -63,7 +61,8 @@ kotlin {
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    disableKonanVerification
                 )
             }
         }
@@ -75,10 +74,9 @@ kotlin {
                 freeCompilerArgs += listOf(
                     "-linker-option", "-framework", "-linker-option", "Metal",
                     "-linker-option", "-framework", "-linker-option", "CoreText",
-                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+                    disableKonanVerification
                 )
-                // TODO: the current compose binary surprises LLVM, so disable checks for now.
-                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
             }
         }
     }
@@ -187,15 +185,6 @@ tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
 
-kotlin {
-    targets.withType<KotlinNativeTarget> {
-        binaries.all {
-            // TODO: the current compose binary surprises LLVM, so disable checks for now.
-            freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
-        }
-    }
-}
-
 compose.desktop.nativeApplication {
     targets(kotlin.targets.getByName("macosX64"))
     distributions {
@@ -212,14 +201,6 @@ afterEvaluate {
         versions.webpackCli.version = "4.9.0"
         nodeVersion = "16.0.0"
     }
-}
-
-
-// TODO: remove when https://youtrack.jetbrains.com/issue/KT-50778 fixed
-project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.java).configureEach {
-    kotlinOptions.freeCompilerArgs += listOf(
-        "-Xir-dce-runtime-diagnostic=log"
-    )
 }
 
 android {

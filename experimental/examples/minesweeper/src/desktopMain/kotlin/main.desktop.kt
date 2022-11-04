@@ -28,3 +28,5 @@ fun main() = application {
 
 @Composable
 actual fun loadImage(src: String): Painter = painterResource(src)
+
+actual fun isMobileDevice() = false
