@@ -77,7 +77,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun proguard(): Unit = with(testProject(TestProjects.proguard)) {
+    fun proguard(): Unit = with(
+        testProject(
+            TestProjects.proguard,
+            testEnvironment = defaultTestEnvironment.copy(composeVerbose = false))
+    ) {
         val enableObfuscation = """
                 compose.desktop {
                     application {
