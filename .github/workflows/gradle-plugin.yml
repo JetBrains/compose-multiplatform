@@ -1,0 +1,28 @@
+name: Test Gradle plugin
+on:
+  pull_request:
+    paths:
+      - 'gradle-plugins/**'
+      - '.github/workflows/gradle-plugin.yml'
+jobs:
+  test-gradle-plugin:
+    strategy:
+      matrix:
+        os: [ubuntu-20.04, macos-12]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '16'
+      - name: Test Gradle plugin
+        shell: bash
+        # --dry-run is needed, because that's the only way to force Gradle
+        # to use configuration from configuration cache and run all tasks in parallel
+        # https://github.com/gradle/gradle/issues/21985
+        run: |
+          cd gradle-plugins
+          ./gradlew assemble
+          ./gradlew :compose:check --continue --configuration-cache --dry-run
+          ./gradlew :compose:check --continue --configuration-cache
