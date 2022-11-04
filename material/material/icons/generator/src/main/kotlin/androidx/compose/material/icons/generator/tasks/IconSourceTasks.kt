@@ -119,6 +119,10 @@ private fun registerIconGenerationTask(
     val sourceSet = project.getMultiplatformSourceSet(KotlinSourceSet.COMMON_MAIN_SOURCE_SET_NAME)
     val generatedSrcMainDirectory = buildDirectory.resolve(IconGenerationTask.GeneratedSrcMain)
     sourceSet.kotlin.srcDir(project.files(generatedSrcMainDirectory).builtBy(task))
+    // add it to the multiplatform sources as well.
+    project.tasks.named("multiplatformSourceJar", Jar::class.java).configure {
+        it.from(task.map { generatedSrcMainDirectory })
+    }
     project.addToSourceJar(generatedSrcMainDirectory, task)
 }
 
