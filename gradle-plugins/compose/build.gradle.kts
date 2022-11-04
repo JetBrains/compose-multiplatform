@@ -89,11 +89,9 @@ val jar = tasks.named<Jar>("jar") {
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-// __SUPPORTED_GRADLE_VERSIONS__
-//testGradleVersion("6.7.1") // min supported by kotlin 1.7.0 gradle plugin https://kotlinlang.org/docs/gradle.html
-// despite that, some tests didn't pass
-testGradleVersion("7.1.1")
-testGradleVersion("7.3.3")
+project.property("compose.tests.gradle.versions")
+    .toString().split(",")
+    .forEach { testGradleVersion(it.trim()) }
 
 val javaHomeForTests: String? = when {
     // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
