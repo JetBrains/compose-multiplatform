@@ -10,7 +10,7 @@
 
 ### Fixes
 - Fix [`duplicate definition of resource file` when running packageRelease](https://github.com/JetBrains/compose-jb/issues/2393)
-- [Fix support of GPU's which don't support DirectX 12](https://github.com/JetBrains/skiko/pull/603)
+- [Fix support of GPU's which don't support DirectX 12 (Windows)](https://github.com/JetBrains/skiko/pull/603)
 
 ## Web
 
