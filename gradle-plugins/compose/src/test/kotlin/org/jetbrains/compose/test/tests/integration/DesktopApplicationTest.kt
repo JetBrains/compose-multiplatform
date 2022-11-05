@@ -18,6 +18,7 @@ import kotlin.collections.HashSet
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class DesktopApplicationTest : GradlePluginTestBase() {
@@ -289,6 +290,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    @Disabled
+    // the test does not work on CI and locally unless test keychain is opened manually
     fun testMacSign() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
 
