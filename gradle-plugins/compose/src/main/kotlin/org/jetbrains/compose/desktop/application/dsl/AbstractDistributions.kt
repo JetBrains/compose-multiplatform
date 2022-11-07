@@ -31,6 +31,7 @@ abstract class AbstractDistributions {
     var vendor: String? = null
     val appResourcesRootDir: DirectoryProperty = objects.directoryProperty()
     val licenseFile: RegularFileProperty = objects.fileProperty()
+    var keepJPackageTmpDir: Boolean? = null
 
     var targetFormats: Set<TargetFormat> = EnumSet.noneOf(TargetFormat::class.java)
     open fun targetFormats(vararg formats: TargetFormat) {

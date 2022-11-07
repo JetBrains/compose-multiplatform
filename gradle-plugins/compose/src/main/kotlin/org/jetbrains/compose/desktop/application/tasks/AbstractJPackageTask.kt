@@ -237,6 +237,10 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
 
+    @get:Input
+    @get:Optional
+    val keepJPackageTmpDir: Property<Boolean?> = objects.nullableProperty()
+
     private val macSigner: MacSigner? by lazy {
         val nonValidatedSettings = nonValidatedMacSigningSettings
         if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
@@ -245,6 +249,9 @@ abstract class AbstractJPackageTask @Inject constructor(
             MacSigner(validatedSettings, runExternalTool)
         } else null
     }
+
+    @get:LocalState
+    protected val jpackageTempDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/jpackage")
 
     @get:LocalState
     protected val signDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/tmp/sign")
@@ -382,6 +389,9 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--copyright", packageCopyright)
         cliArg("--app-version", packageVersion)
         cliArg("--vendor", packageVendor)
+        if (keepJPackageTmpDir.orNull?.equals(true) == true) {
+            cliArg("--temp", jpackageTempDir)
+        }
 
         when (currentOS) {
             OS.MacOS -> {
@@ -474,6 +484,8 @@ abstract class AbstractJPackageTask @Inject constructor(
                 listOf(copyFileToLibsDir(sourceFile))
             }
         }
+
+        cleanDirs(jpackageTempDir)
 
         // todo: incremental copy
         cleanDirs(packagedResourcesDir)
