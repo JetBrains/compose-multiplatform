@@ -31,3 +31,4 @@ Kotlin version | Minimal Compose version | Notes
 1.6.20 | 1.1.1
 1.7.10 | 1.2.0
 1.7.20 | 1.2.0 | JS is not supported (will be fixed in the next versions)
+1.7.20 | 1.2.1

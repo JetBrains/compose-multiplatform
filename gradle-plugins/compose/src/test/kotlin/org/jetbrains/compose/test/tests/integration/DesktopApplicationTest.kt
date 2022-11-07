@@ -168,9 +168,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         val packageFile = packageDirFiles.single()
 
         if (currentOS == OS.Linux) {
-            val expectedName = "test-package_1.0.0-1_amd64.$ext"
-            check(packageFile.name.equals(expectedName, ignoreCase = true)) {
-                "Expected '$expectedName' package in $packageDir, got '${packageFile.name}'"
+            val isTestPackage = packageFile.name.contains("test-package", ignoreCase = true) ||
+                    packageFile.name.contains("testpackage", ignoreCase = true)
+            val isDeb = packageFile.name.endsWith(".$ext")
+            check(isTestPackage && isDeb) {
+                "Expected contain testpackage*.deb or test-package*.deb package in $packageDir, got '${packageFile.name}'"
             }
         } else {
             Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
