@@ -214,7 +214,7 @@ interface GraphicsLayerScope : Density {
      * layer, any content rendered outside of the specified size will be clipped.
      */
     val size: Size
-        get() = Size.Zero
+        get() = Size.Unspecified
 }
 
 /**
@@ -239,7 +239,7 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
     override var shape: Shape = RectangleShape
     override var clip: Boolean = false
     override var compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
-    override var size: Size = Size.Zero
+    override var size: Size = Size.Unspecified
 
     internal var graphicsDensity: Density = Density(1.0f)
 
@@ -269,6 +269,6 @@ internal class ReusableGraphicsLayerScope : GraphicsLayerScope {
         clip = false
         renderEffect = null
         compositingStrategy = CompositingStrategy.Auto
-        size = Size.Zero
+        size = Size.Unspecified
     }
 }
