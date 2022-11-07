@@ -46,7 +46,7 @@ private fun getCards(): List<GetStartedCardPresentation> {
                 ),
                 LinkOnCard(
                     linkText = "Play",
-                    linkUrl = "https://compose-bird.ui.pages.jetbrains/"
+                    linkUrl = "https://compose-bird.ui.pages.jetbrains.team/"
                 )
             )
         )
