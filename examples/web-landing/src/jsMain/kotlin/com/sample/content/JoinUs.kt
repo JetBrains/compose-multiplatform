@@ -39,12 +39,12 @@ fun JoinUs() {
                 }) {
                     Text("Feel free to join the ")
                     LinkToSlack(
-                        url = "https://kotlinlang.slack.com/archives/C01F2HV7868",
+                        url = "https://slack-chats.kotlinlang.org/c/compose-web",
                         text = "#compose-web"
                     )
                     Text(" channel on Kotlin Slack to discuss Compose for Web, or ")
                     LinkToSlack(
-                        url = "https://kotlinlang.slack.com/archives/CJLTWPH7S",
+                        url = "https://slack-chats.kotlinlang.org/c/compose",
                         text = "#compose"
                     )
                     Text(" for general Compose discussions")

@@ -20,7 +20,6 @@ object TestProjects {
     const val defaultArgsOverride = "application/defaultArgsOverride"
     const val unpackSkiko = "application/unpackSkiko"
     const val resources = "application/resources"
-    const val customJavaHome = "application/customJavaHome"
     const val jsMpp = "misc/jsMpp"
     const val jvmPreview = "misc/jvmPreview"
 }

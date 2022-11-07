@@ -50,7 +50,7 @@ kotlin {
 
     // Workaround for an issue:
     //    https://youtrack.jetbrains.com/issue/KT-53561/Invalid-LLVM-module-inlinable-function-call-in-a-function-with-debug-info-must-have-a-dbg-location
-    // Compose comiler produces nodes without line information sometimes that provokes Kotlin native compiler to report errors.
+    // Compose compiler produces nodes without line information sometimes that provokes Kotlin native compiler to report errors.
     // TODO: remove workaround when switch to Kotlin 1.8
     val disableKonanVerification = "-Xverify-compiler=false"
 
@@ -103,15 +103,15 @@ kotlin {
             dependsOn(commonMain)
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                api("androidx.appcompat:appcompat:1.4.1")
-                implementation("androidx.activity:activity-compose:1.4.0")
+                implementation("androidx.appcompat:appcompat:1.5.1")
+                implementation("androidx.activity:activity-compose:1.5.0")
             }
         }
 
         val desktopMain by getting {
-             dependencies {
+            dependencies {
                 implementation(compose.desktop.currentOs)
-             }
+            }
         }
 
         val jsMain by getting {
@@ -195,13 +195,6 @@ afterEvaluate {
     }
 }
 
-// TODO: remove when https://youtrack.jetbrains.com/issue/KT-50778 fixed
-project.tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile::class.java).configureEach {
-    kotlinOptions.freeCompilerArgs += listOf(
-        "-Xir-dce-runtime-diagnostic=log"
-    )
-}
-
 android {
     compileSdk = 32
 
@@ -222,4 +215,3 @@ android {
         }
     }
 }
-
