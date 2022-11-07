@@ -125,6 +125,7 @@ afterEvaluate {
             it.jvmOs("macos-x64", [libs.skikoMacOsX64])
             it.jvmOs("macos-arm64", [libs.skikoMacOsArm64])
             it.jvmOs("windows-x64", [libs.skikoWindowsX64])
+            it.jvmOs("windows-arm64", [libs.skikoWindowsArm64])
         }
     }
 }
