@@ -37,16 +37,16 @@ private fun getCards(): List<GetStartedCardPresentation> {
             )
         ),
         GetStartedCardPresentation(
-            title = "Falling Balls app example",
-            content = "This example demonstrates the use of multiplatform widgets – sharing user interface code between Compose for Desktop and Web.",
+            title = "Compose Bird",
+            content = "A simple game built using the most basic Composable DOM API",
             links = listOf(
                 LinkOnCard(
                     linkText = "Explore the source code",
-                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/falling-balls-web"
+                    linkUrl = "https://github.com/JetBrains/compose-jb/tree/master/examples/web-compose-bird"
                 ),
                 LinkOnCard(
                     linkText = "Play",
-                    linkUrl = "https://falling-balls.ui.pages.jetbrains.team/"
+                    linkUrl = "https://compose-bird.ui.pages.jetbrains/"
                 )
             )
         )
