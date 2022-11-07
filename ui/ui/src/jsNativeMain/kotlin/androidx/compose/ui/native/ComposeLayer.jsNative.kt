@@ -27,7 +27,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.toCompose
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.platform.Platform
-import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.unit.Density
 import kotlinx.coroutines.CoroutineDispatcher
 import org.jetbrains.skia.Canvas
@@ -48,6 +47,7 @@ internal class ComposeLayer(
     private val input: SkikoInput,
 ) {
     private var isDisposed = false
+
     inner class ComponentImpl : SkikoView {
         override val input = this@ComposeLayer.input
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
@@ -77,6 +77,7 @@ internal class ComposeLayer(
                         nativeEvent = event
                     )
                 }
+
                 SkikoTouchEventKind.UNKNOWN -> {
                     TODO("onTouchEvent, event.kind is SkikoTouchEventKind.UNKNOWN")
                 }
@@ -103,10 +104,10 @@ internal class ComposeLayer(
     }
 
     private val scene = ComposeScene(
-        getMainDispatcher(),
-        platform,
-        Density(1f),
-        layer::needRedraw
+        coroutineContext = getMainDispatcher(),
+        platform = platform,
+        density = Density(1f),
+        invalidate = layer::needRedraw,
     )
 
     fun dispose() {
@@ -121,7 +122,7 @@ internal class ComposeLayer(
         scene.constraints = Constraints(maxWidth = width, maxHeight = height)
     }
 
-    fun getActiveFocusRect():Rect? {
+    fun getActiveFocusRect(): Rect? {
         return scene.mainOwner?.focusManager?.getActiveFocusModifier()?.focusRect()
     }
 
@@ -148,8 +149,8 @@ internal class ComposeLayer(
     private fun initContent() {
         // TODO: do we need isDisplayable on SkiaLyer?
         // if (layer.isDisplayable) {
-            _initContent?.invoke()
-            _initContent = null
+        _initContent?.invoke()
+        _initContent = null
         // }
     }
 }

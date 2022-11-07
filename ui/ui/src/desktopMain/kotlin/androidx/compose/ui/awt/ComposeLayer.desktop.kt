@@ -112,7 +112,7 @@ internal class ComposeLayer(
         }
     }
 
-    private val platform = object : Platform {
+    private val platform = object : Platform by Platform.Empty {
         override fun setPointerIcon(pointerIcon: PointerIcon) {
             _component.cursor = (pointerIcon as? AwtCursor)?.cursor ?: Cursor(Cursor.DEFAULT_CURSOR)
         }

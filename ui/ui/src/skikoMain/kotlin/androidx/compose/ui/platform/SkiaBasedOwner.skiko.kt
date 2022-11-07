@@ -208,7 +208,7 @@ internal class SkiaBasedOwner(
 
     override val accessibilityManager = DefaultAccessibilityManager()
 
-    override val textToolbar = DefaultTextToolbar()
+    override val textToolbar = platform.textToolbar
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
 

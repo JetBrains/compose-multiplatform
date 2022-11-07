@@ -19,32 +19,37 @@ package androidx.compose.ui.window
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.native.ComposeLayer
+import androidx.compose.ui.platform.Platform
+import androidx.compose.ui.platform.TextToolbar
+import androidx.compose.ui.platform.TextToolbarStatus
 import androidx.compose.ui.platform.UIKitTextInputService
+import androidx.compose.ui.platform.ViewConfiguration
+import androidx.compose.ui.text.input.PlatformTextInputService
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
-import platform.Foundation.NSCoder
-import platform.UIKit.UIScreen
-import platform.UIKit.UIViewController
 import org.jetbrains.skiko.SkikoUIView
+import org.jetbrains.skiko.TextActions
 import platform.CoreGraphics.CGPointMake
 import platform.CoreGraphics.CGRectMake
+import platform.Foundation.NSCoder
 import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.Foundation.NSValue
 import platform.UIKit.CGRectValue
+import platform.UIKit.UIScreen
+import platform.UIKit.UIViewController
 import platform.UIKit.reloadInputViews
 import platform.UIKit.setClipsToBounds
 import platform.UIKit.setNeedsDisplay
 import platform.darwin.NSObject
-import androidx.compose.ui.platform.Platform
-import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.text.input.PlatformTextInputService
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
 
 // The only difference with macos' Window is that
 // it has return type of UIViewController rather than unit.
@@ -144,12 +149,40 @@ internal actual class ComposeWindow : UIViewController {
                     override val doubleTapMinTimeMillis: Long get() = 40
                     override val touchSlop: Float get() = with(density) { 3.dp.toPx() }
                 }
+            override val textToolbar = object : TextToolbar {
+                override fun showMenu(
+                    rect: Rect,
+                    onCopyRequested: (() -> Unit)?,
+                    onPasteRequested: (() -> Unit)?,
+                    onCutRequested: (() -> Unit)?,
+                    onSelectAllRequested: (() -> Unit)?
+                ) = skikoUIView.showTextMenu(
+                    targetRect = rect.toSkiaRect(),
+                    textActions = object: TextActions {
+                        override val copy: (() -> Unit)? = onCopyRequested
+                        override val cut: (() -> Unit)? = onCutRequested
+                        override val paste: (() -> Unit)? = onPasteRequested
+                        override val selectAll: (() -> Unit)? = onSelectAllRequested
+                    }
+                )
+
+                /**
+                 * TODO on UIKit native behaviour is hide text menu, when touch outside
+                 */
+                override fun hide() = skikoUIView.hideTextMenu()
+
+                override val status: TextToolbarStatus
+                    get() = if (skikoUIView.isTextMenuShown())
+                        TextToolbarStatus.Shown
+                    else
+                        TextToolbarStatus.Hidden
+            }
         }
         layer = ComposeLayer(
             layer = skiaLayer,
             platform = uiKitPlatform,
             getTopLeftOffset = ::getTopLeftOffset,
-            input = uiKitTextInputService.skikoInput
+            input = uiKitTextInputService.skikoInput,
         )
         layer.setContent(content = content)
     }

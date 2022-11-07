@@ -18,6 +18,7 @@ package androidx.compose.ui.platform
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -40,6 +41,7 @@ internal interface Platform {
     fun accessibilityController(owner: SemanticsOwner): AccessibilityController
     fun setPointerIcon(pointerIcon: PointerIcon)
     val viewConfiguration: ViewConfiguration
+    val textToolbar: TextToolbar
 
     companion object {
         @OptIn(ExperimentalComposeUiApi::class)
@@ -81,6 +83,17 @@ internal interface Platform {
                 override val doubleTapTimeoutMillis: Long = 300
                 override val doubleTapMinTimeMillis: Long = 40
                 override val touchSlop: Float = 18f
+            }
+            override val textToolbar: TextToolbar = object : TextToolbar {
+                override fun hide() = Unit
+                override val status: TextToolbarStatus = TextToolbarStatus.Hidden
+                override fun showMenu(
+                    rect: Rect,
+                    onCopyRequested: (() -> Unit)?,
+                    onPasteRequested: (() -> Unit)?,
+                    onCutRequested: (() -> Unit)?,
+                    onSelectAllRequested: (() -> Unit)?
+                ) = Unit
             }
         }
     }

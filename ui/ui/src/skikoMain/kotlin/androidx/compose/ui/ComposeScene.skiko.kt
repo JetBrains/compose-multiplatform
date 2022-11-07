@@ -15,31 +15,29 @@
  */
 package androidx.compose.ui
 
+import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
+import androidx.compose.runtime.CompositionLocalContext
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerButtons
-import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
-import androidx.compose.runtime.CompositionLocalContext
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.NativeKeyEvent
-import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerButton
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputEvent
@@ -49,20 +47,19 @@ import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.areAnyPressed
 import androidx.compose.ui.input.pointer.copyFor
 import androidx.compose.ui.node.LayoutNode
-import androidx.compose.ui.platform.AccessibilityController
-import androidx.compose.ui.platform.Platform
-import androidx.compose.ui.platform.SkiaBasedOwner
+import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.platform.DefaultTextToolbar
 import androidx.compose.ui.platform.FlushCoroutineDispatcher
 import androidx.compose.ui.platform.GlobalSnapshotManager
+import androidx.compose.ui.platform.Platform
+import androidx.compose.ui.platform.SkiaBasedOwner
 import androidx.compose.ui.platform.setContent
-import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntRect
-import androidx.compose.ui.synchronized
-import androidx.compose.ui.text.input.PlatformTextInputService
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
 import kotlinx.coroutines.CoroutineScope
@@ -71,8 +68,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.jetbrains.skia.Canvas
-import org.jetbrains.skiko.currentNanoTime
 import org.jetbrains.skiko.SkiaLayer
+import org.jetbrains.skiko.currentNanoTime
 
 internal val LocalComposeScene = staticCompositionLocalOf<ComposeScene> {
     error("CompositionLocal LocalComposeScene not provided")
@@ -145,7 +142,7 @@ class ComposeScene internal constructor(
             override val textInputService: PlatformTextInputService get() = textInputService
         },
         density,
-        invalidate
+        invalidate,
     )
 
     private var isInvalidationDisabled = false
@@ -364,7 +361,7 @@ class ComposeScene internal constructor(
             density,
             IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
             onPreviewKeyEvent = onPreviewKeyEvent,
-            onKeyEvent = onKeyEvent
+            onKeyEvent = onKeyEvent,
         )
         attach(mainOwner)
         composition = mainOwner.setContent(
