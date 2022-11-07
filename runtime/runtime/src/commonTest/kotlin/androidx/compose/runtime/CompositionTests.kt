@@ -54,6 +54,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
+import org.junit.Ignore
 
 @Composable
 fun Container(content: @Composable () -> Unit) = content()
@@ -3234,6 +3235,7 @@ class CompositionTests {
     }
 
     @Test
+    @Ignore("b/255722247")
     fun testNonLocalReturn_CM1_RetFunc_FalseTrue() = compositionTest {
         var condition by mutableStateOf(false)
 
@@ -3253,6 +3255,7 @@ class CompositionTests {
     }
 
     @Test
+    @Ignore("b/255722247")
     fun testNonLocalReturn_CM1_RetFunc_TrueFalse() = compositionTest {
         var condition by mutableStateOf(true)
 
@@ -3272,6 +3275,7 @@ class CompositionTests {
     }
 
     @Test
+    @Ignore("b/255722247")
     fun test_CM1_CCM1_RetFun_FalseTrue() = compositionTest {
         var condition by mutableStateOf(false)
 
@@ -3291,6 +3295,7 @@ class CompositionTests {
     }
 
     @Test
+    @Ignore("b/255722247")
     fun test_CM1_CCM1_RetFun_TrueFalse() = compositionTest {
         var condition by mutableStateOf(true)
 
