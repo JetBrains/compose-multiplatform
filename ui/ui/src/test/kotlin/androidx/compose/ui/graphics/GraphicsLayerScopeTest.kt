@@ -96,6 +96,6 @@ class GraphicsLayerScopeTest {
         assertThat(transformOrigin).isEqualTo(TransformOrigin.Center)
         assertThat(shape).isEqualTo(RectangleShape)
         assertThat(clip).isEqualTo(false)
-        assertThat(size).isEqualTo(Size.Zero)
+        assertThat(size).isEqualTo(Size.Unspecified)
     }
 }

@@ -70,7 +70,7 @@ fun CompositingStrategyModulateAlpha() {
         // CompositingStrategy.ModulateAlpha ends up with the overlapping region
         // of the 2 draw rect calls to blend transparent blue and transparent red
         // against the black background instead of just transparent blue which is what would
-        // occur with CompositingStrategy.Auto or CompositingStrategy.Always
+        // occur with CompositingStrategy.Auto or CompositingStrategy.Offscreen
         inset(0f, 0f, size.width / 3, size.height / 3) {
             drawRect(color = Color.Red)
         }

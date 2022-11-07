@@ -280,28 +280,28 @@ class AndroidLayoutDrawTest {
                 // Use public RenderNode API
                 in Build.VERSION_CODES.Q..Int.MAX_VALUE ->
                     verifyRenderNode29CompositingStrategy(
-                        CompositingStrategy.Always,
+                        CompositingStrategy.Offscreen,
                         expectedCompositing = true,
                         expectedOverlappingRendering = true
                     )
                 // Cannot access private APIs on P
                 Build.VERSION_CODES.P ->
                     verifyViewLayerCompositingStrategy(
-                        CompositingStrategy.Always,
+                        CompositingStrategy.Offscreen,
                         View.LAYER_TYPE_HARDWARE,
                         true
                     )
                 // Use stub access to framework RenderNode API
                 in Build.VERSION_CODES.M..Int.MAX_VALUE ->
                     verifyRenderNode23CompositingStrategy(
-                        CompositingStrategy.Always,
+                        CompositingStrategy.Offscreen,
                         expectedLayerType = View.LAYER_TYPE_HARDWARE,
                         expectedOverlappingRendering = true
                     )
                 // No RenderNodes, use Views instead
                 else ->
                     verifyViewLayerCompositingStrategy(
-                        CompositingStrategy.Always,
+                        CompositingStrategy.Offscreen,
                         View.LAYER_TYPE_HARDWARE,
                         true
                     )

@@ -264,7 +264,7 @@ internal class SkiaLayer(
             val requiresLayer =
                 (alpha < 1 && compositingStrategy != CompositingStrategy.ModulateAlpha) ||
                 currentRenderEffect != null ||
-                compositingStrategy == CompositingStrategy.Always
+                compositingStrategy == CompositingStrategy.Offscreen
             if (requiresLayer) {
                 canvas.saveLayer(
                     bounds,

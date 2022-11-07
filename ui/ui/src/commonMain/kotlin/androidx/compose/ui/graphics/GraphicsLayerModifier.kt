@@ -322,7 +322,7 @@ fun Modifier.graphicsLayer(
  * an offscreen buffer. This is useful in order to optimize alpha usages with
  * [CompositingStrategy.ModulateAlpha] which will skip the overhead of an offscreen buffer but can
  * generate different rendering results depending on whether or not the contents of the layer are
- * overlapping. Similarly leveraging [CompositingStrategy.Always] is useful in situations where
+ * overlapping. Similarly leveraging [CompositingStrategy.Offscreen] is useful in situations where
  * creating an offscreen buffer is preferred usually in conjunction with [BlendMode] usage.
  *
  * Note that if you provide a non-zero [shadowElevation] and if the passed [shape] is concave the
@@ -478,7 +478,7 @@ value class CompositingStrategy internal constructor(
          * For example, the contents can be drawn into this graphics layer and masked out by drawing
          * additional shapes with [BlendMode.Clear]
          */
-        val Always = CompositingStrategy(1)
+        val Offscreen = CompositingStrategy(1)
 
         /**
          * Modulates alpha for each of the drawing instructions recorded within the graphicsLayer.

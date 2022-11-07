@@ -193,7 +193,7 @@ internal class ViewLayer(
         }
 
         mHasOverlappingRendering = when (compositingStrategy) {
-            CompositingStrategy.Always -> {
+            CompositingStrategy.Offscreen -> {
                 setLayerType(LAYER_TYPE_HARDWARE, null)
                 true
             }
