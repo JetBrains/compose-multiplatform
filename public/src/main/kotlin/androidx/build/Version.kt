@@ -77,7 +77,7 @@ data class Version(
         private const val serialVersionUID = 345435634563L
 
         private val VERSION_FILE_REGEX = Pattern.compile("^(res-)?(.*).txt$")
-        private val VERSION_REGEX = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)(-.+)?$")
+        private val VERSION_REGEX = Pattern.compile("^(\\d+)\\.(\\d+)\\.(\\d+)((?:\\.\\d+)?(?:-.+)?)?$")
 
         private fun checkedMatcher(versionString: String): Matcher {
             val matcher = VERSION_REGEX.matcher(versionString)
