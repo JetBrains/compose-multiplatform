@@ -160,7 +160,7 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
         set(value) {
             with(renderNode) {
                 when (value) {
-                    CompositingStrategy.Always -> {
+                    CompositingStrategy.Offscreen -> {
                         setUseCompositingLayer(true, null)
                         setHasOverlappingRendering(true)
                     }

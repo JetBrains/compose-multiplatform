@@ -565,12 +565,12 @@ package androidx.compose.ui.graphics {
   }
 
   public static final class CompositingStrategy.Companion {
-    method public int getAlways();
     method public int getAuto();
     method public int getModulateAlpha();
-    property public final int Always;
+    method public int getOffscreen();
     property public final int Auto;
     property public final int ModulateAlpha;
+    property public final int Offscreen;
   }
 
   public final class GraphicsLayerModifierKt {

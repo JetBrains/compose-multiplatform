@@ -216,7 +216,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         get() = internalCompositingStrategy
         set(value) {
             when (value) {
-                CompositingStrategy.Always -> {
+                CompositingStrategy.Offscreen -> {
                     renderNode.setLayerType(View.LAYER_TYPE_HARDWARE)
                     renderNode.setHasOverlappingRendering(true)
                 }
@@ -233,7 +233,7 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
         }
 
     internal fun getLayerType(): Int = when (internalCompositingStrategy) {
-        CompositingStrategy.Always -> View.LAYER_TYPE_HARDWARE
+        CompositingStrategy.Offscreen -> View.LAYER_TYPE_HARDWARE
         else -> View.LAYER_TYPE_NONE
     }
 

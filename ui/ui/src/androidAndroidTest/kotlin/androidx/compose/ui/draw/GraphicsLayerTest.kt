@@ -1210,7 +1210,7 @@ class GraphicsLayerTest {
                     .size((dimen / LocalDensity.current.density).dp)
                     .background(Color.LightGray)
                     .graphicsLayer(
-                        compositingStrategy = CompositingStrategy.Always
+                        compositingStrategy = CompositingStrategy.Offscreen
                     )
             ) {
                 inset(0f, 0f, size.width / 3, size.height / 3) {
