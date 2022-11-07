@@ -65,8 +65,17 @@ internal class AndroidParagraphIntrinsics constructor(
 
     private val resolvedTypefaces: MutableList<TypefaceDirtyTracker> = mutableListOf()
 
+    /**
+     * If emojiCompat is used in the making of this Paragraph
+     *
+     * This value will never change
+     */
+    private val emojiCompatProcessed: Boolean = EmojiCompatStatus.fontLoaded.value
+
     override val hasStaleResolvedFonts: Boolean
-        get() = resolvedTypefaces.fastAny { it.isStaleResolvedFont }
+        get() = resolvedTypefaces.fastAny { it.isStaleResolvedFont } ||
+            (!emojiCompatProcessed &&
+                /* short-circuit this state read */ EmojiCompatStatus.fontLoaded.value)
 
     internal val textDirectionHeuristic = resolveTextDirectionHeuristics(
         style.textDirection,
@@ -74,18 +83,18 @@ internal class AndroidParagraphIntrinsics constructor(
     )
 
     init {
-        val resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface = {
-                fontFamily, fontWeight, fontStyle, fontSynthesis ->
-            val result = fontFamilyResolver.resolve(
-                fontFamily,
-                fontWeight,
-                fontStyle,
-                fontSynthesis
-            )
-            val holder = TypefaceDirtyTracker(result)
-            resolvedTypefaces.add(holder)
-            holder.typeface
-        }
+        val resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface =
+            { fontFamily, fontWeight, fontStyle, fontSynthesis ->
+                val result = fontFamilyResolver.resolve(
+                    fontFamily,
+                    fontWeight,
+                    fontStyle,
+                    fontSynthesis
+                )
+                val holder = TypefaceDirtyTracker(result)
+                resolvedTypefaces.add(holder)
+                holder.typeface
+            }
 
         val notAppliedStyle = textPaint.applySpanStyle(
             style = style.toSpanStyle(),
@@ -109,6 +118,7 @@ internal class AndroidParagraphIntrinsics constructor(
             placeholders = placeholders,
             density = density,
             resolveTypeface = resolveTypeface,
+            useEmojiCompat = emojiCompatProcessed
         )
 
         layoutIntrinsics = LayoutIntrinsics(charSequence, textPaint, textDirectionHeuristic)

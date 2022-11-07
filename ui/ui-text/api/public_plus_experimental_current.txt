@@ -1345,6 +1345,9 @@ package androidx.compose.ui.text.platform {
   public final class AndroidTextPaint_androidKt {
   }
 
+  public final class EmojiCompatStatusKt {
+  }
+
   public final class Synchronization_jvmKt {
   }
 

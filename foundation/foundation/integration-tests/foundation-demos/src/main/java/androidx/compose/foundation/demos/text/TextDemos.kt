@@ -73,6 +73,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Variable Fonts") { VariableFontsDemo() },
                 ComposableDemo("FontFamily fallback") { FontFamilyDemo() },
                 ComposableDemo("All system font families") { SystemFontFamilyDemo() },
+                ComposableDemo("Emoji Compat") { EmojiCompatDemo() },
             )
         ),
         DemoCategory(
