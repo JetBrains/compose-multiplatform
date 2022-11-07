@@ -1058,6 +1058,8 @@ sealed interface Composer {
     val composition: ControlledComposition
         @TestOnly get
 
+    fun disableSourceInformation()
+
     companion object {
         /**
          * A special value used to represent no value was stored (e.g. an empty slot). This is
@@ -1254,6 +1256,7 @@ internal class ComposerImpl(
     private var childrenComposing: Int = 0
     private var snapshot = currentSnapshot()
     private var compositionToken: Int = 0
+    private var sourceInformationEnabled = true
 
     private val invalidateStack = Stack<RecomposeScopeImpl>()
 
@@ -3202,19 +3205,25 @@ internal class ComposerImpl(
 
     @ComposeCompilerApi
     override fun sourceInformation(sourceInformation: String) {
-        if (inserting) {
+        if (inserting && sourceInformationEnabled) {
             writer.insertAux(sourceInformation)
         }
     }
 
     @ComposeCompilerApi
     override fun sourceInformationMarkerStart(key: Int, sourceInformation: String) {
-        start(key, objectKey = null, isNode = false, data = sourceInformation)
+        if (sourceInformationEnabled)
+            start(key, objectKey = null, isNode = false, data = sourceInformation)
     }
 
     @ComposeCompilerApi
     override fun sourceInformationMarkerEnd() {
-        end(isNode = false)
+        if (sourceInformationEnabled)
+            end(isNode = false)
+    }
+
+    override fun disableSourceInformation() {
+        sourceInformationEnabled = false
     }
 
     /**

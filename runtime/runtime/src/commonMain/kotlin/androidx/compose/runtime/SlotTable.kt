@@ -3025,6 +3025,16 @@ private class SlotTableGroup(
         )
     }
 
+    override val groupSize: Int get() = table.groups.groupSize(group)
+
+    override val slotsSize: Int
+        get() {
+            val nextGroup = group + groupSize
+            val nextSlot = if (nextGroup < table.groupsSize) table.groups.dataAnchor(nextGroup)
+                else table.slotsSize
+            return nextSlot - table.groups.dataAnchor(group)
+        }
+
     private fun validateRead() {
         if (table.version != version) {
             throw ConcurrentModificationException()

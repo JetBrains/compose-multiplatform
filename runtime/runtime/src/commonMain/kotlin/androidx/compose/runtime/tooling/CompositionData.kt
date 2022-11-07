@@ -92,4 +92,11 @@ interface CompositionGroup : CompositionData {
      */
     val identity: Any?
       get() = null
+
+    /**
+     * The total number of groups, including itself, that this group contains.
+     */
+    val groupSize: Int get() = 0
+
+    val slotsSize: Int get() = 0
 }

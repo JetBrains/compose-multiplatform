@@ -120,6 +120,7 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public <T> void createNode(kotlin.jvm.functions.Function0<? extends T> factory);
     method @androidx.compose.runtime.ComposeCompilerApi public void deactivateToEndGroup(boolean changed);
     method @androidx.compose.runtime.ComposeCompilerApi public void disableReusing();
+    method public void disableSourceInformation();
     method @androidx.compose.runtime.ComposeCompilerApi public void enableReusing();
     method @androidx.compose.runtime.ComposeCompilerApi public void endDefaults();
     method @androidx.compose.runtime.ComposeCompilerApi public void endMovableGroup();
@@ -1060,14 +1061,18 @@ package androidx.compose.runtime.tooling {
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface CompositionGroup extends androidx.compose.runtime.tooling.CompositionData {
     method public Iterable<java.lang.Object> getData();
+    method public default int getGroupSize();
     method public default Object? getIdentity();
     method public Object getKey();
     method public Object? getNode();
+    method public default int getSlotsSize();
     method public String? getSourceInfo();
     property public abstract Iterable<java.lang.Object> data;
+    property public default int groupSize;
     property public default Object? identity;
     property public abstract Object key;
     property public abstract Object? node;
+    property public default int slotsSize;
     property public abstract String? sourceInfo;
   }
 

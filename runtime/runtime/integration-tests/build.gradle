@@ -107,3 +107,75 @@ tasks.withType(KotlinCompile).configureEach {
         freeCompilerArgs += "-Xcontext-receivers"
     }
 }
+
+public File findFile() {
+    project.file("src/androidAndroidTest/kotlin/androidx/compose/runtime/GroupSizeTests.kt")
+}
+
+class UpdateExpectedGroupSizes extends DefaultTask {
+    @Internal
+    File source
+
+    @Internal
+    String sizes
+
+    @TaskAction
+    def exec() {
+        def newExpected = sizes.split(",")
+        if (newExpected.length != 3) {
+            if (newExpected.length < 3)
+                parameterError("Not enough parameters")
+            parameterError("Too many parameters")
+        }
+        if (!newExpected[1].isInteger()) {
+            parameterError("Groups field is not an integer")
+        }
+        if (!newExpected[1].isInteger()) {
+            parameterError("Slots field is not an integer")
+        }
+        def testName = newExpected[0]
+        def newGroups = newExpected[1] as Integer
+        def newSlots = newExpected[2] as Integer
+
+        def lines = source.readLines()
+        def modified = false
+
+        def namePattern = "\"$testName\""
+        for (int i = 0; i < lines.size(); i++) {
+            String line = lines[i]
+            if (line.contains(namePattern)) {
+                def newGroupsIndex = lines[i + 1].indexOf("noMoreGroupsThan")
+                if (newGroupsIndex < 0) error("Group line not found for test $namePattern")
+                lines[i + 1] = lines[i + 1].replaceFirst(/[0-9]+/, "$newGroups")
+                def newSlotsIndex = lines[i + 2].indexOf("noMoreSlotsThan")
+                if (newSlotsIndex < 0) error("Group line not found for test $namePattern")
+                lines[i + 2] = lines[i + 2].replaceFirst(/[0-9]+/, "$newSlots")
+                modified = true
+            }
+        }
+        if (!modified) error("Could not find test $namePattern")
+
+        // Update the file
+        def writer = source.newWriter()
+        lines.forEach {line ->
+            writer.write("$line\n")
+        }
+        writer.close()
+    }
+
+    def parameterError(String message) {
+        error("$message, expected newExpectedGroups to look like " +
+                "<testsName>,<newGroups>,<newSlots>")
+    }
+
+    def error(String message) {
+        throw new GradleException(message)
+    }
+}
+
+afterEvaluate {
+    tasks.register("updateExpectedGroupSizes", UpdateExpectedGroupSizes) { task ->
+        task.source = findFile()
+        task.sizes = project.findProperty("compose.newExpectedSizes")
+    }
+}
