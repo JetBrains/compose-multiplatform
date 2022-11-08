@@ -3065,6 +3065,61 @@ class AndroidAccessibilityTest {
         assertEquals(childInfo.isScreenReaderFocusable, false)
     }
 
+    @Test
+    fun accessibilityStateChangeListenerRemoved_onDetach() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            assertTrue(androidComposeView.isAttachedToWindow)
+        }
+
+        rule.runOnUiThread {
+            container.removeView(androidComposeView)
+        }
+
+        rule.runOnIdle {
+            assertFalse(androidComposeView.isAttachedToWindow)
+
+            val removed = delegate.accessibilityManager.removeAccessibilityStateChangeListener(
+                delegate.enabledStateListener
+            )
+            assertFalse(removed)
+        }
+    }
+
+    @Test
+    fun touchExplorationChangeListenerRemoved_onDetach() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            assertTrue(androidComposeView.isAttachedToWindow)
+        }
+
+        rule.runOnUiThread {
+            container.removeView(androidComposeView)
+        }
+
+        rule.runOnIdle {
+            assertFalse(androidComposeView.isAttachedToWindow)
+
+            val removed = delegate.accessibilityManager.removeTouchExplorationStateChangeListener(
+                delegate.touchExplorationStateListener
+            )
+            assertFalse(removed)
+        }
+    }
+
+    @Test
+    fun isEnabled_returnsFalse_whenUIAutomatorIsTheOnlyEnabledService() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            // This test implies that UIAutomator is enabled and is the only enabled a11y service
+            assertTrue(delegate.accessibilityManager.isEnabled)
+            assertFalse(delegate.isEnabled)
+        }
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {

@@ -30,6 +30,8 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
+import android.view.accessibility.AccessibilityManager.AccessibilityStateChangeListener
+import android.view.accessibility.AccessibilityManager.TouchExplorationStateChangeListener
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_LENGTH
 import android.view.accessibility.AccessibilityNodeInfo.EXTRA_DATA_TEXT_CHARACTER_LOCATION_ARG_START_INDEX
@@ -83,7 +85,6 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.platform.toAccessibilitySpannableString
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.toSize
-import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
 import androidx.core.view.AccessibilityDelegateCompat
@@ -187,20 +188,41 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     /** Virtual view id for the currently hovered logical item. */
     internal var hoveredVirtualViewId = InvalidId
-    private val accessibilityManager: AccessibilityManager =
+
+    @VisibleForTesting
+    internal val accessibilityManager: AccessibilityManager =
         view.context.getSystemService(Context.ACCESSIBILITY_SERVICE) as AccessibilityManager
     internal var accessibilityForceEnabledForTesting = false
 
+    @VisibleForTesting
+    internal val enabledStateListener: AccessibilityStateChangeListener =
+        AccessibilityStateChangeListener { enabled ->
+            enabledServices = if (enabled) {
+                accessibilityManager.getEnabledAccessibilityServiceList(
+                    AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+                )
+            } else {
+                emptyList()
+            }
+        }
+    @VisibleForTesting
+    internal val touchExplorationStateListener: TouchExplorationStateChangeListener =
+        TouchExplorationStateChangeListener {
+            enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(
+                AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+            )
+        }
+    private var enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(
+        AccessibilityServiceInfo.FEEDBACK_ALL_MASK
+    )
     /**
      * True if any accessibility service enabled in the system, except the UIAutomator (as it
      * doesn't appear in the list of enabled services)
      */
-    private val isEnabled: Boolean
+    @VisibleForTesting
+    internal val isEnabled: Boolean
         get() {
             // checking the list allows us to filter out the UIAutomator which doesn't appear in it
-            val enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(
-                AccessibilityServiceInfo.FEEDBACK_ALL_MASK
-            )
             return accessibilityForceEnabledForTesting ||
                 accessibilityManager.isEnabled && enabledServices.isNotEmpty()
         }
@@ -213,20 +235,6 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     private val isTouchExplorationEnabled
         get() = accessibilityForceEnabledForTesting ||
                 accessibilityManager.isEnabled && accessibilityManager.isTouchExplorationEnabled
-
-    /** True if an accessibility service that listens for the event of type [eventType] is enabled
-     * in the system.
-     * Note that UIAutomator will always return false as it doesn't appear in the list of enabled
-     * services
-     */
-    private fun isEnabledForEvent(eventType: Int): Boolean {
-        val enabledServices = accessibilityManager.getEnabledAccessibilityServiceList(
-            AccessibilityServiceInfo.FEEDBACK_ALL_MASK
-        )
-        return enabledServices.fastFirstOrNull {
-            it.eventTypes.and(eventType) != 0
-        } != null || accessibilityForceEnabledForTesting
-    }
 
     private val handler = Handler(Looper.getMainLooper())
     private var nodeProvider: AccessibilityNodeProviderCompat =
@@ -308,9 +316,19 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     init {
         // Remove callbacks that rely on view being attached to a window when we become detached.
         view.addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-            override fun onViewAttachedToWindow(view: View) {}
+            override fun onViewAttachedToWindow(view: View) {
+                accessibilityManager.addAccessibilityStateChangeListener(enabledStateListener)
+                accessibilityManager.addTouchExplorationStateChangeListener(
+                    touchExplorationStateListener
+                )
+            }
             override fun onViewDetachedFromWindow(view: View) {
                 handler.removeCallbacks(semanticsChangeChecker)
+
+                accessibilityManager.removeAccessibilityStateChangeListener(enabledStateListener)
+                accessibilityManager.removeTouchExplorationStateChangeListener(
+                    touchExplorationStateListener
+                )
             }
         })
     }
@@ -1065,7 +1083,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         contentChangeType: Int? = null,
         contentDescription: List<String>? = null
     ): Boolean {
-        if (virtualViewId == InvalidId || !isEnabledForEvent(eventType)) {
+        if (virtualViewId == InvalidId || !isEnabled) {
             return false
         }
 
@@ -1088,7 +1106,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      */
     private fun sendEvent(event: AccessibilityEvent): Boolean {
         // only send an event if there's an enabled service listening for events of this type
-        if (!isEnabledForEvent(event.eventType)) {
+        if (!isEnabled) {
             return false
         }
 
