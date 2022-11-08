@@ -1,6 +1,9 @@
 package org.jetbrains.codeviewer.ui.filetree
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.hoverable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -11,6 +14,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -24,7 +28,6 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import org.jetbrains.codeviewer.platform.VerticalScrollbar
-import org.jetbrains.codeviewer.platform.pointerMoveFilter
 import org.jetbrains.codeviewer.util.withoutWidthConstraints
 
 @Composable
@@ -76,25 +79,17 @@ private fun FileTreeItemView(fontSize: TextUnit, height: Dp, model: FileTree.Ite
         .height(height)
         .fillMaxWidth()
 ) {
-    val active = remember { mutableStateOf(false) }
+    val interactionSource = remember { MutableInteractionSource() }
+    val active by interactionSource.collectIsHoveredAsState()
 
     FileItemIcon(Modifier.align(Alignment.CenterVertically), model)
     Text(
         text = model.name,
-        color = if (active.value) LocalContentColor.current.copy(alpha = 0.60f) else LocalContentColor.current,
+        color = if (active) LocalContentColor.current.copy(alpha = 0.60f) else LocalContentColor.current,
         modifier = Modifier
             .align(Alignment.CenterVertically)
             .clipToBounds()
-            .pointerMoveFilter(
-                onEnter = {
-                    active.value = true
-                    true
-                },
-                onExit = {
-                    active.value = false
-                    true
-                }
-            ),
+            .hoverable(interactionSource),
         softWrap = true,
         fontSize = fontSize,
         overflow = TextOverflow.Ellipsis,

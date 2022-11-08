@@ -7,18 +7,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.ToastBackground
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 enum class ToastDuration(val value: Int) {
     Short(1000), Long(3000)
@@ -53,13 +48,10 @@ fun Toast(
                         color = Foreground
                     )
                 }
-                DisposableEffect(Unit) {
-                    GlobalScope.launch {
-                        delay(duration.value.toLong())
-                        isShown = false
-                        visibility.value = false
-                    }
-                    onDispose {  }
+                LaunchedEffect(Unit) {
+                    delay(duration.value.toLong())
+                    isShown = false
+                    visibility.value = false
                 }
             }
         }

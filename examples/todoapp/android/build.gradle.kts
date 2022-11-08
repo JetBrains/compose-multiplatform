@@ -1,5 +1,3 @@
-import org.jetbrains.compose.compose
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -7,11 +5,11 @@ plugins {
 }
 
 android {
-    compileSdkVersion(31)
+    compileSdk = 33
 
     defaultConfig {
-        minSdkVersion(23)
-        targetSdkVersion(31)
+        minSdk = 26
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
     }
@@ -40,4 +38,7 @@ dependencies {
     implementation(Deps.ArkIvanov.Decompose.extensionsCompose)
     implementation(Deps.AndroidX.AppCompat.appCompat)
     implementation(Deps.AndroidX.Activity.activityCompose)
+
+    // Workaround for https://github.com/JetBrains/compose-jb/issues/2340
+    implementation("androidx.compose.material:material:${Deps.JetpackComposeWorkaround.VERSION}")
 }

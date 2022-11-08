@@ -62,7 +62,7 @@ The plugin creates the following tasks:
 Note, that there is no cross-compilation support available at the moment,
 so the formats can only be built using the specific OS (e.g. to build `.dmg` you have to use macOS).
 Tasks that are not compatible with the current OS are skipped by default.
-* `package` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
+* `packageDistributionForCurrentOS` is a [lifecycle](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:lifecycle_tasks) task,
 aggregating all package tasks for an application.
 * `packageUberJarForCurrentOS` is used to create a single jar file, containing all dependencies for current OS. 
 The task is available starting from the M2 release.
@@ -586,55 +586,54 @@ fun main() {
 3. Run `./gradlew runDistributable`.
 4. Links like `compose://foo/bar` are now redirected from a browser to your application.
 
-## Obfuscation
-    
-To obfuscate Compose Multiplatform JVM applications the standard approach for JVM applications works.
-With the task `packageUberJarForCurrentOS` one could generate a JAR file which could be later obfuscated using ProGuard or R8.
+## Minification & obfuscation
 
-### ProGuard example
+Starting from 1.2 the Compose Gradle plugin supports [ProGuard](https://www.guardsquare.com/proguard) out-of-the-box.
+ProGuard is a well known [open source](https://github.com/Guardsquare/proguard) tool for minification and obfuscation,
+that is developed by [Guardsquare](https://www.guardsquare.com/).
 
-``` kotlin
-// build.gradle.kts
+The Gradle plugin provides a *release* task for each corresponding *default* packaging task:
 
-// Add ProGuard to buildscript classpath
-buildscript {
-    repositories {
-        mavenCentral()
+Default task (w/o ProGuard)| Release task (w. ProGuard)       |Description
+---------------------------|----------------------------------|-----------
+`createDistributable`      | `createReleaseDistributable`     |Creates an application image with bundled JDK & resources
+`runDistributable`         | `runReleaseDistributable`        |Runs an application image with bundled JDK & resources
+`run`                      | `runRelease`                     |Runs a non-packaged application `jar` using Gradle JDK
+`package<FORMAT_NAME>`     | `packageRelease<FORMAT_NAME>`    |Packages an application image into a `<FORMAT_NAME>` file
+`packageForCurrentOS`      | `packageReleaseForCurrentOS`     |Packages an application image into a format compatible with current OS
+`notarize<FORMAT_NAME>`    | `notarizeRelease<FORMAT_NAME>`   |Uploads a `<FORMAT_NAME>` application image for notarization (macOS only)
+`checkNotarizationStatus`  | `checkReleaseNotarizationStatus` |Checks if notarization succeeded (macOS only)
+
+The default configuration adds a few ProGuard rules:
+* an application image is minified, i.e. non-used classes are removed;
+* `compose.desktop.application.mainClass` is used as an entry point;
+* a few `keep` rules to avoid breaking Compose runtime.
+
+In many cases getting a minified Compose application will not require any additional configuration.
+However, sometimes ProGuard might be unable to track certain usages in bytecode
+(for example, this might happen if a class is used via reflection).
+If you encounter an issue, which happens only after ProGuard processing,
+you might want to add custom rules.
+To do so, specify a configuration file via DSL:
+```
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            configurationFiles.from(project.file("compose-desktop.pro"))
+        }
     }
-    dependencies {
-        classpath("com.guardsquare:proguard-gradle:7.2.0")
-    }
-}
-
-// ...
-
-// Define task to obfuscate the JAR and output to <name>.min.jar
-tasks.register<ProGuardTask>("obfuscate") {
-    val packageUberJarForCurrentOS by tasks.getting
-    dependsOn(packageUberJarForCurrentOS)
-    val files = packageUberJarForCurrentOS.outputs.files
-    injars(files)
-    outjars(files.map { file -> File(file.parentFile, "${file.nameWithoutExtension}.min.jar") })
-
-    val library = if (System.getProperty("java.version").startsWith("1.")) "lib/rt.jar" else "jmods"
-    libraryjars("${System.getProperty("java.home")}/$library")
-
-    configuration("proguard-rules.pro")
 }
 ```
+See the Guardsquare's [comprehensive manual](https://www.guardsquare.com/manual/configuration/usage)
+on ProGuard's rules & configuration options.
 
-This ProGuard configuration should get you started:
-
+Obfuscation is disabled by default. To enable it, set the following property via Gradle DSL:
 ```
-# proguard-rules.pro
--dontoptimize
--dontobfuscate
-
--dontwarn kotlinx.**
-
--keepclasseswithmembers public class com.example.MainKt {
-    public static void main(java.lang.String[]);
+compose.desktop {
+    application {
+        buildTypes.release.proguard {
+            obfuscate.set(true)
+        }
+    }
 }
--keep class org.jetbrains.skia.** { *; }
--keep class org.jetbrains.skiko.** { *; }
 ```

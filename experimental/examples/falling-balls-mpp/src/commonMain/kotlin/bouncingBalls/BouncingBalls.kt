@@ -26,7 +26,7 @@ import kotlin.math.max
 import kotlin.math.sin
 import kotlin.random.Random
 
-private inline fun Modifier.noRippleClickable(crossinline onClick: (Offset) -> Unit): Modifier =
+private fun Modifier.noRippleClickable(onClick: (Offset) -> Unit): Modifier =
     composed {
         clickable(
             indication = null,

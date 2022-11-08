@@ -16,6 +16,7 @@ import java.util.*
 import java.util.jar.JarFile
 import kotlin.collections.HashSet
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Test
 
@@ -77,22 +78,74 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun proguard(): Unit = with(testProject(TestProjects.proguard)) {
-        gradle(":runReleaseDistributable").build().checks { check ->
-            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+        val enableObfuscation = """
+                compose.desktop {
+                    application {
+                        buildTypes.release.proguard {
+                            obfuscate.set(true)
+                        }
+                    }
+                }
+            """.trimIndent()
 
-            assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
+        val actualMainImage = file("main-image.actual.png")
+        val expectedMainImage = file("main-image.expected.png")
 
-            val actualMainImage = file("main-image.actual.png")
-            val expectedMainImage = file("main-image.expected.png")
+        fun checkImageBeforeBuild() {
+            assertFalse(actualMainImage.exists(), "'$actualMainImage' exists")
+        }
+        fun checkImageAfterBuild() {
             assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
                 "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
             }
+        }
+
+        checkImageBeforeBuild()
+        gradle(":runReleaseDistributable").build().checks { check ->
+            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+            checkImageAfterBuild()
+            assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
+        }
+
+        file("build.gradle").modify { "$it\n$enableObfuscation" }
+        actualMainImage.delete()
+        checkImageBeforeBuild()
+        gradle(":runReleaseDistributable").build().checks { check ->
+            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+            checkImageAfterBuild()
+            assertNotEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
     }
 
     @Test
     fun packageJvm() = with(testProject(TestProjects.jvm)) {
         testPackageJvmDistributions()
+    }
+
+    @Test
+    fun gradleBuildCache() = with(testProject(TestProjects.jvm)) {
+        modifyGradleProperties {
+            setProperty("org.gradle.caching", "true")
+        }
+        modifyText("settings.gradle") {
+            it + "\n" + """
+                buildCache {
+                    local {
+                        directory = new File(rootDir, 'build-cache')
+                    }
+                }
+            """.trimIndent()
+        }
+
+        val packagingTask = ":packageDistributionForCurrentOS"
+        gradle(packagingTask).build().checks { check ->
+            check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
+        }
+
+        gradle("clean", packagingTask).build().checks { check ->
+            check.taskOutcome(":checkRuntime", TaskOutcome.FROM_CACHE)
+            check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
+        }
     }
 
     @Test
@@ -115,9 +168,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         val packageFile = packageDirFiles.single()
 
         if (currentOS == OS.Linux) {
-            val expectedName = "test-package_1.0.0-1_amd64.$ext"
-            check(packageFile.name.equals(expectedName, ignoreCase = true)) {
-                "Expected '$expectedName' package in $packageDir, got '${packageFile.name}'"
+            val isTestPackage = packageFile.name.contains("test-package", ignoreCase = true) ||
+                    packageFile.name.contains("testpackage", ignoreCase = true)
+            val isDeb = packageFile.name.endsWith(".$ext")
+            check(isTestPackage && isDeb) {
+                "Expected contain testpackage*.deb or test-package*.deb package in $packageDir, got '${packageFile.name}'"
             }
         } else {
             Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
@@ -125,6 +180,33 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.uppercaseFirstChar()}")?.outcome)
         assertEquals(TaskOutcome.SUCCESS, result.task(":packageDistributionForCurrentOS")?.outcome)
     }
+
+    @Test
+    fun testJdk15() = with(customJdkProject(15)) {
+        testPackageJvmDistributions()
+    }
+    @Test
+    fun testJdk18() = with(customJdkProject(18)) {
+        testPackageJvmDistributions()
+    }
+
+    @Test
+    fun testJdk19() = with(customJdkProject(19)) {
+        testPackageJvmDistributions()
+    }
+
+    private fun customJdkProject(javaVersion: Int): TestProject =
+        testProject(TestProjects.jvm).apply {
+            appendText("build.gradle") {
+                """
+                    compose.desktop.application {
+                        javaHome = javaToolchains.launcherFor {
+                            languageVersion.set(JavaLanguageVersion.of($javaVersion))
+                        }.get().metadata.installationPath.asFile.absolutePath
+                    }
+                """.trimIndent()
+            }
+        }
 
     @Test
     fun packageUberJarForCurrentOSJvm() = with(testProject(TestProjects.jvm)) {

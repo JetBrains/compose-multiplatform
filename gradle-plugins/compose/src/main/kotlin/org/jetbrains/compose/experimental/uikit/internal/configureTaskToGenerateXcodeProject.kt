@@ -37,21 +37,8 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                 type: application
                 platform: iOS
                 deploymentTarget: "12.0"
-                prebuildScripts:
-                  - script: cd "${rootDir.absolutePath}" && ./gradlew -i -p . packComposeUikitApplicationForXCode
-                    name: GradleCompile
                 info:
                   path: plists/Ios/Info.plist
-                  properties:
-                    UILaunchStoryboardName: ""
-                    method: "development"
-                sources:
-                  - path: "../../../src/"
-                    excludes:
-                      - "jvm*/**"
-                      - "desktop*/**"
-                      - "android*/**"
-                      - "*Test/**"
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"

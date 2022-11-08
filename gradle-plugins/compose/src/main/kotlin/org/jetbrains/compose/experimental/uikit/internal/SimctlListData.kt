@@ -55,7 +55,11 @@ internal class DeviceData(
     val dataPathSize: Long? = null,
     val logPath: String? = null,
     val udid: String,
-    val isAvailable: Boolean? = null,
+    /**
+     * Simulator may be unavailable after update Xcode version.
+     * By default, we think what simulator is available.
+     */
+    val isAvailable: Boolean = true,
     val deviceTypeIdentifier: String? = null,
     val state: String,
 )

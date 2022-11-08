@@ -3,8 +3,8 @@ package example.imageviewer.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import example.imageviewer.ResString
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
@@ -18,13 +18,9 @@ import example.imageviewer.utils.cropBitmapByScale
 import example.imageviewer.utils.toByteArray
 import java.awt.image.BufferedImage
 import java.io.File
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import org.jetbrains.skia.Image
 
 object ContentState {
@@ -250,7 +246,7 @@ object ContentState {
                     drag
                 )
             )
-        ).asImageBitmap()
+        ).toComposeImageBitmap()
     }
 
     fun swipeNext() {
@@ -358,7 +354,7 @@ private object MainImageWrapper {
     }
 
     private fun copy(bitmap: BufferedImage) : BufferedImage {
-        var result = BufferedImage(bitmap.width, bitmap.height, bitmap.type)
+        val result = BufferedImage(bitmap.width, bitmap.height, bitmap.type)
         val graphics = result.createGraphics()
         graphics.drawImage(bitmap, 0, 0, result.width, result.height, null)
         return result

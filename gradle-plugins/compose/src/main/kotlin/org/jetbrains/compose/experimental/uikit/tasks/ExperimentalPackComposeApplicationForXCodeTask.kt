@@ -12,6 +12,8 @@ import org.gradle.api.provider.Property
 import org.gradle.api.tasks.*
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType
 import java.io.File
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 
 abstract class ExperimentalPackComposeApplicationForXCodeTask : DefaultTask() {
     @get:Input
@@ -46,14 +48,15 @@ abstract class ExperimentalPackComposeApplicationForXCodeTask : DefaultTask() {
             val destFile = dsymDestination.resolve(relativePath)
             destFile.parentFile.mkdirs()
             if (sourceFile.name == executableSource.name) {
-                sourceFile.copyTo(destFile.resolveSibling(executableDestination.name))
+                sourceFile.copyTo(destFile.resolveSibling(executableDestination.name), true)
             } else {
-                sourceFile.copyTo(destFile)
+                sourceFile.copyTo(destFile, true)
             }
         }
 
         executableDestination.parentFile.mkdirs()
-        executableSource.copyTo(executableDestination)
+        // We need to preserve executable flag for resulting executable, "FileKt.copyTo" extension method does not allow this.
+        Files.copy(executableSource.toPath(), executableDestination.toPath(), StandardCopyOption.COPY_ATTRIBUTES, StandardCopyOption.REPLACE_EXISTING)
     }
 
     internal enum class UikitTarget(val simulator: Boolean, val targetName: String) {

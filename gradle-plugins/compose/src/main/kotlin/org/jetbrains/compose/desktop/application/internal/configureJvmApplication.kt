@@ -58,7 +58,6 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         javaHome.set(app.javaHomeProvider)
-        javaRuntimePropertiesFile.set(jvmTmpDirForTask().file("properties.bin"))
     }
 
     val suggestRuntimeModules = tasks.register<AbstractSuggestModulesTask>(
@@ -242,6 +241,15 @@ private fun JvmApplicationContext.configureProguardTask(
     mainClass.set(app.mainClass)
     proguardVersion.set(settings.version)
     configurationFiles.from(settings.configurationFiles)
+    // ProGuard uses -dontobfuscate option to turn off obfuscation, which is enabled by default
+    // We want to disable obfuscation by default, because often
+    // it is not needed, but makes troubleshooting much harder.
+    // If obfuscation is turned off by default,
+    // enabling (`isObfuscationEnabled.set(true)`) seems much better,
+    // than disabling obfuscation disabling (`dontObfuscate.set(false)`).
+    // That's why a task property is follows ProGuard design,
+    // when our DSL does the opposite.
+    dontobfuscate.set(settings.obfuscate.map { !it })
 
     dependsOn(unpackDefaultResources)
     defaultComposeRulesFile.set(unpackDefaultResources.flatMap { it.resources.defaultComposeProguardRules })

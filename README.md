@@ -47,12 +47,15 @@ Note that when you use Compose Multiplatform, you setup your project differently
    * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
    * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
    * [Falling Balls](examples/falling-balls) - Simple game
-   * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
    * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
    * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens, written with external navigation library
    * [todoapp-lite](examples/todoapp-lite) - A simplified version of [todoapp](examples/todoapp), fully based on Compose
    * [widgets gallery](examples/widgets-gallery) - Gallery of standard widgets
    * [IDEA plugin](examples/intellij-plugin) - Plugin for IDEA using Compose for Desktop
+   * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
+   * [web-landing](examples/web-landing) - A landing page built using Compose for Web (HTML composable api)
+   * [compose-web-with-react](examples/web-with-react) - Using compose-in-react and react-in-compose
+   * [compose-web-in-js](examples/web-compose-in-js) - Using Html based composables in js
 
 ## Other ##
 * [artwork](artwork) - design artifacts
@@ -64,6 +67,7 @@ Note that when you use Compose Multiplatform, you setup your project differently
 * [components](components) - custom components of Compose Multiplatform
    * [Split Pane](components/SplitPane)
 * [experimental](experimental) - experimental components and examples
+   * [examples](experimental/examples) - examples that use new experimental functionality
    * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
    * [Video Player](experimental/components/VideoPlayer)
    * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)

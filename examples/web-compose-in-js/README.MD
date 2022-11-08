@@ -1,3 +1,8 @@
+
+**Run in browser:**
+
+`./gradlew jsRun`
+
 ### How to use HTML based @Composable functions in JS?
 
 Useful links:
@@ -66,6 +71,11 @@ The module name was overridden to make it convenient for usage in JS:
 config.output = config.output || {};
 config.output.library = "MyComposables";
 ```
+
+### Running Web browser application
+* To run, launch command: `./gradlew :jsBrowserDevelopmentRun`
+* Or choose **browser** configuration in IDE and run it.  
+  ![browser-run-configuration.png](screenshots/browser-run-configuration.png)
 
 ### Building and using the output
 

@@ -1,7 +1,4 @@
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import org.jetbrains.compose.web.css.margin
 import org.jetbrains.compose.web.css.percent
 import org.jetbrains.compose.web.css.px
@@ -23,15 +20,16 @@ private fun ElementScope<HTMLElement>.UseReactEffect(
     key: Any?,
     content: RBuilder.() -> Unit
 ) {
-    DomSideEffect(key = key) { htmlElement ->
-        render(htmlElement) {
+    DisposableEffect(key) {
+        render(scopeElement) {
             content()
         }
+        onDispose {  }
     }
 
-    DisposableRefEffect { htmlElement ->
+    DisposableEffect(Unit) {
         onDispose {
-            unmountComponentAtNode(htmlElement)
+            unmountComponentAtNode(scopeElement)
         }
     }
 }

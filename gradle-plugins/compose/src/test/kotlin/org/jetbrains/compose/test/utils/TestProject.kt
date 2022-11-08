@@ -8,13 +8,30 @@ package org.jetbrains.compose.test.utils
 import org.gradle.testkit.runner.GradleRunner
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import java.io.File
+import java.util.Properties
 
 data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
-    val composeCompilerArtifact: String? = null
-)
+    val composeCompilerArtifact: String? = null,
+) {
+    private val placeholders = linkedMapOf(
+        "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
+        "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
+        "COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER" to composeCompilerArtifact,
+    )
+
+    fun replacePlaceholdersInFile(file: File) {
+        var content = file.readText()
+        for ((placeholder, value) in placeholders.entries) {
+            if (value != null) {
+                content = content.replace(placeholder, value)
+            }
+        }
+        file.writeText(content)
+    }
+}
 
 class TestProject(
     private val name: String,
@@ -36,18 +53,10 @@ class TestProject(
 
             val target = testEnvironment.workingDir.resolve(orig.relativeTo(originalTestRoot))
             target.parentFile.mkdirs()
+            orig.copyTo(target)
 
             if (orig.name.endsWith(".gradle") || orig.name.endsWith(".gradle.kts")) {
-                val origContent = orig.readText()
-                var newContent = origContent
-                    .replace("COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER", testEnvironment.composeGradlePluginVersion)
-                    .replace("KOTLIN_VERSION_PLACEHOLDER", testEnvironment.kotlinVersion)
-                if (testEnvironment.composeCompilerArtifact != null) {
-                    newContent = newContent.replace("COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER", testEnvironment.composeCompilerArtifact)
-                }
-                target.writeText(newContent)
-            } else {
-                orig.copyTo(target)
+                testEnvironment.replacePlaceholdersInFile(target)
             }
         }
     }
@@ -67,5 +76,37 @@ class TestProject(
 
     fun file(path: String): File =
         testEnvironment.workingDir.resolve(path)
+
+    fun modifyText(path: String, fn: (String) -> String) {
+        val file = file(path)
+        val oldContent = file.readText()
+        val newContent = fn(oldContent)
+        file.writeText(newContent)
+    }
+
+    fun appendText(path: String, fn: () -> String) {
+        val file = file(path)
+        val oldContent = file.readText()
+        val newContent = oldContent + "\n" + fn()
+        file.writeText(newContent)
+    }
+
+    fun modifyGradleProperties(fn: Properties.() -> Unit) {
+        val propertiesFile = file("gradle.properties")
+        val properties = Properties()
+        if (propertiesFile.exists()) {
+            propertiesFile.bufferedReader().use { reader ->
+                properties.load(reader)
+            }
+        }
+        fn(properties)
+        propertiesFile.delete()
+
+        if (properties.isNotEmpty()) {
+            propertiesFile.bufferedWriter().use { writer ->
+                properties.store(writer, null)
+            }
+        }
+    }
 }
 

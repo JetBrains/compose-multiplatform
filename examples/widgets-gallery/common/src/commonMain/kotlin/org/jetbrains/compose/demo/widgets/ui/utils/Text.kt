@@ -14,7 +14,7 @@ fun SubtitleText(subtitle: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun TitleText(title: String, modifier: Modifier = Modifier) {
+fun TitleText(title: String) {
     Text(
         text = title,
         style = typography.h6.copy(fontSize = 14.sp),

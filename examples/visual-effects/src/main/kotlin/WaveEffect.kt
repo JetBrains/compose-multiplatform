@@ -10,6 +10,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -20,7 +22,7 @@ import kotlin.math.*
 
 @Composable
 fun WaveEffect(onCloseRequest: () -> Unit, showControls: Boolean) {
-    var windowState = remember { WindowState(width = 1200.dp, height = 800.dp) }
+    val windowState = remember { WindowState(width = 1200.dp, height = 800.dp) }
     Window(onCloseRequest = {}, undecorated = true, transparent = true, state = windowState) {
         Grid()
     }
@@ -70,8 +72,16 @@ fun Grid() {
 
     Surface(
         modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp))
-            .pointerMoveFilter(onMove = { mouseX = it.x.toInt(); mouseY = it.y.toInt(); false; },
-                onEnter = { State.mouseUsed = true; false; }, onExit = { State.mouseUsed = false; false; }),
+            .onPointerEvent(PointerEventType.Move) {
+                mouseX = it.changes.first().position.x.toInt()
+                mouseY = it.changes.first().position.y.toInt()
+            }
+            .onPointerEvent(PointerEventType.Enter) {
+                State.mouseUsed = true
+            }
+            .onPointerEvent(PointerEventType.Exit) {
+                State.mouseUsed = false
+            },
         color = Color(0, 0, 0),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -80,13 +90,13 @@ fun Grid() {
                 var y = 10 // initial position
                 val shift = 25
                 var evenRow = false
-                var pointerOffsetX = (centerX / 2)
-                var pointerOffsety = (centerY / 2)
+                val pointerOffsetX = (centerX / 2)
+                val pointerOffsety = (centerY / 2)
                 while (y < 790) {
                     x = if (evenRow) 10 + shift else 10
                     while (x < 1190) {
-                        var size: Int = size(x, y, pointerOffsetX, pointerOffsety)
-                        var color = boxColor(x, y, time, pointerOffsetX, pointerOffsety)
+                        val size: Int = size(x, y, pointerOffsetX, pointerOffsety)
+                        val color = boxColor(x, y, time, pointerOffsetX, pointerOffsety)
                         Dot(size, Modifier.offset(x.dp, y.dp), color, time)
                         x += shift * 2
                     }
@@ -111,19 +121,19 @@ fun Grid() {
 fun HighPanel(mouseX: Int, mouseY: Int) {
     Text(
         "Compose",
-        androidx.compose.ui.Modifier.offset(270.dp, 600.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 270, 700)),
+        Modifier.offset(270.dp, 600.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 270, 700)),
         color = colorMouse(mouseX, mouseY, 270, 700),
         fontWeight = FontWeight.Bold
     )
     Text(
         "Multiplatform",
-        androidx.compose.ui.Modifier.offset(350.dp, 700.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 550, 800)),
+        Modifier.offset(350.dp, 700.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 550, 800)),
         color = colorMouse(mouseX, mouseY, 550, 800),
         fontWeight = FontWeight.Bold
     )
     Text(
         "1.0",
-        androidx.compose.ui.Modifier.offset(800.dp, 700.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 800, 800)),
+        Modifier.offset(800.dp, 700.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 800, 800)),
         color = colorMouse(mouseX, mouseY, 800, 800),
         fontWeight = FontWeight.Bold
     )
@@ -137,7 +147,7 @@ private fun alpha(mouseX: Int, mouseY: Int, x: Int, y: Int): Float {
 }
 
 private fun colorMouse(mouseX: Int, mouseY: Int, x: Int, y: Int): Color {
-    var d = distance(mouseX, mouseY, x, y) / 450
+    val d = distance(mouseX, mouseY, x, y) / 450
     val color1 = Color(0x6B, 0x57, 0xFF)
     val color2 = Color(0xFE, 0x28, 0x57)
     val color3 = Color(0xFD, 0xB6, 0x0D)
@@ -178,7 +188,7 @@ private fun size(x: Int, y: Int, mouseX: Int, mouseY: Int): Int {
     var result = 5
     if (y > 550 && x < 550) return result
     if (y > 650 && x < 900) return result
-    var distance2 = sqrt((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY).toDouble()) / 200
+    val distance2 = sqrt((x - mouseX) * (x - mouseX) + (y - mouseY) * (y - mouseY).toDouble()) / 200
     val scale: Double = (if (distance2 < 1) {
         addSize * (1 - distance2)
     } else 0.toDouble())
@@ -205,13 +215,13 @@ private fun boxColor(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Colo
     var color = Color.White
 
     if (c1 <= 0) {
-        var d = c2 / (c2 + c3)
+        val d = c2 / (c2 + c3)
         color = balancedColor(d, color2, color3)
     } else if (c2 <= 0) {
-        var d = c3 / (c1 + c3)
+        val d = c3 / (c1 + c3)
         color = balancedColor(d, color3, color1)
     } else if (c3 <= 0) {
-        var d = c1 / (c1 + c2)
+        val d = c1 / (c1 + c2)
         color = balancedColor(d, color1, color2)
     }
 

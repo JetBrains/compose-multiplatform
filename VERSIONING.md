@@ -1,4 +1,4 @@
- ## Features
+## Compatability and versioning overview
 
 ### Supported platforms
    * macOS (x86-64, arm64)
@@ -31,6 +31,7 @@ Kotlin version | Minimal Compose version | Notes
 1.6.20 | 1.1.1
 1.7.10 | 1.2.0
 1.7.20 | 1.2.0 | JS is not supported (will be fixed in the next versions)
+1.7.20 | 1.2.1
 
 ### Relationship between the Jetpack Compose and Compose Multiplatform release cycles
 
@@ -50,4 +51,3 @@ compose {
 }
 ```
 However, keep in mind that this compiler version isn't tested with Compose Multiplatform, so stability isn't guaranteed.
-

@@ -1,5 +1,7 @@
 package org.jetbrains.compose.demo.widgets.ui
 
+import java.util.Locale
+
 enum class WidgetsType(private val customTitle: String? = null) {
     APP_BARS,
     BUTTONS,
@@ -13,9 +15,11 @@ enum class WidgetsType(private val customTitle: String? = null) {
 
     val readableName: String by lazy {
         name.split("_")
-            .map { it.toLowerCase() }
+            .map { it.lowercase(Locale.getDefault()) }
             .mapIndexed { i, it ->
-                if (i == 0) it.capitalize() else it
+                if (i == 0) it.replaceFirstChar {
+                    if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                } else it
             }.joinToString(" ")
     }
 

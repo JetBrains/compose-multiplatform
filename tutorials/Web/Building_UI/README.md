@@ -49,7 +49,7 @@ Input(attrs = { type(InputType.Text) })
 
 ### Text
 
-The `Text` allows you to add text content to an HTML tag. Besides, the text content it represents, it does not have any parameters:
+The `Text` allows you to add text content to an HTML tag. Besides the text content it represents, it does not have any parameters:
 
 ``` kotlin
 Text("Arbitrary text")

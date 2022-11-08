@@ -1,6 +1,6 @@
 # 🐦 Compose Bird
 
-![](demo.gif)
+![](screenshots/demo.gif)
 
 ![latestVersion](https://img.shields.io/github/v/release/theapache64/compose-bird)
 <a href="https://twitter.com/theapache64" target="_blank">
@@ -12,12 +12,13 @@
 ## ▶️ Play
 
 - https://theapache64.github.io/compose-bird/
+- Use arrow **Up** key to fly
 
 ## 🏃 Run
 
-```
-./gradlew jsBrowserRun
-```
+* To run, launch command: `./gradlew jsBrowserRun`
+* Or choose **browser** configuration in IDE and run it.  
+  ![browser-run-configuration.png](screenshots/browser-run-configuration.png)
 
 ## 📦 Distribute
 

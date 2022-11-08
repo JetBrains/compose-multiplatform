@@ -34,5 +34,6 @@ fun rememberVectorPainter(image: ImageVector, tintColor: Color) =
         name = image.name,
         tintColor = tintColor,
         tintBlendMode = image.tintBlendMode,
+        autoMirror = false,
         content = { _, _ -> RenderVectorGroup(group = image.root) }
     )
