@@ -18,6 +18,9 @@ package androidx.compose.foundation.pager
 
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.DecayAnimationSpec
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.calculateTargetValue
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
@@ -35,6 +38,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyList
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -338,6 +342,11 @@ internal object PagerDefaults {
     /**
      * @param state The [PagerState] that controls the which to which this FlingBehavior will
      * be applied to.
+     * @param pagerSnapDistance A way to control the snapping destination for this [Pager].
+     * The default behavior will result in any fling going to the next page in the direction of the
+     * fling (if the fling has enough velocity, otherwise we'll bounce back). Use
+     * [PagerSnapDistance.atMost] to define a maximum number of pages this [Pager] is allowed to
+     * fling after scrolling is finished and fling has started.
      * @param lowVelocityAnimationSpec The animation spec used to approach the target offset. When
      * the fling velocity is not large enough. Large enough means large enough to naturally decay.
      * @param highVelocityAnimationSpec The animation spec used to approach the target offset. When
@@ -352,18 +361,140 @@ internal object PagerDefaults {
     @Composable
     fun flingBehavior(
         state: PagerState,
-        lowVelocityAnimationSpec: AnimationSpec<Float> = tween(),
+        pagerSnapDistance: PagerSnapDistance = PagerSnapDistance.atMost(1),
+        lowVelocityAnimationSpec: AnimationSpec<Float> = tween(easing = LinearOutSlowInEasing),
         highVelocityAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay(),
-        snapAnimationSpec: AnimationSpec<Float> = spring(),
+        snapAnimationSpec: AnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
     ): FlingBehavior {
         val density = LocalDensity.current
-        val snapLayoutInfoProvider = SnapLayoutInfoProvider(state.lazyListState)
-        return SnapFlingBehavior(
-            snapLayoutInfoProvider,
+
+        return remember(
             lowVelocityAnimationSpec,
             highVelocityAnimationSpec,
             snapAnimationSpec,
+            pagerSnapDistance,
             density
-        )
+        ) {
+            val snapLayoutInfoProvider =
+                SnapLayoutInfoProvider(state, pagerSnapDistance, highVelocityAnimationSpec)
+            SnapFlingBehavior(
+                snapLayoutInfoProvider = snapLayoutInfoProvider,
+                lowVelocityAnimationSpec = lowVelocityAnimationSpec,
+                highVelocityAnimationSpec = highVelocityAnimationSpec,
+                snapAnimationSpec = snapAnimationSpec,
+                density = density
+            )
+        }
+    }
+}
+
+/**
+ * [PagerSnapDistance] defines the way the [Pager] will treat the distance between the current
+ * page and the page where it will settle.
+ */
+@ExperimentalFoundationApi
+@Stable
+internal interface PagerSnapDistance {
+
+    /** Provides a chance to change where the [Pager] fling will settle.
+     *
+     * @param startPage The current page right before the fling starts.
+     * @param suggestedTargetPage The proposed target page where this fling will stop. This target
+     * will be the page that will be correctly positioned (snapped) after naturally decaying with
+     * [velocity] using a [DecayAnimationSpec].
+     * @param velocity The initial fling velocity.
+     * @param pageSize The page size for this [Pager].
+     * @param pageSpacing The spacing used between pages.
+     *
+     * @return An updated target page where to settle. Note that this value needs to be between 0
+     * and the total count of pages in this pager. If an invalid value is passed, the pager will
+     * coerce within the valid values.
+     */
+    fun calculateTargetPage(
+        startPage: Int,
+        suggestedTargetPage: Int,
+        velocity: Float,
+        pageSize: Int,
+        pageSpacing: Int
+    ): Int
+
+    companion object {
+        /**
+         * Limits the maximum number of pages that can be flung per fling gesture.
+         * @param pages The maximum number of extra pages that can be flung at once.
+         */
+        fun atMost(pages: Int): PagerSnapDistance {
+            require(pages >= 0) {
+                "pages should be greater than or equal to 0. You have used $pages."
+            }
+            return PagerSnapDistanceMaxPages(pages)
+        }
+    }
+}
+
+/**
+ * Limits the maximum number of pages that can be flung per fling gesture.
+ * @param pagesLimit The maximum number of extra pages that can be flung at once.
+ */
+@OptIn(ExperimentalFoundationApi::class)
+internal class PagerSnapDistanceMaxPages(private val pagesLimit: Int) : PagerSnapDistance {
+    override fun calculateTargetPage(
+        startPage: Int,
+        suggestedTargetPage: Int,
+        velocity: Float,
+        pageSize: Int,
+        pageSpacing: Int,
+    ): Int {
+        return suggestedTargetPage.coerceIn(startPage - pagesLimit, startPage + pagesLimit)
+    }
+
+    override fun equals(other: Any?): Boolean {
+        return if (other is PagerSnapDistanceMaxPages) {
+            this.pagesLimit == other.pagesLimit
+        } else {
+            false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return pagesLimit.hashCode()
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun SnapLayoutInfoProvider(
+    pagerState: PagerState,
+    pagerSnapDistance: PagerSnapDistance,
+    decayAnimationSpec: DecayAnimationSpec<Float>
+): SnapLayoutInfoProvider {
+    return object : SnapLayoutInfoProvider by SnapLayoutInfoProvider(
+        lazyListState = pagerState.lazyListState,
+        positionInLayout = SnapAlignmentStartToStart
+    ) {
+        override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
+            val effectivePageSize = pagerState.pageSize + pagerState.pageSpacing
+            val initialOffset = pagerState.currentPageOffset * effectivePageSize
+            val animationOffset =
+                decayAnimationSpec.calculateTargetValue(0f, initialVelocity)
+
+            val startPage = pagerState.currentPage
+            val startPageOffset = startPage * effectivePageSize
+
+            val targetOffset =
+                (startPageOffset + initialOffset + animationOffset) / effectivePageSize
+
+            val targetPage = targetOffset.toInt()
+            val correctedTargetPage = pagerSnapDistance.calculateTargetPage(
+                startPage,
+                targetPage,
+                initialVelocity,
+                pagerState.pageSize,
+                pagerState.pageSpacing
+            ).coerceIn(0, pagerState.pageCount)
+
+            val finalOffset = (correctedTargetPage - startPage) * effectivePageSize
+
+            return (finalOffset - initialOffset)
+        }
     }
 }
