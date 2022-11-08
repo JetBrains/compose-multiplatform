@@ -63,7 +63,7 @@ internal class MultiPageSnappingLayoutInfoProvider(
 ) : SnapLayoutInfoProvider by baseSnapLayoutInfoProvider {
     override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
         val offset = decayAnimationSpec.calculateTargetValue(0f, initialVelocity)
-        val finalDecayedOffset = (offset.absoluteValue - snapStepSize()).coerceAtLeast(0f)
+        val finalDecayedOffset = (offset.absoluteValue - calculateSnapStepSize()).coerceAtLeast(0f)
         return finalDecayedOffset * initialVelocity.sign
     }
 }

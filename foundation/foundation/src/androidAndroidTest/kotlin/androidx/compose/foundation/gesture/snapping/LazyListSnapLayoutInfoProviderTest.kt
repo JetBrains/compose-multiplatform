@@ -62,7 +62,7 @@ class LazyListSnapLayoutInfoProviderTest(orientation: Orientation) :
             val density = LocalDensity.current
             val state = rememberLazyListState()
             val layoutInfoProvider = remember(state) { createLayoutInfo(state) }.also {
-                actualItemSize = with(it) { density.snapStepSize() }
+                actualItemSize = with(it) { density.calculateSnapStepSize() }
             }
             expectedItemSize = with(density) { FixedItemSize.toPx() }
             MainLayout(
@@ -87,7 +87,7 @@ class LazyListSnapLayoutInfoProviderTest(orientation: Orientation) :
             val density = LocalDensity.current
             val state = rememberLazyListState()
             val layoutInfoProvider = remember(state) { createLayoutInfo(state) }.also {
-                actualItemSize = with(it) { density.snapStepSize() }
+                actualItemSize = with(it) { density.calculateSnapStepSize() }
             }
             expectedItemSize = state.layoutInfo.visibleItemsInfo.map { it.size }.average().toFloat()
 
@@ -107,7 +107,7 @@ class LazyListSnapLayoutInfoProviderTest(orientation: Orientation) :
             val density = LocalDensity.current
             val state = rememberLazyListState()
             val layoutInfoProvider = remember(state) { createLayoutInfo(state) }.also {
-                snapStepSize = with(it) { density.snapStepSize() }
+                snapStepSize = with(it) { density.calculateSnapStepSize() }
             }
 
             actualItemSize = with(density) { (FixedItemSize + FixedItemSize / 2).toPx() }

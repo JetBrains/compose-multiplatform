@@ -58,7 +58,7 @@ fun SnapLayoutInfoProvider(
         val decayAnimationSpec: DecayAnimationSpec<Float> = splineBasedDecay(this)
         val offset =
             decayAnimationSpec.calculateTargetValue(NoDistance, initialVelocity).absoluteValue
-        val finalDecayOffset = (offset - snapStepSize()).coerceAtLeast(0f)
+        val finalDecayOffset = (offset - calculateSnapStepSize()).coerceAtLeast(0f)
         return if (finalDecayOffset == 0f) {
             finalDecayOffset
         } else {
@@ -88,7 +88,7 @@ fun SnapLayoutInfoProvider(
         return lowerBoundOffset.rangeTo(upperBoundOffset)
     }
 
-    override fun Density.snapStepSize(): Float = with(layoutInfo) {
+    override fun Density.calculateSnapStepSize(): Float = with(layoutInfo) {
         if (visibleItemsInfo.isNotEmpty()) {
             visibleItemsInfo.fastSumBy { it.size } / visibleItemsInfo.size.toFloat()
         } else {

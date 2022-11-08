@@ -29,9 +29,9 @@ import androidx.compose.ui.unit.Density
 @ExperimentalFoundationApi
 interface SnapLayoutInfoProvider {
     /**
-     * The minimum offset that snapping will use to animate. (e.g. an item size)
+     * The minimum offset that snapping will use to animate.(e.g. an item size)
      */
-    fun Density.snapStepSize(): Float
+    fun Density.calculateSnapStepSize(): Float
 
     /**
      * Calculate the distance to navigate before settling into the next snapping bound.

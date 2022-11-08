@@ -33,22 +33,24 @@ fun SnapLayoutInfoProvider(
 
     fun Density.nextFullItemCenter(layoutCenter: Float): Float {
         val intItemSize = itemSize().roundToInt()
-        return floor((layoutCenter + snapStepSize()) / itemSize().roundToInt()) * intItemSize
+        return floor((layoutCenter + calculateSnapStepSize()) / itemSize().roundToInt()) *
+            intItemSize
     }
 
     fun Density.previousFullItemCenter(layoutCenter: Float): Float {
         val intItemSize = itemSize().roundToInt()
-        return ceil((layoutCenter - snapStepSize()) / itemSize().roundToInt()) * intItemSize
+        return ceil((layoutCenter - calculateSnapStepSize()) / itemSize().roundToInt()) *
+            intItemSize
     }
 
     override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
-        val layoutCenter = layoutSize() / 2f + scrollState.value + snapStepSize() / 2f
+        val layoutCenter = layoutSize() / 2f + scrollState.value + calculateSnapStepSize() / 2f
         val lowerBound = nextFullItemCenter(layoutCenter) - layoutCenter
         val upperBound = previousFullItemCenter(layoutCenter) - layoutCenter
         return upperBound.rangeTo(lowerBound)
     }
 
-    override fun Density.snapStepSize(): Float {
+    override fun Density.calculateSnapStepSize(): Float {
         return itemSize()
     }
 

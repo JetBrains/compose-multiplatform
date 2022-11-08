@@ -371,8 +371,8 @@ package androidx.compose.foundation.gestures.snapping {
 
   @androidx.compose.foundation.ExperimentalFoundationApi public interface SnapLayoutInfoProvider {
     method public float calculateApproachOffset(androidx.compose.ui.unit.Density, float initialVelocity);
+    method public float calculateSnapStepSize(androidx.compose.ui.unit.Density);
     method public kotlin.ranges.ClosedFloatingPointRange<java.lang.Float> calculateSnappingOffsetBounds(androidx.compose.ui.unit.Density);
-    method public float snapStepSize(androidx.compose.ui.unit.Density);
   }
 
 }

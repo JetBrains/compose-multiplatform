@@ -257,7 +257,7 @@ private class TestLayoutInfoProvider(
 ) : SnapLayoutInfoProvider {
     var calculateApproachOffsetCount = 0
 
-    override fun Density.snapStepSize(): Float {
+    override fun Density.calculateSnapStepSize(): Float {
         return snapStep
     }
 

@@ -161,7 +161,7 @@ class SnapFlingBehavior(
         velocity: Float
     ): Boolean {
         val decayOffset = highVelocityAnimationSpec.calculateTargetValue(NoDistance, velocity)
-        val snapStepSize = with(snapLayoutInfoProvider) { density.snapStepSize() }
+        val snapStepSize = with(snapLayoutInfoProvider) { density.calculateSnapStepSize() }
         return decayOffset.absoluteValue >= (offset.absoluteValue + snapStepSize)
     }
 
@@ -391,7 +391,9 @@ private class LowVelocityApproachAnimation(
     ): AnimationState<Float, AnimationVector1D> {
         val animationState = AnimationState(initialValue = 0f, initialVelocity = velocity)
         val targetOffset =
-            (abs(offset) + with(layoutInfoProvider) { density.snapStepSize() }) * sign(velocity)
+            (abs(offset) + with(layoutInfoProvider) { density.calculateSnapStepSize() }) * sign(
+                velocity
+            )
         return with(scope) {
             animateSnap(
                 targetOffset = targetOffset,
