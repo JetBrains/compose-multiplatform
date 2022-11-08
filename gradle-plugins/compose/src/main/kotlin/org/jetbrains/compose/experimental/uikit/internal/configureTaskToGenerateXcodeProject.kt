@@ -39,6 +39,8 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                 deploymentTarget: "12.0"
                 info:
                   path: plists/Ios/Info.plist
+                  properties:
+                    UILaunchStoryboardName: $projectName
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"
