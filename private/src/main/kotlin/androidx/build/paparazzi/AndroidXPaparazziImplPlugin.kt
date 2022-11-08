@@ -48,6 +48,7 @@ class AndroidXPaparazziImplPlugin @Inject constructor(
 ) : Plugin<Project> {
     override fun apply(project: Project) {
         val paparazziNative = project.createUnzippedPaparazziNativeDependency()
+        project.afterEvaluate { it.addTestUtilsDependency() }
         project.tasks.register("updateGolden")
         project.tasks.withType<Test>().configureEach { it.configureTestTask(paparazziNative) }
         project.tasks.withType<Test>().whenTaskAdded { project.registerUpdateGoldenTask(it) }
@@ -171,9 +172,19 @@ class AndroidXPaparazziImplPlugin @Inject constructor(
     private val Test.reportDirectory
         get() = project.buildDir.resolve("paparazzi").resolve(name)
 
+    /** Add a testImplementation dependency on the wrapper test utils library. */
+    private fun Project.addTestUtilsDependency() {
+        configurations["testImplementation"].dependencies.add(
+            dependencies.create(project(TEST_UTILS_PROJECT))
+        )
+    }
+
     private companion object {
         /** Package name of the test library, used to namespace system properties */
         const val PACKAGE_NAME = "androidx.testutils.paparazzi"
+
+        /** Project path to the wrapper test utils project. */
+        const val TEST_UTILS_PROJECT = ":internal-testutils-paparazzi"
 
         /** Artifact type attribute for unzipped Paparazzi layoutlib unzipped artifacts */
         const val UNZIPPED_PAPARAZZI_NATIVE = "unzipped-paparazzi-native"
