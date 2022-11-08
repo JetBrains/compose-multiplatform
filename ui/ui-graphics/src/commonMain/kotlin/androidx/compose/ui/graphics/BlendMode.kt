@@ -33,14 +33,6 @@ import androidx.compose.runtime.Immutable
  * range 0.0 to 1.0. The output of the algorithm also has these same four
  * channels, with values computed from the source and destination.
  *
- * The horizontal and vertical bars in these images show the red, green, and
- * blue channels with varying opacity levels, then all three color channels
- * together with those same varying opacity levels, then all three color
- * channels set to zero with those varying opacity levels, then two bars showing
- * a red/green/blue repeating gradient, the first with full opacity and the
- * second with partial opacity, and finally a bar with the three color channels
- * set to zero but the opacity varying in a repeating gradient.
- *
  * ## Application to the [Canvas] API
  *
  * When using [Canvas.saveLayer] and [Canvas.restore], the blend mode of the
