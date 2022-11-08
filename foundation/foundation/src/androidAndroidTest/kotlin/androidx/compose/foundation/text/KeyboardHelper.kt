@@ -16,43 +16,60 @@
 
 package androidx.compose.foundation.text
 
+import android.app.Activity
 import android.content.Context
+import android.content.ContextWrapper
 import android.os.Build
 import android.view.View
+import android.view.Window
 import android.view.WindowInsets
 import android.view.WindowInsetsAnimation
 import android.view.inputmethod.InputMethodManager
 import androidx.annotation.RequiresApi
-import androidx.compose.ui.test.junit4.ComposeTestRule
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
+import androidx.compose.ui.window.DialogWindowProvider
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.common.truth.Truth.assertThat
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
 /**
  * Helper methods for hiding and showing the keyboard in tests.
- * Must set [view] before calling any methods on this class.
+ * Call [initialize] from your test rule's content before calling any other methods on this class.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 class KeyboardHelper(
-    private val composeRule: ComposeTestRule,
+    private val composeRule: ComposeContentTestRule,
     private val timeout: Long = 15_000L
 ) {
     /**
      * The [View] hosting the compose rule's content. Must be set before calling any methods on this
      * class.
      */
-    lateinit var view: View
+    private lateinit var view: View
     private val imm by lazy {
         view.context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
     }
 
     /**
+     * Call this at the top of your test composition before using the helper.
+     */
+    @Composable
+    fun initialize() {
+        view = LocalView.current
+    }
+
+    /**
      * Requests the keyboard to be hidden without waiting for it.
-     * Should be called from the main thread.
      */
     fun hideKeyboard() {
-        if (Build.VERSION.SDK_INT >= 30) {
+        composeRule.runOnIdle {
+            // Use both techniques to hide it, at least one of them will hopefully work.
             hideKeyboardWithInsets()
-        } else {
             hideKeyboardWithImm()
         }
     }
@@ -68,26 +85,25 @@ class KeyboardHelper(
     }
 
     fun hideKeyboardIfShown() {
-        composeRule.runOnIdle {
-            if (isSoftwareKeyboardShown()) {
-                hideKeyboard()
-                waitForKeyboardVisibility(visible = false)
-            }
+        if (composeRule.runOnIdle { isSoftwareKeyboardShown() }) {
+            hideKeyboard()
+            waitForKeyboardVisibility(visible = false)
         }
     }
 
     fun isSoftwareKeyboardShown(): Boolean {
-        return if (Build.VERSION.SDK_INT >= 30) {
+        return if (Build.VERSION.SDK_INT >= 23) {
             isSoftwareKeyboardShownWithInsets()
         } else {
             isSoftwareKeyboardShownWithImm()
         }
     }
 
-    @RequiresApi(30)
+    @RequiresApi(23)
     private fun isSoftwareKeyboardShownWithInsets(): Boolean {
-        return view.rootWindowInsets != null &&
-            view.rootWindowInsets.isVisible(WindowInsets.Type.ime())
+        val insets = view.rootWindowInsets ?: return false
+        val insetsCompat = WindowInsetsCompat.toWindowInsetsCompat(insets, view)
+        return insetsCompat.isVisible(WindowInsetsCompat.Type.ime())
     }
 
     private fun isSoftwareKeyboardShownWithImm(): Boolean {
@@ -97,35 +113,61 @@ class KeyboardHelper(
     }
 
     private fun hideKeyboardWithImm() {
-        imm.hideSoftInputFromWindow(view.windowToken, 0)
+        view.post {
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 
-    @RequiresApi(30)
     private fun hideKeyboardWithInsets() {
-        view.windowInsetsController?.hide(WindowInsets.Type.ime())
+        view.findWindow()?.let { WindowInsetsControllerCompat(it, view) }
+            ?.hide(WindowInsetsCompat.Type.ime())
     }
 
     private fun waitUntil(timeout: Long, condition: () -> Boolean) {
         if (Build.VERSION.SDK_INT >= 30) {
-            view.waitUntil(timeout, condition)
+            view.waitForWindowInsetsUntil(timeout, condition)
         } else {
             composeRule.waitUntil(timeout, condition)
         }
     }
-}
 
-@RequiresApi(30)
-fun View.waitUntil(timeoutMillis: Long, condition: () -> Boolean) {
-    val latch = CountDownLatch(1)
-    rootView.setWindowInsetsAnimationCallback(
-        InsetAnimationCallback {
+    // TODO(b/221889664) Replace with composition local when available.
+    private fun View.findWindow(): Window? =
+        (parent as? DialogWindowProvider)?.window
+            ?: context.findWindow()
+
+    private tailrec fun Context.findWindow(): Window? =
+        when (this) {
+            is Activity -> window
+            is ContextWrapper -> baseContext.findWindow()
+            else -> null
+        }
+
+    @RequiresApi(30)
+    fun View.waitForWindowInsetsUntil(timeoutMillis: Long, condition: () -> Boolean) {
+        val latch = CountDownLatch(1)
+        rootView.setOnApplyWindowInsetsListener { view, windowInsets ->
             if (condition()) {
                 latch.countDown()
             }
+            view.onApplyWindowInsets(windowInsets)
+            windowInsets
         }
-    )
-    val conditionMet = latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
-    assertThat(conditionMet).isTrue()
+        rootView.setWindowInsetsAnimationCallback(
+            InsetAnimationCallback {
+                if (condition()) {
+                    latch.countDown()
+                }
+            }
+        )
+
+        // if condition already met return
+        if (condition()) return
+
+        // else wait for condition to be met
+        val conditionMet = latch.await(timeoutMillis, TimeUnit.MILLISECONDS)
+        assertThat(conditionMet).isTrue()
+    }
 }
 
 @RequiresApi(30)

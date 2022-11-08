@@ -95,10 +95,12 @@ internal class TextInputServiceAndroid(
      */
     private val textInputCommandChannel = Channel<TextInputCommand>(Channel.UNLIMITED)
 
-    internal constructor(view: View) : this(view, InputMethodManagerImpl(view.context))
+    internal constructor(view: View) : this(view, InputMethodManagerImpl(view))
 
     init {
-        if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.create") }
+        if (DEBUG) {
+            Log.d(TAG, "$DEBUG_CLASS.create")
+        }
     }
 
     /**
@@ -138,7 +140,9 @@ internal class TextInputServiceAndroid(
             }
         ).also {
             ics.add(WeakReference(it))
-            if (DEBUG) { Log.d(TAG, "$DEBUG_CLASS.createInputConnection: $ics") }
+            if (DEBUG) {
+                Log.d(TAG, "$DEBUG_CLASS.createInputConnection: $ics")
+            }
         }
     }
 
@@ -324,7 +328,6 @@ internal class TextInputServiceAndroid(
             if (needUpdateSelection) {
                 // updateSelection API requires -1 if there is no composition
                 inputMethodManager.updateSelection(
-                    view = view,
                     selectionStart = newValue.selection.min,
                     selectionEnd = newValue.selection.max,
                     compositionStart = state.composition?.min ?: -1,
@@ -348,7 +351,7 @@ internal class TextInputServiceAndroid(
             restartInputImmediately()
         } else {
             for (i in 0 until ics.size) {
-                ics[i].get()?.updateInputState(this.state, inputMethodManager, view)
+                ics[i].get()?.updateInputState(this.state, inputMethodManager)
             }
         }
     }
@@ -380,16 +383,16 @@ internal class TextInputServiceAndroid(
     /** Immediately restart the IME connection, bypassing the [textInputCommandChannel]. */
     private fun restartInputImmediately() {
         if (DEBUG) Log.d(TAG, "$DEBUG_CLASS.restartInputImmediately")
-        inputMethodManager.restartInput(view)
+        inputMethodManager.restartInput()
     }
 
     /** Immediately show or hide the keyboard, bypassing the [textInputCommandChannel]. */
     private fun setKeyboardVisibleImmediately(visible: Boolean) {
         if (DEBUG) Log.d(TAG, "$DEBUG_CLASS.setKeyboardVisibleImmediately(visible=$visible)")
         if (visible) {
-            inputMethodManager.showSoftInput(view)
+            inputMethodManager.showSoftInput()
         } else {
-            inputMethodManager.hideSoftInputFromWindow(view.windowToken)
+            inputMethodManager.hideSoftInput()
         }
     }
 }
