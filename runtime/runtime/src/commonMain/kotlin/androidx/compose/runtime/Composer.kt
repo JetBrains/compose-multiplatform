@@ -3314,7 +3314,7 @@ internal class ComposerImpl(
                         invokeComposable(this, content)
                         endGroup()
                     } else if (
-                        forciblyRecompose &&
+                        (forciblyRecompose || providersInvalid) &&
                         savedContent != null &&
                         savedContent != Composer.Empty
                     ) {
