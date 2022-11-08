@@ -28,7 +28,7 @@ Preview functionality (check your application UI without building/running it) fo
 Also, see [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) docs from Google. They were originally written for Android, but most of information applies to Compose for Desktop as well.
 
 ### Compose for Web
-* [Getting started with Compose for Web](tutorials/Web/Getting_Started) 
+* [Getting started](tutorials/Web/Getting_Started) 
 * [Building web UI](tutorials/Web/Building_UI)
 * [Handling Events](tutorials/Web/Events_Handling)
 * [Controlled and Uncontrolled inputs](tutorials/Web/Controlled_Uncontrolled_Inputs)
