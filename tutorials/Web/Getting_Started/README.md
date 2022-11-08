@@ -12,9 +12,11 @@ You need to have the following software installed before you begin:
 
 ## Creating a new project
 
-If you don't want to create the project manually, you can [download the template here](https://github.com/JetBrains/compose-jb/tree/master/templates/web-template)
+You can create the project by [downloading the template here](https://github.com/JetBrains/compose-jb/tree/master/templates/web-template) or using the Project Wizard in IDEA:
 
-The project wizard doesn't support Compose for web projects yet, so we need to perform the following steps:
+<img alt="Create new project" src="wizard.png" height="500" />
+
+If you want to create the project manually, perform the following steps:
 
 #### 1. Create a Kotlin Multiplatform project:
 - Select `Gradle` on the left menu
