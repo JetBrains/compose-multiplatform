@@ -56,8 +56,8 @@ dependencies {
         implementation(project(":compose:ui:ui-util"))
         implementation("androidx.annotation:annotation:1.1.0")
         implementation("androidx.core:core-ktx:1.1.0")
-        implementation("androidx.test.espresso:espresso-core:3.3.0")
-        implementation(libs.testMonitor)
+        implementation("androidx.test.espresso:espresso-core:3.5.0")
+        implementation("androidx.test:monitor:1.6.0")
 
         testImplementation(project(":compose:test-utils"))
         testImplementation(libs.truth)
