@@ -24,11 +24,9 @@ which creates a Compose application automatically.
 Note that JDK must be at least JDK 11, and to use the native distribution
 packaging, JDK 15 or later must be used.
 
-<img alt="Create new project 1" src="screen3.png" height="500" />
+<img alt="Create new project 1" src="wizard1.png" height="500" />
 
-<img alt="Create new project 2" src="screen4.png" height="500" />
-
-<img alt="Create new project 3" src="screen5.png" height="500" />
+<img alt="Create new project 2" src="wizard2.png" height="500" />
 
 ### IDE plugin
 
@@ -145,20 +143,20 @@ fun main() = application {
 
 Open `build.gradle.kts` [as a project](https://www.jetbrains.com/help/idea/jetgradle-tool-window.html) in IntelliJ IDEA.
 
-<img alt="New project" src="screen1.png" height="500" />
+<img alt="New project" src="open.png" height="500" />
 
 After you download the Compose for Desktop dependencies from the Maven repositories, your new project is ready
 to go. Open the Gradle toolbar on the right and select `sample/Tasks/compose desktop/run`.
 The first run may take some time. Afterwards, the following dialog will be shown:
 
-<img alt="Application running" src="screen2.gif" height="500" />
+<img alt="Application running" src="app.gif" height="500" />
 
 You can click on the button several times and see that the application reacts and
 updates the UI.
 
 Running and debugging the `main()` function using run gutter is also supported.
 
-<img alt="Application running" src="screen6.png" height="500" />
+<img alt="Application running" src="app-run.png" height="500" />
 
 ## Next steps
 
