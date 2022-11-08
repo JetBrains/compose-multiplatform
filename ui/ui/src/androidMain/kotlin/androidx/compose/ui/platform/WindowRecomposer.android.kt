@@ -366,7 +366,7 @@ fun View.createLifecycleAwareWindowRecomposer(
     viewTreeLifecycle.addObserver(
         object : LifecycleEventObserver {
             override fun onStateChanged(
-                lifecycleOwner: LifecycleOwner,
+                source: LifecycleOwner,
                 event: Lifecycle.Event
             ) {
                 val self = this
@@ -394,7 +394,7 @@ fun View.createLifecycleAwareWindowRecomposer(
                                 // If runRecomposeAndApplyChanges returns or this coroutine is
                                 // cancelled it means we no longer care about this lifecycle.
                                 // Clean up the dangling references tied to this observer.
-                                lifecycleOwner.lifecycle.removeObserver(self)
+                                source.lifecycle.removeObserver(self)
                             }
                         }
                     }
