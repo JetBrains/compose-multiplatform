@@ -191,7 +191,7 @@ interface Modifier {
             level = DeprecationLevel.HIDDEN
         )
         override val isValid: Boolean
-            get() = TODO("Not yet implemented")
+            get() = isAttached
 
         internal open fun updateCoordinator(coordinator: NodeCoordinator?) {
             this.coordinator = coordinator

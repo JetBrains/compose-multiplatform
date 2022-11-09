@@ -36,7 +36,7 @@ interface ObserverNode : DelegatableNode {
     @ExperimentalComposeUiApi
     companion object {
         internal val OnObserveReadsChanged: (ObserverNode) -> Unit = {
-            it.onObservedReadsChanged()
+            if (it.node.isAttached) it.onObservedReadsChanged()
         }
     }
 }
@@ -47,8 +47,8 @@ interface ObserverNode : DelegatableNode {
 @ExperimentalComposeUiApi
 fun <T> T.observeReads(block: () -> Unit) where T : Modifier.Node, T : ObserverNode {
     requireOwner().snapshotObserver.observeReads(
-        this,
-        ObserverNode.OnObserveReadsChanged,
-        block
+        target = this,
+        onChanged = ObserverNode.OnObserveReadsChanged,
+        block = block
     )
 }

@@ -37,17 +37,12 @@ class ObserverNodeTest {
     @get:Rule
     val rule = createComposeRule()
 
-    var value by mutableStateOf(1)
-    var callbackInvoked = false
-
     @Test
     fun simplyObservingValue_doesNotTriggerCallback() {
         // Arrange.
-        val observerNode = object : ObserverNode, Modifier.Node() {
-            override fun onObservedReadsChanged() {
-                callbackInvoked = true
-            }
-        }
+        val value by mutableStateOf(1)
+        var callbackInvoked = false
+        val observerNode = TestObserverNode { callbackInvoked = true }
         rule.setContent {
             Box(Modifier.modifierElementOf { observerNode })
         }
@@ -67,11 +62,9 @@ class ObserverNodeTest {
     @Test
     fun changeInObservedValue_triggersCallback() {
         // Arrange.
-        val observerNode = object : ObserverNode, Modifier.Node() {
-            override fun onObservedReadsChanged() {
-                callbackInvoked = true
-            }
-        }
+        var value by mutableStateOf(1)
+        var callbackInvoked = false
+        val observerNode = TestObserverNode { callbackInvoked = true }
         rule.setContent {
             Box(Modifier.modifierElementOf { observerNode })
         }
@@ -91,10 +84,94 @@ class ObserverNodeTest {
         }
     }
 
+    @Test(expected = IllegalStateException::class)
+    fun unusedNodeDoesNotObserve() {
+        // Arrange.
+        var value by mutableStateOf(1)
+        var callbackInvoked = false
+        val observerNode = TestObserverNode { callbackInvoked = true }
+
+        // Act.
+        rule.runOnIdle {
+            // Read value to observe changes.
+            observerNode.observeReads { value.toString() }
+
+            // Write to the read value to trigger onObservedReadsChanged.
+            value = 3
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(callbackInvoked).isFalse()
+        }
+    }
+
+    @Test
+    fun detachedNodeCanObserveReads() {
+        // Arrange.
+        var value by mutableStateOf(1)
+        var callbackInvoked = false
+        val observerNode = TestObserverNode { callbackInvoked = true }
+        var attached by mutableStateOf(true)
+        rule.setContent {
+            Box(if (attached) modifierElementOf { observerNode } else Modifier)
+        }
+
+        // Act.
+        // Read value while not attached.
+        rule.runOnIdle { attached = false }
+        rule.runOnIdle { observerNode.observeReads { value.toString() } }
+        rule.runOnIdle { attached = true }
+        // Write to the read value to trigger onObservedReadsChanged.
+        rule.runOnIdle { value = 3 }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(callbackInvoked).isTrue()
+        }
+    }
+
+    @Test
+    fun detachedNodeDoesNotCallOnObservedReadsChanged() {
+        // Arrange.
+        var value by mutableStateOf(1)
+        var callbackInvoked = false
+        val observerNode = TestObserverNode { callbackInvoked = true }
+        var attached by mutableStateOf(true)
+        rule.setContent {
+            Box(if (attached) modifierElementOf { observerNode } else Modifier)
+        }
+
+        // Act.
+        rule.runOnIdle {
+            // Read value to observe changes.
+            observerNode.observeReads { value.toString() }
+        }
+
+        rule.runOnIdle {
+            attached = false
+        }
+        // Write to the read value to trigger onObservedReadsChanged.
+        rule.runOnIdle { value = 3 }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(callbackInvoked).isFalse()
+        }
+    }
+
     @ExperimentalComposeUiApi
     private inline fun <reified T : Modifier.Node> Modifier.modifierElementOf(
-        crossinline create: () -> T
+        crossinline create: () -> T,
     ): Modifier {
         return this.then(modifierElementOf(create) { name = "testNode" })
+    }
+
+    class TestObserverNode(
+        private val onObserveReadsChanged: () -> Unit,
+    ) : ObserverNode, Modifier.Node() {
+        override fun onObservedReadsChanged() {
+            this.onObserveReadsChanged()
+        }
     }
 }
