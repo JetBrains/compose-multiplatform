@@ -17,7 +17,6 @@
 package androidx.build
 
 import androidx.benchmark.gradle.BenchmarkPlugin
-import androidx.build.AndroidXImplPlugin.Companion.CHECK_RELEASE_READY_TASK
 import androidx.build.AndroidXImplPlugin.Companion.TASK_TIMEOUT_MINUTES
 import androidx.build.Release.DEFAULT_PUBLISH_CONFIG
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
@@ -836,7 +835,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             if (extension.type != LibraryType.SAMPLES) {
                 val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                 if (verifyDependencyVersionsTask != null) {
-                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     taskConfigurator(verifyDependencyVersionsTask)
                 }
             }
@@ -845,7 +843,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
     companion object {
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
-        const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val GENERATE_TEST_CONFIGURATION_TASK = "GenerateTestConfiguration"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
@@ -905,18 +902,6 @@ private fun Project.addToProjectMap(extension: AndroidXExtension) {
 
 val Project.multiplatformExtension
     get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
-
-/**
- * Creates the [CHECK_RELEASE_READY_TASK], which aggregates tasks that must pass for a
- * project to be considered ready for public release.
- */
-private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvider<out Task>>) {
-    tasks.register(CHECK_RELEASE_READY_TASK) {
-        for (taskProvider in taskProviderList) {
-            it.dependsOn(taskProvider)
-        }
-    }
-}
 
 @Suppress("UNCHECKED_CAST")
 fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {
