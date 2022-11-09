@@ -43,7 +43,7 @@ dependencies {
         implementation(projectOrArtifact(":compose:runtime:runtime"))
         implementation(projectOrArtifact(":compose:ui:ui-unit"))
         implementation(projectOrArtifact(":compose:ui:ui-graphics"))
-        implementation(projectOrArtifact(":activity:activity-compose"))
+        implementation("androidx.activity:activity-compose:1.3.1")
         // old version of common-java8 conflicts with newer version, because both have
         // DefaultLifecycleEventObserver.
         // Outside of androidx this is resolved via constraint added to lifecycle-common,
