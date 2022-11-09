@@ -1029,6 +1029,9 @@ package androidx.compose.foundation.text {
   public final class TextFieldDelegateKt {
   }
 
+  public final class TextFieldFocusModifier_androidKt {
+  }
+
   public final class TextFieldGestureModifiersKt {
   }
 
