@@ -473,6 +473,100 @@ class ComposableMethodTest {
             diffParametersMethod.parameters.map { it.type })
     }
 
+    @Throws(NoSuchMethodException::class)
+    @Test
+    fun test_realParameterTypes_returns_correct_parameterTypes() {
+        val function0 = clazz.getDeclaredComposableMethod("overloadedComposable")
+        val function1 =
+            clazz.getDeclaredComposableMethod("overloadedComposable", String::class.java)
+        val function10 =
+            clazz.getDeclaredComposableMethod(
+                "overloadedComposable",
+                *Array(10) { String::class.java }
+            )
+        val function11 =
+            clazz.getDeclaredComposableMethod(
+                "overloadedComposable",
+                *Array(11) { String::class.java }
+            )
+        val function12 =
+            clazz.getDeclaredComposableMethod(
+                "overloadedComposable",
+                *Array(12) { String::class.java }
+            )
+
+        val method0 = wrapperClazz.getDeclaredComposableMethod("overloadedComposableMethod")
+        val method1 =
+            wrapperClazz.getDeclaredComposableMethod(
+                "overloadedComposableMethod",
+                String::class.java
+            )
+        val method10 =
+            wrapperClazz.getDeclaredComposableMethod(
+                "overloadedComposableMethod",
+                *Array(10) { String::class.java }
+            )
+        val method11 =
+            wrapperClazz.getDeclaredComposableMethod(
+                "overloadedComposableMethod",
+                *Array(11) { String::class.java }
+            )
+        val method12 =
+            wrapperClazz.getDeclaredComposableMethod(
+                "overloadedComposableMethod",
+                *Array(12) { String::class.java }
+            )
+
+        val diffParameters =
+            clazz.getDeclaredComposableMethod(
+                "differentParametersTypes",
+                String::class.java,
+                Any::class.java,
+                Int::class.java,
+                Float::class.java,
+                Double::class.java,
+                Long::class.java
+            )
+
+        val diffParametersMethod =
+            wrapperClazz.getDeclaredComposableMethod(
+                "differentParametersTypesMethod",
+                String::class.java,
+                Any::class.java,
+                Int::class.java,
+                Float::class.java,
+                Double::class.java,
+                Long::class.java
+            )
+
+        assertEquals(0, function0.parameterTypes.size)
+        assertEquals(1, function1.parameterTypes.size)
+        assertEquals(10, function10.parameterTypes.size)
+        assertEquals(11, function11.parameterTypes.size)
+        assertEquals(12, function12.parameterTypes.size)
+        assertEquals(12, function12.parameterTypes.size)
+
+        assertEquals(0, method0.parameterTypes.size)
+        assertEquals(1, method1.parameterTypes.size)
+        assertEquals(10, method10.parameterTypes.size)
+        assertEquals(11, method11.parameterTypes.size)
+        assertEquals(12, method12.parameterTypes.size)
+
+        assertEquals(0, composableMethod.asComposableMethod()!!.parameterTypes.size)
+
+        assertEquals(6, diffParameters.parameterTypes.size)
+        assertEquals(
+            listOf(String::class.java, Any::class.java, Int::class.java, Float::class.java,
+                Double::class.java, Long::class.java),
+            diffParameters.parameterTypes.toList())
+
+        assertEquals(6, diffParametersMethod.parameterTypes.size)
+        assertEquals(
+            listOf(String::class.java, Any::class.java, Int::class.java, Float::class.java,
+                Double::class.java, Long::class.java),
+            diffParametersMethod.parameterTypes.toList())
+    }
+
     private class TestFrameClock : MonotonicFrameClock {
         override suspend fun <R> withFrameNanos(onFrame: (Long) -> R): R = onFrame(0L)
     }
