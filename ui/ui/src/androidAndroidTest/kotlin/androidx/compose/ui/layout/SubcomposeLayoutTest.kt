@@ -64,6 +64,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -1195,6 +1196,57 @@ class SubcomposeLayoutTest {
         rule.runOnIdle {
             assertThat(subcomposionValue).isFalse()
         }
+    }
+
+    @Test
+    fun staticCompositionLocalChangeInMainComposition_withNonStaticLocal_invalidatesComposition() {
+        var isDark by mutableStateOf(false)
+
+        val staticLocal = staticCompositionLocalOf<Boolean> { error("Not defined") }
+        val local = compositionLocalOf<Boolean> { error("Not defined") }
+        val innerLocal = staticCompositionLocalOf<Unit> { error("\not defined") }
+
+        val content = @Composable {
+            CompositionLocalProvider(innerLocal provides Unit) {
+                val value1 = staticLocal.current
+                val value2 = local.current
+                Box(
+                    Modifier
+                        .testTag(if (value1) "dark" else "light")
+                        .requiredSize(if (value2) 50.dp else 100.dp)
+                )
+            }
+        }
+
+        rule.setContent {
+            CompositionLocalProvider(
+                staticLocal provides isDark,
+            ) {
+                CompositionLocalProvider(
+                    local provides staticLocal.current
+                ) {
+                    SubcomposeLayout { constraints ->
+                        val measurables = subcompose(Unit, content)
+                        val placeables = measurables.map {
+                            it.measure(constraints)
+                        }
+                        layout(100, 100) {
+                            placeables.forEach { it.place(IntOffset.Zero) }
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("light")
+            .assertWidthIsEqualTo(100.dp)
+
+        isDark = true
+
+        rule.waitForIdle()
+
+        rule.onNodeWithTag("dark")
+            .assertWidthIsEqualTo(50.dp)
     }
 
     @Test
