@@ -18,6 +18,7 @@ package androidx.compose.ui.text.platform.extensions
 
 import android.graphics.Typeface
 import android.os.Build
+import android.text.TextPaint
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.AndroidTextPaint
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
@@ -130,6 +132,31 @@ internal fun AndroidTextPaint.applySpanStyle(
             style.baselineShift
         }
     )
+}
+
+@OptIn(ExperimentalTextApi::class)
+internal fun AndroidTextPaint.setTextMotion(textMotion: TextMotion?) {
+    val finalTextMotion = textMotion ?: TextMotion.Static
+    flags = if (finalTextMotion.subpixelTextPositioning) {
+        flags or TextPaint.SUBPIXEL_TEXT_FLAG
+    } else {
+        flags and TextPaint.SUBPIXEL_TEXT_FLAG.inv()
+    }
+    when (finalTextMotion.linearity) {
+        TextMotion.Linearity.Linear -> {
+            flags = flags or TextPaint.LINEAR_TEXT_FLAG
+            hinting = TextPaint.HINTING_OFF
+        }
+        TextMotion.Linearity.FontHinting -> {
+            flags and TextPaint.LINEAR_TEXT_FLAG.inv()
+            hinting = TextPaint.HINTING_ON
+        }
+        TextMotion.Linearity.None -> {
+            flags and TextPaint.LINEAR_TEXT_FLAG.inv()
+            hinting = TextPaint.HINTING_OFF
+        }
+        else -> flags
+    }
 }
 
 /**

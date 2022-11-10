@@ -37,6 +37,7 @@ import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextForegroundStyle
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
 
@@ -137,7 +138,8 @@ class TextStyle internal constructor(
             background = background,
             textDecoration = textDecoration,
             shadow = shadow,
-            platformStyle = null
+            platformStyle = null,
+            drawStyle = null
         ),
         ParagraphStyle(
             textAlign = textAlign,
@@ -147,7 +149,8 @@ class TextStyle internal constructor(
             platformStyle = null,
             lineHeightStyle = null,
             lineBreak = null,
-            hyphens = null
+            hyphens = null,
+            textMotion = null
         ),
         platformStyle = null
     )
@@ -226,7 +229,8 @@ class TextStyle internal constructor(
             background = background,
             textDecoration = textDecoration,
             shadow = shadow,
-            platformStyle = platformStyle?.spanStyle
+            platformStyle = platformStyle?.spanStyle,
+            drawStyle = null
         ),
         ParagraphStyle(
             textAlign = textAlign,
@@ -236,7 +240,8 @@ class TextStyle internal constructor(
             platformStyle = platformStyle?.paragraphStyle,
             lineHeightStyle = lineHeightStyle,
             lineBreak = null,
-            hyphens = null
+            hyphens = null,
+            textMotion = null
         ),
         platformStyle = platformStyle
     )
@@ -279,6 +284,7 @@ class TextStyle internal constructor(
      * When null, [LineHeightStyle.Default] is used.
      * @param lineBreak The line breaking configuration for the text.
      * @param hyphens The configuration of hyphenation.
+     * @param textMotion Text character placement, whether to optimize for animated or static text.
      */
     @ExperimentalTextApi
     constructor(
@@ -304,7 +310,8 @@ class TextStyle internal constructor(
         platformStyle: PlatformTextStyle? = null,
         lineHeightStyle: LineHeightStyle? = null,
         lineBreak: LineBreak? = null,
-        hyphens: Hyphens? = null
+        hyphens: Hyphens? = null,
+        textMotion: TextMotion? = null,
     ) : this(
         SpanStyle(
             color = color,
@@ -332,7 +339,8 @@ class TextStyle internal constructor(
             platformStyle = platformStyle?.paragraphStyle,
             lineHeightStyle = lineHeightStyle,
             lineBreak = lineBreak,
-            hyphens = hyphens
+            hyphens = hyphens,
+            textMotion = textMotion
         ),
         platformStyle = platformStyle
     )
@@ -378,6 +386,7 @@ class TextStyle internal constructor(
      * and bottom of last line. The configuration is applied only when a [lineHeight] is defined.
      * @param lineBreak The line breaking configuration for the text.
      * @param hyphens The configuration of hyphenation.
+     * @param textMotion Text character placement, whether to optimize for animated or static text.
      */
     @ExperimentalTextApi
     constructor(
@@ -404,7 +413,8 @@ class TextStyle internal constructor(
         platformStyle: PlatformTextStyle? = null,
         lineHeightStyle: LineHeightStyle? = null,
         lineBreak: LineBreak? = null,
-        hyphens: Hyphens? = null
+        hyphens: Hyphens? = null,
+        textMotion: TextMotion? = null
     ) : this(
         SpanStyle(
             brush = brush,
@@ -433,7 +443,8 @@ class TextStyle internal constructor(
             platformStyle = platformStyle?.paragraphStyle,
             lineHeightStyle = lineHeightStyle,
             lineBreak = lineBreak,
-            hyphens = hyphens
+            hyphens = hyphens,
+            textMotion = textMotion
         ),
         platformStyle = platformStyle
     )
@@ -558,7 +569,8 @@ class TextStyle internal constructor(
                 platformStyle = this.paragraphStyle.platformStyle,
                 lineHeightStyle = this.lineHeightStyle,
                 lineBreak = this.lineBreak,
-                hyphens = this.hyphens
+                hyphens = this.hyphens,
+                textMotion = this.textMotion
             ),
             platformStyle = this.platformStyle
         )
@@ -608,7 +620,8 @@ class TextStyle internal constructor(
                 background = background,
                 textDecoration = textDecoration,
                 shadow = shadow,
-                platformStyle = platformStyle?.spanStyle
+                platformStyle = platformStyle?.spanStyle,
+                drawStyle = this.spanStyle.drawStyle
             ),
             paragraphStyle = ParagraphStyle(
                 textAlign = textAlign,
@@ -618,7 +631,8 @@ class TextStyle internal constructor(
                 platformStyle = platformStyle?.paragraphStyle,
                 lineHeightStyle = lineHeightStyle,
                 lineBreak = this.lineBreak,
-                hyphens = this.hyphens
+                hyphens = this.hyphens,
+                textMotion = this.textMotion
             ),
             platformStyle = platformStyle
         )
@@ -648,7 +662,8 @@ class TextStyle internal constructor(
         platformStyle: PlatformTextStyle? = this.platformStyle,
         lineHeightStyle: LineHeightStyle? = this.paragraphStyle.lineHeightStyle,
         lineBreak: LineBreak? = this.paragraphStyle.lineBreak,
-        hyphens: Hyphens? = this.paragraphStyle.hyphens
+        hyphens: Hyphens? = this.paragraphStyle.hyphens,
+        textMotion: TextMotion? = this.paragraphStyle.textMotion,
     ): TextStyle {
         return TextStyle(
             spanStyle = SpanStyle(
@@ -681,7 +696,8 @@ class TextStyle internal constructor(
                 platformStyle = platformStyle?.paragraphStyle,
                 lineHeightStyle = lineHeightStyle,
                 lineBreak = lineBreak,
-                hyphens = hyphens
+                hyphens = hyphens,
+                textMotion = textMotion
             ),
             platformStyle = platformStyle
         )
@@ -712,7 +728,8 @@ class TextStyle internal constructor(
         platformStyle: PlatformTextStyle? = this.platformStyle,
         lineHeightStyle: LineHeightStyle? = this.paragraphStyle.lineHeightStyle,
         lineBreak: LineBreak? = this.paragraphStyle.lineBreak,
-        hyphens: Hyphens? = this.paragraphStyle.hyphens
+        hyphens: Hyphens? = this.paragraphStyle.hyphens,
+        textMotion: TextMotion? = this.paragraphStyle.textMotion,
     ): TextStyle {
         return TextStyle(
             spanStyle = SpanStyle(
@@ -742,7 +759,8 @@ class TextStyle internal constructor(
                 platformStyle = platformStyle?.paragraphStyle,
                 lineHeightStyle = lineHeightStyle,
                 lineBreak = lineBreak,
-                hyphens = hyphens
+                hyphens = hyphens,
+                textMotion = textMotion
             ),
             platformStyle = platformStyle
         )
@@ -896,6 +914,14 @@ class TextStyle internal constructor(
     @get:ExperimentalTextApi
     val lineBreak: LineBreak? get() = this.paragraphStyle.lineBreak
 
+    /**
+     * Text character placement configuration, whether to optimize for animated or static text.
+     */
+    @ExperimentalTextApi
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    val textMotion: TextMotion? get() = this.paragraphStyle.textMotion
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is TextStyle) return false
@@ -966,7 +992,8 @@ class TextStyle internal constructor(
             "platformStyle=$platformStyle, " +
             "lineHeightStyle=$lineHeightStyle, " +
             "lineBreak=$lineBreak, " +
-            "hyphens=$hyphens" +
+            "hyphens=$hyphens, " +
+            "textMotion=$textMotion" +
             ")"
     }
 

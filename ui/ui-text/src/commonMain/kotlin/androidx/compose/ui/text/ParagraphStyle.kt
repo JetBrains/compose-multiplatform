@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.text.style.lerp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.TextUnit
@@ -53,6 +54,7 @@ private val DefaultLineHeight = TextUnit.Unspecified
  * When null, [LineHeightStyle.Default] is used.
  * @param lineBreak The line breaking configuration for the text.
  * @param hyphens The configuration of hyphenation.
+ * @param textMotion Text character placement, whether to optimize for animated or static text.
  *
  * @see Paragraph
  * @see AnnotatedString
@@ -74,7 +76,11 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
     @get:ExperimentalTextApi
     @property:ExperimentalTextApi
-    val hyphens: Hyphens? = null
+    val hyphens: Hyphens? = null,
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:ExperimentalTextApi
+    @property:ExperimentalTextApi
+    val textMotion: TextMotion? = null
 ) {
 
     /**
@@ -98,6 +104,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
      * @see SpanStyle
      * @see TextStyle
      */
+    @OptIn(ExperimentalTextApi::class)
     constructor(
         textAlign: TextAlign? = null,
         textDirection: TextDirection? = null,
@@ -109,7 +116,10 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         lineHeight = lineHeight,
         textIndent = textIndent,
         platformStyle = null,
-        lineHeightStyle = null
+        lineHeightStyle = null,
+        lineBreak = null,
+        hyphens = null,
+        textMotion = null
     )
 
     /**
@@ -190,7 +200,8 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             platformStyle = mergePlatformStyle(other.platformStyle),
             lineHeightStyle = other.lineHeightStyle ?: this.lineHeightStyle,
             lineBreak = other.lineBreak ?: this.lineBreak,
-            hyphens = other.hyphens ?: this.hyphens
+            hyphens = other.hyphens ?: this.hyphens,
+            textMotion = other.textMotion ?: this.textMotion
         )
     }
 
@@ -221,7 +232,8 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             platformStyle = this.platformStyle,
             lineHeightStyle = this.lineHeightStyle,
             lineBreak = this.lineBreak,
-            hyphens = this.hyphens
+            hyphens = this.hyphens,
+            textMotion = this.textMotion
         )
     }
 
@@ -243,7 +255,8 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             platformStyle = platformStyle,
             lineHeightStyle = lineHeightStyle,
             lineBreak = this.lineBreak,
-            hyphens = this.hyphens
+            hyphens = this.hyphens,
+            textMotion = this.textMotion
         )
     }
 
@@ -256,7 +269,8 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         platformStyle: PlatformParagraphStyle? = this.platformStyle,
         lineHeightStyle: LineHeightStyle? = this.lineHeightStyle,
         lineBreak: LineBreak? = this.lineBreak,
-        hyphens: Hyphens? = this.hyphens
+        hyphens: Hyphens? = this.hyphens,
+        textMotion: TextMotion? = this.textMotion
     ): ParagraphStyle {
         return ParagraphStyle(
             textAlign = textAlign,
@@ -266,7 +280,8 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             platformStyle = platformStyle,
             lineHeightStyle = lineHeightStyle,
             lineBreak = lineBreak,
-            hyphens = hyphens
+            hyphens = hyphens,
+            textMotion = textMotion
         )
     }
 
@@ -283,6 +298,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         if (lineHeightStyle != other.lineHeightStyle) return false
         if (lineBreak != other.lineBreak) return false
         if (hyphens != other.hyphens) return false
+        if (textMotion != other.textMotion) return false
 
         return true
     }
@@ -297,6 +313,7 @@ class ParagraphStyle @ExperimentalTextApi constructor(
         result = 31 * result + (lineHeightStyle?.hashCode() ?: 0)
         result = 31 * result + (lineBreak?.hashCode() ?: 0)
         result = 31 * result + (hyphens?.hashCode() ?: 0)
+        result = 31 * result + (textMotion?.hashCode() ?: 0)
         return result
     }
 
@@ -310,7 +327,8 @@ class ParagraphStyle @ExperimentalTextApi constructor(
             "platformStyle=$platformStyle, " +
             "lineHeightStyle=$lineHeightStyle, " +
             "lineBreak=$lineBreak, " +
-            "hyphens=$hyphens" +
+            "hyphens=$hyphens, " +
+            "textMotion=$textMotion" +
             ")"
     }
 }
@@ -351,7 +369,8 @@ fun lerp(start: ParagraphStyle, stop: ParagraphStyle, fraction: Float): Paragrap
             fraction
         ),
         lineBreak = lerpDiscrete(start.lineBreak, stop.lineBreak, fraction),
-        hyphens = lerpDiscrete(start.hyphens, stop.hyphens, fraction)
+        hyphens = lerpDiscrete(start.hyphens, stop.hyphens, fraction),
+        textMotion = lerpDiscrete(start.textMotion, stop.textMotion, fraction)
     )
 }
 
@@ -378,5 +397,6 @@ internal fun resolveParagraphStyleDefaults(
     platformStyle = style.platformStyle,
     lineHeightStyle = style.lineHeightStyle,
     lineBreak = style.lineBreak ?: LineBreak.Simple,
-    hyphens = style.hyphens ?: Hyphens.None
+    hyphens = style.hyphens ?: Hyphens.None,
+    textMotion = style.textMotion ?: TextMotion.Static
 )

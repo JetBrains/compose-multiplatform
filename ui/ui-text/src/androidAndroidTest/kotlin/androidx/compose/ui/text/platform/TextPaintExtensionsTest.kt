@@ -17,19 +17,23 @@
 package androidx.compose.ui.text.platform
 
 import android.graphics.Typeface
+import android.text.TextPaint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
+import androidx.compose.ui.text.platform.extensions.setTextMotion
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.em
@@ -43,7 +47,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class ApplySpanStyleTest {
+class TextPaintExtensionsTest {
 
     private val context = InstrumentationRegistry.getInstrumentation().targetContext!!
     private val density = Density(context)
@@ -324,5 +328,83 @@ class ApplySpanStyleTest {
 
         assertThat(tp.color).isEqualTo(Color.Red.toArgb())
         assertThat(notApplied.color).isEqualTo(Color.Unspecified)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun setTextMotion_setsCorrectFlags_forLinearAndSubpixel() {
+        val textMotion = TextMotion(TextMotion.Linearity.Linear, true)
+        val tp = AndroidTextPaint(0, density.density)
+        tp.setTextMotion(textMotion)
+
+        assertThat(tp.flags and TextPaint.LINEAR_TEXT_FLAG)
+            .isEqualTo(TextPaint.LINEAR_TEXT_FLAG)
+        assertThat(tp.flags and TextPaint.SUBPIXEL_TEXT_FLAG)
+            .isEqualTo(TextPaint.SUBPIXEL_TEXT_FLAG)
+        assertThat(tp.hinting).isEqualTo(TextPaint.HINTING_OFF)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun setTextMotion_setsCorrectFlags_forFontHintingAndSubpixel() {
+        val textMotion = TextMotion(TextMotion.Linearity.FontHinting, true)
+        val tp = AndroidTextPaint(0, density.density)
+        tp.setTextMotion(textMotion)
+
+        assertThat(tp.flags and TextPaint.LINEAR_TEXT_FLAG)
+            .isEqualTo(0)
+        assertThat(tp.flags and TextPaint.SUBPIXEL_TEXT_FLAG)
+            .isEqualTo(TextPaint.SUBPIXEL_TEXT_FLAG)
+        assertThat(tp.hinting).isEqualTo(TextPaint.HINTING_ON)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun setTextMotion_setsCorrectFlags_forNoneAndSubpixel() {
+        val textMotion = TextMotion(TextMotion.Linearity.None, true)
+        val tp = AndroidTextPaint(0, density.density)
+        tp.setTextMotion(textMotion)
+
+        assertThat(tp.flags and TextPaint.LINEAR_TEXT_FLAG)
+            .isEqualTo(0)
+        assertThat(tp.flags and TextPaint.SUBPIXEL_TEXT_FLAG)
+            .isEqualTo(TextPaint.SUBPIXEL_TEXT_FLAG)
+        assertThat(tp.hinting).isEqualTo(TextPaint.HINTING_OFF)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun setTextMotion_setsCorrectFlags_forLinear() {
+        val textMotion = TextMotion(TextMotion.Linearity.Linear, false)
+        val tp = AndroidTextPaint(0, density.density)
+        tp.setTextMotion(textMotion)
+
+        assertThat(tp.flags and TextPaint.LINEAR_TEXT_FLAG).isEqualTo(TextPaint.LINEAR_TEXT_FLAG)
+        assertThat(tp.flags and TextPaint.SUBPIXEL_TEXT_FLAG).isEqualTo(0)
+        assertThat(tp.hinting).isEqualTo(TextPaint.HINTING_OFF)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun setTextMotion_setsCorrectFlags_forFontHinting() {
+        val textMotion = TextMotion(TextMotion.Linearity.FontHinting, false)
+        val tp = AndroidTextPaint(0, density.density)
+        tp.setTextMotion(textMotion)
+
+        assertThat(tp.flags and TextPaint.LINEAR_TEXT_FLAG).isEqualTo(0)
+        assertThat(tp.flags and TextPaint.SUBPIXEL_TEXT_FLAG).isEqualTo(0)
+        assertThat(tp.hinting).isEqualTo(TextPaint.HINTING_ON)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun setTextMotion_setsCorrectFlags_forNone() {
+        val textMotion = TextMotion(TextMotion.Linearity.None, false)
+        val tp = AndroidTextPaint(0, density.density)
+        tp.setTextMotion(textMotion)
+
+        assertThat(tp.flags and TextPaint.LINEAR_TEXT_FLAG).isEqualTo(0)
+        assertThat(tp.flags and TextPaint.SUBPIXEL_TEXT_FLAG).isEqualTo(0)
+        assertThat(tp.hinting).isEqualTo(TextPaint.HINTING_OFF)
     }
 }
