@@ -692,13 +692,16 @@ class EffectsTests {
         }
         validate(0)
         enabler = true
-        expectChanges()
-        validate(0)
+        // First recomposition here will emit state=0 and create the DisposableEffect. When the
+        // effect runs, it will set state=1, which will invalidate the composition and immediately
+        // trigger another recomposition to emit state=1.
+        assertEquals(2, advanceCount())
+        validate(1)
         advance()
-        expectChanges()
+        assertEquals(1, advanceCount())
         validate(2)
         advance()
-        expectChanges()
+        assertEquals(1, advanceCount())
         validate(3)
     }
 }
