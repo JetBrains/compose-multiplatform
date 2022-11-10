@@ -48,12 +48,13 @@ internal fun runApplicationTest(
      * non-deterministic way when we change position/size very fast (see the snippet below)
      */
     useDelay: Boolean = false,
+    timeoutMillis: Long = 30000,
     body: suspend WindowTestScope.() -> Unit
 ) {
     assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
 
     runBlocking(MainUIDispatcher) {
-        withTimeout(30000) {
+        withTimeout(timeoutMillis) {
             val exceptionHandler = TestExceptionHandler()
             withExceptionHandler(exceptionHandler) {
                 val scope = WindowTestScope(this, useDelay, exceptionHandler)

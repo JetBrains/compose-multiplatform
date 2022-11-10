@@ -50,14 +50,16 @@ internal fun UpdateEffect(update: () -> Unit) {
         }
         snapshotObserver.start()
 
+        lateinit var sendUpdate: (Unit) -> Unit
         fun performUpdate() {
             snapshotObserver.observeReads(
                 Unit,
-                onValueChangedForScope = { tasks.trySend(::performUpdate) }
+                onValueChangedForScope = sendUpdate,
             ) {
                 currentUpdate()
             }
         }
+        sendUpdate = { tasks.trySend(::performUpdate) }
 
         performUpdate()
 
