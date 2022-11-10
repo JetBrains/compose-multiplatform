@@ -458,7 +458,6 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 excludedPackagesForJava = hiddenPackagesJava
                 excludedPackagesForKotlin = emptySet()
                 libraryMetadataFile.set(getMetadataRegularFile(project))
-                showLibraryMetadata = true
                 projectStructureMetadataFile = mergedProjectMetadata
                 // See go/dackka-source-link for details on this link.
                 baseSourceLink = "https://cs.android.com/search?" +

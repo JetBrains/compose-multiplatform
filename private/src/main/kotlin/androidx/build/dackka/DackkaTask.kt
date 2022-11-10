@@ -99,17 +99,9 @@ abstract class DackkaTask @Inject constructor(
     @Input
     lateinit var excludedPackagesForKotlin: Set<String>
 
-    /**
-     * These two variables control displaying of additional metadata in the refdocs.
-     *
-     * LIBRARY_METADATA_FILE: file containing artifactID and other metadata
-     * SHOW_LIBRARY_METADATA: set to "true" to display the data
-     */
+    // Maps to the system variable LIBRARY_METADATA_FILE containing artifactID and other metadata
     @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val libraryMetadataFile: RegularFileProperty
-
-    @Input
-    var showLibraryMetadata: Boolean = false
 
     // The base URL to create source links for classes, as a format string with placeholders for the
     // file path and qualified class name.
@@ -212,7 +204,6 @@ abstract class DackkaTask @Inject constructor(
             excludedPackagesForJava = excludedPackagesForJava,
             excludedPackagesForKotlin = excludedPackagesForKotlin,
             libraryMetadataFile = libraryMetadataFile,
-            showLibraryMetadata = showLibraryMetadata,
         )
     }
 
@@ -236,7 +227,6 @@ interface DackkaParams : WorkParameters {
     val excludedPackagesForJava: ListProperty<String>
     val excludedPackagesForKotlin: ListProperty<String>
     var libraryMetadataFile: Provider<RegularFile>
-    var showLibraryMetadata: Boolean
 }
 
 fun runDackkaWithArgs(
@@ -247,7 +237,6 @@ fun runDackkaWithArgs(
     excludedPackagesForJava: Set<String>,
     excludedPackagesForKotlin: Set<String>,
     libraryMetadataFile: Provider<RegularFile>,
-    showLibraryMetadata: Boolean,
 ) {
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(DackkaWorkAction::class.java) { parameters ->
@@ -257,7 +246,6 @@ fun runDackkaWithArgs(
         parameters.excludedPackagesForJava.set(excludedPackagesForJava)
         parameters.excludedPackagesForKotlin.set(excludedPackagesForKotlin)
         parameters.libraryMetadataFile = libraryMetadataFile
-        parameters.showLibraryMetadata = showLibraryMetadata
     }
 }
 
@@ -273,7 +261,6 @@ abstract class DackkaWorkAction @Inject constructor(
             // b/183989795 tracks moving these away from an environment variables
             it.environment("DEVSITE_TENANT", "androidx")
             it.environment("LIBRARY_METADATA_FILE", parameters.libraryMetadataFile.get().toString())
-            it.environment("SHOW_LIBRARY_METADATA", parameters.showLibraryMetadata)
 
             if (parameters.excludedPackages.get().isNotEmpty())
                 it.environment(
