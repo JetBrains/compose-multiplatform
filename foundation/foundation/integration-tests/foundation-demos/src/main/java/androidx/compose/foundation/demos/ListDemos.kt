@@ -46,7 +46,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
@@ -80,6 +79,8 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -126,6 +127,7 @@ val LazyListDemos = listOf(
     ComposableDemo("List drag and drop") { LazyColumnDragAndDropDemo() },
     ComposableDemo("Grid drag and drop") { LazyGridDragAndDropDemo() },
     ComposableDemo("Staggered grid") { LazyStaggeredGridDemo() },
+    ComposableDemo("Animate item placement") { AnimateItemPlacementDemo() },
     PagingDemos
 )
 
@@ -1002,5 +1004,74 @@ private fun LazyStaggeredGridDemo() {
                 }
             }
         )
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun AnimateItemPlacementDemo() {
+    val items = remember { mutableStateListOf<Int>().apply {
+        repeat(20) { add(it) }
+    } }
+    val selectedIndexes = remember { mutableStateMapOf<Int, Boolean>() }
+    var reverse by remember { mutableStateOf(false) }
+    Column {
+        Row {
+            Button(onClick = {
+                selectedIndexes.entries.reversed().forEach { entry ->
+                    if (entry.value) {
+                        items.remove(entry.key)
+                        items.add(items.size - 3, entry.key)
+                    }
+                }
+            }) {
+                Text("MoveToEnd")
+            }
+            Button(onClick = {
+                selectedIndexes.clear()
+            }) {
+                Text("RmvSelected")
+            }
+            Button(onClick = {
+                reverse = !reverse
+            }) {
+                Text("Reverse=$reverse")
+            }
+        }
+        LazyColumn(
+            Modifier
+                .fillMaxWidth()
+                .weight(1f), reverseLayout = reverse) {
+            items(items, key = { it }) { item ->
+                val selected = selectedIndexes.getOrDefault(item, false)
+                val modifier = if (selected) Modifier.animateItemPlacement() else Modifier
+                var height by remember { mutableStateOf(40.dp) }
+                Row(
+                    modifier
+                        .padding(8.dp)
+                        .fillMaxWidth()
+                        .border(1.dp, Color.Black)
+                        .clickable {
+                            height = if (height == 40.dp) 120.dp else 40.dp
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Checkbox(checked = selected, onCheckedChange = {
+                        selectedIndexes[item] = it
+                    })
+                    Spacer(Modifier.width(16.dp).height(height))
+                    Text("Item $item")
+                }
+            }
+        }
+        var size by remember { mutableStateOf(40.dp) }
+        Box(
+            Modifier
+                .height(size)
+                .fillMaxWidth()
+                .border(1.dp, Color.DarkGray)
+                .clickable {
+                    size = if (size == 40.dp) 350.dp else 40.dp
+                })
     }
 }

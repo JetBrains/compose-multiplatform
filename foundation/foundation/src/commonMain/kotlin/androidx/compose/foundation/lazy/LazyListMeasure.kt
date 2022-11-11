@@ -283,7 +283,6 @@ internal fun measureLazyList(
             consumedScroll = consumedScroll.toInt(),
             layoutWidth = layoutWidth,
             layoutHeight = layoutHeight,
-            reverseLayout = reverseLayout,
             positionedItems = positionedItems,
             itemProvider = itemProvider
         )
