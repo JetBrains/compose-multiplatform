@@ -114,6 +114,14 @@ tasks.register("testComposeJbWeb") {
     dependsOnComposeTask(":compose:runtime:runtime:test")
 }
 
+tasks.register("testUIKit") {
+    if (System.getProperty("os.arch") == "aarch64") {
+        dependsOnComposeTask(":compose:ui:ui:uikitSimArm64Test")
+    } else {
+        dependsOnComposeTask(":compose:ui:ui:uikitX64Test")
+    }
+}
+
 tasks.register("buildNativeDemo") {
     dependsOnComposeTask(":compose:native:demo:assemble")
 }

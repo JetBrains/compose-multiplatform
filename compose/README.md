@@ -49,6 +49,11 @@ Run tests for Web:
 ./scripts/testWeb
 ```
 
+Run tests for UIKit:
+```bash
+./scripts/testUIKit
+```
+
 Run tests for Android:
 ```bash
 ./scripts/testAndroidUnit.sh
