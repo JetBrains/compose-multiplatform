@@ -38,7 +38,7 @@ private const val MinSampleSize: Int = 3
  * The input data is provided by calling [addPosition]. Adding data is cheap.
  *
  * To obtain a velocity, call [calculateVelocity]. This will compute the velocity
- * based on the data added so far. Only call this when  you need to use the velocity,
+ * based on the data added so far. Only call this when you need to use the velocity,
  * as it is comparatively expensive.
  *
  * The quality of the velocity estimation will be better if more data points
@@ -52,9 +52,9 @@ class VelocityTracker {
     internal var currentPointerPositionAccumulator = Offset.Zero
 
     /**
-     * Adds a position as the given time to the tracker.
+     * Adds a position at the given time to the tracker.
      *
-     * Call resetTracking to remove added Offsets.
+     * Call [resetTracking] to remove added [Offset]s.
      *
      * @see resetTracking
      */
