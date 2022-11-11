@@ -27,4 +27,5 @@ package androidx.compose.runtime
     AnnotationTarget.PROPERTY,
     AnnotationTarget.PROPERTY_GETTER
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalComposeApi

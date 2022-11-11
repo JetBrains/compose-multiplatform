@@ -116,7 +116,7 @@ package androidx.compose.ui.tooling.data {
     property public final String? sourceFile;
   }
 
-  @kotlin.RequiresOptIn(message="This API is for tooling only and is likely to change in the future.") public @interface UiToolingDataApi {
+  @kotlin.RequiresOptIn(message="This API is for tooling only and is likely to change in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface UiToolingDataApi {
   }
 
 }

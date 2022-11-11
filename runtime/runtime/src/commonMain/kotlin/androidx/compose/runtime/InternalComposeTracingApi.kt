@@ -20,4 +20,5 @@ package androidx.compose.runtime
     level = RequiresOptIn.Level.ERROR,
     message = "This is internal API that may change frequently and without warning."
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class InternalComposeTracingApi

@@ -350,7 +350,7 @@ package androidx.compose.material3 {
   public final class ElevationKt {
   }
 
-  @kotlin.RequiresOptIn(message="This material API is experimental and is likely to change or to be removed in" + " the future.") public @interface ExperimentalMaterial3Api {
+  @kotlin.RequiresOptIn(message="This material API is experimental and is likely to change or to be removed in" + " the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalMaterial3Api {
   }
 
   @androidx.compose.material3.ExperimentalMaterial3Api public interface ExposedDropdownMenuBoxScope {

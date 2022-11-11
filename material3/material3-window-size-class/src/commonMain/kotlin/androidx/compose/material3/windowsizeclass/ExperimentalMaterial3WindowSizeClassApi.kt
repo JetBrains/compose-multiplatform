@@ -20,4 +20,5 @@ package androidx.compose.material3.windowsizeclass
     "This material3-window-size-class API is experimental and is likely to change or to " +
         "be removed in the future."
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalMaterial3WindowSizeClassApi

@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.LayoutDirection
     AnnotationTarget.FIELD,
     AnnotationTarget.PROPERTY_GETTER,
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalAnimationApi
 
 /**
