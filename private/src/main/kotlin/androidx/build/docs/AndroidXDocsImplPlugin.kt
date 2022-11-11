@@ -28,12 +28,15 @@ import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
 import androidx.build.getKeystore
 import androidx.build.getLibraryByName
+import androidx.build.getLibraryMetricsDirectory
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
 import com.google.gson.GsonBuilder
 import java.io.File
 import java.io.FileNotFoundException
+import java.time.Duration
+import java.time.LocalDateTime
 import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
@@ -435,7 +438,12 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.destinationFile.set(getMetadataRegularFile(project))
         }
 
+        val metricsDirectory = File(project.rootProject.getLibraryMetricsDirectory(), "build")
+        val metricsFile = File(metricsDirectory, "${project.name}.txt")
+        val projectName = project.name
+
         val dackkaTask = project.tasks.register("docs", DackkaTask::class.java) { task ->
+            var taskStartTime: LocalDateTime? = null
             task.apply {
                 dependsOn(unzipJvmSourcesTask)
                 dependsOn(unzipSamplesTask)
@@ -462,6 +470,17 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 // See go/dackka-source-link for details on this link.
                 baseSourceLink = "https://cs.android.com/search?" +
                     "q=file:%s+class:%s&ss=androidx/platform/frameworks/support"
+                task.doFirst {
+                    taskStartTime = LocalDateTime.now()
+                }
+                task.doLast {
+                    val taskEndTime = LocalDateTime.now()
+                    val duration = Duration.between(taskStartTime, taskEndTime).toMillis()
+                    metricsDirectory.mkdirs()
+                    metricsFile.writeText(
+                        "{ \"${projectName}_docs_execution_duration\": $duration }"
+                    )
+                }
             }
         }
 
