@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.Composable
@@ -91,15 +92,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import kotlin.math.ceil
+import kotlin.math.roundToInt
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.roundToInt
-import org.junit.Assert.assertNotNull
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -1348,5 +1349,38 @@ class GraphicsLayerTest {
         assertEquals(sizePx, graphicsLayerHeight)
         assertEquals(sizePx, drawScopeWidth)
         assertEquals(sizePx, drawScopeHeight)
+    }
+    @RequiresApi(Build.VERSION_CODES.O)
+    @Test
+    fun removingGraphicsLayerInvalidatesParentLayer() {
+        var toggle by mutableStateOf(true)
+        val size = 100
+        rule.setContent {
+            val sizeDp = with(LocalDensity.current) { size.toDp() }
+            LazyColumn(Modifier.testTag("lazy").background(Color.Blue)) {
+                items(4) {
+                    Box(
+                        Modifier
+                            .then(if (toggle) Modifier.graphicsLayer(alpha = 0f) else Modifier)
+                            .background(Color.Red)
+                            .size(sizeDp)
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("lazy").captureToImage().asAndroidBitmap().apply {
+            assertEquals(Color.Blue.toArgb(), getPixel(10, (size * 1.5f).roundToInt()))
+            assertEquals(Color.Blue.toArgb(), getPixel(10, (size * 2.5f).roundToInt()))
+        }
+
+        rule.runOnIdle {
+            toggle = !toggle
+        }
+
+        rule.onNodeWithTag("lazy").captureToImage().asAndroidBitmap().apply {
+            assertEquals(Color.Red.toArgb(), getPixel(10, (size * 1.5f).roundToInt()))
+            assertEquals(Color.Red.toArgb(), getPixel(10, (size * 2.5f).roundToInt()))
+        }
     }
 }

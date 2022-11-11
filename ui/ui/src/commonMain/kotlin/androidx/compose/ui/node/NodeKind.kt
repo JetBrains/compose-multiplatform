@@ -156,10 +156,29 @@ internal fun calculateNodeKindSetFrom(node: Modifier.Node): Int {
     return mask
 }
 
+private const val Updated = 0
+private const val Inserted = 1
+private const val Removed = 2
+
 @OptIn(ExperimentalComposeUiApi::class)
-internal fun autoInvalidateNode(node: Modifier.Node) {
+internal fun autoInvalidateRemovedNode(node: Modifier.Node) = autoInvalidateNode(node, Removed)
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun autoInvalidateInsertedNode(node: Modifier.Node) = autoInvalidateNode(node, Inserted)
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun autoInvalidateUpdatedNode(node: Modifier.Node) = autoInvalidateNode(node, Updated)
+@OptIn(ExperimentalComposeUiApi::class)
+private fun autoInvalidateNode(node: Modifier.Node, phase: Int) {
     if (node.isKind(Nodes.Layout) && node is LayoutModifierNode) {
         node.invalidateMeasurements()
+        if (phase == Removed) {
+            val coordinator = node.requireCoordinator(Nodes.Layout)
+            val layer = coordinator.layer
+            if (layer != null) {
+                coordinator.onLayerBlockUpdated(null)
+            }
+        }
     }
     if (node.isKind(Nodes.GlobalPositionAware) && node is GlobalPositionAwareModifierNode) {
         node.requireLayoutNode().invalidateMeasurements()
