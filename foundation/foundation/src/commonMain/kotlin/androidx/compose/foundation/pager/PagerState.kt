@@ -78,7 +78,7 @@ internal class PagerState(
     private val pageAvailableSpace: Int
         get() = pageSize + pageSpacing
 
-    private val pageCount: Int
+    internal val pageCount: Int
         get() = lazyListState.layoutInfo.totalItemsCount
 
     private val closestPageToSnappedPosition: LazyListItemInfo?
@@ -126,9 +126,9 @@ internal class PagerState(
 
     /**
      * Indicates how far the current page is to the snapped position, this will vary from
-     * [MinPageOffset] (page is offset towards the start of the layout) to [MaxPageOffset]
-     * (page is offset towards the end of the layout). This is 0.0 if the [currentPage] is in the
-     * snapped position. The value will flip once the current page changes.
+     * -0.5 (page is offset towards the start of the layout) to 0.5 (page is offset towards the end
+     * of the layout). This is 0.0 if the [currentPage] is in the snapped position. The value will
+     * flip once the current page changes.
      */
     val currentPageOffset: Float by derivedStateOf {
         val currentPagePositionOffset = closestPageToSnappedPosition?.offset ?: 0
