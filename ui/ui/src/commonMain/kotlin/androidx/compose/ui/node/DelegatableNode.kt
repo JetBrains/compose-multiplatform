@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2022 The Android Open Source Project
  *
@@ -302,10 +301,10 @@ internal fun DelegatableNode.requireCoordinator(kind: NodeKind<*>): NodeCoordina
 }
 
 @ExperimentalComposeUiApi
-internal fun DelegatableNode.requireLayoutNode(): LayoutNode = node.coordinator!!.layoutNode
+internal fun DelegatableNode.requireLayoutNode() = checkNotNull(node.coordinator).layoutNode
 
 @ExperimentalComposeUiApi
-internal fun DelegatableNode.requireOwner(): Owner = requireLayoutNode().owner!!
+internal fun DelegatableNode.requireOwner(): Owner = checkNotNull(requireLayoutNode().owner)
 
 /**
  * Invalidates the subtree of this layout, including layout, drawing, parent data, etc.
