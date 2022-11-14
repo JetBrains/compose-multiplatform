@@ -89,7 +89,7 @@ internal fun HorizontalPager(
     beyondBoundsPageCount: Int = 0,
     pageSpacing: Dp = 0.dp,
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
-    flingBehavior: FlingBehavior = PagerDefaults.flingBehavior(state = state),
+    flingBehavior: SnapFlingBehavior = PagerDefaults.flingBehavior(state = state),
     userScrollEnabled: Boolean = true,
     reverseLayout: Boolean = false,
     pageContent: @Composable (page: Int) -> Unit
@@ -149,7 +149,7 @@ internal fun VerticalPager(
     beyondBoundsPageCount: Int = 0,
     pageSpacing: Dp = 0.dp,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
-    flingBehavior: FlingBehavior = PagerDefaults.flingBehavior(state = state),
+    flingBehavior: SnapFlingBehavior = PagerDefaults.flingBehavior(state = state),
     userScrollEnabled: Boolean = true,
     reverseLayout: Boolean = false,
     pageContent: @Composable (page: Int) -> Unit
@@ -184,7 +184,7 @@ internal fun Pager(
     verticalAlignment: Alignment.Vertical = Alignment.CenterVertically,
     horizontalAlignment: Alignment.Horizontal = Alignment.CenterHorizontally,
     contentPadding: PaddingValues,
-    flingBehavior: FlingBehavior,
+    flingBehavior: SnapFlingBehavior,
     userScrollEnabled: Boolean,
     reverseLayout: Boolean,
     pageContent: @Composable (page: Int) -> Unit
@@ -365,7 +365,7 @@ internal object PagerDefaults {
         lowVelocityAnimationSpec: AnimationSpec<Float> = tween(easing = LinearOutSlowInEasing),
         highVelocityAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay(),
         snapAnimationSpec: AnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
-    ): FlingBehavior {
+    ): SnapFlingBehavior {
         val density = LocalDensity.current
 
         return remember(

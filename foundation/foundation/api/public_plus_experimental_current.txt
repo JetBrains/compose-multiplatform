@@ -366,6 +366,7 @@ package androidx.compose.foundation.gestures.snapping {
   @androidx.compose.foundation.ExperimentalFoundationApi public final class SnapFlingBehavior implements androidx.compose.foundation.gestures.FlingBehavior {
     ctor public SnapFlingBehavior(androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider snapLayoutInfoProvider, androidx.compose.animation.core.AnimationSpec<java.lang.Float> lowVelocityAnimationSpec, androidx.compose.animation.core.DecayAnimationSpec<java.lang.Float> highVelocityAnimationSpec, androidx.compose.animation.core.AnimationSpec<java.lang.Float> snapAnimationSpec, androidx.compose.ui.unit.Density density, optional float shortSnapVelocityThreshold);
     method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.coroutines.Continuation<? super java.lang.Float>);
+    method public suspend Object? performFling(androidx.compose.foundation.gestures.ScrollScope, float initialVelocity, kotlin.jvm.functions.Function1<? super java.lang.Float,kotlin.Unit> onSettlingDistanceUpdated, kotlin.coroutines.Continuation<? super java.lang.Float>);
   }
 
   public final class SnapFlingBehaviorKt {
