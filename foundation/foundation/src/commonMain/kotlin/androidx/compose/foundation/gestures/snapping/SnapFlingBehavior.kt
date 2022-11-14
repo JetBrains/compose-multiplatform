@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
+import kotlin.math.absoluteValue
 import kotlin.math.sign
 
 /**
@@ -100,12 +101,14 @@ class SnapFlingBehavior(
     }
 
     private suspend fun ScrollScope.shortSnap(velocity: Float) {
+        debugLog { "Short Snapping" }
         val closestOffset = findClosestOffset(0f, snapLayoutInfoProvider, density)
         val animationState = AnimationState(NoDistance, velocity)
         animateSnap(closestOffset, closestOffset, animationState, snapAnimationSpec)
     }
 
     private suspend fun ScrollScope.longSnap(initialVelocity: Float) {
+        debugLog { "Long Snapping" }
         val initialOffset =
             with(snapLayoutInfoProvider) { density.calculateApproachOffset(initialVelocity) }.let {
                 abs(it) * sign(initialVelocity) // ensure offset sign is correct
@@ -113,7 +116,14 @@ class SnapFlingBehavior(
 
         val (remainingOffset, animationState) = runApproach(initialOffset, initialVelocity)
 
-        animateSnap(remainingOffset, remainingOffset, animationState, snapAnimationSpec)
+        debugLog { "Settling Final Bound=$remainingOffset" }
+
+        animateSnap(
+            remainingOffset,
+            remainingOffset,
+            animationState.copy(value = 0f),
+            snapAnimationSpec
+        )
     }
 
     private suspend fun ScrollScope.runApproach(
@@ -123,8 +133,10 @@ class SnapFlingBehavior(
 
         val animation =
             if (isDecayApproachPossible(offset = initialTargetOffset, velocity = initialVelocity)) {
+                debugLog { "High Velocity Approach" }
                 HighVelocityApproachAnimation(highVelocityAnimationSpec)
             } else {
+                debugLog { "Low Velocity Approach" }
                 LowVelocityApproachAnimation(
                     lowVelocityAnimationSpec,
                     snapLayoutInfoProvider,
@@ -149,7 +161,8 @@ class SnapFlingBehavior(
         velocity: Float
     ): Boolean {
         val decayOffset = highVelocityAnimationSpec.calculateTargetValue(NoDistance, velocity)
-        return abs(decayOffset) > abs(offset)
+        val snapStepSize = with(snapLayoutInfoProvider) { density.snapStepSize() }
+        return decayOffset.absoluteValue >= (offset.absoluteValue + snapStepSize)
     }
 
     override fun equals(other: Any?): Boolean {
@@ -267,6 +280,7 @@ internal fun findClosestOffset(
                 lowerBound
             }
         }
+
         1f -> upperBound
         -1f -> lowerBound
         else -> NoDistance
@@ -407,3 +421,10 @@ private class HighVelocityApproachAnimation(
 internal val MinFlingVelocityDp = 400.dp
 internal const val NoDistance = 0f
 internal const val NoVelocity = 0f
+private const val DEBUG = false
+
+private inline fun debugLog(generateMsg: () -> String) {
+    if (DEBUG) {
+        println("SnapFlingBehavior: ${generateMsg()}")
+    }
+}
