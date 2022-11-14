@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -47,7 +46,6 @@ import org.junit.runner.RunWith
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalTestApi::class)
 class NavigationBarScreenshotTest {
 
     @get:Rule
@@ -95,6 +93,25 @@ class NavigationBarScreenshotTest {
     }
 
     @Test
+    fun lightTheme_defaultColors_disabled() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        composeTestRule.setMaterialContent(lightColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationBar(interactionSource, setUnselectedItemsAsDisabled = true)
+        }
+
+        assertNavigationBarMatches(
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = null,
+            goldenIdentifier = "navigationBar_lightTheme_defaultColors_disabled"
+        )
+    }
+
+    @Test
     fun darkTheme_defaultColors() {
         val interactionSource = MutableInteractionSource()
 
@@ -129,6 +146,25 @@ class NavigationBarScreenshotTest {
             interactionSource = interactionSource,
             interaction = PressInteraction.Press(Offset(10f, 10f)),
             goldenIdentifier = "navigationBar_darkTheme_defaultColors_pressed"
+        )
+    }
+
+    @Test
+    fun darkTheme_defaultColors_disabled() {
+        val interactionSource = MutableInteractionSource()
+
+        var scope: CoroutineScope? = null
+
+        composeTestRule.setMaterialContent(darkColorScheme()) {
+            scope = rememberCoroutineScope()
+            DefaultNavigationBar(interactionSource, setUnselectedItemsAsDisabled = true)
+        }
+
+        assertNavigationBarMatches(
+            scope = scope!!,
+            interactionSource = interactionSource,
+            interaction = null,
+            goldenIdentifier = "navigationBar_darkTheme_defaultColors_disabled"
         )
     }
 
@@ -175,10 +211,12 @@ class NavigationBarScreenshotTest {
  *
  * @param interactionSource the [MutableInteractionSource] for the first [NavigationBarItem], to
  * control its visual state.
+ * @param setUnselectedItemsAsDisabled when true, marks unselected items as disabled
  */
 @Composable
 private fun DefaultNavigationBar(
-    interactionSource: MutableInteractionSource
+    interactionSource: MutableInteractionSource,
+    setUnselectedItemsAsDisabled: Boolean = false,
 ) {
     Box(Modifier.semantics(mergeDescendants = true) {}.testTag(Tag)) {
         NavigationBar {
@@ -191,11 +229,13 @@ private fun DefaultNavigationBar(
             NavigationBarItem(
                 icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
+                enabled = !setUnselectedItemsAsDisabled,
                 onClick = {}
             )
             NavigationBarItem(
                 icon = { Icon(Icons.Filled.Favorite, null) },
                 selected = false,
+                enabled = !setUnselectedItemsAsDisabled,
                 onClick = {}
             )
         }
