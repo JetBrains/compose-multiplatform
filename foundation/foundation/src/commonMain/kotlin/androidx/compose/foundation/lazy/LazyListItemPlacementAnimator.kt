@@ -71,7 +71,7 @@ internal class LazyListItemPlacementAnimator(
         positionedItems: MutableList<LazyListPositionedItem>,
         itemProvider: LazyMeasuredItemProvider
     ) {
-        if (!positionedItems.fastAny { it.hasAnimations }) {
+        if (!positionedItems.fastAny { it.hasAnimations } && keyToItemInfoMap.isEmpty()) {
             // no animations specified - no work needed
             reset()
             return

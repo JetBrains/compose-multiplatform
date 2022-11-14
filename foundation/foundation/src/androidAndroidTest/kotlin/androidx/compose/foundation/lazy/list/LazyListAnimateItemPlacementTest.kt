@@ -1219,6 +1219,39 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
     }
 
+    @Test
+    fun itemWithSpecsIsMovingOut() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3))
+        rule.setContent {
+            LazyList(maxSize = itemSizeDp * 2) {
+                items(list, key = { it }) {
+                    Item(it, animSpec = if (it == 1) AnimSpec else null)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = listOf(0, 2, 3, 1)
+        }
+
+        onAnimationFrame { fraction ->
+            val listSize = itemSize * 2
+            val item1Offset = itemSize + (itemSize * 2f * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, Int>>().apply {
+                add(0 to 0)
+                if (item1Offset < listSize) {
+                    add(1 to item1Offset)
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
     private fun assertPositions(
         vararg expected: Pair<Any, Int>,
         crossAxis: List<Pair<Any, Int>>? = null,

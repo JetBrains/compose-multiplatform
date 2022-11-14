@@ -28,6 +28,7 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -1666,6 +1667,39 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                 }
             }
 
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun itemWithSpecsIsMovingOut() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3))
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 2) {
+                items(list, key = { it }) {
+                    Item(it, animSpec = if (it == 1) AnimSpec else null)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            list = listOf(0, 2, 3, 1)
+        }
+
+        onAnimationFrame { fraction ->
+            val listSize = itemSize * 2
+            val item1Offset = itemSize + (itemSize * 2f * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                add(0 to AxisIntOffset(0, 0))
+                if (item1Offset < listSize) {
+                    add(1 to AxisIntOffset(0, item1Offset))
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+            }
             assertPositions(
                 expected = expected.toTypedArray(),
                 fraction = fraction

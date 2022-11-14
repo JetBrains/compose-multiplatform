@@ -76,7 +76,7 @@ internal class LazyGridItemPlacementAnimator(
         measuredItemProvider: LazyMeasuredItemProvider,
         spanLayoutProvider: LazyGridSpanLayoutProvider
     ) {
-        if (!positionedItems.fastAny { it.hasAnimations }) {
+        if (!positionedItems.fastAny { it.hasAnimations } && keyToItemInfoMap.isEmpty()) {
             // no animations specified - no work needed
             reset()
             return
