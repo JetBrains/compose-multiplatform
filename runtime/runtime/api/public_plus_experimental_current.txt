@@ -289,7 +289,7 @@ package androidx.compose.runtime {
   public final class ExpectKt {
   }
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is an experimental API for Compose and is likely to change before becoming " + "stable.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExperimentalComposeApi {
+  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is an experimental API for Compose and is likely to change before becoming " + "stable.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExperimentalComposeApi {
   }
 
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExplicitGroupsComposable {
@@ -298,10 +298,10 @@ package androidx.compose.runtime {
   @androidx.compose.runtime.StableMarker @kotlin.annotation.MustBeDocumented @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets=kotlin.annotation.AnnotationTarget.CLASS) public @interface Immutable {
   }
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API for Compose modules that may change frequently " + "and without warning.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
+  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API for Compose modules that may change frequently " + "and without warning.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY}) public @interface InternalComposeApi {
   }
 
-  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API that may change frequently and without warning.") public @interface InternalComposeTracingApi {
+  @kotlin.RequiresOptIn(level=kotlin.RequiresOptIn.Level.ERROR, message="This is internal API that may change frequently and without warning.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface InternalComposeTracingApi {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface MonotonicFrameClock extends kotlin.coroutines.CoroutineContext.Element {

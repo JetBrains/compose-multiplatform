@@ -5,7 +5,7 @@ package androidx.compose.material3.windowsizeclass {
     method @androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi @androidx.compose.runtime.Composable public static androidx.compose.material3.windowsizeclass.WindowSizeClass calculateWindowSizeClass(android.app.Activity activity);
   }
 
-  @kotlin.RequiresOptIn(message="This material3-window-size-class API is experimental and is likely to change or to " + "be removed in the future.") public @interface ExperimentalMaterial3WindowSizeClassApi {
+  @kotlin.RequiresOptIn(message="This material3-window-size-class API is experimental and is likely to change or to " + "be removed in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalMaterial3WindowSizeClassApi {
   }
 
   public final class TestOnly_jvmKt {

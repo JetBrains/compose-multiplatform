@@ -123,10 +123,10 @@ package androidx.compose.ui {
     method public static androidx.compose.ui.Modifier materialize(androidx.compose.runtime.Composer, androidx.compose.ui.Modifier modifier);
   }
 
-  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalComposeUiApi {
+  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalComposeUiApi {
   }
 
-  @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") public @interface InternalComposeUiApi {
+  @kotlin.RequiresOptIn(message="Unstable API for use only between compose-ui modules sharing the same exact version, " + "subject to change without notice in major, minor, or patch releases.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface InternalComposeUiApi {
   }
 
   @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface Modifier {
@@ -2474,7 +2474,7 @@ package androidx.compose.ui.node {
     property public abstract long targetSize;
   }
 
-  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY_SETTER}) public @interface InternalCoreApi {
+  @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY_SETTER}) public @interface InternalCoreApi {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface LayoutAwareModifierNode extends androidx.compose.ui.node.DelegatableNode {

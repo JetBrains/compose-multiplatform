@@ -20,4 +20,5 @@ package androidx.compose.foundation
     "This foundation API is experimental and is likely to change or be removed in the " +
         "future."
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalFoundationApi

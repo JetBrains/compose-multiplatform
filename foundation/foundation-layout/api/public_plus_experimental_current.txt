@@ -111,7 +111,7 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
   }
 
-  @kotlin.RequiresOptIn(message="The API of this layout is experimental and is likely to change in the future.") public @interface ExperimentalLayoutApi {
+  @kotlin.RequiresOptIn(message="The API of this layout is experimental and is likely to change in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalLayoutApi {
   }
 
   public final class IntrinsicKt {
