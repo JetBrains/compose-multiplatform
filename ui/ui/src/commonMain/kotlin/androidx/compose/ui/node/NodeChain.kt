@@ -234,7 +234,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         headToTail {
             if (!it.isAttached) {
                 it.attach()
-                if (performInvalidations) autoInvalidateNode(it)
+                if (performInvalidations) autoInvalidateInsertedNode(it)
             }
         }
     }
@@ -432,7 +432,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             // for removing nodes, we always do the autoInvalidateNode call,
             // regardless of whether or not it was a ModifierNodeElement with autoInvalidate
             // true, or a BackwardsCompatNode, etc.
-            autoInvalidateNode(node)
+            autoInvalidateRemovedNode(node)
             node.detach()
         }
         return removeNode(node)
@@ -510,24 +510,26 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             check(node is BackwardsCompatNode)
             node.element = next
             // we always autoInvalidate BackwardsCompatNode
-            autoInvalidateNode(node)
+            autoInvalidateUpdatedNode(node)
             return node
         }
         val updated = next.updateUnsafe(node)
-        val result = if (updated !== node) {
+        if (updated !== node) {
             // if a new instance is returned, we want to detach the old one
+            autoInvalidateRemovedNode(node)
             node.detach()
-            replaceNode(node, updated)
+            val result = replaceNode(node, updated)
+            autoInvalidateInsertedNode(updated)
+            return result
         } else {
             // the node was updated. we are done.
-            updated
+            if (next.autoInvalidate) {
+                // the modifier element is labeled as "auto invalidate", which means that since the
+                // node was updated, we need to invalidate everything relevant to it
+                autoInvalidateUpdatedNode(updated)
+            }
+            return updated
         }
-        if (next.autoInvalidate) {
-            // the modifier element is labeled as "auto invalidate", which means that since the
-            // node was updated, we need to invalidate everything relevant to it
-            autoInvalidateNode(result)
-        }
-        return result
     }
 
     // TRAVERSAL
