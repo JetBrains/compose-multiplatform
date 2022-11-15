@@ -110,7 +110,6 @@ class OverscrollTest {
         )
 
         rule.runOnIdle {
-            // we passed isContentScrolls = 1, so initial draw must occur
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 
@@ -144,7 +143,6 @@ class OverscrollTest {
         )
 
         rule.runOnIdle {
-            // we passed isContentScrolls = 1, so initial draw must occur
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 
@@ -158,7 +156,7 @@ class OverscrollTest {
             // since we consume 1/10 of the delta in the pre scroll during overscroll, expect 9/10
             assertThat(abs(acummulatedScroll - 1000f * 9 / 10)).isWithin(0.1f)
 
-            assertThat(controller.preScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
+            assertThat(controller.lastPreScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
             assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.Drag)
         }
 
@@ -168,15 +166,24 @@ class OverscrollTest {
     }
 
     @Test
-    fun overscrollEffect_scrollable_skipsDeltasIfDisabled() {
+    fun overscrollEffect_scrollable_skipsDeltasIfCannotScroll() {
         var acummulatedScroll = 0f
         val controller = TestOverscrollEffect(consumePreCycles = true)
+
+        var canScroll = true
+
         val scrollableState = ScrollableState { delta ->
             acummulatedScroll += delta
             delta
         }
+
         val viewConfig = rule.setOverscrollContentAndReturnViewConfig(
-            scrollableState = scrollableState,
+            scrollableState = object : ScrollableState by scrollableState {
+                override val canScrollForward: Boolean
+                    get() = canScroll
+                override val canScrollBackward: Boolean
+                    get() = canScroll
+            },
             overscrollEffect = controller
         )
 
@@ -186,15 +193,19 @@ class OverscrollTest {
             up()
         }
 
-        val lastControlledConsumed = rule.runOnIdle {
+        rule.runOnIdle {
             val slop = viewConfig.touchSlop
             // since we consume 1/10 of the delta in the pre scroll during overscroll, expect 9/10
             assertThat(abs(acummulatedScroll - 1000f * 9 / 10)).isWithin(0.1f)
 
-            assertThat(controller.preScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
+            assertThat(controller.lastPreScrollDelta).isEqualTo(Offset(1000f - slop, 0f))
             assertThat(controller.lastNestedScrollSource).isEqualTo(NestedScrollSource.Drag)
-            controller.isEnabled = false
-            controller.preScrollDelta
+            controller.lastPreScrollDelta = Offset.Zero
+        }
+
+        // Inform scrollable that we cannot scroll anymore
+        rule.runOnIdle {
+            canScroll = false
         }
 
         rule.onNodeWithTag(boxTag).performTouchInput {
@@ -204,8 +215,8 @@ class OverscrollTest {
         }
 
         rule.runOnIdle {
-            // still there because we are disabled
-            assertThat(controller.preScrollDelta).isEqualTo(lastControlledConsumed)
+            // Scrollable should not have dispatched any new deltas
+            assertThat(controller.lastPreScrollDelta).isEqualTo(Offset.Zero)
         }
     }
 
@@ -231,7 +242,6 @@ class OverscrollTest {
         )
 
         rule.runOnIdle {
-            // we passed isContentScrolls = 1, so initial draw must occur
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 
@@ -355,7 +365,6 @@ class OverscrollTest {
         }
 
         rule.runOnIdle {
-            controller.isEnabled = true
             val offset = Offset(0f, 5f)
             controller.consumePostScroll(
                 initialDragDelta = offset,
@@ -450,7 +459,6 @@ class OverscrollTest {
         )
 
         rule.runOnIdle {
-            // we passed isContentScrolls = 1, so initial draw must occur
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 
@@ -467,7 +475,7 @@ class OverscrollTest {
         rule.runOnIdle {
             with(controller) {
                 // presented on consume pre scroll
-                assertSingleAxisValue(preScrollDelta.x, preScrollDelta.y)
+                assertSingleAxisValue(lastPreScrollDelta.x, lastPreScrollDelta.y)
 
                 // presented on consume post scroll
                 assertSingleAxisValue(lastOverscrollDelta.x, lastOverscrollDelta.y)
@@ -493,7 +501,6 @@ class OverscrollTest {
         )
 
         rule.runOnIdle {
-            // we passed isContentScrolls = 1, so initial draw must occur
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 
@@ -510,7 +517,7 @@ class OverscrollTest {
         rule.runOnIdle {
             with(controller) {
                 // presented on consume pre scroll
-                assertSingleAxisValue(preScrollDelta.y, preScrollDelta.x)
+                assertSingleAxisValue(lastPreScrollDelta.y, lastPreScrollDelta.x)
 
                 // presented on consume post scroll
                 assertSingleAxisValue(lastOverscrollDelta.y, lastOverscrollDelta.x)
@@ -630,14 +637,13 @@ class OverscrollTest {
     ) : OverscrollEffect {
         var drawCallsCount = 0
         var isInProgressCallCount = 0
-        var isContentScrolls = true
 
         var lastVelocity = Velocity.Zero
         var lastInitialDragDelta = Offset.Zero
         var lastOverscrollDelta = Offset.Zero
         var lastNestedScrollSource: NestedScrollSource? = null
 
-        var preScrollDelta = Offset.Zero
+        var lastPreScrollDelta = Offset.Zero
         var preScrollSource: NestedScrollSource? = null
 
         var preFlingVelocity = Velocity.Zero
@@ -646,7 +652,7 @@ class OverscrollTest {
             scrollDelta: Offset,
             source: NestedScrollSource
         ): Offset {
-            preScrollDelta = scrollDelta
+            lastPreScrollDelta = scrollDelta
             preScrollSource = source
 
             return if (consumePreCycles) scrollDelta / 10f else Offset.Zero
@@ -677,12 +683,6 @@ class OverscrollTest {
                 return animationRunning
             }
 
-        override var isEnabled: Boolean
-            get() = isContentScrolls
-            set(value) {
-                isContentScrolls = value
-            }
-
         override val effectModifier: Modifier = Modifier.drawBehind { drawCallsCount += 1 }
     }
 
@@ -703,7 +703,6 @@ class OverscrollTest {
         )
 
         rule.runOnIdle {
-            // we passed isContentScrolls = 1, so initial draw must occur
             assertThat(controller.drawCallsCount).isEqualTo(1)
         }
 

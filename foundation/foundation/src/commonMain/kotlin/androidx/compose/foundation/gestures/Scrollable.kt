@@ -390,11 +390,14 @@ private class ScrollingLogic(
         return overscrollPreConsumed + preConsumedByParent + axisConsumed + parentConsumed
     }
 
+    private val shouldDispatchOverscroll
+        get() = scrollableState.canScrollForward || scrollableState.canScrollBackward
+
     fun overscrollPreConsumeDelta(
         scrollDelta: Offset,
         source: NestedScrollSource
     ): Offset {
-        return if (overscrollEffect != null && overscrollEffect.isEnabled) {
+        return if (overscrollEffect != null && shouldDispatchOverscroll) {
             overscrollEffect.consumePreScroll(scrollDelta, source)
         } else {
             Offset.Zero
@@ -406,7 +409,7 @@ private class ScrollingLogic(
         availableForOverscroll: Offset,
         source: NestedScrollSource
     ) {
-        if (overscrollEffect != null && overscrollEffect.isEnabled) {
+        if (overscrollEffect != null && shouldDispatchOverscroll) {
             overscrollEffect.consumePostScroll(
                 consumedByChain,
                 availableForOverscroll,
@@ -430,7 +433,7 @@ private class ScrollingLogic(
 
         val availableVelocity = initialVelocity.singleAxisVelocity()
         val preOverscrollConsumed =
-            if (overscrollEffect != null && overscrollEffect.isEnabled) {
+            if (overscrollEffect != null && shouldDispatchOverscroll) {
                 overscrollEffect.consumePreFling(availableVelocity)
             } else {
                 Velocity.Zero
@@ -446,7 +449,7 @@ private class ScrollingLogic(
                 velocityLeft
             )
         val totalLeft = velocityLeft - consumedPost
-        if (overscrollEffect != null && overscrollEffect.isEnabled) {
+        if (overscrollEffect != null && shouldDispatchOverscroll) {
             overscrollEffect.consumePostFling(totalLeft)
         }
 

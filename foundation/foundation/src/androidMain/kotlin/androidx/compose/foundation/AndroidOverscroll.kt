@@ -252,21 +252,6 @@ internal class AndroidEdgeEffectOverscrollEffect(
 
     private var containerSize = Size.Zero
 
-    private val isEnabledState = mutableStateOf(false)
-    override var isEnabled: Boolean = false
-        get() = isEnabledState.value
-        set(value) {
-            // Use field instead of isEnabledState to avoid a state read
-            val enabledChanged = field != value
-            isEnabledState.value = value
-            field = value
-
-            if (enabledChanged) {
-                scrollCycleInProgress = false
-                animateToRelease()
-            }
-        }
-
     override val isInProgress: Boolean
         get() {
             return allEffects.fastAny { it.distanceCompat != 0f }
@@ -522,8 +507,6 @@ private val NoOpOverscrollEffect = object : OverscrollEffect {
     override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
 
     override suspend fun consumePostFling(velocity: Velocity) {}
-
-    override var isEnabled: Boolean = false
 
     override val isInProgress: Boolean
         get() = false

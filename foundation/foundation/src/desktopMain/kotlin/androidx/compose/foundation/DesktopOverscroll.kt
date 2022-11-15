@@ -48,7 +48,6 @@ private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
 
     override suspend fun consumePostFling(velocity: Velocity) {}
 
-    override var isEnabled = false
     override val isInProgress = false
     override val effectModifier = Modifier
 }

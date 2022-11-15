@@ -69,7 +69,7 @@ fun OverscrollSample() {
             // relaxation: when we are in progress of the overscroll and user scrolls in the
             // different direction = substract the overscroll first
             val sameDirection = sign(scrollDelta.y) == sign(overscrollOffset.value)
-            return if (abs(overscrollOffset.value) > 0.5 && !sameDirection && isEnabled) {
+            return if (abs(overscrollOffset.value) > 0.5 && !sameDirection) {
                 val prevOverscrollValue = overscrollOffset.value
                 val newOverscrollValue = overscrollOffset.value + scrollDelta.y
                 if (sign(prevOverscrollValue) != sign(newOverscrollValue)) {
@@ -93,7 +93,7 @@ fun OverscrollSample() {
             source: NestedScrollSource
         ) {
             // if it is a drag, not a fling, add the delta left to our over scroll value
-            if (abs(overscrollDelta.y) > 0.5 && isEnabled && source == NestedScrollSource.Drag) {
+            if (abs(overscrollDelta.y) > 0.5 && source == NestedScrollSource.Drag) {
                 scope.launch {
                     // multiply by 0.1 for the sake of parallax effect
                     overscrollOffset.snapTo(overscrollOffset.value + overscrollDelta.y * 0.1f)
@@ -105,16 +105,12 @@ fun OverscrollSample() {
 
         override suspend fun consumePostFling(velocity: Velocity) {
             // when the fling happens - we just gradually animate our overscroll to 0
-            if (isEnabled) {
-                overscrollOffset.animateTo(
-                    targetValue = 0f,
-                    initialVelocity = velocity.y,
-                    animationSpec = spring()
-                )
-            }
+            overscrollOffset.animateTo(
+                targetValue = 0f,
+                initialVelocity = velocity.y,
+                animationSpec = spring()
+            )
         }
-
-        override var isEnabled: Boolean by mutableStateOf(true)
 
         override val isInProgress: Boolean
             get() = overscrollOffset.isRunning

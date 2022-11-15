@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -91,7 +90,6 @@ internal fun LazyList(
         itemProvider,
         state,
         beyondBoundsInfo,
-        overscrollEffect,
         contentPadding,
         reverseLayout,
         isVertical,
@@ -160,8 +158,6 @@ private fun rememberLazyListMeasurePolicy(
     state: LazyListState,
     /** Keeps track of the number of items we measure and place that are beyond visible bounds. */
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
-    /** The overscroll controller. */
-    overscrollEffect: OverscrollEffect,
     /** The inner padding to be added for the whole content(nor for each individual item) */
     contentPadding: PaddingValues,
     /** reverse the direction of scrolling and layout */
@@ -183,7 +179,6 @@ private fun rememberLazyListMeasurePolicy(
 ) = remember<LazyLayoutMeasureScope.(Constraints) -> MeasureResult>(
     state,
     beyondBoundsInfo,
-    overscrollEffect,
     contentPadding,
     reverseLayout,
     isVertical,
@@ -332,19 +327,6 @@ private fun rememberLazyListMeasurePolicy(
             }
         ).also {
             state.applyMeasureResult(it)
-            refreshOverscrollInfo(overscrollEffect, it)
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private fun refreshOverscrollInfo(
-    overscrollEffect: OverscrollEffect,
-    result: LazyListMeasureResult
-) {
-    val canScrollForward = result.canScrollForward
-    val canScrollBackward = (result.firstVisibleItem?.index ?: 0) != 0 ||
-        result.firstVisibleItemScrollOffset != 0
-
-    overscrollEffect.isEnabled = canScrollForward || canScrollBackward
 }
