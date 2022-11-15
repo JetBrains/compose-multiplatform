@@ -44,8 +44,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.isSpecified
+import androidx.compose.ui.input.ScrollContainerInfo
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.provideScrollContainerInfo
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.contentDescription
@@ -338,6 +340,15 @@ fun ModalBottomSheetLayout(
                 visible = sheetState.targetValue != Hidden
             )
         }
+
+        val containerInfo = remember(sheetState) {
+            object : ScrollContainerInfo {
+                override fun canScrollHorizontally() = false
+
+                override fun canScrollVertically() = sheetState.currentValue != Hidden
+            }
+        }
+
         Surface(
             Modifier
                 .fillMaxWidth()
@@ -353,6 +364,7 @@ fun ModalBottomSheetLayout(
                     IntOffset(0, y)
                 }
                 .bottomSheetSwipeable(sheetState, fullHeight, sheetHeightState)
+                .provideScrollContainerInfo(containerInfo)
                 .onGloballyPositioned {
                     sheetHeightState.value = it.size.height.toFloat()
                 }

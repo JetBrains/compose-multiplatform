@@ -126,6 +126,9 @@ import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
+import androidx.compose.ui.input.ScrollContainerInfo
+import androidx.compose.ui.input.ModifierLocalScrollContainerInfo
+import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -220,6 +223,34 @@ internal class AndroidComposeView(context: Context) :
         false
     }
 
+    // We don't have a way to determine direction in Android, return true for both directions.
+    private val scrollContainerInfo = object : ModifierLocalProvider<ScrollContainerInfo?> {
+        override val key = ModifierLocalScrollContainerInfo
+        override val value = object : ScrollContainerInfo {
+            // Intentionally not using [View#canScrollHorizontally], to maintain semantics of
+            // View#isInScrollingContainer
+            override fun canScrollHorizontally(): Boolean =
+                view.isInScrollableViewGroup()
+
+            // Intentionally not using [View#canScrollVertically], to maintain semantics of
+            // View#isInScrollingContainer
+            override fun canScrollVertically(): Boolean =
+                view.isInScrollableViewGroup()
+
+            // Copied from View#isInScrollingContainer() which is @hide
+            private fun View.isInScrollableViewGroup(): Boolean {
+                var p = parent
+                while (p != null && p is ViewGroup) {
+                    if (p.shouldDelayChildPressedState()) {
+                        return true
+                    }
+                    p = p.parent
+                }
+                return false
+            }
+        }
+    }
+
     private val canvasHolder = CanvasHolder()
 
     override val root = LayoutNode().also {
@@ -231,6 +262,7 @@ internal class AndroidComposeView(context: Context) :
             .then(rotaryInputModifier)
             .then(_focusManager.modifier)
             .then(keyInputModifier)
+            .then(scrollContainerInfo)
     }
 
     override val rootForTest: RootForTest = this

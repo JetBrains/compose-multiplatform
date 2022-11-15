@@ -22,7 +22,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.gestures.DefaultFlingBehavior
 import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.ScrollableDefaults
@@ -60,6 +59,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.consumeScrollContainerInfo
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -69,8 +69,6 @@ import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.materialize
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
@@ -1689,49 +1687,73 @@ class ScrollableTest {
     fun scrollable_setsModifierLocalScrollableContainer() {
         val controller = ScrollableState { it }
 
-        var isOuterInScrollableContainer: Boolean? = null
-        var isInnerInScrollableContainer: Boolean? = null
+        var isOuterInVerticalScrollableContainer: Boolean? = null
+        var isInnerInVerticalScrollableContainer: Boolean? = null
+        var isOuterInHorizontalScrollableContainer: Boolean? = null
+        var isInnerInHorizontalScrollableContainer: Boolean? = null
         rule.setContent {
             Box {
                 Box(
                     modifier = Modifier
                         .testTag(scrollableBoxTag)
                         .size(100.dp)
-                        .then(
-                            object : ModifierLocalConsumer {
-                                override fun onModifierLocalsUpdated(
-                                    scope: ModifierLocalReadScope
-                                ) {
-                                    with(scope) {
-                                        isOuterInScrollableContainer =
-                                            ModifierLocalScrollableContainer.current
-                                    }
-                                }
-                            }
-                        )
+                        .consumeScrollContainerInfo {
+                            isOuterInVerticalScrollableContainer = it?.canScrollVertically()
+                            isOuterInHorizontalScrollableContainer = it?.canScrollHorizontally()
+                        }
                         .scrollable(
                             state = controller,
                             orientation = Orientation.Horizontal
                         )
-                        .then(
-                            object : ModifierLocalConsumer {
-                                override fun onModifierLocalsUpdated(
-                                    scope: ModifierLocalReadScope
-                                ) {
-                                    with(scope) {
-                                        isInnerInScrollableContainer =
-                                            ModifierLocalScrollableContainer.current
-                                    }
-                                }
-                            }
-                        )
+                        .consumeScrollContainerInfo {
+                            isInnerInHorizontalScrollableContainer = it?.canScrollHorizontally()
+                            isInnerInVerticalScrollableContainer = it?.canScrollVertically()
+                        }
                 )
             }
         }
 
         rule.runOnIdle {
-            assertThat(isOuterInScrollableContainer).isFalse()
-            assertThat(isInnerInScrollableContainer).isTrue()
+            assertThat(isInnerInHorizontalScrollableContainer).isTrue()
+            assertThat(isInnerInVerticalScrollableContainer).isFalse()
+            assertThat(isOuterInVerticalScrollableContainer).isFalse()
+            assertThat(isOuterInHorizontalScrollableContainer).isFalse()
+        }
+    }
+
+    @Test
+    fun scrollable_nested_setsModifierLocalScrollableContainer() {
+        val horizontalController = ScrollableState { it }
+        val verticalController = ScrollableState { it }
+
+        var horizontalDrag: Boolean? = null
+        var verticalDrag: Boolean? = null
+        rule.setContent {
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .scrollable(
+                        state = horizontalController,
+                        orientation = Orientation.Horizontal
+                    )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .scrollable(
+                            state = verticalController,
+                            orientation = Orientation.Vertical
+                        )
+                        .consumeScrollContainerInfo {
+                            horizontalDrag = it?.canScrollHorizontally()
+                            verticalDrag = it?.canScrollVertically()
+                        })
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(horizontalDrag).isTrue()
+            assertThat(verticalDrag).isTrue()
         }
     }
 
