@@ -48,4 +48,8 @@ abstract class AndroidXComposeMultiplatformExtension {
       */
     abstract fun darwin(): Unit
 
+    /**
+     * Configures native compilation tasks with flags to link required frameworks
+     */
+    abstract fun configureDarwinFlags(): Unit
 }

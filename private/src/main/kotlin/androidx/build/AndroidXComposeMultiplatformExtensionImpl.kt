@@ -30,6 +30,7 @@ import org.gradle.api.publish.maven.internal.dependencies.DefaultMavenDependency
 import org.gradle.api.publish.maven.internal.dependencies.MavenDependencyInternal
 import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
 import org.gradle.api.attributes.Usage
+import org.jetbrains.kotlin.konan.target.KonanTarget
 
 
 open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
@@ -142,6 +143,37 @@ open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
             sourceSet?.let {
                 it.kotlin.srcDirs(project.rootProject.files("compose/util/util/src/$name/kotlin/"))
             }
+        }
+    }
+
+    override fun configureDarwinFlags() {
+        val darwinFlags = listOf(
+            "-linker-option", "-framework", "-linker-option", "Metal",
+            "-linker-option", "-framework", "-linker-option", "CoreText",
+            "-linker-option", "-framework", "-linker-option", "CoreGraphics",
+            "-linker-option", "-framework", "-linker-option", "CoreServices"
+        )
+        val iosFlags = listOf("-linker-option", "-framework", "-linker-option", "UIKit")
+
+        fun KotlinNativeTarget.configureFreeCompilerArgs() {
+            val isIOS = konanTarget == KonanTarget.IOS_X64 ||
+                konanTarget == KonanTarget.IOS_SIMULATOR_ARM64 ||
+                konanTarget == KonanTarget.IOS_ARM64
+
+            binaries.forEach {
+                val flags = mutableListOf<String>().apply {
+                    addAll(darwinFlags)
+                    if (isIOS) addAll(iosFlags)
+                }
+                it.freeCompilerArgs = it.freeCompilerArgs + flags
+            }
+        }
+        multiplatformExtension.run {
+            macosX64 { configureFreeCompilerArgs() }
+            macosArm64 { configureFreeCompilerArgs() }
+            iosX64("uikitX64") { configureFreeCompilerArgs() }
+            iosArm64("uikitArm64") { configureFreeCompilerArgs() }
+            iosSimulatorArm64("uikitSimArm64") { configureFreeCompilerArgs() }
         }
     }
 }
