@@ -32,6 +32,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.rememberSplineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.DefaultScrollMotionDurationScale
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.runtime.Composable
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.math.sign
+import kotlinx.coroutines.withContext
 
 /**
  * A [FlingBehavior] that performs snapping of items to a given position. The algorithm will
@@ -89,13 +91,16 @@ class SnapFlingBehavior(
 ) : FlingBehavior {
 
     private val velocityThreshold = with(density) { shortSnapVelocityThreshold.toPx() }
+    internal var motionScaleDuration = DefaultScrollMotionDurationScale
 
     override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
         // If snapping from scroll (short snap) or fling (long snap)
-        if (abs(initialVelocity) <= abs(velocityThreshold)) {
-            shortSnap(initialVelocity)
-        } else {
-            longSnap(initialVelocity)
+        withContext(motionScaleDuration) {
+            if (abs(initialVelocity) <= abs(velocityThreshold)) {
+                shortSnap(initialVelocity)
+            } else {
+                longSnap(initialVelocity)
+            }
         }
         return NoVelocity
     }
@@ -397,7 +402,7 @@ private class LowVelocityApproachAnimation(
                 targetOffset = targetOffset,
                 cancelOffset = offset,
                 animationState = animationState,
-                snapAnimationSpec = lowVelocityAnimationSpec,
+                snapAnimationSpec = lowVelocityAnimationSpec
             )
         }
     }

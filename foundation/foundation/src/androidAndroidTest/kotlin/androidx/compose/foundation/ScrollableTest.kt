@@ -2636,4 +2636,4 @@ private fun espressoSwipe(
     )
 }
 
-private class TestScrollMotionDurationScale(override val scaleFactor: Float) : MotionDurationScale
+internal class TestScrollMotionDurationScale(override val scaleFactor: Float) : MotionDurationScale
