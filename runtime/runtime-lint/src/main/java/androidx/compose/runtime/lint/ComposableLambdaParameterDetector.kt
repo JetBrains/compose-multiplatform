@@ -107,7 +107,7 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
             if (name != "content" && parameterInfo.functionType.parameters.isEmpty()) {
                 context.report(
                     ComposableLambdaParameterNaming,
-                    node,
+                    uElement,
                     context.getNameLocation(uElement),
                     "Composable lambda parameter should be named `content`",
                     LintFix.create()
@@ -123,7 +123,7 @@ class ComposableLambdaParameterDetector : Detector(), SourceCodeScanner {
             if (parameter !== node.uastParameters.last()) {
                 context.report(
                     ComposableLambdaParameterPosition,
-                    node,
+                    uElement,
                     context.getNameLocation(uElement),
                     "Composable lambda parameter should be the last parameter so it can be used " +
                         "as a trailing lambda"
