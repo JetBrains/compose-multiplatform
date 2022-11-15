@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.gesture.snapping
 
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
@@ -34,6 +36,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import kotlin.math.absoluteValue
 import kotlin.math.round
 import kotlin.math.sign
 import kotlin.test.assertEquals
@@ -150,7 +153,40 @@ class LazyListSnapLayoutInfoProviderTest(orientation: Orientation) :
     }
 
     @Test
-    fun calculateApproachOffset_approachOffsetIsAlwaysZero() {
+    fun calculateApproachOffset_highVelocity_approachOffsetIsEqualToDecayMinusItemSize() {
+        lateinit var layoutInfoProvider: SnapLayoutInfoProvider
+        val decay = splineBasedDecay<Float>(rule.density)
+        fun calculateTargetOffset(velocity: Float): Float {
+            val offset = decay.calculateTargetValue(0f, velocity).absoluteValue
+            return (offset - with(density) { 200.dp.toPx() }).coerceAtLeast(0f) * velocity.sign
+        }
+        rule.setContent {
+            val state = rememberLazyListState()
+            layoutInfoProvider = remember(state) { createLayoutInfo(state) }
+            LazyColumnOrRow(
+                state = state,
+                flingBehavior = rememberSnapFlingBehavior(layoutInfoProvider)
+            ) {
+                items(200) {
+                    Box(modifier = Modifier.size(200.dp))
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(
+                with(layoutInfoProvider) { density.calculateApproachOffset(10000f) },
+                calculateTargetOffset(10000f)
+            )
+            assertEquals(
+                with(layoutInfoProvider) { density.calculateApproachOffset(-10000f) },
+                calculateTargetOffset(-10000f)
+            )
+        }
+    }
+
+    @Test
+    fun calculateApproachOffset_lowVelocity_approachOffsetIsEqualToZero() {
         lateinit var layoutInfoProvider: SnapLayoutInfoProvider
         rule.setContent {
             val state = rememberLazyListState()
@@ -166,8 +202,14 @@ class LazyListSnapLayoutInfoProviderTest(orientation: Orientation) :
         }
 
         rule.runOnIdle {
-            assertEquals(with(layoutInfoProvider) { density.calculateApproachOffset(1000f) }, 0f)
-            assertEquals(with(layoutInfoProvider) { density.calculateApproachOffset(-1000f) }, 0f)
+            assertEquals(
+                with(layoutInfoProvider) { density.calculateApproachOffset(1000f) },
+                0f
+            )
+            assertEquals(
+                with(layoutInfoProvider) { density.calculateApproachOffset(-1000f) },
+                0f
+            )
         }
     }
 
