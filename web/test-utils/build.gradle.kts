@@ -2,7 +2,7 @@ import org.jetbrains.compose.gradle.standardConf
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
 }
 
 
@@ -34,4 +34,11 @@ kotlin {
             }
         }
     }
+}
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xklib-enable-signature-clash-checks=false",
+        "-Xplugin=${project.properties["compose.plugin.path"]}"
+    )
 }

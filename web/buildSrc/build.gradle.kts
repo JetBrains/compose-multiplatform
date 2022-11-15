@@ -1,4 +1,5 @@
 repositories {
+    mavenLocal()
     gradlePluginPortal()
     mavenCentral()
     maven {

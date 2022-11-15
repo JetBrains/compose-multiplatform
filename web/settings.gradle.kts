@@ -59,21 +59,21 @@ fun module(name: String, path: String) {
 
 
 module(":web-core", "core")
-module(":web-svg", "svg")
+//module(":web-svg", "svg")
 module(":web-integration-core", "integration-core")
-module(":compose-compiler-integration", "compose-compiler-integration")
+//module(":compose-compiler-integration", "compose-compiler-integration")
 module(":internal-web-core-runtime", "internal-web-core-runtime")
 module(":test-utils", "test-utils")
 
-if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
-    module(":web-benchmark-core", "benchmark-core")
-} else {
-    println("skipping benchmarks")
-}
-
-if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
-    println("building with examples")
-    module(":examples:compose-web-lp", "../examples/web-landing")
-    module(":examples:web-compose-bird", "../examples/web-compose-bird")
-    module(":examples:web-with-react", "../examples/web-with-react")
-}
+//if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
+//    module(":web-benchmark-core", "benchmark-core")
+//} else {
+//    println("skipping benchmarks")
+//}
+//
+//if (extra["compose.web.buildSamples"]!!.toString().toBoolean() == true) {
+//    println("building with examples")
+//    module(":examples:compose-web-lp", "../examples/web-landing")
+//    module(":examples:web-compose-bird", "../examples/web-compose-bird")
+//    module(":examples:web-with-react", "../examples/web-with-react")
+//}
