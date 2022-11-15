@@ -350,9 +350,11 @@ class SwipeableV2GestureTest {
     ) = SwipeableV2State(
         initialValue = initialState,
         positionalThreshold = positionalThreshold,
-        velocityThreshold = velocityThreshold,
-        density = density
-    ).apply { if (anchors != null) updateAnchors(anchors) }
+        velocityThreshold = velocityThreshold
+    ).apply {
+        if (anchors != null) updateAnchors(anchors)
+        this.density = density
+    }
 
     private fun TouchInjectionScope.endEdge(orientation: Orientation) =
         if (orientation == Orientation.Horizontal) right else bottom
