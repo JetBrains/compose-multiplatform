@@ -67,30 +67,11 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         desktop()
         js()
         darwin()
+
+        configureDarwinFlags()
     }
 
     kotlin {
-        targets {
-            def darwinFlags = [
-                "-linker-option", "-framework", "-linker-option", "Metal",
-                "-linker-option", "-framework", "-linker-option", "CoreText",
-                "-linker-option", "-framework", "-linker-option", "CoreGraphics",
-                "-linker-option", "-framework", "-linker-option", "CoreServices"
-            ]
-            configure([macosX64, macosArm64]) {
-                binaries.all {
-                    freeCompilerArgs += darwinFlags
-                }
-            }
-            configure([uikitX64, uikitArm64]) {
-                binaries.all {
-                    freeCompilerArgs += darwinFlags
-                    freeCompilerArgs +=
-                        ["-linker-option", "-framework", "-linker-option", "UIKit"]
-                }
-            }
-        }
-
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block above

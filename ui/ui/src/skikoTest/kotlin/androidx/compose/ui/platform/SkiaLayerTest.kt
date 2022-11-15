@@ -24,24 +24,20 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.round
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Assert.assertTrue
-import org.junit.Rule
-import org.junit.Test
 import kotlin.math.PI
 import kotlin.math.cos
 import kotlin.math.roundToInt
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertTrue
 
 class SkiaLayerTest {
-    @get:Rule
-    val rule = createComposeRule()
 
     private val layer = TestSkiaLayer()
     private val cos45 = cos(PI / 4)
@@ -73,7 +69,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `resize and move`() {
+    fun resize_and_move() {
         layer.resize(IntSize(100, 10))
         layer.move(IntOffset(10, 20))
         val matrix = layer.matrix
@@ -83,7 +79,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, left-top origin`() {
+    fun translation_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 10f,
@@ -97,7 +93,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, bottom-right origin`() {
+    fun translation_bottom_right_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 10f,
@@ -111,7 +107,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `scale, left-top origin`() {
+    fun scale_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             scaleX = 2f,
@@ -125,7 +121,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `scale, bottom-right origin`() {
+    fun scale_bottom_right_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             scaleX = 2f,
@@ -139,7 +135,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `rotationX, left-top origin`() {
+    fun rotationX_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationX = 45f,
@@ -153,7 +149,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `rotationX, bottom-right origin`() {
+    fun rotationX_bottom_right_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationX = 45f,
@@ -167,7 +163,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `rotationY, left-top origin`() {
+    fun rotationY_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationY = 45f,
@@ -181,7 +177,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `rotationY, bottom-right origin`() {
+    fun rotationY_bottom_right_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationY = 45f,
@@ -195,7 +191,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `rotationZ, left-top origin`() {
+    fun rotationZ_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationZ = 90f,
@@ -208,7 +204,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `rotationZ, bottom-right origin`() {
+    fun rotationZ_bottom_right_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationZ = 90f,
@@ -221,7 +217,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, scale, left-top origin`() {
+    fun translation_scale_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 60f,
@@ -237,7 +233,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, rotationZ, left-top origin`() {
+    fun translation_rotationZ_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 60f,
@@ -252,7 +248,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, rotationX, left-top origin`() {
+    fun translation_rotationX_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 60f,
@@ -269,7 +265,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, rotationY, left-top origin`() {
+    fun translation_rotationY_left_top_origi() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 60f,
@@ -286,7 +282,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `scale, rotationZ, left-top origin`() {
+    fun scale_rotationZ_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             scaleX = 2f,
@@ -301,7 +297,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `translation, scale, rotationZ, left-top origin`() {
+    fun translation_scale_rotationZ_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 60f,
@@ -318,7 +314,7 @@ class SkiaLayerTest {
     }
 
     @Test
-    fun `is in layer`() {
+    fun is_in_layer() {
         layer.resize(IntSize(0, 0))
         layer.updateProperties(
             clip = false
