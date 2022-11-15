@@ -511,6 +511,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         Role.Checkbox -> "android.widget.CheckBox"
                         Role.RadioButton -> "android.widget.RadioButton"
                         Role.Image -> "android.widget.ImageView"
+                        Role.DropdownList -> "android.widget.Spinner"
                         else -> null
                     }
                     // Images are often minor children of larger widgets, so we only want to

@@ -614,6 +614,12 @@ value class Role private constructor(@Suppress("unused") private val value: Int)
          * [SemanticsProperties.ContentDescription]
          */
         val Image = Role(5)
+        /**
+         * This element is associated with a drop down menu.
+         * Associated semantics properties for accessibility:
+         * [SemanticsActions.OnClick]
+         */
+        val DropdownList = Role(6)
     }
 
     override fun toString() = when (this) {
@@ -623,6 +629,7 @@ value class Role private constructor(@Suppress("unused") private val value: Int)
         RadioButton -> "RadioButton"
         Tab -> "Tab"
         Image -> "Image"
+        DropdownList -> "DropdownList"
         else -> "Unknown"
     }
 }
