@@ -33,8 +33,15 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.OnRemeasuredModifier
+import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
@@ -98,22 +105,32 @@ internal fun <T> Modifier.swipeAnchors(
     possibleValues: Set<T>,
     anchorsChanged: ((oldAnchors: Map<T, Float>, newAnchors: Map<T, Float>) -> Unit)? = null,
     calculateAnchor: (value: T, layoutSize: IntSize) -> Float?,
-) = onSizeChanged { layoutSize ->
-    val previousAnchors = state.anchors
-    val newAnchors = mutableMapOf<T, Float>()
-    possibleValues.forEach {
-        val anchorValue = calculateAnchor(it, layoutSize)
-        if (anchorValue != null) {
-            newAnchors[it] = anchorValue
+) = this.then(SwipeAnchorsModifier(
+    onDensityChanged = { state.density = it },
+    onSizeChanged = { layoutSize ->
+        val previousAnchors = state.anchors
+        val newAnchors = mutableMapOf<T, Float>()
+        possibleValues.forEach {
+            val anchorValue = calculateAnchor(it, layoutSize)
+            if (anchorValue != null) {
+                newAnchors[it] = anchorValue
+            }
         }
+        if (previousAnchors != newAnchors) {
+            state.updateAnchors(newAnchors)
+            if (previousAnchors.isNotEmpty()) {
+                anchorsChanged?.invoke(previousAnchors, newAnchors)
+            }
+        }
+    },
+    inspectorInfo = debugInspectorInfo {
+        name = "swipeAnchors"
+        properties["state"] = state
+        properties["possibleValues"] = possibleValues
+        properties["anchorsChanged"] = anchorsChanged
+        properties["calculateAnchor"] = calculateAnchor
     }
-    if (previousAnchors == newAnchors) return@onSizeChanged
-    state.updateAnchors(newAnchors)
-
-    if (previousAnchors.isNotEmpty()) {
-        anchorsChanged?.invoke(previousAnchors, newAnchors)
-    }
-}
+))
 
 /**
  * State of the [swipeableV2] modifier.
@@ -123,7 +140,6 @@ internal fun <T> Modifier.swipeAnchors(
  * [SwipeableV2State] use [rememberSwipeableV2State].
  *
  * @param initialValue The initial value of the state.
- * @param density The density used to convert thresholds from px to dp.
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  * @param positionalThreshold The positional threshold to be used when calculating the target state
@@ -139,7 +155,6 @@ internal fun <T> Modifier.swipeAnchors(
 @ExperimentalMaterialApi
 internal class SwipeableV2State<T>(
     initialValue: T,
-    internal val density: Density,
     internal val animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec,
     internal val confirmValueChange: (newValue: T) -> Boolean = { true },
     internal val positionalThreshold: Density.(totalDistance: Float) -> Float =
@@ -228,13 +243,13 @@ internal class SwipeableV2State<T>(
     private val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
     private val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
 
-    private val velocityThresholdPx = with(density) { velocityThreshold.toPx() }
-
     internal val draggableState = DraggableState {
         dragPosition = (dragPosition ?: 0f) + it
     }
 
     internal var anchors by mutableStateOf(emptyMap<T, Float>())
+
+    internal var density: Density? = null
 
     internal fun updateAnchors(newAnchors: Map<T, Float>) {
         val previousAnchorsEmpty = anchors.isEmpty()
@@ -348,6 +363,8 @@ internal class SwipeableV2State<T>(
     ): T {
         val currentAnchors = anchors
         val currentAnchor = currentAnchors.requireAnchor(currentValue)
+        val currentDensity = requireDensity()
+        val velocityThresholdPx = with(currentDensity) { velocityThreshold.toPx() }
         return if (currentAnchor <= offset) {
             // Swiping from lower to upper (positive).
             if (velocity >= velocityThresholdPx) {
@@ -355,7 +372,7 @@ internal class SwipeableV2State<T>(
             } else {
                 val upper = currentAnchors.closestAnchor(offset, true)
                 val distance = abs(currentAnchors.getValue(upper) - currentAnchor)
-                val relativeThreshold = abs(positionalThreshold(density, distance))
+                val relativeThreshold = abs(positionalThreshold(currentDensity, distance))
                 val absoluteThreshold = abs(currentAnchor + relativeThreshold)
                 if (offset < absoluteThreshold) currentValue else upper
             }
@@ -366,7 +383,7 @@ internal class SwipeableV2State<T>(
             } else {
                 val lower = currentAnchors.closestAnchor(offset, false)
                 val distance = abs(currentAnchor - currentAnchors.getValue(lower))
-                val relativeThreshold = abs(positionalThreshold(density, distance))
+                val relativeThreshold = abs(positionalThreshold(currentDensity, distance))
                 val absoluteThreshold = abs(currentAnchor - relativeThreshold)
                 if (offset < 0) {
                     // For negative offsets, larger absolute thresholds are closer to lower anchors
@@ -379,6 +396,11 @@ internal class SwipeableV2State<T>(
         }
     }
 
+    private fun requireDensity() = requireNotNull(density) {
+        "SwipeableState did not have a density attached. Are you using Modifier.swipeable with " +
+            "this=$this SwipeableState?"
+    }
+
     companion object {
         /**
          * The default [Saver] implementation for [SwipeableV2State].
@@ -388,8 +410,7 @@ internal class SwipeableV2State<T>(
             animationSpec: AnimationSpec<Float>,
             confirmValueChange: (T) -> Boolean,
             positionalThreshold: Density.(distance: Float) -> Float,
-            velocityThreshold: Dp,
-            density: Density
+            velocityThreshold: Dp
         ) = Saver<SwipeableV2State<T>, T>(
             save = { it.currentValue },
             restore = {
@@ -398,8 +419,7 @@ internal class SwipeableV2State<T>(
                     animationSpec = animationSpec,
                     confirmValueChange = confirmValueChange,
                     positionalThreshold = positionalThreshold,
-                    velocityThreshold = velocityThreshold,
-                    density = density
+                    velocityThreshold = velocityThreshold
                 )
             }
         )
@@ -420,15 +440,13 @@ internal fun <T : Any> rememberSwipeableV2State(
     animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec,
     confirmValueChange: (newValue: T) -> Boolean = { true }
 ): SwipeableV2State<T> {
-    val density = LocalDensity.current
     return rememberSaveable(
-        initialValue, animationSpec, confirmValueChange, density,
+        initialValue, animationSpec, confirmValueChange,
         saver = SwipeableV2State.Saver(
             animationSpec = animationSpec,
             confirmValueChange = confirmValueChange,
             positionalThreshold = SwipeableV2Defaults.PositionalThreshold,
-            velocityThreshold = SwipeableV2Defaults.VelocityThreshold,
-            density = density
+            velocityThreshold = SwipeableV2Defaults.VelocityThreshold
         ),
     ) {
         SwipeableV2State(
@@ -436,8 +454,7 @@ internal fun <T : Any> rememberSwipeableV2State(
             animationSpec = animationSpec,
             confirmValueChange = confirmValueChange,
             positionalThreshold = SwipeableV2Defaults.PositionalThreshold,
-            velocityThreshold = SwipeableV2Defaults.VelocityThreshold,
-            density = density
+            velocityThreshold = SwipeableV2Defaults.VelocityThreshold
         )
     }
 }
@@ -489,6 +506,37 @@ internal object SwipeableV2Defaults {
     @ExperimentalMaterialApi
     val PositionalThreshold: Density.(totalDistance: Float) -> Float =
         fixedPositionalThreshold(56.dp)
+}
+
+@Stable
+private class SwipeAnchorsModifier(
+    private val onDensityChanged: (density: Density) -> Unit,
+    private val onSizeChanged: (layoutSize: IntSize) -> Unit,
+    inspectorInfo: InspectorInfo.() -> Unit,
+) : LayoutModifier, OnRemeasuredModifier, InspectorValueInfo(inspectorInfo) {
+
+    private var lastDensity: Float = -1f
+    private var lastFontScale: Float = -1f
+
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        if (density != lastDensity || fontScale != lastFontScale) {
+            onDensityChanged(Density(density, fontScale))
+            lastDensity = density
+            lastFontScale = fontScale
+        }
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) { placeable.place(0, 0) }
+    }
+
+    override fun onRemeasured(size: IntSize) {
+        onSizeChanged(size)
+    }
+
+    override fun toString() = "SwipeAnchorsModifierImpl(updateDensity=$onDensityChanged, " +
+        "onSizeChanged=$onSizeChanged)"
 }
 
 private fun <T> Map<T, Float>.closestAnchor(
