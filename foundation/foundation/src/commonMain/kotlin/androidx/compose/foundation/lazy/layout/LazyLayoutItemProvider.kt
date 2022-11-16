@@ -92,19 +92,20 @@ interface LazyLayoutIntervalContent {
  *
  * @param intervals [IntervalList] of [LazyLayoutIntervalContent] defined by lazy list DSL
  * @param nearestItemsRange range of indices considered near current viewport
- * @param itemContent composable content based on index inside provided interval
+ * @param itemContent composable content based on the index in the list.
  */
 @ExperimentalFoundationApi
 fun <T : LazyLayoutIntervalContent> LazyLayoutItemProvider(
     intervals: IntervalList<T>,
     nearestItemsRange: IntRange,
-    itemContent: @Composable (interval: T, index: Int) -> Unit,
+    itemContent: @Composable (interval: IntervalList.Interval<T>, index: Int) -> Unit,
 ): LazyLayoutItemProvider =
     DefaultLazyLayoutItemsProvider(itemContent, intervals, nearestItemsRange)
 
 @ExperimentalFoundationApi
 private class DefaultLazyLayoutItemsProvider<IntervalContent : LazyLayoutIntervalContent>(
-    val itemContentProvider: @Composable IntervalContent.(index: Int) -> Unit,
+    val itemContentProvider:
+    @Composable (interval: IntervalList.Interval<IntervalContent>, index: Int) -> Unit,
     val intervals: IntervalList<IntervalContent>,
     nearestItemsRange: IntRange
 ) : LazyLayoutItemProvider {
@@ -114,9 +115,7 @@ private class DefaultLazyLayoutItemsProvider<IntervalContent : LazyLayoutInterva
 
     @Composable
     override fun Item(index: Int) {
-        withLocalIntervalIndex(index) { localIndex, content ->
-            content.itemContentProvider(localIndex)
-        }
+        itemContentProvider(intervals[index], index)
     }
 
     override fun getKey(index: Int): Any =

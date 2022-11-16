@@ -23,10 +23,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.relocation.BringIntoViewResponder
 import androidx.compose.foundation.relocation.bringIntoViewResponder
-import androidx.compose.foundation.lazy.layout.ModifierLocalPinnableParent
-import androidx.compose.foundation.lazy.layout.PinnableParent
-import androidx.compose.foundation.lazy.layout.PinnableParent.PinnedItemsHandle
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -38,7 +36,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.modifier.modifierLocalProvider
+import androidx.compose.ui.layout.LocalPinnableContainer
+import androidx.compose.ui.layout.PinnableContainer
+import androidx.compose.ui.layout.PinnableContainer.PinnedHandle
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
@@ -88,7 +88,9 @@ class FocusableTest {
             Box {
                 BasicText(
                     "focusableText",
-                    modifier = Modifier.testTag(focusTag).focusable()
+                    modifier = Modifier
+                        .testTag(focusTag)
+                        .focusable()
                 )
             }
         }
@@ -104,7 +106,9 @@ class FocusableTest {
             Box {
                 BasicText(
                     "focusableText",
-                    modifier = Modifier.testTag(focusTag).focusable(enabled = false)
+                    modifier = Modifier
+                        .testTag(focusTag)
+                        .focusable(enabled = false)
                 )
             }
         }
@@ -269,24 +273,25 @@ class FocusableTest {
 
     @OptIn(ExperimentalFoundationApi::class)
     @Test
-    fun focusable_pinsAndUnpins_whenItIsFocused() {
+    fun focusable_pins_whenItIsFocused() {
         // Arrange.
         val focusRequester = FocusRequester()
         var onPinInvoked = false
-        var onUnpinInvoked = false
+        val pinnableContainer = object : PinnableContainer {
+            override fun pin(): PinnedHandle {
+                onPinInvoked = true
+                return PinnedHandle {}
+            }
+        }
         rule.setContent {
-            Box(
-                 Modifier
-                     .size(100.dp)
-                     .pinnableParent(
-                         onPin = {
-                             onPinInvoked = true
-                             TestPinnedItemsHandle { onUnpinInvoked = true }
-                         }
-                     )
-                     .focusRequester(focusRequester)
-                     .focusable()
-            )
+            CompositionLocalProvider(LocalPinnableContainer provides pinnableContainer) {
+                Box(
+                    Modifier
+                        .size(100.dp)
+                        .focusRequester(focusRequester)
+                        .focusable()
+                )
+            }
         }
 
         // Act.
@@ -297,6 +302,49 @@ class FocusableTest {
         // Assert.
         rule.runOnIdle {
             assertThat(onPinInvoked).isTrue()
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun focusable_unpins_whenItIsUnfocused() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        val focusRequester2 = FocusRequester()
+        var onUnpinInvoked = false
+        val pinnableContainer = object : PinnableContainer {
+            override fun pin(): PinnedHandle {
+                return PinnedHandle { onUnpinInvoked = true }
+            }
+        }
+        rule.setContent {
+            CompositionLocalProvider(LocalPinnableContainer provides pinnableContainer) {
+                Box(
+                    Modifier
+                        .size(100.dp)
+                        .focusRequester(focusRequester)
+                        .focusable()
+                )
+            }
+            Box(
+                Modifier
+                    .size(100.dp)
+                    .focusRequester(focusRequester2)
+                    .focusable()
+            )
+        }
+
+        // Act.
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+        rule.runOnIdle {
+            assertThat(onUnpinInvoked).isFalse()
+            focusRequester2.requestFocus()
+        }
+
+        // Assert.
+        rule.runOnIdle {
             assertThat(onUnpinInvoked).isTrue()
         }
     }
@@ -347,22 +395,51 @@ class FocusableTest {
         }
     }
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    @ExperimentalFoundationApi
-    private fun Modifier.pinnableParent(onPin: () -> PinnedItemsHandle): Modifier {
-        return modifierLocalProvider(ModifierLocalPinnableParent) {
-            object : PinnableParent {
-                override fun pinItems(): PinnedItemsHandle {
-                    return onPin()
-                }
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun focusable_updatePinnableContainer_staysPinned() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var container1Pinned = false
+        val pinnableContainer1 = object : PinnableContainer {
+            override fun pin(): PinnedHandle {
+                container1Pinned = true
+                return PinnedHandle { container1Pinned = false }
             }
         }
-    }
+        var container2Pinned = false
+        val pinnableContainer2 = object : PinnableContainer {
+            override fun pin(): PinnedHandle {
+                container2Pinned = true
+                return PinnedHandle { container2Pinned = false }
+            }
+        }
+        var pinnableContainer by mutableStateOf<PinnableContainer>(pinnableContainer1)
+        rule.setContent {
+            CompositionLocalProvider(LocalPinnableContainer provides pinnableContainer) {
+                Box(
+                    Modifier
+                        .size(100.dp)
+                        .focusRequester(focusRequester)
+                        .focusable()
+                )
+            }
+        }
 
-    @ExperimentalFoundationApi
-    private class TestPinnedItemsHandle(val onUnpin: () -> Unit) : PinnedItemsHandle {
-        override fun unpin() {
-            onUnpin.invoke()
+        // Act.
+        rule.runOnUiThread {
+            focusRequester.requestFocus()
+        }
+        rule.runOnIdle {
+            assertThat(container1Pinned).isTrue()
+            assertThat(container2Pinned).isFalse()
+            pinnableContainer = pinnableContainer2
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(container1Pinned).isFalse()
+            assertThat(container2Pinned).isTrue()
         }
     }
 }

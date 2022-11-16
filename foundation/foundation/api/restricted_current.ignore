@@ -1,4 +1,8 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.foundation.lazy.LazyListPinningModifierKt:
+    Removed class androidx.compose.foundation.lazy.LazyListPinningModifierKt
+RemovedClass: androidx.compose.foundation.lazy.layout.PinnableParentKt:
+    Removed class androidx.compose.foundation.lazy.layout.PinnableParentKt
 RemovedClass: androidx.compose.foundation.text.MaxLinesHeightModifierKt:
     Removed class androidx.compose.foundation.text.MaxLinesHeightModifierKt
 

@@ -28,6 +28,7 @@ import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
@@ -219,6 +220,11 @@ class LazyListState constructor(
      * Constraints passed to the prefetcher for premeasuring the prefetched items.
      */
     internal var premeasureConstraints by mutableStateOf(Constraints())
+
+    /**
+     * List of extra items to compose during the measure pass.
+     */
+    internal val pinnedItems = mutableStateListOf<LazyListPinnedItem>()
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]

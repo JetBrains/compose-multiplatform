@@ -2075,6 +2075,19 @@ package androidx.compose.ui.layout {
     method public Object? modifyParentData(androidx.compose.ui.unit.Density, Object? parentData);
   }
 
+  @androidx.compose.runtime.Stable public interface PinnableContainer {
+    method public androidx.compose.ui.layout.PinnableContainer.PinnedHandle pin();
+  }
+
+  public static fun interface PinnableContainer.PinnedHandle {
+    method public void unpin();
+  }
+
+  public final class PinnableContainerKt {
+    method public static androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.layout.PinnableContainer> getLocalPinnableContainer();
+    property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.layout.PinnableContainer> LocalPinnableContainer;
+  }
+
   public abstract class Placeable implements androidx.compose.ui.layout.Measured {
     ctor public Placeable();
     method protected final long getApparentToRealOffset();

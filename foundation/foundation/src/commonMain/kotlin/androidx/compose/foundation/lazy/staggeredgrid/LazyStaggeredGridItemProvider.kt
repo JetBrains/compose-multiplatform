@@ -44,7 +44,10 @@ internal fun rememberStaggeredGridItemProvider(
                 scope.intervals,
                 nearestItemsRangeState.value,
             ) { interval, index ->
-                interval.item.invoke(LazyStaggeredGridItemScopeImpl, index)
+                interval.value.item.invoke(
+                    LazyStaggeredGridItemScopeImpl,
+                    index - interval.startIndex
+                )
             }
         }
         object : LazyLayoutItemProvider by DelegatingLazyLayoutItemProvider(itemProviderState) { }
