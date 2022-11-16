@@ -418,7 +418,7 @@ class LazyListsContentPaddingTest(orientation: Orientation) :
         rule.onNodeWithTag("0")
             .assertStartPositionInRootIsEqualTo(0.dp)
         // Shouldn't be visible
-        rule.onNodeWithTag("1").assertIsNotDisplayed()
+        rule.onNodeWithTag("1").assertDoesNotExist()
 
         // Scroll to the top.
         state.scrollBy(itemSize * 5f)

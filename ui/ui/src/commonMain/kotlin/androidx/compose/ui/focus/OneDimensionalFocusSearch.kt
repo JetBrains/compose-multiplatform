@@ -210,8 +210,11 @@ private object FocusableChildrenComparator : Comparator<FocusModifier> {
         requireNotNull(focusModifier2)
 
         // Ignore focus modifiers that won't be considered during focus search.
-        if (!focusModifier1.isEligibleForFocusSearch) return 0
-        if (!focusModifier2.isEligibleForFocusSearch) return 0
+        if (!focusModifier1.isEligibleForFocusSearch || !focusModifier2.isEligibleForFocusSearch) {
+            if (focusModifier1.isEligibleForFocusSearch) return -1
+            if (focusModifier2.isEligibleForFocusSearch) return 1
+            return 0
+        }
 
         val layoutNode1 = checkNotNull(focusModifier1.coordinator?.layoutNode)
         val layoutNode2 = checkNotNull(focusModifier2.coordinator?.layoutNode)

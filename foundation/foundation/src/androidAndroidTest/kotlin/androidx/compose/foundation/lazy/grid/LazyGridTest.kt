@@ -1375,6 +1375,39 @@ class LazyGridTest(
         }
         rule.waitUntil(timeoutMillis = 10000) { animationFinished }
     }
+
+    @Test
+    fun fillingFullSize_nextItemIsNotComposed() {
+        val state = LazyGridState()
+        state.prefetchingEnabled = false
+        val itemSizePx = 5f
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyGrid(
+                1,
+                Modifier
+                    .testTag(LazyGridTag)
+                    .mainAxisSize(itemSize),
+                state
+            ) {
+                items(3) { index ->
+                    Box(Modifier.size(itemSize).testTag("$index"))
+                }
+            }
+        }
+
+        repeat(3) { index ->
+            rule.onNodeWithTag("$index")
+                .assertIsDisplayed()
+            rule.onNodeWithTag("${index + 1}")
+                .assertDoesNotExist()
+            rule.runOnIdle {
+                runBlocking {
+                    state.scrollBy(itemSizePx)
+                }
+            }
+        }
+    }
 }
 
 internal fun IntegerSubject.isEqualTo(expected: Int, tolerance: Int) {

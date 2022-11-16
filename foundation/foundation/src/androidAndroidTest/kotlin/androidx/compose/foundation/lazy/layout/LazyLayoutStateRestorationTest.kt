@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,7 +45,6 @@ class LazyLayoutStateRestorationTest {
     @get:Rule
     val rule = createComposeRule()
 
-    @Ignore // b/244308934
     @Test
     fun visibleItemsStateRestored() {
         val restorationTester = StateRestorationTester(rule)
@@ -83,7 +81,6 @@ class LazyLayoutStateRestorationTest {
         }
     }
 
-    @Ignore // b/244308934
     @Test
     fun itemsStateRestoredWhenWeScrolledBackToIt() {
         var counter0 = 1
@@ -123,7 +120,6 @@ class LazyLayoutStateRestorationTest {
         }
     }
 
-    @Ignore // b/244308934
     @Test
     fun nestedLazy_itemsStateRestoredWhenWeScrolledBackToIt() {
         var counter0 = 1
@@ -206,7 +202,6 @@ class LazyLayoutStateRestorationTest {
         }
     }
 
-    @Ignore // b/244308934
     @Test
     fun stateRestoredWhenUsedWithCustomKeysAfterReordering() {
         val restorationTester = StateRestorationTester(rule)
@@ -218,7 +213,7 @@ class LazyLayoutStateRestorationTest {
         restorationTester.setContent {
             LazyLayout(
                 itemCount = list.size,
-                indexToKey = { "${list[it]}" }
+                indexToKey = { "${list.getOrNull(it)}" }
             ) { index ->
                 val it = list[index]
                 if (it == 0) {

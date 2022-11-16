@@ -333,7 +333,10 @@ private fun LazyStaggeredGridMeasureContext.measure(
         // we want to have at least one item in visibleItems even if in fact all the items are
         // offscreen, this can happen if the content padding is larger than the available size.
         while (
-            currentItemOffsets.any { it <= maxOffset } || measuredItems.all { it.isEmpty() }
+            currentItemOffsets.any {
+                it < maxOffset ||
+                    it <= 0 // filling beforeContentPadding area
+            } || measuredItems.all { it.isEmpty() }
         ) {
             val currentLaneIndex = currentItemOffsets.indexOfMinValue()
             val nextItemIndex =
@@ -542,7 +545,8 @@ private fun LazyStaggeredGridMeasureContext.measure(
         // only scroll backward if the first item is not on screen or fully visible
         val canScrollBackward = !(firstItemIndices[0] == 0 && firstItemOffsets[0] <= 0)
         // only scroll forward if the last item is not on screen or fully visible
-        val canScrollForward = currentItemOffsets.any { it > mainAxisAvailableSize }
+        val canScrollForward = currentItemOffsets.any { it > mainAxisAvailableSize } ||
+            currentItemIndices.all { it < itemCount - 1 }
 
         @Suppress("UNCHECKED_CAST")
         return LazyStaggeredGridMeasureResult(
