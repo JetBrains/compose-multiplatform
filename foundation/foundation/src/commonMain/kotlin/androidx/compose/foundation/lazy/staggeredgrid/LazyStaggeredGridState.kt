@@ -29,9 +29,11 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchH
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
@@ -133,8 +135,10 @@ class LazyStaggeredGridState private constructor(
     /** storage for lane assignments for each item for consistent scrolling in both directions **/
     internal val spans = LazyStaggeredGridSpans()
 
-    internal var canScrollForward = true
-    private var canScrollBackward = true
+    override var canScrollForward: Boolean by mutableStateOf(false)
+        private set
+    override var canScrollBackward: Boolean by mutableStateOf(false)
+        private set
 
     /** implementation of [LazyAnimateScrollScope] scope required for [animateScrollToItem] **/
     private val animateScrollScope = LazyStaggeredGridAnimateScrollScope(this)

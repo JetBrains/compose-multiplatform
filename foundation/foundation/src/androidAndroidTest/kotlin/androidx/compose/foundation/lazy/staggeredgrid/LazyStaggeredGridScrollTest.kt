@@ -33,6 +33,7 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -168,6 +169,39 @@ class LazyStaggeredGridScrollTest(
             lastItem.offset.x
         }
         assertThat(mainAxisOffset).isEqualTo(itemSizePx * 3) // x5 (grid) - x2 (item)
+    }
+
+    @Test
+    fun canScrollForward() = runBlocking {
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        assertThat(state.canScrollForward).isTrue()
+        assertThat(state.canScrollBackward).isFalse()
+    }
+
+    @Test
+    fun canScrollBackward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(99)
+        }
+        val lastItem = state.layoutInfo.visibleItemsInfo.last()
+        val mainAxisOffset = if (orientation == Orientation.Vertical) {
+            lastItem.offset.y
+        } else {
+            lastItem.offset.x
+        }
+        assertThat(mainAxisOffset).isEqualTo(itemSizePx * 3) // x5 (grid) - x2 (item)
+        assertThat(state.canScrollForward).isFalse()
+        assertThat(state.canScrollBackward).isTrue()
+    }
+
+    @Test
+    fun canScrollForwardAndBackward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(10)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(10)
+        assertThat(state.canScrollForward).isTrue()
+        assertThat(state.canScrollBackward).isTrue()
     }
 
     @Composable

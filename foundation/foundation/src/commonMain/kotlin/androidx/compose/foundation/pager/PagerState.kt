@@ -202,6 +202,12 @@ internal class PagerState(
     override val isScrollInProgress: Boolean
         get() = lazyListState.isScrollInProgress
 
+    override val canScrollForward: Boolean
+        get() = lazyListState.canScrollForward
+
+    override val canScrollBackward: Boolean
+        get() = lazyListState.canScrollBackward
+
     private fun Int.coerceInPageRange() = coerceIn(0, pageCount - 1)
     internal fun updateOnScrollStopped() {
         settledPageState = currentPage
