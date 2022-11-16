@@ -95,9 +95,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Full-screen field") { FullScreenTextFieldDemo() },
                 ComposableDemo("Ime Action") { ImeActionDemo() },
                 ComposableDemo("Ime SingleLine") { ImeSingleLineDemo() },
-                ComposableDemo("Inside Dialog") { onNavigateUp ->
-                    DialogInputFieldDemo(onNavigateUp)
-                },
+                ComposableDemo("Inside Dialog") { TextFieldsInDialogDemo() },
                 ComposableDemo("Inside scrollable") { TextFieldsInScrollableDemo() },
                 ComposableDemo("Keyboard Types") { KeyboardTypeDemo() },
                 ComposableDemo("Min/Max Lines") { BasicTextFieldMinMaxDemo() },
@@ -106,6 +104,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Visual Transformation") { VisualTransformationDemo() },
                 ComposableDemo("TextFieldValue") { TextFieldValueDemo() },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
+                ComposableDemo("Focus immediately") { FocusTextFieldImmediatelyDemo() },
             )
         ),
         DemoCategory(

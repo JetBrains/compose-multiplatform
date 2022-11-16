@@ -45,7 +45,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.click
@@ -55,6 +54,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.MediumTest
 import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
@@ -62,6 +62,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
 
+@MediumTest
 @RunWith(Parameterized::class)
 class CoreTextFieldKeyboardScrollableInteractionTest(
     private val scrollableType: ScrollableType,
@@ -96,11 +97,11 @@ class CoreTextFieldKeyboardScrollableInteractionTest(
 
     @Test
     fun test() {
-        // TODO(b/192043120) This is known broken when soft input mode is Resize.
-        assumeTrue(softInputMode != AdjustResize)
+        // TODO(b/179203700) This is known broken for lazy lists.
+        assumeTrue(scrollableType != LazyList)
 
         rule.setContent {
-            keyboardHelper.view = LocalView.current
+            keyboardHelper.initialize()
             TestContent()
         }
 
