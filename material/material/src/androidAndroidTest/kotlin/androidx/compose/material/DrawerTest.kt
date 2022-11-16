@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import android.os.SystemClock.sleep
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -321,12 +320,12 @@ class DrawerTest {
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
 
         // When the drawer state is set to Opened
-        drawerState.animateTo(DrawerValue.Open, TweenSpec())
+        drawerState.open()
         // Then the drawer should be opened
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(0.dp)
 
         // When the drawer state is set to Closed
-        drawerState.animateTo(DrawerValue.Closed, TweenSpec())
+        drawerState.close()
         // Then the drawer should be closed
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
     }
