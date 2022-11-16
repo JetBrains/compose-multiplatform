@@ -408,7 +408,7 @@ fun RangeSlider(
 
     BoxWithConstraints(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .requiredSizeIn(minWidth = ThumbWidth * 2, minHeight = ThumbHeight * 2)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -882,7 +882,7 @@ private fun SliderImpl(
             Box(modifier = Modifier.layoutId(SliderComponents.TRACK)) { track(sliderPositions) }
         },
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .requiredSizeIn(
                 minWidth = SliderTokens.HandleWidth,
                 minHeight = SliderTokens.HandleHeight

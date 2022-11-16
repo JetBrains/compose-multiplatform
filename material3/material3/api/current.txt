@@ -329,6 +329,10 @@ package androidx.compose.material3 {
   public final class IncludeFontPaddingHelper_androidKt {
   }
 
+  public final class InteractiveComponentSizeKt {
+    method public static androidx.compose.ui.Modifier minimumInteractiveComponentSize(androidx.compose.ui.Modifier);
+  }
+
   public final class ListItemKt {
   }
 
@@ -641,9 +645,6 @@ package androidx.compose.material3 {
   }
 
   public final class TonalPaletteKt {
-  }
-
-  public final class TouchTargetKt {
   }
 
   @androidx.compose.runtime.Immutable public final class Typography {

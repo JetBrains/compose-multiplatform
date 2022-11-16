@@ -225,7 +225,7 @@ fun Surface(
     ) {
         Box(
             modifier = modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(
@@ -341,7 +341,7 @@ fun Surface(
     ) {
         Box(
             modifier = modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(
@@ -458,7 +458,7 @@ fun Surface(
     ) {
         Box(
             modifier = modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(
@@ -591,7 +591,7 @@ fun Surface(
     ) {
         Box(
             modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(

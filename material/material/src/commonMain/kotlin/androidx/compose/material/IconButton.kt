@@ -65,7 +65,7 @@ fun IconButton(
 ) {
     Box(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .clickable(
                 onClick = onClick,
                 enabled = enabled,
@@ -109,7 +109,7 @@ fun IconToggleButton(
 ) {
     Box(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .toggleable(
             value = checked,
             onValueChange = onCheckedChange,

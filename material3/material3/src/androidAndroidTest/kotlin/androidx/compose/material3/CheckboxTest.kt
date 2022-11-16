@@ -277,7 +277,7 @@ class CheckboxTest {
         rule
             .setMaterialContentForSizeAssertions {
                 CompositionLocalProvider(
-                    LocalMinimumTouchTargetEnforcement provides minimumTouchTarget
+                    LocalMinimumInteractiveComponentEnforcement provides minimumTouchTarget
                 ) {
                     TriStateCheckbox(
                         state = checkboxValue,
