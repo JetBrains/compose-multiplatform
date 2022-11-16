@@ -314,11 +314,17 @@ internal class ComposeViewAdapter : FrameLayout {
         val animatedVisibilitySearch = AnimationSearch.AnimatedVisibilitySearch {
             clock.trackAnimatedVisibility(it, ::requestLayout)
         }
+
+        fun animateXAsStateSearch() =
+            if (AnimateXAsStateComposeAnimation.apiAvailable)
+                setOf(AnimationSearch.AnimateXAsStateSearch { clock.trackAnimateXAsState(it) })
+            else emptyList()
+
         // All supported animations.
         fun supportedSearch() = setOf(
             transitionSearch,
             animatedVisibilitySearch,
-        )
+        ) + animateXAsStateSearch()
 
         fun unsupportedSearch() = if (UnsupportedComposeAnimation.apiAvailable) setOf(
             animatedContentSearch,
@@ -328,16 +334,11 @@ internal class ComposeViewAdapter : FrameLayout {
             AnimationSearch.InfiniteTransitionSearch { clock.trackInfiniteTransition(it) }
         ) else emptyList()
 
-        fun animateXAsStateSearch() =
-            if (AnimateXAsStateComposeAnimation.apiAvailable)
-                setOf(AnimationSearch.AnimateXAsStateSearch { clock.trackAnimateXAsState(it) })
-            else emptyList()
-
-        // All unsupported animations, if API is available.
-        val extraSearch = unsupportedSearch() + animateXAsStateSearch()
+        // All supported animations
+        val supportedSearch = supportedSearch()
 
         // Animations to track in PreviewAnimationClock.
-        val setToTrack = supportedSearch() + extraSearch
+        val setToTrack = supportedSearch + unsupportedSearch()
 
         // Animations to search. animatedContentSearch is included even if it's not going to be
         // tracked as it should be excluded from transitionSearch.
@@ -360,10 +361,12 @@ internal class ComposeViewAdapter : FrameLayout {
             transitionSearch.animations.removeAll(animatedContentSearch.animations)
         }
 
-        hasAnimations = setToTrack.any { it.hasAnimations() }
+        // If non of supported animations are detected, unsupported animations should not be
+        // available either.
+        hasAnimations = supportedSearch.any { it.hasAnimations() }
 
         // Make the `PreviewAnimationClock` track all the transitions found.
-        if (::clock.isInitialized) {
+        if (::clock.isInitialized && hasAnimations) {
             setToTrack.forEach { it.track() }
         }
     }

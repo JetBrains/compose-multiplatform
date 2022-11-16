@@ -130,6 +130,13 @@ fun AnimatedContentPreview() {
     }
 }
 
+@Preview
+@Composable
+fun AnimatedContentAndTransitionPreview() {
+    AnimatedContentPreview()
+    TransitionPreview()
+}
+
 @OptIn(ExperimentalAnimationApi::class)
 @Preview
 @Composable
@@ -317,6 +324,13 @@ fun AnimateContentSizePreview() {
 
 @Preview
 @Composable
+fun AnimateContentSizeAndTransitionPreview() {
+    AnimateContentSizePreview()
+    TransitionPreview()
+}
+
+@Preview
+@Composable
 fun TargetBasedAnimationPreview() {
     val anim = remember {
         TargetBasedAnimation(
@@ -336,6 +350,13 @@ fun TargetBasedAnimationPreview() {
         } while (playTime < 1_000_000L)
     }
     Box { Text(text = "Play time $playTime") }
+}
+
+@Preview
+@Composable
+fun TargetBasedAndTransitionPreview() {
+    TargetBasedAnimationPreview()
+    TransitionPreview()
 }
 
 @Preview
@@ -361,6 +382,13 @@ fun DecayAnimationPreview() {
 
 @Preview
 @Composable
+fun DecayAndTransitionPreview() {
+    DecayAnimationPreview()
+    TransitionPreview()
+}
+
+@Preview
+@Composable
 fun InfiniteTransitionPreview() {
     val infiniteTransition = rememberInfiniteTransition()
     Row {
@@ -368,6 +396,13 @@ fun InfiniteTransitionPreview() {
         infiniteTransition.PulsingDot(StartOffset(150, StartOffsetType.FastForward))
         infiniteTransition.PulsingDot(StartOffset(300, StartOffsetType.FastForward))
     }
+}
+
+@Preview
+@Composable
+fun InfiniteAndTransitionPreview() {
+    InfiniteTransitionPreview()
+    TransitionPreview()
 }
 
 @Composable
