@@ -61,9 +61,9 @@ import androidx.compose.ui.unit.LayoutDirection
  * Compose and there is no corresponding Compose API. Common examples for the moment are
  * WebView, SurfaceView, AdView, etc.
  *
- * [AndroidView] will clip its content to the layout bounds, as being clipped is a common
- * assumption made by [View]s - keeping clipping disabled might lead to unexpected drawing behavior.
- * Note this deviates from Compose's practice of keeping clipping opt-in, disabled by default.
+ * [AndroidView] will not clip its content to the layout bounds. Use [View.setClipToOutline] on
+ * the child View to clip the contents, if desired. Developers will likely want to do this with
+ * all subclasses of SurfaceView to keep its contents contained.
  *
  * [AndroidView] has nested scroll interop capabilities if the containing view has nested scroll
  * enabled. This means this Composable can dispatch scroll deltas if it is placed inside a
