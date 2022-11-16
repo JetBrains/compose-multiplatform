@@ -20,7 +20,6 @@ package androidx.compose.ui.lint
 
 import androidx.compose.lint.test.Stubs
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
-import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
 import org.junit.Test
@@ -63,7 +62,6 @@ class ModifierParameterDetectorTest : LintDetectorTest() {
             Stubs.Composable,
             Stubs.Modifier
         )
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293766
             .run()
             .expect(
                 """
@@ -105,7 +103,6 @@ Fix for src/androidx/compose/ui/foo/test.kt line 10: Change name to modifier:
             Stubs.Composable,
             Stubs.Modifier
         )
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293766
             .run()
             .expect(
                 """
@@ -149,7 +146,6 @@ Fix for src/androidx/compose/ui/foo/test.kt line 10: Change type to Modifier:
             Stubs.Composable,
             Stubs.Modifier
         )
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293766
             .run()
             .expect(
                 """
@@ -191,7 +187,6 @@ Fix for src/androidx/compose/ui/foo/TestModifier.kt line 12: Change default valu
             Stubs.Composable,
             Stubs.Modifier
         )
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293766
             .run()
             .expect(
                 """
@@ -227,7 +222,6 @@ src/androidx/compose/ui/foo/test.kt:11: Warning: Modifier parameter should be th
             Stubs.Composable,
             Stubs.Modifier
         )
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293766
             .run()
             .expect(
                 """

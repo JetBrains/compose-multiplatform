@@ -59,7 +59,6 @@ class ComposableLambdaParameterDetectorTest : LintDetectorTest() {
             Stubs.Composable
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293458
             .run()
             .expect(
                 """
@@ -97,7 +96,6 @@ Fix for src/androidx/compose/ui/foo/test.kt line 7: Rename text to content:
             Stubs.Composable
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293458
             .run()
             .expect(
                 """
@@ -127,7 +125,6 @@ src/androidx/compose/ui/foo/test.kt:7: Warning: Composable lambda parameter shou
             Stubs.Composable
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293458
             .run()
             .expect(
                 """
@@ -169,7 +166,6 @@ Fix for src/androidx/compose/ui/foo/test.kt line 7: Rename text to content:
             ),
             Stubs.Composable
         )
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293458
             .run()
             .expect(
                 """
@@ -235,7 +231,6 @@ Fix for src/androidx/compose/ui/foo/Foo.kt line 9: Rename text to content:
             Stubs.Composable
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
-            .skipTestModes(TestMode.SUPPRESSIBLE) // b/257293458
             .run()
             .expect(
                 """
