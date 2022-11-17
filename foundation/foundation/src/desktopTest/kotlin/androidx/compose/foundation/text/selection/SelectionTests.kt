@@ -153,4 +153,60 @@ class SelectionTests {
         rule.awaitIdle()
         Truth.assertThat(state.value.selection).isEqualTo(TextRange(1, 0))
     }
+
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @Test
+    fun `Ctrl + Backspace on an empty line with DesktopPlatform-Windows`() = runBlocking {
+        setPlatformDefaultKeyMapping(createPlatformDefaultKeyMapping(DesktopPlatform.Windows))
+        val state = mutableStateOf(TextFieldValue(""))
+
+        rule.setContent {
+            BasicTextField(
+                value = state.value,
+                onValueChange = { state.value = it },
+                modifier = Modifier.testTag("textField")
+            )
+        }
+        rule.awaitIdle()
+        rule.onNodeWithTag("textField").performMouseInput {
+            click(Offset(0f, 0f))
+        }
+        rule.awaitIdle()
+        rule.onNodeWithTag("textField").assertIsFocused()
+        Truth.assertThat(state.value.selection).isEqualTo(TextRange(0, 0))
+
+        rule.onNodeWithTag("textField").performKeyInput {
+            keyDown(Key.CtrlLeft)
+            keyDown(Key.Backspace)
+        }
+        rule.awaitIdle()
+    }
+
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @Test
+    fun `Ctrl + Backspace on an empty line with DesktopPlatform-Macos`() = runBlocking {
+        setPlatformDefaultKeyMapping(createPlatformDefaultKeyMapping(DesktopPlatform.MacOS))
+        val state = mutableStateOf(TextFieldValue(""))
+
+        rule.setContent {
+            BasicTextField(
+                value = state.value,
+                onValueChange = { state.value = it },
+                modifier = Modifier.testTag("textField")
+            )
+        }
+        rule.awaitIdle()
+        rule.onNodeWithTag("textField").performMouseInput {
+            click(Offset(0f, 0f))
+        }
+        rule.awaitIdle()
+        rule.onNodeWithTag("textField").assertIsFocused()
+        Truth.assertThat(state.value.selection).isEqualTo(TextRange(0, 0))
+
+        rule.onNodeWithTag("textField").performKeyInput {
+            keyDown(Key.AltLeft)
+            keyDown(Key.Backspace)
+        }
+        rule.awaitIdle()
+    }
 }
