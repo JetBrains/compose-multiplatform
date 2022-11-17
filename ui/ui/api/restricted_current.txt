@@ -2125,8 +2125,8 @@ package androidx.compose.ui.layout {
     method public float getScaleX();
     method public float getScaleY();
     method @androidx.compose.runtime.Stable public operator long times(float operand);
-    property public final float scaleX;
-    property public final float scaleY;
+    property @androidx.compose.runtime.Stable public final float scaleX;
+    property @androidx.compose.runtime.Stable public final float scaleY;
     field public static final androidx.compose.ui.layout.ScaleFactor.Companion Companion;
   }
 

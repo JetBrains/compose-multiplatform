@@ -345,11 +345,11 @@ package androidx.compose.ui.graphics {
     method public float getGreen();
     method public float getRed();
     method public long getValue();
-    property public final float alpha;
-    property public final float blue;
-    property public final androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace;
-    property public final float green;
-    property public final float red;
+    property @androidx.compose.runtime.Stable public final float alpha;
+    property @androidx.compose.runtime.Stable public final float blue;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace;
+    property @androidx.compose.runtime.Stable public final float green;
+    property @androidx.compose.runtime.Stable public final float red;
     property public final long value;
     field public static final androidx.compose.ui.graphics.Color.Companion Companion;
   }
@@ -932,7 +932,7 @@ package androidx.compose.ui.graphics.colorspace {
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class ColorModel {
     method public int getComponentCount();
-    property public final int componentCount;
+    property @androidx.compose.runtime.Stable public final int componentCount;
     field public static final androidx.compose.ui.graphics.colorspace.ColorModel.Companion Companion;
   }
 

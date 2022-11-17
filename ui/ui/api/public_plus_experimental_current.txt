@@ -473,8 +473,8 @@ package androidx.compose.ui.focus {
     property public abstract boolean canFocus;
     property public default androidx.compose.ui.focus.FocusRequester down;
     property public default androidx.compose.ui.focus.FocusRequester end;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> enter;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> exit;
+    property @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> enter;
+    property @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.ExperimentalComposeUiApi public default kotlin.jvm.functions.Function1<androidx.compose.ui.focus.FocusDirection,androidx.compose.ui.focus.FocusRequester> exit;
     property public default androidx.compose.ui.focus.FocusRequester left;
     property public default androidx.compose.ui.focus.FocusRequester next;
     property public default androidx.compose.ui.focus.FocusRequester previous;
@@ -1817,12 +1817,12 @@ package androidx.compose.ui.input.pointer {
     method public long getUptimeMillis();
     method public boolean isConsumed();
     property @Deprecated public final androidx.compose.ui.input.pointer.ConsumedData consumed;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public final java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical;
+    property @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.ExperimentalComposeUiApi public final java.util.List<androidx.compose.ui.input.pointer.HistoricalChange> historical;
     property public final long id;
     property public final boolean isConsumed;
     property public final long position;
     property public final boolean pressed;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public final float pressure;
+    property @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.ExperimentalComposeUiApi public final float pressure;
     property public final long previousPosition;
     property public final boolean previousPressed;
     property public final long previousUptimeMillis;
@@ -1842,7 +1842,7 @@ package androidx.compose.ui.input.pointer {
     method public abstract void onCancel();
     method public abstract void onPointerEvent(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
     property public boolean interceptOutOfBoundsChildEvents;
-    property @androidx.compose.ui.ExperimentalComposeUiApi public boolean shareWithSiblings;
+    property @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.ExperimentalComposeUiApi public boolean shareWithSiblings;
     property public final long size;
   }
 
@@ -2277,7 +2277,7 @@ package androidx.compose.ui.layout {
     method public final void placeRelativeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
     method public final void placeWithLayer(androidx.compose.ui.layout.Placeable, int x, int y, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
     method public final void placeWithLayer(androidx.compose.ui.layout.Placeable, long position, optional float zIndex, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.GraphicsLayerScope,kotlin.Unit> layerBlock);
-    property @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.layout.LayoutCoordinates? coordinates;
+    property @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.layout.LayoutCoordinates? coordinates;
     property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
     property protected abstract int parentWidth;
   }
@@ -2319,8 +2319,8 @@ package androidx.compose.ui.layout {
     method public float getScaleX();
     method public float getScaleY();
     method @androidx.compose.runtime.Stable public operator long times(float operand);
-    property public final float scaleX;
-    property public final float scaleY;
+    property @androidx.compose.runtime.Stable public final float scaleX;
+    property @androidx.compose.runtime.Stable public final float scaleY;
     field public static final androidx.compose.ui.layout.ScaleFactor.Companion Companion;
   }
 
@@ -2829,7 +2829,7 @@ package androidx.compose.ui.platform {
   @androidx.compose.ui.ExperimentalComposeUiApi public final class LocalSoftwareKeyboardController {
     method @androidx.compose.runtime.Composable public androidx.compose.ui.platform.SoftwareKeyboardController? getCurrent();
     method public infix androidx.compose.runtime.ProvidedValue<androidx.compose.ui.platform.SoftwareKeyboardController> provides(androidx.compose.ui.platform.SoftwareKeyboardController softwareKeyboardController);
-    property @androidx.compose.runtime.Composable public final androidx.compose.ui.platform.SoftwareKeyboardController? current;
+    property @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi public final androidx.compose.ui.platform.SoftwareKeyboardController? current;
     field public static final androidx.compose.ui.platform.LocalSoftwareKeyboardController INSTANCE;
   }
 

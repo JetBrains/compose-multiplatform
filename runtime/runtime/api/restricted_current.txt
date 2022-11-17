@@ -152,7 +152,6 @@ package androidx.compose.runtime {
     method @androidx.compose.runtime.ComposeCompilerApi public void updateRememberedValue(Object? value);
     method @androidx.compose.runtime.ComposeCompilerApi public void useNode();
     property public abstract androidx.compose.runtime.Applier<?> applier;
-    property @org.jetbrains.annotations.TestOnly public abstract kotlin.coroutines.CoroutineContext applyCoroutineContext;
     property @org.jetbrains.annotations.TestOnly public abstract androidx.compose.runtime.ControlledComposition composition;
     property public abstract androidx.compose.runtime.tooling.CompositionData compositionData;
     property public abstract int compoundKeyHash;
