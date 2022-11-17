@@ -412,8 +412,14 @@ class Recomposer(
     private fun recordComposerModificationsLocked() {
         val changes = snapshotInvalidations
         if (changes.isNotEmpty()) {
-            knownCompositions.fastForEach { composition ->
-                composition.recordModificationsOf(changes)
+            run {
+                knownCompositions.fastForEach { composition ->
+                    composition.recordModificationsOf(changes)
+
+                    // Avoid using knownCompositions if recording modification detected a
+                    // shutdown of the recomposer.
+                    if (_state.value <= State.ShuttingDown) return@run
+                }
             }
             snapshotInvalidations = mutableSetOf()
             if (deriveStateLocked() != null) {

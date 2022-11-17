@@ -37,6 +37,8 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.StandardTestDispatcher
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecomposerTests {
@@ -308,6 +310,70 @@ class RecomposerTests {
     @Test
     fun constructRecomposerWithCancelledJob() {
         Recomposer(Job().apply { cancel() })
+    }
+
+    @Test // regression test for b/243862703
+    fun cancelWithPendingInvalidations() {
+        val dispatcher = StandardTestDispatcher()
+        runTest(dispatcher) {
+            val testClock = TestMonotonicFrameClock(this)
+            withContext(testClock) {
+
+                val recomposer = Recomposer(coroutineContext)
+                var launched = false
+                val runner = launch {
+                    launched = true
+                    recomposer.runRecomposeAndApplyChanges()
+                }
+                val compositionOne = Composition(UnitApplier(), recomposer)
+                val compositionTwo = Composition(UnitApplier(), recomposer)
+                var state by mutableStateOf(0)
+                var lastCompositionOneState = -1
+                var lastCompositionTwoState = -1
+                compositionOne.setContent {
+                    lastCompositionOneState = state
+                    LaunchedEffect(Unit) {
+                        delay(1_000)
+                    }
+                }
+                compositionTwo.setContent {
+                    lastCompositionTwoState = state
+                    LaunchedEffect(Unit) {
+                        delay(1_000)
+                    }
+                }
+
+                assertEquals(0, lastCompositionOneState, "initial composition")
+                assertEquals(0, lastCompositionTwoState, "initial composition")
+
+                dispatcher.scheduler.runCurrent()
+
+                assertNotNull(
+                    withTimeoutOrNull(3_000) { recomposer.awaitIdle() },
+                    "timed out waiting for recomposer idle for recomposition"
+                )
+
+                dispatcher.scheduler.runCurrent()
+
+                assertTrue(launched, "Recomposer was never started")
+
+                Snapshot.withMutableSnapshot {
+                    state = 1
+                }
+
+                recomposer.cancel()
+
+                assertNotNull(
+                    withTimeoutOrNull(3_000) { recomposer.awaitIdle() },
+                    "timed out waiting for recomposer idle for recomposition"
+                )
+
+                assertNotNull(
+                    withTimeoutOrNull(3_000) { runner.join() },
+                    "timed out waiting for recomposer runner job"
+                )
+            }
+        }
     }
 }
 
