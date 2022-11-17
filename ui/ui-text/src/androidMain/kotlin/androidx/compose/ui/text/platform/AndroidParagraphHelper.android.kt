@@ -17,6 +17,7 @@
 package androidx.compose.ui.text.platform
 
 import android.graphics.Typeface
+import android.text.Spannable
 import android.text.SpannableString
 import android.text.TextPaint
 import android.text.style.CharacterStyle
@@ -41,6 +42,7 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextIndent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.isUnspecified
+import androidx.emoji2.text.EmojiCompat
 
 @OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal fun createCharSequence(
@@ -51,16 +53,28 @@ internal fun createCharSequence(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
     density: Density,
     resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
+    useEmojiCompat: Boolean,
 ): CharSequence {
+
+    val currentText = if (useEmojiCompat && EmojiCompat.isConfigured()) {
+        EmojiCompat.get().process(text)!!
+    } else {
+        text
+    }
+
     if (spanStyles.isEmpty() &&
         placeholders.isEmpty() &&
         contextTextStyle.textIndent == TextIndent.None &&
         contextTextStyle.lineHeight.isUnspecified
     ) {
-        return text
+        return currentText
     }
 
-    val spannableString = SpannableString(text)
+    val spannableString = if (currentText is Spannable) {
+        currentText
+    } else {
+        SpannableString(currentText)
+    }
 
     // b/199939617
     // Due to a bug in the platform's native drawText stack, some CJK characters cause a bolder

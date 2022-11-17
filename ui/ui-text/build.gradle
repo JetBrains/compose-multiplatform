@@ -47,6 +47,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         implementation(libs.kotlinStdlib)
         implementation("androidx.core:core:1.7.0")
         implementation('androidx.collection:collection:1.0.0')
+        implementation("androidx.emoji2:emoji2:1.2.0")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -130,6 +131,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation("androidx.core:core:1.7.0")
+                implementation("androidx.emoji2:emoji2:1.2.0")
                 implementation('androidx.collection:collection:1.0.0')
             }
 
