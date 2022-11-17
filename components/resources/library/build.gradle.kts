@@ -5,19 +5,34 @@ plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
     id("maven-publish")
+    id("com.android.library")
 }
 
 kotlin {
     jvm("desktop")
+    ios()
+    iosSimulatorArm64()
 
     sourceSets {
-        named("commonMain") {
+        val commonMain by getting {
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
             }
         }
-        named("desktopMain") {}
+        val desktopMain by getting {}
+        val androidMain by getting {}
+        val androidTest by getting {
+            dependencies {
+                implementation("junit:junit:4.13.2")
+            }
+        }
+        val iosMain by getting
+        val iosTest by getting
+        val iosSimulatorArm64Main by getting
+        iosSimulatorArm64Main.dependsOn(iosMain)
+        val iosSimulatorArm64Test by getting
+        iosSimulatorArm64Test.dependsOn(iosTest)
     }
 }
 
