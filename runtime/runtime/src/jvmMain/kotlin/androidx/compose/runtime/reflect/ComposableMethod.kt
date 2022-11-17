@@ -155,7 +155,7 @@ class ComposableMethod internal constructor(
                 realParamsCount -> composer
                 // since this is the root we don't need to be anything unique. 0 should suffice.
                 // changed parameters should be 0 to indicate "uncertain"
-                changedStartIndex -> 1
+                changedStartIndex -> 0
                 in changedStartIndex + 1 until defaultStartIndex -> 0
                 // Default values mask, all parameters set to use defaults
                 in defaultStartIndex until totalParams -> defaultsMasks[idx - defaultStartIndex]
