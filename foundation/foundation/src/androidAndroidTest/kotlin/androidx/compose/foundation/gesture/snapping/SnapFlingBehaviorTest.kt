@@ -28,6 +28,7 @@ import androidx.compose.animation.core.generateDecayAnimationSpec
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.TestScrollMotionDurationScale
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.snapping.MinFlingVelocityDp
@@ -36,15 +37,36 @@ import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.findClosestOffset
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeWithVelocity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth
 import kotlin.test.assertEquals
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -171,6 +193,145 @@ class SnapFlingBehaviorTest {
             assertEquals(1, inspectSplineAnimationSpec?.animationWasExecutions)
             assertEquals(1, inspectSpringAnimationSpec.animationWasExecutions)
             assertEquals(0, inspectTweenAnimationSpec.animationWasExecutions)
+        }
+    }
+
+    @Test
+    fun disableSystemAnimations_defaultFlingBehaviorShouldContinueToWork() {
+
+        lateinit var defaultFlingBehavior: SnapFlingBehavior
+        lateinit var scope: CoroutineScope
+        val state = LazyListState()
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            defaultFlingBehavior = rememberSnapFlingBehavior(state) as SnapFlingBehavior
+
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                state = state,
+                flingBehavior = defaultFlingBehavior as FlingBehavior
+            ) {
+                items(200) { Box(modifier = Modifier.size(20.dp)) }
+            }
+        }
+
+        // Act: Stop clock and fling, one frame should not settle immediately.
+        rule.mainClock.autoAdvance = false
+        scope.launch {
+            state.scroll {
+                with(defaultFlingBehavior) { performFling(10000f) }
+            }
+        }
+        rule.mainClock.advanceTimeByFrame()
+
+        // Assert
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isEqualTo(0)
+        }
+
+        rule.mainClock.autoAdvance = true
+
+        val previousIndex = state.firstVisibleItemIndex
+
+        // Simulate turning off system wide animation
+        scope.launch {
+            state.scroll {
+                withContext(TestScrollMotionDurationScale(0f)) {
+                    with(defaultFlingBehavior) { performFling(10000f) }
+                }
+            }
+        }
+
+        // Act: Stop clock and fling, one frame should not settle immediately.
+        rule.mainClock.autoAdvance = false
+        scope.launch {
+            state.scroll {
+                with(defaultFlingBehavior) { performFling(10000f) }
+            }
+        }
+        rule.mainClock.advanceTimeByFrame()
+
+        // Assert
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isEqualTo(previousIndex)
+        }
+
+        rule.mainClock.autoAdvance = true
+
+        // Assert: let it settle
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isNotEqualTo(previousIndex)
+        }
+    }
+
+    @Test
+    fun defaultFlingBehavior_useScrollMotionDurationScale() {
+        // Arrange
+        var switchMotionDurationScale by mutableStateOf(false)
+        lateinit var defaultFlingBehavior: SnapFlingBehavior
+        lateinit var scope: CoroutineScope
+        val state = LazyListState()
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            defaultFlingBehavior = rememberSnapFlingBehavior(state) as SnapFlingBehavior
+
+            LazyRow(
+                modifier = Modifier
+                    .testTag("snappingList")
+                    .fillMaxSize(),
+                state = state,
+                flingBehavior = defaultFlingBehavior as FlingBehavior
+            ) {
+                items(200) {
+                    Box(modifier = Modifier.size(150.dp)) {
+                        BasicText(text = it.toString())
+                    }
+                }
+            }
+
+            if (switchMotionDurationScale) {
+                defaultFlingBehavior.motionScaleDuration = TestScrollMotionDurationScale(1f)
+            } else {
+                defaultFlingBehavior.motionScaleDuration = TestScrollMotionDurationScale(0f)
+            }
+        }
+
+        // Act: Stop clock and fling, one frame should settle immediately.
+        rule.mainClock.autoAdvance = false
+        rule.onNodeWithTag("snappingList").performTouchInput {
+            swipeWithVelocity(centerRight, center, 10000f)
+        }
+        rule.mainClock.advanceTimeByFrame()
+
+        // Assert
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isGreaterThan(0)
+        }
+
+        // Arrange
+        rule.mainClock.autoAdvance = true
+        switchMotionDurationScale = true // Let animations run normally
+        rule.waitForIdle()
+
+        val previousIndex = state.firstVisibleItemIndex
+        // Act: Stop clock and fling, one frame should not settle.
+        rule.mainClock.autoAdvance = false
+        scope.launch {
+            state.scroll {
+                with(defaultFlingBehavior) { performFling(10000f) }
+            }
+        }
+
+        // Assert: First index hasn't changed because animation hasn't started
+        rule.mainClock.advanceTimeByFrame()
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isEqualTo(previousIndex)
+        }
+        rule.mainClock.autoAdvance = true
+
+        // Wait for settling
+        rule.runOnIdle {
+            Truth.assertThat(state.firstVisibleItemIndex).isNotEqualTo(previousIndex)
         }
     }
 }

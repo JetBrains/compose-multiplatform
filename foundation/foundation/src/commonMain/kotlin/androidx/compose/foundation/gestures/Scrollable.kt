@@ -590,7 +590,7 @@ internal class DefaultFlingBehavior(
 
 private const val DefaultScrollMotionDurationScaleFactor = 1f
 
-private val DefaultScrollMotionDurationScale = object : MotionDurationScale {
+internal val DefaultScrollMotionDurationScale = object : MotionDurationScale {
     override val scaleFactor: Float
         get() = DefaultScrollMotionDurationScaleFactor
 }
