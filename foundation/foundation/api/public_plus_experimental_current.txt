@@ -902,6 +902,7 @@ package androidx.compose.foundation.lazy.staggeredgrid {
   @androidx.compose.foundation.ExperimentalFoundationApi public sealed interface LazyStaggeredGridLayoutInfo {
     method public int getAfterContentPadding();
     method public int getBeforeContentPadding();
+    method public androidx.compose.foundation.gestures.Orientation getOrientation();
     method public int getTotalItemsCount();
     method public int getViewportEndOffset();
     method public long getViewportSize();
@@ -909,6 +910,7 @@ package androidx.compose.foundation.lazy.staggeredgrid {
     method public java.util.List<androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemInfo> getVisibleItemsInfo();
     property public abstract int afterContentPadding;
     property public abstract int beforeContentPadding;
+    property public abstract androidx.compose.foundation.gestures.Orientation orientation;
     property public abstract int totalItemsCount;
     property public abstract int viewportEndOffset;
     property public abstract long viewportSize;

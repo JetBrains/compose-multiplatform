@@ -29,6 +29,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -72,6 +74,18 @@ open class BaseLazyStaggeredGridWithOrientation(
             content
         )
     }
+
+    internal fun axisSize(crossAxis: Int, mainAxis: Int): IntSize =
+        IntSize(
+            if (orientation == Orientation.Vertical) crossAxis else mainAxis,
+            if (orientation == Orientation.Vertical) mainAxis else crossAxis,
+        )
+
+    internal fun axisOffset(crossAxis: Int, mainAxis: Int): IntOffset =
+        IntOffset(
+            if (orientation == Orientation.Vertical) crossAxis else mainAxis,
+            if (orientation == Orientation.Vertical) mainAxis else crossAxis,
+        )
 
     @Composable
     internal fun LazyStaggeredGrid(

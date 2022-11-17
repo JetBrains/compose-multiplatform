@@ -93,6 +93,8 @@ class LazyStaggeredGridTest(
                 "Visible items MUST BE sorted: ${state.layoutInfo.visibleItemsInfo}",
                 isSorted
             )
+
+            assertThat(state.layoutInfo.orientation == orientation)
         }
     }
 
@@ -281,6 +283,53 @@ class LazyStaggeredGridTest(
             .assertCrossAxisStartPositionInRootIsEqualTo(itemSizeDp * 2)
 
         // [item x 4, item x 7, item x 9]
+    }
+
+    @Test
+    fun itemSizeInLayoutInfo() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                lanes = 3,
+                state = state,
+                modifier = Modifier.axisSize(itemSizeDp * 3, itemSizeDp),
+            ) {
+                items(6) {
+                    Spacer(
+                        Modifier
+                            .axisSize(
+                                crossAxis = itemSizeDp,
+                                mainAxis = itemSizeDp * (it + 1)
+                            )
+                            .testTag("$it")
+                            .debugBorder()
+                    )
+                }
+            }
+        }
+
+        state.scrollBy(itemSizeDp * 3)
+
+        val items = state.layoutInfo.visibleItemsInfo
+
+        assertThat(items.size).isEqualTo(3)
+        with(items[0]) {
+            assertThat(index).isEqualTo(3)
+            assertThat(size).isEqualTo(axisSize(itemSizePx, itemSizePx * 4))
+            assertThat(offset).isEqualTo(axisOffset(0, -itemSizePx * 2))
+        }
+
+        with(items[1]) {
+            assertThat(index).isEqualTo(4)
+            assertThat(size).isEqualTo(axisSize(itemSizePx, itemSizePx * 5))
+            assertThat(offset).isEqualTo(axisOffset(itemSizePx, -itemSizePx))
+        }
+
+        with(items[2]) {
+            assertThat(index).isEqualTo(5)
+            assertThat(size).isEqualTo(axisSize(itemSizePx, itemSizePx * 6))
+            assertThat(offset).isEqualTo(axisOffset(itemSizePx * 2, 0))
+        }
     }
 
     @Test
