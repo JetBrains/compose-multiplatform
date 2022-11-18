@@ -67,6 +67,7 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.test.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -111,7 +112,7 @@ class SnapFlingBehaviorTest {
     }
 
     @Test
-    fun performFling_afterSnappingVelocity_shouldReturnNoVelocity() {
+    fun performFling_afterSnappingVelocity_everythingWasConsumed_shouldReturnNoVelocity() {
         val testLayoutInfoProvider = TestLayoutInfoProvider()
         var afterFlingVelocity = 0f
         rule.setContent {
@@ -129,6 +130,29 @@ class SnapFlingBehaviorTest {
 
         rule.runOnIdle {
             assertEquals(NoVelocity, afterFlingVelocity)
+        }
+    }
+
+    @Test
+    fun performFling_afterSnappingVelocity_didNotConsumeAllScroll_shouldReturnRemainingVelocity() {
+        val testLayoutInfoProvider = TestLayoutInfoProvider()
+        var afterFlingVelocity = 0f
+        rule.setContent {
+            // Consume only half
+            val scrollableState = rememberScrollableState(consumeScrollDelta = { it / 2f })
+            val testFlingBehavior = rememberSnapFlingBehavior(testLayoutInfoProvider)
+
+            LaunchedEffect(Unit) {
+                scrollableState.scroll {
+                    afterFlingVelocity = with(testFlingBehavior) {
+                        performFling(50000f)
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertNotEquals(NoVelocity, afterFlingVelocity)
         }
     }
 
