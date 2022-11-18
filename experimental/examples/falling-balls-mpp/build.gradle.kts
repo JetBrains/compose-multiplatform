@@ -4,6 +4,7 @@ buildscript {
         jcenter()
         google()
         mavenCentral()
+        mavenLocal()
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.7.20")
@@ -17,6 +18,7 @@ allprojects {
         google()
         jcenter()
         mavenCentral()
+        mavenLocal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 }
