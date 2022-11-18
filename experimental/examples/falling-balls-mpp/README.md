@@ -1,14 +1,34 @@
-## Run native on MacOS
-  `./gradlew runDebugExecutableMacosX64` (Works on Intel processors)
+# Falling Balls game
 
-## Run web assembly in browser
-  `./gradlew jsBrowserDevelopmentRun`
+Game can run on Android, iOS, desktop or in a browser.
 
-## Run on iOS simulator
-  `./gradlew iosDeployIPhone8Debug`
-  `./gradlew iosDeployIPadDebug`
+*Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed either 
+                 in Android Studio or in Intellij IDEA Ultimate or in AppCode with configured cocoapods.
+
+
+## How to run 
+
+Choose a run configuration for an appropriate target in IDE and run it.
+
+![run-configurations.png](run-configurations.png)
+
+To run on iOS device, please correct `iosApp/Configuration/TeamId.xcconfig` with your Apple Team ID. 
+Alternatively, you may setup signing within XCode opening `iosApp/FallingBalls.xcworkspace` and then 
+using "Signing & Capabilities" tab of `FallingBalls` target. See also how to prepare XCode section below.
+
+Then choose **iosApp** configuration in IDE and run it 
+(may also be referred as `FallingBalls` in the Run Configurations or `iosApp_` for Android studio).
+
+## Run on desktop via Gradle
+
+`./gradlew desktopApp:run`
+
+## Run web assembly in browser via Gradle
+
+`./gradlew jsApp:jsBrowserDevelopmentRun`
 
 ## Prepare Xcode to launch on iOS device
+
 1) **Add your Apple ID.**  
 Xcode -> Preferences... -> Accounts  
 ![apple-id.png](apple-id.png)  
@@ -28,7 +48,6 @@ Xcode prompts you to install the certificate. Require password from login.keycha
 After a successful launch on the device - you can delete this temporary project.  
 Certificates will remain in login.keychain  
 
-## Run on iOS device
- - Set teamId in build.gradle.kts, or set in local.properties (compose.ios.teamId=***)    
- - `./gradlew iosDeployDeviceRelease`  
- - During the build, you will be prompted to access login.keychain  
+## Run native on MacOS
+Choose **shared[macosX64]** or **shared[macosArm64]** configuration in IDE and run it.
+
