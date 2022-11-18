@@ -157,11 +157,8 @@ package androidx.compose.foundation {
     method public suspend Object? consumePreFling(long velocity, kotlin.coroutines.Continuation<? super androidx.compose.ui.unit.Velocity>);
     method public long consumePreScroll(long scrollDelta, int source);
     method public androidx.compose.ui.Modifier getEffectModifier();
-    method public boolean isEnabled();
     method public boolean isInProgress();
-    method public void setEnabled(boolean);
     property public abstract androidx.compose.ui.Modifier effectModifier;
-    property public abstract boolean isEnabled;
     property public abstract boolean isInProgress;
   }
 

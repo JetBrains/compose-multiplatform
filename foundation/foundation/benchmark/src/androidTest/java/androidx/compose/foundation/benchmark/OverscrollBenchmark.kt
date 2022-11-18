@@ -23,6 +23,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.benchmark.lazy.MotionEventHelper
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -32,6 +33,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.overscroll
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
@@ -123,11 +125,19 @@ private class OverscrollTestCase : LayeredComposeTestCase(), ToggleableTestCase 
         view = LocalView.current
         if (!::motionEventHelper.isInitialized) motionEventHelper = MotionEventHelper(view)
         val scrollState = rememberScrollState()
-        val overscrollEffect = ScrollableDefaults.overscrollEffect().apply { isEnabled = true }
+        val wrappedScrollState = remember(scrollState) {
+            object : ScrollableState by scrollState {
+                override val canScrollForward: Boolean
+                    get() = true
+                override val canScrollBackward: Boolean
+                    get() = true
+            }
+        }
+        val overscrollEffect = ScrollableDefaults.overscrollEffect()
         Box(
             Modifier
                 .scrollable(
-                    scrollState,
+                    wrappedScrollState,
                     orientation = Orientation.Vertical,
                     reverseDirection = true,
                     overscrollEffect = overscrollEffect

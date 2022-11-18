@@ -72,8 +72,7 @@ internal fun LazyStaggeredGrid(
         orientation,
         verticalArrangement,
         horizontalArrangement,
-        slotSizesSums,
-        overscrollEffect
+        slotSizesSums
     )
     val semanticState = rememberLazyStaggeredGridSemanticState(state, itemProvider, reverseLayout)
 

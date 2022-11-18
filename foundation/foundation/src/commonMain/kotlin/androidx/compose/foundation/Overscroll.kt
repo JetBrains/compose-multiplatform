@@ -96,12 +96,6 @@ interface OverscrollEffect {
     suspend fun consumePostFling(velocity: Velocity)
 
     /**
-     * Whether the overscroll effect is enabled or not. If it is not enabled, [scrollable] won't
-     * send the events to this effect.
-     */
-    var isEnabled: Boolean
-
-    /**
      * Whether over scroll within this controller is currently on progress or not, e.g. if the
      * overscroll effect is playing animation or shown/interactable in any other way.
      *

@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -46,8 +45,7 @@ internal fun rememberStaggeredGridMeasurePolicy(
     orientation: Orientation,
     verticalArrangement: Arrangement.Vertical,
     horizontalArrangement: Arrangement.Horizontal,
-    slotSizesSums: Density.(Constraints) -> IntArray,
-    overscrollEffect: OverscrollEffect
+    slotSizesSums: Density.(Constraints) -> IntArray
 ): LazyLayoutMeasureScope.(Constraints) -> LazyStaggeredGridMeasureResult = remember(
     state,
     itemProvider,
@@ -56,8 +54,7 @@ internal fun rememberStaggeredGridMeasurePolicy(
     orientation,
     verticalArrangement,
     horizontalArrangement,
-    slotSizesSums,
-    overscrollEffect,
+    slotSizesSums
 ) {
     { constraints ->
         checkScrollableContainerConstraints(
@@ -125,7 +122,6 @@ internal fun rememberStaggeredGridMeasurePolicy(
             afterContentPadding = afterContentPadding,
         ).also {
             state.applyMeasureResult(it)
-            overscrollEffect.isEnabled = it.canScrollForward || it.canScrollBackward
         }
     }
 }

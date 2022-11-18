@@ -2565,8 +2565,6 @@ private val NoOpOverscrollEffect = object : OverscrollEffect {
 
     override suspend fun consumePostFling(velocity: Velocity) {}
 
-    override var isEnabled: Boolean = false
-
     override val isInProgress: Boolean
         get() = false
 
