@@ -3,7 +3,7 @@
 Game can run on Android, iOS, desktop or in a browser.
 
 *Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed either 
-                 in Android Studio or in Intellij IDEA Ultimate or in AppCode with configured cocoapods.
+                 in Android Studio or in AppCode with [installed CocoaPods](https://kotlinlang.org/docs/native-cocoapods.html).
 
 
 ## How to run 
