@@ -9,6 +9,10 @@ internal object ComposeCompilerCompatability {
             "1.3.2",
             unsupportedPlatforms = setOf(KotlinPlatformType.js)
         )
+        "1.8.255-SNAPSHOT" -> ComposeCompilerVersion(
+            "1.3.2",
+            //unsupportedPlatforms = setOf(KotlinPlatformType.js)
+        )
         else -> null
     }
 }

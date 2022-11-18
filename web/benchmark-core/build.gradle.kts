@@ -1,6 +1,6 @@
 plugins {
     id("org.jetbrains.kotlin.multiplatform")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
 }
 
 
@@ -20,7 +20,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                //implementation(compose.runtime)
+                implementation("org.jetbrains.compose.runtime:runtime-js:1.3.0-rc01")
                 implementation(project(":web-core"))
                 implementation(kotlin("stdlib-common"))
             }
@@ -28,6 +29,9 @@ kotlin {
 
         val jsMain by getting {
             dependencies {
+                implementation("org.jetbrains.compose.web:web-core-js:1.2.0-SNAPSHOT")
+                implementation("org.jetbrains.compose.web:internal-web-core-runtime-js:1.2.0-SNAPSHOT")
+                implementation("org.jetbrains.compose.runtime:runtime-js:1.3.0-rc01")
                 implementation(kotlin("stdlib-js"))
             }
         }
@@ -71,3 +75,10 @@ val printBenchmarkResults by tasks.registering {
 }
 
 tasks.named("jsTest") { finalizedBy(printBenchmarkResults) }
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xklib-enable-signature-clash-checks=false",
+        "-Xplugin=${project.properties["compose.plugin.path"]}"
+    )
+}

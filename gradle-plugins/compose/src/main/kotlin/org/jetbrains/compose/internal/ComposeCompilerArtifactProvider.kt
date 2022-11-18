@@ -19,12 +19,12 @@ internal class ComposeCompilerArtifactProvider(
     private val customPluginString: () -> String?
 ) {
     fun checkTargetSupported(target: KotlinTarget) {
-        require(!unsupportedPlatforms.contains(target.platformType)) {
-            "This version of Compose Multiplatform doesn't support Kotlin " +
-                "$kotlinVersion for ${target.platformType} target. " +
-                "Please see $KOTLIN_COMPATABILITY_LINK " +
-                "to know the latest supported version of Kotlin."
-        }
+//        require(!unsupportedPlatforms.contains(target.platformType)) {
+//            "This version of Compose Multiplatform doesn't support Kotlin " +
+//                "$kotlinVersion for ${target.platformType} target. " +
+//                "Please see $KOTLIN_COMPATABILITY_LINK " +
+//                "to know the latest supported version of Kotlin."
+//        }
     }
 
     private val autoCompilerVersion by lazy {

@@ -8,6 +8,7 @@ package org.jetbrains.compose.web.core.tests.css
 import org.jetbrains.compose.web.testutils.*
 import org.jetbrains.compose.web.css.*
 import org.jetbrains.compose.web.dom.Div
+import org.w3c.dom.css.*
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

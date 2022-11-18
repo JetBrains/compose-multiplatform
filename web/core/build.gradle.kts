@@ -2,12 +2,14 @@ import org.jetbrains.compose.gradle.standardConf
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    ////id("org.jetbrains.compose")
 }
 
 
 kotlin {
-    jvm()
+//    jvm {
+//
+//    }
     js(IR) {
         browser() {
             testTask {
@@ -18,11 +20,39 @@ kotlin {
         }
         binaries.executable()
     }
+    wasm {
+        browser() {
+            testTask {
+                useKarma {
+                    standardConf()
+                }
+            }
+        }
+    }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                implementation("org.jetbrains.compose.runtime:runtime:1.3.0-rc01")
+                //implementation(compose.runtime)
+            }
+        }
+
+        val commonTest by getting {
+            dependencies {
+                implementation(project(":test-utils"))
+                implementation(kotlin("test"))
+            }
+        }
+
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+            }
+            dependencies {
+                implementation(project(":internal-web-core-runtime"))
+                // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-reflect
             }
         }
 
@@ -30,9 +60,14 @@ kotlin {
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
             }
-            dependencies {
-                implementation(project(":internal-web-core-runtime"))
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmMain by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
             }
+            dependsOn(jsWasmMain)
         }
 
         val jsTest by getting {
@@ -40,16 +75,19 @@ kotlin {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
-            dependencies {
-                implementation(project(":test-utils"))
-                implementation(kotlin("test-js"))
-            }
         }
 
-        val jvmMain by getting {
-            dependencies {
-                implementation(compose.desktop.currentOs)
-            }
-        }
+//        val jvmMain by getting {
+//            dependencies {
+//                implementation("org.jetbrains.compose.desktop:desktop-jvm-macos-arm64")
+//            }
+//        }
     }
+}
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xklib-enable-signature-clash-checks=false",
+        "-Xplugin=${project.properties["compose.plugin.path"]}"
+    )
 }

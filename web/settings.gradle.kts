@@ -21,6 +21,7 @@ pluginManagement {
     val repos = (localProperties?.getProperty("compose.web.repos"))?.split(File.pathSeparator)
 
     repositories {
+        mavenLocal()
         gradlePluginPortal()
         mavenCentral()
         repos?.forEach { urlPath ->
@@ -42,7 +43,8 @@ pluginManagement {
     resolutionStrategy {
         eachPlugin {
             if (requested.id.id == "org.jetbrains.compose") {
-                useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:$COMPOSE_CORE_VERSION")
+                //useModule("org.jetbrains.compose:org.jetbrains.compose.gradle.plugin:$COMPOSE_CORE_VERSION")
+                useModule("org.jetbrains.compose:compose-gradle-plugin:0.1.0-SNAPSHOT")
             }
         }
     }
@@ -59,7 +61,7 @@ fun module(name: String, path: String) {
 
 
 module(":web-core", "core")
-module(":web-svg", "svg")
+//module(":web-svg", "svg")
 module(":web-integration-core", "integration-core")
 module(":compose-compiler-integration", "compose-compiler-integration")
 module(":internal-web-core-runtime", "internal-web-core-runtime")

@@ -2,7 +2,7 @@ import org.jetbrains.compose.gradle.standardConf
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
 }
 
 
@@ -22,7 +22,8 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(kotlin("stdlib-js"))
-                implementation(compose.runtime)
+                //implementation(compose.runtime)
+                implementation("org.jetbrains.compose.runtime:runtime-js:1.3.0-rc01")
                 implementation(project(":web-core"))
             }
         }
