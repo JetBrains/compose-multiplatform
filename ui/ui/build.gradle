@@ -276,14 +276,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     }
 }
 
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-            "-Xjvm-default=all"
-        ]
-    }
-}
-
 android {
     testOptions.unitTests.includeAndroidResources = true
     buildTypes.all {

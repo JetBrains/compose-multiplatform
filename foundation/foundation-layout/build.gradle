@@ -139,11 +139,3 @@ androidx {
 android {
     namespace "androidx.compose.foundation.layout"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all"
-        ]
-    }
-}

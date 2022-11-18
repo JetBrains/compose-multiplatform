@@ -53,11 +53,3 @@ androidx {
 android {
     namespace "androidx.compose.runtime.rxjava3"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

@@ -46,11 +46,3 @@ androidx {
 android {
     namespace "androidx.compose.material3.catalog.library"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

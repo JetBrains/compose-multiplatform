@@ -113,11 +113,3 @@ androidx {
 android {
     namespace "androidx.compose.material3.windowsizeclass"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

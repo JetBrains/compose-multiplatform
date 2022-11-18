@@ -166,11 +166,3 @@ androidx {
     description = "Compose testing library"
     legacyDisableKotlinStrictApiMode = true
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

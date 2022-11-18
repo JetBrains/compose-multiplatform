@@ -39,11 +39,3 @@ androidx {
 android {
     namespace "androidx.compose.ui.test.manifest"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

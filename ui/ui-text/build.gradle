@@ -193,11 +193,3 @@ androidx {
 android {
     namespace "androidx.compose.ui.text"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

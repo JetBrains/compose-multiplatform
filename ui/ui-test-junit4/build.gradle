@@ -157,11 +157,3 @@ androidx {
     description = "Compose testing integration with JUnit4"
     legacyDisableKotlinStrictApiMode = true
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

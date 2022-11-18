@@ -130,11 +130,3 @@ androidx {
 android {
     namespace "androidx.compose.runtime.saveable"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

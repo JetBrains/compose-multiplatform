@@ -54,11 +54,3 @@ androidx {
 android {
     namespace "androidx.compose.runtime.livedata"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}

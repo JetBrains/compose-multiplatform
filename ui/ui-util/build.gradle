@@ -96,11 +96,3 @@ androidxCompose {
 android {
     namespace "androidx.compose.ui.util"
 }
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
-}
