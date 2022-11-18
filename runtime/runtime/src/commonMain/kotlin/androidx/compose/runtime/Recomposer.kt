@@ -17,16 +17,22 @@
 package androidx.compose.runtime
 
 import androidx.compose.runtime.collection.IdentityArraySet
+import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
 import androidx.compose.runtime.snapshots.MutableSnapshot
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotApplyResult
+import androidx.compose.runtime.snapshots.fastAny
 import androidx.compose.runtime.snapshots.fastForEach
+import androidx.compose.runtime.snapshots.fastGroupBy
 import androidx.compose.runtime.snapshots.fastMap
 import androidx.compose.runtime.snapshots.fastMapNotNull
 import androidx.compose.runtime.tooling.CompositionData
-import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentSetOf
-import androidx.compose.runtime.snapshots.fastAny
-import androidx.compose.runtime.snapshots.fastGroupBy
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.coroutineContext
+import kotlin.coroutines.resume
+import kotlin.native.concurrent.ThreadLocal
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -44,12 +50,6 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.coroutineContext
-import kotlin.coroutines.resume
-import kotlin.native.concurrent.ThreadLocal
 
 // TODO: Can we use rootKey for this since all compositions will have an eventual Recomposer parent?
 private const val RecomposerCompoundHashKey = 1000
@@ -633,6 +633,13 @@ class Recomposer(
                     synchronized(stateLock) {
                         deriveStateLocked()
                     }
+
+                    // Ensure any state objects that were written during apply changes, e.g. nodes
+                    // with state-backed properties, get sent apply notifications to invalidate
+                    // anything observing the nodes. Call this method instead of
+                    // sendApplyNotifications to ensure that objects that were _created_ in this
+                    // snapshot are also considered changed after this point.
+                    Snapshot.notifyObjectsInitialized()
                 }
             }
 
