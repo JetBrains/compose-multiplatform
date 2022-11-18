@@ -28,7 +28,6 @@ import androidx.build.getBuildId
 import androidx.build.getDistributionDirectory
 import androidx.build.getKeystore
 import androidx.build.getLibraryByName
-import androidx.build.getLibraryMetricsDirectory
 import com.android.build.api.attributes.BuildTypeAttr
 import com.android.build.gradle.LibraryExtension
 import com.android.build.gradle.LibraryPlugin
@@ -438,8 +437,8 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
             task.destinationFile.set(getMetadataRegularFile(project))
         }
 
-        val metricsDirectory = File(project.rootProject.getLibraryMetricsDirectory(), "build")
-        val metricsFile = File(metricsDirectory, "${project.name}.txt")
+        val metricsDirectory = project.buildDir
+        val metricsFile = File(metricsDirectory, "build-metrics.json")
         val projectName = project.name
 
         val dackkaTask = project.tasks.register("docs", DackkaTask::class.java) { task ->
