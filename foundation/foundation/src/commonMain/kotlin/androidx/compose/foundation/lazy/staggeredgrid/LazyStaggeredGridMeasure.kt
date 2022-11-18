@@ -177,13 +177,14 @@ private fun LazyStaggeredGridMeasureContext.measure(
                 measureResult = layout(constraints.minWidth, constraints.minHeight) {},
                 canScrollForward = false,
                 canScrollBackward = false,
+                isVertical = isVertical,
                 visibleItemsInfo = emptyList(),
                 totalItemsCount = itemCount,
                 viewportSize = IntSize(constraints.minWidth, constraints.minHeight),
                 viewportStartOffset = -beforeContentPadding,
                 viewportEndOffset = mainAxisAvailableSize + afterContentPadding,
                 beforeContentPadding = beforeContentPadding,
-                afterContentPadding = afterContentPadding
+                afterContentPadding = afterContentPadding,
             )
         }
 
@@ -560,6 +561,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
             },
             canScrollForward = canScrollForward,
             canScrollBackward = canScrollBackward,
+            isVertical = isVertical,
             visibleItemsInfo = positionedItems.asMutableList(),
             totalItemsCount = itemCount,
             viewportSize = IntSize(layoutWidth, layoutHeight),
@@ -713,7 +715,11 @@ private class LazyStaggeredGridMeasuredItem(
             lane = lane,
             index = index,
             key = key,
-            size = IntSize(sizeWithSpacings, crossAxisSize),
+            size = if (isVertical) {
+                IntSize(crossAxisSize, sizeWithSpacings)
+            } else {
+                IntSize(sizeWithSpacings, crossAxisSize)
+            },
             placeables = placeables,
             contentOffset = contentOffset,
             isVertical = isVertical

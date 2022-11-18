@@ -23,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.util.fastFirstOrNull
 
 @ExperimentalFoundationApi
 internal class LazyStaggeredGridScrollPosition(
@@ -42,7 +43,13 @@ internal class LazyStaggeredGridScrollPosition(
      * Updates the current scroll position based on the results of the last measurement.
      */
     fun updateFromMeasureResult(measureResult: LazyStaggeredGridMeasureResult) {
-        lastKnownFirstItemKey = measureResult.visibleItemsInfo.firstOrNull()?.key
+        val firstVisibleIndex = measureResult.firstVisibleItemIndices
+            .minBy { if (it == -1) Int.MAX_VALUE else it }
+            .let { if (it == Int.MAX_VALUE) 0 else it }
+
+        lastKnownFirstItemKey = measureResult.visibleItemsInfo
+            .fastFirstOrNull { it.index == firstVisibleIndex }
+            ?.key
         // we ignore the index and offset from measureResult until we get at least one
         // measurement with real items. otherwise the initial index and scroll passed to the
         // state would be lost and overridden with zeros.
