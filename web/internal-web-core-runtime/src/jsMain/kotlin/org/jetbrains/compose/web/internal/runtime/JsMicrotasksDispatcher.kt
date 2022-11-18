@@ -6,7 +6,7 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.js.Promise
 
 @ComposeWebInternalApi
-class JsMicrotasksDispatcher : CoroutineDispatcher() {
+actual class JsMicrotasksDispatcher : CoroutineDispatcher() {
     override fun dispatch(context: CoroutineContext, block: Runnable) {
         Promise.resolve(Unit).then { block.run() }
     }

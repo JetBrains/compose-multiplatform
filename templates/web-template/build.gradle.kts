@@ -1,24 +1,36 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension
 
+buildscript {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
 
 repositories {
+    mavenLocal()
     mavenCentral()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     google()
 }
 
 kotlin {
-    js(IR) {
+//    js(IR) {
+//        browser()
+//        binaries.executable()
+//    }
+    wasm {
         browser()
         binaries.executable()
     }
     sourceSets {
-        val jsMain by getting {
+        val wasmMain by getting {
             kotlin.srcDir("src/main/kotlin")
             resources.srcDir("src/main/resources")
 

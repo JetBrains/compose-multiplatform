@@ -2,26 +2,42 @@ import org.jetbrains.compose.gradle.standardConf
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
 }
-
 
 kotlin {
     js(IR) {
         browser() {
-            testTask {
-                useKarma {
-                    standardConf()
-                }
-            }
+//            testTask {
+//                useKarma {
+//                    standardConf()
+//                }
+//            }
+        }
+    }
+    wasm {
+        browser() {
+
         }
     }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                //implementation(comp core.runtime)
+                implementation("org.jetbrains.compose.runtime:runtime:1.3.0-rc01-SNAPSHOT")
+                //implementation("org.jetbrains.compose.web:web-core:1.2.0-SNAPSHOT")
             }
+        }
+
+        val jsWasmMain by creating { }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
         }
 
         val jsTest by getting {
@@ -29,5 +45,24 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
+        val wasmTest by getting {
+            dependencies {
+                implementation(kotlin("test-wasm"))
+            }
+        }
+    }
+}
+
+project.tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile>().configureEach {
+    kotlinOptions.freeCompilerArgs += listOf(
+        "-Xklib-enable-signature-clash-checks=false",
+        "-Xplugin=${project.properties["compose.plugin.path"]}"
+    )
+}
+
+project.afterEvaluate {
+    //Disable jsWasmMain intermediate sourceset publication
+    tasks.named("compileJsWasmMainKotlinMetadata") {
+        enabled = false
     }
 }

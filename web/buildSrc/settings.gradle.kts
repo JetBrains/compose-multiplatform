@@ -2,6 +2,7 @@ pluginManagement {
     val kotlinVersion: String = settings.extra["kotlin.version"] as String
 
     repositories {
+        mavenLocal()
         gradlePluginPortal()
         mavenCentral()
         maven {

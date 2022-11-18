@@ -2,7 +2,7 @@ import org.jetbrains.compose.gradle.standardConf
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
 }
 
 
@@ -21,7 +21,7 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
+                implementation("org.jetbrains.compose.runtime:runtime-js:1.3.0-rc01-SNAPSHOT")
                 implementation(kotlin("stdlib-common"))
             }
         }

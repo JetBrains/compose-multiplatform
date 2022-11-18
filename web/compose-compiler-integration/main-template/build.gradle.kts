@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
 }
 
 repositories {
