@@ -437,7 +437,7 @@ package androidx.compose.ui.test {
   public final class TestContext {
   }
 
-  @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
+  @androidx.compose.ui.test.ExperimentalTestApi @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
     ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, optional long frameDelayNanos, optional kotlin.jvm.functions.Function1<? super java.lang.Long,kotlin.Unit> onPerformTraversals);
     method @androidx.compose.ui.test.ExperimentalTestApi public kotlin.coroutines.ContinuationInterceptor getContinuationInterceptor();
     method public long getFrameDelayNanos();
@@ -449,7 +449,7 @@ package androidx.compose.ui.test {
   }
 
   public final class TestMonotonicFrameClock_jvmKt {
-    method @kotlinx.coroutines.ExperimentalCoroutinesApi public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
+    method @androidx.compose.ui.test.ExperimentalTestApi public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
   }
 
   @androidx.compose.ui.test.InternalTestApi public interface TestOwner {

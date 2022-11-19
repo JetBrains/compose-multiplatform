@@ -17,6 +17,7 @@
 package androidx.compose.runtime.benchmark
 
 import androidx.compose.runtime.benchmark.deeptree.DeepTree
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -34,7 +35,7 @@ import org.junit.runners.MethodSorters
  */
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTestApi::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DeepTreeBenchmark : ComposeBenchmarkBase() {
     @UiThreadTest

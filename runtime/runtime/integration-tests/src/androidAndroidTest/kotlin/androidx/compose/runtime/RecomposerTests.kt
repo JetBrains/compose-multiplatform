@@ -19,6 +19,7 @@ package androidx.compose.runtime
 import android.view.View
 import android.widget.TextView
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestMonotonicFrameClock
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -125,7 +126,7 @@ class RecomposerTests : BaseComposeTest() {
     }
 
     @Test
-    @OptIn(ExperimentalCoroutinesApi::class)
+    @OptIn(ExperimentalCoroutinesApi::class, ExperimentalTestApi::class)
     fun runningRecomposerFlow() = runTest(UnconfinedTestDispatcher()) {
         lateinit var recomposer: RecomposerInfo
         val recomposerJob = launch(TestMonotonicFrameClock(this)) {
