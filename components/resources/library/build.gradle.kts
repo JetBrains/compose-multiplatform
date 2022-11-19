@@ -1,4 +1,3 @@
-import org.jetbrains.compose.compose
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -10,6 +9,9 @@ plugins {
 
 kotlin {
     jvm("desktop")
+    android {
+        publishLibraryVariants("release", "debug")
+    }
     ios()
     iosSimulatorArm64()
 
@@ -20,19 +22,39 @@ kotlin {
                 api(compose.foundation)
             }
         }
-        val desktopMain by getting {}
+        val skikoMain by creating {
+            dependsOn(commonMain)
+        }
+        val desktopMain by getting {
+            dependsOn(skikoMain)
+        }
         val androidMain by getting {}
         val androidTest by getting {
             dependencies {
                 implementation("junit:junit:4.13.2")
             }
         }
-        val iosMain by getting
+        val iosMain by getting {
+            dependsOn(skikoMain)
+        }
         val iosTest by getting
         val iosSimulatorArm64Main by getting
         iosSimulatorArm64Main.dependsOn(iosMain)
         val iosSimulatorArm64Test by getting
         iosSimulatorArm64Test.dependsOn(iosTest)
+    }
+}
+
+android {
+    compileSdk = 33
+    sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    defaultConfig {
+        minSdk = 24
+        targetSdk = 33
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 }
 
