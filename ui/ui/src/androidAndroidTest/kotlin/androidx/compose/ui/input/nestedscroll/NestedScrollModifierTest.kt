@@ -48,6 +48,7 @@ import androidx.test.espresso.action.GeneralSwipeAction
 import androidx.test.espresso.action.Press
 import androidx.test.espresso.action.Swipe
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -985,6 +986,7 @@ class NestedScrollModifierTest {
         }
     }
 
+    @FlakyTest(bugId = 259725902)
     @Test
     fun nestedScroll_movingTarget_velocityShouldRespectSign() {
         var lastVelocity = Velocity.Zero
