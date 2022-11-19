@@ -6,10 +6,10 @@
 package org.jetbrains.compose.resources
 
 @ExperimentalResourceApi
-actual fun resource(path: String): Resource = AndroidResource(path)
+actual fun resource(path: String): Resource = AndroidResourceImpl(path)
 
 @ExperimentalResourceApi
-private class AndroidResource(val path: String) : Resource {
+private class AndroidResourceImpl(val path: String) : Resource {
     override suspend fun readBytes(): ByteArray {
         val contextClassLoader = Thread.currentThread().contextClassLoader!!
         return contextClassLoader.getResourceAsStream(path).readBytes()
@@ -17,7 +17,7 @@ private class AndroidResource(val path: String) : Resource {
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        return if (other is AndroidResource) {
+        return if (other is AndroidResourceImpl) {
             path == other.path
         } else {
             false

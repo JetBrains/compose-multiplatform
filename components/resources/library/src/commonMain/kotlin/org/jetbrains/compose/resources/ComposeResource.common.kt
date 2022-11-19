@@ -10,7 +10,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
-import kotlinx.coroutines.runBlocking
+//import kotlinx.coroutines.runBlocking
 
 /**
  * Get and remember resource in a blocking way.
@@ -19,9 +19,10 @@ import kotlinx.coroutines.runBlocking
 @ExperimentalResourceApi
 @Composable
 fun Resource.rememberImageBitmap(): ImageBitmap = remember(this) {
-    runBlocking {
-        readBytes().toImageBitmap()
-    }
+//    runBlocking {
+//        readBytes().toImageBitmap()
+//    }
+    ImageBitmap(100, 100)
 }
 
 /**

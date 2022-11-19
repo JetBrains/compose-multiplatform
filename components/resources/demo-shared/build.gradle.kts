@@ -17,6 +17,7 @@ kotlin {
 
     js(IR) {
         browser()
+        binaries.executable()
     }
 
     macosX64 {
@@ -115,4 +116,8 @@ android {
             resources.srcDir("src/commonMain/resources")
         }
     }
+}
+
+compose.experimental {
+    web.application {}
 }

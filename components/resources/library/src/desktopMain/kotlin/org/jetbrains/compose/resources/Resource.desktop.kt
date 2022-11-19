@@ -6,20 +6,20 @@
 package org.jetbrains.compose.resources
 
 @ExperimentalResourceApi
-actual fun resource(path: String): Resource = DesktopResource(path)
+actual fun resource(path: String): Resource = DesktopResourceImpl(path)
 
 @ExperimentalResourceApi
-private class DesktopResource(val path: String) : Resource {
+private class DesktopResourceImpl(val path: String) : Resource {
     override suspend fun readBytes(): ByteArray {
         val contextClassLoader = Thread.currentThread().contextClassLoader!!
         val resource = contextClassLoader.getResourceAsStream(path)
-            ?: (::DesktopResource.javaClass).getResourceAsStream(path)
+            ?: (::DesktopResourceImpl.javaClass).getResourceAsStream(path)
         return resource.readBytes()
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        return if (other is DesktopResource) {
+        return if (other is DesktopResourceImpl) {
             path == other.path
         } else {
             false

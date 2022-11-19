@@ -12,19 +12,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
+import org.jetbrains.skiko.wasm.onWasmReady
+
+fun main() {
+    onWasmReady {
+        Window("Falling Balls") {
+            MainView()
+        }
+    }
+}
 
 @Composable
 fun MainView() {
-    val selectedExample = remember { mutableStateOf(Examples.FallingBalls) }
-
     Column(modifier = Modifier.fillMaxSize()) {
         Spacer(modifier = Modifier.height(24.dp))
         UseResources()
     }
 }
-
-private enum class Examples {
-    FallingBalls,
-    BouncingBalls
-}
-

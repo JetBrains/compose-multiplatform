@@ -14,7 +14,9 @@ kotlin {
     }
     ios()
     iosSimulatorArm64()
-    js(IR)
+    js(IR) {
+        browser()
+    }
     macosX64()
     macosArm64()
 
@@ -45,8 +47,11 @@ kotlin {
         iosSimulatorArm64Main.dependsOn(iosMain)
         val iosSimulatorArm64Test by getting
         iosSimulatorArm64Test.dependsOn(iosTest)
+        val jsMain by getting {
+            dependsOn(skikoMain)
+        }
         val macosMain by creating {
-            dependsOn(commonMain)
+            dependsOn(skikoMain)
         }
         val macosX64Main by getting {
             dependsOn(macosMain)
@@ -80,3 +85,12 @@ configureMavenPublication(
     artifactId = "components-resources",
     name = "Resources for Compose JB"
 )
+
+// a temporary workaround for a bug in jsRun invocation - see https://youtrack.jetbrains.com/issue/KT-48273
+afterEvaluate {
+    rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
+        versions.webpackDevServer.version = "4.0.0"
+        versions.webpackCli.version = "4.9.0"
+        nodeVersion = "16.0.0"
+    }
+}
