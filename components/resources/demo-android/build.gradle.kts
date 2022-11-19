@@ -18,11 +18,11 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(32)
+    compileSdk = 33
     defaultConfig {
         applicationId = "me.user.androidApp"
-        minSdkVersion(24)
-        targetSdkVersion(32)
+        minSdk = 24
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
     }

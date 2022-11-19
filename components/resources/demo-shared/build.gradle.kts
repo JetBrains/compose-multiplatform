@@ -42,6 +42,7 @@ kotlin {
         framework {
             baseName = "shared"
         }
+        extraSpecAttributes["resources"] =  "['src/commonMain/resources/*', 'src/iosMain/resources/*']"
     }
 
     sourceSets {
@@ -51,6 +52,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
+                implementation(project(":resources:library"))
             }
         }
         val commonTest by getting {
@@ -96,14 +98,21 @@ kotlin {
 }
 
 android {
-    compileSdkVersion(32)
+    compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
-        minSdkVersion(24)
-        targetSdkVersion(32)
+        minSdk = 24
+        targetSdk = 33
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
         targetCompatibility = JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        named("main") {
+//            manifest.srcFile("src/androidMain/AndroidManifest.xml")
+//            res.srcDirs("src/androidMain/res")
+            resources.srcDir("src/commonMain/resources")
+        }
     }
 }
