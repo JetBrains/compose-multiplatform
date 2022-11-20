@@ -1,3 +1,5 @@
+package org.jetbrains.compose.resources
+
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import kotlinx.coroutines.Dispatchers
