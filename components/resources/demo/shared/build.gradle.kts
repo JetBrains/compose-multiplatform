@@ -9,17 +9,13 @@ version = "1.0-SNAPSHOT"
 
 kotlin {
     android()
-
     jvm("desktop")
-
     ios()
     iosSimulatorArm64()
-
     js(IR) {
         browser()
         binaries.executable()
     }
-
     macosX64 {
         binaries {
             executable {
@@ -57,21 +53,6 @@ kotlin {
                 implementation(project(":resources:library"))
             }
         }
-        val commonTest by getting {
-            dependencies {
-                implementation(kotlin("test"))
-            }
-        }
-        val androidMain by getting {
-            dependencies {
-                implementation("com.google.android.material:material:1.5.0")
-            }
-        }
-        val androidTest by getting {
-            dependencies {
-                implementation("junit:junit:4.13.2")
-            }
-        }
         val iosMain by getting
         val iosTest by getting
         val iosSimulatorArm64Main by getting {
@@ -80,13 +61,11 @@ kotlin {
         val iosSimulatorArm64Test by getting {
             dependsOn(iosTest)
         }
-
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
             }
         }
-
         val macosMain by creating {
             dependsOn(commonMain)
         }
@@ -112,8 +91,6 @@ android {
     }
     sourceSets {
         named("main") {
-//            manifest.srcFile("src/androidMain/AndroidManifest.xml")
-//            res.srcDirs("src/androidMain/res")
             resources.srcDir("src/commonMain/resources")
         }
     }

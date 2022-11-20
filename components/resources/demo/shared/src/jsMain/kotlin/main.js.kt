@@ -8,16 +8,15 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
+import org.jetbrains.compose.resources.demo.shared.UseResources
 import org.jetbrains.skiko.wasm.onWasmReady
 
 fun main() {
     onWasmReady {
-        Window("Falling Balls") {
+        Window("Resources demo") {
             MainView()
         }
     }

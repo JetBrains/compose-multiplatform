@@ -7,10 +7,11 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
+import org.jetbrains.compose.resources.demo.shared.MainView
 
 fun main() =
     singleWindowApplication(
-        title = "Falling Balls",
+        title = "Resources demo",
         state = WindowState(size = DpSize(800.dp, 800.dp))
     ) {
         MainView()

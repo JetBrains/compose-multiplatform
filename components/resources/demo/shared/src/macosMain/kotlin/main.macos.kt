@@ -4,12 +4,13 @@
  */
 
 import androidx.compose.ui.window.Window
+import org.jetbrains.compose.resources.demo.shared.UseResources
 import platform.AppKit.NSApp
 import platform.AppKit.NSApplication
 
 fun main() {
     NSApplication.sharedApplication()
-    Window("Falling Balls") {
+    Window("Resources demo") {
         UseResources()
     }
     NSApp?.run()

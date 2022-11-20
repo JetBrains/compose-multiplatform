@@ -9,14 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
+import org.jetbrains.compose.resources.demo.shared.UseResources
 import platform.UIKit.UIViewController
 
-fun MainViewController() : UIViewController =
-    Application("Falling Balls") {
+fun MainViewController(): UIViewController =
+    Application("Resources demo") {
         Column {
-            // To skip upper part of screen.
-            Box(modifier = Modifier
-                .height(100.dp))
+            Box(
+                modifier = Modifier
+                    .height(100.dp)
+            )
             UseResources()
         }
-}
+    }
