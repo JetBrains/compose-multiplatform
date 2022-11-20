@@ -8,16 +8,16 @@
 
 /* Begin PBXBuildFile section */
 		2152FB042600AC8F00CF470E /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iosApp.swift */; };
-		C1FC908188C4E8695729CB06 /* Pods_FallingBalls.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DE96E47030356CE6AD9794A /* Pods_FallingBalls.framework */; };
+		C1FC908188C4E8695729CB06 /* Pods_ResourcesDemo.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DE96E47030356CE6AD9794A /* Pods_ResourcesDemo.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		1EB65E27D2C0F884D0A1A133 /* Pods-FallingBalls.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FallingBalls.debug.xcconfig"; path = "Target Support Files/Pods-FallingBalls/Pods-FallingBalls.debug.xcconfig"; sourceTree = "<group>"; };
+		1EB65E27D2C0F884D0A1A133 /* Pods-ResourcesDemo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ResourcesDemo.debug.xcconfig"; path = "Target Support Files/Pods-ResourcesDemo/Pods-ResourcesDemo.debug.xcconfig"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
-		3D7A606AB0AD7636269BD9D0 /* Pods-FallingBalls.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-FallingBalls.release.xcconfig"; path = "Target Support Files/Pods-FallingBalls/Pods-FallingBalls.release.xcconfig"; sourceTree = "<group>"; };
-		7555FF7B242A565900829871 /* FallingBalls.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FallingBalls.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3D7A606AB0AD7636269BD9D0 /* Pods-ResourcesDemo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-ResourcesDemo.release.xcconfig"; path = "Target Support Files/Pods-ResourcesDemo/Pods-ResourcesDemo.release.xcconfig"; sourceTree = "<group>"; };
+		7555FF7B242A565900829871 /* ResourcesDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ResourcesDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		8DE96E47030356CE6AD9794A /* Pods_FallingBalls.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_FallingBalls.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DE96E47030356CE6AD9794A /* Pods_ResourcesDemo.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_ResourcesDemo.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		AB3632DC29227652001CCB65 /* TeamId.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = TeamId.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -26,7 +26,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C1FC908188C4E8695729CB06 /* Pods_FallingBalls.framework in Frameworks */,
+				C1FC908188C4E8695729CB06 /* Pods_ResourcesDemo.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -47,7 +47,7 @@
 		7555FF7C242A565900829871 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				7555FF7B242A565900829871 /* FallingBalls.app */,
+				7555FF7B242A565900829871 /* ResourcesDemo.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -72,7 +72,7 @@
 		B62309C7396AD7BF607A63B2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				8DE96E47030356CE6AD9794A /* Pods_FallingBalls.framework */,
+				8DE96E47030356CE6AD9794A /* Pods_ResourcesDemo.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -80,8 +80,8 @@
 		E1DAFBE8E1CFC0878361EF0E /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				1EB65E27D2C0F884D0A1A133 /* Pods-FallingBalls.debug.xcconfig */,
-				3D7A606AB0AD7636269BD9D0 /* Pods-FallingBalls.release.xcconfig */,
+				1EB65E27D2C0F884D0A1A133 /* Pods-ResourcesDemo.debug.xcconfig */,
+				3D7A606AB0AD7636269BD9D0 /* Pods-ResourcesDemo.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -89,9 +89,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		7555FF7A242A565900829871 /* FallingBalls */ = {
+		7555FF7A242A565900829871 /* ResourcesDemo */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "FallingBalls" */;
+			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "ResourcesDemo" */;
 			buildPhases = (
 				E8D673591E7196AEA2EA10E2 /* [CP] Check Pods Manifest.lock */,
 				7555FF77242A565900829871 /* Sources */,
@@ -103,9 +103,9 @@
 			);
 			dependencies = (
 			);
-			name = FallingBalls;
+			name = ResourcesDemo;
 			productName = iosApp;
-			productReference = 7555FF7B242A565900829871 /* FallingBalls.app */;
+			productReference = 7555FF7B242A565900829871 /* ResourcesDemo.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -123,7 +123,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 7555FF76242A565900829871 /* Build configuration list for PBXProject "FallingBalls" */;
+			buildConfigurationList = 7555FF76242A565900829871 /* Build configuration list for PBXProject "ResourcesDemo" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -136,7 +136,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				7555FF7A242A565900829871 /* FallingBalls */,
+				7555FF7A242A565900829871 /* ResourcesDemo */,
 			);
 		};
 /* End PBXProject section */
@@ -158,15 +158,15 @@
 			files = (
 			);
 			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FallingBalls/Pods-FallingBalls-resources-${CONFIGURATION}-input-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ResourcesDemo/Pods-ResourcesDemo-resources-${CONFIGURATION}-input-files.xcfilelist",
 			);
 			name = "[CP] Copy Pods Resources";
 			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-FallingBalls/Pods-FallingBalls-resources-${CONFIGURATION}-output-files.xcfilelist",
+				"${PODS_ROOT}/Target Support Files/Pods-ResourcesDemo/Pods-ResourcesDemo-resources-${CONFIGURATION}-output-files.xcfilelist",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-FallingBalls/Pods-FallingBalls-resources.sh\"\n";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-ResourcesDemo/Pods-ResourcesDemo-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 		E8D673591E7196AEA2EA10E2 /* [CP] Check Pods Manifest.lock */ = {
@@ -184,7 +184,7 @@
 			outputFileListPaths = (
 			);
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-FallingBalls-checkManifestLockResult.txt",
+				"$(DERIVED_FILE_DIR)/Pods-ResourcesDemo-checkManifestLockResult.txt",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -325,7 +325,7 @@
 		};
 		7555FFA6242A565B00829871 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 1EB65E27D2C0F884D0A1A133 /* Pods-FallingBalls.debug.xcconfig */;
+			baseConfigurationReference = 1EB65E27D2C0F884D0A1A133 /* Pods-ResourcesDemo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -339,7 +339,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.jetbrains.FallingBalls${TEAM_ID}";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.jetbrains.ResourcesDemo${TEAM_ID}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -349,7 +349,7 @@
 		};
 		7555FFA7242A565B00829871 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 3D7A606AB0AD7636269BD9D0 /* Pods-FallingBalls.release.xcconfig */;
+			baseConfigurationReference = 3D7A606AB0AD7636269BD9D0 /* Pods-ResourcesDemo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "Apple Development";
@@ -363,7 +363,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.jetbrains.FallingBalls${TEAM_ID}";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.jetbrains.ResourcesDemo${TEAM_ID}";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
@@ -374,7 +374,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		7555FF76242A565900829871 /* Build configuration list for PBXProject "FallingBalls" */ = {
+		7555FF76242A565900829871 /* Build configuration list for PBXProject "ResourcesDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7555FFA3242A565B00829871 /* Debug */,
@@ -383,7 +383,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "FallingBalls" */ = {
+		7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "ResourcesDemo" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				7555FFA6242A565B00829871 /* Debug */,
