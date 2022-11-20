@@ -10,23 +10,16 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
-//import kotlinx.coroutines.runBlocking
 
 /**
- * Get and remember resource in a blocking way.
- * May cause performance issues when used on the main thread.
+ * Get and remember resource.
  */
 @ExperimentalResourceApi
 @Composable
-fun Resource.rememberImageBitmap(): ImageBitmap = remember(this) {
-//    runBlocking {
-//        readBytes().toImageBitmap()
-//    }
-    ImageBitmap(100, 100)
-}
+fun Resource.rememberImageBitmap(): ImageBitmap = rememberImageBitmapAsync() ?: remember { ImageBitmap(1, 1) }
 
 /**
- * Get and remember resource in an asynchronous way.
+ * Get and remember resource. While loading and if resource not exists result will be null.
  */
 @ExperimentalResourceApi
 @Composable
