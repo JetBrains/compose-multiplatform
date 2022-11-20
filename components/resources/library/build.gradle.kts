@@ -91,8 +91,8 @@ android {
             devices {
                 maybeCreate<com.android.build.api.dsl.ManagedVirtualDevice>("pixel5").apply {
                     device = "Pixel 5"
-                    apiLevel = 31
-                    systemImageSource = "aosp"
+                    apiLevel = 32
+                    systemImageSource = "google"
                 }
             }
         }

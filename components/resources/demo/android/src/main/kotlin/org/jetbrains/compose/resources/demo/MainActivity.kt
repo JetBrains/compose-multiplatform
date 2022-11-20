@@ -1,4 +1,4 @@
-package org.jetbrains.fallingballs
+package org.jetbrains.compose.resources.demo
 
 import MainView
 import android.os.Bundle
