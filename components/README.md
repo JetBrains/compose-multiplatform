@@ -9,4 +9,7 @@
 
 
 ## Tests
-Run script `./test.sh`
+Run script: 
+```bash
+./test.sh
+```

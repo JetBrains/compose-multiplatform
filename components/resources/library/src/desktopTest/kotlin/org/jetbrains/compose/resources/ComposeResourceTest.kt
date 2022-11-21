@@ -25,7 +25,7 @@ class ComposeResourceTest {
     fun testMissingResource() = runTest (UnconfinedTestDispatcher()) {
         var recompositionCount = 0
         rule.setContent {
-            CountRecompositions(resource("missing.png").rememberImageBitmapAsync()) {
+            CountRecompositions(resource("missing.png").rememberImageBitmap()) {
                 recompositionCount++
             }
         }
@@ -40,7 +40,7 @@ class ComposeResourceTest {
         rule.setContent {
             val state: Boolean by mutableStateFlow.collectAsState(true)
             val resource = resource(if (state) "1.png" else "2.png")
-            CountRecompositions(resource.rememberImageBitmapAsync()) {
+            CountRecompositions(resource.rememberImageBitmap()) {
                 recompositionCount++
             }
         }

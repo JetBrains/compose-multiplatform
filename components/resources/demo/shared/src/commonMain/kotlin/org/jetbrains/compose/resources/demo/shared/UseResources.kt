@@ -12,11 +12,11 @@ internal fun UseResources() {
     Column {
         Text("Hello, resources")
         Image(
-            bitmap = resource("dir/img.png").rememberImageBitmapAsync(),
+            bitmap = resource("dir/img.png").rememberImageBitmap().orEmpty(),
             contentDescription = null,
         )
         Image(
-            bitmap = resource("img.webp").rememberImageBitmap(),
+            bitmap = resource("img.webp").rememberImageBitmap().orEmpty(),
             contentDescription = null,
         )
     }
