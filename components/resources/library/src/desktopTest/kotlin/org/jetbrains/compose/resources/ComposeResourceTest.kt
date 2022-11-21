@@ -23,9 +23,16 @@ class ComposeResourceTest {
 
     @Test
     fun testMissingResource() {
-        rule.setContent {
-            resource("missing.png").rememberImageBitmap()
+        var recompositionCount = 0
+        runBlocking {
+            rule.setContent {
+                CountRecompositions(resource("missing.png").rememberImageBitmapAsync()) {
+                    recompositionCount++
+                }
+            }
+            rule.awaitIdle()
         }
+        assertEquals(1, recompositionCount)
     }
 
     @Test
@@ -40,19 +47,20 @@ class ComposeResourceTest {
                     recompositionCount++
                 }
             }
-            delay(100)
+            rule.awaitIdle()
+            delay(10)
             mutableStateFlow.value = false
-            delay(100)
-            assertEquals(2, recompositionCount)
+            delay(10)
+            rule.awaitIdle()
         }
+        assertEquals(4, recompositionCount)
     }
 
 }
 
 @Composable
-fun CountRecompositions(imageBitmap: ImageBitmap?, onRecomposition: () -> Unit) {
+private fun CountRecompositions(imageBitmap: ImageBitmap?, onRecomposition: () -> Unit) {
     onRecomposition()
-    println("imageBitmap: $imageBitmap")
     if (imageBitmap != null) {
         Image(bitmap = imageBitmap, contentDescription = null)
     }
