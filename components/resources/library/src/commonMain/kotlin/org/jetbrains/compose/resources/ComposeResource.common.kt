@@ -12,7 +12,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 
 /**
- * Get and remember resource.
+ * Get and remember resource. While loading and if resource not exists result will be empty ImageBitmap.
  */
 @ExperimentalResourceApi
 @Composable
@@ -26,7 +26,10 @@ fun Resource.rememberImageBitmap(): ImageBitmap = rememberImageBitmapAsync() ?: 
 fun Resource.rememberImageBitmapAsync(): ImageBitmap? {
     val state = remember(this) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(this) {
-        state.value = readBytes().toImageBitmap()
+        val loadingBytesState = readBytes()
+        if (loadingBytesState is LoadState.Success) {
+            state.value = loadingBytesState.value.toImageBitmap()
+        }
     }
     return state.value
 }

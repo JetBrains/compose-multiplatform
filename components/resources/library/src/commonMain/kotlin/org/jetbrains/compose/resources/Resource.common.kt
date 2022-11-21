@@ -10,7 +10,7 @@ package org.jetbrains.compose.resources
  */
 @ExperimentalResourceApi
 interface Resource {
-    suspend fun readBytes(): ByteArray //todo in future use streaming
+    suspend fun readBytes(): LoadState<ByteArray> //todo in future use streaming
 }
 
 /**
@@ -19,3 +19,5 @@ interface Resource {
  */
 @ExperimentalResourceApi
 expect fun resource(path: String): Resource
+
+//todo reuse LoadState.Error

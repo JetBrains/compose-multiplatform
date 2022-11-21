@@ -18,7 +18,7 @@ actual fun resource(path: String): Resource = JSResourceImpl(path)
 
 @ExperimentalResourceApi
 private class JSResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): ByteArray {
+    override suspend fun readBytes(): LoadState<ByteArray> {
         return suspendCoroutine { continuation ->
             val req = XMLHttpRequest()
             req.open("GET", "/$path", true)
@@ -27,9 +27,9 @@ private class JSResourceImpl(val path: String) : Resource {
             req.onload = { event ->
                 val arrayBuffer = req.response
                 if (arrayBuffer is ArrayBuffer) {
-                    continuation.resume(arrayBuffer.toByteArray())
+                    continuation.resume(LoadState.Success(arrayBuffer.toByteArray()))
                 } else {
-                    continuation.resumeWith(Result.failure(Exception("resource not exists, $path")))
+                    continuation.resume(LoadState.Error(Exception("missing resource with path: $path")))
                 }
             }
             req.send(null)

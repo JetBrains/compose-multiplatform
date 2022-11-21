@@ -42,7 +42,9 @@ kotlin {
         }
         val desktopTest by getting {
             dependencies {
+                implementation(compose.desktop.currentOs)
                 implementation("org.jetbrains.compose.ui:ui-test-junit4:$composeVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
             }
         }
         val androidMain by getting {}

@@ -18,14 +18,14 @@ actual fun resource(path: String): Resource = UIKitResourceImpl(path)
 
 @ExperimentalResourceApi
 private class UIKitResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): ByteArray {
+    override suspend fun readBytes(): LoadState<ByteArray> {
         val absolutePath = NSBundle.mainBundle.resourcePath + "/" + path
         val contentsAtPath: NSData = NSFileManager.defaultManager().contentsAtPath(absolutePath)!!
         val byteArray = ByteArray(contentsAtPath.length.toInt())
         byteArray.usePinned {
             memcpy(it.addressOf(0), contentsAtPath.bytes, contentsAtPath.length)
         }
-        return byteArray
+        return LoadState.Success(byteArray)//todo fail case
     }
 
     override fun equals(other: Any?): Boolean {

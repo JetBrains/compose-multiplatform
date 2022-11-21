@@ -10,11 +10,15 @@ actual fun resource(path: String): Resource = DesktopResourceImpl(path)
 
 @ExperimentalResourceApi
 private class DesktopResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): ByteArray {
+    override suspend fun readBytes(): LoadState<ByteArray> {
         val contextClassLoader = Thread.currentThread().contextClassLoader!!
         val resource = contextClassLoader.getResourceAsStream(path)
             ?: (::DesktopResourceImpl.javaClass).getResourceAsStream(path)
-        return resource.readBytes()
+        if (resource != null) {
+            return LoadState.Success(resource.readBytes())
+        } else {
+            return LoadState.Error(Exception("missing resource with path: $path"))
+        }
     }
 
     override fun equals(other: Any?): Boolean {

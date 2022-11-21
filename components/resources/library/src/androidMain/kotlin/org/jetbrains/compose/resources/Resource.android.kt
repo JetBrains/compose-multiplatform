@@ -10,9 +10,14 @@ actual fun resource(path: String): Resource = AndroidResourceImpl(path)
 
 @ExperimentalResourceApi
 private class AndroidResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): ByteArray {
+    override suspend fun readBytes(): LoadState<ByteArray> {
         val contextClassLoader = Thread.currentThread().contextClassLoader!!
-        return contextClassLoader.getResourceAsStream(path).readBytes()
+        val resource = contextClassLoader.getResourceAsStream(path)
+        if (resource != null) {
+            return LoadState.Success(resource.readBytes())
+        } else {
+            return LoadState.Error(Exception("missing resource with path: $path"))
+        }
     }
 
     override fun equals(other: Any?): Boolean {
