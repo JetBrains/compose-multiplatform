@@ -449,7 +449,7 @@ fun Modifier.graphicsLayer(block: GraphicsLayerScope.() -> Unit): Modifier =
     )
 
 /**
- * Determines when to rendering the contents of the buffer into an offscreen layer before
+ * Determines when to render the contents of a layer into an offscreen buffer before
  * being drawn to the destination.
  */
 @Immutable
@@ -467,7 +467,9 @@ value class CompositingStrategy internal constructor(
          * a compositing layer is created automatically to first render the contents fully opaque,
          * then draw this offscreen buffer to the destination with the corresponding alpha. This is
          * necessary for correctness otherwise alpha applied to individual drawing instructions that
-         * overlap will have a different result than expected
+         * overlap will have a different result than expected. Additionally usage of [RenderEffect]
+         * on the graphicsLayer will also render into an intermediate offscreen buffer before
+         * being drawn into the destination.
          */
         val Auto = CompositingStrategy(0)
 
