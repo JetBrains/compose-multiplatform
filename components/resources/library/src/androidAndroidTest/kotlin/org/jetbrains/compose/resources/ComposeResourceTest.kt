@@ -60,7 +60,6 @@ class ComposeResourceTest {
 @Composable
 private fun CountRecompositions(imageBitmap: ImageBitmap?, onRecomposition: () -> Unit) {
     onRecomposition()
-    println("imageBitmap: $imageBitmap")
     if (imageBitmap != null) {
         Image(bitmap = imageBitmap, contentDescription = null)
     }
