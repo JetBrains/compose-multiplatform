@@ -17,6 +17,7 @@
 package androidx.compose.material.pullrefresh
 
 import androidx.compose.animation.core.animate
+import androidx.compose.foundation.MutatorMutex
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
@@ -136,9 +137,8 @@ class PullRefreshState internal constructor(
         if (!this._refreshing) {
             if (adjustedDistancePulled > threshold) {
                 onRefreshState.value()
-            } else {
-                animateIndicatorTo(0f)
             }
+            animateIndicatorTo(0f)
         }
         distancePulled = 0f
     }
@@ -151,9 +151,16 @@ class PullRefreshState internal constructor(
         }
     }
 
+    // Make sure to cancel any existing animations when we launch a new one. We use this instead of
+    // Animatable as calling snapTo() on every drag delta has a one frame delay, and some extra
+    // overhead of running through the animation pipeline instead of directly mutating the state.
+    private val mutatorMutex = MutatorMutex()
+
     private fun animateIndicatorTo(offset: Float) = animationScope.launch {
-        animate(initialValue = _position, targetValue = offset) { value, _ ->
-            _position = value
+        mutatorMutex.mutate {
+            animate(initialValue = _position, targetValue = offset) { value, _ ->
+                _position = value
+            }
         }
     }
 
