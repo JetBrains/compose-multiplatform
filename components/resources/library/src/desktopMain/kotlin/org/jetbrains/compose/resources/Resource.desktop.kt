@@ -17,7 +17,7 @@ private class DesktopResourceImpl(val path: String) : Resource {
         if (resource != null) {
             return LoadState.Success(resource.readBytes())
         } else {
-            return LoadState.Error(Exception("missing resource with path: $path"))
+            return LoadState.Error(MissingResource(path))
         }
     }
 

@@ -29,7 +29,7 @@ private class JSResourceImpl(val path: String) : Resource {
                 if (arrayBuffer is ArrayBuffer) {
                     continuation.resume(LoadState.Success(arrayBuffer.toByteArray()))
                 } else {
-                    continuation.resume(LoadState.Error(Exception("missing resource with path: $path")))
+                    continuation.resume(LoadState.Error(MissingResource(path)))
                 }
             }
             req.send(null)

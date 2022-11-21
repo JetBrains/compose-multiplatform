@@ -19,3 +19,5 @@ interface Resource {
  */
 @ExperimentalResourceApi
 expect fun resource(path: String): Resource
+
+internal class MissingResource(path: String):Exception("missing resource with path: $path")
