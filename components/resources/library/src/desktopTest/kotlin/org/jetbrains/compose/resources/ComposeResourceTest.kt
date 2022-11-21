@@ -43,8 +43,6 @@ class ComposeResourceTest {
             delay(100)
             mutableStateFlow.value = false
             delay(100)
-            mutableStateFlow.value = true
-            delay(100)
             assertEquals(2, recompositionCount)
         }
     }
