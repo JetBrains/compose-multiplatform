@@ -45,9 +45,7 @@ class ComposeResourceTest {
             }
         }
         rule.awaitIdle()
-        delay(10)
         mutableStateFlow.value = false
-        delay(10)
         rule.awaitIdle()
         assertEquals(4, recompositionCount)
     }

@@ -19,6 +19,7 @@ private class MacOSResourceImpl(val path: String) : Resource {
     override suspend fun readBytes(): LoadState<ByteArray> {
         val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
         val contentsAtPath: NSData? = NSFileManager.defaultManager().run {
+            //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
             contentsAtPath("$currentDirectoryPath/src/macosMain/resources/$path")
                 ?: contentsAtPath("$currentDirectoryPath/src/commonMain/resources/$path")
         }
