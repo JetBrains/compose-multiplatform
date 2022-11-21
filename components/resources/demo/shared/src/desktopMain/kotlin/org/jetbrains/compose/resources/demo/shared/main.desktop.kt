@@ -16,6 +16,5 @@ fun MainView() {
 @Preview
 @Composable
 fun Preview() {
-    //TODO check preview with resources
     MainView()
 }
