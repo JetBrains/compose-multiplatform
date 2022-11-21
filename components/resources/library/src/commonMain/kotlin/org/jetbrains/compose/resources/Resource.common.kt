@@ -19,5 +19,3 @@ interface Resource {
  */
 @ExperimentalResourceApi
 expect fun resource(path: String): Resource
-
-//todo reuse LoadState.Error

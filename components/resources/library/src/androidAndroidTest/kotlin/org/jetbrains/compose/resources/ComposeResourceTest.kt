@@ -5,7 +5,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -15,7 +14,7 @@ import org.junit.Assert
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(InternalTestApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class)
 class ComposeResourceTest {
     @get:Rule
     val rule = createComposeRule()
