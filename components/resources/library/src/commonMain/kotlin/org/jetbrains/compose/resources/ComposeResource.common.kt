@@ -11,6 +11,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.ImageBitmap
 
+private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
+
 /**
  * Get and remember resource. While loading and if resource not exists result will be null.
  */
@@ -31,7 +33,6 @@ fun Resource.rememberImageBitmap(): ImageBitmap? {
  * return current ImageBitmap or return empty while loading
  */
 @ExperimentalResourceApi
-@Composable
-inline fun ImageBitmap?.orEmpty(): ImageBitmap = this ?: remember { ImageBitmap(1, 1) }
+fun ImageBitmap?.orEmpty(): ImageBitmap = this ?: emptyImageBitmap
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
