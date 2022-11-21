@@ -20,7 +20,7 @@ kotlin {
 android {
     compileSdkVersion(32)
     defaultConfig {
-        applicationId = "me.user.androidApp"
+        applicationId = "org.jetbrains.FallingBalls"
         minSdkVersion(24)
         targetSdkVersion(32)
         versionCode = 1
