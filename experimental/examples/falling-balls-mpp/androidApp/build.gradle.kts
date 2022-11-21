@@ -20,7 +20,7 @@ kotlin {
 android {
     compileSdk = 33
     defaultConfig {
-        applicationId = "org.jetbrains.compose.example.fallingballs"
+        applicationId = "org.jetbrains.FallingBalls"
         minSdk = 24
         targetSdk = 33
         versionCode = 1
