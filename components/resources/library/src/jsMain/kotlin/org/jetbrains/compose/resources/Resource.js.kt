@@ -18,7 +18,7 @@ import kotlin.coroutines.suspendCoroutine
 actual fun resource(path: String): Resource = JSResourceImpl(path)
 
 @ExperimentalResourceApi
-private class JSResourceImpl(val path: String) : Resource {
+private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
     override suspend fun readBytes(): ByteArray {
         return suspendCoroutine { continuation ->
             val req = XMLHttpRequest()
@@ -35,19 +35,6 @@ private class JSResourceImpl(val path: String) : Resource {
             }
             req.send(null)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return if (other is JSResourceImpl) {
-            path == other.path
-        } else {
-            false
-        }
-    }
-
-    override fun hashCode(): Int {
-        return path.hashCode()
     }
 }
 

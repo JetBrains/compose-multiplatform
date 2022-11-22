@@ -11,7 +11,7 @@ import java.io.IOException
 actual fun resource(path: String): Resource = AndroidResourceImpl(path)
 
 @ExperimentalResourceApi
-private class AndroidResourceImpl(val path: String) : Resource {
+private class AndroidResourceImpl(path: String) : AbstractResourceImpl(path) {
     override suspend fun readBytes(): ByteArray {
         val resource = (::AndroidResourceImpl.javaClass.classLoader).getResourceAsStream(path)
         if (resource != null) {
@@ -20,20 +20,6 @@ private class AndroidResourceImpl(val path: String) : Resource {
             throw MissingResourceException(path)
         }
     }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return if (other is AndroidResourceImpl) {
-            path == other.path
-        } else {
-            false
-        }
-    }
-
-    override fun hashCode(): Int {
-        return path.hashCode()
-    }
-
 }
 
 internal actual class MissingResourceException actual constructor(path: String) :

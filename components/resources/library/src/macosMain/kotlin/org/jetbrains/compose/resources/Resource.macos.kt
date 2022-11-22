@@ -15,7 +15,7 @@ import platform.posix.memcpy
 actual fun resource(path: String): Resource = MacOSResourceImpl(path)
 
 @ExperimentalResourceApi
-private class MacOSResourceImpl(val path: String) : Resource {
+private class MacOSResourceImpl(path: String) : AbstractResourceImpl(path) {
     override suspend fun readBytes(): ByteArray {
         val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
         val contentsAtPath: NSData? = NSFileManager.defaultManager().run {
@@ -32,19 +32,6 @@ private class MacOSResourceImpl(val path: String) : Resource {
         } else {
             throw MissingResourceException(path)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return if (other is MacOSResourceImpl) {
-            path == other.path
-        } else {
-            false
-        }
-    }
-
-    override fun hashCode(): Int {
-        return path.hashCode()
     }
 }
 

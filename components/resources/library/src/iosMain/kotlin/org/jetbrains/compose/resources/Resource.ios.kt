@@ -17,7 +17,7 @@ import platform.posix.memcpy
 actual fun resource(path: String): Resource = UIKitResourceImpl(path)
 
 @ExperimentalResourceApi
-private class UIKitResourceImpl(val path: String) : Resource {
+private class UIKitResourceImpl(path: String) : AbstractResourceImpl(path) {
     override suspend fun readBytes(): ByteArray {
         val absolutePath = NSBundle.mainBundle.resourcePath + "/" + path
         val contentsAtPath: NSData? = NSFileManager.defaultManager().contentsAtPath(absolutePath)
@@ -30,19 +30,6 @@ private class UIKitResourceImpl(val path: String) : Resource {
         } else {
             throw MissingResourceException(path)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return if (other is UIKitResourceImpl) {
-            path == other.path
-        } else {
-            false
-        }
-    }
-
-    override fun hashCode(): Int {
-        return path.hashCode()
     }
 }
 

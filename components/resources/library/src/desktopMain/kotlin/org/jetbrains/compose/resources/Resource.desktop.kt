@@ -11,7 +11,7 @@ import java.io.IOException
 actual fun resource(path: String): Resource = DesktopResourceImpl(path)
 
 @ExperimentalResourceApi
-private class DesktopResourceImpl(val path: String) : Resource {
+private class DesktopResourceImpl(path: String) : AbstractResourceImpl(path) {
     override suspend fun readBytes(): ByteArray {
         val resource = (::DesktopResourceImpl.javaClass.classLoader).getResourceAsStream(path)
         if (resource != null) {
@@ -19,19 +19,6 @@ private class DesktopResourceImpl(val path: String) : Resource {
         } else {
             throw MissingResourceException(path)
         }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        return if (other is DesktopResourceImpl) {
-            path == other.path
-        } else {
-            false
-        }
-    }
-
-    override fun hashCode(): Int {
-        return path.hashCode()
     }
 }
 

@@ -20,3 +20,19 @@ interface Resource {
 expect fun resource(path: String): Resource
 
 internal expect class MissingResourceException(path: String)
+
+@OptIn(ExperimentalResourceApi::class)
+internal abstract class AbstractResourceImpl(val path: String) : Resource {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        return if (other is AbstractResourceImpl) {
+            path == other.path
+        } else {
+            false
+        }
+    }
+
+    override fun hashCode(): Int {
+        return path.hashCode()
+    }
+}
