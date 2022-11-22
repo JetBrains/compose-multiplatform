@@ -12,13 +12,13 @@ actual fun resource(path: String): Resource = AndroidResourceImpl(path)
 
 @ExperimentalResourceApi
 private class AndroidResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): Result<ByteArray> {
+    override suspend fun readBytes(): ByteArray {
         val contextClassLoader = Thread.currentThread().contextClassLoader!!
         val resource = contextClassLoader.getResourceAsStream(path)
         if (resource != null) {
-            return Result.success(resource.readBytes())
+            return resource.readBytes()
         } else {
-            return Result.failure(MissingResourceException(path))
+            throw MissingResourceException(path)
         }
     }
 

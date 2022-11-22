@@ -18,14 +18,11 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> {
     val state: MutableState<LoadState<ImageBitmap>> = remember(this) { mutableStateOf(LoadState.Loading()) }
     LaunchedEffect(this) {
-        state.value = readBytes().fold(
-            onSuccess = { byteArray ->
-                LoadState.Success(byteArray.toImageBitmap())
-            },
-            onFailure = { throwable ->
-                LoadState.Error(throwable)
-            }
-        )
+        state.value = try {
+            LoadState.Success(readBytes().toImageBitmap())
+        } catch (t: Throwable) {
+            LoadState.Error(t)
+        }
     }
     return state.value
 }

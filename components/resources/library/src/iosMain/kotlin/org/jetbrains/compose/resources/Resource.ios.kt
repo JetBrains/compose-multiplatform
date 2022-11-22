@@ -18,7 +18,7 @@ actual fun resource(path: String): Resource = UIKitResourceImpl(path)
 
 @ExperimentalResourceApi
 private class UIKitResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): Result<ByteArray> {
+    override suspend fun readBytes(): ByteArray {
         val absolutePath = NSBundle.mainBundle.resourcePath + "/" + path
         val contentsAtPath: NSData? = NSFileManager.defaultManager().contentsAtPath(absolutePath)
         if (contentsAtPath != null) {
@@ -26,9 +26,9 @@ private class UIKitResourceImpl(val path: String) : Resource {
             byteArray.usePinned {
                 memcpy(it.addressOf(0), contentsAtPath.bytes, contentsAtPath.length)
             }
-            return Result.success(byteArray)
+            return byteArray
         } else {
-            return Result.failure(MissingResourceException(path))
+            throw MissingResourceException(path)
         }
     }
 

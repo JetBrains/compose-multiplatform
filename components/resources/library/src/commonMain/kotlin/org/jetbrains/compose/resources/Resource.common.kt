@@ -10,7 +10,7 @@ package org.jetbrains.compose.resources
  */
 @ExperimentalResourceApi
 interface Resource {
-    suspend fun readBytes(): Result<ByteArray> //todo in future use streaming
+    suspend fun readBytes(): ByteArray //todo in future use streaming
 }
 
 /**

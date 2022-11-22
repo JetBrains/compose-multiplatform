@@ -11,6 +11,7 @@ import org.w3c.xhr.ARRAYBUFFER
 import org.w3c.xhr.XMLHttpRequest
 import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 
 @ExperimentalResourceApi
@@ -18,7 +19,7 @@ actual fun resource(path: String): Resource = JSResourceImpl(path)
 
 @ExperimentalResourceApi
 private class JSResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): Result<ByteArray> {
+    override suspend fun readBytes(): ByteArray {
         return suspendCoroutine { continuation ->
             val req = XMLHttpRequest()
             req.open("GET", "/$path", true)
@@ -27,9 +28,9 @@ private class JSResourceImpl(val path: String) : Resource {
             req.onload = { event ->
                 val arrayBuffer = req.response
                 if (arrayBuffer is ArrayBuffer) {
-                    continuation.resume(Result.success(arrayBuffer.toByteArray()))
+                    continuation.resume(arrayBuffer.toByteArray())
                 } else {
-                    continuation.resume(Result.failure(MissingResourceException(path)))
+                    continuation.resumeWithException(MissingResourceException(path))
                 }
             }
             req.send(null)
