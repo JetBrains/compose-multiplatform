@@ -13,9 +13,7 @@ actual fun resource(path: String): Resource = DesktopResourceImpl(path)
 @ExperimentalResourceApi
 private class DesktopResourceImpl(val path: String) : Resource {
     override suspend fun readBytes(): ByteArray {
-        val contextClassLoader = Thread.currentThread().contextClassLoader!!
-        val resource = contextClassLoader.getResourceAsStream(path)
-            ?: (::DesktopResourceImpl.javaClass).getResourceAsStream(path)
+        val resource = (::DesktopResourceImpl.javaClass.classLoader).getResourceAsStream(path)
         if (resource != null) {
             return resource.readBytes()
         } else {
