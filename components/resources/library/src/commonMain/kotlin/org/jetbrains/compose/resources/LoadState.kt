@@ -13,7 +13,7 @@ import androidx.compose.runtime.setValue
 sealed class LoadState<T> {
     class Loading<T> : LoadState<T>()
     data class Success<T>(val value: T) : LoadState<T>()
-    data class Error<T>(val exception: Exception) : LoadState<T>()
+    data class Error<T>(val exception: Throwable) : LoadState<T>()
 }
 
 

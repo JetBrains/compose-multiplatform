@@ -5,10 +5,7 @@
 
 package org.jetbrains.compose.resources
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
 
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
@@ -18,13 +15,17 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
  */
 @ExperimentalResourceApi
 @Composable
-fun Resource.rememberImageBitmap(): ImageBitmap? {
-    val state = remember(this) { mutableStateOf<ImageBitmap?>(null) }
+fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> {
+    val state: MutableState<LoadState<ImageBitmap>> = remember(this) { mutableStateOf(LoadState.Loading()) }
     LaunchedEffect(this) {
-        val result: ByteArray? = readBytes().getOrNull()
-        if (result != null) {
-            state.value = result.toImageBitmap()
-        }
+        state.value = readBytes().fold(
+            onSuccess = { byteArray ->
+                LoadState.Success(byteArray.toImageBitmap())
+            },
+            onFailure = { throwable ->
+                LoadState.Error(throwable)
+            }
+        )
     }
     return state.value
 }
@@ -33,6 +34,10 @@ fun Resource.rememberImageBitmap(): ImageBitmap? {
  * return current ImageBitmap or return empty while loading
  */
 @ExperimentalResourceApi
-fun ImageBitmap?.orEmpty(): ImageBitmap = this ?: emptyImageBitmap
+fun LoadState<ImageBitmap>.orEmpty(): ImageBitmap = when (this) {
+    is LoadState.Loading -> emptyImageBitmap
+    is LoadState.Success -> this.value
+    is LoadState.Error -> emptyImageBitmap
+}
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
