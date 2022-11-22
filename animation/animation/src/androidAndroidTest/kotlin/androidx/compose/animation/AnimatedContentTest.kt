@@ -19,6 +19,7 @@ package androidx.compose.animation
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
@@ -43,8 +44,10 @@ import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -52,6 +55,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -59,7 +64,6 @@ import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.roundToInt
 
 @RunWith(AndroidJUnit4::class)
 @LargeTest
@@ -242,15 +246,19 @@ class AnimatedContentTest {
                 ) {
                     if (it) {
                         Box(
-                            modifier = Modifier.onGloballyPositioned {
-                                offset1 = it.positionInRoot()
-                            }.size(size1.width.dp, size1.height.dp)
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    offset1 = it.positionInRoot()
+                                }
+                                .size(size1.width.dp, size1.height.dp)
                         )
                     } else {
                         Box(
-                            modifier = Modifier.onGloballyPositioned {
-                                offset2 = it.positionInRoot()
-                            }.size(size2.width.dp, size2.height.dp)
+                            modifier = Modifier
+                                .onGloballyPositioned {
+                                    offset2 = it.positionInRoot()
+                                }
+                                .size(size2.width.dp, size2.height.dp)
                         )
                     }
                 }
@@ -334,16 +342,19 @@ class AnimatedContentTest {
         }
     }
 
-    @OptIn(ExperimentalAnimationApi::class, InternalAnimationApi::class)
+    @OptIn(ExperimentalAnimationApi::class)
     @Test
     fun AnimatedContentSlideInAndOutOfContainerTest() {
-        val transitionState = MutableTransitionState(true).apply { targetState = false }
+        val transitionState = MutableTransitionState(true)
+        // LinearEasing is required to ensure the animation doesn't reach final values before the
+        // duration.
         val animSpec = tween<IntOffset>(200, easing = LinearEasing)
+        lateinit var trueTransition: Transition<EnterExitState>
+        lateinit var falseTransition: Transition<EnterExitState>
+        rule.mainClock.autoAdvance = false
         rule.setContent {
             CompositionLocalProvider(LocalDensity provides Density(1f, 1f)) {
-                if (!transitionState.targetState && !transitionState.currentState) {
-                    transitionState.targetState = true
-                }
+                @Suppress("UpdateTransitionLabel")
                 val rootTransition = updateTransition(transitionState)
                 rootTransition.AnimatedContent(
                     transitionSpec = {
@@ -365,33 +376,65 @@ class AnimatedContentTest {
                         }
                     }
                 ) { target ->
-                    Box(Modifier.requiredSize(200.dp))
-                    LaunchedEffect(transitionState.targetState) {
-                        while (transition.animations.size == 0) {
-                            delay(10)
-                        }
-                        val anim = transition.animations[0]
-                        while (transitionState.currentState != transitionState.targetState) {
-                            val playTime = (transition.playTimeNanos / 1000_000L).toInt()
-                            if (!transitionState.targetState) {
-                                if (target) {
-                                    assertEquals(IntOffset(-playTime, 0), anim.value)
-                                } else {
-                                    assertEquals(IntOffset(200 - playTime, 0), anim.value)
-                                }
-                            } else {
-                                if (target) {
-                                    assertEquals(IntOffset(playTime - 200, 0), anim.value)
-                                } else {
-                                    assertEquals(IntOffset(playTime, 0), anim.value)
-                                }
-                            }
-                            delay(10)
-                        }
+                    if (target) {
+                        trueTransition = transition
+                    } else {
+                        falseTransition = transition
                     }
+                    Box(
+                        Modifier
+                            .requiredSize(200.dp)
+                            .testTag(target.toString())
+                    )
                 }
             }
         }
+
+        // Kick off the first animation.
+        transitionState.targetState = false
+        // The initial composition creates the transition…
+        rule.mainClock.advanceTimeByFrame()
+        rule.onNodeWithTag("true").assertExists()
+        rule.onNodeWithTag("false").assertExists()
+        // …but the animation won't actually start until one frame later.
+        rule.mainClock.advanceTimeByFrame()
+        assertThat(trueTransition.animations).isNotEmpty()
+        assertThat(falseTransition.animations).isNotEmpty()
+
+        // Loop to ensure the content is offset correctly at each frame.
+        var trueAnim = trueTransition.animations[0]
+        var falseAnim = falseTransition.animations[0]
+        assertThat(transitionState.currentState).isTrue()
+        while (transitionState.currentState) {
+            // True is leaving: it should start at 0 and slide out to -200.
+            assertThat(trueAnim.value).isEqualTo(IntOffset(-trueTransition.playTimeMillis, 0))
+            // False is entering: it should start at 200 and slide in to 0.
+            assertThat(falseAnim.value)
+                .isEqualTo(IntOffset(200 - falseTransition.playTimeMillis, 0))
+            rule.mainClock.advanceTimeByFrame()
+        }
+        // The animation should remove the newly-hidden node from the composition.
+        rule.onNodeWithTag("true").assertDoesNotExist()
+
+        // Kick off the second transition.
+        transitionState.targetState = true
+        rule.mainClock.advanceTimeByFrame()
+        rule.onNodeWithTag("true").assertExists()
+        rule.onNodeWithTag("false").assertExists()
+        rule.mainClock.advanceTimeByFrame()
+        assertThat(trueTransition.animations).isNotEmpty()
+
+        trueAnim = trueTransition.animations[0]
+        falseAnim = falseTransition.animations[0]
+        assertThat(transitionState.currentState).isFalse()
+        while (!transitionState.currentState) {
+            // True is entering, it should start at -200 and slide in to 0.
+            assertThat(trueAnim.value).isEqualTo(IntOffset(trueTransition.playTimeMillis - 200, 0))
+            // False is leaving, it should start at 0 and slide out to 200.
+            assertThat(falseAnim.value).isEqualTo(IntOffset(falseTransition.playTimeMillis, 0))
+            rule.mainClock.advanceTimeByFrame()
+        }
+        rule.onNodeWithTag("false").assertDoesNotExist()
     }
 
     @OptIn(ExperimentalAnimationApi::class)
@@ -488,4 +531,7 @@ class AnimatedContentTest {
             flag = false
         }
     }
+
+    @OptIn(InternalAnimationApi::class)
+    private val Transition<*>.playTimeMillis get() = (playTimeNanos / 1_000_000L).toInt()
 }

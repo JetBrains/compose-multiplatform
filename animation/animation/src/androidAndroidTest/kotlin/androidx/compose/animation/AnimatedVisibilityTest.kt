@@ -44,8 +44,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -53,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth.assertThat
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -95,7 +98,8 @@ class AnimatedVisibilityTest {
                     ) { fullSize -> IntSize(fullSize.width / 10, fullSize.height / 5) },
                 ) {
                     Box(
-                        Modifier.requiredSize(100.dp, 100.dp)
+                        Modifier
+                            .requiredSize(100.dp, 100.dp)
                             .onGloballyPositioned {
                                 offset = it.localToRoot(Offset.Zero)
                             }
@@ -204,7 +208,8 @@ class AnimatedVisibilityTest {
                 ) { fullSize -> IntOffset(-fullSize.width / 10, fullSize.height / 5) },
             ) {
                 Box(
-                    Modifier.requiredSize(100.dp, 100.dp)
+                    Modifier
+                        .requiredSize(100.dp, 100.dp)
                         .onGloballyPositioned {
                             offset = it.localToRoot(Offset.Zero)
                         }
@@ -346,7 +351,11 @@ class AnimatedVisibilityTest {
                 enter = fadeIn(animationSpec = tween(500, easing = easing)),
                 exit = fadeOut(animationSpec = tween(300, easing = easingOut)),
             ) {
-                Box(modifier = Modifier.size(size = 20.dp).background(Color.White))
+                Box(
+                    modifier = Modifier
+                        .size(size = 20.dp)
+                        .background(Color.White)
+                )
                 LaunchedEffect(visible) {
                     var exit = false
                     val enterExit = transition
@@ -421,7 +430,11 @@ class AnimatedVisibilityTest {
                 enter = scaleIn(animationSpec = tween(500, easing = easing)),
                 exit = scaleOut(animationSpec = tween(300, easing = easingOut)),
             ) {
-                Box(modifier = Modifier.size(size = 20.dp).background(Color.White))
+                Box(
+                    modifier = Modifier
+                        .size(size = 20.dp)
+                        .background(Color.White)
+                )
                 LaunchedEffect(visible) {
                     var exit = false
                     val enterExit = transition
@@ -544,9 +557,11 @@ class AnimatedVisibilityTest {
                 transition.AnimatedVisibility(
                     // Only visible in State2
                     visible = { it == TestState.State2 },
-                    modifier = testModifier,
-                    enter = expandIn(animationSpec = tween(100)),
-                    exit = shrinkOut(animationSpec = tween(100))
+                    modifier = testModifier.testTag("content"),
+                    // Must use LinearEasing otherwise the target size will be reached before the
+                    // animation finishes running.
+                    enter = expandIn(animationSpec = tween(100, easing = LinearEasing)),
+                    exit = shrinkOut(animationSpec = tween(100, easing = LinearEasing))
                 ) {
                     Box(Modifier.requiredSize(100.dp, 100.dp)) {
                         DisposableEffect(Unit) {
@@ -559,29 +574,30 @@ class AnimatedVisibilityTest {
             }
         }
         rule.runOnIdle {
-            assertEquals(0, testModifier.width)
-            assertEquals(0, testModifier.height)
+            assertThat(testModifier.width).isEqualTo(0)
+            assertThat(testModifier.height).isEqualTo(0)
             testState.value = TestState.State2
         }
         while (currentState != TestState.State2) {
-            assertTrue(testModifier.width < 100)
+            assertThat(testModifier.width).isLessThan(100)
             rule.mainClock.advanceTimeByFrame()
         }
         rule.runOnIdle {
-            assertEquals(100, testModifier.width)
-            assertEquals(100, testModifier.height)
+            assertThat(testModifier.width).isEqualTo(100)
+            assertThat(testModifier.height).isEqualTo(100)
             testState.value = TestState.State3
         }
         while (currentState != TestState.State3) {
-            assertTrue(testModifier.width > 0)
-            assertFalse(disposed)
+            assertThat(testModifier.width).isGreaterThan(0)
+            rule.onNodeWithTag("content").assertExists()
+            assertThat(disposed).isFalse()
             rule.mainClock.advanceTimeByFrame()
         }
-        rule.mainClock.advanceTimeByFrame()
+        // When the hide animation finishes, it will never get measured with size 0 because the
+        // animation will remove it from the composition instead.
+        rule.onNodeWithTag("content").assertDoesNotExist()
         rule.runOnIdle {
-            assertEquals(0, testModifier.width)
-            assertEquals(0, testModifier.height)
-            assertTrue(disposed)
+            assertThat(disposed).isTrue()
         }
     }
 
