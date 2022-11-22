@@ -282,7 +282,7 @@ communicated to the developer.
 #### Alternate (C) considered: Shared state
 
 With this option all the state of each invocation of the movable content is shared between all
-invocations. This, effectively, indirectly hoists the state objects in the movable conent for
+invocations. This, effectively, indirectly hoists the state objects in the movable content for
 use in multiple places in the composition.
 
 The nodes themselves can be shared as the applier would be notified when it is requested to add a
