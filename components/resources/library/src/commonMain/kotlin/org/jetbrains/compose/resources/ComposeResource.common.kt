@@ -20,8 +20,8 @@ fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> {
     LaunchedEffect(this) {
         state.value = try {
             LoadState.Success(readBytes().toImageBitmap())
-        } catch (t: Throwable) {
-            LoadState.Error(t)
+        } catch (e: Exception) {
+            LoadState.Error(e)
         }
     }
     return state.value
