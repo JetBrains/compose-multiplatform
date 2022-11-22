@@ -23,7 +23,7 @@ Then choose **iosApp** configuration in IDE and run it
 
 `./gradlew desktopApp:run`
 
-## Run web assembly in browser via Gradle
+## Run JS in browser with WebAssembly Skia via Gradle
 
 `./gradlew jsApp:jsBrowserDevelopmentRun`
 
