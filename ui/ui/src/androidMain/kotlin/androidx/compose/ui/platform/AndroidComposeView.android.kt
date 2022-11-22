@@ -87,6 +87,8 @@ import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.InputModeManagerImpl
+import androidx.compose.ui.input.ModifierLocalScrollContainerInfo
+import androidx.compose.ui.input.ScrollContainerInfo
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
 import androidx.compose.ui.input.key.Key.Companion.DirectionDown
@@ -115,19 +117,17 @@ import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.layout.RootMeasurePolicy
+import androidx.compose.ui.modifier.ModifierLocalManager
+import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNode.UsageByParent
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
-import androidx.compose.ui.modifier.ModifierLocalManager
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.input.ScrollContainerInfo
-import androidx.compose.ui.input.ModifierLocalScrollContainerInfo
-import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -856,6 +856,10 @@ internal class AndroidComposeView(context: Context) :
         scheduleMeasureAndLayout()
     }
 
+    override fun measureAndLayoutForTest() {
+        measureAndLayout()
+    }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         trace("AndroidOwner:onMeasure") {
             if (!isAttachedToWindow) {
@@ -876,6 +880,7 @@ internal class AndroidComposeView(context: Context) :
             measureAndLayoutDelegate.updateRootConstraints(constraints)
             measureAndLayoutDelegate.measureOnly()
             setMeasuredDimension(root.width, root.height)
+
             if (_androidViewsHandler != null) {
                 androidViewsHandler.measure(
                     MeasureSpec.makeMeasureSpec(root.width, MeasureSpec.EXACTLY),
@@ -1214,8 +1219,10 @@ internal class AndroidComposeView(context: Context) :
             event.isFromSource(SOURCE_ROTARY_ENCODER) -> handleRotaryEvent(event)
             isBadMotionEvent(event) || !isAttachedToWindow ->
                 super.dispatchGenericMotionEvent(event)
+
             else -> handleMotionEvent(event).dispatchedToAPointerInputModifier
         }
+
         else -> super.dispatchGenericMotionEvent(event)
     }
 
@@ -1603,6 +1610,7 @@ internal class AndroidComposeView(context: Context) :
                     }
                 }
             }
+
             ACTION_HOVER_MOVE ->
                 // Check if we're receiving this when we've already handled it elsewhere
                 if (!isPositionChanged(event)) {
@@ -1789,8 +1797,10 @@ private object AndroidComposeViewVerificationHelperMethodsN {
         val iconToSet = when (icon) {
             is AndroidPointerIcon ->
                 icon.pointerIcon
+
             is AndroidPointerIconType ->
                 android.view.PointerIcon.getSystemIcon(view.context, icon.type)
+
             else ->
                 android.view.PointerIcon.getSystemIcon(
                     view.context,

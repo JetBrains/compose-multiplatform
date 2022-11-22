@@ -2588,6 +2588,7 @@ package androidx.compose.ui.node {
     method public androidx.compose.ui.unit.Density getDensity();
     method public androidx.compose.ui.semantics.SemanticsOwner getSemanticsOwner();
     method public androidx.compose.ui.text.input.TextInputService getTextInputService();
+    method @androidx.compose.ui.ExperimentalComposeUiApi public default void measureAndLayoutForTest();
     method public boolean sendKeyEvent(android.view.KeyEvent keyEvent);
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.semantics.SemanticsOwner semanticsOwner;
