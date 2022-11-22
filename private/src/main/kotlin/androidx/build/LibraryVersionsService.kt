@@ -30,8 +30,6 @@ import org.tomlj.TomlTable
 abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Parameters> {
     interface Parameters : BuildServiceParameters {
         var tomlFile: Provider<String>
-        var composeCustomVersion: Provider<String>
-        var composeCustomGroup: Provider<String>
         var useMultiplatformGroupVersions: Provider<Boolean>
     }
 
@@ -43,14 +41,7 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         val versions = parsedTomlFile.getTable("versions")
             ?: throw GradleException("Library versions toml file is missing [versions] table")
         versions.keySet().associateWith { versionName ->
-            val versionValue =
-                if (versionName.startsWith("COMPOSE") &&
-                    parameters.composeCustomVersion.isPresent
-                ) {
-                    parameters.composeCustomVersion.get()
-                } else {
-                    versions.getString(versionName)!!
-                }
+            val versionValue = versions.getString(versionName)!!
             Version.parseOrNull(versionValue)
                 ?: throw GradleException(
                     "$versionName does not match expected format - $versionValue"
@@ -83,11 +74,7 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         groups.keySet().associateWith { name ->
             val groupDefinition = groups.getTable(name)!!
             val groupName = groupDefinition.getString("group")!!
-            val finalGroupName = if (name.startsWith("COMPOSE") &&
-                parameters.composeCustomGroup.isPresent
-            ) {
-                groupName.replace("androidx.compose", parameters.composeCustomGroup.get())
-            } else groupName
+            val finalGroupName = groupName
 
             val atomicGroupVersion = readGroupVersion(
                 groupDefinition = groupDefinition,
