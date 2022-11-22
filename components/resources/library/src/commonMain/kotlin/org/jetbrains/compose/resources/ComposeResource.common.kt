@@ -21,9 +21,9 @@ private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 fun Resource.rememberImageBitmap(): ImageBitmap? {
     val state = remember(this) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(this) {
-        val loadingBytesState = readBytes()
-        if (loadingBytesState is LoadState.Success) {
-            state.value = loadingBytesState.value.toImageBitmap()
+        val result: ByteArray? = readBytes().getOrNull()
+        if (result != null) {
+            state.value = result.toImageBitmap()
         }
     }
     return state.value

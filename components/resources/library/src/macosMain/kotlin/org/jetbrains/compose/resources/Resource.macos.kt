@@ -16,7 +16,7 @@ actual fun resource(path: String): Resource = MacOSResourceImpl(path)
 
 @ExperimentalResourceApi
 private class MacOSResourceImpl(val path: String) : Resource {
-    override suspend fun readBytes(): LoadState<ByteArray> {
+    override suspend fun readBytes(): Result<ByteArray> {
         val currentDirectoryPath = NSFileManager.defaultManager().currentDirectoryPath
         val contentsAtPath: NSData? = NSFileManager.defaultManager().run {
             //todo in future bundle resources with app and use all sourceSets (skikoMain, nativeMain)
@@ -28,9 +28,9 @@ private class MacOSResourceImpl(val path: String) : Resource {
             byteArray.usePinned {
                 memcpy(it.addressOf(0), contentsAtPath.bytes, contentsAtPath.length)
             }
-            return LoadState.Success(byteArray)
+            return Result.success(byteArray)
         } else {
-            return LoadState.Error(MissingResource(path))
+            return Result.failure(MissingResource(path))
         }
     }
 
