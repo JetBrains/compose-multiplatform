@@ -63,7 +63,7 @@ import kotlinx.coroutines.launch
  *
  * @param state The associated [SwipeableV2State].
  * @param orientation The orientation in which the swipeable can be swiped.
- * @param enabled Whether this [swipeable] is enabled and should react to the user's input.
+ * @param enabled Whether this [swipeableV2] is enabled and should react to the user's input.
  * @param reverseDirection Whether to reverse the direction of the swipe, so a top to bottom
  * swipe will behave like bottom to top, and a left to right swipe will behave like right to left.
  * @param interactionSource Optional [MutableInteractionSource] that will passed on to
