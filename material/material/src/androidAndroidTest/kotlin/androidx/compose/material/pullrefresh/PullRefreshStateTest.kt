@@ -79,13 +79,14 @@ class PullRefreshStateTest {
 
     @Test
     fun pullLessThanOrEqualToThreshold_doesNot_triggerRefresh() {
+        lateinit var state: PullRefreshState
         var refreshCount = 0
         var touchSlop = 0f
         val threshold = 400f
 
         rule.setContent {
             touchSlop = LocalViewConfiguration.current.touchSlop
-            val state = rememberPullRefreshState(
+            state = rememberPullRefreshState(
                 refreshing = false,
                 onRefresh = { refreshCount++ },
                 refreshThreshold = with(LocalDensity.current) { threshold.toDp() }
@@ -110,7 +111,12 @@ class PullRefreshStateTest {
         // Equal to threshold
         pullRefreshNode.performTouchInput { swipeDown(endY = 2 * threshold + touchSlop) }
 
-        rule.runOnIdle { assertThat(refreshCount).isEqualTo(0) }
+        rule.runOnIdle {
+            assertThat(refreshCount).isEqualTo(0)
+            // Since onRefresh was not called, we should reset the position back to 0
+            assertThat(state.progress).isEqualTo(0f)
+            assertThat(state.position).isEqualTo(0f)
+        }
     }
 
     @Test
@@ -306,6 +312,43 @@ class PullRefreshStateTest {
             assertThat(state.progress).isEqualTo(0f)
             assertThat(state.position).isEqualTo(0f)
             assertThat(refreshCount).isEqualTo(0)
+        }
+    }
+
+    @Test
+    fun pullBeyondThreshold_refreshingNotChangedToTrue_animatePositionBackToZero() {
+        lateinit var state: PullRefreshState
+        var refreshCount = 0
+        var touchSlop = 0f
+        val threshold = 400f
+
+        rule.setContent {
+            touchSlop = LocalViewConfiguration.current.touchSlop
+            state = rememberPullRefreshState(
+                refreshing = false,
+                onRefresh = { refreshCount++ },
+                refreshThreshold = with(LocalDensity.current) { threshold.toDp() }
+            )
+
+            Box(Modifier.pullRefresh(state).testTag(PullRefreshTag)) {
+                LazyColumn {
+                    items(100) {
+                        Text("item $it")
+                    }
+                }
+            }
+        }
+
+        // Account for PullModifier - pull down twice the threshold value.
+        pullRefreshNode.performTouchInput { swipeDown(endY = 2 * threshold + touchSlop + 1f) }
+
+        rule.runOnIdle {
+            // onRefresh should be called
+            assertThat(refreshCount).isEqualTo(1)
+            // Since onRefresh did not change refreshing, we should have reset the position back to
+            // 0
+            assertThat(state.progress).isEqualTo(0f)
+            assertThat(state.position).isEqualTo(0f)
         }
     }
 
