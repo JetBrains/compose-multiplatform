@@ -64,10 +64,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth
 import kotlin.test.assertEquals
+import kotlin.test.assertNotEquals
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.test.assertNotEquals
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -108,6 +108,86 @@ class SnapFlingBehaviorTest {
 
         rule.runOnIdle {
             assertEquals(1, testLayoutInfoProvider.calculateApproachOffsetCount)
+        }
+    }
+
+    @Test
+    fun remainingScrollOffset_whenVelocityIsBelowThreshold_shouldRepresentShortSnapOffsets() {
+        val testLayoutInfoProvider = TestLayoutInfoProvider()
+        lateinit var testFlingBehavior: SnapFlingBehavior
+        val scrollOffset = mutableListOf<Float>()
+        rule.setContent {
+            testFlingBehavior = rememberSnapFlingBehavior(testLayoutInfoProvider)
+            VelocityEffect(
+                testFlingBehavior,
+                calculateVelocityThreshold() - 1
+            ) { remainingScrollOffset ->
+                scrollOffset.add(remainingScrollOffset)
+            }
+        }
+
+        // Will Snap Back
+        rule.runOnIdle {
+            assertEquals(scrollOffset.first(), testLayoutInfoProvider.minOffset)
+            assertEquals(scrollOffset.last(), 0f)
+        }
+    }
+
+    @Test
+    fun remainingScrollOffset_whenVelocityIsAboveThreshold_shouldRepresentLongSnapOffsets() {
+        val testLayoutInfoProvider = TestLayoutInfoProvider()
+        lateinit var testFlingBehavior: SnapFlingBehavior
+        val scrollOffset = mutableListOf<Float>()
+        rule.setContent {
+            testFlingBehavior = rememberSnapFlingBehavior(testLayoutInfoProvider)
+            VelocityEffect(
+                testFlingBehavior,
+                calculateVelocityThreshold() + 1
+            ) { remainingScrollOffset ->
+                scrollOffset.add(remainingScrollOffset)
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(scrollOffset.first { it != 0f }, testLayoutInfoProvider.maxOffset)
+            assertEquals(scrollOffset.last(), 0f)
+        }
+    }
+
+    @Test
+    fun remainingScrollOffset_longSnap_targetShouldChangeInAccordanceWithAnimation() {
+        // Arrange
+        val initialOffset = 250f
+        val testLayoutInfoProvider = TestLayoutInfoProvider(approachOffset = initialOffset)
+        lateinit var testFlingBehavior: SnapFlingBehavior
+        val scrollOffset = mutableListOf<Float>()
+        rule.mainClock.autoAdvance = false
+        rule.setContent {
+            testFlingBehavior = rememberSnapFlingBehavior(testLayoutInfoProvider)
+            VelocityEffect(
+                testFlingBehavior,
+                calculateVelocityThreshold() + 1
+            ) { remainingScrollOffset ->
+                scrollOffset.add(remainingScrollOffset)
+            }
+        }
+
+        // assert the initial value emitted by remainingScrollOffset was the one provider by the
+        // snap layout info provider
+        assertEquals(scrollOffset.first(), initialOffset)
+
+        // Act: Advance until remainingScrollOffset grows again
+        rule.mainClock.advanceTimeUntil {
+            scrollOffset.size > 2 &&
+                scrollOffset.last() > scrollOffset[scrollOffset.lastIndex - 1]
+        }
+
+        assertEquals(scrollOffset.last(), testLayoutInfoProvider.maxOffset)
+
+        rule.mainClock.autoAdvance = true
+        // Assert
+        rule.runOnIdle {
+            assertEquals(scrollOffset.last(), 0f)
         }
     }
 
@@ -360,13 +440,18 @@ class SnapFlingBehaviorTest {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun VelocityEffect(testFlingBehavior: FlingBehavior, velocity: Float) {
+private fun VelocityEffect(
+    testFlingBehavior: FlingBehavior,
+    velocity: Float,
+    onSettlingDistanceUpdated: (Float) -> Unit = {}
+) {
     val scrollableState = rememberScrollableState(consumeScrollDelta = { it })
     LaunchedEffect(Unit) {
         scrollableState.scroll {
-            with(testFlingBehavior) {
-                performFling(velocity)
+            with(testFlingBehavior as SnapFlingBehavior) {
+                performFling(velocity, onSettlingDistanceUpdated)
             }
         }
     }

@@ -17,8 +17,11 @@
 package androidx.compose.foundation.gesture.snapping
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.snapping.MinFlingVelocityDp
+import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
 import androidx.compose.foundation.gestures.snapping.calculateDistanceToDesiredSnapPosition
 import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
@@ -46,6 +49,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import com.google.common.truth.Truth
 import kotlin.math.abs
 import kotlin.math.absoluteValue
 import kotlin.test.assertEquals
@@ -63,6 +67,9 @@ class LazyListSnapFlingBehaviorTest(private val orientation: Orientation) :
 
     private val density: Density
         get() = rule.density
+
+    private lateinit var snapLayoutInfoProvider: SnapLayoutInfoProvider
+    private lateinit var snapFlingBehavior: FlingBehavior
 
     @Test
     fun belowThresholdVelocity_lessThanAnItemScroll_shouldStayInSamePage() {
@@ -360,15 +367,73 @@ class LazyListSnapFlingBehaviorTest(private val orientation: Orientation) :
         }
     }
 
+    @Test
+    fun remainingScrollOffset_shouldFollowAnimationOffsets() {
+        var stepSize = 0f
+        var velocityThreshold = 0f
+        val scrollOffset = mutableListOf<Float>()
+        // arrange
+        rule.setContent {
+            val density = LocalDensity.current
+            val state = rememberLazyListState()
+            stepSize = with(density) { ItemSize.toPx() }
+            velocityThreshold = with(density) { MinFlingVelocityDp.toPx() }
+            MainLayout(state = state, scrollOffset)
+        }
+
+        rule.mainClock.autoAdvance = false
+        // act
+        val velocity = velocityThreshold * 3
+        onMainList().performTouchInput {
+            swipeMainAxisWithVelocity(
+                1.5f * stepSize,
+                velocity
+            )
+        }
+        rule.mainClock.advanceTimeByFrame()
+
+        // assert
+        val initialTargetOffset =
+            with(snapLayoutInfoProvider) { density.calculateApproachOffset(velocity) }
+        Truth.assertThat(scrollOffset.first { it != 0f }).isWithin(0.5f)
+            .of(initialTargetOffset)
+
+        // act: wait for remaining offset to grow instead of decay, this indicates the last
+        // snap step will start
+        rule.mainClock.advanceTimeUntil {
+            scrollOffset.size > 2 &&
+                scrollOffset.last() > scrollOffset[scrollOffset.lastIndex - 1]
+        }
+
+        // assert: next calculated bound is the first value emitted by remainingScrollOffset
+        val bounds = with(snapLayoutInfoProvider) { density.calculateSnappingOffsetBounds() }
+        val finalRemainingOffset = bounds.endInclusive
+        Truth.assertThat(scrollOffset.last()).isWithin(0.5f)
+            .of(finalRemainingOffset)
+        rule.mainClock.autoAdvance = true
+
+        // assert: value settles back to zero
+        rule.runOnIdle {
+            Truth.assertThat(scrollOffset.last()).isEqualTo(0f)
+        }
+    }
+
     private fun onMainList() = rule.onNodeWithTag(TestTag)
 
     @Composable
-    fun MainLayout(state: LazyListState) {
-        val layoutInfoProvider = remember(state) { SnapLayoutInfoProvider(state) }
+    fun MainLayout(state: LazyListState, scrollOffset: MutableList<Float> = mutableListOf()) {
+        snapLayoutInfoProvider = remember(state) { SnapLayoutInfoProvider(state) }
+        val innerFlingBehavior =
+            rememberSnapFlingBehavior(snapLayoutInfoProvider = snapLayoutInfoProvider)
+        snapFlingBehavior = remember(innerFlingBehavior) {
+            QuerySnapFlingBehavior(innerFlingBehavior) {
+                scrollOffset.add(it)
+            }
+        }
         LazyColumnOrRow(
             state = state,
             modifier = Modifier.testTag(TestTag),
-            flingBehavior = rememberSnapFlingBehavior(snapLayoutInfoProvider = layoutInfoProvider)
+            flingBehavior = snapFlingBehavior
         ) {
             items(200) {
                 Box(modifier = Modifier.size(ItemSize))
@@ -434,5 +499,17 @@ class LazyListSnapFlingBehaviorTest(private val orientation: Orientation) :
         const val TestTag = "MainList"
         val CenterToCenter: Density.(Float, Float) -> Float =
             { layoutSize, itemSize -> layoutSize / 2f - itemSize / 2f }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private class QuerySnapFlingBehavior(
+    val snapFlingBehavior: SnapFlingBehavior,
+    val onAnimationStep: (Float) -> Unit
+) : FlingBehavior {
+    override suspend fun ScrollScope.performFling(initialVelocity: Float): Float {
+        return with(snapFlingBehavior) {
+            performFling(initialVelocity, onAnimationStep)
+        }
     }
 }
