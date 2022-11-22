@@ -21,9 +21,27 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.PathFillType
+import androidx.compose.ui.graphics.PathMeasure
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Stroke
 
+/**
+ * Defines a group of [Path]s and other [Group]s inside a [VectorPainter]. This is not a regular UI
+ * composable, it can only be called inside composables called from the content parameter to
+ * [rememberVectorPainter].
+ *
+ * @param name Optional name of the group used when describing the vector as a string.
+ * @param rotation The rotation of the group around the Z axis, in degrees.
+ * @param pivotX The horizontal pivot point used for rotation, in pixels.
+ * @param pivotY The vertical pivot point used for rotation, in pixels.
+ * @param scaleX Factor to scale the group by horizontally.
+ * @param scaleY Factor to scale the group by vertically.
+ * @param translationX Horizontal offset of the group, in pixels.
+ * @param translationY Vertical offset of the group, in pixels.
+ * @param clipPathData A list of [PathNode]s that define how to clip the group. Empty by default.
+ * @param content A composable that defines the contents of the group.
+ */
 @Composable
 @VectorComposable
 fun Group(
@@ -56,6 +74,27 @@ fun Group(
     }
 }
 
+/**
+ * Defines a path inside a [VectorPainter]. This is not a regular UI composable, it can only be
+ * called inside composables called from the content parameter to [rememberVectorPainter].
+ *
+ * @param pathData List of [PathNode]s that define the path.
+ * @param pathFillType The [PathFillType] that specifies how to fill the path.
+ * @param name Optional name of the path used when describing the vector as a string.
+ * @param fill The [Brush] used to fill the path.
+ * @param fillAlpha The alpha value to use for [fill].
+ * @param stroke The [Brush] used to stroke the path.
+ * @param strokeAlpha The alpha value to use for [stroke].
+ * @param strokeLineWidth The width of the [stroke]. See [Stroke.width] for details.
+ * @param strokeLineCap The [StrokeCap] of [stroke]. See [Stroke.cap] for details.
+ * @param strokeLineJoin The [StrokeJoin] of [stroke]. See [Stroke.join] for details.
+ * @param strokeLineMiter The stroke miter value. See [Stroke.miter] for details.
+ * @param trimPathStart The fraction of the path that specifies the start of the clipped region of
+ * the path. See [PathMeasure.getSegment].
+ * @param trimPathEnd The fraction of the path that specifies the end of the clipped region of the
+ * path. See [PathMeasure.getSegment].
+ * @param trimPathOffset The amount to offset both [trimPathStart] and [trimPathEnd].
+ */
 @Composable
 @VectorComposable
 fun Path(
