@@ -88,6 +88,7 @@ Run native macos sample:
 export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version &&\
 ./scripts/publishToMavenLocal -Pcompose.platforms=all &&\
 ./scripts/publishGradlePluginToMavenLocal &&\
+./scripts/publishComponentsToMavenLocal &&\
 ./scripts/publishWebComponentsToMavenLocal
 ```
 `-Pcompose.platforms=all` could be replace with comma-separated list of platforms, such as `js,jvm,androidDebug,androidRelease,macosx64,uikit`.

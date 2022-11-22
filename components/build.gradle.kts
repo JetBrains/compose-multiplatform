@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") apply false
+    id("com.android.library") apply false
 }
 
 subprojects {
@@ -9,6 +10,7 @@ subprojects {
         google()
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        mavenLocal()
     }
 
     plugins.withId("java") {
