@@ -23,4 +23,4 @@ private class AndroidResourceImpl(path: String) : AbstractResourceImpl(path) {
 }
 
 internal actual class MissingResourceException actual constructor(path: String) :
-    IOException("missing resource with path: $path")
+    IOException("Missing resource with path: $path")

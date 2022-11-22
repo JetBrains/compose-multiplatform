@@ -12,7 +12,7 @@ val composeVersion = extra["compose.version"] as String
 kotlin {
     jvm("desktop")
     android {
-        publishLibraryVariants("release", "debug")
+        publishLibraryVariants("release")
     }
     ios()
     iosSimulatorArm64()

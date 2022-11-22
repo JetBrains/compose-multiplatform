@@ -41,4 +41,4 @@ private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
 private fun ArrayBuffer.toByteArray() = Int8Array(this, 0, byteLength).unsafeCast<ByteArray>()
 
 internal actual class MissingResourceException actual constructor(path: String) :
-    Exception("missing resource with path: $path")
+    Exception("Missing resource with path: $path")

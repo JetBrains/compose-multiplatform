@@ -34,4 +34,4 @@ private class UIKitResourceImpl(path: String) : AbstractResourceImpl(path) {
 }
 
 internal actual class MissingResourceException actual constructor(path: String) :
-    Exception("missing resource with path: $path")
+    Exception("Missing resource with path: $path")
