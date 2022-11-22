@@ -2,7 +2,6 @@ package org.jetbrains.compose.demo.widgets.platform
 
 object Res {
     object drawable {
-        val food6 = "drawable-nodpi/food6.jpg"
         val p1 = "drawable-nodpi/p1.jpeg"
         val p2 = "drawable-nodpi/p2.jpeg"
         val p3 = "drawable-nodpi/p3.jpeg"

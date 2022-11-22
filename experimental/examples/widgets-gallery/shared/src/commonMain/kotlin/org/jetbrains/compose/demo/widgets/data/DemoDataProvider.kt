@@ -9,6 +9,5 @@ object DemoDataProvider {
         1,
         "Awesome List Item",
         "Very awesome list item has very awesome subtitle. This is bit long",
-        Res.drawable.food6
     )
 }
