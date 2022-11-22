@@ -14,10 +14,9 @@ interface Resource {
 }
 
 /**
- * Get resource from sourceSet/resources.
- * For examples commonMain/resources
+ * Get a resource from <sourceSet>/resources (for example, from commonMain/resources).
  */
 @ExperimentalResourceApi
 expect fun resource(path: String): Resource
 
-internal class MissingResource(path: String):Exception("missing resource with path: $path")
+internal expect class MissingResourceException(path: String)

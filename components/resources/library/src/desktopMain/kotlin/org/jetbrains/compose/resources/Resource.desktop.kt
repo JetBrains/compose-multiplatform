@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.resources
 
+import java.io.IOException
+
 @ExperimentalResourceApi
 actual fun resource(path: String): Resource = DesktopResourceImpl(path)
 
@@ -17,7 +19,7 @@ private class DesktopResourceImpl(val path: String) : Resource {
         if (resource != null) {
             return Result.success(resource.readBytes())
         } else {
-            return Result.failure(MissingResource(path))
+            return Result.failure(MissingResourceException(path))
         }
     }
 
@@ -34,3 +36,6 @@ private class DesktopResourceImpl(val path: String) : Resource {
         return path.hashCode()
     }
 }
+
+internal actual class MissingResourceException actual constructor(path: String) :
+    IOException("missing resource with path: $path")

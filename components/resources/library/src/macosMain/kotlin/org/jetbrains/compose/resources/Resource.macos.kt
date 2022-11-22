@@ -30,7 +30,7 @@ private class MacOSResourceImpl(val path: String) : Resource {
             }
             return Result.success(byteArray)
         } else {
-            return Result.failure(MissingResource(path))
+            return Result.failure(MissingResourceException(path))
         }
     }
 
@@ -47,3 +47,6 @@ private class MacOSResourceImpl(val path: String) : Resource {
         return path.hashCode()
     }
 }
+
+internal actual class MissingResourceException actual constructor(path: String) :
+    Exception("missing resource with path: $path")

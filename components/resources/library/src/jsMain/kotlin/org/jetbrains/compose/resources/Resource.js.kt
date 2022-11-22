@@ -29,7 +29,7 @@ private class JSResourceImpl(val path: String) : Resource {
                 if (arrayBuffer is ArrayBuffer) {
                     continuation.resume(Result.success(arrayBuffer.toByteArray()))
                 } else {
-                    continuation.resume(Result.failure(MissingResource(path)))
+                    continuation.resume(Result.failure(MissingResourceException(path)))
                 }
             }
             req.send(null)
@@ -51,3 +51,6 @@ private class JSResourceImpl(val path: String) : Resource {
 }
 
 private fun ArrayBuffer.toByteArray() = Int8Array(this, 0, byteLength).unsafeCast<ByteArray>()
+
+internal actual class MissingResourceException actual constructor(path: String) :
+    Exception("missing resource with path: $path")
