@@ -18,6 +18,7 @@ package androidx.compose.foundation.text
 
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.isAltPressed
 import androidx.compose.ui.input.key.isCtrlPressed
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
@@ -146,6 +147,12 @@ internal val defaultKeyMapping: KeyMapping =
                         when (event.key) {
                             MappedKeys.MoveHome -> KeyCommand.SELECT_HOME
                             MappedKeys.MoveEnd -> KeyCommand.SELECT_END
+                            else -> null
+                        }
+                    event.isAltPressed ->
+                        when (event.key) {
+                            MappedKeys.Backspace -> KeyCommand.DELETE_FROM_LINE_START
+                            MappedKeys.Delete -> KeyCommand.DELETE_TO_LINE_END
                             else -> null
                         }
                     else -> null
