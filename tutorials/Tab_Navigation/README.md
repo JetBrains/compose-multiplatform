@@ -312,7 +312,7 @@ fun main() = application {
 
 ## Known problems
 
-### Tab key navigation work's bad with multiline TextField
+### Tab key navigation doesn't work in a multiline TextField
 ```Kotlin
 Column(
     modifier = Modifier.padding(50.dp)
