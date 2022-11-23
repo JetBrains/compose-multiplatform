@@ -39,8 +39,6 @@ open class AndroidXExtension(val project: Project) {
             File(project.getSupportRootFolder(), "libraryversions.toml")
         )
         val content = project.providers.fileContents(toml)
-        val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
-        val composeCustomGroup = project.providers.environmentVariable("COMPOSE_CUSTOM_GROUP")
         val useMultiplatformVersions = project.provider {
             Multiplatform.isKotlinNativeEnabled(project)
         }
@@ -50,8 +48,6 @@ open class AndroidXExtension(val project: Project) {
             LibraryVersionsService::class.java
         ) { spec ->
             spec.parameters.tomlFile = content.asText
-            spec.parameters.composeCustomVersion = composeCustomVersion
-            spec.parameters.composeCustomGroup = composeCustomGroup
             spec.parameters.useMultiplatformGroupVersions = useMultiplatformVersions
         }
         LibraryGroups = serviceProvider.get().libraryGroups
