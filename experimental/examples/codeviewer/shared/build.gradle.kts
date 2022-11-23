@@ -23,6 +23,7 @@ kotlin {
         framework {
             baseName = "shared"
         }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
@@ -32,6 +33,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
+                implementation("org.jetbrains.compose.components:components-resources:0.0.0-custom-version")
             }
         }
         val androidMain by getting {
