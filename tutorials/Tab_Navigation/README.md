@@ -329,7 +329,7 @@ Column(
 ```
 When the user presses the 'Tab' key, the focus doesn't switch to the next focusable component. Instead the Tab character is added.
 
-#### Possible workaround:
+#### A possible workaround
 
 This workaround mentioned in [Issues/109](https://github.com/JetBrains/compose-jb/issues/109#issuecomment-1161705265)
 
