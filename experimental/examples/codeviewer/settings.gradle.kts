@@ -20,4 +20,8 @@ pluginManagement {
     }
 }
 
-include(":common", ":android", ":desktop")
+rootProject.name = "codeviewer"
+
+include(":androidApp")
+include(":shared")
+include(":desktopApp")
