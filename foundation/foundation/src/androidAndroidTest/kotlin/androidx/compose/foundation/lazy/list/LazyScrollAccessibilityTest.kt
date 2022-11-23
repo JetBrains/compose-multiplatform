@@ -54,6 +54,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -154,6 +155,7 @@ class LazyScrollAccessibilityTest(private val config: TestConfig) {
         )
     }
 
+    @SdkSuppress(minSdkVersion = 29) // b/260011449
     @Test
     fun verifyScrollActionsAtEnd() {
         createScrollableContent_StartAtEnd()
