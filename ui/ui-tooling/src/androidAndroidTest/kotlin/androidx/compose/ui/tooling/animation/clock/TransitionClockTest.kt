@@ -38,6 +38,7 @@ import androidx.compose.ui.tooling.animation.states.ComposeAnimationState
 import androidx.compose.ui.tooling.animation.states.TargetState
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -212,6 +213,7 @@ class TransitionClockTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 29) // b/260004689
     @Test
     fun clockWithAnimatedContent() {
         val clock = createBooleanTransitionClockWithAnimatedContent()
