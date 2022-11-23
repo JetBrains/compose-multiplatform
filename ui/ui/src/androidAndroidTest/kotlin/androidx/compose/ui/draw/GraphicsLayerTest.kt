@@ -391,6 +391,7 @@ class GraphicsLayerTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCameraDistanceWithRotationY() {
+        if (Build.VERSION.SDK_INT == 28) return // b/260095151
         val testTag = "parent"
         rule.setContent {
             Box(modifier = Modifier.testTag(testTag).wrapContentSize()) {
