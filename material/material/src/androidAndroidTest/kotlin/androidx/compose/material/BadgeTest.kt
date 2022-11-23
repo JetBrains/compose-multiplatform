@@ -15,7 +15,6 @@
  */
 package androidx.compose.material
 
-import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -115,7 +114,8 @@ class BadgeTest {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O) // captureToImage() requires API level 26
+    // @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O) // captureToImage() requires API level 26
+    @SdkSuppress(minSdkVersion = 28) // b/260004658
     fun badge_noContent_shape() {
         var errorColor = Color.Unspecified
         rule.setMaterialContent {
