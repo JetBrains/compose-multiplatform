@@ -327,7 +327,7 @@ Column(
     }
 }
 ```
-When User press 'Tab' key, navigation not performs, and adding tab character to text value.
+When the user presses the 'Tab' key, the focus doesn't switch to the next focusable component. Instead the Tab character is added.
 
 #### Possible workaround:
 
