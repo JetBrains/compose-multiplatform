@@ -39,16 +39,16 @@ open class AndroidXExtension(val project: Project) {
             File(project.getSupportRootFolder(), "libraryversions.toml")
         )
         val content = project.providers.fileContents(toml)
+        // it was removed in AOSP. When there will be a conflict on rebase, keep this
         val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
-        val composeCustomGroup = project.providers.provider { "org.jetbrains.compose" }
 
         val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
             "libraryVersionsService",
             LibraryVersionsService::class.java
         ) { spec ->
             spec.parameters.tomlFile = content.asText
+            // it was removed in AOSP. When there will be a conflict on rebase, keep this
             spec.parameters.composeCustomVersion = composeCustomVersion
-            spec.parameters.composeCustomGroup = composeCustomGroup
         }
         LibraryGroups = serviceProvider.get().libraryGroups
         LibraryVersions = serviceProvider.get().libraryVersions
