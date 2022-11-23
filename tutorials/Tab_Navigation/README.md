@@ -314,15 +314,15 @@ fun main() = application {
 
 ### Tab key navigation doesn't work in a multiline TextField
 ``` Kotlin
-Column(
-    modifier = Modifier.padding(50.dp)
-) {
-    for (x in 1..5) {
-        val text = remember { mutableStateOf("") }
+Column {
+    repeat(5) {
+        var text by remember { mutableStateOf("Hello, World!") }
+
         OutlinedTextField(
-            value = text.value,
-            singleLine = false, // Make attention here! Also by default singleLine is false.
-            onValueChange = { text.value = it }
+            value = text,
+            singleLine = false, // Pay attention here! Also, by default, singleLine is false.
+            onValueChange = { text = it },
+            modifier = Modifier.padding(8.dp)
         )
     }
 }
@@ -332,31 +332,51 @@ When the user presses the 'Tab' key, the focus doesn't switch to the next focusa
 #### A possible workaround
 
 This workaround is mentioned in [Issues/109](https://github.com/JetBrains/compose-jb/issues/109#issuecomment-1161705265).
-
+Write a custom Modifier.moveFocusOnTab:
 ```Kotlin
-OutlinedTextField(
-    value = text.value,
-    singleLine = false,
-    onValueChange = { text.value = it },
-    modifier = Modifier.moveFocusOnTab()
-)
-```
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.input.key.*
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.singleWindowApplication
 
-And function moveFocusOnTab():
+fun main() = singleWindowApplication {
+    Column {
+        repeat(5) {
+            var text by remember { mutableStateOf("Hello, World!") }
 
-```Kotlin
+            OutlinedTextField(
+                value = text,
+                singleLine = false, // Pay attention here! Also, by default, singleLine is false.
+                onValueChange = { text = it },
+                modifier = Modifier.padding(8.dp).moveFocusOnTab()
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
-@Composable
-fun Modifier.moveFocusOnTab(
-    focusManager: FocusManager = LocalFocusManager.current
-) = onPreviewKeyEvent {
+fun Modifier.moveFocusOnTab() = composed {
+    val focusManager = LocalFocusManager.current
+    onPreviewKeyEvent {
         if (it.type == KeyEventType.KeyDown && it.key == Key.Tab) {
             focusManager.moveFocus(
-                if (it.isShiftPressed) FocusDirection.Previous
-                else FocusDirection.Next
+                if (it.isShiftPressed) FocusDirection.Previous else FocusDirection.Next
             )
-            return@onPreviewKeyEvent true
+            true
+        } else {
+            false
         }
-        false
     }
+}
 ```
