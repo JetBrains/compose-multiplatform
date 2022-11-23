@@ -16,9 +16,11 @@
 
 package androidx.compose.material.swipeable
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.material.AutoTestFrameClock
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SwipeableV2Defaults
 import androidx.compose.material.SwipeableV2State
 import androidx.compose.material.fixedPositionalThreshold
 import androidx.compose.material.fractionalPositionalThreshold
@@ -341,16 +343,56 @@ class SwipeableV2GestureTest {
         assertThat(state.currentValue).isEqualTo(A)
     }
 
+    @Test
+    fun swipeable_dragBeyondBounds_clampsAndSwipesBack() {
+        val anchors = mapOf(
+            A to 0f,
+            C to 500f
+        )
+        val state = SwipeableTestState(
+            initialState = A,
+            velocityThreshold = 0.dp
+        )
+        rule.setContent {
+            SwipeableBox(
+                state,
+                calculateAnchor = { state, _ ->
+                    anchors[state]
+                }
+            )
+        }
+
+        val overdrag = 100f
+        val maxBound = state.anchors.getValue(C)
+
+        rule.onNodeWithTag(swipeableTestTag)
+            .performTouchInput {
+                down(Offset(0f, 0f))
+                moveBy(Offset(x = maxBound + overdrag, y = 0f))
+                moveBy(Offset(x = -overdrag, y = 0f))
+            }
+
+        rule.waitForIdle()
+
+        // If we have not correctly coerced our drag deltas, its internal offset would be the
+        // max bound + overdrag. If it is coerced correctly, it will not move past the max bound.
+        // This means that once we swipe back by the amount of overdrag, we should end up at the
+        // max bound - overdrag.
+        assertThat(state.requireOffset()).isEqualTo(maxBound - overdrag)
+    }
+
     private fun SwipeableTestState(
         initialState: TestState,
         density: Density = rule.density,
-        positionalThreshold: Density.(distance: Float) -> Float = { 56f },
+        positionalThreshold: Density.(distance: Float) -> Float = { 56.dp.toPx() },
         velocityThreshold: Dp = 125.dp,
-        anchors: Map<TestState, Float>? = null
+        anchors: Map<TestState, Float>? = null,
+        animationSpec: AnimationSpec<Float> = SwipeableV2Defaults.AnimationSpec
     ) = SwipeableV2State(
         initialValue = initialState,
         positionalThreshold = positionalThreshold,
-        velocityThreshold = velocityThreshold
+        velocityThreshold = velocityThreshold,
+        animationSpec = animationSpec
     ).apply {
         if (anchors != null) updateAnchors(anchors)
         this.density = density

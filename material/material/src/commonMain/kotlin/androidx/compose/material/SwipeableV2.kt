@@ -194,9 +194,8 @@ internal class SwipeableV2State<T>(
      * To guarantee stricter semantics, consider using [requireOffset].
      */
     @get:Suppress("AutoBoxing")
-    val offset: Float? by derivedStateOf {
-        dragPosition?.coerceIn(minBound, maxBound)
-    }
+    var offset: Float? by mutableStateOf(null)
+        private set
 
     /**
      * Require the current offset.
@@ -239,13 +238,11 @@ internal class SwipeableV2State<T>(
     var lastVelocity: Float by mutableStateOf(0f)
         private set
 
-    private var dragPosition by mutableStateOf<Float?>(null)
-
     private val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
     private val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
 
     internal val draggableState = DraggableState {
-        dragPosition = (dragPosition ?: 0f) + it
+        offset = ((offset ?: 0f) + it).coerceIn(minBound, maxBound)
     }
 
     internal var anchors by mutableStateOf(emptyMap<T, Float>())
@@ -256,7 +253,7 @@ internal class SwipeableV2State<T>(
         val previousAnchorsEmpty = anchors.isEmpty()
         anchors = newAnchors
         if (previousAnchorsEmpty) {
-            dragPosition = anchors.requireAnchor(this.currentValue)
+            offset = anchors.requireAnchor(this.currentValue)
         }
     }
 
@@ -298,10 +295,14 @@ internal class SwipeableV2State<T>(
         try {
             draggableState.drag {
                 isAnimationRunning = true
-                var prev = dragPosition ?: 0f
+                var prev = offset ?: 0f
                 try {
                     animate(prev, targetOffset, velocity, animationSpec) { value, velocity ->
-                        dragBy(value - prev)
+                        // Our onDrag coerces the value within the bounds, but an animation may
+                        // overshoot, for example a spring animation or an overshooting interpolator
+                        // We respect the user's intention and allow the overshoot, but still use
+                        // DraggableState's drag for its mutex.
+                        offset = value
                         prev = value
                         lastVelocity = velocity
                     }
@@ -311,10 +312,7 @@ internal class SwipeableV2State<T>(
             }
             lastVelocity = 0f
         } finally {
-            val endOffset = requireNotNull(dragPosition) {
-                "The drag position was in an " +
-                    "invalid state. Please report this issue."
-            }
+            val endOffset = requireOffset()
             val endState = anchors
                 .entries
                 .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
@@ -347,7 +345,7 @@ internal class SwipeableV2State<T>(
      * @return The delta the [draggableState] will consume
      */
     fun dispatchRawDelta(delta: Float): Float {
-        val currentDragPosition = dragPosition ?: 0f
+        val currentDragPosition = offset ?: 0f
         val potentiallyConsumed = currentDragPosition + delta
         val clamped = potentiallyConsumed.coerceIn(minBound, maxBound)
         val deltaToConsume = clamped - currentDragPosition
