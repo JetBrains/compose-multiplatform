@@ -309,3 +309,54 @@ fun main() = application {
 ```
 
 <img alt="reverse-order" src="focus-switcher.gif" height="480" />
+
+## Known problems
+
+### Tab key navigation work's bad with multiline TextField
+```Kotlin
+Column(
+    modifier = Modifier.padding(50.dp)
+) {
+    for (x in 1..5) {
+        val text = remember { mutableStateOf("") }
+        OutlinedTextField(
+            value = text.value,
+            singleLine = false, // Make attention here! Also by default singleLine is false.
+            onValueChange = { text.value = it }
+        )
+    }
+}
+```
+When User press 'Tab' key, navigation not performs, and adding tab character to text value.
+
+#### Possible workaround:
+
+This workaround mentioned in [Issues/109](https://github.com/JetBrains/compose-jb/issues/109#issuecomment-1161705265)
+
+```Kotlin
+OutlinedTextField(
+    value = text.value,
+    singleLine = false,
+    onValueChange = { text.value = it },
+    modifier = Modifier.moveFocusOnTab()
+)
+```
+
+And function moveFocusOnTab():
+
+```Kotlin
+@OptIn(ExperimentalComposeUiApi::class)
+@Composable
+fun Modifier.moveFocusOnTab(
+    focusManager: FocusManager = LocalFocusManager.current
+) = onPreviewKeyEvent {
+        if (it.type == KeyEventType.KeyDown && it.key == Key.Tab) {
+            focusManager.moveFocus(
+                if (it.isShiftPressed) FocusDirection.Previous
+                else FocusDirection.Next
+            )
+            return@onPreviewKeyEvent true
+        }
+        false
+    }
+```
