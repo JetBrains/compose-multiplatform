@@ -39,6 +39,6 @@ internal class TransitionComposeAnimation<T>(
     override val animationObject: Transition<T>,
     override val states: Set<Any>,
     override val label: String?
-) : ComposeAnimation {
+) : ComposeAnimation, TransitionBasedAnimation<T> {
     override val type = ComposeAnimationType.TRANSITION_ANIMATION
 }

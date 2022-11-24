@@ -32,13 +32,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.tooling.animation.AnimatedContentComposeAnimation.Companion.parseAnimatedContent
+import androidx.compose.ui.tooling.animation.AnimationSearch
 import androidx.compose.ui.tooling.animation.TransitionComposeAnimation
+import androidx.compose.ui.tooling.animation.Utils.searchForAnimation
 import androidx.compose.ui.tooling.animation.parse
 import androidx.compose.ui.tooling.animation.states.ComposeAnimationState
 import androidx.compose.ui.tooling.animation.states.TargetState
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -53,6 +57,8 @@ class TransitionClockTest {
     enum class EnumState { One, Two, Three }
 
     data class CustomState(val number: Int)
+
+    //region updateTransition() animations
 
     @Test
     fun clockWithEnumState() {
@@ -234,7 +240,7 @@ class TransitionClockTest {
             assertEquals(310, clock.getMaxDuration(), 30)
             assertEquals(310, clock.getMaxDurationPerIteration(), 30)
             val transitions = clock.getTransitions(100L)
-            assertEquals(4, transitions.size)
+            assertEquals(3, transitions.size)
             transitions[0].let {
                 assertEquals("DeferredAnimation", it.label)
                 assertEquals(0, it.startTimeMillis)
@@ -255,10 +261,6 @@ class TransitionClockTest {
                 assertEquals(310, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.TweenSpec", it.specType)
                 assertGreaterThanOrEqualTo(3, it.values.size)
-            }
-            transitions[3].let {
-                // This animation probably will be removed.
-                assertEquals("TransformOriginInterruptionHandling", it.label)
             }
         }
     }
@@ -493,6 +495,128 @@ class TransitionClockTest {
         }
         return clock
     }
+
+    //endregion
+
+    //region AnimatedContent() animations
+    @Test
+    fun animatedContentClockState() {
+        val search = AnimationSearch.AnimatedContentSearch { }
+        val target = mutableStateOf<Dp?>(null)
+        rule.searchForAnimation(search) { AnimatedContent(1.dp) { target.value = it } }
+        val clock = TransitionClock(search.animations.first().parseAnimatedContent()!!)
+        rule.runOnIdle {
+            clock.setStateParameters(10.dp, 10.dp)
+            clock.setClockTime(0)
+        }
+        rule.runOnIdle {
+            assertEquals(TargetState(10.dp, 10.dp), clock.state)
+            assertEquals(10.dp, target.value)
+            // Change state
+            clock.setStateParameters(20.dp, 40.dp)
+            clock.setClockTime(0)
+        }
+        rule.runOnIdle {
+            assertEquals(TargetState(20.dp, 40.dp), clock.state)
+            assertEquals(40.dp, target.value)
+        }
+    }
+
+    @Test
+    fun animatedContentClockProperties() {
+        val search = AnimationSearch.AnimatedContentSearch { }
+        rule.searchForAnimation(search) { AnimatedContent(1.dp) {} }
+        val clock = TransitionClock(search.animations.first().parseAnimatedContent()!!)
+        rule.runOnIdle {
+            clock.setStateParameters(10.dp, 10.dp)
+        }
+        rule.runOnIdle {
+            assertEquals(2, clock.getAnimatedProperties().size)
+            clock.setStateParameters(20.dp, 40.dp)
+        }
+        rule.runOnIdle {
+            assertEquals(3, clock.getAnimatedProperties().size)
+        }
+    }
+
+    @Test
+    fun animatedContentClockTransitions() {
+        val search = AnimationSearch.AnimatedContentSearch { }
+        rule.searchForAnimation(search) { AnimatedContent(1.dp) {} }
+        val clock = TransitionClock(search.animations.first().parseAnimatedContent()!!)
+        rule.runOnIdle {
+            clock.setStateParameters(10.dp, 10.dp)
+            clock.setClockTime(0)
+        }
+        rule.runOnIdle {
+            // Default clock state.
+            clock.getTransitions(100).let {
+                assertEquals(2, it.size)
+                it[0].let { info ->
+                    assertEquals(0, info.startTimeMillis)
+                    assertEquals(0, info.endTimeMillis)
+                    assertEquals(1, info.values.size)
+                    assertNotNull(info.specType)
+                }
+                it[1].let { info ->
+                    assertEquals(0, info.startTimeMillis)
+                    assertEquals(0, info.endTimeMillis)
+                    assertEquals(1, info.values.size)
+                    assertNotNull(info.specType)
+                }
+            }
+            // Change state
+            clock.setStateParameters(20.dp, 40.dp)
+            clock.setClockTime(0)
+        }
+        rule.waitForIdle()
+        rule.runOnIdle {
+            clock.getTransitions(100).let {
+                assertEquals(3, it.size)
+                it[0].let { info ->
+                    assertTrue(info.startTimeMillis >= 0)
+                    assertTrue(info.endTimeMillis >= 0)
+                    assertTrue(info.values.isNotEmpty())
+                    assertTrue(info.values.isNotEmpty())
+                    assertNotNull(info.specType)
+                }
+                it[1].let { info ->
+                    assertTrue(info.startTimeMillis >= 0)
+                    assertTrue(info.endTimeMillis >= 0)
+                    assertTrue(info.values.isNotEmpty())
+                    assertTrue(info.values.isNotEmpty())
+                    assertNotNull(info.specType)
+                }
+                it[2].let { info ->
+                    assertTrue(info.startTimeMillis >= 0)
+                    assertTrue(info.endTimeMillis >= 0)
+                    assertTrue(info.values.isNotEmpty())
+                    assertTrue(info.values.isNotEmpty())
+                    assertNotNull(info.specType)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun animatedContentClockDuration() {
+        val search = AnimationSearch.AnimatedContentSearch { }
+        rule.searchForAnimation(search) {
+            AnimatedContent(targetState = 1.dp) {}
+        }
+        val clock = TransitionClock(search.animations.first().parseAnimatedContent()!!)
+        rule.runOnIdle {
+            assertEquals(0, clock.getMaxDuration())
+            assertEquals(0, clock.getMaxDurationPerIteration())
+            // Change state
+            clock.setStateParameters(20.dp, 40.dp)
+        }
+        rule.runOnIdle {
+            assertTrue(clock.getMaxDuration() >= 100)
+            assertTrue(clock.getMaxDurationPerIteration() >= 100)
+        }
+    }
+    //endregion
 
     fun assertEquals(expected: Int, actual: Int, delta: Int) {
         assertEquals(null, expected.toFloat(), actual.toFloat(), delta.toFloat())

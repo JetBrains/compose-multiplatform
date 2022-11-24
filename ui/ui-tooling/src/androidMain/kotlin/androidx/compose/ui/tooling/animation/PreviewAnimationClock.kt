@@ -25,6 +25,7 @@ import androidx.compose.animation.tooling.ComposeAnimatedProperty
 import androidx.compose.animation.tooling.ComposeAnimation
 import androidx.compose.animation.tooling.TransitionInfo
 import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation.Companion.parse
+import androidx.compose.ui.tooling.animation.AnimatedContentComposeAnimation.Companion.parseAnimatedContent
 import androidx.compose.ui.tooling.animation.InfiniteTransitionComposeAnimation.Companion.parse
 import androidx.compose.ui.tooling.animation.clock.AnimateXAsStateClock
 import androidx.compose.ui.tooling.animation.clock.AnimatedVisibilityClock
@@ -83,10 +84,17 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     @VisibleForTesting
     internal val infiniteTransitionClocks =
         mutableMapOf<InfiniteTransitionComposeAnimation, InfiniteTransitionClock>()
+
+    /** Map of subscribed [AnimatedContentComposeAnimation]s and corresponding [TransitionClock]s. */
+    @VisibleForTesting
+    internal val animatedContentClocks =
+        mutableMapOf<AnimatedContentComposeAnimation<*>, TransitionClock<*>>()
+
     private val allClocksExceptInfinite: List<ComposeAnimationClock<*, *>>
         get() = transitionClocks.values +
             animatedVisibilityClocks.values +
-            animateXAsStateClocks.values
+            animateXAsStateClocks.values +
+            animatedContentClocks.values
 
     /** All subscribed animations clocks. */
     private val allClocks: List<ComposeAnimationClock<*, *>>
@@ -96,7 +104,7 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     private fun findClock(animation: ComposeAnimation): ComposeAnimationClock<*, *>? {
         return transitionClocks[animation] ?: animatedVisibilityClocks[animation]
         ?: animateXAsStateClocks[animation]
-        ?: infiniteTransitionClocks[animation]
+        ?: infiniteTransitionClocks[animation] ?: animatedContentClocks[animation]
     }
 
     fun trackTransition(animation: Transition<*>) {
@@ -147,7 +155,12 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     }
 
     fun trackAnimatedContent(animation: Transition<*>) {
-        trackUnsupported(animation, animation.label ?: "AnimatedContent")
+        trackAnimation(animation) {
+            animation.parseAnimatedContent()?.let {
+                animatedContentClocks[it] = TransitionClock(it)
+                notifySubscribe(it)
+            }
+        }
     }
 
     fun trackInfiniteTransition(animation: AnimationSearch.InfiniteTransitionSearchInfo) {

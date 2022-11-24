@@ -166,8 +166,8 @@ class ComposeViewAdapterTest {
     fun animatedContentAndTransitionIsSubscribed() {
         checkAnimationsAreSubscribed(
             "AnimatedContentAndTransitionPreview",
-            listOf("AnimatedContent"),
-            listOf("checkBoxAnim")
+            transitions = listOf("checkBoxAnim"),
+            animatedContent = listOf("AnimatedContent")
         )
     }
 
@@ -203,12 +203,12 @@ class ComposeViewAdapterTest {
         checkAnimationsAreSubscribed(
             "AllAnimations",
             unsupported = listOf(
-                "AnimatedContent",
                 "animateContentSize",
                 "TargetBasedAnimation",
                 "DecayAnimation",
             ),
             transitions = listOf("checkBoxAnim", "Crossfade"),
+            animatedContent = listOf("AnimatedContent"),
             animateXAsState = emptyList(),
             infiniteTransitions = listOf("InfiniteTransition")
         )
@@ -320,6 +320,7 @@ class ComposeViewAdapterTest {
         unsupported: List<String> = emptyList(),
         transitions: List<String> = emptyList(),
         animateXAsState: List<String> = emptyList(),
+        animatedContent: List<String> = emptyList(),
         infiniteTransitions: List<String> = emptyList()
     ) {
         val clock = PreviewAnimationClock()
@@ -334,6 +335,7 @@ class ComposeViewAdapterTest {
             assertTrue(clock.transitionClocks.isEmpty())
             assertTrue(clock.trackedUnsupportedAnimations.isEmpty())
             assertTrue(clock.animatedVisibilityClocks.isEmpty())
+            assertTrue(clock.animatedContentClocks.isEmpty())
             assertTrue(clock.infiniteTransitionClocks.isEmpty())
         }
 
@@ -349,6 +351,9 @@ class ComposeViewAdapterTest {
             assertEquals(transitions, clock.transitionClocks.values.map { it.animation.label })
             assertEquals(animateXAsState,
                 clock.animateXAsStateClocks.values.map { it.animation.label })
+            assertEquals(
+                animatedContent,
+                clock.animatedContentClocks.values.map { it.animation.label })
             assertEquals(infiniteTransitions,
                 clock.infiniteTransitionClocks.values.map { it.animation.label })
             assertEquals(0, clock.animatedVisibilityClocks.size)
