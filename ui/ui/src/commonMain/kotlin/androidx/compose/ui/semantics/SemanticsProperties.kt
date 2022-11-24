@@ -307,6 +307,26 @@ object SemanticsActions {
      */
     val CustomActions =
         SemanticsPropertyKey<List<CustomAccessibilityAction>>("CustomActions")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageUp
+     */
+    val PageUp = ActionPropertyKey<() -> Boolean>("PageUp")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageLeft
+     */
+    val PageLeft = ActionPropertyKey<() -> Boolean>("PageLeft")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageDown
+     */
+    val PageDown = ActionPropertyKey<() -> Boolean>("PageDown")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageRight
+     */
+    val PageRight = ActionPropertyKey<() -> Boolean>("PageRight")
 }
 
 /**
@@ -1087,4 +1107,56 @@ fun SemanticsPropertyReceiver.dismiss(
  */
 fun SemanticsPropertyReceiver.requestFocus(label: String? = null, action: (() -> Boolean)?) {
     this[SemanticsActions.RequestFocus] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page up.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageUp] is called.
+ */
+fun SemanticsPropertyReceiver.pageUp(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageUp] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page down.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageDown] is called.
+ */
+fun SemanticsPropertyReceiver.pageDown(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageDown] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page left.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageLeft] is called.
+ */
+fun SemanticsPropertyReceiver.pageLeft(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageLeft] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page right.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageRight] is called.
+ */
+fun SemanticsPropertyReceiver.pageRight(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageRight] = AccessibilityAction(label, action)
 }

@@ -2813,6 +2813,10 @@ package androidx.compose.ui.semantics {
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function1<java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean>>> getGetTextLayoutResult();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getOnClick();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getOnLongClick();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getPageDown();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getPageLeft();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getPageRight();
+    method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getPageUp();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getPasteText();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> getRequestFocus();
     method public androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function2<java.lang.Float,java.lang.Float,java.lang.Boolean>>> getScrollBy();
@@ -2829,6 +2833,10 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function1<java.util.List<androidx.compose.ui.text.TextLayoutResult>,java.lang.Boolean>>> GetTextLayoutResult;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> OnClick;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> OnLongClick;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> PageDown;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> PageLeft;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> PageRight;
+    property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> PageUp;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> PasteText;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function0<java.lang.Boolean>>> RequestFocus;
     property public final androidx.compose.ui.semantics.SemanticsPropertyKey<androidx.compose.ui.semantics.AccessibilityAction<kotlin.jvm.functions.Function2<java.lang.Float,java.lang.Float,java.lang.Boolean>>> ScrollBy;
@@ -3009,6 +3017,10 @@ package androidx.compose.ui.semantics {
     method public static void indexForKey(androidx.compose.ui.semantics.SemanticsPropertyReceiver, kotlin.jvm.functions.Function1<java.lang.Object,java.lang.Integer> mapping);
     method public static void onClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void onLongClick(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void pageDown(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void pageLeft(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void pageRight(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
+    method public static void pageUp(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void password(androidx.compose.ui.semantics.SemanticsPropertyReceiver);
     method public static void pasteText(androidx.compose.ui.semantics.SemanticsPropertyReceiver, optional String? label, kotlin.jvm.functions.Function0<java.lang.Boolean>? action);
     method public static void popup(androidx.compose.ui.semantics.SemanticsPropertyReceiver);

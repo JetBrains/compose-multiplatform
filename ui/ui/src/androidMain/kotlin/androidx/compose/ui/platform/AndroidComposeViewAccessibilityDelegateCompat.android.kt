@@ -938,6 +938,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            Api29Impl.addPageActions(info, semanticsNode)
+        }
+
         info.paneTitle = semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.PaneTitle)
 
         if (semanticsNode.enabled()) {
@@ -1382,6 +1386,22 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 }
 
                 return false
+            }
+            android.R.id.accessibilityActionPageUp -> {
+                val pageAction = node.unmergedConfig.getOrNull(SemanticsActions.PageUp)
+                return pageAction?.action?.invoke() ?: false
+            }
+            android.R.id.accessibilityActionPageDown -> {
+                val pageAction = node.unmergedConfig.getOrNull(SemanticsActions.PageDown)
+                return pageAction?.action?.invoke() ?: false
+            }
+            android.R.id.accessibilityActionPageLeft -> {
+                val pageAction = node.unmergedConfig.getOrNull(SemanticsActions.PageLeft)
+                return pageAction?.action?.invoke() ?: false
+            }
+            android.R.id.accessibilityActionPageRight -> {
+                val pageAction = node.unmergedConfig.getOrNull(SemanticsActions.PageRight)
+                return pageAction?.action?.invoke() ?: false
             }
             android.R.id.accessibilityActionSetProgress -> {
                 if (arguments == null || !arguments.containsKey(
@@ -2601,6 +2621,51 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         fun setScrollEventDelta(event: AccessibilityEvent, deltaX: Int, deltaY: Int) {
             event.scrollDeltaX = deltaX
             event.scrollDeltaY = deltaY
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private object Api29Impl {
+        @JvmStatic
+        @DoNotInline
+        fun addPageActions(
+            info: AccessibilityNodeInfoCompat,
+            semanticsNode: SemanticsNode
+        ) {
+            if (semanticsNode.enabled()) {
+                semanticsNode.unmergedConfig.getOrNull(SemanticsActions.PageUp)?.let {
+                    info.addAction(
+                        AccessibilityActionCompat(
+                            android.R.id.accessibilityActionPageUp,
+                            it.label
+                        )
+                    )
+                }
+                semanticsNode.unmergedConfig.getOrNull(SemanticsActions.PageDown)?.let {
+                    info.addAction(
+                        AccessibilityActionCompat(
+                            android.R.id.accessibilityActionPageDown,
+                            it.label
+                        )
+                    )
+                }
+                semanticsNode.unmergedConfig.getOrNull(SemanticsActions.PageLeft)?.let {
+                    info.addAction(
+                        AccessibilityActionCompat(
+                            android.R.id.accessibilityActionPageLeft,
+                            it.label
+                        )
+                    )
+                }
+                semanticsNode.unmergedConfig.getOrNull(SemanticsActions.PageRight)?.let {
+                    info.addAction(
+                        AccessibilityActionCompat(
+                            android.R.id.accessibilityActionPageRight,
+                            it.label
+                        )
+                    )
+                }
+            }
         }
     }
 }
