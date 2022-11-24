@@ -17,10 +17,10 @@
 package androidx.compose.material3
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.material3.internal.CalendarModelImpl
 import androidx.compose.material3.internal.LegacyCalendarModelImpl
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import java.util.Locale
 import org.junit.Test
@@ -30,7 +30,6 @@ import org.junit.runners.Parameterized
 @MediumTest
 @RunWith(Parameterized::class)
 @OptIn(ExperimentalMaterial3Api::class)
-@RequiresApi(Build.VERSION_CODES.O)
 internal class CalendarModelTest(private val model: CalendarModel) {
 
     @Test
@@ -107,6 +106,7 @@ internal class CalendarModelTest(private val model: CalendarModel) {
         }
     }
 
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun equalModelsOutput() {
         // Note: This test ignores the parameters and just runs a few equality tests for the output.
@@ -141,10 +141,15 @@ internal class CalendarModelTest(private val model: CalendarModel) {
     internal companion object {
         @Parameterized.Parameters(name = "{0}")
         @JvmStatic
-        fun parameters() = arrayOf(
-            CalendarModelImpl(),
-            LegacyCalendarModelImpl()
-        )
+        fun parameters() =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                arrayOf(
+                    CalendarModelImpl(),
+                    LegacyCalendarModelImpl()
+                )
+            } else {
+                arrayOf(LegacyCalendarModelImpl())
+            }
     }
 }
 
