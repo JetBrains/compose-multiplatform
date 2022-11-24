@@ -420,6 +420,19 @@ class ComposeViewAdapterTest {
         )
     }
 
+    /**
+     * Verifies the use of inline classes as preview default parameters. Methods with inline
+     * classes as parameters will get the name mangled so we need to ensure we invoke correctly
+     * the right method.
+     */
+    @Test
+    fun defaultParametersComposableTest4() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "DefaultParametersPreview4"
+        )
+    }
+
     @Test
     fun previewInClass() {
         assertRendersCorrectly(
