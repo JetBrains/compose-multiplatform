@@ -38,7 +38,6 @@ import androidx.compose.ui.tooling.animation.states.ComposeAnimationState
 import androidx.compose.ui.tooling.animation.states.TargetState
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Rule
@@ -153,14 +152,14 @@ class TransitionClockTest {
                 assertEquals(0, it.startTimeMillis)
                 assertEquals(330, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.SpringSpec", it.specType)
-                assertEquals(5, it.values.size)
+                assertGreaterThanOrEqualTo(4, it.values.size)
             }
             transitions[1].let {
                 assertEquals("Built-in shrink/expand", it.label)
                 assertEquals(0, it.startTimeMillis)
                 assertEquals(350, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.SpringSpec", it.specType)
-                assertEquals(5, it.values.size)
+                assertGreaterThanOrEqualTo(4, it.values.size)
             }
             transitions[2].let {
                 assertEquals("Built-in InterruptionHandlingOffset", it.label)
@@ -202,7 +201,7 @@ class TransitionClockTest {
                 assertEquals(0, it.startTimeMillis)
                 assertEquals(300, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.TweenSpec", it.specType)
-                assertEquals(4, it.values.size)
+                assertGreaterThanOrEqualTo(3, it.values.size)
             }
             transitions[0].values.let {
                 assertTrue(it.containsKey(0L))
@@ -213,7 +212,6 @@ class TransitionClockTest {
         }
     }
 
-    @SdkSuppress(minSdkVersion = 29) // b/260004689
     @Test
     fun clockWithAnimatedContent() {
         val clock = createBooleanTransitionClockWithAnimatedContent()
@@ -242,21 +240,21 @@ class TransitionClockTest {
                 assertEquals(0, it.startTimeMillis)
                 assertEquals(190, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.SpringSpec", it.specType)
-                assertEquals(3, it.values.size)
+                assertGreaterThanOrEqualTo(3, it.values.size)
             }
             transitions[1].let {
                 assertEquals("Built-in alpha", it.label)
                 assertEquals(90, it.startTimeMillis, 30)
                 assertEquals(310, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.TweenSpec", it.specType)
-                assertEquals(4, it.values.size)
+                assertGreaterThanOrEqualTo(3, it.values.size)
             }
             transitions[2].let {
                 assertEquals("Built-in scale", it.label)
                 assertEquals(90, it.startTimeMillis, 30)
                 assertEquals(310, it.endTimeMillis, 30)
                 assertEquals("androidx.compose.animation.core.TweenSpec", it.specType)
-                assertEquals(4, it.values.size)
+                assertGreaterThanOrEqualTo(3, it.values.size)
             }
             transitions[3].let {
                 // This animation probably will be removed.
@@ -498,6 +496,10 @@ class TransitionClockTest {
 
     fun assertEquals(expected: Int, actual: Int, delta: Int) {
         assertEquals(null, expected.toFloat(), actual.toFloat(), delta.toFloat())
+    }
+
+    private fun assertGreaterThanOrEqualTo(min: Int, actual: Int) {
+        assertTrue(actual >= min)
     }
 
     fun assertEquals(expected: Long, actual: Long, delta: Long) {
