@@ -18,7 +18,6 @@ package androidx.compose.ui.test
 
 import android.os.Build
 import android.view.View
-import android.view.WindowManager
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,8 +29,8 @@ import androidx.compose.material.AlertDialog
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.testutils.assertContainsColor
+import androidx.compose.testutils.assertDoesNotContainColor
 import androidx.compose.testutils.assertPixels
-import androidx.compose.testutils.expectError
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewRootForTest
@@ -44,12 +43,10 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -118,53 +115,11 @@ class BitmapCapturingTest(val config: TestConfig) {
     }
 
     @Test
-    fun captureIndividualRects_checkSizeAndColors_multiWindow() {
-        composeCheckerboard()
-
-        var calledCount = 0
-        rule.onNodeWithTag(tagTopLeft)
-            .captureToImage(useAllWindows = true)
-            .assertPixels(expectedSize = IntSize(100, 50)) {
-                calledCount++
-                colorTopLeft
-            }
-        assertThat(calledCount).isEqualTo((100 * 50))
-
-        rule.onNodeWithTag(tagTopRight)
-            .captureToImage(useAllWindows = true)
-            .assertPixels(expectedSize = IntSize(100, 50)) {
-                colorTopRight
-            }
-        rule.onNodeWithTag(tagBottomLeft)
-            .captureToImage(useAllWindows = true)
-            .assertPixels(expectedSize = IntSize(100, 50)) {
-                colorBottomLeft
-            }
-        rule.onNodeWithTag(tagBottomRight)
-            .captureToImage(useAllWindows = true)
-            .assertPixels(expectedSize = IntSize(100, 50)) {
-                colorBottomRight
-            }
-    }
-
-    @Test
     fun captureRootContainer_checkSizeAndColors() {
         composeCheckerboard()
 
         rule.onNodeWithTag(rootTag)
             .captureToImage()
-            .assertPixels(expectedSize = IntSize(200, 100)) {
-                expectedColorProvider(it)
-            }
-    }
-
-    @Test
-    @FlakyTest(bugId = 238872517)
-    fun captureRootContainer_checkSizeAndColors_multiWindow() {
-        composeCheckerboard()
-
-        rule.onNodeWithTag(rootTag)
-            .captureToImage(useAllWindows = true)
             .assertPixels(expectedSize = IntSize(200, 100)) {
                 expectedColorProvider(it)
             }
@@ -184,46 +139,7 @@ class BitmapCapturingTest(val config: TestConfig) {
     }
 
     @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P) // b/163023027
-    fun captureDialog_verifyBackground_multiWindow() {
-        // Test that we are really able to capture dialogs to bitmap.
-        setContent {
-            AlertDialog(
-                onDismissRequest = {},
-                confirmButton = {},
-                modifier = Modifier.size(200.dp),
-                backgroundColor = Color.Red
-            )
-        }
-
-        rule.onNode(isDialog())
-            .captureToImage(useAllWindows = true)
-            .assertContainsColor(Color.Red)
-    }
-
-    @Test
-    fun capturePopup_shouldFail() {
-        // Test that we throw an error when trying to capture a popup.
-        setContent {
-            Box {
-                Popup {
-                    Text("Hello")
-                }
-            }
-        }
-
-        expectError<IllegalArgumentException>(
-            expectedMessage = "The node that is being captured " +
-                "to bitmap is in a popup or is a popup itself.*"
-        ) {
-            rule.onNode(isPopup())
-                .captureToImage()
-        }
-    }
-
-    @Ignore("b/235839078")
-    @Test
-    fun capturePopup_verifyBackground_multiWindow() {
+    fun capturePopup_verifyBackground() {
         setContent {
             Box {
                 Popup {
@@ -235,12 +151,12 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
 
         rule.onNode(isPopup())
-            .captureToImage(useAllWindows = true)
+            .captureToImage()
             .assertContainsColor(Color.Red)
     }
 
     @Test
-    fun capturePopup_withComposable_verifyBackground_multiWindow() {
+    fun captureComposable_withPopUp_verifyBackground() {
         setContent {
             Box(
                 Modifier
@@ -257,13 +173,13 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
 
         rule.onNodeWithTag(rootTag)
-            .captureToImage(useAllWindows = true)
-            .assertContainsColor(Color.Red)
+            .captureToImage()
             .assertContainsColor(Color.Yellow)
+            .assertDoesNotContainColor(Color.Red)
     }
 
     @Test
-    fun captureDialog_withOffset_verifyBackground_multiWindow() {
+    fun captureComposable_withDialog_verifyBackground() {
         setContent {
             Box(
                 Modifier
@@ -272,55 +188,23 @@ class BitmapCapturingTest(val config: TestConfig) {
                     .background(Color.Yellow)
             ) {
                 Dialog({}) {
-                    Box(Modifier.size(300.dp).background(Color.Red)) {
+                    Box(
+                        Modifier
+                            .size(300.dp)
+                            .background(Color.Red)) {
                         Text("Hello")
                     }
                 }
             }
         }
-
         rule.onNodeWithTag(rootTag)
-            .captureToImage(useAllWindows = true)
-            .assertContainsColor(Color.Red)
-    }
-
-    @Test
-    fun captureDialog_noShadow_verifyBackground_multiWindow() {
-        setContent {
-            Box(
-                Modifier
-                    .testTag(rootTag)
-                    .size(300.dp)
-                    .background(Color.Yellow)
-            ) {
-                Dialog({}) {
-                    Box(Modifier.testTag("dialog").size(300.dp).background(Color.Red)) {
-                        Text("Hello")
-                    }
-                }
-            }
-        }
-
-        // Remove scrim
-        val dialogWindowProvider =
-            findDialogWindowProviderInParent(fetchNodeRootView("dialog"))
-        rule.runOnUiThread {
-            val originalAttributes = dialogWindowProvider?.window?.attributes
-            originalAttributes?.dimAmount = 0.0f
-
-            // Reapply flag
-            dialogWindowProvider?.window?.clearFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-            dialogWindowProvider?.window?.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
-        }
-
-        rule.onNodeWithTag(rootTag)
-            .captureToImage(useAllWindows = true)
-            .assertContainsColor(Color.Red)
+            .captureToImage()
             .assertContainsColor(Color.Yellow)
+            .assertDoesNotContainColor(Color.Red)
     }
 
     @Test
-    fun capturePopup_verifySize_multiWindow() {
+    fun capturePopup_verifySize() {
         val boxSize = 200.dp
         val boxSizePx = boxSize.toPixel(rule.density).roundToInt()
         setContent {
@@ -334,7 +218,7 @@ class BitmapCapturingTest(val config: TestConfig) {
         }
 
         rule.onNode(isPopup())
-            .captureToImage(useAllWindows = true)
+            .captureToImage()
             .let {
                 assertThat(IntSize(it.width, it.height)).isEqualTo(IntSize(boxSizePx, boxSizePx))
             }
@@ -363,7 +247,10 @@ class BitmapCapturingTest(val config: TestConfig) {
         with(rule.density) {
             setContent {
                 Box(Modifier.background(colorBg)) {
-                    Box(Modifier.padding(top = 20.toDp()).background(colorBg)) {
+                    Box(
+                        Modifier
+                            .padding(top = 20.toDp())
+                            .background(colorBg)) {
                         Column(Modifier.testTag(rootTag)) {
                             Row {
                                 Box(
