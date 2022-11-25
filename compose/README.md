@@ -87,6 +87,7 @@ Run native macos sample:
 ```bash
 export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version &&\
 ./scripts/publishToMavenLocal -Pcompose.platforms=all &&\
+./scripts/publishExtendedIconsToMavenLocal -Pcompose.platforms=all &&\
 ./scripts/publishGradlePluginToMavenLocal &&\
 ./scripts/publishComponentsToMavenLocal &&\
 ./scripts/publishWebComponentsToMavenLocal
