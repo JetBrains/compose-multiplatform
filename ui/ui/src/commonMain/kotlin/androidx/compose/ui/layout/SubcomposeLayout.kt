@@ -18,12 +18,13 @@ package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.ReusableContentHost
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -33,8 +34,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.UiComposable
+import androidx.compose.ui.layout.SubcomposeLayoutState.PrecomposedSlotHandle
 import androidx.compose.ui.materialize
 import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.LayoutNode
@@ -111,7 +112,7 @@ fun SubcomposeLayout(
     val density = LocalDensity.current
     val layoutDirection = LocalLayoutDirection.current
     val viewConfiguration = LocalViewConfiguration.current
-    ComposeNode<LayoutNode, Applier<Any>>(
+    ReusableComposeNode<LayoutNode, Applier<Any>>(
         factory = LayoutNode.Constructor,
         update = {
             set(state, state.setRoot)
@@ -130,8 +131,9 @@ fun SubcomposeLayout(
     }
     val stateHolder = rememberUpdatedState(state)
     DisposableEffect(Unit) {
+        stateHolder.value.keepDetachedNodes()
         onDispose {
-            stateHolder.value.disposeCurrentNodes()
+            stateHolder.value.disposeOrReuseChildren()
         }
     }
 }
@@ -225,9 +227,11 @@ class SubcomposeLayoutState(
     fun precompose(slotId: Any?, content: @Composable () -> Unit): PrecomposedSlotHandle =
         state.precompose(slotId, content)
 
+    internal fun keepDetachedNodes() = state.keepDetachedNodes()
+
     internal fun forceRecomposeChildren() = state.forceRecomposeChildren()
 
-    internal fun disposeCurrentNodes() = state.disposeCurrentNodes()
+    internal fun disposeOrReuseChildren() = state.disposeOrReuseChildren()
 
     /**
      * Instance of this interface is returned by [precompose] function.
@@ -364,14 +368,16 @@ internal class LayoutNodeSubcompositionsState(
             if (field !== value) {
                 field = value
                 // apply the new policy
-                disposeOrReuseStartingFromIndex(0)
+                disposeOrReuseStartingFromIndex(0, retainAllSlots = true)
             }
         }
 
     private var currentIndex = 0
+    private var disposeOnDetach = false
     private val nodeToNodeState = mutableMapOf<LayoutNode, NodeState>()
     // this map contains active slotIds (without precomposed or reusable nodes)
     private val slotIdToNode = mutableMapOf<Any?, LayoutNode>()
+    private val detachedNodes = mutableVectorOf<NodeState>()
     private val scope = Scope()
     private val precomposeMap = mutableMapOf<Any?, LayoutNode>()
     private val reusableSlotIdsSet = SubcomposeSlotReusePolicy.SlotIdsSet()
@@ -388,6 +394,20 @@ internal class LayoutNodeSubcompositionsState(
     private var reusableCount = 0
     private var precomposedCount = 0
 
+    init {
+        root.onDetach = {
+            // UiApplier.clear removes a single level of nodes, but dispatches detach recursively.
+            // SubcomposeLayout traverses children manually, so explicitly removing children from
+            // it here whenever root is detached.
+            // As parent detach happens before children, onDetach for children nodes will only be
+            // called once.
+            disposeCurrentNodes()
+            root.onAttach = {
+                throw IllegalStateException("Disposed subcompose root shouldn't be reattached")
+            }
+        }
+    }
+
     fun subcompose(slotId: Any?, content: @Composable () -> Unit): List<Measurable> {
         makeSureStateIsConsistent()
         val layoutState = root.layoutState
@@ -402,7 +422,8 @@ internal class LayoutNodeSubcompositionsState(
                 precomposedCount--
                 precomposed
             } else {
-                takeNodeFromReusables(slotId) ?: createNodeAt(currentIndex)
+                takeNodeFromReusables(slotId)
+                    ?: createNodeAt(currentIndex)
             }
         }
 
@@ -426,47 +447,65 @@ internal class LayoutNodeSubcompositionsState(
         val nodeState = nodeToNodeState.getOrPut(node) {
             NodeState(slotId, {})
         }
+
         val hasPendingChanges = nodeState.composition?.hasInvalidations ?: true
         if (nodeState.content !== content || hasPendingChanges || nodeState.forceRecompose) {
-            nodeState.content = content
-            subcompose(node, nodeState)
+            subcompose(node, nodeState, content)
             nodeState.forceRecompose = false
         }
     }
 
-    private fun subcompose(node: LayoutNode, nodeState: NodeState) {
+    private fun subcompose(
+        node: LayoutNode,
+        nodeState: NodeState,
+        content: @Composable () -> Unit
+    ) {
         Snapshot.withoutReadObservation {
-            ignoreRemeasureRequests {
-                val content = nodeState.content
-                nodeState.composition = subcomposeInto(
-                    existing = nodeState.composition,
-                    container = node,
-                    parent = compositionContext ?: error("parent composition reference not set"),
-                    // Do not optimize this by passing nodeState.content directly; the additional
-                    // composable function call from the lambda expression affects the scope of
-                    // recomposition and recomposition of siblings.
-                    composable = {
-                        ReusableContentHost(nodeState.active, content)
-                    }
-                )
+            if (nodeState.forceResetContent) {
+                require(nodeState.active) { "Node must be active to reset content" }
+                nodeState.active = false
+                subcomposeNode(node, nodeState)
+                nodeState.active = true
             }
+
+            require(nodeState.active && !nodeState.forceResetContent) {
+                "Node must be active with content cleared for correct subcompose"
+            }
+
+            nodeState.content = content
+            subcomposeNode(node, nodeState)
         }
     }
 
-    private fun subcomposeInto(
-        existing: Composition?,
-        container: LayoutNode,
-        parent: CompositionContext,
-        composable: @Composable () -> Unit
-    ): Composition {
-        return if (existing == null || existing.isDisposed) {
-            createSubcomposition(container, parent)
-        } else {
-            existing
+    private fun subcomposeNode(
+        node: LayoutNode,
+        nodeState: NodeState
+    ) {
+        ignoreRemeasureRequests {
+            val content = nodeState.content
+            val existing = nodeState.composition
+            val parentContext = compositionContext ?: error("parent composition reference not set")
+
+            nodeState.composition =
+                if (existing == null || existing.isDisposed) {
+                    createSubcomposition(node, parentContext)
+                } else {
+                    existing
+                }
+                    .apply {
+                        setContent {
+                            val active = nodeState.active
+
+                            SideEffect {
+                                if (!active) {
+                                    nodeState.forceResetContent = false
+                                }
+                            }
+
+                            ReusableContentHost(active, content)
+                        }
+                    }
         }
-            .apply {
-                setContent(composable)
-            }
     }
 
     private fun getSlotIdAtIndex(index: Int): Any? {
@@ -474,29 +513,33 @@ internal class LayoutNodeSubcompositionsState(
         return nodeToNodeState[node]!!.slotId
     }
 
-    fun disposeOrReuseStartingFromIndex(startIndex: Int) {
+    fun disposeOrReuseStartingFromIndex(startIndex: Int, retainAllSlots: Boolean = false) {
         reusableCount = 0
         val lastReusableIndex = root.foldedChildren.size - precomposedCount - 1
         if (startIndex <= lastReusableIndex) {
             // construct the set of available slot ids
             reusableSlotIdsSet.clear()
-            for (i in startIndex..lastReusableIndex) {
-                reusableSlotIdsSet.add(getSlotIdAtIndex(i))
-            }
+            if (!retainAllSlots) {
+                for (i in startIndex..lastReusableIndex) {
+                    reusableSlotIdsSet.add(getSlotIdAtIndex(i))
+                }
 
-            slotReusePolicy.getSlotsToRetain(reusableSlotIdsSet)
+                slotReusePolicy.getSlotsToRetain(reusableSlotIdsSet)
+            }
             // iterating backwards so it is easier to remove items
             var i = lastReusableIndex
             while (i >= startIndex) {
                 val node = root.foldedChildren[i]
                 val nodeState = nodeToNodeState[node]!!
                 val slotId = nodeState.slotId
-                if (reusableSlotIdsSet.contains(slotId)) {
+                if (retainAllSlots || reusableSlotIdsSet.contains(slotId)) {
                     node.measuredByParent = UsageByParent.NotUsed
                     reusableCount++
                     nodeState.active = false
+                    nodeState.forceResetContent = true
                 } else {
                     ignoreRemeasureRequests {
+                        slotIdToNode.remove(slotId)
                         nodeToNodeState.remove(node)
                         nodeState.composition?.dispose()
                         root.removeAt(i, 1)
@@ -675,6 +718,19 @@ internal class LayoutNodeSubcompositionsState(
         }
     }
 
+    private fun scheduleNodeDispose(node: LayoutNode) {
+        val nodeState = nodeToNodeState.remove(node) ?: return
+        precomposeMap.remove(nodeState.slotId)?.let {
+            precomposedCount--
+        }
+        slotIdToNode.remove(nodeState.slotId)
+        if (!disposeOnDetach) {
+            detachedNodes += nodeState
+        } else {
+            nodeState.composition?.dispose()
+        }
+    }
+
     fun forceRecomposeChildren() {
         nodeToNodeState.forEach { (_, nodeState) ->
             nodeState.forceRecompose = true
@@ -699,18 +755,56 @@ internal class LayoutNodeSubcompositionsState(
     private inline fun ignoreRemeasureRequests(block: () -> Unit) =
         root.ignoreRemeasureRequests(block)
 
-    fun disposeCurrentNodes() {
-        root.ignoreRemeasureRequests {
-            nodeToNodeState.values.forEach {
-                it.composition?.dispose()
-            }
-            root.removeAll()
+    fun keepDetachedNodes() {
+        disposeOnDetach = false
+    }
+
+    fun disposeOrReuseChildren() {
+        reuseCurrentNodes()
+        disposeDetachedNodes()
+
+        makeSureStateIsConsistent()
+
+        disposeOnDetach = true
+    }
+
+    private fun reuseCurrentNodes() {
+        precomposedCount = 0
+        precomposeMap.clear()
+        disposeOrReuseStartingFromIndex(0, retainAllSlots = true)
+    }
+
+    private fun disposeDetachedNodes() {
+        detachedNodes.forEach {
+            it.composition?.dispose()
         }
+        detachedNodes.clear()
+    }
+
+    private fun disposeCurrentNodes() {
+        if (!disposeOnDetach) {
+            // Node is detached before DisposableEffect.onDispose, make sure we remove
+            // composition there to save the state
+            detachedNodes.addAll(nodeToNodeState.values)
+        } else {
+            // Effect already disposed this state, dispose all compositions
+            root.ignoreRemeasureRequests {
+                nodeToNodeState.values.forEach {
+                    it.composition?.dispose()
+                }
+            }
+        }
+
         nodeToNodeState.clear()
         slotIdToNode.clear()
         precomposedCount = 0
         reusableCount = 0
         precomposeMap.clear()
+
+        root.ignoreRemeasureRequests {
+            root.removeAll()
+        }
+
         makeSureStateIsConsistent()
     }
 
@@ -720,7 +814,8 @@ internal class LayoutNodeSubcompositionsState(
         var composition: Composition? = null
     ) {
         var forceRecompose = false
-        var active by mutableStateOf(true)
+        var forceResetContent = false
+        var active: Boolean by mutableStateOf(true)
     }
 
     private inner class Scope : SubcomposeMeasureScope {

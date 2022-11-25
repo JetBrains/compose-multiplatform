@@ -84,6 +84,14 @@
             </intent-filter>
         </activity>
         <activity
+            android:name=".LazyBoxWithConstraintsActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="androidx.compose.integration.macrobenchmark.target.LAZY_BOX_WITH_CONSTRAINTS_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".DifferentTypesListActivity"
             android:exported="true">
             <intent-filter>

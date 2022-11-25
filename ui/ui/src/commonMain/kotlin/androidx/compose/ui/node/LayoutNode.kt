@@ -300,6 +300,10 @@ internal class LayoutNode(
             onChildRemoved(_foldedChildren[i])
         }
         _foldedChildren.clear()
+
+        if (DebugChanges) {
+            println("Removed all children from $this")
+        }
     }
 
     private fun onChildRemoved(child: LayoutNode) {
