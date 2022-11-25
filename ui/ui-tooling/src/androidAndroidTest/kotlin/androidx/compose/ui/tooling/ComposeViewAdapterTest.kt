@@ -301,6 +301,16 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun materialAnimationsAreSubscribed() {
+        checkAnimationsAreSubscribed(
+            "MaterialPreview",
+            unsupported = emptyList(),
+            transitions = listOf("ToggleableState"),
+            animateXAsState = listOf("ColorAnimation", "ColorAnimation", "ColorAnimation")
+        )
+    }
+
     private fun checkAnimationsAreSubscribed(
         preview: String,
         unsupported: List<String> = emptyList(),
