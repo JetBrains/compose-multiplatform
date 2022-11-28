@@ -35,13 +35,14 @@ fun Test.configureJavaForComposeTest() {
     }
 }
 
-fun Project.configureJUnit() {
+fun Project.configureAllTests(fn: Test.() -> Unit = {}) {
     fun DependencyHandler.testImplementation(notation: Any) =
         add(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, notation)
 
     dependencies {
         testImplementation(platform("org.junit:junit-bom:5.7.0"))
         testImplementation("org.junit.jupiter:junit-jupiter")
+        testImplementation("org.junit.platform:junit-platform-launcher")
     }
 
     tasks.withType<Test>().configureEach {
@@ -49,5 +50,12 @@ fun Project.configureJUnit() {
         testLogging {
             events("passed", "skipped", "failed")
         }
+        fn()
+    }
+}
+
+fun Test.systemProperties(map: Map<String, Any>) {
+    for ((k, v) in map) {
+        systemProperty(k, v)
     }
 }

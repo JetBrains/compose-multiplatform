@@ -132,8 +132,3 @@ tasks.register("publishToMavenLocal") {
         dependsOn(subproject.tasks.named("publishToMavenLocal"))
     }
 }
-
-findProperty("compose.tests.github.summary.file")?.let {
-    println("CONFIGURING GITHUB SUMMARY")
-    configureGithubTestsSummary(project.file(it))
-}

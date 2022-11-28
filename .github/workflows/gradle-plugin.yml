@@ -26,3 +26,13 @@ jobs:
           ./gradlew assemble
           ./gradlew :compose:check --continue --configuration-cache --dry-run
           ./gradlew :compose:check --continue --configuration-cache
+      - name: Print summary
+        shell: bash
+        if: always()
+        run: |
+          cd gradle-plugins/compose/build/test-summary
+          for SUMMARY_FILE in `find . -name "*.md"`; do
+            FILE_NAME=`basename $SUMMARY_FILE`
+            echo "## $FILE_NAME" >> $GITHUB_STEP_SUMMARY
+            cat $SUMMARY_FILE >> $GITHUB_STEP_SUMMARY
+          done
