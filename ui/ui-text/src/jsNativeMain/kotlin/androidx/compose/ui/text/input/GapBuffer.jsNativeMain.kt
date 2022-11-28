@@ -22,7 +22,7 @@ internal actual fun String.toCharArray(
     startIndex: Int,
     endIndex: Int
 ) {
-    (startIndex..endIndex).forEach {
+    (startIndex until endIndex).forEach {
         destination[destinationOffset + it] = get(it)
     }
 }
