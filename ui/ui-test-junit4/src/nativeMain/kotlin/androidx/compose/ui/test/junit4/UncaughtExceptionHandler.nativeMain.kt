@@ -16,4 +16,4 @@
 
 package androidx.compose.ui.test.junit4
 
-internal actual inline fun <T> synchronized(lock: Any, block: () -> T): T = kotlin.synchronized(lock, block)
+internal actual inline fun <T> synchronized(lock: Any, block: () -> T): T = block() // TODO: implement using atomicfu

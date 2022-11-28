@@ -25,6 +25,7 @@ import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.util.fastAny
+import kotlin.js.JsName
 
 /**
  * Returns whether the node is enabled.
@@ -516,6 +517,7 @@ internal val SemanticsNode.ancestors: Iterable<SemanticsNode>
     get() = object : Iterable<SemanticsNode> {
         override fun iterator(): Iterator<SemanticsNode> {
             return object : Iterator<SemanticsNode> {
+                @JsName("nextVar")
                 var next = parent
                 override fun hasNext(): Boolean {
                     return next != null

@@ -16,9 +16,13 @@
 
 package androidx.compose.ui.test.junit4
 
-import java.util.concurrent.ExecutionException
-import java.util.concurrent.FutureTask
-import javax.swing.SwingUtilities
+import kotlin.coroutines.suspendCoroutine
+import kotlinx.coroutines.runBlocking
+import platform.Foundation.NSDate
+import platform.Foundation.NSDefaultRunLoopMode
+import platform.Foundation.NSRunLoop
+import platform.Foundation.performBlock
+import platform.Foundation.runMode
 
 /**
  * Runs the given action on the UI thread.
@@ -29,12 +33,13 @@ internal actual fun <T> runOnUiThread(action: () -> T): T {
     return if (isOnUiThread()) {
         action()
     } else {
-        val task: FutureTask<T> = FutureTask(action)
-        SwingUtilities.invokeAndWait(task)
-        try {
-            return task.get()
-        } catch (e: ExecutionException) { // Expose the original exception
-            throw e.cause!!
+        runBlocking {
+            suspendCoroutine {
+                NSRunLoop.mainRunLoop.performBlock {
+                    it.resumeWith(kotlin.runCatching { action() })
+                }
+                NSRunLoop.mainRunLoop.runMode(NSDefaultRunLoopMode, NSDate.new()!!)
+            }
         }
     }
 }
@@ -42,6 +47,4 @@ internal actual fun <T> runOnUiThread(action: () -> T): T {
 /**
  * Returns if the call is made on the main thread.
  */
-internal actual fun isOnUiThread(): Boolean {
-    return SwingUtilities.isEventDispatchThread()
-}
+internal actual fun isOnUiThread(): Boolean = NSRunLoop.currentRunLoop === NSRunLoop.mainRunLoop

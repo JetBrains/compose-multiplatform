@@ -44,8 +44,8 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
-import com.google.common.truth.Truth.assertThat
-import org.junit.Test
+import kotlin.test.Test
+import kotlin.test.assertEquals
 
 @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
 class ComposeUiTestTest {
@@ -68,7 +68,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `mouse, move`() = runComposeUiTest {
+    fun mouse_move() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performMouseInput {
@@ -100,7 +100,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `mouse, drag`() = runComposeUiTest {
+    fun mouse_drag() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performMouseInput {
@@ -140,10 +140,10 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `mouse, press primary`() = runComposeUiTest {
+    fun mouse_press_primary() = runComposeUiTest {
         setContent { TestEventBox() }
 
-        onNodeWithTag("test").performMouseInput { 
+        onNodeWithTag("test").performMouseInput {
             press()
         }
         assertThat(events).hasSize(1)
@@ -157,7 +157,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `mouse, press and release primary`() = runComposeUiTest {
+    fun mouse_press_and_release_primary() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performMouseInput {
@@ -182,7 +182,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `mouse, click`() = runComposeUiTest {
+    fun mouse_click() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performMouseInput {
@@ -204,9 +204,9 @@ class ComposeUiTestTest {
             assertThat(changes[0].type).isEqualTo(Mouse)
         }
     }
-    
+
     @Test
-    fun `mouse, press multiple`() = runComposeUiTest {
+    fun mouse_press_multiple() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performMouseInput {
@@ -254,9 +254,9 @@ class ComposeUiTestTest {
             assertThat(changes[0].type).isEqualTo(Mouse)
         }
     }
-    
+
     @Test
-    fun `mouse, scroll`() = runComposeUiTest {
+    fun mouse_scroll() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performMouseInput {
@@ -284,7 +284,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `touch, drag`() = runComposeUiTest {
+    fun touch_drag() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performTouchInput {
@@ -311,7 +311,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `touch, press`() = runComposeUiTest {
+    fun touch_press() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performTouchInput {
@@ -326,7 +326,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `touch, press and release`() = runComposeUiTest {
+    fun touch_press_and_release() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performTouchInput {
@@ -347,7 +347,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `touch, click`() = runComposeUiTest {
+    fun touch_click() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performTouchInput {
@@ -372,7 +372,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `touch, press multiple`() = runComposeUiTest {
+    fun touch_press_multiple() = runComposeUiTest {
         setContent { TestEventBox() }
 
         onNodeWithTag("test").performTouchInput {
@@ -408,7 +408,7 @@ class ComposeUiTestTest {
     }
 
     @Test
-    fun `text input`() = runComposeUiTest {
+    fun text_input() = runComposeUiTest {
         var text by mutableStateOf(TextFieldValue(""))
         val focusRequester = FocusRequester()
 
@@ -430,4 +430,17 @@ class ComposeUiTestTest {
         onNodeWithTag("test").performTextClearance()
         assertThat(text.text).isEqualTo("")
     }
+}
+
+private class AssertThat<T>(val t: T)
+
+private fun <T> AssertThat<T>.isEqualTo(a: Any?) {
+    assertEquals(a, t)
+}
+
+private fun <T : Collection<*>> AssertThat<T>.hasSize(size: Int) {
+    assertEquals(size, t.size, "Expected size = $size, but was ${t.size}")
+}
+private fun <T> assertThat(t: T): AssertThat<T> {
+    return AssertThat(t)
 }

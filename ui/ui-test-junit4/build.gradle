@@ -78,6 +78,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
         android()
         desktop()
+        darwin()
+        js()
+
+        configureDarwinFlags()
     }
 
     kotlin {
@@ -135,10 +139,31 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoKotlin)
             }
 
+            skikoMain {
+                dependsOn(commonMain)
+                dependencies {
+                    implementation(libs.skikoCommon)
+                }
+            }
+
+            desktopMain.dependsOn(skikoMain)
+            nativeMain.dependsOn(skikoMain)
+            jsMain.dependsOn(skikoMain)
+
             desktopMain.dependencies {
                 implementation(libs.truth)
                 implementation(libs.skiko)
             }
+
+            skikoTest.dependencies {
+                implementation(project(":compose:material:material"))
+                implementation(libs.skikoCommon)
+                implementation(libs.kotlinTest)
+            }
+
+            desktopTest.dependsOn(skikoTest)
+            jsTest.dependsOn(skikoTest)
+            nativeTest.dependsOn(skikoTest)
 
             desktopTest.dependencies {
                 implementation(project(":compose:material:material"))

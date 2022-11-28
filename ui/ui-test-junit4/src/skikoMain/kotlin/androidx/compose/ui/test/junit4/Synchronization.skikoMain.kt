@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,14 @@
 
 package androidx.compose.ui.test.junit4
 
-internal actual inline fun <T> synchronized(lock: Any, block: () -> T): T = kotlin.synchronized(lock, block)
+/**
+ * Runs the given action on the UI thread.
+ *
+ * This method is blocking until the action is complete.
+ */
+internal expect fun <T> runOnUiThread(action: () -> T): T
+
+/**
+ * Returns if the call is made on the main thread.
+ */
+internal expect fun isOnUiThread(): Boolean

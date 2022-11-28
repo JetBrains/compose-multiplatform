@@ -16,20 +16,21 @@
 
 package androidx.compose.ui.test
 
-@OptIn(ExperimentalTestApi::class)
-typealias DesktopComposeUiTest = SkikoComposeUiTest
+import kotlin.native.identityHashCode
 
 /**
- * Variant of [runComposeUiTest] that allows you to specify the size of the surface.
+ * Returns the hash code for the given object that is unique across all currently allocated objects.
+ * The hash code for the null reference is zero.
  *
- * @param width the desired width of the surface
- * @param height the desired height of the surface
+ * Can be negative, and near Int.MAX_VALUE, so it can overflow if used as part of calculations.
+ * For example, don't use this:
+ * ```
+ * val comparison = identityHashCode(midVal) - identityHashCode(leftVal)
+ * if (comparison < 0) ...
+ * ```
+ * Use this instead:
+ * ```
+ * if (identityHashCode(midVal) < identityHashCode(leftVal)) ...
+ * ```
  */
-@ExperimentalTestApi
-fun runDesktopComposeUiTest(
-    width: Int = 1024,
-    height: Int = 768,
-    block: DesktopComposeUiTest.() -> Unit
-) {
-    DesktopComposeUiTest(width, height).runTest(block)
-}
+internal actual fun identityHashCode(instance: Any?): Int = instance.identityHashCode()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2020 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package androidx.compose.ui.test
 
-@OptIn(ExperimentalTestApi::class)
-typealias DesktopComposeUiTest = SkikoComposeUiTest
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyEventType
 
 /**
- * Variant of [runComposeUiTest] that allows you to specify the size of the surface.
- *
- * @param width the desired width of the surface
- * @param height the desired height of the surface
+ * The [KeyEvent] is usually created by the system. This function creates an instance of
+ * [KeyEvent] that can be used in tests.
  */
-@ExperimentalTestApi
-fun runDesktopComposeUiTest(
-    width: Int = 1024,
-    height: Int = 768,
-    block: DesktopComposeUiTest.() -> Unit
-) {
-    DesktopComposeUiTest(width, height).runTest(block)
-}
+internal actual fun keyEvent(
+    key: Key, keyEventType: KeyEventType, modifiers: Int
+): KeyEvent = TODO()
+
+internal actual fun Int.updatedKeyboardModifiers(key: Key, down: Boolean): Int = this // TODO: implement updatedKeyboardModifiers
