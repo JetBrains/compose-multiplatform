@@ -1,7 +1,8 @@
 import com.gradle.publish.PluginBundleExtension
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
-    val kotlinVersion = "1.5.30"
+    val kotlinVersion = "1.7.20"
     kotlin("jvm") version kotlinVersion apply false
     kotlin("plugin.serialization") version kotlinVersion apply false
     id("com.gradle.plugin-publish") version "0.17.0" apply false
@@ -23,6 +24,15 @@ subprojects {
 
             withJavadocJar()
             withSourcesJar()
+        }
+    }
+
+    plugins.withId("org.jetbrains.kotlin.jvm") {
+        tasks.withType(KotlinJvmCompile::class).configureEach {
+            // must be set to a language version of the kotlin compiler & runtime,
+            // which is bundled to the oldest supported Gradle
+            kotlinOptions.languageVersion = "1.5"
+            kotlinOptions.apiVersion = "1.5"
         }
     }
 
