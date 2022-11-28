@@ -169,7 +169,7 @@ fun RowScope.NavigationBarItem(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
 ) {
     val styledIcon = @Composable {
-        val iconColor by colors.iconColor(selected = selected)
+        val iconColor by colors.iconColor(selected = selected, enabled = enabled)
         // If there's a label, don't have a11y services repeat the icon description.
         val clearSemantics = label != null && (alwaysShowLabel || selected)
         Box(modifier = if (clearSemantics) Modifier.clearAndSetSemantics {} else Modifier) {
@@ -180,7 +180,7 @@ fun RowScope.NavigationBarItem(
     val styledLabel: @Composable (() -> Unit)? = label?.let {
         @Composable {
             val style = MaterialTheme.typography.fromToken(NavigationBarTokens.LabelTextFont)
-            val textColor by colors.textColor(selected = selected)
+            val textColor by colors.textColor(selected = selected, enabled = enabled)
             CompositionLocalProvider(LocalContentColor provides textColor) {
                 ProvideTextStyle(style, content = label)
             }
@@ -286,8 +286,33 @@ object NavigationBarItemDefaults {
      * @param indicatorColor the color to use for the indicator when the item is selected.
      * @param unselectedIconColor the color to use for the icon when the item is unselected.
      * @param unselectedTextColor the color to use for the text label when the item is unselected.
+     * @param disabledIconColor the color to use for the icon when the item is disabled.
+     * @param disabledTextColor the color to use for the text label when the item is disabled.
      * @return the resulting [NavigationBarItemColors] used for [NavigationBarItem]
      */
+    @Composable
+    fun colors(
+        selectedIconColor: Color = NavigationBarTokens.ActiveIconColor.toColor(),
+        selectedTextColor: Color = NavigationBarTokens.ActiveLabelTextColor.toColor(),
+        indicatorColor: Color = NavigationBarTokens.ActiveIndicatorColor.toColor(),
+        unselectedIconColor: Color = NavigationBarTokens.InactiveIconColor.toColor(),
+        unselectedTextColor: Color = NavigationBarTokens.InactiveLabelTextColor.toColor(),
+        disabledIconColor: Color = unselectedIconColor.copy(alpha = DisabledAlpha),
+        disabledTextColor: Color = unselectedTextColor.copy(alpha = DisabledAlpha),
+    ): NavigationBarItemColors = NavigationBarItemColors(
+        selectedIconColor = selectedIconColor,
+        selectedTextColor = selectedTextColor,
+        selectedIndicatorColor = indicatorColor,
+        unselectedIconColor = unselectedIconColor,
+        unselectedTextColor = unselectedTextColor,
+        disabledIconColor = disabledIconColor,
+        disabledTextColor = disabledTextColor,
+    )
+
+    @Deprecated(
+        "Use overload with disabledIconColor and disabledTextColor",
+        level = DeprecationLevel.HIDDEN
+    )
     @Composable
     fun colors(
         selectedIconColor: Color = NavigationBarTokens.ActiveIconColor.toColor(),
@@ -301,6 +326,8 @@ object NavigationBarItemDefaults {
         selectedIndicatorColor = indicatorColor,
         unselectedIconColor = unselectedIconColor,
         unselectedTextColor = unselectedTextColor,
+        disabledIconColor = unselectedIconColor.copy(alpha = DisabledAlpha),
+        disabledTextColor = unselectedTextColor.copy(alpha = DisabledAlpha),
     )
 }
 
@@ -311,16 +338,24 @@ class NavigationBarItemColors internal constructor(
     private val selectedIndicatorColor: Color,
     private val unselectedIconColor: Color,
     private val unselectedTextColor: Color,
+    private val disabledIconColor: Color,
+    private val disabledTextColor: Color,
 ) {
     /**
      * Represents the icon color for this item, depending on whether it is [selected].
      *
      * @param selected whether the item is selected
+     * @param enabled whether the item is enabled
      */
     @Composable
-    internal fun iconColor(selected: Boolean): State<Color> {
+    internal fun iconColor(selected: Boolean, enabled: Boolean): State<Color> {
+        val targetValue = when {
+            !enabled -> disabledIconColor
+            selected -> selectedIconColor
+            else -> unselectedIconColor
+        }
         return animateColorAsState(
-            targetValue = if (selected) selectedIconColor else unselectedIconColor,
+            targetValue = targetValue,
             animationSpec = tween(ItemAnimationDurationMillis)
         )
     }
@@ -329,11 +364,17 @@ class NavigationBarItemColors internal constructor(
      * Represents the text color for this item, depending on whether it is [selected].
      *
      * @param selected whether the item is selected
+     * @param enabled whether the item is enabled
      */
     @Composable
-    internal fun textColor(selected: Boolean): State<Color> {
+    internal fun textColor(selected: Boolean, enabled: Boolean): State<Color> {
+        val targetValue = when {
+            !enabled -> disabledTextColor
+            selected -> selectedTextColor
+            else -> unselectedTextColor
+        }
         return animateColorAsState(
-            targetValue = if (selected) selectedTextColor else unselectedTextColor,
+            targetValue = targetValue,
             animationSpec = tween(ItemAnimationDurationMillis)
         )
     }
@@ -351,6 +392,8 @@ class NavigationBarItemColors internal constructor(
         if (selectedTextColor != other.selectedTextColor) return false
         if (unselectedTextColor != other.unselectedTextColor) return false
         if (selectedIndicatorColor != other.selectedIndicatorColor) return false
+        if (disabledIconColor != other.disabledIconColor) return false
+        if (disabledTextColor != other.disabledTextColor) return false
 
         return true
     }
@@ -360,6 +403,8 @@ class NavigationBarItemColors internal constructor(
         result = 31 * result + selectedTextColor.hashCode()
         result = 31 * result + unselectedTextColor.hashCode()
         result = 31 * result + selectedIndicatorColor.hashCode()
+        result = 31 * result + disabledIconColor.hashCode()
+        result = 31 * result + disabledTextColor.hashCode()
 
         return result
     }

@@ -548,7 +548,8 @@ package androidx.compose.material3 {
   }
 
   public final class NavigationBarItemDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationBarItemColors colors(optional long selectedIconColor, optional long selectedTextColor, optional long indicatorColor, optional long unselectedIconColor, optional long unselectedTextColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationBarItemColors colors(optional long selectedIconColor, optional long selectedTextColor, optional long indicatorColor, optional long unselectedIconColor, optional long unselectedTextColor, optional long disabledIconColor, optional long disabledTextColor);
+    method @Deprecated @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationBarItemColors! colors(optional long selectedIconColor, optional long selectedTextColor, optional long indicatorColor, optional long unselectedIconColor, optional long unselectedTextColor);
     field public static final androidx.compose.material3.NavigationBarItemDefaults INSTANCE;
   }
 
@@ -594,7 +595,8 @@ package androidx.compose.material3 {
   }
 
   public final class NavigationRailItemDefaults {
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationRailItemColors colors(optional long selectedIconColor, optional long selectedTextColor, optional long indicatorColor, optional long unselectedIconColor, optional long unselectedTextColor);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationRailItemColors colors(optional long selectedIconColor, optional long selectedTextColor, optional long indicatorColor, optional long unselectedIconColor, optional long unselectedTextColor, optional long disabledIconColor, optional long disabledTextColor);
+    method @Deprecated @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationRailItemColors! colors(optional long selectedIconColor, optional long selectedTextColor, optional long indicatorColor, optional long unselectedIconColor, optional long unselectedTextColor);
     field public static final androidx.compose.material3.NavigationRailItemDefaults INSTANCE;
   }
 
