@@ -13,20 +13,24 @@ dependencies {
     implementation(kotlin("stdlib"))
 }
 
-configureJUnit()
+configureAllTests()
+
+val serializeClasspath by tasks.registering(SerializeClasspathTask::class) {
+    val runtimeClasspath = configurations.runtimeClasspath
+    val jar = tasks.jar
+    dependsOn(runtimeClasspath, jar)
+
+    classpathFileCollection.from(jar.flatMap { it.archiveFile })
+    classpathFileCollection.from(runtimeClasspath)
+    outputFile.set(project.layout.buildDirectory.file("rpc.classpath.txt"))
+}
 
 tasks.test.configure {
     configureJavaForComposeTest()
 
-    val runtimeClasspath = configurations.runtimeClasspath
-    dependsOn(runtimeClasspath)
-    val jar = tasks.jar
-    dependsOn(jar)
-    doFirst {
-        val rpcClasspath = LinkedHashSet<File>()
-        rpcClasspath.add(jar.get().archiveFile.get().asFile)
-        rpcClasspath.addAll(runtimeClasspath.get().files)
-        val classpathString = rpcClasspath.joinToString(File.pathSeparator) { it.absolutePath }
-        systemProperty("org.jetbrains.compose.test.rpc.classpath", classpathString)
-    }
+    dependsOn(serializeClasspath)
+    systemProperty(
+        "org.jetbrains.compose.tests.rpc.classpath.file",
+        serializeClasspath.get().outputFile.get().asFile.absolutePath
+    )
 }

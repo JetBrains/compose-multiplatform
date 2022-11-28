@@ -104,41 +104,10 @@ val isWindows = getCurrentOperatingSystem().isWindows
 val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 
 // check we don't accidentally including unexpected classes (e.g. from embedded dependencies)
-val checkJar by tasks.registering {
+val checkJar by tasks.registering(CheckJarPackagesTask::class) {
     dependsOn(jar)
-
-    doLast {
-        val file = jar.get().archiveFile.get().asFile
-        ZipFile(file).use { zip ->
-            checkJarContainsExpectedPackages(zip)
-        }
-    }
-}
-
-// we want to avoid accidentally including unexpected jars/packages, e.g kotlin-stdlib etc
-fun checkJarContainsExpectedPackages(jar: ZipFile) {
-    val expectedPackages = arrayOf(
-        "org/jetbrains/compose",
-        "kotlinx/serialization"
-    )
-    val unexpectedClasses = arrayListOf<String>()
-
-    for (entry in jar.entries()) {
-        if (entry.isDirectory || !entry.name.endsWith(".class")) continue
-
-        if (expectedPackages.none { prefix -> entry.name.startsWith(prefix) }) {
-            unexpectedClasses.add(entry.name)
-        }
-    }
-
-    if (unexpectedClasses.any()) {
-        error(buildString {
-            appendLine("Some classes from ${jar.name} are not from 'org.jetbrains.compose' package:")
-            unexpectedClasses.forEach {
-                appendLine("  * $it")
-            }
-        })
-    }
+    jarFile.set(jar.archiveFile)
+    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization")
 }
 
 tasks.check {
