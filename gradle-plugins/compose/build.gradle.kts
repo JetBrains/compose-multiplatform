@@ -93,14 +93,6 @@ project.property("compose.tests.gradle.versions")
     .toString().split(",")
     .forEach { testGradleVersion(it.trim()) }
 
-val javaHomeForTests: String? = when {
-    // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
-    JavaVersion.current() >= JavaVersion.VERSION_15 -> System.getProperty("java.home")
-    else -> System.getenv("JDK_15")
-         ?: System.getenv("JDK_FOR_GRADLE_TESTS")
-}
-val isWindows = getCurrentOperatingSystem().isWindows
-
 val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 
 // check we don't accidentally including unexpected classes (e.g. from embedded dependencies)
