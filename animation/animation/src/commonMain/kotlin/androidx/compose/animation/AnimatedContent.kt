@@ -104,6 +104,8 @@ import androidx.compose.ui.util.fastForEachIndexed
  * via [AnimatedVisibilityScope.animateEnterExit] and [AnimatedVisibilityScope.transition]. These
  * custom enter/exit animations will be triggered as the content enters/leaves the container.
  *
+ * [label] is an optional parameter to differentiate from other animations in Android Studio.
+ *
  * @sample androidx.compose.animation.samples.SimpleAnimatedContentSample
  *
  * Below is an example of customizing [transitionSpec] to imply a spatial relationship between
@@ -125,14 +127,43 @@ fun <S> AnimatedContent(
             fadeOut(animationSpec = tween(90))
     },
     contentAlignment: Alignment = Alignment.TopStart,
+    label: String = "AnimatedContent",
     content: @Composable() AnimatedVisibilityScope.(targetState: S) -> Unit
 ) {
-    val transition = updateTransition(targetState = targetState, label = "AnimatedContent")
+    val transition = updateTransition(targetState = targetState, label = label)
     transition.AnimatedContent(
         modifier,
         transitionSpec,
         contentAlignment,
         content = content
+    )
+}
+
+@Deprecated(
+    "AnimatedContent API now has a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+
+@ExperimentalAnimationApi
+@Composable
+fun <S> AnimatedContent(
+    targetState: S,
+    modifier: Modifier = Modifier,
+    transitionSpec: AnimatedContentScope<S>.() -> ContentTransform = {
+        fadeIn(animationSpec = tween(220, delayMillis = 90)) +
+            scaleIn(initialScale = 0.92f, animationSpec = tween(220, delayMillis = 90)) with
+            fadeOut(animationSpec = tween(90))
+    },
+    contentAlignment: Alignment = Alignment.TopStart,
+    content: @Composable() AnimatedVisibilityScope.(targetState: S) -> Unit
+) {
+    AnimatedContent(
+        targetState,
+        modifier,
+        transitionSpec,
+        contentAlignment,
+        "AnimatedContent",
+        content
     )
 }
 
