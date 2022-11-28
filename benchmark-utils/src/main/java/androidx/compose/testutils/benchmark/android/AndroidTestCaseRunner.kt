@@ -80,7 +80,7 @@ class AndroidTestCaseRunner<T : AndroidTestCase>(
     }
 
     fun draw() {
-        getView().draw(canvas)
+        getView().draw(canvas!!)
     }
 
     fun drawFinish() {

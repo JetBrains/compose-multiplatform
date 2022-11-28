@@ -919,10 +919,10 @@ class AndroidViewCompatTest {
             setMeasuredDimension(size, size)
         }
 
-        override fun draw(canvas: Canvas?) {
+        override fun draw(canvas: Canvas) {
             super.draw(canvas)
             drawnAfterLastColorChange = true
-            canvas!!.drawRect(
+            canvas.drawRect(
                 Rect(0, 0, size, size),
                 Paint().apply { color = this@ColoredSquareView.color.toArgb() }
             )
@@ -956,7 +956,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        override fun onDraw(canvas: Canvas?) {
+        override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
             ++draws
         }
