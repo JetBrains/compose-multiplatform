@@ -222,7 +222,7 @@ private val Offset.scrollAxes: Int
  * is one that implements NestedScrollingParent3, a key layout that does that is
  * [androidx.coordinatorlayout.widget.CoordinatorLayout].
  *
- * @param rootView The View that hosts the compose scrollable, this is usually a ComposeView.
+ * @param hostView The View that hosts the compose scrollable, this is usually a ComposeView.
  *
  * Learn how to enable nested scroll interop:
  * @sample androidx.compose.ui.samples.ComposeInCooperatingViewNestedScrollInteropSample
@@ -230,7 +230,7 @@ private val Offset.scrollAxes: Int
  */
 @Composable
 fun rememberNestedScrollInteropConnection(
-    rootView: View = LocalView.current
-): NestedScrollConnection = remember(rootView) {
-    NestedScrollInteropConnection(rootView)
+    hostView: View = LocalView.current
+): NestedScrollConnection = remember(hostView) {
+    NestedScrollInteropConnection(hostView)
 }
