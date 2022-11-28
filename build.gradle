@@ -45,5 +45,5 @@ allprojects {
 }
 
 dependencies {
-  api(project("plugins"))
+    api(project("plugins"))
 }
