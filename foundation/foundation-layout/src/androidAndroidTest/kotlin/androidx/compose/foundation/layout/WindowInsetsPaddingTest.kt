@@ -350,7 +350,7 @@ class WindowInsetsPaddingTest {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     Box(
                         Modifier.fillMaxSize().padding(5.toDp(), 4.toDp(), 3.toDp(), 2.toDp())
-                            .consumedWindowInsets(WindowInsets(5, 4, 3, 2))
+                            .consumeWindowInsets(WindowInsets(5, 4, 3, 2))
                     ) {
                         Box(Modifier.fillMaxSize().systemBarsPadding()) {
                             Box(Modifier.fillMaxSize().onGloballyPositioned { coordinates = it })
@@ -415,7 +415,7 @@ class WindowInsetsPaddingTest {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                 Box(consumingModifier) {
                     val density = LocalDensity.current
-                    Box(Modifier.fillMaxSize().withConsumedWindowInsets {
+                    Box(Modifier.fillMaxSize().onConsumedWindowInsetsChanged {
                         top = it.getTop(density)
                     })
                 }
@@ -435,7 +435,7 @@ class WindowInsetsPaddingTest {
 
         assertThat(top).isEqualTo(0)
 
-        consumingModifier = Modifier.consumedWindowInsets(WindowInsets(0, 5, 0, 0))
+        consumingModifier = Modifier.consumeWindowInsets(WindowInsets(0, 5, 0, 0))
 
         rule.waitForIdle()
 
@@ -639,18 +639,19 @@ class WindowInsetsPaddingTest {
                 Box(
                     Modifier
                         .fillMaxSize()
-                        .consumedWindowInsets(PaddingValues(top = 1.toDp()))
+                        .consumeWindowInsets(PaddingValues(top = 1.toDp()))
                         .windowInsetsPadding(WindowInsets(top = 10))
                         .onGloballyPositioned { outer = it }
                 ) {
-                    Box(Modifier
-                        .consumedWindowInsets(PaddingValues(top = 1.toDp()))
-                        .windowInsetsPadding(WindowInsets(top = 20))
-                        .onGloballyPositioned { middle = it }
+                    Box(
+                        Modifier
+                            .consumeWindowInsets(PaddingValues(top = 1.toDp()))
+                            .windowInsetsPadding(WindowInsets(top = 20))
+                            .onGloballyPositioned { middle = it }
                     ) {
                         Box(
                             Modifier
-                                .consumedWindowInsets(PaddingValues(top = 1.toDp()))
+                                .consumeWindowInsets(PaddingValues(top = 1.toDp()))
                                 .windowInsetsPadding(WindowInsets(top = 30))
                                 .fillMaxSize()
                                 .onGloballyPositioned { inner = it }
@@ -687,18 +688,18 @@ class WindowInsetsPaddingTest {
             Box(
                 Modifier
                     .fillMaxSize()
-                    .consumedWindowInsets(WindowInsets(top = 1))
+                    .consumeWindowInsets(WindowInsets(top = 1))
                     .windowInsetsPadding(WindowInsets(top = 10))
                     .onGloballyPositioned { outer = it }
             ) {
                 Box(Modifier
-                    .consumedWindowInsets(WindowInsets(top = 10))
+                    .consumeWindowInsets(WindowInsets(top = 10))
                     .windowInsetsPadding(WindowInsets(top = 20))
                     .onGloballyPositioned { middle = it }
                 ) {
                     Box(
                         Modifier
-                            .consumedWindowInsets(WindowInsets(top = 20))
+                            .consumeWindowInsets(WindowInsets(top = 20))
                             .windowInsetsPadding(WindowInsets(top = 30))
                             .fillMaxSize()
                             .onGloballyPositioned { inner = it }
@@ -733,9 +734,9 @@ class WindowInsetsPaddingTest {
         setContent {
             Box(Modifier.fillMaxSize()) {
                 val modifier = if (useMiddleInsets) {
-                    Modifier.consumedWindowInsets(WindowInsets(top = 1))
+                    Modifier.consumeWindowInsets(WindowInsets(top = 1))
                 } else {
-                    Modifier.consumedWindowInsets(WindowInsets(top = 2))
+                    Modifier.consumeWindowInsets(WindowInsets(top = 2))
                 }
                 with(LocalDensity.current) {
                     Box(modifier.size(50.toDp())) {

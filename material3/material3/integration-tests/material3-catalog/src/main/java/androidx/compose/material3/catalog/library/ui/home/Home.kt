@@ -20,7 +20,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -50,7 +50,7 @@ fun Home(
         onThemeChange = onThemeChange
     ) { paddingValues ->
         LazyVerticalGrid(
-            modifier = Modifier.consumedWindowInsets(paddingValues),
+            modifier = Modifier.consumeWindowInsets(paddingValues),
             columns = GridCells.Adaptive(HomeCellMinSize),
             content = {
                 items(components) { component ->

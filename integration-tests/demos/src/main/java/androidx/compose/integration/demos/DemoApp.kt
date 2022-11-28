@@ -22,7 +22,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -110,7 +110,7 @@ fun DemoApp(
     ) { innerPadding ->
         val modifier = Modifier
             // as scaffold currently doesn't consume - consume what's needed
-            .consumedWindowInsets(innerPadding)
+            .consumeWindowInsets(innerPadding)
             .padding(innerPadding)
         DemoContent(
             modifier,
