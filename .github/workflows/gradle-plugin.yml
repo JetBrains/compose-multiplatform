@@ -18,14 +18,10 @@ jobs:
           java-version: '16'
       - name: Test Gradle plugin
         shell: bash
-        # --dry-run is needed, because that's the only way to force Gradle
-        # to use configuration from configuration cache and run all tasks in parallel
-        # https://github.com/gradle/gradle/issues/21985
         run: |
           cd gradle-plugins
           ./gradlew assemble
-          ./gradlew :compose:check --continue --configuration-cache --dry-run
-          ./gradlew :compose:check --continue --configuration-cache
+          ./gradlew :compose:check --continue
       - name: Print summary
         shell: bash
         if: always()
