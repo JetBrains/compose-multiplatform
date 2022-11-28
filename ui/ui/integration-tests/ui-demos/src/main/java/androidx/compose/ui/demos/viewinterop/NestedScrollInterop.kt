@@ -19,21 +19,28 @@ package androidx.compose.ui.demos.viewinterop
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
@@ -148,6 +155,30 @@ private fun LazyColumnWithNestedScrollInteropEnabled() {
 }
 
 @Composable
+private fun ScrollableColumnWithNestedScrollInteropEnabled(
+    state: ScrollState,
+    hostView: View
+) {
+    Column(
+        modifier = Modifier
+            .nestedScroll(rememberNestedScrollInteropConnection(hostView))
+            .verticalScroll(state)
+    ) {
+        repeat(100) { item ->
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .size(56.dp)
+                    .background(Color.Gray),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(item.toString())
+            }
+        }
+    }
+}
+
+@Composable
 internal fun ComposeViewComposeNestedInterop() {
     OuterComposeWithNestedScroll { context ->
         LayoutInflater.from(context)
@@ -199,6 +230,53 @@ internal class ComposeInAndroidCoordinatorLayout : ComponentActivity() {
         findViewById<ComposeView>(R.id.compose_view).apply {
             setContent { LazyColumnWithNestedScrollInteropEnabled() }
         }
+    }
+}
+
+internal class ComposeInSwipeToRefreshLayout : ComponentActivity() {
+    @SuppressLint("SetTextI18n")
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.compose_in_android_swipe_to_refresh_layout)
+        val scrollState = ScrollState(0)
+        with(findViewById<NestedScrollableView>(R.id.nested_scrollable_view)) {
+            scrollableState = scrollState
+            addView(
+                ComposeView(this@ComposeInSwipeToRefreshLayout).also {
+                    it.setContent {
+                        ScrollableColumnWithNestedScrollInteropEnabled(
+                            state = scrollState,
+                            hostView = this
+                        )
+                    }
+                }
+            )
+        }
+    }
+}
+
+/**
+ * A host view that uses [ScrollableState] to check if its inner scrollable can scroll
+ * and to communicate with outer View world mechanisms that use [canScrollHorizontally] or
+ * [canScrollVertically] to take actions. (e.g.
+ * [com.google.android.material.bottomsheet.BottomSheetBehavior],
+ * [androidx.slidingpanelayout.widget.SlidingPaneLayout])
+ */
+internal class NestedScrollableView(
+    context: Context,
+    attributeSet: AttributeSet
+) : FrameLayout(context, attributeSet) {
+
+    var scrollableState: ScrollableState? = null
+
+    // One can implement either [canScrollHorizontally] or [canScrollVertically]
+    // depending on their use cases.
+    override fun canScrollVertically(direction: Int): Boolean {
+        return if (direction > 0) {
+            scrollableState?.canScrollForward
+        } else {
+            scrollableState?.canScrollBackward
+        } ?: false
     }
 }
 

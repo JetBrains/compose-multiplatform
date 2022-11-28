@@ -73,6 +73,7 @@ import androidx.compose.ui.demos.viewinterop.BottomSheetFragmentNestedScrollInte
 import androidx.compose.ui.demos.viewinterop.ComplexTouchInterop
 import androidx.compose.ui.demos.viewinterop.ComposeInAndroidCoordinatorLayout
 import androidx.compose.ui.demos.viewinterop.ComposeInAndroidDemos
+import androidx.compose.ui.demos.viewinterop.ComposeInSwipeToRefreshLayout
 import androidx.compose.ui.demos.viewinterop.ComposeViewComposeNestedInterop
 import androidx.compose.ui.demos.viewinterop.EditTextInteropDemo
 import androidx.compose.ui.demos.viewinterop.FocusTransferDemo
@@ -189,6 +190,10 @@ private val NestedScrollInteropDemos = DemoCategory(
         ActivityDemo(
             "(Collaborating) View -> Compose",
             ComposeInAndroidCoordinatorLayout::class
+        ),
+        ActivityDemo(
+            "Compose -> Sliding Pane",
+            ComposeInSwipeToRefreshLayout::class
         ),
         ActivityDemo(
             "(Collaborating) View -> Compose -> View",

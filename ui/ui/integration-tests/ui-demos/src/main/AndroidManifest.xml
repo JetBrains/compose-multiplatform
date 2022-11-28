@@ -49,7 +49,10 @@
             android:name=".viewinterop.ComposeInAndroidCoordinatorLayout"
             android:configChanges="orientation|screenSize"
             android:label="Compose in Coordinator Layout Activity" />
-
+        <activity
+            android:name=".viewinterop.ComposeInSwipeToRefreshLayout"
+            android:configChanges="orientation|screenSize"
+            android:label="Compose in Sliding Pane Layout Activity" />
         <activity
             android:name=".viewinterop.ViewComposeViewNestedScrollInteropDemo"
             android:configChanges="orientation|screenSize"
