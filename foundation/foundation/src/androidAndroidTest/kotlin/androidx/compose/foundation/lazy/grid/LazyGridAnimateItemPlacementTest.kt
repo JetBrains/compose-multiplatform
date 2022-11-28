@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredHeightIn
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.requiredWidthIn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -292,25 +291,13 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
             .assertMainAxisSizeIsEqualTo(size)
 
         onAnimationFrame { fraction ->
-            if (!reverseLayout) {
-                assertPositions(
-                    0 to AxisIntOffset(0, 0),
-                    1 to AxisIntOffset(0, itemSize),
-                    2 to AxisIntOffset(0, itemSize * 2 + (itemSize * fraction).roundToInt()),
-                    3 to AxisIntOffset(0, itemSize * 3 + (itemSize * fraction).roundToInt()),
-                    fraction = fraction,
-                    autoReverse = false
-                )
-            } else {
-                assertPositions(
-                    3 to AxisIntOffset(0, itemSize - (itemSize * fraction).roundToInt()),
-                    2 to AxisIntOffset(0, itemSize * 2 - (itemSize * fraction).roundToInt()),
-                    1 to AxisIntOffset(0, itemSize * 3 - (itemSize * fraction).roundToInt()),
-                    0 to AxisIntOffset(0, itemSize * 4),
-                    fraction = fraction,
-                    autoReverse = false
-                )
-            }
+            assertPositions(
+                0 to AxisIntOffset(0, 0),
+                1 to AxisIntOffset(0, itemSize),
+                2 to AxisIntOffset(0, itemSize * 2 + (itemSize * fraction).roundToInt()),
+                3 to AxisIntOffset(0, itemSize * 3 + (itemSize * fraction).roundToInt()),
+                fraction = fraction
+            )
         }
     }
 
@@ -471,8 +458,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun moveItemToTheBottomOutsideOfBounds() {
         var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
+        val gridSize = itemSize * 3
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
         rule.setContent {
-            LazyGrid(2, maxSize = itemSizeDp * 3) {
+            LazyGrid(2, maxSize = gridSizeDp) {
                 items(list, key = { it }) {
                     Item(it)
                 }
@@ -493,9 +482,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
-            val item1Offset = AxisIntOffset(itemSize, 0 + (itemSize * 4 * fraction).roundToInt())
+            // item 1 moves to and item 8 moves from `gridSize`, right after the end edge
+            val item1Offset = AxisIntOffset(itemSize, 0 + (gridSize * fraction).roundToInt())
             val item8Offset =
-                AxisIntOffset(itemSize, itemSize * 4 - (itemSize * 4 * fraction).roundToInt())
+                AxisIntOffset(itemSize, gridSize - (gridSize * fraction).roundToInt())
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
                 add(0 to AxisIntOffset(0, 0))
                 if (item1Offset.mainAxis < itemSize * 3) {
@@ -545,10 +535,11 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
-            val item8Offset = AxisIntOffset(0, itemSize - (itemSize * 4 * fraction).roundToInt())
+            // item 1 moves from and item 8 moves to `0 - itemSize`, right before the start edge
+            val item8Offset = AxisIntOffset(0, itemSize - (itemSize * 2 * fraction).roundToInt())
             val item1Offset = AxisIntOffset(
                 0,
-                itemSize * -3 + (itemSize * 4 * fraction).roundToInt()
+                -itemSize + (itemSize * 2 * fraction).roundToInt()
             )
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
                 if (item1Offset.mainAxis > -itemSize) {
@@ -618,10 +609,12 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun moveItemToTheBottomOutsideOfBounds_withSpacing() {
         var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9))
+        val gridSize = itemSize * 3 + spacing * 2
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
         rule.setContent {
             LazyGrid(
                 2,
-                maxSize = itemSizeDp * 3 + spacingDp * 2,
+                maxSize = gridSizeDp,
                 arrangement = Arrangement.spacedBy(spacingDp)
             ) {
                 items(list, key = { it }) {
@@ -644,13 +637,14 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
+            // item 1 moves to and item 8 moves from `gridSize`, right after the end edge
             val item1Offset = AxisIntOffset(
                 itemSize,
-                (itemSizePlusSpacing * 4 * fraction).roundToInt()
+                (gridSize * fraction).roundToInt()
             )
             val item8Offset = AxisIntOffset(
                 itemSize,
-                itemSizePlusSpacing * 4 - (itemSizePlusSpacing * 4 * fraction).roundToInt()
+                gridSize - (gridSize * fraction).roundToInt()
             )
             val screenSize = itemSize * 3 + spacing * 2
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
@@ -703,13 +697,15 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
+            // item 8 moves to and item 1 moves from `-itemSize`, right before the start edge
             val item1Offset = AxisIntOffset(
                 0,
-                itemSizePlusSpacing * -2 + (itemSizePlusSpacing * 4 * fraction).roundToInt()
+                -itemSize + ((itemSize + itemSizePlusSpacing * 2) * fraction).roundToInt()
             )
             val item8Offset = AxisIntOffset(
                 0,
-                itemSizePlusSpacing * 2 - (itemSizePlusSpacing * 4 * fraction).roundToInt()
+                itemSizePlusSpacing * 2 -
+                    ((itemSize + itemSizePlusSpacing * 2) * fraction).roundToInt()
             )
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
                 if (item1Offset.mainAxis > -itemSize) {
@@ -768,16 +764,16 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
+            // items 4 and 5 were lines 1 and 3 but we don't compose it
             rule.onNodeWithTag("4").assertDoesNotExist()
             rule.onNodeWithTag("5").assertDoesNotExist()
-            // items 4,5 were between lines 1 and 3 but we don't compose them and don't know the
-            // real size, so we use an average size.
-            val line2Size = (itemSize + itemSize2 + itemSize3) / 3
-            val line1Size = itemSize3 /* the real size of the item 2 */
-            val startItem2Offset = -line1Size - line2Size
+            val item2Size = itemSize3 /* the real size of the item 2 */
+            // item 2 moves from and item 4 moves to `0 - item size`, right before the start edge
+            val startItem2Offset = -item2Size
             val item2Offset =
                 startItem2Offset + ((itemSize2 - startItem2Offset) * fraction).roundToInt()
-            val endItem8Offset = -line2Size - itemSize
+            val item8Size = itemSize /* the real size of the item 8 */
+            val endItem8Offset = -item8Size
             val item8Offset = line3Size - ((line3Size - endItem8Offset) * fraction).roundToInt()
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
                 if (item8Offset > -line4Size) {
@@ -787,7 +783,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                 }
                 add(6 to AxisIntOffset(0, 0))
                 add(7 to AxisIntOffset(itemSize, 0))
-                if (item2Offset > -line1Size) {
+                if (item2Offset > -item2Size) {
                     add(2 to AxisIntOffset(0, item2Offset))
                 } else {
                     rule.onNodeWithTag("2").assertIsNotDisplayed()
@@ -812,7 +808,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun moveItemToTheBottomOutsideOfBounds_differentSizes() {
         var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11))
-        val gridSize = itemSize2 + itemSize3 + itemSize - 1
+        val gridSize = itemSize2 + itemSize3 + itemSize
         val gridSizeDp = with(rule.density) { gridSize.toDp() }
         rule.setContent {
             LazyGrid(2, maxSize = gridSizeDp) {
@@ -845,13 +841,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
-            val line2Size = itemSize
+            // item 1 moves from and item 8 moves to `gridSize`, right after the end edge
+            val startItem8Offset = gridSize
+            val endItem2Offset = gridSize
             val line4Size = itemSize3
-            // line 3 was between 2 and 4 but we don't compose it and don't know the real size,
-            // so we use an average size.
-            val line3Size = (itemSize + itemSize2 + itemSize3) / 3
-            val startItem8Offset = line0Size + line1Size + line2Size + line3Size
-            val endItem2Offset = line0Size + line4Size + line2Size + line3Size
             val item2Offset =
                 line0Size + ((endItem2Offset - line0Size) * fraction).roundToInt()
             val item8Offset =
@@ -862,7 +855,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                 if (item8Offset < gridSize) {
                     add(8 to AxisIntOffset(0, item8Offset))
                 } else {
-                    // rule.onNodeWithTag("8").assertIsNotDisplayed()
+                    rule.onNodeWithTag("8").assertIsNotDisplayed()
                 }
                 add(3 to AxisIntOffset(itemSize, line0Size))
                 add(4 to AxisIntOffset(
@@ -876,7 +869,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                 if (item2Offset < gridSize) {
                     add(2 to AxisIntOffset(0, item2Offset))
                 } else {
-                    // rule.onNodeWithTag("2").assertIsNotDisplayed()
+                    rule.onNodeWithTag("2").assertIsNotDisplayed()
                 }
             }
             assertPositions(
@@ -889,8 +882,8 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     // @Test
     // fun animateAlignmentChange() {
     //     var alignment by mutableStateOf(CrossAxisAlignment.End)
-    //     rule.setContent {
-    //         LazyList(
+    //     rule.setContent{
+    //         LazyGrid(1,
     //             crossAxisAlignment = alignment,
     //             crossAxisSize = itemSizeDp
     //         ) {
@@ -940,8 +933,8 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     // @Test
     // fun animateAlignmentChange_multipleChildrenPerItem() {
     //     var alignment by mutableStateOf(CrossAxisAlignment.Start)
-    //     rule.setContent {
-    //         LazyList(
+    //     rule.setContent{
+    //         LazyGrid(1,
     //             crossAxisAlignment = alignment,
     //             crossAxisSize = itemSizeDp * 2
     //         ) {
@@ -982,9 +975,9 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     //     assumeTrue(isVertical)
 
     //     var alignment by mutableStateOf(CrossAxisAlignment.End)
-    //     rule.setContent {
+    //     rule.setContent{
     //         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-    //             LazyList(
+    //             LazyGrid(1,
     //                 crossAxisAlignment = alignment,
     //                 crossAxisSize = itemSizeDp
     //             ) {
@@ -1118,7 +1111,7 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     }
 
     @Test
-    fun noAnimationWhenScrollOtherPosition() {
+    fun noAnimationWhenScrolledToOtherPosition() {
         rule.setContent {
             LazyGrid(1, maxSize = itemSizeDp * 3) {
                 items(listOf(0, 1, 2, 3, 4, 5, 6, 7), key = { it }) {
@@ -1573,9 +1566,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun animatingItemsWithPreviousIndexLargerThanTheNewItemCount() {
         var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6, 7))
-        val gridSize = itemSize * 2 - 1
+        val gridSize = itemSize * 2
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
         rule.setContent {
-            LazyGrid(2, maxSize = with(rule.density) { gridSize.toDp() }) {
+            LazyGrid(2, maxSize = gridSizeDp) {
                 items(list, key = { it }) {
                     Item(it)
                 }
@@ -1602,17 +1596,13 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
                         (itemSize * (1f - fraction)).roundToInt()
                     )
                 )
-                    val item4MainAxis = itemSize + (itemSize * (1f - fraction)).roundToInt()
-                if (item4MainAxis < gridSize) {
-                    add(
-                        4 to AxisIntOffset(0, item4MainAxis)
-                    )
-                }
-                val item6MainAxis = itemSize + (itemSize * 2 * (1f - fraction)).roundToInt()
-                if (item6MainAxis < gridSize) {
-                    add(
-                        6 to AxisIntOffset(itemSize, item6MainAxis)
-                    )
+                val item4and6MainAxis = gridSize - ((gridSize - itemSize) * fraction).roundToInt()
+                if (item4and6MainAxis < gridSize) {
+                    add(4 to AxisIntOffset(0, item4and6MainAxis))
+                    add(6 to AxisIntOffset(itemSize, item4and6MainAxis))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                    rule.onNodeWithTag("6").assertIsNotDisplayed()
                 }
             }
 
@@ -1626,9 +1616,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun animatingItemsWithPreviousIndexLargerThanTheNewItemCount_differentSpans() {
         var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5, 6))
-        val gridSize = itemSize * 2 - 1
+        val gridSize = itemSize * 2
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
         rule.setContent {
-            LazyGrid(2, maxSize = with(rule.density) { gridSize.toDp() }) {
+            LazyGrid(2, maxSize = gridSizeDp) {
                 items(list, key = { it }, span = {
                     GridItemSpan(if (it == 6) maxLineSpan else 1)
                 }) {
@@ -1651,19 +1642,21 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         onAnimationFrame { fraction ->
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
                 add(0 to AxisIntOffset(0, 0))
-                val item4MainAxis = (itemSize * 2 * (1f - fraction)).roundToInt()
+                val item4MainAxis = gridSize - (gridSize * fraction).roundToInt()
                 if (item4MainAxis < gridSize) {
                     add(
                         4 to AxisIntOffset(itemSize, item4MainAxis)
                     )
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
                 }
-                if (fraction == 1f) {
-                    val item6MainAxis = itemSize + (itemSize * 2 * (1f - fraction)).roundToInt()
-                    if (item6MainAxis < gridSize) {
-                        add(
-                            6 to AxisIntOffset(0, item6MainAxis)
-                        )
-                    }
+                val item6MainAxis = gridSize + itemSize - (gridSize * fraction).roundToInt()
+                if (item6MainAxis < gridSize) {
+                    add(
+                        6 to AxisIntOffset(0, item6MainAxis)
+                    )
+                } else {
+                    rule.onNodeWithTag("6").assertIsNotDisplayed()
                 }
             }
 
@@ -1677,8 +1670,10 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun itemWithSpecsIsMovingOut() {
         var list by mutableStateOf(listOf(0, 1, 2, 3))
+        val gridSize = itemSize * 2
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
         rule.setContent {
-            LazyGrid(1, maxSize = itemSizeDp * 2) {
+            LazyGrid(1, maxSize = gridSizeDp) {
                 items(list, key = { it }) {
                     Item(it, animSpec = if (it == 1) AnimSpec else null)
                 }
@@ -1690,11 +1685,11 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
         }
 
         onAnimationFrame { fraction ->
-            val listSize = itemSize * 2
-            val item1Offset = itemSize + (itemSize * 2f * fraction).roundToInt()
+            // item 1 moves to `gridSize`
+            val item1Offset = itemSize + ((gridSize - itemSize) * fraction).roundToInt()
             val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
                 add(0 to AxisIntOffset(0, 0))
-                if (item1Offset < listSize) {
+                if (item1Offset < gridSize) {
                     add(1 to AxisIntOffset(0, item1Offset))
                 } else {
                     rule.onNodeWithTag("1").assertIsNotDisplayed()
@@ -1702,6 +1697,399 @@ class LazyGridAnimateItemPlacementTest(private val config: Config) {
             }
             assertPositions(
                 expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun moveTwoItemsToTheTopOutsideOfBounds() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5))
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3f, startIndex = 3) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            3 to AxisIntOffset(0, 0),
+            4 to AxisIntOffset(0, itemSize),
+            5 to AxisIntOffset(0, itemSize * 2)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 4, 5, 3, 1, 2)
+        }
+
+        onAnimationFrame { fraction ->
+            // item 2 moves from and item 5 moves to `-itemSize`, right before the start edge
+            val item2Offset = -itemSize + (itemSize * 3 * fraction).roundToInt()
+            val item5Offset = itemSize * 2 - (itemSize * 3 * fraction).roundToInt()
+            // item 1 moves from and item 4 moves to `-itemSize * 2`, right before item 2
+            val item1Offset = -itemSize * 2 + (itemSize * 3 * fraction).roundToInt()
+            val item4Offset = itemSize - (itemSize * 3 * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                if (item1Offset > -itemSize) {
+                    add(1 to AxisIntOffset(0, item1Offset))
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+                if (item2Offset > -itemSize) {
+                    add(2 to AxisIntOffset(0, item2Offset))
+                } else {
+                    rule.onNodeWithTag("2").assertIsNotDisplayed()
+                }
+                add(3 to AxisIntOffset(0, 0))
+                if (item4Offset > -itemSize) {
+                    add(4 to AxisIntOffset(0, item4Offset))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                }
+                if (item5Offset > -itemSize) {
+                    add(5 to AxisIntOffset(0, item5Offset))
+                } else {
+                    rule.onNodeWithTag("5").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun moveTwoItemsToTheTopOutsideOfBounds_withReordering() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5))
+        rule.setContent {
+            LazyGrid(1, maxSize = itemSizeDp * 3f, startIndex = 3) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            3 to AxisIntOffset(0, 0),
+            4 to AxisIntOffset(0, itemSize),
+            5 to AxisIntOffset(0, itemSize * 2)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 5, 4, 3, 2, 1)
+        }
+
+        onAnimationFrame { fraction ->
+            // item 2 moves from and item 4 moves to `-itemSize`, right before the start edge
+            val item2Offset = -itemSize + (itemSize * 2 * fraction).roundToInt()
+            val item4Offset = itemSize - (itemSize * 2 * fraction).roundToInt()
+            // item 1 moves from and item 5 moves to `-itemSize * 2`, right before item 2
+            val item1Offset = -itemSize * 2 + (itemSize * 4 * fraction).roundToInt()
+            val item5Offset = itemSize * 2 - (itemSize * 4 * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                if (item1Offset > -itemSize) {
+                    add(1 to AxisIntOffset(0, item1Offset))
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+                if (item2Offset > -itemSize) {
+                    add(2 to AxisIntOffset(0, item2Offset))
+                } else {
+                    rule.onNodeWithTag("2").assertIsNotDisplayed()
+                }
+                add(3 to AxisIntOffset(0, 0))
+                if (item4Offset > -itemSize) {
+                    add(4 to AxisIntOffset(0, item4Offset))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                }
+                if (item5Offset > -itemSize) {
+                    add(5 to AxisIntOffset(0, item5Offset))
+                } else {
+                    rule.onNodeWithTag("5").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun moveTwoItemsToTheTopOutsideOfBounds_cellsOfTheSameLine() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5))
+        rule.setContent {
+            LazyGrid(2, maxSize = itemSizeDp * 2f, startIndex = 3) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            2 to AxisIntOffset(0, 0),
+            3 to AxisIntOffset(itemSize, 0),
+            4 to AxisIntOffset(0, itemSize),
+            5 to AxisIntOffset(itemSize, itemSize)
+        )
+
+        rule.runOnIdle {
+            list = listOf(4, 5, 2, 3, 0, 1)
+        }
+
+        onAnimationFrame { fraction ->
+            // items 0 and 2 moves from and items 4 and 5 moves to `-itemSize`,
+            // right before the start edge
+            val items0and1Offset = -itemSize + (itemSize * 2 * fraction).roundToInt()
+            val items4and5Offset = itemSize - (itemSize * 2 * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                if (items0and1Offset > -itemSize) {
+                    add(0 to AxisIntOffset(0, items0and1Offset))
+                    add(1 to AxisIntOffset(itemSize, items0and1Offset))
+                } else {
+                    rule.onNodeWithTag("0").assertIsNotDisplayed()
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+                add(2 to AxisIntOffset(0, 0))
+                add(3 to AxisIntOffset(itemSize, 0))
+                if (items4and5Offset > -itemSize) {
+                    add(4 to AxisIntOffset(0, items4and5Offset))
+                    add(5 to AxisIntOffset(itemSize, items4and5Offset))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                    rule.onNodeWithTag("5").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun moveTwoItemsToTheBottomOutsideOfBounds() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val gridSize = itemSize * 3
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
+        rule.setContent {
+            LazyGrid(1, maxSize = gridSizeDp) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(0, itemSize),
+            2 to AxisIntOffset(0, itemSize * 2)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 3, 4, 1, 2)
+        }
+
+        onAnimationFrame { fraction ->
+            // item 1 moves to and item 3 moves from `gridSize`, right after the end edge
+            val item1Offset = itemSize + ((gridSize - itemSize) * fraction).roundToInt()
+            val item3Offset = gridSize - ((gridSize - itemSize) * fraction).roundToInt()
+            // item 2 moves to and item 4 moves from `gridSize + itemSize`, right after item 4
+            val item2Offset = itemSize * 2 + ((gridSize - itemSize) * fraction).roundToInt()
+            val item4Offset = gridSize + itemSize - ((gridSize - itemSize) * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                add(0 to AxisIntOffset(0, 0))
+                if (item1Offset < gridSize) {
+                    add(1 to AxisIntOffset(0, item1Offset))
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+                if (item2Offset < gridSize) {
+                    add(2 to AxisIntOffset(0, item2Offset))
+                } else {
+                    rule.onNodeWithTag("2").assertIsNotDisplayed()
+                }
+                if (item3Offset < gridSize) {
+                    add(3 to AxisIntOffset(0, item3Offset))
+                } else {
+                    rule.onNodeWithTag("3").assertIsNotDisplayed()
+                }
+                if (item4Offset < gridSize) {
+                    add(4 to AxisIntOffset(0, item4Offset))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun moveTwoItemsToTheBottomOutsideOfBounds_withReordering() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4))
+        val gridSize = itemSize * 3
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
+        rule.setContent {
+            LazyGrid(1, maxSize = gridSizeDp) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(0, itemSize),
+            2 to AxisIntOffset(0, itemSize * 2)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 4, 3, 2, 1)
+        }
+
+        onAnimationFrame { fraction ->
+            // item 2 moves to and item 3 moves from `gridSize`, right after the end edge
+            val item2Offset = itemSize * 2 + ((gridSize - itemSize * 2) * fraction).roundToInt()
+            val item3Offset = gridSize - ((gridSize - itemSize * 2) * fraction).roundToInt()
+            // item 1 moves to and item 4 moves from `gridSize + itemSize`, right after item 4
+            val item1Offset = itemSize + ((gridSize + itemSize - itemSize) * fraction).roundToInt()
+            val item4Offset =
+                gridSize + itemSize - ((gridSize + itemSize - itemSize) * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                add(0 to AxisIntOffset(0, 0))
+                if (item1Offset < gridSize) {
+                    add(1 to AxisIntOffset(0, item1Offset))
+                } else {
+                    rule.onNodeWithTag("1").assertIsNotDisplayed()
+                }
+                if (item2Offset < gridSize) {
+                    add(2 to AxisIntOffset(0, item2Offset))
+                } else {
+                    rule.onNodeWithTag("2").assertIsNotDisplayed()
+                }
+                if (item3Offset < gridSize) {
+                    add(3 to AxisIntOffset(0, item3Offset))
+                } else {
+                    rule.onNodeWithTag("3").assertIsNotDisplayed()
+                }
+                if (item4Offset < gridSize) {
+                    add(4 to AxisIntOffset(0, item4Offset))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun moveTwoItemsToTheBottomOutsideOfBounds_cellsOfTheSameLine() {
+        var list by mutableStateOf(listOf(0, 1, 2, 3, 4, 5))
+        val gridSize = itemSize * 2
+        val gridSizeDp = with(rule.density) { gridSize.toDp() }
+        rule.setContent {
+            LazyGrid(2, maxSize = gridSizeDp) {
+                items(list, key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        assertPositions(
+            0 to AxisIntOffset(0, 0),
+            1 to AxisIntOffset(itemSize, 0),
+            2 to AxisIntOffset(0, itemSize),
+            3 to AxisIntOffset(itemSize, itemSize)
+        )
+
+        rule.runOnIdle {
+            list = listOf(0, 1, 4, 5, 2, 3)
+        }
+
+        onAnimationFrame { fraction ->
+            // items 4 and 5 moves from and items 2 and 3 moves to `gridSize`,
+            // right before the start edge
+            val items4and5Offset = gridSize - ((gridSize - itemSize) * fraction).roundToInt()
+            val items2and3Offset = itemSize + ((gridSize - itemSize) * fraction).roundToInt()
+            val expected = mutableListOf<Pair<Any, IntOffset>>().apply {
+                add(0 to AxisIntOffset(0, 0))
+                add(1 to AxisIntOffset(itemSize, 0))
+                if (items2and3Offset < gridSize) {
+                    add(2 to AxisIntOffset(0, items2and3Offset))
+                    add(3 to AxisIntOffset(itemSize, items2and3Offset))
+                } else {
+                    rule.onNodeWithTag("2").assertIsNotDisplayed()
+                    rule.onNodeWithTag("3").assertIsNotDisplayed()
+                }
+                if (items4and5Offset < gridSize) {
+                    add(4 to AxisIntOffset(0, items4and5Offset))
+                    add(5 to AxisIntOffset(itemSize, items4and5Offset))
+                } else {
+                    rule.onNodeWithTag("4").assertIsNotDisplayed()
+                    rule.onNodeWithTag("5").assertIsNotDisplayed()
+                }
+            }
+            assertPositions(
+                expected = expected.toTypedArray(),
+                fraction = fraction
+            )
+        }
+    }
+
+    @Test
+    fun noAnimationWhenParentSizeShrinks() {
+        var size by mutableStateOf(itemSizeDp * 3)
+        rule.setContent {
+            LazyGrid(1, maxSize = size) {
+                items(listOf(0, 1, 2), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            size = itemSizeDp * 2
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, 0),
+                1 to AxisIntOffset(0, itemSize),
+                fraction = fraction
+            )
+            rule.onNodeWithTag("2").assertIsNotDisplayed()
+        }
+    }
+
+    @Test
+    fun noAnimationWhenParentSizeExpands() {
+        var size by mutableStateOf(itemSizeDp * 2)
+        rule.setContent {
+            LazyGrid(1, maxSize = size) {
+                items(listOf(0, 1, 2), key = { it }) {
+                    Item(it)
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            size = itemSizeDp * 3
+        }
+
+        onAnimationFrame { fraction ->
+            assertPositions(
+                0 to AxisIntOffset(0, 0),
+                1 to AxisIntOffset(0, itemSize),
+                2 to AxisIntOffset(0, itemSize * 2),
                 fraction = fraction
             )
         }

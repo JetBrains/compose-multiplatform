@@ -246,9 +246,8 @@ internal fun measureLazyGrid(
             consumedScroll = consumedScroll.toInt(),
             layoutWidth = layoutWidth,
             layoutHeight = layoutHeight,
-            reverseLayout = reverseLayout,
             positionedItems = positionedItems,
-            measuredItemProvider = measuredItemProvider,
+            itemProvider = measuredItemProvider,
             spanLayoutProvider = spanLayoutProvider
         )
 
