@@ -16,7 +16,9 @@
 
 package androidx.compose.material.swipeable
 
+import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.material.ExperimentalMaterialApi
@@ -38,6 +40,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
+import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -294,5 +297,47 @@ class SwipeableV2StateTest {
         }
 
         assertThat(exception).isNull()
+    }
+
+    @Test
+    fun swipeable_animateTo_animatesBeyondBounds() {
+        rule.mainClock.autoAdvance = false
+        val minBound = 0f
+        val maxBound = 500f
+        val anchors = mapOf(
+            A to minBound,
+            C to maxBound
+        )
+
+        val animationSpec = FloatSpringSpec(dampingRatio = Spring.DampingRatioHighBouncy)
+        val animationDuration = animationSpec.getDurationNanos(
+            initialValue = minBound,
+            targetValue = maxBound,
+            initialVelocity = 0f
+        ).let { TimeUnit.NANOSECONDS.toMillis(it) }
+
+        lateinit var state: SwipeableV2State<TestState>
+        lateinit var scope: CoroutineScope
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            state = rememberSwipeableV2State(
+                initialValue = A,
+                animationSpec = animationSpec
+            )
+            SwipeableBox(
+                state,
+                calculateAnchor = { state, _ -> anchors[state] }
+            )
+        }
+        scope.launch {
+            state.animateTo(C)
+        }
+        var highestOffset = 0f
+        for (i in 0..animationDuration step 16) {
+            highestOffset = state.requireOffset()
+            rule.mainClock.advanceTimeBy(16)
+        }
+        assertThat(highestOffset).isGreaterThan(anchors.getValue(C))
     }
 }
