@@ -1,3 +1,4 @@
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
@@ -17,11 +18,15 @@ dependencies {
 compose.desktop {
     application {
         mainClass = "Main"
-        args(project.projectDir.absolutePath)
         nativeDistributions {
             targetFormats(TargetFormat.Dmg, TargetFormat.Msi, TargetFormat.Deb)
         }
-        args(project.projectDir.absolutePath)
+
+        def projectPath = project.projectDir.absolutePath
+        if (DefaultNativePlatform.currentOperatingSystem.isWindows()) {
+            projectPath = projectPath.replace("\\", "\\\\")
+        }
+        args(projectPath)
 
         buildTypes.release.proguard {
             configurationFiles.from("rules.pro")
