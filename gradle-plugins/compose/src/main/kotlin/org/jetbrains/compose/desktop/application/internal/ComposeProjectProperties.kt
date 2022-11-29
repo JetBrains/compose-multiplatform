@@ -10,7 +10,6 @@ import org.gradle.api.provider.ProviderFactory
 
 internal object ComposeProperties {
     internal const val VERBOSE = "compose.desktop.verbose"
-    internal const val OVERRIDE_KOTLIN_JVM_TARGET = "compose.desktop.override.default.kotlin.jvm.target"
     internal const val PRESERVE_WD = "compose.preserve.working.dir"
     internal const val MAC_SIGN = "compose.desktop.mac.sign"
     internal const val MAC_SIGN_ID = "compose.desktop.mac.signing.identity"
@@ -22,11 +21,6 @@ internal object ComposeProperties {
 
     fun isVerbose(providers: ProviderFactory): Provider<Boolean> =
         providers.findProperty(VERBOSE).toBoolean()
-
-    fun overrideKotlinJvmTarget(providers: ProviderFactory): Provider<Boolean> =
-        providers.provider {
-            providers.findProperty(OVERRIDE_KOTLIN_JVM_TARGET)?.toString() != "false"
-        }
 
     fun preserveWorkingDir(providers: ProviderFactory): Provider<Boolean> =
         providers.findProperty(PRESERVE_WD).toBoolean()
