@@ -251,6 +251,52 @@ class ButtonTest {
             "padding between end of text and end of button."
         )
     }
+
+    @Test
+    fun text_button_withIcon_positioning() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextButton(
+                onClick = { /* Do something! */ },
+                contentPadding = ButtonDefaults.TextButtonWithIconContentPadding,
+                modifier = Modifier.testTag(ButtonTestTag)
+            ) {
+                Icon(
+                    Icons.Filled.Favorite,
+                    contentDescription = "Localized description",
+                    modifier = Modifier
+                        .size(ButtonDefaults.IconSize)
+                        .testTag(IconTestTag)
+                        .semantics(mergeDescendants = true) {}
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text(
+                    "Like",
+                    modifier = Modifier
+                        .testTag(TextTestTag)
+                        .semantics(mergeDescendants = true) {}
+                )
+            }
+        }
+
+        val textBounds = rule.onNodeWithTag(TextTestTag).getUnclippedBoundsInRoot()
+        val iconBounds = rule.onNodeWithTag(IconTestTag).getUnclippedBoundsInRoot()
+        val buttonBounds = rule.onNodeWithTag(ButtonTestTag).getUnclippedBoundsInRoot()
+
+        (iconBounds.left - buttonBounds.left).assertIsEqualTo(
+            12.dp,
+            "Padding between start of text button and start of icon."
+        )
+
+        (textBounds.left - iconBounds.right).assertIsEqualTo(
+            ButtonDefaults.IconSpacing,
+            "Padding between end of icon and start of text."
+        )
+
+        (buttonBounds.right - textBounds.right).assertIsEqualTo(
+            16.dp,
+            "padding between end of text and end of text button."
+        )
+    }
 }
 
 private const val ButtonTestTag = "button"
