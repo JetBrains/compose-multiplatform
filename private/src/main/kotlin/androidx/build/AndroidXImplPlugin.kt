@@ -148,6 +148,10 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
         project.configurations.create("samples")
         project.validateMultiplatformPluginHasNotBeenApplied()
+
+        project.tasks.register("printCoordinates", PrintProjectCoordinatesTask::class.java) {
+            it.configureWithAndroidXExtension(extension)
+        }
     }
 
     private fun Project.registerProjectOrArtifact() {
