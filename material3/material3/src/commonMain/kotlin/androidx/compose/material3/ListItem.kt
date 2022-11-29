@@ -37,9 +37,8 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
-// TODO: Provide M3 ListItem doc link when available
 /**
- * Material Design list item.
+ * <a href="https://m3.material.io/components/lists/overview" class="external" target="_blank">Material Design list item.</a>
  *
  * Lists are continuous, vertical indexes of text or images.
  *
@@ -261,9 +260,8 @@ fun ListItem(
 }
 
 // TODO(b/233782301): Complete 3-line list item
-// TODO: Provide M3 ListItem asset and doc link when available
 /**
- * Material Design list item.
+ * <a href="https://m3.material.io/components/lists/overview" class="external" target="_blank">Material Design list item.</a>
  *
  * Lists are continuous, vertical indexes of text or images. For more opinionated List Items,
  * consider using another overload
