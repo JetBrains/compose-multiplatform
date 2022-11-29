@@ -31,3 +31,18 @@
 
 # https://github.com/Kotlin/kotlinx.coroutines/issues/2046
 -dontwarn android.annotation.SuppressLint
+
+# https://github.com/JetBrains/compose-jb/issues/2393
+-dontnote kotlin.coroutines.jvm.internal.**
+-dontnote kotlin.internal.**
+-dontnote kotlin.jvm.internal.**
+-dontnote kotlin.reflect.**
+-dontnote kotlinx.coroutines.debug.internal.**
+-dontnote kotlinx.coroutines.internal.**
+-keep class kotlin.coroutines.Continuation
+-keep class kotlinx.coroutines.CancellableContinuation
+-keep class kotlinx.coroutines.channels.Channel
+-keep class kotlinx.coroutines.CoroutineDispatcher
+-keep class kotlinx.coroutines.CoroutineScope
+# this is a weird one, but breaks build on some combinations of OS and JDK (reproduced on Windows 10 + Corretto 16)
+-dontwarn org.graalvm.compiler.core.aarch64.AArch64NodeMatchRules_MatchStatementSet*
