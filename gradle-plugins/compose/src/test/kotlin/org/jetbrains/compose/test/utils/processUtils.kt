@@ -7,9 +7,9 @@ package org.jetbrains.compose.test.utils
 
 import java.io.File
 
-internal data class ProcessRunResult(val exitCode: Int, val out: String, val err: String)
+data class ProcessRunResult(val exitCode: Int, val out: String, val err: String)
 
-internal fun runProcess(
+fun runProcess(
     tool: File,
     args: Collection<String>,
     checkExitCodeIsNormal: Boolean = true
@@ -47,3 +47,5 @@ internal fun runProcess(
         errFile.delete()
     }
 }
+
+val isWindows = System.getProperty("os.name").contains("windows", ignoreCase = true)

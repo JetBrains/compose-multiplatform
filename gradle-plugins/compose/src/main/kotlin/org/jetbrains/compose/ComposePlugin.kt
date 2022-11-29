@@ -68,17 +68,6 @@ class ComposePlugin : Plugin<Project> {
                     it.replacedBy(replacement, "org.jetbrains.compose isn't compatible with androidx.compose, because it is the same library published with different maven coordinates")
                 }
             }
-
-            val overrideDefaultJvmTarget = ComposeProperties.overrideKotlinJvmTarget(project.providers).get()
-            project.tasks.withType(KotlinCompile::class.java) {
-                it.kotlinOptions.apply {
-                    if (overrideDefaultJvmTarget) {
-                        if (jvmTarget.isNullOrBlank() || jvmTarget.toDouble() < 1.8) {
-                             jvmTarget = "1.8"
-                         }
-                    }
-                }
-            }
         }
     }
 
