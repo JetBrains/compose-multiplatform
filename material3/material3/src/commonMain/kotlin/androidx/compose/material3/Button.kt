@@ -467,8 +467,10 @@ object ButtonDefaults {
      * The default content padding used by [Button], [ElevatedButton], [FilledTonalButton], and
      * [OutlinedButton] buttons.
      *
-     * - See [TextButtonContentPadding] for content padding used by [TextButton].
-     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains [Icon].
+     * - See [TextButtonContentPadding] or [TextButtonWithIconContentPadding] for content padding
+     *  used by [TextButton].
+     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains
+     * [Icon].
      */
     val ContentPadding =
         PaddingValues(
@@ -491,12 +493,27 @@ object ButtonDefaults {
 
     private val TextButtonHorizontalPadding = 12.dp
 
-    /** The default content padding used by [TextButton] */
+    /** The default content padding used by [TextButton].
+     *
+     * - See [TextButtonWithIconContentPadding] for content padding used by [TextButton] that
+     * contains [Icon].
+     */
     val TextButtonContentPadding =
         PaddingValues(
             start = TextButtonHorizontalPadding,
             top = ContentPadding.calculateTopPadding(),
             end = TextButtonHorizontalPadding,
+            bottom = ContentPadding.calculateBottomPadding()
+        )
+
+    private val TextButtonWithIconHorizontalEndPadding = 16.dp
+
+    /** The default content padding used by [TextButton] that contains an [Icon]. */
+    val TextButtonWithIconContentPadding =
+        PaddingValues(
+            start = TextButtonHorizontalPadding,
+            top = ContentPadding.calculateTopPadding(),
+            end = TextButtonWithIconHorizontalEndPadding,
             bottom = ContentPadding.calculateBottomPadding()
         )
 
