@@ -30,6 +30,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.gestures.snapping.SnapFlingBehavior
 import androidx.compose.foundation.gestures.snapping.SnapLayoutInfoProvider
+import androidx.compose.foundation.gestures.snapping.calculateDistanceToDesiredSnapPosition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -37,6 +38,8 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyList
+import androidx.compose.foundation.lazy.LazyListLayoutInfo
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
@@ -44,12 +47,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastSumBy
+import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
 
@@ -77,6 +88,11 @@ import kotlinx.coroutines.flow.filter
  * is allowed. You can still scroll programmatically using [PagerState.scroll] even when it is
  * disabled.
  * @param reverseLayout reverse the direction of scrolling and layout.
+ * @param key a stable and unique key representing the item. When you specify the key the scroll
+ * position will be maintained based on the key, which means if you add/remove items before the
+ * current visible item the item with the given key will be kept as the first visible one.
+ * @param pageNestedScrollConnection A [NestedScrollConnection] that dictates how this [Pager]
+ * behaves with nested lists. The default behavior will see [Pager] to consume all nested deltas.
  * @param pageContent This Pager's page Composable.
  */
 @Composable
@@ -93,6 +109,10 @@ internal fun HorizontalPager(
     flingBehavior: SnapFlingBehavior = PagerDefaults.flingBehavior(state = state),
     userScrollEnabled: Boolean = true,
     reverseLayout: Boolean = false,
+    key: ((index: Int) -> Any)? = null,
+    pageNestedScrollConnection: NestedScrollConnection = PagerDefaults.pageNestedScrollConnection(
+        Orientation.Horizontal
+    ),
     pageContent: @Composable (page: Int) -> Unit
 ) {
     Pager(
@@ -108,6 +128,8 @@ internal fun HorizontalPager(
         beyondBoundsPageCount = beyondBoundsPageCount,
         pageSize = pageSize,
         flingBehavior = flingBehavior,
+        key = key,
+        pageNestedScrollConnection = pageNestedScrollConnection,
         pageContent = pageContent
     )
 }
@@ -137,6 +159,11 @@ internal fun HorizontalPager(
  * is allowed. You can still scroll programmatically using [PagerState.scroll] even when it is
  * disabled.
  * @param reverseLayout reverse the direction of scrolling and layout.
+ * @param key a stable and unique key representing the item. When you specify the key the scroll
+ * position will be maintained based on the key, which means if you add/remove items before the
+ * current visible item the item with the given key will be kept as the first visible one.
+ * @param pageNestedScrollConnection A [NestedScrollConnection] that dictates how this [Pager] behaves
+ * with nested lists. The default behavior will see [Pager] to consume all nested deltas.
  * @param pageContent This Pager's page Composable.
  */
 @Composable
@@ -153,6 +180,10 @@ internal fun VerticalPager(
     flingBehavior: SnapFlingBehavior = PagerDefaults.flingBehavior(state = state),
     userScrollEnabled: Boolean = true,
     reverseLayout: Boolean = false,
+    key: ((index: Int) -> Any)? = null,
+    pageNestedScrollConnection: NestedScrollConnection = PagerDefaults.pageNestedScrollConnection(
+        Orientation.Vertical
+    ),
     pageContent: @Composable (page: Int) -> Unit
 ) {
     Pager(
@@ -168,6 +199,8 @@ internal fun VerticalPager(
         beyondBoundsPageCount = beyondBoundsPageCount,
         pageSize = pageSize,
         flingBehavior = flingBehavior,
+        key = key,
+        pageNestedScrollConnection = pageNestedScrollConnection,
         pageContent = pageContent
     )
 }
@@ -188,6 +221,8 @@ internal fun Pager(
     flingBehavior: SnapFlingBehavior,
     userScrollEnabled: Boolean,
     reverseLayout: Boolean,
+    key: ((index: Int) -> Any)?,
+    pageNestedScrollConnection: NestedScrollConnection,
     pageContent: @Composable (page: Int) -> Unit
 ) {
     require(beyondBoundsPageCount >= 0) {
@@ -247,9 +282,17 @@ internal fun Pager(
         val verticalAlignmentForSpacedArrangement =
             if (!reverseLayout) Alignment.Top else Alignment.Bottom
 
+        val lazyListState = remember(state) {
+            val initialPageOffset =
+                with(density) { pageAvailableSize.roundToPx() } * state.initialPageOffsetFraction
+            LazyListState(state.initialPage, initialPageOffset.roundToInt()).also {
+                state.loadNewState(it)
+            }
+        }
+
         LazyList(
             modifier = Modifier,
-            state = state.lazyListState,
+            state = lazyListState,
             contentPadding = contentPadding,
             flingBehavior = pagerFlingBehavior,
             horizontalAlignment = horizontalAlignment,
@@ -267,14 +310,17 @@ internal fun Pager(
             userScrollEnabled = userScrollEnabled,
             beyondBoundsItemCount = beyondBoundsPageCount
         ) {
-            items(pageCount) {
+
+            items(pageCount, key = key) {
                 val pageMainAxisSizeModifier = if (isVertical) {
                     Modifier.height(pageAvailableSize)
                 } else {
                     Modifier.width(pageAvailableSize)
                 }
                 Box(
-                    modifier = Modifier.then(pageMainAxisSizeModifier),
+                    modifier = Modifier
+                        .then(pageMainAxisSizeModifier)
+                        .nestedScroll(pageNestedScrollConnection),
                     contentAlignment = Alignment.Center
                 ) {
                     pageContent(it)
@@ -391,6 +437,21 @@ internal object PagerDefaults {
             )
         }
     }
+
+    /**
+     * The default implementation of Pager's pageNestedScrollConnection. All fling scroll deltas
+     * will be consumed by the Pager.
+     *
+     * @param orientation The orientation of the pager. This will be used to determine which
+     * direction it will consume everything. The other direction will not be consumed.
+     */
+    fun pageNestedScrollConnection(orientation: Orientation): NestedScrollConnection {
+        return if (orientation == Orientation.Horizontal) {
+            ConsumeHorizontalFlingNestedScrollConnection
+        } else {
+            ConsumeVerticalFlingNestedScrollConnection
+        }
+    }
 }
 
 /**
@@ -472,13 +533,46 @@ private fun SnapLayoutInfoProvider(
     pagerSnapDistance: PagerSnapDistance,
     decayAnimationSpec: DecayAnimationSpec<Float>
 ): SnapLayoutInfoProvider {
-    return object : SnapLayoutInfoProvider by SnapLayoutInfoProvider(
-        lazyListState = pagerState.lazyListState,
-        positionInLayout = SnapAlignmentStartToStart
-    ) {
+    return object : SnapLayoutInfoProvider {
+        val layoutInfo: LazyListLayoutInfo
+            get() = pagerState.layoutInfo
+
+        override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
+            var lowerBoundOffset = Float.NEGATIVE_INFINITY
+            var upperBoundOffset = Float.POSITIVE_INFINITY
+
+            layoutInfo.visibleItemsInfo.fastForEach { item ->
+                val offset = calculateDistanceToDesiredSnapPosition(
+                    layoutInfo,
+                    item,
+                    SnapAlignmentStartToStart
+                )
+
+                // Find item that is closest to the center
+                if (offset <= 0 && offset > lowerBoundOffset) {
+                    lowerBoundOffset = offset
+                }
+
+                // Find item that is closest to center, but after it
+                if (offset >= 0 && offset < upperBoundOffset) {
+                    upperBoundOffset = offset
+                }
+            }
+
+            return lowerBoundOffset.rangeTo(upperBoundOffset)
+        }
+
+        override fun Density.calculateSnapStepSize(): Float = with(layoutInfo) {
+            if (visibleItemsInfo.isNotEmpty()) {
+                visibleItemsInfo.fastSumBy { it.size } / visibleItemsInfo.size.toFloat()
+            } else {
+                0f
+            }
+        }
+
         override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
             val effectivePageSize = pagerState.pageSize + pagerState.pageSpacing
-            val initialOffset = pagerState.currentPageOffset * effectivePageSize
+            val initialOffset = pagerState.currentPageOffsetFraction * effectivePageSize
             val animationOffset =
                 decayAnimationSpec.calculateTargetValue(0f, initialVelocity)
 
@@ -515,5 +609,44 @@ private class PagerWrapperFlingBehavior(
                 pagerState.snapRemainingScrollOffset = remainingScrollOffset
             }
         }
+    }
+}
+
+private val ConsumeHorizontalFlingNestedScrollConnection =
+    ConsumeAllFlingOnDirection(Orientation.Horizontal)
+private val ConsumeVerticalFlingNestedScrollConnection =
+    ConsumeAllFlingOnDirection(Orientation.Vertical)
+
+private class ConsumeAllFlingOnDirection(val orientation: Orientation) : NestedScrollConnection {
+
+    fun Velocity.consumeOnOrientation(orientation: Orientation): Velocity {
+        return if (orientation == Orientation.Vertical) {
+            copy(x = 0f)
+        } else {
+            copy(y = 0f)
+        }
+    }
+
+    fun Offset.consumeOnOrientation(orientation: Orientation): Offset {
+        return if (orientation == Orientation.Vertical) {
+            copy(x = 0f)
+        } else {
+            copy(y = 0f)
+        }
+    }
+
+    override fun onPostScroll(
+        consumed: Offset,
+        available: Offset,
+        source: NestedScrollSource
+    ): Offset {
+        return when (source) {
+            NestedScrollSource.Fling -> available.consumeOnOrientation(orientation)
+            else -> Offset.Zero
+        }
+    }
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        return available.consumeOnOrientation(orientation)
     }
 }
