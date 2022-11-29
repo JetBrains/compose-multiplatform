@@ -153,8 +153,14 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         testPackageJvmDistributions()
     }
 
+
     private fun TestProject.testPackageJvmDistributions() {
         val result = gradle(":packageDistributionForCurrentOS").build()
+
+        val mainClass = file("build/classes").walk().single { it.isFile && it.name == "MainKt.class" }
+        val bytecodeVersion = readClassFileVersion(mainClass)
+        assertEquals(JDK_11_BYTECODE_VERSION, bytecodeVersion, "$mainClass bytecode version")
+
         val ext = when (currentOS) {
             OS.Linux -> "deb"
             OS.Windows -> "msi"

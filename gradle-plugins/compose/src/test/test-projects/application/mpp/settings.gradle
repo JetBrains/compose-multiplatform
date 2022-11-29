@@ -10,4 +10,4 @@ pluginManagement {
         google()
     }
 }
-rootProject.name = "simple"
+rootProject.name = "mpp"
