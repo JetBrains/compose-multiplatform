@@ -88,7 +88,7 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(4)
+        waitForPrefetch(5)
 
         rule.onNodeWithTag("4")
             .assertExists()
@@ -128,7 +128,7 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(8)
+        waitForPrefetch(9)
 
         rule.onNodeWithTag("8")
             .assertExists()
@@ -224,7 +224,7 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(12)
+        waitForPrefetch(13)
 
         rule.onNodeWithTag("12")
             .assertExists()
@@ -364,7 +364,7 @@ class LazyStaggeredGridPrefetcherTest(
             runBlocking(AutoTestFrameClock()) {
                 state.scrollBy(itemsSizePx.toFloat())
             }
-            // then we synchronously dispose LazyColumn
+            // then we synchronously dispose
             emit = false
             remeasure.forceRemeasure()
         }
