@@ -86,7 +86,7 @@ class WindowInsetsSizeTest {
                         Box(Modifier
                             .wrapContentSize()
                             .onGloballyPositioned { coordinates = it }
-                            .consumedWindowInsets(WindowInsets(left = 10))
+                            .consumeWindowInsets(WindowInsets(left = 10))
                         ) {
                             Box(
                                 Modifier
@@ -137,11 +137,12 @@ class WindowInsetsSizeTest {
                     Box(Modifier
                         .wrapContentSize()
                         .onGloballyPositioned { coordinates = it }
-                        .consumedWindowInsets(WindowInsets(bottom = 10))
+                        .consumeWindowInsets(WindowInsets(bottom = 10))
                     ) {
-                        Box(Modifier
-                            .fillMaxWidth()
-                            .windowInsetsBottomHeight(WindowInsets.navigationBars)
+                        Box(
+                            Modifier
+                                .fillMaxWidth()
+                                .windowInsetsBottomHeight(WindowInsets.navigationBars)
                         )
                     }
                 }

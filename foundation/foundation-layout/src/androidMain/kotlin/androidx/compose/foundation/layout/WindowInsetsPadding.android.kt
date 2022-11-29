@@ -26,9 +26,9 @@ import androidx.compose.ui.platform.debugInspectorInfo
 /**
  * Adds padding to accommodate the [safe drawing][WindowInsets.Companion.safeDrawing] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.safeDrawing] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [statusBarsPadding], the area that the parent
  * pads for the status bars will not be padded again by this [safeDrawingPadding] modifier.
@@ -43,9 +43,9 @@ fun Modifier.safeDrawingPadding() =
 /**
  * Adds padding to accommodate the [safe gestures][WindowInsets.Companion.safeGestures] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.safeGestures] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [navigationBarsPadding],
  * the area that the parent layout pads for the status bars will not be padded again by this
@@ -61,9 +61,9 @@ fun Modifier.safeGesturesPadding() =
 /**
  * Adds padding to accommodate the [safe content][WindowInsets.Companion.safeContent] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.safeContent] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [navigationBarsPadding],
  * the area that the parent layout pads for the status bars will not be padded again by this
@@ -79,9 +79,9 @@ fun Modifier.safeContentPadding() =
 /**
  * Adds padding to accommodate the [system bars][WindowInsets.Companion.systemBars] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.systemBars] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [statusBarsPadding], the
  * area that the parent layout pads for the status bars will not be padded again by this
@@ -97,9 +97,9 @@ fun Modifier.systemBarsPadding() =
 /**
  * Adds padding to accommodate the [display cutout][WindowInsets.Companion.displayCutout].
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.displayCutout] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [statusBarsPadding], the
  * area that the parent layout pads for the status bars will not be padded again by this
@@ -115,9 +115,9 @@ fun Modifier.displayCutoutPadding() =
 /**
  * Adds padding to accommodate the [status bars][WindowInsets.Companion.statusBars] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.statusBars] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [displayCutoutPadding], the
  * area that the parent layout pads for the status bars will not be padded again by this
@@ -133,9 +133,9 @@ fun Modifier.statusBarsPadding() =
 /**
  * Adds padding to accommodate the [ime][WindowInsets.Companion.ime] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.ime] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [navigationBarsPadding],
  * the area that the parent layout pads for the status bars will not be padded again by this
@@ -151,9 +151,9 @@ fun Modifier.imePadding() =
 /**
  * Adds padding to accommodate the [navigation bars][WindowInsets.Companion.navigationBars] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.navigationBars] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [systemBarsPadding], the
  * area that the parent layout pads for the status bars will not be padded again by this
@@ -169,9 +169,9 @@ fun Modifier.navigationBarsPadding() =
 /**
  * Adds padding to accommodate the [caption bar][WindowInsets.Companion.captionBar] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.captionBar] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [displayCutoutPadding], the
  * area that the parent layout pads for the status bars will not be padded again by this
@@ -187,9 +187,9 @@ fun Modifier.captionBarPadding() =
 /**
  * Adds padding to accommodate the [waterfall][WindowInsets.Companion.waterfall] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.waterfall] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [systemGesturesPadding],
  * the area that the parent layout pads for the status bars will not be padded again by this
@@ -205,9 +205,9 @@ fun Modifier.waterfallPadding() =
 /**
  * Adds padding to accommodate the [system gestures][WindowInsets.Companion.systemGestures] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.systemGestures] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [waterfallPadding], the
  * area that the parent layout pads for the status bars will not be padded again by this
@@ -224,9 +224,9 @@ fun Modifier.systemGesturesPadding() =
  * Adds padding to accommodate the
  * [mandatory system gestures][WindowInsets.Companion.mandatorySystemGestures] insets.
  *
- * Any insets consumed by other insets padding modifiers or [consumedWindowInsets] on a parent layout
+ * Any insets consumed by other insets padding modifiers or [consumeWindowInsets] on a parent layout
  * will be excluded from the padding. [WindowInsets.Companion.mandatorySystemGestures] will be
- * [consumed][consumedWindowInsets] for child layouts as well.
+ * [consumed][consumeWindowInsets] for child layouts as well.
  *
  * For example, if a parent layout uses [navigationBarsPadding],
  * the area that the parent layout pads for the status bars will not be padded again by this

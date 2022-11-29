@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -99,7 +99,7 @@ fun SimpleScaffoldWithTopBar() {
         content = { innerPadding ->
             LazyColumn(
                 // consume insets as scaffold doesn't do it by default
-                modifier = Modifier.consumedWindowInsets(innerPadding),
+                modifier = Modifier.consumeWindowInsets(innerPadding),
                 contentPadding = innerPadding
             ) {
                 items(count = 100) {
