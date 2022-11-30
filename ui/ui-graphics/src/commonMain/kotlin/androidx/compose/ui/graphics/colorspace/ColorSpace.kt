@@ -398,6 +398,19 @@ fun ColorSpace.connect(
     destination: ColorSpace = ColorSpaces.Srgb,
     intent: RenderIntent = RenderIntent.Perceptual
 ): Connector {
+    if (this === ColorSpaces.Srgb) {
+        if (destination === ColorSpaces.Srgb) {
+            return Connector.SrgbIdentity
+        }
+        if (destination === ColorSpaces.Oklab && intent == RenderIntent.Perceptual) {
+            return Connector.SrgbToOklabPerceptual
+        }
+    } else if (this === ColorSpaces.Oklab &&
+        destination === ColorSpaces.Srgb &&
+        intent == RenderIntent.Perceptual
+    ) {
+        return Connector.OklabToSrgbPerceptual
+    }
     if (this === destination) {
         return Connector.identity(this)
     }
