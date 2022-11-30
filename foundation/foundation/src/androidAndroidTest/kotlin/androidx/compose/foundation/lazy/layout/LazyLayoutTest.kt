@@ -19,7 +19,6 @@ package androidx.compose.foundation.lazy.layout
 import android.os.Parcelable
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -31,8 +30,6 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
-import androidx.compose.ui.layout.Remeasurement
-import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -97,10 +94,7 @@ class LazyLayoutTest {
     @Test
     fun measureAndPlaceTwoItems() {
         val itemProvider = itemProvider({ 2 }) { index ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("$index"))
+            Box(Modifier.fillMaxSize().testTag("$index"))
         }
         rule.setContent {
             LazyLayout(itemProvider) {
@@ -124,14 +118,8 @@ class LazyLayoutTest {
     @Test
     fun measureAndPlaceMultipleLayoutsInOneItem() {
         val itemProvider = itemProvider({ 1 }) { index ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("${index}x0"))
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("${index}x1"))
+            Box(Modifier.fillMaxSize().testTag("${index}x0"))
+            Box(Modifier.fillMaxSize().testTag("${index}x1"))
         }
 
         rule.setContent {
@@ -155,10 +143,7 @@ class LazyLayoutTest {
     @Test
     fun updatingitemProvider() {
         var itemProvider by mutableStateOf(itemProvider({ 1 }) { index ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("$index"))
+            Box(Modifier.fillMaxSize().testTag("$index"))
         })
 
         rule.setContent {
@@ -181,10 +166,7 @@ class LazyLayoutTest {
 
         rule.runOnIdle {
             itemProvider = itemProvider({ 2 }) { index ->
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag("$index"))
+                Box(Modifier.fillMaxSize().testTag("$index"))
             }
         }
 
@@ -196,10 +178,7 @@ class LazyLayoutTest {
     fun stateBaseditemProvider() {
         var itemCount by mutableStateOf(1)
         val itemProvider = itemProvider({ itemCount }) { index ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("$index"))
+            Box(Modifier.fillMaxSize().testTag("$index"))
         }
 
         rule.setContent {
@@ -249,11 +228,7 @@ class LazyLayoutTest {
             }
         }
         val itemProvider = itemProvider({ 1 }) { index ->
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .testTag("$index")
-                    .then(modifier))
+            Box(Modifier.fillMaxSize().testTag("$index").then(modifier))
         }
         var needToCompose by mutableStateOf(false)
         val prefetchState = LazyLayoutPrefetchState()
@@ -360,15 +335,13 @@ class LazyLayoutTest {
     fun nodeIsReusedWithoutExtraRemeasure() {
         var indexToCompose by mutableStateOf<Int?>(0)
         var remeasuresCount = 0
-        val modifier = Modifier
-            .layout { measurable, constraints ->
-                val placeable = measurable.measure(constraints)
-                remeasuresCount++
-                layout(placeable.width, placeable.height) {
-                    placeable.place(0, 0)
-                }
+        val modifier = Modifier.layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints)
+            remeasuresCount++
+            layout(placeable.width, placeable.height) {
+                placeable.place(0, 0)
             }
-            .fillMaxSize()
+        }.fillMaxSize()
         val itemProvider = itemProvider({ 2 }) {
             Box(modifier)
         }
@@ -400,55 +373,6 @@ class LazyLayoutTest {
         rule.runOnIdle {
             assertThat(remeasuresCount).isEqualTo(1)
         }
-    }
-
-    @Test
-    fun subcomposeNodeContentIsResetWhenReused() {
-        var indexToCompose by mutableStateOf(0)
-        var remeasurement: Remeasurement? = null
-        val itemProvider = itemProvider({ 3 }) {
-            BoxWithConstraints(
-                Modifier.testTag("Box $it")
-            ) {
-                Box(Modifier.testTag("$it"))
-            }
-        }
-
-        rule.setContent {
-            LazyLayout(
-                itemProvider = itemProvider,
-                modifier = object : RemeasurementModifier {
-                    @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
-                    override fun onRemeasurementAvailable(value: Remeasurement) {
-                        remeasurement = value
-                    }
-                }
-            ) { constraints ->
-                val node = measure(indexToCompose, constraints).first()
-                layout(node.width, node.height) {
-                    node.place(0, 0)
-                }
-            }
-        }
-
-        rule.runOnIdle {
-            indexToCompose = 1
-            remeasurement?.forceRemeasure()
-            indexToCompose = 2
-            remeasurement?.forceRemeasure()
-        }
-
-        rule.onNodeWithTag("Box 0")
-            .assertDoesNotExist()
-
-        rule.onNodeWithTag("0")
-            .assertDoesNotExist()
-
-        rule.onNodeWithTag("Box 2")
-            .assertExists()
-
-        rule.onNodeWithTag("2")
-            .assertExists()
     }
 
     private fun itemProvider(
