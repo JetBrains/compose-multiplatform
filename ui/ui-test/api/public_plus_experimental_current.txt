@@ -438,16 +438,17 @@ package androidx.compose.ui.test {
   }
 
   @kotlinx.coroutines.ExperimentalCoroutinesApi public final class TestMonotonicFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
-    ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, kotlinx.coroutines.test.TestCoroutineScheduler delayController, optional long frameDelayNanos);
+    ctor public TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, optional long frameDelayNanos, optional kotlin.jvm.functions.Function1<? super java.lang.Long,kotlin.Unit> onPerformTraversals);
+    method @androidx.compose.ui.test.ExperimentalTestApi public kotlin.coroutines.ContinuationInterceptor getContinuationInterceptor();
     method public long getFrameDelayNanos();
     method public boolean getHasAwaiters();
     method public suspend <R> Object? withFrameNanos(kotlin.jvm.functions.Function1<? super java.lang.Long,? extends R> onFrame, kotlin.coroutines.Continuation<? super R>);
+    property @androidx.compose.ui.test.ExperimentalTestApi public final kotlin.coroutines.ContinuationInterceptor continuationInterceptor;
     property public final long frameDelayNanos;
     property public final boolean hasAwaiters;
   }
 
   public final class TestMonotonicFrameClock_jvmKt {
-    method @kotlinx.coroutines.ExperimentalCoroutinesApi public static androidx.compose.ui.test.TestMonotonicFrameClock TestMonotonicFrameClock(kotlinx.coroutines.CoroutineScope coroutineScope, optional long frameDelayNanos);
     method @kotlinx.coroutines.ExperimentalCoroutinesApi public static long getFrameDelayMillis(androidx.compose.ui.test.TestMonotonicFrameClock);
   }
 
@@ -517,6 +518,10 @@ package androidx.compose.ui.test.android {
 }
 
 package androidx.compose.ui.test.internal {
+
+  @androidx.compose.ui.test.InternalTestApi public abstract class DelayPropagatingContinuationInterceptorWrapper extends kotlin.coroutines.AbstractCoroutineContextElement implements kotlin.coroutines.ContinuationInterceptor kotlinx.coroutines.Delay {
+    ctor public DelayPropagatingContinuationInterceptorWrapper(kotlin.coroutines.ContinuationInterceptor? wrappedInterceptor);
+  }
 
   public final class JvmDefaultWithCompatibility_jvmKt {
   }

@@ -50,6 +50,7 @@ import androidx.test.core.app.ApplicationProvider
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
@@ -215,7 +216,7 @@ inline fun <A : ComponentActivity> AndroidComposeUiTestEnvironment(
  * activity that was launched and hosts the Compose content
  */
 @ExperimentalTestApi
-@OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class)
+@OptIn(InternalTestApi::class, ExperimentalCoroutinesApi::class, InternalCoroutinesApi::class)
 abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
     private val idlingResourceRegistry = IdlingResourceRegistry()
 
@@ -228,13 +229,16 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity> {
     private val recomposer: Recomposer
     private val testCoroutineDispatcher = UnconfinedTestDispatcher()
     private val testCoroutineScope = TestScope(testCoroutineDispatcher)
-    private val recomposerContinuationInterceptor =
-        ApplyingContinuationInterceptor(testCoroutineDispatcher)
+
     private val recomposerCoroutineScope: CoroutineScope
     private val coroutineExceptionHandler = UncaughtExceptionHandler()
 
     init {
         val frameClock = TestMonotonicFrameClock(testCoroutineScope)
+        // The applying interceptor needs to be the outermost wrapper since TestMonotonicFrameClock
+        // will not delegate if the dispatcher dispatch is not needed at the time of intercept.
+        val recomposerContinuationInterceptor =
+            ApplyingContinuationInterceptor(frameClock.continuationInterceptor)
         mainClockImpl = MainTestClockImpl(testCoroutineDispatcher.scheduler, frameClock)
         val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
             override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {

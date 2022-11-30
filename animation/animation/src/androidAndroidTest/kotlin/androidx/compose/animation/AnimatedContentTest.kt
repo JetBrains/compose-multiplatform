@@ -459,13 +459,17 @@ class AnimatedContentTest {
             LaunchedEffect(Unit) {
                 assertFalse(transition.isRunning)
                 targetState = 2
-                withFrameMillis { }
-                assertFalse(transition.isRunning)
-                assertEquals(transition.currentState, transition.targetState)
-                // This state change should now cause an animation
-                targetState = 3
-                withFrameMillis { }
-                assertTrue(transition.isRunning)
+                withFrameMillis {
+                    assertFalse(transition.isRunning)
+                    assertEquals(1, transition.currentState)
+                    assertEquals(1, transition.targetState)
+
+                    // This state change should now cause an animation
+                    targetState = 3
+                }
+                withFrameMillis {
+                    assertTrue(transition.isRunning)
+                }
             }
         }
         rule.waitForIdle()

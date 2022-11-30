@@ -30,7 +30,6 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
@@ -43,7 +42,6 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @MediumTest
-@OptIn(ExperimentalTestApi::class)
 class SingleValueAnimationTest {
 
     @get:Rule
@@ -71,10 +69,13 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutSlowInEasing.transform(playTime / 100f)
-                            expected = lerp(250f, 50f, fraction)
-                            frameTime = withFrameNanos { it }
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = ((frameTime - startTime) / 1_000_000L)
+                                    .coerceIn(0, 100)
+                                val fraction = FastOutSlowInEasing.transform(playTime / 100f)
+                                expected = lerp(250f, 50f, fraction)
+                            }
                         } while (frameTime - startTime <= 100_000_000L)
                         // Animation is finished at this point
                         expected = 50f
@@ -109,10 +110,13 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutLinearInEasing.transform(playTime / 200f)
-                            expected = lerp(250f, 50f, fraction)
-                            frameTime = withFrameNanos { it }
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = ((frameTime - startTime) / 1_000_000L)
+                                    .coerceIn(0, 200)
+                                val fraction = FastOutLinearInEasing.transform(playTime / 200f)
+                                expected = lerp(250f, 50f, fraction)
+                            }
                         } while (frameTime - startTime <= 200_000_000L)
                         expected = 50f
                     }
@@ -163,13 +167,15 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            expected = AnimationVector(
-                                lerp(startVal.v1, endVal.v1, playTime / 100f),
-                                lerp(startVal.v2, endVal.v2, playTime / 100f)
-                            )
-
-                            frameTime = withFrameNanos { it }
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = ((frameTime - startTime) / 1_000_000L)
+                                    .coerceIn(0, 100)
+                                expected = AnimationVector(
+                                    lerp(startVal.v1, endVal.v1, playTime / 100f),
+                                    lerp(startVal.v2, endVal.v2, playTime / 100f)
+                                )
+                            }
                         } while (frameTime - startTime <= 100_000_000L)
                         expected = endVal
                     }
@@ -216,17 +222,19 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = ((frameTime - startTime) / 1_000_000L)
+                                    .coerceIn(0, 100)
 
-                            val fraction = LinearOutSlowInEasing.transform(playTime / 100f)
-                            expected = AnimationVector(
-                                lerp(startVal.v1, endVal.v1, fraction),
-                                lerp(startVal.v2, endVal.v2, fraction),
-                                lerp(startVal.v3, endVal.v3, fraction),
-                                lerp(startVal.v4, endVal.v4, fraction)
-                            )
-
-                            frameTime = withFrameNanos { it }
+                                val fraction = LinearOutSlowInEasing.transform(playTime / 100f)
+                                expected = AnimationVector(
+                                    lerp(startVal.v1, endVal.v1, fraction),
+                                    lerp(startVal.v2, endVal.v2, fraction),
+                                    lerp(startVal.v3, endVal.v3, fraction),
+                                    lerp(startVal.v4, endVal.v4, fraction)
+                                )
+                            }
                         } while (frameTime - startTime <= 100_000_000L)
                         expected = endVal
                     }
@@ -263,10 +271,13 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutLinearInEasing.transform(playTime / 100f)
-                            expected = lerp(Color.Black, Color.Cyan, fraction)
-                            frameTime = withFrameNanos { it }
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = ((frameTime - startTime) / 1_000_000L)
+                                    .coerceIn(0, 100)
+                                val fraction = FastOutLinearInEasing.transform(playTime / 100f)
+                                expected = lerp(Color.Black, Color.Cyan, fraction)
+                            }
                         } while (frameTime - startTime <= 100_000_000L)
                         expected = Color.Cyan
                     }
@@ -360,19 +371,23 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = frameTime - startTime
-                            expectedFloat =
-                                specForFloat.getValueFromNanos(playTime, 0f, 100f, 0f)
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = frameTime - startTime
+                                expectedFloat = if (playTime < durationForFloat) {
+                                    specForFloat.getValueFromNanos(playTime, 0f, 100f, 0f)
+                                } else {
+                                    100f
+                                }
 
-                            if (playTime < durationForOffset) {
-                                val offset =
-                                    specForOffset.getValueFromNanos(playTime, 0f, 100f, 0f)
-                                expectedOffset = Offset(offset, offset)
-                            } else {
-                                expectedOffset = Offset(100f, 100f)
+                                expectedOffset = if (playTime < durationForOffset) {
+                                    val offset =
+                                        specForOffset.getValueFromNanos(playTime, 0f, 100f, 0f)
+                                    Offset(offset, offset)
+                                } else {
+                                    Offset(100f, 100f)
+                                }
                             }
-
-                            frameTime = withFrameNanos { it }
                         } while (frameTime - startTime <= durationForFloat)
                         expectedFloat = 100f
                     }
@@ -415,17 +430,20 @@ class SingleValueAnimationTest {
                         val startTime = withFrameNanos { it }
                         var frameTime = startTime
                         do {
-                            val playTime = (frameTime - startTime) / 1_000_000L
-                            val fraction = FastOutSlowInEasing.transform(
-                                playTime / duration.toFloat()
-                            )
-                            expected =
-                                if (enabled) {
-                                    lerp(250f, 50f, fraction)
-                                } else {
-                                    lerp(50f, 250f, fraction)
-                                }
-                            frameTime = withFrameNanos { it }
+                            withFrameNanos {
+                                frameTime = it
+                                val playTime = ((frameTime - startTime) / 1_000_000L)
+                                    .coerceIn(0, duration.toLong())
+                                val fraction = FastOutSlowInEasing.transform(
+                                    playTime / duration.toFloat()
+                                )
+                                expected =
+                                    if (enabled) {
+                                        lerp(250f, 50f, fraction)
+                                    } else {
+                                        lerp(50f, 250f, fraction)
+                                    }
+                            }
                         } while (frameTime - startTime <= duration * 1_000_000L)
                         expected = if (enabled) 50f else 250f
                     }
