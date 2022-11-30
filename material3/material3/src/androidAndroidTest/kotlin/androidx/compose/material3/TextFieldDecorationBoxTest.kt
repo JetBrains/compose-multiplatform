@@ -384,7 +384,9 @@ class TextFieldDecorationBoxTest {
                 // to account for edge pixels
                 if (it.x in 2..(textFieldWidth - 2) && it.y in 2..(borderWidth - 2)) {
                     Color.Red
-                } else null
+                } else {
+                    null
+                }
             }
     }
 
@@ -439,7 +441,9 @@ class TextFieldDecorationBoxTest {
                     it.y in (textFieldHeight - borderWidth + 2)..(textFieldHeight - 2)
                 ) {
                     Color.Red
-                } else null
+                } else {
+                    null
+                }
             }
     }
 

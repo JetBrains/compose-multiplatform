@@ -826,19 +826,19 @@ object FilterChipDefaults {
     fun filterChipColors(
         containerColor: Color = Color.Transparent,
         labelColor: Color = FilterChipTokens.UnselectedLabelTextColor.toColor(),
-        iconColor: Color = FilterChipTokens.UnselectedIconColor.toColor(),
+        iconColor: Color = FilterChipTokens.LeadingIconUnselectedColor.toColor(),
         disabledContainerColor: Color = Color.Transparent,
         disabledLabelColor: Color = FilterChipTokens.DisabledLabelTextColor.toColor()
             .copy(alpha = FilterChipTokens.DisabledLabelTextOpacity),
-        disabledLeadingIconColor: Color = FilterChipTokens.DisabledIconColor.toColor()
-            .copy(alpha = FilterChipTokens.DisabledIconOpacity),
+        disabledLeadingIconColor: Color = FilterChipTokens.DisabledLeadingIconColor.toColor()
+            .copy(alpha = FilterChipTokens.DisabledLeadingIconOpacity),
         disabledTrailingIconColor: Color = disabledLeadingIconColor,
         selectedContainerColor: Color = FilterChipTokens.FlatSelectedContainerColor.toColor(),
         disabledSelectedContainerColor: Color =
             FilterChipTokens.FlatDisabledSelectedContainerColor.toColor()
                 .copy(alpha = FilterChipTokens.FlatDisabledSelectedContainerOpacity),
         selectedLabelColor: Color = FilterChipTokens.SelectedLabelTextColor.toColor(),
-        selectedLeadingIconColor: Color = FilterChipTokens.SelectedIconColor.toColor(),
+        selectedLeadingIconColor: Color = FilterChipTokens.SelectedLeadingIconColor.toColor(),
         selectedTrailingIconColor: Color = selectedLeadingIconColor
     ): SelectableChipColors = SelectableChipColors(
         containerColor = containerColor,
@@ -938,18 +938,18 @@ object FilterChipDefaults {
     fun elevatedFilterChipColors(
         containerColor: Color = FilterChipTokens.ElevatedUnselectedContainerColor.toColor(),
         labelColor: Color = FilterChipTokens.UnselectedLabelTextColor.toColor(),
-        iconColor: Color = FilterChipTokens.UnselectedIconColor.toColor(),
+        iconColor: Color = FilterChipTokens.LeadingIconUnselectedColor.toColor(),
         disabledContainerColor: Color = FilterChipTokens.ElevatedDisabledContainerColor.toColor()
             .copy(alpha = FilterChipTokens.ElevatedDisabledContainerOpacity),
         disabledLabelColor: Color = FilterChipTokens.DisabledLabelTextColor.toColor()
             .copy(alpha = FilterChipTokens.DisabledLabelTextOpacity),
-        disabledLeadingIconColor: Color = FilterChipTokens.DisabledIconColor.toColor()
-            .copy(alpha = FilterChipTokens.DisabledIconOpacity),
+        disabledLeadingIconColor: Color = FilterChipTokens.DisabledLeadingIconColor.toColor()
+            .copy(alpha = FilterChipTokens.DisabledLeadingIconOpacity),
         disabledTrailingIconColor: Color = disabledLeadingIconColor,
         selectedContainerColor: Color = FilterChipTokens.ElevatedSelectedContainerColor.toColor(),
         disabledSelectedContainerColor: Color = disabledContainerColor,
         selectedLabelColor: Color = FilterChipTokens.SelectedLabelTextColor.toColor(),
-        selectedLeadingIconColor: Color = FilterChipTokens.SelectedIconColor.toColor(),
+        selectedLeadingIconColor: Color = FilterChipTokens.SelectedLeadingIconColor.toColor(),
         selectedTrailingIconColor: Color = selectedLeadingIconColor
     ): SelectableChipColors = SelectableChipColors(
         containerColor = containerColor,
