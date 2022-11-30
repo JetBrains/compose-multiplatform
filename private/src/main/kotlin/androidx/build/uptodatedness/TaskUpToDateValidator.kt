@@ -139,6 +139,8 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
 )
 
 val DONT_TRY_RERUNNING_TASK_TYPES = setOf(
+    // TODO(aurimas): add back when upgrading to AGP 8.0.0-beta01
+    "com.android.build.gradle.internal.tasks.BundleLibraryJavaRes_Decorated",
     "com.android.build.gradle.internal.lint.AndroidLintTextOutputTask_Decorated",
     // lint report tasks
     "com.android.build.gradle.internal.lint.AndroidLintTask_Decorated",
