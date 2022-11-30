@@ -53,6 +53,7 @@ import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
+import com.android.build.gradle.internal.tasks.CheckAarMetadataTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import java.io.File
 import java.time.Duration
@@ -465,6 +466,13 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             LibraryApiTaskConfig(libraryExtension),
             androidXExtension
         )
+
+        // Disable AAR verification when we're forcing max dep versions.
+        if (project.usingMaxDepVersions()) {
+            project.tasks.withType(CheckAarMetadataTask::class.java).configureEach { task ->
+                task.enabled = false
+            }
+        }
 
         project.addToProjectMap(androidXExtension)
     }
