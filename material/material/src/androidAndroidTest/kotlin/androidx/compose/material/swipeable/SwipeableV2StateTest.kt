@@ -23,11 +23,13 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.SwipeableV2State
+import androidx.compose.material.fractionalPositionalThreshold
 import androidx.compose.material.rememberSwipeableV2State
 import androidx.compose.material.swipeable.TestState.A
 import androidx.compose.material.swipeable.TestState.B
 import androidx.compose.material.swipeable.TestState.C
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.ui.test.junit4.StateRestorationTester
@@ -121,13 +123,17 @@ class SwipeableV2StateTest {
     fun swipeable_targetState_updatedWithAnimation() {
         rule.mainClock.autoAdvance = false
         val animationDuration = 300
+        val frameLengthMillis = 16L
         lateinit var state: SwipeableV2State<TestState>
         lateinit var scope: CoroutineScope
         rule.setContent {
-            state = rememberSwipeableV2State(
-                initialValue = A,
-                animationSpec = tween(animationDuration, easing = LinearEasing)
-            )
+            state = remember {
+                SwipeableV2State(
+                    initialValue = A,
+                    animationSpec = tween(animationDuration, easing = LinearEasing),
+                    positionalThreshold = fractionalPositionalThreshold(0.5f)
+                )
+            }
             scope = rememberCoroutineScope()
             SwipeableBox(
                 swipeableState = state,
@@ -139,7 +145,7 @@ class SwipeableV2StateTest {
         scope.launch {
             state.animateTo(targetValue = B)
         }
-        rule.mainClock.advanceTimeBy((animationDuration * 0.6).toLong())
+        rule.mainClock.advanceTimeBy(1 * frameLengthMillis)
 
         assertWithMessage("Current state")
             .that(state.currentValue)
@@ -148,7 +154,8 @@ class SwipeableV2StateTest {
             .that(state.targetValue)
             .isEqualTo(B)
 
-        rule.mainClock.advanceTimeBy((animationDuration * 0.4).toLong())
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
 
         assertWithMessage("Current state")
             .that(state.currentValue)

@@ -16,12 +16,18 @@
 
 package androidx.compose.material.swipeable
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.AnchorChangeHandler
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.SwipeableV2Defaults
 import androidx.compose.material.SwipeableV2State
+import androidx.compose.material.fractionalPositionalThreshold
 import androidx.compose.material.rememberSwipeableV2State
 import androidx.compose.material.swipeAnchors
 import androidx.compose.material.swipeable.TestState.A
@@ -29,13 +35,20 @@ import androidx.compose.material.swipeable.TestState.B
 import androidx.compose.material.swipeable.TestState.C
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -144,5 +157,159 @@ class SwipeableV2AnchorTest {
         rule.waitForIdle()
 
         assertThat(state.anchors).isEqualTo(secondAnchors)
+    }
+
+    @Test
+    fun swipeable_reconcileAnchorChangeHandler_retargetsAnimationWhenOffsetChanged() {
+        val animationDurationMillis = 2000
+        lateinit var state: SwipeableV2State<TestState>
+        lateinit var scope: CoroutineScope
+
+        val firstAnchors = mapOf(A to 0f, B to 100f, C to 200f)
+        val secondAnchors = mapOf(A to 300f, B to 400f, C to 600f)
+        var anchors = firstAnchors
+        var size by mutableStateOf(100)
+
+        val animationTarget = B
+
+        rule.setContent {
+            state = remember {
+                SwipeableV2State(
+                    initialValue = A,
+                    animationSpec = tween(animationDurationMillis, easing = LinearEasing),
+                    positionalThreshold = fractionalPositionalThreshold(0.5f)
+                )
+            }
+            scope = rememberCoroutineScope()
+            val anchorChangeHandler = remember(state, scope) {
+                SwipeableV2Defaults.ReconcileAnimationOnAnchorChangeHandler(
+                    state = state,
+                    animate = { target, velocity ->
+                        scope.launch {
+                            state.animateTo(
+                                target,
+                                velocity
+                            )
+                        }
+                    },
+                    snap = { target -> scope.launch { state.snapTo(target) } }
+                )
+            }
+            Box(
+                Modifier
+                    .size(size.dp) // Trigger anchor recalculation when size changes
+                    .swipeAnchors(
+                        state = state,
+                        possibleValues = setOf(A, B, C),
+                        anchorChangeHandler = anchorChangeHandler,
+                        calculateAnchor = { state, _ -> anchors[state] }
+                    )
+            )
+        }
+
+        assertThat(state.currentValue == A)
+        rule.mainClock.autoAdvance = false
+
+        scope.launch { state.animateTo(animationTarget) }
+
+        rule.mainClock.advanceTimeByFrame()
+        anchors = secondAnchors
+        size = 200
+        rule.mainClock.autoAdvance = true
+        rule.waitForIdle()
+
+        assertThat(state.offset).isEqualTo(secondAnchors.getValue(animationTarget))
+    }
+
+    @Test
+    fun swipeable_reconcileAnchorChangeHandler_snapsWhenPreviousAnchorRemoved() {
+        val state = SwipeableV2State(initialValue = A)
+        lateinit var scope: CoroutineScope
+
+        val firstAnchors = mapOf(A to 0f, B to 100f, C to 200f)
+        val secondAnchors = mapOf(B to 400f, C to 600f)
+        var anchors = firstAnchors
+        var size by mutableStateOf(100)
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            val anchorChangeHandler = remember(state, scope) {
+                SwipeableV2Defaults.ReconcileAnimationOnAnchorChangeHandler(
+                    state = state,
+                    animate = { target, velocity ->
+                        scope.launch { state.animateTo(target, velocity) }
+                    },
+                    snap = { target -> scope.launch { state.snapTo(target) } }
+                )
+            }
+            Box(
+                Modifier
+                    .size(size.dp) // Trigger anchor recalculation when size changes
+                    .swipeAnchors(
+                        state = state,
+                        possibleValues = setOf(A, B, C),
+                        anchorChangeHandler = anchorChangeHandler,
+                        calculateAnchor = { state, _ -> anchors[state] }
+                    )
+            )
+        }
+
+        assertThat(state.currentValue == A)
+
+        anchors = secondAnchors
+        size = 200
+        rule.waitForIdle()
+
+        assertThat(state.currentValue).isEqualTo(B)
+    }
+
+    @Test
+    fun swipeable_anchorChangeHandler_calledWithUpdatedAnchorsWhenChanged() {
+        val state = SwipeableV2State(initialValue = A)
+        val initialSize = 100.dp
+        var size: Dp by mutableStateOf(initialSize)
+        var anchorChangeHandlerInvocationCount = 0
+        var actualPreviousAnchors: Map<TestState, Float>? = null
+        var actualNewAnchors: Map<TestState, Float>? = null
+        val testChangeHandler = AnchorChangeHandler { previousAnchors, newAnchors ->
+            anchorChangeHandlerInvocationCount++
+            actualPreviousAnchors = previousAnchors
+            actualNewAnchors = newAnchors
+        }
+        fun calculateAnchor(value: TestState, layoutSize: IntSize) = when (value) {
+            A -> 0f
+            B -> layoutSize.height / 2f
+            C -> layoutSize.height.toFloat()
+        }
+        rule.setContent {
+            Box(
+                Modifier
+                    .requiredSize(size) // Trigger anchor recalculation when size changes
+                    .swipeAnchors(
+                        state = state,
+                        possibleValues = setOf(A, B, C),
+                        anchorChangeHandler = testChangeHandler,
+                        calculateAnchor = ::calculateAnchor
+                    )
+            )
+        }
+
+        // The change handler should not get invoked when the anchors are first set
+        assertThat(anchorChangeHandlerInvocationCount).isEqualTo(0)
+
+        val expectedPreviousAnchors = state.anchors
+        size = 200.dp // Recompose with new size so anchors change
+        val sizePx = with(rule.density) { size.toPx().roundToInt() }
+        val layoutSize = IntSize(sizePx, sizePx)
+        val expectedNewAnchors = mapOf(
+            A to calculateAnchor(A, layoutSize),
+            B to calculateAnchor(B, layoutSize),
+            C to calculateAnchor(C, layoutSize),
+        )
+        rule.waitForIdle()
+
+        assertThat(anchorChangeHandlerInvocationCount).isEqualTo(1)
+        assertThat(actualPreviousAnchors).isEqualTo(expectedPreviousAnchors)
+        assertThat(actualNewAnchors).isEqualTo(expectedNewAnchors)
     }
 }
