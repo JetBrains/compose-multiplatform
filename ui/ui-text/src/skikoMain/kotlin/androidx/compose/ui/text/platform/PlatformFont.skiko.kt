@@ -63,7 +63,6 @@ class LoadedFont internal constructor(
         if (this === other) return true
         if (other !is LoadedFont) return false
         if (identity != other.identity) return false
-        if (!data.contentEquals(other.data)) return false
         if (weight != other.weight) return false
         if (style != other.style) return false
 
@@ -72,7 +71,6 @@ class LoadedFont internal constructor(
 
     override fun hashCode(): Int {
         var result = identity.hashCode()
-        result = 31 * result + data.contentHashCode()
         result = 31 * result + weight.hashCode()
         result = 31 * result + style.hashCode()
         return result
