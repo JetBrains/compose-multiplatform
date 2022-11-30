@@ -18,6 +18,7 @@ import kotlin.collections.HashSet
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 
 class DesktopApplicationTest : GradlePluginTestBase() {
@@ -77,7 +78,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun proguard(): Unit = with(testProject(TestProjects.proguard)) {
+    fun proguard(): Unit = with(
+        testProject(
+            TestProjects.proguard,
+            testEnvironment = defaultTestEnvironment.copy(composeVerbose = false))
+    ) {
         val enableObfuscation = """
                 compose.desktop {
                     application {
@@ -118,11 +123,6 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun packageJvm() = with(testProject(TestProjects.jvm)) {
-        testPackageJvmDistributions()
-    }
-
-    @Test
     fun gradleBuildCache() = with(testProject(TestProjects.jvm)) {
         modifyGradleProperties {
             setProperty("org.gradle.caching", "true")
@@ -146,6 +146,11 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             check.taskOutcome(":checkRuntime", TaskOutcome.FROM_CACHE)
             check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
         }
+    }
+
+    @Test
+    fun packageJvm() = with(testProject(TestProjects.jvm)) {
+        testPackageJvmDistributions()
     }
 
     @Test
@@ -174,11 +179,19 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         val packageFile = packageDirFiles.single()
 
         if (currentOS == OS.Linux) {
-            val isTestPackage = packageFile.name.contains("test-package", ignoreCase = true) ||
-                    packageFile.name.contains("testpackage", ignoreCase = true)
-            val isDeb = packageFile.name.endsWith(".$ext")
-            check(isTestPackage && isDeb) {
-                "Expected contain testpackage*.deb or test-package*.deb package in $packageDir, got '${packageFile.name}'"
+            // The default naming scheme was changed in JDK 18
+            // https://bugs.openjdk.org/browse/JDK-8276084
+            // This test might be used with different JDKs,
+            // so as a workaround we check that the
+            // package name is either one of two expected values.
+            // TODO: Check a corresponding value for each JDK
+            val possibleNames = listOf(
+                "test-package_1.0.0-1_amd64.$ext",
+                "test-package_1.0.0_amd64.$ext",
+            )
+            check(possibleNames.any { packageFile.name.equals(it, ignoreCase = true) }) {
+                "Unexpected package name '${packageFile.name}' in $packageDir\n" +
+                        "Possible names: ${possibleNames.joinToString(", ") { "'$it'" }}"
             }
         } else {
             Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
@@ -285,6 +298,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    @Disabled
+    // the test does not work on CI and locally unless test keychain is opened manually
     fun testMacSign() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
 

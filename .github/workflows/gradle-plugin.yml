@@ -1,0 +1,35 @@
+name: Test Gradle plugin
+on:
+  pull_request:
+    paths:
+      - 'gradle-plugins/**'
+      - '.github/workflows/gradle-plugin.yml'
+jobs:
+  test-gradle-plugin:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-20.04, macos-12, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'corretto'
+          java-version: '16'
+      - name: Test Gradle plugin
+        shell: bash
+        run: |
+          cd gradle-plugins
+          ./gradlew assemble
+          ./gradlew :compose:check --continue
+      - name: Print summary
+        shell: bash
+        if: always()
+        run: |
+          cd gradle-plugins/compose/build/test-summary
+          for SUMMARY_FILE in `find . -name "*.md"`; do
+            FILE_NAME=`basename $SUMMARY_FILE`
+            echo "## $FILE_NAME" >> $GITHUB_STEP_SUMMARY
+            cat $SUMMARY_FILE >> $GITHUB_STEP_SUMMARY
+          done

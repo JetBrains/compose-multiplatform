@@ -316,10 +316,8 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--main-jar", mappedJar)
             cliArg("--main-class", launcherMainClass)
 
-            when (currentOS) {
-                OS.Windows -> {
-                    cliArg("--win-console", winConsole)
-                }
+            if (currentOS == OS.Windows) {
+                cliArg("--win-console", winConsole)
             }
             cliArg("--icon", iconFile)
             launcherArgs.orNull?.forEach {
@@ -369,6 +367,7 @@ abstract class AbstractJPackageTask @Inject constructor(
                     cliArg("--win-menu-group", winMenuGroup)
                     cliArg("--win-upgrade-uuid", winUpgradeUuid)
                 }
+                OS.MacOS -> {}
             }
         }
 
@@ -383,20 +382,18 @@ abstract class AbstractJPackageTask @Inject constructor(
         cliArg("--app-version", packageVersion)
         cliArg("--vendor", packageVendor)
 
-        when (currentOS) {
-            OS.MacOS -> {
-                cliArg("--mac-package-name", macPackageName)
-                cliArg("--mac-package-identifier", nonValidatedMacBundleID)
-                cliArg("--mac-app-store", macAppStore)
-                cliArg("--mac-app-category", macAppCategory)
-                cliArg("--mac-entitlements", macEntitlementsFile)
+        if (currentOS == OS.MacOS) {
+            cliArg("--mac-package-name", macPackageName)
+            cliArg("--mac-package-identifier", nonValidatedMacBundleID)
+            cliArg("--mac-app-store", macAppStore)
+            cliArg("--mac-app-category", macAppCategory)
+            cliArg("--mac-entitlements", macEntitlementsFile)
 
-                macSigner?.let { signer ->
-                    cliArg("--mac-sign", true)
-                    cliArg("--mac-signing-key-user-name", signer.settings.identity)
-                    cliArg("--mac-signing-keychain", signer.settings.keychain)
-                    cliArg("--mac-package-signing-prefix", signer.settings.prefix)
-                }
+            macSigner?.let { signer ->
+                cliArg("--mac-sign", true)
+                cliArg("--mac-signing-key-user-name", signer.settings.identity)
+                cliArg("--mac-signing-keychain", signer.settings.keychain)
+                cliArg("--mac-package-signing-prefix", signer.settings.prefix)
             }
         }
     }

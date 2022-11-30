@@ -5,6 +5,8 @@
 
 package org.jetbrains.compose.test.utils
 
+import java.io.File
+
 object TestProperties {
     val composeCompilerVersion: String
         get() = notNullSystemProperty("compose.tests.compiler.version")
@@ -26,6 +28,10 @@ object TestProperties {
 
     val gradleVersionForTests: String?
         get() = System.getProperty("compose.tests.gradle.version")
+
+    val summaryFile: File?
+        get() = System.getProperty("compose.tests.summary.file")?.let { File(it) }
+
 
     private fun notNullSystemProperty(property: String): String =
         System.getProperty(property) ?: error("The '$property' system property is not set")

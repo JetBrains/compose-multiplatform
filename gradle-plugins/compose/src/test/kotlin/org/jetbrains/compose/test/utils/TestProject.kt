@@ -15,6 +15,7 @@ data class TestEnvironment(
     val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
     val composeCompilerArtifact: String? = null,
+    val composeVerbose: Boolean = true
 ) {
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
@@ -41,7 +42,7 @@ class TestProject(
     private val additionalArgs = listOf(
         "--stacktrace",
         "--init-script", testProjectsRootDir.resolve("init.gradle").absolutePath,
-        "-P${ComposeProperties.VERBOSE}=true"
+        "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}"
     )
 
     init {
