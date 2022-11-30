@@ -1764,9 +1764,10 @@ package androidx.compose.ui.input.pointer {
   }
 
   @androidx.compose.runtime.Stable public interface PointerIcon {
+    field public static final androidx.compose.ui.input.pointer.PointerIcon.Companion Companion;
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public final class PointerIconDefaults {
+  public static final class PointerIcon.Companion {
     method public androidx.compose.ui.input.pointer.PointerIcon getCrosshair();
     method public androidx.compose.ui.input.pointer.PointerIcon getDefault();
     method public androidx.compose.ui.input.pointer.PointerIcon getHand();
@@ -1775,7 +1776,6 @@ package androidx.compose.ui.input.pointer {
     property public final androidx.compose.ui.input.pointer.PointerIcon Default;
     property public final androidx.compose.ui.input.pointer.PointerIcon Hand;
     property public final androidx.compose.ui.input.pointer.PointerIcon Text;
-    field public static final androidx.compose.ui.input.pointer.PointerIconDefaults INSTANCE;
   }
 
   public final class PointerIconKt {

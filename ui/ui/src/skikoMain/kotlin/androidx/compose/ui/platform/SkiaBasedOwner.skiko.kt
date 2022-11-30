@@ -52,7 +52,6 @@ import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
@@ -499,7 +498,7 @@ internal class SkiaBasedOwner(
     override val pointerIconService: PointerIconService =
         object : PointerIconService {
             override var current: PointerIcon
-                get() = desiredPointerIcon ?: PointerIconDefaults.Default
+                get() = desiredPointerIcon ?: PointerIcon.Default
                 set(value) {
                     desiredPointerIcon = value
                 }
