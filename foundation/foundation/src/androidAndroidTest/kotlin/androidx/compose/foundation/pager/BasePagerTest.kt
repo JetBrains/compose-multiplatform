@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.pager
 
+import android.view.View
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
@@ -44,6 +45,7 @@ import androidx.compose.ui.layout.onPlaced
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.TouchInjectionScope
@@ -69,6 +71,7 @@ internal open class BasePagerTest(private val config: ParamConfig) {
     var pageSize: Int = 0
     lateinit var focusManager: FocusManager
     lateinit var firstItemFocusRequester: FocusRequester
+    var composeView: View? = null
 
     @Stable
     fun Modifier.crossAxisSize(size: Dp) =
@@ -120,6 +123,7 @@ internal open class BasePagerTest(private val config: ParamConfig) {
         pageContent: @Composable (page: Int) -> Unit = { Page(index = it) }
     ) {
         rule.setContent {
+            composeView = LocalView.current
             focusManager = LocalFocusManager.current
             val flingBehavior =
                 PagerDefaults.flingBehavior(

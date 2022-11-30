@@ -44,6 +44,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,6 +54,11 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.pageDown
+import androidx.compose.ui.semantics.pageLeft
+import androidx.compose.ui.semantics.pageRight
+import androidx.compose.ui.semantics.pageUp
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
@@ -63,6 +69,7 @@ import androidx.compose.ui.util.fastSumBy
 import kotlin.math.roundToInt
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 /**
  * A Pager that scrolls horizontally. Pages are lazily placed in accordance to the available
@@ -256,7 +263,13 @@ internal fun Pager(
             .collect { state.updateOnScrollStopped() }
     }
 
-    BoxWithConstraints(modifier = modifier) {
+    val pagerSemantics = if (userScrollEnabled) {
+        Modifier.pagerSemantics(state, isVertical)
+    } else {
+        Modifier
+    }
+
+    BoxWithConstraints(modifier = modifier.then(pagerSemantics)) {
         val mainAxisSize = if (isVertical) constraints.maxHeight else constraints.maxWidth
         // Calculates how pages are shown across the main axis
         val pageAvailableSize = remember(
@@ -649,4 +662,42 @@ private class ConsumeAllFlingOnDirection(val orientation: Orientation) : NestedS
     override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
         return available.consumeOnOrientation(orientation)
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Suppress("ComposableModifierFactory")
+@Composable
+private fun Modifier.pagerSemantics(state: PagerState, isVertical: Boolean): Modifier {
+    val scope = rememberCoroutineScope()
+    fun performForwardPaging(): Boolean {
+        return if (state.canScrollForward) {
+            scope.launch {
+                state.animateToNextPage()
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    fun performBackwardPaging(): Boolean {
+        return if (state.canScrollBackward) {
+            scope.launch {
+                state.animateToPreviousPage()
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    return this.then(Modifier.semantics {
+        if (isVertical) {
+            pageUp { performBackwardPaging() }
+            pageDown { performForwardPaging() }
+        } else {
+            pageLeft { performBackwardPaging() }
+            pageRight { performForwardPaging() }
+        }
+    })
 }

@@ -337,6 +337,16 @@ internal class PagerState(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+internal suspend fun PagerState.animateToNextPage() {
+    if (currentPage + 1 < pageCount) animateScrollToPage(currentPage + 1)
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+internal suspend fun PagerState.animateToPreviousPage() {
+    if (currentPage - 1 >= 0) animateScrollToPage(currentPage - 1)
+}
+
 private const val MinPageOffset = -0.5f
 private const val MaxPageOffset = 0.5f
 internal val SnapAlignmentStartToStart: Density.(layoutSize: Float, itemSize: Float) -> Float =
