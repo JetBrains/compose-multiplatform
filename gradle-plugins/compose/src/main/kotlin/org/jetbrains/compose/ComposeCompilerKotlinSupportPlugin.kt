@@ -44,6 +44,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
             KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
             KotlinPlatformType.androidJvm -> true
             KotlinPlatformType.native -> true
+            KotlinPlatformType.wasm -> false
         }
 
     private fun isApplicableJsTarget(kotlinTarget: KotlinTarget): Boolean {

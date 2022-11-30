@@ -1,6 +1,4 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.getCurrentOperatingSystem
-import java.util.zip.ZipFile
 
 plugins {
     kotlin("jvm")
@@ -61,8 +59,6 @@ dependencies {
     compileOnly(kotlin("native-utils"))
 
     testImplementation(gradleTestKit())
-    testImplementation(platform("org.junit:junit-bom:5.7.0"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
     testImplementation(kotlin("gradle-plugin-api"))
 
     // include relocated download task to avoid potential runtime conflicts
@@ -89,62 +85,17 @@ val jar = tasks.named<Jar>("jar") {
     this.duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-// __SUPPORTED_GRADLE_VERSIONS__
-//testGradleVersion("6.7.1") // min supported by kotlin 1.7.0 gradle plugin https://kotlinlang.org/docs/gradle.html
-// despite that, some tests didn't pass
-testGradleVersion("7.1.1")
-testGradleVersion("7.3.3")
-
-val javaHomeForTests: String? = when {
-    // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
-    JavaVersion.current() >= JavaVersion.VERSION_15 -> System.getProperty("java.home")
-    else -> System.getenv("JDK_15")
-         ?: System.getenv("JDK_FOR_GRADLE_TESTS")
-}
-val isWindows = getCurrentOperatingSystem().isWindows
+val supportedGradleVersions = project.property("compose.tests.gradle.versions")
+    .toString().split(",")
+    .map { it.trim() }
 
 val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 
 // check we don't accidentally including unexpected classes (e.g. from embedded dependencies)
-val checkJar by tasks.registering {
+tasks.registerVerificationTask<CheckJarPackagesTask>("checkJar") {
     dependsOn(jar)
-
-    doLast {
-        val file = jar.get().archiveFile.get().asFile
-        ZipFile(file).use { zip ->
-            checkJarContainsExpectedPackages(zip)
-        }
-    }
-}
-
-// we want to avoid accidentally including unexpected jars/packages, e.g kotlin-stdlib etc
-fun checkJarContainsExpectedPackages(jar: ZipFile) {
-    val expectedPackages = arrayOf(
-        "org/jetbrains/compose",
-        "kotlinx/serialization"
-    )
-    val unexpectedClasses = arrayListOf<String>()
-
-    for (entry in jar.entries()) {
-        if (entry.isDirectory || !entry.name.endsWith(".class")) continue
-
-        if (expectedPackages.none { prefix -> entry.name.startsWith(prefix) }) {
-            unexpectedClasses.add(entry.name)
-        }
-    }
-
-    if (unexpectedClasses.any()) {
-        error(buildString {
-            appendLine("Some classes from ${jar.name} are not from 'org.jetbrains.compose' package:")
-            unexpectedClasses.forEach {
-                appendLine("  * $it")
-            }
-        })
-    }
-}
-
-tasks.check {
-    dependsOn(checkJar)
+    jarFile.set(jar.archiveFile)
+    allowedPackagePrefixes.addAll("org.jetbrains.compose", "kotlinx.serialization")
 }
 
 tasks.test {
@@ -154,34 +105,24 @@ tasks.test {
         excludeTestsMatching(gradleTestsPattern)
     }
 }
-fun testGradleVersion(gradleVersion: String) {
-    val taskProvider = tasks.register("testGradle-$gradleVersion", Test::class) {
-        tasks.test.get().let { defaultTest ->
-            classpath = defaultTest.classpath
-        }
+
+for (gradleVersion in supportedGradleVersions) {
+    tasks.registerVerificationTask<Test>("testGradle-$gradleVersion") {
+        classpath = tasks.test.get().classpath
         systemProperty("compose.tests.gradle.version", gradleVersion)
         filter {
             includeTestsMatching(gradleTestsPattern)
         }
     }
-    tasks.named("check") {
-        dependsOn(taskProvider)
-    }
 }
 
-configureJUnit()
-
-tasks.withType<Test>().configureEach {
+configureAllTests {
     configureJavaForComposeTest()
-
     dependsOn(":publishToMavenLocal")
-
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
-    for ((k, v) in project.properties) {
-        if (k.startsWith("compose.")) {
-            systemProperty(k, v.toString())
-        }
-    }
+    val summaryDir = project.buildDir.resolve("test-summary")
+    systemProperty("compose.tests.summary.file", summaryDir.resolve("$name.md").absolutePath)
+    systemProperties(project.properties.filter { it.key.startsWith("compose.") })
 }
 
 task("printAllAndroidxReplacements") {
