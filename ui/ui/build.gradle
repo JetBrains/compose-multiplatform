@@ -240,6 +240,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             skikoTest.dependencies {
                 implementation(libs.kotlinTest)
+                implementation(libs.kotlinCoroutinesTest)
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:foundation:foundation"))
             }

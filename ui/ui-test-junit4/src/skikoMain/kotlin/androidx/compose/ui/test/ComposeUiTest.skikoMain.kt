@@ -48,6 +48,11 @@ actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
 }
 
 @ExperimentalTestApi
+fun runSkikoComposeUiTest(block: SkikoComposeUiTest.() -> Unit) {
+    SkikoComposeUiTest().runTest(block)
+}
+
+@ExperimentalTestApi
 @OptIn(ExperimentalCoroutinesApi::class, InternalTestApi::class)
 class SkikoComposeUiTest(
     width: Int = 1024,

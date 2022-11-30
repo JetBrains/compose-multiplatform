@@ -23,7 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.launch
-import org.jetbrains.skiko.SkikoDispatchers
+import kotlinx.coroutines.Dispatchers
 
 /**
  * Platform-specific mechanism for starting a monitor of global snapshot state writes
@@ -43,7 +43,7 @@ internal actual object GlobalSnapshotManager {
     actual fun ensureStarted() {
         if (started.compareAndSet(0, 1)) {
             val channel = Channel<Unit>(Channel.CONFLATED)
-            CoroutineScope(SkikoDispatchers.Main).launch {
+            CoroutineScope(Dispatchers.Default).launch {
                 channel.consumeEach {
                     Snapshot.sendApplyNotifications()
                 }

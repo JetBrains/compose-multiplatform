@@ -48,7 +48,6 @@ import androidx.compose.ui.input.pointer.areAnyPressed
 import androidx.compose.ui.input.pointer.copyFor
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.RootForTest
-import androidx.compose.ui.platform.DefaultTextToolbar
 import androidx.compose.ui.platform.FlushCoroutineDispatcher
 import androidx.compose.ui.platform.GlobalSnapshotManager
 import androidx.compose.ui.platform.Platform
@@ -62,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntRect
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +97,7 @@ class ComposeScene internal constructor(
     private val invalidate: () -> Unit = {},
     @Deprecated("Will be removed in Compose 1.3")
     internal val createSyntheticNativeMoveEvent:
-        (sourceEvent: Any?, positionSourceEvent: Any?) -> Any? = { _, _ -> null },
+        (sourceEvent: Any?, positionSourceEvent: Any?) -> Any? = { _, _ -> null }
 ) {
     /**
      * Constructs [ComposeScene]

@@ -33,19 +33,22 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
 import kotlin.math.ceil
+import kotlin.test.Ignore
+import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertTrue
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
-import org.junit.Test
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
 
+@Suppress("DEPRECATION")
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 class DragGestureTest {
 
     @Test
-    fun `draggable by mouse primary button`() {
+    fun draggable_by_mouse_primary_button() {
         val density = Density(1f)
         val viewConfiguration = DefaultViewConfiguration(density)
 
@@ -126,7 +129,7 @@ class DragGestureTest {
     }
 
     @Test
-    fun `draggable by mouse secondary button, ignores primary button`() {
+    fun draggable_by_mouse_secondary_button_ignores_primary_button() {
         val density = Density(1f)
         val viewConfiguration = DefaultViewConfiguration(density)
 
@@ -178,7 +181,7 @@ class DragGestureTest {
     }
 
     @Test
-    fun `draggable by touch`() {
+    fun draggable_by_touch() {
         val density = Density(1f)
         val viewConfiguration = DefaultViewConfiguration(density)
 
@@ -265,7 +268,7 @@ class DragGestureTest {
     }
 
     @Test
-    fun `draggable by touch, ignores mouse`() {
+    fun draggable_by_touch_ignores_mouse() {
         val density = Density(1f)
         val viewConfiguration = DefaultViewConfiguration(density)
 
@@ -320,9 +323,10 @@ class DragGestureTest {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     @Ignore // remove Ignore if needed later when startDragOnLongPress mode supported
-    fun `draggable by mouse OnLongPress primary button`() = runBlocking {
+    fun draggable_by_mouse_OnLongPress_primary_button() = runTest(UnconfinedTestDispatcher()) {
         val density = Density(1f)
         val viewConfiguration = DefaultViewConfiguration(density)
 
