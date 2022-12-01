@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.catalog.library.util.SampleSourceUrl
 import androidx.compose.material3.samples.AlertDialogSample
+import androidx.compose.material3.samples.AlertDialogWithCustomContentSample
 import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.AssistChipSample
@@ -344,6 +345,11 @@ val DialogExamples =
             description = DialogExampleDescription,
             sourceUrl = DialogExampleSourceUrl,
         ) { AlertDialogWithIconSample() },
+        Example(
+            name = ::AlertDialogWithCustomContentSample.name,
+            description = DialogExampleDescription,
+            sourceUrl = DialogExampleSourceUrl,
+        ) { AlertDialogWithCustomContentSample() },
     )
 
 private const val BottomAppBarsExampleDescription = "Bottom app bar examples"

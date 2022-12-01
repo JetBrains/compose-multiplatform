@@ -19,6 +19,8 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -120,7 +122,7 @@ class AlertDialogTest {
      * Ensure that Dialogs don't press up against the edges of the screen.
      */
     @Test
-    fun alertDialogDoesNotConsumeFullScreenWidth() {
+    fun alertDialog_doesNotConsumeFullScreenWidth() {
         val dialogWidthCh = Channel<Int>(Channel.CONFLATED)
         var maxDialogWidth = 0
         var screenWidth by mutableStateOf(0)
@@ -130,11 +132,12 @@ class AlertDialogTest {
             val resScreenWidth = context.resources.configuration.screenWidthDp
             with(density) {
                 screenWidth = resScreenWidth.dp.roundToPx()
-                maxDialogWidth = AlertDialogMaxWidth.roundToPx()
+                maxDialogWidth = DialogMaxWidth.roundToPx()
             }
 
             AlertDialog(
-                modifier = Modifier.onSizeChanged { dialogWidthCh.trySend(it.width) }
+                modifier = Modifier
+                    .onSizeChanged { dialogWidthCh.trySend(it.width) }
                     .fillMaxWidth(),
                 onDismissRequest = {},
                 title = { Text(text = "Title") },
@@ -164,13 +167,52 @@ class AlertDialogTest {
         }
     }
 
+    /**
+     * Ensure that a dialog with custom content don't press up against the edges of the screen.
+     */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun alertDialog_customContentDoesNotConsumeFullScreenWidth() {
+        val dialogWidthCh = Channel<Int>(Channel.CONFLATED)
+        var maxDialogWidth = 0
+        var screenWidth by mutableStateOf(0)
+        rule.setContent {
+            val context = LocalContext.current
+            val density = LocalDensity.current
+            val resScreenWidth = context.resources.configuration.screenWidthDp
+            with(density) {
+                screenWidth = resScreenWidth.dp.roundToPx()
+                maxDialogWidth = DialogMaxWidth.roundToPx()
+            }
+
+            AlertDialog(onDismissRequest = {}) {
+                Surface(
+                    modifier = Modifier
+                        .onSizeChanged { dialogWidthCh.trySend(it.width) }
+                        .wrapContentHeight()
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "This area typically contains the supportive text " +
+                            "which presents the details regarding the Dialog's purpose.",
+                    )
+                }
+            }
+        }
+        runBlocking {
+            val dialogWidth = withTimeout(5_000) { dialogWidthCh.receive() }
+            assertThat(dialogWidth).isLessThan(maxDialogWidth)
+            assertThat(dialogWidth).isLessThan(screenWidth)
+        }
+    }
+
     /** Ensure the Dialog's min width. */
     @Test
     fun alertDialog_minWidth() {
         val dialogWidthCh = Channel<Int>(Channel.CONFLATED)
         var minDialogWidth = 0
         rule.setContent {
-            with(LocalDensity.current) { minDialogWidth = AlertDialogMinWidth.roundToPx() }
+            with(LocalDensity.current) { minDialogWidth = DialogMinWidth.roundToPx() }
             AlertDialog(
                 modifier = Modifier.onSizeChanged { dialogWidthCh.trySend(it.width) },
                 onDismissRequest = {},
@@ -187,6 +229,57 @@ class AlertDialogTest {
         runBlocking {
             val dialogWidth = withTimeout(5_000) { dialogWidthCh.receive() }
             assertThat(dialogWidth).isEqualTo(minDialogWidth)
+        }
+    }
+
+    /** Ensure a dialog with custom content has a min width. */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun alertDialog_customContentMinWidth() {
+        val dialogWidthCh = Channel<Int>(Channel.CONFLATED)
+        var minDialogWidth = 0
+        rule.setContent {
+            with(LocalDensity.current) { minDialogWidth = DialogMinWidth.roundToPx() }
+            AlertDialog(onDismissRequest = {}) {
+                Surface(
+                    modifier = Modifier
+                        .onSizeChanged { dialogWidthCh.trySend(it.width) }
+                ) {
+                    Text("Short")
+                }
+            }
+        }
+
+        runBlocking {
+            val dialogWidth = withTimeout(5_000) { dialogWidthCh.receive() }
+            assertThat(dialogWidth).isEqualTo(minDialogWidth)
+        }
+    }
+
+    /** Ensure a dialog with custom content has a min width. */
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Test
+    fun alertDialog_customContentModifiedMinWidth() {
+        val dialogWidthCh = Channel<Int>(Channel.CONFLATED)
+        var customMinDialogWidth = 0
+        rule.setContent {
+            with(LocalDensity.current) { customMinDialogWidth = 150.dp.roundToPx() }
+            AlertDialog(
+                onDismissRequest = {},
+                Modifier.width(width = 150.dp)
+            ) {
+                Surface(
+                    modifier = Modifier
+                        .onSizeChanged { dialogWidthCh.trySend(it.width) }
+                ) {
+                    Text("Short")
+                }
+            }
+        }
+
+        runBlocking {
+            val dialogWidth = withTimeout(5_000) { dialogWidthCh.receive() }
+            assertThat(dialogWidth).isEqualTo(customMinDialogWidth)
         }
     }
 
@@ -207,7 +300,9 @@ class AlertDialogTest {
                 confirmButton = {
                     TextButton(
                         onClick = { /* doSomething() */ },
-                        Modifier.testTag(ConfirmButtonTestTag).semantics(mergeDescendants = true) {}
+                        Modifier
+                            .testTag(ConfirmButtonTestTag)
+                            .semantics(mergeDescendants = true) {}
                     ) {
                         Text("Confirm")
                     }
@@ -215,7 +310,9 @@ class AlertDialogTest {
                 dismissButton = {
                     TextButton(
                         onClick = { /* doSomething() */ },
-                        Modifier.testTag(DismissButtonTestTag).semantics(mergeDescendants = true) {}
+                        Modifier
+                            .testTag(DismissButtonTestTag)
+                            .semantics(mergeDescendants = true) {}
                     ) {
                         Text("Dismiss")
                     }
@@ -281,7 +378,9 @@ class AlertDialogTest {
                 dismissButton = {
                     TextButton(
                         onClick = { /* doSomething() */ },
-                        Modifier.testTag(DismissButtonTestTag).semantics(mergeDescendants = true) {}
+                        Modifier
+                            .testTag(DismissButtonTestTag)
+                            .semantics(mergeDescendants = true) {}
                     ) {
                         Text("Dismiss")
                     }
@@ -337,7 +436,9 @@ class AlertDialogTest {
                 dismissButton = {
                     TextButton(
                         onClick = { /* doSomething() */ },
-                        Modifier.testTag(DismissButtonTestTag).semantics(mergeDescendants = true) {}
+                        Modifier
+                            .testTag(DismissButtonTestTag)
+                            .semantics(mergeDescendants = true) {}
                     ) {
                         Text("Dismiss")
                     }
@@ -375,8 +476,6 @@ class AlertDialogTest {
     }
 }
 
-private val AlertDialogMinWidth = 280.dp
-private val AlertDialogMaxWidth = 560.dp
 private const val IconTestTag = "icon"
 private const val TitleTestTag = "title"
 private const val TextTestTag = "text"
