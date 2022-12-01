@@ -19,7 +19,6 @@ package androidx.compose.foundation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
@@ -30,14 +29,12 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
-import com.google.common.truth.Truth.assertThat
-import org.junit.Test
+import kotlin.test.Test
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
-class RequestFocusTest {
+class RequestFocusSkikoTest {
 
     @Test
-    fun `mouseClickable should request focus on click`() =
+    fun clickable_should_request_focus_on_click() =
         ImageComposeScene(
             width = 100,
             height = 100,
@@ -49,7 +46,37 @@ class RequestFocusTest {
                 Box(modifier = Modifier
                     .size(25.dp)
                     .onFocusChanged { focusState = it }
-                    .mouseClickable { clicked = true }
+                    .clickable { clicked = true }
+                )
+            }
+
+            assertThat(clicked).isEqualTo(false)
+            assertThat(focusState?.isFocused).isEqualTo(false)
+
+            val downButtons = PointerButtons(isPrimaryPressed = true)
+            val upButtons = PointerButtons(isPrimaryPressed = false)
+            scene.sendPointerEvent(PointerEventType.Press, Offset(10f, 10f), buttons = downButtons)
+            scene.sendPointerEvent(PointerEventType.Release, Offset(10f, 10f), buttons = upButtons)
+
+            assertThat(clicked).isEqualTo(true)
+            assertThat(focusState?.hasFocus).isEqualTo(true)
+        }
+
+
+    @Test
+    fun toggleable_should_request_focus_on_click() =
+        ImageComposeScene(
+            width = 100,
+            height = 100,
+            density = Density(1f)
+        ).use { scene ->
+            var focusState: FocusState? = null
+            var clicked = false
+            scene.setContent {
+                Box(modifier = Modifier
+                    .size(25.dp)
+                    .onFocusChanged { focusState = it }
+                    .toggleable(false) { clicked = true }
                 )
             }
 

@@ -243,6 +243,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinCoroutinesTest)
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:foundation:foundation"))
+                implementation(project(":compose:ui:ui-test-junit4"))
             }
 
             desktopTest {

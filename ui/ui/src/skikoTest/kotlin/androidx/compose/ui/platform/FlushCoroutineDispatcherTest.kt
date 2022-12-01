@@ -20,18 +20,19 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertFalse
-import org.junit.Test
 import kotlin.random.Random
+import kotlin.test.Test
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
 class FlushCoroutineDispatcherTest {
+
     @Test
-    fun `all tasks should run with flush`() = runTest {
+    fun all_tasks_should_run_with_flush() = runTest {
         val dispatcher = FlushCoroutineDispatcher(this)
 
         val actualNumbers = mutableListOf<Int>()
@@ -55,7 +56,7 @@ class FlushCoroutineDispatcherTest {
     }
 
     @Test
-    fun `tasks should run even without flush`() = runTest {
+    fun tasks_should_run_even_without_flush() = runTest {
         val dispatcher = FlushCoroutineDispatcher(this)
 
         val actualNumbers = mutableListOf<Int>()
@@ -78,27 +79,29 @@ class FlushCoroutineDispatcherTest {
     }
 
     @Test
-    fun `flushing in another thread`() {
+    fun flushing_in_another_thread() {
         val actualNumbers = mutableListOf<Int>()
         lateinit var dispatcher: FlushCoroutineDispatcher
         val random = Random(123)
 
-        runBlocking(Dispatchers.Default) {
-            dispatcher = FlushCoroutineDispatcher(this)
+        runTest {
+            withContext(Dispatchers.Default) {
+                dispatcher = FlushCoroutineDispatcher(this)
 
-            val addJob = launch(dispatcher) {
-                repeat(10000) {
-                    actualNumbers.add(it)
-                    repeat(random.nextInt(5)) {
-                        yield()
+                val addJob = launch(dispatcher) {
+                    repeat(10000) {
+                        actualNumbers.add(it)
+                        repeat(random.nextInt(5)) {
+                            yield()
+                        }
                     }
                 }
-            }
 
-            launch {
-                while (addJob.isActive) {
-                    dispatcher.flush()
-                    yield()
+                launch {
+                    while (addJob.isActive) {
+                        dispatcher.flush()
+                        yield()
+                    }
                 }
             }
         }

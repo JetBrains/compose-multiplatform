@@ -34,14 +34,14 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.performKeyPress
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.dp
+import kotlin.test.Test
 import kotlin.test.assertEquals
-import org.junit.Test
 
 @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
 class ToggleableTest {
 
     @Test
-    fun `toggleable by Space button`() = runComposeUiTest {
+    fun toggleable_by_Space_button() = runComposeUiTest {
         var state: Boolean by mutableStateOf(false)
         setContent {
             Box(modifier = Modifier.size(100.dp, 100.dp).toggleable(
