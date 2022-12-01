@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
+import androidx.compose.ui.util.lerp
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -830,14 +831,15 @@ private fun Placeable.PlacementScope.place(
 
     // label position is animated
     // in single line text field label is centered vertically before animation starts
+    var labelPositionY: Int? = null
     labelPlaceable?.let {
         val startPositionY = if (singleLine) {
             Alignment.CenterVertically.align(it.height, height)
         } else {
             topPadding
         }
-        val positionY =
-            startPositionY * (1 - animationProgress) - (it.height / 2) * animationProgress
+        val positionY = lerp(startPositionY, -(it.height / 2), animationProgress)
+        labelPositionY = positionY
         val positionX = (
             if (leadingPlaceable == null) {
                 0f
@@ -845,7 +847,7 @@ private fun Placeable.PlacementScope.place(
                 (widthOrZero(leadingPlaceable) - iconPadding) * (1 - animationProgress)
             }
             ).roundToInt() + startPadding
-        it.placeRelative(positionX, positionY.roundToInt())
+        it.placeRelative(positionX, positionY)
     }
 
     // placed center vertically and after the leading icon horizontally if single line text field
@@ -862,10 +864,20 @@ private fun Placeable.PlacementScope.place(
 
     // placed similar to the input text above
     placeholderPlaceable?.let {
-        val placeholderVerticalPosition = if (singleLine) {
-            Alignment.CenterVertically.align(it.height, height)
-        } else {
-            topPadding
+        var placeholderVerticalPosition = max(
+            if (singleLine) {
+                Alignment.CenterVertically.align(it.height, height)
+            } else {
+                topPadding
+            },
+            heightOrZero(labelPlaceable) / 2
+        )
+        // Ensure placeholder's bounding box does not cover label in unfocused state
+        // (workaround for b/261061240)
+        labelPositionY?.let { labelPositionY ->
+            if (placeholderVerticalPosition <= labelPositionY) {
+                placeholderVerticalPosition = labelPositionY + 1
+            }
         }
         it.placeRelative(widthOrZero(leadingPlaceable), placeholderVerticalPosition)
     }
