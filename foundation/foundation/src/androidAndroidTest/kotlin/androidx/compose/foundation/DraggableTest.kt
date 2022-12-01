@@ -52,6 +52,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -608,6 +609,38 @@ class DraggableTest {
         }
 
         assertThat(total).isGreaterThan(0f)
+    }
+
+    @Test
+    fun draggable_noMomentumDragging_onDragStopped_shouldGenerateZeroVelocity() {
+        val delta = -10f
+        var flingVelocity = Float.NaN
+        setDraggableContent {
+            Modifier
+                .draggable(
+                    state = rememberDraggableState { },
+                    orientation = Orientation.Vertical,
+                    onDragStopped = { velocity ->
+                        flingVelocity = velocity
+                    }
+                )
+        }
+
+        // Drag, stop and release. The resulting velocity should be zero because we lost the
+        // gesture momentum.
+        rule.onNodeWithTag(draggableBoxTag).performTouchInput {
+            down(center)
+            // generate various move events
+            repeat(30) {
+                moveBy(Offset(0f, delta), delayMillis = 16L)
+            }
+            // stop for a moment
+            advanceEventTime(3000L)
+            up()
+        }
+        rule.runOnIdle {
+            Assert.assertEquals(0f, flingVelocity)
+        }
     }
 
     @Test

@@ -327,7 +327,7 @@ suspend fun AwaitPointerEventScope.verticalDrag(
     onDrag = onDrag,
     motionFromChange = { it.positionChangeIgnoreConsumed().y },
     motionConsumed = { it.isConsumed }
-)
+) != null
 
 /**
  * Reads pointer input events until a vertical drag is detected or all pointers are up. When the
@@ -475,7 +475,7 @@ suspend fun AwaitPointerEventScope.horizontalDrag(
     onDrag = onDrag,
     motionFromChange = { it.positionChangeIgnoreConsumed().x },
     motionConsumed = { it.isConsumed }
-)
+) != null
 
 /**
  * Reads pointer input events until a horizontal drag is detected or all pointers are up. When the
@@ -569,28 +569,28 @@ suspend fun PointerInputScope.detectHorizontalDragGestures(
  * drag should detect. [onDrag] is called whenever the pointer moves and [motionFromChange]
  * returns non-zero.
  *
- * @return `true` when the gesture ended with all pointers up and `false` when the gesture
- * was canceled.
+ * @return The last pointer input event change when gesture ended with all pointers up
+ * and null when the gesture was canceled.
  */
-private suspend inline fun AwaitPointerEventScope.drag(
+internal suspend inline fun AwaitPointerEventScope.drag(
     pointerId: PointerId,
     onDrag: (PointerInputChange) -> Unit,
     motionFromChange: (PointerInputChange) -> Float,
     motionConsumed: (PointerInputChange) -> Boolean
-): Boolean {
+): PointerInputChange? {
     if (currentEvent.isPointerUp(pointerId)) {
-        return false // The pointer has already been lifted, so the gesture is canceled
+        return null // The pointer has already been lifted, so the gesture is canceled
     }
     var pointer = pointerId
     while (true) {
-        val change = awaitDragOrUp(pointer) { motionFromChange(it) != 0f } ?: return false
+        val change = awaitDragOrUp(pointer) { motionFromChange(it) != 0f } ?: return null
 
         if (motionConsumed(change)) {
-            return false
+            return null
         }
 
         if (change.changedToUpIgnoreConsumed()) {
-            return true
+            return change
         }
 
         onDrag(change)
