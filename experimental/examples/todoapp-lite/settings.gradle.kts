@@ -19,4 +19,8 @@ pluginManagement {
     }
 }
 
-include(":common", ":android", ":desktop")
+rootProject.name = "todoapp-lite"
+
+include(":androidApp")
+include(":shared")
+include(":desktopApp")
