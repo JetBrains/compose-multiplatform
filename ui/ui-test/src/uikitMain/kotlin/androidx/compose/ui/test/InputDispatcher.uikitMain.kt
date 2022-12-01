@@ -20,6 +20,10 @@ package androidx.compose.ui.test
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
+import org.jetbrains.skiko.SkikoInputModifiers
+import org.jetbrains.skiko.SkikoKey
+import org.jetbrains.skiko.SkikoKeyboardEvent
+import org.jetbrains.skiko.SkikoKeyboardEventKind
 
 /**
  * The [KeyEvent] is usually created by the system. This function creates an instance of
@@ -27,6 +31,24 @@ import androidx.compose.ui.input.key.KeyEventType
  */
 internal actual fun keyEvent(
     key: Key, keyEventType: KeyEventType, modifiers: Int
-): KeyEvent = TODO()
+): KeyEvent {
+    return return KeyEvent(
+        SkikoKeyboardEvent(
+// TODO replace  `enum class SkikoKey` by `class SkikoKey` in skiko, change code here to `SkikoKey(it.platformKeyCode)`
+            key = SkikoKey.values().firstOrNull {
+                it.platformKeyCode.toLong() == key.keyCode
+            } ?: error("SkikoKey not found for key=$key"),
+            modifiers = SkikoInputModifiers(modifiers),
+            kind = when (keyEventType) {
+                KeyEventType.KeyUp -> SkikoKeyboardEventKind.UP
+                KeyEventType.KeyDown -> SkikoKeyboardEventKind.DOWN
+                else -> error("Unknown key event type: $keyEventType")
+
+            },
+            timestamp = 0L,
+            platform = null
+        )
+    )
+}
 
 internal actual fun Int.updatedKeyboardModifiers(key: Key, down: Boolean): Int = this // TODO: implement updatedKeyboardModifiers

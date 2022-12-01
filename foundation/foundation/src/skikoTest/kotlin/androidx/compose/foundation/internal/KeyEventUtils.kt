@@ -14,39 +14,17 @@
  * limitations under the License.
  */
 
-package androidx.compose.material.internal
+package androidx.compose.foundation.internal
 
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
-import androidx.compose.ui.input.key.nativeKeyCode
-import androidx.compose.ui.input.key.nativeKeyLocation
-import java.awt.Component
-import java.awt.event.KeyEvent
 
-private object DummyComponent : Component()
 /**
  * The [KeyEvent] is usually created by the system. This function creates an instance of
  * [KeyEvent] that can be used in tests.
  */
-internal fun keyEvent(
+internal expect fun keyEvent(
     key: Key,
     keyEventType: KeyEventType,
     modifiers: Int = 0
-): androidx.compose.ui.input.key.KeyEvent {
-    val action = when (keyEventType) {
-        KeyEventType.KeyDown -> java.awt.event.KeyEvent.KEY_PRESSED
-        KeyEventType.KeyUp -> java.awt.event.KeyEvent.KEY_RELEASED
-        else -> error("Unknown key event type")
-    }
-    return androidx.compose.ui.input.key.KeyEvent(
-        KeyEvent(
-            DummyComponent,
-            action,
-            0L,
-            modifiers,
-            key.nativeKeyCode,
-            KeyEvent.getKeyText(key.nativeKeyCode)[0],
-            key.nativeKeyLocation
-        )
-    )
-}
+): androidx.compose.ui.input.key.KeyEvent

@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalComposeUiApi::class)
+
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.Key
-
-internal actual val platformDefaultKeyMapping: KeyMapping = defaultKeyMapping
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal actual object MappedKeys {
@@ -47,3 +47,30 @@ internal actual object MappedKeys {
     actual val Tab: Key = Key(Key.Tab.keyCode)
     val Copy: Key = Key(Key.Copy.keyCode)
 }
+
+internal actual val MappedKeys.Space: Key
+    get() = Key(Key.Spacebar.keyCode)
+
+internal actual val MappedKeys.F: Key
+    get() = Key(Key.F.keyCode)
+
+internal actual val MappedKeys.B: Key
+    get() = Key(Key.B.keyCode)
+
+internal actual val MappedKeys.P: Key
+    get() = Key(Key.P.keyCode)
+
+internal actual val MappedKeys.N: Key
+    get() = Key(Key.N.keyCode)
+
+internal actual val MappedKeys.E: Key
+    get() = Key(Key.E.keyCode)
+
+internal actual val MappedKeys.D: Key
+    get() = Key(Key.D.keyCode)
+
+internal actual val MappedKeys.K: Key
+    get() = Key(Key.K.keyCode)
+
+internal actual val MappedKeys.O: Key
+    get() = Key(Key.O.keyCode)
