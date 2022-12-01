@@ -2035,27 +2035,13 @@ class SubcomposeLayoutTest {
             }
         }
 
-        var precomposedSlotActive = false
-
         val handle = rule.runOnIdle {
             state.precompose(1) {
-                Box(
-                    modifier = Modifier
-                        .size(10.dp)
-                        .testTag("1")
-                )
-
-                DisposableEffect(Unit) {
-                    precomposedSlotActive = true
-                    onDispose {
-                        precomposedSlotActive = false
-                    }
-                }
+                Box(modifier = Modifier.size(10.dp).testTag("1"))
             }
         }
 
         rule.runOnIdle {
-            assertThat(precomposedSlotActive).isTrue()
             needSlot = false
         }
 
@@ -2063,10 +2049,7 @@ class SubcomposeLayoutTest {
             handle.dispose()
         }
 
-        assertThat(precomposedSlotActive).isFalse()
-
-        // Both slots inside subcompose are reused, as parent was detached with these nodes active
-        rule.onNodeWithTag("1").assertIsNotDisplayed()
+        rule.onNodeWithTag("1").assertDoesNotExist()
         rule.onNodeWithTag("0").assertIsNotDisplayed()
     }
 
@@ -2184,149 +2167,6 @@ class SubcomposeLayoutTest {
 
         rule.waitUntil { isActive }
     }
-
-    @Test
-    fun reusingNestedSubcompose_nestedChildrenAreResetAndReused() {
-        val slotState = mutableStateOf(0)
-
-        val activeChildren = mutableSetOf<Int>()
-        var remeasureCount = 0
-        val measureCountModifier = Modifier.layout { measurable, constraints ->
-            remeasureCount++
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
-            }
-        }
-
-        rule.setContent {
-            SubcomposeLayout(
-                remember { SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)) }
-            ) { constraints ->
-                val slot = slotState.value
-                val child = measure(slot, constraints) {
-                    Box {
-                        SubcomposeLayout { constraints ->
-                            val placeable = measure(Unit, constraints) {
-                                Box(
-                                    modifier = Modifier
-                                        .size(10.dp)
-                                        .then(measureCountModifier)
-                                )
-
-                                DisposableEffect(Unit) {
-                                    activeChildren += slot
-                                    onDispose {
-                                        activeChildren -= slot
-                                    }
-                                }
-                            }
-                            layout(placeable.width, placeable.height) {
-                                placeable.place(0, 0)
-                            }
-                        }
-                    }
-                }
-                layout(child.width, child.height) {
-                    child.place(0, 0)
-                }
-            }
-        }
-
-        rule.runOnIdle {
-            assertThat(activeChildren).containsExactly(0)
-
-            slotState.value = 1
-        }
-
-        rule.runOnIdle {
-            assertThat(activeChildren).containsExactly(1)
-            assertThat(remeasureCount).isEqualTo(2)
-
-            remeasureCount = 0
-
-            slotState.value = 2
-        }
-
-        rule.runOnIdle {
-            assertThat(activeChildren).containsExactly(2)
-            assertThat(remeasureCount).isEqualTo(0)
-        }
-    }
-
-    @Test
-    fun reusingNestedSubcompose_nestedContentIsResetWhenReusedOnNextFrame() {
-        var contentActive by mutableStateOf(true)
-        var slotId by mutableStateOf(0)
-        val activeChildren = mutableSetOf<Int>()
-        var remeasureCount = 0
-        val measureCountModifier = Modifier.layout { measurable, constraints ->
-            remeasureCount++
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
-            }
-        }
-
-        rule.setContent {
-            SubcomposeLayout(
-                remember { SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)) }
-            ) { constraints ->
-                if (contentActive) {
-                    val child = measure(slotId, constraints) {
-                        Box {
-                            SubcomposeLayout { constraints ->
-                                val placeable = measure(Unit, constraints) {
-                                    Box(modifier = Modifier.size(10.dp).then(measureCountModifier))
-
-                                    DisposableEffect(Unit) {
-                                        val capturedSlotId = slotId
-                                        activeChildren += slotId
-                                        onDispose {
-                                            activeChildren -= capturedSlotId
-                                        }
-                                    }
-                                }
-                                layout(placeable.width, placeable.height) {
-                                    placeable.place(0, 0)
-                                }
-                            }
-                        }
-
-                        DisposableEffect(Unit) {
-                            onDispose {
-                                // schedule remeasure / compose when child is reset
-                                contentActive = true
-                                slotId++
-                            }
-                        }
-                    }
-                    layout(child.width, child.height) {
-                        child.place(0, 0)
-                    }
-                } else {
-                    layout(0, 0) { }
-                }
-            }
-        }
-
-        rule.runOnIdle {
-            assertThat(activeChildren).containsExactly(0)
-
-            contentActive = false
-        }
-
-        rule.runOnIdle {
-            assertThat(activeChildren).containsExactly(1)
-        }
-    }
-
-    private fun SubcomposeMeasureScope.measure(
-        slotId: Any,
-        constraints: Constraints,
-        content: @Composable () -> Unit
-    ): Placeable =
-        subcompose(slotId, content).first().measure(constraints)
 
     private fun composeItems(
         state: SubcomposeLayoutState,
