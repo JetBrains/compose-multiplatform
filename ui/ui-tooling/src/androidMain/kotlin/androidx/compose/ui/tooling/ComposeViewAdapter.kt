@@ -441,7 +441,7 @@ internal class ComposeViewAdapter : FrameLayout {
         invalidate()
     }
 
-    override fun dispatchDraw(canvas: Canvas?) {
+    override fun dispatchDraw(canvas: Canvas) {
         super.dispatchDraw(canvas)
 
         if (forceCompositionInvalidation) invalidateComposition()
@@ -455,7 +455,7 @@ internal class ComposeViewAdapter : FrameLayout {
             .flatMap { listOf(it) + it.allChildren() }
             .forEach {
                 if (it.hasBounds()) {
-                    canvas?.apply {
+                    canvas.apply {
                         val pxBounds = android.graphics.Rect(
                             it.bounds.left,
                             it.bounds.top,

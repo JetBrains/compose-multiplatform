@@ -177,7 +177,7 @@ internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
         require(simulationState == SimulationState.DrawPrepared) {
             "You need to call 'drawPrepare' before calling 'draw'."
         }
-        getView().draw(canvas)
+        getView().draw(canvas!!)
         simulationState = SimulationState.DrawInProgress
     }
 
