@@ -27,7 +27,6 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
-import androidx.compose.ui.input.key.utf16CodePoint
 import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.DeleteSurroundingTextCommand
 import androidx.compose.ui.text.input.EditCommand
@@ -56,6 +55,7 @@ internal class TextFieldKeyInput(
     val preparedSelectionState: TextPreparedSelectionState,
     val offsetMapping: OffsetMapping = OffsetMapping.Identity,
     val undoManager: UndoManager? = null,
+    private val keyCombiner: DeadKeyCombiner,
     private val keyMapping: KeyMapping = platformDefaultKeyMapping,
     private val onValueChange: (TextFieldValue) -> Unit = {}
 ) {
@@ -73,14 +73,15 @@ internal class TextFieldKeyInput(
         listOf(this).apply()
     }
 
-    private fun typedCommand(event: KeyEvent): CommitTextCommand? =
-        if (event.isTypedEvent) {
-            val text = StringBuilder().appendCodePointX(event.utf16CodePoint)
-                .toString()
-            CommitTextCommand(text, 1)
-        } else {
-            null
+    private fun typedCommand(event: KeyEvent): CommitTextCommand? {
+        if (!event.isTypedEvent) {
+            return null
         }
+
+        val codePoint = keyCombiner.consume(event) ?: return null
+        val text = StringBuilder().appendCodePointX(codePoint).toString()
+        return CommitTextCommand(text, 1)
+    }
 
     fun process(event: KeyEvent): Boolean {
         typedCommand(event)?.let {
@@ -241,6 +242,7 @@ internal fun Modifier.textFieldKeyInput(
     undoManager: UndoManager
 ) = composed {
     val preparedSelectionState = remember { TextPreparedSelectionState() }
+    val keyCombiner = remember { DeadKeyCombiner() }
     val processor = TextFieldKeyInput(
         state = state,
         selectionManager = manager,
@@ -250,6 +252,7 @@ internal fun Modifier.textFieldKeyInput(
         offsetMapping = offsetMapping,
         preparedSelectionState = preparedSelectionState,
         undoManager = undoManager,
+        keyCombiner = keyCombiner,
         onValueChange = onValueChange
     )
     Modifier.onKeyEvent(processor::process)
