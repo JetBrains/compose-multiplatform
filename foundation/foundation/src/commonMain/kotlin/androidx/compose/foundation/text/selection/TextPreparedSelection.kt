@@ -251,7 +251,7 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
     }
 
     private fun isLtr(): Boolean {
-        val direction = layoutResult?.getParagraphDirection(selection.end)
+        val direction = layoutResult?.getParagraphDirection(transformedEndOffset())
         return direction != ResolvedTextDirection.Rtl
     }
 

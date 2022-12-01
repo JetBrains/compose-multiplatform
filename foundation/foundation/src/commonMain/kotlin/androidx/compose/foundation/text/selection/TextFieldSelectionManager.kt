@@ -81,7 +81,7 @@ internal class TextFieldSelectionManager(
     internal var state: TextFieldState? = null
 
     /**
-     * The current [TextFieldValue].
+     * The current [TextFieldValue]. This contains the original text, not the transformed text.
      */
     internal var value: TextFieldValue by mutableStateOf(TextFieldValue())
 
@@ -703,33 +703,30 @@ internal class TextFieldSelectionManager(
      */
     @OptIn(InternalFoundationTextApi::class)
     private fun getContentRect(): Rect {
-        state?.let {
+        // if it's stale layout, return empty Rect
+        state?.takeIf { !it.isLayoutResultStale }?.let {
+            // value.selection is from the original representation.
+            // we need to convert original offsets into transformed offsets to query
+            // layoutResult because layoutResult belongs to the transformed text.
+            val transformedStart = offsetMapping.originalToTransformed(value.selection.start)
+            val transformedEnd = offsetMapping.originalToTransformed(value.selection.end)
             val startOffset =
-                state?.layoutCoordinates?.localToRoot(getHandlePosition(true)) ?: Offset.Zero
+                state?.layoutCoordinates?.localToRoot(getHandlePosition(true))
+                    ?: Offset.Zero
             val endOffset =
-                state?.layoutCoordinates?.localToRoot(getHandlePosition(false)) ?: Offset.Zero
+                state?.layoutCoordinates?.localToRoot(getHandlePosition(false))
+                    ?: Offset.Zero
             val startTop =
                 state?.layoutCoordinates?.localToRoot(
                     Offset(
                         0f,
-                        it.layoutResult?.value?.getCursorRect(
-                            value.selection.start.coerceIn(
-                                0,
-                                max(0, value.text.length - 1)
-                            )
-                        )?.top ?: 0f
+                        it.layoutResult?.value?.getCursorRect(transformedStart)?.top ?: 0f
                     )
                 )?.y ?: 0f
             val endTop =
                 state?.layoutCoordinates?.localToRoot(
-                    Offset(
-                        0f,
-                        it.layoutResult?.value?.getCursorRect(
-                            value.selection.end.coerceIn(
-                                0,
-                                max(0, value.text.length - 1)
-                            )
-                        )?.top ?: 0f
+                    Offset(0f,
+                        it.layoutResult?.value?.getCursorRect(transformedEnd)?.top ?: 0f
                     )
                 )?.y ?: 0f
 
@@ -849,6 +846,7 @@ internal expect val PointerEvent.isShiftPressed: Boolean
  */
 internal expect fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier
 
+@OptIn(InternalFoundationTextApi::class)
 internal fun calculateSelectionMagnifierCenterAndroid(
     manager: TextFieldSelectionManager,
     magnifierSize: IntSize
@@ -861,9 +859,10 @@ internal fun calculateSelectionMagnifierCenterAndroid(
         Handle.SelectionStart -> manager.value.selection.start
         Handle.SelectionEnd -> manager.value.selection.end
     }
-    val textOffset = manager.offsetMapping.originalToTransformed(rawTextOffset)
-        .coerceIn(manager.value.text.indices)
+    var textOffset = manager.offsetMapping.originalToTransformed(rawTextOffset)
     val layoutResult = manager.state?.layoutResult?.value ?: return Offset.Unspecified
+    val transformedText = manager.state?.textDelegate?.text ?: return Offset.Unspecified
+    textOffset = textOffset.coerceIn(transformedText.indices)
     // Center vertically on the current line.
     // If the text hasn't been laid out yet, don't show the modifier.
     val offsetCenter = layoutResult.getBoundingBox(textOffset).center
