@@ -348,6 +348,33 @@ class ComposeFocusTest {
     }
 
     @Test
+    fun `empty swing panel`() = runFocusTest {
+        val window = ComposeWindow().disposeOnEnd()
+        window.preferredSize = Dimension(500, 500)
+
+        window.setContent {
+            MaterialTheme {
+                Column(Modifier.fillMaxSize()) {
+                    composeButton3.Content()
+                    SwingPanel(
+                        modifier = Modifier.size(100.dp),
+                        factory = {
+                            javax.swing.Box.createVerticalBox()
+                        }
+                    )
+                    composeButton4.Content()
+                }
+            }
+        }
+        window.pack()
+        window.isVisible = true
+
+        testRandomFocus(
+            composeButton3, composeButton4
+        )
+    }
+
+    @Test
     fun `popup inside window`() = runFocusTest {
         val window = ComposeWindow().disposeOnEnd()
         window.preferredSize = Dimension(500, 500)

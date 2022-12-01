@@ -186,9 +186,13 @@ private class FocusSwitcher<T : Component>(
                 .onFocusChanged {
                     if (it.isFocused && !isRequesting) {
                         focusManager.clearFocus(force = true)
-                        info.container.focusTraversalPolicy
-                            .getFirstComponent(info.container)
-                            .requestFocus(FocusEvent.Cause.TRAVERSAL_FORWARD)
+
+                        val component = info.container.focusTraversalPolicy.getFirstComponent(info.container)
+                        if (component != null) {
+                            component.requestFocus(FocusEvent.Cause.TRAVERSAL_FORWARD)
+                        } else {
+                            moveForward()
+                        }
                     }
                 }
                 .focusTarget()
@@ -199,9 +203,13 @@ private class FocusSwitcher<T : Component>(
                 .onFocusChanged {
                     if (it.isFocused && !isRequesting) {
                         focusManager.clearFocus(force = true)
-                        info.container.focusTraversalPolicy
-                            .getLastComponent(info.container)
-                            .requestFocus(FocusEvent.Cause.TRAVERSAL_BACKWARD)
+
+                        val component = info.container.focusTraversalPolicy.getLastComponent(info.container)
+                        if (component != null) {
+                            component.requestFocus(FocusEvent.Cause.TRAVERSAL_BACKWARD)
+                        } else {
+                            moveBackward()
+                        }
                     }
                 }
                 .focusTarget()
