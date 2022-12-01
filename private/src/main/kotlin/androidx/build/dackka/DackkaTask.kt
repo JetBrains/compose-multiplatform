@@ -99,6 +99,15 @@ abstract class DackkaTask @Inject constructor(
     @Input
     lateinit var excludedPackagesForKotlin: Set<String>
 
+    @Input
+    lateinit var annotationsNotToDisplay: List<String>
+
+    @Input
+    lateinit var annotationsNotToDisplayJava: List<String>
+
+    @Input
+    lateinit var annotationsNotToDisplayKotlin: List<String>
+
     // Maps to the system variable LIBRARY_METADATA_FILE containing artifactID and other metadata
     @get:[InputFile PathSensitive(PathSensitivity.NONE)]
     abstract val libraryMetadataFile: RegularFileProperty
@@ -176,7 +185,10 @@ abstract class DackkaTask @Inject constructor(
 
     // Documentation for Dackka command line usage and arguments can be found at
     // https://kotlin.github.io/dokka/1.6.0/user_guide/cli/usage/
+    // Documentation for the DevsitePlugin arguments can be found at
+    // https://cs.android.com/androidx/platform/tools/dokka-devsite-plugin/+/master:src/main/java/com/google/devsite/DevsiteConfiguration.kt
     private fun computeArguments(): File {
+        val gson = DokkaUtils.createGson()
         val linksConfiguration = ""
         val jsonMap = mapOf(
             "moduleName" to "",
@@ -184,9 +196,31 @@ abstract class DackkaTask @Inject constructor(
             "globalLinks" to linksConfiguration,
             "sourceSets" to sourceSets(),
             "offlineMode" to "true",
-            "noJdkLink" to "true"
+            "noJdkLink" to "true",
+            "pluginsConfiguration" to listOf(
+                mapOf(
+                    "fqPluginName" to "com.google.devsite.DevsitePlugin",
+                    "serializationFormat" to "JSON",
+                    // values is a JSON string
+                    "values" to gson.toJson(
+                        mapOf(
+                            "projectPath" to "androidx",
+                            "javaDocsPath" to "",
+                            "kotlinDocsPath" to "kotlin",
+                            "excludedPackages" to excludedPackages,
+                            "excludedPackagesForJava" to excludedPackagesForJava,
+                            "excludedPackagesForKotlin" to excludedPackagesForKotlin,
+                            "libraryMetadataFilename" to libraryMetadataFile.get().toString(),
+                            "baseSourceLink" to baseSourceLink,
+                            "annotationsNotToDisplay" to annotationsNotToDisplay,
+                            "annotationsNotToDisplayJava" to annotationsNotToDisplayJava,
+                            "annotationsNotToDisplayKotlin" to annotationsNotToDisplayKotlin,
+                        )
+                    )
+                )
             )
-        val gson = DokkaUtils.createGson()
+        )
+
         val json = gson.toJson(jsonMap)
         val outputFile = File.createTempFile("dackkaArgs", ".json")
         outputFile.deleteOnExit()

@@ -469,6 +469,9 @@ abstract class AndroidXDocsImplPlugin : Plugin<Project> {
                 // See go/dackka-source-link for details on this link.
                 baseSourceLink = "https://cs.android.com/search?" +
                     "q=file:%s+class:%s&ss=androidx/platform/frameworks/support"
+                annotationsNotToDisplay = hiddenAnnotations
+                annotationsNotToDisplayJava = hiddenAnnotationsJava
+                annotationsNotToDisplayKotlin = hiddenAnnotationsKotlin
                 task.doFirst {
                     taskStartTime = LocalDateTime.now()
                 }
@@ -612,6 +615,36 @@ private val hiddenPackagesJava = setOf(
     "androidx.*compose.*",
     "androidx.*glance.*",
 )
+
+// List of annotations which should not be displayed in the docs
+private val hiddenAnnotations: List<String> = listOf(
+    // This information is compose runtime implementation details; not useful for most, those who
+    // would want it should look at source
+    "androidx.compose.runtime.Stable",
+    "androidx.compose.runtime.Immutable",
+    "androidx.compose.runtime.ReadOnlyComposable",
+    // This opt-in requirement is non-propagating so developers don't need to know about it
+    // https://kotlinlang.org/docs/opt-in-requirements.html#non-propagating-opt-in
+    "androidx.annotation.OptIn",
+    "kotlin.OptIn",
+    // This annotation is used mostly in paging, and was removed at the request of the paging team
+    "androidx.annotation.CheckResult",
+    // This annotation is generated upstream. Dokka uses it for signature serialization. It doesn't
+    // seem useful for developers
+    "kotlin.ParameterName",
+    // This annotations is not useful for developers but right now is @ShowAnnotation?
+    "kotlin.js.JsName",
+    // This annotation is intended to target the compiler and is general not useful for devs.
+    "java.lang.Override"
+)
+
+// Annotations which should not be displayed in the Kotlin docs, in addition to hiddenAnnotations
+private val hiddenAnnotationsKotlin: List<String> = listOf(
+    "kotlin.ExtensionFunctionType"
+)
+
+// Annotations which should not be displayed in the Java docs, in addition to hiddenAnnotations
+private val hiddenAnnotationsJava: List<String> = emptyList()
 
 /**
  * Data class that matches JSON structure of kotlin source set metadata
