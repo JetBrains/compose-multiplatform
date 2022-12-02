@@ -39,9 +39,6 @@ open class AndroidXExtension(val project: Project) {
 
     var mavenGroup: LibraryGroup? = null
         set(value) {
-            val expectedValue = getNewLibraryGroup()
-            validateLibraryGroup(value, expectedValue)
-
             field = value
             chooseProjectVersion()
         }
@@ -67,6 +64,9 @@ open class AndroidXExtension(val project: Project) {
         LibraryVersions = service.libraryVersions
         libraryGroupsByGroupId = service.libraryGroupsByGroupId
         overrideLibraryGroupsByProjectPath = service.overrideLibraryGroupsByProjectPath
+        project.afterEvaluate {
+            validateLibraryGroup()
+        }
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
@@ -78,10 +78,13 @@ open class AndroidXExtension(val project: Project) {
         }
 
     // a temporary method while we migrate from LibraryGroups.${key} to libraryGroup.get()
-    private fun validateLibraryGroup(oldGroup: LibraryGroup?, newGroup: LibraryGroup?) {
-        check(newGroup == oldGroup) {
-            "Error in $project: oldGroup = ${oldGroup?.group} but newGroup = ${newGroup?.group}"
-        }
+    private fun validateLibraryGroup() {
+            val oldGroup = mavenGroup
+            val newGroup = getNewLibraryGroup()
+            check(newGroup == oldGroup) {
+                "Error in ${project.projectDir}/build.gradle: oldGroup = ${oldGroup?.group} " +
+                    "but newGroup = ${newGroup?.group}"
+            }
     }
 
     private fun getNewLibraryGroup(): LibraryGroup? {

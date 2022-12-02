@@ -545,7 +545,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             val mavenGroup = extension.mavenGroup
             val isProbablyPublished = extension.type == LibraryType.PUBLISHED_LIBRARY ||
                 extension.type == LibraryType.UNSET
-            if (mavenGroup != null && isProbablyPublished) {
+            if (mavenGroup != null && isProbablyPublished && extension.shouldPublish()) {
                 validateProjectStructure(mavenGroup.group)
             }
         }
