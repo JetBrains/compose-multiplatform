@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
@@ -33,6 +34,7 @@ import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -48,6 +50,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -2119,6 +2122,54 @@ class SubcomposeLayoutTest {
                 current = current.parentCoordinates
             }
         }
+    }
+
+    @Test
+    fun subcomposeLayoutInsideMovableContent_compositionIsNotDisposed() {
+        var disposeCount = 0
+
+        val content = movableContentOf {
+            SubcomposeLayout(
+                state = remember { SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)) }
+            ) { constraints ->
+                val placeable = subcompose(0) {
+                    Box(Modifier.testTag("0"))
+
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            disposeCount++
+                        }
+                    }
+                }.single().measure(constraints)
+
+                layout(placeable.width, placeable.height) {
+                    placeable.place(IntOffset.Zero)
+                }
+            }
+        }
+
+        var wrappedWithColumn by mutableStateOf(false)
+
+        rule.setContent {
+            if (wrappedWithColumn) {
+                Column {
+                    content()
+                }
+            } else {
+                content()
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertExists()
+
+        rule.runOnIdle {
+            wrappedWithColumn = true
+        }
+
+        rule.onNodeWithTag("0")
+            .assertExists()
+        assertThat(disposeCount).isEqualTo(0)
     }
 
     @Test
