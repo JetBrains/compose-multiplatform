@@ -24,6 +24,10 @@ internal fun <T> AssertThat<T>.isEqualTo(a: Any?) {
     assertEquals(a, t)
 }
 
+internal fun AssertThat<Boolean>.isTrue() = t
+
+internal fun AssertThat<Boolean>.isFalse() = !t
+
 internal fun <T> assertThat(t: T): AssertThat<T> {
     return AssertThat(t)
 }
