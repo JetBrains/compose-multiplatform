@@ -71,14 +71,14 @@ internal class PagerScrollingTest(
     }
 
     @Test
-    fun swipeAllTheWay_verifyPagesAreLayedOutCorrectly() {
+    fun swipeForwardAndBackward_verifyPagesAreLaidOutCorrectly() {
         // Arrange
         val state = PagerState()
         createPager(state = state, modifier = Modifier.fillMaxSize())
         val delta = pagerSize * 0.4f * scrollForwardSign
 
         // Act and Assert - forward
-        repeat(DefaultPageCount) {
+        repeat(DefaultAnimationRepetition) {
             rule.onNodeWithTag(it.toString()).assertIsDisplayed()
             confirmPageIsInCorrectPosition(it)
             rule.onNodeWithTag(it.toString()).performTouchInput {
@@ -91,8 +91,8 @@ internal class PagerScrollingTest(
         }
 
         // Act - backward
-        repeat(DefaultPageCount) {
-            val countDown = DefaultPageCount - 1 - it
+        repeat(DefaultAnimationRepetition) {
+            val countDown = DefaultAnimationRepetition - it
             rule.onNodeWithTag(countDown.toString()).assertIsDisplayed()
             confirmPageIsInCorrectPosition(countDown)
             rule.onNodeWithTag(countDown.toString()).performTouchInput {
@@ -202,32 +202,6 @@ internal class PagerScrollingTest(
         // Assert
         assertThat(state.currentPage).isAtLeast(5)
         rule.onNodeWithTag("${state.currentPage}").assertIsDisplayed()
-        confirmPageIsInCorrectPosition(state.currentPage)
-    }
-
-    @Test
-    fun offscreenPageLimitIsUsed_shouldPlaceMoreItemsThanVisibleOnesAsWeScroll() {
-        // Arrange
-        val state = PagerState()
-        createPager(state = state, modifier = Modifier.fillMaxSize(), offscreenPageLimit = 1)
-        val delta = pagerSize * 1.4f * scrollForwardSign
-
-        repeat(DefaultPageCount) {
-            // Act
-            onPager().performTouchInput {
-                swipeWithVelocityAcrossMainAxis(0f, delta)
-            }
-
-            rule.waitForIdle()
-            // Next page was placed
-            rule.runOnIdle {
-                assertThat(placed).contains(
-                    (state.currentPage + 1)
-                        .coerceAtMost(DefaultPageCount - 1)
-                )
-            }
-        }
-        rule.waitForIdle()
         confirmPageIsInCorrectPosition(state.currentPage)
     }
 

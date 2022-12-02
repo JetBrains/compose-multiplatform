@@ -18,6 +18,7 @@ package androidx.compose.foundation.pager
 
 import android.view.View
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalOverscrollConfiguration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.Orientation
@@ -130,7 +131,10 @@ internal open class BasePagerTest(private val config: ParamConfig) {
                     state = state,
                     pagerSnapDistance = snappingPage
                 )
-            CompositionLocalProvider(LocalLayoutDirection provides config.layoutDirection) {
+            CompositionLocalProvider(
+                LocalLayoutDirection provides config.layoutDirection,
+                LocalOverscrollConfiguration provides null
+            ) {
                 scope = rememberCoroutineScope()
                 Box(
                     modifier = Modifier
@@ -342,6 +346,7 @@ internal class ParamConfig(
 
 internal const val PagerTestTag = "pager"
 internal const val DefaultPageCount = 20
+internal const val DefaultAnimationRepetition = 3
 internal val TestOrientation = listOf(Orientation.Vertical, Orientation.Horizontal)
 internal val TestReverseLayout = listOf(false, true)
 internal val TestLayoutDirection = listOf(LayoutDirection.Rtl, LayoutDirection.Ltr)
