@@ -42,6 +42,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertNotEquals
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,6 +56,7 @@ class DialogWithInsetsTest {
     /**
      * Make sure that insets are available in the Dialog.
      */
+    @Ignore // b/261191574
     @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun dialogSupportsWindowInsets() {
