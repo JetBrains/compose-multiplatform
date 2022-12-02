@@ -104,4 +104,8 @@ task run {
     dependsOn("run1")
 }
 
+androidx {
+    mavenGroup = LibraryGroups.COMPOSE_DESKTOP
+}
+
 BuildOnServerKt.addToBuildOnServer(project, "${project.path}:jvmJar")
