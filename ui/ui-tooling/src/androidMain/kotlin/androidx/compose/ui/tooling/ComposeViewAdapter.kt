@@ -642,7 +642,8 @@ internal class ComposeViewAdapter : FrameLayout {
         override val savedStateRegistry: SavedStateRegistry
             get() = controller.savedStateRegistry
 
-        override fun getLifecycle(): Lifecycle = lifecycleRegistry
+        override val lifecycle: LifecycleRegistry
+            get() = lifecycleRegistry
     }
 
     private val FakeViewModelStoreOwner = object : ViewModelStoreOwner {
@@ -654,7 +655,8 @@ internal class ComposeViewAdapter : FrameLayout {
     private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {
         override val onBackPressedDispatcher = OnBackPressedDispatcher()
 
-        override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycleRegistry
+        override val lifecycle: LifecycleRegistry
+            get() = FakeSavedStateRegistryOwner.lifecycleRegistry
     }
 
     private val FakeActivityResultRegistryOwner = object : ActivityResultRegistryOwner {
