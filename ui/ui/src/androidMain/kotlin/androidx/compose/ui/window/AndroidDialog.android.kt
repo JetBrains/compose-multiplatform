@@ -58,7 +58,8 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
@@ -352,7 +353,7 @@ private class DialogWrapper(
         // Turn of all clipping so shadows can be drawn outside the window
         (window.decorView as? ViewGroup)?.disableClipping()
         setContentView(dialogLayout)
-        ViewTreeLifecycleOwner.set(dialogLayout, ViewTreeLifecycleOwner.get(composeView))
+        dialogLayout.setViewTreeLifecycleOwner(composeView.findViewTreeLifecycleOwner())
         ViewTreeViewModelStoreOwner.set(dialogLayout, ViewTreeViewModelStoreOwner.get(composeView))
         dialogLayout.setViewTreeSavedStateRegistryOwner(
             composeView.findViewTreeSavedStateRegistryOwner()

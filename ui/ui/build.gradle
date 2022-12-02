@@ -77,7 +77,7 @@ dependencies {
         implementation("androidx.customview:customview-poolingcontainer:1.0.0")
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
-        implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
+        implementation(project(":lifecycle:lifecycle-runtime"))
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
         implementation("androidx.profileinstaller:profileinstaller:1.2.1")
         implementation("androidx.emoji2:emoji2:1.2.0")
@@ -174,7 +174,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.customview:customview-poolingcontainer:1.0.0")
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
+                implementation(project(":lifecycle:lifecycle-runtime"))
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
                 implementation("androidx.emoji2:emoji2:1.2.0")
             }

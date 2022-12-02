@@ -78,7 +78,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
@@ -480,7 +480,7 @@ class AndroidViewTest {
                         object : FrameLayout(it) {
                             override fun onAttachedToWindow() {
                                 super.onAttachedToWindow()
-                                childViewTreeLifecycleOwner = ViewTreeLifecycleOwner.get(this)
+                                childViewTreeLifecycleOwner = findViewTreeLifecycleOwner()
                             }
                         }
                     }

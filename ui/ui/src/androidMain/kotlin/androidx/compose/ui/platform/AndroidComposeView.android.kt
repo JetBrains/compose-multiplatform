@@ -155,7 +155,7 @@ import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import java.lang.reflect.Method
@@ -1150,7 +1150,7 @@ internal class AndroidComposeView(context: Context) :
             }
         }
 
-        val lifecycleOwner = ViewTreeLifecycleOwner.get(this)
+        val lifecycleOwner = findViewTreeLifecycleOwner()
         val savedStateRegistryOwner = findViewTreeSavedStateRegistryOwner()
 
         val oldViewTreeOwners = viewTreeOwners

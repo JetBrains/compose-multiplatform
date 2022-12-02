@@ -26,7 +26,7 @@ import androidx.customview.poolingcontainer.removePoolingContainerListener
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 
 /**
  * A strategy for managing the underlying Composition of Compose UI [View]s such as
@@ -142,15 +142,16 @@ interface ViewCompositionStrategy {
     }
 
     /**
-     * [ViewCompositionStrategy] that disposes the composition when the [ViewTreeLifecycleOwner]
-     * of the next window the view is attached to is [destroyed][Lifecycle.Event.ON_DESTROY].
+     * [ViewCompositionStrategy] that disposes the composition when the
+     * [LifecycleOwner] returned by [findViewTreeLifecycleOwner] of the next window
+     * the view is attached to is [destroyed][Lifecycle.Event.ON_DESTROY].
      * This strategy is appropriate for Compose UI views that share a 1-1 relationship with
-     * their closest [ViewTreeLifecycleOwner], such as a Fragment view.
+     * their closest [LifecycleOwner], such as a Fragment view.
      */
     object DisposeOnViewTreeLifecycleDestroyed : ViewCompositionStrategy {
         override fun installFor(view: AbstractComposeView): () -> Unit {
             if (view.isAttachedToWindow) {
-                val lco = checkNotNull(ViewTreeLifecycleOwner.get(view)) {
+                val lco = checkNotNull(view.findViewTreeLifecycleOwner()) {
                     "View tree for $view has no ViewTreeLifecycleOwner"
                 }
                 return installForLifecycle(view, lco.lifecycle)
@@ -159,7 +160,7 @@ interface ViewCompositionStrategy {
                 var disposer: () -> Unit
                 val listener = object : View.OnAttachStateChangeListener {
                     override fun onViewAttachedToWindow(v: View) {
-                        val lco = checkNotNull(ViewTreeLifecycleOwner.get(view)) {
+                        val lco = checkNotNull(view.findViewTreeLifecycleOwner()) {
                             "View tree for $view has no ViewTreeLifecycleOwner"
                         }
                         disposer = installForLifecycle(view, lco.lifecycle)

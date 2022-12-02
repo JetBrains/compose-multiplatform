@@ -62,7 +62,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
@@ -294,7 +294,7 @@ internal class ComposeViewAdapter : FrameLayout {
     }
 
     override fun onAttachedToWindow() {
-        ViewTreeLifecycleOwner.set(composeView.rootView, FakeSavedStateRegistryOwner)
+        composeView.rootView.setViewTreeLifecycleOwner(FakeSavedStateRegistryOwner)
         super.onAttachedToWindow()
     }
 
@@ -560,7 +560,7 @@ internal class ComposeViewAdapter : FrameLayout {
 
     private fun init(attrs: AttributeSet) {
         // ComposeView and lifecycle initialization
-        ViewTreeLifecycleOwner.set(this, FakeSavedStateRegistryOwner)
+        setViewTreeLifecycleOwner(FakeSavedStateRegistryOwner)
         setViewTreeSavedStateRegistryOwner(FakeSavedStateRegistryOwner)
         ViewTreeViewModelStoreOwner.set(this, FakeViewModelStoreOwner)
         addView(composeView)
