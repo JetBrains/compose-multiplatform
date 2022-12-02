@@ -15,12 +15,6 @@ abstract class GradlePluginTestBase {
     val defaultTestEnvironment: TestEnvironment
         get() = TestEnvironment(workingDir = testWorkDir)
 
-    val defaultAndroidxCompilerEnvironment: TestEnvironment
-        get() = defaultTestEnvironment.copy(
-            kotlinVersion = TestKotlinVersions.AndroidxCompatible,
-            composeCompilerArtifact = "androidx.compose.compiler:compiler:${TestProperties.androidxCompilerVersion}"
-        )
-
     fun testProject(
         name: String,
         testEnvironment: TestEnvironment = defaultTestEnvironment

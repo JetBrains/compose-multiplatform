@@ -60,9 +60,45 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
     }
 
+    /**
+     * Test the version of Compose Compiler published by Google.
+     * See https://developer.android.com/jetpack/androidx/releases/compose-kotlin
+     */
     @Test
-    fun testAndroidxCompiler() = with(testProject(TestProjects.androidxCompiler, defaultAndroidxCompilerEnvironment)) {
-        gradle(":runDistributable").build().checks { check ->
+    fun testAndroidxCompiler() = testProject(
+        TestProjects.customCompiler, defaultTestEnvironment.copy(
+            kotlinVersion = "1.6.10",
+            composeCompilerPlugin = "\"androidx.compose.compiler:compiler:1.1.1\""
+        )
+    ).checkCustomComposeCompiler()
+
+    @Test
+    fun testSettingLatestCompiler() = testProject(
+        TestProjects.customCompiler, defaultTestEnvironment.copy(
+            kotlinVersion = "1.7.20",
+            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.7.20\")",
+        )
+    ).checkCustomComposeCompiler()
+
+    @Test
+    fun testSettingAutoCompiler() = testProject(
+        TestProjects.customCompiler, defaultTestEnvironment.copy(
+            kotlinVersion = "1.7.10",
+            composeCompilerPlugin = "dependencies.compiler.auto",
+        )
+    ).checkCustomComposeCompiler()
+
+    @Test
+    fun testKotlinCheckDisabled() = testProject(
+        TestProjects.customCompilerArgs, defaultTestEnvironment.copy(
+            kotlinVersion = "1.7.21",
+            composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.7.20\")",
+            composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.7.21\""
+        )
+    ).checkCustomComposeCompiler()
+
+    private fun TestProject.checkCustomComposeCompiler() {
+        gradle(":runDistributable").build().checks {
             val actualMainImage = file("main-image.actual.png")
             val expectedMainImage = file("main-image.expected.png")
             assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
