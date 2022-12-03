@@ -64,6 +64,7 @@ class DemoTest {
     @get:Rule
     val rule = createAndroidComposeRule<DemoActivity>()
 
+    @Ignore // b/223396893
     @Test
     fun testFiltering() {
         assertIsOnRootScreen()
