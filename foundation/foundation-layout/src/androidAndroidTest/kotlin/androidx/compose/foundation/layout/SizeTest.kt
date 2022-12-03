@@ -53,10 +53,10 @@ import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertNotEquals
 import java.util.concurrent.CountDownLatch
@@ -1836,7 +1836,7 @@ class SizeTest : LayoutTest() {
     }
 
     @Test
-    @FlakyTest(bugId = 183713100)
+    @Ignore // b/183713100
     fun testModifiers_doNotCauseUnnecessaryRemeasure() {
         var first by mutableStateOf(true)
         var totalMeasures = 0
