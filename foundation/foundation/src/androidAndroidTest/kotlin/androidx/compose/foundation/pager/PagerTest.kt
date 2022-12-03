@@ -23,8 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
@@ -107,94 +105,6 @@ internal class PagerTest(val config: ParamConfig) : BasePagerTest(config) {
     }
 
     @Test
-    fun pageSizeFill_onlySnappedItemIsDisplayed() {
-        // Arrange
-        val state = PagerState(5)
-
-        // Act
-        createPager(state = state, modifier = Modifier.fillMaxSize())
-
-        // Assert
-        rule.onNodeWithTag("4").assertDoesNotExist()
-        rule.onNodeWithTag("5").assertIsDisplayed()
-        rule.onNodeWithTag("6").assertDoesNotExist()
-        confirmPageIsInCorrectPosition(5)
-    }
-
-    @Test
-    fun pagerSizeCustom_visibleItemsAreWithinViewport() {
-        // Arrange
-        val state = PagerState(5)
-        val pagerMode = object : PageSize {
-            override fun Density.calculateMainAxisPageSize(
-                availableSpace: Int,
-                pageSpacing: Int
-            ): Int {
-                return 100.dp.roundToPx() + pageSpacing
-            }
-        }
-
-        // Act
-        createPager(
-            state = state,
-            modifier = Modifier.crossAxisSize(200.dp),
-            offscreenPageLimit = 0,
-            pageSize = pagerMode
-        )
-
-        // Assert
-        rule.runOnIdle {
-            val visibleItems = state.layoutInfo.visibleItemsInfo.size
-            val pageCount = with(rule.density) {
-                (pagerSize / (pageSize + config.pageSpacing.roundToPx()))
-            } + 1
-            assertThat(visibleItems).isEqualTo(pageCount)
-        }
-
-        for (pageIndex in 5 until state.layoutInfo.visibleItemsInfo.size + 4) {
-            confirmPageIsInCorrectPosition(5, pageIndex)
-        }
-    }
-
-    @Test
-    fun offscreenPageLimitIsUsed_shouldPlaceMoreItemsThanVisibleOnes() {
-        // Arrange
-        val initialIndex = 5
-        val state = PagerState(initialIndex)
-
-        // Act
-        createPager(state = state, modifier = Modifier.fillMaxSize(), offscreenPageLimit = 2)
-
-        // Assert
-        rule.runOnIdle {
-            assertThat(placed).contains(initialIndex - 2)
-            assertThat(placed).contains(initialIndex - 1)
-            assertThat(placed).contains(initialIndex + 1)
-            assertThat(placed).contains(initialIndex + 2)
-        }
-        confirmPageIsInCorrectPosition(initialIndex, initialIndex - 2)
-        confirmPageIsInCorrectPosition(initialIndex, initialIndex - 1)
-        confirmPageIsInCorrectPosition(initialIndex, initialIndex + 1)
-        confirmPageIsInCorrectPosition(initialIndex, initialIndex + 2)
-    }
-
-    @Test
-    fun offscreenPageLimitIsNotUsed_shouldNotPlaceMoreItemsThanVisibleOnes() {
-        // Arrange
-        val state = PagerState(5)
-
-        // Act
-        createPager(state = state, modifier = Modifier.fillMaxSize(), offscreenPageLimit = 0)
-
-        // Assert
-        rule.waitForIdle()
-        assertThat(placed).doesNotContain(4)
-        assertThat(placed).contains(5)
-        assertThat(placed).doesNotContain(6)
-        confirmPageIsInCorrectPosition(5)
-    }
-
-    @Test
     fun pageCount_pagerOnlyContainsGivenPageCountItems() {
         // Arrange
         val state = PagerState()
@@ -253,14 +163,7 @@ internal class PagerTest(val config: ParamConfig) : BasePagerTest(config) {
         @Parameterized.Parameters(name = "{0}")
         fun params() = mutableListOf<ParamConfig>().apply {
             for (orientation in TestOrientation) {
-                for (pageSpacing in TestPageSpacing) {
-                    add(
-                        ParamConfig(
-                            orientation = orientation,
-                            pageSpacing = pageSpacing
-                        )
-                    )
-                }
+                add(ParamConfig(orientation = orientation))
             }
         }
     }
