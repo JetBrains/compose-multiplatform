@@ -481,6 +481,12 @@ package androidx.compose.material {
     method @androidx.compose.runtime.Composable public static void Icon(androidx.compose.ui.graphics.painter.Painter painter, String? contentDescription, optional androidx.compose.ui.Modifier modifier, optional long tint);
   }
 
+  public final class InteractiveComponentSizeKt {
+    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumInteractiveComponentEnforcement();
+    method public static androidx.compose.ui.Modifier minimumInteractiveComponentSize(androidx.compose.ui.Modifier);
+    property @androidx.compose.material.ExperimentalMaterialApi public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumInteractiveComponentEnforcement;
+  }
+
   public final class ListItemKt {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static void ListItem(optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? secondaryText, optional boolean singleLineSecondaryText, optional kotlin.jvm.functions.Function0<kotlin.Unit>? overlineText, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailing, kotlin.jvm.functions.Function0<kotlin.Unit> text);
   }
@@ -902,11 +908,6 @@ package androidx.compose.material {
 
   @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Stable public interface ThresholdConfig {
     method public float computeThreshold(androidx.compose.ui.unit.Density, float fromValue, float toValue);
-  }
-
-  public final class TouchTargetKt {
-    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumTouchTargetEnforcement();
-    property @androidx.compose.material.ExperimentalMaterialApi public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumTouchTargetEnforcement;
   }
 
   @androidx.compose.runtime.Immutable public final class Typography {

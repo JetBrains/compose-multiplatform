@@ -81,7 +81,7 @@ fun IconButton(
 ) {
     Box(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .size(IconButtonTokens.StateLayerSize)
             .clip(IconButtonTokens.StateLayerShape.toShape())
             .background(color = colors.containerColor(enabled).value)
@@ -142,7 +142,7 @@ fun IconToggleButton(
 ) {
     Box(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .size(IconButtonTokens.StateLayerSize)
             .clip(IconButtonTokens.StateLayerShape.toShape())
             .background(color = colors.containerColor(enabled, checked).value)

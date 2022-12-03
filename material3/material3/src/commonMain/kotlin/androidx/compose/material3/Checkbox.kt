@@ -165,7 +165,7 @@ fun TriStateCheckbox(
         modifier = modifier
             .then(
                 if (onClick != null) {
-                    Modifier.minimumTouchTargetSize()
+                    Modifier.minimumInteractiveComponentSize()
                 } else {
                     Modifier
                 }

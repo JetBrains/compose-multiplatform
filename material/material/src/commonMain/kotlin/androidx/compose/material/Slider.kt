@@ -161,7 +161,7 @@ fun Slider(
     }
     BoxWithConstraints(
         modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
             .sliderSemantics(
                 value,
@@ -309,7 +309,7 @@ fun RangeSlider(
 
     BoxWithConstraints(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .requiredSizeIn(minWidth = ThumbRadius * 4, minHeight = ThumbRadius * 2)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl

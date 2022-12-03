@@ -490,6 +490,12 @@ package androidx.compose.material3 {
     field public static final androidx.compose.material3.InputChipDefaults INSTANCE;
   }
 
+  public final class InteractiveComponentSizeKt {
+    method @androidx.compose.material3.ExperimentalMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumInteractiveComponentEnforcement();
+    method public static androidx.compose.ui.Modifier minimumInteractiveComponentSize(androidx.compose.ui.Modifier);
+    property @androidx.compose.material3.ExperimentalMaterial3Api public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumInteractiveComponentEnforcement;
+  }
+
   @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Immutable public final class ListItemColors {
   }
 
@@ -972,11 +978,6 @@ package androidx.compose.material3 {
   public static final class TopAppBarState.Companion {
     method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TopAppBarState,?> getSaver();
     property public final androidx.compose.runtime.saveable.Saver<androidx.compose.material3.TopAppBarState,?> Saver;
-  }
-
-  public final class TouchTargetKt {
-    method @androidx.compose.material3.ExperimentalMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumTouchTargetEnforcement();
-    property @androidx.compose.material3.ExperimentalMaterial3Api public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumTouchTargetEnforcement;
   }
 
   @androidx.compose.runtime.Immutable public final class Typography {
