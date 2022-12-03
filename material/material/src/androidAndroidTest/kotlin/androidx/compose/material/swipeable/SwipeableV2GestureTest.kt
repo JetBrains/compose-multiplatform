@@ -17,6 +17,8 @@
 package androidx.compose.material.swipeable
 
 import androidx.compose.animation.core.AnimationSpec
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.material.AutoTestFrameClock
 import androidx.compose.material.ExperimentalMaterialApi
@@ -27,6 +29,8 @@ import androidx.compose.material.fractionalPositionalThreshold
 import androidx.compose.material.swipeable.TestState.A
 import androidx.compose.material.swipeable.TestState.B
 import androidx.compose.material.swipeable.TestState.C
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.testutils.WithTouchSlop
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,6 +48,8 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.abs
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Rule
 import org.junit.Test
@@ -379,6 +385,54 @@ class SwipeableV2GestureTest {
         // This means that once we swipe back by the amount of overdrag, we should end up at the
         // max bound - overdrag.
         assertThat(state.requireOffset()).isEqualTo(maxBound - overdrag)
+    }
+
+    @Test
+    fun swipeable_animationCancelledByDrag_resetsTargetValueToClosest() {
+        rule.mainClock.autoAdvance = false
+        val animationDurationMillis = 500
+        val offsetAtB = animationDurationMillis / 2f
+        val offsetAtC = animationDurationMillis.toFloat()
+        val anchors = mapOf(
+            A to 0f,
+            B to offsetAtB,
+            C to offsetAtC
+        )
+        val state = SwipeableTestState(
+            initialState = A,
+            animationSpec = tween(animationDurationMillis, easing = LinearEasing),
+            positionalThreshold = fractionalPositionalThreshold(0.5f)
+        )
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            WithTouchSlop(touchSlop = 0f) {
+                scope = rememberCoroutineScope()
+                SwipeableBox(
+                    swipeableState = state,
+                    orientation = Orientation.Horizontal,
+                    calculateAnchor = { state, _ ->
+                        anchors[state]
+                    }
+                )
+            }
+        }
+
+        assertThat(state.currentValue).isEqualTo(A)
+        assertThat(state.targetValue).isEqualTo(A)
+
+        scope.launch { state.animateTo(C) }
+
+        rule.mainClock.advanceTimeUntil {
+            state.requireOffset() > abs(state.requireOffset() - offsetAtB)
+        } // Advance until our closest anchor is B
+        assertThat(state.targetValue).isEqualTo(C)
+
+        rule.onNodeWithTag(swipeableTestTag)
+            .performTouchInput {
+                down(Offset.Zero)
+            }
+
+        assertThat(state.targetValue).isEqualTo(B) // B is the closest now so we should target it
     }
 
     private fun SwipeableTestState(
