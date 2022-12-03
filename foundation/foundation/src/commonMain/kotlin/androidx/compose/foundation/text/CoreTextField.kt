@@ -527,6 +527,7 @@ internal fun CoreTextField(
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
         .then(focusModifier)
+        .interceptDPadAndMoveFocus(state, focusManager)
         .previewKeyEventToDeselectOnBack(state, manager)
         .then(textKeyInputModifier)
         .textFieldScrollable(scrollerPosition, interactionSource, enabled)
