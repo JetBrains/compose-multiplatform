@@ -146,19 +146,21 @@ import kotlinx.coroutines.delay
 fun main() = application {
     var isVisible by remember { mutableStateOf(true) }
 
-    Window(
-        onCloseRequest = { isVisible = false },
-        visible = isVisible,
-        title = "Counter",
-    ) {
-        var counter by remember { mutableStateOf(0) }
-        LaunchedEffect(Unit) {
-            while (true) {
-                counter++
-                delay(1000)
+    if (isVisible) {
+        Window(
+            onCloseRequest = { isVisible = false },
+            visible = isVisible,
+            title = "Counter",
+        ) {
+            var counter by remember { mutableStateOf(0) }
+            LaunchedEffect(Unit) {
+                while (true) {
+                    counter++
+                    delay(1000)
+                }
             }
+            Text(counter.toString())
         }
-        Text(counter.toString())
     }
 
     if (!isVisible) {
