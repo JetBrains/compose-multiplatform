@@ -1,20 +1,30 @@
+# TodoApp (lite version)
+
 A simplified version of the [TodoApp example](https://github.com/JetBrains/compose-jb/tree/master/examples/todoapp), fully based on Jetpack Compose and without using any third-party libraries.
 
-Supported targets: Android and Desktop.
+Supported targets: Android, Desktop and iOS.
 
-### Running desktop application
- * To run, launch command: `./gradlew :desktop:run`
- * Or choose **desktop** configuration in IDE and run it.  
-  ![desktop-run-configuration.png](screenshots/desktop-run-configuration.png)
+## How to run
 
-### Building native desktop distribution
+Choose a run configuration for an appropriate target in IDE and run it.
+
+![run-configurations.png](run-configurations.png)
+
+To run on iOS device, please correct `iosApp/Configuration/TeamId.xcconfig` with your Apple Team ID.
+Alternatively, you may setup signing within XCode opening `iosApp/TodoAppLite.xcworkspace` and then
+using "Signing & Capabilities" tab of `TodoAppLite` target.
+
+Then choose **iosApp** configuration in IDE and run it
+(may also be referred as `TodoAppLite` in the Run Configurations or `iosApp_` for Android studio).
+
+
+## Run on desktop via Gradle
+
+`./gradlew desktopApp:run`
+
+## Building native desktop distribution
 ```
-./gradlew :desktop:packageDistributionForCurrentOS
-# outputs are written to desktop/build/compose/binaries
+./gradlew :desktopApp:packageDistributionForCurrentOS
+# outputs are written to desktopApp/build/compose/binaries
 ```
-
-### Running Android application
-
-Open project in IntelliJ IDEA or Android Studio and run "android" configuration.
-
 ![Desktop](screenshots/todoapplite.png)
