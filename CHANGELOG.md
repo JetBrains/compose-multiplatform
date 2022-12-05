@@ -1,4 +1,4 @@
-# 1.2.2 (November 2022)
+# 1.2.2 (December 2022)
 
 ## Desktop
 
