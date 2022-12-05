@@ -508,6 +508,45 @@ class OutlinedTextFieldTest {
     }
 
     @Test
+    fun testOutlinedTextField_labelPosition_whenUnfocused_isNotCovered() {
+        // Regression test for b/251162419
+        val labelPosition = Ref<Offset>()
+        val labelSize = Ref<IntSize>()
+        val placeholderPosition = Ref<Offset>()
+        val placeholderSize = Ref<IntSize>()
+
+        rule.setMaterialContent {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                label = {
+                    Text(
+                        text = "Label",
+                        modifier = Modifier.onGloballyPositioned {
+                            labelPosition.value = it.positionInRoot()
+                            labelSize.value = it.size
+                        }
+                    )
+                },
+                placeholder = {
+                    Text(
+                        text = "Placeholder",
+                        modifier = Modifier.onGloballyPositioned {
+                            placeholderPosition.value = it.positionInRoot()
+                            placeholderSize.value = it.size
+                        }
+                    )
+                },
+            )
+        }
+
+        assertThat(labelSize.value!!.height).isAtMost(placeholderSize.value!!.height)
+        assertThat(labelSize.value!!.width).isAtMost(placeholderSize.value!!.width)
+
+        assertThat(labelPosition.value!!.y).isLessThan(placeholderPosition.value!!.y)
+    }
+
+    @Test
     fun testOutlinedTextField_placeholderPosition_withLabel() {
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
