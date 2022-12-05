@@ -286,7 +286,8 @@ internal fun CoreTextField(
                 textInputService,
                 state,
                 value,
-                imeOptions
+                imeOptions,
+                offsetMapping
             )
 
             // The focusable modifier itself will request the entire focusable be brought into view
@@ -391,6 +392,19 @@ internal fun CoreTextField(
             } else if (state.handleState == HandleState.Cursor) {
                 state.showCursorHandle =
                     manager.isSelectionHandleInVisibleBound(isStartHandle = true)
+            }
+            state.layoutResult?.let { layoutResult ->
+                state.inputSession?.let { inputSession ->
+                    TextFieldDelegate.notifyFocusedRect(
+                        value,
+                        state.textDelegate,
+                        layoutResult.value,
+                        it,
+                        inputSession,
+                        state.hasFocus,
+                        offsetMapping
+                    )
+                }
             }
         }
         state.layoutResult?.innerTextFieldCoordinates = it
@@ -882,11 +896,13 @@ private fun tapToFocus(
     }
 }
 
+@OptIn(InternalFoundationTextApi::class)
 private fun notifyTextInputServiceOnFocusChange(
     textInputService: TextInputService,
     state: TextFieldState,
     value: TextFieldValue,
-    imeOptions: ImeOptions
+    imeOptions: ImeOptions,
+    offsetMapping: OffsetMapping
 ) {
     if (state.hasFocus) {
         state.inputSession = TextFieldDelegate.onFocus(
@@ -896,7 +912,21 @@ private fun notifyTextInputServiceOnFocusChange(
             imeOptions,
             state.onValueChange,
             state.onImeActionPerformed
-        )
+        ).also { newSession ->
+            state.layoutCoordinates?.let { coords ->
+                state.layoutResult?.let { layoutResult ->
+                    TextFieldDelegate.notifyFocusedRect(
+                        value,
+                        state.textDelegate,
+                        layoutResult.value,
+                        coords,
+                        newSession,
+                        state.hasFocus,
+                        offsetMapping
+                    )
+                }
+            }
+        }
     } else {
         onBlur(state)
     }
