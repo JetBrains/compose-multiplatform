@@ -19,10 +19,12 @@ package androidx.compose.material
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -43,7 +45,9 @@ import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
@@ -54,6 +58,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -1081,5 +1086,107 @@ class ModalBottomSheetTest {
         size = 30.dp
         rule.waitForIdle()
         assertThat(state.requireOffset()).isWithin(0.5f).of(expectedExpandedAnchor)
+    }
+
+    @Test
+    fun modalBottomSheet_narrowScreen_sheetRespectsMaxWidth() {
+        val layoutTag = "msbl"
+        val sheetTag = "sheet"
+        val simulatedRootWidth = 600.dp
+        val simulatedRootHeight = 1080.dp
+        rule.setContent {
+            ModalBottomSheetLayout(
+                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
+                modifier = Modifier
+                    .testTag(layoutTag)
+                    .requiredSize(simulatedRootWidth, simulatedRootHeight),
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .testTag(sheetTag)
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.4f)
+                    )
+                },
+                content = { Box(Modifier.fillMaxSize()) }
+            )
+        }
+
+        rule.onNodeWithTag(layoutTag)
+            .assertWidthIsEqualTo(simulatedRootWidth)
+
+        val maxSheetWidth = 640.dp
+        val expectedSheetWidth = maxSheetWidth.coerceAtMost(simulatedRootWidth)
+        // Our sheet should be max 640 dp but fill the width if the container is less wide
+        val expectedSheetLeft = if (simulatedRootWidth <= expectedSheetWidth) {
+            0.dp
+        } else {
+            (simulatedRootWidth - expectedSheetWidth) / 2
+        }
+
+        // We are requiring a size on the layout that might be wider than the root width
+        // In that case, our "actual" left might be outside the rule's bounds
+        val simulatedLeft = with(rule.density) {
+            rule.onNodeWithTag(layoutTag).fetchSemanticsNode().positionInRoot.x.toDp()
+        }
+
+        val simulatedExpectedLeft = simulatedLeft + expectedSheetLeft
+
+        rule.onNodeWithTag(sheetTag)
+            .assertLeftPositionInRootIsEqualTo(
+                expectedLeft = simulatedExpectedLeft
+            )
+            .assertWidthIsEqualTo(expectedSheetWidth)
+    }
+
+    @Test
+    fun modalBottomSheet_wideScreen_sheetRespectsMaxWidthAndIsCentered() {
+        val layoutTag = "msbl"
+        val sheetTag = "sheet"
+        val simulatedRootWidth = 1920.dp
+        val simulatedRootHeight = 980.dp
+        rule.setContent {
+            ModalBottomSheetLayout(
+                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
+                modifier = Modifier
+                    .testTag(layoutTag)
+                    .requiredSize(simulatedRootWidth, simulatedRootHeight),
+                sheetContent = {
+                    Box(
+                        Modifier
+                            .testTag(sheetTag)
+                            .fillMaxWidth()
+                            .fillMaxHeight(0.4f)
+                    )
+                },
+                content = { Box(Modifier.fillMaxSize()) }
+            )
+        }
+
+        rule.onNodeWithTag(layoutTag)
+            .assertWidthIsEqualTo(simulatedRootWidth)
+
+        val maxSheetWidth = 640.dp
+        val expectedSheetWidth = maxSheetWidth.coerceAtMost(simulatedRootWidth)
+        // Our sheet should be max 640 dp but fill the width if the container is less wide
+        val expectedSheetLeft = if (simulatedRootWidth <= expectedSheetWidth) {
+            0.dp
+        } else {
+            (simulatedRootWidth - expectedSheetWidth) / 2
+        }
+
+        // We are requiring a size on the layout that might be wider than the root width
+        // In that case, our "actual" left might be outside the rule's bounds
+        val simulatedLeft = with(rule.density) {
+            rule.onNodeWithTag(layoutTag).fetchSemanticsNode().positionInRoot.x.toDp()
+        }
+
+        val simulatedExpectedLeft = simulatedLeft + expectedSheetLeft
+
+        rule.onNodeWithTag(sheetTag)
+            .assertLeftPositionInRootIsEqualTo(
+                expectedLeft = simulatedExpectedLeft
+            )
+            .assertWidthIsEqualTo(expectedSheetWidth)
     }
 }

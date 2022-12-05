@@ -27,8 +27,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.ModalBottomSheetState.Companion.Saver
 import androidx.compose.material.ModalBottomSheetValue.Expanded
 import androidx.compose.material.ModalBottomSheetValue.HalfExpanded
@@ -40,6 +40,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -476,7 +477,8 @@ fun ModalBottomSheetLayout(
 
         Surface(
             Modifier
-                .fillMaxWidth()
+                .align(Alignment.TopCenter) // We offset from the top so we'll center from there
+                .widthIn(max = MaxModalBottomSheetWidth)
                 .nestedScroll(
                     remember(sheetState.swipeableState, orientation) {
                         ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
@@ -688,3 +690,4 @@ private fun ModalBottomSheetAnchorChangeHandler(
 
 private val PositionalThreshold: Density.(Float) -> Float = { 56.dp.toPx() }
 private val VelocityThreshold = 125.dp
+private val MaxModalBottomSheetWidth = 640.dp
