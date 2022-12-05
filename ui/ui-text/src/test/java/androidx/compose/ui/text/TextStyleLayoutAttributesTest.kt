@@ -379,7 +379,8 @@ class TextStyleLayoutAttributesTest {
             getProperty("spanStyle"),
             getProperty("lineHeightStyle"),
             getProperty("hyphens"),
-            getProperty("lineBreak")
+            getProperty("lineBreak"),
+            getProperty("textMotion")
         )
 
         val textStyleProperties = TextStyle::class.memberProperties.map { Property(it) }

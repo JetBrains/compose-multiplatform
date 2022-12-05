@@ -66,6 +66,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
@@ -2013,6 +2014,40 @@ AndroidParagraphTest {
         val bitmapNoSpan = paragraph2.bitmap(textDecoration = TextDecoration.Underline)
 
         assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun textMotionStatic_setsCorrectFlagsOnTextPaint() {
+        val textMotion = TextMotion.Static
+        val text = "abc"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(textMotion = textMotion),
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraph.textPaint.flags and TextPaint.LINEAR_TEXT_FLAG).isEqualTo(0)
+        assertThat(paragraph.textPaint.flags and TextPaint.SUBPIXEL_TEXT_FLAG).isEqualTo(0)
+        assertThat(paragraph.textPaint.hinting).isEqualTo(TextPaint.HINTING_ON)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun textMotionAnimated_setsCorrectFlagsOnTextPaint() {
+        val textMotion = TextMotion.Animated
+        val text = "abc"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(textMotion = textMotion),
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraph.textPaint.flags and TextPaint.LINEAR_TEXT_FLAG)
+            .isEqualTo(TextPaint.LINEAR_TEXT_FLAG)
+        assertThat(paragraph.textPaint.flags and TextPaint.SUBPIXEL_TEXT_FLAG)
+            .isEqualTo(TextPaint.SUBPIXEL_TEXT_FLAG)
+        assertThat(paragraph.textPaint.hinting).isEqualTo(TextPaint.HINTING_OFF)
     }
 
     private fun simpleParagraph(

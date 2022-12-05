@@ -20,6 +20,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.runtime.State
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
@@ -34,6 +35,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intl.AndroidLocale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
+import androidx.compose.ui.text.platform.extensions.setTextMotion
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastAny
@@ -41,7 +43,7 @@ import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import java.util.Locale
 
-@OptIn(InternalPlatformTextApi::class)
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal class AndroidParagraphIntrinsics constructor(
     val text: String,
     val style: TextStyle,
@@ -95,6 +97,8 @@ internal class AndroidParagraphIntrinsics constructor(
                 resolvedTypefaces.add(holder)
                 holder.typeface
             }
+
+        textPaint.setTextMotion(style.textMotion)
 
         val notAppliedStyle = textPaint.applySpanStyle(
             style = style.toSpanStyle(),

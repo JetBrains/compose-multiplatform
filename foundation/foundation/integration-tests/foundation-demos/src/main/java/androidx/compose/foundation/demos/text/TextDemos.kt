@@ -64,6 +64,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Layout Reuse") { TextReuseLayoutDemo() },
                 ComposableDemo("Multi paragraph") { MultiParagraphDemo() },
                 ComposableDemo("Interactive text") { InteractiveTextDemo() },
+                ComposableDemo("Text Animation") { TextAnimationDemo() },
             )
         ),
         DemoCategory(
