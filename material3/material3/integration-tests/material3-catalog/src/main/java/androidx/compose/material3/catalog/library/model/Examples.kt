@@ -661,7 +661,7 @@ val RadioButtonsExamples = listOf(
 )
 
 private const val SlidersExampleDescription = "Sliders examples"
-private const val SlidersExampleSourceUrl = "$SampleSourceUrl/SliderSample.kt"
+private const val SlidersExampleSourceUrl = "$SampleSourceUrl/SliderSamples.kt"
 val SlidersExamples = listOf(
     Example(
         name = ::SliderSample.name,
@@ -741,7 +741,7 @@ val SnackbarsExamples = listOf(
 )
 
 private const val SwitchExampleDescription = "Switch examples"
-private const val SwitchExampleSourceUrl = "$SampleSourceUrl/Switch.kt"
+private const val SwitchExampleSourceUrl = "$SampleSourceUrl/SwitchSamples.kt"
 val SwitchExamples = listOf(
     Example(
         name = ::SwitchSample.name,
