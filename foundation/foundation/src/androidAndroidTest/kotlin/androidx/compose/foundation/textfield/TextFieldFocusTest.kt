@@ -510,8 +510,9 @@ class TextFieldFocusTest {
         count: Int = 1
     ) {
         repeat(count) {
-            val deviceId =
-                InputDevice.getDeviceIds().first { id -> InputDevice.getDevice(id).isVirtual.not() }
+            val deviceId = InputDevice.getDeviceIds().first { id ->
+                InputDevice.getDevice(id)?.isVirtual?.not() ?: false
+            }
             val keyEventDown = KeyEvent(
                 SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
                 KeyEvent.ACTION_DOWN, keyCode, 0, 0, deviceId, 0
