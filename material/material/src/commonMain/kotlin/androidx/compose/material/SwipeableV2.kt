@@ -239,12 +239,21 @@ internal class SwipeableV2State<T>(
     var lastVelocity: Float by mutableStateOf(0f)
         private set
 
-    private val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
-    private val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
+    /**
+     * The minimum offset this state can reach. This will be the smallest anchor, or
+     * [Float.NEGATIVE_INFINITY] if the anchors are not initialized yet.
+     */
+    val minOffset by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
+
+    /**
+     * The maximum offset this state can reach. This will be the biggest anchor, or
+     * [Float.POSITIVE_INFINITY] if the anchors are not initialized yet.
+     */
+    val maxOffset by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
 
     private var animationTarget: T? by mutableStateOf(null)
     internal val draggableState = DraggableState {
-        offset = ((offset ?: 0f) + it).coerceIn(minBound, maxBound)
+        offset = ((offset ?: 0f) + it).coerceIn(minOffset, maxOffset)
     }
 
     internal var anchors by mutableStateOf(emptyMap<T, Float>())
@@ -351,7 +360,7 @@ internal class SwipeableV2State<T>(
     fun dispatchRawDelta(delta: Float): Float {
         val currentDragPosition = offset ?: 0f
         val potentiallyConsumed = currentDragPosition + delta
-        val clamped = potentiallyConsumed.coerceIn(minBound, maxBound)
+        val clamped = potentiallyConsumed.coerceIn(minOffset, maxOffset)
         val deltaToConsume = clamped - currentDragPosition
         if (abs(deltaToConsume) > 0) {
             draggableState.dispatchRawDelta(deltaToConsume)

@@ -16,12 +16,19 @@
 
 package androidx.compose.material
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -40,14 +47,16 @@ import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -746,25 +755,32 @@ class ModalBottomSheetTest {
     @Test
     fun modalBottomSheet_missingAnchors_findsClosest() {
         val topTag = "ModalBottomSheetLayout"
-        val showShortContent = mutableStateOf(false)
-        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        var showShortContent by mutableStateOf(false)
+        val sheetState = ModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden)
+        lateinit var scope: CoroutineScope
         rule.setMaterialContent {
-            LaunchedEffect(showShortContent.value) {
-                sheetState.show()
-            }
+            scope = rememberCoroutineScope()
             ModalBottomSheetLayout(
                 modifier = Modifier.testTag(topTag),
                 sheetState = sheetState,
                 content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = {
-                    if (!showShortContent.value) {
-                        Box(Modifier.fillMaxSize().testTag(sheetTag))
+                    if (showShortContent) {
+                        Box(
+                            Modifier.fillMaxWidth().height(100.dp)
+                        )
                     } else {
-                        Box(Modifier.fillMaxWidth().height(100.dp))
+                        Box(
+                            Modifier.fillMaxSize().testTag(sheetTag)
+                        )
                     }
                 }
             )
         }
+
+        scope.launch { sheetState.show() } // We can't use LaunchedEffect with Swipeable in tests
+        // yet, so we're invoking this outside of composition. See b/254115946.
+        rule.waitForIdle()
 
         rule.onNodeWithTag(topTag).performTouchInput {
             swipeDown()
@@ -775,9 +791,10 @@ class ModalBottomSheetTest {
             assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
         }
 
-        rule.runOnIdle {
-            showShortContent.value = true
-        }
+        showShortContent = true
+        scope.launch { sheetState.show() } // We can't use LaunchedEffect with Swipeable in tests
+        // yet, so we're invoking this outside of composition. See b/254115946.
+
         rule.runOnIdle {
             assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
         }
@@ -821,5 +838,78 @@ class ModalBottomSheetTest {
         }
 
         assertThat(actualValue()).isTrue()
+    }
+
+    @Test
+    fun modalBottomSheet_nestedScroll_consumesWithinBounds_scrollsOutsideBounds() {
+        lateinit var sheetState: ModalBottomSheetState
+        lateinit var scrollState: ScrollState
+        val sheetContentTag = "sheetContent"
+        rule.setContent {
+            sheetState = rememberModalBottomSheetState(
+                initialValue = ModalBottomSheetValue.HalfExpanded
+            )
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                sheetContent = {
+                    scrollState = rememberScrollState()
+                    Column(
+                        Modifier
+                            .verticalScroll(scrollState)
+                            .testTag(sheetContentTag)
+                    ) {
+                        repeat(100) {
+                            Text(it.toString(), Modifier.requiredHeight(50.dp))
+                        }
+                    }
+                },
+                content = { Box(Modifier.fillMaxSize()) }
+            )
+        }
+
+        rule.waitForIdle()
+
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.HalfExpanded)
+
+        rule.onNodeWithTag(sheetContentTag)
+            .performTouchInput {
+                swipeUp(startY = bottom, endY = bottom / 2)
+            }
+        rule.waitForIdle()
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+
+        rule.onNodeWithTag(sheetContentTag)
+            .performTouchInput {
+                swipeUp(startY = bottom, endY = top)
+            }
+        rule.waitForIdle()
+        assertThat(scrollState.value).isGreaterThan(0)
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+
+        rule.onNodeWithTag(sheetContentTag)
+            .performTouchInput {
+                swipeDown(startY = top, endY = bottom)
+            }
+        rule.waitForIdle()
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+
+        rule.onNodeWithTag(sheetContentTag)
+            .performTouchInput {
+                swipeDown(startY = top, endY = bottom / 2)
+            }
+        rule.waitForIdle()
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.HalfExpanded)
+
+        rule.onNodeWithTag(sheetContentTag)
+            .performTouchInput {
+                swipeDown(startY = bottom / 2, endY = bottom)
+            }
+        rule.waitForIdle()
+        assertThat(scrollState.value).isEqualTo(0)
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
     }
 }

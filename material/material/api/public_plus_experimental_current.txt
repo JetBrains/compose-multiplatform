@@ -534,13 +534,17 @@ package androidx.compose.material {
     method @androidx.compose.material.ExperimentalMaterialApi @androidx.compose.runtime.Composable public static androidx.compose.material.ModalBottomSheetState rememberModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
   }
 
-  @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState extends androidx.compose.material.SwipeableState<androidx.compose.material.ModalBottomSheetValue> {
-    ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, boolean isSkipHalfExpanded, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
+  @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState {
+    ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, boolean isSkipHalfExpanded, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmValueChange);
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
+    method public androidx.compose.material.ModalBottomSheetValue getCurrentValue();
+    method public androidx.compose.material.ModalBottomSheetValue getTargetValue();
     method public suspend Object? hide(kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public boolean isVisible();
     method public suspend Object? show(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public final androidx.compose.material.ModalBottomSheetValue currentValue;
     property public final boolean isVisible;
+    property public final androidx.compose.material.ModalBottomSheetValue targetValue;
     field public static final androidx.compose.material.ModalBottomSheetState.Companion Companion;
   }
 

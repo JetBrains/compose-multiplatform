@@ -33,35 +33,37 @@ import androidx.compose.material.ModalBottomSheetValue.Expanded
 import androidx.compose.material.ModalBottomSheetValue.HalfExpanded
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.ScrollContainerInfo
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.provideScrollContainerInfo
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /**
  * Possible values of [ModalBottomSheetState].
@@ -94,30 +96,41 @@ enum class ModalBottomSheetValue {
  * @param isSkipHalfExpanded Whether the half expanded state, if the sheet is tall enough, should
  * be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
  * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
- * <b>Must not be set to true if the [initialValue] is [ModalBottomSheetValue.HalfExpanded].</b>
- * If supplied with [ModalBottomSheetValue.HalfExpanded] for the [initialValue], an
+ * <b>Must not be set to true if the initialValue is [ModalBottomSheetValue.HalfExpanded].</b>
+ * If supplied with [ModalBottomSheetValue.HalfExpanded] for the initialValue, an
  * [IllegalArgumentException] will be thrown.
- * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
 class ModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
-    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
+    internal val animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     internal val isSkipHalfExpanded: Boolean,
-    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
-) : SwipeableState<ModalBottomSheetValue>(
-    initialValue = initialValue,
-    animationSpec = animationSpec,
-    confirmStateChange = confirmStateChange
+    confirmValueChange: (ModalBottomSheetValue) -> Boolean = { true }
 ) {
+
+    internal val swipeableState = SwipeableV2State(
+        initialValue = initialValue,
+        animationSpec = animationSpec,
+        confirmValueChange = confirmValueChange,
+        positionalThreshold = POSITIONAL_THRESHOLD,
+        velocityThreshold = VELOCITY_THRESHOLD
+    )
+
+    val currentValue: ModalBottomSheetValue
+        get() = swipeableState.currentValue
+
+    val targetValue: ModalBottomSheetValue
+        get() = swipeableState.targetValue
+
     /**
      * Whether the bottom sheet is visible.
      */
     val isVisible: Boolean
-        get() = currentValue != Hidden
+        get() = swipeableState.currentValue != Hidden
 
     internal val hasHalfExpandedState: Boolean
-        get() = anchors.values.contains(HalfExpanded)
+        get() = swipeableState.hasAnchorForValue(HalfExpanded)
 
     constructor(
         initialValue: ModalBottomSheetValue,
@@ -146,7 +159,7 @@ class ModalBottomSheetState(
             hasHalfExpandedState -> HalfExpanded
             else -> Expanded
         }
-        animateTo(targetValue = targetValue)
+        animateTo(targetValue)
     }
 
     /**
@@ -178,11 +191,24 @@ class ModalBottomSheetState(
      */
     suspend fun hide() = animateTo(Hidden)
 
-    internal val nestedScrollConnection = this.PreUpPostDownNestedScrollConnection
+    internal suspend fun animateTo(
+        target: ModalBottomSheetValue,
+        velocity: Float = swipeableState.lastVelocity
+    ) = swipeableState.animateTo(target, velocity)
+
+    internal suspend fun snapTo(target: ModalBottomSheetValue) = swipeableState.snapTo(target)
+
+    internal fun requireOffset() = swipeableState.requireOffset()
+
+    internal val lastVelocity: Float get() = swipeableState.lastVelocity
+
+    internal val isAnimationRunning: Boolean get() = swipeableState.isAnimationRunning
 
     companion object {
         /**
          * The default [Saver] implementation for [ModalBottomSheetState].
+         * Saves the [currentValue] and recreates a [ModalBottomSheetState] with the saved value as
+         * initial value.
          */
         fun Saver(
             animationSpec: AnimationSpec<Float>,
@@ -195,7 +221,7 @@ class ModalBottomSheetState(
                     initialValue = it,
                     animationSpec = animationSpec,
                     isSkipHalfExpanded = skipHalfExpanded,
-                    confirmStateChange = confirmStateChange
+                    confirmValueChange = confirmStateChange
                 )
             }
         )
@@ -243,7 +269,7 @@ fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     skipHalfExpanded: Boolean,
-    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
+    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true },
 ): ModalBottomSheetState {
     return rememberSaveable(
         initialValue, animationSpec, skipHalfExpanded, confirmStateChange,
@@ -257,7 +283,7 @@ fun rememberModalBottomSheetState(
             initialValue = initialValue,
             animationSpec = animationSpec,
             isSkipHalfExpanded = skipHalfExpanded,
-            confirmStateChange = confirmStateChange
+            confirmValueChange = confirmStateChange
         )
     }
 }
@@ -274,7 +300,7 @@ fun rememberModalBottomSheetState(
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
-    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
+    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true },
 ): ModalBottomSheetState = rememberModalBottomSheetState(
     initialValue = initialValue,
     animationSpec = animationSpec,
@@ -325,19 +351,28 @@ fun ModalBottomSheetLayout(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
+    val orientation = Orientation.Vertical
+    val anchorChangeHandler = remember(sheetState, scope) {
+        ModalBottomSheetAnchorChangeHandler(
+            state = sheetState,
+            animateTo = { target, velocity ->
+                scope.launch { sheetState.animateTo(target, velocity = velocity) }
+            },
+            snapTo = { target -> scope.launch { sheetState.snapTo(target) } }
+        )
+    }
     BoxWithConstraints(modifier) {
         val fullHeight = constraints.maxHeight.toFloat()
-        val sheetHeightState = remember { mutableStateOf<Float?>(null) }
         Box(Modifier.fillMaxSize()) {
             content()
             Scrim(
                 color = scrimColor,
                 onDismiss = {
-                    if (sheetState.confirmStateChange(Hidden)) {
+                    if (sheetState.swipeableState.confirmValueChange(Hidden)) {
                         scope.launch { sheetState.hide() }
                     }
                 },
-                visible = sheetState.targetValue != Hidden
+                visible = sheetState.swipeableState.targetValue != Hidden
             )
         }
 
@@ -352,40 +387,62 @@ fun ModalBottomSheetLayout(
         Surface(
             Modifier
                 .fillMaxWidth()
-                .nestedScroll(sheetState.nestedScrollConnection)
-                .offset {
-                    val y = if (sheetState.anchors.isEmpty()) {
-                        // if we don't know our anchors yet, render the sheet as hidden
-                        fullHeight.roundToInt()
-                    } else {
-                        // if we do know our anchors, respect them
-                        sheetState.offset.value.roundToInt()
+                .nestedScroll(
+                    remember(sheetState.swipeableState, orientation) {
+                        ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
+                            state = sheetState.swipeableState,
+                            orientation = orientation
+                        )
                     }
-                    IntOffset(0, y)
+                )
+                .offset {
+                    IntOffset(
+                        0,
+                        sheetState.swipeableState
+                            .requireOffset()
+                            .roundToInt()
+                    )
                 }
-                .bottomSheetSwipeable(sheetState, fullHeight, sheetHeightState)
+                .swipeableV2(
+                    state = sheetState.swipeableState,
+                    orientation = orientation,
+                    enabled = sheetState.swipeableState.currentValue != Hidden,
+                )
+                .swipeAnchors(
+                    state = sheetState.swipeableState,
+                    possibleValues = setOf(Hidden, HalfExpanded, Expanded),
+                    anchorChangeHandler = anchorChangeHandler
+                ) { state, sheetSize ->
+                    when (state) {
+                        Hidden -> fullHeight
+                        HalfExpanded -> when {
+                            sheetSize.height < fullHeight / 2 -> null
+                            sheetState.isSkipHalfExpanded -> null
+                            else -> sheetSize.height / 2f
+                        }
+
+                        Expanded -> max(0f, fullHeight - sheetSize.height)
+                    }
+                }
                 .provideScrollContainerInfo(containerInfo)
-                .onGloballyPositioned {
-                    sheetHeightState.value = it.size.height.toFloat()
-                }
                 .semantics {
                     if (sheetState.isVisible) {
                         dismiss {
-                            if (sheetState.confirmStateChange(Hidden)) {
+                            if (sheetState.swipeableState.confirmValueChange(Hidden)) {
                                 scope.launch { sheetState.hide() }
                             }
                             true
                         }
-                        if (sheetState.currentValue == HalfExpanded) {
+                        if (sheetState.swipeableState.currentValue == HalfExpanded) {
                             expand {
-                                if (sheetState.confirmStateChange(Expanded)) {
+                                if (sheetState.swipeableState.confirmValueChange(Expanded)) {
                                     scope.launch { sheetState.expand() }
                                 }
                                 true
                             }
                         } else if (sheetState.hasHalfExpandedState) {
                             collapse {
-                                if (sheetState.confirmStateChange(HalfExpanded)) {
+                                if (sheetState.swipeableState.confirmValueChange(HalfExpanded)) {
                                     scope.launch { sheetState.halfExpand() }
                                 }
                                 true
@@ -401,41 +458,6 @@ fun ModalBottomSheetLayout(
             Column(content = sheetContent)
         }
     }
-}
-
-@Suppress("ModifierInspectorInfo")
-@OptIn(ExperimentalMaterialApi::class)
-private fun Modifier.bottomSheetSwipeable(
-    sheetState: ModalBottomSheetState,
-    fullHeight: Float,
-    sheetHeightState: State<Float?>
-): Modifier {
-    val sheetHeight = sheetHeightState.value
-    val modifier = if (sheetHeight != null) {
-        val anchors = if (sheetHeight < fullHeight / 2 || sheetState.isSkipHalfExpanded) {
-            mapOf(
-                fullHeight to Hidden,
-                fullHeight - sheetHeight to Expanded
-            )
-        } else {
-            mapOf(
-                fullHeight to Hidden,
-                fullHeight / 2 to HalfExpanded,
-                max(0f, fullHeight - sheetHeight) to Expanded
-            )
-        }
-        Modifier.swipeable(
-            state = sheetState,
-            anchors = anchors,
-            orientation = Orientation.Vertical,
-            enabled = sheetState.currentValue != Hidden,
-            resistance = null
-        )
-    } else {
-        Modifier
-    }
-
-    return this.then(modifier)
 }
 
 @Composable
@@ -488,3 +510,89 @@ object ModalBottomSheetDefaults {
         @Composable
         get() = MaterialTheme.colors.onSurface.copy(alpha = 0.32f)
 }
+
+@OptIn(ExperimentalMaterialApi::class)
+private fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
+    state: SwipeableV2State<*>,
+    orientation: Orientation
+): NestedScrollConnection = object : NestedScrollConnection {
+    override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        val delta = available.toFloat()
+        return if (delta < 0 && source == NestedScrollSource.Drag) {
+            state.dispatchRawDelta(delta).toOffset()
+        } else {
+            Offset.Zero
+        }
+    }
+
+    override fun onPostScroll(
+        consumed: Offset,
+        available: Offset,
+        source: NestedScrollSource
+    ): Offset {
+        return if (source == NestedScrollSource.Drag) {
+            state.dispatchRawDelta(available.toFloat()).toOffset()
+        } else {
+            Offset.Zero
+        }
+    }
+
+    override suspend fun onPreFling(available: Velocity): Velocity {
+        val toFling = available.toFloat()
+        val currentOffset = state.requireOffset()
+        return if (toFling < 0 && currentOffset > state.minOffset) {
+            state.settle(velocity = toFling)
+            // since we go to the anchor with tween settling, consume all for the best UX
+            available
+        } else {
+            Velocity.Zero
+        }
+    }
+
+    override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
+        state.settle(velocity = available.toFloat())
+        return available
+    }
+
+    private fun Float.toOffset(): Offset = Offset(
+        x = if (orientation == Orientation.Horizontal) this else 0f,
+        y = if (orientation == Orientation.Vertical) this else 0f
+    )
+
+    @JvmName("velocityToFloat")
+    private fun Velocity.toFloat() = if (orientation == Orientation.Horizontal) x else y
+
+    @JvmName("offsetToFloat")
+    private fun Offset.toFloat(): Float = if (orientation == Orientation.Horizontal) x else y
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+private fun ModalBottomSheetAnchorChangeHandler(
+    state: ModalBottomSheetState,
+    animateTo: (target: ModalBottomSheetValue, velocity: Float) -> Unit,
+    snapTo: (target: ModalBottomSheetValue) -> Unit,
+) = AnchorChangeHandler { previousAnchors, newAnchors ->
+    val previousTarget = state.targetValue
+    val previousTargetOffset = previousAnchors.getValue(previousTarget)
+    val newTarget = when (previousTarget) {
+        Hidden -> Hidden
+        HalfExpanded, Expanded -> {
+            val hasHalfExpandedState = newAnchors.containsKey(HalfExpanded)
+            val newTarget = if (hasHalfExpandedState) HalfExpanded else Expanded
+            newTarget
+        }
+    }
+    val newTargetOffset = newAnchors.getValue(newTarget)
+    if (newTargetOffset != previousTargetOffset) {
+        if (state.isAnimationRunning) {
+            // Re-target the animation to the new offset if it changed
+            animateTo(newTarget, state.lastVelocity)
+        } else {
+            // Snap to the new offset value of the target if no animation was running
+            snapTo(newTarget)
+        }
+    }
+}
+
+private val POSITIONAL_THRESHOLD: Density.(Float) -> Float = { 56.dp.toPx() }
+private val VELOCITY_THRESHOLD = 125.dp
