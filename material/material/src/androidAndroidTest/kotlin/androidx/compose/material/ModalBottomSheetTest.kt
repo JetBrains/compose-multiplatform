@@ -43,6 +43,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onChildAt
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -545,14 +546,8 @@ class ModalBottomSheetTest {
                 modifier = Modifier.testTag(topTag),
                 scrimColor = scrimColor.value,
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
-                sheetContent = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(sheetTag)) }
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = { Box(Modifier.fillMaxSize().testTag(sheetTag)) }
             )
             closeSheet = getString(Strings.CloseSheet)
         }
@@ -709,14 +704,8 @@ class ModalBottomSheetTest {
             ModalBottomSheetLayout(
                 modifier = Modifier.testTag(topTag),
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.HalfExpanded),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
-                sheetContent = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(sheetTag)) }
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
+                sheetContent = { Box(Modifier.fillMaxSize().testTag(sheetTag)) }
             )
         }
 
@@ -746,21 +735,15 @@ class ModalBottomSheetTest {
             ModalBottomSheetLayout(
                 modifier = Modifier.testTag(topTag),
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = {
                     Box(
-                        Modifier
-                            .fillMaxSize()
-                            .testTag(sheetTag)
-                            .onGloballyPositioned {
-                                if (lastKnownPosition != null) {
-                                    assertThat(lastKnownPosition).isEqualTo(it.positionInRoot())
-                                }
-                                lastKnownPosition = it.positionInRoot()
+                        Modifier.fillMaxSize().testTag(sheetTag).onGloballyPositioned {
+                            if (lastKnownPosition != null) {
+                                assertThat(lastKnownPosition).isEqualTo(it.positionInRoot())
                             }
+                            lastKnownPosition = it.positionInRoot()
+                        }
                     )
                 }
             )
@@ -782,22 +765,15 @@ class ModalBottomSheetTest {
             ModalBottomSheetLayout(
                 modifier = Modifier.testTag(topTag),
                 sheetState = sheetState,
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = {
                     if (showShortContent) {
                         Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(100.dp)
+                            Modifier.fillMaxWidth().height(100.dp)
                         )
                     } else {
                         Box(
-                            Modifier
-                                .fillMaxSize()
-                                .testTag(sheetTag)
+                            Modifier.fillMaxSize().testTag(sheetTag)
                         )
                     }
                 }
@@ -832,17 +808,12 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = {
                     Box(
-                        Modifier
-                            .fillMaxSize()
-                            .consumeScrollContainerInfo {
-                                actualValue = { it!!.canScroll() }
-                            }
+                        Modifier.fillMaxSize().consumeScrollContainerInfo {
+                            actualValue = { it!!.canScroll() }
+                        }
                     )
                 }
             )
@@ -857,17 +828,12 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             ModalBottomSheetLayout(
                 sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
+                content = { Box(Modifier.fillMaxSize().testTag(contentTag)) },
                 sheetContent = {
                     Box(
-                        Modifier
-                            .fillMaxSize()
-                            .consumeScrollContainerInfo {
-                                actualValue = { it!!.canScroll() }
-                            }
+                        Modifier.fillMaxSize().consumeScrollContainerInfo {
+                            actualValue = { it!!.canScroll() }
+                        }
                     )
                 }
             )
@@ -1019,5 +985,36 @@ class ModalBottomSheetTest {
         rule.waitForIdle()
 
         assertThat(state.swipeableState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+    }
+
+    @Test
+    fun modalBottomSheetState_notRestoredWhenInitialValueChangesBeforeRestoration() {
+        lateinit var state: ModalBottomSheetState
+        val restorationTester = StateRestorationTester(rule)
+        var tallSheet = true // Not backed by state as we only care about its value when composing
+        var compositionCount = 0
+        restorationTester.setContent {
+            compositionCount++
+            val initialValue = if (tallSheet) ModalBottomSheetValue.HalfExpanded else
+                ModalBottomSheetValue.Expanded
+            state = rememberModalBottomSheetState(initialValue)
+            ModalBottomSheetLayout(
+                sheetState = state,
+                sheetContent = {
+                    Box(if (tallSheet) Modifier.fillMaxSize() else Modifier.height(56.dp))
+                },
+                content = { Box(Modifier.fillMaxSize()) },
+            )
+        }
+
+        assertThat(state.currentValue).isEqualTo(ModalBottomSheetValue.HalfExpanded)
+        assertThat(compositionCount).isEqualTo(1)
+
+        tallSheet = false
+        restorationTester.emulateSavedInstanceStateRestore()
+        rule.waitForIdle()
+        assertThat(compositionCount).isEqualTo(2)
+
+        assertThat(state.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
     }
 }
