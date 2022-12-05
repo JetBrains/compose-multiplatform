@@ -113,8 +113,8 @@ class ModalBottomSheetState(
         initialValue = initialValue,
         animationSpec = animationSpec,
         confirmValueChange = confirmValueChange,
-        positionalThreshold = POSITIONAL_THRESHOLD,
-        velocityThreshold = VELOCITY_THRESHOLD
+        positionalThreshold = PositionalThreshold,
+        velocityThreshold = VelocityThreshold
     )
 
     val currentValue: ModalBottomSheetValue
@@ -594,5 +594,5 @@ private fun ModalBottomSheetAnchorChangeHandler(
     }
 }
 
-private val POSITIONAL_THRESHOLD: Density.(Float) -> Float = { 56.dp.toPx() }
-private val VELOCITY_THRESHOLD = 125.dp
+private val PositionalThreshold: Density.(Float) -> Float = { 56.dp.toPx() }
+private val VelocityThreshold = 125.dp
