@@ -181,7 +181,12 @@ class ModalBottomSheetState(
      * *
      * @throws [CancellationException] if the animation is interrupted
      */
-    internal suspend fun expand() = animateTo(Expanded)
+    internal suspend fun expand() {
+        if (!swipeableState.hasAnchorForValue(Expanded)) {
+            return
+        }
+        animateTo(Expanded)
+    }
 
     /**
      * Hide the bottom sheet with animation and suspend until it if fully hidden or animation has
@@ -421,7 +426,9 @@ fun ModalBottomSheetLayout(
                             else -> sheetSize.height / 2f
                         }
 
-                        Expanded -> max(0f, fullHeight - sheetSize.height)
+                        Expanded -> if (sheetSize.height != 0) {
+                            max(0f, fullHeight - sheetSize.height)
+                        } else null
                     }
                 }
                 .provideScrollContainerInfo(containerInfo)
@@ -578,7 +585,8 @@ private fun ModalBottomSheetAnchorChangeHandler(
         Hidden -> Hidden
         HalfExpanded, Expanded -> {
             val hasHalfExpandedState = newAnchors.containsKey(HalfExpanded)
-            val newTarget = if (hasHalfExpandedState) HalfExpanded else Expanded
+            val newTarget = if (hasHalfExpandedState) HalfExpanded
+                else if (newAnchors.containsKey(Expanded)) Expanded else Hidden
             newTarget
         }
     }
