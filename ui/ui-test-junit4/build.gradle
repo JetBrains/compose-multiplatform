@@ -61,6 +61,7 @@ dependencies {
         testImplementation(libs.truth)
         testImplementation(libs.robolectric)
 
+        androidTestImplementation(project(":compose:animation:animation"))
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":compose:material:material"))
         androidTestImplementation("androidx.fragment:fragment-testing:1.4.1")
@@ -124,6 +125,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
 
             androidAndroidTest.dependencies {
+                implementation(project(":compose:animation:animation"))
                 implementation(project(":compose:test-utils"))
                 implementation(project(":compose:material:material"))
                 implementation("androidx.fragment:fragment-testing:1.4.1")

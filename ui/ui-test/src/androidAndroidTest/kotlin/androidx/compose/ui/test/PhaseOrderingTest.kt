@@ -17,6 +17,9 @@
 package androidx.compose.ui.test
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -24,6 +27,7 @@ import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.util.TestCounter
 import androidx.test.filters.SmallTest
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
@@ -72,7 +76,8 @@ class PhaseOrderingTest {
     @Test
     fun frameCallbackRestartsLayout() {
         val counter = TestCounter()
-        var firstPass = true
+        var firstPass by mutableStateOf(true)
+        var layoutCount = 0
 
         rule.setContent {
             LaunchedEffect(Unit) {
@@ -82,17 +87,20 @@ class PhaseOrderingTest {
                     counter.expect(4)
                     firstPass = false
                 }
-                // TODO(b/222093277) This should happen *after* the next layout pass.
-                counter.expect(5)
+                counter.expect(7)
             }
 
             Layout(content = {}) { _, _ ->
-                // TODO(b/222093277) This should happen *before* the next layout pass.
-                counter.expect(if (firstPass) 2 else 6)
+                counter.expect(if (firstPass) 2 else 5)
+                layoutCount++
                 layout(1, 1) {
-                    counter.expect(3)
+                    counter.expect(if (firstPass) 3 else 6)
                 }
             }
+        }
+
+        rule.runOnIdle {
+            assertThat(layoutCount).isEqualTo(2)
         }
     }
 }
