@@ -620,7 +620,7 @@ class ModalBottomSheetTest {
         rule.setMaterialContent {
             sheetState = rememberModalBottomSheetState(
                 ModalBottomSheetValue.Expanded,
-                confirmStateChange = { newState ->
+                confirmValueChange = { newState ->
                     newState != ModalBottomSheetValue.Hidden
                 }
             )

@@ -29,6 +29,7 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material.ModalBottomSheetState.Companion.Saver
 import androidx.compose.material.ModalBottomSheetValue.Expanded
 import androidx.compose.material.ModalBottomSheetValue.HalfExpanded
 import androidx.compose.material.ModalBottomSheetValue.Hidden
@@ -94,6 +95,34 @@ enum class ModalBottomSheetValue {
  * @param initialValue The initial value of the state. <b>Must not be set to
  * [ModalBottomSheetValue.HalfExpanded] if [isSkipHalfExpanded] is set to true.</b>
  * @param animationSpec The default animation that will be used to animate to a new state.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
+ * @param isSkipHalfExpanded Whether the half expanded state, if the sheet is tall enough, should
+ * be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
+ * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
+ * <b>Must not be set to true if the initialValue is [ModalBottomSheetValue.HalfExpanded].</b>
+ * If supplied with [ModalBottomSheetValue.HalfExpanded] for the initialValue, an
+ * [IllegalArgumentException] will be thrown.
+ */
+@ExperimentalMaterialApi
+@Suppress("Deprecation")
+fun ModalBottomSheetState(
+    initialValue: ModalBottomSheetValue,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
+    confirmValueChange: (ModalBottomSheetValue) -> Boolean = { true },
+    isSkipHalfExpanded: Boolean = false
+) = ModalBottomSheetState(
+    initialValue = initialValue,
+    animationSpec = animationSpec,
+    isSkipHalfExpanded = isSkipHalfExpanded,
+    confirmStateChange = confirmValueChange
+)
+
+/**
+ * State of the [ModalBottomSheetLayout] composable.
+ *
+ * @param initialValue The initial value of the state. <b>Must not be set to
+ * [ModalBottomSheetValue.HalfExpanded] if [isSkipHalfExpanded] is set to true.</b>
+ * @param animationSpec The default animation that will be used to animate to a new state.
  * @param isSkipHalfExpanded Whether the half expanded state, if the sheet is tall enough, should
  * be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
  * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
@@ -103,11 +132,16 @@ enum class ModalBottomSheetValue {
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
-class ModalBottomSheetState(
+class ModalBottomSheetState @Deprecated(
+    message = "This constructor is deprecated. confirmStateChange has been renamed to " +
+        "confirmValueChange.",
+    replaceWith = ReplaceWith("ModalBottomSheetState(" +
+        "initialValue, animationSpec, confirmStateChange, isSkipHalfExpanded)")
+) constructor(
     initialValue: ModalBottomSheetValue,
     internal val animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
-    internal val isSkipHalfExpanded: Boolean,
-    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
+    internal val isSkipHalfExpanded: Boolean = false,
+    confirmStateChange: (ModalBottomSheetValue) -> Boolean
 ) {
 
     internal val swipeableState = SwipeableV2State(
@@ -133,10 +167,17 @@ class ModalBottomSheetState(
     internal val hasHalfExpandedState: Boolean
         get() = swipeableState.hasAnchorForValue(HalfExpanded)
 
+    @Deprecated(
+        message = "This constructor is deprecated. confirmStateChange has been renamed to " +
+            "confirmValueChange.",
+        replaceWith = ReplaceWith("ModalBottomSheetState(" +
+            "initialValue, animationSpec, confirmStateChange, false)")
+    )
+    @Suppress("Deprecation")
     constructor(
         initialValue: ModalBottomSheetValue,
-        animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
-        confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
+        animationSpec: AnimationSpec<Float>,
+        confirmStateChange: (ModalBottomSheetValue) -> Boolean
     ) : this(initialValue, animationSpec, isSkipHalfExpanded = false, confirmStateChange)
 
     init {
@@ -218,8 +259,8 @@ class ModalBottomSheetState(
          */
         fun Saver(
             animationSpec: AnimationSpec<Float>,
+            confirmValueChange: (ModalBottomSheetValue) -> Boolean,
             skipHalfExpanded: Boolean,
-            confirmStateChange: (ModalBottomSheetValue) -> Boolean
         ): Saver<ModalBottomSheetState, *> = Saver(
             save = { it.currentValue },
             restore = {
@@ -227,32 +268,74 @@ class ModalBottomSheetState(
                     initialValue = it,
                     animationSpec = animationSpec,
                     isSkipHalfExpanded = skipHalfExpanded,
-                    confirmStateChange = confirmStateChange
+                    confirmValueChange = confirmValueChange
                 )
             }
         )
 
         /**
          * The default [Saver] implementation for [ModalBottomSheetState].
+         * Saves the [currentValue] and recreates a [ModalBottomSheetState] with the saved value as
+         * initial value.
          */
         @Deprecated(
-            message = "Please specify the skipHalfExpanded parameter",
-            replaceWith = ReplaceWith(
-                "ModalBottomSheetState.Saver(" +
-                    "animationSpec = animationSpec," +
-                    "skipHalfExpanded = ," +
-                    "confirmStateChange = confirmStateChange" +
-                    ")"
-            )
+            message = "This function is deprecated. confirmStateChange has been renamed to " +
+                "confirmValueChange.",
+            replaceWith = ReplaceWith("Saver(animationSpec, confirmStateChange, " +
+                "skipHalfExpanded)")
         )
         fun Saver(
             animationSpec: AnimationSpec<Float>,
+            skipHalfExpanded: Boolean,
             confirmStateChange: (ModalBottomSheetValue) -> Boolean
         ): Saver<ModalBottomSheetState, *> = Saver(
             animationSpec = animationSpec,
-            skipHalfExpanded = false,
-            confirmStateChange = confirmStateChange
+            confirmValueChange = confirmStateChange,
+            skipHalfExpanded = skipHalfExpanded
         )
+    }
+}
+
+/**
+ * Create a [ModalBottomSheetState] and [remember] it.
+ *
+ * @param initialValue The initial value of the state.
+ * @param animationSpec The default animation that will be used to animate to a new state.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
+ * @param skipHalfExpanded Whether the half expanded state, if the sheet is tall enough, should
+ * be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
+ * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
+ * <b>Must not be set to true if the [initialValue] is [ModalBottomSheetValue.HalfExpanded].</b>
+ * If supplied with [ModalBottomSheetValue.HalfExpanded] for the [initialValue], an
+ * [IllegalArgumentException] will be thrown.
+ */
+@ExperimentalMaterialApi
+@Composable
+fun rememberModalBottomSheetState(
+    initialValue: ModalBottomSheetValue,
+    animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
+    confirmValueChange: (ModalBottomSheetValue) -> Boolean = { true },
+    skipHalfExpanded: Boolean = false,
+): ModalBottomSheetState {
+    // Key the rememberSaveable against the initial value. If it changed we don't want to attempt
+    // to restore as the restored value could have been saved with a now invalid set of anchors.
+    // b/152014032
+    return key(initialValue) {
+        rememberSaveable(
+            initialValue, animationSpec, skipHalfExpanded, confirmValueChange,
+            saver = Saver(
+                animationSpec = animationSpec,
+                skipHalfExpanded = skipHalfExpanded,
+                confirmValueChange = confirmValueChange
+            )
+        ) {
+            ModalBottomSheetState(
+                initialValue = initialValue,
+                animationSpec = animationSpec,
+                isSkipHalfExpanded = skipHalfExpanded,
+                confirmValueChange = confirmValueChange
+            )
+        }
     }
 }
 
@@ -269,35 +352,25 @@ class ModalBottomSheetState(
  * [IllegalArgumentException] will be thrown.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
+@Deprecated(
+    message = "This function is deprecated. confirmStateChange has been renamed to " +
+        "confirmValueChange.",
+    replaceWith = ReplaceWith("rememberModalBottomSheetState(" +
+        "initialValue, animationSpec, confirmStateChange, false)")
+)
 @Composable
 @ExperimentalMaterialApi
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     skipHalfExpanded: Boolean,
-    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true },
-): ModalBottomSheetState {
-    // Key the rememberSaveable against the initial value. If it changed we don't want to attempt
-    // to restore as the restored value could have been saved with a now invalid set of anchors.
-    // b/152014032
-    return key(initialValue) {
-        rememberSaveable(
-            initialValue, animationSpec, skipHalfExpanded, confirmStateChange,
-            saver = ModalBottomSheetState.Saver(
-                animationSpec = animationSpec,
-                skipHalfExpanded = skipHalfExpanded,
-                confirmStateChange = confirmStateChange
-            )
-        ) {
-            ModalBottomSheetState(
-                initialValue = initialValue,
-                animationSpec = animationSpec,
-                isSkipHalfExpanded = skipHalfExpanded,
-                confirmStateChange = confirmStateChange
-            )
-        }
-    }
-}
+    confirmStateChange: (ModalBottomSheetValue) -> Boolean,
+): ModalBottomSheetState = rememberModalBottomSheetState(
+    initialValue = initialValue,
+    animationSpec = animationSpec,
+    confirmValueChange = confirmStateChange,
+    skipHalfExpanded = skipHalfExpanded
+)
 
 /**
  * Create a [ModalBottomSheetState] and [remember] it.
@@ -306,17 +379,23 @@ fun rememberModalBottomSheetState(
  * @param animationSpec The default animation that will be used to animate to a new state.
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
+@Deprecated(
+    message = "This function is deprecated. confirmStateChange has been renamed to " +
+        "confirmValueChange.",
+    replaceWith = ReplaceWith("rememberModalBottomSheetState(" +
+        "initialValue, animationSpec, confirmValueChange = confirmStateChange)")
+)
 @Composable
 @ExperimentalMaterialApi
 fun rememberModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
-    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true },
+    confirmStateChange: (ModalBottomSheetValue) -> Boolean,
 ): ModalBottomSheetState = rememberModalBottomSheetState(
     initialValue = initialValue,
     animationSpec = animationSpec,
     skipHalfExpanded = false,
-    confirmStateChange = confirmStateChange
+    confirmValueChange = confirmStateChange
 )
 
 /**
