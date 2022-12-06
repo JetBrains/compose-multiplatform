@@ -34,6 +34,7 @@ import androidx.compose.material.ModalBottomSheetValue.HalfExpanded
 import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
@@ -276,20 +277,25 @@ fun rememberModalBottomSheetState(
     skipHalfExpanded: Boolean,
     confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true },
 ): ModalBottomSheetState {
-    return rememberSaveable(
-        initialValue, animationSpec, skipHalfExpanded, confirmStateChange,
-        saver = ModalBottomSheetState.Saver(
-            animationSpec = animationSpec,
-            skipHalfExpanded = skipHalfExpanded,
-            confirmStateChange = confirmStateChange
-        )
-    ) {
-        ModalBottomSheetState(
-            initialValue = initialValue,
-            animationSpec = animationSpec,
-            isSkipHalfExpanded = skipHalfExpanded,
-            confirmValueChange = confirmStateChange
-        )
+    // Key the rememberSaveable against the initial value. If it changed we don't want to attempt
+    // to restore as the restored value could have been saved with a now invalid set of anchors.
+    // b/152014032
+    return key(initialValue) {
+        rememberSaveable(
+            initialValue, animationSpec, skipHalfExpanded, confirmStateChange,
+            saver = ModalBottomSheetState.Saver(
+                animationSpec = animationSpec,
+                skipHalfExpanded = skipHalfExpanded,
+                confirmStateChange = confirmStateChange
+            )
+        ) {
+            ModalBottomSheetState(
+                initialValue = initialValue,
+                animationSpec = animationSpec,
+                isSkipHalfExpanded = skipHalfExpanded,
+                confirmValueChange = confirmStateChange
+            )
+        }
     }
 }
 
