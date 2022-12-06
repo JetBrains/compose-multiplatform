@@ -66,10 +66,8 @@ interface Font {
     /**
      * Loading strategy for this font.
      */
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @get:ExperimentalTextApi
-    @ExperimentalTextApi
     val loadingStrategy: FontLoadingStrategy
+        get() = FontLoadingStrategy.Blocking
 
     companion object {
         /**
@@ -97,8 +95,7 @@ interface Font {
          *
          * This timeout is not configurable, and timers are maintained globally.
          */
-        @ExperimentalTextApi
-        internal const val MaximumAsyncTimeout = 15_000L
+        const val MaximumAsyncTimeout = 15_000L
     }
 }
 

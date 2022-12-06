@@ -744,17 +744,18 @@ package androidx.compose.ui.text.font {
   }
 
   @androidx.compose.runtime.Immutable public interface Font {
-    method @androidx.compose.ui.text.ExperimentalTextApi public int getLoadingStrategy();
+    method public default int getLoadingStrategy();
     method public int getStyle();
     method public androidx.compose.ui.text.font.FontWeight getWeight();
-    property @androidx.compose.ui.text.ExperimentalTextApi public abstract int loadingStrategy;
+    property public default int loadingStrategy;
     property public abstract int style;
     property public abstract androidx.compose.ui.text.font.FontWeight weight;
     field public static final androidx.compose.ui.text.font.Font.Companion Companion;
-    field @androidx.compose.ui.text.ExperimentalTextApi public static final long MaximumAsyncTimeout = 15000L; // 0x3a98L
+    field public static final long MaximumAsyncTimeout = 15000L; // 0x3a98L
   }
 
   public static final class Font.Companion {
+    field public static final long MaximumAsyncTimeout = 15000L; // 0x3a98L
   }
 
   @Deprecated public static interface Font.ResourceLoader {
@@ -956,7 +957,6 @@ package androidx.compose.ui.text.font {
   public final class ResourceFont implements androidx.compose.ui.text.font.Font {
     method public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style);
     method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.ResourceFont copy(optional int resId, optional androidx.compose.ui.text.font.FontWeight weight, optional int style, optional int loadingStrategy, optional androidx.compose.ui.text.font.FontVariation.Settings variationSettings);
-    method @androidx.compose.ui.text.ExperimentalTextApi public int getLoadingStrategy();
     method public int getResId();
     method public int getStyle();
     method @androidx.compose.ui.text.ExperimentalTextApi public androidx.compose.ui.text.font.FontVariation.Settings getVariationSettings();
