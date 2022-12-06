@@ -22,7 +22,9 @@ kotlin {
         podfile = project.file("../iosApp/Podfile")
         framework {
             baseName = "shared"
+            isStatic = true
         }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
@@ -32,6 +34,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
+                implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
             }
         }
         val androidMain by getting {
