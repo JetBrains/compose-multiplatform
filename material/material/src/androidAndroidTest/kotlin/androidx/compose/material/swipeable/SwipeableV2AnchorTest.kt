@@ -34,6 +34,7 @@ import androidx.compose.material.swipeable.TestState.A
 import androidx.compose.material.swipeable.TestState.B
 import androidx.compose.material.swipeable.TestState.C
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -271,7 +272,7 @@ class SwipeableV2AnchorTest {
         var anchorChangeHandlerInvocationCount = 0
         var actualPreviousAnchors: Map<TestState, Float>? = null
         var actualNewAnchors: Map<TestState, Float>? = null
-        val testChangeHandler = AnchorChangeHandler { previousAnchors, newAnchors ->
+        val testChangeHandler = AnchorChangeHandler { _, previousAnchors, newAnchors ->
             anchorChangeHandlerInvocationCount++
             actualPreviousAnchors = previousAnchors
             actualNewAnchors = newAnchors
@@ -311,5 +312,44 @@ class SwipeableV2AnchorTest {
         assertThat(anchorChangeHandlerInvocationCount).isEqualTo(1)
         assertThat(actualPreviousAnchors).isEqualTo(expectedPreviousAnchors)
         assertThat(actualNewAnchors).isEqualTo(expectedNewAnchors)
+    }
+
+    @Test
+    fun swipeable_anchorChangeHandler_invokedWithPreviousTarget() {
+        val state = SwipeableV2State(
+            initialValue = A,
+            positionalThreshold = fractionalPositionalThreshold(0.5f)
+        )
+        var recordedPreviousTargetValue: TestState? = null
+        val testChangeHandler = AnchorChangeHandler<TestState> { previousTarget, _, _ ->
+            recordedPreviousTargetValue = previousTarget
+        }
+        var anchors = mapOf(
+            A to 0f,
+            B to 100f,
+            C to 200f
+        )
+        var recompose by mutableStateOf(false)
+
+        rule.setContent {
+            Box(
+                key(recompose) {
+                    Modifier
+                        .swipeAnchors(
+                            state = state,
+                            possibleValues = setOf(A, B, C),
+                            anchorChangeHandler = testChangeHandler,
+                            calculateAnchor = { value, _ -> anchors[value] }
+                        )
+                }
+            )
+        }
+
+        assertThat(state.targetValue).isEqualTo(A)
+        anchors = mapOf(B to 500f)
+        recompose = true
+        rule.waitForIdle()
+        assertThat(recordedPreviousTargetValue).isEqualTo(A) // A is not in the anchors anymore, so
+        // we can be sure that is not the targetValue calculated from the new anchors
     }
 }
