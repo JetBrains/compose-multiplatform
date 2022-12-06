@@ -159,24 +159,23 @@ fun Font(
  * @param typefaceLoader a loader that knows how to load this [AndroidFont], may be shared between
  * several fonts
  */
-abstract class AndroidFont
-@ExperimentalTextApi
-constructor(
+abstract class AndroidFont constructor(
     final override val loadingStrategy: FontLoadingStrategy,
     val typefaceLoader: TypefaceLoader,
     variationSettings: FontVariation.Settings,
 ) : Font {
 
-    @OptIn(ExperimentalTextApi::class)
-    // TODO(b/241016309) deprecate this once FontVariation is non-experimental
+    @Deprecated(
+        "Replaced with fontVariation constructor",
+        ReplaceWith(
+            "AndroidFont(loadingStrategy, typefaceLoader, FontVariation.Settings())"
+        )
+    )
     constructor(
         loadingStrategy: FontLoadingStrategy,
         typefaceLoader: TypefaceLoader,
     ) : this(loadingStrategy, typefaceLoader, FontVariation.Settings())
 
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @ExperimentalTextApi
-    @get:ExperimentalTextApi
     val variationSettings: FontVariation.Settings = variationSettings
 
     /**

@@ -30,6 +30,7 @@ import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.AndroidFont.TypefaceLoader
 import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.toFontFamily
@@ -106,7 +107,11 @@ class TextControllerTest {
                 return Typeface.create("cursive", 0)
             }
         }
-        val asyncFont = object : AndroidFont(FontLoadingStrategy.Async, typefaceLoader) {
+        val asyncFont = object : AndroidFont(
+            FontLoadingStrategy.Async,
+            typefaceLoader,
+            FontVariation.Settings()
+        ) {
             override val weight: FontWeight
                 get() = FontWeight.Normal
             override val style: FontStyle

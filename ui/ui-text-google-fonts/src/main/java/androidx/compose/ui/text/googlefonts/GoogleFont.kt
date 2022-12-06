@@ -31,6 +31,7 @@ import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.provider.FontRequest
 import androidx.core.provider.FontsContractCompat
@@ -215,7 +216,7 @@ internal data class GoogleFontImpl constructor(
     override val weight: FontWeight,
     override val style: FontStyle,
     val bestEffort: Boolean
-) : AndroidFont(FontLoadingStrategy.Async, GoogleFontTypefaceLoader) {
+) : AndroidFont(FontLoadingStrategy.Async, GoogleFontTypefaceLoader, FontVariation.Settings()) {
     fun toFontRequest(): FontRequest {
         // note: name is not encoded or quoted per spec
         val query = "name=$name&weight=${weight.weight}" +
