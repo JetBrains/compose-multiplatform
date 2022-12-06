@@ -535,7 +535,7 @@ package androidx.compose.material {
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public final class ModalBottomSheetState {
-    ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, boolean isSkipHalfExpanded, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmValueChange);
+    ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, boolean isSkipHalfExpanded, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
     ctor public ModalBottomSheetState(androidx.compose.material.ModalBottomSheetValue initialValue, optional androidx.compose.animation.core.AnimationSpec<java.lang.Float> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.material.ModalBottomSheetValue,java.lang.Boolean> confirmStateChange);
     method public androidx.compose.material.ModalBottomSheetValue getCurrentValue();
     method public androidx.compose.material.ModalBottomSheetValue getTargetValue();
