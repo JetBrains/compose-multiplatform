@@ -864,7 +864,7 @@ package androidx.compose.ui.text.font {
   public final class FontSynthesis_androidKt {
   }
 
-  @androidx.compose.ui.text.ExperimentalTextApi public final class FontVariation {
+  public final class FontVariation {
     method public androidx.compose.ui.text.font.FontVariation.Setting Setting(String name, float value);
     method public androidx.compose.ui.text.font.FontVariation.Settings Settings(androidx.compose.ui.text.font.FontWeight weight, int style, androidx.compose.ui.text.font.FontVariation.Setting... settings);
     method public androidx.compose.ui.text.font.FontVariation.Setting grade(int value);
