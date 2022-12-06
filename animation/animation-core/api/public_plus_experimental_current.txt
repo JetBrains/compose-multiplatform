@@ -416,6 +416,19 @@ package androidx.compose.animation.core {
   }
 
   public final class InfiniteTransition {
+    method public java.util.List<androidx.compose.animation.core.InfiniteTransition.TransitionAnimationState<?,?>> getAnimations();
+    property public final java.util.List<androidx.compose.animation.core.InfiniteTransition.TransitionAnimationState<?,?>> animations;
+  }
+
+  public final class InfiniteTransition.TransitionAnimationState<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.runtime.State<T> {
+    method public androidx.compose.animation.core.TargetBasedAnimation<T,V> getAnimation();
+    method public androidx.compose.animation.core.AnimationSpec<T> getAnimationSpec();
+    method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
+    method public T! getValue();
+    property public final androidx.compose.animation.core.TargetBasedAnimation<T,V> animation;
+    property public final androidx.compose.animation.core.AnimationSpec<T> animationSpec;
+    property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
+    property public T! value;
   }
 
   public final class InfiniteTransitionKt {

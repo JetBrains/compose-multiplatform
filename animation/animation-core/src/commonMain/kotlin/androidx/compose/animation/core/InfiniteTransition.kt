@@ -57,34 +57,55 @@ fun rememberInfiniteTransition(): InfiniteTransition {
  * @sample androidx.compose.animation.core.samples.InfiniteTransitionSample
  */
 class InfiniteTransition internal constructor() {
-    internal inner class TransitionAnimationState<T, V : AnimationVector>(
-        var initialValue: T,
-        var targetValue: T,
+
+    /**
+     * Each animation created using [InfiniteTransition.animateColor][androidx.compose.animation.animateColor],
+     * [InfiniteTransition.animateFloat], or [InfiniteTransition.animateValue] is represented as a
+     * [TransitionAnimationState] in [InfiniteTransition]. [typeConverter] converts the animation
+     * value from/to an [AnimationVector].
+     */
+    inner class TransitionAnimationState<T, V : AnimationVector> internal constructor(
+        internal var initialValue: T,
+        internal var targetValue: T,
         val typeConverter: TwoWayConverter<T, V>,
-        var animationSpec: AnimationSpec<T>
+        animationSpec: AnimationSpec<T>
     ) : State<T> {
         override var value by mutableStateOf(initialValue)
             internal set
+
+        /** [AnimationSpec] that is used for current animation run. */
+        var animationSpec: AnimationSpec<T> = animationSpec
+            private set
+
+        /**
+         * All the animation configurations including initial value/velocity & target value for
+         * animating from [initialValue] to [targetValue] are captured in [animation].
+         */
         var animation = TargetBasedAnimation(
-            animationSpec,
+            this.animationSpec,
             typeConverter,
             initialValue,
             targetValue
         )
+            internal set
 
         // This is used to signal parent for less work in a normal running mode, but in seeking
         // this is ignored since time can go both ways.
-        var isFinished = false
+        internal var isFinished = false
 
         // If animation is refreshed during the run, start the new animation in the next frame
-        var startOnTheNextFrame = false
+        private var startOnTheNextFrame = false
 
         // When the animation changes, it needs to start from playtime 0 again, offsetting from
         // parent's playtime to achieve that.
-        var playTimeNanosOffset = 0L
+        private var playTimeNanosOffset = 0L
 
         // This gets called when the initial/target value changes, which should be a rare case.
-        fun updateValues(initialValue: T, targetValue: T, animationSpec: AnimationSpec<T>) {
+        internal fun updateValues(
+            initialValue: T,
+            targetValue: T,
+            animationSpec: AnimationSpec<T>
+        ) {
             this.initialValue = initialValue
             this.targetValue = targetValue
             this.animationSpec = animationSpec
@@ -101,7 +122,8 @@ class InfiniteTransition internal constructor() {
             startOnTheNextFrame = true
         }
 
-        fun onPlayTimeChanged(playTimeNanos: Long) {
+        /** Set play time for the [animation]. */
+        internal fun onPlayTimeChanged(playTimeNanos: Long) {
             refreshChildNeeded = false
             if (startOnTheNextFrame) {
                 startOnTheNextFrame = false
@@ -112,28 +134,34 @@ class InfiniteTransition internal constructor() {
             isFinished = animation.isFinishedFromNanos(playTime)
         }
 
-        fun skipToEnd() {
+        internal fun skipToEnd() {
             value = animation.targetValue
             startOnTheNextFrame = true
         }
 
-        fun reset() {
+        internal fun reset() {
             startOnTheNextFrame = true
         }
     }
 
-    internal val animations = mutableVectorOf<TransitionAnimationState<*, *>>()
+    private val _animations = mutableVectorOf<TransitionAnimationState<*, *>>()
     private var refreshChildNeeded by mutableStateOf(false)
     private var startTimeNanos = AnimationConstants.UnspecifiedTime
     private var isRunning by mutableStateOf(true)
 
+    /**
+     * List of [TransitionAnimationState]s that are in a [InfiniteTransition].
+     */
+    val animations: List<TransitionAnimationState<*, *>>
+        get() = _animations.asMutableList()
+
     internal fun addAnimation(animation: TransitionAnimationState<*, *>) {
-        animations.add(animation)
+        _animations.add(animation)
         refreshChildNeeded = true
     }
 
     internal fun removeAnimation(animation: TransitionAnimationState<*, *>) {
-        animations.remove(animation)
+        _animations.remove(animation)
     }
 
     @Suppress("ComposableNaming")
@@ -149,14 +177,14 @@ class InfiniteTransition internal constructor() {
                             durationScale != coroutineContext.durationScale
                         ) {
                             startTimeNanos = it
-                            animations.forEach {
+                            _animations.forEach {
                                 it.reset()
                             }
                             durationScale = coroutineContext.durationScale
                         }
                         if (durationScale == 0f) {
                             // Finish right away
-                            animations.forEach {
+                            _animations.forEach {
                                 it.skipToEnd()
                             }
                         } else {
@@ -178,7 +206,7 @@ class InfiniteTransition internal constructor() {
     private fun onFrame(playTimeNanos: Long) {
         var allFinished = true
         // Pulse new playtime
-        animations.forEach {
+        _animations.forEach {
             if (!it.isFinished) {
                 it.onPlayTimeChanged(playTimeNanos)
             }
