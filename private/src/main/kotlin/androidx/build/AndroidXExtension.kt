@@ -32,16 +32,12 @@ open class AndroidXExtension(val project: Project) {
     @JvmField
     val LibraryVersions: Map<String, Version>
     @JvmField
-    val LibraryGroups: Map<String, LibraryGroup>
+    val AllLibraryGroups: List<LibraryGroup>
 
     val libraryGroupsByGroupId: Map<String, LibraryGroup>
     val overrideLibraryGroupsByProjectPath: Map<String, LibraryGroup>
 
-    var mavenGroup: LibraryGroup? = null
-        set(value) {
-            field = value
-            chooseProjectVersion()
-        }
+    val mavenGroup: LibraryGroup?
 
     init {
         val toml = project.objects.fileProperty().fileValue(
@@ -60,13 +56,12 @@ open class AndroidXExtension(val project: Project) {
             spec.parameters.useMultiplatformGroupVersions = useMultiplatformVersions
         }
         val service = serviceProvider.get()
-        LibraryGroups = service.libraryGroups
+        AllLibraryGroups = service.libraryGroups.values.toList()
         LibraryVersions = service.libraryVersions
         libraryGroupsByGroupId = service.libraryGroupsByGroupId
         overrideLibraryGroupsByProjectPath = service.overrideLibraryGroupsByProjectPath
-        project.afterEvaluate {
-            validateLibraryGroup()
-        }
+        mavenGroup = chooseLibraryGroup()
+        chooseProjectVersion()
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
@@ -77,17 +72,7 @@ open class AndroidXExtension(val project: Project) {
             chooseProjectVersion()
         }
 
-    // a temporary method while we migrate from LibraryGroups.${key} to libraryGroup.get()
-    private fun validateLibraryGroup() {
-            val oldGroup = mavenGroup
-            val newGroup = getNewLibraryGroup()
-            check(newGroup == oldGroup) {
-                "Error in ${project.projectDir}/build.gradle: oldGroup = ${oldGroup?.group} " +
-                    "but newGroup = ${newGroup?.group}"
-            }
-    }
-
-    private fun getNewLibraryGroup(): LibraryGroup? {
+    private fun chooseLibraryGroup(): LibraryGroup? {
         val overridden = overrideLibraryGroupsByProjectPath.get(project.path)
         if (overridden != null)
             return overridden
