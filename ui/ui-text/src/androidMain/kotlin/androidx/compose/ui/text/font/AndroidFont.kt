@@ -29,37 +29,6 @@ import java.io.File
  * Create a Font declaration from a file in the assets directory. The content of the [File] is
  * read during construction.
  *
- * @param assetManager Android AssetManager
- * @param path full path starting from the assets directory (i.e. dir/myfont.ttf for
- * assets/dir/myfont.ttf).
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- */
-@ExperimentalTextApi
-@Stable
-@Deprecated("This experimental Font is replaced by Font(path, assetManager, ...)",
-    replaceWith = ReplaceWith("Font(path, assetManager, weight, style)"),
-    level = DeprecationLevel.WARNING
-)
-fun Font(
-    assetManager: AssetManager,
-    path: String,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = AndroidAssetFont(
-    assetManager,
-    path,
-    weight,
-    style,
-    FontVariation.Settings(weight, style)
-)
-
-/**
- * Create a Font declaration from a file in the assets directory. The content of the [File] is
- * read during construction.
- *
  * @param path full path starting from the assets directory (i.e. dir/myfont.ttf for
  * assets/dir/myfont.ttf).
  * @param assetManager Android AssetManager
