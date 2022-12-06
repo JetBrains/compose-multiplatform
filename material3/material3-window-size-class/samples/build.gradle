@@ -38,7 +38,6 @@ dependencies {
 androidx {
     name = "AndroidX Compose Material 3 Window Size Class Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2022"
     description = "Contains the sample code for the Material 3 Window Size Class APIs"
 }

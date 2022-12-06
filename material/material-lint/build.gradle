@@ -41,7 +41,6 @@ dependencies {
 androidx {
     name = "Compose Material Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2021"
     description = "Compose Material Lint Checks"
 }

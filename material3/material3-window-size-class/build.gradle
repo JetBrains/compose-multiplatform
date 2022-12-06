@@ -105,7 +105,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material 3 Window Size Class"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2022"
     description = "Provides window size classes for building responsive UIs"
 }
