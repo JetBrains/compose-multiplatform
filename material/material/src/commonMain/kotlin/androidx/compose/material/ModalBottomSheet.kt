@@ -100,20 +100,20 @@ enum class ModalBottomSheetValue {
  * <b>Must not be set to true if the initialValue is [ModalBottomSheetValue.HalfExpanded].</b>
  * If supplied with [ModalBottomSheetValue.HalfExpanded] for the initialValue, an
  * [IllegalArgumentException] will be thrown.
- * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
+ * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @ExperimentalMaterialApi
 class ModalBottomSheetState(
     initialValue: ModalBottomSheetValue,
     internal val animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
     internal val isSkipHalfExpanded: Boolean,
-    confirmValueChange: (ModalBottomSheetValue) -> Boolean = { true }
+    confirmStateChange: (ModalBottomSheetValue) -> Boolean = { true }
 ) {
 
     internal val swipeableState = SwipeableV2State(
         initialValue = initialValue,
         animationSpec = animationSpec,
-        confirmValueChange = confirmValueChange,
+        confirmValueChange = confirmStateChange,
         positionalThreshold = PositionalThreshold,
         velocityThreshold = VelocityThreshold
     )
@@ -227,7 +227,7 @@ class ModalBottomSheetState(
                     initialValue = it,
                     animationSpec = animationSpec,
                     isSkipHalfExpanded = skipHalfExpanded,
-                    confirmValueChange = confirmStateChange
+                    confirmStateChange = confirmStateChange
                 )
             }
         )
@@ -293,7 +293,7 @@ fun rememberModalBottomSheetState(
                 initialValue = initialValue,
                 animationSpec = animationSpec,
                 isSkipHalfExpanded = skipHalfExpanded,
-                confirmValueChange = confirmStateChange
+                confirmStateChange = confirmStateChange
             )
         }
     }
