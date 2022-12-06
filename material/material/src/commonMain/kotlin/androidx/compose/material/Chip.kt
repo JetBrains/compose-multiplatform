@@ -201,6 +201,7 @@ fun FilterChip(
         selected = selected,
         onClick = onClick,
         modifier = modifier.semantics { role = Role.Checkbox },
+        enabled = enabled,
         shape = shape,
         color = colors.backgroundColor(enabled, selected).value,
         contentColor = contentColor.value.copy(1.0f),
