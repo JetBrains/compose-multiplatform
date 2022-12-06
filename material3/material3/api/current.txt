@@ -427,6 +427,9 @@ package androidx.compose.material3 {
   public final class MenuKt {
   }
 
+  public final class ModalBottomSheetKt {
+  }
+
   public final class NavigationBarDefaults {
     method @androidx.compose.runtime.Composable public long getContainerColor();
     method public float getElevation();
@@ -598,6 +601,9 @@ package androidx.compose.material3 {
   }
 
   public final class ShapesKt {
+  }
+
+  public final class SheetDefaultsKt {
   }
 
   @androidx.compose.runtime.Immutable public final class SliderColors {

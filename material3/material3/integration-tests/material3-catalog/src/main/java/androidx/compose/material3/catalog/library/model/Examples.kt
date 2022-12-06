@@ -28,6 +28,7 @@ import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.AssistChipSample
 import androidx.compose.material3.samples.BottomAppBarWithFAB
+import androidx.compose.material3.samples.ModalBottomSheetSample
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
 import androidx.compose.material3.samples.CardSample
@@ -155,6 +156,17 @@ val BadgeExamples =
             description = BadgeExampleDescription,
             sourceUrl = BadgeExampleSourceUrl
         ) { NavigationBarItemWithBadge() }
+    )
+
+private const val BottomSheetExampleDescription = "Bottom Sheet examples"
+private const val BottomSheetExampleSourceUrl = "$SampleSourceUrl/BottomSheetSamples.kt"
+val BottomSheetExamples =
+    listOf(
+        Example(
+            name = ::ModalBottomSheetSample.name,
+            description = BottomSheetExampleDescription,
+            sourceUrl = BottomSheetExampleSourceUrl
+        ) { ModalBottomSheetSample() }
     )
 
 private const val ButtonsExampleDescription = "Button examples"

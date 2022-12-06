@@ -69,6 +69,18 @@ private val BottomAppBars = Component(
     examples = BottomAppBarsExamples
 )
 
+private val BottomSheets = Component(
+    id = nextId(),
+    name = "Bottom Sheet",
+    description = "Bottom sheets are surfaces containing supplementary content, anchored to the " +
+        "bottom of the screen.",
+    // No bottom sheet icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/bottom-sheets",
+    docsUrl = "$DocsUrl#bottomsheet",
+    sourceUrl = "$Material3SourceUrl/ModalBottomSheet.kt",
+    examples = BottomSheetExamples
+)
+
 private val Buttons = Component(
     id = nextId(),
     name = "Buttons",
@@ -350,6 +362,7 @@ private val TopAppBar = Component(
 val Components = listOf(
     Badge,
     BottomAppBars,
+    BottomSheets,
     Buttons,
     Card,
     Checkboxes,

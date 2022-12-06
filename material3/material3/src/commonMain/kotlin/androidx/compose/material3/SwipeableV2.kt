@@ -119,9 +119,10 @@ internal fun <T> Modifier.swipeAnchors(
             }
         }
         if (previousAnchors != newAnchors) {
-            state.updateAnchors(newAnchors)
-            if (previousAnchors.isNotEmpty()) {
-                anchorChangeHandler?.onAnchorsChanged(previousAnchors, newAnchors)
+            val previousTarget = state.targetValue
+            val stateRequiresCleanup = state.updateAnchors(newAnchors)
+            if (stateRequiresCleanup) {
+                anchorChangeHandler?.onAnchorsChanged(previousTarget, previousAnchors, newAnchors)
             }
         }
     },
@@ -241,8 +242,8 @@ internal class SwipeableV2State<T>(
     var lastVelocity: Float by mutableStateOf(0f)
         private set
 
-    private val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
-    private val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
+    val minBound by derivedStateOf { anchors.minOrNull() ?: Float.NEGATIVE_INFINITY }
+    val maxBound by derivedStateOf { anchors.maxOrNull() ?: Float.POSITIVE_INFINITY }
 
     private var animationTarget: T? by mutableStateOf(null)
     internal val draggableState = DraggableState {
@@ -253,12 +254,25 @@ internal class SwipeableV2State<T>(
 
     internal var density: Density? = null
 
-    internal fun updateAnchors(newAnchors: Map<T, Float>) {
+    /**
+     * Update the anchors.
+     * If the previous set of anchors was empty, attempt to update the offset to match the initial
+     * value's anchor.
+     *
+     * @return true if the state needs to be adjusted after updating the anchors, e.g. if the
+     * initial value is not found in the initial set of anchors. false if no further updates are
+     * needed.
+     */
+    internal fun updateAnchors(newAnchors: Map<T, Float>): Boolean {
         val previousAnchorsEmpty = anchors.isEmpty()
         anchors = newAnchors
-        if (previousAnchorsEmpty) {
-            offset = anchors.requireAnchor(this.currentValue)
-        }
+        val initialValueHasAnchor = if (previousAnchorsEmpty) {
+            val initialValueAnchor = anchors[currentValue]
+            val initialValueHasAnchor = initialValueAnchor != null
+            if (initialValueHasAnchor) offset = initialValueAnchor
+            initialValueHasAnchor
+        } else true
+        return !initialValueHasAnchor || !previousAnchorsEmpty
     }
 
     /**
@@ -289,6 +303,8 @@ internal class SwipeableV2State<T>(
 
     /**
      * Animate to a [targetValue].
+     * If the [targetValue] is not in the set of anchors, the [currentValue] will be updated to the
+     * [targetValue] without updating the offset.
      *
      * @throws CancellationException if the interaction interrupted by another interaction like a
      * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
@@ -300,30 +316,34 @@ internal class SwipeableV2State<T>(
         targetValue: T,
         velocity: Float = lastVelocity,
     ) {
-        val targetOffset = anchors.requireAnchor(targetValue)
-        try {
-            draggableState.drag {
-                animationTarget = targetValue
-                var prev = offset ?: 0f
-                animate(prev, targetOffset, velocity, animationSpec) { value, velocity ->
-                    // Our onDrag coerces the value within the bounds, but an animation may
-                    // overshoot, for example a spring animation or an overshooting interpolator
-                    // We respect the user's intention and allow the overshoot, but still use
-                    // DraggableState's drag for its mutex.
-                    offset = value
-                    prev = value
-                    lastVelocity = velocity
+        val targetOffset = anchors[targetValue]
+        if (targetOffset != null) {
+            try {
+                draggableState.drag {
+                    animationTarget = targetValue
+                    var prev = offset ?: 0f
+                    animate(prev, targetOffset, velocity, animationSpec) { value, velocity ->
+                        // Our onDrag coerces the value within the bounds, but an animation may
+                        // overshoot, for example a spring animation or an overshooting interpolator
+                        // We respect the user's intention and allow the overshoot, but still use
+                        // DraggableState's drag for its mutex.
+                        offset = value
+                        prev = value
+                        lastVelocity = velocity
+                    }
+                    lastVelocity = 0f
                 }
-                lastVelocity = 0f
+            } finally {
+                animationTarget = null
+                val endOffset = requireOffset()
+                val endState = anchors
+                    .entries
+                    .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
+                    ?.key
+                this.currentValue = endState ?: currentValue
             }
-        } finally {
-            animationTarget = null
-            val endOffset = requireOffset()
-            val endState = anchors
-                .entries
-                .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
-                ?.key
-            this.currentValue = endState ?: currentValue
+        } else {
+            currentValue = targetValue
         }
     }
 
@@ -533,8 +553,7 @@ internal object SwipeableV2Defaults {
         state: SwipeableV2State<T>,
         animate: (target: T, velocity: Float) -> Unit,
         snap: (target: T) -> Unit
-    ) = AnchorChangeHandler { previousAnchors, newAnchors ->
-        val previousTarget = state.targetValue
+    ) = AnchorChangeHandler { previousTarget, previousAnchors, newAnchors ->
         val previousTargetOffset = previousAnchors[previousTarget]
         val newTargetOffset = newAnchors[previousTarget]
         if (previousTargetOffset != newTargetOffset) {
@@ -562,10 +581,15 @@ internal fun interface AnchorChangeHandler<T> {
      * Callback that is invoked when the anchors have changed, after the [SwipeableV2State] has been
      * updated with them. Use this hook to re-launch animations or interrupt them if needed.
      *
+     * @param previousTargetValue The target value before the anchors were updated
      * @param previousAnchors The previously set anchors
      * @param newAnchors The newly set anchors
      */
-    fun onAnchorsChanged(previousAnchors: Map<T, Float>, newAnchors: Map<T, Float>)
+    fun onAnchorsChanged(
+        previousTargetValue: T,
+        previousAnchors: Map<T, Float>,
+        newAnchors: Map<T, Float>
+    )
 }
 
 @Stable
