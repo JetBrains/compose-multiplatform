@@ -195,7 +195,7 @@ internal fun CoreTextField(
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
 
     // CompositionLocals
     // If the text field is disabled or read-only, we should not deal with the input service
