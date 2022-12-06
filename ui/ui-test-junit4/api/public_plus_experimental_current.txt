@@ -82,7 +82,7 @@ package androidx.compose.ui.test.junit4 {
 
   public final class AndroidComposeTestRule_androidKt {
     method public static <A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A> createAndroidComposeRule(Class<A> activityClass);
-    method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A>! createAndroidComposeRule();
+    method public static inline <reified A extends androidx.activity.ComponentActivity> androidx.compose.ui.test.junit4.AndroidComposeTestRule<androidx.test.ext.junit.rules.ActivityScenarioRule<A>,A> createAndroidComposeRule();
     method public static androidx.compose.ui.test.junit4.ComposeContentTestRule createComposeRule();
     method public static androidx.compose.ui.test.junit4.ComposeTestRule createEmptyComposeRule();
   }

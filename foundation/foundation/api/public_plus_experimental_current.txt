@@ -313,10 +313,10 @@ package androidx.compose.foundation.gestures {
 
   public final class TapGestureDetectorKt {
     method public static suspend Object? awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed, optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
-    method @Deprecated public static suspend androidx.compose.ui.input.pointer.PointerInputChange! awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed);
+    method @Deprecated public static suspend androidx.compose.ui.input.pointer.PointerInputChange awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional boolean requireUnconsumed);
     method public static suspend Object? detectTapGestures(androidx.compose.ui.input.pointer.PointerInputScope, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onDoubleTap, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onLongPress, optional kotlin.jvm.functions.Function3<? super androidx.compose.foundation.gestures.PressGestureScope,? super androidx.compose.ui.geometry.Offset,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onPress, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.geometry.Offset,kotlin.Unit>? onTap, optional kotlin.coroutines.Continuation<? super kotlin.Unit>);
     method public static suspend Object? waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, optional androidx.compose.ui.input.pointer.PointerEventPass pass, optional kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>);
-    method @Deprecated public static suspend androidx.compose.ui.input.pointer.PointerInputChange! waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope);
+    method @Deprecated public static suspend androidx.compose.ui.input.pointer.PointerInputChange? waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope);
   }
 
   public final class TransformGestureDetectorKt {
@@ -802,7 +802,7 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutItemProviderKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider DelegatingLazyLayoutItemProvider(androidx.compose.runtime.State<? extends androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider> delegate);
     method @androidx.compose.foundation.ExperimentalFoundationApi public static <T extends androidx.compose.foundation.lazy.layout.LazyLayoutIntervalContent> androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider LazyLayoutItemProvider(androidx.compose.foundation.lazy.layout.IntervalList<? extends T> intervals, kotlin.ranges.IntRange nearestItemsRange, kotlin.jvm.functions.Function2<? super T,? super java.lang.Integer,kotlin.Unit> itemContent);
-    method @androidx.compose.foundation.ExperimentalFoundationApi public static Object! getDefaultLazyLayoutKey(int index);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static Object getDefaultLazyLayoutKey(int index);
   }
 
   public final class LazyLayoutKt {

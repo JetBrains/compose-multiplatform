@@ -285,7 +285,7 @@ package androidx.compose.runtime {
   }
 
   public final class ExpectKt {
-    method @kotlin.PublishedApi internal static inline <R> R! synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
+    method @kotlin.PublishedApi internal static inline <R> R? synchronized(Object lock, kotlin.jvm.functions.Function0<? extends R> block);
   }
 
   @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.SOURCE) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExplicitGroupsComposable {
@@ -649,10 +649,10 @@ package androidx.compose.runtime.collection {
     method public int lastIndexOf(T? element);
     method public inline T? lastOrNull();
     method public inline T? lastOrNull(kotlin.jvm.functions.Function1<? super T,java.lang.Boolean> predicate);
-    method public inline <reified R> R![]! map(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
-    method public inline <reified R> R![]! mapIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
-    method public inline <reified R> androidx.compose.runtime.collection.MutableVector<R>! mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
-    method public inline <reified R> androidx.compose.runtime.collection.MutableVector<R>! mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public inline <reified R> R![] map(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
+    method public inline <reified R> R![] mapIndexed(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
+    method public inline <reified R> androidx.compose.runtime.collection.MutableVector<R> mapIndexedNotNull(kotlin.jvm.functions.Function2<? super java.lang.Integer,? super T,? extends R> transform);
+    method public inline <reified R> androidx.compose.runtime.collection.MutableVector<R> mapNotNull(kotlin.jvm.functions.Function1<? super T,? extends R> transform);
     method public inline operator void minusAssign(T? element);
     method public inline operator void plusAssign(T? element);
     method public boolean remove(T? element);
@@ -674,9 +674,9 @@ package androidx.compose.runtime.collection {
 
   public final class MutableVectorKt {
     method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(optional int capacity);
-    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T> MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
     method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf();
-    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf(T? elements);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T> mutableVectorOf(T? elements);
   }
 
 }

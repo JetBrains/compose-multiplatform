@@ -623,7 +623,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class PaintKt {
-    method public static androidx.compose.ui.graphics.Paint! Paint();
+    method public static androidx.compose.ui.graphics.Paint Paint();
     field public static final float DefaultAlpha = 1.0f;
   }
 
