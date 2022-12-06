@@ -54,6 +54,11 @@ dependencies {
     runtimeOnly(libs.wireGradlePluginz)
 }
 
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
 project.tasks.withType(Jar) { task ->
     task.reproducibleFileOrder = true
     task.preserveFileTimestamps = false

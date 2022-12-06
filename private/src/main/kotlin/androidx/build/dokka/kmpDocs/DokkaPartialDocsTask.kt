@@ -255,7 +255,7 @@ internal abstract class DokkaPartialDocsTask @Inject constructor(
                             // This is a workaround for https://youtrack.jetbrains.com/issue/KT-33893
                             @Suppress("DEPRECATION") // for compatibility
                             (compilation.compileKotlinTask as
-                                org.jetbrains.kotlin.gradle.tasks.KotlinCompile).classpath
+                                org.jetbrains.kotlin.gradle.tasks.KotlinCompile).libraries
                         } else {
                             compilation.compileDependencyFiles
                         }

@@ -29,6 +29,7 @@ import androidx.build.checkapi.JavaApiTaskConfig
 import androidx.build.checkapi.KmpApiTaskConfig
 import androidx.build.checkapi.LibraryApiTaskConfig
 import androidx.build.checkapi.configureProjectForApiTasks
+import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.dependencyTracker.AffectedModuleDetector
 import androidx.build.docs.AndroidXKmpDocsImplPlugin
 import androidx.build.gradle.isRoot
@@ -125,6 +126,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         project.configureKtlint()
+        project.configureKotlinStdlibVersion()
 
         // Configure all Jar-packing tasks for hermetic builds.
         project.tasks.withType(Zip::class.java).configureEach { it.configureForHermeticBuild() }
@@ -378,6 +380,20 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
     private fun HasAndroidTest.excludeVersionFilesFromTestApks() {
         androidTest?.packaging?.resources?.apply {
             excludes.add("/META-INF/androidx*.version")
+        }
+    }
+
+    fun Project.configureKotlinStdlibVersion() {
+        project.configurations.all { configuration ->
+            configuration.resolutionStrategy { strategy ->
+                strategy.eachDependency { details ->
+                    if (details.requested.group == "org.jetbrains.kotlin" &&
+                        (details.requested.name == "kotlin-stdlib-jdk7" ||
+                            details.requested.name == "kotlin-stdlib-jdk8")) {
+                        details.useVersion(KOTLIN_VERSION)
+                    }
+                }
+            }
         }
     }
 
