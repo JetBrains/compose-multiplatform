@@ -21,8 +21,10 @@ import androidx.annotation.RequiresApi
 import androidx.compose.material3.CalendarDate
 import androidx.compose.material3.CalendarModel
 import androidx.compose.material3.CalendarMonth
+import androidx.compose.material3.DateInputFormat
 import androidx.compose.material3.DaysInWeek
 import androidx.compose.material3.ExperimentalMaterial3Api
+import java.text.DateFormat
 import java.text.DateFormatSymbols
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -31,8 +33,11 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.chrono.Chronology
 import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
+import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.Calendar
@@ -87,6 +92,14 @@ internal class LegacyCalendarModelImpl : CalendarModel {
         // Add Sunday to the end.
         add(Pair(weekdays[1], shortWeekdays[1]))
     }
+
+    override val dateInputFormat: DateInputFormat
+        get() = datePatternAsInputFormat(
+            (DateFormat.getDateInstance(
+                DateFormat.SHORT,
+                Locale.getDefault()
+            ) as SimpleDateFormat).toPattern()
+        )
 
     override fun getDate(timeInMillis: Long): CalendarDate {
         val calendar = Calendar.getInstance(utcTimeZone)
@@ -250,6 +263,16 @@ internal class CalendarModelImpl : CalendarModel {
             }
         }
 
+    override val dateInputFormat: DateInputFormat
+        get() = datePatternAsInputFormat(
+            DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                /* dateStyle = */ FormatStyle.SHORT,
+                /* timeStyle = */ null,
+                /* chrono = */ Chronology.ofLocale(Locale.getDefault()),
+                /* locale = */ Locale.getDefault()
+            )
+        )
+
     override fun getDate(timeInMillis: Long): CalendarDate {
         val localDate =
             Instant.ofEpochMilli(timeInMillis).atZone(utcTimeZoneId).toLocalDate()
@@ -354,4 +377,41 @@ internal class CalendarModelImpl : CalendarModel {
     }
 
     private val utcTimeZoneId = ZoneId.of("UTC")
+}
+
+/**
+ * Receives a given local date format string and returns a string that can be displayed to the user
+ * and parsed by the date parser.
+ *
+ * This function:
+ *  - Removes all characters that don't match `d`, `M` and `y`, or any of the date format delimiters
+ *    `.`, `/` and `-`.
+ *  - Ensures that the format is for two digits day and month, and four digits year.
+ *
+ * The output of this cleanup is always a 10 characters string in one of the following variations:
+ *  - yyyy/MM/dd
+ *  - yyyy-MM-dd
+ *  - yyyy.MM.dd
+ *  - dd/MM/yyyy
+ *  - dd-MM-yyyy
+ *  - dd.MM.yyyy
+ *  - MM/dd/yyyy
+ */
+@ExperimentalMaterial3Api
+private fun datePatternAsInputFormat(localeFormat: String): DateInputFormat {
+    val patternWithDelimiters = localeFormat.replace(Regex("[^dMy/\\-.]"), "")
+        .replace(Regex("d{1,2}"), "dd")
+        .replace(Regex("M{1,2}"), "MM")
+        .replace(Regex("y{1,4}"), "yyyy")
+        .replace("My", "M/y") // Edge case for the Kako locale
+        .removeSuffix(".") // Removes a dot suffix that appears in some formats
+
+    val delimiterRegex = Regex("[/\\-.]")
+    val delimiterMatchResult = delimiterRegex.find(patternWithDelimiters)
+    val delimiterIndex = delimiterMatchResult!!.groups[0]!!.range.first
+    val delimiter = patternWithDelimiters.substring(delimiterIndex, delimiterIndex + 1)
+    return DateInputFormat(
+        patternWithDelimiters = patternWithDelimiters,
+        delimiter = delimiter[0]
+    )
 }

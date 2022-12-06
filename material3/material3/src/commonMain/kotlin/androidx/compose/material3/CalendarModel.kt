@@ -16,6 +16,8 @@
 
 package androidx.compose.material3
 
+import java.util.Locale
+
 @ExperimentalMaterial3Api
 internal interface CalendarModel {
 
@@ -41,6 +43,24 @@ internal interface CalendarModel {
      * Older APIs that predate API 26 will hold a full name and the first three letters of the day.
      */
     val weekdayNames: List<Pair<String, String>>
+
+    /**
+     * Holds a [DateInputFormat] for the current [Locale].
+     *
+     * The input format represents the date with two digits for the day and the month, and
+     * four digits for the year.
+     *
+     * For example, the input format patterns, including delimiters, will hold 10-characters strings
+     * in one of the following variations:
+     *  - yyyy/MM/dd
+     *  - yyyy-MM-dd
+     *  - yyyy.MM.dd
+     *  - dd/MM/yyyy
+     *  - dd-MM-yyyy
+     *  - dd.MM.yyyy
+     *  - MM/dd/yyyy
+     */
+    val dateInputFormat: DateInputFormat
 
     /**
      * Returns a [CalendarDate] from a given _UTC_ time in milliseconds.
@@ -175,6 +195,20 @@ internal data class CalendarMonth(
     internal fun indexIn(years: IntRange): Int {
         return (year - years.first) * 12 + month - 1
     }
+}
+
+/**
+ * Holds the date input format pattern information.
+ *
+ * This data class hold the delimiter that is used by the current [Locale] when representing dates
+ * in a short format, as well as a date pattern with and without a delimiter.
+ */
+@ExperimentalMaterial3Api
+internal data class DateInputFormat(
+    val patternWithDelimiters: String,
+    val delimiter: Char
+) {
+    val patternWithoutDelimiters: String = patternWithDelimiters.replace(delimiter.toString(), "")
 }
 
 internal const val DaysInWeek: Int = 7
