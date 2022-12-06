@@ -16,9 +16,6 @@
 
 package androidx.compose.ui.text.font
 
-import androidx.compose.ui.text.ExperimentalTextApi
-
-@ExperimentalTextApi
 internal actual class PlatformFontFamilyTypefaceAdapter actual constructor() :
     FontFamilyTypefaceAdapter {
 
