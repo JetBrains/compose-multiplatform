@@ -57,6 +57,14 @@ private inline fun <reified T> Collection<Group>.findRememberedData(): List<T> {
     }
 }
 
+@OptIn(UiToolingDataApi::class)
+private inline fun <reified T> Group.findData(): T? {
+    // Search in self data and children data
+    return (data + children.flatMap { it.data }).firstOrNull { data ->
+        data is T
+    } as? T
+}
+
 /** Contains tree parsers for different animation types. */
 @OptIn(UiToolingDataApi::class)
 internal class AnimationSearch(
@@ -75,18 +83,24 @@ internal class AnimationSearch(
             setOf(AnimateXAsStateSearch { clock().trackAnimateXAsState(it) })
         else emptyList()
 
+    private fun infiniteTransitionSearch() =
+        if (InfiniteTransitionComposeAnimation.apiAvailable)
+            setOf(InfiniteTransitionSearch {
+                clock().trackInfiniteTransition(it)
+            })
+        else emptySet()
+
     /** All supported animations. */
     private fun supportedSearch() = setOf(
         transitionSearch,
         animatedVisibilitySearch,
-    ) + animateXAsStateSearch()
+    ) + animateXAsStateSearch() + infiniteTransitionSearch()
 
     private fun unsupportedSearch() = if (UnsupportedComposeAnimation.apiAvailable) setOf(
         animatedContentSearch,
         AnimateContentSizeSearch { clock().trackAnimateContentSize(it) },
         TargetBasedSearch { clock().trackTargetBasedAnimations(it) },
-        DecaySearch { clock().trackDecayAnimations(it) },
-        InfiniteTransitionSearch { clock().trackInfiniteTransition(it) }
+        DecaySearch { clock().trackDecayAnimations(it) }
     ) else emptyList()
 
     /** All supported animations. */
@@ -172,8 +186,37 @@ internal class AnimationSearch(
     class DecaySearch(trackAnimation: (DecayAnimation<*, *>) -> Unit) :
         RememberSearch<DecayAnimation<*, *>>(DecayAnimation::class, trackAnimation)
 
-    class InfiniteTransitionSearch(trackAnimation: (InfiniteTransition) -> Unit) :
-        RememberSearch<InfiniteTransition>(InfiniteTransition::class, trackAnimation)
+    data class InfiniteTransitionSearchInfo(
+        val infiniteTransition: InfiniteTransition,
+        val toolingState: ToolingState<Long>
+    )
+
+    class InfiniteTransitionSearch(trackAnimation: (InfiniteTransitionSearchInfo) -> Unit) :
+        Search<InfiniteTransitionSearchInfo>(trackAnimation) {
+
+        override fun addAnimations(groupsWithLocation: Collection<Group>) {
+            animations.addAll(findAnimations(groupsWithLocation))
+        }
+
+        private fun findAnimations(groupsWithLocation: Collection<Group>):
+            List<InfiniteTransitionSearchInfo> {
+            val groups = groupsWithLocation.filter { group -> group.name == "run" }
+                .filterIsInstance<CallGroup>()
+            return groups.mapNotNull {
+                val infiniteTransition = it.findData<InfiniteTransition>()
+                val toolingOverride = it.findData<MutableState<State<Long>?>>()
+                if (infiniteTransition != null && toolingOverride != null) {
+                    if (toolingOverride.value == null) {
+                        toolingOverride.value = ToolingState(0L)
+                    }
+                    InfiniteTransitionSearchInfo(
+                        infiniteTransition,
+                        toolingOverride.value as ToolingState<Long>
+                    )
+                } else null
+            }
+        }
+    }
 
     data class AnimateXAsStateSearchInfo<T, V : AnimationVector>(
         val animatable: Animatable<T, V>,

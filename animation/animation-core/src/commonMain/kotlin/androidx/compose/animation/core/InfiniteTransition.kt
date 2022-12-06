@@ -170,12 +170,16 @@ class InfiniteTransition internal constructor(val label: String) {
     @Suppress("ComposableNaming")
     @Composable
     internal fun run() {
+        val toolingOverride = remember {
+            mutableStateOf<State<Long>?>(null)
+        }
         if (isRunning || refreshChildNeeded) {
             LaunchedEffect(this) {
                 var durationScale = 1f
                 // Restart every time duration scale changes
                 while (true) {
                     withInfiniteAnimationFrameNanos {
+                        val currentTimeNanos = toolingOverride.value?.value ?: it
                         if (startTimeNanos == AnimationConstants.UnspecifiedTime ||
                             durationScale != coroutineContext.durationScale
                         ) {
@@ -191,7 +195,8 @@ class InfiniteTransition internal constructor(val label: String) {
                                 it.skipToEnd()
                             }
                         } else {
-                            val playTimeNanos = ((it - startTimeNanos) / durationScale).toLong()
+                            val playTimeNanos = ((currentTimeNanos - startTimeNanos) /
+                                durationScale).toLong()
                             onFrame(playTimeNanos)
                         }
                     }

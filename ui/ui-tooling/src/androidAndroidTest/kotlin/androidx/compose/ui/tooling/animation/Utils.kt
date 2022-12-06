@@ -42,7 +42,7 @@ object Utils {
 
     val nullableFloatConverter = TwoWayConverter<Float?, AnimationVector1D>({
         AnimationVector1D(it ?: 0f)
-    }, { it.value })
+    }, { if (it.value == 0f) null else it.value })
 
     val stringConverter = TwoWayConverter<String, AnimationVector1D>(
         { AnimationVector1D(it.toFloat()) }, { it.value.toString() })
@@ -89,6 +89,25 @@ object Utils {
                 .flatMap { tree -> tree.findAll { it.location != null } }
             search.addAnimations(groups)
             additionalSearch?.addAnimations(groups)
+        }
+    }
+
+    @OptIn(UiToolingDataApi::class)
+    internal fun ComposeContentTestRule.searchAndTrackAllAnimations(
+        search: AnimationSearch,
+        content: @Composable () -> Unit
+    ) {
+        val slotTableRecord = CompositionDataRecord.create()
+        this.setContent {
+            Inspectable(slotTableRecord) {
+                content()
+            }
+        }
+        this.runOnUiThread {
+            val groups = slotTableRecord.store.map { it.asTree() }
+                .flatMap { tree -> tree.findAll { it.location != null } }
+            search.findAll(groups)
+            search.trackAll()
         }
     }
 

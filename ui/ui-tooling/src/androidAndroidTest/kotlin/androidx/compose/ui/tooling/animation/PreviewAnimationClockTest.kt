@@ -23,10 +23,13 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.InternalAnimationApi
 import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.animateDp
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.createChildTransition
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.fadeIn
@@ -40,6 +43,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.tooling.animation.Utils.searchAndTrackAllAnimations
 import androidx.compose.ui.tooling.animation.states.AnimatedVisibilityState
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
@@ -496,6 +500,50 @@ class PreviewAnimationClockTest {
         }
         // Label is not explicitly set, so we fall back to the default AnimatedVisibility label
         assertEquals("AnimatedVisibility", animatedVisibilityImplicitLabel.label)
+    }
+
+    @Test
+    fun clockWithInfiniteTransition() {
+        val search = AnimationSearch({ testClock }) {}
+        composeRule.searchAndTrackAllAnimations(search) {
+            // Transition with duration 1000
+            val transition = updateTransition(targetState = 10, label = "updateTransition")
+            transition.animateDp(
+                transitionSpec = { tween(durationMillis = 1000, easing = LinearEasing) },
+                label = "AnimatedDp"
+            ) {
+                if (it == 0) 0.dp else 1.dp
+            }
+            // Infinite transition with duration 300
+            val infiniteTransition = rememberInfiniteTransition()
+            infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 1f,
+                animationSpec = infiniteRepeatable(
+                    tween(300),
+                    RepeatMode.Restart
+                )
+            )
+        }
+        // Default states.
+        assertEquals(300, testClock.getMaxDuration())
+        assertEquals(300, testClock.getMaxDurationPerIteration())
+        val transitionAnimation = testClock.transitionClocks.keys.first()
+        val infiniteAnimation = testClock.infiniteTransitionClocks.keys.first()
+        assertTrue(testClock.getAnimatedProperties(infiniteAnimation).isNotEmpty())
+        testClock.getTransitions(infiniteAnimation, 100).let {
+            assertTrue(it.isNotEmpty())
+            assertTrue(it.first().endTimeMillis <= 500)
+        }
+        // With updated transition state.
+        testClock.updateFromAndToStates(transitionAnimation, 0, 1)
+        composeRule.waitForIdle()
+        assertEquals(1000, testClock.getMaxDuration())
+        assertEquals(1000, testClock.getMaxDurationPerIteration())
+        assertTrue(testClock.getAnimatedProperties(infiniteAnimation).isNotEmpty())
+        val transitions = testClock.getTransitions(infiniteAnimation, 100)
+        assertTrue(transitions.isNotEmpty())
+        assertTrue(transitions.first().endTimeMillis >= 500)
     }
 
     // Sets up a transition animation scenario, going from RotationColor.RC1 to RotationColor.RC3.

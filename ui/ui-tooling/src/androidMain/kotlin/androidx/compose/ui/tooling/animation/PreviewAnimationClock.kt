@@ -19,16 +19,17 @@ package androidx.compose.ui.tooling.animation
 import android.util.Log
 import androidx.annotation.VisibleForTesting
 import androidx.compose.animation.core.DecayAnimation
-import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.core.Transition
 import androidx.compose.animation.tooling.ComposeAnimatedProperty
 import androidx.compose.animation.tooling.ComposeAnimation
 import androidx.compose.animation.tooling.TransitionInfo
 import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation.Companion.parse
+import androidx.compose.ui.tooling.animation.InfiniteTransitionComposeAnimation.Companion.parse
 import androidx.compose.ui.tooling.animation.clock.AnimateXAsStateClock
 import androidx.compose.ui.tooling.animation.clock.AnimatedVisibilityClock
 import androidx.compose.ui.tooling.animation.clock.ComposeAnimationClock
+import androidx.compose.ui.tooling.animation.clock.InfiniteTransitionClock
 import androidx.compose.ui.tooling.animation.clock.TransitionClock
 import androidx.compose.ui.tooling.animation.clock.millisToNanos
 import androidx.compose.ui.tooling.animation.states.AnimatedVisibilityState
@@ -78,14 +79,24 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     internal val animateXAsStateClocks =
         mutableMapOf<AnimateXAsStateComposeAnimation<*, *>, AnimateXAsStateClock<*, *>>()
 
+    /** Map of subscribed [InfiniteTransitionComposeAnimation]s and corresponding [InfiniteTransitionClock]s. */
+    @VisibleForTesting
+    internal val infiniteTransitionClocks =
+        mutableMapOf<InfiniteTransitionComposeAnimation, InfiniteTransitionClock>()
+    private val allClocksExceptInfinite: List<ComposeAnimationClock<*, *>>
+        get() = transitionClocks.values +
+            animatedVisibilityClocks.values +
+            animateXAsStateClocks.values
+
     /** All subscribed animations clocks. */
     private val allClocks: List<ComposeAnimationClock<*, *>>
-        get() = transitionClocks.values +
-            animatedVisibilityClocks.values + animateXAsStateClocks.values
+        get() = allClocksExceptInfinite +
+            infiniteTransitionClocks.values
 
     private fun findClock(animation: ComposeAnimation): ComposeAnimationClock<*, *>? {
         return transitionClocks[animation] ?: animatedVisibilityClocks[animation]
         ?: animateXAsStateClocks[animation]
+        ?: infiniteTransitionClocks[animation]
     }
 
     fun trackTransition(animation: Transition<*>) {
@@ -139,8 +150,22 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
         trackUnsupported(animation, animation.label ?: "AnimatedContent")
     }
 
-    fun trackInfiniteTransition(animation: InfiniteTransition) {
-        trackUnsupported(animation, "InfiniteTransition")
+    fun trackInfiniteTransition(animation: AnimationSearch.InfiniteTransitionSearchInfo) {
+        trackAnimation(animation.infiniteTransition) {
+            animation.parse()?.let {
+                infiniteTransitionClocks[it] = InfiniteTransitionClock(it) {
+                    // Let InfiniteTransitionClock be aware about max duration of other animations.
+                    val otherClockMaxDuration =
+                        allClocksExceptInfinite.maxOfOrNull { clock -> clock.getMaxDuration() } ?: 0
+                    val infiniteMaxDurationPerIteration =
+                        infiniteTransitionClocks.values.maxOfOrNull { clock ->
+                            clock.getMaxDurationPerIteration()
+                        } ?: 0
+                    maxOf(otherClockMaxDuration, infiniteMaxDurationPerIteration)
+                }
+                notifySubscribe(it)
+            }
+        }
     }
 
     @VisibleForTesting

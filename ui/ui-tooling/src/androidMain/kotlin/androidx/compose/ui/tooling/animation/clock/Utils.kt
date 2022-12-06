@@ -20,6 +20,7 @@ import androidx.compose.animation.core.Animation
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.InfiniteRepeatableSpec
+import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.KeyframesSpec
 import androidx.compose.animation.core.RepeatableSpec
 import androidx.compose.animation.core.SnapSpec
@@ -28,6 +29,9 @@ import androidx.compose.animation.core.Transition
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec
 import androidx.compose.animation.tooling.TransitionInfo
+
+/** Animations can contain internal only transitions which should be ignored by tooling. */
+internal val IGNORE_TRANSITIONS = listOf("TransformOriginInterruptionHandling")
 
 /**
  * Converts the given time in nanoseconds to milliseconds, rounding up when needed.
@@ -104,6 +108,34 @@ internal fun <T, V : AnimationVector>
 
         for (millis in startTimeMs..endTimeMs step stepMs) {
             values[millis] = this.getValueFromNanos(millisToNanos(millis))
+        }
+        values
+    }
+    return TransitionInfo(
+        label, animationSpec.javaClass.name,
+        startTimeMs, endTimeMs, values
+    )
+}
+
+/**
+ * Creates [TransitionInfo] for [InfiniteTransition.TransitionAnimationState].
+ */
+internal fun <T, V : AnimationVector>
+    InfiniteTransition.TransitionAnimationState<T, V>.createTransitionInfo(
+    stepMs: Long = 1,
+    endTimeMs: Long
+): TransitionInfo {
+    val startTimeMs: Long = 0
+    val values: Map<Long, T> by lazy {
+        val values: MutableMap<Long, T> = mutableMapOf()
+        // Always add start and end points.
+        values[startTimeMs] = this.animation.getValueFromNanos(
+            millisToNanos(startTimeMs)
+        )
+        values[endTimeMs] = this.animation.getValueFromNanos(millisToNanos(endTimeMs))
+
+        for (millis in startTimeMs..endTimeMs step stepMs) {
+            values[millis] = this.animation.getValueFromNanos(millisToNanos(millis))
         }
         values
     }

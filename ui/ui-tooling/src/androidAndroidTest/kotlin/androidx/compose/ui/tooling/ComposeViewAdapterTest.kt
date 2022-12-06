@@ -207,10 +207,10 @@ class ComposeViewAdapterTest {
                 "animateContentSize",
                 "TargetBasedAnimation",
                 "DecayAnimation",
-                "InfiniteTransition"
             ),
             transitions = listOf("checkBoxAnim", "Crossfade"),
-            animateXAsState = emptyList()
+            animateXAsState = emptyList(),
+            infiniteTransitions = listOf("InfiniteTransition")
         )
         AnimateXAsStateComposeAnimation.testOverrideAvailability(true)
     }
@@ -249,8 +249,11 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun infiniteTransitionIsNotSubscribed() {
-        checkAnimationsAreSubscribed("InfiniteTransitionPreview")
+    fun infiniteTransitionIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "InfiniteTransitionPreview",
+            infiniteTransitions = listOf("InfiniteTransition")
+        )
     }
 
     @Test
@@ -275,8 +278,8 @@ class ComposeViewAdapterTest {
     fun infiniteAndTransitionIsSubscribed() {
         checkAnimationsAreSubscribed(
             "InfiniteAndTransitionPreview",
-            listOf("InfiniteTransition"),
-            listOf("checkBoxAnim")
+            transitions = listOf("checkBoxAnim"),
+            infiniteTransitions = listOf("InfiniteTransition")
         )
     }
 
@@ -287,7 +290,8 @@ class ComposeViewAdapterTest {
             "AllAnimations",
             emptyList(),
             listOf("checkBoxAnim", "Crossfade"),
-            animateXAsState = listOf("DpAnimation", "IntAnimation")
+            animateXAsState = listOf("DpAnimation", "IntAnimation"),
+            infiniteTransitions = listOf("InfiniteTransition")
         )
         UnsupportedComposeAnimation.testOverrideAvailability(true)
     }
@@ -315,7 +319,8 @@ class ComposeViewAdapterTest {
         preview: String,
         unsupported: List<String> = emptyList(),
         transitions: List<String> = emptyList(),
-        animateXAsState: List<String> = emptyList()
+        animateXAsState: List<String> = emptyList(),
+        infiniteTransitions: List<String> = emptyList()
     ) {
         val clock = PreviewAnimationClock()
 
@@ -329,6 +334,7 @@ class ComposeViewAdapterTest {
             assertTrue(clock.transitionClocks.isEmpty())
             assertTrue(clock.trackedUnsupportedAnimations.isEmpty())
             assertTrue(clock.animatedVisibilityClocks.isEmpty())
+            assertTrue(clock.infiniteTransitionClocks.isEmpty())
         }
 
         waitFor(5, TimeUnit.SECONDS) {
@@ -343,6 +349,8 @@ class ComposeViewAdapterTest {
             assertEquals(transitions, clock.transitionClocks.values.map { it.animation.label })
             assertEquals(animateXAsState,
                 clock.animateXAsStateClocks.values.map { it.animation.label })
+            assertEquals(infiniteTransitions,
+                clock.infiniteTransitionClocks.values.map { it.animation.label })
             assertEquals(0, clock.animatedVisibilityClocks.size)
         }
     }

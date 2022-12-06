@@ -17,6 +17,8 @@
 package androidx.compose.ui.tooling.animation
 
 import androidx.compose.animation.core.SpringSpec
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.tooling.ComposeAnimationType
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.tooling.AnimateAsStatePreview
 import androidx.compose.ui.tooling.AnimateAsStateWithLabelsPreview
@@ -31,6 +33,7 @@ import androidx.compose.ui.tooling.InfiniteTransitionPreview
 import androidx.compose.ui.tooling.TargetBasedAnimationPreview
 import androidx.compose.ui.tooling.TransitionAnimatedVisibilityPreview
 import androidx.compose.ui.tooling.TransitionPreview
+import androidx.compose.ui.tooling.animation.InfiniteTransitionComposeAnimation.Companion.parse
 import androidx.compose.ui.tooling.animation.Utils.searchForAnimation
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -78,6 +81,25 @@ class AnimationSearchTest {
         assertEquals(1, search.animations.size)
         search.track()
         assertEquals(1, callbacks)
+        val composeAnimation = search.animations.first().parse()!!
+        Assert.assertNotNull(composeAnimation)
+        Assert.assertNotNull(composeAnimation.animationObject)
+        Assert.assertNotNull(composeAnimation.label)
+        assertEquals(1, composeAnimation.states.size)
+        assertEquals(ComposeAnimationType.INFINITE_TRANSITION, composeAnimation.type)
+    }
+
+    @Test
+    fun multipleInfiniteTransitionIsFound() {
+        val search = AnimationSearch.InfiniteTransitionSearch { }
+        rule.searchForAnimation(search) {
+            rememberInfiniteTransition()
+            rememberInfiniteTransition()
+            rememberInfiniteTransition()
+            rememberInfiniteTransition()
+            rememberInfiniteTransition()
+        }
+        assertEquals(5, search.animations.size)
     }
 
     @Test
