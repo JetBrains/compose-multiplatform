@@ -22,7 +22,6 @@ import android.graphics.Typeface
 import android.os.ParcelFileDescriptor
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.ExperimentalTextApi
 import java.io.File
 
 /**
@@ -39,7 +38,6 @@ import java.io.File
  * @param variationSettings on API 26 and above these settings are applied to a variable font when
  * the font is loaded
  */
-@ExperimentalTextApi
 @Stable
 fun Font(
     path: String,
@@ -60,7 +58,6 @@ fun Font(
  * @param variationSettings on API 26 and above these settings are applied to a variable font when
  * the font is loaded
  */
-@ExperimentalTextApi
 @Stable
 @Suppress("StreamFiles")
 fun Font(
@@ -82,7 +79,6 @@ fun Font(
  * @param variationSettings these settings are applied to a variable font when the font is loaded
  */
 @RequiresApi(26)
-@ExperimentalTextApi
 @Stable
 fun Font(
     fileDescriptor: ParcelFileDescriptor,
