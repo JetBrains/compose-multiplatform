@@ -26,6 +26,7 @@ internal actual object MappedKeys {
     actual val C: Key = Key(KeyEvent.KEYCODE_C)
     actual val H: Key = Key(KeyEvent.KEYCODE_H)
     actual val V: Key = Key(KeyEvent.KEYCODE_V)
+    actual val Y: Key = Key(KeyEvent.KEYCODE_Y)
     actual val X: Key = Key(KeyEvent.KEYCODE_X)
     actual val Z: Key = Key(KeyEvent.KEYCODE_Z)
     actual val Backslash: Key = Key(KeyEvent.KEYCODE_BACKSLASH)

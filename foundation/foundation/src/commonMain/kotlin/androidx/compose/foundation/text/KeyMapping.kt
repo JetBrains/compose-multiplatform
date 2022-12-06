@@ -40,6 +40,7 @@ internal expect object MappedKeys {
     val H: Key
     val V: Key
     val X: Key
+    val Y: Key
     val Z: Key
     val Backslash: Key
     val DirectionLeft: Key
@@ -77,6 +78,7 @@ internal fun commonKeyMapping(
                         MappedKeys.V -> KeyCommand.PASTE
                         MappedKeys.X -> KeyCommand.CUT
                         MappedKeys.A -> KeyCommand.SELECT_ALL
+                        MappedKeys.Y -> KeyCommand.REDO
                         MappedKeys.Z -> KeyCommand.UNDO
                         else -> null
                     }
