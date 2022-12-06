@@ -29,6 +29,9 @@ object TestProperties {
     val gradleVersionForTests: String?
         get() = System.getProperty("compose.tests.gradle.version")
 
+    val gradleConfigurationCache: Boolean
+        get() = System.getProperty("compose.tests.gradle.configuration.cache") == "true"
+
     val summaryFile: File?
         get() = System.getProperty("compose.tests.summary.file")?.let { File(it) }
 

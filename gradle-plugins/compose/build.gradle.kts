@@ -109,7 +109,14 @@ tasks.test {
 for (gradleVersion in supportedGradleVersions) {
     tasks.registerVerificationTask<Test>("testGradle-$gradleVersion") {
         classpath = tasks.test.get().classpath
-        systemProperty("compose.tests.gradle.version", gradleVersion)
+        val configCacheSuffix = "-with-configuration-cache"
+        val version = if (gradleVersion.endsWith(configCacheSuffix)) {
+            systemProperty("compose.tests.gradle.configuration.cache", "true")
+            gradleVersion.removeSuffix(configCacheSuffix)
+        } else {
+            gradleVersion
+        }
+        systemProperty("compose.tests.gradle.version", version)
         filter {
             includeTestsMatching(gradleTestsPattern)
         }

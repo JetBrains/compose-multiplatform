@@ -6,20 +6,18 @@
 package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.impldep.org.testng.Assert
-import org.gradle.testkit.runner.TaskOutcome
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.internal.uppercaseFirstChar
 import org.jetbrains.compose.test.utils.*
 
 import java.io.File
 import java.util.*
-import java.util.jar.JarFile
-import kotlin.collections.HashSet
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assumptions
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import java.util.jar.JarFile
 
 class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
@@ -37,32 +35,32 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 }
             """.trimIndent()
         }
-        gradle("run").build().let { result ->
-            assertEquals(TaskOutcome.SUCCESS, result.task(":run")?.outcome)
+        gradle("run").checks {
+            check.taskSuccessful(":run")
         }
-        gradle("runDistributable").build().let { result ->
-            assertEquals(TaskOutcome.SUCCESS, result.task(":createDistributable")!!.outcome)
-            assertEquals(TaskOutcome.SUCCESS, result.task(":runDistributable")?.outcome)
+        gradle("runDistributable").checks {
+            check.taskSuccessful(":createDistributable")
+            check.taskSuccessful(":runDistributable")
         }
     }
 
     @Test
     fun testRunMpp() = with(testProject(TestProjects.mpp)) {
         val logLine = "Kotlin MPP app is running!"
-        gradle("run").build().checks { check ->
-            check.taskOutcome(":run", TaskOutcome.SUCCESS)
+        gradle("run").checks {
+            check.taskSuccessful(":run")
             check.logContains(logLine)
         }
-        gradle("runDistributable").build().checks { check ->
-            check.taskOutcome(":createDistributable", TaskOutcome.SUCCESS)
-            check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+        gradle("runDistributable").checks {
+            check.taskSuccessful(":createDistributable")
+            check.taskSuccessful(":runDistributable")
             check.logContains(logLine)
         }
     }
 
     @Test
     fun testAndroidxCompiler() = with(testProject(TestProjects.androidxCompiler, defaultAndroidxCompilerEnvironment)) {
-        gradle(":runDistributable").build().checks { check ->
+        gradle(":runDistributable").checks {
             val actualMainImage = file("main-image.actual.png")
             val expectedMainImage = file("main-image.expected.png")
             assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
@@ -73,8 +71,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun kotlinDsl(): Unit = with(testProject(TestProjects.jvmKotlinDsl)) {
-        gradle(":packageDistributionForCurrentOS", "--dry-run").build()
-        gradle(":packageReleaseDistributionForCurrentOS", "--dry-run").build()
+        gradle(":packageDistributionForCurrentOS", "--dry-run")
+        gradle(":packageReleaseDistributionForCurrentOS", "--dry-run")
     }
 
     @Test
@@ -106,8 +104,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
 
         checkImageBeforeBuild()
-        gradle(":runReleaseDistributable").build().checks { check ->
-            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+        gradle(":runReleaseDistributable").checks {
+            check.taskSuccessful(":proguardReleaseJars")
             checkImageAfterBuild()
             assertEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
@@ -115,8 +113,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         file("build.gradle").modify { "$it\n$enableObfuscation" }
         actualMainImage.delete()
         checkImageBeforeBuild()
-        gradle(":runReleaseDistributable").build().checks { check ->
-            check.taskOutcome(":proguardReleaseJars", TaskOutcome.SUCCESS)
+        gradle(":runReleaseDistributable").checks {
+            check.taskSuccessful(":proguardReleaseJars")
             checkImageAfterBuild()
             assertNotEqualTextFiles(file("main-methods.actual.txt"), file("main-methods.expected.txt"))
         }
@@ -138,13 +136,13 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         }
 
         val packagingTask = ":packageDistributionForCurrentOS"
-        gradle(packagingTask).build().checks { check ->
-            check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
+        gradle(packagingTask).checks {
+            check.taskSuccessful(packagingTask)
         }
 
-        gradle("clean", packagingTask).build().checks { check ->
-            check.taskOutcome(":checkRuntime", TaskOutcome.FROM_CACHE)
-            check.taskOutcome(packagingTask, TaskOutcome.SUCCESS)
+        gradle("clean", packagingTask).checks {
+            check.taskFromCache(":checkRuntime")
+            check.taskSuccessful(packagingTask)
         }
     }
 
@@ -160,7 +158,7 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
 
     private fun TestProject.testPackageJvmDistributions() {
-        val result = gradle(":packageDistributionForCurrentOS").build()
+        val result = gradle(":packageDistributionForCurrentOS")
 
         val mainClass = file("build/classes").walk().single { it.isFile && it.name == "MainKt.class" }
         val bytecodeVersion = readClassFileVersion(mainClass)
@@ -196,8 +194,10 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         } else {
             Assert.assertEquals(packageFile.name, "TestPackage-1.0.0.$ext", "Unexpected package name")
         }
-        assertEquals(TaskOutcome.SUCCESS, result.task(":package${ext.uppercaseFirstChar()}")?.outcome)
-        assertEquals(TaskOutcome.SUCCESS, result.task(":packageDistributionForCurrentOS")?.outcome)
+        result.checks {
+            check.taskSuccessful(":package${ext.uppercaseFirstChar()}")
+            check.taskSuccessful(":packageDistributionForCurrentOS")
+        }
     }
 
     @Test
@@ -238,8 +238,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     private fun TestProject.testPackageUberJarForCurrentOS() {
-        gradle(":packageUberJarForCurrentOS").build().let { result ->
-            assertEquals(TaskOutcome.SUCCESS, result.task(":packageUberJarForCurrentOS")?.outcome)
+        gradle(":packageUberJarForCurrentOS").checks {
+            check.taskSuccessful(":packageUberJarForCurrentOS")
 
             val resultJarFile = file("build/compose/jars/TestPackage-${currentTarget.id}-1.0.0.jar")
             resultJarFile.checkExists()
@@ -257,9 +257,9 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun testModuleClash() = with(testProject(TestProjects.moduleClashCli)) {
-        gradle(":app:runDistributable").build().checks { check ->
-            check.taskOutcome(":app:createDistributable", TaskOutcome.SUCCESS)
-            check.taskOutcome(":app:runDistributable", TaskOutcome.SUCCESS)
+        gradle(":app:runDistributable").checks { 
+            check.taskSuccessful(":app:createDistributable")
+            check.taskSuccessful(":app:runDistributable")
             check.logContains("Called lib1#util()")
             check.logContains("Called lib2#util()")
         }
@@ -267,8 +267,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun testJavaLogger() = with(testProject(TestProjects.javaLogger)) {
-        gradle(":runDistributable").build().checks { check ->
-            check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+        gradle(":runDistributable").checks {
+            check.taskSuccessful(":runDistributable")
             check.logContains("Compose Gradle plugin test log warning!")
         }
     }
@@ -284,8 +284,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
         Assumptions.assumeTrue(currentOS == OS.MacOS)
 
         with(testProject(TestProjects.macOptions)) {
-            gradle(":runDistributable").build().checks { check ->
-                check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+            gradle(":runDistributable").checks {
+                check.taskSuccessful(":runDistributable")
                 check.logContains("Hello, from Mac OS!")
                 val appDir = testWorkDir.resolve("build/compose/binaries/main/app/TestPackage.app/Contents/")
                 val actualInfoPlist = appDir.resolve("Info.plist").checkExists()
@@ -333,8 +333,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                 security("default-keychain", "-s", keychain)
                 security("unlock-keychain", "-p", password, keychain)
 
-                gradle(":createDistributable").build().checks { check ->
-                    check.taskOutcome(":createDistributable", TaskOutcome.SUCCESS)
+                gradle(":createDistributable").checks {
+                    check.taskSuccessful(":createDistributable")
                     val appDir = testWorkDir.resolve("build/compose/binaries/main/app/TestPackage.app/")
                     val result = runProcess(MacUtils.codesign, args = listOf("--verify", "--verbose", appDir.absolutePath))
                     val actualOutput = result.err.trim()
@@ -345,8 +345,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
                     Assert.assertEquals(expectedOutput, actualOutput)
                 }
 
-                gradle(":runDistributable").build().checks { check ->
-                    check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+                gradle(":runDistributable").checks {
+                    check.taskSuccessful(":runDistributable")
                     check.logContains("Signed app successfully started!")
                 }
             }
@@ -357,8 +357,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     fun testOptionsWithSpaces() {
         with(testProject(TestProjects.optionsWithSpaces)) {
             fun testRunTask(runTask: String) {
-                gradle(runTask).build().checks { check ->
-                    check.taskOutcome(runTask, TaskOutcome.SUCCESS)
+                gradle(runTask).checks {
+                    check.taskSuccessful(runTask)
                     check.logContains("Running test options with spaces!")
                     check.logContains("Arg #1=Value 1!")
                     check.logContains("Arg #2=Value 2!")
@@ -369,8 +369,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":packageDistributionForCurrentOS").build().checks { check ->
-                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").checks {
+                check.taskSuccessful(":packageDistributionForCurrentOS")
             }
         }
     }
@@ -379,8 +379,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     fun testDefaultArgs() {
         with(testProject(TestProjects.defaultArgs)) {
             fun testRunTask(runTask: String) {
-                gradle(runTask).build().checks { check ->
-                    check.taskOutcome(runTask, TaskOutcome.SUCCESS)
+                gradle(runTask).checks {
+                    check.taskSuccessful(runTask)
                     check.logContains("compose.application.configure.swing.globals=true")
                 }
             }
@@ -388,8 +388,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":packageDistributionForCurrentOS").build().checks { check ->
-                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").checks {
+                check.taskSuccessful(":packageDistributionForCurrentOS")
             }
         }
     }
@@ -398,8 +398,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     fun testDefaultArgsOverride() {
         with(testProject(TestProjects.defaultArgsOverride)) {
             fun testRunTask(runTask: String) {
-                gradle(runTask).build().checks { check ->
-                    check.taskOutcome(runTask, TaskOutcome.SUCCESS)
+                gradle(runTask).checks {
+                    check.taskSuccessful(runTask)
                     check.logContains("compose.application.configure.swing.globals=false")
                 }
             }
@@ -407,8 +407,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             testRunTask(":runDistributable")
             testRunTask(":run")
 
-            gradle(":packageDistributionForCurrentOS").build().checks { check ->
-                check.taskOutcome(":packageDistributionForCurrentOS", TaskOutcome.SUCCESS)
+            gradle(":packageDistributionForCurrentOS").checks {
+                check.taskSuccessful(":packageDistributionForCurrentOS")
             }
         }
     }
@@ -416,8 +416,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testSuggestModules() {
         with(testProject(TestProjects.jvm)) {
-            gradle(":suggestRuntimeModules").build().checks { check ->
-                check.taskOutcome(":suggestRuntimeModules", TaskOutcome.SUCCESS)
+            gradle(":suggestRuntimeModules").checks {
+                check.taskSuccessful(":suggestRuntimeModules")
                 check.logContains("Suggested runtime modules to include:")
                 check.logContains("modules(\"java.instrument\", \"jdk.unsupported\")")
             }
@@ -427,8 +427,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testUnpackSkiko() {
         with(testProject(TestProjects.unpackSkiko)) {
-            gradle(":runDistributable").build().checks { check ->
-                check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+            gradle(":runDistributable").checks {
+                check.taskSuccessful(":runDistributable")
 
                 val libraryPathPattern = "Read skiko library path: '(.*)'".toRegex()
                 val m = libraryPathPattern.find(check.log)
@@ -450,12 +450,12 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
     @Test
     fun resources() = with(testProject(TestProjects.resources)) {
-        gradle(":run").build().checks { check ->
-            check.taskOutcome(":run", TaskOutcome.SUCCESS)
+        gradle(":run").checks {
+            check.taskSuccessful(":run")
         }
 
-        gradle(":runDistributable").build().checks { check ->
-            check.taskOutcome(":runDistributable", TaskOutcome.SUCCESS)
+        gradle(":runDistributable").checks {
+            check.taskSuccessful(":runDistributable")
         }
     }
 }
