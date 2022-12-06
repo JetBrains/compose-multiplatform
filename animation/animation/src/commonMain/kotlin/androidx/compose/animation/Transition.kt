@@ -62,7 +62,7 @@ import androidx.compose.ui.graphics.Color
 @Composable
 inline fun <S> Transition<S>.animateColor(
     noinline transitionSpec:
-        @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Color> = { spring() },
+    @Composable Transition.Segment<S>.() -> FiniteAnimationSpec<Color> = { spring() },
     label: String = "ColorAnimation",
     targetValueByState: @Composable() (state: S) -> Color
 ): State<Color> {
@@ -86,6 +86,8 @@ inline fun <S> Transition<S>.animateColor(
  * will be restarted with the new initial/targetValue. __Note__: this means animation continuity
  * will *not* be preserved when changing either [initialValue] or [targetValue].
  *
+ * A [label] for differentiating this animation from others in android studio.
+ *
  * @sample androidx.compose.animation.samples.InfiniteTransitionSample
  *
  * @see InfiniteTransition.animateValue
@@ -95,10 +97,27 @@ inline fun <S> Transition<S>.animateColor(
 fun InfiniteTransition.animateColor(
     initialValue: Color,
     targetValue: Color,
-    animationSpec: InfiniteRepeatableSpec<Color>
+    animationSpec: InfiniteRepeatableSpec<Color>,
+    label: String = "ColorAnimation"
 ): State<Color> {
     val converter = remember {
         (Color.VectorConverter)(targetValue.colorSpace)
     }
-    return animateValue(initialValue, targetValue, converter, animationSpec)
+    return animateValue(initialValue, targetValue, converter, animationSpec, label)
 }
+
+@Deprecated(
+    "animateColor APIs now have a new label parameter added.",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun InfiniteTransition.animateColor(
+    initialValue: Color,
+    targetValue: Color,
+    animationSpec: InfiniteRepeatableSpec<Color>
+): State<Color> = this.animateColor(
+    initialValue = initialValue,
+    targetValue = targetValue,
+    animationSpec = animationSpec,
+    label = "ColorAnimation"
+)

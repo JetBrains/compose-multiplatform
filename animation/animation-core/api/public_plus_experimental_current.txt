@@ -417,24 +417,31 @@ package androidx.compose.animation.core {
 
   public final class InfiniteTransition {
     method public java.util.List<androidx.compose.animation.core.InfiniteTransition.TransitionAnimationState<?,?>> getAnimations();
+    method public String getLabel();
     property public final java.util.List<androidx.compose.animation.core.InfiniteTransition.TransitionAnimationState<?,?>> animations;
+    property public final String label;
   }
 
   public final class InfiniteTransition.TransitionAnimationState<T, V extends androidx.compose.animation.core.AnimationVector> implements androidx.compose.runtime.State<T> {
     method public androidx.compose.animation.core.TargetBasedAnimation<T,V> getAnimation();
     method public androidx.compose.animation.core.AnimationSpec<T> getAnimationSpec();
+    method public String getLabel();
     method public androidx.compose.animation.core.TwoWayConverter<T,V> getTypeConverter();
     method public T! getValue();
     property public final androidx.compose.animation.core.TargetBasedAnimation<T,V> animation;
     property public final androidx.compose.animation.core.AnimationSpec<T> animationSpec;
+    property public final String label;
     property public final androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter;
     property public T! value;
   }
 
   public final class InfiniteTransitionKt {
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Float> animateFloat(androidx.compose.animation.core.InfiniteTransition, float initialValue, float targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<java.lang.Float> animationSpec);
-    method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValue(androidx.compose.animation.core.InfiniteTransition, T? initialValue, T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.InfiniteRepeatableSpec<T> animationSpec);
-    method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.InfiniteTransition rememberInfiniteTransition();
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<java.lang.Float> animateFloat(androidx.compose.animation.core.InfiniteTransition, float initialValue, float targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<java.lang.Float> animationSpec, optional String label);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<? extends java.lang.Float> animateFloat(androidx.compose.animation.core.InfiniteTransition, float initialValue, float targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<java.lang.Float> animationSpec);
+    method @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<T> animateValue(androidx.compose.animation.core.InfiniteTransition, T? initialValue, T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.InfiniteRepeatableSpec<T> animationSpec, optional String label);
+    method @Deprecated @androidx.compose.runtime.Composable public static <T, V extends androidx.compose.animation.core.AnimationVector> androidx.compose.runtime.State<? extends T> animateValue(androidx.compose.animation.core.InfiniteTransition, T? initialValue, T? targetValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, androidx.compose.animation.core.InfiniteRepeatableSpec<T> animationSpec);
+    method @androidx.compose.runtime.Composable public static androidx.compose.animation.core.InfiniteTransition rememberInfiniteTransition(optional String label);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.animation.core.InfiniteTransition rememberInfiniteTransition();
   }
 
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface InternalAnimationApi {
