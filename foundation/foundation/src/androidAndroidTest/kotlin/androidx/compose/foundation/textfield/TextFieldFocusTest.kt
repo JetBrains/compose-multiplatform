@@ -400,6 +400,30 @@ class TextFieldFocusTest {
         }
     }
 
+    @Test
+    fun basicTextField_handlesInvalidDevice() {
+        setupAndEnableBasicTextField()
+        inputSingleLineTextInBasicTextField()
+
+        // -2 shouldn't be a valid device – we verify this below by asserting the device in the
+        // event is actually null.
+        val invalidDeviceId = -2
+        val keyCode = NativeKeyEvent.KEYCODE_DPAD_CENTER
+        val keyEventDown = KeyEvent(
+            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+            KeyEvent.ACTION_DOWN, keyCode, 0, 0, invalidDeviceId, 0
+        )
+        assertThat(keyEventDown.device).isNull()
+        rule.onRoot().performKeyPress(androidx.compose.ui.input.key.KeyEvent(keyEventDown))
+        rule.waitForIdle()
+        val keyEventUp = KeyEvent(
+            SystemClock.uptimeMillis(), SystemClock.uptimeMillis(),
+            KeyEvent.ACTION_UP, keyCode, 0, 0, invalidDeviceId, 0
+        )
+        rule.onRoot().performKeyPress(androidx.compose.ui.input.key.KeyEvent(keyEventUp))
+        rule.waitForIdle()
+    }
+
     private fun setupAndEnableBasicTextField() {
         setupContent()
 
