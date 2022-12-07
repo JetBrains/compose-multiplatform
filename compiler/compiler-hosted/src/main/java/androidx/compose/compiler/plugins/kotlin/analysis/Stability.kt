@@ -62,9 +62,11 @@ import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.ir.util.getInlineClassUnderlyingType
 import org.jetbrains.kotlin.ir.util.isEnumClass
 import org.jetbrains.kotlin.ir.util.isEnumEntry
+import org.jetbrains.kotlin.ir.util.isFinalClass
 import org.jetbrains.kotlin.ir.util.isFunctionOrKFunction
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.isTypeParameter
+import org.jetbrains.kotlin.platform.jvm.isJvm
 
 sealed class Stability {
     // class Foo(val bar: Int)
@@ -352,6 +354,9 @@ class StabilityInferencer(val context: IrPluginContext) {
     private fun canInferStability(declaration: IrClass): Boolean {
         val fqName = declaration.fqNameWhenAvailable?.toString() ?: ""
         return stableBuiltinTypes.contains(fqName) ||
+            // On JS and Native we can't access StabilityInferred annotation for IR_EXTERNAL_DECLARATION_STUB,
+            // therefore skip it for now and calculate the stability on the fly
+            context.platform.isJvm() &&
             declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB
     }
 
