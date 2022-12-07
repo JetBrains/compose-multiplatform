@@ -117,9 +117,10 @@ internal fun <T> Modifier.swipeAnchors(
             }
         }
         if (previousAnchors != newAnchors) {
+            val previousTarget = state.targetValue
             state.updateAnchors(newAnchors)
             if (previousAnchors.isNotEmpty()) {
-                anchorChangeHandler?.onAnchorsChanged(previousAnchors, newAnchors)
+                anchorChangeHandler?.onAnchorsChanged(previousTarget, previousAnchors, newAnchors)
             }
         }
     },
@@ -540,8 +541,7 @@ internal object SwipeableV2Defaults {
         state: SwipeableV2State<T>,
         animate: (target: T, velocity: Float) -> Unit,
         snap: (target: T) -> Unit
-    ) = AnchorChangeHandler { previousAnchors, newAnchors ->
-        val previousTarget = state.targetValue
+    ) = AnchorChangeHandler { previousTarget, previousAnchors, newAnchors ->
         val previousTargetOffset = previousAnchors[previousTarget]
         val newTargetOffset = newAnchors[previousTarget]
         if (previousTargetOffset != newTargetOffset) {
@@ -569,10 +569,15 @@ internal fun interface AnchorChangeHandler<T> {
      * Callback that is invoked when the anchors have changed, after the [SwipeableV2State] has been
      * updated with them. Use this hook to re-launch animations or interrupt them if needed.
      *
+     * @param previousTargetValue The target value before the anchors were updated
      * @param previousAnchors The previously set anchors
      * @param newAnchors The newly set anchors
      */
-    fun onAnchorsChanged(previousAnchors: Map<T, Float>, newAnchors: Map<T, Float>)
+    fun onAnchorsChanged(
+        previousTargetValue: T,
+        previousAnchors: Map<T, Float>,
+        newAnchors: Map<T, Float>
+    )
 }
 
 @Stable
