@@ -141,9 +141,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             skikoMain {
                 dependsOn(commonMain)
-                dependencies {
-                    implementation(libs.skikoCommon)
-                }
             }
 
             desktopMain.dependsOn(skikoMain)
