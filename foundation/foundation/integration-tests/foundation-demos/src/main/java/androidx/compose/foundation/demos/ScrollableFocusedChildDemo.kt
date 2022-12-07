@@ -67,6 +67,7 @@ import kotlin.math.roundToInt
 @Composable
 fun ScrollableFocusedChildDemo() {
     val resizableState = remember { ResizableState() }
+    var reverseScrolling by remember { mutableStateOf(false) }
 
     Column {
         Text(
@@ -82,7 +83,7 @@ fun ScrollableFocusedChildDemo() {
                 },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Cut in half")
+                Text("½ size")
             }
             Button(
                 onClick = {
@@ -90,7 +91,15 @@ fun ScrollableFocusedChildDemo() {
                 },
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Fill max size")
+                Text("Max size")
+            }
+            Button(
+                onClick = {
+                    reverseScrolling = !reverseScrolling
+                },
+                modifier = Modifier.weight(1f)
+            ) {
+                Text("Scroll: ${if (reverseScrolling) "backward" else "forward"}")
             }
         }
 
@@ -107,8 +116,8 @@ fun ScrollableFocusedChildDemo() {
             Box(
                 Modifier
                     .border(2.dp, Color.Black)
-                    .verticalScroll(rememberScrollState())
-                    .horizontalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState(), reverseScrolling = reverseScrolling)
+                    .horizontalScroll(rememberScrollState(), reverseScrolling = reverseScrolling)
             ) {
                 Box(
                     Modifier
