@@ -129,10 +129,12 @@ class LazyListFocusMoveTest(param: Param) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 2 else 0]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 0 else 2]).isTrue()
                 }
+
                 Right -> when (layoutDirection) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 0 else 2]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 2 else 0]).isTrue()
                 }
+
                 Up -> assertThat(isFocused[if (reverseLayout) 2 else 0]).isTrue()
                 Down -> assertThat(isFocused[if (reverseLayout) 0 else 2]).isTrue()
                 Previous -> assertThat(isFocused[0]).isTrue()
@@ -162,8 +164,10 @@ class LazyListFocusMoveTest(param: Param) {
             initiallyFocused.requestFocus()
             when (focusDirection) {
                 Left, Right, Up, Down, Previous, Next -> focusManager.moveFocus(focusDirection)
-                Enter, Exit -> { /* Do nothing */
+                Enter, Exit -> {
+                    // Do nothing
                 }
+
                 else -> unsupportedDirection()
             }
         }
@@ -181,10 +185,12 @@ class LazyListFocusMoveTest(param: Param) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 7 else 3]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 3 else 7]).isTrue()
                 }
+
                 Right -> when (layoutDirection) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 3 else 7]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 7 else 3]).isTrue()
                 }
+
                 Up -> assertThat(isFocused[if (reverseLayout) 7 else 3]).isTrue()
                 Down -> assertThat(isFocused[if (reverseLayout) 3 else 7]).isTrue()
                 Previous -> assertThat(isFocused[3]).isTrue()
@@ -218,8 +224,10 @@ class LazyListFocusMoveTest(param: Param) {
             // Move focus to the last visible item.
             when (focusDirection) {
                 Left, Right, Up, Down, Previous, Next -> focusManager.moveFocus(focusDirection)
-                Enter, Exit -> { /* Do nothing */
+                Enter, Exit -> {
+                    // Do nothing
                 }
+
                 else -> unsupportedDirection()
             }
         }
@@ -237,10 +245,12 @@ class LazyListFocusMoveTest(param: Param) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 208 else 4]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 4 else 208]).isTrue()
                 }
+
                 Right -> when (layoutDirection) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 4 else 208]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 208 else 4]).isTrue()
                 }
+
                 Up -> assertThat(isFocused[if (reverseLayout) 208 else 4]).isTrue()
                 Down -> assertThat(isFocused[if (reverseLayout) 4 else 208]).isTrue()
                 Previous -> assertThat(isFocused[4]).isTrue()
@@ -272,8 +282,10 @@ class LazyListFocusMoveTest(param: Param) {
             // Move focus to the last visible item.
             when (focusDirection) {
                 Left, Right, Up, Down, Previous, Next -> focusManager.moveFocus(focusDirection)
-                Enter, Exit -> { /* Do nothing */
+                Enter, Exit -> {
+                    // Do nothing
                 }
+
                 else -> unsupportedDirection()
             }
         }
@@ -291,10 +303,12 @@ class LazyListFocusMoveTest(param: Param) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 2 else 6]).isTrue()
                 }
+
                 Right -> when (layoutDirection) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 2 else 6]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
                 }
+
                 Up -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
                 Down -> assertThat(isFocused[if (reverseLayout) 2 else 6]).isTrue()
                 Previous -> assertThat(isFocused[2]).isTrue()
@@ -331,8 +345,10 @@ class LazyListFocusMoveTest(param: Param) {
             when (focusDirection) {
                 Left, Right, Up, Down -> focusManager.moveFocus(focusDirection)
                 Previous, Next -> repeat(3) { focusManager.moveFocus(focusDirection) }
-                Enter, Exit -> { /* Do nothing */
+                Enter, Exit -> {
+                    // Do nothing
                 }
+
                 else -> unsupportedDirection()
             }
         }
@@ -350,10 +366,12 @@ class LazyListFocusMoveTest(param: Param) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 0 else 8]).isTrue()
                 }
+
                 Right -> when (layoutDirection) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 0 else 8]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
                 }
+
                 Up -> assertThat(isFocused[if (reverseLayout) 8 else 0]).isTrue()
                 Down -> assertThat(isFocused[if (reverseLayout) 0 else 8]).isTrue()
                 Previous -> assertThat(isFocused[0]).isTrue()
@@ -390,8 +408,10 @@ class LazyListFocusMoveTest(param: Param) {
             when (focusDirection) {
                 Left, Right, Up, Down -> focusManager.moveFocus(focusDirection)
                 Previous, Next -> repeat(3) { focusManager.moveFocus(focusDirection) }
-                Enter, Exit -> { /* Do nothing */
+                Enter, Exit -> {
+                    // Do nothing
                 }
+
                 else -> unsupportedDirection()
             }
         }
@@ -409,10 +429,12 @@ class LazyListFocusMoveTest(param: Param) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 12 else 0]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 2 else 10]).isTrue()
                 }
+
                 Right -> when (layoutDirection) {
                     Ltr -> assertThat(isFocused[if (reverseLayout) 2 else 10]).isTrue()
                     Rtl -> assertThat(isFocused[if (reverseLayout) 12 else 0]).isTrue()
                 }
+
                 Up -> assertThat(isFocused[if (reverseLayout) 12 else 0]).isTrue()
                 Down -> assertThat(isFocused[if (reverseLayout) 2 else 10]).isTrue()
                 Previous -> assertThat(isFocused[2]).isTrue()
@@ -461,6 +483,7 @@ class LazyListFocusMoveTest(param: Param) {
                 reverseLayout = reverseLayout,
                 content = content
             )
+
             Up, Down -> LazyColumn(
                 modifier = Modifier
                     .size(size)
@@ -470,6 +493,7 @@ class LazyListFocusMoveTest(param: Param) {
                 reverseLayout = reverseLayout,
                 content = content
             )
+
             else -> unsupportedDirection()
         }
     }
@@ -487,12 +511,14 @@ class LazyListFocusMoveTest(param: Param) {
                 reverseLayout = reverseLayout,
                 content = content
             )
+
             Up, Down -> LazyRow(
                 modifier = Modifier.size(size),
                 state = state,
                 reverseLayout = reverseLayout,
                 content = content
             )
+
             else -> unsupportedDirection()
         }
     }
