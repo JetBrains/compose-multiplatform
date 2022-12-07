@@ -115,37 +115,15 @@ private class VelocityTracker1D {
      * This can be expensive. Only call this when you need the velocity.
      */
     fun calculateVelocity(): Float {
-        return getVelocityEstimate().velocity
-    }
-
-    /**
-     * Clears the tracked positions added by [addDataPoint].
-     */
-    fun resetTracking() {
-        samples.fill(element = null)
-        index = 0
-    }
-
-    /**
-     * Returns an estimate of the velocity of the object being tracked by the
-     * tracker given the current information available to the tracker.
-     *
-     * Information is added using [addDataPoint].
-     *
-     * Returns an estimate of 0 velocity if there is no data on which to base an estimate.
-     */
-
-    private fun getVelocityEstimate(): VelocityEstimate {
         val dataPoints: MutableList<Float> = mutableListOf()
         val time: MutableList<Float> = mutableListOf()
         var sampleCount = 0
         var index: Int = index
 
         // The sample at index is our newest sample.  If it is null, we have no samples so return.
-        val newestSample: DataPointAtTime = samples[index] ?: return VelocityEstimate.None
+        val newestSample: DataPointAtTime = samples[index] ?: return 0f
 
         var previousSample: DataPointAtTime = newestSample
-        var oldestSample: DataPointAtTime = newestSample
 
         // Starting with the most recent PointAtTime sample, iterate backwards while
         // the samples represent continuous motion.
@@ -160,7 +138,6 @@ private class VelocityTracker1D {
                 break
             }
 
-            oldestSample = sample
             dataPoints.add(sample.dataPoint)
             time.add(-age)
             index = (if (index == 0) HistorySize else index) - 1
@@ -170,32 +147,32 @@ private class VelocityTracker1D {
 
         if (sampleCount >= MinSampleSize) {
             try {
-                val fit = polyFitLeastSquares(time, dataPoints, 2)
-                // The 2nd coefficient is the derivative of the quadratic polynomial at
-                // x = 0, and that happens to be the last timestamp that we end up
-                // passing to polyFitLeastSquares.
-                val slope = fit.coefficients[1]
-                return VelocityEstimate(
-                    // Convert from units/ms to units/s
-                    velocity = slope * 1000,
-                    confidence = fit.confidence,
-                    durationMillis = newestSample.time - oldestSample.time,
-                    offset = newestSample.dataPoint - oldestSample.dataPoint
-                )
+                return calculateVelocity(dataPoints, time)
             } catch (exception: IllegalArgumentException) {
                 // TODO(b/129494918): Is catching an exception here something we really want to do?
-                return VelocityEstimate.None
             }
         }
 
         // We're unable to make a velocity estimate but we did have at least one
         // valid pointer position.
-        return VelocityEstimate(
-            velocity = 0f,
-            confidence = 1.0f,
-            durationMillis = newestSample.time - oldestSample.time,
-            offset = newestSample.dataPoint - oldestSample.dataPoint
-        )
+        return 0f
+    }
+
+    /**
+     * Clears the tracked positions added by [addDataPoint].
+     */
+    fun resetTracking() {
+        samples.fill(element = null)
+        index = 0
+    }
+
+    private fun calculateVelocity(dataPoints: List<Float>, time: List<Float>): Float {
+        // The 2nd coefficient is the derivative of the quadratic polynomial at
+        // x = 0, and that happens to be the last timestamp that we end up
+        // passing to polyFitLeastSquares.
+        val slope = polyFitLeastSquares(time, dataPoints, 2)[1]
+        // Convert from units/ms to units/s
+        return slope * 1000
     }
 }
 
@@ -252,44 +229,6 @@ fun VelocityTracker.addPointerInputChange(event: PointerInputChange) {
 private data class DataPointAtTime(val dataPoint: Float, val time: Long)
 
 /**
- * A velocity estimate.
- *
- * An estimate's [confidence] measures how well the velocity tracker's position
- * data fit a straight line, [durationMillis] is the time that elapsed between the
- * first and last position sample used to compute the velocity, and [offset]
- * is similarly the difference between the first and last positions.
- *
- * See also:
- *
- *  * VelocityTracker, which computes [VelocityEstimate]s.
- */
-private data class VelocityEstimate(
-    /** The velocity, in  units per second. */
-    val velocity: Float,
-    /**
-     * A value between 0.0 and 1.0 that indicates how well [VelocityTracker]
-     * was able to fit a straight line to its position data.
-     *
-     * The value of this property is 1.0 for a perfect fit, 0.0 for a poor fit.
-     */
-    val confidence: Float,
-    /**
-     * The time that elapsed between the first and last position sample used
-     * to compute [velocity].
-     */
-    val durationMillis: Long,
-    /**
-     * The difference between the first and last datapoint used
-     * to compute [velocity].
-     */
-    val offset: Float
-) {
-    companion object {
-        val None = VelocityEstimate(0f, 1f, 0, 0f)
-    }
-}
-
-/**
  *  TODO (shepshapard): If we want to support varying weights for each position, we could accept a
  *  3rd FloatArray of weights for each point and use them instead of the [DefaultWeight].
  */
@@ -318,7 +257,7 @@ internal fun polyFitLeastSquares(
     /** The y-coordinates of each data point. */
     y: List<Float>,
     degree: Int
-): PolynomialFit {
+): List<Float> {
     if (degree < 1) {
         throw IllegalArgumentException("The degree must be at positive integer")
     }
@@ -403,41 +342,8 @@ internal fun polyFitLeastSquares(
         coefficients[i] /= r.get(i, i)
     }
 
-    // Calculate the coefficient of determination (confidence) as:
-    //   1 - (sumSquaredError / sumSquaredTotal)
-    // ...where sumSquaredError is the residual sum of squares (variance of the
-    // error), and sumSquaredTotal is the total sum of squares (variance of the
-    // data) where each has been weighted.
-    var yMean = 0.0f
-    for (h in 0 until m) {
-        yMean += y[h]
-    }
-    yMean /= m
-
-    var sumSquaredError = 0.0f
-    var sumSquaredTotal = 0.0f
-    for (h in 0 until m) {
-        var term = 1.0f
-        var err: Float = y[h] - coefficients[0]
-        for (i in 1 until n) {
-            term *= x[h]
-            err -= term * coefficients[i]
-        }
-        sumSquaredError += DefaultWeight * DefaultWeight * err * err
-        val v = y[h] - yMean
-        sumSquaredTotal += DefaultWeight * DefaultWeight * v * v
-    }
-
-    val confidence =
-        if (sumSquaredTotal <= 0.000001f) 1f else 1f - (sumSquaredError / sumSquaredTotal)
-
-    return PolynomialFit(coefficients, confidence)
+    return coefficients
 }
-
-internal data class PolynomialFit(
-    val coefficients: List<Float>,
-    val confidence: Float
-)
 
 private class Vector(
     val length: Int
