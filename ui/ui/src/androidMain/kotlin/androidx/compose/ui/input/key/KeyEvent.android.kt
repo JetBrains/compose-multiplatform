@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.key
 
+import android.view.KeyCharacterMap
 import android.view.KeyEvent.ACTION_DOWN
 import android.view.KeyEvent.ACTION_UP
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
@@ -50,6 +51,10 @@ actual val KeyEvent.key: Key
  * supplementary characters. In this representation, supplementary characters are represented
  * as a pair of char values, the first from the high-surrogates range, (\uD800-\uDBFF), the
  * second from the low-surrogates range (\uDC00-\uDFFF).
+ *
+ * If the return value has bit [KeyCharacterMap.COMBINING_ACCENT] set, the key is a "dead key"
+ * that should be combined with another to actually produce a character -- see
+ * [KeyCharacterMap.getDeadChar] -- after masking with [KeyCharacterMap.COMBINING_ACCENT_MASK].
  */
 actual val KeyEvent.utf16CodePoint: Int
     get() = nativeKeyEvent.unicodeChar
