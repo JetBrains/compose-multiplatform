@@ -26,6 +26,8 @@ kotlin {
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
+    val composeVersion = extra["compose.version"] as String
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -33,7 +35,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.compose.components:components-resources:0.0.0-custom-version")
+                implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
             }
         }
         val androidMain by getting {
