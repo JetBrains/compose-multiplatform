@@ -41,7 +41,6 @@ dependencies {
 androidx {
     name = "Compose UI Graphics Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2021"
     description = "Compose UI Graphics Lint Checks"
 }

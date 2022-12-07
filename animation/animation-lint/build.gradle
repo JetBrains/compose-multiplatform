@@ -41,7 +41,6 @@ dependencies {
 androidx {
     name = "Compose Animation Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2021"
     description = "Compose Animation Lint Checks"
 }

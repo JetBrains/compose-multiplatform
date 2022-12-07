@@ -38,7 +38,6 @@ dependencies {
 androidx {
     name = "AndroidX Compose Runtime Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2019"
     description = "Contains the sample code for the Compose runtime"
 }

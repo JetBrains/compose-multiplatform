@@ -40,7 +40,6 @@ dependencies {
 androidx {
     name = "AndroidX Compose Testing Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2022"
     description = "Contains samples for AndroidX Compose Testing."
 }
