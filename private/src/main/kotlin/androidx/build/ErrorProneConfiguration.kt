@@ -140,7 +140,8 @@ private fun JavaCompile.configureWithErrorProne() {
         listOf(
             "-Xplugin:ErrorProne",
 
-            "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
+            "-XepExcludedPaths:.*/(build/generated|build/errorProne|external|" +
+                "compileTransaction/compile-output)/.*",
 
             // Consider re-enabling the following checks. Disabled as part of
             // error-prone upgrade
