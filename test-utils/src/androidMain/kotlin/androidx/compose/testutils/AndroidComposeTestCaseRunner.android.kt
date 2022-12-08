@@ -53,7 +53,7 @@ fun <T : ComposeTestCase> createAndroidComposeBenchmarkRunner(
     return AndroidComposeTestCaseRunner(testCaseFactory, activity)
 }
 
-@OptIn(ExperimentalCoroutinesApi::class) // for TestCoroutineDispatcher and friends
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTestApi::class)
 internal class AndroidComposeTestCaseRunner<T : ComposeTestCase>(
     private val testCaseFactory: () -> T,
     private val activity: ComponentActivity

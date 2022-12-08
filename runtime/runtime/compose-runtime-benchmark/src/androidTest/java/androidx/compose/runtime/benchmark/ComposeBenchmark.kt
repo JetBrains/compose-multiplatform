@@ -28,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.unit.dp
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -40,7 +41,7 @@ import org.junit.runners.MethodSorters
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTestApi::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class ComposeBenchmark : ComposeBenchmarkBase() {
 

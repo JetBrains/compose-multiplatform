@@ -21,10 +21,12 @@ import androidx.activity.compose.setContent
 import androidx.benchmark.junit4.BenchmarkRule
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ControlledComposition
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.TestMonotonicFrameClock
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -35,10 +37,7 @@ import kotlinx.coroutines.withContext
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
-@OptIn(InternalComposeApi::class)
 abstract class ComposeBenchmarkBase {
     @get:Rule
     val benchmarkRule = BenchmarkRule()
@@ -47,7 +46,12 @@ abstract class ComposeBenchmarkBase {
     @get:Rule
     val activityRule = androidx.test.rule.ActivityTestRule(ComposeActivity::class.java)
 
+    // Here and elsewhere in this file, this is intentionally not OptIn, because we want to
+    // communicate to consumers that by using this API, they're also transitively getting all the
+    // experimental risk of using the experimental API in the kotlinx testing library.
+    // DO NOT MAKE OPT-IN!
     @ExperimentalCoroutinesApi
+    @ExperimentalTestApi
     suspend fun TestScope.measureCompose(block: @Composable () -> Unit) = coroutineScope {
         val activity = activityRule.activity
         val recomposer = Recomposer(coroutineContext)
@@ -73,6 +77,7 @@ abstract class ComposeBenchmarkBase {
     }
 
     @ExperimentalCoroutinesApi
+    @ExperimentalTestApi
     suspend fun TestScope.measureRecomposeSuspending(
         block: RecomposeReceiver.() -> Unit
     ) = coroutineScope {
@@ -118,6 +123,7 @@ abstract class ComposeBenchmarkBase {
 }
 
 @ExperimentalCoroutinesApi
+@ExperimentalTestApi
 fun runBlockingTestWithFrameClock(
     context: CoroutineContext = EmptyCoroutineContext,
     testBody: suspend TestScope.() -> Unit
