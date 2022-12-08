@@ -69,7 +69,7 @@ class ComposePlugin : Plugin<Project> {
                 }
             }
 
-            project.tasks.withType(KotlinCompile::class.java) {
+            project.tasks.withType(KotlinCompile::class.java).configureEach {
                 it.kotlinOptions.apply {
                     freeCompilerArgs = freeCompilerArgs +
                             composeExtension.kotlinCompilerPluginArgs.get().flatMap { arg ->
