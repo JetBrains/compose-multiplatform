@@ -118,8 +118,8 @@ internal fun <T> Modifier.swipeAnchors(
         }
         if (previousAnchors != newAnchors) {
             val previousTarget = state.targetValue
-            state.updateAnchors(newAnchors)
-            if (previousAnchors.isNotEmpty()) {
+            val stateRequiresCleanup = state.updateAnchors(newAnchors)
+            if (stateRequiresCleanup) {
                 anchorChangeHandler?.onAnchorsChanged(previousTarget, previousAnchors, newAnchors)
             }
         }
@@ -261,12 +261,25 @@ internal class SwipeableV2State<T>(
 
     internal var density: Density? = null
 
-    internal fun updateAnchors(newAnchors: Map<T, Float>) {
+    /**
+     * Update the anchors.
+     * If the previous set of anchors was empty, attempt to update the offset to match the initial
+     * value's anchor.
+     *
+     * @return true if the state needs to be adjusted after updating the anchors, e.g. if the
+     * initial value is not found in the initial set of anchors. false if no further updates are
+     * needed.
+     */
+    internal fun updateAnchors(newAnchors: Map<T, Float>): Boolean {
         val previousAnchorsEmpty = anchors.isEmpty()
         anchors = newAnchors
-        if (previousAnchorsEmpty) {
-            offset = anchors.requireAnchor(this.currentValue)
-        }
+        val initialValueHasAnchor = if (previousAnchorsEmpty) {
+            val initialValueAnchor = anchors[currentValue]
+            val initialValueHasAnchor = initialValueAnchor != null
+            if (initialValueHasAnchor) offset = initialValueAnchor
+            initialValueHasAnchor
+        } else true
+        return !initialValueHasAnchor || !previousAnchorsEmpty
     }
 
     /**
@@ -276,6 +289,8 @@ internal class SwipeableV2State<T>(
 
     /**
      * Snap to a [targetValue] without any animation.
+     * If the [targetValue] is not in the set of anchors, the [currentValue] will be updated to the
+     * [targetValue] without updating the offset.
      *
      * @throws CancellationException if the interaction interrupted by another interaction like a
      * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
@@ -283,20 +298,26 @@ internal class SwipeableV2State<T>(
      * @param targetValue The target value of the animation
      */
     suspend fun snapTo(targetValue: T) {
-        val targetOffset = anchors.requireAnchor(targetValue)
-        try {
-            draggableState.drag {
-                animationTarget = targetValue
-                dragBy(targetOffset - requireOffset())
+        val targetOffset = anchors[targetValue]
+        if (targetOffset != null) {
+            try {
+                draggableState.drag {
+                    animationTarget = targetValue
+                    dragBy(targetOffset - requireOffset())
+                }
+                this.currentValue = targetValue
+            } finally {
+                animationTarget = null
             }
-            this.currentValue = targetValue
-        } finally {
-            animationTarget = null
+        } else {
+            currentValue = targetValue
         }
     }
 
     /**
      * Animate to a [targetValue].
+     * If the [targetValue] is not in the set of anchors, the [currentValue] will be updated to the
+     * [targetValue] without updating the offset.
      *
      * @throws CancellationException if the interaction interrupted by another interaction like a
      * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
@@ -308,30 +329,34 @@ internal class SwipeableV2State<T>(
         targetValue: T,
         velocity: Float = lastVelocity,
     ) {
-        val targetOffset = anchors.requireAnchor(targetValue)
-        try {
-            draggableState.drag {
-                animationTarget = targetValue
-                var prev = offset ?: 0f
-                animate(prev, targetOffset, velocity, animationSpec) { value, velocity ->
-                    // Our onDrag coerces the value within the bounds, but an animation may
-                    // overshoot, for example a spring animation or an overshooting interpolator
-                    // We respect the user's intention and allow the overshoot, but still use
-                    // DraggableState's drag for its mutex.
-                    offset = value
-                    prev = value
-                    lastVelocity = velocity
+        val targetOffset = anchors[targetValue]
+        if (targetOffset != null) {
+            try {
+                draggableState.drag {
+                    animationTarget = targetValue
+                    var prev = offset ?: 0f
+                    animate(prev, targetOffset, velocity, animationSpec) { value, velocity ->
+                        // Our onDrag coerces the value within the bounds, but an animation may
+                        // overshoot, for example a spring animation or an overshooting interpolator
+                        // We respect the user's intention and allow the overshoot, but still use
+                        // DraggableState's drag for its mutex.
+                        offset = value
+                        prev = value
+                        lastVelocity = velocity
+                    }
+                    lastVelocity = 0f
                 }
-                lastVelocity = 0f
+            } finally {
+                animationTarget = null
+                val endOffset = requireOffset()
+                val endState = anchors
+                    .entries
+                    .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
+                    ?.key
+                this.currentValue = endState ?: currentValue
             }
-        } finally {
-            animationTarget = null
-            val endOffset = requireOffset()
-            val endState = anchors
-                .entries
-                .firstOrNull { (_, anchorOffset) -> abs(anchorOffset - endOffset) < 0.5f }
-                ?.key
-            this.currentValue = endState ?: currentValue
+        } else {
+            currentValue = targetValue
         }
     }
 

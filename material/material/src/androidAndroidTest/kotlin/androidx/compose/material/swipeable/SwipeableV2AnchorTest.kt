@@ -352,4 +352,28 @@ class SwipeableV2AnchorTest {
         assertThat(recordedPreviousTargetValue).isEqualTo(A) // A is not in the anchors anymore, so
         // we can be sure that is not the targetValue calculated from the new anchors
     }
+
+    @Test
+    fun swipeable_anchorChangeHandler_invokedIfInitialValueNotInInitialAnchors() {
+        val state = SwipeableV2State(initialValue = A)
+        var anchorChangeHandlerInvocationCount = 0
+        val testChangeHandler = AnchorChangeHandler<TestState> { _, _, _ ->
+            anchorChangeHandlerInvocationCount++
+        }
+        val anchors = mapOf(B to 100f, C to 200f)
+
+        rule.setContent {
+            Box(
+                Modifier
+                    .swipeAnchors(
+                        state = state,
+                        possibleValues = setOf(B, C),
+                        anchorChangeHandler = testChangeHandler,
+                        calculateAnchor = { value, _ -> anchors[value] }
+                    )
+            )
+        }
+
+        assertThat(anchorChangeHandlerInvocationCount).isEqualTo(1)
+    }
 }

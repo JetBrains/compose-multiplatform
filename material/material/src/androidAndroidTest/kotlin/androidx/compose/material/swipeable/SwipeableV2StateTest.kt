@@ -395,4 +395,50 @@ class SwipeableV2StateTest {
         assertThat(state.minOffset).isEqualTo(minBound)
         assertThat(state.maxOffset).isEqualTo(maxBound)
     }
+
+    @Test
+    fun swipeable_targetNotInAnchors_animateTo_updatesCurrentValue() {
+        val state = SwipeableV2State(initialValue = A)
+        assertThat(state.anchors).isEmpty()
+        assertThat(state.currentValue).isEqualTo(A)
+        runBlocking { state.animateTo(B) }
+        assertThat(state.currentValue).isEqualTo(B)
+    }
+
+    @Test
+    fun swipeable_targetNotInAnchors_snapTo_updatesCurrentValue() {
+        val state = SwipeableV2State(initialValue = A)
+        assertThat(state.anchors).isEmpty()
+        assertThat(state.currentValue).isEqualTo(A)
+        runBlocking { state.snapTo(B) }
+        assertThat(state.currentValue).isEqualTo(B)
+    }
+
+    @Test
+    fun swipeable_updateAnchors_initialUpdate_initialValueInAnchors_shouldntUpdate() {
+        val state = SwipeableV2State(initialValue = A)
+        val anchors = mapOf(A to 200f, C to 300f)
+        val shouldInvokeChangeHandler = state.updateAnchors(anchors)
+        assertThat(shouldInvokeChangeHandler).isFalse()
+    }
+
+    @Test
+    fun swipeable_updateAnchors_initialUpdate_initialValueNotInAnchors_shouldUpdate() {
+        val state = SwipeableV2State(initialValue = A)
+        val anchors = mapOf(B to 200f, C to 300f)
+        val shouldInvokeChangeHandler = state.updateAnchors(anchors)
+        assertThat(shouldInvokeChangeHandler).isTrue()
+    }
+
+    @Test
+    fun swipeable_updateAnchors_updateExistingAnchors_shouldUpdate() {
+        val state = SwipeableV2State(initialValue = A)
+        val anchors = mapOf(A to 0f, B to 200f, C to 300f)
+
+        var shouldInvokeChangeHandler = state.updateAnchors(anchors)
+        assertThat(shouldInvokeChangeHandler).isFalse()
+
+        shouldInvokeChangeHandler = state.updateAnchors(mapOf(A to 100f, B to 500f, C to 700f))
+        assertThat(shouldInvokeChangeHandler).isTrue()
+    }
 }
