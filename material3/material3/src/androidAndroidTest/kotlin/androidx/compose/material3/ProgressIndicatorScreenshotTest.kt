@@ -22,8 +22,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -38,7 +39,6 @@ import org.junit.runner.RunWith
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@OptIn(ExperimentalTestApi::class)
 class ProgressIndicatorScreenshotTest {
     @get:Rule
     val rule = createComposeRule()
@@ -50,17 +50,17 @@ class ProgressIndicatorScreenshotTest {
     private val wrapperTestTag = "progressIndicatorWrapper"
 
     @Test
-    fun linearProgressIndicator_lightTheme_definite() {
+    fun linearProgressIndicator_lightTheme_determinate() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 LinearProgressIndicator(progress = 0.5f)
             }
         }
-        assertIndicatorAgainstGolden("linearProgressIndicator_lightTheme_definite")
+        assertIndicatorAgainstGolden("linearProgressIndicator_lightTheme_determinate")
     }
 
     @Test
-    fun linearProgressIndicator_lightTheme_indefinite() {
+    fun linearProgressIndicator_lightTheme_indeterminate() {
         rule.mainClock.autoAdvance = false
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
@@ -68,31 +68,41 @@ class ProgressIndicatorScreenshotTest {
             }
         }
         rule.mainClock.advanceTimeBy(500)
-        assertIndicatorAgainstGolden("linearProgressIndicator_lightTheme_indefinite")
+        assertIndicatorAgainstGolden("linearProgressIndicator_lightTheme_indeterminate")
     }
 
     @Test
-    fun linearProgressIndicator_darkTheme_definite() {
+    fun linearProgressIndicator_darkTheme_determinate() {
         rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 LinearProgressIndicator(progress = 0.5f)
             }
         }
-        assertIndicatorAgainstGolden("linearProgressIndicator_darkTheme_definite")
+        assertIndicatorAgainstGolden("linearProgressIndicator_darkTheme_determinate")
     }
 
     @Test
-    fun circularProgressIndicator_lightTheme_definite() {
+    fun linearProgressIndicator_lightTheme_determinate_customCap() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                LinearProgressIndicator(progress = 0.5f, strokeCap = StrokeCap.Round)
+            }
+        }
+        assertIndicatorAgainstGolden("linearProgressIndicator_lightTheme_determinate_customCap")
+    }
+
+    @Test
+    fun circularProgressIndicator_lightTheme_determinate() {
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 CircularProgressIndicator(progress = 0.5f)
             }
         }
-        assertIndicatorAgainstGolden("circularProgressIndicator_lightTheme_definite")
+        assertIndicatorAgainstGolden("circularProgressIndicator_lightTheme_determinate")
     }
 
     @Test
-    fun circularProgressIndicator_lightTheme_indefinite() {
+    fun circularProgressIndicator_lightTheme_indeterminate() {
         rule.mainClock.autoAdvance = false
         rule.setMaterialContent(lightColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
@@ -100,17 +110,32 @@ class ProgressIndicatorScreenshotTest {
             }
         }
         rule.mainClock.advanceTimeBy(500)
-        assertIndicatorAgainstGolden("circularProgressIndicator_lightTheme_indefinite")
+        assertIndicatorAgainstGolden("circularProgressIndicator_lightTheme_indeterminate")
     }
 
     @Test
-    fun circularProgressIndicator_darkTheme_definite() {
+    fun circularProgressIndicator_darkTheme_determinate() {
         rule.setMaterialContent(darkColorScheme()) {
             Box(wrap.testTag(wrapperTestTag)) {
                 CircularProgressIndicator(progress = 0.5f)
             }
         }
-        assertIndicatorAgainstGolden("circularProgressIndicator_darkTheme_definite")
+        assertIndicatorAgainstGolden("circularProgressIndicator_darkTheme_determinate")
+    }
+
+    @Test
+    fun circularProgressIndicator_lightTheme_determinate_customCapAndTrack() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                CircularProgressIndicator(
+                    progress = 0.5f,
+                    trackColor = Color.Gray,
+                    strokeCap = StrokeCap.Round
+                )
+            }
+        }
+        assertIndicatorAgainstGolden(
+            "circularProgressIndicator_lightTheme_determinate_customCapAndTrack")
     }
 
     private fun assertIndicatorAgainstGolden(goldenName: String) {
