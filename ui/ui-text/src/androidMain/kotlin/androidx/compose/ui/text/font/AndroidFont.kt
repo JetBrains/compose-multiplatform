@@ -22,39 +22,7 @@ import android.graphics.Typeface
 import android.os.ParcelFileDescriptor
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Stable
-import androidx.compose.ui.text.ExperimentalTextApi
 import java.io.File
-
-/**
- * Create a Font declaration from a file in the assets directory. The content of the [File] is
- * read during construction.
- *
- * @param assetManager Android AssetManager
- * @param path full path starting from the assets directory (i.e. dir/myfont.ttf for
- * assets/dir/myfont.ttf).
- * @param weight The weight of the font. The system uses this to match a font to a font request
- * that is given in a [androidx.compose.ui.text.SpanStyle].
- * @param style The style of the font, normal or italic. The system uses this to match a font to a
- * font request that is given in a [androidx.compose.ui.text.SpanStyle].
- */
-@ExperimentalTextApi
-@Stable
-@Deprecated("This experimental Font is replaced by Font(path, assetManager, ...)",
-    replaceWith = ReplaceWith("Font(path, assetManager, weight, style)"),
-    level = DeprecationLevel.WARNING
-)
-fun Font(
-    assetManager: AssetManager,
-    path: String,
-    weight: FontWeight = FontWeight.Normal,
-    style: FontStyle = FontStyle.Normal
-): Font = AndroidAssetFont(
-    assetManager,
-    path,
-    weight,
-    style,
-    FontVariation.Settings(weight, style)
-)
 
 /**
  * Create a Font declaration from a file in the assets directory. The content of the [File] is
@@ -70,7 +38,6 @@ fun Font(
  * @param variationSettings on API 26 and above these settings are applied to a variable font when
  * the font is loaded
  */
-@ExperimentalTextApi
 @Stable
 fun Font(
     path: String,
@@ -91,7 +58,6 @@ fun Font(
  * @param variationSettings on API 26 and above these settings are applied to a variable font when
  * the font is loaded
  */
-@ExperimentalTextApi
 @Stable
 @Suppress("StreamFiles")
 fun Font(
@@ -113,7 +79,6 @@ fun Font(
  * @param variationSettings these settings are applied to a variable font when the font is loaded
  */
 @RequiresApi(26)
-@ExperimentalTextApi
 @Stable
 fun Font(
     fileDescriptor: ParcelFileDescriptor,
@@ -159,24 +124,23 @@ fun Font(
  * @param typefaceLoader a loader that knows how to load this [AndroidFont], may be shared between
  * several fonts
  */
-abstract class AndroidFont
-@ExperimentalTextApi
-constructor(
+abstract class AndroidFont constructor(
     final override val loadingStrategy: FontLoadingStrategy,
     val typefaceLoader: TypefaceLoader,
     variationSettings: FontVariation.Settings,
 ) : Font {
 
-    @OptIn(ExperimentalTextApi::class)
-    // TODO(b/241016309) deprecate this once FontVariation is non-experimental
+    @Deprecated(
+        "Replaced with fontVariation constructor",
+        ReplaceWith(
+            "AndroidFont(loadingStrategy, typefaceLoader, FontVariation.Settings())"
+        )
+    )
     constructor(
         loadingStrategy: FontLoadingStrategy,
         typefaceLoader: TypefaceLoader,
     ) : this(loadingStrategy, typefaceLoader, FontVariation.Settings())
 
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @ExperimentalTextApi
-    @get:ExperimentalTextApi
     val variationSettings: FontVariation.Settings = variationSettings
 
     /**

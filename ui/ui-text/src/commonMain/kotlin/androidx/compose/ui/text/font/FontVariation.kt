@@ -17,7 +17,6 @@
 package androidx.compose.ui.text.font
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.util.fastAny
@@ -28,7 +27,6 @@ import androidx.compose.ui.util.fastAny
  * To learn more about the font variation settings, see the list supported by
  * [fonts.google.com](https://fonts.google.com/variablefonts#axis-definitions).
  */
-@ExperimentalTextApi
 object FontVariation {
     /**
      * A collection of settings to apply to a single font.

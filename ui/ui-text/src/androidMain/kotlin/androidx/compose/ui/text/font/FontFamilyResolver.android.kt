@@ -35,7 +35,6 @@ import kotlin.coroutines.CoroutineContext
  * All instances of FontFamily.Resolver created by [createFontFamilyResolver] share the same
  * typeface caches.
  */
-@OptIn(ExperimentalTextApi::class)
 fun createFontFamilyResolver(
     context: Context
 ): FontFamily.Resolver {
@@ -68,7 +67,6 @@ fun createFontFamilyResolver(
  * @param context Android context for resolving fonts
  * @param coroutineContext context to launch async requests in during resolution.
  */
-@ExperimentalTextApi
 fun createFontFamilyResolver(
     context: Context,
     coroutineContext: CoroutineContext
