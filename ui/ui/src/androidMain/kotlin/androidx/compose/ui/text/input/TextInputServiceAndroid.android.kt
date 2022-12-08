@@ -31,6 +31,7 @@ import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.S
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.StartInput
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.StopInput
 import androidx.core.view.inputmethod.EditorInfoCompat
+import androidx.emoji2.text.EmojiCompat
 import java.lang.ref.WeakReference
 import kotlin.math.roundToInt
 import kotlinx.coroutines.channels.Channel
@@ -112,6 +113,7 @@ internal class TextInputServiceAndroid(
         }
 
         outAttrs.update(imeOptions, state)
+        outAttrs.updateWithEmojiCompat()
 
         return RecordingInputConnection(
             initState = state,
@@ -395,6 +397,15 @@ internal class TextInputServiceAndroid(
             inputMethodManager.hideSoftInput()
         }
     }
+}
+
+/**
+ * Call to update EditorInfo correctly when EmojiCompat is configured.
+ */
+private fun EditorInfo.updateWithEmojiCompat() {
+    if (!EmojiCompat.isConfigured()) { return }
+
+    EmojiCompat.get().updateEditorInfo(this)
 }
 
 /**

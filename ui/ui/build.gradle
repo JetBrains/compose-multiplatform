@@ -80,6 +80,7 @@ dependencies {
         implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
         implementation("androidx.profileinstaller:profileinstaller:1.2.0")
+        implementation("androidx.emoji2:emoji2:1.2.0")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -174,6 +175,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
+                implementation("androidx.emoji2:emoji2:1.2.0")
             }
 
             jvmMain.dependencies {
