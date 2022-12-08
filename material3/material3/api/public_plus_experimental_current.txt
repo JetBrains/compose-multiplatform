@@ -138,6 +138,9 @@ package androidx.compose.material3 {
   public final class CalendarModelKt {
   }
 
+  public final class CalendarModel_androidKt {
+  }
+
   @androidx.compose.runtime.Immutable public final class CardColors {
   }
 
@@ -1135,9 +1138,6 @@ package androidx.compose.material3 {
 }
 
 package androidx.compose.material3.internal {
-
-  public final class AndroidDatePickerModel_androidKt {
-  }
 
   public final class ExposedDropdownMenuPopupKt {
   }

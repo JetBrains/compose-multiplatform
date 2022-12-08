@@ -17,8 +17,6 @@
 package androidx.compose.material3
 
 import android.os.Build
-import androidx.compose.material3.internal.CalendarModelImpl
-import androidx.compose.material3.internal.LegacyCalendarModelImpl
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat

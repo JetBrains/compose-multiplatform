@@ -18,6 +18,12 @@ package androidx.compose.material3
 
 import java.util.Locale
 
+/**
+ * Creates a [CalendarModel] to be used by the date picker.
+ */
+@ExperimentalMaterial3Api
+internal expect fun createCalendarModel(): CalendarModel
+
 @ExperimentalMaterial3Api
 internal interface CalendarModel {
 
@@ -209,6 +215,43 @@ internal data class DateInputFormat(
     val delimiter: Char
 ) {
     val patternWithoutDelimiters: String = patternWithDelimiters.replace(delimiter.toString(), "")
+}
+
+/**
+ * Receives a given local date format string and returns a string that can be displayed to the user
+ * and parsed by the date parser.
+ *
+ * This function:
+ *  - Removes all characters that don't match `d`, `M` and `y`, or any of the date format delimiters
+ *    `.`, `/` and `-`.
+ *  - Ensures that the format is for two digits day and month, and four digits year.
+ *
+ * The output of this cleanup is always a 10 characters string in one of the following variations:
+ *  - yyyy/MM/dd
+ *  - yyyy-MM-dd
+ *  - yyyy.MM.dd
+ *  - dd/MM/yyyy
+ *  - dd-MM-yyyy
+ *  - dd.MM.yyyy
+ *  - MM/dd/yyyy
+ */
+@ExperimentalMaterial3Api
+internal fun datePatternAsInputFormat(localeFormat: String): DateInputFormat {
+    val patternWithDelimiters = localeFormat.replace(Regex("[^dMy/\\-.]"), "")
+        .replace(Regex("d{1,2}"), "dd")
+        .replace(Regex("M{1,2}"), "MM")
+        .replace(Regex("y{1,4}"), "yyyy")
+        .replace("My", "M/y") // Edge case for the Kako locale
+        .removeSuffix(".") // Removes a dot suffix that appears in some formats
+
+    val delimiterRegex = Regex("[/\\-.]")
+    val delimiterMatchResult = delimiterRegex.find(patternWithDelimiters)
+    val delimiterIndex = delimiterMatchResult!!.groups[0]!!.range.first
+    val delimiter = patternWithDelimiters.substring(delimiterIndex, delimiterIndex + 1)
+    return DateInputFormat(
+        patternWithDelimiters = patternWithDelimiters,
+        delimiter = delimiter[0]
+    )
 }
 
 internal const val DaysInWeek: Int = 7
