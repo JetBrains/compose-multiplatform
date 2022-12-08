@@ -40,6 +40,24 @@ internal actual fun getString(string: Strings): String {
         Strings.Search -> resources.getString(androidx.compose.material3.R.string.search)
         Strings.SuggestionsAvailable ->
             resources.getString(androidx.compose.material3.R.string.suggestions_available)
+        Strings.DatePickerTitle -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_title
+        )
+        Strings.DatePickerHeadline -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_headline
+        )
+        Strings.DatePickerSwitchToYearSelection -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_switch_to_year_selection
+        )
+        Strings.DatePickerSwitchToDaySelection -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_switch_to_day_selection
+        )
+        Strings.DatePickerNextMonth -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_switch_to_next_month
+        )
+        Strings.DatePickerPreviousMonth -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_switch_to_previous_month
+        )
         else -> ""
     }
 }

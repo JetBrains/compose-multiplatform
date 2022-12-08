@@ -36,6 +36,12 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val Dismiss = Strings(10)
         val Search = Strings(11)
         val SuggestionsAvailable = Strings(12)
+        val DatePickerTitle = Strings(13)
+        val DatePickerHeadline = Strings(14)
+        val DatePickerSwitchToYearSelection = Strings(15)
+        val DatePickerSwitchToDaySelection = Strings(16)
+        val DatePickerNextMonth = Strings(17)
+        val DatePickerPreviousMonth = Strings(18)
     }
 }
 

@@ -116,6 +116,17 @@ private val Chips = Component(
     examples = ChipsExamples
 )
 
+private val DatePickers = Component(
+    id = nextId(),
+    name = "Date pickers",
+    description = "Date pickers let users select a date or range of dates.",
+    // No date picker icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/datepicker",
+    docsUrl = "$PackageSummaryUrl#datepicker",
+    sourceUrl = "$Material3SourceUrl/DatePicker.kt",
+    examples = DatePickerExamples
+)
+
 private val Dialogs = Component(
     id = nextId(),
     name = "Dialogs",
@@ -343,6 +354,7 @@ val Components = listOf(
     Card,
     Checkboxes,
     Chips,
+    DatePickers,
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,

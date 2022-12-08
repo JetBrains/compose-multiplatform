@@ -38,6 +38,8 @@ import androidx.compose.material3.samples.CircularProgressIndicatorSample
 import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
+import androidx.compose.material3.samples.DatePickerSample
+import androidx.compose.material3.samples.DatePickerWithDateValidatorSample
 import androidx.compose.material3.samples.DismissibleNavigationDrawerSample
 import androidx.compose.material3.samples.DockedSearchBarSample
 import androidx.compose.material3.samples.EditableExposedDropdownMenuSample
@@ -333,6 +335,25 @@ val ChipsExamples = listOf(
     ) {
         ChipGroupSingleLineSample()
     }
+)
+
+private const val DatePickerExampleDescription = "Date picker examples"
+private const val DatePickerExampleSourceUrl = "$SampleSourceUrl/DatePickerSamples.kt"
+val DatePickerExamples = listOf(
+    Example(
+        name = ::DatePickerSample.name,
+        description = DatePickerExampleDescription,
+        sourceUrl = DatePickerExampleSourceUrl
+    ) {
+        DatePickerSample()
+    },
+    Example(
+        name = ::DatePickerWithDateValidatorSample.name,
+        description = DatePickerExampleDescription,
+        sourceUrl = DatePickerExampleSourceUrl
+    ) {
+        DatePickerWithDateValidatorSample()
+    },
 )
 
 private const val DialogExampleDescription = "Dialog examples"

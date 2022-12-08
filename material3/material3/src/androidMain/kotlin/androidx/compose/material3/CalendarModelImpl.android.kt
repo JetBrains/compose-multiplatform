@@ -27,6 +27,7 @@ import java.time.chrono.Chronology
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
 import java.time.format.DateTimeParseException
+import java.time.format.DecimalStyle
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.WeekFields
@@ -90,7 +91,11 @@ internal class CalendarModelImpl : CalendarModel {
 
     override fun getMonth(timeInMillis: Long): CalendarMonth {
         return getMonth(
-            Instant.ofEpochMilli(timeInMillis).atZone(utcTimeZoneId).toLocalDate()
+            Instant
+                .ofEpochMilli(timeInMillis)
+                .atZone(utcTimeZoneId)
+                .withDayOfMonth(1)
+                .toLocalDate()
         )
     }
 
@@ -123,12 +128,14 @@ internal class CalendarModelImpl : CalendarModel {
     }
 
     override fun format(month: CalendarMonth, pattern: String): String {
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(pattern)
+        val formatter: DateTimeFormatter =
+            DateTimeFormatter.ofPattern(pattern).withDecimalStyle(DecimalStyle.ofDefaultLocale())
         return month.toLocalDate().format(formatter)
     }
 
     override fun format(date: CalendarDate, pattern: String): String {
-        val formatter: DateTimeFormatter = DateTimeFormatter.ofPattern(pattern)
+        val formatter: DateTimeFormatter =
+            DateTimeFormatter.ofPattern(pattern).withDecimalStyle(DecimalStyle.ofDefaultLocale())
         return date.toLocalDate().format(formatter)
     }
 

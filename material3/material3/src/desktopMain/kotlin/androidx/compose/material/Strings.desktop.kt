@@ -33,6 +33,12 @@ internal actual fun getString(string: Strings): String {
         Strings.Dismiss -> "Dismiss"
         Strings.Search -> "Search"
         Strings.SuggestionsAvailable -> "Suggestions below"
+        Strings.DatePickerTitle -> "Select date"
+        Strings.DatePickerHeadline -> "Selected date"
+        Strings.DatePickerSwitchToYearSelection -> "Switch to selecting a year"
+        Strings.DatePickerSwitchToDaySelection -> "Switch to selecting a day"
+        Strings.DatePickerNextMonth -> "Change to next month"
+        Strings.DatePickerPreviousMonth -> "Change to previous month"
         else -> ""
     }
 }
