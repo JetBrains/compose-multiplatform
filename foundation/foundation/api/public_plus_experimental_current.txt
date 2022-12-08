@@ -12,6 +12,19 @@ package androidx.compose.foundation {
     method public static androidx.compose.ui.Modifier background(androidx.compose.ui.Modifier, androidx.compose.ui.graphics.Brush brush, optional androidx.compose.ui.graphics.Shape shape, optional float alpha);
   }
 
+  public final class BasicMarqueeKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.MarqueeSpacing MarqueeSpacing(float spacing);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.ui.Modifier basicMarquee(androidx.compose.ui.Modifier, optional int iterations, optional int animationMode, optional int delayMillis, optional int initialDelayMillis, optional androidx.compose.foundation.MarqueeSpacing spacing, optional float velocity);
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static int getDefaultMarqueeDelayMillis();
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static int getDefaultMarqueeIterations();
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static androidx.compose.foundation.MarqueeSpacing getDefaultMarqueeSpacing();
+    method @androidx.compose.foundation.ExperimentalFoundationApi public static float getDefaultMarqueeVelocity();
+    property @androidx.compose.foundation.ExperimentalFoundationApi public static final int DefaultMarqueeDelayMillis;
+    property @androidx.compose.foundation.ExperimentalFoundationApi public static final int DefaultMarqueeIterations;
+    property @androidx.compose.foundation.ExperimentalFoundationApi public static final androidx.compose.foundation.MarqueeSpacing DefaultMarqueeSpacing;
+    property @androidx.compose.foundation.ExperimentalFoundationApi public static final float DefaultMarqueeVelocity;
+  }
+
   public final class BorderKt {
     method public static androidx.compose.ui.Modifier border(androidx.compose.ui.Modifier, androidx.compose.foundation.BorderStroke border, optional androidx.compose.ui.graphics.Shape shape);
     method public static androidx.compose.ui.Modifier border(androidx.compose.ui.Modifier, float width, long color, optional androidx.compose.ui.graphics.Shape shape);
@@ -122,6 +135,26 @@ package androidx.compose.foundation {
     method public androidx.compose.foundation.MagnifierStyle getTextDefault();
     property public final androidx.compose.foundation.MagnifierStyle Default;
     property public final androidx.compose.foundation.MagnifierStyle TextDefault;
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @kotlin.jvm.JvmInline public final value class MarqueeAnimationMode {
+    field public static final androidx.compose.foundation.MarqueeAnimationMode.Companion Companion;
+  }
+
+  public static final class MarqueeAnimationMode.Companion {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public int getImmediately();
+    method @androidx.compose.foundation.ExperimentalFoundationApi public int getWhileFocused();
+    property @androidx.compose.foundation.ExperimentalFoundationApi public final int Immediately;
+    property @androidx.compose.foundation.ExperimentalFoundationApi public final int WhileFocused;
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public fun interface MarqueeSpacing {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public int calculateSpacing(androidx.compose.ui.unit.Density, int contentWidth, int containerWidth);
+    field public static final androidx.compose.foundation.MarqueeSpacing.Companion Companion;
+  }
+
+  public static final class MarqueeSpacing.Companion {
+    method @androidx.compose.foundation.ExperimentalFoundationApi public androidx.compose.foundation.MarqueeSpacing fractionOfContainer(float fraction);
   }
 
   public enum MutatePriority {

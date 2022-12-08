@@ -68,5 +68,6 @@ val FoundationDemos = DemoCategory(
         ComposableDemo("Focused bounds") { FocusedBoundsDemo() },
         ComposableDemo("Scrollable with focused child") { ScrollableFocusedChildDemo() },
         ComposableDemo("Window insets") { WindowInsetsDemo() },
+        ComposableDemo("Marquee") { BasicMarqueeDemo() },
     )
 )
