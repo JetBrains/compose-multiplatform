@@ -85,15 +85,15 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
     @get:Rule
     val rule = createComposeRule()
 
-    private val itemSize: Int = 50
+    private val itemSize: Float = 50f
     private var itemSizeDp: Dp = Dp.Infinity
-    private val itemSize2: Int = 30
+    private val itemSize2: Float = 30f
     private var itemSize2Dp: Dp = Dp.Infinity
-    private val itemSize3: Int = 20
+    private val itemSize3: Float = 20f
     private var itemSize3Dp: Dp = Dp.Infinity
-    private val containerSize: Int = itemSize * 5
+    private val containerSize: Float = itemSize * 5
     private var containerSizeDp: Dp = Dp.Infinity
-    private val spacing: Int = 10
+    private val spacing: Float = 10f
     private var spacingDp: Dp = Dp.Infinity
     private val itemSizePlusSpacing = itemSize + spacing
     private var itemSizePlusSpacingDp = Dp.Infinity
@@ -123,7 +123,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
             }
         }
 
-        assertPositions(0 to 0, 1 to itemSize)
+        assertPositions(0 to 0f, 1 to itemSize)
 
         rule.runOnIdle {
             list = listOf(1, 0)
@@ -131,8 +131,8 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0 + (itemSize * fraction).roundToInt(),
-                1 to itemSize - (itemSize * fraction).roundToInt(),
+                0 to 0 + itemSize * fraction,
+                1 to itemSize - itemSize * fraction,
                 fraction = fraction
             )
         }
@@ -149,7 +149,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
             }
         }
 
-        assertLayoutInfoPositions(0 to 0, 1 to itemSize)
+        assertLayoutInfoPositions(0 to 0f, 1 to itemSize)
 
         rule.runOnIdle {
             list = listOf(1, 0)
@@ -157,7 +157,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame {
             // fraction doesn't affect the offsets in layout info
-            assertLayoutInfoPositions(1 to 0, 0 to itemSize)
+            assertLayoutInfoPositions(1 to 0f, 0 to itemSize)
         }
     }
 
@@ -173,7 +173,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSize,
             2 to itemSize * 2,
             3 to itemSize * 3,
@@ -186,11 +186,11 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0 + (itemSize * 4 * fraction).roundToInt(),
+                0 to 0 + itemSize * 4 * fraction,
                 1 to itemSize,
                 2 to itemSize * 2,
                 3 to itemSize * 3,
-                4 to itemSize * 4 - (itemSize * 4 * fraction).roundToInt(),
+                4 to itemSize * 4 - itemSize * 4 * fraction,
                 fraction = fraction
             )
         }
@@ -208,7 +208,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSize,
             2 to itemSize * 2,
             3 to itemSize * 3,
@@ -221,11 +221,11 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0 + (itemSize * 4 * fraction).roundToInt(),
-                1 to itemSize - (itemSize * fraction).roundToInt(),
-                2 to itemSize * 2 - (itemSize * fraction).roundToInt(),
-                3 to itemSize * 3 - (itemSize * fraction).roundToInt(),
-                4 to itemSize * 4 - (itemSize * fraction).roundToInt(),
+                0 to 0 + itemSize * 4 * fraction,
+                1 to itemSize - itemSize * fraction,
+                2 to itemSize * 2 - itemSize * fraction,
+                3 to itemSize * 3 - itemSize * fraction,
+                4 to itemSize * 4 - itemSize * fraction,
                 fraction = fraction
             )
         }
@@ -255,10 +255,10 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0,
+                0 to 0f,
                 1 to itemSize,
-                2 to itemSize * 2 + (itemSize * fraction).roundToInt(),
-                3 to itemSize * 3 + (itemSize * fraction).roundToInt(),
+                2 to itemSize * 2 + itemSize * fraction,
+                3 to itemSize * 3 + itemSize * fraction,
                 fraction = fraction
             )
         }
@@ -282,9 +282,9 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         onAnimationFrame { fraction ->
             assertPositions(
                 0 to itemSize * 4,
-                1 to itemSize - (itemSize * fraction).roundToInt(),
+                1 to itemSize - itemSize * fraction,
                 2 to itemSize,
-                3 to itemSize * 3 - (itemSize * fraction).roundToInt(),
+                3 to itemSize * 3 - itemSize * fraction,
                 4 to itemSize * 3,
                 fraction = fraction
             )
@@ -310,11 +310,11 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         onAnimationFrame(duration = Duration * 2) { fraction ->
             val shorterAnimFraction = (fraction * 2).coerceAtMost(1f)
             assertPositions(
-                0 to 0 + (itemSize * 4 * shorterAnimFraction).roundToInt(),
-                1 to itemSize - (itemSize * fraction).roundToInt(),
-                2 to itemSize * 2 - (itemSize * shorterAnimFraction).roundToInt(),
-                3 to itemSize * 3 - (itemSize * fraction).roundToInt(),
-                4 to itemSize * 4 - (itemSize * shorterAnimFraction).roundToInt(),
+                0 to 0 + itemSize * 4 * shorterAnimFraction,
+                1 to itemSize - itemSize * fraction,
+                2 to itemSize * 2 - itemSize * shorterAnimFraction,
+                3 to itemSize * 3 - itemSize * fraction,
+                4 to itemSize * 4 - itemSize * shorterAnimFraction,
                 fraction = fraction
             )
         }
@@ -333,7 +333,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSize,
             2 to itemSize * 2,
             3 to itemSize * 3,
@@ -345,10 +345,10 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0 + (itemSize * 2 * fraction).roundToInt(),
-                1 to itemSize + (itemSize * 2 * fraction).roundToInt(),
-                2 to itemSize * 2 - (itemSize * 2 * fraction).roundToInt(),
-                3 to itemSize * 3 - (itemSize * 2 * fraction).roundToInt(),
+                0 to 0 + itemSize * 2 * fraction,
+                1 to itemSize + itemSize * 2 * fraction,
+                2 to itemSize * 2 - itemSize * 2 * fraction,
+                3 to itemSize * 3 - itemSize * 2 * fraction,
                 fraction = fraction
             )
         }
@@ -372,9 +372,9 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0 + (itemSize * 2 * fraction).roundToInt(),
+                0 to 0 + itemSize * 2 * fraction,
                 1 to itemSize * 3,
-                2 to itemSize * 2 - (itemSize * 2 * fraction).roundToInt(),
+                2 to itemSize * 2 - itemSize * 2 * fraction,
                 3 to itemSize,
                 fraction = fraction
             )
@@ -409,9 +409,9 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                1 to itemSize - (itemSize * fraction).roundToInt(),
+                1 to itemSize - itemSize * fraction,
                 2 to itemSize * 2,
-                3 to itemSize * 3 + (itemSize * fraction).roundToInt(),
+                3 to itemSize * 3 + itemSize * fraction,
                 fraction = fraction
             )
         }
@@ -431,7 +431,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSize,
             2 to itemSize * 2
         )
@@ -442,10 +442,10 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 1 moves to and item 4 moves from `listSize`, right after the end edge
-            val item1Offset = itemSize + ((listSize - itemSize) * fraction).roundToInt()
-            val item4Offset = listSize - ((listSize - itemSize) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
-                add(0 to 0)
+            val item1Offset = itemSize + (listSize - itemSize) * fraction
+            val item4Offset = listSize - (listSize - itemSize) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
+                add(0 to 0f)
                 if (item1Offset < itemSize * 3) {
                     add(1 to item1Offset)
                 } else {
@@ -477,7 +477,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            3 to 0,
+            3 to 0f,
             4 to itemSize,
             5 to itemSize * 2
         )
@@ -488,15 +488,15 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 1 moves from and item 4 moves to `0 - itemSize`, right before the start edge
-            val item1Offset = -itemSize + (itemSize * 2 * fraction).roundToInt()
-            val item4Offset = itemSize - (itemSize * 2 * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
+            val item1Offset = -itemSize + itemSize * 2 * fraction
+            val item4Offset = itemSize - itemSize * 2 * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
                 if (item4Offset > -itemSize) {
                     add(4 to item4Offset)
                 } else {
                     rule.onNodeWithTag("4").assertIsNotDisplayed()
                 }
-                add(3 to 0)
+                add(3 to 0f)
                 if (item1Offset > -itemSize) {
                     add(1 to item1Offset)
                 } else {
@@ -526,7 +526,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            3 to 0,
+            3 to 0f,
             4 to itemSize
         )
 
@@ -536,15 +536,15 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 1 moves from and item 4 moves to `0 - itemSize`, right before the start edge
-            val item1Offset = -itemSize + (itemSize * 2 * fraction).roundToInt()
-            val item4Offset = itemSize - (itemSize * 2 * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
+            val item1Offset = -itemSize + itemSize * 2 * fraction
+            val item4Offset = itemSize - itemSize * 2 * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
                 if (item4Offset > -itemSize) {
                     add(4 to item4Offset)
                 } else {
                     rule.onNodeWithTag("4").assertIsNotDisplayed()
                 }
-                add(3 to 0)
+                add(3 to 0f)
                 if (item1Offset > -itemSize) {
                     add(1 to item1Offset)
                 } else {
@@ -575,10 +575,10 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0 + (itemSizePlusSpacing * 3 * fraction).roundToInt(),
-                1 to itemSizePlusSpacing - (itemSizePlusSpacing * fraction).roundToInt(),
-                2 to itemSizePlusSpacing * 2 - (itemSizePlusSpacing * fraction).roundToInt(),
-                3 to itemSizePlusSpacing * 3 - (itemSizePlusSpacing * fraction).roundToInt(),
+                0 to 0 + itemSizePlusSpacing * 3 * fraction,
+                1 to itemSizePlusSpacing - itemSizePlusSpacing * fraction,
+                2 to itemSizePlusSpacing * 2 - itemSizePlusSpacing * fraction,
+                3 to itemSizePlusSpacing * 3 - itemSizePlusSpacing * fraction,
                 fraction = fraction
             )
         }
@@ -601,7 +601,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSizePlusSpacing,
             2 to itemSizePlusSpacing * 2
         )
@@ -613,12 +613,12 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         onAnimationFrame { fraction ->
             // item 1 moves to and item 4 moves from `listSize`, right after the end edge
             val item1Offset =
-                itemSizePlusSpacing + ((listSize - itemSizePlusSpacing) * fraction).roundToInt()
+                itemSizePlusSpacing + (listSize - itemSizePlusSpacing) * fraction
             val item4Offset =
-                listSize - ((listSize - itemSizePlusSpacing) * fraction).roundToInt()
+                listSize - (listSize - itemSizePlusSpacing) * fraction
             val screenSize = itemSize * 3 + spacing * 2
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
-                add(0 to 0)
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
+                add(0 to 0f)
                 if (item1Offset < screenSize) {
                     add(1 to item1Offset)
                 } else {
@@ -654,7 +654,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            3 to 0,
+            3 to 0f,
             4 to itemSizePlusSpacing,
             5 to itemSizePlusSpacing * 2
         )
@@ -666,16 +666,16 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         onAnimationFrame { fraction ->
             // item 4 moves to and item 1 moves from `-itemSize`, right before the start edge
             val item1Offset =
-                -itemSize + ((itemSize + itemSizePlusSpacing) * fraction).roundToInt()
+                -itemSize + (itemSize + itemSizePlusSpacing) * fraction
             val item4Offset =
-                itemSizePlusSpacing - ((itemSize + itemSizePlusSpacing) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
+                itemSizePlusSpacing - (itemSize + itemSizePlusSpacing) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
                 if (item4Offset > -itemSize) {
                     add(4 to item4Offset)
                 } else {
                     rule.onNodeWithTag("4").assertIsNotDisplayed()
                 }
-                add(3 to 0)
+                add(3 to 0f)
                 if (item1Offset > -itemSize) {
                     add(1 to item1Offset)
                 } else {
@@ -706,7 +706,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         val item3Size = itemSize2
         val item4Size = itemSize
         assertPositions(
-            3 to 0,
+            3 to 0f,
             4 to item3Size,
             5 to item3Size + item4Size
         )
@@ -723,22 +723,22 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
             // item 1 moves from and item 4 moves to `0 - item size`, right before the start edge
             val startItem1Offset = -item1Size
             val item1Offset =
-                startItem1Offset + ((itemSize2 - startItem1Offset) * fraction).roundToInt()
+                startItem1Offset + (itemSize2 - startItem1Offset) * fraction
             val endItem4Offset = -item4Size
-            val item4Offset = item3Size - ((item3Size - endItem4Offset) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
+            val item4Offset = item3Size - (item3Size - endItem4Offset) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
                 if (item4Offset > -item4Size) {
                     add(4 to item4Offset)
                 } else {
                     rule.onNodeWithTag("4").assertIsNotDisplayed()
                 }
-                add(3 to 0)
+                add(3 to 0f)
                 if (item1Offset > -item1Size) {
                     add(1 to item1Offset)
                 } else {
                     rule.onNodeWithTag("1").assertIsNotDisplayed()
                 }
-                add(5 to item3Size + item4Size - ((item4Size - item1Size) * fraction).roundToInt())
+                add(5 to item3Size + item4Size - (item4Size - item1Size) * fraction)
             }
             assertPositions(
                 expected = expected.toTypedArray(),
@@ -765,7 +765,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         val item0Size = itemSize2
         val item1Size = itemSize
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to item0Size,
             2 to item0Size + item1Size
         )
@@ -780,17 +780,17 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
             val endItem1Offset = listSize
             val item4Size = itemSize3
             val item1Offset =
-                item0Size + ((endItem1Offset - item0Size) * fraction).roundToInt()
+                item0Size + (endItem1Offset - item0Size) * fraction
             val item4Offset =
-                startItem4Offset - ((startItem4Offset - item0Size) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
-                add(0 to 0)
+                startItem4Offset - (startItem4Offset - item0Size) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
+                add(0 to 0f)
                 if (item1Offset < listSize) {
                     add(1 to item1Offset)
                 } else {
                     rule.onNodeWithTag("1").assertIsNotDisplayed()
                 }
-                add(2 to item0Size + item1Size - ((item1Size - item4Size) * fraction).roundToInt())
+                add(2 to item0Size + item1Size - (item1Size - item4Size) * fraction)
                 if (item4Offset < listSize) {
                     add(4 to item4Offset)
                 } else {
@@ -823,11 +823,11 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         val item2Start = itemSize - itemSize2
         val item3Start = itemSize - itemSize3
         assertPositions(
-            1 to 0,
+            1 to 0f,
             2 to itemSize,
             3 to itemSize * 2,
             crossAxis = listOf(
-                1 to 0,
+                1 to 0f,
                 2 to item2Start,
                 3 to item3Start,
             )
@@ -842,13 +842,13 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         val item3End = itemSize / 2 - itemSize3 / 2
         onAnimationFrame { fraction ->
             assertPositions(
-                1 to 0,
+                1 to 0f,
                 2 to itemSize,
                 3 to itemSize * 2,
                 crossAxis = listOf(
-                    1 to 0,
-                    2 to item2Start + ((item2End - item2Start) * fraction).roundToInt(),
-                    3 to item3Start + ((item3End - item3Start) * fraction).roundToInt(),
+                    1 to 0f,
+                    2 to item2Start + (item2End - item2Start) * fraction,
+                    3 to item3Start + (item3End - item3Start) * fraction,
                 ),
                 fraction = fraction
             )
@@ -881,13 +881,13 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         val containerSize = itemSize * 2
         onAnimationFrame { fraction ->
             assertPositions(
-                1 to 0,
+                1 to 0f,
                 2 to itemSize,
                 3 to itemSize * 2,
                 crossAxis = listOf(
-                    1 to ((containerSize - itemSize) * fraction).roundToInt(),
-                    2 to ((containerSize - itemSize2) * fraction).roundToInt(),
-                    3 to ((containerSize - itemSize3) * fraction).roundToInt()
+                    1 to (containerSize - itemSize) * fraction,
+                    2 to (containerSize - itemSize2) * fraction,
+                    3 to (containerSize - itemSize3) * fraction
                 ),
                 fraction = fraction
             )
@@ -916,13 +916,13 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            1 to 0,
+            1 to 0f,
             2 to itemSize,
             3 to itemSize * 2,
             crossAxis = listOf(
-                1 to 0,
-                2 to 0,
-                3 to 0,
+                1 to 0f,
+                2 to 0f,
+                3 to 0f,
             )
         )
 
@@ -933,13 +933,13 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                1 to 0,
+                1 to 0f,
                 2 to itemSize,
                 3 to itemSize * 2,
                 crossAxis = listOf(
-                    1 to 0,
-                    2 to ((itemSize / 2 - itemSize2 / 2) * fraction).roundToInt(),
-                    3 to ((itemSize / 2 - itemSize3 / 2) * fraction).roundToInt(),
+                    1 to 0f,
+                    2 to (itemSize / 2 - itemSize2 / 2) * fraction,
+                    3 to (itemSize / 2 - itemSize3 / 2) * fraction
                 ),
                 fraction = fraction
             )
@@ -949,8 +949,8 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
     @Test
     fun moveItemToEndCausingNextItemsToAnimate_withContentPadding() {
         var list by mutableStateOf(listOf(0, 1, 2, 3, 4))
-        val rawStartPadding = 8
-        val rawEndPadding = 12
+        val rawStartPadding = 8f
+        val rawEndPadding = 12f
         val (startPaddingDp, endPaddingDp) = with(rule.density) {
             rawStartPadding.toDp() to rawEndPadding.toDp()
         }
@@ -978,10 +978,10 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         onAnimationFrame { fraction ->
             assertPositions(
                 0 to startPadding,
-                1 to startPadding + itemSize + (itemSize * 3 * fraction).roundToInt(),
-                2 to startPadding + itemSize * 2 - (itemSize * fraction).roundToInt(),
-                3 to startPadding + itemSize * 3 - (itemSize * fraction).roundToInt(),
-                4 to startPadding + itemSize * 4 - (itemSize * fraction).roundToInt(),
+                1 to startPadding + itemSize + itemSize * 3 * fraction,
+                2 to startPadding + itemSize * 2 - itemSize * fraction,
+                3 to startPadding + itemSize * 3 - itemSize * fraction,
+                4 to startPadding + itemSize * 4 - itemSize * fraction,
                 fraction = fraction
             )
         }
@@ -1035,7 +1035,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         rule.runOnIdle {
             runBlocking {
-                state.scrollToItem(0, itemSize / 2)
+                state.scrollToItem(0, (itemSize / 2).roundToInt())
             }
         }
 
@@ -1231,9 +1231,9 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 1 moves to `listSize`
-            val item1Offset = itemSize + ((listSize - itemSize) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
-                add(0 to 0)
+            val item1Offset = itemSize + (listSize - itemSize) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
+                add(0 to 0f)
                 if (item1Offset < listSize) {
                     add(1 to item1Offset)
                 } else {
@@ -1259,7 +1259,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            3 to 0,
+            3 to 0f,
             4 to itemSize,
             5 to itemSize * 2
         )
@@ -1270,12 +1270,12 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 2 moves from and item 5 moves to `-itemSize`, right before the start edge
-            val item2Offset = -itemSize + (itemSize * 3 * fraction).roundToInt()
-            val item5Offset = itemSize * 2 - (itemSize * 3 * fraction).roundToInt()
+            val item2Offset = -itemSize + itemSize * 3 * fraction
+            val item5Offset = itemSize * 2 - itemSize * 3 * fraction
             // item 1 moves from and item 4 moves to `-itemSize * 2`, right before item 2
-            val item1Offset = -itemSize * 2 + (itemSize * 3 * fraction).roundToInt()
-            val item4Offset = itemSize - (itemSize * 3 * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
+            val item1Offset = -itemSize * 2 + itemSize * 3 * fraction
+            val item4Offset = itemSize - itemSize * 3 * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
                 if (item1Offset > -itemSize) {
                     add(1 to item1Offset)
                 } else {
@@ -1286,7 +1286,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
                 } else {
                     rule.onNodeWithTag("2").assertIsNotDisplayed()
                 }
-                add(3 to 0)
+                add(3 to 0f)
                 if (item4Offset > -itemSize) {
                     add(4 to item4Offset)
                 } else {
@@ -1317,7 +1317,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            3 to 0,
+            3 to 0f,
             4 to itemSize,
             5 to itemSize * 2
         )
@@ -1328,12 +1328,12 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 2 moves from and item 4 moves to `-itemSize`, right before the start edge
-            val item2Offset = -itemSize + (itemSize * 2 * fraction).roundToInt()
-            val item4Offset = itemSize - (itemSize * 2 * fraction).roundToInt()
+            val item2Offset = -itemSize + itemSize * 2 * fraction
+            val item4Offset = itemSize - itemSize * 2 * fraction
             // item 1 moves from and item 5 moves to `-itemSize * 2`, right before item 2
-            val item1Offset = -itemSize * 2 + (itemSize * 4 * fraction).roundToInt()
-            val item5Offset = itemSize * 2 - (itemSize * 4 * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
+            val item1Offset = -itemSize * 2 + itemSize * 4 * fraction
+            val item5Offset = itemSize * 2 - itemSize * 4 * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
                 if (item1Offset > -itemSize) {
                     add(1 to item1Offset)
                 } else {
@@ -1344,7 +1344,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
                 } else {
                     rule.onNodeWithTag("2").assertIsNotDisplayed()
                 }
-                add(3 to 0)
+                add(3 to 0f)
                 if (item4Offset > -itemSize) {
                     add(4 to item4Offset)
                 } else {
@@ -1377,7 +1377,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSize,
             2 to itemSize * 2
         )
@@ -1388,13 +1388,13 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 1 moves to and item 3 moves from `listSize`, right after the end edge
-            val item1Offset = itemSize + ((listSize - itemSize) * fraction).roundToInt()
-            val item3Offset = listSize - ((listSize - itemSize) * fraction).roundToInt()
+            val item1Offset = itemSize + (listSize - itemSize) * fraction
+            val item3Offset = listSize - (listSize - itemSize) * fraction
             // item 2 moves to and item 4 moves from `listSize + itemSize`, right after item 4
-            val item2Offset = itemSize * 2 + ((listSize - itemSize) * fraction).roundToInt()
-            val item4Offset = listSize + itemSize - ((listSize - itemSize) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
-                add(0 to 0)
+            val item2Offset = itemSize * 2 + (listSize - itemSize) * fraction
+            val item4Offset = listSize + itemSize - (listSize - itemSize) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
+                add(0 to 0f)
                 if (item1Offset < listSize) {
                     add(1 to item1Offset)
                 } else {
@@ -1437,7 +1437,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
         }
 
         assertPositions(
-            0 to 0,
+            0 to 0f,
             1 to itemSize,
             2 to itemSize * 2
         )
@@ -1448,14 +1448,14 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             // item 2 moves to and item 3 moves from `listSize`, right after the end edge
-            val item2Offset = itemSize * 2 + ((listSize - itemSize * 2) * fraction).roundToInt()
-            val item3Offset = listSize - ((listSize - itemSize * 2) * fraction).roundToInt()
+            val item2Offset = itemSize * 2 + (listSize - itemSize * 2) * fraction
+            val item3Offset = listSize - (listSize - itemSize * 2) * fraction
             // item 1 moves to and item 4 moves from `listSize + itemSize`, right after item 4
-            val item1Offset = itemSize + ((listSize + itemSize - itemSize) * fraction).roundToInt()
+            val item1Offset = itemSize + (listSize + itemSize - itemSize) * fraction
             val item4Offset =
-                listSize + itemSize - ((listSize + itemSize - itemSize) * fraction).roundToInt()
-            val expected = mutableListOf<Pair<Any, Int>>().apply {
-                add(0 to 0)
+                listSize + itemSize - (listSize + itemSize - itemSize) * fraction
+            val expected = mutableListOf<Pair<Any, Float>>().apply {
+                add(0 to 0f)
                 if (item1Offset < listSize) {
                     add(1 to item1Offset)
                 } else {
@@ -1501,7 +1501,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0,
+                0 to 0f,
                 1 to itemSize,
                 fraction = fraction
             )
@@ -1526,7 +1526,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
 
         onAnimationFrame { fraction ->
             assertPositions(
-                0 to 0,
+                0 to 0f,
                 1 to itemSize,
                 2 to itemSize * 2,
                 fraction = fraction
@@ -1535,11 +1535,12 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
     }
 
     private fun assertPositions(
-        vararg expected: Pair<Any, Int>,
-        crossAxis: List<Pair<Any, Int>>? = null,
+        vararg expected: Pair<Any, Float>,
+        crossAxis: List<Pair<Any, Float>>? = null,
         fraction: Float? = null,
         autoReverse: Boolean = reverseLayout
     ) {
+        val roundedExpected = expected.map { it.first to it.second.roundToInt() }
         with(rule.density) {
             val actual = expected.map {
                 val actualOffset = rule.onNodeWithTag(it.first.toString())
@@ -1555,7 +1556,7 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
                 assertWithMessage("Fraction=$fraction").that(actual)
             }
             subject.isEqualTo(
-                listOf(*expected).let { list ->
+                roundedExpected.let { list ->
                     if (!autoReverse) {
                         list
                     } else {
@@ -1586,14 +1587,16 @@ class LazyListAnimateItemPlacementTest(private val config: Config) {
                     "CrossAxis" + if (fraction != null) "for fraction=$fraction" else ""
                 )
                     .that(actualCross)
-                    .isEqualTo(crossAxis)
+                    .isEqualTo(crossAxis.map { it.first to it.second.roundToInt() })
             }
         }
     }
 
-    private fun assertLayoutInfoPositions(vararg offsets: Pair<Any, Int>) {
+    private fun assertLayoutInfoPositions(vararg offsets: Pair<Any, Float>) {
         rule.runOnIdle {
-            assertThat(visibleItemsOffsets).isEqualTo(listOf(*offsets))
+            assertThat(visibleItemsOffsets).isEqualTo(offsets.map {
+                it.first to it.second.roundToInt()
+            })
         }
     }
 
