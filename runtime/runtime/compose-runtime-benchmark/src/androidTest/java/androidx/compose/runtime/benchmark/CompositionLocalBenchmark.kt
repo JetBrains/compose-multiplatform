@@ -19,9 +19,6 @@ package androidx.compose.runtime.benchmark
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -113,91 +110,6 @@ class CompositionLocalBenchmark : ComposeBenchmarkBase() {
                     repeat(100) { local.current }
                 }
             }
-        }
-    }
-
-    @UiThreadTest
-    @Test
-    fun compositionLocal_compose_depth_10000_1() = runBlockingTestWithFrameClock {
-        measureCompose {
-            CompositionLocalProvider(local provides 100) {
-                DepthOf(10000) {
-                    local.current
-                }
-            }
-        }
-    }
-    @UiThreadTest
-    @Test
-    @Ignore // Only used for overhead comparison, not to be tracked.
-    fun compositionLocal_compose_depth_10000_10() = runBlockingTestWithFrameClock {
-        measureCompose {
-            CompositionLocalProvider(local provides 100) {
-                DepthOf(10000) {
-                    repeat(10) { local.current }
-                }
-            }
-        }
-    }
-
-    // This is the only one of the "compose" benchmarks that should be tracked.
-    @UiThreadTest
-    @Test
-    fun compositionLocal_compose_depth_10000_100() = runBlockingTestWithFrameClock {
-        measureCompose {
-            CompositionLocalProvider(local provides 100) {
-                DepthOf(10000) {
-                    repeat(100) { local.current }
-                }
-            }
-        }
-    }
-
-    @UiThreadTest
-    @Test
-    fun compositionLocal_recompose_depth_10000_1() = runBlockingTestWithFrameClock {
-        var data by mutableStateOf(0)
-        var sync: Int = 0
-
-        measureRecomposeSuspending {
-            compose {
-                DepthOf(10000) {
-                    // Force the read to occur in a way that is difficult for the compiler to figure
-                    // out that it is not used.
-                    sync = data
-                    repeat(1) { local.current }
-                }
-            }
-            update {
-                data++
-            }
-        }
-        if (sync > Int.MAX_VALUE / 2) {
-            println("This is just to fool the compiler into thinking sync is used")
-        }
-    }
-
-    @UiThreadTest
-    @Test
-    fun compositionLocal_recompose_depth_10000_100() = runBlockingTestWithFrameClock {
-        var data by mutableStateOf(0)
-        var sync: Int = 0
-
-        measureRecomposeSuspending {
-            compose {
-                DepthOf(10000) {
-                    // Force the read to occur in a way that is difficult for the compiler to figure
-                    // out that it is not used.
-                    sync = data
-                    repeat(100) { local.current }
-                }
-            }
-            update {
-                data++
-            }
-        }
-        if (sync > Int.MAX_VALUE / 2) {
-            println("This is just to fool the compiler into thinking sync is used")
         }
     }
 }
