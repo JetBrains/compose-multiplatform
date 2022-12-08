@@ -502,7 +502,7 @@ package androidx.compose.foundation.lazy {
   public final class LazyListMeasureKt {
   }
 
-  public final class LazyListPinningModifierKt {
+  public final class LazyListPinnableContainerProviderKt {
   }
 
   @androidx.compose.foundation.lazy.LazyScopeMarker @kotlin.jvm.JvmDefaultWithCompatibility public interface LazyListScope {
@@ -719,9 +719,6 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class Lazy_androidKt {
-  }
-
-  public final class PinnableParentKt {
   }
 
 }

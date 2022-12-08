@@ -116,7 +116,6 @@ internal fun LazyList(
             )
             .clipScrollableContainer(orientation)
             .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout, orientation)
-            .lazyListPinningModifier(state, beyondBoundsInfo)
             .overscroll(overscrollEffect)
             .scrollable(
                 orientation = orientation,
@@ -317,6 +316,7 @@ private fun rememberLazyListMeasurePolicy(
             placementAnimator = placementAnimator,
             beyondBoundsInfo = beyondBoundsInfo,
             beyondBoundsItemCount = beyondBoundsItemCount,
+            pinnedItems = state.pinnedItems,
             layout = { width, height, placement ->
                 layout(
                     containerConstraints.constrainWidth(width + totalHorizontalPadding),

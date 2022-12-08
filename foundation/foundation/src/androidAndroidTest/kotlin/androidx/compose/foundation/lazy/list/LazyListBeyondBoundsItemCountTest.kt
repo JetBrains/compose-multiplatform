@@ -95,7 +95,7 @@ class LazyListBeyondBoundsItemCountTest(config: Config) :
             state.layoutInfo.visibleItemsInfo.last().index + beyondBoundsItemCount
 
         for (index in nonVisibleStartIndexAfter until nonVisibleEndIndexAfter) {
-            rule.onNodeWithTag(index.toString()).assertPlaced()
+            rule.onNodeWithTag(index.toString()).assertIsPlaced()
         }
     }
 
@@ -106,7 +106,7 @@ class LazyListBeyondBoundsItemCountTest(config: Config) :
             state.layoutInfo.visibleItemsInfo.first().index - beyondBoundsItemCount
 
         for (index in nonVisibleStartIndexBefore downTo nonVisibleEndIndexBefore) {
-            rule.onNodeWithTag(index.toString()).assertPlaced()
+            rule.onNodeWithTag(index.toString()).assertIsPlaced()
         }
     }
 
@@ -166,7 +166,7 @@ class LazyListBeyondBoundsItemCountTest(config: Config) :
  *
  * Throws [AssertionError] if the node is not placed.
  */
-private fun SemanticsNodeInteraction.assertPlaced(): SemanticsNodeInteraction {
+internal fun SemanticsNodeInteraction.assertIsPlaced(): SemanticsNodeInteraction {
     val errorMessageOnFail = "Assert failed: The component is not placed!"
     if (!fetchSemanticsNode(errorMessageOnFail).layoutInfo.isPlaced) {
         throw AssertionError(errorMessageOnFail)
