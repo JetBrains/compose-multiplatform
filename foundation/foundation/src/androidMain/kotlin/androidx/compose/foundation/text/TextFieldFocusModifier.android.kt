@@ -47,8 +47,8 @@ internal actual fun Modifier.interceptDPadAndMoveFocus(
     return this
         .onPreviewKeyEvent { keyEvent ->
             // If direction keys from virtual alphabetic keyboard are used, propagate the input
-            if (keyEvent.nativeKeyEvent.device.keyboardType == KEYBOARD_TYPE_ALPHABETIC &&
-                keyEvent.nativeKeyEvent.device.isVirtual) {
+            val device = keyEvent.nativeKeyEvent.device ?: return@onPreviewKeyEvent false
+            if (device.keyboardType == KEYBOARD_TYPE_ALPHABETIC && device.isVirtual) {
                 return@onPreviewKeyEvent false
             }
 
