@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -104,6 +105,10 @@ open class BaseLazyListTestWithOrientation(
         } else {
             composeViewSwipeRight()
         }
+    }
+
+    fun Velocity.toFloat(): Float {
+        return if (orientation == Orientation.Vertical) y else x
     }
 
     @Composable

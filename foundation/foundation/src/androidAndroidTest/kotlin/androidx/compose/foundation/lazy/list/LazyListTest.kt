@@ -2036,7 +2036,7 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         // assert
         rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            val diff = abs((velocity - tracker.calculateVelocity()).toFloat())
             assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
         }
         tracker.resetTracking()
@@ -2047,7 +2047,7 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         // assert
         rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            val diff = abs((velocity - tracker.calculateVelocity()).toFloat())
             assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
         }
     }

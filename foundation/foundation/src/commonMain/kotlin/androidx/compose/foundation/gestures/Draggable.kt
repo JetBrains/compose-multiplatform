@@ -39,9 +39,12 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputChange
+import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
+import androidx.compose.ui.input.pointer.positionChangeIgnoreConsumed
 import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.input.pointer.util.addPointerInputChange
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -358,17 +361,36 @@ private suspend fun AwaitPointerEventScope.awaitDrag(
 
     channel.trySend(DragDelta(if (reverseDirection) initialDelta * -1f else initialDelta))
 
-    val dragTick: (PointerInputChange) -> Unit = { event ->
+    return onDragOrUp(orientation, startEvent.id) { event ->
+        // Velocity tracker takes all events, even UP
         velocityTracker.addPointerInputChange(event)
-        val delta = event.positionChange()
-        event.consume()
-        channel.trySend(DragDelta(if (reverseDirection) delta * -1f else delta))
+
+        // Dispatch only MOVE events
+        if (!event.changedToUpIgnoreConsumed()) {
+            val delta = event.positionChange()
+            event.consume()
+            channel.trySend(DragDelta(if (reverseDirection) delta * -1f else delta))
+        }
     }
-    return if (orientation == Orientation.Vertical) {
-        verticalDrag(startEvent.id, dragTick)
+}
+
+private suspend fun AwaitPointerEventScope.onDragOrUp(
+    orientation: Orientation,
+    pointerId: PointerId,
+    onDrag: (PointerInputChange) -> Unit
+): Boolean {
+    val motionFromChange: (PointerInputChange) -> Float = if (orientation == Orientation.Vertical) {
+        { it.positionChangeIgnoreConsumed().y }
     } else {
-        horizontalDrag(startEvent.id, dragTick)
+        { it.positionChangeIgnoreConsumed().x }
     }
+
+    return drag(
+        pointerId = pointerId,
+        onDrag = onDrag,
+        motionFromChange = motionFromChange,
+        motionConsumed = { it.isConsumed }
+    )?.let(onDrag) != null
 }
 
 private class DragLogic(

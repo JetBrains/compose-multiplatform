@@ -746,7 +746,8 @@ class OverscrollTest {
         }
 
         rule.runOnIdle {
-            assertThat(controller.lastVelocity).isEqualTo(Velocity.Zero)
+            assertThat(controller.lastVelocity.x).isWithin(0.01f).of(0f)
+            assertThat(controller.lastVelocity.y).isWithin(0.01f).of(0f)
         }
     }
 }
