@@ -1,9 +1,3 @@
 // Baseline format: 1.0
-InvalidNullConversion: androidx.compose.material3.NavigationBarItemDefaults#colors(long, long, long, long, long):
-    Attempted to remove @NonNull annotation from method androidx.compose.material3.NavigationBarItemDefaults.colors(long,long,long,long,long)
-InvalidNullConversion: androidx.compose.material3.NavigationRailItemDefaults#colors(long, long, long, long, long):
-    Attempted to remove @NonNull annotation from method androidx.compose.material3.NavigationRailItemDefaults.colors(long,long,long,long,long)
-
-
 RemovedClass: androidx.compose.material3.TouchTargetKt:
     Removed class androidx.compose.material3.TouchTargetKt
