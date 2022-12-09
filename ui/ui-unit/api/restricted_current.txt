@@ -353,6 +353,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class TextUnitKt {
+    method public static long TextUnit(float value, long type);
     method @kotlin.PublishedApi internal static void checkArithmetic(long a);
     method @kotlin.PublishedApi internal static void checkArithmetic(long a, long b);
     method @kotlin.PublishedApi internal static void checkArithmetic(long a, long b, long c);
