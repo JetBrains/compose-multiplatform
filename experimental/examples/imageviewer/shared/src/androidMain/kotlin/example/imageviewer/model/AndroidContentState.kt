@@ -18,6 +18,8 @@ data class ContentStateData(
     val mainImage:Bitmap = createEmptyBitmap(),
     val currentImageIndex:Int = 0,
     val miniatures:Miniatures = Miniatures(),
+    val origin: Bitmap? = null,
+    val picture:Picture = Picture(image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)),
 )
 
 interface Notification {
@@ -39,6 +41,7 @@ class ContentState(
 ) {
     fun getSelectedImage():Bitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
+    private val mainImageWrapper = MainImageWrapper(state)
 
     private fun applyFilters(bitmap: Bitmap):Bitmap {
         var result: Bitmap = bitmap
@@ -79,8 +82,8 @@ class ContentState(
                                 wrapPictureIntoMainImage(picture)
                             } else {
                                 state.value = state.value.copy(
-                                    mainImage = MainImageWrapper.getImage(),
-                                    currentImageIndex = MainImageWrapper.getId()
+                                    mainImage = mainImageWrapper.getImage(),
+                                    currentImageIndex = mainImageWrapper.getId()
                                 )
                             }
                             onContentReady()
@@ -99,7 +102,7 @@ class ContentState(
     }
 
     fun getSelectedImageName(): String {
-        return MainImageWrapper.getName()
+        return mainImageWrapper.getName()
     }
 
     private fun toggleFilterState(filter: FilterType) {
@@ -115,11 +118,11 @@ class ContentState(
     fun toggleFilter(filter: FilterType) {
         toggleFilterState(filter)
 
-        var bitmap = MainImageWrapper.origin
+        var bitmap = state.value.origin
 
         if (bitmap != null) {
             bitmap = applyFilters(bitmap)
-            MainImageWrapper.setImage(bitmap)
+            mainImageWrapper.setImage(bitmap)
             state.value = state.value.copy(mainImage = bitmap)
         }
     }
@@ -130,7 +133,7 @@ class ContentState(
         state.value = state.value.copy(
             filterUIState = emptySet()
         )
-        return MainImageWrapper.restore()
+        return mainImageWrapper.restore()
     }
 
     fun restoreMainImage() {
@@ -141,7 +144,7 @@ class ContentState(
 
     // preview/fullscreen image managing
     fun isMainImageEmpty(): Boolean {
-        return MainImageWrapper.isEmpty()
+        return mainImageWrapper.isEmpty()
     }
 
     fun fullscreen(picture: Picture) {
@@ -151,7 +154,7 @@ class ContentState(
     }
 
     fun setMainImage(picture: Picture) {
-        if (MainImageWrapper.getId() == picture.id) {
+        if (mainImageWrapper.getId() == picture.id) {
             if (!state.value.isContentReady)
                 onContentReady()
             return
@@ -161,8 +164,7 @@ class ContentState(
         backgroundScope.launch {
             if (isInternetAvailable()) {
 
-                val fullSizePicture = loadFullImage(picture.source)
-                fullSizePicture.id = picture.id
+                val fullSizePicture = loadFullImage(picture.source).copy(id = picture.id)
 
                 withContext(Dispatchers.Main) {
                     wrapPictureIntoMainImage(fullSizePicture)
@@ -184,8 +186,8 @@ class ContentState(
     }
 
     private fun wrapPictureIntoMainImage(picture: Picture) {
-        MainImageWrapper.wrapPicture(picture)
-        MainImageWrapper.saveOrigin()
+        mainImageWrapper.wrapPicture(picture)
+        mainImageWrapper.saveOrigin()
         state.value = state.value.copy(
             mainImage = picture.image,
             currentImageIndex = picture.id
@@ -225,7 +227,7 @@ class ContentState(
             if (isInternetAvailable()) {
                 withContext(Dispatchers.Main) {
                     clearCache(cacheDirProvider())
-                    MainImageWrapper.clear()
+                    mainImageWrapper.clear()
                     state.value = state.value.copy(
                         miniatures = Miniatures(),
                         isContentReady = false,
@@ -243,22 +245,22 @@ class ContentState(
     fun isContentReady(): Boolean = state.value.isContentReady
 }
 
-private object MainImageWrapper {
-    // origin image
-    var origin: Bitmap? = null
-        private set
-
+private class MainImageWrapper(val state: MutableState<ContentStateData>) {
     fun saveOrigin() {
-        origin = copy(picture.value.image)
+        state.value = state.value.copy(
+            origin = copy(picture.value.image)
+        )
     }
 
     fun restore(): Bitmap {
-
-        if (origin != null) {
+        if (state.value.origin != null) {
             filtersSet.clear()
-            picture.value.image = copy(origin!!)
+            state.value = state.value.copy(
+                picture = state.value.picture.copy(
+                    image = copy(state.value.origin!!)
+                )
+            )
         }
-
         return copy(picture.value.image)
     }
 
@@ -272,7 +274,11 @@ private object MainImageWrapper {
     }
 
     fun setImage(bitmap: Bitmap) {
-        picture.value.image = bitmap
+        state.value = state.value.copy(
+            picture = state.value.picture.copy(
+                image = bitmap
+            )
+        )
     }
 
     fun isEmpty(): Boolean {

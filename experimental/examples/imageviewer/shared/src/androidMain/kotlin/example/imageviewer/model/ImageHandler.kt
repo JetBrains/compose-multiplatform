@@ -5,7 +5,7 @@ import android.graphics.BitmapFactory
 import example.imageviewer.utils.cacheImage
 import example.imageviewer.utils.cacheImagePostfix
 import example.imageviewer.utils.scaleBitmapAspectRatio
-import example.imageviewer.utils.toPx
+import kotlinx.coroutines.*
 import java.io.File
 import java.io.FileInputStream
 import java.io.InputStream
@@ -41,32 +41,27 @@ fun loadFullImage(source: String): Picture {
     return Picture(image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
 }
 
-fun loadImages(cachePath: String, list: List<String>): MutableList<Picture> {
-    val result: MutableList<Picture> = ArrayList()
-
-    for (source in list) {
-        val name = getNameURL(source)
-        val path = cachePath + File.separator + name
-
-        if (File(path + "info").exists()) {
-            addCachedMiniature(filePath = path, outList = result)
-        } else {
-            addFreshMiniature(source = source, outList = result, path = cachePath)
-        }
-
-        result.last().id = result.size - 1
+suspend fun loadImages(cachePath: String, list: List<String>): List<Picture> =
+    withContext(SupervisorJob() + Dispatchers.IO) {
+        list.mapIndexed { index, source->
+            async {
+                val name = getNameURL(source)
+                val path = cachePath + File.separator + name
+                if (File(path + "info").exists()) {
+                    getCachedMiniature(filePath = path)
+                } else {
+                    getFreshMiniature(source = source, path = cachePath)
+                }?.copy(id = index)
+            }
+        }.awaitAll().filterNotNull()
     }
 
-    return result
-}
-
-private fun addFreshMiniature(
+suspend fun getFreshMiniature(
     source: String,
-    outList: MutableList<Picture>,
     path: String
-) {
-    try {
-        val url = URL(source)
+):Picture? {
+    return try {
+        val url = URL(source)//todo ktor
         val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = 5000
         connection.connect()
@@ -83,19 +78,21 @@ private fun addFreshMiniature(
                 result.height
             )
 
-            outList.add(picture)
             cacheImage(path + getNameURL(source), picture)
+            picture
+        } else {
+            null
         }
     } catch (e: Exception) {
         e.printStackTrace()
+        null
     }
 }
 
-private fun addCachedMiniature(
-    filePath: String,
-    outList: MutableList<Picture>
-) {
-    try {
+suspend private fun getCachedMiniature(
+    filePath: String
+):Picture? {
+    return try {
         val read = BufferedReader(
             InputStreamReader(
                 FileInputStream(filePath + cacheImagePostfix),
@@ -119,10 +116,13 @@ private fun addCachedMiniature(
                 width,
                 height
             )
-            outList.add(picture)
+            picture
+        } else {
+            null
         }
     } catch (e: Exception) {
         e.printStackTrace()
+        null
     }
 }
 
