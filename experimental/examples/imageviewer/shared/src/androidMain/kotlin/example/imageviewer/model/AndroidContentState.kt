@@ -6,6 +6,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
+import example.imageviewer.core.createEmptyBitmap
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import kotlinx.coroutines.*
@@ -15,7 +16,7 @@ val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 data class ContentStateData(
     val filterUIState: Set<FilterType> = emptySet(),
     val isContentReady:Boolean = false,
-    val mainImage:Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+    val mainImage:Bitmap = createEmptyBitmap(),
     val currentImageIndex:Int = 0,
     val miniatures:Miniatures = Miniatures(),
 )

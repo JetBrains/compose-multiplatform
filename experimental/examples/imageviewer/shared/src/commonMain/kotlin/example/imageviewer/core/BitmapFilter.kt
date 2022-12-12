@@ -1,7 +1,8 @@
 package example.imageviewer.core
 
-expect class Bitmap
+expect class CommonBitmap
+expect fun createEmptyBitmap():CommonBitmap
 
 interface BitmapFilter {
-    fun apply(bitmap: Bitmap) : Bitmap
+    fun apply(bitmap: CommonBitmap) : CommonBitmap
 }
