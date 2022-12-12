@@ -5,11 +5,9 @@ import android.graphics.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import example.imageviewer.core.BitmapFilter
-import example.imageviewer.shared.R
 import example.imageviewer.core.FilterType
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
-import example.imageviewer.view.showPopUpMessage
 import kotlinx.coroutines.*
 
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
@@ -22,19 +20,30 @@ data class ContentStateData(
     val miniatures:Miniatures = Miniatures(),
 )
 
+interface Notification {
+    fun notifyInvalidRepo()
+    fun notifyRepoIsEmpty()
+    fun notifyNoInternet()
+    fun notifyLoadImageUnavaliable()
+    fun notifyLastImage()
+    fun notifyFirstImage()
+    fun notifyRefreshUnavailable()
+}
+
 class ContentState(
     val repository: ImageRepository,
     val contextProvider: () -> Context,
     val getFilter: (FilterType) -> BitmapFilter,
-    val state:MutableState<ContentStateData>
+    val state:MutableState<ContentStateData>,
+    val notification: Notification,
 ) {
-    val context get() = contextProvider()
+    private val context get() = contextProvider()
 
     fun getSelectedImage():Bitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
 
-    fun applyFilters(bitmap: android.graphics.Bitmap):Bitmap {
-        var result: android.graphics.Bitmap = bitmap
+    fun applyFilters(bitmap: Bitmap):Bitmap {
+        var result: Bitmap = bitmap
         for (filter in state.value.filterUIState.map { getFilter(it) }) {
             result = filter.apply(result)
         }
@@ -50,10 +59,7 @@ class ContentState(
 
                     if (imageList.isEmpty()) {
                         withContext(Dispatchers.Main) {
-                            showPopUpMessage(
-                                getString(R.string.repo_invalid),
-                                context
-                            )
+                            notification.notifyInvalidRepo()
                             onContentReady()
                         }
                         return@launch
@@ -63,10 +69,7 @@ class ContentState(
 
                     if (pictureList.isEmpty()) {
                         withContext(Dispatchers.Main) {
-                            showPopUpMessage(
-                                getString(R.string.repo_empty),
-                                context
-                            )
+                            notification.notifyRepoIsEmpty()
                             onContentReady()
                         }
                     } else {
@@ -87,10 +90,7 @@ class ContentState(
                     }
                 } else {
                     withContext(Dispatchers.Main) {
-                        showPopUpMessage(
-                            getString(R.string.no_internet),
-                            context
-                        )
+                        notification.notifyNoInternet()
                         onContentReady()
                     }
                 }
@@ -98,10 +98,6 @@ class ContentState(
                 e.printStackTrace()
             }
         }
-    }
-
-    fun getString(id: Int): String {
-        return context.getString(id)
     }
 
     fun getSelectedImageName(): String {
@@ -129,9 +125,6 @@ class ContentState(
             state.value = state.value.copy(mainImage = bitmap)
         }
     }
-
-    private fun containsFilter(type: FilterType): Boolean =
-        state.value.filterUIState.contains(type)
 
     fun isFilterEnabled(type: FilterType): Boolean = state.value.filterUIState.contains(type)
 
@@ -179,10 +172,7 @@ class ContentState(
                 }
             } else {
                 withContext(Dispatchers.Main) {
-                    showPopUpMessage(
-                        "${getString(R.string.no_internet)}\n${getString(R.string.load_image_unavailable)}",
-                        context
-                    )
+                    notification.notifyLoadImageUnavaliable()
                     wrapPictureIntoMainImage(picture)
                 }
             }
@@ -206,10 +196,7 @@ class ContentState(
 
     fun swipeNext() {
         if (state.value.currentImageIndex == state.value.miniatures.size() - 1) {
-            showPopUpMessage(
-                getString(R.string.last_image),
-                context
-            )
+            notification.notifyLastImage()
             return
         }
 
@@ -223,10 +210,7 @@ class ContentState(
 
     fun swipePrevious() {
         if (state.value.currentImageIndex == 0) {
-            showPopUpMessage(
-                getString(R.string.first_image),
-                context
-            )
+            notification.notifyFirstImage()
             return
         }
 
@@ -252,10 +236,7 @@ class ContentState(
                 }
             } else {
                 withContext(Dispatchers.Main) {
-                    showPopUpMessage(
-                        "${getString(R.string.no_internet)}\n${getString(R.string.refresh_unavailable)}",
-                        context
-                    )
+                    notification.notifyRefreshUnavailable()
                 }
             }
         }
@@ -318,18 +299,6 @@ private object MainImageWrapper {
 
     // applied filters
     private var filtersSet: MutableSet<FilterType> = LinkedHashSet()
-
-    fun addFilter(filter: FilterType) {
-        filtersSet.add(filter)
-    }
-
-    fun removeFilter(filter: FilterType) {
-        filtersSet.remove(filter)
-    }
-
-    fun getFilters(): Set<FilterType> {
-        return filtersSet
-    }
 
     private fun copy(bitmap: Bitmap): Bitmap {
         return bitmap.copy(bitmap.config, false)
