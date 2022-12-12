@@ -17,7 +17,7 @@ import kotlinx.coroutines.*
 
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-class ContentState() {
+class ContentState {
 
     private lateinit var context: Context
     private lateinit var repository: ImageRepository
@@ -27,15 +27,12 @@ class ContentState() {
         if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
             return this
         }
-
         this.context = context
         this.uriRepository = uriRepository
         repository = ImageRepository(uriRepository)
         appliedFilters = FiltersManager(context)
         isContentReady.value = false
-
         initData()
-
         return this
     }
 
@@ -70,7 +67,6 @@ class ContentState() {
     private val filterUIState: MutableMap<FilterType, MutableState<Boolean>> = LinkedHashMap()
 
     private fun toggleFilterState(filter: FilterType) {
-
         if (!filterUIState.containsKey(filter)) {
             filterUIState[filter] = mutableStateOf(true)
         } else {
@@ -80,7 +76,6 @@ class ContentState() {
     }
 
     fun toggleFilter(filter: FilterType) {
-
         if (containsFilter(filter)) {
             removeFilter(filter)
         } else {
