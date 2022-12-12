@@ -16,9 +16,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-fun loadFullImage(source: String): Picture {
+suspend fun loadFullImage(source: String): Picture {
     try {
-        val url = URL(source)
+        val url = URL(source)//todo ktor
         val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
         connection.connectTimeout = 5000
         connection.connect()
