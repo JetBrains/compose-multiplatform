@@ -7,7 +7,7 @@ import android.os.Looper
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.res.stringResource
-import example.imageviewer.common.R
+import example.imageviewer.shared.R
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
 import example.imageviewer.utils.clearCache

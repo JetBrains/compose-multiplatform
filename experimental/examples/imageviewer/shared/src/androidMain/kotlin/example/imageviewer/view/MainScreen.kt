@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import example.imageviewer.common.R
+import example.imageviewer.shared.R
 import example.imageviewer.model.AppState
 import example.imageviewer.model.ContentState
 import example.imageviewer.model.Picture

@@ -2,7 +2,7 @@ package example.imageviewer.style
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
-import example.imageviewer.common.R
+import example.imageviewer.shared.R
 
 @Composable
 fun icEmpty() = painterResource(R.drawable.empty)
