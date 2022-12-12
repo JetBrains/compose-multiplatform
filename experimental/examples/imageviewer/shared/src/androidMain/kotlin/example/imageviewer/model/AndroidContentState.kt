@@ -2,14 +2,11 @@ package example.imageviewer.model
 
 import android.content.Context
 import android.graphics.*
-import android.os.Handler
-import android.os.Looper
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.res.stringResource
+import example.imageviewer.core.BitmapFilter
 import example.imageviewer.shared.R
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.filtration.FiltersManager
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.view.showPopUpMessage
@@ -17,118 +14,34 @@ import kotlinx.coroutines.*
 
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
-class ContentState {
+data class ContentStateData(
+    val filterUIState: Set<FilterType> = emptySet(),
+    val isContentReady:Boolean = false,
+    val mainImage:Bitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+    val currentImageIndex:Int = 0,
+    val miniatures:Miniatures = Miniatures(),
+)
 
-    private lateinit var context: Context
-    private lateinit var repository: ImageRepository
-    private lateinit var uriRepository: String
+class ContentState(
+    val repository: ImageRepository,
+    val contextProvider: () -> Context,
+    val getFilter: (FilterType) -> BitmapFilter,
+    val state:MutableState<ContentStateData>
+) {
+    val context get() = contextProvider()
 
-    fun applyContent(context: Context, uriRepository: String): ContentState {
-        if (this::uriRepository.isInitialized && this.uriRepository == uriRepository) {
-            return this
+    fun getSelectedImage():Bitmap = state.value.mainImage
+    fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
+
+    fun applyFilters(bitmap: android.graphics.Bitmap):Bitmap {
+        var result: android.graphics.Bitmap = bitmap
+        for (filter in state.value.filterUIState.map { getFilter(it) }) {
+            result = filter.apply(result)
         }
-        this.context = context
-        this.uriRepository = uriRepository
-        repository = ImageRepository(uriRepository)
-        appliedFilters = FiltersManager(context)
-        isContentReady.value = false
-        initData()
-        return this
+        return result
     }
 
-    private val isContentReady = mutableStateOf(false)
-    fun isContentReady(): Boolean {
-        return isContentReady.value
-    }
-
-    fun getString(id: Int): String {
-        return context.getString(id)
-    }
-
-    // drawable content
-    private val mainImage = mutableStateOf(Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
-    private val currentImageIndex = mutableStateOf(0)
-    private val miniatures = Miniatures()
-
-    fun getMiniatures(): List<Picture> {
-        return miniatures.getMiniatures()
-    }
-
-    fun getSelectedImage(): Bitmap {
-        return mainImage.value
-    }
-
-    fun getSelectedImageName(): String {
-        return MainImageWrapper.getName()
-    }
-
-    // filters managing
-    private lateinit var appliedFilters: FiltersManager
-    private val filterUIState: MutableMap<FilterType, MutableState<Boolean>> = LinkedHashMap()
-
-    private fun toggleFilterState(filter: FilterType) {
-        if (!filterUIState.containsKey(filter)) {
-            filterUIState[filter] = mutableStateOf(true)
-        } else {
-            val value = filterUIState[filter]!!.value
-            filterUIState[filter]!!.value = !value
-        }
-    }
-
-    fun toggleFilter(filter: FilterType) {
-        if (containsFilter(filter)) {
-            removeFilter(filter)
-        } else {
-            addFilter(filter)
-        }
-
-        toggleFilterState(filter)
-
-        var bitmap = MainImageWrapper.origin
-
-        if (bitmap != null) {
-            bitmap = appliedFilters.applyFilters(bitmap)
-            MainImageWrapper.setImage(bitmap)
-            mainImage.value = bitmap
-        }
-    }
-
-    private fun addFilter(filter: FilterType) {
-        appliedFilters.add(filter)
-        MainImageWrapper.addFilter(filter)
-    }
-
-    private fun removeFilter(filter: FilterType) {
-        appliedFilters.remove(filter)
-        MainImageWrapper.removeFilter(filter)
-    }
-
-    private fun containsFilter(type: FilterType): Boolean {
-        return appliedFilters.contains(type)
-    }
-
-    fun isFilterEnabled(type: FilterType): Boolean {
-        if (!filterUIState.containsKey(type)) {
-            filterUIState[type] = mutableStateOf(false)
-        }
-        return filterUIState[type]!!.value
-    }
-
-    private fun restoreFilters(): Bitmap {
-        filterUIState.clear()
-        appliedFilters.clear()
-        return MainImageWrapper.restore()
-    }
-
-    fun restoreMainImage() {
-        mainImage.value = restoreFilters()
-    }
-
-    // application content initialization
-    private fun initData() {
-        if (isContentReady.value)
-            return
-
+    fun initData() {
         val directory = context.cacheDir.absolutePath
         backgroundScope.launch {
             try {
@@ -159,14 +72,15 @@ class ContentState {
                     } else {
                         val picture = loadFullImage(imageList[0])
                         withContext(Dispatchers.Main) {
-                            miniatures.setMiniatures(pictureList)
+                            state.value.miniatures.setMiniatures(pictureList)
 
                             if (isMainImageEmpty()) {
                                 wrapPictureIntoMainImage(picture)
                             } else {
-                                appliedFilters.add(MainImageWrapper.getFilters())
-                                mainImage.value = MainImageWrapper.getImage()
-                                currentImageIndex.value = MainImageWrapper.getId()
+                                state.value = state.value.copy(
+                                    mainImage = MainImageWrapper.getImage(),
+                                    currentImageIndex = MainImageWrapper.getId()
+                                )
                             }
                             onContentReady()
                         }
@@ -184,7 +98,54 @@ class ContentState {
                 e.printStackTrace()
             }
         }
+    }
 
+    fun getString(id: Int): String {
+        return context.getString(id)
+    }
+
+    fun getSelectedImageName(): String {
+        return MainImageWrapper.getName()
+    }
+
+    private fun toggleFilterState(filter: FilterType) {
+        state.value = state.value.copy(
+            filterUIState = if (!state.value.filterUIState.contains(filter)) {
+                state.value.filterUIState + filter
+            } else {
+                state.value.filterUIState - filter
+            }
+        )
+    }
+
+    fun toggleFilter(filter: FilterType) {
+        toggleFilterState(filter)
+
+        var bitmap = MainImageWrapper.origin
+
+        if (bitmap != null) {
+            bitmap = applyFilters(bitmap)
+            MainImageWrapper.setImage(bitmap)
+            state.value = state.value.copy(mainImage = bitmap)
+        }
+    }
+
+    private fun containsFilter(type: FilterType): Boolean =
+        state.value.filterUIState.contains(type)
+
+    fun isFilterEnabled(type: FilterType): Boolean = state.value.filterUIState.contains(type)
+
+    private fun restoreFilters(): Bitmap {
+        state.value = state.value.copy(
+            filterUIState = emptySet()
+        )
+        return MainImageWrapper.restore()
+    }
+
+    fun restoreMainImage() {
+        state.value = state.value.copy(
+            mainImage = restoreFilters()
+        )
     }
 
     // preview/fullscreen image managing
@@ -193,18 +154,18 @@ class ContentState {
     }
 
     fun fullscreen(picture: Picture) {
-        isContentReady.value = false
+        state.value = state.value.copy(isContentReady = false)
         AppState.screenState(ScreenType.FullscreenImage)
         setMainImage(picture)
     }
 
     fun setMainImage(picture: Picture) {
         if (MainImageWrapper.getId() == picture.id) {
-            if (!isContentReady())
+            if (!state.value.isContentReady)
                 onContentReady()
             return
         }
-        isContentReady.value = false
+        state.value = state.value.copy(isContentReady = false)
 
         backgroundScope.launch {
             if (isInternetAvailable()) {
@@ -229,18 +190,22 @@ class ContentState {
     }
 
     private fun onContentReady() {
-        isContentReady.value = true
+        state.value = state.value.copy(
+            isContentReady = true
+        )
     }
 
     private fun wrapPictureIntoMainImage(picture: Picture) {
         MainImageWrapper.wrapPicture(picture)
         MainImageWrapper.saveOrigin()
-        mainImage.value = picture.image
-        currentImageIndex.value = picture.id
+        state.value = state.value.copy(
+            mainImage = picture.image,
+            currentImageIndex = picture.id
+        )
     }
 
     fun swipeNext() {
-        if (currentImageIndex.value == miniatures.size() - 1) {
+        if (state.value.currentImageIndex == state.value.miniatures.size() - 1) {
             showPopUpMessage(
                 getString(R.string.last_image),
                 context
@@ -249,11 +214,15 @@ class ContentState {
         }
 
         restoreFilters()
-        setMainImage(miniatures.get(++currentImageIndex.value))
+        val nextIndex = state.value.currentImageIndex + 1
+        state.value = state.value.copy(
+            currentImageIndex = nextIndex
+        )
+        setMainImage(state.value.miniatures.get(nextIndex))
     }
 
     fun swipePrevious() {
-        if (currentImageIndex.value == 0) {
+        if (state.value.currentImageIndex == 0) {
             showPopUpMessage(
                 getString(R.string.first_image),
                 context
@@ -262,7 +231,11 @@ class ContentState {
         }
 
         restoreFilters()
-        setMainImage(miniatures.get(--currentImageIndex.value))
+        val prevIndex = state.value.currentImageIndex - 1
+        state.value = state.value.copy(
+            currentImageIndex = prevIndex
+        )
+        setMainImage(state.value.miniatures.get(prevIndex))
     }
 
     fun refresh() {
@@ -271,8 +244,10 @@ class ContentState {
                 withContext(Dispatchers.Main) {
                     clearCache(context)
                     MainImageWrapper.clear()
-                    miniatures.clear()
-                    isContentReady.value = false
+                    state.value = state.value.copy(
+                        miniatures = Miniatures(),
+                        isContentReady = false,
+                    )
                     initData()
                 }
             } else {
@@ -285,6 +260,8 @@ class ContentState {
             }
         }
     }
+
+    fun isContentReady(): Boolean = state.value.isContentReady
 }
 
 private object MainImageWrapper {
