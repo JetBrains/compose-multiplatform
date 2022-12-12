@@ -77,14 +77,15 @@ fun LinearProgressIndicator(
     trackColor: Color = ProgressIndicatorDefaults.linearTrackColor,
     strokeCap: StrokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
 ) {
+    val coercedProgress = progress.coerceIn(0f, 1f)
     Canvas(
         modifier
-            .progressSemantics(progress)
+            .progressSemantics(coercedProgress)
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
     ) {
         val strokeWidth = size.height
         drawLinearIndicatorTrack(trackColor, strokeWidth, strokeCap)
-        drawLinearIndicator(0f, progress, color, strokeWidth, strokeCap)
+        drawLinearIndicator(0f, coercedProgress, color, strokeWidth, strokeCap)
     }
 }
 
@@ -291,17 +292,18 @@ fun CircularProgressIndicator(
     trackColor: Color = ProgressIndicatorDefaults.circularTrackColor,
     strokeCap: StrokeCap = ProgressIndicatorDefaults.CircularDeterminateStrokeCap,
 ) {
+    val coercedProgress = progress.coerceIn(0f, 1f)
     val stroke = with(LocalDensity.current) {
         Stroke(width = strokeWidth.toPx(), cap = strokeCap)
     }
     Canvas(
         modifier
-            .progressSemantics(progress)
+            .progressSemantics(coercedProgress)
             .size(CircularIndicatorDiameter)
     ) {
         // Start at 12 o'clock
         val startAngle = 270f
-        val sweep = progress * 360f
+        val sweep = coercedProgress * 360f
         drawCircularIndicatorTrack(trackColor, stroke)
         drawDeterminateCircularIndicator(startAngle, sweep, color, stroke)
     }

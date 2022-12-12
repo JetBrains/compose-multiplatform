@@ -77,6 +77,28 @@ class ProgressIndicatorTest {
     }
 
     @Test
+    fun determinateLinearProgressIndicator_ProgressIsCoercedInBounds() {
+        val tag = "linear"
+        val progress = mutableStateOf(-1f)
+
+        rule.setMaterialContent {
+            LinearProgressIndicator(modifier = Modifier.testTag(tag), progress = progress.value)
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
+
+        rule.runOnUiThread {
+            progress.value = 1.5f
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .assertRangeInfoEquals(ProgressBarRangeInfo(1f, 0f..1f))
+    }
+
+    @Test
     fun determinateLinearProgressIndicator_Size() {
         rule
             .setMaterialContentForSizeAssertions {
@@ -139,6 +161,31 @@ class ProgressIndicatorTest {
         rule.onNodeWithTag(tag)
             .assertIsDisplayed()
             .assertRangeInfoEquals(ProgressBarRangeInfo(0.5f, 0f..1f))
+    }
+
+    @Test
+    fun determinateCircularProgressIndicator_ProgressIsCoercedInBounds() {
+        val tag = "circular"
+        val progress = mutableStateOf(-1f)
+
+        rule.setMaterialContent {
+            CircularProgressIndicator(
+                modifier = Modifier.testTag(tag),
+                progress = progress.value
+            )
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .assertRangeInfoEquals(ProgressBarRangeInfo(0f, 0f..1f))
+
+        rule.runOnUiThread {
+            progress.value = 1.5f
+        }
+
+        rule.onNodeWithTag(tag)
+            .assertIsDisplayed()
+            .assertRangeInfoEquals(ProgressBarRangeInfo(1f, 0f..1f))
     }
 
     @Test
