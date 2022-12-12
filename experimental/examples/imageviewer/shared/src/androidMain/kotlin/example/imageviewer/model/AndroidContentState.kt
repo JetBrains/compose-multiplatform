@@ -16,8 +16,7 @@ import example.imageviewer.view.showPopUpMessage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-
-object ContentState {
+class ContentState {
 
     private lateinit var context: Context
     private lateinit var repository: ImageRepository
@@ -42,11 +41,6 @@ object ContentState {
     private val executor: ExecutorService by lazy { Executors.newFixedThreadPool(2) }
 
     private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
-
-    private val isAppReady = mutableStateOf(false)
-    fun isAppReady(): Boolean {
-        return isAppReady.value
-    }
 
     private val isContentReady = mutableStateOf(false)
     fun isContentReady(): Boolean {
@@ -245,7 +239,6 @@ object ContentState {
 
     private fun onContentReady() {
         isContentReady.value = true
-        isAppReady.value = true
     }
 
     private fun wrapPictureIntoMainImage(picture: Picture) {
