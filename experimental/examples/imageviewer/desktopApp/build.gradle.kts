@@ -1,7 +1,7 @@
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    kotlin("multiplatform") // kotlin("jvm") doesn't work well in IDEA/AndroidStudio (https://github.com/JetBrains/compose-jb/issues/22)
+    kotlin("multiplatform")
     id("org.jetbrains.compose")
 }
 
@@ -10,10 +10,10 @@ kotlin {
         withJava()
     }
     sourceSets {
-        named("jvmMain") {
+        val jvmMain by getting  {
             dependencies {
                 implementation(compose.desktop.currentOs)
-                implementation(project(":common"))
+                implementation(project(":shared"))
             }
         }
     }
