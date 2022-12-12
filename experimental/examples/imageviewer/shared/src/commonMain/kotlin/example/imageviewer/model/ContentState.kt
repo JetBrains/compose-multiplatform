@@ -1,10 +1,7 @@
 package example.imageviewer.model
 
 import androidx.compose.runtime.MutableState
-import example.imageviewer.core.BitmapFilter
-import example.imageviewer.core.CommonBitmap
-import example.imageviewer.core.FilterType
-import example.imageviewer.core.createEmptyBitmap
+import example.imageviewer.core.*
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import kotlinx.coroutines.*
@@ -296,7 +293,5 @@ class ContentState(
         return state.value.picture.id
     }
 
-    private fun copyBitmap(bitmap: CommonBitmap): CommonBitmap {
-        return bitmap.copy(bitmap.config, false)
-    }
+    private fun copyBitmap(bitmap: CommonBitmap): CommonBitmap = bitmap.copy()
 }

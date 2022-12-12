@@ -14,7 +14,16 @@
 
 package example.imageviewer.model
 
-expect class Picture
+import example.imageviewer.core.CommonBitmap
+
+data class Picture(
+    val source: String = "",
+    val name: String = "",
+    val image: CommonBitmap,
+    val width: Int = 0,
+    val height: Int = 0,
+    val id: Int = 0
+)
 
 class Miniatures(
     private var list: List<Picture> = emptyList()
