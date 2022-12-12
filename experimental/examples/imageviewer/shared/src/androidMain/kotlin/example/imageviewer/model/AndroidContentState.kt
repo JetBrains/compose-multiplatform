@@ -1,6 +1,5 @@
 package example.imageviewer.model
 
-import android.content.Context
 import android.graphics.*
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -25,7 +24,7 @@ interface Notification {
     fun notifyInvalidRepo()
     fun notifyRepoIsEmpty()
     fun notifyNoInternet()
-    fun notifyLoadImageUnavaliable()
+    fun notifyLoadImageUnavailable()
     fun notifyLastImage()
     fun notifyFirstImage()
     fun notifyRefreshUnavailable()
@@ -33,17 +32,15 @@ interface Notification {
 
 class ContentState(
     val repository: ImageRepository,
-    val contextProvider: () -> Context,
     val getFilter: (FilterType) -> BitmapFilter,
     val state:MutableState<ContentStateData>,
     val notification: Notification,
+    val cacheDirProvider: () -> String
 ) {
-    private val context get() = contextProvider()
-
     fun getSelectedImage():Bitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
 
-    fun applyFilters(bitmap: Bitmap):Bitmap {
+    private fun applyFilters(bitmap: Bitmap):Bitmap {
         var result: Bitmap = bitmap
         for (filter in state.value.filterUIState.map { getFilter(it) }) {
             result = filter.apply(result)
@@ -52,7 +49,7 @@ class ContentState(
     }
 
     fun initData() {
-        val directory = context.cacheDir.absolutePath
+        val directory = cacheDirProvider()
         backgroundScope.launch {
             try {
                 if (isInternetAvailable()) {
@@ -173,7 +170,7 @@ class ContentState(
                 }
             } else {
                 withContext(Dispatchers.Main) {
-                    notification.notifyLoadImageUnavaliable()
+                    notification.notifyLoadImageUnavailable()
                     wrapPictureIntoMainImage(picture)
                 }
             }
@@ -227,7 +224,7 @@ class ContentState(
         backgroundScope.launch {
             if (isInternetAvailable()) {
                 withContext(Dispatchers.Main) {
-                    clearCache(context)
+                    clearCache(cacheDirProvider())
                     MainImageWrapper.clear()
                     state.value = state.value.copy(
                         miniatures = Miniatures(),

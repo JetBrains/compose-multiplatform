@@ -23,7 +23,6 @@ class MainActivity : AppCompatActivity() {
 
         val content = ContentState(
             repository = ImageRepository("https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"),
-            contextProvider = { this },
             getFilter = {
                 when (it) {
                     FilterType.GrayScale -> GrayScaleFilter()
@@ -32,7 +31,8 @@ class MainActivity : AppCompatActivity() {
                 }
             },
             state = mutableStateOf(ContentStateData()),
-            notification = AndroidNotification(contextProvider = { this })
+            notification = AndroidNotification(contextProvider = { this }),
+            cacheDirProvider = {this.cacheDir.absolutePath}
         ).apply {
             initData()
         }
@@ -70,7 +70,7 @@ class AndroidNotification(val contextProvider: () -> Context): Notification {
         )
     }
 
-    override fun notifyLoadImageUnavaliable() {
+    override fun notifyLoadImageUnavailable() {
         showPopUpMessage(
             "${getString(R.string.no_internet)}\n${getString(R.string.load_image_unavailable)}",
             context
