@@ -13,10 +13,11 @@ import example.imageviewer.model.filtration.FiltersManager
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.view.showPopUpMessage
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import kotlinx.coroutines.*
 
-class ContentState {
+val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+
+class ContentState() {
 
     private lateinit var context: Context
     private lateinit var repository: ImageRepository
@@ -37,10 +38,6 @@ class ContentState {
 
         return this
     }
-
-    private val executor: ExecutorService by lazy { Executors.newFixedThreadPool(2) }
-
-    private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
 
     private val isContentReady = mutableStateOf(false)
     fun isContentReady(): Boolean {
@@ -138,27 +135,26 @@ class ContentState {
             return
 
         val directory = context.cacheDir.absolutePath
-
-        executor.execute {
+        backgroundScope.launch {
             try {
                 if (isInternetAvailable()) {
                     val imageList = repository.get()
 
                     if (imageList.isEmpty()) {
-                        handler.post {
+                        withContext(Dispatchers.Main) {
                             showPopUpMessage(
                                 getString(R.string.repo_invalid),
                                 context
                             )
                             onContentReady()
                         }
-                        return@execute
+                        return@launch
                     }
 
                     val pictureList = loadImages(directory, imageList)
 
                     if (pictureList.isEmpty()) {
-                        handler.post {
+                        withContext(Dispatchers.Main) {
                             showPopUpMessage(
                                 getString(R.string.repo_empty),
                                 context
@@ -167,8 +163,7 @@ class ContentState {
                         }
                     } else {
                         val picture = loadFullImage(imageList[0])
-
-                        handler.post {
+                        withContext(Dispatchers.Main) {
                             miniatures.setMiniatures(pictureList)
 
                             if (isMainImageEmpty()) {
@@ -182,7 +177,7 @@ class ContentState {
                         }
                     }
                 } else {
-                    handler.post {
+                    withContext(Dispatchers.Main) {
                         showPopUpMessage(
                             getString(R.string.no_internet),
                             context
@@ -194,6 +189,7 @@ class ContentState {
                 e.printStackTrace()
             }
         }
+
     }
 
     // preview/fullscreen image managing
@@ -215,18 +211,18 @@ class ContentState {
         }
         isContentReady.value = false
 
-        executor.execute {
+        backgroundScope.launch {
             if (isInternetAvailable()) {
 
                 val fullSizePicture = loadFullImage(picture.source)
                 fullSizePicture.id = picture.id
 
-                handler.post {
+                withContext(Dispatchers.Main) {
                     wrapPictureIntoMainImage(fullSizePicture)
                     onContentReady()
                 }
             } else {
-                handler.post {
+                withContext(Dispatchers.Main) {
                     showPopUpMessage(
                         "${getString(R.string.no_internet)}\n${getString(R.string.load_image_unavailable)}",
                         context
@@ -275,9 +271,9 @@ class ContentState {
     }
 
     fun refresh() {
-        executor.execute {
+        backgroundScope.launch {
             if (isInternetAvailable()) {
-                handler.post {
+                withContext(Dispatchers.Main) {
                     clearCache(context)
                     MainImageWrapper.clear()
                     miniatures.clear()
@@ -285,7 +281,7 @@ class ContentState {
                     initData()
                 }
             } else {
-                handler.post {
+                withContext(Dispatchers.Main) {
                     showPopUpMessage(
                         "${getString(R.string.no_internet)}\n${getString(R.string.refresh_unavailable)}",
                         context
