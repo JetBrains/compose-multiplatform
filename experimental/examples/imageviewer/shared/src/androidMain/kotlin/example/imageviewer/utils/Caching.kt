@@ -35,7 +35,7 @@ fun cacheImage(path: String, picture: Picture) {
     }
 }
 
-fun clearCache(cacheDir:String) {
+actual fun clearCache(cacheDir:String) {
 
     val directory = File(cacheDir)
 

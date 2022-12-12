@@ -1,8 +1,8 @@
 package example.imageviewer.model
 
-import android.graphics.Bitmap
 import androidx.compose.runtime.MutableState
 import example.imageviewer.core.BitmapFilter
+import example.imageviewer.core.CommonBitmap
 import example.imageviewer.core.FilterType
 import example.imageviewer.core.createEmptyBitmap
 import example.imageviewer.utils.clearCache
@@ -14,11 +14,11 @@ val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 data class ContentStateData(
     val filterUIState: Set<FilterType> = emptySet(),
     val isContentReady: Boolean = false,
-    val mainImage: Bitmap = createEmptyBitmap(),
+    val mainImage: CommonBitmap = createEmptyBitmap(),
     val currentImageIndex: Int = 0,
     val miniatures: Miniatures = Miniatures(),
-    val origin: Bitmap? = null,
-    val picture: Picture = Picture(image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)),
+    val origin: CommonBitmap? = null,
+    val picture: Picture = Picture(image = createEmptyBitmap()),
 )
 
 interface Notification {
@@ -38,11 +38,11 @@ class ContentState(
     val notification: Notification,
     val cacheDirProvider: () -> String
 ) {
-    fun getSelectedImage(): Bitmap = state.value.mainImage
+    fun getSelectedImage(): CommonBitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
 
-    private fun applyFilters(bitmap: Bitmap): Bitmap {
-        var result: Bitmap = bitmap
+    private fun applyFilters(bitmap: CommonBitmap): CommonBitmap {
+        var result: CommonBitmap = bitmap
         for (filter in state.value.filterUIState.map { getFilter(it) }) {
             result = filter.apply(result)
         }
@@ -127,7 +127,7 @@ class ContentState(
 
     fun isFilterEnabled(type: FilterType): Boolean = state.value.filterUIState.contains(type)
 
-    private fun restoreFilters(): Bitmap {
+    private fun restoreFilters(): CommonBitmap {
         state.value = state.value.copy(
             filterUIState = emptySet()
         )
@@ -248,7 +248,7 @@ class ContentState(
         )
     }
 
-    private fun restore(): Bitmap {
+    private fun restore(): CommonBitmap {
         if (state.value.origin != null) {
             state.value = state.value.copy(
                 filterUIState = emptySet(),
@@ -266,7 +266,7 @@ class ContentState(
         )
     }
 
-    private fun setImage(bitmap: Bitmap) {
+    private fun setImage(bitmap: CommonBitmap) {
         state.value = state.value.copy(
             picture = state.value.picture.copy(
                 image = bitmap
@@ -280,7 +280,7 @@ class ContentState(
 
     private fun clear() {
         state.value = state.value.copy(
-            picture = Picture(image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
+            picture = Picture(image = createEmptyBitmap())
         )
     }
 
@@ -288,7 +288,7 @@ class ContentState(
         return state.value.picture.name
     }
 
-    private fun getImage(): Bitmap {
+    private fun getImage(): CommonBitmap {
         return state.value.picture.image
     }
 
@@ -296,7 +296,7 @@ class ContentState(
         return state.value.picture.id
     }
 
-    private fun copyBitmap(bitmap: Bitmap): Bitmap {
+    private fun copyBitmap(bitmap: CommonBitmap): CommonBitmap {
         return bitmap.copy(bitmap.config, false)
     }
 }

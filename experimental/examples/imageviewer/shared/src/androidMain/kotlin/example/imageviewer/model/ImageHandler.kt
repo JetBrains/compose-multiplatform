@@ -16,7 +16,7 @@ import java.net.HttpURLConnection
 import java.net.URL
 import java.nio.charset.StandardCharsets
 
-suspend fun loadFullImage(source: String): Picture {
+actual suspend fun loadFullImage(source: String): Picture {
     try {
         val url = URL(source)//todo ktor
         val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
@@ -41,7 +41,7 @@ suspend fun loadFullImage(source: String): Picture {
     return Picture(image = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888))
 }
 
-suspend fun loadImages(cachePath: String, list: List<String>): List<Picture> =
+actual suspend fun loadImages(cachePath: String, list: List<String>): List<Picture> =
     withContext(SupervisorJob() + Dispatchers.IO) {
         list.mapIndexed { index, source->
             async {
@@ -56,7 +56,7 @@ suspend fun loadImages(cachePath: String, list: List<String>): List<Picture> =
         }.awaitAll().filterNotNull()
     }
 
-suspend fun getFreshMiniature(
+private suspend fun getFreshMiniature(
     source: String,
     path: String
 ):Picture? {
@@ -89,7 +89,7 @@ suspend fun getFreshMiniature(
     }
 }
 
-suspend private fun getCachedMiniature(
+private suspend fun getCachedMiniature(
     filePath: String
 ):Picture? {
     return try {
