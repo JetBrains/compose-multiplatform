@@ -31,6 +31,9 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import example.imageviewer.common.R
 import example.imageviewer.model.AppState
@@ -54,14 +57,14 @@ fun MainScreen(content: ContentState) {
         ScrollableArea(content)
     }
     if (!content.isContentReady()) {
-        LoadingScreen(content.getString(R.string.loading))
+        LoadingScreen(stringResource(R.string.loading))
     }
 }
 
 @Composable
 fun TopContent(content: ContentState) {
-    TitleBar(text = content.getString(R.string.app_name), content = content)
-    if (content.getOrientation() == Configuration.ORIENTATION_PORTRAIT) {
+    TitleBar(text = stringResource(R.string.app_name), content = content)
+    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
         PreviewImage(content)
         Spacer(modifier = Modifier.height(10.dp))
         Divider()
@@ -166,17 +169,20 @@ fun Miniature(
                 style = MaterialTheme.typography.body1
             )
 
+            val context = LocalContext.current
+            val popupText = "${(R.string.picture)} " +
+                    "${picture.name} \n" +
+                    "${stringResource(R.string.size)} " +
+                    "${picture.width}x${picture.height} " +
+                    "${stringResource(R.string.pixels)}"
+
             Clickable(
                 modifier = Modifier.height(70.dp)
                     .width(30.dp),
                 onClick = {
                     showPopUpMessage(
-                        "${content.getString(R.string.picture)} " +
-                                "${picture.name} \n" +
-                                "${content.getString(R.string.size)} " +
-                                "${picture.width}x${picture.height} " +
-                                "${content.getString(R.string.pixels)}",
-                        content.getContext()
+                        popupText,
+                        context
                     )
                 }
             ) {

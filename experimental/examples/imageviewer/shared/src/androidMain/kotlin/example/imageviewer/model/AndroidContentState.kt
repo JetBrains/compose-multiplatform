@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Looper
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.res.stringResource
 import example.imageviewer.common.R
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.filtration.FiltersManager
@@ -41,14 +42,6 @@ object ContentState {
     private val executor: ExecutorService by lazy { Executors.newFixedThreadPool(2) }
 
     private val handler: Handler by lazy { Handler(Looper.getMainLooper()) }
-
-    fun getContext(): Context {
-        return context
-    }
-
-    fun getOrientation(): Int {
-        return context.resources.configuration.orientation
-    }
 
     private val isAppReady = mutableStateOf(false)
     fun isAppReady(): Boolean {
