@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile
 plugins {
     id("java")
     id("org.jetbrains.kotlin.jvm") version "1.5.10"
-    id("org.jetbrains.intellij") version "1.6.0"
+    id("org.jetbrains.intellij") version "1.10.1"
     id("org.jetbrains.changelog") version "1.3.1"
 }
 
@@ -57,7 +57,6 @@ tasks {
 
     patchPluginXml {
         sinceBuild.set(projectProperties.pluginSinceBuild)
-        untilBuild.set(projectProperties.pluginUntilBuild)
     }
 
     runPluginVerifier {
@@ -72,7 +71,6 @@ class ProjectProperties(private val project: Project) {
     val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
     val pluginChannels get() = listProperty("plugin.channels")
     val pluginSinceBuild get() = stringProperty("plugin.since.build")
-    val pluginUntilBuild get() = stringProperty("plugin.until.build")
     val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
 
     private fun stringProperty(key: String): String =
