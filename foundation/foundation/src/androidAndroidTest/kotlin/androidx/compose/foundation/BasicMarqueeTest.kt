@@ -23,7 +23,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.testutils.assertContainsColor
+import androidx.compose.testutils.assertDoesNotContainColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
@@ -41,13 +47,13 @@ import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -81,26 +87,15 @@ class BasicMarqueeTest {
 
     private fun Int.toDp() = with(rule.density) { this@toDp.toDp() }
 
+    @Before
+    fun setUp() {
+        rule.mainClock.autoAdvance = false
+    }
+
     @Test
     fun initialState() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .basicMarquee()
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
-                )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            TestMarqueeContent(Modifier.basicMarquee())
         }
 
         rule.onRoot().captureToImage()
@@ -109,28 +104,12 @@ class BasicMarqueeTest {
 
     @Test
     fun animationDisabled() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .basicMarquee(
-                        iterations = 0,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 0
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         // Color2 should never show up.
@@ -144,31 +123,13 @@ class BasicMarqueeTest {
 
     @Test
     fun animates_singleIteration_noSpace() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 1,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 1,
+                    spacing = MarqueeSpacing(0.toDp())
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -216,31 +177,12 @@ class BasicMarqueeTest {
 
     @Test
     fun animates_singleIteration_fixedSpace() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 1,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        spacing = MarqueeSpacing(10.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    spacing = MarqueeSpacing(10.toDp())
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -307,31 +249,12 @@ class BasicMarqueeTest {
 
     @Test
     fun animates_singleIteration_fractionOfSpace() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 1,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        spacing = MarqueeSpacing.fractionOfContainer(0.1f)
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    spacing = MarqueeSpacing.fractionOfContainer(0.1f)
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -398,32 +321,14 @@ class BasicMarqueeTest {
 
     @Test
     fun animates_twoIterations_noInitialDelay_noDelay() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 2,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        delayMillis = 0,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 2,
+                    initialDelayMillis = 0,
+                    delayMillis = 0,
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -510,32 +415,14 @@ class BasicMarqueeTest {
     @Test
     fun animates_twoIterations_initialDelay_noDelay() {
         val initialFrameDelay = 2
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 2,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = FrameDelay * initialFrameDelay,
-                        delayMillis = 0,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 2,
+                    initialDelayMillis = FrameDelay * initialFrameDelay,
+                    delayMillis = 0,
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -633,32 +520,14 @@ class BasicMarqueeTest {
     @Test
     fun animates_twoIterations_noInitialDelay_delay() {
         val frameDelay = 2
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 2,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        delayMillis = FrameDelay * frameDelay,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 2,
+                    initialDelayMillis = 0,
+                    delayMillis = FrameDelay * frameDelay,
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -757,32 +626,14 @@ class BasicMarqueeTest {
     fun animates_twoIterations_initialDelay_delay() {
         val initialFrameDelay = 2
         val frameDelay = 3
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 2,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = FrameDelay * initialFrameDelay,
-                        delayMillis = FrameDelay * frameDelay,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 2,
+                    initialDelayMillis = FrameDelay * initialFrameDelay,
+                    delayMillis = FrameDelay * frameDelay,
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -890,31 +741,12 @@ class BasicMarqueeTest {
 
     @Test
     fun animates_negativeVelocity() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 1,
-                        velocity = (-10).pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    velocity = (-10).pxPerFrame,
                 )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         rule.onRoot().captureToImage()
@@ -962,32 +794,9 @@ class BasicMarqueeTest {
 
     @Test
     fun animates_rtl() {
-        rule.mainClock.autoAdvance = false
         rule.setContent {
             CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-                Row(
-                    Modifier
-                        .width(100.toDp())
-                        .background(BackgroundColor)
-                        .basicMarquee(
-                            iterations = 1,
-                            velocity = 10.pxPerFrame,
-                            animationMode = Immediately,
-                            initialDelayMillis = 0,
-                            spacing = MarqueeSpacing(0.toDp())
-                        )
-                ) {
-                    Box(
-                        Modifier
-                            .size(100.toDp())
-                            .background(Color1)
-                    )
-                    Box(
-                        Modifier
-                            .size(100.toDp())
-                            .background(Color2)
-                    )
-                }
+                TestMarqueeContent(Modifier.basicMarqueeWithTestParams())
             }
         }
 
@@ -1038,34 +847,14 @@ class BasicMarqueeTest {
     fun animationMode_onlyWhileFocused() {
         val focusRequester = FocusRequester()
         lateinit var focusManager: FocusManager
-        rule.mainClock.autoAdvance = false
         rule.setContent {
             focusManager = LocalFocusManager.current
-            Row(
+            TestMarqueeContent(
                 Modifier
-                    .width(100.toDp())
-                    .background(BackgroundColor)
-                    .basicMarquee(
-                        iterations = 1,
-                        velocity = 10.pxPerFrame,
-                        animationMode = WhileFocused,
-                        initialDelayMillis = 0,
-                        spacing = MarqueeSpacing(0.toDp())
-                    )
+                    .basicMarqueeWithTestParams(animationMode = WhileFocused)
                     .focusRequester(focusRequester)
                     .focusable()
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
-                )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
-                )
-            }
+            )
         }
 
         // Nothing should happen before focusing.
@@ -1111,35 +900,74 @@ class BasicMarqueeTest {
     }
 
     @Test
+    fun animationCancelled_whenIterationsChanges() {
+        testAnimationContinuity(
+            resetsAnimation = true,
+            Modifier.basicMarqueeWithTestParams(iterations = 10),
+            Modifier.basicMarqueeWithTestParams(iterations = 11)
+        )
+    }
+
+    @Test
+    fun animationCancelled_whenVelocityChanges() {
+        testAnimationContinuity(
+            resetsAnimation = true,
+            Modifier.basicMarqueeWithTestParams(velocity = 10.pxPerFrame),
+            Modifier.basicMarqueeWithTestParams(velocity = 11.pxPerFrame)
+        )
+    }
+
+    @Test
+    fun animationCancelled_whenInitialDelayChanges() {
+        testAnimationContinuity(
+            resetsAnimation = true,
+            Modifier.basicMarqueeWithTestParams(initialDelayMillis = 0),
+            Modifier.basicMarqueeWithTestParams(initialDelayMillis = 1)
+        )
+    }
+
+    @Test
+    fun animationCancelled_whenDelayChanges() {
+        testAnimationContinuity(
+            resetsAnimation = true,
+            Modifier.basicMarqueeWithTestParams(delayMillis = 0),
+            Modifier.basicMarqueeWithTestParams(delayMillis = 1)
+        )
+    }
+
+    @Test
+    fun animationNotCancelled_whenSpacingFunctionChangesButSameSpacing() {
+        val spacing1 = MarqueeSpacing { _, _ -> 1 }
+        val spacing2 = MarqueeSpacing { _, _ -> 1 }
+        testAnimationContinuity(
+            resetsAnimation = false,
+            Modifier.basicMarqueeWithTestParams(spacing = spacing1),
+            Modifier.basicMarqueeWithTestParams(spacing = spacing2)
+        )
+    }
+
+    @Test
+    fun animationCancelled_whenSpacingChanges() {
+        var spacing by mutableStateOf(0)
+        val spacingFunction = MarqueeSpacing { _, _ -> spacing }
+        testAnimationContinuity(
+            resetsAnimation = true,
+            modifierFactory = { Modifier.basicMarqueeWithTestParams(spacing = spacingFunction) },
+            onChange = { spacing = 1 }
+        )
+    }
+
+    @Test
     fun drawCounts() {
         var outerDraws = 0
         var innerDraws = 0
         val iterations = 10
 
-        rule.mainClock.autoAdvance = false
         rule.setContent {
-            Row(
-                Modifier
-                    .drawBehind { outerDraws++ }
-                    .width(100.toDp())
-                    .basicMarquee(
-                        iterations = 1,
-                        velocity = 10.pxPerFrame,
-                        animationMode = Immediately,
-                        initialDelayMillis = 0,
-                        spacing = MarqueeSpacing(0.dp)
-                    )
+            Box(Modifier.drawBehind { outerDraws++ }) {
+                TestMarqueeContent(marqueeModifier = Modifier
+                    .basicMarqueeWithTestParams()
                     .drawBehind { innerDraws++ }
-            ) {
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color1)
-                )
-                Box(
-                    Modifier
-                        .size(100.toDp())
-                        .background(Color2)
                 )
             }
         }
@@ -1153,6 +981,85 @@ class BasicMarqueeTest {
             assertThat(innerDraws).isEqualTo(iterations + 1)
         }
     }
+
+    private fun testAnimationContinuity(
+        resetsAnimation: Boolean,
+        modifier1: Modifier,
+        modifier2: Modifier
+    ) {
+        var modifier by mutableStateOf(modifier1)
+        testAnimationContinuity(
+            resetsAnimation,
+            modifierFactory = { modifier },
+            onChange = { modifier = modifier2 }
+        )
+    }
+
+    private fun testAnimationContinuity(
+        resetsAnimation: Boolean,
+        modifierFactory: () -> Modifier,
+        onChange: () -> Unit
+    ) {
+        rule.setContent {
+            TestMarqueeContent(modifierFactory())
+        }
+
+        // Run the animation for a bit so we can tell when it resets.
+        repeat(3) {
+            rule.mainClock.advanceTimeByFrame()
+        }
+        rule.onRoot().captureToImage()
+            .assertContainsColor(Color1)
+            .assertContainsColor(Color2)
+
+        onChange()
+
+        rule.mainClock.advanceTimeByFrame()
+        rule.waitForIdle()
+        val image = rule.onRoot().captureToImage().assertContainsColor(Color1)
+        if (resetsAnimation) {
+            image.assertDoesNotContainColor(Color2)
+        } else {
+            image.assertContainsColor(Color2)
+        }
+    }
+
+    @Composable
+    private fun TestMarqueeContent(marqueeModifier: Modifier) {
+        Row(
+            Modifier
+                .width(100.toDp())
+                .background(BackgroundColor)
+                .then(marqueeModifier)
+        ) {
+            Box(
+                Modifier
+                    .size(100.toDp())
+                    .background(Color1)
+            )
+            Box(
+                Modifier
+                    .size(100.toDp())
+                    .background(Color2)
+            )
+        }
+    }
+
+    private fun Modifier.basicMarqueeWithTestParams(
+        iterations: Int = 1,
+        animationMode: MarqueeAnimationMode = Immediately,
+        delayMillis: Int = 0,
+        initialDelayMillis: Int = 0,
+        spacing: MarqueeSpacing = MarqueeSpacing(0.toDp()),
+        velocity: Dp = 10.pxPerFrame
+    ) = basicMarquee(
+        iterations = iterations,
+        animationMode = animationMode,
+        delayMillis = delayMillis,
+        initialDelayMillis = initialDelayMillis,
+        spacing = spacing,
+        velocity = velocity
+    )
 
     /**
      * Finds the x coordinate in the image of the top row of pixels where the color first changes
