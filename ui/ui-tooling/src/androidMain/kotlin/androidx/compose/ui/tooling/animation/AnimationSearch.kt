@@ -28,6 +28,7 @@ import androidx.compose.runtime.State
 import androidx.compose.ui.tooling.data.CallGroup
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.UiToolingDataApi
+import androidx.compose.ui.tooling.findAll
 import androidx.compose.ui.tooling.firstOrNull
 import kotlin.reflect.KClass
 import kotlin.reflect.safeCast
@@ -58,7 +59,82 @@ private inline fun <reified T> Collection<Group>.findRememberedData(): List<T> {
 
 /** Contains tree parsers for different animation types. */
 @OptIn(UiToolingDataApi::class)
-internal class AnimationSearch {
+internal class AnimationSearch(
+    private val clock: () -> PreviewAnimationClock,
+    private val onSeek: () -> Unit
+) {
+    private val transitionSearch = TransitionSearch { clock().trackTransition(it) }
+    private val animatedContentSearch =
+        AnimatedContentSearch { clock().trackAnimatedContent(it) }
+    private val animatedVisibilitySearch = AnimatedVisibilitySearch {
+        clock().trackAnimatedVisibility(it, onSeek)
+    }
+
+    private fun animateXAsStateSearch() =
+        if (AnimateXAsStateComposeAnimation.apiAvailable)
+            setOf(AnimateXAsStateSearch { clock().trackAnimateXAsState(it) })
+        else emptyList()
+
+    /** All supported animations. */
+    private fun supportedSearch() = setOf(
+        transitionSearch,
+        animatedVisibilitySearch,
+    ) + animateXAsStateSearch()
+
+    private fun unsupportedSearch() = if (UnsupportedComposeAnimation.apiAvailable) setOf(
+        animatedContentSearch,
+        AnimateContentSizeSearch { clock().trackAnimateContentSize(it) },
+        TargetBasedSearch { clock().trackTargetBasedAnimations(it) },
+        DecaySearch { clock().trackDecayAnimations(it) },
+        InfiniteTransitionSearch { clock().trackInfiniteTransition(it) }
+    ) else emptyList()
+
+    /** All supported animations. */
+    private val supportedSearch = supportedSearch()
+
+    /** Animations to track in PreviewAnimationClock. */
+    private val setToTrack = supportedSearch + unsupportedSearch()
+
+    /**
+     * Animations to search. animatedContentSearch is included even if it's not going to be
+     * tracked as it should be excluded from transitionSearch.
+     */
+    private val setToSearch = setToTrack + setOf(animatedContentSearch)
+
+    /**
+     * If non of supported animations are detected, unsupported animations should not be
+     * available either.
+     */
+    val hasAnimations: Boolean
+        get() = supportedSearch.any { it.hasAnimations() }
+
+    /**
+     * Finds all animations defined in the Compose tree where the root is the
+     * `@Composable` being previewed.
+     */
+    fun findAll(slotTrees: Collection<Group>) {
+        // Check all the slot tables, since some animations might not be present in the same
+        // table as the one containing the `@Composable` being previewed, e.g. when they're
+        // defined using sub-composition.
+        slotTrees.forEach { tree ->
+            val groupsWithLocation = tree.findAll { it.location != null }
+            setToSearch.forEach { it.addAnimations(groupsWithLocation) }
+            // Remove all AnimatedVisibility parent transitions from the transitions list,
+            // otherwise we'd duplicate them in the Android Studio Animation Preview because we
+            // will track them separately.
+            transitionSearch.animations.removeAll(animatedVisibilitySearch.animations)
+            // Remove all AnimatedContent parent transitions from the transitions list, so we can
+            // ignore these animations while support is not added to Animation Preview.
+            transitionSearch.animations.removeAll(animatedContentSearch.animations)
+        }
+    }
+
+    /** Make the [clock] track all the animations found. */
+    fun trackAll() {
+        if (hasAnimations) {
+            setToTrack.forEach { it.track() }
+        }
+    }
 
     /** Search for animations with type [T]. */
     open class Search<T : Any>(private val trackAnimation: (T) -> Unit) {

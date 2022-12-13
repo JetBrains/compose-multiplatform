@@ -48,10 +48,8 @@ import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalFontLoader
 import androidx.compose.ui.platform.ViewRootForTest
 import androidx.compose.ui.text.font.createFontFamilyResolver
-import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation
 import androidx.compose.ui.tooling.animation.AnimationSearch
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
-import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import androidx.compose.ui.tooling.data.Group
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
@@ -302,72 +300,16 @@ internal class ComposeViewAdapter : FrameLayout {
 
     /**
      * Finds all animations defined in the Compose tree where the root is the
-     * `@Composable` being previewed. We only return animations defined in the user code, i.e.
-     * the ones we've got source information for.
+     * `@Composable` being previewed.
      */
-    @Suppress("UNCHECKED_CAST")
     private fun findAndTrackAnimations() {
         val slotTrees = slotTableRecord.store.map { it.asTree() }
-        val transitionSearch = AnimationSearch.TransitionSearch { clock.trackTransition(it) }
-        val animatedContentSearch =
-            AnimationSearch.AnimatedContentSearch { clock.trackAnimatedContent(it) }
-        val animatedVisibilitySearch = AnimationSearch.AnimatedVisibilitySearch {
-            clock.trackAnimatedVisibility(it, ::requestLayout)
-        }
-
-        fun animateXAsStateSearch() =
-            if (AnimateXAsStateComposeAnimation.apiAvailable)
-                setOf(AnimationSearch.AnimateXAsStateSearch { clock.trackAnimateXAsState(it) })
-            else emptyList()
-
-        // All supported animations.
-        fun supportedSearch() = setOf(
-            transitionSearch,
-            animatedVisibilitySearch,
-        ) + animateXAsStateSearch()
-
-        fun unsupportedSearch() = if (UnsupportedComposeAnimation.apiAvailable) setOf(
-            animatedContentSearch,
-            AnimationSearch.AnimateContentSizeSearch { clock.trackAnimateContentSize(it) },
-            AnimationSearch.TargetBasedSearch { clock.trackTargetBasedAnimations(it) },
-            AnimationSearch.DecaySearch { clock.trackDecayAnimations(it) },
-            AnimationSearch.InfiniteTransitionSearch { clock.trackInfiniteTransition(it) }
-        ) else emptyList()
-
-        // All supported animations
-        val supportedSearch = supportedSearch()
-
-        // Animations to track in PreviewAnimationClock.
-        val setToTrack = supportedSearch + unsupportedSearch()
-
-        // Animations to search. animatedContentSearch is included even if it's not going to be
-        // tracked as it should be excluded from transitionSearch.
-        val setToSearch = setToTrack + setOf(animatedContentSearch)
-
-        // Check all the slot tables, since some animations might not be present in the same
-        // table as the one containing the `@Composable` being previewed, e.g. when they're
-        // defined using sub-composition.
-        slotTrees.forEach { tree ->
-            val groupsWithLocation = tree.findAll { it.location != null }
-            setToSearch.forEach { it.addAnimations(groupsWithLocation) }
-
-            // Remove all AnimatedVisibility parent transitions from the transitions list,
-            // otherwise we'd duplicate them in the Android Studio Animation Preview because we
-            // will track them separately.
-            transitionSearch.animations.removeAll(animatedVisibilitySearch.animations)
-
-            // Remove all AnimatedContent parent transitions from the transitions list, so we can
-            // ignore these animations while support is not added to Animation Preview.
-            transitionSearch.animations.removeAll(animatedContentSearch.animations)
-        }
-
-        // If non of supported animations are detected, unsupported animations should not be
-        // available either.
-        hasAnimations = supportedSearch.any { it.hasAnimations() }
-
-        // Make the `PreviewAnimationClock` track all the transitions found.
-        if (::clock.isInitialized && hasAnimations) {
-            setToTrack.forEach { it.track() }
+        AnimationSearch(::clock, ::requestLayout).let {
+            it.findAll(slotTrees)
+            hasAnimations = it.hasAnimations
+            if (::clock.isInitialized) {
+                it.trackAll()
+            }
         }
     }
 
