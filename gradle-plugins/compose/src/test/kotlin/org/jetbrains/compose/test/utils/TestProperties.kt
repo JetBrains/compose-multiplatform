@@ -17,12 +17,6 @@ object TestProperties {
     val composeJsCompilerCompatibleKotlinVersion: String
         get() = notNullSystemProperty("compose.tests.js.compiler.compatible.kotlin.version")
 
-    val androidxCompilerVersion: String
-        get() = notNullSystemProperty("compose.tests.androidx.compiler.version")
-
-    val androidxCompilerCompatibleKotlinVersion: String
-        get() = notNullSystemProperty("compose.tests.androidx.compiler.compatible.kotlin.version")
-
     val composeGradlePluginVersion: String
         get() = notNullSystemProperty("compose.tests.compose.gradle.plugin.version")
 

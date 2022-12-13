@@ -1,16 +1,20 @@
 package org.jetbrains.compose
 
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
+private const val KOTLIN_COMPATABILITY_LINK =
+    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#kotlin-compatibility"
 
 internal object ComposeCompilerCompatability {
-    fun compilerVersionFor(kotlinVersion: String): ComposeCompilerVersion? = when (kotlinVersion) {
-        "1.7.10" -> ComposeCompilerVersion("1.3.0")
-        "1.7.20" -> ComposeCompilerVersion("1.3.2.1")
-        else -> null
+    private val kotlinToCompiler = sortedMapOf(
+        "1.7.10" to "1.3.0",
+        "1.7.20" to "1.3.2.1",
+    )
+
+    fun compilerVersionFor(kotlinVersion: String): String {
+        return kotlinToCompiler[kotlinVersion] ?: throw RuntimeException(
+            "This version of Compose Multiplatform doesn't support Kotlin " +
+                    "$kotlinVersion. " +
+                    "Please see $KOTLIN_COMPATABILITY_LINK " +
+                    "to know the latest supported version of Kotlin."
+        )
     }
 }
-
-internal data class ComposeCompilerVersion(
-    val version: String,
-    val unsupportedPlatforms: Set<KotlinPlatformType> = emptySet()
-)

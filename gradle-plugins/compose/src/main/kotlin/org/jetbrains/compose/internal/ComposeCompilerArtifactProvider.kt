@@ -5,44 +5,16 @@
 
 package org.jetbrains.compose.internal
 
-import org.jetbrains.compose.ComposeCompilerCompatability
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider.DefaultCompiler.pluginArtifact
-import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
-import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 
-private const val KOTLIN_COMPATABILITY_LINK =
-    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#kotlin-compatibility"
-
 internal class ComposeCompilerArtifactProvider(
-    private val kotlinVersion: String,
-    private val customPluginString: () -> String?
+    private val customPluginString: () -> String
 ) {
-    fun checkTargetSupported(target: KotlinTarget) {
-        require(!unsupportedPlatforms.contains(target.platformType)) {
-            "This version of Compose Multiplatform doesn't support Kotlin " +
-                "$kotlinVersion for ${target.platformType} target. " +
-                "Please see $KOTLIN_COMPATABILITY_LINK " +
-                "to know the latest supported version of Kotlin."
-        }
-    }
-
-    private val autoCompilerVersion by lazy {
-        requireNotNull(
-            ComposeCompilerCompatability.compilerVersionFor(kotlinVersion)
-        ) {
-            "This version of Compose Multiplatform doesn't support Kotlin " +
-                    "$kotlinVersion. " +
-                    "Please see $KOTLIN_COMPATABILITY_LINK " +
-                    "to know the latest supported version of Kotlin."
-        }
-    }
-
-    private val customCompilerArtifact: SubpluginArtifact? by lazy {
+    val compilerArtifact: SubpluginArtifact by lazy {
         val customPlugin = customPluginString()
-        val customCoordinates = customPlugin?.split(":")
-        when (customCoordinates?.size) {
-            null -> null
+        val customCoordinates = customPlugin.split(":")
+        when (customCoordinates.size) {
             1 -> {
                 val customVersion = customCoordinates[0]
                 check(customVersion.isNotBlank()) { "'compose.kotlinCompilerPlugin' cannot be blank!" }
@@ -59,14 +31,6 @@ internal class ComposeCompilerArtifactProvider(
                         Actual value: '$customPlugin'
                 """.trimIndent())
         }
-    }
-
-    private val unsupportedPlatforms: Set<KotlinPlatformType> by lazy {
-        if (customCompilerArtifact != null) emptySet() else autoCompilerVersion.unsupportedPlatforms
-    }
-
-    val compilerArtifact: SubpluginArtifact get() {
-        return customCompilerArtifact ?: pluginArtifact(version = autoCompilerVersion.version)
     }
 
     val compilerHostedArtifact: SubpluginArtifact

@@ -7,5 +7,4 @@ package org.jetbrains.compose.test.utils
 
 object TestKotlinVersions {
     val Default = TestProperties.composeCompilerCompatibleKotlinVersion
-    val AndroidxCompatible =  TestProperties.androidxCompilerCompatibleKotlinVersion
 }
