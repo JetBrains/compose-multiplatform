@@ -6,7 +6,7 @@ private const val KOTLIN_COMPATABILITY_LINK =
 internal object ComposeCompilerCompatability {
     private val kotlinToCompiler = sortedMapOf(
         "1.7.10" to "1.3.0",
-        "1.7.20" to "1.3.2.1",
+        "1.7.20" to "1.3.2.2-beta01",
     )
 
     fun compilerVersionFor(kotlinVersion: String): String {
