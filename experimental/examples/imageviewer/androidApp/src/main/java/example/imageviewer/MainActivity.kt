@@ -4,40 +4,39 @@ import android.content.Context
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.activity.compose.setContent
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import example.imageviewer.core.FilterType
+import example.imageviewer.model.*
 import example.imageviewer.view.AppUI
-import example.imageviewer.model.ContentState
-import example.imageviewer.model.ContentStateData
-import example.imageviewer.model.ImageRepository
-import example.imageviewer.model.Notification
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import example.imageviewer.view.showPopUpMessage
+import kotlinx.coroutines.Dispatchers
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val content = ContentState(
-            repository = ImageRepository("https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"),
-            getFilter = {
-                when (it) {
-                    FilterType.GrayScale -> GrayScaleFilter()
-                    FilterType.Pixel -> PixelFilter()
-                    FilterType.Blur -> BlurFilter(this)
-                }
-            },
-            state = mutableStateOf(ContentStateData()),
-            notification = AndroidNotification(contextProvider = { this }),
-            cacheDirProvider = {this.cacheDir.absolutePath}
-        ).apply {
-            initData()
-        }
-
         setContent {
+            val content = ContentState(
+                getFilter = {
+                    when (it) {
+                        FilterType.GrayScale -> GrayScaleFilter()
+                        FilterType.Pixel -> PixelFilter()
+                        FilterType.Blur -> BlurFilter(this)
+                    }
+                },
+                state = remember { mutableStateOf(ContentStateData()) },
+                notification = AndroidNotification(contextProvider = { this }),
+                repository = rememberImageRepository(rememberCoroutineScope { Dispatchers.Default })
+            ).apply {
+                initData()
+            }
             AppUI(content)
         }
     }

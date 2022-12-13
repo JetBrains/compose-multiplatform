@@ -28,9 +28,6 @@ fun loadFullImage(source: String): Picture {
             return Picture(
                 source = source,
                 image = bitmap,
-                name = getNameURL(source),
-                width = bitmap.width,
-                height = bitmap.height
             )
         }
     } catch (e: Exception) {
@@ -52,8 +49,6 @@ fun loadImages(cachePath: String, list: List<String>): MutableList<Picture> {
         } else {
             addFreshMiniature(source = source, outList = result, path = cachePath)
         }
-
-        result.last().id = result.size - 1
     }
 
     return result
@@ -76,10 +71,7 @@ private fun addFreshMiniature(
         if (result != null) {
             val picture = Picture(
                 source,
-                getNameURL(source),
                 scaleBitmapAspectRatio(result, 200, 164),
-                result.width,
-                result.height
             )
 
             outList.add(picture)
@@ -113,10 +105,7 @@ private fun addCachedMiniature(
         if (result != null) {
             val picture = Picture(
                 source,
-                getNameURL(source),
                 result,
-                width,
-                height
             )
             outList.add(picture)
         }

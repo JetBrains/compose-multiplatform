@@ -1,9 +1,9 @@
 package example.imageviewer.core
 
-expect class CommonBitmap
-expect fun CommonBitmap.copy():CommonBitmap
-expect fun createEmptyBitmap():CommonBitmap
+import androidx.compose.ui.graphics.ImageBitmap
+
+fun createEmptyBitmap(): ImageBitmap = ImageBitmap(1,1)
 
 interface BitmapFilter {
-    fun apply(bitmap: CommonBitmap) : CommonBitmap
+    fun apply(bitmap: ImageBitmap): ImageBitmap
 }

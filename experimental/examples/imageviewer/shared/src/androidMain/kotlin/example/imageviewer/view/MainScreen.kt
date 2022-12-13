@@ -38,7 +38,7 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.shared.R
 import example.imageviewer.model.AppState
 import example.imageviewer.model.ContentState
-import example.imageviewer.model.Picture
+import example.imageviewer.model.*
 import example.imageviewer.model.ScreenType
 import example.imageviewer.style.DarkGray
 import example.imageviewer.style.DarkGreen
@@ -121,7 +121,7 @@ fun PreviewImage(content: ContentState) {
                 if (content.isMainImageEmpty()) {
                     icEmpty()
                 } else {
-                    BitmapPainter(content.getSelectedImage().asImageBitmap())
+                    BitmapPainter(content.getSelectedImage())
                 },
                 contentDescription = null,
                 modifier = Modifier
@@ -154,7 +154,7 @@ fun Miniature(
                 }
             ) {
                 Image(
-                    picture.image.asImageBitmap(),
+                    picture.image,
                     contentDescription = null,
                     modifier = Modifier.height(70.dp)
                         .width(90.dp)

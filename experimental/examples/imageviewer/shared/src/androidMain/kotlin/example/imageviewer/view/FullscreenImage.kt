@@ -164,7 +164,7 @@ fun Image(content: ContentState) {
             Scalable(onScale = scale, modifier = Modifier.fillMaxSize()) {
                 val bitmap = imageByGesture(content, scale, drag)
                 Image(
-                    bitmap = bitmap.asImageBitmap(),
+                    bitmap = bitmap,
                     contentDescription = null,
                     contentScale = adjustImageScale(bitmap)
                 )
@@ -178,20 +178,21 @@ fun imageByGesture(
     content: ContentState,
     scale: ScaleHandler,
     drag: DragHandler
-): Bitmap {
-    val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)
-
-    if (scale.factor.value > 1f)
-        return bitmap
-
-    if (abs(drag.getDistance().x) > displayWidth() / 10) {
-        if (drag.getDistance().x < 0) {
-            content.swipeNext()
-        } else {
-            content.swipePrevious()
-        }
-        drag.cancel()
-    }
-
-    return bitmap
+): ImageBitmap {
+    return content.getSelectedImage()
+//    val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)//todo crop
+//
+//    if (scale.factor.value > 1f)
+//        return bitmap
+//
+//    if (abs(drag.getDistance().x) > displayWidth() / 10) {
+//        if (drag.getDistance().x < 0) {
+//            content.swipeNext()
+//        } else {
+//            content.swipePrevious()
+//        }
+//        drag.cancel()
+//    }
+//
+//    return bitmap
 }

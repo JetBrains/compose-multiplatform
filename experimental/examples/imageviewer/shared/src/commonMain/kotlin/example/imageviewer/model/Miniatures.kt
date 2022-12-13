@@ -14,16 +14,25 @@
 
 package example.imageviewer.model
 
-import example.imageviewer.core.CommonBitmap
+import androidx.compose.ui.graphics.ImageBitmap
 
-data class Picture(
-    val source: String = "",
-    val name: String = "",
-    val image: CommonBitmap,
-    val width: Int = 0,
-    val height: Int = 0,
-    val id: Int = 0
+
+data class NetworkRequest(
+    val url: String
 )
+
+data class Picture(//todo data
+    val source: String = "",//todo
+    val image: ImageBitmap,
+    val id: Int = source.hashCode()//todo
+)
+
+fun getNameURL(url: String): String {
+    return url.substring(url.lastIndexOf('/') + 1, url.length)
+}
+val Picture.name get() = getNameURL(source)
+val Picture.width get():Int = image.width
+val Picture.height get():Int = image.height
 
 class Miniatures(
     private var list: List<Picture> = emptyList()

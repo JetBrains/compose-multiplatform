@@ -1,20 +1,25 @@
 package example.imageviewer.model
 
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.*
 import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
+import example.imageviewer.utils.ktorHttpClient
+import io.ktor.client.request.*
 import kotlinx.coroutines.*
+import org.jetbrains.compose.resources.load
 
+val IMAGES_DATA_URL = "https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 
 data class ContentStateData(
     val filterUIState: Set<FilterType> = emptySet(),
     val isContentReady: Boolean = false,
-    val mainImage: CommonBitmap = createEmptyBitmap(),
+    val mainImage: ImageBitmap = createEmptyBitmap(),
     val currentImageIndex: Int = 0,
     val miniatures: Miniatures = Miniatures(),
-    val origin: CommonBitmap? = null,
+    val origin: ImageBitmap? = null,
     val picture: Picture = Picture(image = createEmptyBitmap()),
 )
 
@@ -29,17 +34,16 @@ interface Notification {
 }
 
 class ContentState(
-    val repository: ImageRepository,
     val getFilter: (FilterType) -> BitmapFilter,
     val state: MutableState<ContentStateData>,
     val notification: Notification,
-    val cacheDirProvider: () -> String
+    val repository: ContentRepository<NetworkRequest, ImageBitmap>
 ) {
-    fun getSelectedImage(): CommonBitmap = state.value.mainImage
+    fun getSelectedImage(): ImageBitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
 
-    private fun applyFilters(bitmap: CommonBitmap): CommonBitmap {
-        var result: CommonBitmap = bitmap
+    private fun applyFilters(bitmap: ImageBitmap): ImageBitmap {
+        var result = bitmap
         for (filter in state.value.filterUIState.map { getFilter(it) }) {
             result = filter.apply(result)
         }
@@ -47,11 +51,10 @@ class ContentState(
     }
 
     fun initData() {
-        val directory = cacheDirProvider()
         backgroundScope.launch {
             try {
                 if (isInternetAvailable()) {
-                    val imageList = repository.get()
+                    val imageList = ktorHttpClient.get<String>(IMAGES_DATA_URL).lines()
 
                     if (imageList.isEmpty()) {
                         withContext(Dispatchers.Main) {
@@ -61,7 +64,11 @@ class ContentState(
                         return@launch
                     }
 
-                    val pictureList = loadImages(directory, imageList)
+                    val pictureList: List<Picture> = imageList.map {
+                        async {
+                            Picture(it, repository.loadContent(NetworkRequest(it)))
+                        }
+                    }.awaitAll()
 
                     if (pictureList.isEmpty()) {
                         withContext(Dispatchers.Main) {
@@ -69,7 +76,7 @@ class ContentState(
                             onContentReady()
                         }
                     } else {
-                        val picture = loadFullImage(imageList[0])
+                        val picture = Picture(imageList[0], repository.loadContent(NetworkRequest(imageList[0])))
                         withContext(Dispatchers.Main) {
                             state.value.miniatures.setMiniatures(pictureList)
 
@@ -124,7 +131,7 @@ class ContentState(
 
     fun isFilterEnabled(type: FilterType): Boolean = state.value.filterUIState.contains(type)
 
-    private fun restoreFilters(): CommonBitmap {
+    private fun restoreFilters(): ImageBitmap {
         state.value = state.value.copy(
             filterUIState = emptySet()
         )
@@ -159,7 +166,7 @@ class ContentState(
         backgroundScope.launch {
             if (isInternetAvailable()) {
 
-                val fullSizePicture = loadFullImage(picture.source).copy(id = picture.id)
+                val fullSizePicture = Picture(picture.source, repository.loadContent(NetworkRequest(picture.source)))
 
                 withContext(Dispatchers.Main) {
                     wrapPictureIntoMainImage(fullSizePicture)
@@ -221,7 +228,7 @@ class ContentState(
         backgroundScope.launch {
             if (isInternetAvailable()) {
                 withContext(Dispatchers.Main) {
-                    clearCache(cacheDirProvider())
+//                    clearCache(cacheDirProvider())//todo
                     clear()
                     state.value = state.value.copy(
                         miniatures = Miniatures(),
@@ -241,20 +248,21 @@ class ContentState(
 
     private fun saveOrigin() {
         state.value = state.value.copy(
-            origin = copyBitmap(state.value.picture.image)
+            origin = state.value.picture.image
         )
     }
 
-    private fun restore(): CommonBitmap {
-        if (state.value.origin != null) {
+    private fun restore(): ImageBitmap {
+        val origin = state.value.origin
+        if (origin != null) {
             state.value = state.value.copy(
                 filterUIState = emptySet(),
                 picture = state.value.picture.copy(
-                    image = copyBitmap(state.value.origin!!)
+                    image = origin
                 )
             )
         }
-        return copyBitmap(state.value.picture.image)
+        return origin!!//todo null check
     }
 
     private fun wrapPicture(picture: Picture) {
@@ -263,7 +271,7 @@ class ContentState(
         )
     }
 
-    private fun setImage(bitmap: CommonBitmap) {
+    private fun setImage(bitmap: ImageBitmap) {
         state.value = state.value.copy(
             picture = state.value.picture.copy(
                 image = bitmap
@@ -285,7 +293,7 @@ class ContentState(
         return state.value.picture.name
     }
 
-    private fun getImage(): CommonBitmap {
+    private fun getImage(): ImageBitmap {
         return state.value.picture.image
     }
 
@@ -293,5 +301,4 @@ class ContentState(
         return state.value.picture.id
     }
 
-    private fun copyBitmap(bitmap: CommonBitmap): CommonBitmap = bitmap.copy()
 }

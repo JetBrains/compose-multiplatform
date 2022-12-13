@@ -3,6 +3,7 @@ package example.imageviewer.utils
 import android.content.Context
 import android.graphics.*
 import example.imageviewer.model.Picture
+import example.imageviewer.model.*
 import java.io.File
 import java.io.BufferedWriter
 import java.io.OutputStreamWriter
@@ -13,26 +14,27 @@ import java.nio.charset.StandardCharsets
 val cacheImagePostfix = "info"
 
 fun cacheImage(path: String, picture: Picture) {
-    try {
-        FileOutputStream(path).use { out ->
-            picture.image.compress(Bitmap.CompressFormat.PNG, 100, out)
-        }
-
-        val bw =
-            BufferedWriter(
-                OutputStreamWriter(
-                    FileOutputStream(path + cacheImagePostfix), StandardCharsets.UTF_8
-                )
-            )
-
-        bw.write(picture.source)
-        bw.write("\r\n${picture.width}")
-        bw.write("\r\n${picture.height}")
-        bw.close()
-
-    } catch (e: IOException) {
-        e.printStackTrace()
-    }
+    TODO()
+//    try {
+//        FileOutputStream(path).use { out ->
+//            picture.image.compress(Bitmap.CompressFormat.PNG, 100, out)
+//        }
+//
+//        val bw =
+//            BufferedWriter(
+//                OutputStreamWriter(
+//                    FileOutputStream(path + cacheImagePostfix), StandardCharsets.UTF_8
+//                )
+//            )
+//
+//        bw.write(picture.source)
+//        bw.write("\r\n${picture.width}")
+//        bw.write("\r\n${picture.height}")
+//        bw.close()
+//
+//    } catch (e: IOException) {
+//        e.printStackTrace()
+//    }
 }
 
 actual fun clearCache(cacheDir:String) {
