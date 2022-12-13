@@ -30,6 +30,7 @@ internal actual fun getString(string: Strings): String {
         Strings.Dialog -> "Dialog"
         Strings.MenuExpanded -> "Expanded"
         Strings.MenuCollapsed -> "Collapsed"
+        Strings.Dismiss -> "Dismiss"
         else -> ""
     }
 }

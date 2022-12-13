@@ -33,6 +33,7 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val Dialog = Strings(7)
         val MenuExpanded = Strings(8)
         val MenuCollapsed = Strings(9)
+        val Dismiss = Strings(10)
     }
 }
 
