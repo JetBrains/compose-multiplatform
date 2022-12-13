@@ -223,7 +223,7 @@ fun Snackbar(
                     content = {
                         Icon(
                             Icons.Filled.Close,
-                            contentDescription = null, // TODO add "Dismiss Snackbar" to Strings.
+                            contentDescription = getString(Strings.Dismiss),
                         )
                     }
                 )
