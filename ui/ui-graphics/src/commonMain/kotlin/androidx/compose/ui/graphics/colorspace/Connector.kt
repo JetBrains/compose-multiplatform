@@ -295,5 +295,11 @@ internal constructor(
                 }
             }
         }
+
+        internal val SrgbIdentity = identity(ColorSpaces.Srgb)
+        internal val SrgbToOklabPerceptual =
+            Connector(ColorSpaces.Srgb, ColorSpaces.Oklab, RenderIntent.Perceptual)
+        internal val OklabToSrgbPerceptual =
+            Connector(ColorSpaces.Oklab, ColorSpaces.Srgb, RenderIntent.Perceptual)
     }
 }

@@ -806,6 +806,38 @@ class ColorSpaceTest {
         )
     }
 
+    @Test
+    fun identitySrgbConnector() {
+        val connector1 = ColorSpaces.Srgb.connect()
+        val connector2 = ColorSpaces.Srgb.connect()
+
+        assertSame(connector1, connector2)
+        assertEquals(ColorSpaces.Srgb, connector1.source)
+        assertEquals(ColorSpaces.Srgb, connector1.destination)
+    }
+
+    @Test
+    fun srgbToOklabConnector() {
+        val connector1 = ColorSpaces.Srgb.connect(ColorSpaces.Oklab)
+        val connector2 = ColorSpaces.Srgb.connect(ColorSpaces.Oklab)
+
+        assertSame(connector1, connector2)
+        assertEquals(ColorSpaces.Srgb, connector1.source)
+        assertEquals(ColorSpaces.Oklab, connector1.destination)
+        assertEquals(RenderIntent.Perceptual, connector1.renderIntent)
+    }
+
+    @Test
+    fun oklabToSrgbConnector() {
+        val connector1 = ColorSpaces.Oklab.connect()
+        val connector2 = ColorSpaces.Oklab.connect()
+
+        assertSame(connector1, connector2)
+        assertEquals(ColorSpaces.Oklab, connector1.source)
+        assertEquals(ColorSpaces.Srgb, connector1.destination)
+        assertEquals(RenderIntent.Perceptual, connector1.renderIntent)
+    }
+
     companion object {
         // Column-major RGB->XYZ transform matrix for the sRGB color space
         private val SRGB_TO_XYZ = floatArrayOf(
