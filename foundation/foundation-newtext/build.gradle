@@ -48,6 +48,28 @@ dependencies {
 
         lintChecks(project(":compose:foundation:foundation-lint"))
         lintPublish(project(":compose:foundation:foundation-lint"))
+
+        testImplementation(project(":compose:test-utils"))
+        testImplementation(libs.testRules)
+        testImplementation(libs.testRunner)
+        testImplementation(libs.junit)
+        testImplementation(libs.truth)
+        testImplementation(libs.kotlinTest)
+        testImplementation(libs.mockitoCore4)
+        testImplementation(libs.mockitoKotlin4)
+
+        androidTestImplementation(project(":compose:test-utils"))
+        androidTestImplementation(project(":internal-testutils-fonts"))
+        androidTestImplementation(project(":internal-testutils-runtime"))
+        androidTestImplementation(libs.testRules)
+        androidTestImplementation(libs.testRunner)
+        androidTestImplementation(libs.testMonitor)
+        androidTestImplementation(libs.junit)
+        androidTestImplementation(libs.kotlinTest)
+        androidTestImplementation(libs.truth)
+        androidTestImplementation(libs.dexmakerMockito)
+        androidTestImplementation(libs.mockitoCore)
+        androidTestImplementation(libs.mockitoKotlin)
     }
 }
 
@@ -77,6 +99,36 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
+            }
+
+            androidTest.dependencies {
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.junit)
+                implementation(libs.mockitoCore4)
+                implementation(libs.truth)
+                implementation(libs.kotlinReflect)
+                implementation(libs.mockitoKotlin4)
+            }
+
+            commonTest.dependencies {
+                implementation(libs.kotlinTest)
+                implementation(libs.kotlinCoroutinesTest)
+            }
+
+            androidAndroidTest.dependencies {
+                implementation(project(":compose:test-utils"))
+                implementation(project(":internal-testutils-fonts"))
+                implementation(project(":internal-testutils-runtime"))
+
+                implementation(libs.testRules)
+                implementation(libs.testRunner)
+                implementation(libs.testMonitor)
+                implementation(libs.junit)
+                implementation(libs.truth)
+                implementation(libs.dexmakerMockito)
+                implementation(libs.mockitoCore)
+                implementation(libs.mockitoKotlin)
             }
         }
     }
