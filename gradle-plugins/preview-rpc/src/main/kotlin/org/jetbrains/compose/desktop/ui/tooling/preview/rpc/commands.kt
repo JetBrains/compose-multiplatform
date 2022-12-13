@@ -23,9 +23,8 @@ internal fun RemoteConnection.receiveAttach(
                 listener?.onError(
                     "Compose Multiplatform Gradle plugin version is not compatible with Intellij plugin version"
                 )
-            } else {
-                fn()
             }
+            fn()
         }
     }
 }
