@@ -39,7 +39,7 @@ internal class PreviewPanel(private val myProject: Project) : JBPanel<PreviewPan
         clear()
         appendLine(
             AllIcons.General.Error,
-            "Preview rendering encountered an error",
+            "Preview encountered an error",
             SimpleTextAttributes.REGULAR_ATTRIBUTES,
             null
         )
