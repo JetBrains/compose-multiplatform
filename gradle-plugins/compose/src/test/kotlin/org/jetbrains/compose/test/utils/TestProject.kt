@@ -14,13 +14,15 @@ data class TestEnvironment(
     val workingDir: File,
     val kotlinVersion: String = TestKotlinVersions.Default,
     val composeGradlePluginVersion: String = TestProperties.composeGradlePluginVersion,
-    val composeCompilerArtifact: String? = null,
-    val composeVerbose: Boolean = true
+    val composeCompilerPlugin: String? = null,
+    val composeCompilerArgs: String? = null,
+    val composeVerbose: Boolean = true,
 ) {
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
         "KOTLIN_VERSION_PLACEHOLDER" to kotlinVersion,
-        "COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER" to composeCompilerArtifact,
+        "COMPOSE_COMPILER_PLUGIN_PLACEHOLDER" to composeCompilerPlugin,
+        "COMPOSE_COMPILER_PLUGIN_ARGS_PLACEHOLDER" to composeCompilerArgs,
     )
 
     fun replacePlaceholdersInFile(file: File) {

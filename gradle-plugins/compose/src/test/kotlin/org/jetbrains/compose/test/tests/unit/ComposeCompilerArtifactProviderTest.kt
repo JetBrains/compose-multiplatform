@@ -15,26 +15,10 @@ import org.junit.jupiter.api.Assertions.*
 
 internal class ComposeCompilerArtifactProviderTest {
     @Test
-    fun defaultCompilerArtifact() {
-        assertArtifactEquals(
-            Expected.jbCompiler,
-            Actual.compiler(null, TestProperties.composeCompilerCompatibleKotlinVersion)
-        )
-    }
-
-    @Test
-    fun defaultCompilerHostedArtifact() {
-        assertArtifactEquals(
-            Expected.jbCompilerHosted,
-            Actual.compilerHosted(null, TestProperties.composeCompilerCompatibleKotlinVersion)
-        )
-    }
-
-    @Test
     fun customVersion() {
         assertArtifactEquals(
             Expected.jbCompiler.copy(version = "10.20.30"),
-            Actual.compiler("10.20.30", TestProperties.composeCompilerCompatibleKotlinVersion)
+            Actual.compiler("10.20.30")
         )
     }
 
@@ -42,10 +26,7 @@ internal class ComposeCompilerArtifactProviderTest {
     fun customCompiler() {
         assertArtifactEquals(
             Expected.googleCompiler.copy(version = "1.3.1"),
-            Actual.compiler(
-                "androidx.compose.compiler:compiler:1.3.1",
-                TestProperties.androidxCompilerCompatibleKotlinVersion
-            )
+            Actual.compiler("androidx.compose.compiler:compiler:1.3.1")
         )
     }
 
@@ -54,10 +35,7 @@ internal class ComposeCompilerArtifactProviderTest {
         // check that we don't replace artifactId for non-jb compiler
         assertArtifactEquals(
             Expected.googleCompiler.copy(version = "1.3.1"),
-            Actual.compilerHosted(
-                "androidx.compose.compiler:compiler:1.3.1",
-                TestProperties.composeCompilerCompatibleKotlinVersion
-            )
+            Actual.compilerHosted("androidx.compose.compiler:compiler:1.3.1")
         )
     }
 
@@ -68,9 +46,9 @@ internal class ComposeCompilerArtifactProviderTest {
         testIllegalCompiler("")
     }
 
-    private fun testIllegalCompiler(pluginString: String?) {
+    private fun testIllegalCompiler(pluginString: String) {
         try {
-            Actual.compiler(pluginString, "")
+            Actual.compiler(pluginString)
         } catch (e: Exception) {
             return
         }
@@ -79,11 +57,11 @@ internal class ComposeCompilerArtifactProviderTest {
     }
 
     object Actual {
-        fun compiler(pluginString: String?, kotlinVersion: String) =
-            ComposeCompilerArtifactProvider(kotlinVersion) { pluginString }.compilerArtifact
+        fun compiler(pluginString: String) =
+            ComposeCompilerArtifactProvider { pluginString }.compilerArtifact
 
-        fun compilerHosted(pluginString: String?, kotlinVersion: String) =
-            ComposeCompilerArtifactProvider(kotlinVersion) { pluginString }.compilerHostedArtifact
+        fun compilerHosted(pluginString: String) =
+            ComposeCompilerArtifactProvider { pluginString }.compilerHostedArtifact
     }
 
     object Expected {

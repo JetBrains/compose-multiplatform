@@ -17,7 +17,8 @@ dependencies {
 }
 
 compose {
-    kotlinCompilerPlugin.set("COMPOSE_COMPILER_ARTIFACT_PLACEHOLDER")
+    kotlinCompilerPlugin.set(COMPOSE_COMPILER_PLUGIN_PLACEHOLDER)
+    kotlinCompilerPluginArgs.add(COMPOSE_COMPILER_PLUGIN_ARGS_PLACEHOLDER)
 
     desktop {
         application {

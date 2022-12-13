@@ -19,7 +19,6 @@ import org.gradle.api.artifacts.repositories.MavenArtifactRepository
 import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
-import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
@@ -28,18 +27,19 @@ import org.jetbrains.compose.experimental.internal.checkExperimentalTargetsWithS
 import org.jetbrains.compose.experimental.internal.configureExperimental
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
+import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
 class ComposePlugin : Plugin<Project> {
     override fun apply(project: Project) {
-        val composeExtension = project.extensions.create("compose", ComposeExtension::class.java)
+        val composeExtension = project.extensions.create("compose", ComposeExtension::class.java, project)
         val desktopExtension = composeExtension.extensions.create("desktop", DesktopExtension::class.java)
         val androidExtension = composeExtension.extensions.create("android", AndroidExtension::class.java)
         val experimentalExtension = composeExtension.extensions.create("experimental", ExperimentalExtension::class.java)
 
-        project.dependencies.extensions.add("compose", Dependencies)
+        project.dependencies.extensions.add("compose", Dependencies(project))
 
         if (!project.buildFile.endsWith(".gradle.kts")) {
             setUpGroovyDslExtensions(project)
@@ -66,6 +66,15 @@ class ComposePlugin : Plugin<Project> {
             fun ComponentModuleMetadataHandler.replaceAndroidx(original: String, replacement: String) {
                 module(original) {
                     it.replacedBy(replacement, "org.jetbrains.compose isn't compatible with androidx.compose, because it is the same library published with different maven coordinates")
+                }
+            }
+
+            project.tasks.withType(KotlinCompile::class.java).configureEach {
+                it.kotlinOptions.apply {
+                    freeCompilerArgs = freeCompilerArgs +
+                            composeExtension.kotlinCompilerPluginArgs.get().flatMap { arg ->
+                                listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:$arg")
+                            }
                 }
             }
         }
@@ -97,8 +106,9 @@ class ComposePlugin : Plugin<Project> {
         }
     }
 
-    object Dependencies {
+    class Dependencies(project: Project) {
         val desktop = DesktopDependencies
+        val compiler = CompilerDependencies(project)
         val animation get() = composeDependency("org.jetbrains.compose.animation:animation")
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
@@ -128,6 +138,16 @@ class ComposePlugin : Plugin<Project> {
         val currentOs by lazy {
             composeDependency("org.jetbrains.compose.desktop:desktop-jvm-${currentTarget.id}")
         }
+    }
+
+    class CompilerDependencies(private val project: Project) {
+        fun forKotlin(version: String) = "org.jetbrains.compose.compiler:compiler:" +
+                ComposeCompilerCompatability.compilerVersionFor(version)
+
+        /**
+         * Compose Compiler that is chosen by the version of Kotlin applied to the Gradle project
+         */
+        val auto get() = forKotlin(project.getKotlinPluginVersion())
     }
 
     object DesktopComponentsDependencies {
@@ -165,7 +185,7 @@ private fun composeDependency(groupWithArtifact: String) = "$groupWithArtifact:$
 private fun setUpGroovyDslExtensions(project: Project) {
     project.plugins.withId("org.jetbrains.kotlin.multiplatform") {
         (project.extensions.getByName("kotlin") as? ExtensionAware)?.apply {
-            extensions.add("compose", ComposePlugin.Dependencies)
+            extensions.add("compose", ComposePlugin.Dependencies(project))
         }
     }
     (project.repositories as? ExtensionAware)?.extensions?.apply {
