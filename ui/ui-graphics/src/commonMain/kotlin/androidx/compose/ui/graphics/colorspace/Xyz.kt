@@ -16,6 +16,9 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.packFloats
+
 /**
  * Implementation of the CIE XYZ color space. Assumes the white point is D50.
  */
@@ -43,6 +46,24 @@ internal class Xyz(
         v[1] = clamp(v[1])
         v[2] = clamp(v[2])
         return v
+    }
+
+    override fun toXy(v0: Float, v1: Float, v2: Float): Long {
+        return packFloats(clamp(v0), clamp(v1))
+    }
+
+    override fun toZ(v0: Float, v1: Float, v2: Float): Float {
+        return clamp(v2)
+    }
+
+    override fun xyzaToColor(
+        x: Float,
+        y: Float,
+        z: Float,
+        a: Float,
+        colorSpace: ColorSpace
+    ): Color {
+        return Color(clamp(x), clamp(y), clamp(z), a, colorSpace)
     }
 
     override fun fromXyz(v: FloatArray): FloatArray {

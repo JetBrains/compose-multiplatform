@@ -132,19 +132,12 @@ value class Color(val value: ULong) {
      * @return A non-null color instance in the specified color space
      */
     fun convert(colorSpace: ColorSpace): Color {
-        if (colorSpace == this.colorSpace) {
+        val thisColorSpace = this.colorSpace
+        if (colorSpace == thisColorSpace) {
             return this // nothing to convert
         }
-        val connector = this.colorSpace.connect(colorSpace)
-        val color = getComponents()
-        connector.transform(color)
-        return Color(
-            red = color[0],
-            green = color[1],
-            blue = color[2],
-            alpha = color[3],
-            colorSpace = colorSpace
-        )
+        val connector = thisColorSpace.connect(colorSpace)
+        return connector.transformToColor(red, green, blue, alpha)
     }
 
     /**
@@ -621,7 +614,7 @@ fun Color.luminance(): Float {
             "The supplied color space is ${colorSpace.model}"
     }
 
-    val eotf = (colorSpace as Rgb).eotf
+    val eotf = (colorSpace as Rgb).eotfFunc
     val r = eotf(red.toDouble())
     val g = eotf(green.toDouble())
     val b = eotf(blue.toDouble())
