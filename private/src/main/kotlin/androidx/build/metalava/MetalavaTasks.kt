@@ -55,6 +55,7 @@ object MetalavaTasks {
             task.generateRestrictToLibraryGroupAPIs = generateRestrictToLibraryGroupAPIs
             task.baselines.set(baselinesApiLocation)
             task.targetsJavaConsumers = extension.targetsJavaConsumers
+            task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }
@@ -80,6 +81,7 @@ object MetalavaTasks {
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
+                task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
                 task.cacheEvenIfNoOutputs()
                 task.dependsOn(generateApi)
             }
@@ -94,6 +96,7 @@ object MetalavaTasks {
                 task.api.set(builtApiLocation)
                 task.dependencyClasspath = javaCompileInputs.dependencyClasspath
                 task.bootClasspath = javaCompileInputs.bootClasspath
+                task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
                 task.dependsOn(generateApi)
             }
         }
@@ -105,6 +108,7 @@ object MetalavaTasks {
             task.metalavaClasspath.from(metalavaClasspath)
             task.baselines.set(baselinesApiLocation)
             task.targetsJavaConsumers.set(extension.targetsJavaConsumers)
+            task.k2UastEnabled.set(extension.metalavaK2UastEnabled)
             processManifest?.let {
                 task.manifestPath.set(processManifest.manifestOutputFile)
             }

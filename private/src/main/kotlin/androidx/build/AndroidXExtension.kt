@@ -277,6 +277,8 @@ open class AndroidXExtension(val project: Project) {
 
     var bypassCoordinateValidation = false
 
+    var metalavaK2UastEnabled = false
+
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
             shouldConfigureApiTasks()
