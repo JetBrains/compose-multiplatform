@@ -130,13 +130,17 @@ class CreateDecoysTransformer(
         }
 
         val newName = declaration.decoyImplementationName()
-        val original = super.visitSimpleFunction(declaration) as IrSimpleFunction
-        val copied = original.copyWithName(newName)
-        copied.parent = original.parent
-
+        val copied = declaration.copyWithName(newName) as IrSimpleFunction
+        copied.parent = declaration.parent
         originalFunctions += copied to declaration.parent
 
-        return original.apply {
+        // "copied" has new symbols (due to deepCopyWithSymbols).
+        // Therefore, we need to recurse into the copied version.
+        // Otherwise, `copied` function can be added to a parent that is not in IR hierarchy anymore,
+        // for example: an anonymous class implementing an interface with @Composable function.
+        super.visitSimpleFunction(copied) as IrSimpleFunction
+
+        return declaration.apply {
             setDecoyAnnotation(newName.asString())
 
             valueParameters.forEach { it.defaultValue = null }
