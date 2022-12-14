@@ -18,6 +18,9 @@ internal fun Project.configureTaskToGenerateXcodeProject(
 ): TaskProvider<AbstractComposeIosTask> = tasks.composeIosTask<AbstractComposeIosTask>("iosGenerateXcodeProject$id") {
     dependsOn(taskInstallXcodeGen)
     doLast {
+        val commonMainResources = file("src/commonMain/resources").absolutePath
+        val uikitMainResources = file("src/uikitMain/resources").absolutePath
+        val iosMainResources = file("src/iosMain/resources").absolutePath
         val buildIosDir = getBuildIosDir(id)
         buildIosDir.mkdirs()
         buildIosDir.resolve("project.yml").writeText(
@@ -39,11 +42,23 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                 deploymentTarget: "12.0"
                 info:
                   path: plists/Ios/Info.plist
+                  properties:
+                    UILaunchStoryboardName: $projectName
                 settings:
                   LIBRARY_SEARCH_PATHS: "$(inherited)"
                   ENABLE_BITCODE: "YES"
                   ONLY_ACTIVE_ARCH: "NO"
                   VALID_ARCHS: "arm64"
+                sources:
+                  - path: $commonMainResources
+                    optional: true
+                    buildPhase: resources
+                  - path: $uikitMainResources
+                    optional: true
+                    buildPhase: resources
+                  - path: $iosMainResources
+                    optional: true
+                    buildPhase: resources
             """.trimIndent()
         )
         runExternalTool(xcodeGenExecutable, emptyList(), workingDir = buildIosDir)

@@ -37,12 +37,12 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
         project.providers.gradleProperty("compose.desktop.preview.ide.port")
 
     @get:InputFiles
-    internal val uiTooling = project.configurations.detachedConfiguration(
+    internal val uiTooling: FileCollection = project.configurations.detachedConfiguration(
         project.dependencies.create("org.jetbrains.compose.ui:ui-tooling-desktop:${ComposeBuildConfig.composeVersion}")
     ).apply { isTransitive = false }
 
     @get:InputFiles
-    internal val hostClasspath = project.configurations.detachedConfiguration(
+    internal val hostClasspath: FileCollection = project.configurations.detachedConfiguration(
         project.dependencies.create("org.jetbrains.compose:preview-rpc:${ComposeBuildConfig.composeVersion}")
     )
 

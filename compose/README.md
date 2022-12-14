@@ -49,6 +49,11 @@ Run tests for Web:
 ./scripts/testWeb
 ```
 
+Run tests for UIKit:
+```bash
+./scripts/testUIKit
+```
+
 Run tests for Android:
 ```bash
 ./scripts/testAndroidUnit.sh
@@ -82,8 +87,14 @@ Run native macos sample:
 ```bash
 export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version &&\
 ./scripts/publishToMavenLocal -Pcompose.platforms=all &&\
-./scripts/publishGradlePluginToMavenLocal &&\
-./scripts/publishWebComponentsToMavenLocal
+./scripts/publishGradlePluginToMavenLocal
 ```
 `-Pcompose.platforms=all` could be replace with comma-separated list of platforms, such as `js,jvm,androidDebug,androidRelease,macosx64,uikit`.
 
+## Publish additional libraries to mavenLocal
+```bash
+export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version &&\
+./scripts/publishWebComponentsToMavenLocal &&\
+./scripts/publishExtendedIconsToMavenLocal -Pcompose.platforms=all &&\
+./scripts/publishComponentsToMavenLocal
+```
