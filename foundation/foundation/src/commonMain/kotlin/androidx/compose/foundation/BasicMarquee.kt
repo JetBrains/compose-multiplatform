@@ -116,11 +116,13 @@ val DefaultMarqueeVelocity: Dp = 30.dp
  * forever, and 0 will disable animation.
  * @param animationMode Whether the marquee should start animating [Immediately] or only
  * [WhileFocused]. In [WhileFocused] mode, the modified node or the content must be made
- * [focusable].
+ * [focusable]. Note that the [initialDelayMillis] is part of the animation, so this parameter
+ * determines when that initial delay starts counting down, not when the content starts to actually
+ * scroll.
  * @param delayMillis The duration to wait before starting each subsequent iteration, in millis.
  * @param initialDelayMillis The duration to wait before starting the first iteration of the
  * animation, in millis. By default, there will be no initial delay if [animationMode] is
- * [Immediately], otherwise the initial delay will be [delayMillis].
+ * [WhileFocused], otherwise the initial delay will be [delayMillis].
  * @param spacing A [MarqueeSpacing] that specifies how much space to leave at the end of the
  * content before showing the beginning again.
  * @param velocity The speed of the animation in dps / second.
@@ -129,6 +131,7 @@ val DefaultMarqueeVelocity: Dp = 30.dp
 fun Modifier.basicMarquee(
     iterations: Int = DefaultMarqueeIterations,
     animationMode: MarqueeAnimationMode = Immediately,
+    // TODO(aosp/2339066) Consider taking an AnimationSpec instead of specific configuration params.
     delayMillis: Int = DefaultMarqueeDelayMillis,
     initialDelayMillis: Int = if (animationMode == Immediately) delayMillis else 0,
     spacing: MarqueeSpacing = DefaultMarqueeSpacing,
@@ -151,8 +154,6 @@ fun Modifier.basicMarquee(
         delayMillis,
         initialDelayMillis,
         velocity,
-        spacing,
-        animationMode,
         density,
         layoutDirection,
     ) {
@@ -161,11 +162,11 @@ fun Modifier.basicMarquee(
             delayMillis = delayMillis,
             initialDelayMillis = initialDelayMillis,
             velocity = velocity * if (layoutDirection == Ltr) 1f else -1f,
-            spacing = spacing,
-            animationMode = animationMode,
             density = density
         )
     }
+    modifier.spacing = spacing
+    modifier.animationMode = animationMode
 
     LaunchedEffect(modifier) {
         modifier.runAnimation()
@@ -179,14 +180,15 @@ private class MarqueeModifier(
     private val delayMillis: Int,
     private val initialDelayMillis: Int,
     private val velocity: Dp,
-    private val spacing: MarqueeSpacing,
-    private val animationMode: MarqueeAnimationMode,
     private val density: Density,
 ) : Modifier.Element, LayoutModifier, DrawModifier, FocusEventModifier {
 
     private var contentWidth by mutableStateOf(0)
     private var containerWidth by mutableStateOf(0)
     private var hasFocus by mutableStateOf(false)
+    var spacing: MarqueeSpacing by mutableStateOf(DefaultMarqueeSpacing)
+    var animationMode: MarqueeAnimationMode by mutableStateOf(Immediately)
+
     private val offset = Animatable(0f)
     private val direction = sign(velocity.value)
     private val spacingPx by derivedStateOf {
@@ -194,32 +196,6 @@ private class MarqueeModifier(
             density.calculateSpacing(contentWidth, containerWidth)
         }
     }
-    private val firstCopyVisible by derivedStateOf {
-        when (direction) {
-            1f -> offset.value < contentWidth
-            else -> offset.value < containerWidth
-        }
-    }
-    private val secondCopyVisible by derivedStateOf {
-        when (direction) {
-            1f -> offset.value > (contentWidth + spacingPx) - containerWidth
-            else -> offset.value > spacingPx
-        }
-    }
-    private val secondCopyOffset: Float by derivedStateOf {
-        when (direction) {
-            1f -> contentWidth + spacingPx
-            else -> -contentWidth - spacingPx
-        }.toFloat()
-    }
-
-    private val contentWidthPlusSpacing: Float?
-        get() {
-            // Don't animate if content fits. (Because coroutines, the int will get boxed anyway.)
-            if (contentWidth <= containerWidth) return null
-            if (animationMode == WhileFocused && !hasFocus) return null
-            return (contentWidth + spacingPx).toFloat()
-        }
 
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -238,6 +214,19 @@ private class MarqueeModifier(
 
     override fun ContentDrawScope.draw() {
         val clipOffset = offset.value * direction
+        val firstCopyVisible = when (direction) {
+            1f -> offset.value < contentWidth
+            else -> offset.value < containerWidth
+        }
+        val secondCopyVisible = when (direction) {
+            1f -> offset.value > (contentWidth + spacingPx) - containerWidth
+            else -> offset.value > spacingPx
+        }
+        val secondCopyOffset = when (direction) {
+            1f -> contentWidth + spacingPx
+            else -> -contentWidth - spacingPx
+        }.toFloat()
+
         clipRect(left = clipOffset, right = clipOffset + containerWidth) {
             // TODO(b/262284225) When both copies are visible, we call drawContent twice. This is
             //  generally a bad practice, however currently the only alternative is to compose the
@@ -265,7 +254,12 @@ private class MarqueeModifier(
             return
         }
 
-        snapshotFlow { contentWidthPlusSpacing }.collectLatest { contentWithSpacingWidth ->
+        snapshotFlow {
+            // Don't animate if content fits. (Because coroutines, the int will get boxed anyway.)
+            if (contentWidth <= containerWidth) return@snapshotFlow null
+            if (animationMode == WhileFocused && !hasFocus) return@snapshotFlow null
+            (contentWidth + spacingPx).toFloat()
+        }.collectLatest { contentWithSpacingWidth ->
             // Don't animate when the content fits.
             if (contentWithSpacingWidth == null) return@collectLatest
 
@@ -342,15 +336,17 @@ value class MarqueeAnimationMode private constructor(private val value: Int) {
     }
 
     companion object {
-        /** Starts animating immediately, irrespective of focus state. */
+        /**
+         * Starts animating immediately (accounting for any initial delay), irrespective of focus
+         * state.
+         */
         @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
         @ExperimentalFoundationApi
         @get:ExperimentalFoundationApi
         val Immediately = MarqueeAnimationMode(0)
 
         /**
-         * Only animates while the marquee has focus. This includes when a focusable child in the
-         * marquee's content is focused.
+         * Only animates while the marquee has focus or a node in the marquee's content has focus.
          */
         @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
         @ExperimentalFoundationApi
