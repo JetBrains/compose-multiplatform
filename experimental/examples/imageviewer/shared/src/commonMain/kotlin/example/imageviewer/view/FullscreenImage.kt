@@ -1,7 +1,5 @@
 package example.imageviewer.view
 
-import android.graphics.Bitmap
-import android.graphics.Rect
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.rememberScrollState
@@ -16,7 +14,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -26,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
@@ -35,24 +31,14 @@ import example.imageviewer.model.AppState
 import example.imageviewer.model.ContentState
 import example.imageviewer.model.ScreenType
 import example.imageviewer.style.DarkGray
-import example.imageviewer.style.DarkGreen
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.MiniatureColor
 import example.imageviewer.style.Transparent
-import example.imageviewer.style.icBack
-import example.imageviewer.style.icFilterBlurOff
-import example.imageviewer.style.icFilterBlurOn
-import example.imageviewer.style.icFilterGrayscaleOff
-import example.imageviewer.style.icFilterGrayscaleOn
-import example.imageviewer.style.icFilterPixelOff
-import example.imageviewer.style.icFilterPixelOn
 import example.imageviewer.utils.adjustImageScale
-import example.imageviewer.utils.cropBitmapByScale
-import example.imageviewer.utils.displayWidth
-import example.imageviewer.utils.getDisplayBounds
-import kotlin.math.abs
-import kotlin.math.pow
-import kotlin.math.roundToInt
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.orEmpty
+import org.jetbrains.compose.resources.rememberImageBitmap
+import org.jetbrains.compose.resources.resource
 
 @Composable
 fun FullscreenImage(
@@ -67,6 +53,7 @@ fun FullscreenImage(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun ToolBar(
     text: String,
@@ -88,7 +75,7 @@ fun ToolBar(
                         }
                     }) {
                     Image(
-                        icBack(),
+                        resource("back.png").rememberImageBitmap().orEmpty(),
                         contentDescription = null,
                         modifier = Modifier.size(38.dp)
                     )
@@ -142,12 +129,25 @@ fun FilterButton(
     Spacer(Modifier.width(20.dp))
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
-fun getFilterImage(type: FilterType, content: ContentState): Painter {
+fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
     return when (type) {
-        FilterType.GrayScale -> if (content.isFilterEnabled(type)) icFilterGrayscaleOn() else icFilterGrayscaleOff()
-        FilterType.Pixel -> if (content.isFilterEnabled(type)) icFilterPixelOn() else icFilterPixelOff()
-        FilterType.Blur -> if (content.isFilterEnabled(type)) icFilterBlurOn() else icFilterBlurOff()
+        FilterType.GrayScale -> if (content.isFilterEnabled(type)) {
+            resource("grayscale_on.png").rememberImageBitmap().orEmpty()
+        } else {
+            resource("grayscale_off.png").rememberImageBitmap().orEmpty()
+        }
+        FilterType.Pixel -> if (content.isFilterEnabled(type)) {
+            resource("pixel_on.png").rememberImageBitmap().orEmpty()
+        } else {
+            resource("pixel_off.png").rememberImageBitmap().orEmpty()
+        }
+        FilterType.Blur -> if (content.isFilterEnabled(type)) {
+            resource("blur_on.png").rememberImageBitmap().orEmpty()
+        } else {
+            resource("blur_off.png").rememberImageBitmap().orEmpty()
+        }
     }
 }
 

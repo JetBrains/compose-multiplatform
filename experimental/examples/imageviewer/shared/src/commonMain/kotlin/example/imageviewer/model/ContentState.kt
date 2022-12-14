@@ -31,13 +31,20 @@ interface Notification {
     fun notifyLastImage()
     fun notifyFirstImage()
     fun notifyRefreshUnavailable()
+    fun notifyImageData(picture: Picture)
+}
+
+interface Localization {
+    val appName: String // stringResource(R.string.app_name)
+    val loading: String // stringResource(R.string.loading)
 }
 
 class ContentState(
     val getFilter: (FilterType) -> BitmapFilter,
     val state: MutableState<ContentStateData>,
     val notification: Notification,
-    val repository: ContentRepository<NetworkRequest, ImageBitmap>
+    val repository: ContentRepository<NetworkRequest, ImageBitmap>,
+    val localization: Localization
 ) {
     fun getSelectedImage(): ImageBitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()

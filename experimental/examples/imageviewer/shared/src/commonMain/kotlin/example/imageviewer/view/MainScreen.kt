@@ -1,54 +1,25 @@
 package example.imageviewer.view
 
-import android.content.res.Configuration
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.*
 import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import example.imageviewer.shared.R
-import example.imageviewer.model.AppState
-import example.imageviewer.model.ContentState
 import example.imageviewer.model.*
-import example.imageviewer.model.ScreenType
-import example.imageviewer.style.DarkGray
-import example.imageviewer.style.DarkGreen
-import example.imageviewer.style.Foreground
-import example.imageviewer.style.LightGray
-import example.imageviewer.style.MiniatureColor
-import example.imageviewer.style.Transparent
-import example.imageviewer.style.icDots
-import example.imageviewer.style.icEmpty
-import example.imageviewer.style.icRefresh
+import example.imageviewer.style.*
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.orEmpty
+import org.jetbrains.compose.resources.rememberImageBitmap
+import org.jetbrains.compose.resources.resource
 
 @Composable
 fun MainScreen(content: ContentState) {
@@ -57,21 +28,22 @@ fun MainScreen(content: ContentState) {
         ScrollableArea(content)
     }
     if (!content.isContentReady()) {
-        LoadingScreen(stringResource(R.string.loading))
+        LoadingScreen(content.localization.loading)
     }
 }
 
 @Composable
 fun TopContent(content: ContentState) {
-    TitleBar(text = stringResource(R.string.app_name), content = content)
-    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {
+    TitleBar(text = content.localization.appName, content = content)
+//    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {//todo
         PreviewImage(content)
         Spacer(modifier = Modifier.height(10.dp))
         Divider()
-    }
+//    }
     Spacer(modifier = Modifier.height(5.dp))
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun TitleBar(text: String, content: ContentState) {
     TopAppBar(
@@ -96,7 +68,7 @@ fun TitleBar(text: String, content: ContentState) {
                         }
                     ) {
                         Image(
-                            icRefresh(),
+                            bitmap = resource("refresh.png").rememberImageBitmap().orEmpty(),
                             contentDescription = null,
                             modifier = Modifier.size(35.dp)
                         )
@@ -106,6 +78,7 @@ fun TitleBar(text: String, content: ContentState) {
         })
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun PreviewImage(content: ContentState) {
     Clickable(onClick = {
@@ -118,10 +91,10 @@ fun PreviewImage(content: ContentState) {
             elevation = 1.dp
         ) {
             Image(
-                if (content.isMainImageEmpty()) {
-                    icEmpty()
+                bitmap = if (content.isMainImageEmpty()) {
+                    resource("empty.png").rememberImageBitmap().orEmpty()
                 } else {
-                    BitmapPainter(content.getSelectedImage())
+                    content.getSelectedImage()
                 },
                 contentDescription = null,
                 modifier = Modifier
@@ -132,6 +105,7 @@ fun PreviewImage(content: ContentState) {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun Miniature(
     picture: Picture,
@@ -169,25 +143,15 @@ fun Miniature(
                 style = MaterialTheme.typography.body1
             )
 
-            val context = LocalContext.current
-            val popupText = "${(R.string.picture)} " +
-                    "${picture.name} \n" +
-                    "${stringResource(R.string.size)} " +
-                    "${picture.width}x${picture.height} " +
-                    "${stringResource(R.string.pixels)}"
-
             Clickable(
                 modifier = Modifier.height(70.dp)
                     .width(30.dp),
                 onClick = {
-                    showPopUpMessage(
-                        popupText,
-                        context
-                    )
+                    content.notification.notifyImageData(picture)
                 }
             ) {
                 Image(
-                    icDots(),
+                    resource("dots.png").rememberImageBitmap().orEmpty(),
                     contentDescription = null,
                     modifier = Modifier.height(70.dp)
                         .width(30.dp)

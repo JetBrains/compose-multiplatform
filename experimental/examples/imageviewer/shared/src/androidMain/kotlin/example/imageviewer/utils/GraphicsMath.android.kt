@@ -7,8 +7,6 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.layout.ContentScale
 import kotlin.math.pow
 import kotlin.math.roundToInt
 import example.imageviewer.view.DragHandler
@@ -95,16 +93,6 @@ fun applyBlurFilter(bitmap: Bitmap, context: Context): Bitmap {
     return result
 }
 
-fun adjustImageScale(bitmap: ImageBitmap): ContentScale {
-    val bitmapRatio = (10 * bitmap.width.toFloat() / bitmap.height).toInt()
-    val displayRatio = (10 * displayWidth().toFloat() / displayHeight()).toInt()
-
-    if (displayRatio > bitmapRatio) {
-        return ContentScale.FillHeight
-    }
-    return ContentScale.FillWidth
-}
-
 fun toPx(dp: Int): Int {
     return (dp * Resources.getSystem().displayMetrics.density).toInt()
 }
@@ -113,11 +101,11 @@ fun toDp(px: Int): Int {
     return (px / Resources.getSystem().displayMetrics.density).toInt()
 }
 
-fun displayWidth(): Int {
+actual fun displayWidth(): Int {
     return Resources.getSystem().displayMetrics.widthPixels
 }
 
-fun displayHeight(): Int {
+actual fun displayHeight(): Int {
     return Resources.getSystem().displayMetrics.heightPixels
 }
 
