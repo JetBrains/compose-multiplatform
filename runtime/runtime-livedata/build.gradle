@@ -35,6 +35,7 @@ dependencies {
 
     androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
     androidTestImplementation(projectOrArtifact(":compose:test-utils"))
+    androidTestImplementation("androidx.lifecycle:lifecycle-runtime-testing:2.5.1")
     androidTestImplementation(libs.testRunner)
     androidTestImplementation(libs.junit)
     androidTestImplementation(libs.truth)
