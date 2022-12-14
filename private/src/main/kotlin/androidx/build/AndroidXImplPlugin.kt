@@ -250,25 +250,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             val capitalizedTestTaskName = testTaskName.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
             }
-
-            val zipHtmlTask = project.tasks.register(
-                "zipHtmlResultsOf$capitalizedTestTaskName",
-                Zip::class.java
-            ) {
-                val destinationDirectory = File("$xmlReportDestDir-html")
-                it.destinationDirectory.set(destinationDirectory)
-                it.archiveFileName.set(archiveName)
-                it.from(project.file(task.reports.html.outputLocation))
-                it.doLast { zip ->
-                    // If the test itself didn't display output, then the report task should
-                    // remind the user where to find its output
-                    zip.logger.lifecycle(
-                        "Html results of $testTaskName zipped into " +
-                            "$destinationDirectory/$archiveName"
-                    )
-                }
-            }
-            task.finalizedBy(zipHtmlTask)
             val xmlReport = task.reports.junitXml
             if (xmlReport.required.get()) {
                 val zipXmlTask = project.tasks.register(
