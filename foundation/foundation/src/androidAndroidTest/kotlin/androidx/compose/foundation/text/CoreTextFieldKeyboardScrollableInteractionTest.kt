@@ -55,7 +55,6 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
-import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,9 +96,6 @@ class CoreTextFieldKeyboardScrollableInteractionTest(
 
     @Test
     fun test() {
-        // TODO(b/179203700) This is known broken for lazy lists.
-        assumeTrue(scrollableType != LazyList)
-
         rule.setContent {
             keyboardHelper.initialize()
             TestContent()
