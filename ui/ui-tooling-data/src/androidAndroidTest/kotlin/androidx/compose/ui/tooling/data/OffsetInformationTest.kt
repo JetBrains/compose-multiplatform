@@ -61,6 +61,42 @@ class OffsetInformationTest : ToolingTest() {
             offsets
         )
     }
+
+    @Test
+    fun testInline() {
+        val slotTableRecord = CompositionDataRecord.create()
+        show {
+            Inspectable(slotTableRecord) {
+                OffsetData()
+            }
+        }
+
+        val table = slotTableRecord.store.first()
+        val tree = table.asTree()
+        val inlines = tree.all().filter {
+            it.location?.sourceFile == "OffsetData.kt" &&
+                it.name != null && it.name != "remember"
+        }.map {
+            it.name!! to it.isInline
+        }
+
+        assertArrayEquals(
+            arrayListOf(
+                "MyComposeTheme" to false,
+                "Column" to true,
+                "Text" to false,
+                "Greeting" to false,
+                "Text" to false,
+                "Surface" to false,
+                "Button" to false,
+                "Text" to false,
+                "Surface" to false,
+                "TextButton" to false,
+                "Row" to true
+            ),
+            inlines
+        )
+    }
 }
 
 @OptIn(UiToolingDataApi::class)
