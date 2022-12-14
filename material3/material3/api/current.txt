@@ -244,6 +244,58 @@ package androidx.compose.material3 {
   public final class DragGestureDetectorCopyKt {
   }
 
+  public final class DrawerDefaults {
+    method @androidx.compose.runtime.Composable public long getContainerColor();
+    method public float getDismissibleDrawerElevation();
+    method public float getMaximumDrawerWidth();
+    method public float getModalDrawerElevation();
+    method public float getPermanentDrawerElevation();
+    method @androidx.compose.runtime.Composable public long getScrimColor();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getShape();
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.WindowInsets getWindowInsets();
+    property public final float DismissibleDrawerElevation;
+    property public final float MaximumDrawerWidth;
+    property public final float ModalDrawerElevation;
+    property public final float PermanentDrawerElevation;
+    property @androidx.compose.runtime.Composable public final long containerColor;
+    property @androidx.compose.runtime.Composable public final long scrimColor;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape shape;
+    property @androidx.compose.runtime.Composable public final androidx.compose.foundation.layout.WindowInsets windowInsets;
+    field public static final androidx.compose.material3.DrawerDefaults INSTANCE;
+  }
+
+  @androidx.compose.runtime.Stable public final class DrawerState {
+    ctor public DrawerState(androidx.compose.material3.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material3.DrawerValue,java.lang.Boolean> confirmStateChange);
+    method public suspend Object? animateTo(androidx.compose.material3.DrawerValue targetValue, androidx.compose.animation.core.AnimationSpec<java.lang.Float> anim, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? close(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public androidx.compose.material3.DrawerValue getCurrentValue();
+    method public androidx.compose.runtime.State<java.lang.Float> getOffset();
+    method public androidx.compose.material3.DrawerValue getTargetValue();
+    method public boolean isAnimationRunning();
+    method public boolean isClosed();
+    method public boolean isOpen();
+    method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? snapTo(androidx.compose.material3.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    property public final androidx.compose.material3.DrawerValue currentValue;
+    property public final boolean isAnimationRunning;
+    property public final boolean isClosed;
+    property public final boolean isOpen;
+    property public final androidx.compose.runtime.State<java.lang.Float> offset;
+    property public final androidx.compose.material3.DrawerValue targetValue;
+    field public static final androidx.compose.material3.DrawerState.Companion Companion;
+  }
+
+  public static final class DrawerState.Companion {
+    method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.DrawerState,androidx.compose.material3.DrawerValue> Saver(kotlin.jvm.functions.Function1<? super androidx.compose.material3.DrawerValue,java.lang.Boolean> confirmStateChange);
+  }
+
+  public enum DrawerValue {
+    method public static androidx.compose.material3.DrawerValue valueOf(String name) throws java.lang.IllegalArgumentException;
+    method public static androidx.compose.material3.DrawerValue[] values();
+    enum_constant public static final androidx.compose.material3.DrawerValue Closed;
+    enum_constant public static final androidx.compose.material3.DrawerValue Open;
+  }
+
   public final class DynamicTonalPaletteKt {
     method @RequiresApi(android.os.Build.VERSION_CODES.S) public static androidx.compose.material3.ColorScheme dynamicDarkColorScheme(android.content.Context context);
     method @RequiresApi(android.os.Build.VERSION_CODES.S) public static androidx.compose.material3.ColorScheme dynamicLightColorScheme(android.content.Context context);
@@ -387,7 +439,29 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void NavigationBarItem(androidx.compose.foundation.layout.RowScope, boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional boolean alwaysShowLabel, optional androidx.compose.material3.NavigationBarItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
   }
 
+  @androidx.compose.runtime.Stable public interface NavigationDrawerItemColors {
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> badgeColor(boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> containerColor(boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> iconColor(boolean selected);
+    method @androidx.compose.runtime.Composable public androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> textColor(boolean selected);
+  }
+
+  public final class NavigationDrawerItemDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.NavigationDrawerItemColors colors(optional long selectedContainerColor, optional long unselectedContainerColor, optional long selectedIconColor, optional long unselectedIconColor, optional long selectedTextColor, optional long unselectedTextColor, optional long selectedBadgeColor, optional long unselectedBadgeColor);
+    method public androidx.compose.foundation.layout.PaddingValues getItemPadding();
+    property public final androidx.compose.foundation.layout.PaddingValues ItemPadding;
+    field public static final androidx.compose.material3.NavigationDrawerItemDefaults INSTANCE;
+  }
+
   public final class NavigationDrawerKt {
+    method @androidx.compose.runtime.Composable public static void DismissibleDrawerSheet(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape drawerShape, optional long drawerContainerColor, optional long drawerContentColor, optional float drawerTonalElevation, optional androidx.compose.foundation.layout.WindowInsets windowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void DismissibleNavigationDrawer(kotlin.jvm.functions.Function0<kotlin.Unit> drawerContent, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.DrawerState drawerState, optional boolean gesturesEnabled, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void ModalDrawerSheet(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape drawerShape, optional long drawerContainerColor, optional long drawerContentColor, optional float drawerTonalElevation, optional androidx.compose.foundation.layout.WindowInsets windowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void ModalNavigationDrawer(kotlin.jvm.functions.Function0<kotlin.Unit> drawerContent, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.DrawerState drawerState, optional boolean gesturesEnabled, optional long scrimColor, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void NavigationDrawerItem(kotlin.jvm.functions.Function0<kotlin.Unit> label, boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? icon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? badge, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.NavigationDrawerItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
+    method @androidx.compose.runtime.Composable public static void PermanentDrawerSheet(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.ui.graphics.Shape drawerShape, optional long drawerContainerColor, optional long drawerContentColor, optional float drawerTonalElevation, optional androidx.compose.foundation.layout.WindowInsets windowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.ColumnScope,kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static void PermanentNavigationDrawer(kotlin.jvm.functions.Function0<kotlin.Unit> drawerContent, optional androidx.compose.ui.Modifier modifier, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.runtime.Composable public static androidx.compose.material3.DrawerState rememberDrawerState(androidx.compose.material3.DrawerValue initialValue, optional kotlin.jvm.functions.Function1<? super androidx.compose.material3.DrawerValue,java.lang.Boolean> confirmStateChange);
   }
 
   public final class NavigationRailDefaults {
