@@ -174,10 +174,7 @@ private fun autoInvalidateNode(node: Modifier.Node, phase: Int) {
         node.invalidateMeasurements()
         if (phase == Removed) {
             val coordinator = node.requireCoordinator(Nodes.Layout)
-            val layer = coordinator.layer
-            if (layer != null) {
-                coordinator.onLayerBlockUpdated(null)
-            }
+            coordinator.detach()
         }
     }
     if (node.isKind(Nodes.GlobalPositionAware) && node is GlobalPositionAwareModifierNode) {

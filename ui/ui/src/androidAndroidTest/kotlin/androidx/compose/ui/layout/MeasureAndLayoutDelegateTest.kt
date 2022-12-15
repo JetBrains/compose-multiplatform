@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.unit.Constraints
@@ -1280,5 +1282,69 @@ class MeasureAndLayoutDelegateTest {
                 }
             }
         }
+    }
+
+    @Test
+    fun removingChildPlacedWithGraphicsLayerDestroysTheLayer() {
+        val root = root {
+            add(node())
+            placeWithLayer = true
+        }
+
+        var activeLayers = 0
+
+        val delegate = createDelegate(root, createLayer = {
+            activeLayers++
+            object : MockLayer() {
+                override fun destroy() {
+                    super.destroy()
+                    activeLayers--
+                }
+            }
+        })
+
+        assertThat(activeLayers).isEqualTo(1)
+
+        root.removeAll()
+        delegate.measureAndLayout()
+
+        assertThat(activeLayers).isEqualTo(0)
+    }
+
+    @Test
+    fun removingModifierWithLayerFromTheNodeDestroysTheLayer() {
+        val root = root {
+            add(node {
+                modifier = Modifier
+                    .graphicsLayer()
+                    // we add extra layout modifier after graphicsLayer so the layer is added on
+                    // the coordinator associated with the modifier which is going to be removed
+                    .layout { measurable, constraints ->
+                        val placeable = measurable.measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            placeable.place(0, 0)
+                        }
+                    }
+            })
+        }
+
+        var activeLayers = 0
+
+        val delegate = createDelegate(root, createLayer = {
+            activeLayers++
+            object : MockLayer() {
+                override fun destroy() {
+                    super.destroy()
+                    activeLayers--
+                }
+            }
+        })
+
+        assertThat(activeLayers).isEqualTo(1)
+
+        root.first.modifier = Modifier
+        delegate.measureAndLayout()
+
+        assertThat(activeLayers).isEqualTo(0)
     }
 }
