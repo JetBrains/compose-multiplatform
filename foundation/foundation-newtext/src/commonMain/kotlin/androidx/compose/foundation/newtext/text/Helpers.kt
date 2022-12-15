@@ -36,3 +36,5 @@ internal inline fun <T, R> List<T>.fastMapIndexedNotNull(
 }
 
 internal fun Float.ceilToIntPx(): Int = ceil(this).roundToInt()
+
+internal const val DefaultMinLines = 1
