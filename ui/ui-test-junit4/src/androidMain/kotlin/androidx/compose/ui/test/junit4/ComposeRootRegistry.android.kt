@@ -24,7 +24,7 @@ import androidx.compose.ui.platform.ViewRootForTest
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import java.util.Collections
 import java.util.WeakHashMap
 import java.util.concurrent.CountDownLatch
@@ -187,7 +187,7 @@ internal class ComposeRootRegistry {
             // the lifecycle observer will get notified.
             // TODO: This can be missing if the ComposeView is in a ViewOverlay.
             // If so, we do nothing and bail.
-            val lifecycle = ViewTreeLifecycleOwner.get(view)?.lifecycle ?: return
+            val lifecycle = view.findViewTreeLifecycleOwner()?.lifecycle ?: return
             lifecycle.addObserver(this)
             // Setup a lambda to remove the observer when we're detached from the window. When
             // that happens, we won't have access to the lifecycle anymore.

@@ -30,8 +30,9 @@ import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.UiComposable
 import androidx.compose.ui.node.InternalCoreApi
 import androidx.compose.ui.node.Owner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.LifecycleOwner
 import java.lang.ref.WeakReference
 
 /**
@@ -177,7 +178,8 @@ abstract class AbstractComposeView @JvmOverloads constructor(
     /**
      * Perform initial composition for this view.
      * Once this method is called or the view becomes attached to a window,
-     * either [disposeComposition] must be called or the [ViewTreeLifecycleOwner] must
+     * either [disposeComposition] must be called or the
+     * [LifecycleOwner] returned by [findViewTreeLifecycleOwner] must
      * reach the [Lifecycle.State.DESTROYED] state for the composition to be cleaned up
      * properly. (This restriction is temporary.)
      *

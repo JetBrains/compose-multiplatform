@@ -74,7 +74,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
@@ -417,7 +418,7 @@ internal class PopupLayout(
 
     init {
         id = android.R.id.content
-        ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
+        setViewTreeLifecycleOwner(composeView.findViewTreeLifecycleOwner())
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
         setViewTreeSavedStateRegistryOwner(composeView.findViewTreeSavedStateRegistryOwner())
         // Set unique id for AbstractComposeView. This allows state restoration for the state
@@ -665,7 +666,7 @@ internal class PopupLayout(
      * Remove the view from the [WindowManager].
      */
     fun dismiss() {
-        ViewTreeLifecycleOwner.set(this, null)
+        setViewTreeLifecycleOwner(null)
         windowManager.removeViewImmediate(this)
     }
 

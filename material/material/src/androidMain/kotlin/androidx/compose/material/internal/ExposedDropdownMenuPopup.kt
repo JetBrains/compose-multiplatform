@@ -64,7 +64,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.window.PopupPositionProvider
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
@@ -255,7 +256,7 @@ private class PopupLayout(
 
     init {
         id = android.R.id.content
-        ViewTreeLifecycleOwner.set(this, ViewTreeLifecycleOwner.get(composeView))
+        setViewTreeLifecycleOwner(composeView.findViewTreeLifecycleOwner())
         ViewTreeViewModelStoreOwner.set(this, ViewTreeViewModelStoreOwner.get(composeView))
         setViewTreeSavedStateRegistryOwner(composeView.findViewTreeSavedStateRegistryOwner())
         composeView.viewTreeObserver.addOnGlobalLayoutListener(this)
@@ -364,7 +365,7 @@ private class PopupLayout(
      * Remove the view from the [WindowManager].
      */
     fun dismiss() {
-        ViewTreeLifecycleOwner.set(this, null)
+        setViewTreeLifecycleOwner(null)
         composeView.viewTreeObserver.removeOnGlobalLayoutListener(this)
         windowManager.removeViewImmediate(this)
     }
