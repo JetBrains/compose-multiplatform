@@ -45,106 +45,13 @@
 //import example.imageviewer.style.TranslucentBlack
 //import example.imageviewer.style.TranslucentWhite
 //import example.imageviewer.style.Transparent
-//import example.imageviewer.style.icDots
-//import example.imageviewer.style.icEmpty
-//import example.imageviewer.style.icRefresh
-//import example.imageviewer.utils.toByteArray
-//
-//@Composable
-//fun MainScreen(content: ContentState) {
-//    Column {
-//        TopContent(content)
-//        ScrollableArea(content)
-//    }
-//    if (!content.isContentReady()) {
-//        LoadingScreen(ResString.loading)
-//    }
-//}
-//
-//@Composable
-//fun TopContent(content: ContentState) {
-//    TitleBar(text = ResString.appName, content = content)
-//    PreviewImage(content)
-//    Spacer(modifier = Modifier.height(10.dp))
-//    Divider()
-//    Spacer(modifier = Modifier.height(5.dp))
-//}
-//
-//@Composable
-//fun TitleBar(text: String, content: ContentState) {
-//    val interactionSource = remember { MutableInteractionSource() }
-//    val refreshButtonHover by interactionSource.collectIsHoveredAsState()
-//    TopAppBar(
-//        backgroundColor = DarkGreen,
-//        title = {
-//        Row(Modifier.height(50.dp)) {
-//            Text(
-//                text,
-//                color = Foreground,
-//                modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
-//            )
-//            Surface(
-//                color = Transparent,
-//                modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
-//                shape = CircleShape
-//            ) {
-//                Tooltip(ResString.refresh) {
-//                    Clickable(
-//                        modifier = Modifier
-//                            .hoverable(interactionSource)
-//                            .background(color = if (refreshButtonHover) TranslucentBlack else Transparent),
-//                        onClick = {
-//                            if (content.isContentReady()) {
-//                                content.refresh()
-//                            }
-//                        }
-//                    ) {
-//                        Image(
-//                            icRefresh(),
-//                            contentDescription = null,
-//                            modifier = Modifier.size(35.dp)
-//                        )
-//                    }
-//                }
-//            }
-//        }
-//    })
-//}
-//
-//@Composable
-//fun PreviewImage(content: ContentState) {
-//    Clickable(
-//        modifier = Modifier.background(color = DarkGray),
-//        onClick = {
-//            AppState.screenState(ScreenType.FullscreenImage)
-//        }
-//    ) {
-//        Card(
-//            backgroundColor = Transparent,
-//            modifier = Modifier.height(250.dp),
-//            shape = RectangleShape,
-//            elevation = 1.dp
-//        ) {
-//            Image(
-//                if (content.isMainImageEmpty())
-//                    icEmpty()
-//                else
-//                    BitmapPainter(content.getSelectedImage()),
-//                contentDescription = null,
-//                modifier = Modifier
-//                    .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
-//                contentScale = ContentScale.Fit
-//            )
-//        }
-//    }
-//}
 //
 //@Composable
 //fun Miniature(
 //    picture: Picture,
 //    content: ContentState
 //) {
-//    val cardHoverInteractionSource = remember { MutableInteractionSource() }
+//    val cardHoverInteractionSource = remember { MutableInteractionSource() }//todo hover
 //    val cardHover by cardHoverInteractionSource.collectIsHoveredAsState()
 //    val infoButtonInteractionSource = remember { MutableInteractionSource() }
 //    val infoButtonHover by infoButtonInteractionSource.collectIsHoveredAsState()
@@ -239,12 +146,4 @@
 //                .fillMaxHeight()
 //        )
 //    }
-//}
-//
-//@Composable
-//fun Divider() {
-//    Divider(
-//        color = LightGray,
-//        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-//    )
 //}

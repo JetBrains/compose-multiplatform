@@ -42,26 +42,6 @@
 //import example.imageviewer.style.MiniatureColor
 //import example.imageviewer.style.TranslucentBlack
 //import example.imageviewer.style.Transparent
-//import example.imageviewer.style.icBack
-//import example.imageviewer.style.icFilterBlurOff
-//import example.imageviewer.style.icFilterBlurOn
-//import example.imageviewer.style.icFilterGrayscaleOff
-//import example.imageviewer.style.icFilterGrayscaleOn
-//import example.imageviewer.style.icFilterPixelOff
-//import example.imageviewer.style.icFilterPixelOn
-//
-//@Composable
-//fun FullscreenImage(
-//    content: ContentState
-//) {
-//    Column {
-//        ToolBar(content.getSelectedImageName(), content)
-//        Image(content)
-//    }
-//    if (!content.isContentReady()) {
-//        LoadingScreen()
-//    }
-//}
 //
 //@Composable
 //fun ToolBar(
@@ -80,7 +60,7 @@
 //                modifier = Modifier.padding(start = 20.dp).align(Alignment.CenterVertically),
 //                shape = CircleShape
 //            ) {
-//                Tooltip(ResString.back) {
+//                Tooltip(ResString.back) {//todo Tooltip
 //                    Clickable(
 //                        modifier = Modifier
 //                            .hoverable(backButtonInteractionSource)
@@ -138,7 +118,7 @@
 //    Box(
 //        modifier = Modifier.background(color = Transparent).clip(CircleShape)
 //    ) {
-//        Tooltip("$type") {
+//        Tooltip("$type") {//todo tooltip
 //            Clickable(
 //                modifier = Modifier
 //                    .hoverable(interactionSource)
@@ -156,18 +136,9 @@
 //    Spacer(Modifier.width(20.dp))
 //}
 //
-//@Composable
-//fun getFilterImage(type: FilterType, content: ContentState): Painter {
-//    return when (type) {
-//        FilterType.GrayScale -> if (content.isFilterEnabled(type)) icFilterGrayscaleOn() else icFilterGrayscaleOff()
-//        FilterType.Pixel -> if (content.isFilterEnabled(type)) icFilterPixelOn() else icFilterPixelOff()
-//        FilterType.Blur -> if (content.isFilterEnabled(type)) icFilterBlurOn() else icFilterBlurOff()
-//    }
-//}
-//
 //@OptIn(ExperimentalComposeUiApi::class)
 //@Composable
-//fun Image(content: ContentState) {
+//fun Image(content: ContentState) {//todo
 //    val onUpdate = remember { { content.updateMainImage() } }
 //    Surface(
 //        color = DarkGray,

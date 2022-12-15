@@ -9,7 +9,7 @@ import example.imageviewer.utils.applyGrayScaleFilter
 
 class GrayScaleFilter : BitmapFilter {
 
-    override fun apply(bitmap: ImageBitmap) : ImageBitmap {
-        return  applyGrayScaleFilter(bitmap.toAwtImage()).toComposeImageBitmap()
+    override fun apply(bitmap: ImageBitmap): ImageBitmap {
+        return applyGrayScaleFilter(bitmap.toAwtImage()).toComposeImageBitmap()
     }
 }

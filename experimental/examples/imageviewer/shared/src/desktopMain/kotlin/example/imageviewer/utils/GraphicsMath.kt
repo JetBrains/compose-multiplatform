@@ -43,8 +43,8 @@ fun scaleBitmapAspectRatio(
 
 fun getDisplayBounds(bitmap: BufferedImage, windowSize: DpSize): Rectangle {
 
-    val boundW: Float = windowSize.width.value.toFloat()
-    val boundH: Float = windowSize.height.value.toFloat()
+    val boundW: Float = windowSize.width.value
+    val boundH: Float = windowSize.height.value
 
     val ratioX: Float = bitmap.width / boundW
     val ratioY: Float = bitmap.height / boundH
@@ -109,12 +109,6 @@ fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
         result.width - radius * 2,
         result.height - radius * 2
     )
-}
-
-fun toByteArray(bitmap: BufferedImage) : ByteArray {
-    val baos = ByteArrayOutputStream()
-    ImageIO.write(bitmap, "png", baos)
-    return baos.toByteArray()
 }
 
 fun cropImage(bitmap: BufferedImage, crop: Rectangle) : BufferedImage {
