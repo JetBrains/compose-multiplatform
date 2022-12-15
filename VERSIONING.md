@@ -30,8 +30,37 @@ Kotlin version | Minimal Compose version | Notes
 1.5.31 | 1.0.0
 1.6.20 | 1.1.1
 1.7.10 | 1.2.0
-1.7.20 | 1.2.0 | JS is not supported (will be fixed in the next versions)
+1.7.20 | 1.2.0 | JS is not supported (fixed in the 1.2.1)
 1.7.20 | 1.2.1
+
+### Using the latest Kotlin version 
+
+When a new version of Kotlin is released, the corresponding Compose Multiplatform release may not yet have been published. There are still ways to use it, although stability is not guarantied. Even if it compiles fine, there can be hidden runtime errors, so it is not recommended to use them for production builds.
+
+#### Using Jetpack Compose Compiler
+
+The compilation process of composable functions is handled by the Compose compiler plugin. Each release of the compiler plugin is strictly bound to a single version of the Kotlin compiler. Normally, the Gradle plugin chooses an appropriate version of the compiler plugin automatically. But there is a way to choose another version of Compose Compiler. For example, you can use Jetpack Compose Compiler published by Google.
+
+First, check [this page](https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility) to find a compatible version. If there is one, use it this way:
+```
+compose {
+    kotlinCompilerPlugin.set("androidx.compose.compiler:compiler:1.4.0-alpha02")
+}
+```
+(`1.4.0-alpha02` corresponds Kotlin 1.7.21)
+
+#### Disabling Kotlin compatibility check
+
+If there is no compatible version of Jetpack Compose Compiler (or you encountered errors), you can try to use Compose Compiler for another version of Kotlin, but disable the Kotlin version check. It can work, if you upgrade to a hotfix version of Kotlin, and most probably won't work if you upgrade to a major version of Kotlin.
+
+```
+compose {
+    kotlinCompilerPlugin.set(dependencies.compiler.forKotlin("1.7.20"))
+    kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.7.21")
+}
+```
+
+Here we set a fixed version of Compose Compiler and configure it by specifying additional arguments. The argument `suppressKotlinVersionCompatibilityCheck` disables the internal Kotlin check that happens inside the compiler. In this argument you should specify the version of Kotlin that is applied to your project. It is required to avoid situations when you upgraded Kotlin and forgot to update Compose Compiler.
 
 ### Relationship between the Jetpack Compose and Compose Multiplatform release cycles
 
@@ -42,12 +71,3 @@ When a new version of Jetpack Compose is released, we pick the release commit, u
 The gap between a Compose Multiplatform release and a Jetpack Compose release is usually 1 to 3 months.
 
 When you build your application for Android, the artifacts published by Google are used. For example, if you apply the Compose Multiplatform 1.2.0 Gradle plugin and add `implementation(compose.material3)` to your `dependencies`, then your project will use the `androidx.compose.material3:material3:1.0.0-alpha14` artifact in the Android target (but `org.jetbrains.compose.material3:material3:1.2.0` in the other targets). See the `Updated dependencies` sections in the [CHANGELOG](https://github.com/JetBrains/compose-jb/blob/master/CHANGELOG.md) to know exactly which version of the Jetpack Compose artifact will be used.
-
-The Compose Compiler version can be changed independently of other Compose libraries. In order to support newer versions of Kotlin, you may want to use [the cutting-edge Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility) published by Google in your Compose Multiplatform project. For example, when a new version of Kotlin is released, the corresponding Compose Multiplatform release may not yet have been published, but manually specifying a newer Compose Compiler version can allow you to build your Compose Multiplatform app using the latest Kotlin release. To do so, set `kotlinCompilerPlugin` in the `compose` section of your `build.gradle.kts` file as follows:
-
-```kotlin
-compose {
-    kotlinCompilerPlugin.set("androidx.compose.compiler:compiler:1.3.1")
-}
-```
-However, keep in mind that this compiler version isn't tested with Compose Multiplatform, so stability isn't guaranteed.
