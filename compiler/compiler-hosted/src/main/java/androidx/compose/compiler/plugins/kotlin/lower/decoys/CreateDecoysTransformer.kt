@@ -19,11 +19,7 @@ package androidx.compose.compiler.plugins.kotlin.lower.decoys
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.lower.ModuleLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.ir.addChild
-import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.copyTypeParametersFrom
 import org.jetbrains.kotlin.backend.common.ir.moveBodyTo
-import org.jetbrains.kotlin.backend.common.ir.remapTypeParameters
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.serialization.signature.IdSignatureSerializer
 import org.jetbrains.kotlin.ir.IrStatement
@@ -46,6 +42,10 @@ import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.addChild
+import org.jetbrains.kotlin.ir.util.copyTo
+import org.jetbrains.kotlin.ir.util.remapTypeParameters
+import org.jetbrains.kotlin.ir.util.copyTypeParametersFrom
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.hasDefaultValue
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
@@ -131,8 +131,12 @@ class CreateDecoysTransformer(
 
         // "copied" has new symbols (due to deepCopyWithSymbols).
         // Therefore, we need to recurse into the copied version.
-        // Otherwise, `copied` function can be added to a parent that is not in IR hierarchy anymore,
-        // for example: an anonymous class implementing an interface with @Composable function.
+        // Otherwise, inner `copied` functions can be added to a parent
+        // that is not in the IR tree anymore (due to a body removal from decoy - see `stubBody`).
+        // The use cases:
+        // 1) A @Composable function declaring an anonymous object implementing
+        // an interface with @Composable function.
+        // 2) A @Composable function declaring a local class with a @Composable function.
         super.visitSimpleFunction(copied) as IrSimpleFunction
 
         return declaration.apply {
@@ -150,14 +154,19 @@ class CreateDecoysTransformer(
             return super.visitConstructor(declaration)
         }
 
-        val original = super.visitConstructor(declaration) as IrConstructor
         val newName = declaration.decoyImplementationName()
-
-        val copied = original.copyWithName(newName, context.irFactory::buildConstructor)
-
+        val copied = declaration.copyWithName(
+            newName, context.irFactory::buildConstructor
+        ) as IrConstructor
+        copied.parent = declaration.parent
         originalFunctions += copied to declaration.parent
 
-        return original.apply {
+        // "copied" has new symbols (due to deepCopyWithSymbols).
+        // Therefore, we need to recurse into the copied version.
+        // See the comment in visitSimpleFunction for an explanation.
+        super.visitConstructor(copied) as IrConstructor
+
+        return declaration.apply {
             setDecoyAnnotation(newName.asString())
             stubBody()
         }
