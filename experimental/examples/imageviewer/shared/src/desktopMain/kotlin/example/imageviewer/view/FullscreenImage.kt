@@ -107,35 +107,6 @@
 //    }
 //}
 //
-//@Composable
-//fun FilterButton(
-//    content: ContentState,
-//    type: FilterType,
-//    modifier: Modifier = Modifier.size(38.dp)
-//) {
-//    val interactionSource = remember { MutableInteractionSource() }
-//    val filterButtonHover by interactionSource.collectIsHoveredAsState()
-//    Box(
-//        modifier = Modifier.background(color = Transparent).clip(CircleShape)
-//    ) {
-//        Tooltip("$type") {//todo tooltip
-//            Clickable(
-//                modifier = Modifier
-//                    .hoverable(interactionSource)
-//                    .background(color = if (filterButtonHover) TranslucentBlack else Transparent),
-//                onClick = { content.toggleFilter(type)}
-//            ) {
-//                Image(
-//                    getFilterImage(type = type, content = content),
-//                    contentDescription = null,
-//                    modifier
-//                )
-//            }
-//        }
-//    }
-//    Spacer(Modifier.width(20.dp))
-//}
-//
 //@OptIn(ExperimentalComposeUiApi::class)
 //@Composable
 //fun Image(content: ContentState) {//todo

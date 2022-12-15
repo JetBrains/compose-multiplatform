@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Tooltip(
-    text: String = "Tooltip",
+actual fun Tooltip(
+    text: String,
     content: @Composable () -> Unit
 ) {
     TooltipArea(
