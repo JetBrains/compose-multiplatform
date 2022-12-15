@@ -3,8 +3,6 @@ package example.imageviewer.model
 import io.ktor.client.*
 import io.ktor.client.request.*
 
-expect suspend fun loadImages(cachePath: String, list: List<String>): List<Picture>
-
 public interface ContentRepository<K, T> {
     public abstract suspend fun loadContent(key: K): T
 }

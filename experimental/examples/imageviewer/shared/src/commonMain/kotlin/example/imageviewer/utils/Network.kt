@@ -16,11 +16,6 @@ package example.imageviewer.utils
 
 import io.ktor.client.*
 import io.ktor.client.request.*
-import kotlinx.coroutines.Deferred
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-
-//import java.net.InetAddress
 
 fun isInternetAvailable(): Boolean {
     return runBlocking {

@@ -3,12 +3,10 @@ package example.imageviewer.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.*
-import example.imageviewer.utils.clearCache
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.utils.ktorHttpClient
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
-import org.jetbrains.compose.resources.load
 
 val IMAGES_DATA_URL = "https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
