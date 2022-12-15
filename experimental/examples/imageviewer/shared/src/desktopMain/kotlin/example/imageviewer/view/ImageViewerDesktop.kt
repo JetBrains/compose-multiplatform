@@ -58,6 +58,8 @@ fun ApplicationScope.ImageViewerDesktop() {
                 }
 
                 override val localization: Localization = object : Localization {
+                    override val back: String
+                        get() = ResString.back
                     override val appName: String
                         get() = ResString.appName
                     override val loading: String

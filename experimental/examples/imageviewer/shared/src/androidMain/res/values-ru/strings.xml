@@ -12,4 +12,5 @@
     <string name="picture">Изображение:</string>
     <string name="size">Размеры:</string>
     <string name="pixels">пикселей.</string>
+    <string name="back">назад</string>
 </resources>

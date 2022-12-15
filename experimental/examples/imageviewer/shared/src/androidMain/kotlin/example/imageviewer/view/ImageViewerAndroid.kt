@@ -36,6 +36,7 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
         }
 
     override val localization: Localization = object : Localization {
+        override val back: String = context.getString(R.string.back)
         override val appName: String = context.getString(R.string.app_name)
         override val loading: String = context.getString(R.string.loading)
 

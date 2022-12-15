@@ -34,8 +34,9 @@ interface Notification {
 }
 
 interface Localization {
-    val appName: String // stringResource(R.string.app_name)
-    val loading: String // stringResource(R.string.loading)
+    val back: String
+    val appName: String
+    val loading: String
 }
 
 class ContentState(

@@ -45,26 +45,35 @@ fun ToolBar(
     text: String,
     content: ContentState
 ) {
-    val scrollState = rememberScrollState()
-    Surface(color = MiniatureColor, modifier = Modifier.height(44.dp)) {
+    val backButtonInteractionSource = remember { MutableInteractionSource() }
+    val backButtonHover by backButtonInteractionSource.collectIsHoveredAsState()
+    Surface(
+        color = MiniatureColor,
+        modifier = Modifier.height(44.dp)
+    ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Surface(
                 color = Transparent,
                 modifier = Modifier.padding(start = 20.dp).align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
-                Clickable(
-                    onClick = {
-                        if (content.isContentReady()) {
-                            content.restoreMainImage()
-                            AppState.screenState(ScreenType.MainScreen)
-                        }
-                    }) {
-                    Image(
-                        resource("back.png").rememberImageBitmap().orEmpty(),
-                        contentDescription = null,
-                        modifier = Modifier.size(38.dp)
-                    )
+                Tooltip(content.dependencies.localization.back) {//todo Tooltip
+                    Clickable(
+                        modifier = Modifier
+                            .hoverable(backButtonInteractionSource)
+                            .background(color = if (backButtonHover) TranslucentBlack else Transparent),
+                        onClick = {
+                            if (content.isContentReady()) {
+                                content.restoreMainImage()
+                                AppState.screenState(ScreenType.MainScreen)
+                            }
+                        }) {
+                        Image(
+                            resource("back.png").rememberImageBitmap().orEmpty(),
+                            contentDescription = null,
+                            modifier = Modifier.size(38.dp)
+                        )
+                    }
                 }
             }
             Text(
@@ -82,7 +91,7 @@ fun ToolBar(
                     .align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
-                Row(Modifier.horizontalScroll(scrollState)) {
+                Row(Modifier.horizontalScroll(rememberScrollState())) {
                     for (type in FilterType.values()) {
                         FilterButton(content, type)
                     }
