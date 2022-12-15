@@ -43,7 +43,6 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
 
     override val imageRepository: ContentRepository<NetworkRequest, ImageBitmap> =
         createRealRepository(HttpClient(CIO))
-            .decorateWithDiskCache(ioScope, context.cacheDir)
             .adapter { it.toImageBitmap() }
 
     override val notification: Notification = object : Notification {
