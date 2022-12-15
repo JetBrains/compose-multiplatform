@@ -32,6 +32,17 @@ class AnonymousObjectsInComposable {
 
         assertEquals("<div>Abc2</div>", document.body!!.firstElementChild!!.outerHTML)
     }
+
+    @Test
+    // Issue:
+    // abc3.Abc$composable_z540rc_k$ is not a function
+    fun testConstructorWithComposable() {
+        renderComposableInBody {
+            TestConstructor { return@TestConstructor 111 }.otherComposable!!.invoke()
+        }
+
+        assertEquals("<div>Abc223-111</div>", document.body!!.firstElementChild!!.outerHTML)
+    }
 }
 
 @Composable
@@ -62,4 +73,23 @@ internal fun createHasComposable(): HasComposable2 {
 internal interface HasComposable2 {
     @Composable
     fun Abc()
+}
+
+class TestConstructor constructor() {
+
+    var otherComposable: (@Composable () -> Unit)? = null
+    constructor(retInt: @Composable () -> Int): this() {
+        otherComposable = {
+            val abc3: HasComposable2 = object : HasComposable2 {
+                @Composable
+                override fun Abc() {
+                    Div {
+                        val i = retInt()
+                        Text("Abc223-$i")
+                    }
+                }
+            }
+            abc3.Abc()
+        }
+    }
 }
