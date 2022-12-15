@@ -1,4 +1,5 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import kotlinx.browser.document
 import org.jetbrains.compose.web.dom.Div
 import org.jetbrains.compose.web.dom.Text
@@ -11,7 +12,7 @@ class AnonymousObjectsInComposable {
     @Test
     // Issue: content.Abc$composable_z540rc_k$ is not a function
     // https://github.com/JetBrains/compose-jb/issues/2549
-    fun passingFunctionReference() {
+    fun testComposableInAnonymousObject() {
         renderComposableInBody {
             val content: HasComposable2 = createHasComposable()
             content.Abc()
@@ -19,6 +20,31 @@ class AnonymousObjectsInComposable {
 
         assertEquals("<div>Abc</div>", document.body!!.firstElementChild!!.outerHTML)
     }
+
+    @Test
+    // Issue:
+    // java.lang.IllegalArgumentException: Could not find local implementation for Abc$composable
+    // at androidx.compose.compiler.plugins.kotlin.lower.decoys.DecoyTransformBase$DefaultImpls.getComposableForDecoy(DecoyTransformBase.kt:110)
+    fun testLocalClassWithComposable() {
+        renderComposableInBody {
+            HasLocalClassWithComposable()
+        }
+
+        assertEquals("<div>Abc2</div>", document.body!!.firstElementChild!!.outerHTML)
+    }
+}
+
+@Composable
+internal fun HasLocalClassWithComposable() {
+    class Abc : HasComposable2 {
+        @Composable
+        override fun Abc() {
+            Div { Text("Abc2") }
+        }
+    }
+
+    val abc = remember { Abc() }
+    abc.Abc()
 }
 
 @Composable
