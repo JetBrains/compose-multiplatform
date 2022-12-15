@@ -43,7 +43,7 @@ For the latest versions, see the [latest versions](https://github.com/JetBrains/
 ```
 plugins {
     kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.compose") version "1.2.1"
+    id("org.jetbrains.compose") version "1.2.2"
 }
 ```
 
@@ -77,7 +77,7 @@ Then create `build.gradle.kts` with the following content:
 ``` kotlin
 plugins {
     kotlin("jvm") version "1.7.20"
-    id("org.jetbrains.compose") version "1.2.1"
+    id("org.jetbrains.compose") version "1.2.2"
 }
 
 repositories {
