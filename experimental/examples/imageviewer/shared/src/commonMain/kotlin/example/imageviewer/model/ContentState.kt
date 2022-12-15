@@ -58,52 +58,48 @@ class ContentState(
     fun initData() {
         backgroundScope.launch {
             try {
-                if (isInternetAvailable()) {
-                    val imageList = ktorHttpClient.get<String>(IMAGES_DATA_URL).lines()
+                val imageList = ktorHttpClient.get<String>(IMAGES_DATA_URL).lines()
 
-                    if (imageList.isEmpty()) {
-                        withContext(Dispatchers.Main) {
-                            notification.notifyInvalidRepo()
-                            onContentReady()
-                        }
-                        return@launch
+                if (imageList.isEmpty()) {
+                    with(notification) {
+                        notifyInvalidRepo()
                     }
+                    onContentReady()
+                    return@launch
+                }
 
-                    val pictureList: List<Picture> = imageList.map {
-                        async {
-                            Picture(it, repository.loadContent(NetworkRequest(it)))
-                        }
-                    }.awaitAll()
+                val pictureList: List<Picture> = imageList.map {
+                    async {
+                        Picture(it, repository.loadContent(NetworkRequest(it)))
+                    }
+                }.awaitAll()
 
-                    if (pictureList.isEmpty()) {
-                        withContext(Dispatchers.Main) {
-                            notification.notifyRepoIsEmpty()
-                            onContentReady()
-                        }
-                    } else {
-                        val picture = Picture(imageList[0], repository.loadContent(NetworkRequest(imageList[0])))
-                        withContext(Dispatchers.Main) {
-                            state.value.miniatures.setMiniatures(pictureList)
-
-                            if (isMainImageEmpty()) {
-                                wrapPictureIntoMainImage(picture)
-                            } else {
-                                state.value = state.value.copy(
-                                    mainImage = getImage(),
-                                    currentImageIndex = getId()
-                                )
-                            }
-                            onContentReady()
-                        }
+                if (pictureList.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        notification.notifyRepoIsEmpty()
+                        onContentReady()
                     }
                 } else {
+                    val picture = Picture(imageList[0], repository.loadContent(NetworkRequest(imageList[0])))
                     withContext(Dispatchers.Main) {
-                        notification.notifyNoInternet()
+                        state.value.miniatures.setMiniatures(pictureList)
+
+                        if (isMainImageEmpty()) {
+                            wrapPictureIntoMainImage(picture)
+                        } else {
+                            state.value = state.value.copy(
+                                mainImage = getImage(),
+                                currentImageIndex = getId()
+                            )
+                        }
                         onContentReady()
                     }
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                withContext(Dispatchers.Main) {
+                    notification.notifyNoInternet()
+                    onContentReady()
+                }
             }
         }
     }

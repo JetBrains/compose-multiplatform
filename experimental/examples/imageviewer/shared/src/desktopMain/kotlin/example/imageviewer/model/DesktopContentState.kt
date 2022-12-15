@@ -27,7 +27,6 @@ object ContentState {
     val drag = DragHandler()
     val scale = ScaleHandler()
     lateinit var windowState: WindowState
-    private lateinit var repository: ImageRepository
     private lateinit var uriRepository: String
     val scope = CoroutineScope(Dispatchers.IO)
 
@@ -37,7 +36,6 @@ object ContentState {
             return this
         }
         this.uriRepository = uriRepository
-        repository = ImageRepository(uriRepository)
         isContentReady.value = false
 
         initData()

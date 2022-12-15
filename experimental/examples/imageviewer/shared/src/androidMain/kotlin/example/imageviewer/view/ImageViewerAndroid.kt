@@ -17,9 +17,7 @@ import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 
 @Composable
 fun ImageViewerAndroid() {
@@ -87,11 +85,13 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
         )
 
         private fun showPopUpMessage(text: String) {
-            Toast.makeText(
-                context,
-                text,
-                Toast.LENGTH_SHORT
-            ).show()
+            GlobalScope.launch(context = Dispatchers.Main) {
+                Toast.makeText(
+                    context,
+                    text,
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
 
     }

@@ -17,15 +17,13 @@ package example.imageviewer.utils
 import io.ktor.client.*
 import io.ktor.client.request.*
 
-fun isInternetAvailable(): Boolean {
-    return runBlocking {
-        try {
-            ktorHttpClient.head<String>("http://google.com")
-            true
-        } catch (e: Exception) {
-            println(e.message)
-            false
-        }
+suspend fun isInternetAvailable(): Boolean {
+    return try {
+        ktorHttpClient.head<String>("http://google.com")
+        true
+    } catch (e: Exception) {
+        println(e.message)
+        false
     }
 }
 
