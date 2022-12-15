@@ -18,6 +18,8 @@ package androidx.compose.ui.text.platform
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.text.EmojiSupportMatch
+import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.unit.Density
@@ -62,5 +64,30 @@ class AndroidParagraphIntrinsicsTest {
         assertThat(subject.hasStaleResolvedFonts).isFalse()
         fontState.value = true
         assertThat(subject.hasStaleResolvedFonts).isTrue()
+    }
+
+    @Test
+    fun whenStyleSaysNoemojiCompat_NoEmojiCompat() {
+        val fontState = mutableStateOf(false)
+        EmojiCompatStatus.setDelegateForTesting(object : EmojiCompatStatusDelegate {
+            override val fontLoaded: State<Boolean>
+                get() = fontState
+        })
+
+        val style = TextStyle(
+            platformStyle = PlatformTextStyle(
+                emojiSupportMatch = EmojiSupportMatch.None
+            )
+        )
+        val subject = ActualParagraphIntrinsics(
+            "text",
+            style,
+            listOf(),
+            listOf(),
+            Density(1f),
+            createFontFamilyResolver(context)
+        )
+        fontState.value = true
+        assertThat(subject.hasStaleResolvedFonts).isFalse()
     }
 }

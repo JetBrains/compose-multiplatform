@@ -20,6 +20,7 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.runtime.State
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.EmojiSupportMatch
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
@@ -72,11 +73,12 @@ internal class AndroidParagraphIntrinsics constructor(
      *
      * This value will never change
      */
-    private val emojiCompatProcessed: Boolean = EmojiCompatStatus.fontLoaded.value
+    private val emojiCompatProcessed: Boolean =
+        if (!style.hasEmojiCompat) { false } else { EmojiCompatStatus.fontLoaded.value }
 
     override val hasStaleResolvedFonts: Boolean
         get() = resolvedTypefaces.fastAny { it.isStaleResolvedFont } ||
-            (!emojiCompatProcessed &&
+            (!emojiCompatProcessed && style.hasEmojiCompat &&
                 /* short-circuit this state read */ EmojiCompatStatus.fontLoaded.value)
 
     internal val textDirectionHeuristic = resolveTextDirectionHeuristics(
@@ -182,3 +184,6 @@ private class TypefaceDirtyTracker(val resolveResult: State<Any>) {
     val isStaleResolvedFont: Boolean
         get() = resolveResult.value !== initial
 }
+
+private val TextStyle.hasEmojiCompat: Boolean
+    get() = platformStyle?.paragraphStyle?.emojiSupportMatch != EmojiSupportMatch.None
