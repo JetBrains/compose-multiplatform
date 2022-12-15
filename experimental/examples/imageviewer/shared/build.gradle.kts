@@ -56,6 +56,8 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.common)
                 implementation("io.ktor:ktor-client-cio:1.4.1")//todo version
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
+
             }
         }
     }

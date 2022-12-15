@@ -32,15 +32,15 @@ class FiltersManager {
         return filtersMap.contains(filter)
     }
 
-    fun applyFilters(bitmap: BufferedImage): BufferedImage {
-
-        var result: BufferedImage = bitmap
-        for (filter in filtersMap) {
-            result = filter.value.apply(result)
-        }
-
-        return result
-    }
+//    fun applyFilters(bitmap: BufferedImage): BufferedImage {
+//
+//        var result: BufferedImage = bitmap
+//        for (filter in filtersMap) {
+//            result = filter.value.apply(result)
+//        }
+//
+//        return result
+//    }
 }
 
 private fun getFilter(type: FilterType): BitmapFilter {

@@ -10,14 +10,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import example.imageviewer.model.ContentState
 import example.imageviewer.style.DarkGray
 
 @Composable
-fun SplashUI() {
+fun SplashUI(content: ContentState) {
     Box(Modifier.fillMaxSize().background(DarkGray)) {
         Text(
-            // TODO implement common resources
-            "Image Viewer",
+            content.dependencies.localization.appName,
             Modifier.align(Alignment.Center),
             color = Color.White,
             fontWeight = FontWeight.Bold,

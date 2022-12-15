@@ -2,6 +2,7 @@ package example.imageviewer.model
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.ImageBitmap
+import example.imageviewer.Dependencies
 import example.imageviewer.core.*
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.utils.ktorHttpClient
@@ -38,18 +39,15 @@ interface Localization {
 }
 
 class ContentState(
-    val getFilter: (FilterType) -> BitmapFilter,
     val state: MutableState<ContentStateData>,
-    val notification: Notification,
-    val repository: ContentRepository<NetworkRequest, ImageBitmap>,
-    val localization: Localization
+    val dependencies: Dependencies
 ) {
     fun getSelectedImage(): ImageBitmap = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
 
     private fun applyFilters(bitmap: ImageBitmap): ImageBitmap {
         var result = bitmap
-        for (filter in state.value.filterUIState.map { getFilter(it) }) {
+        for (filter in state.value.filterUIState.map { dependencies.getFilter(it) }) {
             result = filter.apply(result)
         }
         return result
@@ -61,7 +59,7 @@ class ContentState(
                 val imageList = ktorHttpClient.get<String>(IMAGES_DATA_URL).lines()
 
                 if (imageList.isEmpty()) {
-                    with(notification) {
+                    with(dependencies.notification) {
                         notifyInvalidRepo()
                     }
                     onContentReady()
@@ -70,17 +68,20 @@ class ContentState(
 
                 val pictureList: List<Picture> = imageList.map {
                     async {
-                        Picture(it, repository.loadContent(NetworkRequest(it)))
+                        Picture(it, dependencies.imageRepository.loadContent(NetworkRequest(it)))
                     }
                 }.awaitAll()
 
                 if (pictureList.isEmpty()) {
                     withContext(Dispatchers.Main) {
-                        notification.notifyRepoIsEmpty()
+                        dependencies.notification.notifyRepoIsEmpty()
                         onContentReady()
                     }
                 } else {
-                    val picture = Picture(imageList[0], repository.loadContent(NetworkRequest(imageList[0])))
+                    val picture = Picture(
+                        imageList[0],
+                        dependencies.imageRepository.loadContent(NetworkRequest(imageList[0]))
+                    )
                     withContext(Dispatchers.Main) {
                         state.value.miniatures.setMiniatures(pictureList)
 
@@ -97,7 +98,7 @@ class ContentState(
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
-                    notification.notifyNoInternet()
+                    dependencies.notification.notifyNoInternet()
                     onContentReady()
                 }
             }
@@ -166,16 +167,17 @@ class ContentState(
 
         backgroundScope.launch {
             if (isInternetAvailable()) {
-
-                val fullSizePicture = Picture(picture.source, repository.loadContent(NetworkRequest(picture.source)))
-
+                val fullSizePicture = Picture(
+                    picture.source,
+                    dependencies.imageRepository.loadContent(NetworkRequest(picture.source))
+                )
                 withContext(Dispatchers.Main) {
                     wrapPictureIntoMainImage(fullSizePicture)
                     onContentReady()
                 }
             } else {
                 withContext(Dispatchers.Main) {
-                    notification.notifyLoadImageUnavailable()
+                    dependencies.notification.notifyLoadImageUnavailable()
                     wrapPictureIntoMainImage(picture)
                 }
             }
@@ -199,7 +201,7 @@ class ContentState(
 
     fun swipeNext() {
         if (state.value.currentImageIndex == state.value.miniatures.size() - 1) {
-            notification.notifyLastImage()
+            dependencies.notification.notifyLastImage()
             return
         }
 
@@ -213,7 +215,7 @@ class ContentState(
 
     fun swipePrevious() {
         if (state.value.currentImageIndex == 0) {
-            notification.notifyFirstImage()
+            dependencies.notification.notifyFirstImage()
             return
         }
 
@@ -239,7 +241,7 @@ class ContentState(
                 }
             } else {
                 withContext(Dispatchers.Main) {
-                    notification.notifyRefreshUnavailable()
+                    dependencies.notification.notifyRefreshUnavailable()
                 }
             }
         }

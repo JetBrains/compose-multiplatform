@@ -25,13 +25,8 @@ interface Dependencies {
 @Composable
 internal fun ImageViewerCommon(dependencies: Dependencies) {
     val content = ContentState(
-        getFilter = {
-            dependencies.getFilter(it)
-        },
         state = remember { mutableStateOf(ContentStateData()) },
-        notification = dependencies.notification,
-        repository = dependencies.imageRepository,
-        localization = dependencies.localization,
+        dependencies = dependencies,
     ).apply {
         initData()
     }

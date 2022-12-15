@@ -204,3 +204,6 @@ fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): DpSize {
     val height: Int = if (desiredHeight < preferredHeight) desiredHeight else preferredHeight
     return DpSize(width.dp, height.dp)
 }
+
+actual fun displayWidth(): Int = 1024 //todo
+actual fun displayHeight(): Int = 768 //todo

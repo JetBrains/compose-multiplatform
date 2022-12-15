@@ -28,13 +28,13 @@ fun MainScreen(content: ContentState) {
         ScrollableArea(content)
     }
     if (!content.isContentReady()) {
-        LoadingScreen(content.localization.loading)
+        LoadingScreen(content.dependencies.localization.loading)
     }
 }
 
 @Composable
 fun TopContent(content: ContentState) {
-    TitleBar(text = content.localization.appName, content = content)
+    TitleBar(text = content.dependencies.localization.appName, content = content)
 //    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {//todo
         PreviewImage(content)
         Spacer(modifier = Modifier.height(10.dp))
@@ -147,7 +147,7 @@ fun Miniature(
                 modifier = Modifier.height(70.dp)
                     .width(30.dp),
                 onClick = {
-                    content.notification.notifyImageData(picture)
+                    content.dependencies.notification.notifyImageData(picture)
                 }
             ) {
                 Image(
