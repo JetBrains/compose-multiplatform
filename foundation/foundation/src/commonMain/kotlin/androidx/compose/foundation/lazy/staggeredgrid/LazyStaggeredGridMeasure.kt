@@ -21,6 +21,8 @@ import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.fastMaxOfOrNull
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLaneInfo.Companion.FullSpan
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLaneInfo.Companion.Unset
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.layout.Placeable
@@ -30,15 +32,24 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.packInts
+import androidx.compose.ui.util.unpackInt1
+import androidx.compose.ui.util.unpackInt2
 import kotlin.math.abs
-import kotlin.math.min
 import kotlin.math.roundToInt
 import kotlin.math.sign
+
+private const val DebugLoggingEnabled = false
+private inline fun debugLog(message: () -> String) {
+    if (DebugLoggingEnabled) {
+        println(message())
+    }
+}
 
 @ExperimentalFoundationApi
 internal fun LazyLayoutMeasureScope.measureStaggeredGrid(
     state: LazyStaggeredGridState,
-    itemProvider: LazyLayoutItemProvider,
+    itemProvider: LazyStaggeredGridItemProvider,
     resolvedSlotSums: IntArray,
     constraints: Constraints,
     isVertical: Boolean,
@@ -77,23 +88,23 @@ internal fun LazyLayoutMeasureScope.measureStaggeredGrid(
             } else {
                 // Grid got resized (or we are in a initial state)
                 // Adjust indices accordingly
-                context.spans.reset()
+                context.laneInfo.reset()
                 IntArray(resolvedSlotSums.size).apply {
                     // Try to adjust indices in case grid got resized
                     for (lane in indices) {
                         this[lane] = if (
-                            lane < firstVisibleIndices.size && firstVisibleIndices[lane] != -1
+                            lane < firstVisibleIndices.size && firstVisibleIndices[lane] != Unset
                         ) {
                             firstVisibleIndices[lane]
                         } else {
                             if (lane == 0) {
                                 0
                             } else {
-                                context.findNextItemIndex(this[lane - 1], lane)
+                                maxInRange(SpanRange(0, lane)) + 1
                             }
                         }
                         // Ensure spans are updated to be in correct range
-                        context.spans.setSpan(this[lane], lane)
+                        context.laneInfo.setLane(this[lane], lane)
                     }
                 }
             }
@@ -127,7 +138,7 @@ internal fun LazyLayoutMeasureScope.measureStaggeredGrid(
 @OptIn(ExperimentalFoundationApi::class)
 private class LazyStaggeredGridMeasureContext(
     val state: LazyStaggeredGridState,
-    val itemProvider: LazyLayoutItemProvider,
+    val itemProvider: LazyStaggeredGridItemProvider,
     val resolvedSlotSums: IntArray,
     val constraints: Constraints,
     val isVertical: Boolean,
@@ -143,20 +154,40 @@ private class LazyStaggeredGridMeasureContext(
         isVertical,
         itemProvider,
         measureScope,
-        resolvedSlotSums
-    ) { index, lane, key, placeables ->
-        val isLastInLane = spans.findNextItemIndex(index, lane) >= itemProvider.itemCount
+        resolvedSlotSums,
+        crossAxisSpacing
+    ) { index, lane, span, key, placeables ->
         LazyStaggeredGridMeasuredItem(
             index,
             key,
             placeables,
             isVertical,
             contentOffset,
-            if (isLastInLane) 0 else mainAxisSpacing
+            mainAxisSpacing,
+            lane,
+            span
         )
     }
 
-    val spans = state.spans
+    val laneInfo = state.laneInfo
+
+    val laneCount = resolvedSlotSums.size
+
+    fun LazyStaggeredGridItemProvider.isFullSpan(itemIndex: Int): Boolean =
+        spanProvider.isFullSpan(itemIndex)
+
+    fun LazyStaggeredGridItemProvider.getSpanRange(itemIndex: Int, lane: Int): SpanRange {
+        val isFullSpan = spanProvider.isFullSpan(itemIndex)
+        val span = if (isFullSpan) laneCount else 1
+        val targetLane = if (isFullSpan) 0 else lane
+        return SpanRange(targetLane, span)
+    }
+
+    inline val SpanRange.isFullSpan: Boolean
+        get() = end - start != 1
+
+    inline val SpanRange.laneInfo: Int
+        get() = if (isFullSpan) FullSpan else start
 }
 
 @ExperimentalFoundationApi
@@ -169,7 +200,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
     with(measureScope) {
         val itemCount = itemProvider.itemCount
 
-        if (itemCount <= 0 || resolvedSlotSums.isEmpty()) {
+        if (itemCount <= 0 || laneCount == 0) {
             return LazyStaggeredGridMeasureResult(
                 firstVisibleItemIndices = initialItemIndices,
                 firstVisibleItemScrollOffsets = initialItemOffsets,
@@ -202,7 +233,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
         firstItemOffsets.offsetBy(-scrollDelta)
 
         // this will contain all the MeasuredItems representing the visible items
-        val measuredItems = Array(resolvedSlotSums.size) {
+        val measuredItems = Array(laneCount) {
             ArrayDeque<LazyStaggeredGridMeasuredItem>()
         }
 
@@ -215,7 +246,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
                 val itemIndex = firstItemIndices[lane]
                 val itemOffset = firstItemOffsets[lane]
 
-                if (itemOffset < -mainAxisSpacing && itemIndex > 0) {
+                if (itemOffset < maxOf(-mainAxisSpacing, 0) && itemIndex > 0) {
                     return true
                 }
             }
@@ -225,33 +256,60 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
         var laneToCheckForGaps = -1
 
-        // we had scrolled backward or we compose items in the start padding area, which means
-        // items before current firstItemScrollOffset should be visible. compose them and update
-        // firstItemScrollOffset
-        while (hasSpaceBeforeFirst()) {
-            val laneIndex = firstItemOffsets.indexOfMinValue()
-            val previousItemIndex = findPreviousItemIndex(
-                item = firstItemIndices[laneIndex],
-                lane = laneIndex
-            )
+        debugLog { "=========== MEASURE START ==========" }
+        debugLog {
+            "| Filling up from indices: ${firstItemIndices.toList()}, " +
+                "offsets: ${firstItemOffsets.toList()}"
+        }
 
+        // we had scrolled backward or we compose items in the start padding area, which means
+        // items before current firstItemOffset should be visible. compose them and update
+        // firstItemOffsets
+        while (hasSpaceBeforeFirst()) {
+            // staggered grid always keeps item index increasing top to bottom
+            // the first item that should contain something before it must have the largest index
+            // among the rest
+            val laneIndex = firstItemIndices.indexOfMaxValue()
+            val itemIndex = firstItemIndices[laneIndex]
+
+            // other lanes might have smaller offsets than the one chosen above, which indicates
+            // incorrect measurement (e.g. item was deleted or it changed size)
+            // correct this by offsetting affected lane back to match currently chosen offset
+            for (i in firstItemOffsets.indices) {
+                if (
+                    firstItemIndices[i] != firstItemIndices[laneIndex] &&
+                        firstItemOffsets[i] < firstItemOffsets[laneIndex]
+                ) {
+                    // If offset of the lane is smaller than currently chosen lane,
+                    // offset the lane to be where current value of the chosen index is.
+                    firstItemOffsets[i] = firstItemOffsets[laneIndex]
+                }
+            }
+
+            val previousItemIndex = findPreviousItemIndex(itemIndex, laneIndex)
             if (previousItemIndex < 0) {
                 laneToCheckForGaps = laneIndex
                 break
             }
 
-            if (spans.getSpan(previousItemIndex) == LazyStaggeredGridSpans.Unset) {
-                spans.setSpan(previousItemIndex, laneIndex)
-            }
-
+            val spanRange = itemProvider.getSpanRange(previousItemIndex, laneIndex)
+            laneInfo.setLane(previousItemIndex, spanRange.laneInfo)
             val measuredItem = measuredItemProvider.getAndMeasure(
-                previousItemIndex,
-                laneIndex
+                index = previousItemIndex,
+                span = spanRange
             )
-            measuredItems[laneIndex].addFirst(measuredItem)
 
-            firstItemIndices[laneIndex] = previousItemIndex
-            firstItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
+            val offset = firstItemOffsets.maxInRange(spanRange)
+            val gaps = if (spanRange.isFullSpan) laneInfo.getGaps(previousItemIndex) else null
+            spanRange.forEach { lane ->
+                firstItemIndices[lane] = previousItemIndex
+                val gap = if (gaps == null) 0 else gaps[lane]
+                firstItemOffsets[lane] = offset + measuredItem.sizeWithSpacings + gap
+            }
+        }
+        debugLog {
+            @Suppress("ListIterator")
+            "| up filled, measured items are ${measuredItems.map { it.map { it.index } }}"
         }
 
         fun misalignedStart(referenceLane: Int): Boolean {
@@ -261,17 +319,19 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
             // Case 1: Each lane has laid out all items, but offsets do no match
             val misalignedOffsets = laneRange.any { lane ->
-                findPreviousItemIndex(firstItemIndices[lane], lane) == -1 &&
+                findPreviousItemIndex(firstItemIndices[lane], lane) == Unset &&
                     firstItemOffsets[lane] != firstItemOffsets[referenceLane]
             }
             // Case 2: Some lanes are still missing items, and there's no space left to place them
             val moreItemsInOtherLanes = laneRange.any { lane ->
-                findPreviousItemIndex(firstItemIndices[lane], lane) != -1 &&
+                findPreviousItemIndex(firstItemIndices[lane], lane) != Unset &&
                     firstItemOffsets[lane] >= firstItemOffsets[referenceLane]
             }
             // Case 3: the first item is in the wrong lane (it should always be in
             // the first one)
-            val firstItemInWrongLane = spans.getSpan(0) != 0
+            val firstItemLane = laneInfo.getLane(0)
+            val firstItemInWrongLane =
+                firstItemLane != 0 && firstItemLane != Unset && firstItemLane != FullSpan
             // If items are not aligned, reset all measurement data we gathered before and
             // proceed with initial measure
             return misalignedOffsets || moreItemsInOtherLanes || firstItemInWrongLane
@@ -285,6 +345,9 @@ private fun LazyStaggeredGridMeasureContext.measure(
         if (firstItemOffsets[0] < minOffset) {
             scrollDelta += firstItemOffsets[0]
             firstItemOffsets.offsetBy(minOffset - firstItemOffsets[0])
+            debugLog {
+                "| correcting scroll delta from ${firstItemOffsets[0]} to $minOffset"
+            }
         }
 
         // neutralize previously added start padding as we stopped filling the before content padding
@@ -297,7 +360,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
         if (laneToCheckForGaps != -1) {
             val lane = laneToCheckForGaps
             if (misalignedStart(lane) && canRestartMeasure) {
-                spans.reset()
+                laneInfo.reset()
                 return measure(
                     initialScrollDelta = scrollDelta,
                     initialItemIndices = IntArray(firstItemIndices.size) { -1 },
@@ -309,29 +372,73 @@ private fun LazyStaggeredGridMeasureContext.measure(
             }
         }
 
-        val currentItemIndices = initialItemIndices.copyOf().apply {
-            // ensure indices match item count, in case it decreased
-            ensureIndicesInRange(this, itemCount)
-        }
-        val currentItemOffsets = IntArray(initialItemOffsets.size) {
-            -(initialItemOffsets[it] - scrollDelta)
+        // start measuring down from first item indices/offsets decided above to ensure correct
+        // arrangement.
+        // this means we are calling measure second time on items previously measured in this
+        // function, but LazyLayout caches them, so no overhead.
+        val currentItemIndices = firstItemIndices.copyOf()
+        val currentItemOffsets = IntArray(firstItemOffsets.size) {
+            -firstItemOffsets[it]
         }
 
         val maxOffset = (mainAxisAvailableSize + afterContentPadding).coerceAtLeast(0)
 
-        // compose first visible items we received from state
-        currentItemIndices.forEachIndexed { laneIndex, itemIndex ->
-            if (itemIndex < 0) return@forEachIndexed
+        debugLog {
+            "| filling from current: indices: ${currentItemIndices.toList()}, " +
+                "offsets: ${currentItemOffsets.toList()}"
+        }
 
-            val measuredItem = measuredItemProvider.getAndMeasure(itemIndex, laneIndex)
-            currentItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
-            measuredItems[laneIndex].addLast(measuredItem)
+        // current item should be pointing to the index of previously measured item below,
+        // as lane assignments must be decided based on size and offset of all previous items
+        // this loop makes sure to measure items that were initially passed to the current item
+        // indices with correct item order
+        var initialItemsMeasured = 0
+        var initialLaneToMeasure = currentItemIndices.indexOfMinValue()
+        while (initialLaneToMeasure != -1 && initialItemsMeasured < laneCount) {
+            val itemIndex = currentItemIndices[initialLaneToMeasure]
+            val laneIndex = initialLaneToMeasure
 
-            spans.setSpan(itemIndex, laneIndex)
+            initialLaneToMeasure = currentItemIndices.indexOfMinValue(minBound = itemIndex)
+            initialItemsMeasured++
+
+            if (itemIndex < 0) continue
+
+            val spanRange = itemProvider.getSpanRange(itemIndex, laneIndex)
+            val measuredItem = measuredItemProvider.getAndMeasure(
+                itemIndex,
+                spanRange
+            )
+
+            laneInfo.setLane(itemIndex, spanRange.laneInfo)
+            val offset = currentItemOffsets.maxInRange(spanRange) + measuredItem.sizeWithSpacings
+            spanRange.forEach { lane ->
+                currentItemOffsets[lane] = offset
+                currentItemIndices[lane] = itemIndex
+                measuredItems[lane].addLast(measuredItem)
+            }
+
+            if (currentItemOffsets[spanRange.start] <= minOffset + mainAxisSpacing) {
+                measuredItem.isVisible = false
+            }
+
+            if (spanRange.isFullSpan) {
+                // full span items overwrite other slots if we measure it here, so skip measuring
+                // the rest of the slots
+                initialItemsMeasured = laneCount
+            }
+        }
+
+        debugLog {
+            @Suppress("ListIterator")
+            "| current filled, measured items are ${measuredItems.map { it.map { it.index } }}"
+        }
+        debugLog {
+            "| filling down from indices: ${currentItemIndices.toList()}, " +
+                "offsets: ${currentItemOffsets.toList()}"
         }
 
         // then composing visible items forward until we fill the whole viewport.
-        // we want to have at least one item in visibleItems even if in fact all the items are
+        // we want to have at least one item in measuredItems even if in fact all the items are
         // offscreen, this can happen if the content padding is larger than the available size.
         while (
             currentItemOffsets.any {
@@ -340,74 +447,72 @@ private fun LazyStaggeredGridMeasureContext.measure(
             } || measuredItems.all { it.isEmpty() }
         ) {
             val currentLaneIndex = currentItemOffsets.indexOfMinValue()
-            val nextItemIndex =
-                findNextItemIndex(currentItemIndices[currentLaneIndex], currentLaneIndex)
+            val previousItemIndex = currentItemIndices.max()
+            val itemIndex = previousItemIndex + 1
 
-            if (nextItemIndex >= itemCount) {
-                // if any items changed its size, the spans may not behave correctly
-                // there are no more items in this lane, but there could be more in others
-                // recheck if we can add more items and reset spans accordingly
-                var missedItemIndex = Int.MAX_VALUE
-                currentItemIndices.forEachIndexed { laneIndex, i ->
-                    if (laneIndex == currentLaneIndex) return@forEachIndexed
-                    var itemIndex = findNextItemIndex(i, laneIndex)
-                    while (itemIndex < itemCount) {
-                        missedItemIndex = minOf(itemIndex, missedItemIndex)
-                        spans.setSpan(itemIndex, LazyStaggeredGridSpans.Unset)
-                        itemIndex = findNextItemIndex(itemIndex, laneIndex)
-                    }
-                }
-                // there's at least one missed item which may fit current lane
-                if (missedItemIndex != Int.MAX_VALUE && canRestartMeasure) {
-                    // reset current lane to the missed item index and restart measure
-                    initialItemIndices[currentLaneIndex] =
-                        min(initialItemIndices[currentLaneIndex], missedItemIndex)
-                    return measure(
-                        initialScrollDelta = initialScrollDelta,
-                        initialItemIndices = initialItemIndices,
-                        initialItemOffsets = initialItemOffsets,
-                        canRestartMeasure = false
-                    )
-                } else {
-                    break
-                }
+            if (itemIndex >= itemCount) {
+                break
             }
 
-            if (firstItemIndices[currentLaneIndex] == -1) {
-                firstItemIndices[currentLaneIndex] = nextItemIndex
-            }
-            spans.setSpan(nextItemIndex, currentLaneIndex)
+            val spanRange = itemProvider.getSpanRange(itemIndex, currentLaneIndex)
 
-            val measuredItem =
-                measuredItemProvider.getAndMeasure(nextItemIndex, currentLaneIndex)
-            currentItemOffsets[currentLaneIndex] += measuredItem.sizeWithSpacings
-            measuredItems[currentLaneIndex].addLast(measuredItem)
-            currentItemIndices[currentLaneIndex] = nextItemIndex
+            laneInfo.setLane(itemIndex, spanRange.laneInfo)
+            val measuredItem = measuredItemProvider.getAndMeasure(itemIndex, spanRange)
+
+            val offset = currentItemOffsets.maxInRange(spanRange)
+            val gaps = if (spanRange.isFullSpan) {
+                laneInfo.getGaps(itemIndex) ?: IntArray(laneCount)
+            } else {
+                null
+            }
+            spanRange.forEach { lane ->
+                if (gaps != null) {
+                    gaps[lane] = offset - currentItemOffsets[lane]
+                }
+                currentItemIndices[lane] = itemIndex
+                currentItemOffsets[lane] = offset + measuredItem.sizeWithSpacings
+                measuredItems[lane].addLast(measuredItem)
+            }
+            laneInfo.setGaps(itemIndex, gaps)
+
+            if (currentItemOffsets[spanRange.start] <= minOffset + mainAxisSpacing) {
+                // We scrolled past measuredItem, and it is not visible anymore. We measured it
+                // for correct positioning of other items, but there's no need to place it.
+                // Mark it as not visible and filter below.
+                measuredItem.isVisible = false
+            }
+        }
+
+        debugLog {
+            @Suppress("ListIterator")
+            "| down filled, measured items are ${measuredItems.map { it.map { it.index } }}"
         }
 
         // some measured items are offscreen, remove them from the list and adjust indices/offsets
         for (laneIndex in measuredItems.indices) {
             val laneItems = measuredItems[laneIndex]
-            var offset = currentItemOffsets[laneIndex]
-            var inBoundsIndex = 0
-            for (i in laneItems.lastIndex downTo 0) {
-                val item = laneItems[i]
-                offset -= item.sizeWithSpacings
-                inBoundsIndex = i
-                if (offset <= minOffset + mainAxisSpacing) {
-                    break
-                }
+
+            while (laneItems.size > 1 && !laneItems.first().isVisible) {
+                val item = laneItems.removeFirst()
+                val gaps = if (item.span != 1) laneInfo.getGaps(item.index) else null
+                firstItemOffsets[laneIndex] -=
+                    item.sizeWithSpacings + if (gaps == null) 0 else gaps[laneIndex]
             }
 
-            // the rest of the items are offscreen, update firstIndex/Offset for lane and remove
-            // items from measured list
-            for (i in 0 until inBoundsIndex) {
-                val item = laneItems.removeFirst()
-                firstItemOffsets[laneIndex] -= item.sizeWithSpacings
-            }
-            if (laneItems.isNotEmpty()) {
-                firstItemIndices[laneIndex] = laneItems.first().index
-            }
+            firstItemIndices[laneIndex] = laneItems.firstOrNull()?.index ?: Unset
+        }
+
+        if (currentItemIndices.any { it == itemCount - 1 }) {
+            currentItemOffsets.offsetBy(-mainAxisSpacing)
+        }
+
+        debugLog {
+            @Suppress("ListIterator")
+            "| removed invisible items: ${measuredItems.map { it.map { it.index } }}"
+        }
+        debugLog {
+            "| filling back up from indices: ${firstItemIndices.toList()}, " +
+                "offsets: ${firstItemOffsets.toList()}"
         }
 
         // we didn't fill the whole viewport with items starting from firstVisibleItemIndex.
@@ -433,7 +538,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
                 if (previousIndex < 0) {
                     if (misalignedStart(laneIndex) && canRestartMeasure) {
-                        spans.reset()
+                        laneInfo.reset()
                         return measure(
                             initialScrollDelta = scrollDelta,
                             initialItemIndices = IntArray(firstItemIndices.size) { -1 },
@@ -446,15 +551,21 @@ private fun LazyStaggeredGridMeasureContext.measure(
                     break
                 }
 
-                spans.setSpan(previousIndex, laneIndex)
-
+                val spanRange = itemProvider.getSpanRange(previousIndex, laneIndex)
+                laneInfo.setLane(previousIndex, spanRange.laneInfo)
                 val measuredItem = measuredItemProvider.getAndMeasure(
-                    previousIndex,
-                    laneIndex
+                    index = previousIndex,
+                    spanRange
                 )
-                measuredItems[laneIndex].addFirst(measuredItem)
-                firstItemOffsets[laneIndex] += measuredItem.sizeWithSpacings
-                firstItemIndices[laneIndex] = previousIndex
+
+                val offset = firstItemOffsets.maxInRange(spanRange)
+                val gaps = if (spanRange.isFullSpan) laneInfo.getGaps(previousIndex) else null
+                spanRange.forEach { lane ->
+                    measuredItems[lane].addFirst(measuredItem)
+                    firstItemIndices[lane] = previousIndex
+                    val gap = if (gaps == null) 0 else gaps[lane]
+                    firstItemOffsets[lane] = offset + measuredItem.sizeWithSpacings + gap
+                }
             }
             scrollDelta += toScrollBack
 
@@ -465,6 +576,14 @@ private fun LazyStaggeredGridMeasureContext.measure(
                 currentItemOffsets.offsetBy(offsetValue)
                 firstItemOffsets.offsetBy(-offsetValue)
             }
+        }
+
+        debugLog {
+            @Suppress("ListIterator")
+            "| measured: ${measuredItems.map { it.map { it.index } }}"
+        }
+        debugLog {
+            "| first indices: ${firstItemIndices.toList()}, offsets: ${firstItemOffsets.toList()}"
         }
 
         // report the amount of pixels we consumed. scrollDelta can be smaller than
@@ -487,12 +606,15 @@ private fun LazyStaggeredGridMeasureContext.measure(
             for (laneIndex in measuredItems.indices) {
                 val laneItems = measuredItems[laneIndex]
                 for (i in laneItems.indices) {
-                    val size = laneItems[i].sizeWithSpacings
+                    val item = laneItems[i]
+                    val gaps = laneInfo.getGaps(item.index)
+                    val size = item.sizeWithSpacings + if (gaps == null) 0 else gaps[laneIndex]
                     if (
                         i != laneItems.lastIndex &&
                         firstItemOffsets[laneIndex] != 0 &&
                         firstItemOffsets[laneIndex] >= size
                     ) {
+
                         firstItemOffsets[laneIndex] -= size
                         firstItemIndices[laneIndex] = laneItems[i + 1].index
                     } else {
@@ -500,6 +622,11 @@ private fun LazyStaggeredGridMeasureContext.measure(
                     }
                 }
             }
+        }
+
+        debugLog {
+            "| final first indices: ${firstItemIndices.toList()}, " +
+                "offsets: ${firstItemOffsets.toList()}"
         }
 
         // end measure
@@ -526,8 +653,13 @@ private fun LazyStaggeredGridMeasureContext.measure(
             }
             val item = measuredItems[laneIndex].removeFirst()
 
+            if (item.lane != laneIndex) {
+                continue
+            }
+
             // todo(b/182882362): arrangement support
-            val mainAxisOffset = itemScrollOffsets[laneIndex]
+            val spanRange = SpanRange(item.lane, item.span)
+            val mainAxisOffset = itemScrollOffsets.maxInRange(spanRange)
             val crossAxisOffset =
                 if (laneIndex == 0) {
                     0
@@ -535,8 +667,22 @@ private fun LazyStaggeredGridMeasureContext.measure(
                     resolvedSlotSums[laneIndex - 1] + crossAxisSpacing * laneIndex
                 }
 
+            if (item.placeables.isEmpty()) {
+                // nothing to place, ignore spacings
+                continue
+            }
+
             positionedItems += item.position(laneIndex, mainAxisOffset, crossAxisOffset)
-            itemScrollOffsets[laneIndex] += item.sizeWithSpacings
+            spanRange.forEach { lane ->
+                itemScrollOffsets[lane] = mainAxisOffset + item.sizeWithSpacings
+            }
+        }
+
+        debugLog {
+            "| positioned: ${positionedItems.map { "${it.index} at ${it.offset}" }.toList()}"
+        }
+        debugLog {
+            "========== MEASURE DONE ==========="
         }
 
         // todo: reverse layout support
@@ -573,17 +719,40 @@ private fun LazyStaggeredGridMeasureContext.measure(
     }
 }
 
+@JvmInline
+private value class SpanRange private constructor(val packedValue: Long) {
+    constructor(lane: Int, span: Int) : this(packInts(lane, lane + span))
+
+    inline val start get(): Int = unpackInt1(packedValue)
+    inline val end get(): Int = unpackInt2(packedValue)
+    inline val size get(): Int = end - start
+}
+
+private inline fun SpanRange.forEach(block: (Int) -> Unit) {
+    for (i in start until end) {
+        block(i)
+    }
+}
+
 private fun IntArray.offsetBy(delta: Int) {
     for (i in indices) {
         this[i] = this[i] + delta
     }
 }
 
-internal fun IntArray.indexOfMinValue(): Int {
+private fun IntArray.maxInRange(indexRange: SpanRange): Int {
+    var max = Int.MIN_VALUE
+    indexRange.forEach {
+        max = maxOf(max, this[it])
+    }
+    return max
+}
+
+internal fun IntArray.indexOfMinValue(minBound: Int = Int.MIN_VALUE): Int {
     var result = -1
     var min = Int.MAX_VALUE
     for (i in indices) {
-        if (min > this[i]) {
+        if (this[i] in (minBound + 1) until min) {
             min = this[i]
             result = i
         }
@@ -632,21 +801,20 @@ private fun LazyStaggeredGridMeasureContext.ensureIndicesInRange(
 ) {
     // reverse traverse to make sure last items are recorded to the latter lanes
     for (i in indices.indices.reversed()) {
-        while (indices[i] >= itemCount) {
+        while (indices[i] >= itemCount || !laneInfo.assignedToLane(indices[i], i)) {
             indices[i] = findPreviousItemIndex(indices[i], i)
         }
-        if (indices[i] != -1) {
+        if (indices[i] >= 0) {
             // reserve item for span
-            spans.setSpan(indices[i], i)
+            if (!itemProvider.isFullSpan(indices[i])) {
+                laneInfo.setLane(indices[i], i)
+            }
         }
     }
 }
 
 private fun LazyStaggeredGridMeasureContext.findPreviousItemIndex(item: Int, lane: Int): Int =
-    spans.findPreviousItemIndex(item, lane)
-
-private fun LazyStaggeredGridMeasureContext.findNextItemIndex(item: Int, lane: Int): Int =
-    spans.findNextItemIndex(item, lane)
+    laneInfo.findPreviousItemIndex(item, lane)
 
 @OptIn(ExperimentalFoundationApi::class)
 private class LazyStaggeredGridMeasureProvider(
@@ -654,11 +822,13 @@ private class LazyStaggeredGridMeasureProvider(
     private val itemProvider: LazyLayoutItemProvider,
     private val measureScope: LazyLayoutMeasureScope,
     private val resolvedSlotSums: IntArray,
-    private val measuredItemFactory: MeasuredItemFactory
+    private val crossAxisSpacing: Int,
+    private val measuredItemFactory: MeasuredItemFactory,
 ) {
-    private fun childConstraints(slot: Int): Constraints {
+    private fun childConstraints(slot: Int, span: Int): Constraints {
         val previousSum = if (slot == 0) 0 else resolvedSlotSums[slot - 1]
-        val crossAxisSize = resolvedSlotSums[slot] - previousSum
+        val crossAxisSize =
+            resolvedSlotSums[slot + span - 1] - previousSum + crossAxisSpacing * (span - 1)
         return if (isVertical) {
             Constraints.fixedWidth(crossAxisSize)
         } else {
@@ -666,10 +836,10 @@ private class LazyStaggeredGridMeasureProvider(
         }
     }
 
-    fun getAndMeasure(index: Int, lane: Int): LazyStaggeredGridMeasuredItem {
+    fun getAndMeasure(index: Int, span: SpanRange): LazyStaggeredGridMeasuredItem {
         val key = itemProvider.getKey(index)
-        val placeables = measureScope.measure(index, childConstraints(lane))
-        return measuredItemFactory.createItem(index, lane, key, placeables)
+        val placeables = measureScope.measure(index, childConstraints(span.start, span.size))
+        return measuredItemFactory.createItem(index, span.start, span.size, key, placeables)
     }
 }
 
@@ -678,6 +848,7 @@ private fun interface MeasuredItemFactory {
     fun createItem(
         index: Int,
         lane: Int,
+        span: Int,
         key: Any,
         placeables: List<Placeable>
     ): LazyStaggeredGridMeasuredItem
@@ -689,8 +860,12 @@ private class LazyStaggeredGridMeasuredItem(
     val placeables: List<Placeable>,
     val isVertical: Boolean,
     val contentOffset: IntOffset,
-    val spacing: Int
+    val spacing: Int,
+    val lane: Int,
+    val span: Int
 ) {
+    var isVisible = true
+
     val mainAxisSize: Int = placeables.fastFold(0) { size, placeable ->
         size + if (isVertical) placeable.height else placeable.width
     }

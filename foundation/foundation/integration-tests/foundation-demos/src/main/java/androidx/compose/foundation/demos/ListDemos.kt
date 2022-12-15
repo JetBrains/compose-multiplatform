@@ -59,6 +59,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.samples.StickyHeaderSample
@@ -972,18 +973,26 @@ private fun LazyStaggeredGridDemo() {
             Button(onClick = { if (count != 0) count-- }) { Text(text = "--") }
         }
 
-        val state = rememberLazyStaggeredGridState()
+        val state = rememberLazyStaggeredGridState(initialFirstVisibleItemIndex = 29)
 
         LazyVerticalStaggeredGrid(
             columns = StaggeredGridCells.Fixed(3),
             modifier = Modifier.fillMaxSize(),
             state = state,
-            contentPadding = PaddingValues(vertical = 500.dp, horizontal = 20.dp),
+            contentPadding = PaddingValues(vertical = 30.dp, horizontal = 20.dp),
             horizontalArrangement = Arrangement.spacedBy(10.dp),
             verticalArrangement = Arrangement.spacedBy(10.dp),
             content = {
-                items(count) {
-                    var expanded by rememberSaveable { mutableStateOf(false) }
+                items(
+                    count,
+                    span = {
+                        if (it % 30 == 0)
+                            StaggeredGridItemSpan.FullLine
+                        else
+                            StaggeredGridItemSpan.SingleLane
+                    }
+                ) {
+                    var expanded by remember { mutableStateOf(false) }
                     val index = indices.value[it % indices.value.size]
                     val color = colors[index]
                     Box(
@@ -1059,7 +1068,10 @@ private fun AnimateItemPlacementDemo() {
                     Checkbox(checked = selected, onCheckedChange = {
                         selectedIndexes[item] = it
                     })
-                    Spacer(Modifier.width(16.dp).height(height))
+                    Spacer(
+                        Modifier
+                            .width(16.dp)
+                            .height(height))
                     Text("Item $item")
                 }
             }

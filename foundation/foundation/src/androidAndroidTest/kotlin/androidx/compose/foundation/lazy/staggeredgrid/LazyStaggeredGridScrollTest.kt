@@ -18,17 +18,14 @@ package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -204,6 +201,16 @@ class LazyStaggeredGridScrollTest(
         assertThat(state.canScrollBackward).isTrue()
     }
 
+    @Test
+    fun sctollToItem_fullSpan() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(49, 10)
+        }
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(49)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+    }
+
     @Composable
     private fun TestContent() {
         // |-|-|
@@ -220,13 +227,22 @@ class LazyStaggeredGridScrollTest(
             state = state,
             modifier = Modifier.axisSize(itemSizeDp * 2, itemSizeDp * 5)
         ) {
-            items(100) {
+            items(
+                count = 100,
+                span = {
+                    if (it == 50) {
+                        StaggeredGridItemSpan.FullLine
+                    } else {
+                        StaggeredGridItemSpan.SingleLane
+                    }
+                }
+            ) {
                 BasicText(
                     "$it",
                     Modifier
                         .mainAxisSize(itemSizeDp * ((it % 2) + 1))
                         .testTag("$it")
-                        .border(1.dp, Color.Black)
+                        .debugBorder()
                 )
             }
         }
