@@ -101,7 +101,7 @@ class ColorSpaceTest {
             "Test", FloatArray(6), WhitePoint(0f, 0f),
             op, sIdentity, 0.0f, 1.0f
         )
-        assertEquals(0.5, cs.oetf(0.25), 1e-5)
+        assertEquals(0.5, cs.oetfFunc.invoke(0.25), 1e-5)
     }
 
     @Test
@@ -111,7 +111,7 @@ class ColorSpaceTest {
             "Test", FloatArray(6), WhitePoint(0f, 0f),
             sIdentity, op, 0.0f, 1.0f
         )
-        assertEquals(0.0625, cs.eotf(0.25), 1e-5)
+        assertEquals(0.0625, cs.eotfFunc.invoke(0.25), 1e-5)
     }
 
     @Test

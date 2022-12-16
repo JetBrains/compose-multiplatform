@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.packFloats
 import kotlin.math.pow
 
 /**
@@ -58,6 +60,55 @@ internal class Lab(
         v[2] = z * Illuminant.D50Xyz[2]
 
         return v
+    }
+
+    override fun toXy(v0: Float, v1: Float, v2: Float): Long {
+        val v00 = v0.coerceIn(0.0f, 100.0f)
+        val v10 = v0.coerceIn(-128.0f, 128.0f)
+
+        val fy = (v00 + 16.0f) / 116.0f
+        val fx = fy + (v10 * 0.002f)
+        val x = if (fx > D) fx * fx * fx else (1.0f / B) * (fx - C)
+        val y = if (fy > D) fy * fy * fy else (1.0f / B) * (fy - C)
+
+        return packFloats(x * Illuminant.D50Xyz[0], y * Illuminant.D50Xyz[1])
+    }
+
+    override fun toZ(v0: Float, v1: Float, v2: Float): Float {
+        val v00 = v0.coerceIn(0.0f, 100.0f)
+        val v20 = v2.coerceIn(-128.0f, 128.0f)
+        val fy = (v00 + 16.0f) / 116.0f
+        val fz = fy - (v20 * 0.005f)
+        val z = if (fz > D) fz * fz * fz else (1.0f / B) * (fz - C)
+        return z * Illuminant.D50Xyz[2]
+    }
+
+    override fun xyzaToColor(
+        x: Float,
+        y: Float,
+        z: Float,
+        a: Float,
+        colorSpace: ColorSpace
+    ): Color {
+        val x1 = x / Illuminant.D50Xyz[0]
+        val y1 = y / Illuminant.D50Xyz[1]
+        val z1 = z / Illuminant.D50Xyz[2]
+
+        val fx = if (x1 > A) x1.pow(1f / 3f) else B * x1 + C
+        val fy = if (y1 > A) y1.pow(1f / 3f) else B * y1 + C
+        val fz = if (z1 > A) z1.pow(1f / 3f) else B * z1 + C
+
+        val l = 116.0f * fy - 16.0f
+        val a1 = 500.0f * (fx - fy)
+        val b = 200.0f * (fy - fz)
+
+        return Color(
+            l.coerceIn(0.0f, 100.0f),
+            a1.coerceIn(-128.0f, 128.0f),
+            b.coerceIn(-128.0f, 128.0f),
+            a,
+            colorSpace
+        )
     }
 
     override fun fromXyz(v: FloatArray): FloatArray {
