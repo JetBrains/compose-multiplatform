@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
 import androidx.test.filters.FlakyTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -53,6 +54,7 @@ class InputModeTest(private val param: Param) {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun initialInputMode() {
         // Arrange.
         rule.setContentWithInputManager {
@@ -64,6 +66,7 @@ class InputModeTest(private val param: Param) {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun switchToTouchModeProgrammatically() {
         // Arrange.
         rule.setContentWithInputManager {
@@ -92,6 +95,7 @@ class InputModeTest(private val param: Param) {
 
     @FlakyTest(bugId = 202524920)
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun switchToKeyboardModeProgrammatically() {
         // Arrange.
         val testTag = "Box"

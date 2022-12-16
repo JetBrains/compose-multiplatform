@@ -75,6 +75,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -620,6 +621,7 @@ class ToggleableTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_interactionSource_focus_inKeyboardMode() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -820,6 +822,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithEnterKey() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
@@ -848,6 +851,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithNumPadEnterKey() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
@@ -876,6 +880,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithDpadCenter() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
@@ -904,6 +909,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithEnterKey_triStateToggleable() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
@@ -932,6 +938,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_enterKey_emitsIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -978,6 +985,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_numPadEnterKey_emitsIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -1024,6 +1032,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_dpadCenter_emitsIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -1107,6 +1116,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_doubleEnterKey_emitsFurtherInteractions() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -1167,6 +1177,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -1226,6 +1237,7 @@ class ToggleableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_interruptedClick_emitsCancelIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
