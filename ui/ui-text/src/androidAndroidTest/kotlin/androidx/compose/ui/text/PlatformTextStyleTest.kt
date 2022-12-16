@@ -98,6 +98,26 @@ class PlatformTextStyleTest {
     }
 
     @Test
+    fun merge_platformStyle_handlesEmoji() {
+        val style = TextStyle(
+            platformStyle = PlatformTextStyle(
+                emojiSupportMatch = EmojiSupportMatch.None
+            )
+        )
+        val otherStyle = TextStyle(
+            platformStyle = PlatformTextStyle(
+                emojiSupportMatch = EmojiSupportMatch.Default
+            )
+        )
+
+        val mergedStyle = style.merge(otherStyle)
+
+        assertThat(mergedStyle.platformStyle?.paragraphStyle?.emojiSupportMatch).isEqualTo(
+            EmojiSupportMatch.Default
+        )
+    }
+
+    @Test
     fun merge_platformStyle_true_on_false_on() {
         val style = TextStyle(
             platformStyle = PlatformTextStyle(

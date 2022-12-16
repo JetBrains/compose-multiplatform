@@ -86,6 +86,17 @@ package androidx.compose.ui.text {
     method public static inline <R> R withStyle(androidx.compose.ui.text.AnnotatedString.Builder, androidx.compose.ui.text.ParagraphStyle style, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.AnnotatedString.Builder,? extends R> block);
   }
 
+  @kotlin.jvm.JvmInline public final value class EmojiSupportMatch {
+    field public static final androidx.compose.ui.text.EmojiSupportMatch.Companion Companion;
+  }
+
+  public static final class EmojiSupportMatch.Companion {
+    method public int getDefault();
+    method public int getNone();
+    property public final int Default;
+    property public final int None;
+  }
+
   public final class JvmAnnotatedString_jvmKt {
   }
 
@@ -284,8 +295,13 @@ package androidx.compose.ui.text {
 
   public final class PlatformParagraphStyle {
     ctor @Deprecated public PlatformParagraphStyle(optional boolean includeFontPadding);
+    ctor @Deprecated public PlatformParagraphStyle(optional int emojiSupportMatch, optional boolean includeFontPadding);
+    ctor public PlatformParagraphStyle(optional int emojiSupportMatch);
+    method public int getEmojiSupportMatch();
     method @Deprecated public boolean getIncludeFontPadding();
     method public androidx.compose.ui.text.PlatformParagraphStyle merge(androidx.compose.ui.text.PlatformParagraphStyle? other);
+    method public void setEmojiSupportMatch(int);
+    property public final int emojiSupportMatch;
     property @Deprecated public final boolean includeFontPadding;
     field public static final androidx.compose.ui.text.PlatformParagraphStyle.Companion Companion;
   }
@@ -309,6 +325,7 @@ package androidx.compose.ui.text {
   public final class PlatformTextStyle {
     ctor public PlatformTextStyle(androidx.compose.ui.text.PlatformSpanStyle? spanStyle, androidx.compose.ui.text.PlatformParagraphStyle? paragraphStyle);
     ctor @Deprecated public PlatformTextStyle(optional boolean includeFontPadding);
+    ctor public PlatformTextStyle(int emojiSupportMatch);
     method public androidx.compose.ui.text.PlatformParagraphStyle? getParagraphStyle();
     method public androidx.compose.ui.text.PlatformSpanStyle? getSpanStyle();
     property public final androidx.compose.ui.text.PlatformParagraphStyle? paragraphStyle;

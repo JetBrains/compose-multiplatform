@@ -69,6 +69,16 @@ actual class PlatformTextStyle {
         spanStyle = null
     )
 
+    /**
+     * Set EmojiMatchSupport on [PlatformParagraphStyle]
+     */
+    constructor(
+        emojiSupportMatch: EmojiSupportMatch
+    ) : this(
+        paragraphStyle = PlatformParagraphStyle(emojiSupportMatch),
+        spanStyle = null
+    )
+
     override fun hashCode(): Int {
         var result = spanStyle?.hashCode() ?: 0
         result = 31 * result + (paragraphStyle?.hashCode() ?: 0)
@@ -111,34 +121,57 @@ actual class PlatformParagraphStyle {
     @Deprecated("Sets includeFontPadding parameter for transitioning. Will be removed.")
     val includeFontPadding: Boolean
 
+    var emojiSupportMatch: EmojiSupportMatch
+
     @Deprecated("Provides configuration options for behavior compatibility.")
     constructor(includeFontPadding: Boolean = DefaultIncludeFontPadding) {
         this.includeFontPadding = includeFontPadding
+        this.emojiSupportMatch = EmojiSupportMatch.Default
     }
 
-    constructor() : this(includeFontPadding = DefaultIncludeFontPadding)
+    @Deprecated("Provides configuration options for behavior compatibility.")
+    constructor(
+        emojiSupportMatch: EmojiSupportMatch = EmojiSupportMatch.Default,
+        includeFontPadding: Boolean = DefaultIncludeFontPadding
+    ) {
+        this.includeFontPadding = includeFontPadding
+        this.emojiSupportMatch = emojiSupportMatch
+    }
+
+    constructor(emojiSupportMatch: EmojiSupportMatch = EmojiSupportMatch.Default) {
+        this.includeFontPadding = DefaultIncludeFontPadding
+        this.emojiSupportMatch = emojiSupportMatch
+    }
+
+    constructor() : this(
+        includeFontPadding = DefaultIncludeFontPadding,
+        emojiSupportMatch = EmojiSupportMatch.Default
+    )
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is PlatformParagraphStyle) return false
         if (includeFontPadding != other.includeFontPadding) return false
+        if (emojiSupportMatch != other.emojiSupportMatch) return false
         return true
     }
 
     override fun hashCode(): Int {
-        return includeFontPadding.hashCode()
+        var result = includeFontPadding.hashCode()
+        result = 31 * result + emojiSupportMatch.hashCode()
+        return result
     }
 
     override fun toString(): String {
         return "PlatformParagraphStyle(" +
-            "includeFontPadding=$includeFontPadding" +
+            "includeFontPadding=$includeFontPadding, " +
+            "emojiSupportMatch=$emojiSupportMatch" +
         ")"
     }
 
     actual fun merge(other: PlatformParagraphStyle?): PlatformParagraphStyle {
         if (other == null) return this
-        // this should be AndroidParagraphConfig(param1=..., param2=...) when a new param is added.
-        // right now it is not needed to create a copy
+        // merge strategy is simple overwrite for current params, update if a optional param happens
         return other
     }
 }
@@ -193,6 +226,11 @@ actual fun lerp(
     if (start.includeFontPadding == stop.includeFontPadding) return start
 
     return PlatformParagraphStyle(
+        emojiSupportMatch = lerpDiscrete(
+            start.emojiSupportMatch,
+            stop.emojiSupportMatch,
+            fraction
+        ),
         includeFontPadding = lerpDiscrete(
             start.includeFontPadding,
             stop.includeFontPadding,
