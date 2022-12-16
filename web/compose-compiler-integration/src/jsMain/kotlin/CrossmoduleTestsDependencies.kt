@@ -93,3 +93,15 @@ class ClassSavesStringAndComposableIntoVar(
 val GlobalComposableLambdaToShowText: @Composable (text: () -> String) -> Unit = {
     Text(it())
 }
+
+
+// Should be Stable
+sealed interface StableSealedInterface {
+    object A : StableSealedInterface
+    object B : StableSealedInterface
+    object C : StableSealedInterface
+}
+
+data class StableDataClass(val abc: Int)
+data class StableClass(val abc: Int)
+class StableTypedClass<T>(val abc: T)
