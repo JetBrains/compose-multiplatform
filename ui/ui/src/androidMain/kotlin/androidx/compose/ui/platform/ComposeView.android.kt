@@ -335,6 +335,28 @@ abstract class AbstractComposeView @JvmOverloads constructor(
         getChildAt(0)?.layoutDirection = layoutDirection
     }
 
+    // Transition group handling:
+    // Both the framework and androidx transition APIs use isTransitionGroup as a signal for
+    // determining view properties to capture during a transition. As AbstractComposeView uses
+    // a view subhierarchy to perform its work but operates as a single unit, mark instances as
+    // transition groups by default.
+    // This is implemented as overridden methods instead of setting isTransitionGroup = true in
+    // the constructor so that values set explicitly by xml inflation performed by the ViewGroup
+    // constructor will take precedence. As of this writing all known framework implementations
+    // use the public isTransitionGroup method rather than checking the internal ViewGroup flag
+    // to determine behavior, making this implementation a slight compatibility risk for a
+    // tradeoff of cleaner View-consumer API behavior without the overhead of performing an
+    // additional obtainStyledAttributes call to determine a value potentially overridden from xml.
+
+    private var isTransitionGroupSet = false
+
+    override fun isTransitionGroup(): Boolean = !isTransitionGroupSet || super.isTransitionGroup()
+
+    override fun setTransitionGroup(isTransitionGroup: Boolean) {
+        super.setTransitionGroup(isTransitionGroup)
+        isTransitionGroupSet = true
+    }
+
     // Below: enforce restrictions on adding child views to this ViewGroup
 
     override fun addView(child: View?) {
