@@ -124,6 +124,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         /** Virtual node identifier value for invalid nodes. */
         const val InvalidId = Integer.MIN_VALUE
         const val ClassName = "android.view.View"
+        const val TextFieldClassName = "android.widget.EditText"
+        const val TextClassName = "android.widget.TextView"
         const val LogTag = "AccessibilityDelegate"
         const val ExtraDataTestTagKey = "androidx.compose.ui.semantics.testTag"
 
@@ -291,7 +293,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
      */
     @VisibleForTesting
     internal class SemanticsNodeCopy(
-        semanticsNode: SemanticsNode,
+        val semanticsNode: SemanticsNode,
         currentSemanticsNodes: Map<Int, SemanticsNodeWithAdjustedBounds>
     ) {
         val unmergedConfig = semanticsNode.unmergedConfig
@@ -523,10 +525,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
         if (semanticsNode.isTextField) {
-            info.className = "android.widget.EditText"
+            info.className = TextFieldClassName
         }
         if (semanticsNode.config.contains(SemanticsProperties.Text)) {
-            info.className = "android.widget.TextView"
+            info.className = TextClassName
         }
 
         info.packageName = view.context.packageName
@@ -1200,7 +1202,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         fromIndex: Int?,
         toIndex: Int?,
         itemCount: Int?,
-        text: String?
+        text: CharSequence?
     ): AccessibilityEvent {
         return createEvent(
             virtualViewId,
@@ -2042,10 +2044,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                         )
                     }
                     SemanticsProperties.EditableText -> {
-                        // TODO(b/160184953) Add test for SemanticsProperty Text change event
                         if (newNode.isTextField) {
+
                             val oldText = oldNode.unmergedConfig.getTextForTextField() ?: ""
                             val newText = newNode.unmergedConfig.getTextForTextField() ?: ""
+                            val trimmedNewText = trimToSize(newText, ParcelSafeTextLength)
+
                             var startCount = 0
                             // endCount records how many characters are the same from the end.
                             var endCount = 0
@@ -2070,16 +2074,53 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                             }
                             val removedCount = oldTextLen - endCount - startCount
                             val addedCount = newTextLen - endCount - startCount
-                            val textChangeEvent = createEvent(
-                                semanticsNodeIdToAccessibilityVirtualNodeId(id),
-                                AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
-                            )
-                            textChangeEvent.fromIndex = startCount
-                            textChangeEvent.removedCount = removedCount
-                            textChangeEvent.addedCount = addedCount
-                            textChangeEvent.beforeText = oldText
-                            textChangeEvent.text.add(trimToSize(newText, ParcelSafeTextLength))
-                            sendEvent(textChangeEvent)
+
+                            // (b/247891690) We won't send a text change event when we only toggle
+                            // the password visibility of the node
+                            val becamePasswordNode = oldNode.semanticsNode.isTextField &&
+                                !oldNode.semanticsNode.isPassword && newNode.isPassword
+                            val becameNotPasswordNode = oldNode.semanticsNode.isTextField &&
+                                oldNode.semanticsNode.isPassword && !newNode.isPassword
+                            val event = if (becamePasswordNode || becameNotPasswordNode) {
+                                // (b/247891690) password visibility toggle is handled by a
+                                // selection event. Because internally Talkback already has the
+                                // correct cursor position, there will be no announcement.
+                                // Therefore we first send the "cursor reset" event with the
+                                // selection at (0, 0) and right after that we will send the event
+                                // with the correct cursor position. This behaves similarly to the
+                                // View-based material EditText which also sends two selection
+                                // events
+                                createTextSelectionChangedEvent(
+                                    virtualViewId = semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                                    fromIndex = 0,
+                                    toIndex = 0,
+                                    itemCount = newTextLen,
+                                    text = trimmedNewText
+                                )
+                            } else {
+                                createEvent(
+                                    semanticsNodeIdToAccessibilityVirtualNodeId(id),
+                                    AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
+                                ).apply {
+                                    this.fromIndex = startCount
+                                    this.removedCount = removedCount
+                                    this.addedCount = addedCount
+                                    this.beforeText = oldText
+                                    this.text.add(trimmedNewText)
+                                }
+                            }
+                            event.className = TextFieldClassName
+                            sendEvent(event)
+
+                            // (b/247891690) second event with the correct cursor position (see
+                            // comment above for more details)
+                            if (becamePasswordNode || becameNotPasswordNode) {
+                                val textRange =
+                                    newNode.unmergedConfig[SemanticsProperties.TextSelectionRange]
+                                event.fromIndex = textRange.start
+                                event.toIndex = textRange.end
+                                sendEvent(event)
+                            }
                         } else {
                             sendEventForVirtualView(
                                 semanticsNodeIdToAccessibilityVirtualNodeId(id),

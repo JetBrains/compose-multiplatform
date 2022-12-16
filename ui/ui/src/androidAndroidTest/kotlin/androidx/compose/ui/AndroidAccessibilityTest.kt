@@ -87,6 +87,7 @@ import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.ClassName
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.InvalidId
+import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextFieldClassName
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToMap
@@ -1408,6 +1409,7 @@ class AndroidAccessibilityTest {
             textFieldNode.id,
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
         )
+        textEvent.className = TextFieldClassName
         textEvent.fromIndex = initialText.length
         textEvent.removedCount = 0
         textEvent.addedCount = text.length - initialText.length
