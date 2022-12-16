@@ -89,12 +89,10 @@ internal class ViewLayer(
 
     init {
         setWillNotDraw(false) // we WILL draw
-        id = generateViewId()
         container.addView(this)
     }
 
-    override val layerId: Long
-        get() = id.toLong()
+    override val layerId: Long = generateViewId().toLong()
 
     override val ownerViewId: Long
         get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
