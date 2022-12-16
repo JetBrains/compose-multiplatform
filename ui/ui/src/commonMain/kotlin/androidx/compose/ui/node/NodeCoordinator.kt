@@ -933,12 +933,9 @@ internal abstract class NodeCoordinator(
      * recreated.
      */
     open fun detach() {
-        onLayerBlockUpdated(layerBlock)
-        // The layer has been removed and we need to invalidate the containing layer. We've lost
-        // which layer contained this one, but all layers in this modifier chain will be invalidated
-        // in onModifierChanged(). Therefore the only possible layer that won't automatically be
-        // invalidated is the parent's layer. We'll invalidate it here:
-        layoutNode.parent?.invalidateLayer()
+        if (layer != null) {
+            onLayerBlockUpdated(null)
+        }
     }
 
     /**
