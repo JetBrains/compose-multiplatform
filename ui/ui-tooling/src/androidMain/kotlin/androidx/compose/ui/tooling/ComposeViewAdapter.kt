@@ -43,6 +43,7 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.LocalFontLoader
@@ -51,6 +52,7 @@ import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.tooling.animation.AnimationSearch
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.data.Group
+import androidx.compose.ui.tooling.data.NodeGroup
 import androidx.compose.ui.tooling.data.SourceLocation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.data.asTree
@@ -89,7 +91,8 @@ data class ViewInfo(
     val lineNumber: Int,
     val bounds: IntRect,
     val location: SourceLocation?,
-    val children: List<ViewInfo>
+    val children: List<ViewInfo>,
+    val layoutInfo: Any?
 ) {
     fun hasBounds(): Boolean = bounds.bottom != 0 && bounds.right != 0
 
@@ -201,6 +204,8 @@ internal class ComposeViewAdapter : FrameLayout {
      */
     private var onDraw = {}
 
+    internal var stitchTrees = true
+
     private val debugBoundsPaint = Paint().apply {
         pathEffect = DashPathEffect(floatArrayOf(5f, 10f, 15f, 20f), 0f)
         style = Paint.Style.STROKE
@@ -221,11 +226,6 @@ internal class ComposeViewAdapter : FrameLayout {
         init(attrs)
     }
 
-    private fun walkTable(viewInfo: ViewInfo, indent: Int = 0) {
-        Log.d(TAG, ("|  ".repeat(indent)) + "|-$viewInfo")
-        viewInfo.children.forEach { walkTable(it, indent + 1) }
-    }
-
     private val Group.fileName: String
         get() = location?.sourceFile ?: ""
 
@@ -242,10 +242,16 @@ internal class ComposeViewAdapter : FrameLayout {
      * Returns true if this [Group] has no source position information and no children
      */
     private fun Group.isNullGroup(): Boolean =
-        hasNullSourcePosition() && children.isEmpty()
+        hasNullSourcePosition() &&
+            children.isEmpty() &&
+            ((this as? NodeGroup)?.node as? LayoutInfo) == null
 
     private fun Group.toViewInfo(): ViewInfo {
-        if (children.size == 1 && hasNullSourcePosition()) {
+        val layoutInfo = ((this as? NodeGroup)?.node as? LayoutInfo)
+
+        if (children.size == 1 &&
+            hasNullSourcePosition() &&
+            layoutInfo == null) {
             // There is no useful information in this intermediate node, remove.
             return children.single().toViewInfo()
         }
@@ -260,7 +266,8 @@ internal class ComposeViewAdapter : FrameLayout {
             location?.lineNumber ?: -1,
             box,
             location,
-            childrenViewInfo
+            childrenViewInfo,
+            layoutInfo
         )
     }
 
@@ -268,12 +275,18 @@ internal class ComposeViewAdapter : FrameLayout {
      * Processes the recorded slot table and re-generates the [viewInfos] attribute.
      */
     private fun processViewInfos() {
-        viewInfos = slotTableRecord.store.map { it.asTree() }.map { it.toViewInfo() }.toList()
+        val newViewInfos = slotTableRecord
+            .store
+            .map { it.asTree().toViewInfo() }
+            .toList()
+
+        viewInfos = if (stitchTrees)
+            stitchTrees(newViewInfos)
+        else newViewInfos
 
         if (debugViewInfos) {
-            viewInfos.forEach {
-                walkTable(it)
-            }
+            val debugString = viewInfos.toDebugString()
+            Log.d(TAG, debugString)
         }
     }
 

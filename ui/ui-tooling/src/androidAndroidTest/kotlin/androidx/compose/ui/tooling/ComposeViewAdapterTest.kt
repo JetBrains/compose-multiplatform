@@ -122,6 +122,87 @@ class ComposeViewAdapterTest {
     }
 
     @Test
+    fun lazyColumn() {
+        run {
+            composeViewAdapter.stitchTrees = false
+            val viewInfos = assertRendersCorrectly(
+                "androidx.compose.ui.tooling.LazyColumnPreviewKt",
+                "SimpleLazyComposablePreview"
+            )
+
+            assertEquals(
+                """
+                    |<root>
+                    .|LazyColumnPreview.kt:35
+                    |<root>
+                    .|LazyColumnPreview.kt:35
+                    |<root>
+                    .|LazyColumnPreview.kt:35
+                    |<root>
+                    .|LazyColumnPreview.kt:31
+                    ..|LazyColumnPreview.kt:32
+                """.trimIndent(),
+                viewInfos.toDebugString {
+                it.fileName == "LazyColumnPreview.kt"
+            }.trimIndent())
+        }
+
+        run {
+            composeViewAdapter.stitchTrees = true
+            val viewInfos = assertRendersCorrectly(
+                "androidx.compose.ui.tooling.LazyColumnPreviewKt",
+                "SimpleLazyComposablePreview"
+            )
+
+            assertEquals(
+                1,
+                viewInfos.size
+            )
+            assertEquals(
+                """
+                    |<root>
+                    .|LazyColumnPreview.kt:31
+                    ..|LazyColumnPreview.kt:32
+                    ...|LazyColumnPreview.kt:35
+                    ...|LazyColumnPreview.kt:35
+                    ...|LazyColumnPreview.kt:35
+                """.trimIndent(),
+                viewInfos.toDebugString() {
+                    it.fileName == "LazyColumnPreview.kt"
+                }.trimIndent())
+        }
+    }
+
+    @Test
+    fun complexTreeStitchLazyColumn() {
+        run {
+            composeViewAdapter.stitchTrees = true
+            val viewInfos = assertRendersCorrectly(
+                "androidx.compose.ui.tooling.LazyColumnPreviewKt",
+                "ComplexLazyComposablePreview"
+            )
+
+            assertEquals(1, viewInfos.size)
+            assertEquals(
+                """
+                    |<root>
+                    .|LazyColumnPreview.kt:45
+                    ..|LazyColumnPreview.kt:46
+                    ...|LazyColumnPreview.kt:49
+                    ...|LazyColumnPreview.kt:50
+                    ....|LazyColumnPreview.kt:53
+                    .....|LazyColumnPreview.kt:54
+                    ....|LazyColumnPreview.kt:53
+                    .....|LazyColumnPreview.kt:54
+                """.trimIndent(),
+                viewInfos.toDebugString() {
+                    it.fileName == "LazyColumnPreview.kt"
+                }.trimIndent()
+            )
+        }
+    }
+
+    @Test
     fun animatedVisibilityIsTracked() {
         val clock = PreviewAnimationClock()
 
