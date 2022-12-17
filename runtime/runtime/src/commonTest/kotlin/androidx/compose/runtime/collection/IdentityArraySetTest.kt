@@ -19,8 +19,10 @@ package androidx.compose.runtime.collection
 import androidx.compose.runtime.identityHashCode
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlin.test.assertFailsWith
 import kotlin.test.assertFalse
 import kotlin.test.assertNotEquals
+import kotlin.test.assertNotNull
 import kotlin.test.assertNotSame
 import kotlin.test.assertNull
 import kotlin.test.assertTrue
@@ -34,6 +36,28 @@ class IdentityArraySetTest {
     fun emptyConstruction() {
         val s = IdentityArraySet<Stuff>()
         assertEquals(0, s.size)
+    }
+
+    @Test
+    fun get_indexWithinBounds_shouldNotThrow() {
+        list.forEach { set.add(it) }
+
+        assertNotNull(set.get(0))
+    }
+
+    @Test
+    fun get_indexOutOfBounds_shouldThrow() {
+        list.forEach { set.add(it) }
+
+        // Index less than 0
+        assertFailsWith<IndexOutOfBoundsException> {
+            set.get(-1)
+        }
+
+        // Index greater than size
+        assertFailsWith<IndexOutOfBoundsException> {
+            set.get(list.size + 1)
+        }
     }
 
     @Test
