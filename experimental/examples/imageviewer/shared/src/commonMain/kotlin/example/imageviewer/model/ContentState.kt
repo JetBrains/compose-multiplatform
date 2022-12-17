@@ -20,6 +20,7 @@ data class ContentStateData(
     val miniatures: Miniatures = Miniatures(),
     val origin: ImageBitmap? = null,
     val picture: Picture = Picture(image = createEmptyBitmap()),
+    val scale: Float = 1f,
 )
 
 interface Notification {

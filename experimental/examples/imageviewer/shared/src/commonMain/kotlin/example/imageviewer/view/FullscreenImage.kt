@@ -153,28 +153,6 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
 }
 
 @Composable
-fun Image(content: ContentState) {
-    val drag = remember { DragHandler() }
-    val scale = remember { ScaleHandler() }
-
-    Surface(
-        color = DarkGray,
-        modifier = Modifier.fillMaxSize()
-    ) {
-        Draggable(dragHandler = drag, modifier = Modifier.fillMaxSize()) {
-            Scalable(onScale = scale, modifier = Modifier.fillMaxSize()) {
-                val bitmap = imageByGesture(content, scale, drag)
-                Image(
-                    bitmap = bitmap,
-                    contentDescription = null,
-                    contentScale = adjustImageScale(bitmap)
-                )
-            }
-        }
-    }
-}
-
-@Composable
 fun imageByGesture(
     content: ContentState,
     scale: ScaleHandler,

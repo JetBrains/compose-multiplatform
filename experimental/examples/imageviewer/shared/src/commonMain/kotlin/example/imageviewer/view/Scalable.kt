@@ -4,9 +4,10 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import example.imageviewer.model.ContentStateData
 import example.imageviewer.style.Transparent
 
 @Composable
@@ -28,20 +29,34 @@ fun Scalable(
     }
 }
 
-class ScaleHandler(private val maxFactor: Float = 5f, private val minFactor: Float = 1f) {
-    val factor = mutableStateOf(1f)
-
+class ScaleHandler(
+    private val state: MutableState<ContentStateData>,
+    private val maxFactor: Float = 5f,
+    private val minFactor: Float = 1f
+) {
     fun reset() {
-        if (factor.value > minFactor)
-            factor.value = minFactor
+        if (state.value.scale > minFactor) {
+            state.value = state.value.copy(
+                scale = minFactor
+            )
+        }
     }
 
     fun onScale(scaleFactor: Float): Float {
-        factor.value += scaleFactor - 1f
+        state.value = state.value.copy(
+            scale = state.value.scale + scaleFactor - 1f
+        )
 
-        if (maxFactor < factor.value) factor.value = maxFactor
-        if (minFactor > factor.value) factor.value = minFactor
-
+        if (maxFactor < state.value.scale) {
+            state.value = state.value.copy(
+                scale = maxFactor
+            )
+        }
+        if (minFactor > state.value.scale) {
+            state.value = state.value.copy(
+                scale = minFactor
+            )
+        }
         return scaleFactor
     }
 }

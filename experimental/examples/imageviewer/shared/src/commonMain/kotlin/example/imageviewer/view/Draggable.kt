@@ -37,8 +37,8 @@ fun Draggable(
 
 class DragHandler {
 
-    private val amount = mutableStateOf(Point(0f, 0f))
-    private val distance = mutableStateOf(Point(0f, 0f))
+    private val amount = mutableStateOf(Point(0f, 0f))//todo state
+    private val distance = mutableStateOf(Point(0f, 0f))//todo
     private val locker: EventLocker = EventLocker()
 
     fun getAmount(): Point {
