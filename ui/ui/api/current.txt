@@ -2808,12 +2808,14 @@ package androidx.compose.ui.semantics {
   public static final class Role.Companion {
     method public int getButton();
     method public int getCheckbox();
+    method public int getDropdownList();
     method public int getImage();
     method public int getRadioButton();
     method public int getSwitch();
     method public int getTab();
     property public final int Button;
     property public final int Checkbox;
+    property public final int DropdownList;
     property public final int Image;
     property public final int RadioButton;
     property public final int Switch;

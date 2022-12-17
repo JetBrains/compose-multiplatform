@@ -65,7 +65,13 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -132,6 +138,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -279,6 +286,46 @@ class AndroidAccessibilityTest {
             }
         }
         assertEquals("On", stateDescription)
+        assertTrue(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forDropdown() {
+        val options = listOf("Option1", "Option2", "Option3", "Option4", "Option5")
+        val tag = "Dropdown"
+        container.setContent {
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(
+                modifier = Modifier
+                    .semantics { role = Role.DropdownList }
+                    .testTag(tag),
+                onClick = { expanded = true }) {
+                Icon(Icons.Default.MoreVert, null)
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                offset = DpOffset(24.dp, 0.dp),
+            ) {
+                options.forEach {
+                    DropdownMenuItem(onClick = {}) {
+                        Text(it)
+                    }
+                }
+            }
+        }
+
+        val dropdownIcon = rule.onNodeWithTag(tag, true)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(dropdownIcon.id)!!
+
+        assertEquals("android.widget.Spinner", accessibilityNodeInfo.className)
         assertTrue(accessibilityNodeInfo.isClickable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
         assertTrue(
