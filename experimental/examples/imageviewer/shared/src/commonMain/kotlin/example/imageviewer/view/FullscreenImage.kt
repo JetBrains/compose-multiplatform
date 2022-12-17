@@ -157,7 +157,7 @@ fun imageByGesture(
     content: ContentState,
     scale: ScaleHandler,
     drag: DragHandler
-): ImageBitmap {
+): ImageBitmap? {
     return content.getSelectedImage()
 //    val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)//todo crop
 //

@@ -22,13 +22,17 @@ import example.imageviewer.style.DarkGray
 import example.imageviewer.utils.cropBitmapByBounds
 import example.imageviewer.utils.cropImage
 import example.imageviewer.utils.getDisplayBounds
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.orEmpty
+import org.jetbrains.compose.resources.rememberImageBitmap
+import org.jetbrains.compose.resources.resource
 import org.jetbrains.skia.Bitmap
 import java.awt.Rectangle
 import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
 @Composable
 actual fun Image(content: ContentState) {
     val drag = remember { DragHandler() }
@@ -76,7 +80,7 @@ actual fun Image(content: ContentState) {
                     }
             ) {
                 Image(
-                    bitmap = content.getSelectedImage(),
+                    bitmap = content.getSelectedImage() ?: resource("empty.png").rememberImageBitmap().orEmpty(),
                     contentDescription = null,
                     contentScale = ContentScale.Fit
                 )

@@ -91,11 +91,7 @@ fun PreviewImage(content: ContentState) {
             elevation = 1.dp
         ) {
             Image(
-                bitmap = if (content.isMainImageEmpty()) {
-                    resource("empty.png").rememberImageBitmap().orEmpty()
-                } else {
-                    content.getSelectedImage()
-                },
+                bitmap = content.getSelectedImage() ?: resource("empty.png").rememberImageBitmap().orEmpty(),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),

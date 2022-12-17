@@ -15,11 +15,14 @@ val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 data class ContentStateData(
     val filterUIState: Set<FilterType> = emptySet(),
     val isContentReady: Boolean = false,
-    val mainImage: ImageBitmap = createEmptyBitmap(),
+    val mainImage: ImageBitmap? = null,
     val currentImageIndex: Int = 0,
     val miniatures: Miniatures = Miniatures(),
+    /**
+     * Image without filters
+     */
     val origin: ImageBitmap? = null,
-    val picture: Picture = Picture(image = createEmptyBitmap()),
+    val picture: Picture? = null,
     val scale: Float = 1f,
 )
 
@@ -44,7 +47,7 @@ class ContentState(
     val state: MutableState<ContentStateData>,
     val dependencies: Dependencies
 ) {
-    fun getSelectedImage(): ImageBitmap = state.value.mainImage
+    fun getSelectedImage(): ImageBitmap? = state.value.mainImage
     fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
 
     private fun applyFilters(bitmap: ImageBitmap): ImageBitmap {
@@ -86,15 +89,7 @@ class ContentState(
                     )
                     withContext(Dispatchers.Main) {
                         state.value.miniatures.setMiniatures(pictureList)
-
-                        if (isMainImageEmpty()) {
-                            wrapPictureIntoMainImage(picture)
-                        } else {
-                            state.value = state.value.copy(
-                                mainImage = getImage(),
-                                currentImageIndex = getId()
-                            )
-                        }
+                        wrapPictureIntoMainImage(picture)
                         onContentReady()
                     }
                 }
@@ -148,11 +143,6 @@ class ContentState(
         )
     }
 
-    // preview/fullscreen image managing
-    fun isMainImageEmpty(): Boolean {
-        return isEmpty()
-    }
-
     fun fullscreen(picture: Picture) {
         state.value = state.value.copy(isContentReady = false)
         AppState.screenState(ScreenType.FullscreenImage)
@@ -160,7 +150,7 @@ class ContentState(
     }
 
     fun setMainImage(picture: Picture) {
-        if (getId() == picture.id) {
+        if (state.value.picture == picture) {
             if (!state.value.isContentReady)
                 onContentReady()
             return
@@ -170,8 +160,8 @@ class ContentState(
         backgroundScope.launch {
             if (isInternetAvailable()) {
                 val fullSizePicture = Picture(
-                    picture.source,
-                    dependencies.imageRepository.loadContent(NetworkRequest(picture.source))
+                    picture.url,
+                    dependencies.imageRepository.loadContent(NetworkRequest(picture.url))
                 )
                 withContext(Dispatchers.Main) {
                     wrapPictureIntoMainImage(fullSizePicture)
@@ -196,8 +186,7 @@ class ContentState(
         wrapPicture(picture)
         saveOrigin()
         state.value = state.value.copy(
-            mainImage = picture.image,
-            currentImageIndex = picture.id
+            mainImage = picture.image
         )
     }
 
@@ -208,7 +197,7 @@ class ContentState(
         }
 
         restoreFilters()
-        val nextIndex = state.value.currentImageIndex + 1
+        val nextIndex = (state.value.currentImageIndex + 1) % state.value.miniatures.size()
         state.value = state.value.copy(
             currentImageIndex = nextIndex
         )
@@ -233,7 +222,6 @@ class ContentState(
         backgroundScope.launch {
             if (isInternetAvailable()) {
                 withContext(Dispatchers.Main) {
-//                    clearCache(cacheDirProvider())//todo
                     clear()
                     state.value = state.value.copy(
                         miniatures = Miniatures(),
@@ -253,7 +241,7 @@ class ContentState(
 
     private fun saveOrigin() {
         state.value = state.value.copy(
-            origin = state.value.picture.image
+            origin = state.value.picture?.image
         )
     }
 
@@ -262,7 +250,7 @@ class ContentState(
         if (origin != null) {
             state.value = state.value.copy(
                 filterUIState = emptySet(),
-                picture = state.value.picture.copy(
+                picture = state.value.picture?.copy(
                     image = origin
                 )
             )
@@ -278,32 +266,18 @@ class ContentState(
 
     private fun setImage(bitmap: ImageBitmap) {
         state.value = state.value.copy(
-            picture = state.value.picture.copy(
+            picture = state.value.picture?.copy(
                 image = bitmap
             )
         )
     }
 
-    private fun isEmpty(): Boolean {
-        return (state.value.picture.name == "")
-    }
-
     private fun clear() {
-        state.value = state.value.copy(
-            picture = Picture(image = createEmptyBitmap())
-        )
+        state.value = state.value.copy(picture = null)
     }
 
-    private fun getName(): String {
-        return state.value.picture.name
-    }
+    private fun getName(): String = state.value.picture?.name ?: "no picture"
 
-    private fun getImage(): ImageBitmap {
-        return state.value.picture.image
-    }
-
-    private fun getId(): Int {
-        return state.value.picture.id
-    }
+    private fun getImage() = state.value.picture?.image
 
 }
