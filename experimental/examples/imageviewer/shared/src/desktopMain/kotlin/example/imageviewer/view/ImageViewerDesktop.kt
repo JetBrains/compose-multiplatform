@@ -120,6 +120,7 @@ fun ApplicationScope.ImageViewerDesktop() {
                         }
                     }
                 })
+                Toast(message.value, toastState)
             }
         }
 //        } else {
@@ -138,7 +139,6 @@ fun ApplicationScope.ImageViewerDesktop() {
 //        }
     }
 
-    Toast(message.value, toastState)
 }
 
 fun showPopUpMessage(text: String) {
