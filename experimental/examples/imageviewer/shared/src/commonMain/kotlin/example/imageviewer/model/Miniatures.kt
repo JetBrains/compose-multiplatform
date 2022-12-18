@@ -16,43 +16,12 @@ package example.imageviewer.model
 
 import androidx.compose.ui.graphics.ImageBitmap
 
-
-data class NetworkRequest(
+data class NetworkRequest(//todo simplify to String
     val url: String
 )
 
-data class Picture(
-    val url: String,
-    val image: ImageBitmap
-)
+fun getNameURL(url: String): String = url.substring(url.lastIndexOf('/') + 1, url.length)
 
-fun getNameURL(url: String): String {
-    return url.substring(url.lastIndexOf('/') + 1, url.length)
-}
-val Picture.name get() = getNameURL(url)
-val Picture.width get():Int = image.width
-val Picture.height get():Int = image.height
-
-class Miniatures(
-    private var list: List<Picture> = emptyList()
-) {
-    fun get(index: Int): Picture {
-        return list[index]
-    }
-
-    fun getMiniatures(): List<Picture> {
-        return list.toList()
-    }
-
-    fun setMiniatures(list: List<Picture>) {
-        this.list = list.toList()
-    }
-
-    fun size(): Int {
-        return list.size
-    }
-
-    fun clear() {
-        list = emptyList()
-    }
-}
+val Picture.name get() = getNameURL(big)
+val Picture.width get():Int = 123//todo
+val Picture.height get():Int = 123//todo

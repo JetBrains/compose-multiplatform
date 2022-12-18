@@ -3,6 +3,7 @@ plugins {
     kotlin("native.cocoapods")
     id("com.android.library")
     id("org.jetbrains.compose")
+    kotlin("plugin.serialization")
 }
 
 version = "1.0-SNAPSHOT"
@@ -33,7 +34,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
-                
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
             }
         }
         val androidMain by getting {

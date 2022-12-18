@@ -8,23 +8,40 @@ import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.utils.ktorHttpClient
 import io.ktor.client.request.*
 import kotlinx.coroutines.*
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.builtins.ListSerializer
+import kotlinx.serialization.json.Json
 
-val IMAGES_DATA_URL = "https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/fetching.list"
+@Serializable
+data class Picture(val big: String, val small: String)
+val Picture.bigUrl get() = "$BASE_URL/$big"
+val Picture.smallUrl get() = "$BASE_URL/$small"
+
+val BASE_URL =
+    "https://raw.githubusercontent.com/JetBrains/compose-jb/dima-avdeev/add-uikit-to-imageviewer/artwork/imageviewerrepo"
+
+//todo dima-avdeev/add-uikit-to-imageviewer to master
+val PICTURES_DATA_URL = "$BASE_URL/pictures.json"
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
+val jsonReader = Json {
+    ignoreUnknownKeys = true
+}
+
+sealed interface ScreenState {
+    object Miniatures : ScreenState
+    object FullScreen : ScreenState
+}
 
 data class ContentStateData(
-    val filterUIState: Set<FilterType> = emptySet(),
-    val isContentReady: Boolean = false,
     val mainImage: ImageBitmap? = null,
     val currentImageIndex: Int = 0,
-    val miniatures: Miniatures = Miniatures(),
-    /**
-     * Image without filters
-     */
-    val origin: ImageBitmap? = null,
-    val picture: Picture? = null,
-    val scale: Float = 1f,
+    val miniatures: Map<Picture, ImageBitmap> = emptyMap(),
+    val pictures: List<Picture> = emptyList(),
+    val screen: ScreenState = ScreenState.Miniatures
 )
+
+val ContentStateData.isContentReady get() = pictures.isNotEmpty()
+val ContentStateData.picture get():Picture? = pictures.getOrNull(currentImageIndex)
 
 interface Notification {
     fun notifyInvalidRepo()
@@ -47,56 +64,32 @@ class ContentState(
     val state: MutableState<ContentStateData>,
     val dependencies: Dependencies
 ) {
-    fun getSelectedImage(): ImageBitmap? = state.value.mainImage
-    fun getMiniatures(): List<Picture> = state.value.miniatures.getMiniatures()
-
-    private fun applyFilters(bitmap: ImageBitmap): ImageBitmap {
-        var result = bitmap
-        for (filter in state.value.filterUIState.map { dependencies.getFilter(it) }) {
-            result = filter.apply(result)
-        }
-        return result
+    fun modifyState(changeState: ContentStateData.() -> ContentStateData) {
+        state.value = state.value.changeState()
     }
 
     fun initData() {
         backgroundScope.launch {
             try {
-                val imageList = ktorHttpClient.get<String>(IMAGES_DATA_URL).lines()
-
-                if (imageList.isEmpty()) {
-                    with(dependencies.notification) {
-                        notifyInvalidRepo()
-                    }
-                    onContentReady()
-                    return@launch
+                val pictures = jsonReader.decodeFromString(
+                    ListSerializer(Picture.serializer()),
+                    ktorHttpClient.get(PICTURES_DATA_URL)
+                )
+                modifyState {
+                    copy(pictures = pictures)
                 }
 
-                val pictureList: List<Picture> = imageList.map {
-                    async {
-                        Picture(it, dependencies.imageRepository.loadContent(NetworkRequest(it)))
-                    }
-                }.awaitAll()
-
-                if (pictureList.isEmpty()) {
-                    withContext(Dispatchers.Main) {
-                        dependencies.notification.notifyRepoIsEmpty()
-                        onContentReady()
-                    }
-                } else {
-                    val picture = Picture(
-                        imageList[0],
-                        dependencies.imageRepository.loadContent(NetworkRequest(imageList[0]))
-                    )
-                    withContext(Dispatchers.Main) {
-                        state.value.miniatures.setMiniatures(pictureList)
-                        wrapPictureIntoMainImage(picture)
-                        onContentReady()
+                pictures.forEach { picture ->
+                    launch {
+                        val pair = picture to dependencies.imageRepository.loadContent(NetworkRequest(picture.smallUrl))
+                        modifyState {
+                            copy(miniatures = miniatures + pair)
+                        }
                     }
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
                     dependencies.notification.notifyNoInternet()
-                    onContentReady()
                 }
             }
         }
@@ -106,102 +99,41 @@ class ContentState(
         return getName()
     }
 
-    private fun toggleFilterState(filter: FilterType) {
-        state.value = state.value.copy(
-            filterUIState = if (!state.value.filterUIState.contains(filter)) {
-                state.value.filterUIState + filter
-            } else {
-                state.value.filterUIState - filter
-            }
-        )
-    }
-
-    fun toggleFilter(filter: FilterType) {
-        toggleFilterState(filter)
-
-        var bitmap = state.value.origin
-
-        if (bitmap != null) {
-            bitmap = applyFilters(bitmap)
-            setImage(bitmap)
-            state.value = state.value.copy(mainImage = bitmap)
-        }
-    }
-
-    fun isFilterEnabled(type: FilterType): Boolean = state.value.filterUIState.contains(type)
-
-    private fun restoreFilters(): ImageBitmap {
-        state.value = state.value.copy(
-            filterUIState = emptySet()
-        )
-        return restore()
-    }
-
-    fun restoreMainImage() {
-        state.value = state.value.copy(
-            mainImage = restoreFilters()
-        )
-    }
-
     fun fullscreen(picture: Picture) {
-        state.value = state.value.copy(isContentReady = false)
-        AppState.screenState(ScreenType.FullscreenImage)
+        state.value = state.value.copy(
+            screen = ScreenState.FullScreen
+        )
         setMainImage(picture)
     }
 
     fun setMainImage(picture: Picture) {
-        if (state.value.picture == picture) {
-            if (!state.value.isContentReady)
-                onContentReady()
-            return
-        }
-        state.value = state.value.copy(isContentReady = false)
-
         backgroundScope.launch {
             if (isInternetAvailable()) {
-                val fullSizePicture = Picture(
-                    picture.url,
-                    dependencies.imageRepository.loadContent(NetworkRequest(picture.url))
-                )
-                withContext(Dispatchers.Main) {
-                    wrapPictureIntoMainImage(fullSizePicture)
-                    onContentReady()
+                val mainImage = dependencies.imageRepository.loadContent(NetworkRequest(picture.bigUrl))
+                modifyState {
+                    copy(
+                        mainImage = mainImage
+                    )
                 }
             } else {
                 withContext(Dispatchers.Main) {
                     dependencies.notification.notifyLoadImageUnavailable()
-                    wrapPictureIntoMainImage(picture)
                 }
             }
         }
     }
 
-    private fun onContentReady() {
-        state.value = state.value.copy(
-            isContentReady = true
-        )
-    }
-
-    private fun wrapPictureIntoMainImage(picture: Picture) {
-        wrapPicture(picture)
-        saveOrigin()
-        state.value = state.value.copy(
-            mainImage = picture.image
-        )
-    }
-
     fun swipeNext() {
-        if (state.value.currentImageIndex == state.value.miniatures.size() - 1) {
+        if (state.value.currentImageIndex == state.value.miniatures.size - 1) {
             dependencies.notification.notifyLastImage()
             return
         }
 
-        restoreFilters()
-        val nextIndex = (state.value.currentImageIndex + 1) % state.value.miniatures.size()
+        val nextIndex = (state.value.currentImageIndex + 1) % state.value.miniatures.size
         state.value = state.value.copy(
             currentImageIndex = nextIndex
         )
-        setMainImage(state.value.miniatures.get(nextIndex))
+        updateMainImage()
     }
 
     fun swipePrevious() {
@@ -210,23 +142,25 @@ class ContentState(
             return
         }
 
-        restoreFilters()
         val prevIndex = state.value.currentImageIndex - 1
         state.value = state.value.copy(
             currentImageIndex = prevIndex
         )
-        setMainImage(state.value.miniatures.get(prevIndex))
+        updateMainImage()
+    }
+
+    fun updateMainImage() {
+        val picture = state.value.picture
+        if (picture != null) {
+            setMainImage(picture)
+        }
     }
 
     fun refresh() {
         backgroundScope.launch {
             if (isInternetAvailable()) {
                 withContext(Dispatchers.Main) {
-                    clear()
-                    state.value = state.value.copy(
-                        miniatures = Miniatures(),
-                        isContentReady = false,
-                    )
+                    state.value = ContentStateData()
                     initData()
                 }
             } else {
@@ -239,45 +173,6 @@ class ContentState(
 
     fun isContentReady(): Boolean = state.value.isContentReady
 
-    private fun saveOrigin() {
-        state.value = state.value.copy(
-            origin = state.value.picture?.image
-        )
-    }
-
-    private fun restore(): ImageBitmap {
-        val origin = state.value.origin
-        if (origin != null) {
-            state.value = state.value.copy(
-                filterUIState = emptySet(),
-                picture = state.value.picture?.copy(
-                    image = origin
-                )
-            )
-        }
-        return origin!!//todo null check
-    }
-
-    private fun wrapPicture(picture: Picture) {
-        state.value = state.value.copy(
-            picture = picture
-        )
-    }
-
-    private fun setImage(bitmap: ImageBitmap) {
-        state.value = state.value.copy(
-            picture = state.value.picture?.copy(
-                image = bitmap
-            )
-        )
-    }
-
-    private fun clear() {
-        state.value = state.value.copy(picture = null)
-    }
-
     private fun getName(): String = state.value.picture?.name ?: "no picture"
-
-    private fun getImage() = state.value.picture?.image
 
 }

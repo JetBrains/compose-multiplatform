@@ -135,10 +135,10 @@ fun cropBitmapByBounds(
 
     if (leftOffset > invisibleW) {
         leftOffset = invisibleW.toFloat()
-        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
     }
     if (leftOffset < 0) {
-        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
         leftOffset = 0f
     }
 
@@ -147,10 +147,10 @@ fun cropBitmapByBounds(
 
     if (topOffset > invisibleH) {
         topOffset = invisibleH.toFloat()
-        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
     }
     if (topOffset < 0) {
-        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
         topOffset = 0f
     }
 

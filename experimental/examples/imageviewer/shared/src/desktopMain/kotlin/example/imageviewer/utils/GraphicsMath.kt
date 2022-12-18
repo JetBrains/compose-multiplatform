@@ -1,5 +1,6 @@
 package example.imageviewer.utils
 
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import java.awt.Dimension
@@ -119,14 +120,14 @@ fun cropBitmapByScale(
     bitmap: BufferedImage,
     size: DpSize,
     scale: Float,
-    drag: DragHandler
+    offset: Offset,
 ): BufferedImage {
     val crop = cropBitmapByBounds(
         bitmap,
         getDisplayBounds(bitmap, size),
         size,
         scale,
-        drag
+        offset,
     )
     return cropImage(
         bitmap,
@@ -139,7 +140,7 @@ fun cropBitmapByBounds(
     bounds: Rectangle,
     size: DpSize,
     scaleFactor: Float,
-    drag: DragHandler
+    offset:Offset
 ): Rectangle {
 
     if (scaleFactor <= 1f) {
@@ -153,8 +154,8 @@ fun cropBitmapByBounds(
 
     scale *= size.width.value / bounds.width.toDouble()
 
-    val offsetX = drag.getAmount().x / scale
-    val offsetY = drag.getAmount().y / scale
+    val offsetX = offset.x / scale
+    val offsetY = offset.y / scale
 
     if (boundW > bitmap.width) {
         boundW = bitmap.width
@@ -168,10 +169,10 @@ fun cropBitmapByBounds(
 
     if (leftOffset > invisibleW) {
         leftOffset = invisibleW
-        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().x = -((invisibleW / 2.0) * scale).roundToInt().toFloat()
     }
     if (leftOffset < 0) {
-        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().x = ((invisibleW / 2.0) * scale).roundToInt().toFloat()
         leftOffset = 0
     }
 
@@ -180,10 +181,10 @@ fun cropBitmapByBounds(
 
     if (topOffset > invisibleH) {
         topOffset = invisibleH
-        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().y = -((invisibleH / 2.0) * scale).roundToInt().toFloat()
     }
     if (topOffset < 0) {
-        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
+//        drag.getAmount().y = ((invisibleH / 2.0) * scale).roundToInt().toFloat()
         topOffset = 0
     }
 

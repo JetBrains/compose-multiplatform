@@ -3,9 +3,7 @@ package example.imageviewer.view
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -23,7 +21,6 @@ import example.imageviewer.style.Transparent
 fun Zoomable(
     scaleHandler: ScaleHandler,
     modifier: Modifier = Modifier,
-    onUpdate: (() -> Unit)? = null,
     children: @Composable() () -> Unit
 ) {
     val focusRequester = FocusRequester()
@@ -35,15 +32,12 @@ fun Zoomable(
                 when (it.key) {
                     Key.I -> {
                         scaleHandler.onScale(1.2f)
-                        onUpdate?.invoke()
                     } 
                     Key.O -> {
-                        scaleHandler.onScale(0.8f) 
-                        onUpdate?.invoke()
+                        scaleHandler.onScale(0.8f)
                     }
                     Key.R -> {
-                        scaleHandler.reset() 
-                        onUpdate?.invoke()
+                        scaleHandler.reset()
                     }
                 }
             }
@@ -60,8 +54,31 @@ fun Zoomable(
         children()
     }
 
-    DisposableEffect(Unit) {
+    LaunchedEffect(Unit) {
         focusRequester.requestFocus()
-        onDispose { }
+    }
+}
+
+class ScaleHandler(
+    private val scaleState: MutableState<Float>,
+    private val maxFactor: Float = 5f,
+    private val minFactor: Float = 1f
+) {
+    fun reset() {
+        if (scaleState.value > minFactor) {
+            scaleState.value = minFactor
+        }
+    }
+
+    fun onScale(scaleFactor: Float): Float {
+        scaleState.value = scaleState.value + scaleFactor - 1f
+
+        if (maxFactor < scaleState.value) {
+            scaleState.value = maxFactor
+        }
+        if (minFactor > scaleState.value) {
+            scaleState.value = minFactor
+        }
+        return scaleFactor
     }
 }

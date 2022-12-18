@@ -7,10 +7,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
-import androidx.compose.material.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -25,7 +25,26 @@ import org.jetbrains.compose.resources.resource
 fun MainScreen(content: ContentState) {
     Column {
         TopContent(content)
-        ScrollableArea(content)
+        Divider(color = LightGray, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
+        val scrollState = rememberScrollState()
+        Column(Modifier.verticalScroll(scrollState)) {
+            for (picture in content.state.value.pictures) {
+                Miniature(
+                    picture = picture,
+                    image = content.state.value.miniatures[picture],
+                    onClickSelect = {
+                        content.setMainImage(picture)
+                    },
+                    onClickFullScreen = {
+                        content.fullscreen(picture)
+                    },
+                    onClickInfo = {
+                        content.dependencies.notification.notifyImageData(picture)
+                    },
+                )
+                Spacer(modifier = Modifier.height(5.dp))
+            }
+        }
     }
     if (!content.isContentReady()) {
         LoadingScreen(content.dependencies.localization.loading)
@@ -36,9 +55,8 @@ fun MainScreen(content: ContentState) {
 fun TopContent(content: ContentState) {
     TitleBar(text = content.dependencies.localization.appName, content = content)
 //    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {//todo
-        PreviewImage(content)
-        Spacer(modifier = Modifier.height(10.dp))
-        Divider()
+    PreviewImage(content)
+    Spacer(modifier = Modifier.height(10.dp))
 //    }
     Spacer(modifier = Modifier.height(5.dp))
 }
@@ -82,7 +100,9 @@ fun TitleBar(text: String, content: ContentState) {
 @Composable
 fun PreviewImage(content: ContentState) {
     Clickable(onClick = {
-        AppState.screenState(ScreenType.FullscreenImage)
+        content.state.value = content.state.value.copy(
+            screen = ScreenState.FullScreen
+        )
     }) {
         Card(
             backgroundColor = DarkGray,
@@ -91,7 +111,7 @@ fun PreviewImage(content: ContentState) {
             elevation = 1.dp
         ) {
             Image(
-                bitmap = content.getSelectedImage() ?: resource("empty.png").rememberImageBitmap().orEmpty(),
+                bitmap = content.state.value.mainImage ?: resource("empty.png").rememberImageBitmap().orEmpty(),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
@@ -105,14 +125,17 @@ fun PreviewImage(content: ContentState) {
 @Composable
 fun Miniature(
     picture: Picture,
-    content: ContentState
+    image: ImageBitmap?,
+    onClickSelect: () -> Unit,
+    onClickFullScreen: () -> Unit,
+    onClickInfo: () -> Unit,
 ) {
     Card(
         backgroundColor = MiniatureColor,
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).height(70.dp)
             .fillMaxWidth()
             .clickable {
-                content.setMainImage(picture)
+                onClickSelect()
             },
         shape = RectangleShape,
         elevation = 2.dp
@@ -120,17 +143,25 @@ fun Miniature(
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Clickable(
                 onClick = {
-                    content.fullscreen(picture)
+                    onClickFullScreen()
                 }
             ) {
-                Image(
-                    picture.image,
-                    contentDescription = null,
-                    modifier = Modifier.height(70.dp)
-                        .width(90.dp)
-                        .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 1.dp),
-                    contentScale = ContentScale.Crop
-                )
+                val modifier = Modifier.height(70.dp)
+                    .width(90.dp)
+                    .padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 1.dp)
+                if (image != null) {
+                    Image(
+                        image,
+                        contentDescription = null,
+                        modifier = modifier,
+                        contentScale = ContentScale.Crop
+                    )
+                } else {
+                    CircularProgressIndicator(
+                        modifier = modifier,
+                        color = DarkGreen
+                    )
+                }
             }
             Text(
                 text = picture.name,
@@ -143,7 +174,7 @@ fun Miniature(
                 modifier = Modifier.height(70.dp)
                     .width(30.dp),
                 onClick = {
-                    content.dependencies.notification.notifyImageData(picture)
+                    onClickInfo()
                 }
             ) {
                 Image(
@@ -159,26 +190,3 @@ fun Miniature(
     }
 }
 
-@Composable
-fun ScrollableArea(content: ContentState) {
-    var index = 1
-    val scrollState = rememberScrollState()
-    Column(Modifier.verticalScroll(scrollState)) {
-        for (picture in content.getMiniatures()) {
-            Miniature(
-                picture = picture,
-                content = content
-            )
-            Spacer(modifier = Modifier.height(5.dp))
-            index++
-        }
-    }
-}
-
-@Composable
-fun Divider() {
-    Divider(
-        color = LightGray,
-        modifier = Modifier.padding(start = 10.dp, end = 10.dp)
-    )
-}

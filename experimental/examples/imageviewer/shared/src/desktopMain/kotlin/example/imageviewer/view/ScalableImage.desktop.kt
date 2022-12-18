@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
@@ -30,57 +32,48 @@ import javax.imageio.ImageIO
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
 @Composable
 actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swipePrevious: () -> Unit) {
-    val drag = remember { DragHandler() }
+    val scaleState = remember { mutableStateOf(1f) }
+    val scale = scaleState.value
     val size = LocalWindowSize.current
-    val onUpdate = remember {
-        {
-            if (image != null) {
-                content.state.value = content.state.value.copy(
-                    mainImage = org.jetbrains.skia.Image.makeFromEncoded(
-                        toByteArray(
-                            cropBitmapByScale(
-                                image.toAwtImage(),
-                                size,
-                                content.state.value.scale,
-                                drag
-                            )
-                        )
-                    ).toComposeImageBitmap()
+    val drag = remember { DragHandler() }
+
+    val modifiedImage: ImageBitmap = remember(image, scale, size) {
+        org.jetbrains.skia.Image.makeFromEncoded(
+            toByteArray(
+                cropBitmapByScale(
+                    image.toAwtImage(),
+                    size,
+                    scaleState.value,
+                    drag.getAmount()
                 )
-            }
-        }
+            )
+        ).toComposeImageBitmap()
     }
-    val scaleHandler = remember { ScaleHandler(content.state) }
+
+    val scaleHandler = remember { ScaleHandler(scaleState) }
     Surface(
         color = DarkGray,
         modifier = Modifier.fillMaxSize()
     ) {
         Draggable(
-            onUpdate = onUpdate,
             dragHandler = drag,
             modifier = Modifier.fillMaxSize()
         ) {
             Zoomable(
-                onUpdate = onUpdate,
                 scaleHandler = scaleHandler,
                 modifier = Modifier.fillMaxSize()
                     .onPreviewKeyEvent {
                         if (it.type == KeyEventType.KeyUp) {
                             when (it.key) {
-                                Key.DirectionLeft -> {
-                                    content.swipePrevious()
-                                }
-
-                                Key.DirectionRight -> {
-                                    content.swipeNext()
-                                }
+                                Key.DirectionLeft -> swipePrevious()
+                                Key.DirectionRight -> swipeNext()
                             }
                         }
                         false
                     }
             ) {
                 Image(
-                    bitmap = content.getSelectedImage() ?: resource("empty.png").rememberImageBitmap().orEmpty(),
+                    bitmap = modifiedImage,
                     contentDescription = null,
                     contentScale = ContentScale.Fit
                 )
@@ -88,7 +81,6 @@ actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swipePreviou
         }
     }
 }
-
 
 fun toByteArray(bitmap: BufferedImage): ByteArray {
     val baos = ByteArrayOutputStream()
@@ -100,41 +92,17 @@ fun cropBitmapByScale(
     bitmap: BufferedImage,
     size: DpSize,
     scale: Float,
-    drag: DragHandler
+    offset: Offset,
 ): BufferedImage {
     val crop = cropBitmapByBounds(
         bitmap,
         getDisplayBounds(bitmap, size),
         size,
         scale,
-        drag
+        offset,
     )
     return cropImage(
         bitmap,
         Rectangle(crop.x, crop.y, crop.width - crop.x, crop.height - crop.y)
     )
-}
-
-class ScaleHandler(
-    private val scaleState: MutableState<Float>,
-    private val maxFactor: Float = 5f,
-    private val minFactor: Float = 1f
-) {
-    fun reset() {
-        if (scaleState.value > minFactor) {
-            scaleState.value = minFactor
-        }
-    }
-
-    fun onScale(scaleFactor: Float): Float {
-        scaleState.value = scaleState.value + scaleFactor - 1f
-
-        if (maxFactor < scaleState.value) {
-            scaleState.value = maxFactor
-        }
-        if (minFactor > scaleState.value) {
-            scaleState.value = minFactor
-        }
-        return scaleFactor
-    }
 }
