@@ -39,14 +39,6 @@ fun FullscreenImage(
 ) {
     val filtersState = remember { mutableStateOf(emptySet<FilterType>()) }
 
-    fun switchFilter(type: FilterType) {
-        filtersState.value = if (filtersState.value.contains(type)) {
-            filtersState.value - type
-        } else {
-            filtersState.value + type
-        }
-    }
-
     val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(picture) {
         originalImageState.value = getImage(picture)
@@ -54,12 +46,11 @@ fun FullscreenImage(
 
     val originalImage = originalImageState.value
     val filters = filtersState.value
-    val imageWithFilter = remember(originalImage, filtersState.value) {
+    val imageWithFilter = remember(originalImage, filters) {
         if (originalImage != null) {
             var result: ImageBitmap = originalImage
-            for (filter in filtersState.value.map { getFilter(it) }) {
+            for (filter in filters.map { getFilter(it) }) {
                 result = filter.apply(result)
-                println("apply filter")
             }
             result
         } else {
@@ -113,8 +104,12 @@ fun FullscreenImage(
                 ) {
                     Row(Modifier.horizontalScroll(rememberScrollState())) {
                         for (type in FilterType.values()) {
-                            FilterButton(filtersState.value.contains(type), type, onClick = {
-                                switchFilter(type)
+                            FilterButton(filters.contains(type), type, onClick = {
+                                filtersState.value = if (filters.contains(type)) {
+                                    filters - type
+                                } else {
+                                    filters + type
+                                }
                             })
                         }
                     }

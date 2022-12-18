@@ -95,17 +95,6 @@ class ContentState(
         }
     }
 
-    fun getSelectedImageName(): String {
-        return getName()
-    }
-
-    fun fullscreen(picture: Picture) {
-        state.value = state.value.copy(
-            screen = ScreenState.FullScreen
-        )
-        setMainImage(picture)
-    }
-
     fun setMainImage(picture: Picture) {
         backgroundScope.launch {
             if (isInternetAvailable()) {

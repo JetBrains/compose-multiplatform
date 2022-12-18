@@ -29,7 +29,7 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swipePrevious: () -> Unit) {
     val scaleState = remember { mutableStateOf(1f) }

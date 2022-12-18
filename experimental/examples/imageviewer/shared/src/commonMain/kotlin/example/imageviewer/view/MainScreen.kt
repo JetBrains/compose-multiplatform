@@ -28,7 +28,8 @@ fun MainScreen(content: ContentState) {
         Divider(color = LightGray, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
         val scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)) {
-            for (picture in content.state.value.pictures) {
+            for (i in content.state.value.pictures.indices) {
+                val picture = content.state.value.pictures[i]
                 Miniature(
                     picture = picture,
                     image = content.state.value.miniatures[picture],
@@ -36,7 +37,10 @@ fun MainScreen(content: ContentState) {
                         content.setMainImage(picture)
                     },
                     onClickFullScreen = {
-                        content.fullscreen(picture)
+                        content.state.value = content.state.value.copy(
+                            currentImageIndex = i,
+                            screen = ScreenState.FullScreen
+                        )
                     },
                     onClickInfo = {
                         content.dependencies.notification.notifyImageData(picture)
