@@ -20,22 +20,22 @@ import example.imageviewer.model.AppState
 import example.imageviewer.model.ContentState
 import example.imageviewer.model.ScreenType
 import example.imageviewer.style.*
-import example.imageviewer.utils.adjustImageScale
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.orEmpty
 import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
 @Composable
-fun FullscreenImage(
-    content: ContentState
-) {
+fun FullscreenImage(content: ContentState, ) {
+    val mainImage = content.state.value.mainImage
+
     Column {
         ToolBar(content.getSelectedImageName(), content)
-        Image(content)
-    }
-    if (!content.isContentReady()) {
-        LoadingScreen()
+        if (mainImage != null) {
+            ScalableImage(mainImage, content::swipeNext, content::swipePrevious)
+        } else {
+            LoadingScreen()
+        }
     }
 }
 
@@ -117,7 +117,7 @@ fun FilterButton(
                 modifier = Modifier
                     .hoverable(interactionSource)
                     .background(color = if (filterButtonHover) TranslucentBlack else Transparent),
-                onClick = { content.toggleFilter(type)}
+                onClick = { content.toggleFilter(type) }
             ) {
                 Image(
                     getFilterImage(type = type, content = content),
@@ -139,11 +139,13 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
         } else {
             resource("grayscale_off.png").rememberImageBitmap().orEmpty()
         }
+
         FilterType.Pixel -> if (content.isFilterEnabled(type)) {
             resource("pixel_on.png").rememberImageBitmap().orEmpty()
         } else {
             resource("pixel_off.png").rememberImageBitmap().orEmpty()
         }
+
         FilterType.Blur -> if (content.isFilterEnabled(type)) {
             resource("blur_on.png").rememberImageBitmap().orEmpty()
         } else {
@@ -152,26 +154,3 @@ fun getFilterImage(type: FilterType, content: ContentState): ImageBitmap {
     }
 }
 
-@Composable
-fun imageByGesture(
-    content: ContentState,
-    scale: ScaleHandler,
-    drag: DragHandler
-): ImageBitmap? {
-    return content.getSelectedImage()
-//    val bitmap = cropBitmapByScale(content.getSelectedImage(), scale.factor.value, drag)//todo crop
-//
-//    if (scale.factor.value > 1f)
-//        return bitmap
-//
-//    if (abs(drag.getDistance().x) > displayWidth() / 10) {
-//        if (drag.getDistance().x < 0) {
-//            content.swipeNext()
-//        } else {
-//            content.swipePrevious()
-//        }
-//        drag.cancel()
-//    }
-//
-//    return bitmap
-}
