@@ -12,6 +12,7 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -23,6 +24,9 @@ import example.imageviewer.utils.displayHeight
 import example.imageviewer.utils.displayWidth
 import kotlin.math.pow
 import kotlin.math.roundToInt
+
+const val MAX_SCALE = 5f
+const val MIN_SCALE = 1f
 
 @Composable
 internal actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
@@ -38,22 +42,13 @@ internal actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
                 color = Transparent,
                 modifier = modifier.fillMaxSize().pointerInput(Unit) {
                     detectTransformGestures { _, _, zoom, _ ->
-                        val maxFactor = 5f
-                        val minFactor = 1f
-                        scaleState.value = scaleState.value + zoom - 1f
-                        if (maxFactor < scaleState.value) {
-                            scaleState.value = maxFactor
-                        }
-                        if (minFactor > scaleState.value) {
-                            scaleState.value = minFactor
-                        }
+                        scaleState.updateZoom(zoom)
                     }
                 }.pointerInput(Unit) {
                     detectTapGestures(onDoubleTap = { scaleState.value = 1f })
                 },
             ) {
-                val croppedBitmap = cropBitmapByScale(image.asAndroidBitmap(), scaleState.value, drag)
-                val imageBitmap = croppedBitmap.asImageBitmap()
+                val imageBitmap = cropBitmapByScale(image, scaleState.value, drag.getAmount())
                 Image(
                     bitmap = imageBitmap,
                     contentDescription = null,
@@ -64,12 +59,27 @@ internal actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
     }
 }
 
-fun cropBitmapByScale(bitmap: Bitmap, scale: Float, drag: DragHandler): Bitmap {
+private fun MutableState<Float>.updateZoom(zoom: Float) {
+    var newScale = value + zoom - 1f
+    if (newScale > MAX_SCALE) {
+        newScale = MAX_SCALE
+    } else if (newScale < MIN_SCALE) {
+        newScale = MIN_SCALE
+    }
+    value = newScale
+}
+
+expect fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset): ImageBitmap
+
+actual fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset): ImageBitmap =
+    cropBitmapByScale(image.asAndroidBitmap(), scale, offset).asImageBitmap()
+
+fun cropBitmapByScale(bitmap: Bitmap, scale: Float, offset: Offset): Bitmap {
     val crop = cropBitmapByBounds(
         bitmap,
         getDisplayBounds(bitmap),
         scale,
-        drag
+        offset
     )
     return Bitmap.createBitmap(
         bitmap,
@@ -84,7 +94,7 @@ fun cropBitmapByBounds(
     bitmap: Bitmap,
     bounds: Rect,
     scaleFactor: Float,
-    drag: DragHandler
+    offset: Offset,
 ): Rect {
     if (scaleFactor <= 1f)
         return Rect(0, 0, bitmap.width, bitmap.height)
@@ -96,8 +106,8 @@ fun cropBitmapByBounds(
 
     scale *= displayWidth() / bounds.width().toDouble()
 
-    val offsetX = drag.getAmount().x / scale
-    val offsetY = drag.getAmount().y / scale
+    val offsetX = offset.x / scale
+    val offsetY = offset.y / scale
 
     if (boundW > bitmap.width) {
         boundW = bitmap.width
