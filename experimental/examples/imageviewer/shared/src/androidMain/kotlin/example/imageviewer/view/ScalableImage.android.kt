@@ -38,7 +38,6 @@ internal actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swi
             Surface(
                 color = Transparent,
                 modifier = Modifier.fillMaxSize().pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { scaleState.value = 1f })
                     detectTransformGestures { _, _, zoom, _ ->
                         val maxFactor = 5f
                         val minFactor = 1f
@@ -50,6 +49,7 @@ internal actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swi
                             scaleState.value = minFactor
                         }
                     }
+                    detectTapGestures(onDoubleTap = { scaleState.value = 1f })
                 },
             ) {
                 val bitmap = imageByGesture(image, scaleState.value, drag, swipeNext, swipePrevious)

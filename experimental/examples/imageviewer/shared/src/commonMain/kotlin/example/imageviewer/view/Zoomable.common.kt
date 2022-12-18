@@ -18,10 +18,10 @@ import example.imageviewer.style.Transparent
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Zoomable(
+fun ZoomWithKeyboard(
     scaleHandler: ScaleHandler,
     modifier: Modifier = Modifier,
-    children: @Composable() () -> Unit
+    children: @Composable () -> Unit
 ) {
     val focusRequester = FocusRequester()
 

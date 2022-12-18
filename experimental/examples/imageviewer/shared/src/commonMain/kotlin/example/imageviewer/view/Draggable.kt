@@ -19,15 +19,22 @@ fun Draggable(
 ) {
     Surface(
         color = Transparent,
-        modifier = modifier.pointerInput(Unit) {
-            detectDragGestures(
-                onDragStart = { dragHandler.reset() },
-                onDragEnd = { dragHandler.reset() },
-                onDragCancel = { dragHandler.cancel() },
-            ) { change, dragAmount ->
-                dragHandler.drag(dragAmount)
-                onUpdate?.invoke()
-                change.consume()
+        modifier = modifier.run {
+            if (false) {//todo
+                pointerInput(Unit) {
+                    detectDragGestures(
+                        onDragStart = { dragHandler.reset() },
+                        onDragEnd = { dragHandler.reset() },
+                        onDragCancel = { dragHandler.cancel() },
+                    ) { change, dragAmount ->
+                        dragHandler.drag(dragAmount)
+                        onUpdate?.invoke()
+                        change.consume()
+                    }
+                }
+
+            } else {
+                this
             }
         }
     ) {
