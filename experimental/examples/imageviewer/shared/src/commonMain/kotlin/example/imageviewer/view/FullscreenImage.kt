@@ -5,15 +5,17 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.key.*
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
@@ -117,10 +119,27 @@ fun FullscreenImage(
             }
         }
 
-        if (imageWithFilter != null) {
-            ScalableImage(imageWithFilter, nextImage, previousImage)
-        } else {
-            LoadingScreen()
+        Box(Modifier.fillMaxSize()) {
+            if (imageWithFilter != null) {
+                ScalableImage(
+                    modifier = Modifier,
+                    image = imageWithFilter,
+                )
+            } else {
+                LoadingScreen()
+            }
+            FloatingActionButton(
+                modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
+                onClick = previousImage
+            ) {
+                Icon(imageVector = Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous")
+            }
+            FloatingActionButton(
+                modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+                onClick = nextImage
+            ) {
+                Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "Next")
+            }
         }
     }
 }

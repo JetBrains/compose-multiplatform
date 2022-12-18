@@ -19,9 +19,8 @@ import java.awt.image.BufferedImage
 import java.io.ByteArrayOutputStream
 import javax.imageio.ImageIO
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swipePrevious: () -> Unit) {
+actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
     val scaleState = remember { mutableStateOf(1f) }
     val scale = scaleState.value
     val size = LocalWindowSize.current
@@ -51,16 +50,7 @@ actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swipePreviou
         ) {
             ZoomWithKeyboard(
                 scaleHandler = scaleHandler,
-                modifier = Modifier.fillMaxSize()
-                    .onPreviewKeyEvent {
-                        if (it.type == KeyEventType.KeyUp) {
-                            when (it.key) {
-                                Key.DirectionLeft -> swipePrevious()
-                                Key.DirectionRight -> swipeNext()
-                            }
-                        }
-                        false
-                    }
+                modifier = modifier.fillMaxSize()
             ) {
                 Image(
                     bitmap = modifiedImage,

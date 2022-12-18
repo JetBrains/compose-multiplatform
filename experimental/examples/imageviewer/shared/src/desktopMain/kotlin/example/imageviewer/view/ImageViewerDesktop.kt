@@ -2,17 +2,17 @@ package example.imageviewer.view
 
 import androidx.compose.ui.Modifier
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.window.*
 import example.imageviewer.*
 import example.imageviewer.core.BitmapFilter
@@ -40,11 +40,12 @@ val LocalWindowSize =  staticCompositionLocalOf {
     DpSize.Unspecified
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
-    val state = rememberWindowState()
-    CompositionLocalProvider(LocalWindowSize provides state.size) {
-        //    if (content.isContentReady()) {
+    val windowState = rememberWindowState()
+    val state = remember { mutableStateOf(ContentStateData()) }
+    CompositionLocalProvider(LocalWindowSize provides windowState.size) {
         Window(
             onCloseRequest = ::exitApplication,
             title = "Image Viewer",
@@ -52,13 +53,24 @@ fun ApplicationScope.ImageViewerDesktop() {
                 position = WindowPosition.Aligned(Alignment.Center),
                 size = getPreferredWindowSize(800, 1000)
             ),
-            icon = painterResource("ic_imageviewer_round.png")
+            icon = painterResource("ic_imageviewer_round.png"),
+            onKeyEvent = {
+                if (it.type == KeyEventType.KeyUp) {
+                    when (it.key) {
+                        Key.DirectionLeft -> state.previousImage()
+                        Key.DirectionRight -> state.nextImage()
+                    }
+                }
+                false
+            }
         ) {
             Surface(
                 modifier = Modifier.fillMaxSize(),
                 color = Gray
             ) {
-                ImageViewerCommon(dependencies = object : Dependencies {
+                ImageViewerCommon(
+                    state = state,
+                    dependencies = object : Dependencies {
                     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
                         FilterType.GrayScale -> GrayScaleFilter()
                         FilterType.Pixel -> PixelFilter()
@@ -123,20 +135,6 @@ fun ApplicationScope.ImageViewerDesktop() {
                 Toast(message.value, toastState)
             }
         }
-//        } else {
-//            Window(
-//                onCloseRequest = ::exitApplication,
-//                title = "Image Viewer",
-//                state = WindowState(
-//                    position = WindowPosition.Aligned(Alignment.Center),
-//                    size = getPreferredWindowSize(800, 300)
-//                ),
-//                undecorated = true,
-//                icon = icon,
-//            ) {
-//                SplashUI(content)
-//            }
-//        }
     }
 
 }

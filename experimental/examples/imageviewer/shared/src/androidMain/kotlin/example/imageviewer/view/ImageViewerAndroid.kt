@@ -3,6 +3,7 @@ package example.imageviewer.view
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.ImageBitmap
@@ -24,7 +25,7 @@ fun ImageViewerAndroid() {
     val context: Context = LocalContext.current
     val ioScope = rememberCoroutineScope { SupervisorJob() + Dispatchers.IO }
     val dependencies = remember(context) { getDependencies(context, ioScope) }
-    ImageViewerCommon(dependencies)
+    ImageViewerCommon(dependencies, remember { mutableStateOf(ContentStateData()) })
 }
 
 private fun getDependencies(context: Context, ioScope: CoroutineScope) = object : Dependencies {

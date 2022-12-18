@@ -3,8 +3,7 @@ package example.imageviewer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
@@ -22,8 +21,10 @@ interface Dependencies {
 }
 
 @Composable
-internal fun ImageViewerCommon(dependencies: Dependencies) {
-    val state = remember { mutableStateOf(ContentStateData()) }
+internal fun ImageViewerCommon(
+    dependencies: Dependencies,
+    state: MutableState<ContentStateData>
+) {
     val content = ContentState(
         state = state,
         dependencies = dependencies,
@@ -39,15 +40,16 @@ internal fun ImageViewerCommon(dependencies: Dependencies) {
             ScreenState.Miniatures -> {
                 MainScreen(content)
             }
+
             ScreenState.FullScreen -> {
                 FullscreenImage(
                     picture = state.value.picture!!,
                     getImage = { dependencies.imageRepository.loadContent(NetworkRequest(it.bigUrl)) },
-                    getFilter = {dependencies.getFilter(it)},
+                    getFilter = { dependencies.getFilter(it) },
                     localization = dependencies.localization,
                     back = { state.value = state.value.copy(screen = ScreenState.Miniatures) },
-                    nextImage = content::swipeNext,
-                    previousImage = content::swipePrevious,
+                    nextImage = { content.state.nextImage() },
+                    previousImage = { content.state.previousImage() },
                 )
             }
         }

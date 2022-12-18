@@ -21,12 +21,11 @@ import example.imageviewer.style.Transparent
 import example.imageviewer.utils.adjustImageScale
 import example.imageviewer.utils.displayHeight
 import example.imageviewer.utils.displayWidth
-import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
 @Composable
-internal actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swipePrevious: () -> Unit) {
+internal actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
     val drag = remember { DragHandler() }
     val scaleState: MutableState<Float> = remember { mutableStateOf(1f) }
 
@@ -37,7 +36,7 @@ internal actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swi
         Draggable(dragHandler = drag, modifier = Modifier.fillMaxSize()) {
             Surface(
                 color = Transparent,
-                modifier = Modifier.fillMaxSize().pointerInput(Unit) {
+                modifier = modifier.fillMaxSize().pointerInput(Unit) {
                     detectTransformGestures { _, _, zoom, _ ->
                         val maxFactor = 5f
                         val minFactor = 1f
@@ -49,43 +48,20 @@ internal actual fun ScalableImage(image: ImageBitmap, swipeNext: () -> Unit, swi
                             scaleState.value = minFactor
                         }
                     }
+                }.pointerInput(Unit) {
                     detectTapGestures(onDoubleTap = { scaleState.value = 1f })
                 },
             ) {
-                val bitmap = imageByGesture(image, scaleState.value, drag, swipeNext, swipePrevious)
+                val croppedBitmap = cropBitmapByScale(image.asAndroidBitmap(), scaleState.value, drag)
+                val imageBitmap = croppedBitmap.asImageBitmap()
                 Image(
-                    bitmap = bitmap,
+                    bitmap = imageBitmap,
                     contentDescription = null,
-                    contentScale = adjustImageScale(bitmap)
+                    contentScale = adjustImageScale(imageBitmap)
                 )
             }
         }
     }
-}
-
-@Composable
-private fun imageByGesture(
-    image: ImageBitmap,
-    scale: Float,
-    drag: DragHandler,
-    swipeNext: () -> Unit,
-    swipePrevious: () -> Unit,
-): ImageBitmap {
-    val bitmap = cropBitmapByScale(image.asAndroidBitmap(), scale, drag)
-
-    if (scale > 1f)
-        return bitmap.asImageBitmap()
-
-    if (abs(drag.getDistance().x) > displayWidth() / 10) {
-        if (drag.getDistance().x < 0) {
-            swipeNext()
-        } else {
-            swipePrevious()
-        }
-        drag.cancel()
-    }
-
-    return bitmap.asImageBitmap()
 }
 
 fun cropBitmapByScale(bitmap: Bitmap, scale: Float, drag: DragHandler): Bitmap {

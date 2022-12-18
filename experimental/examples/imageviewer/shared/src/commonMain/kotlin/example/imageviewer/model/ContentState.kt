@@ -3,7 +3,6 @@ package example.imageviewer.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.Dependencies
-import example.imageviewer.core.*
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.utils.ktorHttpClient
 import io.ktor.client.request.*
@@ -14,6 +13,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class Picture(val big: String, val small: String)
+
 val Picture.bigUrl get() = "$BASE_URL/$big"
 val Picture.smallUrl get() = "$BASE_URL/$small"
 
@@ -39,6 +39,26 @@ data class ContentStateData(
     val pictures: List<Picture> = emptyList(),
     val screen: ScreenState = ScreenState.Miniatures
 )
+
+fun MutableState<ContentStateData>.modifyState(modification: ContentStateData.() -> ContentStateData) {
+    value = value.modification()
+}
+
+fun MutableState<ContentStateData>.nextImage() = modifyState {
+    var newIndex = currentImageIndex + 1
+    if (newIndex > pictures.lastIndex) {
+        newIndex = 0
+    }
+    copy(currentImageIndex = newIndex)
+}
+
+fun MutableState<ContentStateData>.previousImage() = modifyState {
+    var newIndex = currentImageIndex - 1
+    if (newIndex < 0) {
+        newIndex = pictures.lastIndex
+    }
+    copy(currentImageIndex = newIndex)
+}
 
 val ContentStateData.isContentReady get() = pictures.isNotEmpty()
 val ContentStateData.picture get():Picture? = pictures.getOrNull(currentImageIndex)
@@ -110,32 +130,6 @@ class ContentState(
                 }
             }
         }
-    }
-
-    fun swipeNext() {
-        if (state.value.currentImageIndex == state.value.miniatures.size - 1) {
-            dependencies.notification.notifyLastImage()
-            return
-        }
-
-        val nextIndex = (state.value.currentImageIndex + 1) % state.value.miniatures.size
-        state.value = state.value.copy(
-            currentImageIndex = nextIndex
-        )
-        updateMainImage()
-    }
-
-    fun swipePrevious() {
-        if (state.value.currentImageIndex == 0) {
-            dependencies.notification.notifyFirstImage()
-            return
-        }
-
-        val prevIndex = state.value.currentImageIndex - 1
-        state.value = state.value.copy(
-            currentImageIndex = prevIndex
-        )
-        updateMainImage()
     }
 
     fun updateMainImage() {
