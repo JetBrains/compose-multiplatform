@@ -161,4 +161,3 @@ fun getDisplayBounds(bitmap: Bitmap): Rect {
 
     return Rect(0, 0, resultW.toInt(), resultH.toInt())
 }
-

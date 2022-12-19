@@ -28,7 +28,6 @@ import org.jetbrains.compose.resources.orEmpty
 import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun FullscreenImage(
     picture: Picture,
@@ -61,64 +60,7 @@ fun FullscreenImage(
     }
 
     Column {
-        val backButtonInteractionSource = remember { MutableInteractionSource() }
-        val backButtonHover by backButtonInteractionSource.collectIsHoveredAsState()
-        Surface(
-            color = MiniatureColor,
-            modifier = Modifier.height(44.dp)
-        ) {
-            Row(modifier = Modifier.padding(end = 30.dp)) {
-                Surface(
-                    color = Transparent,
-                    modifier = Modifier.padding(start = 20.dp).align(Alignment.CenterVertically),
-                    shape = CircleShape
-                ) {
-                    Tooltip(localization.back) {
-                        Clickable(
-                            modifier = Modifier
-                                .hoverable(backButtonInteractionSource)
-                                .background(color = if (backButtonHover) TranslucentBlack else Transparent),
-                            onClick = {
-                                back()
-                            }) {
-                            Image(
-                                resource("back.png").rememberImageBitmap().orEmpty(),
-                                contentDescription = null,
-                                modifier = Modifier.size(38.dp)
-                            )
-                        }
-                    }
-                }
-                Text(
-                    picture.name,
-                    color = Foreground,
-                    maxLines = 1,
-                    modifier = Modifier.padding(start = 30.dp).weight(1f)
-                        .align(Alignment.CenterVertically),
-                    style = MaterialTheme.typography.body1
-                )
-
-                Surface(
-                    color = Color(255, 255, 255, 40),
-                    modifier = Modifier.size(154.dp, 38.dp)
-                        .align(Alignment.CenterVertically),
-                    shape = CircleShape
-                ) {
-                    Row(Modifier.horizontalScroll(rememberScrollState())) {
-                        for (type in FilterType.values()) {
-                            FilterButton(filters.contains(type), type, onClick = {
-                                filtersState.value = if (filters.contains(type)) {
-                                    filters - type
-                                } else {
-                                    filters + type
-                                }
-                            })
-                        }
-                    }
-                }
-            }
-        }
-
+        Toolbar(picture.name, filtersState, localization, back)
         Box(Modifier.fillMaxSize()) {
             if (imageWithFilter != null) {
                 ScalableImage(
@@ -144,8 +86,70 @@ fun FullscreenImage(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
-fun FilterButton(
+private fun Toolbar(title:String, filtersState: MutableState<Set<FilterType>>, localization: Localization, back: () -> Unit) {
+    val backButtonInteractionSource = remember { MutableInteractionSource() }
+    val backButtonHover by backButtonInteractionSource.collectIsHoveredAsState()
+    Surface(
+        color = MiniatureColor,
+        modifier = Modifier.height(44.dp)
+    ) {
+        Row(modifier = Modifier.padding(end = 30.dp)) {
+            Surface(
+                color = Transparent,
+                modifier = Modifier.padding(start = 20.dp).align(Alignment.CenterVertically),
+                shape = CircleShape
+            ) {
+                Tooltip(localization.back) {
+                    Clickable(
+                        modifier = Modifier
+                            .hoverable(backButtonInteractionSource)
+                            .background(color = if (backButtonHover) TranslucentBlack else Transparent),
+                        onClick = {
+                            back()
+                        }) {
+                        Image(
+                            resource("back.png").rememberImageBitmap().orEmpty(),
+                            contentDescription = null,
+                            modifier = Modifier.size(38.dp)
+                        )
+                    }
+                }
+            }
+            Text(
+                title,
+                color = Foreground,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 30.dp).weight(1f)
+                    .align(Alignment.CenterVertically),
+                style = MaterialTheme.typography.body1
+            )
+
+            Surface(
+                color = Color(255, 255, 255, 40),
+                modifier = Modifier.size(154.dp, 38.dp)
+                    .align(Alignment.CenterVertically),
+                shape = CircleShape
+            ) {
+                Row(Modifier.horizontalScroll(rememberScrollState())) {
+                    for (type in FilterType.values()) {
+                        FilterButton(filtersState.value.contains(type), type, onClick = {
+                            filtersState.value = if (filtersState.value.contains(type)) {
+                                filtersState.value - type
+                            } else {
+                                filtersState.value + type
+                            }
+                        })
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun FilterButton(
     active: Boolean,
     type: FilterType,
     onClick: () -> Unit,
@@ -175,7 +179,7 @@ fun FilterButton(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun getFilterImage(active: Boolean, type: FilterType): ImageBitmap {
+private fun getFilterImage(active: Boolean, type: FilterType): ImageBitmap {
     return when (type) {
         FilterType.GrayScale -> if (active) {
             resource("grayscale_on.png").rememberImageBitmap().orEmpty()
