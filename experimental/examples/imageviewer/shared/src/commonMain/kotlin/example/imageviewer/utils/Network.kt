@@ -19,7 +19,7 @@ import io.ktor.client.request.*
 
 suspend fun isInternetAvailable(): Boolean {
     return try {
-        ktorHttpClient.head<String>("http://google.com")
+        ktorHttpClient.head("http://google.com")
         true
     } catch (e: Exception) {
         println(e.message)

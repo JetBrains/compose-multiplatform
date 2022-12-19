@@ -6,6 +6,7 @@ import example.imageviewer.Dependencies
 import example.imageviewer.utils.isInternetAvailable
 import example.imageviewer.utils.ktorHttpClient
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.*
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.builtins.ListSerializer
@@ -93,7 +94,7 @@ class ContentState(
             try {
                 val pictures = jsonReader.decodeFromString(
                     ListSerializer(Picture.serializer()),
-                    ktorHttpClient.get(PICTURES_DATA_URL)
+                    ktorHttpClient.get(PICTURES_DATA_URL).bodyAsText()
                 )
                 modifyState {
                     copy(pictures = pictures)

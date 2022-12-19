@@ -7,6 +7,7 @@ plugins {
 }
 
 version = "1.0-SNAPSHOT"
+val ktorVersion = extra["ktor.version"]
 
 kotlin {
     android()
@@ -29,7 +30,8 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-core:1.4.1")//todo version
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -41,7 +43,6 @@ kotlin {
             dependencies {
                 implementation("androidx.appcompat:appcompat:1.5.1")
                 implementation("androidx.core:core-ktx:1.8.0")
-                implementation("io.ktor:ktor-client-cio:1.4.1")//todo version
             }
         }
 //        val iosMain by getting
@@ -56,7 +57,6 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
-                implementation("io.ktor:ktor-client-cio:1.4.1")//todo version
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
 
             }
