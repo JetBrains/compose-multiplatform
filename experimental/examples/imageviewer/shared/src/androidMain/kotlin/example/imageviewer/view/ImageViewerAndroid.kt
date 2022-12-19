@@ -17,7 +17,7 @@ import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import io.ktor.client.*
-import io.ktor.client.engine.cio.*
+import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.*
 
 @Composable
@@ -44,7 +44,7 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
     }
 
     override val imageRepository: ContentRepository<ImageBitmap> =
-        createRealRepository(HttpClient(CIO))
+        createRealRepository(HttpClient(OkHttp))
             .adapter { it.toImageBitmap() }
 
     override val notification: Notification = object : Notification {

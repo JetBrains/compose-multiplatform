@@ -31,7 +31,6 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("io.ktor:ktor-client-cio:$ktorVersion")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -43,9 +42,14 @@ kotlin {
             dependencies {
                 implementation("androidx.appcompat:appcompat:1.5.1")
                 implementation("androidx.core:core-ktx:1.8.0")
+                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
             }
         }
-//        val iosMain by getting
+//        val iosMain by getting {
+//            dependencies {
+//                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+//            }
+//        }
 //        val iosTest by getting
 //        val iosSimulatorArm64Main by getting {
 //            dependsOn(iosMain)
@@ -58,7 +62,7 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.common)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
-
+                implementation("io.ktor:ktor-client-cio:$ktorVersion")
             }
         }
     }

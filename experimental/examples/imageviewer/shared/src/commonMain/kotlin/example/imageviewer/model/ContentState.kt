@@ -109,6 +109,8 @@ class ContentState(
                     }
                 }
             } catch (e: Exception) {
+                println("TODO EXCEPTION")
+                e.printStackTrace()
                 withContext(Dispatchers.Main) {
                     dependencies.notification.notifyNoInternet()
                 }
