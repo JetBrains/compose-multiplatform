@@ -26,14 +26,14 @@ import org.junit.runners.JUnit4
 import org.mockito.kotlin.mock
 
 @RunWith(JUnit4::class)
-class MultiParagraphPlaceholderLayoutCacheTest {
+class MultiParagraphLayoutCacheTest {
     private val density = Density(density = 1f)
     private val fontFamilyResolver = mock<FontFamily.Resolver>()
 
     @Test(expected = IllegalStateException::class)
     fun whenMinInstrinsicWidth_withoutLayout_throws() {
-        val textDelegate = MultiParagraphPlaceholderLayoutCache(
-            InlineContentLayoutDrawParams(
+        val textDelegate = MultiParagraphLayoutCache(
+            TextInlineContentLayoutDrawParams(
                 text = AnnotatedString(""),
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver
@@ -46,8 +46,8 @@ class MultiParagraphPlaceholderLayoutCacheTest {
 
     @Test(expected = IllegalStateException::class)
     fun whenMaxIntrinsicWidth_withoutLayout_throws() {
-        val textDelegate = MultiParagraphPlaceholderLayoutCache(
-            InlineContentLayoutDrawParams(
+        val textDelegate = MultiParagraphLayoutCache(
+            TextInlineContentLayoutDrawParams(
                 text = AnnotatedString(""),
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver

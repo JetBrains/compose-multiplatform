@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.newtext.text
 
-import androidx.compose.foundation.newtext.text.modifiers.InlineContentLayoutDrawModifier
-import androidx.compose.foundation.newtext.text.modifiers.InlineContentLayoutDrawParams
+import androidx.compose.foundation.newtext.text.modifiers.TextInlineContentLayoutDrawModifier
+import androidx.compose.foundation.newtext.text.modifiers.TextInlineContentLayoutDrawParams
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -168,7 +168,7 @@ private fun Modifier.textModifier(
     placeholders: List<AnnotatedString.Range<Placeholder>>?,
     onPlaceholderLayout: ((List<Rect?>) -> Unit)?
 ): Modifier {
-    val params = InlineContentLayoutDrawParams(
+    val params = TextInlineContentLayoutDrawParams(
         text,
         style,
         fontFamilyResolver,
@@ -182,7 +182,7 @@ private fun Modifier.textModifier(
     )
     return this then modifierElementOf(
         params,
-        create = { InlineContentLayoutDrawModifier(params) },
+        create = { TextInlineContentLayoutDrawModifier(params) },
         update = { it.update(params) },
         definitions = {},
     )

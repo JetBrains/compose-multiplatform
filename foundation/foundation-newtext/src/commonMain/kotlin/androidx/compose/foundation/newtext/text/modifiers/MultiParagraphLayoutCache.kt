@@ -18,12 +18,14 @@ package androidx.compose.foundation.newtext.text.modifiers
 
 import androidx.compose.foundation.newtext.text.ceilToIntPx
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.MultiParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.resolveDefaults
+import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -31,8 +33,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
 
-internal class MultiParagraphPlaceholderLayoutCache(
-    private val params: InlineContentLayoutDrawParams,
+internal class MultiParagraphLayoutCache(
+    private val params: TextInlineContentLayoutDrawParams,
     private val density: Density,
     private val placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList()
 ) {
@@ -41,7 +43,11 @@ internal class MultiParagraphPlaceholderLayoutCache(
     // MultiParagraph. Can we have a fast-path that uses just Paragraph in simpler cases (ie,
     // String)?
     internal var paragraphIntrinsics: MultiParagraphIntrinsics? = null
+
     internal var intrinsicsLayoutDirection: LayoutDirection? = null
+
+    private var layoutCache: TextLayoutResult? = null
+    private var cachedIntrinsicHeight: Pair<Int, Int>? = null
 
     private val nonNullIntrinsics: MultiParagraphIntrinsics
         get() = paragraphIntrinsics
@@ -50,39 +56,24 @@ internal class MultiParagraphPlaceholderLayoutCache(
     /**
      * The width for text if all soft wrap opportunities were taken.
      *
-     * Valid only after [layout] has been called.
+     * Valid only after [layoutWithConstraints] has been called.
      */
     val minIntrinsicWidth: Int get() = nonNullIntrinsics.minIntrinsicWidth.ceilToIntPx()
 
     /**
      * The width at which increasing the width of the text no longer decreases the height.
      *
-     * Valid only after [layout] has been called.
+     * Valid only after [layoutWithConstraints] has been called.
      */
     val maxIntrinsicWidth: Int get() = nonNullIntrinsics.maxIntrinsicWidth.ceilToIntPx()
 
-    fun layoutIntrinsics(layoutDirection: LayoutDirection) {
-        val localIntrinsics = paragraphIntrinsics
-        val intrinsics = if (
-            localIntrinsics == null ||
-            layoutDirection != intrinsicsLayoutDirection ||
-            localIntrinsics.hasStaleResolvedFonts
-        ) {
-            intrinsicsLayoutDirection = layoutDirection
-            MultiParagraphIntrinsics(
-                annotatedString = params.text,
-                style = resolveDefaults(params.style, layoutDirection),
-                density = density,
-                fontFamilyResolver = params.fontFamilyResolver,
-                placeholders = placeholders
-            )
-        } else {
-            localIntrinsics
+    val layout: TextLayoutResult
+        get() {
+            layoutCache?.let {
+                return it
+            }
+            throw IllegalStateException("You must call doLayoutInConstraints first")
         }
-
-        paragraphIntrinsics = intrinsics
-    }
-
     /**
      * Computes the visual position of the glyphs for painting the text.
      *
@@ -93,7 +84,7 @@ internal class MultiParagraphPlaceholderLayoutCache(
         constraints: Constraints,
         layoutDirection: LayoutDirection
     ): MultiParagraph {
-        layoutIntrinsics(layoutDirection)
+        setLayoutDirection(layoutDirection)
 
         val minWidth = constraints.minWidth
         val widthMatters = params.softWrap || params.overflow == TextOverflow.Ellipsis
@@ -144,10 +135,40 @@ internal class MultiParagraphPlaceholderLayoutCache(
         )
     }
 
-    fun layout(
+    private fun setLayoutDirection(layoutDirection: LayoutDirection) {
+        val localIntrinsics = paragraphIntrinsics
+        val intrinsics = if (
+            localIntrinsics == null ||
+            layoutDirection != intrinsicsLayoutDirection ||
+            localIntrinsics.hasStaleResolvedFonts
+        ) {
+            intrinsicsLayoutDirection = layoutDirection
+            MultiParagraphIntrinsics(
+                annotatedString = params.text,
+                style = resolveDefaults(params.style, layoutDirection),
+                density = density,
+                fontFamilyResolver = params.fontFamilyResolver,
+                placeholders = placeholders
+            )
+        } else {
+            localIntrinsics
+        }
+
+        paragraphIntrinsics = intrinsics
+    }
+
+    /**
+     * Update layout constraints for this text
+     *
+     * @return true if constraints caused a text layout invalidation
+     */
+    fun layoutWithConstraints(
         constraints: Constraints,
         layoutDirection: LayoutDirection
-    ): TextLayoutResult {
+    ): Boolean {
+        if (!layoutCache.newConstraintsProduceNewLayout(constraints, layoutDirection)) {
+            return false
+        }
         val multiParagraph = layoutText(
             constraints,
             layoutDirection
@@ -160,11 +181,7 @@ internal class MultiParagraphPlaceholderLayoutCache(
             )
         )
 
-        // NOTE(text-perf-review): it feels odd to create the input + result at the same time. if
-        // the allocation of these objects is 1:1 then it might make sense to just merge them?
-        // Alternatively, we might be able to save some effortØBa here by having a common object for
-        // the types that go into the result here that are less likely to change
-        return TextLayoutResult(
+        layoutCache = TextLayoutResult(
             TextLayoutInput(
                 params.text,
                 params.style,
@@ -180,5 +197,91 @@ internal class MultiParagraphPlaceholderLayoutCache(
             multiParagraph,
             size
         )
+        return true
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    private fun TextLayoutResult?.newConstraintsProduceNewLayout(
+        constraints: Constraints,
+        layoutDirection: LayoutDirection
+    ): Boolean {
+        // no layout yet
+        if (this == null) return true
+
+        // layout direction changed
+        if (layoutDirection != layoutInput.layoutDirection) return true
+
+        // if we were passed identical constraints just skip more work
+        if (constraints == layoutInput.constraints) return false
+
+        // only be clever if we can predict line break behavior exactly
+        val canBeClever = when (params.style.lineBreak) {
+            LineBreak.Simple -> true
+            else -> false
+        }
+        if (!canBeClever) {
+            return true
+        }
+
+        // see if width would produce the same wraps (greedy wraps only)
+        val canWrap = params.softWrap && params.maxLines > 1
+        if (canWrap && size.width != multiParagraph.maxIntrinsicWidth.ceilToIntPx()) {
+            // some soft wrapping happened, check to see if we're between the previous measure and
+            // the next wrap
+            val prevActualMaxWidth = params.paraMaxWidthFor(layoutInput.constraints)
+            val newMaxWidth = params.paraMaxWidthFor(constraints)
+            if (newMaxWidth > prevActualMaxWidth) {
+                // we've grown the potential layout area, and may break longer lines
+                return true
+            }
+            if (newMaxWidth <= size.width) {
+                // it's possible to shrink this text (possible opt: check minIntrinsicWidth
+                return true
+            }
+        }
+        // if we get here width won't change, height may be clipped
+        if (constraints.maxHeight < multiParagraph.height) {
+            // vertical clip changes
+            return true
+        }
+
+        // breaks can't change, height can't change
+        return false
+    }
+
+    private fun TextInlineContentLayoutDrawParams.paraMaxWidthFor(constraints: Constraints): Int {
+        val minWidth = constraints.minWidth
+        val widthMatters = softWrap || overflow == TextOverflow.Ellipsis
+        val maxWidth = if (widthMatters && constraints.hasBoundedWidth) {
+            constraints.maxWidth
+        } else {
+            Constraints.Infinity
+        }
+        return if (minWidth == maxWidth) {
+            maxWidth
+        } else {
+            maxIntrinsicWidth.coerceIn(minWidth, maxWidth)
+        }
+    }
+
+    fun intrinsicHeightAt(width: Int, layoutDirection: LayoutDirection): Int {
+        cachedIntrinsicHeight?.let { (prevWidth, prevHeight) ->
+            if (width == prevWidth) return prevHeight
+        }
+        val result = layoutText(
+            Constraints(0, width, 0, Constraints.Infinity),
+            layoutDirection
+        ).height.ceilToIntPx()
+
+        cachedIntrinsicHeight = width to result
+        return result
+    }
+
+    fun equalForLayout(value: TextInlineContentLayoutDrawParams): Boolean {
+        return params.equalForLayout(value)
+    }
+
+    fun equalForCallbacks(value: TextInlineContentLayoutDrawParams): Boolean {
+        return params.equalForCallbacks(value)
     }
 }
