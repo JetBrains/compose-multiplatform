@@ -1309,17 +1309,19 @@ class TextStyleTest {
         assertThat(style.platformStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
-    @Test
-    fun `copy without platformStyle uses existing platformStyle`() {
-        @Suppress("DEPRECATION")
-        val style = TextStyle(
-            platformStyle = PlatformTextStyle(includeFontPadding = false)
-        )
-        val newStyle = style.copy()
-
-        assertThat(newStyle.platformStyle).isEqualTo(style.platformStyle)
-    }
+// TODO: `includeFontPadding` is not available on desktop. Comment out when `includeFontPadding` is removed in upstream.
+// keep this comment in JB fork.
+//    @OptIn(ExperimentalTextApi::class)
+//    @Test
+//    fun `copy without platformStyle uses existing platformStyle`() {
+//        @Suppress("DEPRECATION")
+//        val style = TextStyle(
+//            platformStyle = PlatformTextStyle(includeFontPadding = false)
+//        )
+//        val newStyle = style.copy()
+//
+//        assertThat(newStyle.platformStyle).isEqualTo(style.platformStyle)
+//    }
 
     @OptIn(ExperimentalTextApi::class)
     @Test
@@ -1513,46 +1515,47 @@ class TextStyleTest {
         )
     }
 
-    @OptIn(ExperimentalTextApi::class)
-    @Test
-    fun `toParagraphStyle return attributes with correct values`() {
-        val textAlign = TextAlign.Justify
-        val textDirection = TextDirection.Rtl
-        val lineHeight = 100.sp
-        val textIndent = TextIndent(firstLine = 20.sp, restLine = 40.sp)
-        val lineHeightStyle = LineHeightStyle(
-            alignment = Alignment.Center,
-            trim = Trim.None
-        )
-        val hyphens = Hyphens.Auto
-        val lineBreak = LineBreak(
-            strategy = LineBreak.Strategy.Balanced,
-            strictness = LineBreak.Strictness.Strict,
-            wordBreak = LineBreak.WordBreak.Phrase
-        )
-
-        val style = TextStyle(
-            textAlign = textAlign,
-            textDirection = textDirection,
-            lineHeight = lineHeight,
-            textIndent = textIndent,
-            lineHeightStyle = lineHeightStyle,
-            lineBreak = lineBreak,
-            hyphens = hyphens
-        )
-
-        assertThat(style.toParagraphStyle()).isEqualTo(
-            ParagraphStyle(
-                textAlign = textAlign,
-                textDirection = textDirection,
-                lineHeight = lineHeight,
-                textIndent = textIndent,
-                lineHeightStyle = lineHeightStyle,
-                hyphens = hyphens,
-                lineBreak = lineBreak
-            )
-        )
-    }
+// Commented in JB fork only: LineBreak has different actual constructor on desktop (skikoMain)
+//    @OptIn(ExperimentalTextApi::class)
+//    @Test
+//    fun `toParagraphStyle return attributes with correct values`() {
+//        val textAlign = TextAlign.Justify
+//        val textDirection = TextDirection.Rtl
+//        val lineHeight = 100.sp
+//        val textIndent = TextIndent(firstLine = 20.sp, restLine = 40.sp)
+//        val lineHeightStyle = LineHeightStyle(
+//            alignment = Alignment.Center,
+//            trim = Trim.None
+//        )
+//        val hyphens = Hyphens.Auto
+//        val lineBreak = LineBreak(
+//            strategy = LineBreak.Strategy.Balanced,
+//            strictness = LineBreak.Strictness.Strict,
+//            wordBreak = LineBreak.WordBreak.Phrase
+//        )
+//
+//        val style = TextStyle(
+//            textAlign = textAlign,
+//            textDirection = textDirection,
+//            lineHeight = lineHeight,
+//            textIndent = textIndent,
+//            lineHeightStyle = lineHeightStyle,
+//            lineBreak = lineBreak,
+//            hyphens = hyphens
+//        )
+//
+//        assertThat(style.toParagraphStyle()).isEqualTo(
+//            ParagraphStyle(
+//                textAlign = textAlign,
+//                textDirection = textDirection,
+//                lineHeight = lineHeight,
+//                textIndent = textIndent,
+//                lineHeightStyle = lineHeightStyle,
+//                hyphens = hyphens,
+//                lineBreak = lineBreak
+//            )
+//        )
+//    }
 
     @Test(expected = IllegalStateException::class)
     fun `negative lineHeight throws IllegalStateException`() {

@@ -22,7 +22,7 @@ import androidx.compose.foundation.text.findPrecedingBreak
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class StringHelpersTest {
+class StringHelpersSkikoMainTest {
     val complexString = "\uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0"
 
     @Test

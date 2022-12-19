@@ -74,6 +74,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             commonTest.dependencies {
                 implementation(kotlin("test-junit"))
             }
+            desktopTest.kotlin.srcDirs("src/test/kotlin")
         }
     }
 }

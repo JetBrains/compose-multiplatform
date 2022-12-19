@@ -104,6 +104,15 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.testExtJunit)
                 implementation(libs.espressoCore)
             }
+
+            desktopTest {
+                dependencies {
+                    implementation(libs.junit)
+                    implementation(libs.truth)
+                    implementation(libs.kotlinTest)
+                }
+            }
+            desktopTest.kotlin.srcDirs("src/test/kotlin")
         }
     }
     dependencies {

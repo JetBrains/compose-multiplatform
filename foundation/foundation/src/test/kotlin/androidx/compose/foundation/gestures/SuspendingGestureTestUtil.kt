@@ -26,7 +26,6 @@ import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.withRunningRecomposer
-import androidx.compose.testutils.TestViewConfiguration
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -39,9 +38,11 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.materialize
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
+import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
@@ -356,4 +357,14 @@ internal class SuspendingGestureTestUtil(
         }
         override fun clear() {}
     }
+
+
+    // Copy-pasted from test-utils module (see TestViewConfiguration) to make it usable on desktop
+    class TestViewConfiguration(
+        override val longPressTimeoutMillis: Long = 500L,
+        override val doubleTapTimeoutMillis: Long = 300L,
+        override val doubleTapMinTimeMillis: Long = 40L,
+        override val touchSlop: Float = 18f,
+        override val minimumTouchTargetSize: DpSize = DpSize(48.dp, 48.dp)
+    ) : ViewConfiguration
 }
