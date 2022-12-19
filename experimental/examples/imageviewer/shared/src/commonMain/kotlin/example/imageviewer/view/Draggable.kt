@@ -11,7 +11,7 @@ import example.imageviewer.core.EventLocker
 import example.imageviewer.style.Transparent
 
 @Composable
-fun Draggable(
+internal fun Draggable(
     dragHandler: DragHandler,
     modifier: Modifier = Modifier,
     onUpdate: (() -> Unit)? = null,

@@ -29,7 +29,7 @@ import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
 @Composable
-fun FullscreenImage(
+internal fun FullscreenImage(
     picture: Picture,
     getImage: suspend (Picture) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
@@ -59,9 +59,9 @@ fun FullscreenImage(
         }
     }
 
-    Column {
-        Toolbar(picture.name, filtersState, localization, back)
-        Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize()) {
+        Column {
+            Toolbar(picture.name, filtersState, localization, back)
             if (imageWithFilter != null) {
                 ScalableImage(
                     modifier = Modifier,
@@ -70,25 +70,26 @@ fun FullscreenImage(
             } else {
                 LoadingScreen()
             }
-            FloatingActionButton(
-                modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
-                onClick = previousImage
-            ) {
-                Icon(imageVector = Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous")
-            }
-            FloatingActionButton(
-                modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-                onClick = nextImage
-            ) {
-                Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "Next")
-            }
+        }
+
+        FloatingActionButton(modifier = Modifier.align(Alignment.BottomStart).padding(10.dp), onClick = previousImage) {
+            Icon(imageVector = Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous")
+        }
+        FloatingActionButton(modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp), onClick = nextImage) {
+            Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "Next")
         }
     }
+
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun Toolbar(title:String, filtersState: MutableState<Set<FilterType>>, localization: Localization, back: () -> Unit) {
+private fun Toolbar(
+    title: String,
+    filtersState: MutableState<Set<FilterType>>,
+    localization: Localization,
+    back: () -> Unit
+) {
     val backButtonInteractionSource = remember { MutableInteractionSource() }
     val backButtonHover by backButtonInteractionSource.collectIsHoveredAsState()
     Surface(
