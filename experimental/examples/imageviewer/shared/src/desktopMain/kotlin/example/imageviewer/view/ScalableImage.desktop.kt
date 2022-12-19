@@ -1,69 +1,80 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import example.imageviewer.style.DarkGray
 import example.imageviewer.utils.cropBitmapByScale
-import java.awt.image.BufferedImage
-import java.io.ByteArrayOutputStream
-import javax.imageio.ImageIO
 
+private const val MAX_SCALE = 5f
+private const val MIN_SCALE = 1f
+
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
     val scaleState = remember { mutableStateOf(1f) }
-    val scale = scaleState.value
-    val size = LocalWindowSize.current
-    val drag = remember { DragHandler() }
-    val scaleHandler = remember { ScaleHandler(scaleState) }
-
-    val modifiedImage: ImageBitmap = remember(image, scale, size) {
-        org.jetbrains.skia.Image.makeFromEncoded(
-            toByteArray(
-                cropBitmapByScale(
-                    image.toAwtImage(),
-                    size,
-                    scale,
-                    drag.getAmount()
-                )
-            )
-        ).toComposeImageBitmap()
-    }
+    val dragState = remember { mutableStateOf(Offset.Zero) }
+    val focusRequester = FocusRequester()
 
     Surface(
         color = DarkGray,
         modifier = Modifier.fillMaxSize()
-    ) {
-        Draggable(
-            dragHandler = drag,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            ZoomWithKeyboard(
-                scaleHandler = scaleHandler,
-                modifier = modifier.fillMaxSize()
-            ) {
-                Image(
-                    bitmap = modifiedImage,
-                    contentDescription = null,
-                    contentScale = ContentScale.Fit
-                )
+            .pointerInput(Unit) {
+                detectDragGestures { change, dragAmount ->
+                    dragState.value += dragAmount
+                    change.consume()
+                }
+            }.onPreviewKeyEvent {
+                if (it.type == KeyEventType.KeyUp) {
+                    when (it.key) {
+                        Key.I, Key.Plus, Key.Equals -> scaleState.updateZoom(1.2f)
+                        Key.O, Key.Minus -> scaleState.updateZoom(0.8f)
+                        Key.R -> scaleState.value = 1f
+                    }
+                }
+                false
             }
-        }
+            .focusRequester(focusRequester)
+            .focusable()
+    ) {
+        Image(
+            bitmap = cropBitmapByScale(image, scaleState.value, dragState.value),
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
+    }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
     }
 }
 
-fun toByteArray(bitmap: BufferedImage): ByteArray {
-    val baos = ByteArrayOutputStream()
-    ImageIO.write(bitmap, "png", baos)
-    return baos.toByteArray()
+private fun MutableState<Float>.updateZoom(zoom: Float) {
+    var newScale = value + zoom - 1f
+    if (newScale > MAX_SCALE) {
+        newScale = MAX_SCALE
+    } else if (newScale < MIN_SCALE) {
+        newScale = MIN_SCALE
+    }
+    value = newScale
+}
+
+@Composable
+actual fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset): ImageBitmap {
+    val size = LocalWindowSize.current
+    return cropBitmapByScale(image.toAwtImage(), size, scale, offset).toComposeImageBitmap()
 }

@@ -17,7 +17,6 @@ import java.awt.image.ConvolveOp
 import java.awt.image.Kernel
 import kotlin.math.pow
 import kotlin.math.roundToInt
-import example.imageviewer.view.DragHandler
 
 fun scaleBitmapAspectRatio(
     bitmap: BufferedImage,

@@ -17,45 +17,38 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
 import example.imageviewer.style.DarkGray
-import example.imageviewer.style.Transparent
-import example.imageviewer.utils.adjustImageScale
 import example.imageviewer.utils.displayHeight
 import example.imageviewer.utils.displayWidth
 import kotlin.math.pow
 import kotlin.math.roundToInt
 
-const val MAX_SCALE = 5f
-const val MIN_SCALE = 1f
+private const val MAX_SCALE = 5f
+private const val MIN_SCALE = 1f
 
 @Composable
 internal actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
-    val drag = remember { DragHandler() }
-    val scaleState: MutableState<Float> = remember { mutableStateOf(1f) }
+    val dragState = remember(image) { mutableStateOf(Offset.Zero) }
+    val scaleState = remember(image) { mutableStateOf(1f) }
 
     Surface(
         color = DarkGray,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier.fillMaxSize()
+            .pointerInput(Unit) {
+                detectTransformGestures { _, pan, zoom, _ ->
+                    dragState.value += pan
+                    scaleState.updateZoom(zoom)
+                }
+            }.pointerInput(Unit) {
+                detectTapGestures(onDoubleTap = { scaleState.value = 1f })
+            },
     ) {
-        Draggable(dragHandler = drag, modifier = Modifier.fillMaxSize()) {
-            Surface(
-                color = Transparent,
-                modifier = modifier.fillMaxSize().pointerInput(Unit) {
-                    detectTransformGestures { _, _, zoom, _ ->
-                        scaleState.updateZoom(zoom)
-                    }
-                }.pointerInput(Unit) {
-                    detectTapGestures(onDoubleTap = { scaleState.value = 1f })
-                },
-            ) {
-                val imageBitmap = cropBitmapByScale(image, scaleState.value, drag.getAmount())
-                Image(
-                    bitmap = imageBitmap,
-                    contentDescription = null,
-                    contentScale = adjustImageScale(imageBitmap)
-                )
-            }
-        }
+        Image(
+            bitmap = cropBitmapByScale(image, scaleState.value, dragState.value),
+            contentDescription = null,
+            contentScale = ContentScale.Fit
+        )
     }
 }
 
@@ -69,8 +62,7 @@ private fun MutableState<Float>.updateZoom(zoom: Float) {
     value = newScale
 }
 
-expect fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset): ImageBitmap
-
+@Composable
 actual fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset): ImageBitmap =
     cropBitmapByScale(image.asAndroidBitmap(), scale, offset).asImageBitmap()
 
