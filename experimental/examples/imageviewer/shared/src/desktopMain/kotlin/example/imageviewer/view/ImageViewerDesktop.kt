@@ -44,7 +44,7 @@ val LocalWindowSize =  staticCompositionLocalOf {
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val windowState = rememberWindowState()
-    val state = remember { mutableStateOf(ContentStateData()) }
+    val state = remember { mutableStateOf(AppState()) }
     CompositionLocalProvider(LocalWindowSize provides windowState.size) {
         Window(
             onCloseRequest = ::exitApplication,

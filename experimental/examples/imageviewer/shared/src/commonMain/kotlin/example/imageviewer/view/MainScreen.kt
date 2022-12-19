@@ -8,12 +8,14 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import example.imageviewer.Dependencies
 import example.imageviewer.model.*
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -22,44 +24,44 @@ import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
 @Composable
-fun MainScreen(content: ContentState) {
+internal fun MainScreen(state: MutableState<AppState>, dependencies: Dependencies) {
     Column {
-        TopContent(content)
+        TopContent(state, dependencies)
         Divider(color = LightGray, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
         val scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)) {
-            for (i in content.state.value.pictures.indices) {
-                val picture = content.state.value.pictures[i]
+            for (i in state.value.pictures.indices) {
+                val picture = state.value.pictures[i]
                 Miniature(
                     picture = picture,
-                    image = content.state.value.miniatures[picture],
+                    image = state.value.miniatures[picture],
                     onClickSelect = {
-                        content.setMainImage(picture)
+                        state.setMainImage(picture, dependencies)
                     },
                     onClickFullScreen = {
-                        content.state.value = content.state.value.copy(
+                        state.value = state.value.copy(
                             currentImageIndex = i,
                             screen = ScreenState.FullScreen
                         )
                     },
                     onClickInfo = {
-                        content.dependencies.notification.notifyImageData(picture)
+                        dependencies.notification.notifyImageData(picture)
                     },
                 )
                 Spacer(modifier = Modifier.height(5.dp))
             }
         }
     }
-    if (!content.isContentReady()) {
-        LoadingScreen(content.dependencies.localization.loading)
+    if (!state.value.isContentReady) {
+        LoadingScreen(dependencies.localization.loading)
     }
 }
 
 @Composable
-fun TopContent(content: ContentState) {
-    TitleBar(text = content.dependencies.localization.appName, content = content)
+private fun TopContent(state: MutableState<AppState>, dependencies: Dependencies) {
+    TitleBar(state, dependencies)
 //    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {//todo
-    PreviewImage(content)
+    PreviewImage(state)
     Spacer(modifier = Modifier.height(10.dp))
 //    }
     Spacer(modifier = Modifier.height(5.dp))
@@ -67,13 +69,13 @@ fun TopContent(content: ContentState) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun TitleBar(text: String, content: ContentState) {
+private fun TitleBar(state: MutableState<AppState>, dependencies: Dependencies) {
     TopAppBar(
         backgroundColor = DarkGreen,
         title = {
             Row(Modifier.height(50.dp)) {
                 Text(
-                    text,
+                    dependencies.localization.appName,
                     color = Foreground,
                     modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
                 )
@@ -84,8 +86,8 @@ fun TitleBar(text: String, content: ContentState) {
                 ) {
                     Clickable(
                         onClick = {
-                            if (content.isContentReady()) {
-                                content.refresh()
+                            if (state.value.isContentReady) {
+                                state.refresh(dependencies)
                             }
                         }
                     ) {
@@ -102,9 +104,9 @@ fun TitleBar(text: String, content: ContentState) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun PreviewImage(content: ContentState) {
+fun PreviewImage(state: MutableState<AppState>) {
     Clickable(onClick = {
-        content.state.value = content.state.value.copy(
+        state.value = state.value.copy(
             screen = ScreenState.FullScreen
         )
     }) {
@@ -115,7 +117,7 @@ fun PreviewImage(content: ContentState) {
             elevation = 1.dp
         ) {
             Image(
-                bitmap = content.state.value.mainImage ?: resource("empty.png").rememberImageBitmap().orEmpty(),
+                bitmap = state.value.mainImage ?: resource("empty.png").rememberImageBitmap().orEmpty(),
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),

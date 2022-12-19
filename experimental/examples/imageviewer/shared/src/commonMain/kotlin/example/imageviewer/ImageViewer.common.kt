@@ -23,14 +23,9 @@ interface Dependencies {
 @Composable
 internal fun ImageViewerCommon(
     dependencies: Dependencies,
-    state: MutableState<ContentStateData>
+    state: MutableState<AppState>
 ) {
-    val content = ContentState(
-        state = state,
-        dependencies = dependencies,
-    ).apply {
-        initData()
-    }
+    state.initData(dependencies)
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -38,7 +33,7 @@ internal fun ImageViewerCommon(
     ) {
         when (state.value.screen) {
             ScreenState.Miniatures -> {
-                MainScreen(content)
+                MainScreen(state, dependencies)
             }
 
             ScreenState.FullScreen -> {
@@ -48,8 +43,8 @@ internal fun ImageViewerCommon(
                     getFilter = { dependencies.getFilter(it) },
                     localization = dependencies.localization,
                     back = { state.value = state.value.copy(screen = ScreenState.Miniatures) },
-                    nextImage = { content.state.nextImage() },
-                    previousImage = { content.state.previousImage() },
+                    nextImage = { state.nextImage() },
+                    previousImage = { state.previousImage() },
                 )
             }
         }

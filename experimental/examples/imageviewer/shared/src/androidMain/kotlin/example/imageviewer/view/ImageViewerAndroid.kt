@@ -25,7 +25,7 @@ fun ImageViewerAndroid() {
     val context: Context = LocalContext.current
     val ioScope = rememberCoroutineScope { SupervisorJob() + Dispatchers.IO }
     val dependencies = remember(context) { getDependencies(context, ioScope) }
-    ImageViewerCommon(dependencies, remember { mutableStateOf(ContentStateData()) })
+    ImageViewerCommon(dependencies, remember { mutableStateOf(AppState()) })
 }
 
 private fun getDependencies(context: Context, ioScope: CoroutineScope) = object : Dependencies {
