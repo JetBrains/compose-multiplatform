@@ -195,7 +195,6 @@ class DrawerState(
      *
      * @param targetValue The new target value
      */
-    @ExperimentalMaterialApi
     suspend fun snapTo(targetValue: DrawerValue) {
         swipeableState.snapTo(targetValue)
     }
