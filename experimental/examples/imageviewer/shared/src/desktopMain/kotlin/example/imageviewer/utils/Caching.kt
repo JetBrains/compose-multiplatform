@@ -1,17 +1,16 @@
 package example.imageviewer.utils
 
 import example.imageviewer.model.ContentRepository
-import example.imageviewer.model.NetworkRequest
 import example.imageviewer.model.getNameURL
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.math.absoluteValue
 
-fun ContentRepository<NetworkRequest, ByteArray>.decorateWithDiskCache(
+fun ContentRepository<ByteArray>.decorateWithDiskCache(
     backgroundScope: CoroutineScope,
     cacheDir: File
-): ContentRepository<NetworkRequest, ByteArray> {
+): ContentRepository<ByteArray> {
 
     class FileSystemLock()
 
@@ -19,9 +18,9 @@ fun ContentRepository<NetworkRequest, ByteArray>.decorateWithDiskCache(
     val locksCount = 100
     val locks = Array(locksCount) { FileSystemLock() }
 
-    fun getLock(key: NetworkRequest) = locks[key.hashCode().absoluteValue % locksCount]
+    fun getLock(url: String) = locks[url.hashCode().absoluteValue % locksCount]
 
-    return object : ContentRepository<NetworkRequest, ByteArray> {
+    return object : ContentRepository<ByteArray> {
         init {
             try {
                 if (!cacheDir.exists()) {
@@ -33,15 +32,12 @@ fun ContentRepository<NetworkRequest, ByteArray>.decorateWithDiskCache(
             }
         }
 
-        override suspend fun loadContent(key: NetworkRequest): ByteArray {
+        override suspend fun loadContent(url: String): ByteArray {
             if (!cacheDir.exists()) {
-                return origin.loadContent(key)
+                return origin.loadContent(url)
             }
-            val file = with(key) {
-                cacheDir.resolve("cache-${getNameURL(key.url)}.png")
-            }
-
-            val fromCache: ByteArray? = synchronized(getLock(key)) {
+            val file = cacheDir.resolve("cache-${getNameURL(url)}.png")
+            val fromCache: ByteArray? = synchronized(getLock(url)) {
                 if (file.exists()) {
                     try {
                         file.readBytes()
@@ -59,9 +55,9 @@ fun ContentRepository<NetworkRequest, ByteArray>.decorateWithDiskCache(
             val result = if (fromCache != null) {
                 fromCache
             } else {
-                val image = origin.loadContent(key)
+                val image = origin.loadContent(url)
                 backgroundScope.launch {
-                    synchronized(getLock(key)) {
+                    synchronized(getLock(url)) {
                         // save to cacheDir
                         try {
                             file.writeBytes(image)

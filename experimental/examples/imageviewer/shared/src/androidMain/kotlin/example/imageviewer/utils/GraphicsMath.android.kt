@@ -7,9 +7,6 @@ import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
 import android.renderscript.ScriptIntrinsicBlur
-import kotlin.math.pow
-import kotlin.math.roundToInt
-import example.imageviewer.view.DragHandler
 
 fun scaleBitmapAspectRatio(
     bitmap: Bitmap,

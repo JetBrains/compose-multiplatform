@@ -2,11 +2,11 @@ package example.imageviewer
 
 import example.imageviewer.model.ContentRepository
 
-fun <K, A, B> ContentRepository<K, A>.adapter(transform: (A) -> B): ContentRepository<K, B> {
+fun <A, B> ContentRepository<A>.adapter(transform: (A) -> B): ContentRepository<B> {
     val origin = this
-    return object : ContentRepository<K, B> {
-        override suspend fun loadContent(key: K): B {
-            return transform(origin.loadContent(key))
+    return object : ContentRepository<B> {
+        override suspend fun loadContent(url: String): B {
+            return transform(origin.loadContent(url))
         }
     }
 }

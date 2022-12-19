@@ -85,7 +85,7 @@ fun ApplicationScope.ImageViewerDesktop() {
                         override val loading: String
                             get() = ResString.loading
                     }
-                    override val imageRepository: ContentRepository<NetworkRequest, ImageBitmap> =
+                    override val imageRepository: ContentRepository<ImageBitmap> =
                         createRealRepository(HttpClient(CIO))
                             .decorateWithDiskCache(
                                 ioScope,

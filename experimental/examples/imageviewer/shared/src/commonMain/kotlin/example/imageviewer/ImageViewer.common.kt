@@ -16,7 +16,7 @@ import example.imageviewer.view.MainScreen
 interface Dependencies {
     fun getFilter(type: FilterType): BitmapFilter
     val localization: Localization
-    val imageRepository: ContentRepository<NetworkRequest, ImageBitmap>
+    val imageRepository: ContentRepository<ImageBitmap>
     val notification: Notification
 }
 
@@ -44,7 +44,7 @@ internal fun ImageViewerCommon(
             ScreenState.FullScreen -> {
                 FullscreenImage(
                     picture = state.value.picture!!,
-                    getImage = { dependencies.imageRepository.loadContent(NetworkRequest(it.bigUrl)) },
+                    getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                     getFilter = { dependencies.getFilter(it) },
                     localization = dependencies.localization,
                     back = { state.value = state.value.copy(screen = ScreenState.Miniatures) },

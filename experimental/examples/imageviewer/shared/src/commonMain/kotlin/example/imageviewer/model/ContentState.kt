@@ -102,7 +102,7 @@ class ContentState(
 
                 pictures.forEach { picture ->
                     launch {
-                        val pair = picture to dependencies.imageRepository.loadContent(NetworkRequest(picture.smallUrl))
+                        val pair = picture to dependencies.imageRepository.loadContent(picture.smallUrl)
                         modifyState {
                             copy(miniatures = miniatures + pair)
                         }
@@ -119,7 +119,7 @@ class ContentState(
     fun setMainImage(picture: Picture) {
         backgroundScope.launch {
             if (isInternetAvailable()) {
-                val mainImage = dependencies.imageRepository.loadContent(NetworkRequest(picture.bigUrl))
+                val mainImage = dependencies.imageRepository.loadContent(picture.bigUrl)
                 modifyState {
                     copy(
                         mainImage = mainImage

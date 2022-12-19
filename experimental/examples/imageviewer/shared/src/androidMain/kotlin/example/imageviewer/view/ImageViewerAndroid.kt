@@ -43,7 +43,7 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
 
     }
 
-    override val imageRepository: ContentRepository<NetworkRequest, ImageBitmap> =
+    override val imageRepository: ContentRepository<ImageBitmap> =
         createRealRepository(HttpClient(CIO))
             .adapter { it.toImageBitmap() }
 
