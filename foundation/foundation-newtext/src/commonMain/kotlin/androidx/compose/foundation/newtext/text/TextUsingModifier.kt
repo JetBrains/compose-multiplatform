@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.newtext.text
 
-import androidx.compose.foundation.newtext.text.modifiers.TextInlineContentLayoutDrawModifier
+import androidx.compose.foundation.newtext.text.modifiers.StaticTextModifier
 import androidx.compose.foundation.newtext.text.modifiers.TextInlineContentLayoutDrawParams
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
@@ -182,7 +182,7 @@ private fun Modifier.textModifier(
     )
     return this then modifierElementOf(
         params,
-        create = { TextInlineContentLayoutDrawModifier(params) },
+        create = { StaticTextModifier(params) },
         update = { it.update(params) },
         definitions = {},
     )

@@ -45,7 +45,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -86,7 +85,6 @@ class TextLayoutTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun textLayout_intrinsicMeasurements() {
         val textSize = Ref<IntSize>()
         val doubleTextSize = Ref<IntSize>()
@@ -111,6 +109,9 @@ class TextLayoutTest {
                         measurables: List<Measurable>,
                         constraints: Constraints
                     ): MeasureResult {
+                        measurables.forEach {
+                            it.measure(constraints)
+                        }
                         textMeasurable = measurables.first()
                         return layout(0, 0) {}
                     }
@@ -214,7 +215,6 @@ class TextLayoutTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun textLayout_OnTextLayoutCallback() {
         val resultsFromCallback = mutableListOf<TextLayoutResult>()
         rule.setContent {
