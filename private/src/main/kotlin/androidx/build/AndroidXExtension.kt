@@ -45,7 +45,11 @@ open class AndroidXExtension(val project: Project) {
         )
         val content = project.providers.fileContents(toml)
 
-        // Used in a few situations, most notably when building pre-release binaries for androidxdev
+        // These parameters are used when building pre-release binaries for androidxdev.
+        // These parameters are only expected to be compatible with :compose:compiler:compiler .
+        // To use them may require specifying specific projects and disabling some checks
+        // like this:
+        // `./gradlew :compose:compiler:compiler:publishToMavenLocal -Pandroidx.versionExtraCheckEnabled=false`
         val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
         val composeCustomGroup = project.providers.environmentVariable("COMPOSE_CUSTOM_GROUP")
         val useMultiplatformVersions = project.provider {
