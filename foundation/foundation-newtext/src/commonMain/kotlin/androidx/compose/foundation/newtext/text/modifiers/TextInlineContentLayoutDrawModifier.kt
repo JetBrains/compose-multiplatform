@@ -36,6 +36,7 @@ internal class TextInlineContentLayoutDrawModifier(
 
     internal var params: TextInlineContentLayoutDrawParams = params
         set(value) {
+            validate(params)
             layoutCache?.let { cache ->
                 if (cache.equalForLayout(value) || cache.equalForCallbacks(value)) {
                     textDelegateDirty = true
@@ -46,6 +47,10 @@ internal class TextInlineContentLayoutDrawModifier(
             // if we set params, always redraw.
             invalidateDraw()
         }
+
+    private fun validate(params: TextInlineContentLayoutDrawParams) {
+        validateMinMaxLines(params.minLines, params.maxLines)
+    }
 
     private fun getOrUpdateTextDelegateInLayout(
         density: Density

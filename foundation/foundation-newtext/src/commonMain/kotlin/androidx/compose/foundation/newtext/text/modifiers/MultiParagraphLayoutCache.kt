@@ -170,12 +170,21 @@ internal class MultiParagraphLayoutCache(
         if (!layoutCache.newConstraintsProduceNewLayout(constraints, layoutDirection)) {
             return false
         }
-        val multiParagraph = layoutText(
-            constraints,
-            layoutDirection
-        )
+        val finalConstraints = if (params.maxLines != Int.MAX_VALUE || params.minLines >= 1) {
+            constraints.coerceMaxMinLines(
+                layoutDirection = layoutDirection,
+                minLines = params.minLines,
+                maxLines = params.maxLines,
+                paramStyle = params.style,
+                density = density,
+                fontFamilyResolver = params.fontFamilyResolver
+            )
+        } else {
+            constraints
+        }
+        val multiParagraph = layoutText(finalConstraints, layoutDirection)
 
-        val size = constraints.constrain(
+        val size = finalConstraints.constrain(
             IntSize(
                 multiParagraph.width.ceilToIntPx(),
                 multiParagraph.height.ceilToIntPx()
@@ -193,7 +202,7 @@ internal class MultiParagraphLayoutCache(
                 density,
                 layoutDirection,
                 params.fontFamilyResolver,
-                constraints
+                finalConstraints
             ),
             multiParagraph,
             size

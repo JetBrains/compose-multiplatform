@@ -38,7 +38,11 @@ internal data class TextInlineContentLayoutDrawParams(
     val minLines: Int = DefaultMinLines,
     val placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
     val onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
-)
+) {
+    init {
+        validateMinMaxLines(minLines, maxLines)
+    }
+}
 
 internal fun TextInlineContentLayoutDrawParams.equalForCallbacks(
     newParams: TextInlineContentLayoutDrawParams
