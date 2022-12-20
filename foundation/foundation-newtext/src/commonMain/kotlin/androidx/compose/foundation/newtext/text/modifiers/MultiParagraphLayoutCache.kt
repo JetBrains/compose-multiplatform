@@ -69,12 +69,8 @@ internal class MultiParagraphLayoutCache(
     val maxIntrinsicWidth: Int get() = nonNullIntrinsics.maxIntrinsicWidth.ceilToIntPx()
 
     val layout: TextLayoutResult
-        get() {
-            layoutCache?.let {
-                return it
-            }
-            throw IllegalStateException("You must call doLayoutInConstraints first")
-        }
+        get() = layoutCache
+            ?: throw IllegalStateException("You must call doLayoutInConstraints first")
 
     val layoutOrNull: TextLayoutResult?
         get() = layoutCache
@@ -219,12 +215,9 @@ internal class MultiParagraphLayoutCache(
         // if we were passed identical constraints just skip more work
         if (constraints == layoutInput.constraints) return false
 
-        // only be clever if we can predict line break behavior exactly
-        val canBeClever = when (params.style.lineBreak) {
-            LineBreak.Simple -> true
-            else -> false
-        }
-        if (!canBeClever) {
+        // only be clever if we can predict line break behavior exactly, which is only possible with
+        // simple geometry math for the greedy layout case
+        if (params.style.lineBreak != LineBreak.Simple) {
             return true
         }
 
@@ -244,6 +237,15 @@ internal class MultiParagraphLayoutCache(
                 return true
             }
         }
+
+        // check any constraint width changes for single line text
+        if (!canWrap &&
+            (constraints.maxWidth != layoutInput.constraints.maxWidth ||
+                (constraints.minWidth != layoutInput.constraints.minWidth))) {
+            // no soft wrap and width is different, always invalidate
+            return true
+        }
+
         // if we get here width won't change, height may be clipped
         if (constraints.maxHeight < multiParagraph.height) {
             // vertical clip changes

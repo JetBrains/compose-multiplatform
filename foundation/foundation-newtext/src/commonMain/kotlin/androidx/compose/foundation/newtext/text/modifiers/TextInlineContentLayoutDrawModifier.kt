@@ -34,7 +34,7 @@ internal class TextInlineContentLayoutDrawModifier(
     val layoutOrNull: TextLayoutResult?
         get() = layoutCache?.layoutOrNull
 
-    private var params: TextInlineContentLayoutDrawParams = params
+    internal var params: TextInlineContentLayoutDrawParams = params
         set(value) {
             layoutCache?.let { cache ->
                 if (cache.equalForLayout(value) || cache.equalForCallbacks(value)) {
@@ -46,10 +46,6 @@ internal class TextInlineContentLayoutDrawModifier(
             // if we set params, always redraw.
             invalidateDraw()
         }
-
-    fun update(params: TextInlineContentLayoutDrawParams) {
-        this.params = params
-    }
 
     private fun getOrUpdateTextDelegateInLayout(
         density: Density
@@ -79,15 +75,12 @@ internal class TextInlineContentLayoutDrawModifier(
     ): MeasureResult {
         val td = getOrUpdateTextDelegateInLayout(this)
 
-        // Otherwise, we expect that all restarts lead to a new text layout
         val didChangeLayout = td.layoutWithConstraints(constraints, layoutDirection)
         val textLayoutResult = td.layout
 
         if (didChangeLayout) {
             invalidateDraw()
-            params.onTextLayout?.let { onTextLayout ->
-                onTextLayout(textLayoutResult)
-            }
+            params.onTextLayout?.invoke(textLayoutResult)
         }
 
         // first share the placeholders
@@ -109,7 +102,7 @@ internal class TextInlineContentLayoutDrawModifier(
                 LastBaseline to textLayoutResult.lastBaseline.roundToInt()
             )
         ) {
-            // this is effictively graphicsLayer
+            // this is basically a graphicsLayer
             placeable.placeWithLayer(0, 0)
         }
     }
@@ -186,9 +179,9 @@ internal class TextInlineContentLayoutDrawModifier(
 
     override fun ContentDrawScope.draw() {
         drawIntoCanvas { canvas ->
-            layoutCache?.layout?.let { textLayout ->
-                TextPainter.paint(canvas, textLayout)
-            }
+            TextPainter.paint(canvas, requireNotNull(layoutCache?.layout))
+        }
+        if (!params.placeholders.isNullOrEmpty()) {
             drawContent()
         }
     }

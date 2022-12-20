@@ -30,8 +30,9 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.LocalFontFamilyResolver
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
@@ -159,7 +160,7 @@ private class TextMeasurePolicy(
 private fun Modifier.textModifier(
     text: AnnotatedString,
     style: TextStyle,
-    onTextLayout: (TextLayoutResult) -> Unit,
+    onTextLayout: ((TextLayoutResult) -> Unit)?,
     overflow: TextOverflow,
     softWrap: Boolean,
     maxLines: Int,
@@ -180,10 +181,13 @@ private fun Modifier.textModifier(
         placeholders,
         onPlaceholderLayout,
     )
-    return this then modifierElementOf(
+    return this then object : ModifierNodeElement<StaticTextModifier>(
         params,
-        create = { StaticTextModifier(params) },
-        update = { it.update(params) },
-        definitions = {},
-    )
+        false,
+        debugInspectorInfo {}
+    ) {
+        override fun create(): StaticTextModifier = StaticTextModifier(params)
+        override fun update(node: StaticTextModifier): StaticTextModifier =
+            node.also { it.update(params) }
+    }
 }

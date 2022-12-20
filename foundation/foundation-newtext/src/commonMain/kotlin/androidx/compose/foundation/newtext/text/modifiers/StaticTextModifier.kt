@@ -31,6 +31,7 @@ import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.unit.Constraints
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -40,27 +41,31 @@ internal class StaticTextModifier(
 
     private val drawLayout = delegated { TextInlineContentLayoutDrawModifier(params) }
 
-    private var text: AnnotatedString = params.text
+    private var _semanticsConfiguration: SemanticsConfiguration = generateSemantics(params.text)
 
-    override val semanticsConfiguration: SemanticsConfiguration
-        get() = SemanticsConfiguration().also {
+    private val semanticsTextLayoutResult: (MutableList<TextLayoutResult>) -> Boolean =
+        { textLayoutResult ->
+            val layout = drawLayout.layoutOrNull?.also {
+                textLayoutResult.add(it)
+            }
+            layout != null
+        }
+
+    private fun generateSemantics(text: AnnotatedString): SemanticsConfiguration {
+        return SemanticsConfiguration().also {
             it.isMergingSemanticsOfDescendants = false
             it.isClearingSemantics = false
             it.text = text
-            it.getTextLayoutResult { textLayoutResult ->
-               val result = drawLayout.layoutOrNull
-               if (result == null) {
-                   return@getTextLayoutResult false
-               } else {
-                   textLayoutResult.add(result)
-                   return@getTextLayoutResult true
-               }
-            }
+            it.getTextLayoutResult(action = semanticsTextLayoutResult)
         }
+    }
+
+    override val semanticsConfiguration: SemanticsConfiguration
+        get() = _semanticsConfiguration
 
     fun update(params: TextInlineContentLayoutDrawParams) {
-        text = params.text
-        drawLayout.update(params)
+        _semanticsConfiguration = generateSemantics(params.text)
+        drawLayout.params = params
     }
 
     override fun IntrinsicMeasureScope.minIntrinsicWidth(
