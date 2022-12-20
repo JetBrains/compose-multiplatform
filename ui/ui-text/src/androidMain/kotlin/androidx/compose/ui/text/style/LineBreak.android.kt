@@ -17,7 +17,9 @@
 package androidx.compose.ui.text.style
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.style.LineBreak.Strategy
+import androidx.compose.ui.text.style.LineBreak.Strictness
+import androidx.compose.ui.text.style.LineBreak.WordBreak
 
 // TODO(b/246340708): Remove @sample LineBreakSample from the actual class
 /**
@@ -40,7 +42,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
  * @param strictness defines the line breaking rules
  * @param wordBreak defines how words are broken
  */
-@ExperimentalTextApi
 @Immutable
 actual class LineBreak(
     val strategy: Strategy,

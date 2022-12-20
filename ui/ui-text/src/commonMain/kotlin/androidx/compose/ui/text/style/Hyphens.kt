@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.text.style
 
-import androidx.compose.ui.text.ExperimentalTextApi
-
 /**
  * Automatic hyphenation configuration.
  *
@@ -43,7 +41,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
  * The default configuration for [Hyphens] = [Hyphens.None]
  *
  */
-@ExperimentalTextApi
 class Hyphens private constructor() {
     companion object {
         /**

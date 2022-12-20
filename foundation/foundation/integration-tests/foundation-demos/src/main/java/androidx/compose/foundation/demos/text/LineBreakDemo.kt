@@ -30,7 +30,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -40,7 +39,6 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalTextApi::class)
 private val lineBreakOptions = listOf(
     "Simple" to LineBreak.Simple,
     "Paragraph" to LineBreak.Paragraph,
@@ -55,9 +53,8 @@ private val lineBreakOptions = listOf(
 private val demoText = "This is an example text\n今日は自由が丘で焼き鳥を食べます。"
 private val presetNameStyle = SpanStyle(fontWeight = FontWeight.Bold, fontSize = 16.sp)
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
-fun TextLineBreakingDemo() {
+fun TextLineBreakDemo() {
     val selectedFontSize = remember { mutableStateOf(16f) }
 
     Column(modifier = Modifier.fillMaxSize()) {

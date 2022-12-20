@@ -103,7 +103,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.textDirection).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge non-null hyphens uses other's hyphens`() {
         val style = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -114,7 +113,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(otherStyle.hyphens)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge hyphens other null, returns original`() {
         val style = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -125,7 +123,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(style.hyphens)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge null hyphens other non-null, returns other's hyphens`() {
         val style = ParagraphStyle(hyphens = null)
@@ -136,7 +133,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(otherStyle.hyphens)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge hyphens both null returns null`() {
         val style = ParagraphStyle(hyphens = null)
@@ -207,7 +203,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.textIndent).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge null with non-null lineBreak uses other's lineBreak`() {
         val style = ParagraphStyle(lineBreak = null)
@@ -218,7 +213,6 @@ class ParagraphStyleTest {
         assertThat(mergedStyle.lineBreak).isEqualTo(otherStyle.lineBreak)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge non-null with null lineBreak returns original's lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
@@ -229,7 +223,6 @@ class ParagraphStyleTest {
         assertThat(mergedStyle.lineBreak).isEqualTo(style.lineBreak)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge null with null lineBreak returns null`() {
         val style = ParagraphStyle(lineBreak = null)
@@ -240,7 +233,6 @@ class ParagraphStyleTest {
         assertThat(mergedStyle.lineBreak).isEqualTo(null)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge non-null with non-null lineBreak returns other's lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
@@ -251,7 +243,6 @@ class ParagraphStyleTest {
         assertThat(mergedStyle.lineBreak).isEqualTo(otherStyle.lineBreak)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge null platformStyles`() {
         val style1 = ParagraphStyle(platformStyle = null)
@@ -339,7 +330,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.textDirection).isEqualTo(style2.textDirection)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp hyphens with a null, b not null and t is smaller than half`() {
         val style1 = ParagraphStyle(hyphens = null)
@@ -350,7 +340,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp hyphens with a null, b not null and t is equal to half`() {
         val style1 = ParagraphStyle(hyphens = null)
@@ -361,7 +350,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(style2.hyphens)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp hyphens with a and b are not null and t is smaller than half`() {
         val style1 = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -372,7 +360,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(style1.hyphens)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp hyphens with a and b are not Null and t is larger than half`() {
         val style1 = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -443,7 +430,6 @@ class ParagraphStyleTest {
         assertThat(anotherNewStyle.lineHeight).isEqualTo(22.sp)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with null platformStyles has null platformStyle`() {
         val style = ParagraphStyle(platformStyle = null)
@@ -454,7 +440,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.platformStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with null lineHeightStyles has null lineHeightStyle`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -465,7 +450,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineHeightStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with non-null start, null end, closer to start has non-null lineHeightStyle`() {
         val style = ParagraphStyle(lineHeightStyle = LineHeightStyle.Default)
@@ -476,7 +460,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineHeightStyle).isSameInstanceAs(style.lineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with non-null start, null end, closer to end has null lineHeightStyle`() {
         val style = ParagraphStyle(lineHeightStyle = LineHeightStyle.Default)
@@ -487,7 +470,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineHeightStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with null start, non-null end, closer to start has null lineHeightStyle`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -498,7 +480,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineHeightStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with null start, non-null end, closer to end has non-null lineHeightStyle`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -509,7 +490,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineHeightStyle).isSameInstanceAs(otherStyle.lineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with non-null start, null end, closer to start has non-null lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Heading)
@@ -520,7 +500,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineBreak).isSameInstanceAs(style.lineBreak)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with non-null start, null end, closer to end has null lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Heading)
@@ -531,7 +510,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineBreak).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with null start, non-null end, closer to start has null lineBreak`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -542,7 +520,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineBreak).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `lerp with null start, non-null end, closer to end has non-null lineBreak`() {
         val style = ParagraphStyle(lineBreak = null)
@@ -553,7 +530,6 @@ class ParagraphStyleTest {
         assertThat(lerpedStyle.lineBreak).isSameInstanceAs(otherStyle.lineBreak)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return false for different line height behavior`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -562,7 +538,6 @@ class ParagraphStyleTest {
         assertThat(style == otherStyle).isFalse()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return true for same line height behavior`() {
         val style = ParagraphStyle(lineHeightStyle = LineHeightStyle.Default)
@@ -571,7 +546,6 @@ class ParagraphStyleTest {
         assertThat(style == otherStyle).isTrue()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is same for same line height behavior`() {
         val style = ParagraphStyle(lineHeightStyle = LineHeightStyle.Default)
@@ -580,7 +554,6 @@ class ParagraphStyleTest {
         assertThat(style.hashCode()).isEqualTo(otherStyle.hashCode())
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is different for different line height behavior`() {
         val style = ParagraphStyle(
@@ -599,7 +572,6 @@ class ParagraphStyleTest {
         assertThat(style.hashCode()).isNotEqualTo(otherStyle.hashCode())
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `copy with lineHeightStyle returns new lineHeightStyle`() {
         val style = ParagraphStyle(
@@ -617,7 +589,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineHeightStyle).isEqualTo(newLineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `copy without lineHeightStyle uses existing lineHeightStyle`() {
         val style = ParagraphStyle(
@@ -631,7 +602,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineHeightStyle).isEqualTo(style.lineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `copy with hyphens returns new hyphens`() {
         val style = ParagraphStyle(hyphens = Hyphens.None)
@@ -640,7 +610,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(Hyphens.Auto)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `copy without hyphens uses existing hyphens`() {
         val style = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -649,7 +618,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.hyphens).isEqualTo(style.hyphens)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return false for different and non-null hyphens behavior`() {
         val style = ParagraphStyle(hyphens = Hyphens.None)
@@ -658,7 +626,6 @@ class ParagraphStyleTest {
         assertThat(style == otherStyle).isFalse()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return false for null and non-null hyphens`() {
         val style = ParagraphStyle(hyphens = null)
@@ -667,7 +634,6 @@ class ParagraphStyleTest {
         assertThat(style == otherStyle).isFalse()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return true for same and non-null hyphens behavior`() {
         val style = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -676,7 +642,6 @@ class ParagraphStyleTest {
         assertThat(style == otherStyle).isTrue()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `equals return true for both null hyphens`() {
         val style = ParagraphStyle(hyphens = null)
@@ -685,7 +650,6 @@ class ParagraphStyleTest {
         assertThat(style == otherStyle).isTrue()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is same for same hyphens behavior`() {
         val style = ParagraphStyle(hyphens = Hyphens.Auto)
@@ -694,7 +658,6 @@ class ParagraphStyleTest {
         assertThat(style.hashCode()).isEqualTo(otherStyle.hashCode())
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is different for different hyphens behavior`() {
         val style = ParagraphStyle(hyphens = Hyphens.None)
@@ -703,7 +666,6 @@ class ParagraphStyleTest {
         assertThat(style.hashCode()).isNotEqualTo(otherStyle.hashCode())
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge with null lineHeightStyle uses other's lineHeightStyle`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -714,7 +676,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineHeightStyle).isEqualTo(otherStyle.lineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge with non-null lineHeightStyle, returns original`() {
         val style = ParagraphStyle(lineHeightStyle = LineHeightStyle.Default)
@@ -725,7 +686,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineHeightStyle).isEqualTo(style.lineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge with both null lineHeightStyle returns null`() {
         val style = ParagraphStyle(lineHeightStyle = null)
@@ -736,7 +696,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineHeightStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `merge with both non-null lineHeightStyle returns other's lineHeightStyle`() {
         val style = ParagraphStyle(
@@ -757,7 +716,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineHeightStyle).isEqualTo(otherStyle.lineHeightStyle)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `constructor without lineHeightStyle sets lineHeightStyle to null`() {
         val style = ParagraphStyle(textAlign = TextAlign.Start)
@@ -765,7 +723,6 @@ class ParagraphStyleTest {
         assertThat(style.lineHeightStyle).isNull()
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `copy with lineBreak returns new lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
@@ -774,7 +731,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineBreak).isEqualTo(LineBreak.Heading)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `copy without lineBreak uses existing lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
@@ -783,7 +739,6 @@ class ParagraphStyleTest {
         assertThat(newStyle.lineBreak).isEqualTo(style.lineBreak)
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is same for same lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)
@@ -792,7 +747,6 @@ class ParagraphStyleTest {
         assertThat(style.hashCode()).isEqualTo(otherStyle.hashCode())
     }
 
-    @OptIn(ExperimentalTextApi::class)
     @Test
     fun `hashCode is different for different lineBreak`() {
         val style = ParagraphStyle(lineBreak = LineBreak.Paragraph)

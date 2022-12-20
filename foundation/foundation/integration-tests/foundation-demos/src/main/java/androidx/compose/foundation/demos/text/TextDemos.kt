@@ -38,7 +38,7 @@ val TextDemos = DemoCategory(
                 DemoCategory(
                     "Line breaking",
                     listOf(
-                        ComposableDemo("Line breaking") { TextLineBreakingDemo() },
+                        ComposableDemo("Line Break") { TextLineBreakDemo() },
                         ComposableDemo("Hyphens") { TextDemoHyphens() },
                         ComposableDemo("Ellipsize") { EllipsizeDemo() },
                         ComposableDemo("Ellipsize and letterspacing") {

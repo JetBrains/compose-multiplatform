@@ -17,10 +17,8 @@
 package androidx.compose.ui.text.style
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
 
 @Immutable
-@ExperimentalTextApi
 actual class LineBreak private constructor() {
     actual companion object {
         actual val Simple: LineBreak = LineBreak()
