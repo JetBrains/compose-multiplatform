@@ -19,8 +19,10 @@ package androidx.compose.ui.test
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ComposeScene
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
+import androidx.compose.ui.platform.SkiaRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.junit4.MainTestClockImpl
 import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
@@ -139,17 +141,34 @@ class SkikoComposeUiTest(
         constraints = Constraints(maxWidth = surface.width, maxHeight = surface.height)
     }
 
-    private fun isIdle() =
-        !Snapshot.current.hasPendingChanges() &&
-            !scene.hasInvalidations()
+    private fun shouldPumpTime(): Boolean {
+        return mainClock.autoAdvance &&
+            (Snapshot.current.hasPendingChanges() || scene.hasInvalidations())
+    }
+
+    @OptIn(InternalComposeUiApi::class)
+    private fun isIdle(): Boolean {
+        var i = 0
+        while (i < 100 && shouldPumpTime()) {
+            mainClock.advanceTimeByFrame()
+            ++i
+        }
+
+        val hasPendingMeasureOrLayout = testOwner.getRoots(true).any {
+            (it as SkiaRootForTest).hasPendingMeasureOrLayout
+        }
+
+        return !shouldPumpTime() && !hasPendingMeasureOrLayout
+    }
 
     override fun waitForIdle() {
-        // always check even if we are idle
-        uncaughtExceptionHandler.throwUncaught()
-        while (!isIdle()) {
+        // TODO: consider adding a timeout to avoid an infinite loop?
+        do {
+            // always check even if we are idle
+            uncaughtExceptionHandler.throwUncaught()
             renderNextFrame()
             uncaughtExceptionHandler.throwUncaught()
-        }
+        } while (!isIdle())
     }
 
     override suspend fun awaitIdle() {

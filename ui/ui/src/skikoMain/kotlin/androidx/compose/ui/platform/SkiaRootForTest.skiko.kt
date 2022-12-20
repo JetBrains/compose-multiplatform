@@ -33,6 +33,11 @@ interface SkiaRootForTest : RootForTest {
     val scene: ComposeScene get() = throw UnsupportedOperationException("SkiaRootForTest.scene is not implemented")
 
     /**
+     * Whether the Owner has pending layout work.
+     */
+    val hasPendingMeasureOrLayout: Boolean
+
+    /**
      * Process pointer event
      *
      * [timeMillis] time when the pointer event occurred

@@ -220,6 +220,9 @@ internal class SkiaBasedOwner(
 
     override val viewConfiguration = platform.viewConfiguration
 
+    override val hasPendingMeasureOrLayout: Boolean
+        get() = measureAndLayoutDelegate.hasPendingMeasureOrLayout
+
     init {
         snapshotObserver.startObserving()
         root.attach(this)

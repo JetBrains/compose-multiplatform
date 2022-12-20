@@ -25,19 +25,25 @@ import kotlinx.coroutines.Runnable
 import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
+import kotlinx.coroutines.CancellableContinuation
+import kotlinx.coroutines.Delay
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.InternalCoroutinesApi
 
 /**
  * Dispatcher with the ability to immediately perform (flush) all pending tasks.
  * Without a flush all tasks are dispatched in the dispatcher provided by [scope]
  */
+@OptIn(InternalCoroutinesApi::class)
 internal class FlushCoroutineDispatcher(
     scope: CoroutineScope
-) : CoroutineDispatcher() {
+) : CoroutineDispatcher(), Delay {
     // Dispatcher should always be alive, even if Job is cancelled. Otherwise coroutines which
     // use this dispatcher won't be properly cancelled.
     // TODO replace it by scope.coroutineContext[Dispatcher] when it will be no longer experimental
     private val scope = CoroutineScope(scope.coroutineContext.minusKey(Job))
     private val tasks = mutableSetOf<Runnable>()
+    private val delayedTasks = mutableSetOf<Runnable>()
     private val tasksLock = createSynchronizedObject()
     private val tasksCopy = mutableSetOf<Runnable>()
     @Volatile
@@ -62,7 +68,7 @@ internal class FlushCoroutineDispatcher(
      * Does the dispatcher have any tasks scheduled or currently in progress
      */
     fun hasTasks() = synchronized(tasksLock) {
-        tasks.isNotEmpty()
+        tasks.isNotEmpty() && delayedTasks.isNotEmpty()
     } && !isPerformingRun
 
     /**
@@ -85,6 +91,25 @@ internal class FlushCoroutineDispatcher(
             body()
         } finally {
             isPerformingRun = false
+        }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun scheduleResumeAfterDelay(timeMillis: Long, continuation: CancellableContinuation<Unit>) {
+        val block = Runnable { continuation.resume(Unit, null) }
+        synchronized(tasksLock) {
+            delayedTasks.add(block)
+        }
+        scope.launch {
+            kotlinx.coroutines.delay(timeMillis)
+            performRun {
+                val isTaskAlive = synchronized(tasksLock) {
+                    delayedTasks.remove(block)
+                }
+                if (isTaskAlive) {
+                    block.run()
+                }
+            }
         }
     }
 }
