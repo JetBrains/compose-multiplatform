@@ -50,8 +50,9 @@ internal class MultiParagraphLayoutCache(
     private var cachedIntrinsicHeight: Pair<Int, Int>? = null
 
     private val nonNullIntrinsics: MultiParagraphIntrinsics
-        get() = paragraphIntrinsics
-            ?: throw IllegalStateException("layoutIntrinsics must be called first")
+        get() = paragraphIntrinsics ?: throw IllegalStateException(
+            "MeasureScope.measure() must be called first to query text intrinsics"
+        )
 
     /**
      * The width for text if all soft wrap opportunities were taken.
@@ -61,7 +62,7 @@ internal class MultiParagraphLayoutCache(
     val minIntrinsicWidth: Int get() = nonNullIntrinsics.minIntrinsicWidth.ceilToIntPx()
 
     /**
-     * The width at which increasing the width of the text no longer decreases the height.
+     * The width at which increasing the width of the text no lonfger decreases the height.
      *
      * Valid only after [layoutWithConstraints] has been called.
      */
@@ -74,6 +75,10 @@ internal class MultiParagraphLayoutCache(
             }
             throw IllegalStateException("You must call doLayoutInConstraints first")
         }
+
+    val layoutOrNull: TextLayoutResult?
+        get() = layoutCache
+
     /**
      * Computes the visual position of the glyphs for painting the text.
      *

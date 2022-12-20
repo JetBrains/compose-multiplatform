@@ -26,7 +26,6 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -40,7 +39,6 @@ class BasicTextSemanticsTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    @Ignore // not implemented yet
     fun semanticsTextChanges_String() {
         var text by mutableStateOf("before")
         rule.setContent {
@@ -53,7 +51,6 @@ class BasicTextSemanticsTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    @Ignore // not implemented yet
     fun semanticsTextChanges_AnnotatedString() {
         var text by mutableStateOf("before")
         rule.setContent {

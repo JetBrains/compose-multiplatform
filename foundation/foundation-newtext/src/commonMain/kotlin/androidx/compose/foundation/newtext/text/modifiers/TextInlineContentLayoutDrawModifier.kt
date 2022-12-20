@@ -15,6 +15,7 @@ import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateLayout
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -26,11 +27,12 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeUiApi::class)
 internal class TextInlineContentLayoutDrawModifier(
     params: TextInlineContentLayoutDrawParams
-) : Modifier.Node(),
-    LayoutModifierNode,
-    DrawModifierNode {
+) : Modifier.Node(), LayoutModifierNode, DrawModifierNode {
     private var layoutCache: MultiParagraphLayoutCache? = null
     private var textDelegateDirty = true
+
+    val layoutOrNull: TextLayoutResult?
+        get() = layoutCache?.layoutOrNull
 
     private var params: TextInlineContentLayoutDrawParams = params
         set(value) {
@@ -61,6 +63,14 @@ internal class TextInlineContentLayoutDrawModifier(
             textDelegateDirty = false
             textDelegate
         }
+    }
+
+    fun measureNonExtension(
+        measureScope: MeasureScope,
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        return measureScope.measure(measurable, constraints)
     }
 
     override fun MeasureScope.measure(
@@ -104,12 +114,28 @@ internal class TextInlineContentLayoutDrawModifier(
         }
     }
 
+    fun minIntrinsicWidthNonExtension(
+        intrinsicMeasureScope: IntrinsicMeasureScope,
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ): Int {
+        return intrinsicMeasureScope.minIntrinsicWidth(measurable, height)
+    }
+
     override fun IntrinsicMeasureScope.minIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
     ): Int {
         val td = getOrUpdateTextDelegateInLayout(this)
         return td.minIntrinsicWidth
+    }
+
+    fun minIntrinsicHeightNonExtension(
+        intrinsicMeasureScope: IntrinsicMeasureScope,
+        measurable: IntrinsicMeasurable,
+        width: Int
+    ): Int {
+        return intrinsicMeasureScope.minIntrinsicHeight(measurable, width)
     }
 
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
@@ -120,6 +146,14 @@ internal class TextInlineContentLayoutDrawModifier(
             .intrinsicHeightAt(width, layoutDirection)
     }
 
+    fun maxIntrinsicWidthNonExtension(
+        intrinsicMeasureScope: IntrinsicMeasureScope,
+        measurable: IntrinsicMeasurable,
+        height: Int
+    ): Int {
+        return intrinsicMeasureScope.maxIntrinsicWidth(measurable, height)
+    }
+
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
@@ -128,12 +162,26 @@ internal class TextInlineContentLayoutDrawModifier(
         return td.maxIntrinsicWidth
     }
 
+    fun maxIntrinsicHeightNonExtension(
+        intrinsicMeasureScope: IntrinsicMeasureScope,
+        measurable: IntrinsicMeasurable,
+        width: Int
+    ): Int {
+        return intrinsicMeasureScope.maxIntrinsicHeight(measurable, width)
+    }
+
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
     ): Int {
         return getOrUpdateTextDelegateInLayout(this)
             .intrinsicHeightAt(width, layoutDirection)
+    }
+
+    fun drawNonExtension(
+        contentDrawScope: ContentDrawScope
+    ) {
+        return contentDrawScope.draw()
     }
 
     override fun ContentDrawScope.draw() {
