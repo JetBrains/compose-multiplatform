@@ -18,6 +18,7 @@ package androidx.build.testConfiguration
 
 import androidx.build.dependencyTracker.ProjectSubset
 import androidx.build.renameApkForTesting
+import com.android.build.api.variant.BuiltArtifact
 import com.android.build.api.variant.BuiltArtifacts
 import com.android.build.api.variant.BuiltArtifactsLoader
 import org.gradle.api.DefaultTask
@@ -107,6 +108,18 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
     @get:OutputFile
     abstract val clientToTServiceToT: RegularFileProperty
 
+    /**
+     * output file where we write the sha256 of each APK we refer in tests.
+     */
+    @get:OutputFile
+    abstract val shaReportOutput: RegularFileProperty
+
+    /**
+     * output file where we write the sha256 of each APK we refer in constained tests.
+     */
+    @get:OutputFile
+    abstract val constrainedShaReportOutput: RegularFileProperty
+
     @get:OutputFile
     abstract val constrainedClientPreviousServiceToT: RegularFileProperty
 
@@ -124,30 +137,37 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         val servicePreviousApk = resolveApk(
             servicePreviousFolder, servicePreviousLoader
         )
+        val testApkSha256Report = TestApkSha256Report()
         writeConfigFileContent(
-            clientToTApk, serviceToTApk, clientToTPath.get(),
+            testApkSha256Report, clientToTApk, serviceToTApk, clientToTPath.get(),
             serviceToTPath.get(), clientToTServiceToT, false, false
         )
         writeConfigFileContent(
-            clientToTApk, servicePreviousApk, clientToTPath.get(),
+            testApkSha256Report, clientToTApk, servicePreviousApk, clientToTPath.get(),
             servicePreviousPath.get(), clientToTServicePrevious, false, true
         )
         writeConfigFileContent(
-            clientPreviousApk, serviceToTApk, clientPreviousPath.get(),
+            testApkSha256Report, clientPreviousApk, serviceToTApk, clientPreviousPath.get(),
             serviceToTPath.get(), clientPreviousServiceToT, true, false
         )
         // write constrained configs as well
         writeConfigFileContent(
-            clientToTApk, serviceToTApk, clientToTPath.get(),
+            testApkSha256Report, clientToTApk, serviceToTApk, clientToTPath.get(),
             serviceToTPath.get(), constrainedClientToTServiceToT, false, false, true
         )
         writeConfigFileContent(
-            clientToTApk, servicePreviousApk, clientToTPath.get(),
+            testApkSha256Report, clientToTApk, servicePreviousApk, clientToTPath.get(),
             servicePreviousPath.get(), constrainedClientToTServicePrevious, false, true, true
         )
         writeConfigFileContent(
-            clientPreviousApk, serviceToTApk, clientPreviousPath.get(),
+            testApkSha256Report, clientPreviousApk, serviceToTApk, clientPreviousPath.get(),
             serviceToTPath.get(), constrainedClientPreviousServiceToT, true, false, true
+        )
+        testApkSha256Report.writeToFile(
+            shaReportOutput.get().asFile
+        )
+        testApkSha256Report.writeToFile(
+            constrainedShaReportOutput.get().asFile
         )
     }
 
@@ -159,12 +179,13 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
             ?: throw RuntimeException("Cannot load required APK for task: $name")
     }
 
-    private fun resolveName(apk: BuiltArtifacts, path: String): String {
-        return apk.elements.single().outputFile.substringAfterLast("/")
+    private fun BuiltArtifact.resolveName(path: String): String {
+        return outputFile.substringAfterLast("/")
             .renameApkForTesting(path, false)
     }
 
     private fun writeConfigFileContent(
+        testApkSha256Report: TestApkSha256Report,
         clientApk: BuiltArtifacts,
         serviceApk: BuiltArtifacts,
         clientPath: String,
@@ -175,9 +196,21 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
         isConstrained: Boolean = false
     ) {
         val configBuilder = MediaConfigBuilder()
-        configBuilder.clientApkName(resolveName(clientApk, clientPath))
+        val clientBuiltArtifact = clientApk.elements.single()
+        val serviceBuiltArtifact = serviceApk.elements.single()
+        val clientApkName = clientBuiltArtifact.resolveName(clientPath)
+        val serviceApkName = serviceBuiltArtifact.resolveName(servicePath)
+        testApkSha256Report.addFile(
+            name = clientApkName,
+            builtArtifact = clientBuiltArtifact
+        )
+        testApkSha256Report.addFile(
+            name = serviceApkName,
+            builtArtifact = serviceBuiltArtifact
+        )
+        configBuilder.clientApkName(clientApkName)
             .clientApplicationId(clientApk.applicationId)
-            .serviceApkName(resolveName(serviceApk, servicePath))
+            .serviceApkName(serviceApkName)
             .serviceApplicationId(serviceApk.applicationId)
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())

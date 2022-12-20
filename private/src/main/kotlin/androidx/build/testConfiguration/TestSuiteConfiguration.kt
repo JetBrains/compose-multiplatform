@@ -62,6 +62,7 @@ fun Project.createTestConfigurationGenerationTask(
     overrideProject: Project = this
 ) {
     val xmlName = "${path.asFilenamePrefix()}$variantName.xml"
+    val sha256XmlName = "${path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
     rootProject.tasks.named("createModuleInfo").configure {
         it as ModuleInfoGenerator
         it.testModules.add(
@@ -78,7 +79,11 @@ fun Project.createTestConfigurationGenerationTask(
         task.testFolder.set(artifacts.get(SingleArtifact.APK))
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
         task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
+        task.shaReportOutput.fileValue(File(getTestConfigDirectory(), sha256XmlName))
         task.constrainedOutputXml.fileValue(File(getConstrainedTestConfigDirectory(), xmlName))
+        task.constrainedShaReportOutput.fileValue(
+            File(getConstrainedTestConfigDirectory(), sha256XmlName)
+        )
         task.presubmit.set(isPresubmitBuild())
         // Disable work tests on < API 18: b/178127496
         if (path.startsWith(":work:")) {
@@ -226,6 +231,7 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
 ) {
     val mediaPrefix = getMediaConfigTaskPrefix(isMedia2)
     val mediaTask = getOrCreateMediaTestConfigTask(this, isMedia2)
+    val sha256ReportFileName = "$mediaPrefix$SHA_256_FILE_SUFFIX"
     mediaTask.configure {
         it as GenerateMediaTestConfigurationTask
         if (this.name.contains("client")) {
@@ -285,6 +291,18 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
                 "${mediaPrefix}ClientToTServiceToT$variantName.xml"
             )
         )
+        it.shaReportOutput.fileValue(
+            File(
+                this.getTestConfigDirectory(),
+                sha256ReportFileName
+            )
+        )
+        it.constrainedShaReportOutput.fileValue(
+            File(
+                this.getConstrainedTestConfigDirectory(),
+                sha256ReportFileName
+            )
+        )
         it.minSdk.set(minSdk)
         it.testRunner.set(testRunner)
         it.presubmit.set(isPresubmitBuild())
@@ -323,10 +341,22 @@ private fun Project.configureMacrobenchmarkConfigTask(
                     "${this.path.asFilenamePrefix()}$variantName.xml"
                 )
             )
+            task.shaReportOutput.fileValue(
+                File(
+                    this.getTestConfigDirectory(),
+                    "${this.path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
+                )
+            )
             task.constrainedOutputXml.fileValue(
                 File(
                     this.getTestConfigDirectory(),
                     "${this.path.asFilenamePrefix()}$variantName.xml"
+                )
+            )
+            task.constrainedShaReportOutput.fileValue(
+                File(
+                    this.getTestConfigDirectory(),
+                    "${this.path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
                 )
             )
             task.minSdk.set(minSdk)
@@ -427,3 +457,9 @@ fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
         }
     }
 }
+
+/**
+ * Suffix to add for xml files which include the SHA256 of referred APKs.
+ * see: [TestApkSha256Report].
+ */
+private const val SHA_256_FILE_SUFFIX = "-sha256Report.xml"
