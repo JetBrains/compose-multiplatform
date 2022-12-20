@@ -1,7 +1,9 @@
 package org.jetbrains.compose.demo.visuals
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.singleWindowApplication
@@ -20,8 +22,16 @@ fun mainNY() = application {
     NYWindow(::exitApplication)
 }
 
+
+fun allSamples() = application {
+    val windowState = remember { WindowState(width = 1200.dp, height = 900.dp) }
+    Window(onCloseRequest = ::exitApplication, title = "Visual effects", undecorated = false, transparent = false, state = windowState) {
+        AllSamplesView()
+    }
+}
+
 fun main(args: Array<String>) {
-    if (args.isEmpty()) return mainWords()
+    if (args.isEmpty()) return allSamples()
     when (val effect = args[0]) {
         "words" -> mainWords()
         "wave" -> mainWave(false)

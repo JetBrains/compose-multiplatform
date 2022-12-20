@@ -18,8 +18,9 @@ import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.*
-import java.lang.Math.random
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -43,6 +44,8 @@ data class SnowFlake(
 data class Star(val x: Dp, val y: Dp, val color: Color, val size: Dp)
 
 const val HNYString = "Happy New Year!"
+
+fun random(): Float = Random.nextFloat()
 
 class DoubleRocket(val particle: Particle) {
     private val STATE_ROCKET = 0
@@ -287,19 +290,23 @@ fun NYContent() {
 
                 starrySky(stars)
 
-                Text(
-                    "202",
-                    Modifier.scale(10f).align(Alignment.Center).offset(-2.dp, 15.dp)
-                        .alpha(if (flickering2) 0.8f else 1.0f),
-                    color = Color.White
-                )
+                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
+                    Text(
+                        fontSize = 10.em,
+                        text ="202",
+                        modifier = Modifier
+                            .alpha(if (flickering2) 0.8f else 1.0f).offset(0.dp, -15.dp),
+                        color = Color.White
+                    )
 
-                val alpha = if (flickering2) flickeringAlpha(time) else 1.0f
-                Text(
-                    "2",
-                    Modifier.scale(10f).align(Alignment.Center).offset(14.dp, 15.dp).alpha(alpha),
-                    color = Color.White
-                )
+                    val alpha = if (flickering2) flickeringAlpha(time) else 1.0f
+                    Text(
+                        fontSize = 10.em,
+                        text = "2",
+                        modifier = Modifier.alpha(alpha).offset(0.dp, -15.dp),
+                        color = Color.White
+                    )
+                }
 
                 if (started) { //delay to be able to start recording
                     //HNY
@@ -309,7 +316,8 @@ fun NYContent() {
                     HNYString.forEach {
                         val alpha = alphaHNY(i, time, startTime)
                         Text(
-                            it.toString(),
+                            fontSize = 14.sp,
+                            text= it.toString(),
                             color = color,
                             modifier = Modifier.scale(5f).align(Alignment.Center).offset(0.dp, 85.dp)
                                 .rotate((angle + 5.0f * i)).offset(0.dp, -90.dp).alpha(alpha)

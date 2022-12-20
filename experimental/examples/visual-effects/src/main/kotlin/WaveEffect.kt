@@ -133,7 +133,7 @@ fun HighPanel(mouseX: Int, mouseY: Int) {
     )
     Text(
         "1.0",
-        Modifier.offset(800.dp, 700.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 800, 800)),
+        Modifier.offset(850.dp, 700.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 800, 800)),
         color = colorMouse(mouseX, mouseY, 800, 800),
         fontWeight = FontWeight.Bold
     )
