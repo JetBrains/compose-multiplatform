@@ -119,8 +119,11 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
 
             desktopMain.dependsOn(skikoMain)
-            jsMain.dependsOn(skikoMain)
-            nativeMain.dependsOn(skikoMain)
+
+            jsNativeMain.dependsOn(skikoMain)
+
+            jsMain.dependsOn(jsNativeMain)
+            nativeMain.dependsOn(jsNativeMain)
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
@@ -148,6 +151,13 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.mockitoKotlin)
                 implementation(libs.testUiautomator)
+            }
+
+            desktopTest.dependencies {
+                implementation(project(":compose:ui:ui-test-junit4"))
+                implementation(libs.truth)
+                implementation(libs.junit)
+                implementation(libs.skikoCurrentOs)
             }
         }
     }
