@@ -12,17 +12,19 @@ import example.imageviewer.model.*
 import example.imageviewer.style.Gray
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
+import io.ktor.client.*
 
 interface Dependencies {
     fun getFilter(type: FilterType): BitmapFilter
     val localization: Localization
+    val httpClient:HttpClient
     val imageRepository: ContentRepository<ImageBitmap>
     val notification: Notification
 }
 
 @Composable
 internal fun ImageViewerCommon(state: MutableState<State>, dependencies: Dependencies) {
-    state.refreshData(dependencies)
+    state.refresh(dependencies)
 
     Surface(
         modifier = Modifier.fillMaxSize(),

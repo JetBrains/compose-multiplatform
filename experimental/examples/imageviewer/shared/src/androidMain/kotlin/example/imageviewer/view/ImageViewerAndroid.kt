@@ -44,8 +44,10 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
 
     }
 
+    override val httpClient: HttpClient = HttpClient(OkHttp)
+
     override val imageRepository: ContentRepository<ImageBitmap> =
-        createRealRepository(HttpClient(OkHttp))
+        createRealRepository(httpClient)
             .adapter { it.toImageBitmap() }
 
     override val notification: Notification = object : Notification {

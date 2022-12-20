@@ -3,8 +3,6 @@ package example.imageviewer.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.Dependencies
-import example.imageviewer.utils.isInternetAvailable
-import example.imageviewer.utils.ktorHttpClient
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import kotlinx.coroutines.*
@@ -61,62 +59,34 @@ fun MutableState<State>.previousImage() = modifyState {
     copy(currentImageIndex = newIndex)
 }
 
-fun MutableState<State>.refreshData(dependencies: Dependencies) {
+fun MutableState<State>.refresh(dependencies: Dependencies) {
     backgroundScope.launch {
         try {
             val pictures = jsonReader.decodeFromString(
                 ListSerializer(Picture.serializer()),
-                ktorHttpClient.get(PICTURES_DATA_URL).bodyAsText()
+                dependencies.httpClient.get(PICTURES_DATA_URL).bodyAsText()
             )
-
             val miniatures = pictures.map { picture ->
                 async {
                     picture to dependencies.imageRepository.loadContent(picture.smallUrl)
                 }
             }.awaitAll().toMap()
+
             modifyState {
                 copy(pictures = pictures, miniatures = miniatures)
             }
-
         } catch (e: Exception) {
             e.printStackTrace()
-            withContext(Dispatchers.Main) {
-                dependencies.notification.notifyNoInternet()
-            }
+            dependencies.notification.notifyNoInternet()
         }
     }
 }
 
 fun MutableState<State>.setMainImage(picture: Picture, dependencies: Dependencies) {
     backgroundScope.launch {
-        if (isInternetAvailable()) {
-            val mainImage = dependencies.imageRepository.loadContent(picture.bigUrl)
-            modifyState {
-                copy(
-                    mainImage = mainImage
-                )
-            }
-        } else {
-            withContext(Dispatchers.Main) {
-                dependencies.notification.notifyLoadImageUnavailable()
-            }
-        }
-    }
-}
-
-fun MutableState<State>.refresh(dependencies: Dependencies) {
-    backgroundScope.launch {
-        if (isInternetAvailable()) {
-            withContext(Dispatchers.Main) {
-                modifyState {
-                    State()
-                }
-                refreshData(dependencies)
-            }
-        } else {
-            withContext(Dispatchers.Main) {
-                dependencies.notification.notifyRefreshUnavailable()
-            }
+        val mainImage = dependencies.imageRepository.loadContent(picture.bigUrl)
+        modifyState {
+            copy(mainImage = mainImage)
         }
     }
 }

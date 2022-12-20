@@ -37,7 +37,7 @@ private val message: MutableState<String> = mutableStateOf("")
 private val toastState: MutableState<Boolean> = mutableStateOf(false)
 val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)//todo
 
-val LocalWindowSize =  staticCompositionLocalOf {
+val LocalWindowSize = staticCompositionLocalOf {
     DpSize.Unspecified
 }
 
@@ -72,67 +72,70 @@ fun ApplicationScope.ImageViewerDesktop() {
                 ImageViewerCommon(
                     state = state,
                     dependencies = object : Dependencies {
-                    override fun getFilter(type: FilterType): BitmapFilter = when (type) {
-                        FilterType.GrayScale -> GrayScaleFilter()
-                        FilterType.Pixel -> PixelFilter()
-                        FilterType.Blur -> BlurFilter()
-                    }
-
-                    override val localization: Localization = object : Localization {
-                        override val back: String
-                            get() = ResString.back
-                        override val appName: String
-                            get() = ResString.appName
-                        override val loading: String
-                            get() = ResString.loading
-                    }
-                    override val imageRepository: ContentRepository<ImageBitmap> =
-                        createRealRepository(HttpClient(CIO))
-                            .decorateWithDiskCache(
-                                ioScope,
-                                File(System.getProperty("user.home")!!).resolve("Pictures").resolve("imageviewer")
-                            )
-                            .adapter { it.toImageBitmap() }
-
-                    override val notification: Notification = object : Notification {
-                        override fun notifyInvalidRepo() {
-                            showPopUpMessage(ResString.repoInvalid)
+                        override fun getFilter(type: FilterType): BitmapFilter = when (type) {
+                            FilterType.GrayScale -> GrayScaleFilter()
+                            FilterType.Pixel -> PixelFilter()
+                            FilterType.Blur -> BlurFilter()
                         }
 
-                        override fun notifyRepoIsEmpty() {
-                            showPopUpMessage(ResString.repoEmpty)
+                        override val localization: Localization = object : Localization {
+                            override val back: String
+                                get() = ResString.back
+                            override val appName: String
+                                get() = ResString.appName
+                            override val loading: String
+                                get() = ResString.loading
                         }
 
-                        override fun notifyNoInternet() {
-                            showPopUpMessage(ResString.noInternet)
-                        }
+                        override val httpClient: HttpClient = HttpClient(CIO)
 
-                        override fun notifyLoadImageUnavailable() {
-                            showPopUpMessage("${ResString.noInternet}\n${ResString.loadImageUnavailable}")
-                        }
+                        override val imageRepository: ContentRepository<ImageBitmap> =
+                            createRealRepository(httpClient)
+                                .decorateWithDiskCache(
+                                    ioScope,
+                                    File(System.getProperty("user.home")!!).resolve("Pictures").resolve("imageviewer")
+                                )
+                                .adapter { it.toImageBitmap() }
 
-                        override fun notifyLastImage() {
-                            showPopUpMessage(ResString.lastImage)
-                        }
+                        override val notification: Notification = object : Notification {
+                            override fun notifyInvalidRepo() {
+                                showPopUpMessage(ResString.repoInvalid)
+                            }
 
-                        override fun notifyFirstImage() {
-                            showPopUpMessage(ResString.firstImage)
-                        }
+                            override fun notifyRepoIsEmpty() {
+                                showPopUpMessage(ResString.repoEmpty)
+                            }
 
-                        override fun notifyRefreshUnavailable() {
-                            showPopUpMessage("${ResString.noInternet}\n${ResString.refreshUnavailable}")
-                        }
+                            override fun notifyNoInternet() {
+                                showPopUpMessage(ResString.noInternet)
+                            }
 
-                        override fun notifyImageData(picture: Picture) {
-                            showPopUpMessage(
-                                """
+                            override fun notifyLoadImageUnavailable() {
+                                showPopUpMessage("${ResString.noInternet}\n${ResString.loadImageUnavailable}")
+                            }
+
+                            override fun notifyLastImage() {
+                                showPopUpMessage(ResString.lastImage)
+                            }
+
+                            override fun notifyFirstImage() {
+                                showPopUpMessage(ResString.firstImage)
+                            }
+
+                            override fun notifyRefreshUnavailable() {
+                                showPopUpMessage("${ResString.noInternet}\n${ResString.refreshUnavailable}")
+                            }
+
+                            override fun notifyImageData(picture: Picture) {
+                                showPopUpMessage(
+                                    """
                                 ${ResString.picture} ${picture.name}
                                 ${ResString.size} ${picture.width}x${picture.height} ${ResString.pixels}
                             """.trimIndent()
-                            )
+                                )
+                            }
                         }
-                    }
-                })
+                    })
                 Toast(message.value, toastState)
             }
         }
