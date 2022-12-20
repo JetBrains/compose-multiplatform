@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 
 // TODO(seanmcq): break this into (text, style) and (rest...) objects to avoid high-invalidation cost
 // TODO(seanmcq): Explore this holding non-AnnotatedString (future perf opt)
-internal data class InlineContentLayoutDrawParams(
+internal data class TextInlineContentLayoutDrawParams(
     val text: AnnotatedString,
     val style: TextStyle,
     val fontFamilyResolver: FontFamily.Resolver,
@@ -39,3 +39,26 @@ internal data class InlineContentLayoutDrawParams(
     val placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
     val onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
 )
+
+internal fun TextInlineContentLayoutDrawParams.equalForCallbacks(
+    newParams: TextInlineContentLayoutDrawParams
+): Boolean {
+    return onTextLayout == newParams.onTextLayout &&
+        onPlaceholderLayout == newParams.onPlaceholderLayout
+}
+internal fun TextInlineContentLayoutDrawParams.equalForLayout(
+    newParams: TextInlineContentLayoutDrawParams
+): Boolean {
+    if (this === newParams) return true
+
+    if (text != newParams.text) return false
+    if (!style.hasSameLayoutAffectingAttributes(newParams.style)) return false
+    if (maxLines != newParams.maxLines) return false
+    if (minLines != newParams.minLines) return false
+    if (softWrap != newParams.softWrap) return false
+    if (fontFamilyResolver != newParams.fontFamilyResolver) return false
+    if (overflow != newParams.overflow) return false
+    if (placeholders != newParams.placeholders) return false
+
+    return true
+}

@@ -1,8 +1,5 @@
 package androidx.compose.foundation.newtext.text.modifiers
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
@@ -16,50 +13,51 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
-import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.node.invalidateDraw
+import androidx.compose.ui.node.invalidateLayout
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
 
 /**
- * Modifier that does Layout and Draw for [InlineContentLayoutDrawParams]
+ * Modifier that does Layout and Draw for [TextInlineContentLayoutDrawParams]
  */
 @OptIn(ExperimentalComposeUiApi::class)
-internal class InlineContentLayoutDrawModifier(
-    params: InlineContentLayoutDrawParams
+internal class TextInlineContentLayoutDrawModifier(
+    params: TextInlineContentLayoutDrawParams
 ) : Modifier.Node(),
     LayoutModifierNode,
     DrawModifierNode {
-    private lateinit var lastTextDelegate: MultiParagraphPlaceholderLayoutCache
-    private var lastTextLayoutResult: TextLayoutResult? by mutableStateOf(null)
+    private var layoutCache: MultiParagraphLayoutCache? = null
     private var textDelegateDirty = true
 
-    private var params: InlineContentLayoutDrawParams = params
+    private var params: TextInlineContentLayoutDrawParams = params
         set(value) {
-            textDelegateDirty = true
+            layoutCache?.let { cache ->
+                if (cache.equalForLayout(value) || cache.equalForCallbacks(value)) {
+                    textDelegateDirty = true
+                    invalidateLayout()
+                }
+            }
             field = value
-            // TODO: calculate if only draw changed
-            invalidateLayout()
+            // if we set params, always redraw.
+            invalidateDraw()
         }
 
-    private fun invalidateDraw() {
-    }
-
-    private fun invalidateLayout() {
-        forceRemeasure()
-    }
-
-    fun update(params: InlineContentLayoutDrawParams) {
+    fun update(params: TextInlineContentLayoutDrawParams) {
         this.params = params
     }
 
-    private fun getCurrentTextDelegate(density: Density): MultiParagraphPlaceholderLayoutCache {
-        return if (!textDelegateDirty) {
-            lastTextDelegate
+    private fun getOrUpdateTextDelegateInLayout(
+        density: Density
+    ): MultiParagraphLayoutCache {
+        val localLayoutCache = layoutCache
+        return if (!textDelegateDirty && localLayoutCache != null) {
+            localLayoutCache
         } else {
-            val textDelegate = MultiParagraphPlaceholderLayoutCache(params, density)
-            lastTextDelegate = textDelegate
+            val textDelegate = MultiParagraphLayoutCache(params, density)
+            this.layoutCache = textDelegate
             textDelegateDirty = false
             textDelegate
         }
@@ -69,17 +67,17 @@ internal class InlineContentLayoutDrawModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        val td = getCurrentTextDelegate(this)
-
-        // TODO: Detect if this is only a constraints change and compare intrinsic and old/new
-        //  constraints
+        val td = getOrUpdateTextDelegateInLayout(this)
 
         // Otherwise, we expect that all restarts lead to a new text layout
-        val textLayoutResult = td.layout(constraints, layoutDirection)
+        val didChangeLayout = td.layoutWithConstraints(constraints, layoutDirection)
+        val textLayoutResult = td.layout
 
-        params.onTextLayout?.let { onTextLayout ->
-            onTextLayout(textLayoutResult)
-            // TODO: figure out how to expose this to selection here
+        if (didChangeLayout) {
+            invalidateDraw()
+            params.onTextLayout?.let { onTextLayout ->
+                onTextLayout(textLayoutResult)
+            }
         }
 
         // first share the placeholders
@@ -93,8 +91,6 @@ internal class InlineContentLayoutDrawModifier(
             )
         )
 
-        lastTextLayoutResult = textLayoutResult
-
         return layout(
             textLayoutResult.size.width,
             textLayoutResult.size.height,
@@ -103,7 +99,8 @@ internal class InlineContentLayoutDrawModifier(
                 LastBaseline to textLayoutResult.lastBaseline.roundToInt()
             )
         ) {
-            placeable.place(0, 0)
+            // this is effictively graphicsLayer
+            placeable.placeWithLayer(0, 0)
         }
     }
 
@@ -111,7 +108,7 @@ internal class InlineContentLayoutDrawModifier(
         measurable: IntrinsicMeasurable,
         height: Int
     ): Int {
-        val td = getCurrentTextDelegate(this)
+        val td = getOrUpdateTextDelegateInLayout(this)
         return td.minIntrinsicWidth
     }
 
@@ -119,17 +116,15 @@ internal class InlineContentLayoutDrawModifier(
         measurable: IntrinsicMeasurable,
         width: Int
     ): Int {
-        val td = getCurrentTextDelegate(this)
-        return td
-            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
-            .size.height
+        return getOrUpdateTextDelegateInLayout(this)
+            .intrinsicHeightAt(width, layoutDirection)
     }
 
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
     ): Int {
-        val td = getCurrentTextDelegate(this)
+        val td = getOrUpdateTextDelegateInLayout(this)
         return td.maxIntrinsicWidth
     }
 
@@ -137,15 +132,13 @@ internal class InlineContentLayoutDrawModifier(
         measurable: IntrinsicMeasurable,
         width: Int
     ): Int {
-        val td = getCurrentTextDelegate(this)
-        return td
-            .layout(Constraints(0, width, 0, Constraints.Infinity), layoutDirection)
-            .size.height
+        return getOrUpdateTextDelegateInLayout(this)
+            .intrinsicHeightAt(width, layoutDirection)
     }
 
     override fun ContentDrawScope.draw() {
         drawIntoCanvas { canvas ->
-            lastTextLayoutResult?.let { textLayout ->
+            layoutCache?.layout?.let { textLayout ->
                 TextPainter.paint(canvas, textLayout)
             }
             drawContent()

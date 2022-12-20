@@ -35,7 +35,7 @@ import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
 @SmallTest
-class MultiParagraphPlaceholderLayoutCacheWidthWithLetterSpacingTest {
+class MultiParagraphLayoutCacheWidthWithLetterSpacingTest {
     private val fontFamily = TEST_FONT_FAMILY
 
     /**
@@ -72,8 +72,8 @@ class MultiParagraphPlaceholderLayoutCacheWidthWithLetterSpacingTest {
     }
 
     private fun assertLineCount(style: TextStyle) {
-        val textDelegate = MultiParagraphPlaceholderLayoutCache(
-            InlineContentLayoutDrawParams(
+        val textDelegate = MultiParagraphLayoutCache(
+            TextInlineContentLayoutDrawParams(
                 text = AnnotatedString(text = "This is a callout message"),
                 style = style.copy(
                     fontFamily = fontFamily,
@@ -85,7 +85,8 @@ class MultiParagraphPlaceholderLayoutCacheWidthWithLetterSpacingTest {
             ),
             density = density,
         )
-        val layoutResult = textDelegate.layout(Constraints(), LayoutDirection.Ltr)
+        textDelegate.layoutWithConstraints(Constraints(), LayoutDirection.Ltr)
+        val layoutResult = textDelegate.layout
         assertThat(layoutResult.lineCount).isEqualTo(1)
     }
 }
