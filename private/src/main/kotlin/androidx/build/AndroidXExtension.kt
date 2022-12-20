@@ -23,6 +23,7 @@ import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import java.io.File
 
 /**
@@ -39,11 +40,10 @@ open class AndroidXExtension(val project: Project) {
 
     val mavenGroup: LibraryGroup?
 
+    val listProjectsService: Provider<ListProjectsService>
+
     init {
-        val toml = project.objects.fileProperty().fileValue(
-            File(project.getSupportRootFolder(), "libraryversions.toml")
-        )
-        val content = project.providers.fileContents(toml)
+        val toml = lazyReadFile("libraryversions.toml")
 
         // These parameters are used when building pre-release binaries for androidxdev.
         // These parameters are only expected to be compatible with :compose:compiler:compiler .
@@ -56,22 +56,33 @@ open class AndroidXExtension(val project: Project) {
             Multiplatform.isKotlinNativeEnabled(project)
         }
 
-        val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
+        // service that can compute group/version for a project
+        val versionServiceProvider = project.gradle.sharedServices.registerIfAbsent(
             "libraryVersionsService",
             LibraryVersionsService::class.java
         ) { spec ->
-            spec.parameters.tomlFile = content.asText
+            spec.parameters.tomlFile = toml
             spec.parameters.composeCustomVersion = composeCustomVersion
             spec.parameters.composeCustomGroup = composeCustomGroup
             spec.parameters.useMultiplatformGroupVersions = useMultiplatformVersions
         }
-        val service = serviceProvider.get()
-        AllLibraryGroups = service.libraryGroups.values.toList()
-        LibraryVersions = service.libraryVersions
-        libraryGroupsByGroupId = service.libraryGroupsByGroupId
-        overrideLibraryGroupsByProjectPath = service.overrideLibraryGroupsByProjectPath
+        val versionService = versionServiceProvider.get()
+        AllLibraryGroups = versionService.libraryGroups.values.toList()
+        LibraryVersions = versionService.libraryVersions
+        libraryGroupsByGroupId = versionService.libraryGroupsByGroupId
+        overrideLibraryGroupsByProjectPath = versionService.overrideLibraryGroupsByProjectPath
+
         mavenGroup = chooseLibraryGroup()
         chooseProjectVersion()
+
+        // service that can compute full list of projects in settings.gradle
+        val settings = lazyReadFile("settings.gradle")
+        listProjectsService = project.gradle.sharedServices.registerIfAbsent(
+            "listProjectsService",
+            ListProjectsService::class.java
+        ) { spec ->
+            spec.parameters.settingsFile = settings
+        }
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
@@ -82,11 +93,26 @@ open class AndroidXExtension(val project: Project) {
             chooseProjectVersion()
         }
 
+    fun getAllProjectPathsInSameGroup(): List<String> {
+        val allProjectPaths = listProjectsService.get().allPossibleProjectPaths
+        val ourGroup = chooseLibraryGroup()
+        if (ourGroup == null)
+            return listOf(project.path)
+        val projectPathsInSameGroup = allProjectPaths.filter { otherPath ->
+            getLibraryGroupFromProjectPath(otherPath) == ourGroup
+        }
+        return projectPathsInSameGroup
+    }
+
+    private fun lazyReadFile(fileName: String): Provider<String> {
+        val fileProperty = project.objects.fileProperty().fileValue(
+            File(project.getSupportRootFolder(), fileName)
+        )
+        return project.providers.fileContents(fileProperty).asText
+    }
+
     private fun chooseLibraryGroup(): LibraryGroup? {
-        val overridden = overrideLibraryGroupsByProjectPath.get(project.path)
-        if (overridden != null)
-            return overridden
-        return getLibraryGroupFromProjectPath()
+        return getLibraryGroupFromProjectPath(project.path)
     }
 
     private fun substringBeforeLastColon(projectPath: String): String {
@@ -94,28 +120,27 @@ open class AndroidXExtension(val project: Project) {
         return projectPath.substring(0, lastColonIndex)
     }
 
-    private fun getLibraryGroupFromProjectPath(): LibraryGroup? {
-        // Get the text of the library group, something like "androidx.core"
-        // This currently relies on AndroidXImplPlugin.validateProjectStructure to
-        // enforce these project groups. Later this will become the enforcement
-        val projectPath = project.path
+    // gets the library group from the project path, including special cases
+    private fun getLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+        val overridden = overrideLibraryGroupsByProjectPath.get(projectPath)
+        if (overridden != null)
+            return overridden
 
-        val result = getLibraryGroupFromProjectPath(projectPath)
+        val result = getStandardLibraryGroupFromProjectPath(projectPath)
         if (result != null)
             return result
 
         // samples are allowed to be nested deeper
-        if (project.path.contains("samples")) {
+        if (projectPath.contains("samples")) {
             val parentPath = substringBeforeLastColon(projectPath)
             return getLibraryGroupFromProjectPath(parentPath)
         }
         return null
     }
 
-    private fun getLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+    // simple function to get the library group from the project path, without special cases
+    private fun getStandardLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
         // Get the text of the library group, something like "androidx.core"
-        // This currently relies on AndroidXImplPlugin.validateProjectStructure to
-        // enforce these project groups. Later this will become the enforcement
         val parentPath = substringBeforeLastColon(projectPath)
 
         if (parentPath == "")
