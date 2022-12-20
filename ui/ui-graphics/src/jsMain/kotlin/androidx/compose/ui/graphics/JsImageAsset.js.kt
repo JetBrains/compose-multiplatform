@@ -16,6 +16,16 @@
 
 package androidx.compose.ui.graphics
 
+import org.khronos.webgl.ArrayBuffer
+import org.khronos.webgl.ArrayBufferView
+import org.khronos.webgl.Int32Array
+import org.khronos.webgl.Uint8Array
+import org.khronos.webgl.get
+
 internal actual fun ByteArray.putBytesInto(array: IntArray, offset: Int, length: Int): Unit =
-   TODO("implement js ByteArray.putBytesInto()")
+   val byteBuffer = Uint8Array(toTypedArray()).buffer
+   val intArray = Int32Array(byteBuffer, offset, length)
+   for(i in 0 until intArray.length) {
+      array[i] = intArray[i]
+   }
 
