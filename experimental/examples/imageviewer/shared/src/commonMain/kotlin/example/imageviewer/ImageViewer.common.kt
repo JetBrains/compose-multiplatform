@@ -13,11 +13,13 @@ import example.imageviewer.style.Gray
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
 import io.ktor.client.*
+import kotlinx.coroutines.CoroutineScope
 
 interface Dependencies {
+    val httpClient: HttpClient
+    val ioScope: CoroutineScope
     fun getFilter(type: FilterType): BitmapFilter
     val localization: Localization
-    val httpClient:HttpClient
     val imageRepository: ContentRepository<ImageBitmap>
     val notification: Notification
 }

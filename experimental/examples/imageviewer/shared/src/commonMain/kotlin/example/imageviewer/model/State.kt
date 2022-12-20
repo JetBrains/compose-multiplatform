@@ -21,7 +21,6 @@ val BASE_URL =
     "https://raw.githubusercontent.com/JetBrains/compose-jb/dima-avdeev/add-uikit-to-imageviewer/artwork/imageviewerrepo"
 
 val PICTURES_DATA_URL = "$BASE_URL/pictures.json"
-val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 val jsonReader = Json {
     ignoreUnknownKeys = true
 }
@@ -60,7 +59,7 @@ fun MutableState<State>.previousImage() = modifyState {
 }
 
 fun MutableState<State>.refresh(dependencies: Dependencies) {
-    backgroundScope.launch {
+    dependencies.ioScope.launch {
         try {
             val pictures = jsonReader.decodeFromString(
                 ListSerializer(Picture.serializer()),
@@ -83,7 +82,7 @@ fun MutableState<State>.refresh(dependencies: Dependencies) {
 }
 
 fun MutableState<State>.setMainImage(picture: Picture, dependencies: Dependencies) {
-    backgroundScope.launch {
+    dependencies.ioScope.launch {
         val mainImage = dependencies.imageRepository.loadContent(picture.bigUrl)
         modifyState {
             copy(mainImage = mainImage)
@@ -101,12 +100,53 @@ interface Notification {
     fun notifyLoadImageUnavailable()
     fun notifyLastImage()
     fun notifyFirstImage()
-    fun notifyRefreshUnavailable()
     fun notifyImageData(picture: Picture)
+    fun notifyRefreshUnavailable()
+}
+
+abstract class PopupNotification(val localization: Localization) : Notification {
+    abstract fun showPopUpMessage(text: String)
+
+    override fun notifyInvalidRepo() = showPopUpMessage(localization.repoInvalid)
+    override fun notifyRepoIsEmpty() = showPopUpMessage(localization.repoEmpty)
+    override fun notifyNoInternet() = showPopUpMessage(localization.noInternet)
+    override fun notifyLoadImageUnavailable() =
+        showPopUpMessage(
+            """
+                ${localization.noInternet}
+                ${localization.loadImageUnavailable}
+            """.trimIndent()
+        )
+
+    override fun notifyLastImage() = showPopUpMessage(localization.lastImage)
+    override fun notifyFirstImage() = showPopUpMessage(localization.firstImage)
+    override fun notifyImageData(picture: Picture) = showPopUpMessage(
+        """
+            ${localization.picture} ${picture.name}
+            ${localization.size} ${picture.width}x${picture.height} ${localization.pixels}
+        """.trimIndent()
+    )
+
+    override fun notifyRefreshUnavailable() = showPopUpMessage(
+        """
+            ${localization.noInternet}
+            ${localization.refreshUnavailable}
+        """.trimIndent()
+    )
 }
 
 interface Localization {
     val back: String
     val appName: String
     val loading: String
+    val repoInvalid: String
+    val repoEmpty: String
+    val noInternet: String
+    val loadImageUnavailable: String
+    val lastImage: String
+    val firstImage: String
+    val picture: String
+    val size: String
+    val pixels: String
+    val refreshUnavailable: String
 }

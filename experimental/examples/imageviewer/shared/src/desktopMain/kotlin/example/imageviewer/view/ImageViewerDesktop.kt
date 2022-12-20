@@ -46,6 +46,9 @@ val LocalWindowSize = staticCompositionLocalOf {
 fun ApplicationScope.ImageViewerDesktop() {
     val windowState = rememberWindowState()
     val state = remember { mutableStateOf(State()) }
+    val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.IO }
+    val dependencies = remember(ioScope) { getDependencies(ioScope) }
+
     CompositionLocalProvider(LocalWindowSize provides windowState.size) {
         Window(
             onCloseRequest = ::exitApplication,
@@ -71,79 +74,56 @@ fun ApplicationScope.ImageViewerDesktop() {
             ) {
                 ImageViewerCommon(
                     state = state,
-                    dependencies = object : Dependencies {
-                        override fun getFilter(type: FilterType): BitmapFilter = when (type) {
-                            FilterType.GrayScale -> GrayScaleFilter()
-                            FilterType.Pixel -> PixelFilter()
-                            FilterType.Blur -> BlurFilter()
-                        }
-
-                        override val localization: Localization = object : Localization {
-                            override val back: String
-                                get() = ResString.back
-                            override val appName: String
-                                get() = ResString.appName
-                            override val loading: String
-                                get() = ResString.loading
-                        }
-
-                        override val httpClient: HttpClient = HttpClient(CIO)
-
-                        override val imageRepository: ContentRepository<ImageBitmap> =
-                            createRealRepository(httpClient)
-                                .decorateWithDiskCache(
-                                    ioScope,
-                                    File(System.getProperty("user.home")!!).resolve("Pictures").resolve("imageviewer")
-                                )
-                                .adapter { it.toImageBitmap() }
-
-                        override val notification: Notification = object : Notification {
-                            override fun notifyInvalidRepo() {
-                                showPopUpMessage(ResString.repoInvalid)
-                            }
-
-                            override fun notifyRepoIsEmpty() {
-                                showPopUpMessage(ResString.repoEmpty)
-                            }
-
-                            override fun notifyNoInternet() {
-                                showPopUpMessage(ResString.noInternet)
-                            }
-
-                            override fun notifyLoadImageUnavailable() {
-                                showPopUpMessage("${ResString.noInternet}\n${ResString.loadImageUnavailable}")
-                            }
-
-                            override fun notifyLastImage() {
-                                showPopUpMessage(ResString.lastImage)
-                            }
-
-                            override fun notifyFirstImage() {
-                                showPopUpMessage(ResString.firstImage)
-                            }
-
-                            override fun notifyRefreshUnavailable() {
-                                showPopUpMessage("${ResString.noInternet}\n${ResString.refreshUnavailable}")
-                            }
-
-                            override fun notifyImageData(picture: Picture) {
-                                showPopUpMessage(
-                                    """
-                                ${ResString.picture} ${picture.name}
-                                ${ResString.size} ${picture.width}x${picture.height} ${ResString.pixels}
-                            """.trimIndent()
-                                )
-                            }
-                        }
-                    })
+                    dependencies = dependencies
+                )
                 Toast(message.value, toastState)
             }
         }
     }
-
 }
 
-fun showPopUpMessage(text: String) {
-    message.value = text
-    toastState.value = true
+private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
+    init {
+        println("getDependencies, ioScope: ${ioScope}")
+    }
+
+    override val ioScope: CoroutineScope = ioScope
+    override fun getFilter(type: FilterType): BitmapFilter = when (type) {
+        FilterType.GrayScale -> GrayScaleFilter()
+        FilterType.Pixel -> PixelFilter()
+        FilterType.Blur -> BlurFilter()
+    }
+
+    override val localization: Localization = object : Localization {
+        override val back: String get() = ResString.back
+        override val appName: String get() = ResString.appName
+        override val loading: String get() = ResString.loading
+        override val repoInvalid: String get() = ResString.repoInvalid
+        override val repoEmpty: String get() = ResString.repoEmpty
+        override val noInternet: String get() = ResString.noInternet
+        override val loadImageUnavailable: String get() = ResString.loadImageUnavailable
+        override val lastImage: String get() = ResString.lastImage
+        override val firstImage: String get() = ResString.firstImage
+        override val picture: String get() = ResString.picture
+        override val size: String get() = ResString.size
+        override val pixels: String get() = ResString.pixels
+        override val refreshUnavailable: String get() = ResString.refreshUnavailable
+    }
+
+    override val httpClient: HttpClient = HttpClient(CIO)
+
+    override val imageRepository: ContentRepository<ImageBitmap> =
+        createRealRepository(httpClient)
+            .decorateWithDiskCache(
+                ioScope,
+                File(System.getProperty("user.home")!!).resolve("Pictures").resolve("imageviewer")
+            )
+            .adapter { it.toImageBitmap() }
+
+    override val notification: Notification = object : PopupNotification(localization) {
+        override fun showPopUpMessage(text: String) {
+            message.value = text
+            toastState.value = true
+        }
+    }
 }
