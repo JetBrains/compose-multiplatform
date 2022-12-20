@@ -74,6 +74,10 @@ fun MutableState<State>.refresh(dependencies: Dependencies) {
             modifyState {
                 copy(pictures = pictures, miniatures = miniatures)
             }
+        } catch (e: CancellationException) {
+            println("Rethrowing CancellationException with original cause")
+            // https://kotlinlang.org/docs/exception-handling.html#exceptions-aggregation
+            throw e
         } catch (e: Exception) {
             e.printStackTrace()
             dependencies.notification.notifyNoInternet()
