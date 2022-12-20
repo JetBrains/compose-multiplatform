@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
 @Composable
-internal fun MainScreen(state: MutableState<AppState>, dependencies: Dependencies) {
+internal fun MainScreen(state: MutableState<State>, dependencies: Dependencies) {
     Column {
         TopContent(state, dependencies)
         Divider(color = LightGray, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
@@ -58,7 +58,7 @@ internal fun MainScreen(state: MutableState<AppState>, dependencies: Dependencie
 }
 
 @Composable
-private fun TopContent(state: MutableState<AppState>, dependencies: Dependencies) {
+private fun TopContent(state: MutableState<State>, dependencies: Dependencies) {
     TitleBar(state, dependencies)
 //    if (LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT) {//todo
     PreviewImage(state)
@@ -69,7 +69,7 @@ private fun TopContent(state: MutableState<AppState>, dependencies: Dependencies
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun TitleBar(state: MutableState<AppState>, dependencies: Dependencies) {
+private fun TitleBar(state: MutableState<State>, dependencies: Dependencies) {
     TopAppBar(
         backgroundColor = DarkGreen,
         title = {
@@ -104,7 +104,7 @@ private fun TitleBar(state: MutableState<AppState>, dependencies: Dependencies) 
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun PreviewImage(state: MutableState<AppState>) {
+fun PreviewImage(state: MutableState<State>) {
     Clickable(onClick = {
         state.value = state.value.copy(
             screen = ScreenState.FullScreen

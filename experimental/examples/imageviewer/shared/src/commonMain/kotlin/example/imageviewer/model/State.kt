@@ -18,10 +18,10 @@ data class Picture(val big: String, val small: String)
 val Picture.bigUrl get() = "$BASE_URL/$big"
 val Picture.smallUrl get() = "$BASE_URL/$small"
 
+//todo dima-avdeev/add-uikit-to-imageviewer to master
 val BASE_URL =
     "https://raw.githubusercontent.com/JetBrains/compose-jb/dima-avdeev/add-uikit-to-imageviewer/artwork/imageviewerrepo"
 
-//todo dima-avdeev/add-uikit-to-imageviewer to master
 val PICTURES_DATA_URL = "$BASE_URL/pictures.json"
 val backgroundScope = CoroutineScope(SupervisorJob() + Dispatchers.Default)
 val jsonReader = Json {
@@ -33,7 +33,7 @@ sealed interface ScreenState {
     object FullScreen : ScreenState
 }
 
-data class AppState(
+data class State(
     val mainImage: ImageBitmap? = null,
     val currentImageIndex: Int = 0,
     val miniatures: Map<Picture, ImageBitmap> = emptyMap(),
@@ -41,11 +41,11 @@ data class AppState(
     val screen: ScreenState = ScreenState.Miniatures
 )
 
-fun MutableState<AppState>.modifyState(modification: AppState.() -> AppState) {
+fun MutableState<State>.modifyState(modification: State.() -> State) {
     value = value.modification()
 }
 
-fun MutableState<AppState>.nextImage() = modifyState {
+fun MutableState<State>.nextImage() = modifyState {
     var newIndex = currentImageIndex + 1
     if (newIndex > pictures.lastIndex) {
         newIndex = 0
@@ -53,7 +53,7 @@ fun MutableState<AppState>.nextImage() = modifyState {
     copy(currentImageIndex = newIndex)
 }
 
-fun MutableState<AppState>.previousImage() = modifyState {
+fun MutableState<State>.previousImage() = modifyState {
     var newIndex = currentImageIndex - 1
     if (newIndex < 0) {
         newIndex = pictures.lastIndex
@@ -61,25 +61,23 @@ fun MutableState<AppState>.previousImage() = modifyState {
     copy(currentImageIndex = newIndex)
 }
 
-fun MutableState<AppState>.initData(dependencies: Dependencies) {
+fun MutableState<State>.refreshData(dependencies: Dependencies) {
     backgroundScope.launch {
         try {
             val pictures = jsonReader.decodeFromString(
                 ListSerializer(Picture.serializer()),
                 ktorHttpClient.get(PICTURES_DATA_URL).bodyAsText()
             )
+
+            val miniatures = pictures.map { picture ->
+                async {
+                    picture to dependencies.imageRepository.loadContent(picture.smallUrl)
+                }
+            }.awaitAll().toMap()
             modifyState {
-                copy(pictures = pictures)
+                copy(pictures = pictures, miniatures = miniatures)
             }
 
-            pictures.forEach { picture ->
-                launch {
-                    val pair = picture to dependencies.imageRepository.loadContent(picture.smallUrl)
-                    modifyState {
-                        copy(miniatures = miniatures + pair)
-                    }
-                }
-            }
         } catch (e: Exception) {
             e.printStackTrace()
             withContext(Dispatchers.Main) {
@@ -89,7 +87,7 @@ fun MutableState<AppState>.initData(dependencies: Dependencies) {
     }
 }
 
-fun MutableState<AppState>.setMainImage(picture: Picture, dependencies: Dependencies) {
+fun MutableState<State>.setMainImage(picture: Picture, dependencies: Dependencies) {
     backgroundScope.launch {
         if (isInternetAvailable()) {
             val mainImage = dependencies.imageRepository.loadContent(picture.bigUrl)
@@ -106,14 +104,14 @@ fun MutableState<AppState>.setMainImage(picture: Picture, dependencies: Dependen
     }
 }
 
-fun MutableState<AppState>.refresh(dependencies: Dependencies) {
+fun MutableState<State>.refresh(dependencies: Dependencies) {
     backgroundScope.launch {
         if (isInternetAvailable()) {
             withContext(Dispatchers.Main) {
                 modifyState {
-                    AppState()
+                    State()
                 }
-                initData(dependencies)
+                refreshData(dependencies)
             }
         } else {
             withContext(Dispatchers.Main) {
@@ -123,8 +121,8 @@ fun MutableState<AppState>.refresh(dependencies: Dependencies) {
     }
 }
 
-val AppState.isContentReady get() = pictures.isNotEmpty()
-val AppState.picture get():Picture? = pictures.getOrNull(currentImageIndex)
+val State.isContentReady get() = pictures.isNotEmpty()
+val State.picture get():Picture? = pictures.getOrNull(currentImageIndex)
 
 interface Notification {
     fun notifyInvalidRepo()

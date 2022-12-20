@@ -21,11 +21,8 @@ interface Dependencies {
 }
 
 @Composable
-internal fun ImageViewerCommon(
-    dependencies: Dependencies,
-    state: MutableState<AppState>
-) {
-    state.initData(dependencies)
+internal fun ImageViewerCommon(state: MutableState<State>, dependencies: Dependencies) {
+    state.refreshData(dependencies)
 
     Surface(
         modifier = Modifier.fillMaxSize(),

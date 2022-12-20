@@ -19,6 +19,7 @@ import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.model.Notification
+import example.imageviewer.model.State
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
@@ -44,7 +45,7 @@ val LocalWindowSize =  staticCompositionLocalOf {
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val windowState = rememberWindowState()
-    val state = remember { mutableStateOf(AppState()) }
+    val state = remember { mutableStateOf(State()) }
     CompositionLocalProvider(LocalWindowSize provides windowState.size) {
         Window(
             onCloseRequest = ::exitApplication,
