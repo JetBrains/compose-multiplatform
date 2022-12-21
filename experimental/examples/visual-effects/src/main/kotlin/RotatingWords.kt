@@ -16,13 +16,13 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.loadSvgPainter
-import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.resources.*
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun Words() {
     val density = LocalDensity.current
@@ -46,9 +46,8 @@ fun Words() {
         )
     )
 
-    val logoSvg = remember {
-        useResource("compose-community-primary.svg") { loadSvgPainter(it, density) }
-    }
+    // TODO: use vector image (.svg or .xml)
+    val logoImg = resource("compose-community-primary.png").rememberImageBitmap().orEmpty()
 
     val baseLogo = DpOffset(350.dp, 270.dp)
 
@@ -76,7 +75,7 @@ fun Words() {
             alpha = 0.4f)
 
         val size = 80.dp * scale
-        Image(logoSvg, contentDescription = "Logo",
+        Image(logoImg, contentDescription = "Logo",
             modifier = Modifier
                 .offset(baseLogo.x - size / 2, baseLogo.y - size / 2)
                 .size(size)

@@ -17,6 +17,7 @@ repositories {
 
 dependencies {
     implementation(compose.desktop.currentOs)
+    implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
 }
 
 tasks.withType<KotlinCompile> {
