@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 
 // TODO(seanmcq): break this into (text, style) and (rest...) objects to avoid high-invalidation cost
 // TODO(seanmcq): Explore this holding non-AnnotatedString (future perf opt)
-internal data class TextInlineContentLayoutDrawParams(
+internal data class TextInlineContentLayoutDrawParams constructor(
     val text: AnnotatedString,
     val style: TextStyle,
     val fontFamilyResolver: FontFamily.Resolver,
@@ -38,6 +38,7 @@ internal data class TextInlineContentLayoutDrawParams(
     val minLines: Int = DefaultMinLines,
     val placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
     val onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
+    val selectionController: StaticTextSelectionModifierController? = null
 ) {
     init {
         validateMinMaxLines(minLines, maxLines)

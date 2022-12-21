@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.text.selection
+package androidx.compose.foundation.newtext.text.copypasta.selection
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect

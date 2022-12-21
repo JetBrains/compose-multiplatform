@@ -16,7 +16,10 @@
 
 package androidx.compose.foundation.newtext.text
 
+import androidx.compose.foundation.newtext.text.copypasta.selection.LocalSelectionRegistrar
+import androidx.compose.foundation.newtext.text.copypasta.selection.LocalTextSelectionColors
 import androidx.compose.foundation.newtext.text.modifiers.StaticTextModifier
+import androidx.compose.foundation.newtext.text.modifiers.StaticTextSelectionModifierController
 import androidx.compose.foundation.newtext.text.modifiers.TextInlineContentLayoutDrawParams
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
@@ -61,6 +64,19 @@ fun TextUsingModifier(
     maxLines: Int = Int.MAX_VALUE,
     minLines: Int = 1,
 ) {
+
+    val selectionRegistrar = LocalSelectionRegistrar.current
+    val selectionController = if (selectionRegistrar != null) {
+        val backgroundSelectionColor = LocalTextSelectionColors.current.backgroundColor
+        remember(selectionRegistrar, backgroundSelectionColor) {
+            StaticTextSelectionModifierController(
+                selectionRegistrar,
+                backgroundSelectionColor
+            )
+        }
+    } else {
+        null
+    }
     Layout(
         content = {},
         modifier = modifier.textModifier(
@@ -74,6 +90,7 @@ fun TextUsingModifier(
             fontFamilyResolver = LocalFontFamilyResolver.current,
             placeholders = null,
             onPlaceholderLayout = null,
+            selectionController = selectionController
         ),
         TextMeasurePolicy { null }
     )
@@ -97,6 +114,19 @@ fun TextUsingModifier(
 ) {
     val fontFamilyResolver = LocalFontFamilyResolver.current
 
+    val selectionRegistrar = LocalSelectionRegistrar.current
+    val selectionController = if (selectionRegistrar != null) {
+        val backgroundSelectionColor = LocalTextSelectionColors.current.backgroundColor
+        remember(selectionRegistrar, backgroundSelectionColor) {
+            StaticTextSelectionModifierController(
+                selectionRegistrar,
+                backgroundSelectionColor
+            )
+        }
+    } else {
+        null
+    }
+
     val (placeholders, inlineComposables) = text.resolveInlineContent(inlineContent)
     val measuredPlaceholderPositions = remember {
         mutableStateOf<List<Rect?>?>(null)
@@ -117,7 +147,8 @@ fun TextUsingModifier(
             minLines = minLines,
             fontFamilyResolver = fontFamilyResolver,
             placeholders = placeholders,
-            onPlaceholderLayout = { measuredPlaceholderPositions.value = it }
+            onPlaceholderLayout = { measuredPlaceholderPositions.value = it },
+            selectionController = selectionController
         ),
         measurePolicy = TextMeasurePolicy { measuredPlaceholderPositions.value }
     )
@@ -167,7 +198,8 @@ private fun Modifier.textModifier(
     minLines: Int,
     fontFamilyResolver: FontFamily.Resolver,
     placeholders: List<AnnotatedString.Range<Placeholder>>?,
-    onPlaceholderLayout: ((List<Rect?>) -> Unit)?
+    onPlaceholderLayout: ((List<Rect?>) -> Unit)?,
+    selectionController: StaticTextSelectionModifierController?
 ): Modifier {
     val params = TextInlineContentLayoutDrawParams(
         text,
@@ -180,8 +212,9 @@ private fun Modifier.textModifier(
         minLines,
         placeholders,
         onPlaceholderLayout,
+        selectionController
     )
-    return this then object : ModifierNodeElement<StaticTextModifier>(
+    val staticTextModifier = object : ModifierNodeElement<StaticTextModifier>(
         params,
         false,
         debugInspectorInfo {}
@@ -190,4 +223,6 @@ private fun Modifier.textModifier(
         override fun update(node: StaticTextModifier): StaticTextModifier =
             node.also { it.update(params) }
     }
+    val selectionModifier = selectionController?.modifier ?: Modifier
+    return this then selectionModifier then staticTextModifier
 }

@@ -8,10 +8,12 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LastBaseline
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateLayout
@@ -27,7 +29,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeUiApi::class)
 internal class TextInlineContentLayoutDrawModifier(
     params: TextInlineContentLayoutDrawParams
-) : Modifier.Node(), LayoutModifierNode, DrawModifierNode {
+) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, GlobalPositionAwareModifierNode {
     private var layoutCache: MultiParagraphLayoutCache? = null
     private var textDelegateDirty = true
 
@@ -86,6 +88,7 @@ internal class TextInlineContentLayoutDrawModifier(
         if (didChangeLayout) {
             invalidateDraw()
             params.onTextLayout?.invoke(textLayoutResult)
+            params.selectionController?.updateTextLayout(textLayoutResult)
         }
 
         // first share the placeholders
@@ -183,11 +186,16 @@ internal class TextInlineContentLayoutDrawModifier(
     }
 
     override fun ContentDrawScope.draw() {
+        params.selectionController?.draw(this)
         drawIntoCanvas { canvas ->
             TextPainter.paint(canvas, requireNotNull(layoutCache?.layout))
         }
         if (!params.placeholders.isNullOrEmpty()) {
             drawContent()
         }
+    }
+
+    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
+        params.selectionController?.updateGlobalPosition(coordinates)
     }
 }
