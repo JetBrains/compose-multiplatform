@@ -81,7 +81,7 @@ internal fun InlineChildren(
 
 private typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
 private typealias InlineContentRange = AnnotatedString.Range<@Composable (String) -> Unit>
-internal const val INLINE_CONTENT_TAG = "androidx.compose.foundation.newtext.text.inlineContent"
+internal const val INLINE_CONTENT_TAG = "androidx.compose.foundation.text.inlineContent"
 
 private val EmptyInlineContent: Pair<List<PlaceholderRange>, List<InlineContentRange>> =
     Pair(emptyList(), emptyList())

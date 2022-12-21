@@ -17,11 +17,9 @@
 package androidx.compose.foundation.newtext.text.modifiers
 
 import androidx.compose.foundation.newtext.text.ceilToIntPx
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.MultiParagraphIntrinsics
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.resolveDefaults
@@ -35,8 +33,7 @@ import androidx.compose.ui.unit.constrain
 
 internal class MultiParagraphLayoutCache(
     private val params: TextInlineContentLayoutDrawParams,
-    private val density: Density,
-    private val placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList()
+    private val density: Density
 ) {
     /*@VisibleForTesting*/
     // NOTE(text-perf-review): it seems like TextDelegate essentially guarantees that we use
@@ -149,7 +146,7 @@ internal class MultiParagraphLayoutCache(
                 style = resolveDefaults(params.style, layoutDirection),
                 density = density,
                 fontFamilyResolver = params.fontFamilyResolver,
-                placeholders = placeholders
+                placeholders = params.placeholders.orEmpty()
             )
         } else {
             localIntrinsics
@@ -195,7 +192,7 @@ internal class MultiParagraphLayoutCache(
             TextLayoutInput(
                 params.text,
                 params.style,
-                placeholders,
+                params.placeholders.orEmpty(),
                 params.maxLines,
                 params.softWrap,
                 params.overflow,
