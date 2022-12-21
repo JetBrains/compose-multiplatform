@@ -20,10 +20,7 @@
     <string name="dialog" msgid="4057925834421392736">"ডায়ল’গ"</string>
     <string name="expanded" msgid="5974471714631304645">"বিস্তাৰ কৰা আছে"</string>
     <string name="collapsed" msgid="5389587048670450460">"সংকোচন কৰা আছে"</string>
-    <!-- no translation found for dismiss (1461218791585306270) -->
-    <skip />
-    <!-- no translation found for search (8595876902241072592) -->
-    <skip />
-    <!-- no translation found for suggestions_available (7189888345201419934) -->
-    <skip />
+    <string name="dismiss" msgid="1461218791585306270">"অগ্ৰাহ্য কৰক"</string>
+    <string name="search" msgid="8595876902241072592">"সন্ধান"</string>
+    <string name="suggestions_available" msgid="7189888345201419934">"তলত পৰামৰ্শ দেখুওৱা হৈছে"</string>
 </resources>

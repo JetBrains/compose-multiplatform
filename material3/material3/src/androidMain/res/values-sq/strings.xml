@@ -20,10 +20,7 @@
     <string name="dialog" msgid="4057925834421392736">"Dialogu"</string>
     <string name="expanded" msgid="5974471714631304645">"U zgjerua"</string>
     <string name="collapsed" msgid="5389587048670450460">"U palos"</string>
-    <!-- no translation found for dismiss (1461218791585306270) -->
-    <skip />
-    <!-- no translation found for search (8595876902241072592) -->
-    <skip />
-    <!-- no translation found for suggestions_available (7189888345201419934) -->
-    <skip />
+    <string name="dismiss" msgid="1461218791585306270">"Hiq"</string>
+    <string name="search" msgid="8595876902241072592">"Kërko"</string>
+    <string name="suggestions_available" msgid="7189888345201419934">"Sugjerimet më poshtë"</string>
 </resources>
