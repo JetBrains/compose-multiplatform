@@ -15,8 +15,10 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
-import androidx.compose.ui.node.invalidateDraw
+import androidx.compose.ui.node.ObserverNode
+import androidx.compose.ui.node.invalidateLayer
 import androidx.compose.ui.node.invalidateLayout
+import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
 import androidx.compose.ui.unit.Constraints
@@ -29,7 +31,8 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeUiApi::class)
 internal class TextInlineContentLayoutDrawModifier(
     params: TextInlineContentLayoutDrawParams
-) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, GlobalPositionAwareModifierNode {
+) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, GlobalPositionAwareModifierNode,
+    ObserverNode {
     private var layoutCache: MultiParagraphLayoutCache? = null
     private var textDelegateDirty = true
 
@@ -40,14 +43,14 @@ internal class TextInlineContentLayoutDrawModifier(
         set(value) {
             validate(params)
             layoutCache?.let { cache ->
-                if (cache.equalForLayout(value) || cache.equalForCallbacks(value)) {
+                if (!(cache.equalForLayout(value) && cache.equalForCallbacks(value))) {
                     textDelegateDirty = true
                     invalidateLayout()
                 }
             }
             field = value
             // if we set params, always redraw.
-            invalidateDraw()
+            invalidateLayer()
         }
 
     private fun validate(params: TextInlineContentLayoutDrawParams) {
@@ -85,8 +88,12 @@ internal class TextInlineContentLayoutDrawModifier(
         val didChangeLayout = td.layoutWithConstraints(constraints, layoutDirection)
         val textLayoutResult = td.layout
 
+        observeReads {
+            textLayoutResult.multiParagraph.intrinsics.hasStaleResolvedFonts
+        }
+
         if (didChangeLayout) {
-            invalidateDraw()
+            invalidateLayer()
             params.onTextLayout?.invoke(textLayoutResult)
             params.selectionController?.updateTextLayout(textLayoutResult)
         }
@@ -111,7 +118,7 @@ internal class TextInlineContentLayoutDrawModifier(
             )
         ) {
             // this is basically a graphicsLayer
-            placeable.placeWithLayer(0, 0)
+            placeable.place(0, 0)
         }
     }
 
@@ -197,5 +204,9 @@ internal class TextInlineContentLayoutDrawModifier(
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         params.selectionController?.updateGlobalPosition(coordinates)
+    }
+
+    override fun onObservedReadsChanged() {
+        invalidateLayout()
     }
 }

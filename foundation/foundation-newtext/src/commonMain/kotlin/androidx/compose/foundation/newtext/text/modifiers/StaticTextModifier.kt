@@ -20,12 +20,15 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.ObserverNode
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.getTextLayoutResult
@@ -37,7 +40,8 @@ import androidx.compose.ui.unit.Constraints
 @OptIn(ExperimentalComposeUiApi::class)
 internal class StaticTextModifier(
     params: TextInlineContentLayoutDrawParams
-) : DelegatingNode(), LayoutModifierNode, DrawModifierNode, SemanticsModifierNode {
+) : DelegatingNode(), LayoutModifierNode, DrawModifierNode, SemanticsModifierNode,
+    GlobalPositionAwareModifierNode, ObserverNode {
 
     private val drawLayout = delegated { TextInlineContentLayoutDrawModifier(params) }
 
@@ -105,5 +109,13 @@ internal class StaticTextModifier(
 
     override fun ContentDrawScope.draw() {
         drawLayout.drawNonExtension(this)
+    }
+
+    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
+        drawLayout.onGloballyPositioned(coordinates)
+    }
+
+    override fun onObservedReadsChanged() {
+        drawLayout.onObservedReadsChanged()
     }
 }

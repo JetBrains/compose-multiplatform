@@ -215,6 +215,9 @@ internal class MultiParagraphLayoutCache(
         // no layout yet
         if (this == null) return true
 
+        // async typeface changes
+        if (this.multiParagraph.intrinsics.hasStaleResolvedFonts) return true
+
         // layout direction changed
         if (layoutDirection != layoutInput.layoutDirection) return true
 
