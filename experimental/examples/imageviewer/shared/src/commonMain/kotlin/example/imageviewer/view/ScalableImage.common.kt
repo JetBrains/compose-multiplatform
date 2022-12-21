@@ -21,7 +21,6 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.*
-import example.imageviewer.style.DarkGray
 
 private const val MAX_SCALE = 5f
 private const val MIN_SCALE = 1f
@@ -30,7 +29,8 @@ private const val MIN_SCALE = 1f
 @Composable
 fun ScalableImage(image: ImageBitmap) {
     val focusRequester = FocusRequester()
-    val state = remember { mutableStateOf(ScalableState(IntSize(image.width, image.height))) }
+    val imageSize = IntSize(image.width, image.height)
+    val state = remember(imageSize) { mutableStateOf(ScalableState(imageSize)) }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -93,37 +93,20 @@ fun ScalableImage(image: ImageBitmap) {
     }
 }
 
-private data class ScalableState(
+data class ScalableState(
     val imageSize: IntSize,
     val boxSize: IntSize = IntSize(1, 1),
     val offset: IntOffset = IntOffset.Zero,
     val scale: Float = 1f
 )
 
-private fun ScalableState.changeOffset(x: Int = offset.x, y: Int = offset.y) = copy(offset = IntOffset(x, y))
+fun ScalableState.changeOffset(x: Int = offset.x, y: Int = offset.y) = copy(offset = IntOffset(x, y))
 
-private fun ScalableState.updateOffset(): ScalableState {
-    var result = this
-    if (offset.x + visiblePart.width > imageSize.width) {
-        result = result.changeOffset(x = imageSize.width - visiblePart.width)
-    }
-    if (offset.y + visiblePart.height > imageSize.height) {
-        result = result.changeOffset(y = imageSize.height - visiblePart.height)
-    }
-    if (offset.x < 0) {
-        result = result.changeOffset(x = 0)
-    }
-    if (offset.y < 0) {
-        result = result.changeOffset(y = 0)
-    }
-    return result
-}
-
-private fun ScalableState.changeBoxSize(size: IntSize) =
+fun ScalableState.changeBoxSize(size: IntSize) =
     copy(boxSize = size)
         .updateOffset()
 
-private fun ScalableState.addScale(diff: Float) =
+fun ScalableState.addScale(diff: Float) =
     if (scale + diff > MAX_SCALE) {
         copy(scale = MAX_SCALE)
     } else if (scale + diff < MIN_SCALE) {
@@ -132,7 +115,7 @@ private fun ScalableState.addScale(diff: Float) =
         copy(scale = scale + diff)
     }.updateOffset()
 
-private fun ScalableState.addDragAmount(diff: Offset) =
+fun ScalableState.addDragAmount(diff: Offset) =
     copy(offset = offset - IntOffset((diff.x + 1).toInt(), (diff.y + 1).toInt()))
         .updateOffset()
 
@@ -154,3 +137,20 @@ private val ScalableState.visiblePart
 
         return IntRect(offset = offset, size = size)
     }
+
+private fun ScalableState.updateOffset(): ScalableState {
+    var result = this
+    if (offset.x + visiblePart.width > imageSize.width) {
+        result = result.changeOffset(x = imageSize.width - visiblePart.width)
+    }
+    if (offset.y + visiblePart.height > imageSize.height) {
+        result = result.changeOffset(y = imageSize.height - visiblePart.height)
+    }
+    if (offset.x < 0) {
+        result = result.changeOffset(x = 0)
+    }
+    if (offset.y < 0) {
+        result = result.changeOffset(y = 0)
+    }
+    return result
+}
