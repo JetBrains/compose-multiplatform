@@ -21,7 +21,7 @@ import example.imageviewer.style.Foreground
 import example.imageviewer.style.TranslucentBlack
 
 @Composable
-fun LoadingScreen(text: String = "") {
+internal fun LoadingScreen(text: String = "") {
     Box(
         modifier = Modifier.fillMaxSize().background(color = TranslucentBlack)
     ) {

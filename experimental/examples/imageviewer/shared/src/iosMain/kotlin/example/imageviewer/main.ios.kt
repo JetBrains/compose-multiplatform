@@ -21,6 +21,6 @@ fun MainViewController() : UIViewController =
                 modifier = Modifier
                     .height(30.dp)
             )
-            MainView()
+            ImageViewerIos()
         }
     }

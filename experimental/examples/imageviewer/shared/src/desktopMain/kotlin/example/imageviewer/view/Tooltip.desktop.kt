@@ -1,6 +1,5 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.BoxWithTooltip
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.TooltipArea
 import androidx.compose.foundation.layout.padding
@@ -15,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-actual fun Tooltip(
+internal actual fun Tooltip(
     text: String,
     content: @Composable () -> Unit
 ) {

@@ -77,10 +77,6 @@ fun ApplicationScope.ImageViewerDesktop() {
 }
 
 private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
-    init {
-        println("getDependencies, ioScope: ${ioScope}")
-    }
-
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
         FilterType.GrayScale -> GrayScaleFilter()

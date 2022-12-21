@@ -12,20 +12,20 @@ val ktorVersion = extra["ktor.version"]
 kotlin {
     android()
     jvm("desktop")
-//    ios()
-//    iosSimulatorArm64()
+    ios()
+    iosSimulatorArm64()
 
-//    cocoapods {
-//        summary = "Shared code for the sample"
-//        homepage = "https://github.com/JetBrains/compose-jb"
-//        ios.deploymentTarget = "14.1"
-//        podfile = project.file("../iosApp/Podfile")
-//        framework {
-//            baseName = "shared"
-//            isStatic = true
-//        }
-//        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
-//    }
+    cocoapods {
+        summary = "Shared code for the sample"
+        homepage = "https://github.com/JetBrains/compose-jb"
+        ios.deploymentTarget = "14.1"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -45,18 +45,18 @@ kotlin {
                 implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
             }
         }
-//        val iosMain by getting {
-//            dependencies {
-//                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
-//            }
-//        }
-//        val iosTest by getting
-//        val iosSimulatorArm64Main by getting {
-//            dependsOn(iosMain)
-//        }
-//        val iosSimulatorArm64Test by getting {
-//            dependsOn(iosTest)
-//        }
+        val iosMain by getting {
+            dependencies {
+                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+            }
+        }
+        val iosTest by getting
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Test by getting {
+            dependsOn(iosTest)
+        }
 
         val desktopMain by getting {
             dependencies {

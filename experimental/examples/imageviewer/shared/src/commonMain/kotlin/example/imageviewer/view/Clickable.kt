@@ -6,7 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 
 @Composable
-fun Clickable(
+internal fun Clickable(
     modifier: Modifier = Modifier,
     onClick: (() -> Unit)? = null,
     children: @Composable () -> Unit = { }

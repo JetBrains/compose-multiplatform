@@ -12,8 +12,11 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.key.*
@@ -65,6 +68,7 @@ internal fun FullscreenImage(
     Box(Modifier.fillMaxSize()) {
         Column {
             Toolbar(picture.name, filtersState, localization, back)
+
             if (imageWithFilter != null) {
                 val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
                 val scalableState = remember(imageSize) { mutableStateOf(ScalableState(imageSize)) }
@@ -77,13 +81,15 @@ internal fun FullscreenImage(
                         .addUserInput(scalableState)
                 ) {
                     Image(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier.fillMaxSize()
+                            .blur(radius = 10.dp),
                         painter = BitmapPainter(
                             imageWithFilter,
                             srcOffset = scalableState.value.visiblePart.topLeft,
                             srcSize = scalableState.value.visiblePart.size
                         ),
-                        contentDescription = null
+                        contentDescription = null,
+                        colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
                     )
                 }
             } else {

@@ -3,7 +3,9 @@ package example.imageviewer.view
 import androidx.compose.runtime.Composable
 
 @Composable
-expect fun Tooltip(
-    text: String = "Tooltip",
+internal actual fun Tooltip( //todo ios
+    text: String,
     content: @Composable () -> Unit
-)
+) {
+    content()
+}

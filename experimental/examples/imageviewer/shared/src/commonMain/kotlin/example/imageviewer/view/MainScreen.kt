@@ -104,7 +104,7 @@ private fun TitleBar(state: MutableState<State>, dependencies: Dependencies) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun PreviewImage(state: MutableState<State>) {
+internal fun PreviewImage(state: MutableState<State>) {
     Clickable(onClick = {
         state.value = state.value.copy(
             screen = ScreenState.FullScreen
@@ -129,7 +129,7 @@ fun PreviewImage(state: MutableState<State>) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun Miniature(
+internal fun Miniature(
     picture: Picture,
     image: ImageBitmap?,
     onClickSelect: () -> Unit,
