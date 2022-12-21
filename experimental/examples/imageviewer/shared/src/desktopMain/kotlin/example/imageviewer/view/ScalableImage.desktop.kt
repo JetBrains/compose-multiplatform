@@ -2,6 +2,8 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
@@ -15,8 +17,13 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.AwaitPointerEventScope
+import androidx.compose.ui.input.pointer.PointerEvent
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import example.imageviewer.style.DarkGray
 import example.imageviewer.utils.cropBitmapByScale
 
@@ -37,6 +44,16 @@ actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
                 detectDragGestures { change, dragAmount ->
                     dragState.value += dragAmount
                     change.consume()
+                }
+            }.pointerInput(Unit) {
+                awaitPointerEventScope {
+                    while (true) {
+                        val event = awaitPointerEvent()
+                        if (event.type == PointerEventType.Scroll) {
+                            val delta = event.changes.getOrNull(0)?.scrollDelta ?: Offset.Zero
+                            scaleState.updateZoom(1 + delta.y / 100)
+                        }
+                    }
                 }
             }.onPreviewKeyEvent {
                 if (it.type == KeyEventType.KeyUp) {
