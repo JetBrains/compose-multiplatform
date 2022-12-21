@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
@@ -68,10 +70,15 @@ internal fun FullscreenImage(
     Box(Modifier.fillMaxSize()) {
         Column {
             Toolbar(picture.name, filtersState, localization, back)
-
             if (imageWithFilter != null) {
                 val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
                 val scalableState = remember(imageSize) { mutableStateOf(ScalableState(imageSize)) }
+                Slider(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = scalableState.value.scale,
+                    valueRange = MIN_SCALE..MAX_SCALE,
+                    onValueChange = { scalableState.value = scalableState.value.setScale(it) }
+                )
                 Box(
                     modifier = Modifier.fillMaxSize()
                         .background(Color.DarkGray)

@@ -27,7 +27,6 @@ import org.jetbrains.compose.resources.resource
 internal fun MainScreen(state: MutableState<State>, dependencies: Dependencies) {
     Column {
         TopContent(state, dependencies)
-        Divider(color = LightGray, modifier = Modifier.padding(start = 10.dp, end = 10.dp))
         val scrollState = rememberScrollState()
         Column(Modifier.verticalScroll(scrollState)) {
             for (i in state.value.pictures.indices) {

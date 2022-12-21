@@ -5,8 +5,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 
-private const val MAX_SCALE = 5f
-private const val MIN_SCALE = 1f
+const val MAX_SCALE = 5f
+const val MIN_SCALE = 1f
 
 data class ScalableState(
     val imageSize: IntSize,
@@ -19,6 +19,10 @@ fun ScalableState.changeOffset(x: Int = offset.x, y: Int = offset.y) = copy(offs
 
 fun ScalableState.changeBoxSize(size: IntSize) =
     copy(boxSize = size)
+        .updateOffset()
+
+fun ScalableState.setScale(scale: Float) =
+    copy(scale = scale)
         .updateOffset()
 
 fun ScalableState.addScale(diff: Float) =
