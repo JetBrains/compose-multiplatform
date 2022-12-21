@@ -935,8 +935,10 @@ class AppBarTest {
 
         // Check that the app bar stayed at its position (i.e. its bounds are with a smaller height)
         val boundsBefore = rule.onNodeWithTag(TopAppBarTestTag).getBoundsInRoot()
-        assertThat(TopAppBarLargeTokens.ContainerHeight).isEqualTo(boundsBefore.height)
-
+        TopAppBarLargeTokens.ContainerHeight.assertIsEqualTo(
+            expected = boundsBefore.height,
+            subject = "container height"
+        )
         // Slightly drag up the app bar.
         rule.onNodeWithTag(TopAppBarTestTag).performTouchInput {
             down(Offset(x = 100f, y = height - 20f))
