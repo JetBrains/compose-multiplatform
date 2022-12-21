@@ -5,6 +5,7 @@ import android.graphics.Rect
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
@@ -18,6 +19,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.DpSize
 import example.imageviewer.style.DarkGray
 import example.imageviewer.utils.displayHeight
 import example.imageviewer.utils.displayWidth
@@ -32,23 +34,25 @@ internal actual fun ScalableImage(modifier: Modifier, image: ImageBitmap) {
     val dragState = remember(image) { mutableStateOf(Offset.Zero) }
     val scaleState = remember(image) { mutableStateOf(1f) }
 
-    Surface(
-        color = DarkGray,
-        modifier = modifier.fillMaxSize()
-            .pointerInput(Unit) {
-                detectTransformGestures { _, pan, zoom, _ ->
-                    dragState.value += pan
-                    scaleState.updateZoom(zoom)
-                }
-            }.pointerInput(Unit) {
-                detectTapGestures(onDoubleTap = { scaleState.value = 1f })
-            },
-    ) {
-        Image(
-            bitmap = cropBitmapByScale(image, scaleState.value, dragState.value),
-            contentDescription = null,
-            contentScale = ContentScale.Fit
-        )
+    BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+        Surface(
+            color = DarkGray,
+            modifier = modifier.fillMaxSize()
+                .pointerInput(Unit) {
+                    detectTransformGestures { _, pan, zoom, _ ->
+                        dragState.value += pan
+                        scaleState.updateZoom(zoom)
+                    }
+                }.pointerInput(Unit) {
+                    detectTapGestures(onDoubleTap = { scaleState.value = 1f })
+                },
+        ) {
+            Image(
+                bitmap = cropBitmapByScale(image, scaleState.value, dragState.value, DpSize(maxWidth, maxHeight)),
+                contentDescription = null,
+                contentScale = ContentScale.Fit
+            )
+        }
     }
 }
 
@@ -63,13 +67,14 @@ private fun MutableState<Float>.updateZoom(zoom: Float) {
 }
 
 @Composable
-actual fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset): ImageBitmap =
-    cropBitmapByScale(image.asAndroidBitmap(), scale, offset).asImageBitmap()
+private fun cropBitmapByScale(image: ImageBitmap, scale: Float, offset: Offset, size: DpSize): ImageBitmap =
+    cropBitmapByScale(image.asAndroidBitmap(), size, scale, offset).asImageBitmap()
 
-fun cropBitmapByScale(bitmap: Bitmap, scale: Float, offset: Offset): Bitmap {
+fun cropBitmapByScale(bitmap: Bitmap, size: DpSize, scale: Float, offset: Offset): Bitmap {
     val crop = cropBitmapByBounds(
         bitmap,
         getDisplayBounds(bitmap),
+        size,
         scale,
         offset
     )
@@ -85,6 +90,7 @@ fun cropBitmapByScale(bitmap: Bitmap, scale: Float, offset: Offset): Bitmap {
 fun cropBitmapByBounds(
     bitmap: Bitmap,
     bounds: Rect,
+    size: DpSize,
     scaleFactor: Float,
     offset: Offset,
 ): Rect {

@@ -13,5 +13,5 @@ fun adjustImageScale(bitmap: ImageBitmap): ContentScale {
     return ContentScale.FillWidth
 }
 
-expect fun displayWidth(): Int
-expect fun displayHeight(): Int
+ fun displayWidth(): Int = TODO()
+ fun displayHeight(): Int = TODO()

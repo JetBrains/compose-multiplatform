@@ -35,11 +35,6 @@ import java.io.File
 
 private val message: MutableState<String> = mutableStateOf("")
 private val toastState: MutableState<Boolean> = mutableStateOf(false)
-val ioScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)//todo
-
-val LocalWindowSize = staticCompositionLocalOf {
-    DpSize.Unspecified
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -49,37 +44,36 @@ fun ApplicationScope.ImageViewerDesktop() {
     val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val dependencies = remember(ioScope) { getDependencies(ioScope) }
 
-    CompositionLocalProvider(LocalWindowSize provides windowState.size) {
-        Window(
-            onCloseRequest = ::exitApplication,
-            title = "Image Viewer",
-            state = WindowState(
-                position = WindowPosition.Aligned(Alignment.Center),
-                size = getPreferredWindowSize(800, 1000)
-            ),
-            icon = painterResource("ic_imageviewer_round.png"),
-            onKeyEvent = {
-                if (it.type == KeyEventType.KeyUp) {
-                    when (it.key) {
-                        Key.DirectionLeft -> state.previousImage()
-                        Key.DirectionRight -> state.nextImage()
-                    }
+    Window(
+        onCloseRequest = ::exitApplication,
+        title = "Image Viewer",
+        state = WindowState(
+            position = WindowPosition.Aligned(Alignment.Center),
+            size = getPreferredWindowSize(800, 1000)
+        ),
+        icon = painterResource("ic_imageviewer_round.png"),
+        onKeyEvent = {
+            if (it.type == KeyEventType.KeyUp) {
+                when (it.key) {
+                    Key.DirectionLeft -> state.previousImage()
+                    Key.DirectionRight -> state.nextImage()
                 }
-                false
             }
+            false
+        }
+    ) {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = Gray
         ) {
-            Surface(
-                modifier = Modifier.fillMaxSize(),
-                color = Gray
-            ) {
-                ImageViewerCommon(
-                    state = state,
-                    dependencies = dependencies
-                )
-                Toast(message.value, toastState)
-            }
+            ImageViewerCommon(
+                state = state,
+                dependencies = dependencies
+            )
+            Toast(message.value, toastState)
         }
     }
+
 }
 
 private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {

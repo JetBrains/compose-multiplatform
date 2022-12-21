@@ -15,7 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
@@ -63,10 +66,26 @@ internal fun FullscreenImage(
         Column {
             Toolbar(picture.name, filtersState, localization, back)
             if (imageWithFilter != null) {
-                ScalableImage(
-                    modifier = Modifier,
-                    image = imageWithFilter,
-                )
+                val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
+                val scalableState = remember(imageSize) { mutableStateOf(ScalableState(imageSize)) }
+                Box(
+                    modifier = Modifier.fillMaxSize()
+                        .background(Color.DarkGray)
+                        .onGloballyPositioned { coordinates ->
+                            scalableState.value = scalableState.value.changeBoxSize(coordinates.size)
+                        }
+                        .addUserInput(scalableState)
+                ) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = BitmapPainter(
+                            imageWithFilter,
+                            srcOffset = scalableState.value.visiblePart.topLeft,
+                            srcSize = scalableState.value.visiblePart.size
+                        ),
+                        contentDescription = null
+                    )
+                }
             } else {
                 LoadingScreen()
             }

@@ -85,11 +85,3 @@ fun toDp(px: Int): Int {
     return (px / Resources.getSystem().displayMetrics.density).toInt()
 }
 
-actual fun displayWidth(): Int {
-    return Resources.getSystem().displayMetrics.widthPixels
-}
-
-actual fun displayHeight(): Int {
-    return Resources.getSystem().displayMetrics.heightPixels
-}
-
