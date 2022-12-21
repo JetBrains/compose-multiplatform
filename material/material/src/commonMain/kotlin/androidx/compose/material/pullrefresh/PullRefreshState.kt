@@ -71,14 +71,14 @@ fun rememberPullRefreshState(
         refreshingOffsetPx = refreshingOffset.toPx()
     }
 
-    // refreshThreshold and refreshingOffset should not be changed after instantiation, so any
-    // changes to these values are ignored.
     val state = remember(scope) {
         PullRefreshState(scope, onRefreshState, refreshingOffsetPx, thresholdPx)
     }
 
     SideEffect {
         state.setRefreshing(refreshing)
+        state.setThreshold(thresholdPx)
+        state.setRefreshingOffset(refreshingOffsetPx)
     }
 
     return state
@@ -101,8 +101,8 @@ fun rememberPullRefreshState(
 class PullRefreshState internal constructor(
     private val animationScope: CoroutineScope,
     private val onRefreshState: State<() -> Unit>,
-    private val refreshingOffset: Float,
-    internal val threshold: Float
+    refreshingOffset: Float,
+    threshold: Float
 ) {
     /**
      * A float representing how far the user has pulled as a percentage of the refreshThreshold.
@@ -116,15 +116,18 @@ class PullRefreshState internal constructor(
 
     internal val refreshing get() = _refreshing
     internal val position get() = _position
+    internal val threshold get() = _threshold
 
     private val adjustedDistancePulled by derivedStateOf { distancePulled * DragMultiplier }
 
     private var _refreshing by mutableStateOf(false)
     private var _position by mutableStateOf(0f)
     private var distancePulled by mutableStateOf(0f)
+    private var _threshold by mutableStateOf(threshold)
+    private var _refreshingOffset by mutableStateOf(refreshingOffset)
 
     internal fun onPull(pullDelta: Float): Float {
-        if (this._refreshing) return 0f // Already refreshing, do nothing.
+        if (_refreshing) return 0f // Already refreshing, do nothing.
 
         val newOffset = (distancePulled + pullDelta).coerceAtLeast(0f)
         val dragConsumed = newOffset - distancePulled
@@ -134,7 +137,7 @@ class PullRefreshState internal constructor(
     }
 
     internal fun onRelease() {
-        if (!this._refreshing) {
+        if (!_refreshing) {
             if (adjustedDistancePulled > threshold) {
                 onRefreshState.value()
             }
@@ -144,10 +147,21 @@ class PullRefreshState internal constructor(
     }
 
     internal fun setRefreshing(refreshing: Boolean) {
-        if (this._refreshing != refreshing) {
-            this._refreshing = refreshing
-            this.distancePulled = 0f
-            animateIndicatorTo(if (refreshing) refreshingOffset else 0f)
+        if (_refreshing != refreshing) {
+            _refreshing = refreshing
+            distancePulled = 0f
+            animateIndicatorTo(if (refreshing) _refreshingOffset else 0f)
+        }
+    }
+
+    internal fun setThreshold(threshold: Float) {
+        _threshold = threshold
+    }
+
+    internal fun setRefreshingOffset(refreshingOffset: Float) {
+        if (_refreshingOffset != refreshingOffset) {
+            _refreshingOffset = refreshingOffset
+            if (refreshing) animateIndicatorTo(refreshingOffset)
         }
     }
 

@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalViewConfiguration
@@ -349,6 +350,38 @@ class PullRefreshStateTest {
             // 0
             assertThat(state.progress).isEqualTo(0f)
             assertThat(state.position).isEqualTo(0f)
+        }
+    }
+
+    @Test
+    fun thresholdAndRefreshingOffsetUpdated() {
+        val initialThreshold = 800f
+        val newThreshold = 1600f
+        val initialOffset = 400f
+        val newOffset = 800f
+        lateinit var state: PullRefreshState
+        val refreshingOffset = mutableStateOf(initialOffset)
+        val refreshThreshold = mutableStateOf(initialThreshold)
+
+        rule.setContent {
+            state = rememberPullRefreshState(
+                refreshing = true,
+                onRefresh = { },
+                refreshThreshold = with(LocalDensity.current) { refreshThreshold.value.toDp() },
+                refreshingOffset = with(LocalDensity.current) { refreshingOffset.value.toDp() }
+            )
+        }
+
+        rule.runOnIdle {
+            assertThat(state.threshold).isEqualTo(initialThreshold)
+            assertThat(state.position).isEqualTo(initialOffset)
+            refreshThreshold.value = newThreshold
+            refreshingOffset.value = newOffset
+        }
+
+        rule.runOnIdle {
+            assertThat(state.threshold).isEqualTo(newThreshold)
+            assertThat(state.position).isEqualTo(newOffset)
         }
     }
 
