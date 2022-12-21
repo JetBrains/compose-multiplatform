@@ -14,13 +14,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.*
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -200,15 +198,6 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
 }
 
 val rocket = DoubleRocket(Particle(0.0, 1000.0, 2.1, -12.5, Color.White))
-
-
-@Composable
-fun NYWindow(onCloseRequest: () -> Unit) {
-    val windowState = remember { WindowState(width = width.dp, height = height.dp) }
-    Window(onCloseRequest = onCloseRequest, undecorated = true, transparent = true, state = windowState) {
-        NYContent()
-    }
-}
 
 fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: SnapshotStateList<SnowFlake>) {
     for (i in 0..snowCount) {

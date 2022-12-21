@@ -1,6 +1,5 @@
 package org.jetbrains.compose.demo.visuals
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,38 +11,12 @@ import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPosition
-import androidx.compose.ui.window.WindowState
 import kotlin.math.*
-
-@Composable
-fun WaveEffect(onCloseRequest: () -> Unit, showControls: Boolean) {
-    val windowState = remember { WindowState(width = 1200.dp, height = 800.dp) }
-    Window(onCloseRequest = {}, undecorated = true, transparent = true, state = windowState) {
-        Grid()
-    }
-
-    if (showControls) {
-        Window(
-            onCloseRequest = onCloseRequest,
-            state = WindowState(width = 200.dp, height = 400.dp, position = WindowPosition(1400.dp, 200.dp))
-        ) {
-            Column {
-                SettingsPanel(State.red, "Red")
-                SettingsPanel(State.green, "Green")
-                SettingsPanel(State.blue, "Blue")
-            }
-        }
-    }
-}
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-@Preview
 fun Grid() {
     var mouseX by remember { mutableStateOf(0) }
     var mouseY by remember { mutableStateOf(0) }
@@ -228,38 +201,8 @@ private fun boxColor(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Colo
     return balancedColor(fade, color, Color.White)
 }
 
-internal class ColorSettings {
-    var enabled by mutableStateOf(true)
-    var waveLength by mutableStateOf(30.0)
-    var simple by mutableStateOf(true)
-    var period by mutableStateOf(80.0)
-}
-
-private class State {
+internal class State {
     companion object {
-        var red by mutableStateOf(ColorSettings())
-        var green by mutableStateOf(ColorSettings())
-        var blue by mutableStateOf(ColorSettings())
         var mouseUsed by mutableStateOf(false)
     }
 }
-
-@Composable
-internal fun SettingsPanel(settings: ColorSettings, name: String) {
-    Row {
-        Text(name)
-        Checkbox(settings.enabled, onCheckedChange = { settings.enabled = it })
-        Checkbox(settings.simple, onCheckedChange = { settings.simple = it })
-        Slider(
-            (settings.waveLength.toFloat() - 10) / 90,
-            { settings.waveLength = 10 + 90 * it.toDouble() },
-            Modifier.width(100.dp)
-        )
-        Slider(
-            (settings.period.toFloat() - 10) / 90,
-            { settings.period = 10 + 90 * it.toDouble() },
-            Modifier.width(100.dp)
-        )
-    }
-}
-

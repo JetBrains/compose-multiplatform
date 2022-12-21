@@ -1,18 +1,14 @@
 package org.jetbrains.compose.demo.visuals
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.*
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
@@ -24,14 +20,9 @@ import androidx.compose.ui.res.loadSvgPainter
 import androidx.compose.ui.res.useResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.singleWindowApplication
 
-@OptIn(ExperimentalAnimationApi::class, ExperimentalMaterialApi::class)
-@Preview
 @Composable
 fun Words() {
     val density = LocalDensity.current
@@ -110,7 +101,6 @@ fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
 }
 
 @Composable
-@Preview
 fun FallingSnow() {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         repeat(50) {
@@ -146,7 +136,6 @@ fun FallingSnow() {
 }
 
 @Composable
-@Preview
 fun Background() = Box(
     Modifier
         .fillMaxSize()
@@ -154,7 +143,6 @@ fun Background() = Box(
 )
 
 @Composable
-@Preview
 fun RotatingWords() {
     Background()
     FallingSnow()
