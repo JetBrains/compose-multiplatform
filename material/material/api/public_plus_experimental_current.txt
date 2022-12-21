@@ -378,7 +378,7 @@ package androidx.compose.material {
     method public boolean isClosed();
     method public boolean isOpen();
     method public suspend Object? open(kotlin.coroutines.Continuation<? super kotlin.Unit>);
-    method @androidx.compose.material.ExperimentalMaterialApi public suspend Object? snapTo(androidx.compose.material.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
+    method public suspend Object? snapTo(androidx.compose.material.DrawerValue targetValue, kotlin.coroutines.Continuation<? super kotlin.Unit>);
     property public final androidx.compose.material.DrawerValue currentValue;
     property public final boolean isAnimationRunning;
     property public final boolean isClosed;
