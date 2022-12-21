@@ -20,10 +20,9 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
         target.plugins.withType(ComposePlugin::class.java) {
             val composeExt = target.extensions.getByType(ComposeExtension::class.java)
 
-            composeCompilerArtifactProvider = ComposeCompilerArtifactProvider(
-                kotlinVersion = target.getKotlinPluginVersion()
-            ) {
-                composeExt.kotlinCompilerPlugin.orNull
+            composeCompilerArtifactProvider = ComposeCompilerArtifactProvider {
+                composeExt.kotlinCompilerPlugin.orNull ?:
+                    ComposeCompilerCompatability.compilerVersionFor(target.getKotlinPluginVersion())
             }
         }
     }
@@ -58,7 +57,6 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 
     override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
         val target = kotlinCompilation.target
-        composeCompilerArtifactProvider.checkTargetSupported(target)
         return target.project.provider {
             platformPluginOptions[target.platformType] ?: emptyList()
         }
