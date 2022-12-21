@@ -14,6 +14,12 @@ package androidx.compose.ui.tooling {
   public final class PreviewUtilsKt {
   }
 
+  public final class ShadowViewInfoKt {
+  }
+
+  public final class ViewInfoUtilKt {
+  }
+
 }
 
 package androidx.compose.ui.tooling.animation {
