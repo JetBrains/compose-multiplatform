@@ -128,7 +128,6 @@ private fun Toolbar(
     val backButtonInteractionSource = remember { MutableInteractionSource() }
     val backButtonHover by backButtonInteractionSource.collectIsHoveredAsState()
     Surface(
-//        color = MiniatureColor,
         modifier = Modifier.height(44.dp)
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
