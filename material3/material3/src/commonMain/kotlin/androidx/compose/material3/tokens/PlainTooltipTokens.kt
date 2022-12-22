@@ -18,7 +18,7 @@ package androidx.compose.material3.tokens
 
 internal object PlainTooltipTokens {
     val ContainerColor = ColorSchemeKeyTokens.InverseSurface
-    val ContainerShape = ShapeKeyTokens.CornerSmall
+    val ContainerShape = ShapeKeyTokens.CornerExtraSmall
     val SupportingTextColor = ColorSchemeKeyTokens.InverseOnSurface
     val SupportingTextFont = TypographyKeyTokens.BodySmall
 }
