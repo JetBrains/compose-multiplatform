@@ -14,8 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import example.imageviewer.model.TOAST_DURATION
-import example.imageviewer.style.Foreground
-import example.imageviewer.style.ToastBackground
+import example.imageviewer.style.ImageviewerColors
 import kotlinx.coroutines.delay
 
 sealed interface ToastState {
@@ -35,14 +34,11 @@ internal fun Toast(
         ) {
             Surface(
                 modifier = Modifier.size(300.dp, 70.dp),
-                color = ToastBackground,
+                color = ImageviewerColors.ToastBackground,
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(
-                        text = value.message,
-                        color = Foreground
-                    )
+                    Text(value.message)
                 }
                 LaunchedEffect(value.message) {
                     delay(TOAST_DURATION)

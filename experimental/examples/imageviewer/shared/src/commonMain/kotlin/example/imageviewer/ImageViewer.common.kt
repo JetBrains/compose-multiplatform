@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
-import example.imageviewer.style.Gray
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
 
@@ -14,10 +13,7 @@ import example.imageviewer.view.MainScreen
 internal fun ImageViewerCommon(state: MutableState<State>, dependencies: Dependencies) {
     state.refresh(dependencies)
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Gray
-    ) {
+    Surface(modifier = Modifier.fillMaxSize()) {
         when (state.value.screen) {
             ScreenState.Miniatures -> {
                 MainScreen(state, dependencies)

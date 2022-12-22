@@ -19,6 +19,7 @@ import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
+import example.imageviewer.style.ImageViewerTheme
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +33,9 @@ fun ImageViewerAndroid() {
     val ioScope = rememberCoroutineScope { Dispatchers.IO }
     val dependencies = remember(context, ioScope) { getDependencies(context, ioScope) }
     val state = remember { mutableStateOf(State()) }
-    ImageViewerCommon(state, dependencies)
+    ImageViewerTheme {
+        ImageViewerCommon(state, dependencies)
+    }
 }
 
 private fun getDependencies(context: Context, ioScope: CoroutineScope) = object : Dependencies {

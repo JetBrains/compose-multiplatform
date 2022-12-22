@@ -11,7 +11,7 @@ import example.imageviewer.model.ContentRepository
 import example.imageviewer.model.State
 import example.imageviewer.model.adapter
 import example.imageviewer.model.createNetworkRepository
-import example.imageviewer.style.Gray
+import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
 import io.ktor.client.*
@@ -26,15 +26,16 @@ internal fun ImageViewerIos() {
     val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.Default }
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = Gray
-    ) {
-        ImageViewerCommon(
-            state = state,
-            dependencies = dependencies
-        )
-        Toast(toastState)
+    ImageViewerTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            ImageViewerCommon(
+                state = state,
+                dependencies = dependencies
+            )
+            Toast(toastState)
+        }
     }
 }
 

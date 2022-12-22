@@ -62,16 +62,15 @@ private fun TopContent(state: MutableState<State>, dependencies: Dependencies) {
 @Composable
 private fun TitleBar(state: MutableState<State>, dependencies: Dependencies) {
     TopAppBar(
-        backgroundColor = DarkGreen,
+        backgroundColor = MaterialTheme.colors.surface,
         title = {
             Row(Modifier.height(50.dp)) {
                 Text(
                     dependencies.localization.appName,
-                    color = Foreground,
                     modifier = Modifier.weight(1f).align(Alignment.CenterVertically)
                 )
                 Surface(
-                    color = Transparent,
+                    color = ImageviewerColors.Transparent,
                     modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
                     shape = CircleShape
                 ) {

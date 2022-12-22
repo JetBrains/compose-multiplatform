@@ -64,7 +64,7 @@ internal fun FullscreenImage(
         }
     }
 
-    Box(Modifier.fillMaxSize()) {
+    Box(Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)) {
         Column {
             Toolbar(picture?.name ?: "", filtersState, localization, back)
             if (imageWithFilter != null) {
@@ -75,11 +75,10 @@ internal fun FullscreenImage(
                     modifier = Modifier.fillMaxWidth(),
                     value = scalableState.value.scale,
                     valueRange = MIN_SCALE..MAX_SCALE,
-                    onValueChange = { scalableState.setScale(it) }
+                    onValueChange = { scalableState.setScale(it) },
                 )
                 Box(
                     modifier = Modifier.fillMaxSize()
-                        .background(Color.DarkGray)
                         .onGloballyPositioned { coordinates ->
                             scalableState.changeBoxSize(coordinates.size)
                         }
@@ -101,10 +100,18 @@ internal fun FullscreenImage(
         }
 
         FloatingActionButton(modifier = Modifier.align(Alignment.BottomStart).padding(10.dp), onClick = previousImage) {
-            Icon(imageVector = Icons.Filled.KeyboardArrowLeft, contentDescription = "Previous")
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowLeft,
+                contentDescription = "Previous",
+                tint = MaterialTheme.colors.primary
+            )
         }
         FloatingActionButton(modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp), onClick = nextImage) {
-            Icon(imageVector = Icons.Filled.KeyboardArrowRight, contentDescription = "Next")
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowRight,
+                contentDescription = "Next",
+                tint = MaterialTheme.colors.primary
+            )
         }
     }
 
@@ -121,12 +128,12 @@ private fun Toolbar(
     val backButtonInteractionSource = remember { MutableInteractionSource() }
     val backButtonHover by backButtonInteractionSource.collectIsHoveredAsState()
     Surface(
-        color = MiniatureColor,
+//        color = MiniatureColor,
         modifier = Modifier.height(44.dp)
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
             Surface(
-                color = Transparent,
+                color = Color.Transparent,
                 modifier = Modifier.padding(start = 20.dp).align(Alignment.CenterVertically),
                 shape = CircleShape
             ) {
@@ -136,14 +143,13 @@ private fun Toolbar(
                         contentDescription = null,
                         modifier = Modifier.size(38.dp)
                             .hoverable(backButtonInteractionSource)
-                            .background(color = if (backButtonHover) TranslucentBlack else Transparent)
+                            .background(color = ImageviewerColors.buttonBackground(backButtonHover))
                             .clickable { back() }
                     )
                 }
             }
             Text(
                 title,
-                color = Foreground,
                 maxLines = 1,
                 modifier = Modifier.padding(start = 30.dp).weight(1f)
                     .align(Alignment.CenterVertically),
@@ -181,7 +187,7 @@ private fun FilterButton(
     val interactionSource = remember { MutableInteractionSource() }
     val filterButtonHover by interactionSource.collectIsHoveredAsState()
     Box(
-        modifier = Modifier.background(color = Transparent).clip(CircleShape)
+        modifier = Modifier.background(color = ImageviewerColors.Transparent).clip(CircleShape)
     ) {
         Tooltip(type.toString()) {
             Image(
@@ -189,7 +195,7 @@ private fun FilterButton(
                 contentDescription = null,
                 Modifier.size(38.dp)
                     .hoverable(interactionSource)
-                    .background(color = if (filterButtonHover) TranslucentBlack else Transparent)
+                    .background(color = ImageviewerColors.buttonBackground(filterButtonHover))
                     .clickable { onClick() }
             )
         }

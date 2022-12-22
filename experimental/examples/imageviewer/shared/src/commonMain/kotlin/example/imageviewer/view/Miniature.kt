@@ -28,7 +28,7 @@ internal fun Miniature(
     onClickInfo: () -> Unit,
 ) {
     Card(
-        backgroundColor = MiniatureColor,
+        backgroundColor = ImageviewerColors.MiniatureColor,
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).height(70.dp)
             .fillMaxWidth()
             .clickable {
@@ -49,14 +49,10 @@ internal fun Miniature(
                     contentScale = ContentScale.Crop
                 )
             } else {
-                CircularProgressIndicator(
-                    modifier = modifier,
-                    color = DarkGreen
-                )
+                CircularProgressIndicator(modifier)
             }
             Text(
                 text = picture.name,
-                color = Foreground,
                 modifier = Modifier.weight(1f).align(Alignment.CenterVertically).padding(start = 16.dp),
                 style = MaterialTheme.typography.body1
             )

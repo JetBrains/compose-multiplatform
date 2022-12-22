@@ -22,7 +22,7 @@ import example.imageviewer.model.State
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
-import example.imageviewer.style.Gray
+import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.utils.decorateWithDiskCache
 import example.imageviewer.utils.getPreferredWindowSize
 import io.ktor.client.*
@@ -57,15 +57,16 @@ fun ApplicationScope.ImageViewerDesktop() {
             false
         }
     ) {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = Gray
-        ) {
-            ImageViewerCommon(
-                state = state,
-                dependencies = dependencies
-            )
-            Toast(toastState)
+        ImageViewerTheme {
+            Surface(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                ImageViewerCommon(
+                    state = state,
+                    dependencies = dependencies
+                )
+                Toast(toastState)
+            }
         }
     }
 }
@@ -96,12 +97,19 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
 
     override val httpClient: HttpClient = HttpClient(CIO)
 
+    val userHome: String? = System.getProperty("user.home")
     override val imageRepository: ContentRepository<ImageBitmap> =
         createNetworkRepository(httpClient)
-            .decorateWithDiskCache(
-                ioScope,
-                File(System.getProperty("user.home")!!).resolve("Pictures").resolve("imageviewer")
-            )
+            .run {
+                if (userHome != null) {
+                    decorateWithDiskCache(
+                        ioScope,
+                        File(userHome).resolve("Pictures").resolve("imageviewer")
+                    )
+                } else {
+                    this
+                }
+            }
             .adapter { it.toImageBitmap() }
 
     override val notification: Notification = object : PopupNotification(localization) {
