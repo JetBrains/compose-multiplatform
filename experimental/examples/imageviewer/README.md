@@ -1,7 +1,7 @@
 # Imageviewer
 
 An example of image gallery for remote server image viewing,
-based on Jetpack Compose UI library (desktop, android and iOS).
+based on Compose Multiplatform UI library (desktop, android and iOS).
 
 ## How to run
 
