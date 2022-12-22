@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun SampleWithTopAppBar(sample: Screen, state: MutableState<Screen>, content: @Composable (PaddingValues) -> Unit) {
+internal fun SampleWithTopAppBar(sample: Screen, state: MutableState<Screen>, content: @Composable (PaddingValues) -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             topBar = {
@@ -44,7 +44,7 @@ enum class Screen(val screen: String) {
 }
 
 @Composable
-fun MyButton(screenState: MutableState<Screen>, to: Screen) {
+internal fun MyButton(screenState: MutableState<Screen>, to: Screen) {
     Button(onClick = {
         screenState.value = to
     }) {
@@ -53,7 +53,7 @@ fun MyButton(screenState: MutableState<Screen>, to: Screen) {
 }
 
 @Composable
-fun AllSamplesView() {
+internal fun AllSamplesView() {
     MaterialTheme {
         val screenState: MutableState<Screen> = remember { mutableStateOf(Screen.CHOOSE_SAMPLE) }
         when (screenState.value) {

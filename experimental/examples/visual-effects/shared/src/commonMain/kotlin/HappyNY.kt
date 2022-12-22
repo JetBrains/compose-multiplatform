@@ -110,7 +110,7 @@ class DoubleRocket(val particle: Particle) {
     }
 
     @Composable
-    fun draw() {
+    internal fun draw() {
         if (state == rocket.STATE_ROCKET) {
             particle.draw()
         } else {
@@ -163,7 +163,7 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
     }
 
     @Composable
-    fun draw() {
+    internal fun draw() {
         if (!exploded) {
             particle.draw()
         } else {
@@ -185,7 +185,7 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
     }
 
     @Composable
-    fun draw() {
+    internal fun draw() {
         val alphaFactor = if (type == 0) 1.0f else 1 / (1 + abs(vy / 5)).toFloat()
         Box(Modifier.size(5.dp).offset(x.dp, y.dp).alpha(alphaFactor).clip(CircleShape).background(color))
         for (i in 1..5) {
@@ -229,7 +229,7 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun NYContent() {
+internal fun NYContent() {
     var time by remember { mutableStateOf(nanoTime()) }
     var started by remember { mutableStateOf(false) }
     var startTime = remember { nanoTime() }
@@ -371,20 +371,20 @@ fun flickeringAlpha(time: Long): Float {
 
 
 @Composable
-fun starrySky(stars: SnapshotStateList<Star>) {
+internal fun starrySky(stars: SnapshotStateList<Star>) {
     stars.forEach {
         star(it.x, it.y, it.color, size = it.size)
     }
 }
 
 @Composable
-fun star(x: Dp, y: Dp, color: Color = Color.White, size: Dp) {
+internal fun star(x: Dp, y: Dp, color: Color = Color.White, size: Dp) {
     Box(Modifier.offset(x, y).scale(1.0f, 0.2f).rotate(45f).size(size).background(color))
     Box(Modifier.offset(x, y).scale(0.2f, 1.0f).rotate(45f).size(size).background(color))
 }
 
 @Composable
-fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long) {
+internal fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long) {
     val deltaAngle = (time - startTime) / 100000000
     with(LocalDensity.current) {
         snowFlakes.forEach {
@@ -400,7 +400,7 @@ fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, s
 }
 
 @Composable
-fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
+internal fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
     Box(modifier) {
         snowFlakeInt(0, 0f, 30.dp, 0.dp, alpha)
         snowFlakeInt(0, 60f, 15.dp, 25.dp, alpha)
@@ -413,7 +413,7 @@ fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
 }
 
 @Composable
-fun snowFlakeInt(level: Int, angle: Float, shiftX: Dp, shiftY: Dp, alpha: Float) {
+internal fun snowFlakeInt(level: Int, angle: Float, shiftX: Dp, shiftY: Dp, alpha: Float) {
     if (level > 3) return
     Box(
         Modifier.offset(shiftX, shiftY).rotate(angle).width(100.dp).height(10.dp).scale(0.6f).alpha(1f)

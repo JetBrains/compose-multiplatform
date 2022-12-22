@@ -24,7 +24,7 @@ import org.jetbrains.compose.resources.*
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun Words() {
+internal fun Words() {
     val density = LocalDensity.current
     val duration = 5000
 
@@ -85,7 +85,7 @@ fun Words() {
 }
 
 @Composable
-fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
+internal fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
          color: Color, alpha: Float = 0.8f) {
     Text(
         modifier = Modifier
@@ -100,7 +100,7 @@ fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
 }
 
 @Composable
-fun FallingSnow() {
+internal fun FallingSnow() {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         repeat(50) {
             val size = remember { 20.dp + 10.dp * random() }
@@ -135,14 +135,14 @@ fun FallingSnow() {
 }
 
 @Composable
-fun Background() = Box(
+internal fun Background() = Box(
     Modifier
         .fillMaxSize()
         .background(Color(0xFF6F97FF))
 )
 
 @Composable
-fun RotatingWords() {
+internal fun RotatingWords() {
     Background()
     FallingSnow()
     Words()

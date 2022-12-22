@@ -18,7 +18,7 @@ import kotlin.math.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun WaveEffectGrid() {
+internal fun WaveEffectGrid() {
     var mouseX by remember { mutableStateOf(0) }
     var mouseY by remember { mutableStateOf(0) }
     var centerX by remember { mutableStateOf(1200) }
@@ -93,7 +93,7 @@ fun WaveEffectGrid() {
 }
 
 @Composable
-fun HighPanel(mouseX: Int, mouseY: Int) {
+internal fun HighPanel(mouseX: Int, mouseY: Int) {
     Text(
         "Compose",
         Modifier.offset(270.dp, 600.dp).scale(7.0f).alpha(alpha(mouseX, mouseY, 270, 700)),
@@ -148,7 +148,7 @@ private fun distance(x1: Int, y1: Int, x2: Int, y2: Int): Double {
 }
 
 @Composable
-fun Dot(size: Int, modifier: Modifier, color: Color, time: Long) {
+internal fun Dot(size: Int, modifier: Modifier, color: Color, time: Long) {
     Box(
         modifier.rotate(time.toFloat() / (15 * 10000000)).clip(RoundedCornerShape((3 + size / 20).dp))
             .size(width = size.dp, height = size.dp)
