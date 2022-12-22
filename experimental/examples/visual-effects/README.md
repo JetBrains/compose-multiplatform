@@ -17,7 +17,7 @@ Alternatively, you may setup signing within XCode opening `iosApp/VisualEffects.
 using "Signing & Capabilities" tab of `VisualEffects` target.
 
 Then choose **iosApp** configuration in IDE and run it
-(may also be referred as `VisualEffects` in the Run Configurations or `iosApp_` for Android studio).
+(may also be referred as `VisualEffects` in the Run Configurations or `iosApp (Android Studio)` for Android Studio).
 
 ## Run on desktop via Gradle
 
