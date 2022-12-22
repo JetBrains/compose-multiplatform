@@ -40,8 +40,10 @@ import androidx.compose.ui.unit.Dp
 internal const val DefaultMinLines = 1
 
 /**
- * Constraint the height of the text field so that it vertically occupies at least [minLines]
- * number of lines and at most [maxLines] number of lines.
+ * Constraint the height of the TextField or BasicText so that it vertically occupies at least
+ * [minLines] number of lines and at most [maxLines] number of lines. BasicText should not use this
+ * function for calculating maxLines constraints since MultiParagraph computation already handles
+ * that.
  */
 internal fun Modifier.heightInLines(
     textStyle: TextStyle,
