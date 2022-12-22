@@ -1,11 +1,8 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,8 +21,9 @@ import org.jetbrains.compose.resources.resource
 internal fun MainScreen(state: MutableState<State>, dependencies: Dependencies) {
     Column {
         TopContent(state, dependencies)
-        val scrollState = rememberScrollState()
-        Column(Modifier.verticalScroll(scrollState)) {
+        ScrollableColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
             for (i in state.value.pictures.indices) {
                 val picture = state.value.pictures[i]
                 Miniature(
