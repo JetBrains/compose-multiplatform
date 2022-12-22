@@ -38,8 +38,8 @@ internal fun SampleWithTopAppBar(sample: Screen, state: MutableState<Screen>, co
 
 enum class Screen(val screen: String) {
     CHOOSE_SAMPLE("Choose a demo:"),
-    WORDS("Word"),
-    WAVE("Wave"),
+    WORDS("Rotating Words"),
+    WAVE("Wave Effect"),
     NY("Happy New Year!");
 }
 
