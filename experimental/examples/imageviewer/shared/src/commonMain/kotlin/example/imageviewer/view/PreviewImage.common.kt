@@ -34,7 +34,7 @@ internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture
     val image = imageState.value
     Card(
         backgroundColor = DarkGray,
-        modifier = Modifier.height(250.dp)
+        modifier = Modifier.height(200.dp)
             .clickable { state.toFullscreen() },
         shape = RectangleShape,
         elevation = 1.dp

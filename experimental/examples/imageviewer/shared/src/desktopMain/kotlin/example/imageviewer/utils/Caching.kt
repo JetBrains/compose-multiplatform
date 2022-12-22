@@ -12,7 +12,7 @@ fun ContentRepository<ByteArray>.decorateWithDiskCache(
     cacheDir: File
 ): ContentRepository<ByteArray> {
 
-    class FileSystemLock()
+    class FileSystemLock
 
     val origin = this
     val locksCount = 100

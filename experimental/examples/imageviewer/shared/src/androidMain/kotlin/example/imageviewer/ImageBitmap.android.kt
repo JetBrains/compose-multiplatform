@@ -8,5 +8,5 @@ import androidx.compose.ui.graphics.asImageBitmap
 actual fun ByteArray.toImageBitmap(): ImageBitmap = toAndroidBitmap().asImageBitmap()
 
 fun ByteArray.toAndroidBitmap(): Bitmap {
-    return BitmapFactory.decodeByteArray(this, 0, size);
+    return BitmapFactory.decodeByteArray(this, 0, size)
 }

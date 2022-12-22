@@ -41,7 +41,7 @@ internal fun MainScreen(state: MutableState<State>, dependencies: Dependencies) 
                         dependencies.notification.notifyImageData(picture)
                     },
                 )
-                Spacer(modifier = Modifier.height(5.dp))
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -55,9 +55,7 @@ private fun TopContent(state: MutableState<State>, dependencies: Dependencies) {
     TitleBar(state, dependencies)
     if (needShowPreview()) {
         PreviewImage(state = state, getImage = { dependencies.imageRepository.loadContent(it.bigUrl) })
-        Spacer(modifier = Modifier.height(5.dp))
     }
-    Spacer(modifier = Modifier.height(5.dp))
 }
 
 @OptIn(ExperimentalResourceApi::class)

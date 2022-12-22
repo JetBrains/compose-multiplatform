@@ -34,11 +34,11 @@ fun scaleBitmapAspectRatio(
 fun applyGrayScaleFilter(bitmap: BufferedImage): BufferedImage {
 
     val result = BufferedImage(
-        bitmap.getWidth(),
-        bitmap.getHeight(),
+        bitmap.width,
+        bitmap.height,
         BufferedImage.TYPE_BYTE_GRAY)
 
-    val graphics = result.getGraphics()
+    val graphics = result.graphics
     graphics.drawImage(bitmap, 0, 0, null)
     graphics.dispose()
 
@@ -58,9 +58,9 @@ fun applyPixelFilter(bitmap: BufferedImage): BufferedImage {
 
 fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
 
-    var result = BufferedImage(bitmap.getWidth(), bitmap.getHeight(), bitmap.type)
+    var result = BufferedImage(bitmap.width, bitmap.height, bitmap.type)
 
-    val graphics = result.getGraphics()
+    val graphics = result.graphics
     graphics.drawImage(bitmap, 0, 0, null)
     graphics.dispose()
 
@@ -69,7 +69,7 @@ fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
     val weight: Float = 1.0f / (size * size)
     val matrix = FloatArray(size * size)
 
-    for (i in 0..matrix.size - 1) {
+    for (i in matrix.indices) {
         matrix[i] = weight
     }
 
