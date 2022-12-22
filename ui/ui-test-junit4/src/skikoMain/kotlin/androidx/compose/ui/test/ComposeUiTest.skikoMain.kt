@@ -20,6 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.InternalComposeUiApi
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asSkiaBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.platform.SkiaRootForTest
@@ -40,6 +44,9 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
 import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.roundToInt
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.IRect
 import org.jetbrains.skia.Image
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.currentNanoTime
@@ -50,8 +57,14 @@ actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
 }
 
 @ExperimentalTestApi
-fun runSkikoComposeUiTest(block: SkikoComposeUiTest.() -> Unit) {
-    SkikoComposeUiTest().runTest(block)
+fun runSkikoComposeUiTest(
+    size: Size = Size(1024.0f, 768.0f),
+    block: SkikoComposeUiTest.() -> Unit
+) {
+    SkikoComposeUiTest(
+        width = size.width.roundToInt(),
+        height = size.height.roundToInt()
+    ).runTest(block)
 }
 
 @ExperimentalTestApi
@@ -243,9 +256,17 @@ class SkikoComposeUiTest(
         return SemanticsNodeInteractionCollection(testContext, useUnmergedTree, matcher)
     }
 
-    fun captureToImage(): Image {
+    fun captureToImage(): ImageBitmap {
         waitForIdle()
-        return surface.makeImageSnapshot()
+        return surface.makeImageSnapshot().toComposeImageBitmap()
+    }
+
+    fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
+        waitForIdle()
+        val rect = fetchSemanticsNode().boundsInWindow
+        val iRect = IRect.makeLTRB(rect.left.toInt(), rect.top.toInt(), rect.right.toInt(), rect.bottom.toInt())
+        val image = surface.makeImageSnapshot(iRect)
+        return image!!.toComposeImageBitmap()
     }
 
     private inner class DesktopTestOwner : TestOwner {

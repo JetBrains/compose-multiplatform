@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.RootForTest
 
 /**
