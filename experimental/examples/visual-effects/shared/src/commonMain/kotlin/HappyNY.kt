@@ -290,7 +290,7 @@ internal fun NYContent() {
                     val alpha = if (flickering2) flickeringAlpha(time) else 1.0f
                     Text(
                         fontSize = 10.em,
-                        text = "2",
+                        text = "3",
                         modifier = Modifier.alpha(alpha).offset(0.dp, -15.dp),
                         color = Color.White
                     )
