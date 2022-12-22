@@ -33,16 +33,13 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import java.io.File
 
-private val message: MutableState<String> = mutableStateOf("")
-private val toastState: MutableState<Boolean> = mutableStateOf(false)
-
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
-    val windowState = rememberWindowState()
+    val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val state = remember { mutableStateOf(State()) }
     val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.IO }
-    val dependencies = remember(ioScope) { getDependencies(ioScope) }
+    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -70,13 +67,13 @@ fun ApplicationScope.ImageViewerDesktop() {
                 state = state,
                 dependencies = dependencies
             )
-            Toast(message.value, toastState)
+            Toast(toastState)
         }
     }
 
 }
 
-private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
+private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
         FilterType.GrayScale -> GrayScaleFilter()
@@ -112,8 +109,12 @@ private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
 
     override val notification: Notification = object : PopupNotification(localization) {
         override fun showPopUpMessage(text: String) {
-            message.value = text
-            toastState.value = true
+            toastState.value = ToastState.Shown(text)
         }
     }
+}
+
+sealed interface ToastState {
+    object Hidden : ToastState
+    class Shown(val message: String):ToastState
 }

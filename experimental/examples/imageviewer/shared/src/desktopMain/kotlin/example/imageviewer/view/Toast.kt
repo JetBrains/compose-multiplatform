@@ -15,24 +15,14 @@ import example.imageviewer.style.Foreground
 import example.imageviewer.style.ToastBackground
 import kotlinx.coroutines.delay
 
-enum class ToastDuration(val value: Int) {
-    Short(1000), Long(3000)
-}
-
-private var isShown: Boolean = false
+private const val TOAST_DURATION = 3000L
 
 @Composable
 fun Toast(
-    text: String,
-    visibility: MutableState<Boolean> = mutableStateOf(false),
-    duration: ToastDuration = ToastDuration.Long
+    state: MutableState<ToastState>
 ) {
-    if (isShown) {
-        return
-    }
-
-    if (visibility.value) {
-        isShown = true
+    val value = state.value
+    if (value is ToastState.Shown) {
         Box(
             modifier = Modifier.fillMaxSize().padding(bottom = 20.dp),
             contentAlignment = Alignment.BottomCenter
@@ -44,14 +34,13 @@ fun Toast(
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Text(
-                        text = text,
+                        text = value.message,
                         color = Foreground
                     )
                 }
-                LaunchedEffect(Unit) {
-                    delay(duration.value.toLong())
-                    isShown = false
-                    visibility.value = false
+                LaunchedEffect(value.message) {
+                    delay(TOAST_DURATION)
+                    state.value = ToastState.Hidden
                 }
             }
         }

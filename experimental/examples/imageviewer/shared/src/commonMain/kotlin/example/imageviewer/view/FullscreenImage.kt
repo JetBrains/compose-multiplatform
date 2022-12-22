@@ -7,18 +7,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.key.*
@@ -88,15 +83,13 @@ internal fun FullscreenImage(
                         .addUserInput(scalableState)
                 ) {
                     Image(
-                        modifier = Modifier.fillMaxSize()
-                            .blur(radius = 10.dp),
+                        modifier = Modifier.fillMaxSize(),
                         painter = BitmapPainter(
                             imageWithFilter,
                             srcOffset = scalableState.value.visiblePart.topLeft,
                             srcSize = scalableState.value.visiblePart.size
                         ),
-                        contentDescription = null,
-                        colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+                        contentDescription = null
                     )
                 }
             } else {

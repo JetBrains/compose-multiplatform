@@ -3,11 +3,8 @@ package example.imageviewer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.window.*
-import example.imageviewer.*
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
@@ -40,7 +37,7 @@ internal fun ImageViewerIos() {
 
 }
 
-class StubFilter():BitmapFilter {//todo
+class StubFilter : BitmapFilter {
     override fun apply(bitmap: ImageBitmap): ImageBitmap {
         return bitmap
     }
@@ -55,19 +52,19 @@ private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
     }
 
     override val localization: Localization = object : Localization {
-        override val back: String get() = "todo"
-        override val appName: String get() = "todo"
-        override val loading: String get() = "todo"
-        override val repoInvalid: String get() = "todo"
-        override val repoEmpty: String get() = "todo"
-        override val noInternet: String get() = "todo"
-        override val loadImageUnavailable: String get() = "todo"
-        override val lastImage: String get() = "todo"
-        override val firstImage: String get() = "todo"
-        override val picture: String get() = "todo"
-        override val size: String get() = "todo"
-        override val pixels: String get() = "todo"
-        override val refreshUnavailable: String get() = "todo"
+        override val appName = "ImageViewer"
+        override val loading = "Loading images..."
+        override val repoEmpty = "Repository is empty."
+        override val noInternet = "No internet access."
+        override val repoInvalid = "List of images in current repository is invalid or empty."
+        override val refreshUnavailable = "Cannot refresh images."
+        override val loadImageUnavailable = "Cannot load full size image."
+        override val lastImage = "This is last image."
+        override val firstImage = "This is first image."
+        override val picture = "Picture:"
+        override val size = "Size:"
+        override val pixels = "pixels."
+        override val back = "Back"
     }
 
     override val httpClient: HttpClient = HttpClient(Darwin)
