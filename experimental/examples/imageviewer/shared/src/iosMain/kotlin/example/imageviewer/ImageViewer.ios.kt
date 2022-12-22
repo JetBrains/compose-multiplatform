@@ -7,8 +7,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.*
+import example.imageviewer.model.ContentRepository
 import example.imageviewer.model.State
+import example.imageviewer.model.adapter
+import example.imageviewer.model.createNetworkRepository
 import example.imageviewer.style.Gray
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState

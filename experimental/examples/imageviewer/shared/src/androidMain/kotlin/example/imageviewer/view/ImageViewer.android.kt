@@ -11,14 +11,20 @@ import androidx.compose.ui.platform.LocalContext
 import example.imageviewer.*
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.*
+import example.imageviewer.model.ContentRepository
+import example.imageviewer.model.State
+import example.imageviewer.model.adapter
+import example.imageviewer.model.createNetworkRepository
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun ImageViewerAndroid() {

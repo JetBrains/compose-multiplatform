@@ -36,7 +36,8 @@ fun applyGrayScaleFilter(bitmap: BufferedImage): BufferedImage {
     val result = BufferedImage(
         bitmap.width,
         bitmap.height,
-        BufferedImage.TYPE_BYTE_GRAY)
+        BufferedImage.TYPE_BYTE_GRAY
+    )
 
     val graphics = result.graphics
     graphics.drawImage(bitmap, 0, 0, null)
