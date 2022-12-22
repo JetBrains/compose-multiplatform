@@ -76,7 +76,7 @@ fun AllSamplesView() {
             }
             Screen.WAVE -> {
                 SampleWithTopAppBar(Screen.WAVE, screenState) {
-                    Grid()
+                    WaveEffectGrid()
                 }
             }
 

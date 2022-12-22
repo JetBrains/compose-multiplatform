@@ -17,7 +17,7 @@ fun mainWords() = singleWindowApplication(
 fun WaveEffect(onCloseRequest: () -> Unit, showControls: Boolean) {
     val windowState = remember { WindowState(width = 1200.dp, height = 800.dp) }
     Window(onCloseRequest = {}, undecorated = true, transparent = true, state = windowState) {
-        Grid()
+        WaveEffectGrid()
     }
 
     if (showControls) {
@@ -55,16 +55,5 @@ fun allSamples() = application {
     val windowState = remember { WindowState(width = 1200.dp, height = 900.dp) }
     Window(onCloseRequest = ::exitApplication, title = "Visual effects", undecorated = false, transparent = false, state = windowState) {
         AllSamplesView()
-    }
-}
-
-fun main(args: Array<String>) {
-    if (args.isEmpty()) return allSamples()
-    when (val effect = args[0]) {
-        "words" -> mainWords()
-        "wave" -> mainWave(false)
-        "wave-controls" -> mainWave(true)
-        "NY" -> mainNY()
-        else -> throw Error("Unknown effect: $effect")
     }
 }

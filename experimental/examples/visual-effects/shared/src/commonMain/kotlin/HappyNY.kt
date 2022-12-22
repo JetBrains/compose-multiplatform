@@ -1,6 +1,5 @@
 package org.jetbrains.compose.demo.visuals
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -19,6 +18,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -71,7 +71,7 @@ class DoubleRocket(val particle: Particle) {
     }
 
     private fun reset() {
-        if (particle.vx < 0) return //to stop drawing after the second rocket. This could be commented out
+//        if (particle.vx < 0) return //to stop drawing after the second rocket. This could be commented out
         state = STATE_ROCKET
         particle.x = if (particle.vx > 0) width - 0.0 else 0.0
         particle.y = 1000.0
@@ -229,12 +229,11 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-@Preview
 fun NYContent() {
-    var time by remember { mutableStateOf(System.nanoTime()) }
+    var time by remember { mutableStateOf(nanoTime()) }
     var started by remember { mutableStateOf(false) }
-    var startTime = remember { System.nanoTime() }
-    var prevTime by remember { mutableStateOf(System.nanoTime()) }
+    var startTime = remember { nanoTime() }
+    var prevTime by remember { mutableStateOf(nanoTime()) }
     val snowFlakes = remember { mutableStateListOf<SnowFlake>() }
     val stars = remember { mutableStateListOf<Star>() }
     var flickering2 by remember { mutableStateOf(true) }

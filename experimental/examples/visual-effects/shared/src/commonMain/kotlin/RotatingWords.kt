@@ -103,21 +103,21 @@ fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
 fun FallingSnow() {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         repeat(50) {
-            val size = remember { 20.dp + 10.dp * Math.random().toFloat() }
-            val alpha = remember { 0.10f + 0.15f * Math.random().toFloat() }
+            val size = remember { 20.dp + 10.dp * random() }
+            val alpha = remember { 0.10f + 0.15f * random() }
             val sizePx = with(LocalDensity.current) { size.toPx() }
-            val x = remember { (constraints.maxWidth * Math.random()).toInt() }
+            val x = remember { (constraints.maxWidth * random()).toInt() }
 
             val infiniteTransition = rememberInfiniteTransition()
             val t by infiniteTransition.animateFloat(
                 initialValue = 0f,
                 targetValue = 1f,
                 animationSpec = infiniteRepeatable(
-                    animation = tween(16000 + (16000 * Math.random()).toInt(), easing = LinearEasing),
+                    animation = tween(16000 + (16000 * random()).toInt(), easing = LinearEasing),
                     repeatMode = RepeatMode.Restart
                 )
             )
-            val initialT = remember { Math.random().toFloat() }
+            val initialT = remember { random() }
             val actualT = (initialT + t) % 1f
             val y = (-sizePx + (constraints.maxHeight + sizePx) * actualT).toInt()
 

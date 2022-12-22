@@ -9,15 +9,16 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import org.jetbrains.compose.demo.visuals.platform.PointerEventKind
+import org.jetbrains.compose.demo.visuals.platform.nanoTime
+import org.jetbrains.compose.demo.visuals.platform.onPointerEvent
 import kotlin.math.*
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-fun Grid() {
+fun WaveEffectGrid() {
     var mouseX by remember { mutableStateOf(0) }
     var mouseY by remember { mutableStateOf(0) }
     var centerX by remember { mutableStateOf(1200) }
@@ -25,10 +26,10 @@ fun Grid() {
     var vX by remember { mutableStateOf(0) }
     var vY by remember { mutableStateOf(0) }
 
-    var time by remember { mutableStateOf(System.nanoTime()) }
-    var prevTime by remember { mutableStateOf(System.nanoTime()) }
+    var time by remember { mutableStateOf(nanoTime()) }
+    var prevTime by remember { mutableStateOf(nanoTime()) }
 
-    if (State.mouseUsed) {
+    if (State.entered) {
         centerX = (centerX + vX * (time - prevTime) / 1000000000).toInt()
         if (centerX < -100) centerX = -100
         if (centerX > 2600) centerX = 2600
@@ -45,16 +46,17 @@ fun Grid() {
 
     Surface(
         modifier = Modifier.fillMaxSize().padding(5.dp).shadow(3.dp, RoundedCornerShape(20.dp))
-            .onPointerEvent(PointerEventType.Move) {
-                mouseX = it.changes.first().position.x.toInt()
-                mouseY = it.changes.first().position.y.toInt()
+            .onPointerEvent(PointerEventKind.Move) {
+                mouseX = x
+                mouseY = y
             }
-            .onPointerEvent(PointerEventType.Enter) {
-                State.mouseUsed = true
+            .onPointerEvent(PointerEventKind.In) {
+                State.entered = true
             }
-            .onPointerEvent(PointerEventType.Exit) {
-                State.mouseUsed = false
-            },
+            .onPointerEvent(PointerEventKind.Out) {
+                State.entered = false
+            }
+        ,
         color = Color(0, 0, 0),
         shape = RoundedCornerShape(20.dp)
     ) {
@@ -165,12 +167,12 @@ private fun size(x: Int, y: Int, mouseX: Int, mouseY: Int): Int {
     val scale: Double = (if (distance2 < 1) {
         addSize * (1 - distance2)
     } else 0.toDouble())
-    result += (if (State.mouseUsed) round(7.5 * scale).toInt() else 0)
+    result += (if (State.entered) round(7.5 * scale).toInt() else 0)
     return result
 }
 
 private fun boxColor(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Color {
-    if (!State.mouseUsed) return Color.White
+    if (!State.entered) return Color.White
 
     val color1 = Color(0x6B, 0x57, 0xFF)
     val color2 = Color(0xFE, 0x28, 0x57)
@@ -203,6 +205,6 @@ private fun boxColor(x: Int, y: Int, time: Long, mouseX: Int, mouseY: Int): Colo
 
 internal class State {
     companion object {
-        var mouseUsed by mutableStateOf(false)
+        var entered by mutableStateOf(false)
     }
 }
