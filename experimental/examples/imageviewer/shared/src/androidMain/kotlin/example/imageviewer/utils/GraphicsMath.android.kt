@@ -1,7 +1,6 @@
 package example.imageviewer.utils
 
 import android.content.Context
-import android.content.res.Resources
 import android.graphics.*
 import android.renderscript.Allocation
 import android.renderscript.Element
@@ -76,12 +75,3 @@ fun applyBlurFilter(bitmap: Bitmap, context: Context): Bitmap {
 
     return result
 }
-
-fun toPx(dp: Int): Int {
-    return (dp * Resources.getSystem().displayMetrics.density).toInt()
-}
-
-fun toDp(px: Int): Int {
-    return (px / Resources.getSystem().displayMetrics.density).toInt()
-}
-

@@ -11,14 +11,18 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import example.imageviewer.model.TOAST_DURATION
 import example.imageviewer.style.Foreground
 import example.imageviewer.style.ToastBackground
 import kotlinx.coroutines.delay
 
-private const val TOAST_DURATION = 3000L
+sealed interface ToastState {
+    object Hidden : ToastState
+    class Shown(val message: String) : ToastState
+}
 
 @Composable
-fun Toast(
+internal fun Toast(
     state: MutableState<ToastState>
 ) {
     val value = state.value

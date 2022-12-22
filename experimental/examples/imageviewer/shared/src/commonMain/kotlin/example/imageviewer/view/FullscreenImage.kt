@@ -18,13 +18,13 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import example.imageviewer.Localization
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.Localization
-import example.imageviewer.model.Picture
-import example.imageviewer.model.name
+import example.imageviewer.model.*
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.orEmpty
@@ -33,7 +33,7 @@ import org.jetbrains.compose.resources.resource
 
 @Composable
 internal fun FullscreenImage(
-    picture: Picture,
+    picture: Picture?,
     getImage: suspend (Picture) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
@@ -45,7 +45,9 @@ internal fun FullscreenImage(
 
     val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(picture) {
-        originalImageState.value = getImage(picture)
+        if (picture != null) {
+            originalImageState.value = getImage(picture)
+        }
     }
 
     val originalImage = originalImageState.value
@@ -64,21 +66,22 @@ internal fun FullscreenImage(
 
     Box(Modifier.fillMaxSize()) {
         Column {
-            Toolbar(picture.name, filtersState, localization, back)
+            Toolbar(picture?.name ?: "", filtersState, localization, back)
             if (imageWithFilter != null) {
                 val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
                 val scalableState = remember(imageSize) { mutableStateOf(ScalableState(imageSize)) }
+                val visiblePartOfImage: IntRect = scalableState.value.visiblePart
                 Slider(
                     modifier = Modifier.fillMaxWidth(),
                     value = scalableState.value.scale,
                     valueRange = MIN_SCALE..MAX_SCALE,
-                    onValueChange = { scalableState.value = scalableState.value.setScale(it) }
+                    onValueChange = { scalableState.setScale(it) }
                 )
                 Box(
                     modifier = Modifier.fillMaxSize()
                         .background(Color.DarkGray)
                         .onGloballyPositioned { coordinates ->
-                            scalableState.value = scalableState.value.changeBoxSize(coordinates.size)
+                            scalableState.changeBoxSize(coordinates.size)
                         }
                         .addUserInput(scalableState)
                 ) {
@@ -86,8 +89,8 @@ internal fun FullscreenImage(
                         modifier = Modifier.fillMaxSize(),
                         painter = BitmapPainter(
                             imageWithFilter,
-                            srcOffset = scalableState.value.visiblePart.topLeft,
-                            srcSize = scalableState.value.visiblePart.size
+                            srcOffset = visiblePartOfImage.topLeft,
+                            srcSize = visiblePartOfImage.size
                         ),
                         contentDescription = null
                     )
@@ -128,19 +131,14 @@ private fun Toolbar(
                 shape = CircleShape
             ) {
                 Tooltip(localization.back) {
-                    Clickable(
-                        modifier = Modifier
+                    Image(
+                        resource("back.png").rememberImageBitmap().orEmpty(),
+                        contentDescription = null,
+                        modifier = Modifier.size(38.dp)
                             .hoverable(backButtonInteractionSource)
-                            .background(color = if (backButtonHover) TranslucentBlack else Transparent),
-                        onClick = {
-                            back()
-                        }) {
-                        Image(
-                            resource("back.png").rememberImageBitmap().orEmpty(),
-                            contentDescription = null,
-                            modifier = Modifier.size(38.dp)
-                        )
-                    }
+                            .background(color = if (backButtonHover) TranslucentBlack else Transparent)
+                            .clickable { back() }
+                    )
                 }
             }
             Text(
@@ -186,18 +184,14 @@ private fun FilterButton(
         modifier = Modifier.background(color = Transparent).clip(CircleShape)
     ) {
         Tooltip(type.toString()) {
-            Clickable(
-                modifier = Modifier
+            Image(
+                getFilterImage(active, type = type),
+                contentDescription = null,
+                Modifier.size(38.dp)
                     .hoverable(interactionSource)
-                    .background(color = if (filterButtonHover) TranslucentBlack else Transparent),
-                onClick = { onClick() }
-            ) {
-                Image(
-                    getFilterImage(active, type = type),
-                    contentDescription = null,
-                    Modifier.size(38.dp)
-                )
-            }
+                    .background(color = if (filterButtonHover) TranslucentBlack else Transparent)
+                    .clickable { onClick() }
+            )
         }
     }
     Spacer(Modifier.width(20.dp))

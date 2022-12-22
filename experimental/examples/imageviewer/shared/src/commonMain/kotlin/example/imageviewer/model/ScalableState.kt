@@ -1,12 +1,10 @@
-package example.imageviewer.view
+package example.imageviewer.model
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
-
-const val MAX_SCALE = 5f
-const val MIN_SCALE = 1f
 
 data class ScalableState(
     val imageSize: IntSize,
@@ -14,29 +12,6 @@ data class ScalableState(
     val offset: IntOffset = IntOffset.Zero,
     val scale: Float = 1f
 )
-
-fun ScalableState.changeOffset(x: Int = offset.x, y: Int = offset.y) = copy(offset = IntOffset(x, y))
-
-fun ScalableState.changeBoxSize(size: IntSize) =
-    copy(boxSize = size)
-        .updateOffset()
-
-fun ScalableState.setScale(scale: Float) =
-    copy(scale = scale)
-        .updateOffset()
-
-fun ScalableState.addScale(diff: Float) =
-    if (scale + diff > MAX_SCALE) {
-        copy(scale = MAX_SCALE)
-    } else if (scale + diff < MIN_SCALE) {
-        copy(scale = MIN_SCALE)
-    } else {
-        copy(scale = scale + diff)
-    }.updateOffset()
-
-fun ScalableState.addDragAmount(diff: Offset) =
-    copy(offset = offset - IntOffset((diff.x + 1).toInt(), (diff.y + 1).toInt()))
-        .updateOffset()
 
 val ScalableState.visiblePart
     get() : IntRect {
@@ -57,7 +32,32 @@ val ScalableState.visiblePart
         return IntRect(offset = offset, size = size)
     }
 
-private fun ScalableState.updateOffset(): ScalableState {
+fun MutableState<ScalableState>.changeBoxSize(size: IntSize) = modifyState {
+    copy(boxSize = size)
+        .updateOffsetLimits()
+}
+
+fun MutableState<ScalableState>.setScale(scale: Float) = modifyState {
+    copy(scale = scale)
+        .updateOffsetLimits()
+}
+
+fun MutableState<ScalableState>.addScale(diff: Float) = modifyState {
+    if (scale + diff > MAX_SCALE) {
+        copy(scale = MAX_SCALE)
+    } else if (scale + diff < MIN_SCALE) {
+        copy(scale = MIN_SCALE)
+    } else {
+        copy(scale = scale + diff)
+    }.updateOffsetLimits()
+}
+
+fun MutableState<ScalableState>.addDragAmount(diff: Offset) = modifyState {
+    copy(offset = offset - IntOffset((diff.x + 1).toInt(), (diff.y + 1).toInt()))
+        .updateOffsetLimits()
+}
+
+private fun ScalableState.updateOffsetLimits(): ScalableState {
     var result = this
     if (offset.x + visiblePart.width > imageSize.width) {
         result = result.changeOffset(x = imageSize.width - visiblePart.width)
@@ -73,3 +73,5 @@ private fun ScalableState.updateOffset(): ScalableState {
     }
     return result
 }
+
+private fun ScalableState.changeOffset(x: Int = offset.x, y: Int = offset.y) = copy(offset = IntOffset(x, y))

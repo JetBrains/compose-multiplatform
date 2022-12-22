@@ -5,24 +5,10 @@ import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import example.imageviewer.core.BitmapFilter
-import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.style.Gray
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
-import io.ktor.client.*
-import kotlinx.coroutines.CoroutineScope
-
-interface Dependencies {
-    val httpClient: HttpClient
-    val ioScope: CoroutineScope
-    fun getFilter(type: FilterType): BitmapFilter
-    val localization: Localization
-    val imageRepository: ContentRepository<ImageBitmap>
-    val notification: Notification
-}
 
 @Composable
 internal fun ImageViewerCommon(state: MutableState<State>, dependencies: Dependencies) {
@@ -39,7 +25,7 @@ internal fun ImageViewerCommon(state: MutableState<State>, dependencies: Depende
 
             ScreenState.FullScreen -> {
                 FullscreenImage(
-                    picture = state.value.picture!!,
+                    picture = state.value.picture,
                     getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                     getFilter = { dependencies.getFilter(it) },
                     localization = dependencies.localization,

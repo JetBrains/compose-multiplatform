@@ -12,13 +12,12 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.window.*
 import example.imageviewer.*
+import example.imageviewer.Notification
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import example.imageviewer.model.Notification
 import example.imageviewer.model.State
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
@@ -30,7 +29,6 @@ import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import java.io.File
 
 @OptIn(ExperimentalComposeUiApi::class)
@@ -70,7 +68,6 @@ fun ApplicationScope.ImageViewerDesktop() {
             Toast(toastState)
         }
     }
-
 }
 
 private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
@@ -100,7 +97,7 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
     override val httpClient: HttpClient = HttpClient(CIO)
 
     override val imageRepository: ContentRepository<ImageBitmap> =
-        createRealRepository(httpClient)
+        createNetworkRepository(httpClient)
             .decorateWithDiskCache(
                 ioScope,
                 File(System.getProperty("user.home")!!).resolve("Pictures").resolve("imageviewer")
@@ -112,9 +109,4 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
             toastState.value = ToastState.Shown(text)
         }
     }
-}
-
-sealed interface ToastState {
-    object Hidden : ToastState
-    class Shown(val message: String):ToastState
 }

@@ -10,19 +10,19 @@ import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.model.State
 import example.imageviewer.style.Gray
+import example.imageviewer.view.Toast
+import example.imageviewer.view.ToastState
 import io.ktor.client.*
 import io.ktor.client.engine.darwin.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
-private val message: MutableState<String> = mutableStateOf("")
-private val toastState: MutableState<Boolean> = mutableStateOf(false)
-
 @Composable
 internal fun ImageViewerIos() {
+    val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val state = remember { mutableStateOf(State()) }
-    val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.Default }//todo?
-    val dependencies = remember(ioScope) { getDependencies(ioScope) }
+    val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.Default }
+    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -32,9 +32,8 @@ internal fun ImageViewerIos() {
             state = state,
             dependencies = dependencies
         )
-//        Toast(message.value, toastState)//todo
+        Toast(toastState)
     }
-
 }
 
 class StubFilter : BitmapFilter {
@@ -43,7 +42,7 @@ class StubFilter : BitmapFilter {
     }
 }
 
-private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
+private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
         FilterType.GrayScale -> StubFilter()
@@ -70,13 +69,12 @@ private fun getDependencies(ioScope: CoroutineScope) = object : Dependencies {
     override val httpClient: HttpClient = HttpClient(Darwin)
 
     override val imageRepository: ContentRepository<ImageBitmap> =
-        createRealRepository(httpClient)
+        createNetworkRepository(httpClient)
             .adapter { it.toImageBitmap() }
 
     override val notification: Notification = object : PopupNotification(localization) {
         override fun showPopUpMessage(text: String) {
-            message.value = text
-            toastState.value = true
+            toastState.value = ToastState.Shown(text)
         }
     }
 }

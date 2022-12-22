@@ -8,6 +8,6 @@ import example.imageviewer.utils.applyGrayScaleFilter
 
 class GrayScaleFilter : BitmapFilter {
 
-    override fun apply(bitmap: ImageBitmap) : ImageBitmap =
+    override fun apply(bitmap: ImageBitmap): ImageBitmap =
         applyGrayScaleFilter(bitmap.asAndroidBitmap()).asImageBitmap()
 }
