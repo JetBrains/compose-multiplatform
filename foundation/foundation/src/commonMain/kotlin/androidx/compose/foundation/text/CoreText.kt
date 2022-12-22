@@ -501,6 +501,8 @@ internal class TextController(val state: TextState) : RememberObserver {
             // initial style and minLines, and then never got updates to those values. Here it gets
             // created every time it's read, i.e. every recomposition, so it will always have the
             // latest values.
+            // Also, there is no need to pass state.textDelegate.maxLines here as it is passed to
+            // MultiParagraph computation anyway.
             .heightInLines(state.textDelegate.style, state.textDelegate.minLines)
             .then(semanticsModifier)
             .then(selectionModifiers)

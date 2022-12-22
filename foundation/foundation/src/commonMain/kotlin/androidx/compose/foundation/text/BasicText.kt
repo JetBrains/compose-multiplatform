@@ -220,6 +220,7 @@ fun BasicText(
                     softWrap = softWrap,
                     fontFamilyResolver = fontFamilyResolver,
                     overflow = overflow,
+                    minLines = minLines,
                     maxLines = maxLines,
                     placeholders = placeholders
                 ),
@@ -239,6 +240,7 @@ fun BasicText(
                 fontFamilyResolver = fontFamilyResolver,
                 overflow = overflow,
                 maxLines = maxLines,
+                minLines = minLines,
                 placeholders = placeholders,
             )
         )
