@@ -1,7 +1,25 @@
-Several visual effects implmented with Compose Multiplatform, used in 1.0 release announce video.
+# Visual Effects
 
-### Running desktop application
-* To run, launch command: `./gradlew run`
-* Or choose **desktop** configuration in IDE and run it.  
-  ![desktop-run-configuration.png](screenshots/desktop-run-configuration.png)
+Several visual effects implemented with Compose Multiplatform, used in 1.0 release announce video.
+
+*Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed either
+in Android Studio or in AppCode with [installed CocoaPods](https://kotlinlang.org/docs/native-cocoapods.html).
+
+
+## How to run
+
+Choose a run configuration for an appropriate target in IDE and run it.
+
+![run-configurations.png](run-configurations.png)
+
+To run on iOS device, please correct `iosApp/Configuration/TeamId.xcconfig` with your Apple Team ID.
+Alternatively, you may setup signing within XCode opening `iosApp/VisualEffects.xcworkspace` and then
+using "Signing & Capabilities" tab of `VisualEffects` target.
+
+Then choose **iosApp** configuration in IDE and run it
+(may also be referred as `VisualEffects` in the Run Configurations or `iosApp (Android Studio)` for Android Studio).
+
+## Run on desktop via Gradle
+
+`./gradlew desktopApp:run`
 

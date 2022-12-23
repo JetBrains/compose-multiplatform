@@ -1,6 +1,5 @@
 package org.jetbrains.compose.demo.visuals
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -14,12 +13,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerMoveFilter
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.*
-import java.lang.Math.random
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -43,6 +42,8 @@ data class SnowFlake(
 data class Star(val x: Dp, val y: Dp, val color: Color, val size: Dp)
 
 const val HNYString = "Happy New Year!"
+
+fun random(): Float = Random.nextFloat()
 
 class DoubleRocket(val particle: Particle) {
     private val STATE_ROCKET = 0
@@ -70,7 +71,7 @@ class DoubleRocket(val particle: Particle) {
     }
 
     private fun reset() {
-        if (particle.vx < 0) return //to stop drawing after the second rocket. This could be commented out
+//        if (particle.vx < 0) return //to stop drawing after the second rocket. This could be commented out
         state = STATE_ROCKET
         particle.x = if (particle.vx > 0) width - 0.0 else 0.0
         particle.y = 1000.0
@@ -109,7 +110,7 @@ class DoubleRocket(val particle: Particle) {
     }
 
     @Composable
-    fun draw() {
+    internal fun draw() {
         if (state == rocket.STATE_ROCKET) {
             particle.draw()
         } else {
@@ -162,7 +163,7 @@ class Rocket(val particle: Particle, val color: Color, val startTime: Long = 0) 
     }
 
     @Composable
-    fun draw() {
+    internal fun draw() {
         if (!exploded) {
             particle.draw()
         } else {
@@ -184,7 +185,7 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
     }
 
     @Composable
-    fun draw() {
+    internal fun draw() {
         val alphaFactor = if (type == 0) 1.0f else 1 / (1 + abs(vy / 5)).toFloat()
         Box(Modifier.size(5.dp).offset(x.dp, y.dp).alpha(alphaFactor).clip(CircleShape).background(color))
         for (i in 1..5) {
@@ -197,15 +198,6 @@ class Particle(var x: Double, var y: Double, var vx: Double, var vy: Double, val
 }
 
 val rocket = DoubleRocket(Particle(0.0, 1000.0, 2.1, -12.5, Color.White))
-
-
-@Composable
-fun NYWindow(onCloseRequest: () -> Unit) {
-    val windowState = remember { WindowState(width = width.dp, height = height.dp) }
-    Window(onCloseRequest = onCloseRequest, undecorated = true, transparent = true, state = windowState) {
-        NYContent()
-    }
-}
 
 fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: SnapshotStateList<SnowFlake>) {
     for (i in 0..snowCount) {
@@ -237,12 +229,11 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
-@Preview
-fun NYContent() {
-    var time by remember { mutableStateOf(System.nanoTime()) }
+internal fun NYContent() {
+    var time by remember { mutableStateOf(nanoTime()) }
     var started by remember { mutableStateOf(false) }
-    var startTime = remember { System.nanoTime() }
-    var prevTime by remember { mutableStateOf(System.nanoTime()) }
+    var startTime = remember { nanoTime() }
+    var prevTime by remember { mutableStateOf(nanoTime()) }
     val snowFlakes = remember { mutableStateListOf<SnowFlake>() }
     val stars = remember { mutableStateListOf<Star>() }
     var flickering2 by remember { mutableStateOf(true) }
@@ -287,19 +278,23 @@ fun NYContent() {
 
                 starrySky(stars)
 
-                Text(
-                    "202",
-                    Modifier.scale(10f).align(Alignment.Center).offset(-2.dp, 15.dp)
-                        .alpha(if (flickering2) 0.8f else 1.0f),
-                    color = Color.White
-                )
+                Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
+                    Text(
+                        fontSize = 10.em,
+                        text = "202",
+                        modifier = Modifier
+                            .alpha(if (flickering2) 0.8f else 1.0f).offset(0.dp, -15.dp),
+                        color = Color.White
+                    )
 
-                val alpha = if (flickering2) flickeringAlpha(time) else 1.0f
-                Text(
-                    "2",
-                    Modifier.scale(10f).align(Alignment.Center).offset(14.dp, 15.dp).alpha(alpha),
-                    color = Color.White
-                )
+                    val alpha = if (flickering2) flickeringAlpha(time) else 1.0f
+                    Text(
+                        fontSize = 10.em,
+                        text = "3",
+                        modifier = Modifier.alpha(alpha).offset(0.dp, -15.dp),
+                        color = Color.White
+                    )
+                }
 
                 if (started) { //delay to be able to start recording
                     //HNY
@@ -309,7 +304,8 @@ fun NYContent() {
                     HNYString.forEach {
                         val alpha = alphaHNY(i, time, startTime)
                         Text(
-                            it.toString(),
+                            fontSize = 14.sp,
+                            text= it.toString(),
                             color = color,
                             modifier = Modifier.scale(5f).align(Alignment.Center).offset(0.dp, 85.dp)
                                 .rotate((angle + 5.0f * i)).offset(0.dp, -90.dp).alpha(alpha)
@@ -375,20 +371,20 @@ fun flickeringAlpha(time: Long): Float {
 
 
 @Composable
-fun starrySky(stars: SnapshotStateList<Star>) {
+internal fun starrySky(stars: SnapshotStateList<Star>) {
     stars.forEach {
         star(it.x, it.y, it.color, size = it.size)
     }
 }
 
 @Composable
-fun star(x: Dp, y: Dp, color: Color = Color.White, size: Dp) {
+internal fun star(x: Dp, y: Dp, color: Color = Color.White, size: Dp) {
     Box(Modifier.offset(x, y).scale(1.0f, 0.2f).rotate(45f).size(size).background(color))
     Box(Modifier.offset(x, y).scale(0.2f, 1.0f).rotate(45f).size(size).background(color))
 }
 
 @Composable
-fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long) {
+internal fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, startTime: Long) {
     val deltaAngle = (time - startTime) / 100000000
     with(LocalDensity.current) {
         snowFlakes.forEach {
@@ -404,7 +400,7 @@ fun snow(time: Long, prevTime: Long, snowFlakes: SnapshotStateList<SnowFlake>, s
 }
 
 @Composable
-fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
+internal fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
     Box(modifier) {
         snowFlakeInt(0, 0f, 30.dp, 0.dp, alpha)
         snowFlakeInt(0, 60f, 15.dp, 25.dp, alpha)
@@ -417,7 +413,7 @@ fun snowFlake(modifier: Modifier, alpha: Float = 0.8f) {
 }
 
 @Composable
-fun snowFlakeInt(level: Int, angle: Float, shiftX: Dp, shiftY: Dp, alpha: Float) {
+internal fun snowFlakeInt(level: Int, angle: Float, shiftX: Dp, shiftY: Dp, alpha: Float) {
     if (level > 3) return
     Box(
         Modifier.offset(shiftX, shiftY).rotate(angle).width(100.dp).height(10.dp).scale(0.6f).alpha(1f)
