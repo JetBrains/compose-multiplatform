@@ -4,5 +4,5 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-actual fun ScrollableColumn(modifier: Modifier, content: @Composable () -> Unit) =
+internal actual fun ScrollableColumn(modifier: Modifier, content: @Composable () -> Unit) =
     TouchScrollableColumn(modifier, content)
