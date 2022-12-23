@@ -281,7 +281,7 @@ internal fun NYContent() {
                 Row(modifier = Modifier.fillMaxSize(), verticalAlignment = Alignment.Bottom, horizontalArrangement = Arrangement.Center) {
                     Text(
                         fontSize = 10.em,
-                        text ="202",
+                        text = "202",
                         modifier = Modifier
                             .alpha(if (flickering2) 0.8f else 1.0f).offset(0.dp, -15.dp),
                         color = Color.White
