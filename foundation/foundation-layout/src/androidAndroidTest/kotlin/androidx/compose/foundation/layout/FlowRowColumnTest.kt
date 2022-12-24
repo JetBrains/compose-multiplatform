@@ -1268,4 +1268,702 @@ class FlowRowColumnTest {
             }
         }
     }
+
+    @Test
+    fun testFlowRow_minIntrinsicWidth() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                   width = it.width
+                            },
+                            horizontalArrangement = Arrangement.Start,
+                            maxItemsInEachRow = 5
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            maxItemsInEachColumn = 6
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth_wrap() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            maxItemsInEachColumn = 5
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(40)
+    }
+
+    @Test
+    fun testFlowRow_maxIntrinsicWidth() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Max).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            horizontalArrangement = Arrangement.Start,
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(120)
+    }
+
+    @Test
+    fun testFlowColumn_maxIntrinsicWidth() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Max).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowRow_minIntrinsicWidth_withSpaceBy() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            horizontalArrangement = Arrangement.spacedBy(20.toDp()),
+                            maxItemsInEachRow = 5
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth_withSpaceBy() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(80.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            verticalArrangement = Arrangement.spacedBy(20.toDp()),
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(60)
+    }
+
+    @Test
+    fun testFlowRow_maxIntrinsicWidth_withSpaceBy() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Max).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            horizontalArrangement = Arrangement.spacedBy(10.toDp()),
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(180)
+    }
+
+    @Test
+    fun testFlowColumn_maxIntrinsicWidth_withSpaceBy() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Max).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            verticalArrangement = Arrangement.spacedBy(20.toDp()),
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(40)
+    }
+
+    @Test
+    fun testFlowRow_minIntrinsicWidth_withAConstraint() {
+        var width = 0
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                                height = it.height
+                            },
+                            maxItemsInEachRow = 5
+                        ) {
+                            repeat(6) { index ->
+                                Box(
+                                    Modifier
+                                        .width(if (index == 5) 100.toDp() else 20.toDp())
+                                        .height(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(100)
+        Truth.assertThat(height).isEqualTo(40)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth_withAConstraint() {
+        var width = 0
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                                height = it.height
+                            },
+                            maxItemsInEachColumn = 5
+                        ) {
+                            repeat(6) { index ->
+                                Box(
+                                    Modifier
+                                        .height(if (index == 5) 100.toDp() else 20.toDp())
+                                        .width(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(height).isEqualTo(100)
+        Truth.assertThat(width).isEqualTo(40)
+    }
+
+    @Test
+    fun testFlowRow_minIntrinsicWidth_withAConstraint_withSpacedBy() {
+        var width = 0
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                                height = it.height
+                            },
+                            horizontalArrangement = Arrangement.spacedBy(10.toDp()),
+                            maxItemsInEachRow = 5
+                        ) {
+                            repeat(6) { index ->
+                                Box(
+                                    Modifier
+                                        .width(if (index == 5) 100.toDp() else 20.toDp())
+                                        .height(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(100)
+        Truth.assertThat(height).isEqualTo(60)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth_withAConstraint_withSpacedBy() {
+        var width = 0
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                                height = it.height
+                            },
+                            verticalArrangement = Arrangement.spacedBy(10.toDp()),
+                            maxItemsInEachColumn = 5
+                        ) {
+                            repeat(6) { index ->
+                                Box(
+                                    Modifier
+                                        .width(if (index == 5) 100.toDp() else 20.toDp())
+                                        .height(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(height).isEqualTo(140)
+        Truth.assertThat(width).isEqualTo(120)
+    }
+
+    @Test
+    fun testFlowRow_minIntrinsicWidth_withMaxItems() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            maxItemsInEachRow = 2
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth_withMaxItems() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            maxItemsInEachRow = 2
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowRow_maxIntrinsicWidth_withMaxItems() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Max).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            maxItemsInEachRow = 2
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(40)
+    }
+
+    @Test
+    fun testFlowColumn_maxIntrinsicWidth_withMaxItems() {
+        var width = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Max).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                            },
+                            maxItemsInEachColumn = 2
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(60)
+    }
+
+    @Test
+    fun testFlowRow_minIntrinsicWidth_withAConstraint_withMaxItems() {
+        var width = 0
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                                height = it.height
+                            },
+                            maxItemsInEachRow = 2
+                        ) {
+                            repeat(10) { index ->
+                                Box(
+                                    Modifier
+                                        .width(if (index == 5) 100.toDp() else 20.toDp())
+                                        .height(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(101)
+        Truth.assertThat(height).isEqualTo(120)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicWidth_withAConstraint_withMaxItems() {
+        var width = 0
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.width(IntrinsicSize.Min).wrapContentHeight().onSizeChanged {
+                                width = it.width
+                                height = it.height
+                            },
+                            maxItemsInEachColumn = 2
+                        ) {
+                            repeat(10) { index ->
+                                Box(
+                                    Modifier
+                                        .width(if (index == 5) 100.toDp() else 20.toDp())
+                                        .height(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(width).isEqualTo(180)
+        Truth.assertThat(height).isEqualTo(40)
+    }
+
+    @Test
+    fun testFlowRow_minIntrinsicHeight() {
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowRow(
+                            Modifier.height(IntrinsicSize.Min).wrapContentWidth().onSizeChanged {
+                                height = it.height
+                            },
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(height).isEqualTo(20)
+    }
+
+    @Test
+    fun testFlowColumn_minIntrinsicHeight() {
+        var height = 0
+        rule.setContent {
+            CompositionLocalProvider(
+                values = arrayOf(
+                    LocalLayoutDirection provides LayoutDirection.Rtl,
+                )
+            ) {
+                with(LocalDensity.current) {
+                    Box(Modifier.size(200.toDp())) {
+                        FlowColumn(
+                            Modifier.height(IntrinsicSize.Min).wrapContentWidth().onSizeChanged {
+                                height = it.height
+                            },
+                            maxItemsInEachColumn = 5
+                        ) {
+                            repeat(6) {
+                                Box(
+                                    Modifier
+                                        .size(20.toDp())
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        rule.waitForIdle()
+        Truth.assertThat(height).isEqualTo(20)
+    }
 }
