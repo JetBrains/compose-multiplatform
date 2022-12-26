@@ -77,5 +77,5 @@ Note that when you use Compose Multiplatform, you setup your project differently
 
 * [The latest stable release](https://github.com/JetBrains/compose-jb/releases/latest)
 * [The latest dev release](https://github.com/JetBrains/compose-jb/releases)
-* [Compatability and versioning overview](VERSIONING.md)
+* [Compatibility and versioning overview](VERSIONING.md)
 * [Changelog](CHANGELOG.md)
