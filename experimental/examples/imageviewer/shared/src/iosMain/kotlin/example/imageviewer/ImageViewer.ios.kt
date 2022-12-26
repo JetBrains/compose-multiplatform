@@ -11,6 +11,9 @@ import example.imageviewer.model.ContentRepository
 import example.imageviewer.model.State
 import example.imageviewer.model.adapter
 import example.imageviewer.model.createNetworkRepository
+import example.imageviewer.model.filtration.BlurFilter
+import example.imageviewer.model.filtration.GrayScaleFilter
+import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
@@ -39,18 +42,12 @@ internal fun ImageViewerIos() {
     }
 }
 
-class StubFilter : BitmapFilter {
-    override fun apply(bitmap: ImageBitmap): ImageBitmap {
-        return bitmap
-    }
-}
-
-private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
+fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
-        FilterType.GrayScale -> StubFilter()
-        FilterType.Pixel -> StubFilter()
-        FilterType.Blur -> StubFilter()
+        FilterType.GrayScale -> GrayScaleFilter()
+        FilterType.Pixel -> PixelFilter()
+        FilterType.Blur -> BlurFilter()
     }
 
     override val localization: Localization = object : Localization {
