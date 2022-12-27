@@ -330,7 +330,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
-            onVariants { it.configureLicensePackaging() }
+            onVariants { it.configureTests() }
             finalizeDsl {
                 project.configureAndroidProjectForLint(
                     it.lint,
@@ -354,6 +354,11 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.addToProjectMap(androidXExtension)
     }
 
+    private fun HasAndroidTest.configureTests() {
+        configureLicensePackaging()
+        excludeVersionFilesFromTestApks()
+    }
+
     private fun HasAndroidTest.configureLicensePackaging() {
         androidTest?.packaging?.resources?.apply {
             // Workaround a limitation in AGP that fails to merge these META-INF license files.
@@ -363,6 +368,16 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
             //   - net.java.dev.jna:jna:5.5.0
             excludes.add("/META-INF/LGPL2.1")
+        }
+    }
+
+    /**
+     * Excludes files telling which versions of androidx libraries were used in test apks
+     * to avoid invalidating the build cache as often
+     */
+    private fun HasAndroidTest.excludeVersionFilesFromTestApks() {
+        androidTest?.packaging?.resources?.apply {
+            excludes.add("/META-INF/androidx*.version")
         }
     }
 
@@ -415,7 +430,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             beforeVariants(selector().withBuildType("release")) { variant ->
                 variant.enableUnitTest = false
             }
-            onVariants { it.configureLicensePackaging() }
+            onVariants { it.configureTests() }
             finalizeDsl {
                 project.configureAndroidProjectForLint(it.lint, androidXExtension, isLibrary = true)
             }
