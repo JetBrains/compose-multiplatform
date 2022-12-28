@@ -106,7 +106,7 @@ class SwipeableV2GestureTest {
 
     private fun verifyOffsetMatchesAnchor() =
         { state: SwipeableV2State<TestState>, target: TestState ->
-            val swipeableSizePx = with(rule.density) { swipeableSize.toPx() }
+            val swipeableSizePx = with(rule.density) { swipeableSize.roundToPx() }
             val targetOffset = when (target) {
                 A -> 0f
                 B -> swipeableSizePx / 2

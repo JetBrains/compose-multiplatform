@@ -47,7 +47,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
-import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.junit.Rule
@@ -100,8 +99,8 @@ class SwipeableV2AnchorTest {
         lateinit var state: SwipeableV2State<TestState>
 
         fun anchorA() = 0f
-        fun anchorB(layoutHeight: Float) = layoutHeight / 2
-        fun anchorC(layoutHeight: Float) = layoutHeight
+        fun anchorB(layoutHeight: Int) = layoutHeight / 2f
+        fun anchorC(layoutHeight: Int) = layoutHeight.toFloat()
 
         val swipeableSize = 200.dp
 
@@ -116,14 +115,14 @@ class SwipeableV2AnchorTest {
                     ) { state, layoutSize ->
                         when (state) {
                             A -> 0f
-                            B -> anchorB(layoutSize.height.toFloat())
-                            C -> anchorC(layoutSize.height.toFloat())
+                            B -> anchorB(layoutSize.height)
+                            C -> anchorC(layoutSize.height)
                         }
                     }
             )
         }
 
-        val expectedHeight = with(rule.density) { swipeableSize.toPx() }
+        val expectedHeight = with(rule.density) { swipeableSize.roundToPx() }
         assertThat(state.anchors[A]).isEqualTo(anchorA())
         assertThat(state.anchors[B]).isEqualTo(anchorB(expectedHeight))
         assertThat(state.anchors[C]).isEqualTo(anchorC(expectedHeight))
@@ -300,7 +299,7 @@ class SwipeableV2AnchorTest {
 
         val expectedPreviousAnchors = state.anchors
         size = 200.dp // Recompose with new size so anchors change
-        val sizePx = with(rule.density) { size.toPx().roundToInt() }
+        val sizePx = with(rule.density) { size.roundToPx() }
         val layoutSize = IntSize(sizePx, sizePx)
         val expectedNewAnchors = mapOf(
             A to calculateAnchor(A, layoutSize),
