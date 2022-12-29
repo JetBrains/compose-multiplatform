@@ -96,6 +96,11 @@ object SemanticsProperties {
     val Focused = SemanticsPropertyKey<Boolean>("Focused")
 
     /**
+     * @see SemanticsPropertyReceiver.isContainer
+     */
+    val IsContainer = SemanticsPropertyKey<Boolean>("IsContainer")
+
+    /**
      * @see SemanticsPropertyReceiver.invisibleToUser
      */
     @ExperimentalComposeUiApi
@@ -751,6 +756,14 @@ var SemanticsPropertyReceiver.liveRegion by SemanticsProperties.LiveRegion
  * @see SemanticsProperties.Focused
  */
 var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
+
+/**
+ * Whether this semantics node is a container. This is defined as a node whose function
+ * is to serve as a boundary or border in organizing its children.
+ *
+ * @see SemanticsProperties.IsContainer
+ */
+var SemanticsPropertyReceiver.isContainer by SemanticsProperties.IsContainer
 
 /**
  * Whether this node is specially known to be invisible to the user.
