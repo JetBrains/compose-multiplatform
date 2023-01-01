@@ -18,8 +18,8 @@ import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.debug
 
 abstract class ExperimentalUnpackSkikoWasmRuntimeTask @Inject constructor(
-    val files: FileSystemOperations,
-    val archives: ArchiveOperations,
+    private val files: FileSystemOperations,
+    private val archives: ArchiveOperations,
 ): DefaultTask() {
     @get:InputFiles
     lateinit var runtimeClasspath: Configuration
