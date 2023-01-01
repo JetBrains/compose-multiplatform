@@ -14,7 +14,10 @@ import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.debug
 
-abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
+abstract class ExperimentalUnpackSkikoWasmRuntimeTask @Inject constructor(
+    val files: FileSystemOperations,
+    val archives: ArchiveOperations,
+): DefaultTask() {
     @get:InputFiles
     lateinit var runtimeClasspath: Configuration
 
@@ -23,8 +26,6 @@ abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
 
     @TaskAction
     fun run() {
-        project.delete(outputDir)
-        project.mkdir(outputDir)
         val runtimeArtifacts = runtimeClasspath.resolvedConfiguration.resolvedArtifacts
         for (artifact in runtimeArtifacts) {
             logger.debug { "Checking artifact: id=${artifact.id}, file=${artifact.file}" }
@@ -43,8 +44,8 @@ abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
 
         for (file in skikoRuntimeConfig.resolve()) {
             if (file.name.endsWith(".jar", ignoreCase = true)) {
-                project.copy { copySpec ->
-                    copySpec.from(project.zipTree(file))
+                files.sync { copySpec ->
+                    copySpec.from(archives.zipTree(file))
                     copySpec.into(outputDir)
                 }
             }
