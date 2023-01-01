@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.experimental.web.tasks
 
+import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
