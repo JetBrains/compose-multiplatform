@@ -284,8 +284,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
     private var paneDisplayed = ArraySet<Int>()
     private var idToBeforeMap = HashMap<Int, Int>()
+    private var idToAfterMap = HashMap<Int, Int>()
     private val EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL =
         "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL"
+    private val EXTRA_DATA_TEST_TRAVERSALAFTER_VAL =
+        "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALAFTER_VAL"
 
     /**
      * A snapshot of the semantics node. The children here is fixed and are taken from the time
@@ -444,6 +447,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     private fun setTraversalValues() {
         idToBeforeMap.clear()
+        idToAfterMap.clear()
         var idToCoordinatesList = mutableListOf<Pair<Int, Rect>>()
 
         fun depthFirstSearch(currNode: SemanticsNode) {
@@ -464,10 +468,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
         }
 
-        currentSemanticsNodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]?.semanticsNode
-            ?.replacedChildrenSortedByBounds?.fastForEach { node ->
-                depthFirstSearch(node)
-            }
+        currentSemanticsNodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]?.semanticsNode?.let {
+            depthFirstSearch(
+                it
+            )
+        }
 
         // Iterate through our ordered list, and creating a mapping of current node to next node ID
         // We'll later read through this and set traversal order with IdToBeforeMap
@@ -475,6 +480,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val prevId = idToCoordinatesList[i - 1].first
             val currId = idToCoordinatesList[i].first
             idToBeforeMap[prevId] = currId
+            idToAfterMap[currId] = prevId
         }
 
         return
@@ -1035,6 +1041,12 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             addExtraDataToAccessibilityNodeInfoHelper(
                 virtualViewId, info.unwrap(), EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL, null)
         }
+
+        if (idToAfterMap[virtualViewId] != null) {
+            idToAfterMap[virtualViewId]?.let { info.setTraversalAfter(view, it) }
+            addExtraDataToAccessibilityNodeInfoHelper(
+                virtualViewId, info.unwrap(), EXTRA_DATA_TEST_TRAVERSALAFTER_VAL, null)
+        }
     }
 
     /** Set the error text for this node */
@@ -1532,10 +1544,14 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         val node = currentSemanticsNodes[virtualViewId]?.semanticsNode ?: return
         val text = getIterableTextForAccessibility(node)
 
-        // This extra is just for testing: needed a way to retrieve `traversalBefore` from
-        // non-sealed instance of ANI
+        // This extra is just for testing: needed a way to retrieve `traversalBefore` and
+        // `traversalAfter` from a non-sealed instance of an ANI
         if (extraDataKey == EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL) {
             idToBeforeMap[virtualViewId]?.let {
+                info.extras.putInt(extraDataKey, it)
+            }
+        } else if (extraDataKey == EXTRA_DATA_TEST_TRAVERSALAFTER_VAL) {
+            idToAfterMap[virtualViewId]?.let {
                 info.extras.putInt(extraDataKey, it)
             }
         } else if (node.unmergedConfig.contains(SemanticsActions.GetTextLayoutResult) &&
