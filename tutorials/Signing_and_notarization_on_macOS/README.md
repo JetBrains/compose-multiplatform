@@ -24,7 +24,7 @@ You will need a certificate for signing your app.
 Open https://developer.apple.com/account/resources/certificates
 
 #### Creating a new certificate
-1. [Create a certificate signing request](https://help.apple.com/developer-account/#/devbfa00fef7):
+1. [Create a certificate signing request](https://developer.apple.com/help/account/create-certificates/create-a-certificate-signing-request):
     * Open `Keychain Access`.
     * Open the menu dialog
         ```
