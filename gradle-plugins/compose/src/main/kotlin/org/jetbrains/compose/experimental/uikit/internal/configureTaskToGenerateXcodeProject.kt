@@ -8,15 +8,16 @@ package org.jetbrains.compose.experimental.uikit.internal
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
+import org.jetbrains.compose.experimental.uikit.tasks.ExtractXcodeGenTask
 
 internal fun Project.configureTaskToGenerateXcodeProject(
     id: String,
     projectName: String,
     bundleIdPrefix: String,
     getTeamId: () -> String? = { null },
-    taskInstallXcodeGen: TaskProvider<*>,
+    taskInstallXcodeGen: TaskProvider<ExtractXcodeGenTask>,
 ): TaskProvider<AbstractComposeIosTask> = tasks.composeIosTask<AbstractComposeIosTask>("iosGenerateXcodeProject$id") {
-    dependsOn(taskInstallXcodeGen)
+    inputs.file(taskInstallXcodeGen.map { it.getExecutable() })
     doLast {
         val commonMainResources = file("src/commonMain/resources").absolutePath
         val uikitMainResources = file("src/uikitMain/resources").absolutePath
@@ -61,6 +62,6 @@ internal fun Project.configureTaskToGenerateXcodeProject(
                     buildPhase: resources
             """.trimIndent()
         )
-        runExternalTool(xcodeGenExecutable, emptyList(), workingDir = buildIosDir)
+        runExternalTool(inputs.files.first(), emptyList(), workingDir = buildIosDir)
     }
 }

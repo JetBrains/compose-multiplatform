@@ -28,7 +28,7 @@ internal fun Project.configureIosDeployTasks(
     val projectName = application.projectName
     val bundleIdPrefix = application.bundleIdPrefix
 
-    val taskInstallXcodeGen: TaskProvider<*> = configureInstallXcodeGenTask()
+    val taskInstallXcodeGen = configureInstallXcodeGenTask()
     val taskInstallIosDeploy: TaskProvider<*> = configureInstallIosDeployTask()
 
     application.deployConfigurations.deployTargets.forEach { target ->

@@ -6,35 +6,24 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.internal.MacUtils
-import org.jetbrains.compose.desktop.application.internal.UnixUtils
-import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
+import org.gradle.api.tasks.TaskProvider
+import org.jetbrains.compose.experimental.uikit.tasks.DownloadXcodeGenTask
+import org.jetbrains.compose.experimental.uikit.tasks.ExtractXcodeGenTask
 
-internal val Project.xcodeGenExecutable get() = xcodeGenSrc.resolve(".build/apple/Products/Release/xcodegen")
+private const val XCODE_GEN_TAG = "2.32.0"
+private const val XCODE_GEN_URL = "https://github.com/yonaskolb/XcodeGen/releases/download/$XCODE_GEN_TAG/xcodegen.zip"
+private val Project.xcodeGenSrc get() = rootProject.buildDir.resolve("xcodegen-$XCODE_GEN_TAG")
 
-private const val XCODE_GEN_GIT = "https://github.com/yonaskolb/XcodeGen.git"
-private const val XCODE_GEN_TAG = "2.26.0"
-private val Project.xcodeGenSrc get() = rootProject.buildDir.resolve("xcodegen-$XCODE_GEN_TAG-src")
-
-fun Project.configureInstallXcodeGenTask() =
-    tasks.composeIosTask<AbstractComposeIosTask>("iosInstallXcodeGen") {
-        onlyIf { !xcodeGenExecutable.exists() }
-        doLast {
-            xcodeGenSrc.deleteRecursively()
-            runExternalTool(
-                UnixUtils.git,
-                listOf(
-                    "clone",
-                    "--depth", "1",
-                    "--branch", XCODE_GEN_TAG,
-                    XCODE_GEN_GIT,
-                    xcodeGenSrc.absolutePath
-                )
-            )
-            runExternalTool(
-                MacUtils.make,
-                listOf("build"),
-                workingDir = xcodeGenSrc
-            )
-        }
+fun Project.configureInstallXcodeGenTask(): TaskProvider<ExtractXcodeGenTask> {
+    val downalodTask = tasks.register("iosDownloadXcodeGenBinary", DownloadXcodeGenTask::class.java) {
+        it.downloadUrl.set(XCODE_GEN_URL)
+        it.destFile.set(xcodeGenSrc.resolve("xcodegen-$XCODE_GEN_TAG.zip"))
     }
+
+    return tasks.register("iosExtractXcodeGenBinary", ExtractXcodeGenTask::class.java) {
+        it.from(zipTree(downalodTask.map { it.outputs.files.first() }))
+        it.into(xcodeGenSrc)
+        it.fileMode = 0b111100100 // chmod: 744
+    }
+}
+
