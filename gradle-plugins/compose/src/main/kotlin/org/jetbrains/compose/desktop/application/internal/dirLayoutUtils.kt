@@ -10,6 +10,7 @@ import org.gradle.api.Task
 import org.gradle.api.file.Directory
 import org.gradle.api.file.ProjectLayout
 import org.gradle.api.provider.Provider
+import org.jetbrains.compose.internal.utils.dir
 
 internal val Project.jvmDirs: JvmDirectoriesProvider
     get() = JvmDirectoriesProvider(project.layout)

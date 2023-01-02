@@ -13,7 +13,7 @@ import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildType
 import org.jetbrains.compose.internal.KOTLIN_JVM_PLUGIN_ID
 import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
 import org.jetbrains.compose.internal.javaSourceSets
-import org.jetbrains.compose.internal.joinDashLowercaseNonEmpty
+import org.jetbrains.compose.internal.utils.joinDashLowercaseNonEmpty
 import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 

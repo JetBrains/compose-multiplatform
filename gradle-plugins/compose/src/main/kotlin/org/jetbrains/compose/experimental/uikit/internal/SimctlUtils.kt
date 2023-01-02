@@ -6,7 +6,7 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import kotlinx.serialization.json.Json
-import org.jetbrains.compose.desktop.application.internal.MacUtils
+import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 
 val json = Json {

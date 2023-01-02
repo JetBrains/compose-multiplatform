@@ -1,17 +1,12 @@
 /*
- * Copyright 2020-2021 JetBrains s.r.o. and respective authors and developers.
+ * Copyright 2020-2023 JetBrains s.r.o. and respective authors and developers.
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-package org.jetbrains.compose.internal
+package org.jetbrains.compose.internal.utils
 
 import org.gradle.api.Project
-import org.gradle.api.Task
-import org.gradle.api.file.Directory
 import org.gradle.api.logging.Logger
-import org.gradle.api.provider.Provider
-import org.gradle.api.tasks.TaskProvider
-import java.io.File
 import java.util.*
 
 internal inline fun Logger.info(fn: () -> String) {
@@ -25,20 +20,6 @@ internal inline fun Logger.debug(fn: () -> String) {
         debug(fn())
     }
 }
-
-internal inline fun <reified T : Task> Project.registerTask(
-    name: String,
-    crossinline fn: T.() -> Unit
-): TaskProvider<T> =
-    tasks.register(name, T::class.java) { task ->
-        task.fn()
-    }
-
-internal fun Provider<String>.toDir(project: Project): Provider<Directory> =
-    project.layout.dir(map { File(it) })
-
-internal fun Provider<File>.fileToDir(project: Project): Provider<Directory> =
-    project.layout.dir(this)
 
 val Project.localPropertiesFile get() = project.rootProject.file("local.properties")
 

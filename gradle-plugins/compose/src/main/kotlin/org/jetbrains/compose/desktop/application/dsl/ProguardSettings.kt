@@ -8,8 +8,8 @@ package org.jetbrains.compose.desktop.application.dsl
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
+import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.nullableProperty
 import javax.inject.Inject
 
 private const val DEFAULT_PROGUARD_VERSION = "7.2.2"

@@ -10,6 +10,7 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.process.ExecOperations
 import org.gradle.process.ExecResult
+import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

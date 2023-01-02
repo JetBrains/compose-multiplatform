@@ -7,8 +7,12 @@ package org.jetbrains.compose.test.tests.integration
 
 import org.gradle.internal.impldep.org.testng.Assert
 import org.gradle.testkit.runner.TaskOutcome
-import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.internal.uppercaseFirstChar
+import org.jetbrains.compose.internal.utils.MacUtils
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentArch
+import org.jetbrains.compose.internal.utils.currentOS
+import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.compose.test.utils.*
 
 import java.io.File

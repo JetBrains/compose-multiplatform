@@ -6,6 +6,7 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
+import org.jetbrains.compose.internal.utils.MacUtils
 import java.io.File
 import java.nio.file.Files
 import java.util.regex.Pattern

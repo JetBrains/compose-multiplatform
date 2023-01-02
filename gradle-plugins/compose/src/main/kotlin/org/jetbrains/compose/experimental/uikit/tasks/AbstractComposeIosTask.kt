@@ -7,7 +7,7 @@ package org.jetbrains.compose.experimental.uikit.tasks
 
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
-import org.gradle.api.internal.file.FileOperations
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -17,7 +17,7 @@ import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.internal.utils.notNullProperty
 import javax.inject.Inject
 
 abstract class AbstractComposeIosTask : DefaultTask() {
@@ -31,7 +31,7 @@ abstract class AbstractComposeIosTask : DefaultTask() {
     protected abstract val execOperations: ExecOperations
 
     @get:Inject
-    protected abstract val fileOperations: FileOperations
+    protected abstract val fileOperations: FileSystemOperations
 
     @get:LocalState
     protected val logsDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/logs/$name")

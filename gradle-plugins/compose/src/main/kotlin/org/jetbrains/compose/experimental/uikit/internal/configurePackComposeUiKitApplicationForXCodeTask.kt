@@ -7,7 +7,7 @@ package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
 import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
-import org.jetbrains.compose.internal.fileToDir
+import org.jetbrains.compose.internal.utils.fileToDir
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
 import org.jetbrains.kotlin.gradle.plugin.mpp.NativeBuildType

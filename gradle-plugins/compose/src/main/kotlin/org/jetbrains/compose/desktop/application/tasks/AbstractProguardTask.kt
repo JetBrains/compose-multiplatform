@@ -15,12 +15,10 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.*
-import org.jetbrains.compose.desktop.application.internal.ioFile
 import org.jetbrains.compose.desktop.application.internal.files.mangledName
 import org.jetbrains.compose.desktop.application.internal.files.normalizedPath
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.*
 import java.io.File
 import java.io.Writer
 import kotlin.collections.LinkedHashMap
@@ -80,7 +78,7 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
             project.dependencies.create("com.guardsquare:proguard-gradle:${proguardVersion.get()}")
         ).files
 
-        cleanDirs(destinationDir, workingDir)
+        fileOperations.clearDirs(destinationDir, workingDir)
         val destinationDir = destinationDir.ioFile.absoluteFile
 
         // todo: can be cached for a jdk

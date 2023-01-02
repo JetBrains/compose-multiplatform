@@ -5,8 +5,8 @@
 
 package org.jetbrains.compose.desktop.application.dsl
 
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 
 enum class TargetFormat(
     internal val id: String,

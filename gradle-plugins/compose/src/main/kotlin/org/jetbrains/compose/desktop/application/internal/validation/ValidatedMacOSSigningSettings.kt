@@ -9,8 +9,8 @@ import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.dsl.MacOSSigningSettings
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
 
 internal data class ValidatedMacOSSigningSettings(

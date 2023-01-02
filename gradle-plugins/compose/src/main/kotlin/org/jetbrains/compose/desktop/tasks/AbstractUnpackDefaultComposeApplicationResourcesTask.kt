@@ -13,7 +13,8 @@ import org.gradle.api.tasks.Internal
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.ComposeBuildConfig
-import org.jetbrains.compose.desktop.application.internal.ioFile
+import org.jetbrains.compose.internal.utils.clearDirs
+import org.jetbrains.compose.internal.utils.ioFile
 
 private const val DEFAULT_COMPOSE_PROGUARD_RULES_FILE_NAME = "default-compose-desktop-rules.pro"
 
@@ -35,7 +36,7 @@ abstract class AbstractUnpackDefaultComposeApplicationResourcesTask : AbstractCo
 
     @TaskAction
     fun run() {
-        cleanDirs(destinationDir)
+        fileOperations.clearDirs(destinationDir)
 
         unpack(iconSourcePath("mac", "icns"), resources.macIcon)
         unpack(iconSourcePath("windows", "ico"), resources.windowsIcon)

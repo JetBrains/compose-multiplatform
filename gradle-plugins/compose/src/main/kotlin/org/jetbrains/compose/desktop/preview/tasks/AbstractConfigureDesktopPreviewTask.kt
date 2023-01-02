@@ -7,9 +7,9 @@ import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.ComposeBuildConfig
-import org.jetbrains.compose.desktop.application.internal.currentTarget
-import org.jetbrains.compose.desktop.application.internal.javaExecutable
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.internal.utils.javaExecutable
+import org.jetbrains.compose.internal.utils.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
 import org.jetbrains.compose.desktop.ui.tooling.preview.rpc.*
 import java.io.File

@@ -11,6 +11,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.*
 import org.jetbrains.compose.desktop.application.internal.files.checkExistingFile
 import org.jetbrains.compose.desktop.application.internal.files.findOutputFileOrDir
+import org.jetbrains.compose.internal.utils.MacUtils
+import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

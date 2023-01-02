@@ -8,7 +8,7 @@ package org.jetbrains.compose.desktop.application.internal
 import org.gradle.api.Project
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
-import org.jetbrains.compose.internal.registerTask
+import org.jetbrains.compose.internal.utils.registerTask
 
 internal fun configureDesktop(project: Project, desktopExtension: DesktopExtension) {
     if (desktopExtension._isJvmApplicationInitialized) {

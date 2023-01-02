@@ -20,11 +20,11 @@ import org.gradle.api.plugins.ExtensionAware
 import org.jetbrains.compose.android.AndroidExtension
 import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
-import org.jetbrains.compose.desktop.application.internal.currentTarget
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.checkExperimentalTargetsWithSkikoIsEnabled
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion

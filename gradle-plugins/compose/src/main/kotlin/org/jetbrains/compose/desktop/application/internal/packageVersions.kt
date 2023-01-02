@@ -8,6 +8,7 @@ package org.jetbrains.compose.desktop.application.internal
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
+import org.jetbrains.compose.internal.utils.OS
 
 internal fun JvmApplicationContext.packageVersionFor(
     targetFormat: TargetFormat

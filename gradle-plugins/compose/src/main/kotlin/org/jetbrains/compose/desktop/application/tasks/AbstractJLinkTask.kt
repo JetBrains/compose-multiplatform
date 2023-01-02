@@ -14,9 +14,9 @@ import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.RuntimeCompressionLevel
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.cliArg
-import org.jetbrains.compose.desktop.application.internal.ioFile
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
+import org.jetbrains.compose.internal.utils.ioFile
+import org.jetbrains.compose.internal.utils.notNullProperty
+import org.jetbrains.compose.internal.utils.nullableProperty
 import java.io.File
 
 // todo: public DSL

@@ -12,6 +12,7 @@ import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationDistributions
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildTypes
+import org.jetbrains.compose.internal.utils.new
 import javax.inject.Inject
 
 internal open class JvmApplicationData @Inject constructor(
