@@ -20,6 +20,14 @@ import org.junit.jupiter.api.Test
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
+    fun skikoWasm() = with(testProject(TestProjects.skikoWasm)) {
+        gradle(":build").checks {
+            check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
+            check.taskSuccessful(":compileKotlinJs")
+        }
+    }
+
+    @Test
     fun jsMppIsNotBroken() =
         with(
             testProject(
