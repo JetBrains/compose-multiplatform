@@ -22,4 +22,7 @@ internal fun KotlinJsIrTarget.configureExperimentalWebApplication(app: Experimen
     mainCompilation.compileKotlinTaskProvider.configure { compileTask ->
         compileTask.dependsOn(unpackRuntime)
     }
+    project.tasks.named(mainCompilation.processResourcesTaskName).configure { processResourcesTask ->
+        processResourcesTask.dependsOn(unpackRuntime)
+    }
 }
