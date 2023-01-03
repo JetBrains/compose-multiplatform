@@ -10,7 +10,7 @@ import org.jetbrains.compose.web.css.keywords.auto
 import org.w3c.dom.HTMLElement
 
 private fun HTMLElement.setHighlightedCode(code: String) {
-    innerText = code
+    textContent = code
     HighlightJs.highlightElement(this)
 }
 
