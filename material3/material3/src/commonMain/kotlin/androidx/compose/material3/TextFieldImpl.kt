@@ -69,6 +69,8 @@ internal fun CommonDecorationBox(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     singleLine: Boolean = false,
     enabled: Boolean = true,
@@ -110,7 +112,8 @@ internal fun CommonDecorationBox(
         },
         contentColor = labelColor,
         showLabel = label != null
-    ) { labelProgress, labelTextStyleColor, labelContentColor, placeholderAlphaProgress ->
+    ) { labelProgress, labelTextStyleColor, labelContentColor, placeholderAlphaProgress,
+        prefixSuffixAlphaProgress ->
 
         val decoratedLabel: @Composable (() -> Unit)? = label?.let {
             @Composable {
@@ -137,6 +140,24 @@ internal fun CommonDecorationBox(
                     }
                 }
             } else null
+
+        val prefixColor = colors.prefixColor(enabled, isError, interactionSource).value
+        val decoratedPrefix: @Composable (() -> Unit)? = prefix?.let {
+            @Composable {
+                Box(Modifier.alpha(prefixSuffixAlphaProgress)) {
+                    Decoration(contentColor = prefixColor, typography = bodyLarge, content = it)
+                }
+            }
+        }
+
+        val suffixColor = colors.suffixColor(enabled, isError, interactionSource).value
+        val decoratedSuffix: @Composable (() -> Unit)? = suffix?.let {
+            @Composable {
+                Box(Modifier.alpha(prefixSuffixAlphaProgress)) {
+                    Decoration(contentColor = suffixColor, typography = bodyLarge, content = it)
+                }
+            }
+        }
 
         // Developers need to handle invalid input manually. But since we don't provide error
         // message slot API, we can set the default error message in case developers forget about
@@ -182,6 +203,8 @@ internal fun CommonDecorationBox(
                     label = decoratedLabel,
                     leading = decoratedLeading,
                     trailing = decoratedTrailing,
+                    prefix = decoratedPrefix,
+                    suffix = decoratedSuffix,
                     container = containerWithId,
                     supporting = decoratedSupporting,
                     singleLine = singleLine,
@@ -210,6 +233,8 @@ internal fun CommonDecorationBox(
                     label = decoratedLabel,
                     leading = decoratedLeading,
                     trailing = decoratedTrailing,
+                    prefix = decoratedPrefix,
+                    suffix = decoratedSuffix,
                     supporting = decoratedSupporting,
                     singleLine = singleLine,
                     onLabelMeasured = {
@@ -263,7 +288,8 @@ private object TextFieldTransitionScope {
             labelProgress: Float,
             labelTextStyleColor: Color,
             labelContentColor: Color,
-            placeholderOpacity: Float
+            placeholderOpacity: Float,
+            prefixSuffixOpacity: Float,
         ) -> Unit
     ) {
         // Transitions from/to InputPhase.Focused are the most critical in the transition below.
@@ -310,6 +336,17 @@ private object TextFieldTransitionScope {
             }
         }
 
+        val prefixSuffixOpacity by transition.animateFloat(
+            label = "PrefixSuffixOpacity",
+            transitionSpec = { tween(durationMillis = AnimationDuration) }
+        ) {
+            when (it) {
+                InputPhase.Focused -> 1f
+                InputPhase.UnfocusedEmpty -> if (showLabel) 0f else 1f
+                InputPhase.UnfocusedNotEmpty -> 1f
+            }
+        }
+
         val labelTextStyleColor by transition.animateColor(
             transitionSpec = { tween(durationMillis = AnimationDuration) },
             label = "LabelTextStyleColor"
@@ -330,7 +367,8 @@ private object TextFieldTransitionScope {
             labelProgress,
             labelTextStyleColor,
             labelContentColor,
-            placeholderOpacity
+            placeholderOpacity,
+            prefixSuffixOpacity,
         )
     }
 }
@@ -357,6 +395,8 @@ internal const val PlaceholderId = "Hint"
 internal const val LabelId = "Label"
 internal const val LeadingId = "Leading"
 internal const val TrailingId = "Trailing"
+internal const val PrefixId = "Prefix"
+internal const val SuffixId = "Suffix"
 internal const val SupportingId = "Supporting"
 internal const val ContainerId = "Container"
 internal val ZeroConstraints = Constraints(0, 0, 0, 0)
@@ -368,5 +408,6 @@ private const val PlaceholderAnimationDelayOrDuration = 67
 internal val TextFieldPadding = 16.dp
 internal val HorizontalIconPadding = 12.dp
 internal val SupportingTopPadding = 4.dp
+internal val PrefixSuffixTextPadding = 2.dp
 
 internal val IconDefaultSizeModifier = Modifier.defaultMinSize(48.dp, 48.dp)

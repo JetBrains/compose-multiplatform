@@ -867,6 +867,181 @@ class TextFieldTest {
     }
 
     @Test
+    fun testTextField_prefixAndSuffixPosition_withLabel() {
+        val textFieldHeight = 60.dp
+        val labelSize = Ref<IntSize>()
+        val prefixPosition = Ref<Offset>()
+        val suffixPosition = Ref<Offset>()
+        val suffixSize = Ref<IntSize>()
+        val density = Density(2f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalDensity provides density) {
+                TextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
+                    label = {
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelSize.value = it.size
+                            }
+                        )
+                    },
+                    prefix = {
+                        Text(
+                            text = "P",
+                            modifier = Modifier.onGloballyPositioned {
+                                prefixPosition.value = it.positionInRoot()
+                            }
+                        )
+                    },
+                    suffix = {
+                        Text(
+                            text = "S",
+                            modifier = Modifier.onGloballyPositioned {
+                                suffixPosition.value = it.positionInRoot()
+                                suffixSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                // prefix
+                assertThat(prefixPosition.value?.x).isWithin(1f).of(ExpectedPadding.toPx())
+                assertThat(prefixPosition.value?.y)
+                    .isWithin(1f)
+                    .of(
+                        TextFieldWithLabelVerticalPadding.toPx() +
+                            labelSize.value!!.height.toFloat()
+                    )
+
+                // suffix
+                assertThat(suffixPosition.value?.x).isWithin(1f).of(
+                    (TextFieldWidth - ExpectedPadding - suffixSize.value!!.width.toDp()).toPx()
+                )
+                assertThat(suffixPosition.value?.y)
+                    .isWithin(1f)
+                    .of(
+                        TextFieldWithLabelVerticalPadding.toPx() +
+                            labelSize.value!!.height.toFloat()
+                    )
+            }
+        }
+    }
+
+    @Test
+    fun testTextField_prefixAndSuffixPosition_whenNoLabel() {
+        val textFieldHeight = 60.dp
+        val prefixPosition = Ref<Offset>()
+        val suffixPosition = Ref<Offset>()
+        val suffixSize = Ref<IntSize>()
+        val density = Density(2f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalDensity provides density) {
+                TextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
+                    prefix = {
+                        Text(
+                            text = "P",
+                            modifier = Modifier.onGloballyPositioned {
+                                prefixPosition.value = it.positionInRoot()
+                            }
+                        )
+                    },
+                    suffix = {
+                        Text(
+                            text = "S",
+                            modifier = Modifier.onGloballyPositioned {
+                                suffixPosition.value = it.positionInRoot()
+                                suffixSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                // prefix
+                assertThat(prefixPosition.value?.x).isWithin(1f).of(ExpectedPadding.toPx())
+                assertThat(prefixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+
+                // suffix
+                assertThat(suffixPosition.value?.x).isWithin(1f).of(
+                    (TextFieldWidth - ExpectedPadding - suffixSize.value!!.width.toDp()).toPx()
+                )
+                assertThat(suffixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+            }
+        }
+    }
+
+    @Test
+    fun testTextField_prefixAndSuffixPosition_withIcons() {
+        val textFieldHeight = 60.dp
+        val prefixPosition = Ref<Offset>()
+        val suffixPosition = Ref<Offset>()
+        val suffixSize = Ref<IntSize>()
+        val density = Density(2f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalDensity provides density) {
+                TextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
+                    prefix = {
+                        Text(
+                            text = "P",
+                            modifier = Modifier.onGloballyPositioned {
+                                prefixPosition.value = it.positionInRoot()
+                            }
+                        )
+                    },
+                    suffix = {
+                        Text(
+                            text = "S",
+                            modifier = Modifier.onGloballyPositioned {
+                                suffixPosition.value = it.positionInRoot()
+                                suffixSize.value = it.size
+                            }
+                        )
+                    },
+                    leadingIcon = { Icon(Icons.Default.Favorite, null) },
+                    trailingIcon = { Icon(Icons.Default.Favorite, null) },
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                val iconSize = 24.dp // default icon size
+
+                // prefix
+                assertThat(prefixPosition.value?.x).isWithin(1f).of(
+                    (ExpectedPadding + IconPadding + iconSize).toPx())
+                assertThat(prefixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+
+                // suffix
+                assertThat(suffixPosition.value?.x).isWithin(1f).of(
+                    (TextFieldWidth - IconPadding - iconSize - ExpectedPadding -
+                        suffixSize.value!!.width.toDp()).toPx()
+                )
+                assertThat(suffixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+            }
+        }
+    }
+
+    @Test
     fun testTextField_labelPositionX_initial_withTrailingAndLeading() {
         val height = 60.dp
         val labelPosition = Ref<Offset>()
