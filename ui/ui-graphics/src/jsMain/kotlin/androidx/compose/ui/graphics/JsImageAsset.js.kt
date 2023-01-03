@@ -22,10 +22,11 @@ import org.khronos.webgl.Int32Array
 import org.khronos.webgl.Uint8Array
 import org.khronos.webgl.get
 
-internal actual fun ByteArray.putBytesInto(array: IntArray, offset: Int, length: Int): Unit =
-   val byteBuffer = Uint8Array(toTypedArray()).buffer
+internal actual fun ByteArray.putBytesInto(array: IntArray, offset: Int, length: Int): Unit {
+   val byteBuffer = Uint8Array(this.toTypedArray()).buffer
    val intArray = Int32Array(byteBuffer, offset, length)
-   for(i in 0 until intArray.length) {
+   for (i in 0 until intArray.length) {
       array[i] = intArray[i]
    }
+}
 
