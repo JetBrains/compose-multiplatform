@@ -46,7 +46,7 @@ internal class CalendarModelTest(private val model: CalendarModel) {
 
     @Test
     fun dateCreation() {
-        val date = model.getDate(January2022Millis) // 1/1/2022
+        val date = model.getCanonicalDate(January2022Millis) // 1/1/2022
         assertThat(date.year).isEqualTo(2022)
         assertThat(date.month).isEqualTo(1)
         assertThat(date.dayOfMonth).isEqualTo(1)
@@ -54,10 +54,20 @@ internal class CalendarModelTest(private val model: CalendarModel) {
     }
 
     @Test
+    fun dateCreation_withRounding() {
+        val date = model.getCanonicalDate(January2022Millis + 30000) // 1/1/2022 + 30000 millis
+        assertThat(date.year).isEqualTo(2022)
+        assertThat(date.month).isEqualTo(1)
+        assertThat(date.dayOfMonth).isEqualTo(1)
+        // Check that the milliseconds represent the start of the day.
+        assertThat(date.utcTimeMillis).isEqualTo(January2022Millis)
+    }
+
+    @Test
     fun dateRestore() {
         val date =
             CalendarDate(year = 2022, month = 1, dayOfMonth = 1, utcTimeMillis = January2022Millis)
-        assertThat(model.getDate(date.utcTimeMillis)).isEqualTo(date)
+        assertThat(model.getCanonicalDate(date.utcTimeMillis)).isEqualTo(date)
     }
 
     @Test
@@ -154,8 +164,8 @@ internal class CalendarModelTest(private val model: CalendarModel) {
         val newModel = CalendarModelImpl()
         val legacyModel = LegacyCalendarModelImpl()
 
-        val date = newModel.getDate(January2022Millis) // 1/1/2022
-        val legacyDate = legacyModel.getDate(January2022Millis)
+        val date = newModel.getCanonicalDate(January2022Millis) // 1/1/2022
+        val legacyDate = legacyModel.getCanonicalDate(January2022Millis)
         val month = newModel.getMonth(date)
         val legacyMonth = legacyModel.getMonth(date)
 

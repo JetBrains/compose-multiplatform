@@ -69,14 +69,18 @@ internal class LegacyCalendarModelImpl : CalendarModel {
             ) as SimpleDateFormat).toPattern()
         )
 
-    override fun getDate(timeInMillis: Long): CalendarDate {
+    override fun getCanonicalDate(timeInMillis: Long): CalendarDate {
         val calendar = Calendar.getInstance(utcTimeZone)
         calendar.timeInMillis = timeInMillis
+        calendar[Calendar.HOUR_OF_DAY] = 0
+        calendar[Calendar.MINUTE] = 0
+        calendar[Calendar.SECOND] = 0
+        calendar[Calendar.MILLISECOND] = 0
         return CalendarDate(
             year = calendar[Calendar.YEAR],
             month = calendar[Calendar.MONTH] + 1,
             dayOfMonth = calendar[Calendar.DAY_OF_MONTH],
-            utcTimeMillis = timeInMillis
+            utcTimeMillis = calendar.timeInMillis
         )
     }
 

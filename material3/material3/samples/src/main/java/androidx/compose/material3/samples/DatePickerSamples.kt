@@ -15,7 +15,6 @@
  */
 package androidx.compose.material3.samples
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Arrangement
@@ -41,16 +40,14 @@ import java.util.TimeZone
 @Composable
 fun DatePickerSample() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Here we just update a Text with the selected timestamp on every selection.
-        // In a real app, you may consider composing this date picker in a dialog and read the value
-        // when the confirm button is clicked.
-        val datePickerState = rememberDatePickerState()
+        // Pre-select a date with January 4, 2020
+        val datePickerState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
         DatePicker(datePickerState = datePickerState, modifier = Modifier.padding(16.dp))
         Text("Selected date timestamp: ${datePickerState.selectedDateMillis ?: "no selection"}")
     }
 }
 
-@SuppressLint("ClassVerificationFailure")
+@Suppress("ClassVerificationFailure")
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled

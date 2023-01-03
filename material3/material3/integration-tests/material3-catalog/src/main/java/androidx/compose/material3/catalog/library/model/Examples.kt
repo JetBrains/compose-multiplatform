@@ -65,7 +65,6 @@ import androidx.compose.material3.samples.FilledTonalIconToggleButtonSample
 import androidx.compose.material3.samples.FilterChipSample
 import androidx.compose.material3.samples.FilterChipWithLeadingIconSample
 import androidx.compose.material3.samples.FloatingActionButtonSample
-import androidx.compose.material3.samples.SearchBarSample
 import androidx.compose.material3.samples.IconButtonSample
 import androidx.compose.material3.samples.IconTabs
 import androidx.compose.material3.samples.IconToggleButtonSample
@@ -104,6 +103,7 @@ import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
 import androidx.compose.material3.samples.ScaffoldWithSimpleSnackbar
 import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingTextTabs
+import androidx.compose.material3.samples.SearchBarSample
 import androidx.compose.material3.samples.SimpleBottomAppBar
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleOutlinedTextFieldSample

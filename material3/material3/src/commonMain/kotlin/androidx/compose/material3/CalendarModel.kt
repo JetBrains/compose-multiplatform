@@ -71,9 +71,12 @@ internal interface CalendarModel {
     /**
      * Returns a [CalendarDate] from a given _UTC_ time in milliseconds.
      *
+     * The returned date will hold milliseconds value that represent the start of the day, which may
+     * be different than the one provided to this function.
+     *
      * @param timeInMillis UTC milliseconds from the epoch
      */
-    fun getDate(timeInMillis: Long): CalendarDate
+    fun getCanonicalDate(timeInMillis: Long): CalendarDate
 
     /**
      * Returns a [CalendarMonth] from a given _UTC_ time in milliseconds.

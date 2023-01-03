@@ -31,8 +31,6 @@ import androidx.compose.ui.test.performClick
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import java.time.DayOfWeek
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -89,7 +87,7 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
     }
 
     @Test
-    fun datePicker_invalidSundaySelection() {
+    fun datePicker_invalidDateSelection() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
                 val monthInUtcMillis = dayInUtcMilliseconds(year = 2000, month = 6, dayOfMonth = 1)
@@ -97,17 +95,11 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
                     datePickerState = rememberDatePickerState(
                         initialDisplayedMonthMillis = monthInUtcMillis
                     ),
-                    dateValidator = { utcDateInMills ->
-                        val localDate =
-                            Instant.ofEpochMilli(utcDateInMills).atZone(ZoneId.of("UTC"))
-                                .toLocalDate()
-                        val dayOfWeek = localDate.dayOfWeek
-                        dayOfWeek != DayOfWeek.SUNDAY
-                    }
+                    dateValidator = { false }
                 )
             }
         }
-        assertAgainstGolden("datePicker_invalidSundaySelection_${scheme.name}")
+        assertAgainstGolden("datePicker_invalidDateSelection_${scheme.name}")
     }
 
     @Test

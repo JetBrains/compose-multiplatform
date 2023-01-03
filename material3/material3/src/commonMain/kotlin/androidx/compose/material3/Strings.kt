@@ -40,8 +40,8 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val DatePickerHeadline = Strings(14)
         val DatePickerSwitchToYearSelection = Strings(15)
         val DatePickerSwitchToDaySelection = Strings(16)
-        val DatePickerNextMonth = Strings(17)
-        val DatePickerPreviousMonth = Strings(18)
+        val DatePickerSwitchToNextMonth = Strings(17)
+        val DatePickerSwitchToPreviousMonth = Strings(18)
     }
 }
 

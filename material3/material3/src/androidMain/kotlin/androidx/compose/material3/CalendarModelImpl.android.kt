@@ -23,6 +23,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.chrono.Chronology
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeFormatterBuilder
@@ -78,14 +79,14 @@ internal class CalendarModelImpl : CalendarModel {
             )
         )
 
-    override fun getDate(timeInMillis: Long): CalendarDate {
+    override fun getCanonicalDate(timeInMillis: Long): CalendarDate {
         val localDate =
             Instant.ofEpochMilli(timeInMillis).atZone(utcTimeZoneId).toLocalDate()
         return CalendarDate(
             year = localDate.year,
             month = localDate.monthValue,
             dayOfMonth = localDate.dayOfMonth,
-            utcTimeMillis = timeInMillis
+            utcTimeMillis = localDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC) * 1000
         )
     }
 

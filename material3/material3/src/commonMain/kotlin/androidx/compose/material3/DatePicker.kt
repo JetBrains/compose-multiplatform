@@ -18,12 +18,12 @@ package androidx.compose.material3
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.gestures.snapping.rememberSnapFlingBehavior
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -43,15 +43,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.tokens.DatePickerModalTokens
 import androidx.compose.material3.tokens.MotionTokens
 import androidx.compose.material3.tokens.TypographyKeyTokens
@@ -73,13 +70,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
@@ -94,7 +89,7 @@ import kotlinx.coroutines.launch
 /**
  * <a href="https://m3.material.io/components/date-pickers/overview" class="external" target="_blank">Material Design date picker</a>.
  *
- * Date pickers let people select a date and can be embedded into Dialogs.
+ * Date pickers let people select a date and preferably should be embedded into Dialogs.
  *
  * A simple DatePicker looks like:
  * @sample androidx.compose.material3.samples.DatePickerSample
@@ -102,8 +97,7 @@ import kotlinx.coroutines.launch
  * A DatePicker with validation that blocks certain days from being selected looks like:
  * @sample androidx.compose.material3.samples.DatePickerWithDateValidatorSample
  *
- * @param datePickerState state of the date picker. Use this state for pre-setting or obtaining the
- * selected date. See [rememberDatePickerState].
+ * @param datePickerState state of the date picker. See [rememberDatePickerState].
  * @param modifier the [Modifier] to be applied to this date picker
  * @param dateFormatter a [DatePickerFormatter] that provides formatting patterns for dates display
  * @param dateValidator a lambda that takes a date timestamp and return true if the date is a valid
@@ -137,6 +131,154 @@ fun DatePicker(
     headline = headline,
     colors = colors
 )
+
+/**
+ * Creates a [DatePickerState] for a date picker that is remembered across compositions.
+ *
+ * @param initialSelectedDateMillis timestamp in _UTC_ milliseconds from the epoch that represents
+ * an initial selection of a date. Provide a `null` to indicate no selection.
+ * @param initialDisplayedMonthMillis timestamp in _UTC_ milliseconds from the epoch that represents
+ * an initial selection of a month to be displayed to the user. By default, in case an
+ * `initialSelectedDateMillis` is provided, the initial displayed month would be the month of the
+ * selected date. Otherwise, in case `null` is provided, the displayed month would be the
+ * current one.
+ * @param yearRange an [IntRange] that holds the year range that the date picker will be limited to
+ */
+@Composable
+@ExperimentalMaterial3Api
+fun rememberDatePickerState(
+    @Suppress("AutoBoxing") initialSelectedDateMillis: Long? = null,
+    @Suppress("AutoBoxing") initialDisplayedMonthMillis: Long? = initialSelectedDateMillis,
+    yearRange: IntRange = DatePickerDefaults.YearRange
+): DatePickerState = rememberSaveable(
+    saver = DatePickerState.Saver()
+) {
+    DatePickerState(
+        initialSelectedDateMillis = initialSelectedDateMillis,
+        initialDisplayedMonthMillis = initialDisplayedMonthMillis,
+        yearRange = yearRange
+    )
+}
+
+/**
+ * A state object that can be hoisted to observe the date picker state. See
+ * [rememberDatePickerState].
+ *
+ * The state's [selectedDateMillis] will provide a timestamp that represents the _start_ of the day.
+ *
+ * @param initialSelectedDateMillis timestamp in _UTC_ milliseconds from the epoch that represents
+ * an initial selection of a date. Provide a `null` to indicate no selection. Note that the state's
+ * [selectedDateMillis] will provide a timestamp that represents the _start_ of the day, which may
+ * be different than the provided initialSelectedDateMillis.
+ * @param initialDisplayedMonthMillis timestamp in _UTC_ milliseconds from the epoch that represents
+ * an initial selection of a month to be displayed to the user. In case `null` is provided, the
+ * displayed month would be the current one.
+ * @param yearRange an [IntRange] that holds the year range that the date picker will be limited to
+ * @see rememberDatePickerState
+ * @throws [IllegalArgumentException] if the initial selected date or displayed month represent a
+ * year that is out of the year range.
+ */
+@ExperimentalMaterial3Api
+@Stable
+class DatePickerState constructor(
+    @Suppress("AutoBoxing") initialSelectedDateMillis: Long?,
+    @Suppress("AutoBoxing") initialDisplayedMonthMillis: Long?,
+    val yearRange: IntRange
+) {
+    internal val calendarModel: CalendarModel = createCalendarModel()
+
+    /**
+     * A timestamp that represents the _start_ of the day of the selected date in _UTC_ milliseconds
+     * from the epoch.
+     *
+     * In case no date was selected or provided, the state will hold a `null` value.
+     */
+    @get:Suppress("AutoBoxing")
+    val selectedDateMillis by derivedStateOf {
+        selectedDate?.utcTimeMillis
+    }
+
+    /**
+     * A mutable state of [CalendarDate] that represents the selected date.
+     */
+    internal var selectedDate by mutableStateOf(
+        if (initialSelectedDateMillis != null) {
+            val date = calendarModel.getCanonicalDate(
+                initialSelectedDateMillis
+            )
+            require(yearRange.contains(date.year)) {
+                "The initial selected date's year (${date.year}) is out of the years range of " +
+                    "$yearRange."
+            }
+            date
+        } else {
+            null
+        }
+    )
+
+    /**
+     * A mutable state for the month that is displayed to the user. In case an initial month was not
+     * provided, the current month will be the one to be displayed.
+     */
+    internal var displayedMonth by mutableStateOf(
+        if (initialDisplayedMonthMillis != null) {
+            val month = calendarModel.getMonth(initialDisplayedMonthMillis)
+            require(yearRange.contains(month.year)) {
+                "The initial display month's year (${month.year}) is out of the years range of " +
+                    "$yearRange."
+            }
+            month
+        } else {
+            currentMonth
+        }
+    )
+
+    /**
+     * The current [CalendarMonth] that represents the present's day month.
+     */
+    internal val currentMonth: CalendarMonth
+        get() = calendarModel.getMonth(calendarModel.today)
+
+    /**
+     * The displayed month index within the total months at the defined years range.
+     *
+     * @see [displayedMonth]
+     * @see [yearRange]
+     */
+    internal val displayedMonthIndex: Int
+        get() = displayedMonth.indexIn(yearRange)
+
+    /**
+     * The total month count for the defined years range.
+     *
+     * @see [yearRange]
+     */
+    internal val totalMonthsInRange: Int
+        get() = (yearRange.last - yearRange.first + 1) * 12
+
+    companion object {
+        /**
+         * The default [Saver] implementation for [DatePickerState].
+         */
+        fun Saver(): Saver<DatePickerState, *> = Saver(
+            save = {
+                listOf(
+                    it.selectedDateMillis,
+                    it.displayedMonth.startUtcTimeMillis,
+                    it.yearRange.first,
+                    it.yearRange.last
+                )
+            },
+            restore = { value ->
+                DatePickerState(
+                    initialSelectedDateMillis = value[0] as Long?,
+                    initialDisplayedMonthMillis = value[1] as Long?,
+                    yearRange = IntRange(value[2] as Int, value[3] as Int)
+                )
+            }
+        )
+    }
+}
 
 /**
  * Contains default values used by the date pickers.
@@ -242,153 +384,7 @@ object DatePickerDefaults {
     }
 
     /** The range of years for the date picker dialogs. */
-    val YearsRange: IntRange = IntRange(1900, 2100)
-
-    /** The default shape for date picker dialogs. */
-    val shape: Shape @Composable get() = DatePickerModalTokens.ContainerShape.toShape()
-}
-
-/**
- * Creates a [DatePickerState] for a date picker that is remembered across compositions.
- *
- * @param initialSelectedDateMillis timestamp in _UTC_ milliseconds from the epoch that represents
- * an initial selection of a date. Provide a `null` to indicate no selection.
- * @param initialDisplayedMonthMillis timestamp in _UTC_ milliseconds from the epoch that represents
- * an initial selection of a month to be displayed to the user. By default, in case an
- * `initialSelectedDateMillis` is provided, the initial displayed month would be the month of the
- * selected date. Otherwise, in case `null` is provided, the displayed month would be the
- * current one.
- * @param yearsRange a pair that holds the years range that the date picker should be limited to
- */
-@Composable
-@ExperimentalMaterial3Api
-fun rememberDatePickerState(
-    @Suppress("AutoBoxing") initialSelectedDateMillis: Long? = null,
-    @Suppress("AutoBoxing") initialDisplayedMonthMillis: Long? = initialSelectedDateMillis,
-    yearsRange: IntRange = DatePickerDefaults.YearsRange
-): DatePickerState = rememberSaveable(
-    yearsRange,
-    saver = DatePickerState.Saver(
-        yearsRange = yearsRange,
-    )
-) {
-    DatePickerState(
-        initialSelectedDateMillis = initialSelectedDateMillis,
-        initialDisplayedMonthMillis = initialDisplayedMonthMillis,
-        yearsRange = yearsRange
-    )
-}
-
-/**
- * A state object that can be hoisted to observe the date picker state.
- *
- * @param initialSelectedDateMillis timestamp in _UTC_ milliseconds from the epoch that represents
- * an initial selection of a date. Provide a `null` to indicate no selection.
- * @param initialDisplayedMonthMillis timestamp in _UTC_ milliseconds from the epoch that represents
- * an initial selection of a month to be displayed to the user. In case `null` is provided, the
- * displayed month would be the current one.
- * @param yearsRange a pair that holds the years range that the date picker should be limited to
- * @see rememberDatePickerState
- */
-@ExperimentalMaterial3Api
-@Stable
-class DatePickerState constructor(
-    @Suppress("AutoBoxing") initialSelectedDateMillis: Long?,
-    @Suppress("AutoBoxing") initialDisplayedMonthMillis: Long?,
-    val yearsRange: IntRange
-) {
-    internal var calendarModel: CalendarModel = createCalendarModel()
-
-    /**
-     * A timestamp of the selected date in _UTC_ milliseconds from the epoch.
-     *
-     * In case no date was selected or provided, the state will hold a `null` value.
-     */
-    @get:Suppress("AutoBoxing")
-    val selectedDateMillis by derivedStateOf {
-        selectedDate?.utcTimeMillis
-    }
-
-    /**
-     * A mutable state of [CalendarDate] that represents the selected date.
-     */
-    internal var selectedDate by mutableStateOf(
-        if (initialSelectedDateMillis != null) {
-            calendarModel.getDate(
-                initialSelectedDateMillis
-            )
-        } else {
-            null
-        }
-    )
-
-    /**
-     * A mutable state for the month that is displayed to the user. In case an initial month was not
-     * provided, the current month will be the one to be displayed.
-     */
-    internal var displayedMonth by mutableStateOf(
-        if (initialDisplayedMonthMillis != null) {
-            calendarModel.getMonth(initialDisplayedMonthMillis)
-        } else {
-            currentMonth
-        }
-    )
-
-    /**
-     * The current [CalendarMonth] that represents the present's day month.
-     */
-    internal val currentMonth: CalendarMonth
-        get() = calendarModel.getMonth(calendarModel.today)
-
-    /** Sets the next month to be the [displayedMonth]. */
-    internal fun displayNextMonth() {
-        displayedMonth = calendarModel.plusMonths(displayedMonth, 1)
-    }
-
-    /** Sets the previous month to be the [displayedMonth]. */
-    internal fun displayPreviousMonth() {
-        displayedMonth = calendarModel.minusMonths(displayedMonth, 1)
-    }
-
-    /**
-     * The displayed month index within the total months at the defined years range.
-     *
-     * @see [displayedMonth]
-     * @see [yearsRange]
-     */
-    internal val displayedMonthIndex: Int
-        get() = displayedMonth.indexIn(yearsRange)
-
-    /**
-     * The total month count for the defined years range.
-     *
-     * @see [yearsRange]
-     */
-    internal val totalMonthsInRange: Int
-        get() = (yearsRange.last - yearsRange.first + 1) * 12
-
-    companion object {
-        /**
-         * The default [Saver] implementation for [DatePickerState].
-         */
-        fun Saver(
-            yearsRange: IntRange
-        ): Saver<DatePickerState, *> = Saver(
-            save = {
-                listOf(
-                    it.selectedDateMillis,
-                    it.displayedMonth.startUtcTimeMillis
-                )
-            },
-            restore = { value ->
-                DatePickerState(
-                    initialSelectedDateMillis = value[0],
-                    initialDisplayedMonthMillis = value[1],
-                    yearsRange = yearsRange
-                )
-            }
-        )
-    }
+    val YearRange: IntRange = IntRange(1900, 2100)
 }
 
 /**
@@ -618,6 +614,9 @@ private fun DatePickerImpl(
     headline: @Composable () -> Unit,
     colors: DatePickerColors
 ) {
+    val monthsListState =
+        rememberLazyListState(initialFirstVisibleItemIndex = datePickerState.displayedMonthIndex)
+    val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = modifier
             .sizeIn(minWidth = ContainerWidth, minHeight = ContainerHeight)
@@ -632,23 +631,79 @@ private fun DatePickerImpl(
             headline()
         }
 
-        val monthsLazyListState =
-            rememberLazyListState(
-                initialFirstVisibleItemIndex = datePickerState.displayedMonthIndex
-            )
+        Divider()
 
         val onDateSelected = { dateInMillis: Long ->
-            datePickerState.selectedDate = datePickerState.calendarModel.getDate(dateInMillis)
+            datePickerState.selectedDate =
+                datePickerState.calendarModel.getCanonicalDate(dateInMillis)
         }
-        Divider()
-        HorizontalDatePicker(
-            onDateSelected = onDateSelected,
-            datePickerState = datePickerState,
-            monthsLazyListState = monthsLazyListState,
-            dateFormatter = dateFormatter,
-            dateValidator = dateValidator,
-            colors = colors
+
+        var yearPickerVisible by rememberSaveable { mutableStateOf(false) }
+        MonthsNavigation(
+            nextAvailable = monthsListState.canScrollForward,
+            previousAvailable = monthsListState.canScrollBackward,
+            yearPickerVisible = yearPickerVisible,
+            yearPickerText = dateFormatter.formatMonthYear(
+                datePickerState.displayedMonth,
+                datePickerState.calendarModel
+            ) ?: "-",
+            onNextClicked = {
+                coroutineScope.launch {
+                    monthsListState.animateScrollToItem(
+                        monthsListState.firstVisibleItemIndex + 1
+                    )
+                }
+            },
+            onPreviousClicked = {
+                coroutineScope.launch {
+                    monthsListState.animateScrollToItem(
+                        monthsListState.firstVisibleItemIndex - 1
+                    )
+                }
+            },
+            onYearPickerButtonClicked = { yearPickerVisible = !yearPickerVisible }
         )
+
+        Box {
+            Column {
+                WeekDays(colors, datePickerState.calendarModel)
+                HorizontalMonthsList(
+                    onDateSelected = onDateSelected,
+                    datePickerState = datePickerState,
+                    lazyListState = monthsListState,
+                    dateValidator = dateValidator,
+                    colors = colors
+                )
+            }
+            androidx.compose.animation.AnimatedVisibility(
+                visible = yearPickerVisible,
+                modifier = Modifier.clipToBounds(),
+                enter = expandVertically() + fadeIn(initialAlpha = 0.6f),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column {
+                    YearPicker(
+                        onYearSelected = { year ->
+                            // Switch back to the monthly calendar and scroll to the selected year.
+                            yearPickerVisible = !yearPickerVisible
+                            coroutineScope.launch {
+                                // Scroll to the selected year (maintaining the month of year).
+                                // A LaunchEffect at the MonthsList will take care of rest and will
+                                // update the state's displayedMonth to the month we scrolled to.
+                                with(datePickerState) {
+                                    monthsListState.scrollToItem(
+                                        (year - yearRange.first) * 12 + displayedMonth.month - 1
+                                    )
+                                }
+                            }
+                        },
+                        colors = colors,
+                        datePickerState = datePickerState
+                    )
+                    Divider()
+                }
+            }
+        }
     }
 }
 
@@ -693,100 +748,12 @@ private fun DatePickerHeader(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun HorizontalDatePicker(
-    onDateSelected: (dateInMillis: Long) -> Unit,
-    datePickerState: DatePickerState,
-    monthsLazyListState: LazyListState,
-    dateFormatter: DatePickerFormatter,
-    dateValidator: (Long) -> Boolean,
-    colors: DatePickerColors
-) {
-    val coroutineScope = rememberCoroutineScope()
-
-    val nextMonthAvailable by remember(monthsLazyListState, datePickerState) {
-        derivedStateOf {
-            monthsLazyListState.firstVisibleItemIndex < datePickerState.totalMonthsInRange - 1
-        }
-    }
-    val previousMonthAvailable by remember(monthsLazyListState, datePickerState) {
-        derivedStateOf {
-            monthsLazyListState.firstVisibleItemIndex > 0
-        }
-    }
-
-    var yearPickerVisible by rememberSaveable { mutableStateOf(false) }
-    MonthsNavigation(
-        nextAvailable = nextMonthAvailable,
-        previousAvailable = previousMonthAvailable,
-        yearPickerVisible = yearPickerVisible,
-        yearPickerText = dateFormatter.formatMonthYear(
-            datePickerState.displayedMonth,
-            datePickerState.calendarModel
-        ) ?: "-",
-        onNextClicked = {
-            datePickerState.displayNextMonth()
-            coroutineScope.launch {
-                monthsLazyListState.animateScrollToItem(
-                    monthsLazyListState.firstVisibleItemIndex + 1
-                )
-            }
-        },
-        onPreviousClicked = {
-            datePickerState.displayPreviousMonth()
-            coroutineScope.launch {
-                monthsLazyListState.animateScrollToItem(
-                    monthsLazyListState.firstVisibleItemIndex - 1
-                )
-            }
-        },
-        onYearPickerButtonClicked = { yearPickerVisible = !yearPickerVisible }
-    )
-    // TODO Add motion for switching between the modes.
-    if (yearPickerVisible) {
-        YearPicker(
-            onYearSelected = { year ->
-                // Switch back to the monthly calendar and scroll to the selected year.
-                yearPickerVisible = !yearPickerVisible
-                coroutineScope.launch {
-                    // Scroll to the selected year (maintaining the month of year).
-                    // A LaunchEffect at the MonthsPager will take care of rest and will update
-                    // the state's displayedMonth to the month we scrolled to.
-                    monthsLazyListState.scrollToItem(
-                        (year - datePickerState.yearsRange.first) * 12 +
-                            datePickerState.displayedMonth.month - 1
-                    )
-                }
-            },
-            colors = colors,
-            datePickerState = datePickerState
-        )
-        Divider()
-    } else {
-        WeekDays(colors, datePickerState.calendarModel)
-        HorizontalMonthsList(
-            onMonthChanged = { year, month ->
-                datePickerState.displayedMonth =
-                    datePickerState.calendarModel.getMonth(year, month)
-            },
-            onDateSelected = onDateSelected,
-            datePickerState = datePickerState,
-            lazyListState = monthsLazyListState,
-            dateValidator = dateValidator,
-            colors = colors
-        )
-    }
-}
-
 /**
  * Composes a horizontal pageable list of months.
  */
-@Suppress("IllegalExperimentalApiUsage") // TODO (b/261627439): Address before moving to beta
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun HorizontalMonthsList(
-    onMonthChanged: (year: Int, month: Int) -> Unit,
     onDateSelected: (dateInMillis: Long) -> Unit,
     datePickerState: DatePickerState,
     lazyListState: LazyListState,
@@ -794,71 +761,50 @@ private fun HorizontalMonthsList(
     colors: DatePickerColors,
 ) {
     val today = datePickerState.calendarModel.today
-    MonthsListWrapper(
-        lazyListState = lazyListState,
-        datePickerState = datePickerState,
-        onMonthChanged = onMonthChanged
-    ) { firstMonth ->
-        LazyRow(
-            state = lazyListState,
-            flingBehavior = rememberSnapFlingBehavior(lazyListState)
-        ) {
-            items(datePickerState.totalMonthsInRange) {
-                val month =
-                    datePickerState.calendarModel.plusMonths(
-                        from = firstMonth,
-                        addedMonthsCount = it
-                    )
-                Box(
-                    modifier = Modifier.fillParentMaxWidth()
-                ) {
-                    Month(
-                        month = month,
-                        onDateSelected = onDateSelected,
-                        today = today,
-                        selectedDate = datePickerState.selectedDate,
-                        dateValidator = dateValidator,
-                        colors = colors
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
- * A wrapper for composing a list of months.
- *
- * The direction of the list is determined by the [content]. See [HorizontalMonthsList].
- */
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun MonthsListWrapper(
-    lazyListState: LazyListState,
-    datePickerState: DatePickerState,
-    onMonthChanged: (year: Int, month: Int) -> Unit,
-    content: @Composable (firstMonth: CalendarMonth) -> Unit
-) {
-    val firstMonth = remember(datePickerState.yearsRange) {
+    val firstMonth = remember(datePickerState.yearRange) {
         datePickerState.calendarModel.getMonth(
-            year = datePickerState.yearsRange.first,
+            year = datePickerState.yearRange.first,
             month = 1 // January
         )
     }
+    LazyRow(
+        state = lazyListState
+        // TODO: Add flingBehavior = rememberSnapFlingBehavior(lazyListState) when promoted
+        //  to stable
+    ) {
+        items(datePickerState.totalMonthsInRange) {
+            val month =
+                datePickerState.calendarModel.plusMonths(
+                    from = firstMonth,
+                    addedMonthsCount = it
+                )
+            Box(
+                modifier = Modifier.fillParentMaxWidth()
+            ) {
+                Month(
+                    month = month,
+                    onDateSelected = onDateSelected,
+                    today = today,
+                    selectedDate = datePickerState.selectedDate,
+                    dateValidator = dateValidator,
+                    colors = colors
+                )
+            }
+        }
+    }
 
-    content(firstMonth)
-
-    // Ensures that the onMonthChanged is only called when the month is changing by scrolling this
-    // pager and not by the arrow actions above it.
     LaunchedEffect(lazyListState) {
         snapshotFlow { lazyListState.firstVisibleItemIndex }.collect {
             val yearOffset = lazyListState.firstVisibleItemIndex / 12
             val month = lazyListState.firstVisibleItemIndex % 12 + 1
             with(datePickerState) {
                 if (displayedMonth.month != month ||
-                    displayedMonth.year != yearsRange.first + yearOffset
+                    displayedMonth.year != yearRange.first + yearOffset
                 ) {
-                    onMonthChanged(yearsRange.first + yearOffset, month)
+                    displayedMonth = calendarModel.getMonth(
+                        year = yearRange.first + yearOffset,
+                        month = month
+                    )
                 }
             }
         }
@@ -885,18 +831,16 @@ private fun WeekDays(colors: DatePickerColors, calendarModel: CalendarModel) {
         // TODO: Use the value from the tokens, once updated (b/251240936).
         val textStyle = MaterialTheme.typography.fromToken(WeekdaysLabelTextFont)
         ProvideTextStyle(value = textStyle) {
-            // Although the days can be composed in a Row, here we use a LazyVerticalGrid to match
-            // the exact spacing that will appear at the calendar grid underneath on every
-            // orientation.
-            LazyVerticalGrid(
-                columns = GridCells.Fixed(DaysInWeek),
-                modifier = Modifier.defaultMinSize(
-                    minHeight = RecommendedSizeForAccessibility
-                ),
+            Row(
+                modifier = Modifier
+                    .defaultMinSize(
+                        minHeight = RecommendedSizeForAccessibility
+                    )
+                    .fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                userScrollEnabled = false
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                items(items = dayNames) {
+                dayNames.forEach {
                     Box(
                         modifier = Modifier
                             .clearAndSetSemantics { contentDescription = it.first }
@@ -934,37 +878,50 @@ private fun Month(
         // TODO: Use the value from the tokens, once updated (b/251240936).
         MaterialTheme.typography.fromToken(DateLabelTextFont)
     ) {
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(DaysInWeek),
+        var cellsCount = 0
+        Column(
             modifier = Modifier
                 .requiredHeight(RecommendedSizeForAccessibility * MaxCalendarRows),
-            horizontalArrangement = Arrangement.SpaceEvenly,
-            userScrollEnabled = false
+            verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            // Fill the empty slots until the first day of the month.
-            items(month.daysFromStartOfWeekToFirstOfMonth) {
-                Box(
-                    modifier = Modifier.requiredSize(
-                        width = RecommendedSizeForAccessibility,
-                        height = RecommendedSizeForAccessibility
-                    )
-                )
-            }
-
-            items(count = month.numberOfDays) {
-                // TODO a11y should announce the day and whether it's selected or not.
-                val dateInMillis = month.startUtcTimeMillis + (it * MillisecondsIn24Hours)
-                Day(
-                    checked = dateInMillis == selectedDate?.utcTimeMillis,
-                    onCheckedChange = { onDateSelected(dateInMillis) },
-                    animateChecked = true,
-                    enabled = remember(dateInMillis) {
-                        dateValidator.invoke(dateInMillis)
-                    },
-                    today = dateInMillis == today.utcTimeMillis,
-                    text = (it + 1).toLocalString(),
-                    colors = colors
-                )
+            repeat(MaxCalendarRows) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    repeat(DaysInWeek) {
+                        if (cellsCount < month.daysFromStartOfWeekToFirstOfMonth ||
+                            cellsCount >=
+                            (month.daysFromStartOfWeekToFirstOfMonth + month.numberOfDays)
+                        ) {
+                            // Empty cell
+                            Box(
+                                modifier = Modifier.requiredSize(
+                                    width = RecommendedSizeForAccessibility,
+                                    height = RecommendedSizeForAccessibility
+                                )
+                            )
+                        } else {
+                            // TODO a11y should announce the day and whether it's selected or not.
+                            val dayNumber = cellsCount - month.daysFromStartOfWeekToFirstOfMonth
+                            val dateInMillis = month.startUtcTimeMillis +
+                                (dayNumber * MillisecondsIn24Hours)
+                            Day(
+                                checked = dateInMillis == selectedDate?.utcTimeMillis,
+                                onCheckedChange = { onDateSelected(dateInMillis) },
+                                animateChecked = true,
+                                enabled = remember(dateInMillis) {
+                                    dateValidator.invoke(dateInMillis)
+                                },
+                                today = dateInMillis == today.utcTimeMillis,
+                                text = (dayNumber + 1).toLocalString(),
+                                colors = colors
+                            )
+                        }
+                        cellsCount++
+                    }
+                }
             }
         }
     }
@@ -981,53 +938,37 @@ private fun Day(
     text: String,
     colors: DatePickerColors
 ) {
-    Box(
+    Surface(
+        checked = checked,
+        onCheckedChange = onCheckedChange,
         modifier = Modifier
             .minimumInteractiveComponentSize()
             .requiredSize(
                 DatePickerModalTokens.DateStateLayerWidth,
                 DatePickerModalTokens.DateStateLayerHeight
-            )
-            .clip(DatePickerModalTokens.DateContainerShape.toShape())
-            .background(
-                colors.dayContainerColor(
-                    selected = checked,
-                    enabled = enabled,
-                    animate = animateChecked
-                ).value
-            )
-            .toggleable(
-                value = checked,
-                onValueChange = onCheckedChange,
-                enabled = enabled,
-                role = Role.Checkbox,
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    bounded = true,
-                    radius = DatePickerModalTokens.DateStateLayerWidth / 2
-                )
-            )
-            .then(
-                // Add a border to mark the current day (i.e. today).
-                if (today && !checked) {
-                    Modifier.border(
-                        BorderStroke(
-                            DatePickerModalTokens.DateTodayContainerOutlineWidth,
-                            colors.todayDateBorderColor
-                        ), DatePickerModalTokens.DateContainerShape.toShape()
-                    )
-                } else {
-                    Modifier
-                }
             ),
-        contentAlignment = Alignment.Center
-    ) {
-        val contentColor = colors.dayContentColor(
+        enabled = enabled,
+        shape = DatePickerModalTokens.DateContainerShape.toShape(),
+        color = colors.dayContainerColor(
+            selected = checked,
+            enabled = enabled,
+            animate = animateChecked
+        ).value,
+        contentColor = colors.dayContentColor(
             today = today,
             selected = checked,
             enabled = enabled,
-        ).value
-        CompositionLocalProvider(LocalContentColor provides contentColor) {
+        ).value,
+        border = if (today && !checked) {
+            BorderStroke(
+                DatePickerModalTokens.DateTodayContainerOutlineWidth,
+                colors.todayDateBorderColor
+            )
+        } else {
+            null
+        }
+    ) {
+        Box(contentAlignment = Alignment.Center) {
             Text(
                 text = text,
                 textAlign = TextAlign.Center
@@ -1053,21 +994,21 @@ private fun YearPicker(
                 // Set the initial index to a few years before the current year to allow quicker
                 // selection of previous years.
                 initialFirstVisibleItemIndex = max(
-                    0, displayedYear - datePickerState.yearsRange.first - YearsInRow
+                    0, displayedYear - datePickerState.yearRange.first - YearsInRow
                 )
             )
         LazyVerticalGrid(
             columns = GridCells.Fixed(YearsInRow),
             // Keep the height the same as the monthly calendar height + weekdays height.
-            modifier = Modifier.requiredHeight(
-                RecommendedSizeForAccessibility * (MaxCalendarRows + 1)
-            ),
+            modifier = Modifier
+                .requiredHeight(RecommendedSizeForAccessibility * (MaxCalendarRows + 1))
+                .background(colors.containerColor),
             state = lazyGridState,
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalArrangement = Arrangement.spacedBy(YearsVerticalPadding)
         ) {
-            items(datePickerState.yearsRange.count()) {
-                val selectedYear = it + datePickerState.yearsRange.first
+            items(datePickerState.yearRange.count()) {
+                val selectedYear = it + datePickerState.yearRange.first
                 Year(
                     checked = selectedYear == displayedYear,
                     currentYear = selectedYear == currentYear,
@@ -1080,9 +1021,13 @@ private fun YearPicker(
                         width = DatePickerModalTokens.SelectionYearContainerWidth,
                         height = DatePickerModalTokens.SelectionYearContainerHeight
                     ),
-                    text = selectedYear.toLocalString(),
                     colors = colors
-                )
+                ) {
+                    Text(
+                        text = selectedYear.toLocalString(),
+                        textAlign = TextAlign.Center
+                    )
+                }
             }
         }
     }
@@ -1095,8 +1040,8 @@ private fun Year(
     currentYear: Boolean,
     onCheckedChange: (Boolean) -> Unit,
     modifier: Modifier,
-    text: String,
-    colors: DatePickerColors
+    colors: DatePickerColors,
+    content: @Composable () -> Unit
 ) {
     val border = remember(currentYear, checked) {
         if (currentYear && !checked) {
@@ -1122,10 +1067,7 @@ private fun Year(
         border = border
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                textAlign = TextAlign.Center
-            )
+            content()
         }
     }
 }
@@ -1158,9 +1100,10 @@ private fun MonthsNavigation(
         // A menu button for selecting a year.
         YearPickerMenuButton(
             onClick = onYearPickerButtonClicked,
-            text = yearPickerText,
             expanded = yearPickerVisible
-        )
+        ) {
+            Text(yearPickerText)
+        }
         // Show arrows for traversing months (only visible when the year selection is off)
         if (!yearPickerVisible) {
             Row {
@@ -1172,7 +1115,7 @@ private fun MonthsNavigation(
                         } else {
                             Icons.Filled.KeyboardArrowLeft
                         },
-                        contentDescription = getString(Strings.DatePickerPreviousMonth)
+                        contentDescription = getString(Strings.DatePickerSwitchToPreviousMonth)
                     )
                 }
                 IconButton(onClick = onNextClicked, enabled = nextAvailable) {
@@ -1182,7 +1125,7 @@ private fun MonthsNavigation(
                         } else {
                             Icons.Filled.KeyboardArrowRight
                         },
-                        contentDescription = getString(Strings.DatePickerNextMonth)
+                        contentDescription = getString(Strings.DatePickerSwitchToNextMonth)
                     )
                 }
             }
@@ -1194,10 +1137,9 @@ private fun MonthsNavigation(
 @Composable
 private fun YearPickerMenuButton(
     onClick: () -> Unit,
-    text: String,
+    expanded: Boolean,
     modifier: Modifier = Modifier,
-    expanded: Boolean = false,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    content: @Composable () -> Unit
 ) {
     TextButton(
         onClick = onClick,
@@ -1207,9 +1149,8 @@ private fun YearPickerMenuButton(
         ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
         elevation = null,
         border = null,
-        interactionSource = interactionSource,
     ) {
-        Text(text = text)
+        content()
         Spacer(Modifier.size(ButtonDefaults.IconSpacing))
         Icon(
             Icons.Filled.ArrowDropDown,

@@ -52,10 +52,10 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerSwitchToDaySelection -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_day_selection
         )
-        Strings.DatePickerNextMonth -> resources.getString(
+        Strings.DatePickerSwitchToNextMonth -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_next_month
         )
-        Strings.DatePickerPreviousMonth -> resources.getString(
+        Strings.DatePickerSwitchToPreviousMonth -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_previous_month
         )
         else -> ""

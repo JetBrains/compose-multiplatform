@@ -37,8 +37,8 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerHeadline -> "Selected date"
         Strings.DatePickerSwitchToYearSelection -> "Switch to selecting a year"
         Strings.DatePickerSwitchToDaySelection -> "Switch to selecting a day"
-        Strings.DatePickerNextMonth -> "Change to next month"
-        Strings.DatePickerPreviousMonth -> "Change to previous month"
+        Strings.DatePickerSwitchToNextMonth -> "Change to next month"
+        Strings.DatePickerSwitchToPreviousMonth -> "Change to previous month"
         else -> ""
     }
 }
