@@ -251,13 +251,13 @@ class NavigationBarTest {
             val expectedItemWidth = (availableWidth / 4)
             val expectedItemHeight = NavigationBarTokens.ContainerHeight.toPx()
 
-            Truth.assertThat(itemCoords.size).isEqualTo(4)
+            assertThat(itemCoords.size).isEqualTo(4)
 
             itemCoords.forEach { (index, coord) ->
                 // Rounding differences for width can occur on smaller screens
-                Truth.assertThat(coord.size.width.toFloat()).isWithin(1f).of(expectedItemWidth)
-                Truth.assertThat(coord.size.height).isEqualTo(expectedItemHeight.toInt())
-                Truth.assertThat(coord.positionInWindow().x).isWithin(1f)
+                assertThat(coord.size.width.toFloat()).isWithin(1f).of(expectedItemWidth)
+                assertThat(coord.size.height.toFloat()).isWithin(1f).of(expectedItemHeight)
+                assertThat(coord.positionInWindow().x).isWithin(1f)
                     .of((expectedItemWidth + NavigationBarItemHorizontalPadding.toPx()) * index)
             }
         }

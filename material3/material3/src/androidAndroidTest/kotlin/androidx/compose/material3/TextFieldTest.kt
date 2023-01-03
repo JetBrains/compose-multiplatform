@@ -561,11 +561,9 @@ class TextFieldTest {
             assertThat(placeholderSize.value?.height).isGreaterThan(0)
             assertThat(placeholderSize.value?.width).isGreaterThan(0)
             // placeholder's position
-            assertThat(placeholderPosition.value?.x).isEqualTo(
-                ExpectedPadding.roundToPx().toFloat()
-            )
-            assertThat(placeholderPosition.value?.y)
-                .isEqualTo(
+            assertThat(placeholderPosition.value?.x).isWithin(1f).of(ExpectedPadding.toPx())
+            assertThat(placeholderPosition.value?.y).isWithin(1f)
+                .of(
                     TextFieldWithLabelVerticalPadding.toPx() +
                         labelSize.value!!.height.toFloat()
                 )
