@@ -26,11 +26,9 @@ import javax.inject.Inject
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.FileCollection
-import org.gradle.api.file.RegularFile
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.ListProperty
-import org.gradle.api.provider.Provider
 import org.gradle.api.provider.SetProperty
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Classpath
@@ -125,13 +123,6 @@ abstract class DackkaTask @Inject constructor(
                     "file://${docsProjectDir.toPath()}/package-lists/$name/package-list"
             )
         }
-        val sourceLinks = listOf(
-            DokkaInputModels.SrcLink(
-                // This is part of dokka source links but isn't needed by dackka
-                File("/"),
-                baseSourceLink
-            )
-        )
         val gson = GsonBuilder().create()
         val multiplatformSourceSets = projectStructureMetadataFile
             .takeIf { it.exists() }
@@ -160,7 +151,8 @@ abstract class DackkaTask @Inject constructor(
                         noJdkLink = !analysisPlatform.androidOrJvm(),
                         noAndroidSdkLink = analysisPlatform != DokkaAnalysisPlatform.ANDROID,
                         noStdlibLink = false,
-                        sourceLinks = sourceLinks
+                        // Dackka source link configuration doesn't use the Dokka version
+                        sourceLinks = emptyList()
                     )
                 }
         } ?: emptyList()
@@ -178,7 +170,8 @@ abstract class DackkaTask @Inject constructor(
                 noJdkLink = false,
                 noAndroidSdkLink = false,
                 noStdlibLink = false,
-                sourceLinks = sourceLinks
+                // Dackka source link configuration doesn't use the Dokka version
+                sourceLinks = emptyList()
             )
         ) + multiplatformSourceSets
     }
@@ -234,10 +227,6 @@ abstract class DackkaTask @Inject constructor(
             classpath = dackkaClasspath,
             argsFile = computeArguments(),
             workerExecutor = workerExecutor,
-            excludedPackages = excludedPackages,
-            excludedPackagesForJava = excludedPackagesForJava,
-            excludedPackagesForKotlin = excludedPackagesForKotlin,
-            libraryMetadataFile = libraryMetadataFile,
         )
     }
 
@@ -257,29 +246,17 @@ abstract class DackkaTask @Inject constructor(
 interface DackkaParams : WorkParameters {
     val args: ListProperty<String>
     val classpath: SetProperty<File>
-    val excludedPackages: ListProperty<String>
-    val excludedPackagesForJava: ListProperty<String>
-    val excludedPackagesForKotlin: ListProperty<String>
-    var libraryMetadataFile: Provider<RegularFile>
 }
 
 fun runDackkaWithArgs(
     classpath: FileCollection,
     argsFile: File,
     workerExecutor: WorkerExecutor,
-    excludedPackages: Set<String>,
-    excludedPackagesForJava: Set<String>,
-    excludedPackagesForKotlin: Set<String>,
-    libraryMetadataFile: Provider<RegularFile>,
 ) {
     val workQueue = workerExecutor.noIsolation()
     workQueue.submit(DackkaWorkAction::class.java) { parameters ->
         parameters.args.set(listOf(argsFile.path, "-loggingLevel", "WARN"))
         parameters.classpath.set(classpath)
-        parameters.excludedPackages.set(excludedPackages)
-        parameters.excludedPackagesForJava.set(excludedPackagesForJava)
-        parameters.excludedPackagesForKotlin.set(excludedPackagesForKotlin)
-        parameters.libraryMetadataFile = libraryMetadataFile
     }
 }
 
@@ -291,28 +268,6 @@ abstract class DackkaWorkAction @Inject constructor(
             it.mainClass.set("org.jetbrains.dokka.MainKt")
             it.args = parameters.args.get()
             it.classpath(parameters.classpath.get())
-
-            // b/183989795 tracks moving these away from an environment variables
-            it.environment("DEVSITE_TENANT", "androidx")
-            it.environment("LIBRARY_METADATA_FILE", parameters.libraryMetadataFile.get().toString())
-
-            if (parameters.excludedPackages.get().isNotEmpty())
-                it.environment(
-                    "DACKKA_EXCLUDED_PACKAGES",
-                    parameters.excludedPackages.get().joinToString(",")
-                )
-
-            if (parameters.excludedPackagesForJava.get().isNotEmpty())
-                it.environment(
-                    "DACKKA_EXCLUDED_PACKAGES_JAVA",
-                    parameters.excludedPackagesForJava.get().joinToString(",")
-                )
-
-            if (parameters.excludedPackagesForKotlin.get().isNotEmpty())
-                it.environment(
-                    "DACKKA_EXCLUDED_PACKAGES_KOTLIN",
-                    parameters.excludedPackagesForKotlin.get().joinToString(",")
-                )
         }
     }
 }
