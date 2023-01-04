@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.test.junit4
 
+import android.os.Handler
+import android.os.Looper
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalOverscrollConfiguration
@@ -33,10 +35,12 @@ import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.Button
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,6 +63,7 @@ import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runComposeUiTest
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.test.espresso.AppNotIdleException
 import androidx.test.espresso.IdlingPolicies
 import androidx.test.espresso.IdlingPolicy
@@ -274,5 +279,62 @@ class RobolectricComposeTest {
             }
             return 0f
         }
+    }
+
+    @Test
+    fun testComposePostsToMainThread() = runComposeUiTest {
+        var postToMain by mutableStateOf(false)
+        var postedToMain by mutableStateOf(false)
+        var composedAfterMain = false
+
+        setContent {
+            if (postToMain && !postedToMain) {
+                DisposableEffect(Unit) {
+                    val handler = Handler(Looper.getMainLooper())
+                    handler.post { postedToMain = true }
+                    onDispose {}
+                }
+            } else if (postedToMain) {
+                DisposableEffect(Unit) {
+                    composedAfterMain = true
+                    onDispose {}
+                }
+            }
+        }
+
+        runOnIdle {
+            assertThat(postedToMain).isFalse()
+            assertThat(composedAfterMain).isFalse()
+        }
+
+        postToMain = true
+
+        runOnIdle {
+            assertThat(postedToMain).isTrue()
+            assertThat(composedAfterMain).isTrue()
+        }
+    }
+
+    @Test
+    fun testWaitForPopupWindow() = runComposeUiTest {
+        var expanded by mutableStateOf(false)
+
+        setContent {
+            Box(Modifier.requiredSize(20.dp)) {
+                if (expanded) {
+                    Popup {
+                        DropdownMenuItem(modifier = Modifier.testTag("MenuContent"), onClick = {}) {
+                            Text("Option 1")
+                        }
+                    }
+                }
+            }
+        }
+
+        onNodeWithTag("MenuContent").assertDoesNotExist()
+
+        expanded = true
+
+        onNodeWithTag("MenuContent").assertIsDisplayed()
     }
 }
