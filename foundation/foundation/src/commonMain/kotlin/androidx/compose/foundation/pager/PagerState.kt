@@ -207,8 +207,8 @@ class PagerState(
                     0f
                 }
             val pageDisplacement =
-                (offsetFromFling + offsetFromScroll).roundToInt() / pageAvailableSpace
-            (currentPage + pageDisplacement).coerceInPageRange()
+                (offsetFromFling + offsetFromScroll) / pageAvailableSpace
+            (currentPage + pageDisplacement.roundToInt()).coerceInPageRange()
         }
     }
 
@@ -293,6 +293,11 @@ class PagerState(
             } else {
                 page + visiblePages.size.coerceAtMost(currentPosition)
             }
+
+            debugLog {
+                "animateScrollToPage with pre-jump to position=$preJumpPosition"
+            }
+
             // Pre-jump to 1 viewport away from destination item, if possible
             requireNotNull(lazyListState).scrollToItem(preJumpPosition)
             currentPosition = preJumpPosition
@@ -304,6 +309,10 @@ class PagerState(
             distanceToSnapPosition + pageOffsetFraction * pageAvailableSpace
 
         val displacement = targetOffset - currentOffset + pageOffsetToSnappedPosition
+
+        debugLog {
+            "animateScrollToPage $displacement pixels"
+        }
         requireNotNull(lazyListState).animateScrollBy(displacement, animationSpec)
         animationTargetPage = -1
     }
@@ -422,4 +431,11 @@ private val UnitDensity = object : Density {
 private val EmptyInteractionSources = object : InteractionSource {
     override val interactions: Flow<Interaction>
         get() = emptyFlow()
+}
+
+private const val DEBUG = false
+private inline fun debugLog(generateMsg: () -> String) {
+    if (DEBUG) {
+        println("PagerState: ${generateMsg()}")
+    }
 }
