@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"Odbacivanje"</string>
     <string name="search" msgid="8595876902241072592">"Pretraživanje"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"Prijedlozi su u nastavku"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"Odabir datuma"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"Odabrani datum"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Prebaci na odabir godine"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"Prebaci na odabir dana"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Promijeni na sljedeći mjesec"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Promijeni na prethodni mjesec"</string>
 </resources>

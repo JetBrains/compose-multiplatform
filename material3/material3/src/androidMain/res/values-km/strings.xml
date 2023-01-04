@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"ច្រានចោល"</string>
     <string name="search" msgid="8595876902241072592">"ស្វែងរក"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"ការណែនាំខាងក្រោម"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"ជ្រើសរើស​កាលបរិច្ឆេទ"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"កាលបរិច្ឆេទដែលបាន​ជ្រើសរើស"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"ប្ដូរទៅ​ការជ្រើសរើសឆ្នាំ"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"ប្ដូរទៅ​ការជ្រើសរើសថ្ងៃ"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"ប្ដូរ​ទៅ​ខែបន្ទាប់"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"ប្ដូរ​ទៅ​ខែមុន"</string>
 </resources>

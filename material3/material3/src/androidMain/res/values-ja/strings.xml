@@ -23,4 +23,16 @@
     <string name="dismiss" msgid="1461218791585306270">"閉じる"</string>
     <string name="search" msgid="8595876902241072592">"検索"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"検索候補は次のとおりです"</string>
+    <!-- no translation found for date_picker_title (9208721003668059792) -->
+    <skip />
+    <!-- no translation found for date_picker_headline (2846784065735639969) -->
+    <skip />
+    <!-- no translation found for date_picker_switch_to_year_selection (3412370019845183965) -->
+    <skip />
+    <!-- no translation found for date_picker_switch_to_day_selection (5820832733264067677) -->
+    <skip />
+    <!-- no translation found for date_picker_switch_to_next_month (8313783187901412102) -->
+    <skip />
+    <!-- no translation found for date_picker_switch_to_previous_month (7596294429748914881) -->
+    <skip />
 </resources>

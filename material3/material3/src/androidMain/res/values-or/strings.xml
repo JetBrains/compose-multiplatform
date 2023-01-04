@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"ଖାରଜ କରନ୍ତୁ"</string>
     <string name="search" msgid="8595876902241072592">"ସର୍ଚ୍ଚ କରନ୍ତୁ"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"ପରାମର୍ଶ ତଳେ ଦିଆଯାଇଛି"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"ତାରିଖ ଚୟନ କରନ୍ତୁ"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"ଚୟନିତ ତାରିଖ"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"ବର୍ଷ ଚୟନ କରିବାକୁ ସ୍ୱିଚ କରନ୍ତୁ"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"ଦିନ ଚୟନ କରିବାକୁ ସ୍ୱିଚ କରନ୍ତୁ"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"ପରବର୍ତ୍ତୀ ମାସକୁ ପରିବର୍ତ୍ତନ କରନ୍ତୁ"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"ପୂର୍ବବର୍ତ୍ତୀ ମାସକୁ ପରିବର୍ତ୍ତନ କରନ୍ତୁ"</string>
 </resources>

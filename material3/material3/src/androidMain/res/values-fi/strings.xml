@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"Hylkää"</string>
     <string name="search" msgid="8595876902241072592">"Haku"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"Ehdotuksia alla"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"Valitse päivämäärä"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"Valittu päivämäärä"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Vaihda vuoden valintaan"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"Vaihda päivämäärän valintaan"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Vaihda seuraavaan kuukauteen"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Vaihda edelliseen kuukauteen"</string>
 </resources>
