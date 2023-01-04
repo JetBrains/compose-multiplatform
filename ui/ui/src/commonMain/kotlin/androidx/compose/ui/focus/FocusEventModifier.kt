@@ -16,29 +16,37 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.collection.MutableVector
-import androidx.compose.runtime.collection.mutableVectorOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Deactivated
-import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalProvider
-import androidx.compose.ui.modifier.ModifierLocalReadScope
-import androidx.compose.ui.modifier.ProvidableModifierLocal
-import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.Nodes
+import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.node.visitAncestors
+import androidx.compose.ui.node.visitChildren
+
+/**
+ * Implement this interface create a modifier node that can be used to observe focus state changes
+ * to a [FocusTargetModifierNode] down the hierarchy.
+ */
+@ExperimentalComposeUiApi
+interface FocusEventModifierNode : DelegatableNode {
+
+    /**
+     * A parent FocusEventNode is notified of [FocusState] changes to the [FocusTargetModifierNode]
+     * associated with this [FocusEventModifierNode].
+     */
+    fun onFocusEvent(focusState: FocusState)
+}
 
 /**
  * A [modifier][Modifier.Element] that can be used to observe focus state events.
  */
+@Deprecated("Use FocusEventModifierNode instead")
 @JvmDefaultWithCompatibility
 interface FocusEventModifier : Modifier.Element {
     /**
@@ -47,120 +55,62 @@ interface FocusEventModifier : Modifier.Element {
     fun onFocusEvent(focusState: FocusState)
 }
 
-internal val ModifierLocalFocusEvent = modifierLocalOf<FocusEventModifierLocal?> { null }
+@OptIn(ExperimentalComposeUiApi::class)
+internal class FocusEventModifierNodeImpl(
+    var onFocusEvent: (FocusState) -> Unit
+) : FocusEventModifierNode, Modifier.Node() {
 
-internal class FocusEventModifierLocal(
-    val onFocusEvent: (FocusState) -> Unit,
-) : ModifierLocalProvider<FocusEventModifierLocal?>, ModifierLocalConsumer {
-    // parent/children form three of FocusEventModifierLocals
-    private var parent: FocusEventModifierLocal? = null
-    private val children = mutableVectorOf<FocusEventModifierLocal>()
-
-    /**
-     * This is the list of modifiers that contribute to the focus event's state.
-     * When there are multiple, all FocusModifier states must be considered when notifying an event.
-     */
-    private val focusModifiers = mutableVectorOf<FocusModifier>()
-
-    override val key: ProvidableModifierLocal<FocusEventModifierLocal?>
-        get() = ModifierLocalFocusEvent
-    override val value: FocusEventModifierLocal
-        get() = this
-
-    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) = with(scope) {
-        val newParent = ModifierLocalFocusEvent.current
-        if (newParent != parent) {
-            parent?.let { parent ->
-                parent.children -= this@FocusEventModifierLocal
-                parent.removeFocusModifiers(focusModifiers)
-            }
-            parent = newParent
-            if (newParent != null) {
-                newParent.children += this@FocusEventModifierLocal
-                newParent.addFocusModifiers(focusModifiers)
-            }
-        }
-        parent = ModifierLocalFocusEvent.current
+    override fun onFocusEvent(focusState: FocusState) {
+        this.onFocusEvent.invoke(focusState)
     }
+}
 
-    fun addFocusModifier(focusModifier: FocusModifier) {
-        focusModifiers += focusModifier
-        parent?.addFocusModifier(focusModifier)
-    }
-
-    private fun addFocusModifiers(modifiers: MutableVector<FocusModifier>) {
-        focusModifiers.addAll(modifiers)
-        parent?.addFocusModifiers(modifiers)
-    }
-
-    fun removeFocusModifier(focusModifier: FocusModifier) {
-        focusModifiers -= focusModifier
-        parent?.removeFocusModifier(focusModifier)
-    }
-
-    private fun removeFocusModifiers(modifiers: MutableVector<FocusModifier>) {
-        focusModifiers.removeAll(modifiers)
-        parent?.removeFocusModifiers(modifiers)
-    }
-
-    fun propagateFocusEvent() {
-        val notifiedState = when (focusModifiers.size) {
-            0 -> Inactive
-            1 -> focusModifiers[0].focusState
-            else -> {
-                // We have multiple children, so we have to recalculate the focus state
-                var focusedChild: FocusModifier? = null
-                var allChildrenDisabled: Boolean? = null
-                focusModifiers.forEach {
-                    when (it.focusState) {
-                        Active,
-                        ActiveParent,
-                        Captured,
-                        DeactivatedParent -> {
-                            focusedChild = it
-                            allChildrenDisabled = false
-                        }
-                        Deactivated -> if (allChildrenDisabled == null) {
-                            allChildrenDisabled = true
-                        }
-                        Inactive -> allChildrenDisabled = false
-                    }
-                }
-
-                focusedChild?.focusState ?: if (allChildrenDisabled == true) {
-                    Deactivated
-                } else {
-                    Inactive
-                }
-            }
-        }
-        onFocusEvent(notifiedState)
-        parent?.propagateFocusEvent()
-    }
-
-    fun notifyIfNoFocusModifiers() {
-        if (focusModifiers.isEmpty()) {
-            onFocusEvent(FocusStateImpl.Inactive)
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusEventModifierNode.getFocusState(): FocusState {
+    visitChildren(Nodes.FocusTarget) {
+        when (val focusState = it.focusStateImpl) {
+            // If we find a focused child, we use that child's state as the aggregated state.
+            Active, ActiveParent, Captured -> return focusState
+            // We use the Inactive state only if we don't have a focused child.
+            // ie. we ignore this child if another child provides aggregated state.
+            Inactive -> return@visitChildren
         }
     }
+    return Inactive
 }
 
 /**
  * Add this modifier to a component to observe focus state events.
  */
-fun Modifier.onFocusEvent(onFocusEvent: (FocusState) -> Unit): Modifier = composed(
-    debugInspectorInfo {
-        name = "onFocusEvent"
-        properties["onFocusEvent"] = onFocusEvent
-    }
-) {
-    val modifier = remember(onFocusEvent) {
-        FocusEventModifierLocal(onFocusEvent = onFocusEvent)
-    }
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.onFocusEvent(onFocusEvent: (FocusState) -> Unit): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
+    modifierElementOf(
+        key = onFocusEvent,
+        create = { FocusEventModifierNodeImpl(onFocusEvent) },
+        update = { it.onFocusEvent = onFocusEvent },
+        definitions = {
+            name = "onFocusEvent"
+            properties["onFocusEvent"] = onFocusEvent
+        }
+    )
+)
 
-    SideEffect {
-        modifier.notifyIfNoFocusModifiers()
-    }
+/**
+ * Sends a "Focus Event" up the hierarchy that asks all [FocusEventModifierNode]s to recompute their
+ * observed focus state.
+ *
+ * Make this public after [FocusTargetModifierNode] is made public.
+ */
+@ExperimentalComposeUiApi
+internal fun FocusTargetModifierNode.refreshFocusEventNodes() {
+    visitAncestors(Nodes.FocusEvent or Nodes.FocusTarget) {
+        // If we reach the previous focus target node, we have gone too far, as
+        //  this is applies to the another focus event.
+        if (it.isKind(Nodes.FocusTarget)) return
 
-    modifier
+        // TODO(251833873): Consider caching it.getFocusState().
+        check(it is FocusEventModifierNode)
+        it.onFocusEvent(it.getFocusState())
+    }
 }

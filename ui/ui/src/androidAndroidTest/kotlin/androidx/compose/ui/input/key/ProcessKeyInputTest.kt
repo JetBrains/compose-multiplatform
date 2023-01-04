@@ -16,17 +16,20 @@
 
 package androidx.compose.ui.input.key
 
+import android.view.KeyEvent as AndroidKeyEvent
+import android.view.KeyEvent.KEYCODE_A as KeyCodeA
+import android.view.KeyEvent.ACTION_DOWN
+import android.view.KeyEvent.ACTION_UP
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.setFocusableContent
-import android.view.KeyEvent.KEYCODE_A as KeyCodeA
-import android.view.KeyEvent as AndroidKeyEvent
-import android.view.KeyEvent.ACTION_DOWN
-import android.view.KeyEvent.ACTION_UP
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.setFocusableContent
 import androidx.compose.ui.input.key.Key.Companion.A
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyUp
@@ -40,7 +43,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Suppress("DEPRECATION")
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 @OptIn(ExperimentalComposeUiApi::class)
@@ -52,7 +54,7 @@ class ProcessKeyInputTest {
     fun noRootFocusTarget_throwsException() {
         // Arrange.
         rule.setContent {
-            Box(modifier = KeyInputModifier(null, null))
+            Box(modifier = Modifier.onKeyEvent { false })
         }
 
         // Act.
@@ -75,7 +77,9 @@ class ProcessKeyInputTest {
 
         // Arrange.
         rule.setFocusableContent {
-            Box(modifier = Modifier.focusTarget().onKeyEvent { true })
+            Box(modifier = Modifier
+                .focusTarget()
+                .onKeyEvent { true })
         }
 
         // Act.
@@ -215,6 +219,82 @@ class ProcessKeyInputTest {
         rule.runOnIdle {
             assertThat(onPreviewKeyEventTrigger).isEqualTo(1)
             assertThat(onKeyEventTrigger).isEqualTo(2)
+        }
+    }
+
+    @Test
+    fun onKeyEvent_afterUpdate() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var keyEventFromOnKeyEvent1: KeyEvent? = null
+        var keyEventFromOnKeyEvent2: KeyEvent? = null
+        var onKeyEvent: (event: KeyEvent) -> Boolean by mutableStateOf(
+            value = {
+                keyEventFromOnKeyEvent1 = it
+                true
+            }
+        )
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onKeyEvent(onKeyEvent)
+                    .focusTarget()
+            )
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Act.
+        rule.runOnIdle {
+            onKeyEvent = {
+                keyEventFromOnKeyEvent2 = it
+                true
+            }
+        }
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(keyEventFromOnKeyEvent1).isNull()
+            assertThat(keyEventFromOnKeyEvent2).isNotNull()
+        }
+    }
+
+    @Test
+    fun onPreviewKeyEvent_afterUpdate() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var keyEventFromOnPreviewKeyEvent1: KeyEvent? = null
+        var keyEventFromOnPreviewKeyEvent2: KeyEvent? = null
+        var onPreviewKeyEvent: (event: KeyEvent) -> Boolean by mutableStateOf(
+            value = {
+                keyEventFromOnPreviewKeyEvent1 = it
+                true
+            }
+        )
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onPreviewKeyEvent(onPreviewKeyEvent)
+                    .focusTarget()
+            )
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Act.
+        rule.runOnIdle {
+            onPreviewKeyEvent = {
+                keyEventFromOnPreviewKeyEvent2 = it
+                true
+            }
+        }
+        rule.onRoot().performKeyPress(keyEvent(KeyCodeA, KeyUp))
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(keyEventFromOnPreviewKeyEvent1).isNull()
+            assertThat(keyEventFromOnPreviewKeyEvent2).isNotNull()
         }
     }
 

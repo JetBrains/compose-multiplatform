@@ -19,6 +19,7 @@ import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusTargetModifierNode
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.input.pointer.PointerInputFilter
@@ -41,6 +42,9 @@ import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadLayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadMeasuring
+import androidx.compose.ui.node.Nodes.FocusEvent
+import androidx.compose.ui.node.Nodes.FocusProperties
+import androidx.compose.ui.node.Nodes.FocusTarget
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.simpleIdentityToString
 import androidx.compose.ui.semantics.SemanticsModifierCore.Companion.generateSemanticsId
@@ -398,6 +402,8 @@ internal class LayoutNode(
 
         forEachCoordinatorIncludingInner { it.attach() }
         onAttach?.invoke(owner)
+
+        invalidateFocusOnAttach()
     }
 
     /**
@@ -410,6 +416,7 @@ internal class LayoutNode(
         checkNotNull(owner) {
             "Cannot detach node that is already detached!  Tree: " + parent?.debugTreeToString()
         }
+        invalidateFocusOnDetach()
         val parent = this.parent
         if (parent != null) {
             parent.invalidateLayer()
@@ -1041,6 +1048,33 @@ internal class LayoutNode(
             requestLookaheadRemeasure()
         } else {
             requestRemeasure()
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun invalidateFocusOnAttach() {
+        if (nodes.has(FocusTarget or FocusProperties or FocusEvent)) {
+            nodes.headToTail {
+                if (it.isKind(FocusTarget) or it.isKind(FocusProperties) or it.isKind(FocusEvent)) {
+                    autoInvalidateInsertedNode(it)
+                }
+            }
+        }
+    }
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private fun invalidateFocusOnDetach() {
+        if (nodes.has(FocusTarget)) {
+            nodes.tailToHead {
+                if (
+                    it.isKind(FocusTarget) &&
+                    it is FocusTargetModifierNode &&
+                    it.focusState.isFocused
+                ) {
+                    requireOwner().focusOwner.clearFocus(force = true, refreshFocusEvents = false)
+                    it.scheduleInvalidationForFocusEvents()
+                }
+            }
         }
     }
 

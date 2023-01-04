@@ -26,6 +26,7 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -54,6 +55,9 @@ class InvalidateSubtreeTest {
                 val obj = object : Modifier.Node() {}
                 invalidate = { obj.invalidateSubtree() }
                 obj
+            },
+            definitions = debugInspectorInfo {
+                name = "Invalidate Subtree Modifier.Node"
             }
         )
         rule.setContent {
@@ -103,6 +107,9 @@ class InvalidateSubtreeTest {
                 val obj = object : Modifier.Node() {}
                 invalidate = { obj.invalidateSubtree() }
                 obj
+            },
+            definitions = debugInspectorInfo {
+                name = "Invalidate Subtree Modifier.Node"
             }
         )
         rule.setContent {

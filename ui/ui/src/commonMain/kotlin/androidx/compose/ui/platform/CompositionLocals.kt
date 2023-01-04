@@ -180,7 +180,7 @@ internal fun ProvideCommonCompositionLocals(
         LocalAutofillTree provides owner.autofillTree,
         LocalClipboardManager provides owner.clipboardManager,
         LocalDensity provides owner.density,
-        LocalFocusManager provides owner.focusManager,
+        LocalFocusManager provides owner.focusOwner,
         @Suppress("DEPRECATION") LocalFontLoader
             providesDefault @Suppress("DEPRECATION") owner.fontLoader,
         LocalFontFamilyResolver providesDefault owner.fontFamilyResolver,

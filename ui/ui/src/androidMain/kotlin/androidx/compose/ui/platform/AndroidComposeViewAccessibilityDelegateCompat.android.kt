@@ -1423,7 +1423,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             }
             AccessibilityNodeInfoCompat.ACTION_CLEAR_FOCUS -> {
                 return if (node.unmergedConfig.getOrNull(SemanticsProperties.Focused) == true) {
-                    view.focusManager.clearFocus()
+                    view.focusOwner.clearFocus()
                     true
                 } else {
                     false

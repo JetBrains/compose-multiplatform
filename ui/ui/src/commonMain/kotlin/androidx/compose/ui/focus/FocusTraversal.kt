@@ -17,7 +17,6 @@
 package androidx.compose.ui.focus
 
 import androidx.compose.runtime.collection.MutableVector
-import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Enter
@@ -32,12 +31,14 @@ import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
-import androidx.compose.ui.focus.FocusStateImpl.Deactivated
-import androidx.compose.ui.focus.FocusStateImpl.DeactivatedParent
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.layout.findRootCoordinates
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.Nodes
+import androidx.compose.ui.node.visitAncestors
+import androidx.compose.ui.node.visitChildren
+import androidx.compose.ui.node.visitSubtreeIf
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
@@ -174,10 +175,11 @@ value class FocusDirection internal constructor(@Suppress("unused") private val 
  * @param onFound This lambda is invoked if focus search finds the next focus node.
  * @return if no focus node is found, we return false. otherwise we return the result of [onFound].
  */
-internal fun FocusModifier.focusSearch(
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusTargetModifierNode.focusSearch(
     focusDirection: FocusDirection,
     layoutDirection: LayoutDirection,
-    onFound: (FocusModifier) -> Boolean
+    onFound: (FocusTargetModifierNode) -> Boolean
 ): Boolean {
     return when (focusDirection) {
         Next, Previous -> oneDimensionalFocusSearch(focusDirection, onFound)
@@ -189,105 +191,95 @@ internal fun FocusModifier.focusSearch(
             findActiveFocusNode()?.twoDimensionalFocusSearch(direction, onFound) ?: false
         }
         @OptIn(ExperimentalComposeUiApi::class)
-        Exit -> findActiveFocusNode()?.findActiveParent().let {
-            if (it == this || it == null) false else onFound.invoke(it)
+        Exit -> findActiveFocusNode()?.findNonDeactivatedParent().let {
+            if (it == null || it == this) false else onFound.invoke(it)
         }
         else -> error(invalidFocusDirection)
     }
 }
 
-@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-internal fun FocusModifier.findActiveFocusNode(): FocusModifier? {
-    return when (focusState) {
-        Active, Captured -> this
-        ActiveParent, DeactivatedParent -> focusedChild?.findActiveFocusNode()
-        Inactive, Deactivated -> null
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusTargetModifierNode.findActiveFocusNode(): FocusTargetModifierNode? {
+    when (focusStateImpl) {
+        Active, Captured -> return this
+        ActiveParent -> {
+            visitChildren(Nodes.FocusTarget) { node ->
+                node.findActiveFocusNode()?.let { return it }
+            }
+            return null
+        }
+        Inactive -> return null
     }
 }
 
 @Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-internal fun FocusModifier.findActiveParent(): FocusModifier? = parent?.let {
-        when (focusState) {
-            Active, Captured, Deactivated, DeactivatedParent, Inactive -> it.findActiveParent()
-            ActiveParent -> this
-        }
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusTargetModifierNode.findNonDeactivatedParent(): FocusTargetModifierNode? {
+    visitAncestors(Nodes.FocusTarget) {
+        if (it.fetchFocusProperties().canFocus) return it
     }
+    return null
+}
 
 /**
  * Returns the bounding box of the focus layout area in the root or [Rect.Zero] if the
  * FocusModifier has not had a layout.
  */
-internal fun FocusModifier.focusRect(): Rect = coordinator?.let {
+@ExperimentalComposeUiApi
+internal fun FocusTargetModifierNode.focusRect(): Rect = coordinator?.let {
     it.findRootCoordinates().localBoundingBoxOf(it, clipBounds = false)
 } ?: Rect.Zero
+
 /**
- * Returns all [FocusModifier] children that are not [FocusStateImpl.isDeactivated]. Any
+ * Returns all [FocusTargetModifierNode] children that are not Deactivated. Any
  * child that is deactivated will add activated children instead, unless the deactivated
  * node has a custom Enter specified.
  */
-internal fun FocusModifier.activatedChildren(): MutableVector<FocusModifier> {
-    if (!children.any { it.focusState.isDeactivated }) {
-        return children
-    }
-    val activated = mutableVectorOf<FocusModifier>()
-    children.forEach { child ->
-        if (!child.focusState.isDeactivated) {
-            activated += child
-        } else {
-            // When we encounter a deactivated child, we add all its children,
-            // unless a custom Enter is specified.
-            @OptIn(ExperimentalComposeUiApi::class)
-            when (val customEnter = child.focusProperties.enter(Enter)) {
-                Cancel -> return mutableVectorOf()
-                Default -> activated.addAll(child.activatedChildren())
-                else -> customEnter.focusRequesterModifierLocals.forEach {
-                    it.findFocusNode()?.let { activated.add(it) }
-                }
+@ExperimentalComposeUiApi
+internal fun DelegatableNode.collectAccessibleChildren(
+    accessibleChildren: MutableVector<FocusTargetModifierNode>
+) {
+    visitSubtreeIf(Nodes.FocusTarget) {
+
+        if (it.fetchFocusProperties().canFocus) {
+            accessibleChildren.add(it)
+            return@visitSubtreeIf false
+        }
+
+        // If we encounter a deactivated child, we mimic a moveFocus(Enter).
+        when (val customEnter = it.fetchFocusProperties().enter(Enter)) {
+            // If the user declined a custom enter, omit this part of the tree.
+            Cancel -> return@visitSubtreeIf false
+
+            // If there is no custom enter, we consider all the children.
+            Default -> return@visitSubtreeIf true
+
+            else -> customEnter.focusRequesterNodes.forEach { node ->
+                node.collectAccessibleChildren(accessibleChildren)
             }
         }
+        false
     }
-    return activated
-}
-
-/**
- * Returns the inner-most KeyInputModifier on the same LayoutNode as this FocusModifier.
- */
-@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-internal fun FocusModifier.findLastKeyInputModifier(): KeyInputModifier? {
-    val layoutNode = coordinator?.layoutNode ?: return null
-    var best: KeyInputModifier? = null
-    keyInputChildren.forEach { keyInputModifier ->
-        if (keyInputModifier.layoutNode == layoutNode) {
-            best = lastOf(keyInputModifier, best)
-        }
-    }
-    if (best != null) {
-        return best
-    }
-    // There isn't a KeyInputModifier after this, but there may be one before this.
-    return keyInputModifier
 }
 
 /**
  * Whether this node should be considered when searching for the next item during a traversal.
  */
-internal val FocusModifier.isEligibleForFocusSearch: Boolean
+@ExperimentalComposeUiApi
+internal val FocusTargetModifierNode.isEligibleForFocusSearch: Boolean
     get() = coordinator?.layoutNode?.isPlaced == true &&
-            coordinator?.layoutNode?.isAttached == true
+        coordinator?.layoutNode?.isAttached == true
 
-/**
- * Returns [one] if it comes after [two] in the modifier chain or [two] if it comes after [one].
- */
-@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-private fun lastOf(one: KeyInputModifier, two: KeyInputModifier?): KeyInputModifier {
-    var mod = two ?: return one
-    val layoutNode = one.layoutNode
-    while (mod != one) {
-        val parent = mod.parent
-        if (parent == null || parent.layoutNode != layoutNode) {
-            return one
+@ExperimentalComposeUiApi
+internal val FocusTargetModifierNode.activeChild: FocusTargetModifierNode?
+    get() {
+        if (!node.isAttached) return null
+
+        visitChildren(Nodes.FocusTarget) {
+            when (it.focusStateImpl) {
+                Active, ActiveParent, Captured -> return it
+                Inactive -> return@visitChildren
+            }
         }
-        mod = parent
+        return null
     }
-    return two
-}

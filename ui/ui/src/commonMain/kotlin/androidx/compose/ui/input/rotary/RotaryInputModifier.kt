@@ -18,11 +18,48 @@ package androidx.compose.ui.input.rotary
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.focus.FocusDirectedInputEvent
-import androidx.compose.ui.input.focus.FocusAwareInputModifier
-import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.platform.inspectable
+import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.modifierElementOf
+
+/**
+ * Implement this interface to create a [Modifier.Node] that can intercept rotary scroll events.
+ *
+ * The event is routed to the focused item. Before reaching the focused item,
+ * [onPreRotaryScrollEvent]() is called for parents of the focused item. If the parents don't
+ * consume the event, [onPreRotaryScrollEvent]() is called for the focused item. If the event is
+ * still not consumed, [onRotaryScrollEvent]() is called on the focused item's parents.
+ */
+@ExperimentalComposeUiApi
+interface RotaryInputModifierNode : DelegatableNode {
+    /**
+     * This function is called when a [RotaryScrollEvent] is received by this node during the upward
+     * pass. While implementing this callback, return true to stop propagation of this event. If you
+     * return false, the key event will be sent to this [RotaryInputModifierNode]'s parent.
+     */
+    fun onRotaryScrollEvent(event: RotaryScrollEvent): Boolean
+
+    /**
+     * This function is called when a [RotaryScrollEvent] is received by this node during the
+     * downward pass. It gives ancestors of a focused component the chance to intercept an event.
+     * Return true to stop propagation of this event. If you return false, the event will be sent
+     * to this [RotaryInputModifierNode]'s child. If none of the children consume the event,
+     * it will be sent back up to the root using the [onRotaryScrollEvent] function.
+     */
+    fun onPreRotaryScrollEvent(event: RotaryScrollEvent): Boolean
+}
+
+@ExperimentalComposeUiApi
+internal class RotaryInputModifierNodeImpl(
+    var onEvent: ((RotaryScrollEvent) -> Boolean)?,
+    var onPreEvent: ((RotaryScrollEvent) -> Boolean)?
+) : RotaryInputModifierNode, Modifier.Node() {
+    override fun onRotaryScrollEvent(event: RotaryScrollEvent): Boolean {
+        return onEvent?.invoke(event) ?: false
+    }
+    override fun onPreRotaryScrollEvent(event: RotaryScrollEvent): Boolean {
+        return onPreEvent?.invoke(event) ?: false
+    }
+}
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -43,21 +80,21 @@ import androidx.compose.ui.platform.inspectable
  * access to a [RotaryScrollEvent] when a child does not consume it:
  * @sample androidx.compose.ui.samples.PreRotaryEventSample
  */
+@Suppress("ModifierInspectorInfo") // b/251831790.
 @ExperimentalComposeUiApi
 fun Modifier.onRotaryScrollEvent(
     onRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
-): Modifier = inspectable(
-    inspectorInfo = debugInspectorInfo {
-        name = "onRotaryScrollEvent"
-        properties["onRotaryScrollEvent"] = onRotaryScrollEvent
-    }
-) {
-    FocusAwareInputModifier(
-        onEvent = onRotaryScrollEvent.focusAwareCallback(),
-        onPreEvent = null,
-        key = ModifierLocalRotaryScrollParent
+): Modifier = this.then(
+    modifierElementOf(
+        key = onRotaryScrollEvent,
+        create = { RotaryInputModifierNodeImpl(onEvent = onRotaryScrollEvent, onPreEvent = null) },
+        update = { it.onEvent = onRotaryScrollEvent },
+        definitions = {
+            name = "onRotaryScrollEvent"
+            properties["onRotaryScrollEvent"] = onRotaryScrollEvent
+        }
     )
-}
+)
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -80,30 +117,20 @@ fun Modifier.onRotaryScrollEvent(
  *
  * @sample androidx.compose.ui.samples.PreRotaryEventSample
  */
+@Suppress("ModifierInspectorInfo") // b/251831790.
 @ExperimentalComposeUiApi
 fun Modifier.onPreRotaryScrollEvent(
     onPreRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
-): Modifier = inspectable(
-    inspectorInfo = debugInspectorInfo {
-        name = "onPreRotaryScrollEvent"
-        properties["onPreRotaryScrollEvent"] = onPreRotaryScrollEvent
-    }
-) {
-    FocusAwareInputModifier(
-        onEvent = null,
-        onPreEvent = onPreRotaryScrollEvent.focusAwareCallback(),
-        key = ModifierLocalRotaryScrollParent
+): Modifier = this.then(
+    modifierElementOf(
+        key = onPreRotaryScrollEvent,
+        create = {
+            RotaryInputModifierNodeImpl(onEvent = null, onPreEvent = onPreRotaryScrollEvent)
+        },
+        update = { it.onPreEvent = onPreRotaryScrollEvent },
+        definitions = {
+            name = "onPreRotaryScrollEvent"
+            properties["onPreRotaryScrollEvent"] = onPreRotaryScrollEvent
+        }
     )
-}
-
-@ExperimentalComposeUiApi
-internal val ModifierLocalRotaryScrollParent =
-    modifierLocalOf<FocusAwareInputModifier<RotaryScrollEvent>?> { null }
-
-@ExperimentalComposeUiApi
-private fun ((RotaryScrollEvent) -> Boolean).focusAwareCallback() = { e: FocusDirectedInputEvent ->
-    check(e is RotaryScrollEvent) {
-        "FocusAwareEvent is dispatched to the wrong FocusAwareParent."
-    }
-    invoke(e)
-}
+)

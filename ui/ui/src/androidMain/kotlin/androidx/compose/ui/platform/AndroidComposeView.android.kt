@@ -73,9 +73,8 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusManagerImpl
-import androidx.compose.ui.focus.focusRect
+import androidx.compose.ui.focus.FocusOwner
+import androidx.compose.ui.focus.FocusOwnerImpl
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
@@ -101,9 +100,9 @@ import androidx.compose.ui.input.key.Key.Companion.NumPadEnter
 import androidx.compose.ui.input.key.Key.Companion.Tab
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType.Companion.KeyDown
-import androidx.compose.ui.input.key.KeyInputModifier
 import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.AndroidPointerIcon
 import androidx.compose.ui.input.pointer.AndroidPointerIconType
@@ -196,9 +195,7 @@ internal class AndroidComposeView(context: Context) :
         properties = {}
     )
 
-    private val _focusManager: FocusManagerImpl = FocusManagerImpl()
-    override val focusManager: FocusManager
-        get() = _focusManager
+    override val focusOwner: FocusOwner = FocusOwnerImpl { registerOnEndApplyChangesListener(it) }
 
     private val _windowInfo: WindowInfoImpl = WindowInfoImpl()
     override val windowInfo: WindowInfo
@@ -206,16 +203,13 @@ internal class AndroidComposeView(context: Context) :
 
     // TODO(b/177931787) : Consider creating a KeyInputManager like we have for FocusManager so
     //  that this common logic can be used by all owners.
-    private val keyInputModifier: KeyInputModifier = KeyInputModifier(
-        onKeyEvent = {
-            val focusDirection = getFocusDirection(it)
-            if (focusDirection == null || it.type != KeyDown) return@KeyInputModifier false
+    private val keyInputModifier = Modifier.onKeyEvent {
+        val focusDirection = getFocusDirection(it)
+        if (focusDirection == null || it.type != KeyDown) return@onKeyEvent false
 
-            // Consume the key event if we moved focus.
-            focusManager.moveFocus(focusDirection)
-        },
-        onPreviewKeyEvent = null
-    )
+        // Consume the key event if we moved focus.
+        focusOwner.moveFocus(focusDirection)
+    }
 
     private val rotaryInputModifier = Modifier.onRotaryScrollEvent {
         // TODO(b/210748692): call focusManager.moveFocus() in response to rotary events.
@@ -259,7 +253,7 @@ internal class AndroidComposeView(context: Context) :
         it.modifier = Modifier
             .then(semanticsModifier)
             .then(rotaryInputModifier)
-            .then(_focusManager.modifier)
+            .then(focusOwner.modifier)
             .then(keyInputModifier)
             .then(scrollContainerInfo)
     }
@@ -401,7 +395,6 @@ internal class AndroidComposeView(context: Context) :
     // executed whenever the touch mode changes.
     private val touchModeChangeListener = ViewTreeObserver.OnTouchModeChangeListener { touchMode ->
         _inputModeManager.inputMode = if (touchMode) Touch else Keyboard
-        _focusManager.fetchUpdatedFocusProperties()
     }
 
     private val textInputServiceAndroid = TextInputServiceAndroid(this)
@@ -605,11 +598,11 @@ internal class AndroidComposeView(context: Context) :
      * system for accurate focus searching and so ViewRootImpl will scroll correctly.
      */
     override fun getFocusedRect(rect: Rect) {
-        _focusManager.getActiveFocusModifier()?.focusRect()?.let {
-            rect.left = it.left.roundToInt()
-            rect.top = it.top.roundToInt()
-            rect.right = it.right.roundToInt()
-            rect.bottom = it.bottom.roundToInt()
+        focusOwner.getFocusRect()?.run {
+            rect.left = left.roundToInt()
+            rect.top = top.roundToInt()
+            rect.right = right.roundToInt()
+            rect.bottom = bottom.roundToInt()
         } ?: super.getFocusedRect(rect)
     }
 
@@ -621,9 +614,7 @@ internal class AndroidComposeView(context: Context) :
     override fun onFocusChanged(gainFocus: Boolean, direction: Int, previouslyFocusedRect: Rect?) {
         super.onFocusChanged(gainFocus, direction, previouslyFocusedRect)
         Log.d(FocusTag, "Owner FocusChanged($gainFocus)")
-        with(_focusManager) {
-            if (gainFocus) takeFocus() else releaseFocus()
-        }
+        if (gainFocus) focusOwner.takeFocus() else focusOwner.releaseFocus()
     }
 
     override fun onWindowFocusChanged(hasWindowFocus: Boolean) {
@@ -646,7 +637,7 @@ internal class AndroidComposeView(context: Context) :
     }
 
     override fun sendKeyEvent(keyEvent: KeyEvent): Boolean {
-        return keyInputModifier.processKeyInput(keyEvent)
+        return focusOwner.dispatchKeyEvent(keyEvent)
     }
 
     override fun dispatchKeyEvent(event: AndroidKeyEvent) =
@@ -1268,7 +1259,7 @@ internal class AndroidComposeView(context: Context) :
             horizontalScrollPixels = axisValue * getScaledHorizontalScrollFactor(config, context),
             uptimeMillis = event.eventTime
         )
-        return _focusManager.getActiveFocusModifier()?.propagateRotaryEvent(rotaryEvent) ?: false
+        return focusOwner.dispatchRotaryEvent(rotaryEvent)
     }
 
     private fun handleMotionEvent(motionEvent: MotionEvent): ProcessResult {
@@ -1569,7 +1560,7 @@ internal class AndroidComposeView(context: Context) :
         if (superclassInitComplete) {
             layoutDirectionFromInt(layoutDirection).let {
                 this.layoutDirection = it
-                _focusManager.layoutDirection = it
+                focusOwner.layoutDirection = it
             }
         }
     }

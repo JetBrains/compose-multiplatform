@@ -44,9 +44,11 @@ class FocusAggregationTest {
         }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isFalse()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -64,9 +66,11 @@ class FocusAggregationTest {
         }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isFalse()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -87,9 +91,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isTrue()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -103,9 +109,11 @@ class FocusAggregationTest {
         }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isFalse()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -119,9 +127,11 @@ class FocusAggregationTest {
         }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isFalse()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isFalse()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -139,9 +149,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isTrue()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -160,9 +172,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isTrue()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -181,9 +195,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isTrue()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -205,9 +221,11 @@ class FocusAggregationTest {
         }
 
         // Assert.
-        assertThat(focusState.isFocused).isTrue()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isTrue()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isTrue()
+        }
     }
 
     @Test
@@ -229,9 +247,11 @@ class FocusAggregationTest {
         }
 
         // Assert.
-        assertThat(focusState.isFocused).isTrue()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isTrue()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isTrue()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isTrue()
+        }
     }
 
     @Test
@@ -250,9 +270,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -272,9 +294,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -295,9 +319,11 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 
     @Test
@@ -322,8 +348,10 @@ class FocusAggregationTest {
         rule.runOnIdle { focusRequester.requestFocus() }
 
         // Assert.
-        assertThat(focusState.isFocused).isFalse()
-        assertThat(focusState.hasFocus).isTrue()
-        assertThat(focusState.isCaptured).isFalse()
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(focusState.isCaptured).isFalse()
+        }
     }
 }

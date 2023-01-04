@@ -22,6 +22,9 @@ import android.view.KeyEvent.META_SHIFT_ON
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.key.Key.Companion.Tab
@@ -42,6 +45,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import com.google.common.truth.Truth.assertThat
 import org.junit.runners.Parameterized
+import org.junit.runners.Parameterized.Parameters
 
 @ExperimentalComposeUiApi
 @MediumTest
@@ -55,7 +59,7 @@ class CustomFocusTraversalTest(
 
     companion object {
         @JvmStatic
-        @Parameterized.Parameters(name = "moveFocusProgrammatically = {0}, useFocusModifier = {1}")
+        @Parameters(name = "moveFocusProgrammatically = {0}, useFocusOrderModifier = {1}")
         fun initParameters() = listOf(
             arrayOf(true, true),
             arrayOf(true, false),
@@ -713,7 +717,7 @@ class CustomFocusTraversalTest(
     }
 
     @Test
-    fun focusProperties_emptyfocusPropertiesInParent_doesNotResetCustomNextSetByChild() {
+    fun focusProperties_emptyFocusPropertiesInParent_doesNotResetCustomNextSetByChild() {
         // Arrange.
         var item1Focused = false
         var item2Focused = false
@@ -764,8 +768,128 @@ class CustomFocusTraversalTest(
         }
     }
 
+    @Test
+    fun changedFocusProperties() {
+        // Arrange.
+        var item1Focused = false
+        var item2Focused = false
+        var item3Focused = false
+        var item4Focused = false
+        val (item1, item3, item4) = FocusRequester.createRefs()
+        var nextItem = item3
+        lateinit var focusManager: FocusManager
+        rule.setFocusableContent {
+            focusManager = LocalFocusManager.current
+            Row {
+                Box(
+                    Modifier
+                        .focusRequester(item1)
+                        .dynamicFocusProperties { next = nextItem }
+                        .onFocusChanged { item1Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .onFocusChanged { item2Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .focusRequester(item3)
+                        .onFocusChanged { item3Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .focusRequester(item4)
+                        .onFocusChanged { item4Focused = it.isFocused }
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle { item1.requestFocus() }
+
+        // Act.
+        rule.runOnIdle {
+            nextItem = item4
+        }
+        if (moveFocusProgrammatically) {
+            rule.runOnIdle {
+                focusManager.moveFocus(FocusDirection.Next)
+            }
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(item1Focused).isFalse()
+            assertThat(item2Focused).isFalse()
+            assertThat(item3Focused).isFalse()
+            assertThat(item4Focused).isTrue()
+        }
+    }
+
+    @Test
+    fun changedFocusProperties_mutableState() {
+        // Arrange.
+        var item1Focused = false
+        var item2Focused = false
+        var item3Focused = false
+        var item4Focused = false
+        val (item1, item3, item4) = FocusRequester.createRefs()
+        var nextItem by mutableStateOf(item3)
+        lateinit var focusManager: FocusManager
+        rule.setFocusableContent {
+            focusManager = LocalFocusManager.current
+            Row {
+                Box(
+                    Modifier
+                        .focusRequester(item1)
+                        .dynamicFocusProperties { next = nextItem }
+                        .onFocusChanged { item1Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .onFocusChanged { item2Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .focusRequester(item3)
+                        .onFocusChanged { item3Focused = it.isFocused }
+                        .focusTarget()
+                )
+                Box(
+                    Modifier
+                        .focusRequester(item4)
+                        .onFocusChanged { item4Focused = it.isFocused }
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle { item1.requestFocus() }
+
+        // Act.
+        rule.runOnIdle { nextItem = item4 }
+        if (moveFocusProgrammatically) {
+            rule.runOnIdle { focusManager.moveFocus(FocusDirection.Next) }
+        } else {
+            rule.onRoot().performKeyPress(KeyEvent(AndroidKeyEvent(KeyDown, Tab.nativeKeyCode)))
+        }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(item1Focused).isFalse()
+            assertThat(item2Focused).isFalse()
+            assertThat(item3Focused).isFalse()
+            assertThat(item4Focused).isTrue()
+        }
+    }
+
     @Suppress("DEPRECATION")
-    fun Modifier.dynamicFocusProperties(block: FocusOrder.() -> Unit): Modifier =
+    private fun Modifier.dynamicFocusProperties(block: FocusOrder.() -> Unit): Modifier =
         if (useFocusOrderModifier) {
             this.then(ReceiverFocusOrderModifier(block))
         } else {

@@ -388,20 +388,21 @@ package androidx.compose.ui.focus {
     property public final int Up;
   }
 
-  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
-    method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
+  @Deprecated @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
   }
 
   public final class FocusEventModifierKt {
     method public static androidx.compose.ui.Modifier onFocusEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusEvent);
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface FocusEventModifierNode extends androidx.compose.ui.node.DelegatableNode {
+    method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusManager {
     method public void clearFocus(optional boolean force);
     method public boolean moveFocus(int focusDirection);
-  }
-
-  public final class FocusManagerKt {
   }
 
   public final class FocusModifierKt {
@@ -487,6 +488,10 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier focusProperties(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusProperties,kotlin.Unit> scope);
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface FocusPropertiesModifierNode extends androidx.compose.ui.node.DelegatableNode {
+    method public void modifyFocusProperties(androidx.compose.ui.focus.FocusProperties focusProperties);
+  }
+
   public final class FocusRequester {
     ctor public FocusRequester();
     method public boolean captureFocus();
@@ -526,13 +531,19 @@ package androidx.compose.ui.focus {
   public final class FocusRequesterKt {
   }
 
-  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
-    method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
+  @Deprecated @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getFocusRequester();
     property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
   }
 
   public final class FocusRequesterModifierKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean captureFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
     method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean freeFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean requestFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface FocusRequesterModifierNode extends androidx.compose.ui.node.DelegatableNode {
   }
 
   public interface FocusState {
@@ -542,6 +553,13 @@ package androidx.compose.ui.focus {
     property public abstract boolean hasFocus;
     property public abstract boolean isCaptured;
     property public abstract boolean isFocused;
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public final class FocusTargetModifierNode extends androidx.compose.ui.Modifier.Node implements androidx.compose.ui.modifier.ModifierLocalNode androidx.compose.ui.node.ObserverNode {
+    ctor public FocusTargetModifierNode();
+    method public androidx.compose.ui.focus.FocusState getFocusState();
+    method public void onObservedReadsChanged();
+    property public final androidx.compose.ui.focus.FocusState focusState;
   }
 
   public final class FocusTransactionsKt {
@@ -1587,6 +1605,11 @@ package androidx.compose.ui.input.key {
     method public static androidx.compose.ui.Modifier onPreviewKeyEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.key.KeyEvent,java.lang.Boolean> onPreviewKeyEvent);
   }
 
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface KeyInputModifierNode extends androidx.compose.ui.node.DelegatableNode {
+    method public boolean onKeyEvent(android.view.KeyEvent event);
+    method public boolean onPreKeyEvent(android.view.KeyEvent event);
+  }
+
   public final class Key_androidKt {
     method public static long Key(int nativeKeyCode);
     method public static int getNativeKeyCode(long);
@@ -1930,6 +1953,11 @@ package androidx.compose.ui.input.rotary {
   public final class RotaryInputModifierKt {
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier onPreRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onPreRotaryScrollEvent);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier onRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onRotaryScrollEvent);
+  }
+
+  @androidx.compose.ui.ExperimentalComposeUiApi public interface RotaryInputModifierNode extends androidx.compose.ui.node.DelegatableNode {
+    method public boolean onPreRotaryScrollEvent(androidx.compose.ui.input.rotary.RotaryScrollEvent event);
+    method public boolean onRotaryScrollEvent(androidx.compose.ui.input.rotary.RotaryScrollEvent event);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public final class RotaryScrollEvent {

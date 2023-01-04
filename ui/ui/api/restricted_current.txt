@@ -292,8 +292,8 @@ package androidx.compose.ui.focus {
     property public final int Up;
   }
 
-  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
-    method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
+  @Deprecated @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusEventModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
   }
 
   public final class FocusEventModifierKt {
@@ -303,9 +303,6 @@ package androidx.compose.ui.focus {
   @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusManager {
     method public void clearFocus(optional boolean force);
     method public boolean moveFocus(int focusDirection);
-  }
-
-  public final class FocusManagerKt {
   }
 
   public final class FocusModifierKt {
@@ -401,8 +398,8 @@ package androidx.compose.ui.focus {
   public final class FocusRequesterKt {
   }
 
-  @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
-    method public androidx.compose.ui.focus.FocusRequester getFocusRequester();
+  @Deprecated @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
+    method @Deprecated public androidx.compose.ui.focus.FocusRequester getFocusRequester();
     property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
   }
 

@@ -468,12 +468,11 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         element: Modifier.Element,
         child: Modifier.Node,
     ): Modifier.Node {
-        val node = if (element is ModifierNodeElement<*>) {
-            element.create().also {
+        val node = when (element) {
+            is ModifierNodeElement<*> -> element.create().also {
                 it.kindSet = calculateNodeKindSetFrom(it)
             }
-        } else {
-            BackwardsCompatNode(element)
+            else -> BackwardsCompatNode(element)
         }
         return insertParent(node, child)
     }
@@ -506,29 +505,34 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         next: Modifier.Element,
         node: Modifier.Node,
     ): Modifier.Node {
-        if (prev !is ModifierNodeElement<*> || next !is ModifierNodeElement<*>) {
-            check(node is BackwardsCompatNode)
-            node.element = next
-            // we always autoInvalidate BackwardsCompatNode
-            autoInvalidateUpdatedNode(node)
-            return node
-        }
-        val updated = next.updateUnsafe(node)
-        if (updated !== node) {
-            // if a new instance is returned, we want to detach the old one
-            autoInvalidateRemovedNode(node)
-            node.detach()
-            val result = replaceNode(node, updated)
-            autoInvalidateInsertedNode(updated)
-            return result
-        } else {
-            // the node was updated. we are done.
-            if (next.autoInvalidate) {
-                // the modifier element is labeled as "auto invalidate", which means that since the
-                // node was updated, we need to invalidate everything relevant to it
-                autoInvalidateUpdatedNode(updated)
+        when {
+            prev is ModifierNodeElement<*> && next is ModifierNodeElement<*> -> {
+                val updated = next.updateUnsafe(node)
+                if (updated !== node) {
+                    // if a new instance is returned, we want to detach the old one
+                    autoInvalidateRemovedNode(node)
+                    node.detach()
+                    val result = replaceNode(node, updated)
+                    autoInvalidateInsertedNode(updated)
+                    return result
+                } else {
+                    // the node was updated. we are done.
+                    if (next.autoInvalidate) {
+                        // the modifier element is labeled as "auto invalidate", which means
+                        // that since the node was updated, we need to invalidate everything
+                        // relevant to it.
+                        autoInvalidateUpdatedNode(updated)
+                    }
+                    return updated
+                }
             }
-            return updated
+            node is BackwardsCompatNode -> {
+                node.element = next
+                // We always autoInvalidate BackwardsCompatNode.
+                autoInvalidateUpdatedNode(node)
+                return node
+            }
+            else -> error("Unknown Modifier.Node type")
         }
     }
 
@@ -621,6 +625,8 @@ internal class NodeChain(val layoutNode: LayoutNode) {
     }
 
     internal fun has(type: NodeKind<*>): Boolean = aggregateChildKindSet and type.mask != 0
+
+    internal fun has(mask: Int): Boolean = aggregateChildKindSet and mask != 0
 
     override fun toString(): String = buildString {
         append("[")

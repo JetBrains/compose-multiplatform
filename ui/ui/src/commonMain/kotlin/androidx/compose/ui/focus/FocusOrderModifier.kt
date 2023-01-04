@@ -212,10 +212,12 @@ fun Modifier.focusOrder(
  * focus search.
  * @param layoutDirection the current system [LayoutDirection].
  */
-internal fun FocusModifier.customFocusSearch(
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusTargetModifierNode.customFocusSearch(
     focusDirection: FocusDirection,
     layoutDirection: LayoutDirection
 ): FocusRequester {
+    val focusProperties = fetchFocusProperties()
     return when (focusDirection) {
         Next -> focusProperties.next
         Previous -> focusProperties.previous
