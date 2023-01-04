@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -139,20 +140,149 @@ class ScrollbarTest {
     @Test
     fun `drag outside slider and back`() {
         runBlocking(Dispatchers.Main) {
+            val scale = 2f  // Content distance to corresponding scrollbar distance
             rule.setContent {
-                TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
+                TestBox(size = 100.dp, childSize = 10.dp * scale, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
 
+            // While thumb is at the top, drag it up and then down the same distance. Content should not move.
             rule.onNodeWithTag("scrollbar").performMouseInput {
-                moveTo(Offset(10f, 25f))
+                moveTo(Offset(0f, 25f))
+                press()
+                moveBy(Offset(0f, -50f))
+                moveBy(Offset(0f, 50f))
+                release()
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
+
+            // While thumb is at the top, drag it up and then down a bit more. Content should move by the diff.
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 25f))
+                press()
+                moveBy(Offset(0f, -50f))
+                moveBy(Offset(0f, 51f))
+                release()
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-1.dp * scale)
+
+            // Drag thumb exactly to the end. Content should be at the bottom.
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 25f))
+                press()
+                moveBy(Offset(0f, 50f))
+                release()
+            }
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp * scale)
+
+            // While thumb is at the bottom, drag it down and then up the same distance. Content should not move
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 75f))
                 press()
                 moveBy(Offset(0f, 50f))
                 moveBy(Offset(0f, -50f))
                 release()
             }
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp * scale)
+
+            // While thumb is at the bottom, drag it down and then up a bit more. Content should move by the diff
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 75f))
+                press()
+                moveBy(Offset(0f, 50f))
+                moveBy(Offset(0f, -51f))
+                release()
+            }
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-49.dp * scale)
+
+        }
+    }
+
+    @Test
+    fun `drag slider with varying size items`() {
+        runBlocking(Dispatchers.Main) {
+            val listState = LazyListState()
+            rule.setContent {
+                LazyTestBox(state = listState, size = 100.dp, scrollbarWidth = 10.dp){
+                    item {
+                        Box(Modifier.size(20.dp))
+                    }
+                    item {
+                        Box(Modifier.size(180.dp))
+                    }
+                    item {
+                        Box(Modifier.size(20.dp))
+                    }
+                    item {
+                        Box(Modifier.size(180.dp))
+                    }
+                }
+            }
             rule.awaitIdle()
-            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
+
+
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 5f))
+                press()
+            }
+
+            // Scroll all the way down, one pixel at a time. Make sure the content moves "up" every time.
+            for (i in 1..100){
+                val firstVisibleItemIndexBefore = listState.firstVisibleItemIndex
+                val firstVisibleItemScrollOffsetBefore = listState.firstVisibleItemScrollOffset
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    moveBy(Offset(0f, 1f))
+                }
+                rule.awaitIdle()
+                val firstVisibleItemIndexAfter = listState.firstVisibleItemIndex
+                val firstVisibleItemScrollOffsetAfter = listState.firstVisibleItemScrollOffset
+
+                if (firstVisibleItemIndexAfter < firstVisibleItemIndexBefore)
+                    throw AssertionError(
+                        "First visible item index decreased on iteration $i while dragging down; " +
+                        "before=$firstVisibleItemIndexBefore, after=$firstVisibleItemIndexAfter"
+                    )
+                else if ((firstVisibleItemIndexAfter == firstVisibleItemIndexBefore) &&
+                    (firstVisibleItemScrollOffsetAfter < firstVisibleItemScrollOffsetBefore))
+                    throw AssertionError(
+                        "First visible item offset decreased on iteration $i while dragging down; " +
+                            "item index=$firstVisibleItemIndexAfter, " +
+                            "offset before=$firstVisibleItemScrollOffsetBefore, " +
+                            "offset after=$firstVisibleItemScrollOffsetAfter"
+                    )
+            }
+
+            // Scroll back all the way up, one pixel at a time. Make sure the content moves "down" every time
+            for (i in 1..100){
+                val firstVisibleItemIndexBefore = listState.firstVisibleItemIndex
+                val firstVisibleItemScrollOffsetBefore = listState.firstVisibleItemScrollOffset
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    moveBy(Offset(0f, -1f))
+                }
+                rule.awaitIdle()
+                val firstVisibleItemIndexAfter = listState.firstVisibleItemIndex
+                val firstVisibleItemScrollOffsetAfter = listState.firstVisibleItemScrollOffset
+
+                if (firstVisibleItemIndexAfter > firstVisibleItemIndexBefore)
+                    throw AssertionError(
+                        "First visible item index increased on iteration $i while dragging up; " +
+                            "before=$firstVisibleItemIndexBefore, after=$firstVisibleItemIndexAfter"
+                    )
+                else if ((firstVisibleItemIndexAfter == firstVisibleItemIndexBefore) &&
+                    (firstVisibleItemScrollOffsetAfter > firstVisibleItemScrollOffsetBefore))
+                    throw AssertionError(
+                        "First visible item offset increased on iteration $i while dragging up; " +
+                            "item index=$firstVisibleItemIndexAfter, " +
+                            "offset before=$firstVisibleItemScrollOffsetBefore, " +
+                            "offset after=$firstVisibleItemScrollOffsetAfter"
+                    )
+            }
+
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
+            }
         }
     }
 
@@ -544,6 +674,34 @@ class ScrollbarTest {
                     Box(Modifier.size(childSize).testTag("box$it"))
                 }
             }
+
+            VerticalScrollbar(
+                adapter = rememberScrollbarAdapter(state),
+                reverseLayout = reverseLayout,
+                modifier = Modifier
+                    .width(scrollbarWidth)
+                    .fillMaxHeight()
+                    .testTag("scrollbar")
+            )
+        }
+    }
+
+    @Suppress("SameParameterValue")
+    @Composable
+    private fun LazyTestBox(
+        state: LazyListState,
+        size: Dp,
+        scrollbarWidth: Dp,
+        reverseLayout: Boolean = false,
+        content: LazyListScope.() -> Unit,
+    ) = withTestEnvironment {
+        Box(Modifier.size(size)) {
+            LazyColumn(
+                Modifier.fillMaxSize().testTag("column"),
+                state,
+                reverseLayout = reverseLayout,
+                content = content
+            )
 
             VerticalScrollbar(
                 adapter = rememberScrollbarAdapter(state),
