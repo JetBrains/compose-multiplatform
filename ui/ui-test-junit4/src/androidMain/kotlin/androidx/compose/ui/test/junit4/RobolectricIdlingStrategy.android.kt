@@ -49,6 +49,12 @@ internal class RobolectricIdlingStrategy(
             // Use Java's clock, Android's clock is mocked
             val start = System.currentTimeMillis()
             var iteration = 0
+            // This doesn't just check if compose is idle, it also potentially performs work to try
+            // to get to idle. That work may queue up work on the main queue, so even if compose
+            // reports idle we need to drain the main queue at least one more time to ensure that
+            // is complete. However, we also need to check compose again after draining the queue
+            // since it may have queued up more compose work.
+            var composeIsIdle = composeIdlingResource.isIdleNow
             do {
                 // Check if we hit the timeout
                 if (System.currentTimeMillis() - start >= timeoutMillis) {
@@ -62,14 +68,19 @@ internal class RobolectricIdlingStrategy(
                     )
                 }
                 iteration++
-                // Run Espresso.onIdle() to drain the main message queue
+                // Run Espresso.onIdle() to drain the main message queue. This may queue up more
+                // work for compose, so we need to check if compose is idle one more time.
                 runEspressoOnIdle()
-                // Check if we need a measure/layout pass
+                // Check if we need a measure/layout pass.
                 requestLayoutIfNeeded()
-                // Let ComposeIdlingResource fast-forward compositions
-                val isIdle = composeIdlingResource.isIdleNow
-                // Repeat while not idle
-            } while (!isIdle)
+                // Check if draining the main queue queued up any more compose work. Even if compose
+                // itself reports idle, reading this property queue up work on the main queue, so
+                // always drain it one more time. We only consider compose truly idle if it reported
+                // idle both before and after draining the main queue.
+                val composeWasIdleBeforeDrain = composeIsIdle
+                composeIsIdle = composeIdlingResource.isIdleNow
+                // Repeat while not idle.
+            } while (!(composeIsIdle && composeWasIdleBeforeDrain))
         }
     }
 
