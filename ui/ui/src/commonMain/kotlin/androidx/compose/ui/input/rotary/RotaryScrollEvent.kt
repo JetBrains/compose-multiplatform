@@ -16,15 +16,12 @@
 
 package androidx.compose.ui.input.rotary
 
-import androidx.compose.ui.ExperimentalComposeUiApi
-
 /**
  * This event represents a rotary input event.
  *
  * Some Wear OS devices contain a physical rotating side button, or a rotating bezel. When the user
  * turns the button or rotates the bezel, a [RotaryScrollEvent] is sent to the item in focus.
  */
-@ExperimentalComposeUiApi
 class RotaryScrollEvent internal constructor(
     /**
      * The amount to scroll (in pixels) in response to a [RotaryScrollEvent] in a container that

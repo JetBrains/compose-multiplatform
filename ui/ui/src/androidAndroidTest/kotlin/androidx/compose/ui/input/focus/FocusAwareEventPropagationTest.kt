@@ -54,14 +54,12 @@ import org.junit.runners.Parameterized
  * [androidx.compose.ui.input.rotary.RotaryScrollEvent]s, but it is meant to test the generic
  * propagation logic for all focus-aware events.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @MediumTest
 @RunWith(Parameterized::class)
 class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
     @get:Rule
     val rule = createComposeRule()
 
-    @OptIn(ExperimentalComposeUiApi::class)
     private val sentEvent: Any = when (nodeType) {
         KeyInput ->
             KeyEvent(AndroidKeyEvent(AndroidKeyEvent.ACTION_DOWN, AndroidKeyEvent.KEYCODE_A))
@@ -528,6 +526,7 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
     }
 
     private fun Modifier.onFocusAwareEvent(onEvent: (Any) -> Boolean): Modifier = this.then(
+        @OptIn(ExperimentalComposeUiApi::class)
         when (nodeType) {
             KeyInput -> modifierElementOf(
                 key = onEvent,
@@ -552,6 +551,7 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
     )
 
     private fun Modifier.onPreFocusAwareEvent(onEvent: (Any) -> Boolean): Modifier = this.then(
+        @OptIn(ExperimentalComposeUiApi::class)
         when (nodeType) {
             KeyInput -> modifierElementOf(
                 key = onEvent,

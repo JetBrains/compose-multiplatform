@@ -1775,6 +1775,17 @@ package androidx.compose.ui.input.pointer.util {
 package androidx.compose.ui.input.rotary {
 
   public final class RotaryInputModifierKt {
+    method public static androidx.compose.ui.Modifier onPreRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onPreRotaryScrollEvent);
+    method public static androidx.compose.ui.Modifier onRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onRotaryScrollEvent);
+  }
+
+  public final class RotaryScrollEvent {
+    method public float getHorizontalScrollPixels();
+    method public long getUptimeMillis();
+    method public float getVerticalScrollPixels();
+    property public final float horizontalScrollPixels;
+    property public final long uptimeMillis;
+    property public final float verticalScrollPixels;
   }
 
 }

@@ -1951,8 +1951,8 @@ package androidx.compose.ui.input.pointer.util {
 package androidx.compose.ui.input.rotary {
 
   public final class RotaryInputModifierKt {
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier onPreRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onPreRotaryScrollEvent);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier onRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onRotaryScrollEvent);
+    method public static androidx.compose.ui.Modifier onPreRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onPreRotaryScrollEvent);
+    method public static androidx.compose.ui.Modifier onRotaryScrollEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.rotary.RotaryScrollEvent,java.lang.Boolean> onRotaryScrollEvent);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface RotaryInputModifierNode extends androidx.compose.ui.node.DelegatableNode {
@@ -1960,7 +1960,7 @@ package androidx.compose.ui.input.rotary {
     method public boolean onRotaryScrollEvent(androidx.compose.ui.input.rotary.RotaryScrollEvent event);
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public final class RotaryScrollEvent {
+  public final class RotaryScrollEvent {
     method public float getHorizontalScrollPixels();
     method public long getUptimeMillis();
     method public float getVerticalScrollPixels();
