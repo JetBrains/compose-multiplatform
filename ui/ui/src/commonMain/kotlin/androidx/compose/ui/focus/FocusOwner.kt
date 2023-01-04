@@ -82,7 +82,6 @@ internal interface FocusOwner : FocusManager {
     /**
      * Dispatches a rotary scroll event through the compose hierarchy.
      */
-    @OptIn(ExperimentalComposeUiApi::class)
     fun dispatchRotaryEvent(event: RotaryScrollEvent): Boolean
 
     /**

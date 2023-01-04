@@ -48,7 +48,7 @@ interface RotaryInputModifierNode : DelegatableNode {
     fun onPreRotaryScrollEvent(event: RotaryScrollEvent): Boolean
 }
 
-@ExperimentalComposeUiApi
+@OptIn(ExperimentalComposeUiApi::class)
 internal class RotaryInputModifierNodeImpl(
     var onEvent: ((RotaryScrollEvent) -> Boolean)?,
     var onPreEvent: ((RotaryScrollEvent) -> Boolean)?
@@ -81,10 +81,10 @@ internal class RotaryInputModifierNodeImpl(
  * @sample androidx.compose.ui.samples.PreRotaryEventSample
  */
 @Suppress("ModifierInspectorInfo") // b/251831790.
-@ExperimentalComposeUiApi
 fun Modifier.onRotaryScrollEvent(
     onRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
 ): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
     modifierElementOf(
         key = onRotaryScrollEvent,
         create = { RotaryInputModifierNodeImpl(onEvent = onRotaryScrollEvent, onPreEvent = null) },
@@ -118,10 +118,10 @@ fun Modifier.onRotaryScrollEvent(
  * @sample androidx.compose.ui.samples.PreRotaryEventSample
  */
 @Suppress("ModifierInspectorInfo") // b/251831790.
-@ExperimentalComposeUiApi
 fun Modifier.onPreRotaryScrollEvent(
     onPreRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
 ): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
     modifierElementOf(
         key = onPreRotaryScrollEvent,
         create = {
