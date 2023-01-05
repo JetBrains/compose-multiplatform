@@ -37,9 +37,13 @@ import org.jetbrains.skiko.SkikoPointerEvent
 import org.jetbrains.skiko.SkikoTouchEvent
 import org.jetbrains.skiko.SkikoTouchEventKind
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.DpRect
+import androidx.compose.ui.unit.ExperimentalUnitApi
+import androidx.compose.ui.unit.toDpRect
 import org.jetbrains.skiko.SkikoInput
 import org.jetbrains.skiko.currentNanoTime
 
+@OptIn(ExperimentalUnitApi::class)
 internal class ComposeLayer(
     internal val layer: SkiaLayer,
     platform: Platform,
@@ -48,12 +52,14 @@ internal class ComposeLayer(
 ) {
     private var isDisposed = false
 
+    // Should be set to an actual value by ComposeWindow implementation
+    private var density = Density(1f)
+
     inner class ComponentImpl : SkikoView {
         override val input = this@ComposeLayer.input
+
         override fun onRender(canvas: Canvas, width: Int, height: Int, nanoTime: Long) {
-            val contentScale = layer.contentScale
-            canvas.scale(contentScale, contentScale)
-            scene.render(canvas/*, (width / contentScale).toInt(), (height / contentScale).toInt()*/, nanoTime)
+            scene.render(canvas, nanoTime)
         }
 
         override fun onKeyboardEvent(event: SkikoKeyboardEvent) {
@@ -68,10 +74,13 @@ internal class ComposeLayer(
                 SkikoTouchEventKind.MOVED,
                 SkikoTouchEventKind.CANCELLED,
                 SkikoTouchEventKind.ENDED -> {
+                    val scale = density.density
                     scene.sendPointerEvent(
                         eventType = event.kind.toCompose(),
-                        // TODO: account for the proper density.
-                        position = Offset(event.x.toFloat(), event.y.toFloat()) - getTopLeftOffset(), // * scene.density
+                        position = Offset(
+                            x = event.x.toFloat() * scale,
+                            y = event.y.toFloat() * scale
+                        ) - getTopLeftOffset(),
                         timeMillis = currentMillis(),
                         type = PointerType.Touch,
                         nativeEvent = event
@@ -86,10 +95,13 @@ internal class ComposeLayer(
 
         @OptIn(ExperimentalComposeUiApi::class)
         override fun onPointerEvent(event: SkikoPointerEvent) {
+            val scale = density.density
             scene.sendPointerEvent(
                 eventType = event.kind.toCompose(),
-                // TODO: account for the proper density.
-                position = Offset(event.x.toFloat(), event.y.toFloat()) - getTopLeftOffset(), // * density,
+                position = Offset(
+                    x = event.x.toFloat() * scale,
+                    y = event.y.toFloat() * scale
+                ) - getTopLeftOffset(),
                 timeMillis = currentMillis(),
                 type = PointerType.Mouse,
                 nativeEvent = event
@@ -106,9 +118,14 @@ internal class ComposeLayer(
     private val scene = ComposeScene(
         coroutineContext = getMainDispatcher(),
         platform = platform,
-        density = Density(1f),
+        density = density,
         invalidate = layer::needRedraw,
     )
+
+    fun setDensity(newDensity: Density) {
+        density = newDensity
+        scene.density = newDensity
+    }
 
     fun dispose() {
         check(!isDisposed)
@@ -122,9 +139,8 @@ internal class ComposeLayer(
         scene.constraints = Constraints(maxWidth = width, maxHeight = height)
     }
 
-    fun getActiveFocusRect(): Rect? {
-        return scene.mainOwner?.focusManager?.getActiveFocusModifier()?.focusRect()
-    }
+    fun getActiveFocusRect(): DpRect? =
+        scene.mainOwner?.focusManager?.getActiveFocusModifier()?.focusRect()?.toDpRect(density)
 
     fun setContent(
         onPreviewKeyEvent: (ComposeKeyEvent) -> Boolean = { false },

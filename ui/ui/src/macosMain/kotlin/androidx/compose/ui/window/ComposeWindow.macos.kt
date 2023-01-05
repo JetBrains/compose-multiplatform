@@ -21,8 +21,8 @@ import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.MacosTextInputService
-
 import androidx.compose.ui.platform.Platform
+import androidx.compose.ui.unit.Density
 import platform.AppKit.*
 import platform.Foundation.*
 import kotlinx.cinterop.*
@@ -65,7 +65,9 @@ internal actual class ComposeWindow actual constructor() {
         layer.layer.attachTo(nsWindow)
         nsWindow.orderFrontRegardless()
         contentRect.useContents {
-            layer.setSize(size.width.toInt(), size.height.toInt())
+            val scale = nsWindow.backingScaleFactor.toFloat()
+            layer.setDensity(Density(scale))
+            layer.setSize((size.width * scale).toInt(), (size.height * scale).toInt())
         }
     }
 

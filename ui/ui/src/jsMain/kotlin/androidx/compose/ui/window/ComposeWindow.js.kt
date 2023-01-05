@@ -26,11 +26,16 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlinx.browser.document
+import kotlinx.browser.window
 import org.w3c.dom.HTMLCanvasElement
 
 internal actual class ComposeWindow actual constructor() {
 
-    private val density: Density = Density(1f) //todo get and update density from Browser platform
+    private val density: Density = Density(
+        density = window.devicePixelRatio.toFloat(),
+        fontScale = 1f
+    )
+
     private val jsTextInputService = JSTextInputService()
     val platform = object : Platform by Platform.Empty {
         override val textInputService = jsTextInputService
@@ -63,11 +68,7 @@ internal actual class ComposeWindow actual constructor() {
         canvas.setAttribute("tabindex", "0")
         layer.layer.needRedraw()
 
-        val scale = layer.layer.contentScale
-        layer.setSize(
-            (canvas.width / scale).toInt(),
-            (canvas.height / scale).toInt()
-        )
+        layer.setSize(canvas.width, canvas.height)
     }
 
     /**
@@ -79,6 +80,7 @@ internal actual class ComposeWindow actual constructor() {
         content: @Composable () -> Unit
     ) {
         println("ComposeWindow.setContent")
+        layer.setDensity(density)
         layer.setContent(
             content = content
         )

@@ -29,8 +29,12 @@ import androidx.compose.ui.platform.UIKitTextInputService
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toOffset
+import kotlin.math.roundToInt
+import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
@@ -38,6 +42,7 @@ import org.jetbrains.skiko.SkikoUIView
 import org.jetbrains.skiko.TextActions
 import platform.CoreGraphics.CGPointMake
 import platform.CoreGraphics.CGRectMake
+import platform.CoreGraphics.CGSize
 import platform.Foundation.NSCoder
 import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
@@ -46,9 +51,11 @@ import platform.Foundation.NSValue
 import platform.UIKit.CGRectValue
 import platform.UIKit.UIScreen
 import platform.UIKit.UIViewController
+import platform.UIKit.UIViewControllerTransitionCoordinatorProtocol
 import platform.UIKit.reloadInputViews
 import platform.UIKit.setClipsToBounds
 import platform.UIKit.setNeedsDisplay
+import platform.UIKit.window
 import platform.darwin.NSObject
 
 // The only difference with macos' Window is that
@@ -70,7 +77,9 @@ internal actual class ComposeWindow : UIViewController {
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
-    private val density: Density = Density(1f) //todo get and update density from UIKit Platform
+    private val density: Density
+        get() = Density(layer.layer.contentScale)
+
     private lateinit var layer: ComposeLayer
     private lateinit var content: @Composable () -> Unit
     private val keyboardVisibilityListener = object : NSObject() {
@@ -82,7 +91,7 @@ internal actual class ComposeWindow : UIViewController {
             val screenHeight = UIScreen.mainScreen.bounds.useContents { size.height }
             val focused = layer.getActiveFocusRect()
             if (focused != null) {
-                val focusedBottom = focused.bottom + getTopLeftOffset().y
+                val focusedBottom = focused.bottom.value + getTopLeftOffset().y
                 val hiddenPartOfFocusedElement = focusedBottom + keyboardHeight - screenHeight
                 if (hiddenPartOfFocusedElement > 0) {
                     // If focused element hidden by keyboard, then change UIView bounds.
@@ -187,10 +196,24 @@ internal actual class ComposeWindow : UIViewController {
         layer.setContent(content = content)
     }
 
+    override fun viewWillTransitionToSize(
+        size: CValue<CGSize>,
+        withTransitionCoordinator: UIViewControllerTransitionCoordinatorProtocol
+    ) {
+        layer.setDensity(density)
+        val scale = density.density
+        val width = size.useContents { width } * scale
+        val height = size.useContents { height } * scale
+        layer.setSize(width.roundToInt(), height.roundToInt())
+        super.viewWillTransitionToSize(size, withTransitionCoordinator)
+    }
+
     override fun viewWillAppear(animated: Boolean) {
         super.viewDidAppear(animated)
         val (width, height) = getViewFrameSize()
-        layer.setSize(width, height)
+        layer.setDensity(density)
+        val scale = density.density
+        layer.setSize((width * scale).roundToInt(), (height * scale).roundToInt())
         NSNotificationCenter.defaultCenter.addObserver(
             observer = keyboardVisibilityListener,
             selector = NSSelectorFromString("keyboardWillShow:"),
@@ -253,7 +276,7 @@ internal actual class ComposeWindow : UIViewController {
                 point = CGPointMake(0.0, 0.0),
                 toCoordinateSpace = UIScreen.mainScreen.coordinateSpace()
             )
-        return topLeftPoint.useContents { Offset(x.toFloat(), y.toFloat()) }
+        return topLeftPoint.useContents { DpOffset(x.dp, y.dp).toOffset(density) }
     }
 
 }
