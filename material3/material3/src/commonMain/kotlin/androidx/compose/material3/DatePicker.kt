@@ -79,11 +79,13 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import java.lang.Integer.max
@@ -91,11 +93,11 @@ import java.text.NumberFormat
 import kotlinx.coroutines.launch
 
 // TODO: External preview image.
-// TODO: Update the docs to reference the upcoming DatePickerDialog.
 /**
  * <a href="https://m3.material.io/components/date-pickers/overview" class="external" target="_blank">Material Design date picker</a>.
  *
  * Date pickers let people select a date and preferably should be embedded into Dialogs.
+ * See [DatePickerDialog].
  *
  * A simple DatePicker looks like:
  * @sample androidx.compose.material3.samples.DatePickerSample
@@ -414,6 +416,12 @@ object DatePickerDefaults {
 
     /** The range of years for the date picker dialogs. */
     val YearRange: IntRange = IntRange(1900, 2100)
+
+    /** The default tonal elevation used for [DatePickerDialog]. */
+    val TonalElevation: Dp = DatePickerModalTokens.ContainerElevation
+
+    /** The default shape for date picker dialogs. */
+    val shape: Shape @Composable get() = DatePickerModalTokens.ContainerShape.toShape()
 }
 
 /**
@@ -648,7 +656,7 @@ private fun DatePickerImpl(
     val coroutineScope = rememberCoroutineScope()
     Column(
         modifier = modifier
-            .sizeIn(minWidth = ContainerWidth, minHeight = ContainerHeight)
+            .sizeIn(minWidth = ContainerWidth)
             .padding(DatePickerHorizontalPadding)
     ) {
         DatePickerHeader(
@@ -712,6 +720,13 @@ private fun DatePickerImpl(
             ) {
                 Column {
                     YearPicker(
+                        // Keep the height the same as the monthly calendar + weekdays height, and
+                        // take into account the thickness of the divider that will be composed
+                        // below it.
+                        modifier = Modifier.requiredHeight(
+                            RecommendedSizeForAccessibility * (MaxCalendarRows + 1) -
+                                DividerDefaults.Thickness
+                        ),
                         onYearSelected = { year ->
                             // Switch back to the monthly calendar and scroll to the selected year.
                             yearPickerVisible = !yearPickerVisible
@@ -1010,6 +1025,7 @@ private fun Day(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun YearPicker(
+    modifier: Modifier,
     onYearSelected: (year: Int) -> Unit,
     colors: DatePickerColors,
     datePickerState: DatePickerState
@@ -1027,12 +1043,15 @@ private fun YearPicker(
                     0, displayedYear - datePickerState.yearRange.first - YearsInRow
                 )
             )
+        // Match the years container color to any elevated surface color that is composed under it.
+        val containerColor = if (colors.containerColor == MaterialTheme.colorScheme.surface) {
+            MaterialTheme.colorScheme.surfaceColorAtElevation(LocalAbsoluteTonalElevation.current)
+        } else {
+            colors.containerColor
+        }
         LazyVerticalGrid(
             columns = GridCells.Fixed(YearsInRow),
-            // Keep the height the same as the monthly calendar height + weekdays height.
-            modifier = Modifier
-                .requiredHeight(RecommendedSizeForAccessibility * (MaxCalendarRows + 1))
-                .background(colors.containerColor),
+            modifier = modifier.background(containerColor),
             state = lazyGridState,
             horizontalArrangement = Arrangement.SpaceEvenly,
             verticalArrangement = Arrangement.spacedBy(YearsVerticalPadding)
@@ -1204,6 +1223,10 @@ private fun Int.toLocalString(): String {
     return formatter.format(this)
 }
 
+// TODO: Remove after b/247694457 for updating the tokens is resolved.
+internal val ContainerWidth = 360.dp
+internal val ContainerHeight = 568.dp
+
 internal val MonthYearHeight = 56.dp
 internal val DatePickerHorizontalPadding = PaddingValues(horizontal = 12.dp)
 internal val HeaderPadding = PaddingValues(
@@ -1211,19 +1234,11 @@ internal val HeaderPadding = PaddingValues(
     top = 16.dp,
     bottom = 12.dp
 )
-internal val CalendarMonthSubheadPadding = PaddingValues(
-    start = 12.dp,
-    top = 20.dp,
-    bottom = 8.dp
-)
+
 private val YearsVerticalPadding = 16.dp
 
 private const val MaxCalendarRows = 6
 private const val YearsInRow: Int = 3
-
-// TODO: Remove after b/247694457 for updating the tokens is resolved.
-private val ContainerWidth = 360.dp
-private val ContainerHeight = 568.dp
 
 // TODO: Remove after b/251240936 for updating the typography is resolved.
 private val WeekdaysLabelTextFont = TypographyKeyTokens.BodyLarge
