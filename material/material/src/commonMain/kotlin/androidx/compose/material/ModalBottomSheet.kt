@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.ModalBottomSheetState.Companion.Saver
@@ -479,6 +480,7 @@ fun ModalBottomSheetLayout(
             Modifier
                 .align(Alignment.TopCenter) // We offset from the top so we'll center from there
                 .widthIn(max = MaxModalBottomSheetWidth)
+                .fillMaxWidth()
                 .nestedScroll(
                     remember(sheetState.swipeableState, orientation) {
                         ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
