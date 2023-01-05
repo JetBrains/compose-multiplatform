@@ -229,9 +229,14 @@ class PagerState(
     val currentPageOffsetFraction: Float by derivedStateOf {
         val currentPagePositionOffset = closestPageToSnappedPosition?.offset ?: 0
         val pageUsedSpace = pageAvailableSpace.toFloat()
-        ((-currentPagePositionOffset) / (pageUsedSpace)).coerceIn(
-            MinPageOffset, MaxPageOffset
-        )
+        if (pageUsedSpace == 0f) {
+            // Default to 0 when there's no info about the page size yet.
+            0f
+        } else {
+            ((-currentPagePositionOffset) / (pageUsedSpace)).coerceIn(
+                MinPageOffset, MaxPageOffset
+            )
+        }
     }
 
     /**

@@ -31,6 +31,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertFalse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -671,6 +672,18 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
 
         // Assert
         assertThat(state.currentPage).isEqualTo(5)
+    }
+
+    @Test
+    fun currentPageOffsetFraction_shouldNeverBeNan() {
+        rule.setContent {
+            val state = rememberPagerState()
+            // Read state in composition, should never be Nan
+            assertFalse { state.currentPageOffsetFraction.isNaN() }
+            HorizontalOrVerticalPager(pageCount = 10, state = state) {
+                Page(index = it)
+            }
+        }
     }
 
     companion object {
