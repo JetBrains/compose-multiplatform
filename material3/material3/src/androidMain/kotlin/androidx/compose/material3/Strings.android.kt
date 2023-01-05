@@ -50,6 +50,9 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerHeadline -> resources.getString(
             androidx.compose.material3.R.string.date_picker_headline
         )
+        Strings.DatePickerYearPickerPaneTitle -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_year_picker_pane_title
+        )
         Strings.DatePickerSwitchToYearSelection -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_year_selection
         )
@@ -61,6 +64,15 @@ internal actual fun getString(string: Strings): String {
         )
         Strings.DatePickerSwitchToPreviousMonth -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_previous_month
+        )
+        Strings.DatePickerNavigateToYearDescription -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_navigate_to_year_description
+        )
+        Strings.DatePickerHeadlineDescription -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_headline_description
+        )
+        Strings.DatePickerNoSelectionDescription -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_no_selection_description
         )
         else -> ""
     }
