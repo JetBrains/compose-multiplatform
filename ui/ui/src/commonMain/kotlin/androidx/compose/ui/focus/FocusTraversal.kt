@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection.Companion.Down
 import androidx.compose.ui.focus.FocusDirection.Companion.Enter
@@ -26,7 +25,6 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusDirection.Companion.Right
 import androidx.compose.ui.focus.FocusDirection.Companion.Up
-import androidx.compose.ui.focus.FocusRequester.Companion.Cancel
 import androidx.compose.ui.focus.FocusRequester.Companion.Default
 import androidx.compose.ui.focus.FocusStateImpl.Active
 import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
@@ -34,136 +32,57 @@ import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.findRootCoordinates
-import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.visitAncestors
 import androidx.compose.ui.node.visitChildren
-import androidx.compose.ui.node.visitSubtreeIf
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
 
-private const val invalidFocusDirection = "Invalid FocusDirection"
-
 /**
- * The [FocusDirection] is used to specify the direction for a [FocusManager.moveFocus]
- * request.
+ * Search up the component tree for any parent/parents that have specified a custom focus order.
+ * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
+ * children.
  *
- * @sample androidx.compose.ui.samples.MoveFocusSample
+ * @param focusDirection the focus direction passed to [FocusManager.moveFocus] that triggered this
+ * focus search.
+ * @param layoutDirection the current system [LayoutDirection].
  */
-@kotlin.jvm.JvmInline
-value class FocusDirection internal constructor(@Suppress("unused") private val value: Int) {
-
-    override fun toString(): String {
-        return when (this) {
-            Next -> "Next"
-            Previous -> "Previous"
-            Left -> "Left"
-            Right -> "Right"
-            Up -> "Up"
-            Down -> "Down"
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusTargetModifierNode.customFocusSearch(
+    focusDirection: FocusDirection,
+    layoutDirection: LayoutDirection
+): FocusRequester {
+    val focusProperties = fetchFocusProperties()
+    return when (focusDirection) {
+        Next -> focusProperties.next
+        Previous -> focusProperties.previous
+        Up -> focusProperties.up
+        Down -> focusProperties.down
+        Left -> when (layoutDirection) {
+            Ltr -> focusProperties.start
+            Rtl -> focusProperties.end
+        }.takeUnless { it == Default } ?: focusProperties.left
+        Right -> when (layoutDirection) {
+            Ltr -> focusProperties.end
+            Rtl -> focusProperties.start
+        }.takeUnless { it == Default } ?: focusProperties.right
+        // TODO(b/183746982): add focus order API for "In" and "Out".
+        //  Developers can to specify a custom "In" to specify which child should be visited when
+        //  the user presses dPad center. (They can also redirect the "In" to some other item).
+        //  Developers can specify a custom "Out" to specify which composable should take focus
+        //  when the user presses the back button.
+        @OptIn(ExperimentalComposeUiApi::class)
+        Enter -> {
             @OptIn(ExperimentalComposeUiApi::class)
-            Enter -> "Enter"
-            @OptIn(ExperimentalComposeUiApi::class)
-            Exit -> "Exit"
-            else -> invalidFocusDirection
+            focusProperties.enter(focusDirection)
         }
-    }
-
-    companion object {
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item.
-         *
-         *  @sample androidx.compose.ui.samples.MoveFocusSample
-         */
-        val Next: FocusDirection = FocusDirection(1)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  previous focusable item.
-         *
-         *  @sample androidx.compose.ui.samples.MoveFocusSample
-         */
-        val Previous: FocusDirection = FocusDirection(2)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item to the left of the currently focused item.
-         *
-         *  @sample androidx.compose.ui.samples.MoveFocusSample
-         */
-        val Left: FocusDirection = FocusDirection(3)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item to the right of the currently focused item.
-         *
-         *  @sample androidx.compose.ui.samples.MoveFocusSample
-         */
-        val Right: FocusDirection = FocusDirection(4)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item that is above the currently focused item.
-         *
-         *  @sample androidx.compose.ui.samples.MoveFocusSample
-         */
-        val Up: FocusDirection = FocusDirection(5)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item that is below the currently focused item.
-         *
-         *  @sample androidx.compose.ui.samples.MoveFocusSample
-         */
-        val Down: FocusDirection = FocusDirection(6)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item that is a child of the currently focused item.
-         */
-        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-        @get:ExperimentalComposeUiApi
-        @ExperimentalComposeUiApi
-        val Enter: FocusDirection = FocusDirection(7)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you want to move focus to
-         *  the parent of the currently focused item.
-         */
-        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-        @get:ExperimentalComposeUiApi
-        @ExperimentalComposeUiApi
-        val Exit: FocusDirection = FocusDirection(8)
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you are searching for the
-         *  next focusable item that is a child of the currently focused item.
-         */
-        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET", "Unused")
-        @get:ExperimentalComposeUiApi
-        @ExperimentalComposeUiApi
-        @Deprecated(
-            "Use FocusDirection.Enter instead.",
-            ReplaceWith("Enter", "androidx.compose.ui.focus.FocusDirection.Companion.Enter"),
-            DeprecationLevel.WARNING
-        )
-        val In: FocusDirection = Enter
-
-        /**
-         *  Direction used in [FocusManager.moveFocus] to indicate that you want to move focus to
-         *  the parent of the currently focused item.
-         */
-        @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET", "Unused")
-        @get:ExperimentalComposeUiApi
-        @ExperimentalComposeUiApi
-        @Deprecated(
-            "Use FocusDirection.Exit instead.",
-            ReplaceWith("Exit", "androidx.compose.ui.focus.FocusDirection.Companion.Exit"),
-            DeprecationLevel.WARNING
-        )
-        val Out: FocusDirection = Exit
+        @OptIn(ExperimentalComposeUiApi::class)
+        Exit -> {
+            @OptIn(ExperimentalComposeUiApi::class)
+            focusProperties.exit(focusDirection)
+        }
+        else -> error("invalid FocusDirection")
     }
 }
 
@@ -194,31 +113,8 @@ internal fun FocusTargetModifierNode.focusSearch(
         Exit -> findActiveFocusNode()?.findNonDeactivatedParent().let {
             if (it == null || it == this) false else onFound.invoke(it)
         }
-        else -> error(invalidFocusDirection)
+        else -> error("Focus search invoked with invalid FocusDirection $focusDirection")
     }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal fun FocusTargetModifierNode.findActiveFocusNode(): FocusTargetModifierNode? {
-    when (focusStateImpl) {
-        Active, Captured -> return this
-        ActiveParent -> {
-            visitChildren(Nodes.FocusTarget) { node ->
-                node.findActiveFocusNode()?.let { return it }
-            }
-            return null
-        }
-        Inactive -> return null
-    }
-}
-
-@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
-@OptIn(ExperimentalComposeUiApi::class)
-internal fun FocusTargetModifierNode.findNonDeactivatedParent(): FocusTargetModifierNode? {
-    visitAncestors(Nodes.FocusTarget) {
-        if (it.fetchFocusProperties().canFocus) return it
-    }
-    return null
 }
 
 /**
@@ -229,38 +125,6 @@ internal fun FocusTargetModifierNode.findNonDeactivatedParent(): FocusTargetModi
 internal fun FocusTargetModifierNode.focusRect(): Rect = coordinator?.let {
     it.findRootCoordinates().localBoundingBoxOf(it, clipBounds = false)
 } ?: Rect.Zero
-
-/**
- * Returns all [FocusTargetModifierNode] children that are not Deactivated. Any
- * child that is deactivated will add activated children instead, unless the deactivated
- * node has a custom Enter specified.
- */
-@ExperimentalComposeUiApi
-internal fun DelegatableNode.collectAccessibleChildren(
-    accessibleChildren: MutableVector<FocusTargetModifierNode>
-) {
-    visitSubtreeIf(Nodes.FocusTarget) {
-
-        if (it.fetchFocusProperties().canFocus) {
-            accessibleChildren.add(it)
-            return@visitSubtreeIf false
-        }
-
-        // If we encounter a deactivated child, we mimic a moveFocus(Enter).
-        when (val customEnter = it.fetchFocusProperties().enter(Enter)) {
-            // If the user declined a custom enter, omit this part of the tree.
-            Cancel -> return@visitSubtreeIf false
-
-            // If there is no custom enter, we consider all the children.
-            Default -> return@visitSubtreeIf true
-
-            else -> customEnter.focusRequesterNodes.forEach { node ->
-                node.collectAccessibleChildren(accessibleChildren)
-            }
-        }
-        false
-    }
-}
 
 /**
  * Whether this node should be considered when searching for the next item during a traversal.
@@ -283,3 +147,26 @@ internal val FocusTargetModifierNode.activeChild: FocusTargetModifierNode?
         }
         return null
     }
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun FocusTargetModifierNode.findActiveFocusNode(): FocusTargetModifierNode? {
+    when (focusStateImpl) {
+        Active, Captured -> return this
+        ActiveParent -> {
+            visitChildren(Nodes.FocusTarget) { node ->
+                node.findActiveFocusNode()?.let { return it }
+            }
+            return null
+        }
+        Inactive -> return null
+    }
+}
+
+@Suppress("ModifierFactoryExtensionFunction", "ModifierFactoryReturnType")
+@OptIn(ExperimentalComposeUiApi::class)
+private fun FocusTargetModifierNode.findNonDeactivatedParent(): FocusTargetModifierNode? {
+    visitAncestors(Nodes.FocusTarget) {
+        if (it.fetchFocusProperties().canFocus) return it
+    }
+    return null
+}
