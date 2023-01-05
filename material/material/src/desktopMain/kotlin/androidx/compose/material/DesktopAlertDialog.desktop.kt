@@ -45,6 +45,7 @@ import androidx.compose.ui.window.PopupPositionProvider
 import androidx.compose.ui.window.rememberDialogState
 import java.awt.event.KeyEvent
 import androidx.compose.ui.window.Dialog as CoreDialog
+import androidx.compose.foundation.background
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
 
@@ -218,9 +219,11 @@ object PopupAlertDialogProvider : AlertDialogProvider {
                 }
             },
         ) {
+            val scrimColor = Color.Black.copy(alpha = 0.32f) //todo configure scrim color in function arguments
             Box(
                 modifier = Modifier
                     .fillMaxSize()
+                    .background(scrimColor)
                     .pointerInput(onDismissRequest) {
                         detectTapGestures(onPress = { onDismissRequest() })
                     },
