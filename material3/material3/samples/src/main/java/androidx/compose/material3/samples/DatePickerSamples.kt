@@ -20,9 +20,9 @@ import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.DateInput
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -52,7 +52,7 @@ fun DatePickerSample() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         // Pre-select a date for January 4, 2020
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
-        DatePicker(datePickerState = datePickerState, modifier = Modifier.padding(16.dp))
+        DatePicker(state = datePickerState, modifier = Modifier.padding(16.dp))
 
         Text("Selected date timestamp: ${datePickerState.selectedDateMillis ?: "no selection"}")
     }
@@ -104,7 +104,7 @@ fun DatePickerDialogSample() {
                 }
             }
         ) {
-            DatePicker(datePickerState = datePickerState)
+            DatePicker(state = datePickerState)
         }
     }
 }
@@ -118,7 +118,7 @@ fun DatePickerWithDateValidatorSample() {
     val datePickerState = rememberDatePickerState()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         DatePicker(
-            datePickerState = datePickerState,
+            state = datePickerState,
             // Blocks Sunday and Saturday from being selected.
             dateValidator = { utcDateInMills ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -143,61 +143,9 @@ fun DatePickerWithDateValidatorSample() {
 @Composable
 fun DateInputSample() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        val dateInputState = rememberDatePickerState()
-        DateInput(dateInputState = dateInputState, modifier = Modifier.padding(16.dp))
+        val state = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+        DatePicker(state = state, modifier = Modifier.padding(16.dp))
 
-        Text("Entered date timestamp: ${dateInputState.selectedDateMillis ?: "no input"}")
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview
-@Sampled
-@Composable
-fun DateInputDialogSample() {
-    // Decoupled snackbar host state from scaffold state for demo purposes.
-    val snackState = remember { SnackbarHostState() }
-    val snackScope = rememberCoroutineScope()
-    SnackbarHost(hostState = snackState, Modifier)
-    val openDialog = remember { mutableStateOf(true) }
-    // TODO demo how to read the selected date from the state.
-    if (openDialog.value) {
-        // Pre-select a date for January 4, 2020
-        val dateInputState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
-        val confirmEnabled = derivedStateOf { dateInputState.selectedDateMillis != null }
-        DatePickerDialog(
-            onDismissRequest = {
-                // Dismiss the dialog when the user clicks outside the dialog or on the back
-                // button. If you want to disable that functionality, simply use an empty
-                // onDismissRequest.
-                openDialog.value = false
-            },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                        snackScope.launch {
-                            snackState.showSnackbar(
-                                "Entered date timestamp: ${dateInputState.selectedDateMillis}"
-                            )
-                        }
-                    },
-                    enabled = confirmEnabled.value
-                ) {
-                    Text("OK")
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = {
-                        openDialog.value = false
-                    }
-                ) {
-                    Text("Cancel")
-                }
-            }
-        ) {
-            DateInput(dateInputState = dateInputState)
-        }
+        Text("Entered date timestamp: ${state.selectedDateMillis ?: "no input"}")
     }
 }

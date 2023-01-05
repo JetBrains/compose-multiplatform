@@ -16,23 +16,18 @@
 
 package androidx.compose.material3
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
-import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
@@ -44,131 +39,41 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 
-// TODO: External preview image.
-// TODO: Introduce a rememberDateInputState once we allow switching between modes.
-/**
- * <a href="https://m3.material.io/components/date-pickers/overview" class="external" target="_blank">Material Design date input</a>.
- *
- * Date pickers let people input a date, and preferably should be embedded into Dialogs.
- * See [DatePickerDialog].
- *
- * A simple DateInput looks like:
- * @sample androidx.compose.material3.samples.DateInputSample
- *
- * @param dateInputState state of the date input. See [rememberDatePickerState].
- * @param modifier the [Modifier] to be applied to this date input
- * @param dateFormatter a [DatePickerFormatter] that provides formatting skeletons for dates display
- * @param dateValidator a lambda that takes a date timestamp and return true if the date is a valid
- * one for input. Invalid dates will be indicate with an error at the UI.
- * @param title the title to be displayed in the date input
- * @param headline the headline to be displayed in the date input
- * @param colors [DatePickerColors] that will be used to resolve the colors used for this date input
- * in different states. See [DatePickerDefaults.colors].
- */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DateInput(
-    dateInputState: DatePickerState,
-    modifier: Modifier = Modifier,
-    dateFormatter: DatePickerFormatter = remember { DatePickerFormatter() },
-    dateValidator: (Long) -> Boolean = { true },
-    title: (@Composable () -> Unit)? = { DateInputDefaults.DateInputTitle() },
-    headline: @Composable () -> Unit = {
-        DateInputDefaults.DateInputHeadline(
-            dateInputState,
-            dateFormatter
-        )
-    },
-    colors: DatePickerColors = DatePickerDefaults.colors()
+internal fun DateInputContent(
+    state: DatePickerState,
+    dateFormatter: DatePickerFormatter,
+    dateValidator: (Long) -> Boolean,
 ) {
-    Column(modifier = modifier.padding(DatePickerHorizontalPadding)) {
-        // Reusing the same header that is used by the DatePicker.
-        DatePickerHeader(
-            modifier = Modifier,
-            title = title,
-            titleContentColor = colors.titleContentColor,
-            headlineContentColor = colors.headlineContentColor
-        ) {
-            headline()
-        }
-        Divider()
-        DateInputTextField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(InputTextFieldPadding),
-            dateInputState = dateInputState,
-            dateFormatter = dateFormatter,
-            dateValidator = dateValidator
-        )
-    }
-}
-
-/**
- * Contains default values used by the date input.
- */
-@ExperimentalMaterial3Api
-@Stable
-object DateInputDefaults {
-
-    /** A default date input title composable. */
-    @Composable
-    fun DateInputTitle() = Text(getString(string = Strings.DateInputTitle))
-
-    /**
-     * A default date input headline composable lambda that displays a default headline text when
-     * there is no date selection, and an actual date string when there is.
-     *
-     * @param state a [DatePickerState] that will help determine the title's headline
-     * @param dateFormatter a [DatePickerFormatter]
-     */
-    @Composable
-    fun DateInputHeadline(state: DatePickerState, dateFormatter: DatePickerFormatter) {
-        val defaultLocale = defaultLocale()
-        val formattedDate = dateFormatter.formatDate(
-            date = state.selectedDate,
-            calendarModel = state.calendarModel,
-            locale = defaultLocale
-        )
-        val verboseDateDescription = dateFormatter.formatDate(
-            date = state.selectedDate,
-            calendarModel = state.calendarModel,
-            locale = defaultLocale,
-            forContentDescription = true
-        ) ?: getString(Strings.DateInputNoInputHeadlineDescription)
-
-        val headlineText = formattedDate ?: getString(string = Strings.DateInputHeadline)
-        val headlineDescription =
-            getString(Strings.DateInputHeadlineDescription).format(verboseDateDescription)
-
-        Text(
-            text = headlineText,
-            modifier = Modifier.semantics {
-                liveRegion = LiveRegionMode.Polite
-                contentDescription = headlineDescription
-            },
-            maxLines = 1
-        )
-    }
+    DateInputTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(InputTextFieldPadding),
+        state = state,
+        dateFormatter = dateFormatter,
+        dateValidator = dateValidator
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DateInputTextField(
     modifier: Modifier,
-    dateInputState: DatePickerState,
+    state: DatePickerState,
     dateFormatter: DatePickerFormatter,
     dateValidator: (Long) -> Boolean
 ) {
     // Obtain the DateInputFormat for the default Locale.
     val defaultLocale = defaultLocale()
     val dateInputFormat = remember(defaultLocale) {
-        dateInputState.calendarModel.getDateInputFormat(defaultLocale)
+        state.calendarModel.getDateInputFormat(defaultLocale)
     }
     var errorText by rememberSaveable { mutableStateOf("") }
     var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
             TextFieldValue(
-                text = with(dateInputState) {
+                text = with(state) {
                     selectedDate?.let {
                         calendarModel.formatWithPattern(
                             it.utcTimeMillis,
@@ -203,7 +108,7 @@ private fun DateInputTextField(
             errorText = ""
             return null
         }
-        val parsedDate = dateInputState.calendarModel.parse(
+        val parsedDate = state.calendarModel.parse(
             dateInputText,
             dateInputFormat.patternWithoutDelimiters
         )
@@ -212,10 +117,10 @@ private fun DateInputTextField(
             return null
         }
         // Check that the date is within the valid range of years.
-        if (!dateInputState.yearRange.contains(parsedDate.year)) {
+        if (!state.yearRange.contains(parsedDate.year)) {
             errorText = errorDateOutOfYearRange.format(
-                dateInputState.yearRange.first,
-                dateInputState.yearRange.last
+                state.yearRange.first,
+                state.yearRange.last
             )
             return null
         }
@@ -224,7 +129,7 @@ private fun DateInputTextField(
             errorText = errorInvalidNotAllowed.format(
                 dateFormatter.formatDate(
                     date = parsedDate,
-                    calendarModel = dateInputState.calendarModel,
+                    calendarModel = state.calendarModel,
                     locale = defaultLocale
                 )
             )
@@ -240,7 +145,7 @@ private fun DateInputTextField(
                 input.text.all { it.isDigit() }
             ) {
                 text = input
-                dateInputState.selectedDate = validate(input)
+                state.selectedDate = validate(input)
             }
         },
         modifier = modifier

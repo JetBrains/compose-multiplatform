@@ -88,6 +88,9 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerNoSelectionDescription -> resources.getString(
             androidx.compose.material3.R.string.date_picker_no_selection_description
         )
+        Strings.DatePickerTodayDescription -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_today_description
+        )
         Strings.DateInputTitle -> resources.getString(
             androidx.compose.material3.R.string.date_input_title
         )
@@ -100,7 +103,7 @@ internal actual fun getString(string: Strings): String {
         Strings.DateInputHeadlineDescription -> resources.getString(
             androidx.compose.material3.R.string.date_input_headline_description
         )
-        Strings.DateInputNoInputHeadlineDescription -> resources.getString(
+        Strings.DateInputNoInputDescription -> resources.getString(
             androidx.compose.material3.R.string.date_input_no_input_description
         )
         Strings.DateInputInvalidNotAllowed -> resources.getString(
@@ -111,6 +114,12 @@ internal actual fun getString(string: Strings): String {
         )
         Strings.DateInputInvalidYearRange -> resources.getString(
             androidx.compose.material3.R.string.date_input_invalid_year_range
+        )
+        Strings.DatePickerSwitchToCalendarMode -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_switch_to_calendar_mode
+        )
+        Strings.DatePickerSwitchToInputMode -> resources.getString(
+            androidx.compose.material3.R.string.date_picker_switch_to_input_mode
         )
         Strings.TooltipLongPressLabel -> resources.getString(
             androidx.compose.material3.R.string.tooltip_long_press_label
