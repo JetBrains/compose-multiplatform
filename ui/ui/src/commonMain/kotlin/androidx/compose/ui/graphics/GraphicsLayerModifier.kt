@@ -18,13 +18,15 @@ package androidx.compose.ui.graphics
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.Nodes
+import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.node.requireCoordinator
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.unit.Constraints
@@ -239,6 +241,7 @@ fun Modifier.graphicsLayer(
  * @param ambientShadowColor see [GraphicsLayerScope.ambientShadowColor]
  * @param spotShadowColor see [GraphicsLayerScope.spotShadowColor]
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Deprecated(
     "Replace with graphicsLayer that consumes a compositing strategy",
     replaceWith = ReplaceWith(
@@ -267,44 +270,24 @@ fun Modifier.graphicsLayer(
     renderEffect: RenderEffect? = null,
     ambientShadowColor: Color = DefaultShadowColor,
     spotShadowColor: Color = DefaultShadowColor,
-) = this.then(
-    SimpleGraphicsLayerModifier(
-        scaleX = scaleX,
-        scaleY = scaleY,
-        alpha = alpha,
-        translationX = translationX,
-        translationY = translationY,
-        shadowElevation = shadowElevation,
-        ambientShadowColor = ambientShadowColor,
-        spotShadowColor = spotShadowColor,
-        rotationX = rotationX,
-        rotationY = rotationY,
-        rotationZ = rotationZ,
-        cameraDistance = cameraDistance,
-        transformOrigin = transformOrigin,
-        shape = shape,
-        clip = clip,
-        renderEffect = renderEffect,
-        inspectorInfo = debugInspectorInfo {
-            name = "graphicsLayer"
-            properties["scaleX"] = scaleX
-            properties["scaleY"] = scaleY
-            properties["alpha"] = alpha
-            properties["translationX"] = translationX
-            properties["translationY"] = translationY
-            properties["shadowElevation"] = shadowElevation
-            properties["rotationX"] = rotationX
-            properties["rotationY"] = rotationY
-            properties["rotationZ"] = rotationZ
-            properties["cameraDistance"] = cameraDistance
-            properties["transformOrigin"] = transformOrigin
-            properties["shape"] = shape
-            properties["clip"] = clip
-            properties["renderEffect"] = renderEffect
-            properties["ambientShadowColor"] = ambientShadowColor
-            properties["spotShadowColor"] = spotShadowColor
-        }
-    )
+) = graphicsLayer(
+    scaleX,
+    scaleY,
+    alpha,
+    translationX,
+    translationY,
+    shadowElevation,
+    rotationX,
+    rotationY,
+    rotationZ,
+    cameraDistance,
+    transformOrigin,
+    shape,
+    clip,
+    renderEffect,
+    ambientShadowColor,
+    spotShadowColor,
+    CompositingStrategy.Auto
 )
 
 /**
@@ -360,6 +343,7 @@ fun Modifier.graphicsLayer(
  * @param spotShadowColor see [GraphicsLayerScope.spotShadowColor]
  * @param compositingStrategy see [GraphicsLayerScope.compositingStrategy]
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Stable
 fun Modifier.graphicsLayer(
     scaleX: Float = 1f,
@@ -379,50 +363,91 @@ fun Modifier.graphicsLayer(
     ambientShadowColor: Color = DefaultShadowColor,
     spotShadowColor: Color = DefaultShadowColor,
     compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
-) = this.then(
-    SimpleGraphicsLayerModifier(
-        scaleX = scaleX,
-        scaleY = scaleY,
-        alpha = alpha,
-        translationX = translationX,
-        translationY = translationY,
-        shadowElevation = shadowElevation,
-        rotationX = rotationX,
-        rotationY = rotationY,
-        rotationZ = rotationZ,
-        cameraDistance = cameraDistance,
-        transformOrigin = transformOrigin,
-        shape = shape,
-        clip = clip,
-        renderEffect = renderEffect,
-        ambientShadowColor = ambientShadowColor,
-        spotShadowColor = spotShadowColor,
-        compositingStrategy = compositingStrategy,
-        inspectorInfo = debugInspectorInfo {
-            name = "graphicsLayer"
-            properties["scaleX"] = scaleX
-            properties["scaleY"] = scaleY
-            properties["alpha"] = alpha
-            properties["translationX"] = translationX
-            properties["translationY"] = translationY
-            properties["shadowElevation"] = shadowElevation
-            properties["rotationX"] = rotationX
-            properties["rotationY"] = rotationY
-            properties["rotationZ"] = rotationZ
-            properties["cameraDistance"] = cameraDistance
-            properties["transformOrigin"] = transformOrigin
-            properties["shape"] = shape
-            properties["clip"] = clip
-            properties["renderEffect"] = renderEffect
-            properties["ambientShadowColor"] = ambientShadowColor
-            properties["spotShadowColor"] = spotShadowColor
-            properties["compositingStrategy"] = compositingStrategy
-        }
-    )
+) = this then modifierElementOf(
+    key = GraphicsLayerParameters(
+        scaleX,
+        scaleY,
+        alpha,
+        translationX,
+        translationY,
+        shadowElevation,
+        rotationX,
+        rotationY,
+        rotationZ,
+        cameraDistance,
+        transformOrigin,
+        shape,
+        clip,
+        renderEffect,
+        ambientShadowColor,
+        spotShadowColor,
+        compositingStrategy
+    ),
+    create = {
+        SimpleGraphicsLayerModifier(
+            scaleX = scaleX,
+            scaleY = scaleY,
+            alpha = alpha,
+            translationX = translationX,
+            translationY = translationY,
+            shadowElevation = shadowElevation,
+            rotationX = rotationX,
+            rotationY = rotationY,
+            rotationZ = rotationZ,
+            cameraDistance = cameraDistance,
+            transformOrigin = transformOrigin,
+            shape = shape,
+            clip = clip,
+            renderEffect = renderEffect,
+            ambientShadowColor = ambientShadowColor,
+            spotShadowColor = spotShadowColor,
+            compositingStrategy = compositingStrategy
+        )
+    },
+    definitions = debugInspectorInfo {
+        name = "graphicsLayer"
+        properties["scaleX"] = scaleX
+        properties["scaleY"] = scaleY
+        properties["alpha"] = alpha
+        properties["translationX"] = translationX
+        properties["translationY"] = translationY
+        properties["shadowElevation"] = shadowElevation
+        properties["rotationX"] = rotationX
+        properties["rotationY"] = rotationY
+        properties["rotationZ"] = rotationZ
+        properties["cameraDistance"] = cameraDistance
+        properties["transformOrigin"] = transformOrigin
+        properties["shape"] = shape
+        properties["clip"] = clip
+        properties["renderEffect"] = renderEffect
+        properties["ambientShadowColor"] = ambientShadowColor
+        properties["spotShadowColor"] = spotShadowColor
+        properties["compositingStrategy"] = compositingStrategy
+    },
+    update = {
+        it.scaleX = scaleX
+        it.scaleY = scaleY
+        it.alpha = alpha
+        it.translationX = translationX
+        it.translationY = translationY
+        it.shadowElevation = shadowElevation
+        it.rotationX = rotationX
+        it.rotationY = rotationY
+        it.rotationZ = rotationZ
+        it.cameraDistance = cameraDistance
+        it.transformOrigin = transformOrigin
+        it.shape = shape
+        it.clip = clip
+        it.renderEffect = renderEffect
+        it.ambientShadowColor = ambientShadowColor
+        it.spotShadowColor = spotShadowColor
+        it.compositingStrategy = compositingStrategy
+        it.invalidateLayerBlock()
+    }
 )
 
 /**
- * A [Modifier.Element] that makes content draw into a draw layer. The draw layer can be
+ * A [Modifier.Node] that makes content draw into a draw layer. The draw layer can be
  * invalidated separately from parents. A [graphicsLayer] should be used when the content
  * updates independently from anything above it to minimize the invalidated content.
  *
@@ -436,16 +461,17 @@ fun Modifier.graphicsLayer(
  *
  * @param block block on [GraphicsLayerScope] where you define the layer properties.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Stable
 fun Modifier.graphicsLayer(block: GraphicsLayerScope.() -> Unit): Modifier =
-    this.then(
-        BlockGraphicsLayerModifier(
-            layerBlock = block,
-            inspectorInfo = debugInspectorInfo {
-                name = "graphicsLayer"
-                properties["block"] = block
-            }
-        )
+    this then modifierElementOf(
+        key = block,
+        create = { BlockGraphicsLayerModifier(block) },
+        definitions = debugInspectorInfo {
+            name = "graphicsLayer"
+            properties["block"] = block
+        },
+        update = { it.layerBlock = block }
     )
 
 /**
@@ -503,10 +529,10 @@ value class CompositingStrategy internal constructor(
 fun Modifier.toolingGraphicsLayer() =
     if (isDebugInspectorInfoEnabled) this.then(Modifier.graphicsLayer()) else this
 
+@OptIn(ExperimentalComposeUiApi::class)
 private class BlockGraphicsLayerModifier(
-    private val layerBlock: GraphicsLayerScope.() -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
+    var layerBlock: GraphicsLayerScope.() -> Unit,
+) : LayoutModifierNode, Modifier.Node() {
 
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -518,42 +544,53 @@ private class BlockGraphicsLayerModifier(
         }
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (other !is BlockGraphicsLayerModifier) return false
-        return layerBlock == other.layerBlock
-    }
-
-    override fun hashCode(): Int {
-        return layerBlock.hashCode()
-    }
-
     override fun toString(): String =
         "BlockGraphicsLayerModifier(" +
             "block=$layerBlock)"
 }
 
-private class SimpleGraphicsLayerModifier(
-    private val scaleX: Float,
-    private val scaleY: Float,
-    private val alpha: Float,
-    private val translationX: Float,
-    private val translationY: Float,
-    private val shadowElevation: Float,
-    private val rotationX: Float,
-    private val rotationY: Float,
-    private val rotationZ: Float,
-    private val cameraDistance: Float,
-    private val transformOrigin: TransformOrigin,
-    private val shape: Shape,
-    private val clip: Boolean,
-    private val renderEffect: RenderEffect?,
-    private val ambientShadowColor: Color,
-    private val spotShadowColor: Color,
-    private val compositingStrategy: CompositingStrategy = CompositingStrategy.Auto,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
+private data class GraphicsLayerParameters(
+    val scaleX: Float,
+    val scaleY: Float,
+    val alpha: Float,
+    val translationX: Float,
+    val translationY: Float,
+    val shadowElevation: Float,
+    val rotationX: Float,
+    val rotationY: Float,
+    val rotationZ: Float,
+    val cameraDistance: Float,
+    val transformOrigin: TransformOrigin,
+    val shape: Shape,
+    val clip: Boolean,
+    val renderEffect: RenderEffect?,
+    val ambientShadowColor: Color,
+    val spotShadowColor: Color,
+    val compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
+)
 
-    private val layerBlock: GraphicsLayerScope.() -> Unit = {
+@OptIn(ExperimentalComposeUiApi::class)
+private class SimpleGraphicsLayerModifier(
+    var scaleX: Float,
+    var scaleY: Float,
+    var alpha: Float,
+    var translationX: Float,
+    var translationY: Float,
+    var shadowElevation: Float,
+    var rotationX: Float,
+    var rotationY: Float,
+    var rotationZ: Float,
+    var cameraDistance: Float,
+    var transformOrigin: TransformOrigin,
+    var shape: Shape,
+    var clip: Boolean,
+    var renderEffect: RenderEffect?,
+    var ambientShadowColor: Color,
+    var spotShadowColor: Color,
+    var compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
+) : LayoutModifierNode, Modifier.Node() {
+
+    private var layerBlock: GraphicsLayerScope.() -> Unit = {
         scaleX = this@SimpleGraphicsLayerModifier.scaleX
         scaleY = this@SimpleGraphicsLayerModifier.scaleY
         alpha = this@SimpleGraphicsLayerModifier.alpha
@@ -573,6 +610,13 @@ private class SimpleGraphicsLayerModifier(
         compositingStrategy = this@SimpleGraphicsLayerModifier.compositingStrategy
     }
 
+    fun invalidateLayerBlock() {
+        requireCoordinator(Nodes.Layout).wrapped?.updateLayerBlock(
+            this.layerBlock,
+            forceLayerInvalidated = true
+        )
+    }
+
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -581,48 +625,6 @@ private class SimpleGraphicsLayerModifier(
         return layout(placeable.width, placeable.height) {
             placeable.placeWithLayer(0, 0, layerBlock = layerBlock)
         }
-    }
-
-    override fun hashCode(): Int {
-        var result = scaleX.hashCode()
-        result = 31 * result + scaleY.hashCode()
-        result = 31 * result + alpha.hashCode()
-        result = 31 * result + translationX.hashCode()
-        result = 31 * result + translationY.hashCode()
-        result = 31 * result + shadowElevation.hashCode()
-        result = 31 * result + rotationX.hashCode()
-        result = 31 * result + rotationY.hashCode()
-        result = 31 * result + rotationZ.hashCode()
-        result = 31 * result + cameraDistance.hashCode()
-        result = 31 * result + transformOrigin.hashCode()
-        result = 31 * result + shape.hashCode()
-        result = 31 * result + clip.hashCode()
-        result = 31 * result + renderEffect.hashCode()
-        result = 31 * result + ambientShadowColor.hashCode()
-        result = 31 * result + spotShadowColor.hashCode()
-        result = 31 * result + compositingStrategy.hashCode()
-        return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        val otherModifier = other as? SimpleGraphicsLayerModifier ?: return false
-        return scaleX == otherModifier.scaleX &&
-            scaleY == otherModifier.scaleY &&
-            alpha == otherModifier.alpha &&
-            translationX == otherModifier.translationX &&
-            translationY == otherModifier.translationY &&
-            shadowElevation == otherModifier.shadowElevation &&
-            rotationX == otherModifier.rotationX &&
-            rotationY == otherModifier.rotationY &&
-            rotationZ == otherModifier.rotationZ &&
-            cameraDistance == otherModifier.cameraDistance &&
-            transformOrigin == otherModifier.transformOrigin &&
-            shape == otherModifier.shape &&
-            clip == otherModifier.clip &&
-            renderEffect == otherModifier.renderEffect &&
-            ambientShadowColor == otherModifier.ambientShadowColor &&
-            spotShadowColor == otherModifier.spotShadowColor &&
-            compositingStrategy == otherModifier.compositingStrategy
     }
 
     override fun toString(): String =

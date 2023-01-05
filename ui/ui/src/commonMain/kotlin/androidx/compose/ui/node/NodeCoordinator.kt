@@ -62,7 +62,7 @@ internal abstract class NodeCoordinator(
     Measurable,
     LayoutCoordinates,
     OwnerScope,
-    (Canvas) -> Unit {
+        (Canvas) -> Unit {
 
     abstract val tail: Modifier.Node
 
@@ -83,6 +83,7 @@ internal abstract class NodeCoordinator(
 
     override val coordinates: LayoutCoordinates
         get() = this
+
     private fun headNode(includeTail: Boolean): Modifier.Node? {
         return if (layoutNode.outerCoordinator === this) {
             layoutNode.nodes.head
@@ -399,12 +400,26 @@ internal abstract class NodeCoordinator(
         }
     }
 
-    fun onLayerBlockUpdated(layerBlock: (GraphicsLayerScope.() -> Unit)?) {
+    fun updateLayerBlock(
+        layerBlock: (GraphicsLayerScope.() -> Unit)?,
+        forceLayerInvalidated: Boolean = false
+    ) {
+        val layerInvalidated = this.layerBlock !== layerBlock || forceLayerInvalidated
+        this.layerBlock = layerBlock
+        onLayerBlockUpdated(layerBlock, forceLayerInvalidated = layerInvalidated)
+    }
+
+    private fun onLayerBlockUpdated(
+        layerBlock: (GraphicsLayerScope.() -> Unit)?,
+        forceLayerInvalidated: Boolean = false
+    ) {
         val layerInvalidated = this.layerBlock !== layerBlock || layerDensity != layoutNode
-            .density || layerLayoutDirection != layoutNode.layoutDirection
+            .density || layerLayoutDirection != layoutNode.layoutDirection ||
+            forceLayerInvalidated
         this.layerBlock = layerBlock
         this.layerDensity = layoutNode.density
         this.layerLayoutDirection = layoutNode.layoutDirection
+
         if (isAttached && layerBlock != null) {
             if (layer == null) {
                 layer = layoutNode.requireOwner().createLayer(
