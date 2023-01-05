@@ -1,7 +1,7 @@
 /*
  * Copyright 2022 The Android Open Source Project
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * Licensed under the Apache License, Version 2.0 (the "License")
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
-import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.newtext.text.TextUsingModifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
@@ -24,6 +24,7 @@ import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkComposeMeasureLayout
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
@@ -33,21 +34,26 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 /**
- * Toggle between "" and "aaaa..." to simulate backend text loading.
+ * Toggle between missing Text and Text("aaa..") to simulate backend text loading.
  *
  * This intentionally hits as many text caches as possible, to isolate compose setText behavior.
  */
-class SetText(private val text: String) : LayeredComposeTestCase(), ToggleableTestCase {
+@OptIn(ExperimentalTextApi::class)
+class ModifierIfNotEmptyCallText(
+    private val text: String
+) : LayeredComposeTestCase(), ToggleableTestCase {
     private var toggleText = mutableStateOf("")
 
     private val style = TextStyle.Default.copy(fontFamily = FontFamily.Monospace)
 
     @Composable
     override fun MeasuredContent() {
-        BasicText(
-            toggleText.value,
-            style = style
-        )
+        if (toggleText.value.isNotEmpty()) {
+            TextUsingModifier(
+                text = toggleText.value,
+                style = style
+            )
+        }
     }
 
     override fun toggleState() {
@@ -61,14 +67,14 @@ class SetText(private val text: String) : LayeredComposeTestCase(), ToggleableTe
 
 @LargeTest
 @RunWith(Parameterized::class)
-open class SetTextParent(private val size: Int) {
+open class ModifierIfNotEmptyParent(private val size: Int) {
 
     @get:Rule
     val benchmarkRule = ComposeBenchmarkRule()
 
     private val caseFactory = {
         val text = generateCacheableStringOf(size)
-        SetText(text)
+        ModifierIfNotEmptyCallText(text)
     }
 
     companion object {
@@ -93,7 +99,7 @@ open class SetTextParent(private val size: Int) {
  */
 @LargeTest
 @RunWith(Parameterized::class)
-class AllAppsSetText(size: Int) : SetTextParent(size) {
+class ModifierAllAppsIfNotEmptyCallText(size: Int) : ModifierIfNotEmptyParent(size) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
@@ -108,7 +114,7 @@ class AllAppsSetText(size: Int) : SetTextParent(size) {
  */
 @LargeTest
 @RunWith(Parameterized::class)
-class ChatAppSetText(size: Int) : SetTextParent(size) {
+class ModifierChatAppIfNotEmptyCallText(size: Int) : ModifierIfNotEmptyParent(size) {
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
