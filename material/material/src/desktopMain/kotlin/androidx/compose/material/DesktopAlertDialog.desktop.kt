@@ -229,7 +229,11 @@ object PopupAlertDialogProvider : AlertDialogProvider {
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Surface(elevation = 24.dp) {
+                Surface(Modifier.pointerInput(onDismissRequest) {
+                    detectTapGestures(onPress = {
+                        // Workaround to disable clicks on Surface background https://github.com/JetBrains/compose-jb/issues/2581
+                    })
+                }, elevation = 24.dp) {
                     content()
                 }
             }
