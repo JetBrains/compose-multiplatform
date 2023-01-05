@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"Закрыць"</string>
     <string name="search" msgid="8595876902241072592">"Пошук"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"Прапановы ўнізе"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"Выберыце дату"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"Выбраная дата"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Перайсці да выбару года"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"Перайсці да выбару дня"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Перайсці да наступнага месяца"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Перайсці да папярэдняга месяца"</string>
 </resources>

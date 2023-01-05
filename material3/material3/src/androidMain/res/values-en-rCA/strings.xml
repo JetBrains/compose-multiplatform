@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"Dismiss"</string>
     <string name="search" msgid="8595876902241072592">"Search"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"Suggestions below"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"Select date"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"Selected date"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Switch to selecting a year"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"Switch to selecting a day"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Change to next month"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Change to previous month"</string>
 </resources>

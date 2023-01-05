@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"ഡിസ്‌മിസ് ചെയ്യുക"</string>
     <string name="search" msgid="8595876902241072592">"തിരയുക"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"നിദ്ദേശങ്ങൾ ചുവടെയുണ്ട്"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"തീയതി തിരഞ്ഞെടുക്കുക"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"തിരഞ്ഞെടുത്ത തീയതി"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"വർഷം തിരഞ്ഞെടുക്കുന്നതിലേക്ക് മാറുക"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"ദിവസം തിരഞ്ഞെടുക്കുന്നതിലേക്ക് മാറുക"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"അടുത്ത മാസത്തിലേക്ക് മാറ്റുക"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"മുമ്പത്തെ മാസത്തിലേക്ക് മാറ്റുക"</string>
 </resources>

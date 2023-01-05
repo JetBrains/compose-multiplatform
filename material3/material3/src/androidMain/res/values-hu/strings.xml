@@ -23,4 +23,10 @@
     <string name="dismiss" msgid="1461218791585306270">"Elvetés"</string>
     <string name="search" msgid="8595876902241072592">"Keresés"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"Javaslatok alább"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"Dátum kiválasztása"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"Kiválasztott dátum"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Váltson a kívánt év kiválasztásához"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"Váltson a kívánt nap kiválasztásához"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Váltás a következő hónapra"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Váltás az előző hónapra"</string>
 </resources>
