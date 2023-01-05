@@ -740,15 +740,16 @@ private fun calculateHeight(
     density: Float,
     paddingValues: PaddingValues
 ): Int {
-    // Even though the padding is defined by the developer, it only affects the text field when the
-    // text field is focused. Otherwise, we use the default value.
-    val verticalPadding = density * if (isLabelFocused) {
+    val hasLabel = labelHeight > 0
+    // Even though the padding is defined by the developer, if there's a label, it only affects the
+    // text field in the focused state. Otherwise, we use the default value.
+    val verticalPadding = density * if (!hasLabel || isLabelFocused) {
         (paddingValues.calculateTopPadding() + paddingValues.calculateBottomPadding()).value
     } else {
         (TextFieldPadding * 2).value
     }
 
-    val middleSectionHeight = if (isLabelFocused) {
+    val middleSectionHeight = if (hasLabel && isLabelFocused) {
         verticalPadding + labelHeight + max(textFieldHeight, placeholderHeight)
     } else {
         verticalPadding + maxOf(labelHeight, textFieldHeight, placeholderHeight)
