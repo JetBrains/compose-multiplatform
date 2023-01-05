@@ -1304,7 +1304,8 @@ internal class ComposerImpl(
      * @see [startRestartGroup]
      */
     @ComposeCompilerApi
-    override fun startReplaceableGroup(key: Int) = start(key, null, false, null)
+    override fun startReplaceableGroup(key: Int) =
+        start(key, null, GroupKind.Group, null)
 
     /**
      * Indicates the end of a "Replaceable Group" at the current execution position. A
@@ -1329,7 +1330,8 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     @Suppress("unused")
-    override fun startDefaults() = start(defaultsKey, null, false, null)
+    override fun startDefaults() =
+        start(defaultsKey, null, GroupKind.Group, null)
 
     /**
      *
@@ -1383,7 +1385,8 @@ internal class ComposerImpl(
      * @see [startRestartGroup]
      */
     @ComposeCompilerApi
-    override fun startMovableGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
+    override fun startMovableGroup(key: Int, dataKey: Any?) =
+        start(key, dataKey, GroupKind.Group, null)
 
     /**
      * Indicates the end of a "Movable Group" at the current execution position. A Movable Group is
@@ -1545,9 +1548,9 @@ internal class ComposerImpl(
      *
      *  @param key The key for the group
      */
-    private fun startGroup(key: Int) = start(key, null, false, null)
+    private fun startGroup(key: Int) = start(key, null, GroupKind.Group, null)
 
-    private fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, false, null)
+    private fun startGroup(key: Int, dataKey: Any?) = start(key, dataKey, GroupKind.Group, null)
 
     /**
      * End the current group.
@@ -1567,17 +1570,12 @@ internal class ComposerImpl(
      * is scheduled to be inserted at the current location.
      */
     override fun startNode() {
-        val key = if (inserting) nodeKey
-        else if (reusing)
-            if (reader.groupKey == nodeKey) nodeKeyReplace else nodeKey
-        else if (reader.groupKey == nodeKeyReplace) nodeKeyReplace
-        else nodeKey
-        start(key, null, true, null)
+        start(nodeKey, null, GroupKind.Node, null)
         nodeExpected = true
     }
 
     override fun startReusableNode() {
-        start(nodeKey, null, true, null)
+        start(nodeKey, null, GroupKind.ReusableNode, null)
         nodeExpected = true
     }
 
@@ -1630,7 +1628,7 @@ internal class ComposerImpl(
             reusingGroup = reader.currentGroup
             reusing = true
         }
-        start(key, null, false, dataKey)
+        start(key, null, GroupKind.Group, dataKey)
     }
 
     override fun endReusableGroup() {
@@ -1993,7 +1991,7 @@ internal class ComposerImpl(
         providersInvalidStack.push(providersInvalid.asInt())
         providersInvalid = invalid
         providerCache = providers
-        start(compositionLocalMapKey, compositionLocalMap, false, providers)
+        start(compositionLocalMapKey, compositionLocalMap, GroupKind.Group, providers)
     }
 
     @InternalComposeApi
@@ -2087,18 +2085,19 @@ internal class ComposerImpl(
         }
     }
 
-    private fun start(key: Int, objectKey: Any?, isNode: Boolean, data: Any?) {
+    private fun start(key: Int, objectKey: Any?, kind: GroupKind, data: Any?) {
         validateNodeNotExpected()
 
         updateCompoundKeyWhenWeEnterGroup(key, objectKey, data)
 
         // Check for the insert fast path. If we are already inserting (creating nodes) then
         // there is no need to track insert, deletes and moves with a pending changes object.
+        val isNode = kind.isNode
         if (inserting) {
             reader.beginEmpty()
             val startIndex = writer.currentGroup
             when {
-                isNode -> writer.startNode(Composer.Empty)
+                isNode -> writer.startNode(key, Composer.Empty)
                 data != null -> writer.startData(key, objectKey ?: Composer.Empty, data)
                 else -> writer.startGroup(key, objectKey ?: Composer.Empty)
             }
@@ -2117,9 +2116,10 @@ internal class ComposerImpl(
             return
         }
 
+        val forceReplace = !kind.isReusable && reusing
         if (pending == null) {
             val slotKey = reader.groupKey
-            if (slotKey == key && objectKey == reader.groupObjectKey) {
+            if (!forceReplace && slotKey == key && objectKey == reader.groupObjectKey) {
                 // The group is the same as what was generated last time.
                 startReaderGroup(isNode, data)
             } else {
@@ -2135,7 +2135,7 @@ internal class ComposerImpl(
         if (pending != null) {
             // Check to see if the key was generated last time from the keys collected above.
             val keyInfo = pending.getNext(key, objectKey)
-            if (keyInfo != null) {
+            if (!forceReplace && keyInfo != null) {
                 // This group was generated last time, use it.
                 pending.recordUsed(keyInfo)
 
@@ -2172,7 +2172,7 @@ internal class ComposerImpl(
                 writer.beginInsert()
                 val startIndex = writer.currentGroup
                 when {
-                    isNode -> writer.startNode(Composer.Empty)
+                    isNode -> writer.startNode(key, Composer.Empty)
                     data != null -> writer.startData(key, objectKey ?: Composer.Empty, data)
                     else -> writer.startGroup(key, objectKey ?: Composer.Empty)
                 }
@@ -2783,7 +2783,7 @@ internal class ComposerImpl(
      */
     @ComposeCompilerApi
     override fun startRestartGroup(key: Int): Composer {
-        start(key, null, false, null)
+        start(key, null, GroupKind.Group, null)
         addRecomposeScope()
         return this
     }
@@ -2882,7 +2882,7 @@ internal class ComposerImpl(
             // when applying late changes which might be very complicated otherwise.
             val providersChanged = if (inserting) false else reader.groupAux != locals
             if (providersChanged) providerUpdates[reader.currentGroup] = locals
-            start(compositionLocalMapKey, compositionLocalMap, false, locals)
+            start(compositionLocalMapKey, compositionLocalMap, GroupKind.Group, locals)
 
             // Either insert a place-holder to be inserted later (either created new or moved from
             // another location) or (re)compose the movable content. This is forced if a new value
@@ -3213,7 +3213,7 @@ internal class ComposerImpl(
     @ComposeCompilerApi
     override fun sourceInformationMarkerStart(key: Int, sourceInformation: String) {
         if (sourceInformationEnabled)
-            start(key, objectKey = null, isNode = false, data = sourceInformation)
+            start(key, objectKey = null, kind = GroupKind.Group, data = sourceInformation)
     }
 
     @ComposeCompilerApi
@@ -4027,7 +4027,7 @@ internal class ComposerImpl(
  *
  * @see ComposeNode
  */
-@kotlin.jvm.JvmInline
+@JvmInline
 value class Updater<T> constructor(
     @PublishedApi internal val composer: Composer
 ) {
@@ -4149,7 +4149,7 @@ value class Updater<T> constructor(
     }
 }
 
-@kotlin.jvm.JvmInline
+@JvmInline
 value class SkippableUpdater<T> constructor(
     @PublishedApi internal val composer: Composer
 ) {
@@ -4375,6 +4375,21 @@ private val resetSlotsInstance: Change = { _, slots, _ -> slots.reset() }
 private val KeyInfo.joinedKey: Any get() = if (objectKey != null) JoinedKey(key, objectKey) else key
 
 /*
+ * Group types used with [Composer.start] to differentiate between different types of groups
+ */
+@JvmInline
+private value class GroupKind private constructor(val value: Int) {
+    inline val isNode get() = value != Group.value
+    inline val isReusable get() = value != Node.value
+
+    companion object {
+        val Group = GroupKind(0)
+        val Node = GroupKind(1)
+        val ReusableNode = GroupKind(2)
+    }
+}
+
+/*
  * Integer keys are arbitrary values in the biload range. The do not need to be unique as if
  * there is a chance they will collide with a compiler generated key they are paired with a
  * OpaqueKey to ensure they are unique.
@@ -4387,10 +4402,7 @@ private const val rootKey = 100
 // An arbitrary key value for a node.
 private const val nodeKey = 125
 
-// An arbitrary key value for a node used to force the node to be replaced.
-private const val nodeKeyReplace = 126
-
-// An arbitrary key value for a node used to force the node to be replaced.
+// An arbitrary key value that marks the default parameter group
 private const val defaultsKey = -127
 
 @PublishedApi

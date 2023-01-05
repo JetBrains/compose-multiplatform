@@ -1241,7 +1241,7 @@ class SlotTableTests {
         sourceTable.write { writer ->
             writer.beginInsert()
             anchors.add(writer.anchor())
-            writer.startNode(10, 10)
+            writer.startNode(10, node = 10)
             writer.update(100)
             writer.update(200)
             writer.endGroup()
@@ -3955,6 +3955,14 @@ class SlotTableTests {
     }
 }
 
+private const val NodeKey = 125
+
+private fun SlotWriter.startNode(key: Any?) =
+    startNode(NodeKey, key)
+
+private fun SlotWriter.startNode(key: Any?, node: Any?) =
+    startNode(NodeKey, key, node)
+
 @OptIn(InternalComposeApi::class)
 internal inline fun SlotWriter.group(block: () -> Unit) {
     startGroup()
@@ -3971,7 +3979,7 @@ internal inline fun SlotWriter.group(key: Int, block: () -> Unit) {
 
 @OptIn(InternalComposeApi::class)
 internal inline fun SlotWriter.nodeGroup(key: Int, node: Any, block: () -> Unit = { }) {
-    startNode(key, node)
+    startNode(NodeKey, key, node)
     block()
     endGroup()
 }
@@ -4040,7 +4048,7 @@ private fun testItems(): SlotTable {
         }
 
         fun element(key: Int, block: () -> Unit) {
-            writer.startNode(key, "node for key $key")
+            writer.startNode(key, node = "node for key $key")
             block()
             writer.endGroup()
         }
