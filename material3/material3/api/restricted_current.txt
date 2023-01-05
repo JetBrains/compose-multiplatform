@@ -232,6 +232,9 @@ package androidx.compose.material3 {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.graphics.Color> LocalContentColor;
   }
 
+  public final class DateInputKt {
+  }
+
   public final class DatePickerDialog_androidKt {
   }
 

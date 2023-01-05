@@ -144,29 +144,29 @@ internal class CalendarModelTest(private val model: CalendarModel) {
     @Test
     fun dateInputFormat() {
         Locale.setDefault(Locale.US)
-        assertThat(model.dateInputFormat.patternWithDelimiters).isEqualTo("MM/dd/yyyy")
-        assertThat(model.dateInputFormat.patternWithoutDelimiters).isEqualTo("MMddyyyy")
-        assertThat(model.dateInputFormat.delimiter).isEqualTo('/')
+        assertThat(model.getDateInputFormat().patternWithDelimiters).isEqualTo("MM/dd/yyyy")
+        assertThat(model.getDateInputFormat().patternWithoutDelimiters).isEqualTo("MMddyyyy")
+        assertThat(model.getDateInputFormat().delimiter).isEqualTo('/')
 
         Locale.setDefault(Locale.CHINA)
-        assertThat(model.dateInputFormat.patternWithDelimiters).isEqualTo("yyyy/MM/dd")
-        assertThat(model.dateInputFormat.patternWithoutDelimiters).isEqualTo("yyyyMMdd")
-        assertThat(model.dateInputFormat.delimiter).isEqualTo('/')
+        assertThat(model.getDateInputFormat().patternWithDelimiters).isEqualTo("yyyy/MM/dd")
+        assertThat(model.getDateInputFormat().patternWithoutDelimiters).isEqualTo("yyyyMMdd")
+        assertThat(model.getDateInputFormat().delimiter).isEqualTo('/')
 
         Locale.setDefault(Locale.UK)
-        assertThat(model.dateInputFormat.patternWithDelimiters).isEqualTo("dd/MM/yyyy")
-        assertThat(model.dateInputFormat.patternWithoutDelimiters).isEqualTo("ddMMyyyy")
-        assertThat(model.dateInputFormat.delimiter).isEqualTo('/')
+        assertThat(model.getDateInputFormat().patternWithDelimiters).isEqualTo("dd/MM/yyyy")
+        assertThat(model.getDateInputFormat().patternWithoutDelimiters).isEqualTo("ddMMyyyy")
+        assertThat(model.getDateInputFormat().delimiter).isEqualTo('/')
 
         Locale.setDefault(Locale.KOREA)
-        assertThat(model.dateInputFormat.patternWithDelimiters).isEqualTo("yyyy.MM.dd")
-        assertThat(model.dateInputFormat.patternWithoutDelimiters).isEqualTo("yyyyMMdd")
-        assertThat(model.dateInputFormat.delimiter).isEqualTo('.')
+        assertThat(model.getDateInputFormat().patternWithDelimiters).isEqualTo("yyyy.MM.dd")
+        assertThat(model.getDateInputFormat().patternWithoutDelimiters).isEqualTo("yyyyMMdd")
+        assertThat(model.getDateInputFormat().delimiter).isEqualTo('.')
 
         Locale.setDefault(Locale("es", "CL"))
-        assertThat(model.dateInputFormat.patternWithDelimiters).isEqualTo("dd-MM-yyyy")
-        assertThat(model.dateInputFormat.patternWithoutDelimiters).isEqualTo("ddMMyyyy")
-        assertThat(model.dateInputFormat.delimiter).isEqualTo('-')
+        assertThat(model.getDateInputFormat().patternWithDelimiters).isEqualTo("dd-MM-yyyy")
+        assertThat(model.getDateInputFormat().patternWithoutDelimiters).isEqualTo("ddMMyyyy")
+        assertThat(model.getDateInputFormat().delimiter).isEqualTo('-')
     }
 
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
@@ -184,7 +184,7 @@ internal class CalendarModelTest(private val model: CalendarModel) {
 
         assertThat(newModel.today).isEqualTo(legacyModel.today)
         assertThat(month).isEqualTo(legacyMonth)
-        assertThat(newModel.dateInputFormat).isEqualTo(legacyModel.dateInputFormat)
+        assertThat(newModel.getDateInputFormat()).isEqualTo(legacyModel.getDateInputFormat())
         assertThat(newModel.plusMonths(month, 3)).isEqualTo(legacyModel.plusMonths(month, 3))
         assertThat(date).isEqualTo(legacyDate)
         assertThat(newModel.getDayOfWeek(date)).isEqualTo(legacyModel.getDayOfWeek(date))

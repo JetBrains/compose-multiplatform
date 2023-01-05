@@ -44,6 +44,14 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerNavigateToYearDescription -> "Navigate to year %1$"
         Strings.DatePickerHeadlineDescription -> "Current selection: %1$"
         Strings.DatePickerNoSelectionDescription -> "None"
+        Strings.DateInputTitle -> "Select date"
+        Strings.DateInputHeadline -> "Entered date"
+        Strings.DateInputLabel -> "Date"
+        Strings.DateInputHeadlineDescription -> "Entered date: %1$"
+        Strings.DateInputNoInputHeadlineDescription -> "None"
+        Strings.DateInputInvalidNotAllowed -> "Date not allowed: %1$"
+        Strings.DateInputInvalidForPattern -> "Date does not match expected pattern: %1$"
+        Strings.DateInputInvalidYearRange -> "Date out of expected year range %1$ - %2$"
         else -> ""
     }
 }

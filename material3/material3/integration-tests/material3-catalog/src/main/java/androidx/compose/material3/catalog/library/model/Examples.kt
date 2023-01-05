@@ -38,6 +38,8 @@ import androidx.compose.material3.samples.CircularProgressIndicatorSample
 import androidx.compose.material3.samples.ClickableCardSample
 import androidx.compose.material3.samples.ClickableElevatedCardSample
 import androidx.compose.material3.samples.ClickableOutlinedCardSample
+import androidx.compose.material3.samples.DateInputDialogSample
+import androidx.compose.material3.samples.DateInputSample
 import androidx.compose.material3.samples.DatePickerDialogSample
 import androidx.compose.material3.samples.DatePickerSample
 import androidx.compose.material3.samples.DatePickerWithDateValidatorSample
@@ -362,6 +364,20 @@ val DatePickerExamples = listOf(
         sourceUrl = DatePickerExampleSourceUrl
     ) {
         DatePickerWithDateValidatorSample()
+    },
+    Example(
+        name = ::DateInputSample.name,
+        description = DatePickerExampleDescription,
+        sourceUrl = DatePickerExampleSourceUrl
+    ) {
+        DateInputSample()
+    },
+    Example(
+        name = ::DateInputDialogSample.name,
+        description = DatePickerExampleDescription,
+        sourceUrl = DatePickerExampleSourceUrl
+    ) {
+        DateInputDialogSample()
     },
 )
 
