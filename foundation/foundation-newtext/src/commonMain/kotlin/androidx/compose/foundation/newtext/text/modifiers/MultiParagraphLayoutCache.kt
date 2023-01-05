@@ -35,6 +35,8 @@ internal class MultiParagraphLayoutCache(
     private val params: TextInlineContentLayoutDrawParams,
     private val density: Density
 ) {
+    private var minMaxLinesCoercer: MinMaxLinesCoercer? = null
+
     /*@VisibleForTesting*/
     // NOTE(text-perf-review): it seems like TextDelegate essentially guarantees that we use
     // MultiParagraph. Can we have a fast-path that uses just Paragraph in simpler cases (ie,
@@ -167,14 +169,20 @@ internal class MultiParagraphLayoutCache(
         if (!layoutCache.newConstraintsProduceNewLayout(constraints, layoutDirection)) {
             return false
         }
-        val finalConstraints = if (params.maxLines != Int.MAX_VALUE || params.minLines >= 1) {
-            constraints.coerceMaxMinLines(
-                layoutDirection = layoutDirection,
+        val finalConstraints = if (params.maxLines != Int.MAX_VALUE || params.minLines > 1) {
+            val localMinMax = MinMaxLinesCoercer.from(
+                minMaxLinesCoercer,
+                layoutDirection,
+                params.style,
+                density,
+                params.fontFamilyResolver
+            ).also {
+                minMaxLinesCoercer = it
+            }
+            localMinMax.coerceMaxMinLines(
+                inConstraints = constraints,
                 minLines = params.minLines,
-                maxLines = params.maxLines,
-                paramStyle = params.style,
-                density = density,
-                fontFamilyResolver = params.fontFamilyResolver
+                maxLines = params.maxLines
             )
         } else {
             constraints
