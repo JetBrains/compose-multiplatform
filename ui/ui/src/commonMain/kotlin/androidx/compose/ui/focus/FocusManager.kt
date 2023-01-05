@@ -160,9 +160,9 @@ internal class FocusOwnerImpl(onRequestApplyChangesListener: (() -> Unit) -> Uni
         val source = rootFocusNode.findActiveFocusNode() ?: return false
 
         // Check if a custom focus traversal order is specified.
-        return when (val next = source.customFocusSearch(focusDirection, layoutDirection)) {
+        when (val next = source.customFocusSearch(focusDirection, layoutDirection)) {
             @OptIn(ExperimentalComposeUiApi::class)
-            Cancel -> false
+            Cancel -> return false
             Default -> {
                 val foundNextItem =
                     rootFocusNode.focusSearch(focusDirection, layoutDirection) { destination ->
@@ -172,18 +172,11 @@ internal class FocusOwnerImpl(onRequestApplyChangesListener: (() -> Unit) -> Uni
                         }
                         // If we found a potential next item, move focus to it.
                         destination.requestFocus()
-                        true
                     }
                 // If we didn't find a potential next item, try to wrap around.
-                foundNextItem || wrapAroundFocus(focusDirection)
+                return foundNextItem || wrapAroundFocus(focusDirection)
             }
-            else -> {
-                // TODO(b/175899786): We ideally need to check if the nextFocusRequester points to
-                //  something that is visible and focusable in the current mode (Touch/Non-Touch
-                //  mode).
-                next.requestFocus()
-                true
-            }
+            else -> return next.findFocusTarget { it.requestFocus() } ?: false
         }
     }
 
