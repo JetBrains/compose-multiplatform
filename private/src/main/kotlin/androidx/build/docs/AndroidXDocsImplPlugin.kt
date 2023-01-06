@@ -59,6 +59,7 @@ import org.gradle.api.plugins.JavaBasePlugin
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.CacheableTask
+import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
@@ -662,7 +663,7 @@ data class SourceSetMetadata(
 @CacheableTask
 abstract class UnzipMultiplatformSourcesTask() : DefaultTask() {
 
-    @get:InputFiles @get:PathSensitive(PathSensitivity.RELATIVE)
+    @get:Input
     abstract val inputJars: ListProperty<File>
 
     @OutputDirectory
