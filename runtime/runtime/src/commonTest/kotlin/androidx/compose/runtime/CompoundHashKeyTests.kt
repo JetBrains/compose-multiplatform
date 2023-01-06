@@ -16,6 +16,7 @@
 
 package androidx.compose.runtime
 
+import androidx.compose.runtime.mock.NonReusableText
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectNoChanges
 import kotlin.test.Test
@@ -80,6 +81,31 @@ class CompoundHashKeyTests {
         advance()
 
         assertEquals(originalKey, testClass.currentKey)
+    }
+
+    @Test // b/263760668
+    fun testReusableContentNodeKeys() = compositionTest {
+        var keyOnEnter = -1
+        var keyOnExit = -1
+
+        var contentKey by mutableStateOf(0)
+
+        compose {
+            ReusableContent(contentKey) {
+                keyOnEnter = currentCompositeKeyHash
+
+                NonReusableText("$contentKey")
+
+                keyOnExit = currentCompositeKeyHash
+            }
+        }
+
+        assertEquals(keyOnEnter, keyOnExit)
+
+        contentKey = 1
+        advance()
+
+        assertEquals(keyOnEnter, keyOnExit)
     }
 }
 
