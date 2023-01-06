@@ -1937,6 +1937,15 @@ package androidx.compose.ui.input.pointer.util {
     method public void resetTracking();
   }
 
+  public final class VelocityTracker1D {
+    ctor public VelocityTracker1D(boolean isDataDifferential);
+    method public void addDataPoint(long timeMillis, float dataPoint);
+    method public float calculateVelocity();
+    method public boolean isDataDifferential();
+    method public void resetTracking();
+    property public final boolean isDataDifferential;
+  }
+
   public final class VelocityTrackerKt {
     method public static void addPointerInputChange(androidx.compose.ui.input.pointer.util.VelocityTracker, androidx.compose.ui.input.pointer.PointerInputChange event);
   }

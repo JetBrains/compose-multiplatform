@@ -88,22 +88,47 @@ class VelocityTracker {
  * A velocity tracker calculating velocity in 1 dimension.
  *
  * Add displacement data points using [addDataPoint], and obtain velocity using [calculateVelocity].
+ *
+ * Note: for calculating touch-related or other 2 dimensional/planar velocities, please use
+ * [VelocityTracker], which handles velocity tracking across both X and Y dimensions at once.
  */
-internal class VelocityTracker1D(
+class VelocityTracker1D internal constructor(
     // whether the data points added to the tracker represent differential values
     // (i.e. change in the  tracked object's displacement since the previous data point).
     // If false, it means that the data points added to the tracker will be considered as absolute
     // values (e.g. positional values).
-    private val differentialDataPoints: Boolean = false,
+    val isDataDifferential: Boolean = false,
     // The velocity tracking strategy that this instance uses for all velocity calculations.
     private val strategy: Strategy = Strategy.Lsq2,
 ) {
 
     init {
-        if (differentialDataPoints && strategy.equals(Strategy.Lsq2)) {
+        if (isDataDifferential && strategy.equals(Strategy.Lsq2)) {
             throw IllegalStateException("Lsq2 not (yet) supported for differential axes")
         }
     }
+
+    /**
+     * Constructor to create a new velocity tracker. It allows to specify whether or not the tracker
+     * should consider the data ponits provided via [addDataPoint] as differential or
+     * non-differential.
+     *
+     * Differential data ponits represent change in displacement. For instance, differential data
+     * points of [2, -1, 5] represent: the object moved by "2" units, then by "-1" units, then by
+     * "5" units. An example use case for differential data points is when tracking velocity for an
+     * object whose displacements (or change in positions) over time are known.
+     *
+     * Non-differential data ponits represent position of the object whose velocity is tracked. For
+     * instance, non-differential data points of [2, -1, 5] represent: the object was at position
+     * "2", then at position "-1", then at position "5". An example use case for non-differential
+     * data points is when tracking velocity for an object whose positions on a geometrical axis
+     * over different instances of time are known.
+     *
+     * @param isDataDifferential [true] if the data ponits provided to the constructed tracker
+     * are differential. [false] otherwise.
+     */
+    constructor(isDataDifferential: Boolean) : this(isDataDifferential, Strategy.Impulse)
+
     private val minSampleSize: Int = when (strategy) {
         Strategy.Impulse -> 2
         Strategy.Lsq2 -> 3
@@ -114,7 +139,7 @@ internal class VelocityTracker1D(
      * result in notably different velocities than the others, so make careful choice or change of
      * strategy whenever you want to make one.
      */
-    enum class Strategy {
+    internal enum class Strategy {
         /**
          * Least squares strategy. Polynomial fit at degree 2.
          * Note that the implementation of this strategy currently supports only non-differential
@@ -133,8 +158,11 @@ internal class VelocityTracker1D(
     private var index: Int = 0
 
     /**
-     * Adds a data point for velocity calculation. A data point should represent a position along
-     * the tracked axis at a given time, [timeMillis].
+     * Adds a data point for velocity calculation at a given time, [timeMillis]. The data ponit
+     * represents an amount of a change in position (for differential data points), or an absolute
+     * position (for non-differential data points). Whether or not the tracker handles differential
+     * data points is decided by [isDataDifferential], which is set once and finally during
+     * the construction of the tracker.
      *
      * Use the same units for the data points provided. For example, having some data points in `cm`
      * and some in `m` will result in incorrect velocity calculations, as this method (and the
@@ -188,7 +216,7 @@ internal class VelocityTracker1D(
             // Multiply by "1000" to convert from units/ms to units/s
             return when (strategy) {
                 Strategy.Impulse ->
-                    calculateImpulseVelocity(dataPoints, time, differentialDataPoints) * 1000
+                    calculateImpulseVelocity(dataPoints, time, isDataDifferential) * 1000
                 Strategy.Lsq2 -> calculateLeastSquaresVelocity(dataPoints, time) * 1000
             }
         }
@@ -199,7 +227,7 @@ internal class VelocityTracker1D(
     }
 
     /**
-     * Clears the tracked positions added by [addDataPoint].
+     * Clears data points added by [addDataPoint].
      */
     fun resetTracking() {
         samples.fill(element = null)
@@ -487,7 +515,7 @@ internal fun polyFitLeastSquares(
 private fun calculateImpulseVelocity(
     dataPoints: List<Float>,
     time: List<Float>,
-    differentialDataPoints: Boolean
+    isDataDifferential: Boolean
 ): Float {
     val numDataPoints = dataPoints.size
     if (numDataPoints < 2) {
@@ -501,7 +529,7 @@ private fun calculateImpulseVelocity(
             // For differential data ponits, each measurement reflects the amount of change in the
             // subject's position. However, the first sample is discarded in computation because we
             // don't know the time duration over which this change has occurred.
-            if (differentialDataPoints) dataPoints[0]
+            if (isDataDifferential) dataPoints[0]
             else dataPoints[0] - dataPoints[1]
         return dataPointsDelta / (time[0] - time[1])
     }
@@ -512,7 +540,7 @@ private fun calculateImpulseVelocity(
         }
         val vPrev = kineticEnergyToVelocity(work)
         val dataPointsDelta =
-            if (differentialDataPoints) -dataPoints[i - 1]
+            if (isDataDifferential) -dataPoints[i - 1]
             else dataPoints[i] - dataPoints[i - 1]
         val vCurr = dataPointsDelta / (time[i] - time[i - 1])
         work += (vCurr - vPrev) * abs(vCurr)

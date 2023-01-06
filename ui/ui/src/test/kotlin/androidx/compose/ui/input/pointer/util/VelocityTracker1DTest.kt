@@ -35,7 +35,7 @@ class VelocityTracker1DTest {
     @Test
     fun lsq2_differentialValues_unsupported() {
         assertThrows(IllegalStateException::class.java) {
-            VelocityTracker1D(differentialDataPoints = true, Strategy.Lsq2)
+            VelocityTracker1D(isDataDifferential = true, Strategy.Lsq2)
         }
     }
     @Test
@@ -154,7 +154,7 @@ class VelocityTracker1DTest {
     @Test
     fun resetTracking_differentialValues_impulse() {
         // Fixed velocity at 5 points per 10 milliseconds
-        val tracker = VelocityTracker1D(differentialDataPoints = true, Strategy.Impulse)
+        val tracker = VelocityTracker1D(isDataDifferential = true, Strategy.Impulse)
         tracker.addDataPoint(0, 0f)
         tracker.addDataPoint(10, 5f)
         tracker.addDataPoint(20, 10f)
@@ -169,7 +169,7 @@ class VelocityTracker1DTest {
     @Test
     fun resetTracking_nonDifferentialValues_impulse() {
         // Fixed velocity at 5 points per 10 milliseconds
-        val tracker = VelocityTracker1D(differentialDataPoints = false, Strategy.Impulse)
+        val tracker = VelocityTracker1D(isDataDifferential = false, Strategy.Impulse)
         tracker.addDataPoint(0, 0f)
         tracker.addDataPoint(10, 5f)
         tracker.addDataPoint(20, 10f)
@@ -184,7 +184,7 @@ class VelocityTracker1DTest {
     @Test
     fun resetTracking_nonDifferentialValues_lsq2() {
         // Fixed velocity at 5 points per 10 milliseconds
-        val tracker = VelocityTracker1D(differentialDataPoints = false, Strategy.Lsq2)
+        val tracker = VelocityTracker1D(isDataDifferential = false, Strategy.Lsq2)
         tracker.addDataPoint(0, 0f)
         tracker.addDataPoint(10, 5f)
         tracker.addDataPoint(20, 10f)
