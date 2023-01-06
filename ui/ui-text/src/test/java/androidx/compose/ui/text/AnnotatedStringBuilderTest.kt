@@ -850,6 +850,35 @@ class AnnotatedStringBuilderTest {
     }
 
     @Test
+    fun hasStringAnnotationTrue() {
+        val text = "Test"
+        val annotation = "Annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushStringAnnotation(tag, annotation)
+            append(text)
+            pop()
+        }.toAnnotatedString()
+
+        assertThat(buildResult.hasStringAnnotations(tag, 0, text.length)).isTrue()
+    }
+
+    @Test
+    fun hasStringAnnotationFalse() {
+        val text = "Test"
+        val annotation = "Annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushStringAnnotation(tag, annotation)
+            append(text)
+            pop()
+            append(text)
+        }.toAnnotatedString()
+
+        assertThat(buildResult.hasStringAnnotations(tag, text.length, buildResult.length)).isFalse()
+    }
+
+    @Test
     fun pushAnnotation_multiple_nested() {
         val annotation1 = "Annotation1"
         val annotation2 = "Annotation2"

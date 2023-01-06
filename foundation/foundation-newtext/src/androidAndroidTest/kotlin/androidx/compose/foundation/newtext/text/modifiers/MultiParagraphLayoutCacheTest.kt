@@ -52,7 +52,7 @@ class MultiParagraphLayoutCacheTest {
             val spanStyle = SpanStyle(fontSize = fontSize, fontFamily = fontFamily)
             val annotatedString = AnnotatedString(text, spanStyle)
             val textDelegate = MultiParagraphLayoutCache(
-                TextInlineContentLayoutDrawParams(
+                StaticTextLayoutDrawParams(
                     text = annotatedString,
                     style = TextStyle.Default,
                     fontFamilyResolver = fontFamilyResolver,
@@ -75,7 +75,7 @@ class MultiParagraphLayoutCacheTest {
             val spanStyle = SpanStyle(fontSize = fontSize, fontFamily = fontFamily)
             val annotatedString = AnnotatedString(text, spanStyle)
             val textDelegate = MultiParagraphLayoutCache(
-                TextInlineContentLayoutDrawParams(
+                StaticTextLayoutDrawParams(
                     text = annotatedString,
                     style = TextStyle.Default,
                     fontFamilyResolver = fontFamilyResolver,
@@ -93,7 +93,7 @@ class MultiParagraphLayoutCacheTest {
     @Test
     fun TextLayoutInput_reLayout_withDifferentHeight() {
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = AnnotatedString(text = "Hello World!"),
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver,
@@ -121,7 +121,7 @@ class MultiParagraphLayoutCacheTest {
     @Test
     fun TextLayoutResult_reLayout_withDifferentHeight() {
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = AnnotatedString(text = "Hello World!"),
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver,
@@ -151,7 +151,7 @@ class MultiParagraphLayoutCacheTest {
         val fontSize = 20f
         val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = text,
                 style = TextStyle(fontSize = fontSize.sp),
                 fontFamilyResolver = fontFamilyResolver,
@@ -178,7 +178,7 @@ class MultiParagraphLayoutCacheTest {
         val fontSize = 20f
         val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = text,
                 style = TextStyle(fontSize = fontSize.sp),
                 fontFamilyResolver = fontFamilyResolver,
@@ -203,7 +203,7 @@ class MultiParagraphLayoutCacheTest {
         val fontSize = 20f
         val text = AnnotatedString(text = "Hello World")
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = text,
                 style = TextStyle(fontSize = fontSize.sp, letterSpacing = 0.5.sp),
                 fontFamilyResolver = fontFamilyResolver,

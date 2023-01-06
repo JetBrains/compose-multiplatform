@@ -22,6 +22,7 @@ package androidx.compose.ui.text {
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<java.lang.String>> getStringAnnotations(int start, int end);
     method public String getText();
     method public java.util.List<androidx.compose.ui.text.AnnotatedString.Range<androidx.compose.ui.text.TtsAnnotation>> getTtsAnnotations(int start, int end);
+    method public boolean hasStringAnnotations(String tag, int start, int end);
     method @androidx.compose.runtime.Stable public operator androidx.compose.ui.text.AnnotatedString plus(androidx.compose.ui.text.AnnotatedString other);
     method public androidx.compose.ui.text.AnnotatedString subSequence(int startIndex, int endIndex);
     method public androidx.compose.ui.text.AnnotatedString subSequence(long range);

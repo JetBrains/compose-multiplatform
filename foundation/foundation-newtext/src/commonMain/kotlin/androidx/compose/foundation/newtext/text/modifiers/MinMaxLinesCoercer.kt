@@ -32,7 +32,8 @@ internal class MinMaxLinesCoercer private constructor(
     val fontFamilyResolver: FontFamily.Resolver
 ) {
     private val resolvedStyle = resolveDefaults(inputTextStyle, layoutDirection)
-    private var lineHeightCache: Pair<Float, Float>? = null
+    private var lineHeightCache: Float = Float.NaN
+    private var oneLineHeightCache: Float = Float.NaN
 
     companion object {
         // LRU cache of one since this tends to be used for similar styles
@@ -86,44 +87,42 @@ internal class MinMaxLinesCoercer private constructor(
         minLines: Int,
         maxLines: Int,
     ): Constraints {
-        val (lineHeight, oneLine) = lineHeightCache.let {
-            if (it != null) {
-                it
-            } else {
-                val oneLine = Paragraph(
-                    text = EmptyTextReplacement,
-                    style = resolvedStyle,
-                    constraints = Constraints(),
-                    density = density,
-                    fontFamilyResolver = fontFamilyResolver,
-                    maxLines = 1,
-                    ellipsis = false
-                ).height
+        var oneLineHeight = oneLineHeightCache
+        var lineHeight = lineHeightCache
+        if (oneLineHeight.isNaN() || lineHeight.isNaN()) {
+            oneLineHeight = Paragraph(
+                text = EmptyTextReplacement,
+                style = resolvedStyle,
+                constraints = Constraints(),
+                density = density,
+                fontFamilyResolver = fontFamilyResolver,
+                maxLines = 1,
+                ellipsis = false
+            ).height
 
-                val twoLines = Paragraph(
-                    text = TwoLineTextReplacement,
-                    style = resolvedStyle,
-                    constraints = Constraints(),
-                    density = density,
-                    fontFamilyResolver = fontFamilyResolver,
-                    maxLines = 2,
-                    ellipsis = false
-                ).height
+            val twoLineHeight = Paragraph(
+                text = TwoLineTextReplacement,
+                style = resolvedStyle,
+                constraints = Constraints(),
+                density = density,
+                fontFamilyResolver = fontFamilyResolver,
+                maxLines = 2,
+                ellipsis = false
+            ).height
 
-                val result = (twoLines - oneLine) to oneLine
-                lineHeightCache = result
-                result
-            }
+            lineHeight = twoLineHeight - oneLineHeight
+            oneLineHeightCache = oneLineHeight
+            lineHeightCache = lineHeight
         }
         val maxHeight = if (maxLines != Int.MAX_VALUE) {
-            (oneLine + (lineHeight * (maxLines - 1)))
+            (oneLineHeight + (lineHeight * (maxLines - 1)))
                 .roundToInt()
                 .coerceAtLeast(0)
         } else {
             inConstraints.maxHeight
         }
         val minHeight = if (minLines != 1) {
-            (oneLine + (lineHeight * (minLines - 1)))
+            (oneLineHeight + (lineHeight * (minLines - 1)))
                 .roundToInt()
                 .coerceAtLeast(0)
                 .coerceAtMost(maxHeight)

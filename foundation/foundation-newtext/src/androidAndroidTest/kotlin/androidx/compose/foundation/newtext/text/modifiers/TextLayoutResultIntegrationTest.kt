@@ -56,7 +56,7 @@ class TextLayoutResultIntegrationTest {
             val spanStyle = SpanStyle(fontSize = fontSize, fontFamily = fontFamily)
             val annotatedString = AnnotatedString(text, spanStyle)
             val textDelegate = MultiParagraphLayoutCache(
-                TextInlineContentLayoutDrawParams(
+                StaticTextLayoutDrawParams(
                     text = annotatedString,
                     style = TextStyle.Default,
                     fontFamilyResolver = fontFamilyResolver
@@ -80,7 +80,7 @@ class TextLayoutResultIntegrationTest {
         val spanStyle = SpanStyle(fontSize = 20.sp, fontFamily = fontFamily)
         val annotatedString = AnnotatedString(text, spanStyle)
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver
@@ -102,7 +102,7 @@ class TextLayoutResultIntegrationTest {
             val text = "hello"
             val annotatedString = AnnotatedString(text, spanStyle)
             val textDelegate = MultiParagraphLayoutCache(
-                TextInlineContentLayoutDrawParams(
+                StaticTextLayoutDrawParams(
                     text = annotatedString,
                     style = TextStyle.Default,
                     fontFamilyResolver = fontFamilyResolver
@@ -120,7 +120,7 @@ class TextLayoutResultIntegrationTest {
     @Test
     fun layout_build_layoutResult() {
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = AnnotatedString("Hello"),
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver
@@ -147,7 +147,7 @@ class TextLayoutResultIntegrationTest {
         )
 
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver
@@ -175,7 +175,7 @@ class TextLayoutResultIntegrationTest {
             )
 
             val textDelegate = MultiParagraphLayoutCache(
-                TextInlineContentLayoutDrawParams(
+                StaticTextLayoutDrawParams(
                     text = annotatedString,
                     style = TextStyle.Default,
                     fontFamilyResolver = fontFamilyResolver
@@ -199,7 +199,7 @@ class TextLayoutResultIntegrationTest {
         val spanStyle = SpanStyle(fontSize = 20.sp, fontFamily = fontFamily)
         val annotatedString = AnnotatedString(text, spanStyle)
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver
@@ -224,7 +224,7 @@ class TextLayoutResultIntegrationTest {
         val maxLines = 3
 
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver,
@@ -253,7 +253,7 @@ class TextLayoutResultIntegrationTest {
         val maxLines = 10
 
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver,
@@ -281,7 +281,7 @@ class TextLayoutResultIntegrationTest {
         val annotatedString = AnnotatedString(text, spanStyle)
 
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver,
@@ -314,7 +314,7 @@ class TextLayoutResultIntegrationTest {
         val annotatedString = AnnotatedString(text, spanStyle)
 
         val textDelegate = MultiParagraphLayoutCache(
-            TextInlineContentLayoutDrawParams(
+            StaticTextLayoutDrawParams(
                 text = annotatedString,
                 style = TextStyle.Default,
                 fontFamilyResolver = fontFamilyResolver

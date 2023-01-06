@@ -18,9 +18,9 @@ package androidx.compose.foundation.newtext.text
 
 import androidx.compose.foundation.newtext.text.copypasta.selection.LocalSelectionRegistrar
 import androidx.compose.foundation.newtext.text.copypasta.selection.LocalTextSelectionColors
-import androidx.compose.foundation.newtext.text.modifiers.StaticTextModifier
 import androidx.compose.foundation.newtext.text.modifiers.StaticTextSelectionModifierController
-import androidx.compose.foundation.newtext.text.modifiers.TextInlineContentLayoutDrawParams
+import androidx.compose.foundation.newtext.text.modifiers.StaticTextLayoutDrawParams
+import androidx.compose.foundation.newtext.text.modifiers.StaticTextModifier
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -33,6 +33,7 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.platform.LocalFontFamilyResolver
 import androidx.compose.ui.platform.debugInspectorInfo
@@ -78,7 +79,6 @@ fun TextUsingModifier(
         null
     }
     Layout(
-        content = {},
         modifier = modifier.textModifier(
             AnnotatedString(text),
             style = style,
@@ -92,7 +92,7 @@ fun TextUsingModifier(
             onPlaceholderLayout = null,
             selectionController = selectionController
         ),
-        TextMeasurePolicy { null }
+        EmptyMeasurePolicy
     )
 }
 
@@ -112,8 +112,6 @@ fun TextUsingModifier(
     minLines: Int = 1,
     inlineContent: Map<String, InlineTextContent>? = null,
 ) {
-    val fontFamilyResolver = LocalFontFamilyResolver.current
-
     val selectionRegistrar = LocalSelectionRegistrar.current
     val selectionController = if (selectionRegistrar != null) {
         val backgroundSelectionColor = LocalTextSelectionColors.current.backgroundColor
@@ -127,31 +125,58 @@ fun TextUsingModifier(
         null
     }
 
-    val (placeholders, inlineComposables) = text.resolveInlineContent(inlineContent)
-    val measuredPlaceholderPositions = remember {
-        mutableStateOf<List<Rect?>?>(null)
+    if (!text.hasInlineContent()) {
+        // this is the same as text: String, use all the early exits
+        Layout(
+            modifier = modifier.textModifier(
+                text = text,
+                style = style,
+                onTextLayout = onTextLayout,
+                overflow = overflow,
+                softWrap = softWrap,
+                maxLines = maxLines,
+                minLines = minLines,
+                fontFamilyResolver = LocalFontFamilyResolver.current,
+                placeholders = null,
+                onPlaceholderLayout = null,
+                selectionController = selectionController
+            ),
+            EmptyMeasurePolicy
+        )
+    } else {
+        // do the inline content allocs
+        val (placeholders, inlineComposables) = text.resolveInlineContent(inlineContent)
+        val measuredPlaceholderPositions = remember {
+            mutableStateOf<List<Rect?>?>(null)
+        }
+        Layout(
+            content = { InlineChildren(text, inlineComposables) },
+            modifier = modifier.textModifier(
+                text = text,
+                style = style,
+                onTextLayout = onTextLayout,
+                overflow = overflow,
+                softWrap = softWrap,
+                maxLines = maxLines,
+                minLines = minLines,
+                fontFamilyResolver = LocalFontFamilyResolver.current,
+                placeholders = placeholders,
+                onPlaceholderLayout = { measuredPlaceholderPositions.value = it },
+                selectionController = selectionController
+            ),
+            measurePolicy = TextMeasurePolicy { measuredPlaceholderPositions.value }
+        )
     }
-    Layout(
-        content = if (inlineComposables.isEmpty()) {
-            {}
-        } else {
-            { InlineChildren(text, inlineComposables) }
-        },
-        modifier = modifier.textModifier(
-            text = text,
-            style = style,
-            onTextLayout = onTextLayout,
-            overflow = overflow,
-            softWrap = softWrap,
-            maxLines = maxLines,
-            minLines = minLines,
-            fontFamilyResolver = fontFamilyResolver,
-            placeholders = placeholders,
-            onPlaceholderLayout = { measuredPlaceholderPositions.value = it },
-            selectionController = selectionController
-        ),
-        measurePolicy = TextMeasurePolicy { measuredPlaceholderPositions.value }
-    )
+}
+
+private object EmptyMeasurePolicy : MeasurePolicy {
+    private val placementBlock: Placeable.PlacementScope.() -> Unit = {}
+    override fun MeasureScope.measure(
+        measurables: List<Measurable>,
+        constraints: Constraints
+    ): MeasureResult {
+        return layout(constraints.maxWidth, constraints.maxHeight, placementBlock = placementBlock)
+    }
 }
 
 private class TextMeasurePolicy(
@@ -201,7 +226,7 @@ private fun Modifier.textModifier(
     onPlaceholderLayout: ((List<Rect?>) -> Unit)?,
     selectionController: StaticTextSelectionModifierController?
 ): Modifier {
-    val params = TextInlineContentLayoutDrawParams(
+    val params = StaticTextLayoutDrawParams(
         text,
         style,
         fontFamilyResolver,
@@ -221,7 +246,7 @@ private fun Modifier.textModifier(
     ) {
         override fun create(): StaticTextModifier = StaticTextModifier(params)
         override fun update(node: StaticTextModifier): StaticTextModifier =
-            node.also { it.update(params) }
+            node.also { it.params = params }
     }
     val selectionModifier = selectionController?.modifier ?: Modifier
     return this then selectionModifier then staticTextModifier

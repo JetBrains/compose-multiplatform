@@ -21,6 +21,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.AnnotatedString.Builder
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 
@@ -139,6 +140,13 @@ class AnnotatedString internal constructor(
         annotations.fastFilter {
             it.item is String && tag == it.tag && intersect(start, end, it.start, it.end)
         } as List<Range<String>>
+
+    /**
+     * Returns true if [getStringAnnotations] with the same parameters would return a non-empty list
+     */
+    fun hasStringAnnotations(tag: String, start: Int, end: Int): Boolean = annotations.fastAny {
+        it.item is String && tag == it.tag && intersect(start, end, it.start, it.end)
+    }
 
     /**
      * Query all of the string annotations attached on this AnnotatedString.

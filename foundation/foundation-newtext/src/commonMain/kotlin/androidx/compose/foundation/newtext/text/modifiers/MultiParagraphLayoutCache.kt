@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
 
 internal class MultiParagraphLayoutCache(
-    private val params: TextInlineContentLayoutDrawParams,
+    private val params: StaticTextLayoutDrawParams,
     private val density: Density
 ) {
     private var minMaxLinesCoercer: MinMaxLinesCoercer? = null
@@ -273,7 +273,7 @@ internal class MultiParagraphLayoutCache(
         return false
     }
 
-    private fun TextInlineContentLayoutDrawParams.paraMaxWidthFor(constraints: Constraints): Int {
+    private fun StaticTextLayoutDrawParams.paraMaxWidthFor(constraints: Constraints): Int {
         val minWidth = constraints.minWidth
         val widthMatters = softWrap || overflow == TextOverflow.Ellipsis
         val maxWidth = if (widthMatters && constraints.hasBoundedWidth) {
@@ -301,11 +301,7 @@ internal class MultiParagraphLayoutCache(
         return result
     }
 
-    fun equalForLayout(value: TextInlineContentLayoutDrawParams): Boolean {
-        return params.equalForLayout(value)
-    }
-
-    fun equalForCallbacks(value: TextInlineContentLayoutDrawParams): Boolean {
-        return params.equalForCallbacks(value)
+    fun diff(value: StaticTextLayoutDrawParams): StaticTextLayoutDrawParamsDiff {
+        return params.diff(value)
     }
 }
