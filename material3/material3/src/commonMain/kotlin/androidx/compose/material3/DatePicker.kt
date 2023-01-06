@@ -17,6 +17,10 @@
 package androidx.compose.material3
 
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.DecayAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.exponentialDecay
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -24,6 +28,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -74,6 +79,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
@@ -380,6 +386,29 @@ object DatePickerDefaults {
             Text(getString(string = Strings.DatePickerHeadline), maxLines = 1)
         } else {
             Text(formattedDate, maxLines = 1)
+        }
+    }
+
+    /**
+     * Creates and remembers a [FlingBehavior] that will represent natural fling curve with snap to
+     * the most visible month in the months list.
+     *
+     * @param lazyListState a [LazyListState]
+     * @param decayAnimationSpec the decay to use
+     */
+    @Composable
+    internal fun rememberSnapFlingBehavior(
+        lazyListState: LazyListState,
+        decayAnimationSpec: DecayAnimationSpec<Float> = exponentialDecay()
+    ): FlingBehavior {
+        val density = LocalDensity.current
+        return remember(density) {
+            SnapFlingBehavior(
+                lazyListState = lazyListState,
+                decayAnimationSpec = decayAnimationSpec,
+                snapAnimationSpec = spring(stiffness = Spring.StiffnessMediumLow),
+                density = density
+            )
         }
     }
 
@@ -768,9 +797,10 @@ private fun HorizontalMonthsList(
         )
     }
     LazyRow(
-        state = lazyListState
-        // TODO: Add flingBehavior = rememberSnapFlingBehavior(lazyListState) when promoted
-        //  to stable
+        state = lazyListState,
+        // TODO(b/264687693): replace with the framework's rememberSnapFlingBehavior(lazyListState)
+        //  when promoted to stable
+        flingBehavior = DatePickerDefaults.rememberSnapFlingBehavior(lazyListState)
     ) {
         items(datePickerState.totalMonthsInRange) {
             val month =
