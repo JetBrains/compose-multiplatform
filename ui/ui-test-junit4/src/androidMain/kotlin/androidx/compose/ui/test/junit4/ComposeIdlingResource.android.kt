@@ -42,6 +42,21 @@ internal class ComposeIdlingResource(
     private var hadPendingSetContent = false
     private var hadPendingMeasureLayout = false
 
+    /**
+     * Tries to get Compose to idle by advancing frames until Compose has no more work to do, then
+     * returns true iff Compose was "idle" at the time when the getter was called – i.e. there was
+     * no Compose work that required advancing frames, and there are no pending `setContent` calls
+     * and no pending measure/layout passes.
+     *
+     * It returns false if frames were advanced, even if Compose is technically idle after advancing
+     * them because of Robolectric. When running tests in Robolectric, the return value of this
+     * property is used to determine whether to drain the main queue again. If Compose did any work
+     * at all, that work may have posted additional work to the main queue, so we need to drain it
+     * again just to make sure.
+     *
+     * So this implementation treats the "now" in the property name as the time just before the
+     * property was called, not the time just before it returns.
+     */
     override val isIdleNow: Boolean
         get() {
             fun shouldPumpTime(): Boolean {
@@ -59,6 +74,7 @@ internal class ComposeIdlingResource(
                 clock.advanceTimeByFrame()
                 ++i
             }
+            val composeDidWork = i > 0
 
             // pending set content needs all created compose roots,
             // because by definition they will not be in resumed state
@@ -68,7 +84,7 @@ internal class ComposeIdlingResource(
             val composeRoots = composeRootRegistry.getRegisteredComposeRoots()
             hadPendingMeasureLayout = composeRoots.any { it.shouldWaitForMeasureAndLayout }
 
-            return !shouldPumpTime() &&
+            return !composeDidWork &&
                 !hadPendingSetContent &&
                 !hadPendingMeasureLayout
         }

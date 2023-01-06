@@ -150,7 +150,12 @@ class RobolectricComposeTest {
         setContent {
             val offset = animateFloatAsState(target)
             Box(Modifier.fillMaxSize()) {
-                Box(Modifier.size(10.dp).offset(x = offset.value.dp).testTag("box"))
+                Box(
+                    Modifier
+                        .size(10.dp)
+                        .offset(x = offset.value.dp)
+                        .testTag("box")
+                )
             }
         }
         onNodeWithTag("box").assertLeftPositionInRootIsEqualTo(0.dp)
@@ -211,13 +216,20 @@ class RobolectricComposeTest {
                 CompositionLocalProvider(LocalOverscrollConfiguration provides null) {
                     Box(Modifier.fillMaxSize()) {
                         Column(
-                            Modifier.requiredSize(200.dp).verticalScroll(
-                                scrollState,
-                                flingBehavior = flingBehavior
-                            ).testTag("list")
+                            Modifier
+                                .requiredSize(200.dp)
+                                .verticalScroll(
+                                    scrollState,
+                                    flingBehavior = flingBehavior
+                                )
+                                .testTag("list")
                         ) {
                             repeat(n) {
-                                Spacer(Modifier.fillMaxWidth().height(30.dp))
+                                Spacer(
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .height(30.dp)
+                                )
                             }
                         }
                     }
@@ -282,36 +294,43 @@ class RobolectricComposeTest {
     }
 
     @Test
-    fun testComposePostsToMainThread() = runComposeUiTest {
-        var postToMain by mutableStateOf(false)
-        var postedToMain by mutableStateOf(false)
-        var composedAfterMain = false
+    fun testComposeMainQueueTrampolining() = runComposeUiTest {
+        val trampoliningIterations = 10
+        var phase by mutableStateOf(0)
+        var done = false
+        val handler = Handler(Looper.getMainLooper())
 
         setContent {
-            if (postToMain && !postedToMain) {
-                DisposableEffect(Unit) {
-                    val handler = Handler(Looper.getMainLooper())
-                    handler.post { postedToMain = true }
+            // Alternate scheduling work to the main queue and scheduling work for Compose.
+            // waitForIdle shouldn't return until both Compose and the main queue have nothing to
+            // do.
+            if (phase in 1 until trampoliningIterations) {
+                DisposableEffect(phase) {
+                    handler.post { phase++ }
                     onDispose {}
                 }
-            } else if (postedToMain) {
+            } else if (phase == trampoliningIterations) {
                 DisposableEffect(Unit) {
-                    composedAfterMain = true
+                    done = true
                     onDispose {}
                 }
             }
         }
 
         runOnIdle {
-            assertThat(postedToMain).isFalse()
-            assertThat(composedAfterMain).isFalse()
+            assertThat(phase).isEqualTo(0)
+            assertThat(done).isFalse()
         }
 
-        postToMain = true
+        // Trigger the trampolining.
+        phase = 1
 
+        // If Robolectric and Compose don't coordinate idleness correctly, waitForIdle will return
+        // before finishing the chain of trampolined work, and we won't be in the expected terminal
+        // state.
         runOnIdle {
-            assertThat(postedToMain).isTrue()
-            assertThat(composedAfterMain).isTrue()
+            assertThat(phase).isEqualTo(trampoliningIterations)
+            assertThat(done).isTrue()
         }
     }
 
