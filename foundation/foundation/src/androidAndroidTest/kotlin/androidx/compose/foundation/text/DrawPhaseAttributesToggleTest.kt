@@ -177,7 +177,7 @@ class DrawPhaseAttributesToggleTest(private val config: Config) {
 
         rule.setContent {
             BasicText(
-                "ABC",
+                "TextPainter",
                 style = style,
                 modifier = Modifier.testTag(textTag)
             )
