@@ -39,6 +39,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.filters.MediumTest
+import androidx.test.filters.RequiresDevice
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.sign
@@ -95,6 +96,7 @@ internal class TextFieldVisualTransformationMagnifierTest(
         assertThat(getMagnifierCenterOffset()).isNotEqualTo(Offset.Zero)
     }
 
+    @RequiresDevice // b/264701475
     @Test
     fun checkMagnifierFollowsHandleHorizontally() {
         val handle = config.handle
