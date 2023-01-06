@@ -16,6 +16,10 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -29,6 +33,8 @@ import androidx.compose.ui.focus.FocusRequester.Companion.Cancel
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
@@ -175,6 +181,57 @@ class TwoDimensionalFocusTraversalImplicitEnterTest(param: Param) {
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isFalse()
             assertThat(child.value).isFalse()
+        }
+    }
+
+    /**
+     *                    _________
+     *                   |   Up   |
+     *                   |________|
+     *                 ________________
+     *                |               |
+     *   _________    |     empty     |    _________
+     *  |  Left  |    |   lazylist    |   |  Right |
+     *  |________|    |               |   |________|
+     *                |_______________|
+     *                    _________
+     *                   |  Down  |
+     *                   |________|
+     */
+    @Test
+    fun moveFocusEnter_emptyLazyList() {
+        // Arrange.
+        val (up, down, left, right) = List(4) { mutableStateOf(false) }
+        var (upItem, downItem, leftItem, rightItem) = FocusRequester.createRefs()
+        when (focusDirection) {
+            Left -> rightItem = initialFocus
+            Right -> leftItem = initialFocus
+            Up -> downItem = initialFocus
+            Down -> upItem = initialFocus
+        }
+        rule.setContentForTest {
+            FocusableBox(up, 30, 0, 10, 10, upItem)
+            FocusableBox(left, 0, 30, 10, 10, leftItem)
+            LazyRow(
+                Modifier
+                    .offset { IntOffset(30, 30) }
+                    .width(10.dp)
+                    .height(10.dp)
+            ) {}
+            FocusableBox(right, 100, 30, 10, 10, rightItem)
+            FocusableBox(down, 30, 90, 10, 10, downItem)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            when (focusDirection) {
+                Left, Up, Down -> assertThat(left.value).isTrue()
+                Right -> assertThat(right.value).isTrue()
+            }
         }
     }
 

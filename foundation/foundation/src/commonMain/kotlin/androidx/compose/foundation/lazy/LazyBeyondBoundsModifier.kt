@@ -78,11 +78,22 @@ private class LazyListBeyondBoundsModifierLocal(
         get() = ModifierLocalBeyondBoundsLayout
     override val value: BeyondBoundsLayout
         get() = this
+    companion object {
+        private val emptyBeyondBoundsScope = object : BeyondBoundsScope {
+            override val hasMoreContent = false
+        }
+    }
 
     override fun <T> layout(
         direction: BeyondBoundsLayout.LayoutDirection,
         block: BeyondBoundsScope.() -> T?
     ): T? {
+        // If the lazy list is empty, or if it does not have any visible items (Which implies
+        // that there isn't space to add a single item), we don't attempt to layout any more items.
+        if (state.layoutInfo.totalItemsCount <= 0 || state.layoutInfo.visibleItemsInfo.isEmpty()) {
+            return block.invoke(emptyBeyondBoundsScope)
+        }
+
         // We use a new interval each time because this function is re-entrant.
         var interval = beyondBoundsInfo.addInterval(
             state.firstVisibleItemIndex,
