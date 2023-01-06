@@ -289,7 +289,8 @@ internal fun CoreTextField(
                 textInputService,
                 state,
                 value,
-                imeOptions
+                imeOptions,
+                offsetMapping
             )
 
             // The focusable modifier itself will request the entire focusable be brought into view
@@ -395,6 +396,7 @@ internal fun CoreTextField(
                 state.showCursorHandle =
                     manager.isSelectionHandleInVisibleBound(isStartHandle = true)
             }
+            notifyFocusedRect(state, value, offsetMapping)
         }
         state.layoutResult?.innerTextFieldCoordinates = it
     }
@@ -590,6 +592,7 @@ internal fun CoreTextField(
                             if (prevResult != result) {
                                 state.layoutResult = TextLayoutResultProxy(result)
                                 onTextLayout(result)
+                                notifyFocusedRect(state, value, offsetMapping)
                             }
 
                             // calculate the min height for single line text to prevent text cuts.
@@ -890,11 +893,13 @@ private fun tapToFocus(
     }
 }
 
+@OptIn(InternalFoundationTextApi::class)
 private fun notifyTextInputServiceOnFocusChange(
     textInputService: TextInputService,
     state: TextFieldState,
     value: TextFieldValue,
-    imeOptions: ImeOptions
+    imeOptions: ImeOptions,
+    offsetMapping: OffsetMapping
 ) {
     if (state.hasFocus) {
         state.inputSession = TextFieldDelegate.onFocus(
@@ -905,6 +910,7 @@ private fun notifyTextInputServiceOnFocusChange(
             state.onValueChange,
             state.onImeActionPerformed
         )
+        notifyFocusedRect(state, value, offsetMapping)
     } else {
         onBlur(state)
     }
@@ -1036,3 +1042,29 @@ internal expect fun CursorHandle(
     modifier: Modifier,
     content: @Composable (() -> Unit)?
 )
+
+// TODO(b/262648050) Try to find a better API.
+@OptIn(InternalFoundationTextApi::class)
+private fun notifyFocusedRect(
+    state: TextFieldState,
+    value: TextFieldValue,
+    offsetMapping: OffsetMapping
+) {
+    // If this reports state reads it causes an invalidation cycle.
+    // This function doesn't need to be invalidated anyway because it's already explicitly called
+    // after updating text layout or position.
+    Snapshot.withoutReadObservation {
+        val layoutResult = state.layoutResult ?: return
+        val inputSession = state.inputSession ?: return
+        val layoutCoordinates = state.layoutCoordinates ?: return
+        TextFieldDelegate.notifyFocusedRect(
+            value,
+            state.textDelegate,
+            layoutResult.value,
+            layoutCoordinates,
+            inputSession,
+            state.hasFocus,
+            offsetMapping
+        )
+    }
+}
