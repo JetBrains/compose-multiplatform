@@ -16,7 +16,6 @@ import java.net.SocketTimeoutException
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import kotlin.concurrent.thread
-import org.gradle.testkit.runner.TaskOutcome
 import org.junit.jupiter.api.Test
 
 class GradlePluginTest : GradlePluginTestBase() {
@@ -30,18 +29,13 @@ class GradlePluginTest : GradlePluginTestBase() {
                 )
             )
         ) {
-            gradle(":compileKotlinJs").build().checks { check ->
-                check.taskOutcome(":compileKotlinJs", TaskOutcome.SUCCESS)
+            gradle(":compileKotlinJs").checks {
+                check.taskSuccessful(":compileKotlinJs")
             }
         }
 
     @Test
-    fun configurePreviewWithoutConfigurationCache() = configurePreview(withConfigurationCache = false)
-
-    @Test
-    fun configurePreviewWithConfigurationCache() = configurePreview(withConfigurationCache = true)
-
-    private fun configurePreview(withConfigurationCache: Boolean) {
+    fun configurePreview() {
         val isAlive = AtomicBoolean(true)
         val receivedConfigCount = AtomicInteger(0)
         val port = AtomicInteger(-1)
@@ -82,7 +76,7 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
 
         try {
-            testConfigureDesktopPreviewImpl(port.get(), withConfigurationCache)
+            testConfigureDesktopPreviewImpl(port.get())
         } finally {
             isAlive.set(false)
             connectionThread.interrupt()
@@ -96,35 +90,20 @@ class GradlePluginTest : GradlePluginTestBase() {
         }
     }
 
-    private fun testConfigureDesktopPreviewImpl(port: Int, withConfigurationCache: Boolean) {
+    private fun testConfigureDesktopPreviewImpl(port: Int) {
         check(port > 0) { "Invalid port: $port" }
         with(testProject(TestProjects.jvmPreview)) {
             val portProperty = "-Pcompose.desktop.preview.ide.port=$port"
             val previewTargetProperty = "-Pcompose.desktop.preview.target=PreviewKt.ExamplePreview"
             val jvmTask = ":jvm:configureDesktopPreview"
-            val configurationCacheArg = "--configuration-cache"
-            val jvmRunner = if (withConfigurationCache) {
-                gradle(jvmTask, portProperty, previewTargetProperty, configurationCacheArg)
-            } else {
-                gradle(jvmTask, portProperty, previewTargetProperty)
+            gradle(jvmTask, portProperty, previewTargetProperty).checks {
+                check.taskSuccessful(jvmTask)
             }
-            jvmRunner
-                .build()
-                .checks { check ->
-                    check.taskOutcome(jvmTask, TaskOutcome.SUCCESS)
-                }
 
             val mppTask = ":mpp:configureDesktopPreviewDesktop"
-            val mppRunner = if (withConfigurationCache) {
-                gradle(mppTask, portProperty, previewTargetProperty, configurationCacheArg)
-            } else {
-                gradle(mppTask, portProperty, previewTargetProperty)
+            gradle(mppTask, portProperty, previewTargetProperty).checks {
+                check.taskSuccessful(mppTask)
             }
-            mppRunner
-                .build()
-                .checks { check ->
-                    check.taskOutcome(mppTask, TaskOutcome.SUCCESS)
-                }
         }
     }
 
