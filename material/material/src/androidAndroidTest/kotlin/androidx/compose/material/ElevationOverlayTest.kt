@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import androidx.test.filters.RequiresDevice
 import androidx.test.filters.SdkSuppress
 import org.junit.Rule
 import org.junit.Test
@@ -109,6 +110,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
             }
     }
 
+    @RequiresDevice // b/264705287
     @Test
     fun correctElevationOverlayWithCustomContentColor() {
         val customContentColor = Color.Blue
