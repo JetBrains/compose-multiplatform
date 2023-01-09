@@ -94,10 +94,11 @@ internal class AnimationSearch(
     private fun supportedSearch() = setOf(
         transitionSearch,
         animatedVisibilitySearch,
-    ) + animateXAsStateSearch() + infiniteTransitionSearch()
+    ) + animateXAsStateSearch() + infiniteTransitionSearch() +
+        (if (AnimatedContentComposeAnimation.apiAvailable)
+            setOf(animatedContentSearch) else emptySet())
 
     private fun unsupportedSearch() = if (UnsupportedComposeAnimation.apiAvailable) setOf(
-        animatedContentSearch,
         AnimateContentSizeSearch { clock().trackAnimateContentSize(it) },
         TargetBasedSearch { clock().trackTargetBasedAnimations(it) },
         DecaySearch { clock().trackDecayAnimations(it) }
