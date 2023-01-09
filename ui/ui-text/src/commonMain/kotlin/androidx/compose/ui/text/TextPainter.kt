@@ -27,10 +27,12 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.DrawTransform
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.isUnspecified
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextForegroundStyle.Unspecified
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.modulate
 import androidx.compose.ui.unit.Constraints
@@ -57,27 +59,40 @@ object TextPainter {
             canvas.save()
             canvas.clipRect(bounds)
         }
-        val resolvedSpanStyle = resolveSpanStyleDefaults(
-            textLayoutResult.layoutInput.style.spanStyle
-        )
+
+        /* inline resolveSpanStyleDefaults to avoid an allocation in draw */
+        val style = textLayoutResult.layoutInput.style.spanStyle
+        val textDecoration = style.textDecoration ?: TextDecoration.None
+        val shadow = style.shadow ?: Shadow.None
+        val drawStyle = style.drawStyle ?: Fill
         try {
-            val brush = resolvedSpanStyle.brush
+            val brush = style.brush
             if (brush != null) {
+                val alpha = if (style.textForegroundStyle !== Unspecified) {
+                    style.textForegroundStyle.alpha
+                } else {
+                    1.0f
+                }
                 textLayoutResult.multiParagraph.paint(
                     canvas = canvas,
                     brush = brush,
-                    alpha = resolvedSpanStyle.alpha,
-                    shadow = resolvedSpanStyle.shadow,
-                    decoration = resolvedSpanStyle.textDecoration,
-                    drawStyle = resolvedSpanStyle.drawStyle
+                    alpha = alpha,
+                    shadow = shadow,
+                    decoration = textDecoration,
+                    drawStyle = drawStyle
                 )
             } else {
+                val color = if (style.textForegroundStyle !== Unspecified) {
+                    style.textForegroundStyle.color
+                } else {
+                    Color.Black
+                }
                 textLayoutResult.multiParagraph.paint(
                     canvas = canvas,
-                    color = resolvedSpanStyle.color,
-                    shadow = resolvedSpanStyle.shadow,
-                    decoration = resolvedSpanStyle.textDecoration,
-                    drawStyle = resolvedSpanStyle.drawStyle
+                    color = color,
+                    shadow = shadow,
+                    decoration = textDecoration,
+                    drawStyle = drawStyle
                 )
             }
         } finally {
