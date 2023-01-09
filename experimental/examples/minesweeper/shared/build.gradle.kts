@@ -46,6 +46,8 @@ kotlin {
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
+    val composeVersion = extra["compose.version"] as String
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -53,6 +55,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
+                implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
             }
         }
         val commonTest by getting {
@@ -101,6 +104,8 @@ kotlin {
 android {
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
+    sourceSets["main"].res.srcDirs("src/androidMain/res")
+    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
     defaultConfig {
         minSdk = 24
         targetSdk = 33

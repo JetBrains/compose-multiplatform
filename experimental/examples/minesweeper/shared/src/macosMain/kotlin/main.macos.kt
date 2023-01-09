@@ -29,7 +29,4 @@ fun main() {
     NSApp?.run()
 }
 
-@Composable
-actual fun loadImage(src: String): Painter = loadImageAsColoredRect(src)
-
 actual fun isMobileDevice() = false

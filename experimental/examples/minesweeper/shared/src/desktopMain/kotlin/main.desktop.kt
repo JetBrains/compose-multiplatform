@@ -1,7 +1,5 @@
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.window.WindowState
 
 @Composable
@@ -13,8 +11,5 @@ fun MainView(windowState: WindowState) =
             }
         )
     }
-
-@Composable
-actual fun loadImage(src: String): Painter = painterResource(src)
 
 actual fun isMobileDevice() = false
