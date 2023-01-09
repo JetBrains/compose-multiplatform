@@ -6,7 +6,6 @@
 package org.jetbrains.compose.desktop.application.tasks
 
 import org.gradle.api.file.*
-import org.gradle.api.internal.file.FileOperations
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -22,6 +21,7 @@ import org.jetbrains.compose.desktop.application.internal.files.*
 import org.jetbrains.compose.desktop.application.internal.files.MacJarSignFileCopyingProcessor
 import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
+import org.jetbrains.compose.internal.utils.*
 import java.io.*
 import java.util.*
 import javax.inject.Inject
@@ -408,8 +408,7 @@ abstract class AbstractJPackageTask @Inject constructor(
             outdatedLibs.addAll(files.files)
 
             logger.debug("Clearing all files in working dir: $libsDirFile")
-            fileOperations.delete(libsDirFile)
-            libsDirFile.mkdirs()
+            fileOperations.clearDirs(libsDirFile)
         }
 
         if (inputChanges.isIncremental) {
@@ -440,8 +439,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         val fileProcessor =
             macSigner?.let { signer ->
                 val tmpDirForSign = signDir.ioFile
-                fileOperations.delete(tmpDirForSign)
-                tmpDirForSign.mkdirs()
+                fileOperations.clearDirs(tmpDirForSign)
 
                 MacJarSignFileCopyingProcessor(
                     signer,
@@ -473,7 +471,7 @@ abstract class AbstractJPackageTask @Inject constructor(
         }
 
         // todo: incremental copy
-        cleanDirs(packagedResourcesDir)
+        fileOperations.clearDirs(packagedResourcesDir)
         val destResourcesDir = packagedResourcesDir.ioFile
         val appResourcesDir = appResourcesDir.ioFileOrNull
         if (appResourcesDir != null) {
@@ -481,14 +479,14 @@ abstract class AbstractJPackageTask @Inject constructor(
                 val relPath = file.relativeTo(appResourcesDir).path
                 val destFile = destResourcesDir.resolve(relPath)
                 if (file.isDirectory) {
-                    fileOperations.mkdir(destFile)
+                    fileOperations.mkdirs(destFile)
                 } else {
                     file.copyTo(destFile)
                 }
             }
         }
 
-        cleanDirs(jpackageResources)
+        fileOperations.clearDirs(jpackageResources)
         if (currentOS == OS.MacOS) {
             InfoPlistBuilder(macExtraPlistKeysRawXml.orNull)
                 .also { setInfoPlistValues(it) }
@@ -642,7 +640,7 @@ private fun isSkikoForCurrentOS(lib: File): Boolean =
     lib.name.startsWith("skiko-awt-runtime-${currentOS.id}-${currentArch.id}")
             && lib.name.endsWith(".jar")
 
-private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileOperations): List<File> {
+private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperations: FileSystemOperations): List<File> {
     val entriesToUnpack = when (currentOS) {
         OS.MacOS -> setOf("libskiko-macos-${currentArch.id}.dylib")
         OS.Windows -> setOf("skiko-windows-${currentArch.id}.dll", "icudtl.dat")
@@ -654,8 +652,7 @@ private fun unpackSkikoForCurrentOS(sourceJar: File, skikoDir: File, fileOperati
     val targetJar = skikoDir.resolve(sourceJar.name)
     outputFiles.add(targetJar)
 
-    fileOperations.delete(skikoDir)
-    fileOperations.mkdir(skikoDir)
+    fileOperations.clearDirs(skikoDir)
     transformJar(sourceJar, targetJar) { entry, zin, zout ->
         // check both entry or entry.sha256
         if (entry.name.removeSuffix(".sha256") in entriesToUnpack) {

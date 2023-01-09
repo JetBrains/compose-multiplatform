@@ -7,13 +7,13 @@ package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.compose.desktop.application.internal.MacUtils
+import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 import org.jetbrains.compose.experimental.uikit.tasks.ExperimentalPackComposeApplicationForXCodeTask
-import org.jetbrains.compose.internal.getLocalProperty
-import org.jetbrains.compose.internal.localPropertiesFile
+import org.jetbrains.compose.internal.utils.getLocalProperty
+import org.jetbrains.compose.internal.utils.localPropertiesFile
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 
 fun Project.registerConnectedDeviceTasks(

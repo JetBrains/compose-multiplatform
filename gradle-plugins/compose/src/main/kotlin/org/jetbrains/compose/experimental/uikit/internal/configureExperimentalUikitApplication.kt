@@ -6,8 +6,8 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.experimental.dsl.ExperimentalUiKitApplication
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 

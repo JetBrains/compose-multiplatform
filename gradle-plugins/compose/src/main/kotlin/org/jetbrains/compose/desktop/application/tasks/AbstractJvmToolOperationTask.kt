@@ -14,10 +14,8 @@ import org.gradle.api.tasks.*
 import org.gradle.process.ExecResult
 import org.gradle.work.InputChanges
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.ioFile
-import org.jetbrains.compose.desktop.application.internal.jvmToolFile
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
+import org.jetbrains.compose.internal.utils.*
 import java.io.File
 
 abstract class AbstractJvmToolOperationTask(private val toolName: String) : AbstractComposeDesktopTask() {
@@ -37,7 +35,7 @@ abstract class AbstractJvmToolOperationTask(private val toolName: String) : Abst
     }
 
     protected open fun prepareWorkingDir(inputChanges: InputChanges) {
-        cleanDirs(workingDir)
+        fileOperations.clearDirs(workingDir)
     }
 
     protected open fun makeArgs(tmpDir: File): MutableList<String> = arrayListOf<String>().apply {

@@ -8,7 +8,7 @@ package org.jetbrains.compose.desktop.application.internal.validation
 import org.gradle.api.GradleException
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.JvmApplicationContext
-import org.jetbrains.compose.desktop.application.internal.OS
+import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.desktop.application.internal.packageBuildVersionFor
 import org.jetbrains.compose.desktop.application.internal.packageVersionFor
 

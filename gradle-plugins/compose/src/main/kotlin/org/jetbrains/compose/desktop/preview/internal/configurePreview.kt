@@ -5,6 +5,7 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.JvmApplicationRuntimeFilesProvider
 import org.jetbrains.compose.desktop.preview.tasks.AbstractConfigureDesktopPreviewTask
 import org.jetbrains.compose.internal.*
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.plugin.KotlinPlatformType
 import org.jetbrains.kotlin.gradle.targets.jvm.KotlinJvmTarget
 

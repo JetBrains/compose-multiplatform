@@ -9,10 +9,13 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.component.ModuleComponentIdentifier
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import org.jetbrains.compose.internal.debug
+import org.jetbrains.compose.internal.utils.clearDirs
+import org.jetbrains.compose.internal.utils.debug
+import javax.inject.Inject
 
 abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
     @get:InputFiles
@@ -21,10 +24,12 @@ abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
+    @get:Inject
+    internal abstract val fileOperations: FileSystemOperations
+
     @TaskAction
     fun run() {
-        project.delete(outputDir)
-        project.mkdir(outputDir)
+        fileOperations.clearDirs(outputDir)
         val runtimeArtifacts = runtimeClasspath.resolvedConfiguration.resolvedArtifacts
         for (artifact in runtimeArtifacts) {
             logger.debug { "Checking artifact: id=${artifact.id}, file=${artifact.file}" }

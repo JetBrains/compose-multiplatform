@@ -7,7 +7,7 @@ package org.jetbrains.compose.desktop.application.dsl
 
 import org.gradle.api.Action
 import org.gradle.api.model.ObjectFactory
-import org.jetbrains.compose.desktop.application.internal.new
+import org.jetbrains.compose.internal.utils.new
 import javax.inject.Inject
 
 abstract class JvmApplicationBuildTypes @Inject constructor(

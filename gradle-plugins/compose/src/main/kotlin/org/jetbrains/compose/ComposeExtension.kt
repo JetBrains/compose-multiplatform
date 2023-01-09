@@ -10,7 +10,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.plugins.ExtensionAware
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
+import org.jetbrains.compose.internal.utils.nullableProperty
 import javax.inject.Inject
 
 abstract class ComposeExtension @Inject constructor(

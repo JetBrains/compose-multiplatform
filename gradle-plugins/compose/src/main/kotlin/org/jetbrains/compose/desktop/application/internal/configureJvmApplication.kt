@@ -17,6 +17,14 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
+import org.jetbrains.compose.internal.utils.currentTarget
+import org.jetbrains.compose.internal.utils.dir
+import org.jetbrains.compose.internal.utils.ioFile
+import org.jetbrains.compose.internal.utils.ioFileOrNull
+import org.jetbrains.compose.internal.utils.javaExecutable
+import org.jetbrains.compose.internal.utils.provider
 import java.io.File
 
 private val defaultJvmArgs = listOf("-D$CONFIGURE_SWING_GLOBALS=true")

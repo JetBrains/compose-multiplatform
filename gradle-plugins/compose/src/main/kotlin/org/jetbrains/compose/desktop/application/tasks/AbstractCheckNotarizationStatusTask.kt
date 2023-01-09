@@ -8,10 +8,10 @@ package org.jetbrains.compose.desktop.application.tasks
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.tasks.*
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.desktop.application.internal.MacUtils
+import org.jetbrains.compose.internal.utils.MacUtils
 import org.jetbrains.compose.desktop.application.internal.NOTARIZATION_REQUEST_INFO_FILE_NAME
 import org.jetbrains.compose.desktop.application.internal.NotarizationRequestInfo
-import org.jetbrains.compose.desktop.application.internal.ioFile
+import org.jetbrains.compose.internal.utils.ioFile
 
 abstract class AbstractCheckNotarizationStatusTask : AbstractNotarizationTask() {
     @get:Internal

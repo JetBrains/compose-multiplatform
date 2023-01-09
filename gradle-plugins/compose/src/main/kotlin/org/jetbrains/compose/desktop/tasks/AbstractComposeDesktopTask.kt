@@ -8,7 +8,7 @@ package org.jetbrains.compose.desktop.tasks
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.Directory
 import org.gradle.api.file.FileSystemLocation
-import org.gradle.api.internal.file.FileOperations
+import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -18,7 +18,8 @@ import org.gradle.api.tasks.LocalState
 import org.gradle.process.ExecOperations
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
-import org.jetbrains.compose.desktop.application.internal.notNullProperty
+import org.jetbrains.compose.internal.utils.clearDirs
+import org.jetbrains.compose.internal.utils.notNullProperty
 import javax.inject.Inject
 
 abstract class AbstractComposeDesktopTask : DefaultTask() {
@@ -32,7 +33,7 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
     protected abstract val execOperations: ExecOperations
 
     @get:Inject
-    protected abstract val fileOperations: FileOperations
+    protected abstract val fileOperations: FileSystemOperations
 
     @get:LocalState
     protected val logsDir: Provider<Directory> = project.layout.buildDirectory.dir("compose/logs/$name")
@@ -47,11 +48,4 @@ abstract class AbstractComposeDesktopTask : DefaultTask() {
     @get:Internal
     internal val runExternalTool: ExternalToolRunner
         get() = ExternalToolRunner(verbose, logsDir, execOperations)
-
-    protected fun cleanDirs(vararg dirs: Provider<out FileSystemLocation>) {
-        for (dir in dirs) {
-            fileOperations.delete(dir)
-            fileOperations.mkdir(dir)
-        }
-    }
 }

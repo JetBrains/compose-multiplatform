@@ -9,6 +9,8 @@ import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.Project
 import org.gradle.api.tasks.Copy
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.File
 
 internal const val DOWNLOAD_WIX_TOOLSET_TASK_NAME = "downloadWix"

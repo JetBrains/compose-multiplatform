@@ -7,9 +7,9 @@ package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
 import org.gradle.api.tasks.TaskProvider
-import org.jetbrains.compose.desktop.application.internal.Arch
-import org.jetbrains.compose.desktop.application.internal.MacUtils
-import org.jetbrains.compose.desktop.application.internal.currentArch
+import org.jetbrains.compose.internal.utils.Arch
+import org.jetbrains.compose.internal.utils.MacUtils
+import org.jetbrains.compose.internal.utils.currentArch
 import org.jetbrains.compose.experimental.dsl.DeployTarget
 import org.jetbrains.compose.experimental.dsl.UiKitConfiguration
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask

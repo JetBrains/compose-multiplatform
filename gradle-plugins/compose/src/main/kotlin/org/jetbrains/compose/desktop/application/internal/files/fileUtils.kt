@@ -7,8 +7,8 @@ package org.jetbrains.compose.desktop.application.internal.files
 
 import org.gradle.api.tasks.Internal
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import java.io.*
 import java.security.DigestInputStream
 import java.security.MessageDigest

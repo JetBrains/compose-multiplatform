@@ -11,7 +11,7 @@ import org.gradle.api.provider.ProviderFactory
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Optional
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
-import org.jetbrains.compose.desktop.application.internal.nullableProperty
+import org.jetbrains.compose.internal.utils.nullableProperty
 import javax.inject.Inject
 
 abstract class MacOSNotarizationSettings {

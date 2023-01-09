@@ -6,7 +6,7 @@
 package org.jetbrains.compose.experimental.web.internal
 
 import org.jetbrains.compose.experimental.dsl.ExperimentalWebApplication
-import org.jetbrains.compose.internal.registerTask
+import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.experimental.web.tasks.ExperimentalUnpackSkikoWasmRuntimeTask
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 

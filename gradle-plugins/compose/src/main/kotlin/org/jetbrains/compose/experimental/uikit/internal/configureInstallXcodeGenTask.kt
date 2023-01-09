@@ -6,8 +6,8 @@
 package org.jetbrains.compose.experimental.uikit.internal
 
 import org.gradle.api.Project
-import org.jetbrains.compose.desktop.application.internal.MacUtils
-import org.jetbrains.compose.desktop.application.internal.UnixUtils
+import org.jetbrains.compose.internal.utils.MacUtils
+import org.jetbrains.compose.internal.utils.UnixUtils
 import org.jetbrains.compose.experimental.uikit.tasks.AbstractComposeIosTask
 
 internal val Project.xcodeGenExecutable get() = xcodeGenSrc.resolve(".build/apple/Products/Release/xcodegen")

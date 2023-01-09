@@ -5,8 +5,8 @@
 
 package org.jetbrains.compose.test.tests.unit
 
-import org.jetbrains.compose.desktop.application.internal.OS
-import org.jetbrains.compose.desktop.application.internal.currentOS
+import org.jetbrains.compose.internal.utils.OS
+import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.desktop.application.internal.files.contentHash
 
 import org.junit.jupiter.api.Assertions.*

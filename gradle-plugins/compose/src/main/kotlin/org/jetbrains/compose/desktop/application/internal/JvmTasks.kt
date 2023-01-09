@@ -9,7 +9,7 @@ import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.tasks.TaskProvider
 import org.jetbrains.compose.desktop.application.dsl.JvmApplicationBuildType
-import org.jetbrains.compose.internal.uppercaseFirstChar
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 
 internal class JvmTasks(
     private val project: Project,
