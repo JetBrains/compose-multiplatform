@@ -39,6 +39,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
 import org.junit.Ignore
 import org.junit.Rule
@@ -149,7 +150,6 @@ class TooltipTest {
             .assertTopPositionInRootIsEqualTo(textBound.bottom + 16.dp)
     }
 
-    @Ignore // b/264887805
     @Test
     fun plainTooltip_behavior() {
         val tooltipState = PlainTooltipState()
@@ -162,19 +162,25 @@ class TooltipTest {
         }
 
         // Tooltip should initially be not visible
-        assert(!tooltipState.isVisible)
+        assertThat(tooltipState.isVisible).isFalse()
 
-        // Long press the icon and check that the tooltip is now showing
+        // Test will manually advance the time to check the timeout
+        rule.mainClock.autoAdvance = false
+
+        // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
 
-        assert(tooltipState.isVisible)
+        // Check that the tooltip is now showing
+        rule.waitForIdle()
+        assertThat(tooltipState.isVisible).isTrue()
 
         // Tooltip should dismiss itself after 1.5s
-        rule.waitUntil(TooltipDuration + 100L) { !tooltipState.isVisible }
+        rule.mainClock.advanceTimeBy(milliseconds = TooltipDuration)
+        rule.waitForIdle()
+        assertThat(tooltipState.isVisible).isFalse()
     }
 
-    @Ignore // b/264887805
     @Test
     fun richTooltip_behavior_noAction() {
         val tooltipState = RichTooltipState()
@@ -188,16 +194,23 @@ class TooltipTest {
         }
 
         // Tooltip should initially be not visible
-        assert(!tooltipState.isVisible)
+        assertThat(tooltipState.isVisible).isFalse()
 
-        // Long press the icon and check that the tooltip is now showing
+        // Test will manually advance the time to check the timeout
+        rule.mainClock.autoAdvance = false
+
+        // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
 
-        assert(tooltipState.isVisible)
+        // Check that the tooltip is now showing
+        rule.waitForIdle()
+        assertThat(tooltipState.isVisible).isTrue()
 
         // Tooltip should dismiss itself after 1.5s
-        rule.waitUntil(TooltipDuration + 100L) { !tooltipState.isVisible }
+        rule.mainClock.advanceTimeBy(milliseconds = TooltipDuration)
+        rule.waitForIdle()
+        assertThat(tooltipState.isVisible).isFalse()
     }
 
     @Test
@@ -220,20 +233,28 @@ class TooltipTest {
         }
 
         // Tooltip should initially be not visible
-        assert(!tooltipState.isVisible)
+        assertThat(tooltipState.isVisible).isFalse()
 
-        // Long press the icon and check that the tooltip is now showing
+        // Test will manually advance the time to check the timeout
+        rule.mainClock.autoAdvance = false
+
+        // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
-        assert(tooltipState.isVisible)
+
+        // Check that the tooltip is now showing
+        rule.waitForIdle()
+        assertThat(tooltipState.isVisible).isTrue()
 
         // Tooltip should still be visible after the normal TooltipDuration, since we have an action.
-        rule.waitUntil(TooltipDuration + 100L) { tooltipState.isVisible }
+        rule.mainClock.advanceTimeBy(milliseconds = TooltipDuration)
+        rule.waitForIdle()
+        assertThat(tooltipState.isVisible).isTrue()
 
         // Click the action and check that it closed the tooltip
         rule.onNodeWithTag(ActionTestTag)
             .performTouchInput { click() }
-        assert(!tooltipState.isVisible)
+        assertThat(tooltipState.isVisible).isFalse()
     }
 
     @Composable
