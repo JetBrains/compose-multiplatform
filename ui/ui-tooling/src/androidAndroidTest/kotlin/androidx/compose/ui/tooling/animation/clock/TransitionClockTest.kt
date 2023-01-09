@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.animation.parse
 import androidx.compose.ui.tooling.animation.states.ComposeAnimationState
 import androidx.compose.ui.tooling.animation.states.TargetState
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -519,6 +520,22 @@ class TransitionClockTest {
         rule.runOnIdle {
             assertEquals(TargetState(20.dp, 40.dp), clock.state)
             assertEquals(40.dp, target.value)
+        }
+    }
+
+    @Test
+    fun animatedContentClockStateAsList() {
+        val search = AnimationSearch.AnimatedContentSearch { }
+        val target = mutableStateOf<IntSize?>(null)
+        rule.searchForAnimation(search) { AnimatedContent(IntSize(10, 10)) { target.value = it } }
+        val clock = TransitionClock(search.animations.first().parseAnimatedContent()!!)
+        rule.runOnIdle {
+            clock.setStateParameters(listOf(20, 30), listOf(40, 50))
+            clock.setClockTime(0)
+        }
+        rule.runOnIdle {
+            assertEquals(TargetState(IntSize(20, 30), IntSize(40, 50)), clock.state)
+            assertEquals(IntSize(40, 50), target.value)
         }
     }
 
