@@ -14,7 +14,6 @@ kotlin {
     iosSimulatorArm64()
     js(IR) {
         browser()
-        binaries.executable()
     }
     macosX64 {
         binaries {
