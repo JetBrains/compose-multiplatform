@@ -239,8 +239,11 @@ class ComposeViewAdapterTest {
     }
 
     @Test
-    fun animatedContentIsNotSubscribed() {
-        checkAnimationsAreSubscribed("AnimatedContentPreview")
+    fun animatedContentIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "AnimatedContentPreview",
+            animatedContent = listOf("AnimatedContent")
+        )
     }
 
     @Test
@@ -369,9 +372,10 @@ class ComposeViewAdapterTest {
         UnsupportedComposeAnimation.testOverrideAvailability(false)
         checkAnimationsAreSubscribed(
             "AllAnimations",
-            emptyList(),
-            listOf("checkBoxAnim", "Crossfade"),
+            unsupported = emptyList(),
+            transitions = listOf("checkBoxAnim", "Crossfade"),
             animateXAsState = listOf("DpAnimation", "IntAnimation"),
+            animatedContent = listOf("AnimatedContent"),
             infiniteTransitions = listOf("InfiniteTransition")
         )
         UnsupportedComposeAnimation.testOverrideAvailability(true)
