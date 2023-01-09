@@ -154,6 +154,10 @@ internal fun <T, V : AnimationVector>
     )
 }
 
+/**
+ * [parseParametersToValue] makes sure what [currentValue], [par1], [par2] have the same types and
+ * returned [TargetState] always has correct and the same type as [currentValue].
+ */
 @Suppress("UNCHECKED_CAST")
 internal fun <T> parseParametersToValue(currentValue: T, par1: Any, par2: Any?): TargetState<T>? {
 
