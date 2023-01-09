@@ -20,16 +20,8 @@ import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.TargetBasedAnimation
 import androidx.compose.animation.tooling.ComposeAnimatedProperty
 import androidx.compose.animation.tooling.TransitionInfo
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation
 import androidx.compose.ui.tooling.animation.states.TargetState
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 
 /**
  * [ComposeAnimationClock] for [AnimateXAsStateComposeAnimation].
@@ -57,101 +49,9 @@ internal class AnimateXAsStateClock<T, V : AnimationVector>(
 
     private var currAnimation: TargetBasedAnimation<T, V> = getCurrentAnimation()
 
-    @Suppress("UNCHECKED_CAST")
     override fun setStateParameters(par1: Any, par2: Any?) {
-
-        fun parametersAreValid(par1: Any?, par2: Any?): Boolean {
-            return currentValue != null &&
-                par1 != null && par2 != null && par1::class == par2::class
-        }
-
-        fun parametersHasTheSameType(value: Any, par1: Any, par2: Any): Boolean {
-            return value::class == par1::class && value::class == par2::class
-        }
-
-        if (!parametersAreValid(par1, par2)) return
-
-        if (parametersHasTheSameType(currentValue!!, par1, par2!!)) {
-            state = TargetState(par1 as T, par2 as T)
-            return
-        }
-
-        if (par1 is List<*> && par2 is List<*>) {
-            try {
-                state = when (currentValue) {
-                    is IntSize -> TargetState(
-                        IntSize(par1[0] as Int, par1[1] as Int),
-                        IntSize(par2[0] as Int, par2[1] as Int)
-                    )
-
-                    is IntOffset -> TargetState(
-                        IntOffset(par1[0] as Int, par1[1] as Int),
-                        IntOffset(par2[0] as Int, par2[1] as Int)
-                    )
-
-                    is Size -> TargetState(
-                        Size(par1[0] as Float, par1[1] as Float),
-                        Size(par2[0] as Float, par2[1] as Float)
-                    )
-
-                    is Offset -> TargetState(
-                        Offset(par1[0] as Float, par1[1] as Float),
-                        Offset(par2[0] as Float, par2[1] as Float)
-                    )
-
-                    is Rect ->
-                        TargetState(
-                            Rect(
-                                par1[0] as Float,
-                                par1[1] as Float,
-                                par1[2] as Float,
-                                par1[3] as Float
-                            ),
-                            Rect(
-                                par2[0] as Float,
-                                par2[1] as Float,
-                                par2[2] as Float,
-                                par2[3] as Float
-                            ),
-                        )
-                    is Color -> TargetState(
-                        Color(
-                            par1[0] as Float,
-                            par1[1] as Float,
-                            par1[2] as Float,
-                            par1[3] as Float
-                        ),
-                        Color(
-                            par2[0] as Float,
-                            par2[1] as Float,
-                            par2[2] as Float,
-                            par2[3] as Float
-                        ),
-                    )
-
-                    is Dp -> {
-                        if (parametersHasTheSameType(currentValue!!, par1[0]!!, par2[0]!!))
-                            TargetState(par1[0], par2[0]) else TargetState(
-                            (par1[0] as Float).dp, (par2[0] as Float).dp
-                        )
-                    }
-
-                    else -> {
-                        if (parametersAreValid(par1[0], par2[0]) &&
-                            parametersHasTheSameType(currentValue!!, par1[0]!!, par2[0]!!)
-                        ) TargetState(par1[0], par2[0])
-                        else return
-                    }
-                } as TargetState<T>
-            } catch (_: IndexOutOfBoundsException) {
-                return
-            } catch (_: ClassCastException) {
-                return
-            } catch (_: IllegalArgumentException) {
-                return
-            } catch (_: NullPointerException) {
-                return
-            }
+        parseParametersToValue(currentValue, par1, par2)?.let {
+            state = it
         }
     }
 
