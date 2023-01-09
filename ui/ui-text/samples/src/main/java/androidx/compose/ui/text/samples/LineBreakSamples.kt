@@ -19,12 +19,10 @@ package androidx.compose.ui.text.samples
 import androidx.annotation.Sampled
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.LineBreak
 import androidx.compose.ui.unit.sp
 
-@OptIn(ExperimentalTextApi::class)
 @Sampled
 @Composable
 fun LineBreakSample() {
@@ -44,7 +42,6 @@ fun LineBreakSample() {
     )
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Sampled
 @Composable
 fun AndroidLineBreakSample() {
