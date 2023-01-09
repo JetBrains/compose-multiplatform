@@ -495,7 +495,7 @@ package androidx.compose.ui.focus {
     method public void modifyFocusProperties(androidx.compose.ui.focus.FocusProperties focusProperties);
   }
 
-  public final class FocusRequester {
+  @androidx.compose.runtime.Stable public final class FocusRequester {
     ctor public FocusRequester();
     method public boolean captureFocus();
     method public boolean freeFocus();
