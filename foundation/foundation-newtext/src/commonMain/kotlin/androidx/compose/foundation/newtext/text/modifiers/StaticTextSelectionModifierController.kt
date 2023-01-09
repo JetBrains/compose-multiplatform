@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.newtext.text.modifiers
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.newtext.text.copypasta.TextDragObserver
 import androidx.compose.foundation.newtext.text.copypasta.detectDragGesturesAfterLongPressWithObserver
 import androidx.compose.foundation.newtext.text.copypasta.selection.MouseSelectionObserver
@@ -126,7 +125,7 @@ internal class StaticTextSelectionModifierController(
 }
 
 // this is not chained, but is a standalone factory
-@SuppressLint("ModifierFactoryExtensionFunction")
+@Suppress("ModifierFactoryExtensionFunction")
 private fun SelectionRegistrar.makeSelectionModifier(
     selectableId: Long,
     layoutCoordinates: () -> LayoutCoordinates?,

@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.newtext.text.copypasta.selection
 
-import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -54,7 +53,7 @@ internal fun SimpleLayout(modifier: Modifier = Modifier, content: @Composable ()
 }
 
 // copypasta from foundation to compile this copypasta
-@SuppressLint("BanInlineOptIn")
+@Suppress("BanInlineOptIn") // Treat Kotlin Contracts as non-experimental.
 @OptIn(ExperimentalContracts::class)
 internal inline fun <T, R> List<T>.fastFold(initial: R, operation: (acc: R, T) -> R): R {
     contract { callsInPlace(operation) }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,16 @@
 
 package androidx.compose.foundation.newtext.text.copypasta
 
-/**
- * This is a temporary workaround and should be removed after proper mouse handling is settled
- * (b/171402426).
- */
-internal expect val isInTouchMode: Boolean
+import org.jetbrains.skia.BreakIterator
+
+internal actual fun String.findPrecedingBreak(index: Int): Int {
+    val it = BreakIterator.makeCharacterInstance()
+    it.setText(this)
+    return it.preceding(index)
+}
+
+internal actual fun String.findFollowingBreak(index: Int): Int {
+    val it = BreakIterator.makeCharacterInstance()
+    it.setText(this)
+    return it.following(index)
+}

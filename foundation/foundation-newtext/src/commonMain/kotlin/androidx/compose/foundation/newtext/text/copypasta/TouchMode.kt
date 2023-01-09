@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,8 @@
 
 package androidx.compose.foundation.newtext.text.copypasta
 
-internal actual val isInTouchMode = true
+/**
+ * This is a temporary workaround and should be removed after proper mouse handling is settled
+ * (b/171402426).
+ */
+internal val isInTouchMode: Boolean = true
