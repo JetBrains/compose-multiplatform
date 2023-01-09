@@ -11,7 +11,7 @@ in Android Studio or in AppCode with [installed CocoaPods](https://kotlinlang.or
 `./gradlew :resources:demo:desktopApp:run`
 
 ### Run JS in browser with WebAssembly Skia via Gradle:
-`./gradlew :resources:demo:shared:jsBrowserDevelopmentRun`
+`./gradlew :resources:demo:jsApp:jsBrowserDevelopmentRun`
 
 ### Run MacOS via Gradle:
  - on Intel CPU: `./gradlew :resources:demo:shared:runDebugExecutableMacosX64`
