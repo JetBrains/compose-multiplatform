@@ -1104,7 +1104,6 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .testTag(sheetTag)
-                            .fillMaxWidth()
                             .fillMaxHeight(0.4f)
                     )
                 },
@@ -1133,6 +1132,7 @@ class ModalBottomSheetTest {
         val simulatedExpectedLeft = simulatedLeft + expectedSheetLeft
 
         rule.onNodeWithTag(sheetTag)
+            .onParent()
             .assertLeftPositionInRootIsEqualTo(
                 expectedLeft = simulatedExpectedLeft
             )
@@ -1155,7 +1155,6 @@ class ModalBottomSheetTest {
                     Box(
                         Modifier
                             .testTag(sheetTag)
-                            .fillMaxWidth()
                             .fillMaxHeight(0.4f)
                     )
                 },
@@ -1184,6 +1183,7 @@ class ModalBottomSheetTest {
         val simulatedExpectedLeft = simulatedLeft + expectedSheetLeft
 
         rule.onNodeWithTag(sheetTag)
+            .onParent()
             .assertLeftPositionInRootIsEqualTo(
                 expectedLeft = simulatedExpectedLeft
             )
