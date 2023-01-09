@@ -114,6 +114,7 @@ val TextDemos = DemoCategory(
             listOf(
                 ComposableDemo("Text selection") { TextSelectionDemo() },
                 ComposableDemo("Text selection sample") { TextSelectionSample() },
+                ComposableDemo("Overflowed Selection") { TextOverflowedSelectionDemo() },
             )
         ),
         DemoCategory(

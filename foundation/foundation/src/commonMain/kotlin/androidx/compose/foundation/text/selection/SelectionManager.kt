@@ -807,6 +807,8 @@ internal fun calculateSelectionMagnifierCenterAndroid(
         // The end offset is exclusive.
         val offset = if (isStartHandle) anchor.offset else anchor.offset - 1
 
+        if (offset > selectable.getLastVisibleOffset()) return Offset.Unspecified
+
         // The horizontal position doesn't snap to cursor positions but should directly track the
         // actual drag.
         val localDragPosition = selectableCoordinates.localPositionOf(

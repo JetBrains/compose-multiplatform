@@ -246,8 +246,6 @@ class MultiParagraph(
      * because we reached `maxLines` lines of text or because the `maxLines` was
      * null, `ellipsis` was not null, and one of the lines exceeded the width
      * constraint.
-     *
-     * See the discussion of the `maxLines` and `ellipsis` arguments at [ParagraphStyle].
      */
     val didExceedMaxLines: Boolean
 
@@ -779,7 +777,7 @@ class MultiParagraph(
 
     private fun requireLineIndexInRange(lineIndex: Int) {
         require(lineIndex in 0 until lineCount) {
-            "lineIndex($lineIndex) is out of bounds [0, $lineIndex)"
+            "lineIndex($lineIndex) is out of bounds [0, $lineCount)"
         }
     }
 }

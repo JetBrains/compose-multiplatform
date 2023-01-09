@@ -56,16 +56,18 @@ internal class TextFieldMagnifierTest : AbstractSelectionMagnifierTests() {
         text: String,
         modifier: Modifier,
         style: TextStyle,
-        onTextLayout: (TextLayoutResult) -> Unit
+        onTextLayout: (TextLayoutResult) -> Unit,
+        maxLines: Int
     ) {
         BasicTextField(
             text,
-                onValueChange = {},
-                modifier = modifier,
-                textStyle = style,
-                onTextLayout = onTextLayout
-            )
-        }
+            onValueChange = {},
+            modifier = modifier,
+            textStyle = style,
+            onTextLayout = onTextLayout,
+            maxLines = Int.MAX_VALUE
+        )
+    }
 
     @Test
     fun magnifier_appears_whileStartCursorTouched() {

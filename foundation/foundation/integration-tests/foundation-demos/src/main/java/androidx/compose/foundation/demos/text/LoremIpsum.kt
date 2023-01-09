@@ -28,7 +28,7 @@ fun loremIpsum(
     language: Language = Language.Latin,
     wordCount: Int = language.words.size
 ): String =
-    language.words.joinToString(separator = " ", limit = wordCount)
+    language.words.joinToString(separator = " ", limit = wordCount, truncated = "")
 
 private val LatinLipsum = """
     Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque a egestas nisi. Aenean

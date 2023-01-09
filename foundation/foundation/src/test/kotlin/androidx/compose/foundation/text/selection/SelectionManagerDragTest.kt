@@ -223,6 +223,7 @@ internal class FakeSelectable : Selectable {
     var getTextCalledTimes = 0
     var selectionToReturn: Selection? = null
     var textToReturn: AnnotatedString? = null
+    var lastVisibleOffsetToReturn: Int = 0
 
     var handlePosition = Offset.Zero
     var boundingBox = Rect.Zero
@@ -287,6 +288,10 @@ internal class FakeSelectable : Selectable {
         return TextRange.Zero
     }
 
+    override fun getLastVisibleOffset(): Int {
+        return lastVisibleOffsetToReturn
+    }
+
     fun clear() {
         lastEndHandlePosition = null
         lastStartHandlePosition = null
@@ -299,5 +304,6 @@ internal class FakeSelectable : Selectable {
         getTextCalledTimes = 0
         selectionToReturn = null
         textToReturn = null
+        lastVisibleOffsetToReturn = 0
     }
 }

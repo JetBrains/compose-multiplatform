@@ -79,7 +79,6 @@ import com.nhaarman.mockitokotlin2.verify
 import java.util.concurrent.CountDownLatch
 import kotlin.math.max
 import kotlin.math.sign
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -328,7 +327,7 @@ class SelectionContainerTest {
     }
 
     @Test
-    fun selectionHandle_remainsInComposition_whenTextIsOverflown_clipped_softwrapDisabled() {
+    fun selectionHandle_remainsInComposition_whenTextIsOverflowed_clipped_softwrapDisabled() {
         createSelectionContainer {
             Column {
                 BasicText(
@@ -365,35 +364,53 @@ class SelectionContainerTest {
         assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
     }
 
-    @Ignore("b/262428141")
     @Test
-    fun selectionHandle_remainsInComposition_whenTextIsOverflown_clipped_maxLines1() {
+    fun allTextIsSelected_whenTextIsOverflowed_clipped_maxLines1() = with(rule.density) {
+        val longText = "$textContent ".repeat(100)
         createSelectionContainer {
             Column {
                 BasicText(
-                    AnnotatedString("$textContent ".repeat(100)),
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag(tag1),
+                    AnnotatedString(longText),
+                    Modifier.fillMaxWidth().testTag(tag1),
                     style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
                     maxLines = 1
                 )
-                DisableSelection {
-                    BasicText(
-                        textContent,
-                        Modifier.fillMaxWidth().testTag(tag2),
-                        style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
-                        maxLines = 1
-                    )
-                }
             }
         }
 
         startSelection(tag1)
-        dragHandleTo(Handle.SelectionEnd, offset = characterBox(tag2, 4).center)
+        dragHandleTo(
+            handle = Handle.SelectionEnd,
+            offset = characterBox(tag1, 4).bottomRight + Offset(x = 0f, y = fontSize.toPx())
+        )
 
         assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
-        assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
+        assertAnchorInfo(selection.value?.end, offset = longText.length, selectableId = 1)
+    }
+
+    @Test
+    fun allTextIsSelected_whenTextIsOverflowed_ellipsized_maxLines1() = with(rule.density) {
+        val longText = "$textContent ".repeat(100)
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(longText),
+                    Modifier.fillMaxWidth().testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(
+            handle = Handle.SelectionEnd,
+            offset = characterBox(tag1, 4).bottomRight + Offset(x = 0f, y = fontSize.toPx())
+        )
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = longText.length, selectableId = 1)
     }
 
     private fun startSelection(
