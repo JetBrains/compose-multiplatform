@@ -28,8 +28,10 @@ import androidx.compose.ui.focus.FocusStateImpl.ActiveParent
 import androidx.compose.ui.focus.FocusStateImpl.Captured
 import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.visitChildren
+import androidx.compose.ui.node.visitSubtreeIf
 import kotlin.math.absoluteValue
 import kotlin.math.max
 
@@ -187,6 +189,38 @@ private fun FocusTargetModifierNode.searchChildren(
         children.remove(nextItem)
     }
     return false
+}
+
+/**
+ * Returns all [FocusTargetModifierNode] children that are not Deactivated. Any
+ * child that is deactivated will add activated children instead, unless the deactivated
+ * node has a custom Enter specified.
+ */
+@ExperimentalComposeUiApi
+private fun DelegatableNode.collectAccessibleChildren(
+    accessibleChildren: MutableVector<FocusTargetModifierNode>
+) {
+    visitSubtreeIf(Nodes.FocusTarget) {
+
+        if (it.fetchFocusProperties().canFocus) {
+            accessibleChildren.add(it)
+            return@visitSubtreeIf false
+        }
+
+        // If we encounter a deactivated child, we mimic a moveFocus(Enter).
+        when (val customEnter = it.fetchFocusProperties().enter(Enter)) {
+            // If the user declined a custom enter, omit this part of the tree.
+            FocusRequester.Cancel -> return@visitSubtreeIf false
+
+            // If there is no custom enter, we consider all the children.
+            FocusRequester.Default -> return@visitSubtreeIf true
+
+            else -> customEnter.focusRequesterNodes.forEach { node ->
+                node.collectAccessibleChildren(accessibleChildren)
+            }
+        }
+        false
+    }
 }
 
 // Iterate through this list of focus nodes and find best candidate in the specified direction.

@@ -48,7 +48,7 @@ fun Modifier.onFocusChanged(onFocusChanged: (FocusState) -> Unit): Modifier = th
 private class FocusChangedModifierNode(
     var onFocusChanged: (FocusState) -> Unit
 ) : FocusEventModifierNode, Modifier.Node() {
-    var focusState: FocusState? = null
+    private var focusState: FocusState? = null
     override fun onFocusEvent(focusState: FocusState) {
         if (this.focusState != focusState) {
             this.focusState = focusState

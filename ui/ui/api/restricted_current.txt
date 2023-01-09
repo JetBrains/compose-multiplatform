@@ -300,6 +300,9 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier onFocusEvent(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusEvent);
   }
 
+  public final class FocusEventModifierNodeKt {
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusManager {
     method public void clearFocus(optional boolean force);
     method public boolean moveFocus(int focusDirection);
@@ -405,6 +408,9 @@ package androidx.compose.ui.focus {
 
   public final class FocusRequesterModifierKt {
     method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
+  }
+
+  public final class FocusRequesterModifierNodeKt {
   }
 
   public interface FocusState {

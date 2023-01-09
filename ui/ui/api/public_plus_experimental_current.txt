@@ -400,6 +400,9 @@ package androidx.compose.ui.focus {
     method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
   }
 
+  public final class FocusEventModifierNodeKt {
+  }
+
   @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusManager {
     method public void clearFocus(optional boolean force);
     method public boolean moveFocus(int focusDirection);
@@ -537,13 +540,16 @@ package androidx.compose.ui.focus {
   }
 
   public final class FocusRequesterModifierKt {
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean captureFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
     method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean freeFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
-    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean requestFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface FocusRequesterModifierNode extends androidx.compose.ui.node.DelegatableNode {
+  }
+
+  public final class FocusRequesterModifierNodeKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean captureFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean freeFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static boolean requestFocus(androidx.compose.ui.focus.FocusRequesterModifierNode);
   }
 
   public interface FocusState {

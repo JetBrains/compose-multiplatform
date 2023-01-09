@@ -27,7 +27,6 @@ import androidx.compose.ui.focus.FocusOrderModifier
 import androidx.compose.ui.focus.FocusProperties
 import androidx.compose.ui.focus.FocusPropertiesModifierNode
 import androidx.compose.ui.focus.FocusTargetModifierNode
-import androidx.compose.ui.focus.scheduleInvalidationOfAssociatedFocusTargets
 import androidx.compose.ui.input.key.KeyInputModifierNode
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.rotary.RotaryInputModifierNode
@@ -243,6 +242,15 @@ private fun autoInvalidateNode(node: Modifier.Node, phase: Int) {
     }
     if (node.isKind(Nodes.FocusEvent) && node is FocusEventModifierNode && phase != Removed) {
         node.requireOwner().focusOwner.scheduleInvalidation(node)
+    }
+}
+
+@ExperimentalComposeUiApi
+private fun FocusPropertiesModifierNode.scheduleInvalidationOfAssociatedFocusTargets() {
+    visitChildren(Nodes.FocusTarget) {
+        // Schedule invalidation for the focus target,
+        // which will cause it to recalculate focus properties.
+        requireOwner().focusOwner.scheduleInvalidation(it)
     }
 }
 

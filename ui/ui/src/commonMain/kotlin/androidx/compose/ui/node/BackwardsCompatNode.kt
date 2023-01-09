@@ -25,8 +25,8 @@ import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.focus.FocusEventModifier
 import androidx.compose.ui.focus.FocusEventModifierNode
+import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusOrderModifier
-import androidx.compose.ui.focus.FocusOrderModifierToProperties
 import androidx.compose.ui.focus.FocusProperties
 import androidx.compose.ui.focus.FocusPropertiesModifierNode
 import androidx.compose.ui.focus.FocusRequesterModifier
@@ -450,4 +450,17 @@ private val onDrawCacheReadsChanged = { it: BackwardsCompatNode ->
 
 private val updateModifierLocalConsumer = { it: BackwardsCompatNode ->
     it.updateModifierLocalConsumer()
+}
+
+/**
+ * Used internally for FocusOrderModifiers so that we can compare the modifiers and can reuse
+ * the ModifierLocalConsumerEntity and ModifierLocalProviderEntity.
+ */
+@Suppress("DEPRECATION")
+private class FocusOrderModifierToProperties(
+    val modifier: FocusOrderModifier
+) : (FocusProperties) -> Unit {
+    override fun invoke(focusProperties: FocusProperties) {
+        modifier.populateFocusOrder(FocusOrder(focusProperties))
+    }
 }

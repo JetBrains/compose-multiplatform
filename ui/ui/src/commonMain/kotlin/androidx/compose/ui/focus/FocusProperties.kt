@@ -18,26 +18,7 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.DelegatableNode
-import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.modifierElementOf
-import androidx.compose.ui.node.requireOwner
-import androidx.compose.ui.node.visitChildren
-
-/**
- * Implement this interface create a modifier node that can be used to modify the focus properties
- * of the associated [FocusTargetModifierNode].
- */
-@ExperimentalComposeUiApi
-interface FocusPropertiesModifierNode : DelegatableNode {
-    /**
-     * A parent can modify the focus properties associated with the nearest
-     * [FocusTargetModifierNode] child node. If a [FocusTargetModifierNode] has multiple parent
-     * [FocusPropertiesModifierNode]s, properties set by a parent higher up in the hierarchy
-     * overwrite properties set by those that are lower in the hierarchy.
-     */
-    fun modifyFocusProperties(focusProperties: FocusProperties)
-}
 
 /**
  * Properties that are applied to [focusTarget] that is the first child of the
@@ -173,36 +154,6 @@ interface FocusProperties {
         set(_) {}
 }
 
-/**
- * This modifier allows you to specify properties that are accessible to [focusTarget]s further
- * down the modifier chain or on child layout nodes.
- *
- * @sample androidx.compose.ui.samples.FocusPropertiesSample
- */
-@Suppress("ModifierInspectorInfo") // b/251831790.
-fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = this.then(
-    @OptIn(ExperimentalComposeUiApi::class)
-    modifierElementOf(
-        key = scope,
-        create = { FocusPropertiesModifierNodeImpl(scope) },
-        update = { it.focusPropertiesScope = scope },
-        definitions = {
-            name = "focusProperties"
-            properties["scope"] = scope
-        }
-    )
-)
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal class FocusPropertiesModifierNodeImpl(
-    internal var focusPropertiesScope: FocusProperties.() -> Unit,
-) : FocusPropertiesModifierNode, Modifier.Node() {
-
-    override fun modifyFocusProperties(focusProperties: FocusProperties) {
-        focusProperties.apply(focusPropertiesScope)
-    }
-}
-
 internal class FocusPropertiesImpl : FocusProperties {
     override var canFocus: Boolean = true
     override var next: FocusRequester = FocusRequester.Default
@@ -219,11 +170,32 @@ internal class FocusPropertiesImpl : FocusProperties {
     override var exit: (FocusDirection) -> FocusRequester = { FocusRequester.Default }
 }
 
-@ExperimentalComposeUiApi
-internal fun FocusPropertiesModifierNode.scheduleInvalidationOfAssociatedFocusTargets() {
-    visitChildren(Nodes.FocusTarget) {
-        // Schedule invalidation for the focus target,
-        // which will cause it to recalculate focus properties.
-        requireOwner().focusOwner.scheduleInvalidation(it)
+/**
+ * This modifier allows you to specify properties that are accessible to [focusTarget]s further
+ * down the modifier chain or on child layout nodes.
+ *
+ * @sample androidx.compose.ui.samples.FocusPropertiesSample
+ */
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
+    (modifierElementOf(
+        key = scope,
+        create = { FocusPropertiesModifierNodeImpl(scope) },
+        update = { it.focusPropertiesScope = scope },
+        definitions = {
+            name = "focusProperties"
+            properties["scope"] = scope
+        }
+    ))
+)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private class FocusPropertiesModifierNodeImpl(
+    var focusPropertiesScope: FocusProperties.() -> Unit,
+) : FocusPropertiesModifierNode, Modifier.Node() {
+
+    override fun modifyFocusProperties(focusProperties: FocusProperties) {
+        focusProperties.apply(focusPropertiesScope)
     }
 }
