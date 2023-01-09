@@ -24,6 +24,7 @@ import androidx.compose.foundation.lazy.grid.scrollBy
 import androidx.compose.runtime.Stable
 import androidx.compose.testutils.assertIsEqualTo
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
@@ -148,6 +149,8 @@ open class BaseLazyLayoutTestWithOrientation(private val orientation: Orientatio
             bottom = afterContentCrossAxis
         )
     }
+
+    internal fun Modifier.debugBorder(color: Color = Color.Black) = border(1.dp, color)
 
     companion object {
         internal const val FrameDuration = 16L

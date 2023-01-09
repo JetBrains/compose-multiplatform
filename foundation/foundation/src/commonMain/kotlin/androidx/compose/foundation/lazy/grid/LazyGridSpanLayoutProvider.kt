@@ -224,6 +224,7 @@ internal class LazyGridSpanLayoutProvider(private val itemProvider: LazyGridItem
         buckets.add(Bucket(0))
         lastLineIndex = 0
         lastLineStartItemIndex = 0
+        lastLineStartKnownSpan = 0
         cachedBucketIndex = -1
         cachedBucket.clear()
     }
