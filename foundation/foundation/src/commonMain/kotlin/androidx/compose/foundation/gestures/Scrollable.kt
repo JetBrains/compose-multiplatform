@@ -37,7 +37,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.ScrollContainerInfo
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -49,7 +48,8 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.provideScrollContainerInfo
+import androidx.compose.ui.modifier.ModifierLocalProvider
+import androidx.compose.ui.modifier.modifierLocalOf
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
@@ -172,6 +172,7 @@ fun Modifier.scrollable(
                 overscrollEffect,
                 enabled
             )
+            .then(if (enabled) ModifierLocalScrollableContainerProvider else Modifier)
     }
 )
 
@@ -265,14 +266,6 @@ private fun Modifier.pointerScrollable(
     val draggableState = remember { ScrollDraggableState(scrollLogic) }
     val scrollConfig = platformScrollConfig()
 
-    val scrollContainerInfo = remember(orientation, enabled) {
-        object : ScrollContainerInfo {
-            override fun canScrollHorizontally() = enabled && orientation == Horizontal
-
-            override fun canScrollVertically() = enabled && orientation == Orientation.Vertical
-        }
-    }
-
     return draggable(
         draggableState,
         orientation = orientation,
@@ -289,7 +282,6 @@ private fun Modifier.pointerScrollable(
     )
         .mouseWheelScroll(scrollLogic, scrollConfig)
         .nestedScroll(nestedScrollConnection, nestedScrollDispatcher.value)
-        .provideScrollContainerInfo(scrollContainerInfo)
 }
 
 private fun Modifier.mouseWheelScroll(
@@ -589,6 +581,18 @@ internal class DefaultFlingBehavior(
             }
         }
     }
+}
+
+// TODO: b/203141462 - make this public and move it to ui
+/**
+ * Whether this modifier is inside a scrollable container, provided by [Modifier.scrollable].
+ * Defaults to false.
+ */
+internal val ModifierLocalScrollableContainer = modifierLocalOf { false }
+
+private object ModifierLocalScrollableContainerProvider : ModifierLocalProvider<Boolean> {
+    override val key = ModifierLocalScrollableContainer
+    override val value = true
 }
 
 private const val DefaultScrollMotionDurationScaleFactor = 1f

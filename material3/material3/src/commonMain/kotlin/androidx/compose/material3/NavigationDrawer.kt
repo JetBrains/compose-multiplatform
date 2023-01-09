@@ -57,9 +57,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.input.ScrollContainerInfo
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.provideScrollContainerInfo
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -266,15 +264,6 @@ fun ModalNavigationDrawer(
 
     val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-
-    val containerInfo = remember(gesturesEnabled) {
-        object : ScrollContainerInfo {
-            override fun canScrollHorizontally() = gesturesEnabled
-
-            override fun canScrollVertically() = false
-        }
-    }
-
     Box(
         modifier
             .fillMaxSize()
@@ -288,7 +277,6 @@ fun ModalNavigationDrawer(
                 velocityThreshold = DrawerVelocityThreshold,
                 resistance = null
             )
-            .provideScrollContainerInfo(containerInfo)
     ) {
         Box {
             content()
@@ -369,14 +357,6 @@ fun DismissibleNavigationDrawer(
 
     val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
-    val containerInfo = remember(gesturesEnabled) {
-        object : ScrollContainerInfo {
-            override fun canScrollHorizontally() = gesturesEnabled
-
-            override fun canScrollVertically() = false
-        }
-    }
-
     Box(
         modifier.swipeable(
             state = drawerState.swipeableState,
@@ -387,7 +367,7 @@ fun DismissibleNavigationDrawer(
             reverseDirection = isRtl,
             velocityThreshold = DrawerVelocityThreshold,
             resistance = null
-        ).provideScrollContainerInfo(containerInfo)
+        )
     ) {
         Layout(content = {
             Box(Modifier.semantics {

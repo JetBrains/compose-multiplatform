@@ -26,8 +26,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.canScroll
-import androidx.compose.ui.input.consumeScrollContainerInfo
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -1204,77 +1202,5 @@ class DrawerTest {
 
         topNode = rule.onNodeWithTag(topTag).fetchSemanticsNode()
         assertEquals(2, topNode.children.size)
-    }
-
-    @Test
-    fun modalDrawer_providesScrollableContainerInfo_enabled() {
-        var actualValue = { false }
-        rule.setMaterialContent {
-            ModalDrawer(
-                drawerContent = {},
-                content = {
-                    Box(Modifier.consumeScrollContainerInfo {
-                        actualValue = { it!!.canScroll() }
-                    })
-                }
-            )
-        }
-
-        assertThat(actualValue()).isTrue()
-    }
-
-    @Test
-    fun modalDrawer_providesScrollableContainerInfo_disabled() {
-        var actualValue = { false }
-        rule.setMaterialContent {
-            ModalDrawer(
-                drawerContent = {},
-                gesturesEnabled = false,
-                content = {
-                    Box(Modifier.consumeScrollContainerInfo {
-                        actualValue = { it!!.canScroll() }
-                    })
-                }
-            )
-        }
-
-        assertThat(actualValue()).isFalse()
-    }
-
-    @OptIn(ExperimentalMaterialApi::class)
-    @Test
-    fun bottomDrawer_providesScrollableContainerInfo_enabled() {
-        var actualValue = { false }
-        rule.setMaterialContent {
-            BottomDrawer(
-                drawerContent = {},
-                content = {
-                    Box(Modifier.consumeScrollContainerInfo {
-                        actualValue = { it!!.canScroll() }
-                    })
-                }
-            )
-        }
-
-        assertThat(actualValue()).isTrue()
-    }
-
-    @OptIn(ExperimentalMaterialApi::class)
-    @Test
-    fun bottomDrawer_providesScrollableContainerInfo_disabled() {
-        var actualValue = { false }
-        rule.setMaterialContent {
-            BottomDrawer(
-                drawerContent = {},
-                gesturesEnabled = false,
-                content = {
-                    Box(Modifier.consumeScrollContainerInfo {
-                        actualValue = { it!!.canScroll() }
-                    })
-                }
-            )
-        }
-
-        assertThat(actualValue()).isFalse()
     }
 }

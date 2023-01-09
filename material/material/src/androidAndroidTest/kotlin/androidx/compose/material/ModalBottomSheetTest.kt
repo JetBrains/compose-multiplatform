@@ -36,8 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.canScroll
-import androidx.compose.ui.input.consumeScrollContainerInfo
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.testTag
@@ -831,56 +829,6 @@ class ModalBottomSheetTest {
         rule.runOnIdle {
             assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
         }
-    }
-
-    @Test
-    fun modalBottomSheet_providesScrollableContainerInfo_hidden() {
-        var actualValue = { false }
-        rule.setMaterialContent {
-            ModalBottomSheetLayout(
-                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
-                sheetContent = {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .consumeScrollContainerInfo {
-                                actualValue = { it!!.canScroll() }
-                            }
-                    )
-                }
-            )
-        }
-
-        assertThat(actualValue()).isFalse()
-    }
-
-    @Test
-    fun modalBottomSheet_providesScrollableContainerInfo_expanded() {
-        var actualValue = { false }
-        rule.setMaterialContent {
-            ModalBottomSheetLayout(
-                sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Expanded),
-                content = { Box(
-                    Modifier
-                        .fillMaxSize()
-                        .testTag(contentTag)) },
-                sheetContent = {
-                    Box(
-                        Modifier
-                            .fillMaxSize()
-                            .consumeScrollContainerInfo {
-                                actualValue = { it!!.canScroll() }
-                            }
-                    )
-                }
-            )
-        }
-
-        assertThat(actualValue()).isTrue()
     }
 
     @Test
