@@ -67,7 +67,7 @@ internal class AnimatedVisibilityClock(override val animation: AnimatedVisibilit
         animation.childTransition?.let { child ->
             return child.allAnimations().map {
                 it.createTransitionInfo(stepMillis)
-            }.sortedBy { it.label }
+            }.sortedBy { it.label }.filter { !IGNORE_TRANSITIONS.contains(it.label) }
         }
         return emptyList()
     }
@@ -76,7 +76,7 @@ internal class AnimatedVisibilityClock(override val animation: AnimatedVisibilit
         animation.childTransition?.let { child ->
             return child.allAnimations().mapNotNull {
                 ComposeAnimatedProperty(it.label, it.value ?: return@mapNotNull null)
-            }.sortedBy { it.label }
+            }.sortedBy { it.label }.filter { !IGNORE_TRANSITIONS.contains(it.label) }
         }
         return emptyList()
     }
