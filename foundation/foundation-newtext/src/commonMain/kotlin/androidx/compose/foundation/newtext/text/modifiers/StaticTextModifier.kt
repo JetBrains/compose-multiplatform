@@ -18,8 +18,10 @@ import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ObserverNode
 import androidx.compose.ui.node.SemanticsModifierNode
+import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateLayer
 import androidx.compose.ui.node.invalidateLayout
+import androidx.compose.ui.node.invalidateMeasurements
 import androidx.compose.ui.node.invalidateSemantics
 import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.semantics.SemanticsConfiguration
@@ -56,17 +58,23 @@ internal class StaticTextModifier(
                 }
                 if (diff.hasLayoutDiffs || diff.hasCallbackDiffs) {
                     textDelegateDirty = true
-                    invalidateLayout()
+                    invalidateMeasurements()
                 }
                 if (diff.anyDiffs) {
                     // if anything changed we redraw
-                    invalidateLayer()
+                    invalidateDraw()
                 }
                 return
             }
 
-            // if we set params, always redraw.
-            invalidateLayer()
+            // if no layout has happened, 🎶 just invalidate everything 🎶
+            // we don't expect to hit this often, but if we do don't keep anything around from
+            // the previous params and restart all passes ⚽
+            _semanticsConfiguration = null
+            textDelegateDirty = true
+            invalidateSemantics()
+            invalidateMeasurements()
+            invalidateDraw()
         }
 
     private var _semanticsConfiguration: SemanticsConfiguration? = null
