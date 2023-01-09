@@ -12,4 +12,4 @@ fun MainView(windowState: WindowState) =
         )
     }
 
-actual fun isMobileDevice() = false
+actual fun hasRightClick() = true

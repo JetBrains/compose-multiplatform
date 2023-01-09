@@ -12,4 +12,4 @@ fun MainViewController() : UIViewController =
     }
 
 
-actual fun isMobileDevice() = true
+actual fun hasRightClick() = false

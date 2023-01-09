@@ -19,7 +19,7 @@ import kotlin.math.max
 @Composable
 internal fun loadImage(res: String): Painter = BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
 
-expect fun isMobileDevice(): Boolean
+expect fun hasRightClick(): Boolean
 
 object Difficulty {
     val EASY = GameSettings(9, 9, 10)

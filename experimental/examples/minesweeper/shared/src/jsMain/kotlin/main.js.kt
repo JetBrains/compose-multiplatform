@@ -3,4 +3,4 @@ import androidx.compose.runtime.Composable
 @Composable
 fun MainView() = Game()
 
-actual fun isMobileDevice() = false
+actual fun hasRightClick() = false

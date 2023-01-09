@@ -29,4 +29,4 @@ fun main() {
     NSApp?.run()
 }
 
-actual fun isMobileDevice() = false
+actual fun hasRightClick() = false

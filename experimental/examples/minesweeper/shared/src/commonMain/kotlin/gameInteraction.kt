@@ -7,7 +7,7 @@ import androidx.compose.ui.input.pointer.*
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun Modifier.gameInteraction(open: () -> Unit, flag: () -> Unit, seek: () -> Unit): Modifier =
-    if (isMobileDevice()) {
+    if (!hasRightClick()) {
         combinedClickable(
             onClick = {
                 open()
