@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.ScrollConfig
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
@@ -283,6 +284,36 @@ class ScrollbarTest {
             rule.onNodeWithTag("scrollbar").performMouseInput {
                 release()
             }
+        }
+    }
+
+    @Test
+    fun `scroll lazy column to bottom with content padding`() {
+        runBlocking(Dispatchers.Main) {
+            val listState = LazyListState()
+            rule.setContent {
+                LazyTestBox(
+                    state = listState,
+                    size = 100.dp,
+                    childSize = 10.dp,
+                    childCount = 20,
+                    scrollbarWidth = 10.dp,
+                    contentPadding = PaddingValues(vertical = 25.dp)
+                )
+            }
+            rule.awaitIdle()
+
+            // Drag to the bottom
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 20f), end = Offset(0f, 80f))
+            }
+
+            rule.awaitIdle()
+
+            // Note that if the scrolling is incorrect, this can fail not only with a wrong value, but also by not
+            // finding the box node, as it may have not scrolled into view.
+            // Last box should be at containerSize - bottomPadding - boxSize
+            rule.onNodeWithTag("box19").assertTopPositionInRootIsEqualTo(100.dp - 25.dp - 10.dp)
         }
     }
 
@@ -662,12 +693,14 @@ class ScrollbarTest {
         childSize: Dp,
         childCount: Int,
         scrollbarWidth: Dp,
-        reverseLayout: Boolean = false
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        reverseLayout: Boolean = false,
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
             LazyColumn(
                 Modifier.fillMaxSize().testTag("column"),
                 state,
+                contentPadding = contentPadding,
                 reverseLayout = reverseLayout
             ) {
                 items((0 until childCount).toList()) {

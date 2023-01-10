@@ -472,7 +472,11 @@ private class LazyScrollbarAdapter(
     }
 
     override fun maxScrollOffset(containerSize: Int) =
-        (averageItemSize * itemCount - containerSize).coerceAtLeast(0f)
+        (averageItemSize * itemCount
+            + scrollState.layoutInfo.beforeContentPadding
+            + scrollState.layoutInfo.afterContentPadding
+            - containerSize
+        ).coerceAtLeast(0f)
 
     private val itemCount get() = scrollState.layoutInfo.totalItemsCount
 
