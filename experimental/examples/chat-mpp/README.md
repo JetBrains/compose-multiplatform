@@ -1,23 +1,28 @@
 # Chat example app
 
-## Run on Android:
-- connect device or emulator
-- `./gradlew installDebug`
-- open app
+Example can run on Android, iOS, desktop or in a browser.
 
-## Run on Desktop jvm
-  `./gradlew run`
+*Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed either 
+                 in Android Studio or in AppCode with [installed CocoaPods](https://kotlinlang.org/docs/native-cocoapods.html).
 
-## Run native on MacOS
-  `./gradlew runDebugExecutableMacosX64` (Works on Intel processors)
 
-## Run web assembly in browser
-  `./gradlew jsBrowserDevelopmentRun`
+## How to run 
 
-## Run on iOS simulator
-  `./gradlew iosDeployIPhone8Debug`
-  `./gradlew iosDeployIPadDebug`
+Choose a run configuration for an appropriate target in IDE and run it.
 
-## Run on iOS device
-- Read about iOS target in [falling-balls-mpp/README.md](../falling-balls-mpp/README.md)
-- `./gradlew iosDeployDeviceRelease`
+![run-configurations.png](run-configurations.png)
+
+To run on iOS device, please correct `iosApp/Configuration/TeamId.xcconfig` with your Apple Team ID. 
+Alternatively, you may setup signing within XCode opening `iosApp/Chat.xcworkspace` and then 
+using "Signing & Capabilities" tab of `Chat` target.
+
+Then choose **iosApp** configuration in IDE and run it 
+(may also be referred as `Chat` in the Run Configurations or `iosApp (Android Studio)` for Android studio).
+
+## Run on desktop via Gradle
+
+`./gradlew desktopApp:run`
+
+## Run JS in browser with WebAssembly Skia via Gradle
+
+`./gradlew jsApp:jsBrowserDevelopmentRun`
