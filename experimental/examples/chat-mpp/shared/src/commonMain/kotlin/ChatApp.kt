@@ -14,7 +14,7 @@ val friendMessages = listOf(
 )
 
 @Composable
-fun ChatApp() {
+internal fun ChatApp() {
     val coroutineScope = rememberCoroutineScope()
     val store = remember { coroutineScope.createStore() }
     val state by store.stateFlow.collectAsState()

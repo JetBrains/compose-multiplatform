@@ -8,7 +8,7 @@ fun main() {
     onWasmReady {
         Window("Chat") {
             Column(modifier = Modifier.fillMaxSize()) {
-                ChatApp()
+                MainView()
             }
         }
     }

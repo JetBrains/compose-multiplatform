@@ -1,2 +1,8 @@
 local.properties
 .idea
+iosApp/Podfile.lock
+iosApp/Pods/*
+iosApp/Chat.xcworkspace/*
+iosApp/Chat.xcodeproj/*
+!iosApp/Chat.xcodeproj/project.pbxproj
+shared/shared.podspec
