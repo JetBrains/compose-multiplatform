@@ -97,6 +97,7 @@ import androidx.compose.material3.samples.PlainTooltipWithManualInvocationSample
 import androidx.compose.material3.samples.RadioButtonSample
 import androidx.compose.material3.samples.RadioGroupSample
 import androidx.compose.material3.samples.RangeSliderSample
+import androidx.compose.material3.samples.RangeSliderWithCustomComponents
 import androidx.compose.material3.samples.ScaffoldWithCoroutinesSnackbar
 import androidx.compose.material3.samples.ScaffoldWithCustomSnackbar
 import androidx.compose.material3.samples.ScaffoldWithIndefiniteSnackbar
@@ -722,6 +723,20 @@ val SlidersExamples = listOf(
         StepsSliderSample()
     },
     Example(
+        name = ::SliderWithCustomThumbSample.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        SliderWithCustomThumbSample()
+    },
+    Example(
+        name = ::SliderWithCustomTrackAndThumb.name,
+        description = SlidersExampleDescription,
+        sourceUrl = SlidersExampleSourceUrl
+    ) {
+        SliderWithCustomTrackAndThumb()
+    },
+    Example(
         name = ::RangeSliderSample.name,
         description = SlidersExampleDescription,
         sourceUrl = SlidersExampleSourceUrl
@@ -736,18 +751,11 @@ val SlidersExamples = listOf(
         StepRangeSliderSample()
     },
     Example(
-        name = ::SliderWithCustomThumbSample.name,
+        name = ::RangeSliderWithCustomComponents.name,
         description = SlidersExampleDescription,
         sourceUrl = SlidersExampleSourceUrl
     ) {
-        SliderWithCustomThumbSample()
-    },
-    Example(
-        name = ::SliderWithCustomTrackAndThumb.name,
-        description = SlidersExampleDescription,
-        sourceUrl = SlidersExampleSourceUrl
-    ) {
-        SliderWithCustomTrackAndThumb()
+        RangeSliderWithCustomComponents()
     }
 )
 
