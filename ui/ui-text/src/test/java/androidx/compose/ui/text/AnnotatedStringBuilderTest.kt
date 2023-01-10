@@ -184,10 +184,10 @@ class AnnotatedStringBuilderTest {
         val text = "a"
         val annotatedString = AnnotatedString(
             text = text,
-            spanStyles = listOf(
+            spanStylesOrNull = listOf(
                 text.inclusiveRangeOf('a', 'a', item = SpanStyle(color = Color.Red))
             ),
-            paragraphStyles = listOf(
+            paragraphStylesOrNull = listOf(
                 text.inclusiveRangeOf('a', 'a', item = ParagraphStyle(lineHeight = 20.sp))
             ),
             annotations = listOf(
@@ -222,8 +222,8 @@ class AnnotatedStringBuilderTest {
         )
         val appendedAnnotatedString = AnnotatedString(
             text = appendedText,
-            spanStyles = appendedSpanStyles,
-            paragraphStyles = appendedParagraphStyles,
+            spanStylesOrNull = appendedSpanStyles,
+            paragraphStylesOrNull = appendedParagraphStyles,
             annotations = appendedAnnotations
         )
 

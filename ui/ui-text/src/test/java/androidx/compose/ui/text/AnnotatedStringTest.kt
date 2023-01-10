@@ -113,8 +113,8 @@ class AnnotatedStringTest {
         )
         val annotatedString1 = AnnotatedString(
             text = text1,
-            spanStyles = spanStyles1,
-            paragraphStyles = paragraphStyles1,
+            spanStylesOrNull = spanStyles1,
+            paragraphStylesOrNull = paragraphStyles1,
             annotations = annotations1
         )
 
@@ -123,8 +123,8 @@ class AnnotatedStringTest {
         val paragraphStyle = ParagraphStyle(lineHeight = 10.sp)
         val annotatedString2 = AnnotatedString(
             text = text2,
-            spanStyles = listOf(Range(spanStyle, 0, text2.length)),
-            paragraphStyles = listOf(Range(paragraphStyle, 0, text2.length)),
+            spanStylesOrNull = listOf(Range(spanStyle, 0, text2.length)),
+            paragraphStylesOrNull = listOf(Range(paragraphStyle, 0, text2.length)),
             annotations = listOf(Range("annotation2", 0, text2.length, "scope2"))
         )
 
