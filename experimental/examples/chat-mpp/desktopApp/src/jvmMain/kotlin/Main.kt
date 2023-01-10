@@ -1,5 +1,3 @@
-import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
@@ -10,11 +8,5 @@ fun main() =
         title = "Chat",
         state = WindowState(size = DpSize(500.dp, 800.dp))
     ) {
-        ChatApp()
+        MainView()
     }
-
-@Preview
-@Composable
-fun ChatPreview() {
-    ChatApp()
-}
