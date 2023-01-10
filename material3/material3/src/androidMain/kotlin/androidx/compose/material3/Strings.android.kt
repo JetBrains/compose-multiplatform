@@ -36,8 +36,12 @@ internal actual fun getString(string: Strings): String {
         Strings.Dialog -> resources.getString(androidx.compose.material3.R.string.dialog)
         Strings.MenuExpanded -> resources.getString(androidx.compose.material3.R.string.expanded)
         Strings.MenuCollapsed -> resources.getString(androidx.compose.material3.R.string.collapsed)
-        Strings.Dismiss -> resources.getString(androidx.compose.material3.R.string.dismiss)
-        Strings.Search -> resources.getString(androidx.compose.material3.R.string.search)
+        Strings.SnackbarDismiss -> resources.getString(
+            androidx.compose.material3.R.string.snackbar_dismiss
+        )
+        Strings.SearchBarSearch -> resources.getString(
+            androidx.compose.material3.R.string.search_bar_search
+        )
         Strings.SuggestionsAvailable ->
             resources.getString(androidx.compose.material3.R.string.suggestions_available)
         Strings.DatePickerTitle -> resources.getString(

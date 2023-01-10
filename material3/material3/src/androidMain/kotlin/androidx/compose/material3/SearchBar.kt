@@ -401,7 +401,7 @@ private fun SearchBarInputField(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
 ) {
     val focusRequester = remember { FocusRequester() }
-    val searchSemantics = getString(Strings.Search)
+    val searchSemantics = getString(Strings.SearchBarSearch)
     val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
     val textColor = LocalTextStyle.current.color.takeOrElse {
         colors.textColor(enabled).value

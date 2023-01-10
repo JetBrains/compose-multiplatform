@@ -20,8 +20,6 @@
     <string name="dialog" msgid="4057925834421392736">"مربّع حوار"</string>
     <string name="expanded" msgid="5974471714631304645">"موسَّع"</string>
     <string name="collapsed" msgid="5389587048670450460">"مصغَّر"</string>
-    <string name="dismiss" msgid="1461218791585306270">"إغلاق"</string>
-    <string name="search" msgid="8595876902241072592">"بحث"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"إليك الاقتراحات:"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"اختيار تاريخ"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"التاريخ المحدَّد"</string>

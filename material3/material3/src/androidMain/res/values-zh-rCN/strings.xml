@@ -20,8 +20,6 @@
     <string name="dialog" msgid="4057925834421392736">"对话框"</string>
     <string name="expanded" msgid="5974471714631304645">"已展开"</string>
     <string name="collapsed" msgid="5389587048670450460">"已收起"</string>
-    <string name="dismiss" msgid="1461218791585306270">"关闭"</string>
-    <string name="search" msgid="8595876902241072592">"搜索"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"以下是搜索建议"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"选择日期"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"选定的日期"</string>
