@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -297,8 +298,9 @@ private fun ListItem(
     ) {
         Row(
             modifier = Modifier
-            .heightIn(min = minHeight)
-            .padding(paddingValues),
+                .heightIn(min = minHeight)
+                .padding(paddingValues)
+                .semantics(mergeDescendants = true) {},
             content = content
         )
     }
