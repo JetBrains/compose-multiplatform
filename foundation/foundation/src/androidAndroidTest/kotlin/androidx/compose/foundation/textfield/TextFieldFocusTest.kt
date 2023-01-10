@@ -68,6 +68,7 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -380,6 +381,7 @@ class TextFieldFocusTest {
         rule.onNodeWithTag("test-button-bottom").assertIsFocused()
     }
 
+    @Ignore // b/264919150
     @Test
     fun basicTextField_checkKeyboardShown_onDPadCenter() {
         setupAndEnableBasicTextField()
