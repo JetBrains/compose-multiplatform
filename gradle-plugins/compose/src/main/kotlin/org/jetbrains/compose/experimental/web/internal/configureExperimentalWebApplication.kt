@@ -14,7 +14,7 @@ import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.experimental.dsl.ExperimentalWebApplication
 import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.experimental.web.tasks.ExperimentalUnpackSkikoWasmRuntimeTask
-import org.jetbrains.compose.internal.uppercaseFirstChar
+import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
 internal fun KotlinJsIrTarget.configureExperimentalWebApplication(app: ExperimentalWebApplication) {
