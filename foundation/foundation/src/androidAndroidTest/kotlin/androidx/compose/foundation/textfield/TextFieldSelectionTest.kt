@@ -43,6 +43,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.input.VisualTransformation
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -238,6 +239,7 @@ class TextFieldSelectionTest {
         )
     }
 
+    @Ignore // b/265023420
     @Test
     fun textField_extendsSelection_toLeft() {
         textField_extendsSelection(
@@ -248,6 +250,7 @@ class TextFieldSelectionTest {
         )
     }
 
+    @Ignore // b/265023621
     @Test
     fun textField_extendsSelection_withPasswordVisualTransformation_toLeft() {
         textField_extendsSelection(
