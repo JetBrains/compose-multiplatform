@@ -1,1 +1,7 @@
 local.properties
+iosApp/Podfile.lock
+iosApp/Pods/*
+iosApp/Minesweeper.xcworkspace/*
+iosApp/Minesweeper.xcodeproj/*
+!iosApp/Minesweeper.xcodeproj/project.pbxproj
+shared/shared.podspec
