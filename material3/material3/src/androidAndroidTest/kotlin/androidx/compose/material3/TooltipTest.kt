@@ -75,6 +75,7 @@ class TooltipTest {
             .assertWidthIsEqualTo(customWidth)
     }
 
+    @FlakyTest(bugId = 264907895)
     @Test
     fun plainTooltip_content_padding() {
         rule.setMaterialContent(lightColorScheme()) {
