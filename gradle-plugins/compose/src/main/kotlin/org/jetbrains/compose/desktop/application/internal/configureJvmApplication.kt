@@ -248,6 +248,11 @@ private fun JvmApplicationContext.configureProguardTask(
     val settings = buildType.proguard
     mainClass.set(app.mainClass)
     proguardVersion.set(settings.version)
+    proguardFiles.from(proguardVersion.map { proguardVersion ->
+        project.configurations.detachedConfiguration(
+            project.dependencies.create("com.guardsquare:proguard-gradle:${proguardVersion}")
+        )
+    })
     configurationFiles.from(settings.configurationFiles)
     // ProGuard uses -dontobfuscate option to turn off obfuscation, which is enabled by default
     // We want to disable obfuscation by default, because often
