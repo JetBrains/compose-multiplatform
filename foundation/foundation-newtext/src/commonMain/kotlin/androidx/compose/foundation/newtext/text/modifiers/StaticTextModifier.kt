@@ -16,14 +16,11 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
-import androidx.compose.ui.node.ObserverNode
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateLayer
-import androidx.compose.ui.node.invalidateLayout
 import androidx.compose.ui.node.invalidateMeasurements
 import androidx.compose.ui.node.invalidateSemantics
-import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.text
@@ -41,7 +38,7 @@ import kotlin.math.roundToInt
 internal class StaticTextModifier(
     params: StaticTextLayoutDrawParams
 ) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, GlobalPositionAwareModifierNode,
-    SemanticsModifierNode, ObserverNode {
+    SemanticsModifierNode {
     private var baselineCache: Map<AlignmentLine, Int>? = null
     private var layoutCache: MultiParagraphLayoutCache? = null
     private var textDelegateDirty = true
@@ -145,9 +142,8 @@ internal class StaticTextModifier(
         val didChangeLayout = td.layoutWithConstraints(constraints, layoutDirection)
         val textLayoutResult = td.layout
 
-        observeReads {
-            textLayoutResult.multiParagraph.intrinsics.hasStaleResolvedFonts
-        }
+        // ensure measure restarts when hasStaleResolvedFonts by reading in measure
+        textLayoutResult.multiParagraph.intrinsics.hasStaleResolvedFonts
 
         if (didChangeLayout) {
             invalidateLayer()
@@ -262,9 +258,5 @@ internal class StaticTextModifier(
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         params.selectionController?.updateGlobalPosition(coordinates)
-    }
-
-    override fun onObservedReadsChanged() {
-        invalidateLayout()
     }
 }
