@@ -44,14 +44,18 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlinx.coroutines.launch
+import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlinx.coroutines.launch
 
 @Sampled
 @Composable
 fun TransformableSample() {
     Box(
-        Modifier.size(200.dp).clipToBounds().background(Color.LightGray)
+        Modifier
+            .size(200.dp)
+            .clipToBounds()
+            .background(Color.LightGray)
     ) {
         // set up all transformation states
         var scale by remember { mutableStateOf(1f) }
@@ -61,7 +65,8 @@ fun TransformableSample() {
         // let's create a modifier state to specify how to update our UI state defined above
         val state = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
             // note: scale goes by factor, not an absolute difference, so we need to multiply it
-            scale *= zoomChange
+            // for this example, we don't allow downscaling, so cap it to 1f
+            scale = max(scale * zoomChange, 1f)
             rotation += rotationChange
             offset += offsetChange
         }
