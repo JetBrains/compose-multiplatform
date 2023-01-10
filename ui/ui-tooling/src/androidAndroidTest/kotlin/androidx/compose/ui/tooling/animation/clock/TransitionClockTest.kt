@@ -21,7 +21,9 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.ExperimentalTransitionApi
 import androidx.compose.animation.core.animateDp
+import androidx.compose.animation.core.createChildTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.tooling.ComposeAnimatedProperty
@@ -30,6 +32,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.tooling.animation.AnimatedContentComposeAnimation.Companion.parseAnimatedContent
@@ -495,6 +498,68 @@ class TransitionClockTest {
             clock = TransitionClock(transition.parse() as TransitionComposeAnimation<Boolean>)
         }
         return clock
+    }
+
+    @Test
+    fun childTransition() {
+        val search = AnimationSearch.TransitionSearch { }
+        rule.searchForAnimation(search) { childTransitions() }
+        val clock = TransitionClock(search.animations.first().parse()!!)
+
+        rule.runOnIdle {
+            clock.getTransitions(100).let {
+                assertEquals(5, it.size)
+                assertEquals("Parent", it[0].label)
+                assertEquals("Child1", it[1].label)
+                assertEquals("Grandchild", it[2].label)
+                assertEquals("GrandGrandchild", it[3].label)
+                assertEquals("Child2", it[4].label)
+            }
+            clock.getAnimatedProperties().let {
+                assertEquals(5, it.size)
+                assertEquals("Parent", it[0].label)
+                assertEquals("Child1", it[1].label)
+                assertEquals("Grandchild", it[2].label)
+                assertEquals("GrandGrandchild", it[3].label)
+                assertEquals("Child2", it[4].label)
+            }
+        }
+    }
+
+    @OptIn(ExperimentalTransitionApi::class)
+    @Composable
+    fun childTransitions() {
+        val state by remember { mutableStateOf(EnumState.One) }
+        val parentTransition = updateTransition(state, label = "parent")
+        parentTransition.animateDp(
+            transitionSpec = { tween(durationMillis = 1000, delayMillis = 100) },
+            label = "Parent"
+        ) { 10.dp }
+
+        val child = parentTransition.createChildTransition(label = "child1") { it }.apply {
+            this.animateDp(
+                transitionSpec = { tween(durationMillis = 1000, delayMillis = 100) },
+                label = "Child1"
+            ) { 10.dp }
+        }
+        val grandchild = child.createChildTransition(label = "child1") { it }.apply {
+            this.animateDp(
+                transitionSpec = { tween(durationMillis = 1000, delayMillis = 100) },
+                label = "Grandchild"
+            ) { 10.dp }
+        }
+        grandchild.createChildTransition(label = "child1") { it }.apply {
+            this.animateDp(
+                transitionSpec = { tween(durationMillis = 1000, delayMillis = 100) },
+                label = "GrandGrandchild"
+            ) { 10.dp }
+        }
+        parentTransition.createChildTransition(label = "child2") { it }.apply {
+            this.animateDp(
+                transitionSpec = { tween(durationMillis = 1000, delayMillis = 100) },
+                label = "Child2"
+            ) { 10.dp }
+        }
     }
 
     //endregion
