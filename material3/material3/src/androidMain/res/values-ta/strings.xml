@@ -20,8 +20,6 @@
     <string name="dialog" msgid="4057925834421392736">"உரையாடல்"</string>
     <string name="expanded" msgid="5974471714631304645">"விரிக்கப்பட்டது"</string>
     <string name="collapsed" msgid="5389587048670450460">"சுருக்கப்பட்டது"</string>
-    <string name="dismiss" msgid="1461218791585306270">"மூடும்"</string>
-    <string name="search" msgid="8595876902241072592">"தேடும்"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"பரிந்துரைகள் கீழே கிடைக்கும்"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"தேதியைத் தேர்ந்தெடுக்கவும்"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"தேர்ந்தெடுக்கப்பட்ட தேதி"</string>

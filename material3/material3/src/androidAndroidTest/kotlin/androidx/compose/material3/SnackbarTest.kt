@@ -105,7 +105,7 @@ class SnackbarTest {
             }
         lateinit var dismissContentDescription: String
         rule.setMaterialContent(lightColorScheme()) {
-            dismissContentDescription = getString(string = Strings.Dismiss)
+            dismissContentDescription = getString(string = Strings.SnackbarDismiss)
             Box { Snackbar(snackbarData = snackbarData) }
         }
 

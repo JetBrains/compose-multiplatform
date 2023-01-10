@@ -20,8 +20,6 @@
     <string name="dialog" msgid="4057925834421392736">"Дыялогавае акно"</string>
     <string name="expanded" msgid="5974471714631304645">"Разгорнута"</string>
     <string name="collapsed" msgid="5389587048670450460">"Згорнута"</string>
-    <string name="dismiss" msgid="1461218791585306270">"Закрыць"</string>
-    <string name="search" msgid="8595876902241072592">"Пошук"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"Прапановы ўнізе"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"Выберыце дату"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"Выбраная дата"</string>
