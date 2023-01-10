@@ -18,6 +18,7 @@ package androidx.compose.foundation.newtext.text
 
 import androidx.compose.foundation.newtext.text.copypasta.selection.LocalSelectionRegistrar
 import androidx.compose.foundation.newtext.text.copypasta.selection.LocalTextSelectionColors
+import androidx.compose.foundation.newtext.text.modifiers.SelectableStaticTextModifier
 import androidx.compose.foundation.newtext.text.modifiers.StaticTextSelectionModifierController
 import androidx.compose.foundation.newtext.text.modifiers.StaticTextLayoutDrawParams
 import androidx.compose.foundation.newtext.text.modifiers.StaticTextModifier
@@ -239,15 +240,31 @@ private fun Modifier.textModifier(
         onPlaceholderLayout,
         selectionController
     )
-    val staticTextModifier = object : ModifierNodeElement<StaticTextModifier>(
-        params,
-        false,
-        debugInspectorInfo {}
-    ) {
-        override fun create(): StaticTextModifier = StaticTextModifier(params)
-        override fun update(node: StaticTextModifier): StaticTextModifier =
-            node.also { it.params = params }
+    if (selectionController == null) {
+        val staticTextModifier = object : ModifierNodeElement<StaticTextModifier>(
+            params,
+            false,
+            debugInspectorInfo {}
+        ) {
+            override fun create(): StaticTextModifier = StaticTextModifier(params)
+            override fun update(node: StaticTextModifier): StaticTextModifier =
+                node.also { it.params = params }
+        }
+        return this then Modifier /* selection position */ then staticTextModifier
+    } else {
+        val selectableTextModifier =
+            object : ModifierNodeElement<SelectableStaticTextModifier>(
+                params,
+                false,
+                debugInspectorInfo {}
+            ) {
+                override fun create(): SelectableStaticTextModifier =
+                    SelectableStaticTextModifier(params)
+
+                override fun update(
+                    node: SelectableStaticTextModifier
+                ): SelectableStaticTextModifier = node.also { it.params = params }
+            }
+        return this then selectionController.modifier then selectableTextModifier
     }
-    val selectionModifier = selectionController?.modifier ?: Modifier
-    return this then selectionModifier then staticTextModifier
 }

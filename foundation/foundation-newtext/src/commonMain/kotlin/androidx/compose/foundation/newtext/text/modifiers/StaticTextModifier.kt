@@ -9,12 +9,10 @@ import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LastBaseline
-import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.node.DrawModifierNode
-import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.invalidateDraw
@@ -37,8 +35,7 @@ import kotlin.math.roundToInt
 @OptIn(ExperimentalComposeUiApi::class)
 internal class StaticTextModifier(
     params: StaticTextLayoutDrawParams
-) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, GlobalPositionAwareModifierNode,
-    SemanticsModifierNode {
+) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, SemanticsModifierNode {
     private var baselineCache: Map<AlignmentLine, Int>? = null
     private var layoutCache: MultiParagraphLayoutCache? = null
     private var textDelegateDirty = true
@@ -254,9 +251,5 @@ internal class StaticTextModifier(
         if (!params.placeholders.isNullOrEmpty()) {
             drawContent()
         }
-    }
-
-    override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
-        params.selectionController?.updateGlobalPosition(coordinates)
     }
 }
