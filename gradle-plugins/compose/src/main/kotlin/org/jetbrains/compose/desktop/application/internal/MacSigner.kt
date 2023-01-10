@@ -6,19 +6,54 @@
 package org.jetbrains.compose.desktop.application.internal
 
 import org.jetbrains.compose.desktop.application.internal.validation.ValidatedMacOSSigningSettings
+import org.jetbrains.compose.internal.utils.Arch
 import org.jetbrains.compose.internal.utils.MacUtils
+import org.jetbrains.compose.internal.utils.currentArch
 import java.io.File
-import java.nio.file.Files
 import java.util.regex.Pattern
+import kotlin.io.path.isExecutable
 
-internal class MacSigner(
-    val settings: ValidatedMacOSSigningSettings,
-    private val runExternalTool: ExternalToolRunner
-) {
+internal abstract class MacSigner(protected val runTool: ExternalToolRunner) {
+    /**
+     * If [entitlements] file is provided, executables are signed with entitlements.
+     * Set [forceEntitlements] to `true` to sign all types of files with the provided [entitlements].
+     */
+    abstract fun sign(
+        file: File,
+        entitlements: File? = null,
+        forceEntitlements: Boolean = false
+    )
+
+    fun unsign(file: File) {
+        runTool.unsign(file)
+    }
+
+    abstract val settings: ValidatedMacOSSigningSettings?
+}
+
+internal class NoCertificateSigner(runTool: ExternalToolRunner) : MacSigner(runTool) {
+    override fun sign(file: File, entitlements: File?, forceEntitlements: Boolean) {
+        unsign(file)
+        if (currentArch == Arch.Arm64) {
+            // Apple Silicon requires binaries to be signed
+            // For local builds, ad hoc signatures are OK
+            // https://wiki.lazarus.freepascal.org/Code_Signing_for_macOS
+            runTool.codesign("--sign", "-", "-vvvv", file.absolutePath)
+        }
+    }
+
+    override val settings: ValidatedMacOSSigningSettings?
+        get() = null
+}
+
+internal class MacSignerImpl(
+    override val settings: ValidatedMacOSSigningSettings,
+    runTool: ExternalToolRunner
+) : MacSigner(runTool)  {
     private lateinit var signKey: String
 
     init {
-        runExternalTool(
+        runTool(
             MacUtils.security,
             args = listOfNotNull(
                 "find-certificate",
@@ -27,58 +62,26 @@ internal class MacSigner(
                 settings.fullDeveloperID,
                 settings.keychain?.absolutePath
             ),
-            processStdout = { stdout ->
-                signKey = findCertificate(stdout)
-            }
+            processStdout = { signKey = matchCertificates(it) }
         )
     }
 
-    /**
-     * If [entitlements] file is provided, executables are signed with entitlements.
-     * Set [forceEntitlements] to `true` to sign all types of files with the provided [entitlements].
-     */
-    fun sign(
+    override fun sign(
         file: File,
-        entitlements: File? = null,
-        forceEntitlements: Boolean = false
+        entitlements: File?,
+        forceEntitlements: Boolean
     ) {
-        val args = arrayListOf(
-            "-vvvv",
-            "--timestamp",
-            "--options", "runtime",
-            "--force",
-            "--prefix", settings.prefix,
-            "--sign", signKey
+        runTool.unsign(file)
+        runTool.sign(
+            file = file,
+            signKey = signKey,
+            entitlements = entitlements?.takeIf { forceEntitlements || file.isExecutable },
+            prefix = settings.prefix,
+            keychain = settings.keychain
         )
-
-        settings.keychain?.let {
-            args.add("--keychain")
-            args.add(it.absolutePath)
-        }
-
-        if (forceEntitlements || Files.isExecutable(file.toPath())) {
-            entitlements?.let {
-                args.add("--entitlements")
-                args.add(it.absolutePath)
-            }
-        }
-
-        args.add(file.absolutePath)
-
-        runExternalTool(MacUtils.codesign, args)
     }
 
-    fun unsign(file: File) {
-        val args = listOf(
-            "-vvvv",
-            "--remove-signature",
-            file.absolutePath
-        )
-        runExternalTool(MacUtils.codesign, args)
-
-    }
-
-    private fun findCertificate(certificates: String): String {
+    private fun matchCertificates(certificates: String): String {
         val regex = Pattern.compile("\"alis\"<blob>=\"([^\"]+)\"")
         val m = regex.matcher(certificates)
         if (!m.find()) {
@@ -98,3 +101,33 @@ internal class MacSigner(
         return result
     }
 }
+
+private fun ExternalToolRunner.codesign(vararg args: String) =
+    this(MacUtils.codesign, args.toList())
+
+private fun ExternalToolRunner.unsign(file: File) =
+    codesign("-vvvv", "--remove-signature", file.absolutePath)
+
+private fun ExternalToolRunner.sign(
+    file: File,
+    signKey: String,
+    entitlements: File?,
+    prefix: String?,
+    keychain: File?
+) = codesign(
+    "-vvvv",
+    "--timestamp",
+    "--options", "runtime",
+    "--force",
+    *optionalArg("--prefix", prefix),
+    "--sign", signKey,
+    *optionalArg("--keychain", keychain?.absolutePath),
+    *optionalArg("--entitlements", entitlements?.absolutePath),
+    file.absolutePath
+)
+
+private fun optionalArg(arg: String, value: String?): Array<String> =
+    if (value != null) arrayOf(arg, value) else emptyArray()
+
+private val File.isExecutable: Boolean
+    get() = toPath().isExecutable()

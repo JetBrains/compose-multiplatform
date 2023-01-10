@@ -23,11 +23,14 @@ import org.jetbrains.compose.desktop.application.internal.JvmRuntimeProperties
 import org.jetbrains.compose.desktop.application.internal.validation.validate
 import org.jetbrains.compose.internal.utils.*
 import java.io.*
+import java.nio.file.LinkOption
 import java.util.*
 import javax.inject.Inject
 import kotlin.collections.HashMap
 import kotlin.collections.HashSet
 import kotlin.collections.ArrayList
+import kotlin.io.path.isExecutable
+import kotlin.io.path.isRegularFile
 
 abstract class AbstractJPackageTask @Inject constructor(
     @get:Input
@@ -237,12 +240,17 @@ abstract class AbstractJPackageTask @Inject constructor(
     @get:Nested
     internal var nonValidatedMacSigningSettings: MacOSSigningSettings? = null
 
+    private val shouldSign: Boolean
+        get() = nonValidatedMacSigningSettings?.sign?.get() == true
+
     private val macSigner: MacSigner? by lazy {
         val nonValidatedSettings = nonValidatedMacSigningSettings
-        if (currentOS == OS.MacOS && nonValidatedSettings?.sign?.get() == true) {
-            val validatedSettings =
-                nonValidatedSettings.validate(nonValidatedMacBundleID, project, macAppStore)
-            MacSigner(validatedSettings, runExternalTool)
+        if (currentOS == OS.MacOS) {
+            if (shouldSign) {
+                val validatedSettings =
+                    nonValidatedSettings!!.validate(nonValidatedMacBundleID, project, macAppStore)
+                MacSignerImpl(validatedSettings, runExternalTool)
+            } else NoCertificateSigner(runExternalTool)
         } else null
     }
 
@@ -389,11 +397,11 @@ abstract class AbstractJPackageTask @Inject constructor(
             cliArg("--mac-app-category", macAppCategory)
             cliArg("--mac-entitlements", macEntitlementsFile)
 
-            macSigner?.let { signer ->
+            macSigner?.settings?.let { signingSettings ->
                 cliArg("--mac-sign", true)
-                cliArg("--mac-signing-key-user-name", signer.settings.identity)
-                cliArg("--mac-signing-keychain", signer.settings.keychain)
-                cliArg("--mac-package-signing-prefix", signer.settings.prefix)
+                cliArg("--mac-signing-key-user-name", signingSettings.identity)
+                cliArg("--mac-signing-keychain", signingSettings.keychain)
+                cliArg("--mac-package-signing-prefix", signingSettings.prefix)
             }
         }
     }
@@ -434,19 +442,16 @@ abstract class AbstractJPackageTask @Inject constructor(
         return outdatedLibs
     }
 
+    private fun jarCopyingProcessor(): FileCopyingProcessor =
+        if (currentOS == OS.MacOS) {
+            val tmpDirForSign = signDir.ioFile
+            fileOperations.clearDirs(tmpDirForSign)
+            MacJarSignFileCopyingProcessor(macSigner!!, tmpDirForSign, jvmRuntimeInfo.majorVersion)
+        } else SimpleFileCopyingProcessor
+
     override fun prepareWorkingDir(inputChanges: InputChanges) {
         val libsDir = libsDir.ioFile
-        val fileProcessor =
-            macSigner?.let { signer ->
-                val tmpDirForSign = signDir.ioFile
-                fileOperations.clearDirs(tmpDirForSign)
-
-                MacJarSignFileCopyingProcessor(
-                    signer,
-                    tmpDirForSign,
-                    jvmRuntimeVersion = jvmRuntimeInfo.majorVersion
-                )
-            } ?: SimpleFileCopyingProcessor
+        val fileProcessor = jarCopyingProcessor()
 
         val mangleJarFilesNames = mangleJarFilesNames.get()
         fun copyFileToLibsDir(sourceFile: File): File {
@@ -525,17 +530,30 @@ abstract class AbstractJPackageTask @Inject constructor(
 
     private fun modifyRuntimeOnMacOsIfNeeded() {
         if (currentOS != OS.MacOS || targetFormat != TargetFormat.AppImage) return
-        macSigner?.let { macSigner ->
-            val macSigningHelper = MacSigningHelper(
-                macSigner = macSigner,
-                runtimeProvisioningProfile = macRuntimeProvisioningProfile.ioFileOrNull,
-                entitlementsFile = macEntitlementsFile.ioFileOrNull,
-                runtimeEntitlementsFile = macRuntimeEntitlementsFile.ioFileOrNull,
-                destinationDir = destinationDir.ioFile,
-                packageName = packageName.get()
-            )
-            macSigningHelper.modifyRuntimeIfNeeded()
+
+        val appDir = destinationDir.ioFile.resolve("${packageName.get()}.app")
+        val runtimeDir = appDir.resolve("Contents/runtime")
+
+        // Add the provisioning profile
+        macRuntimeProvisioningProfile.ioFileOrNull?.copyTo(
+            target = runtimeDir.resolve("Contents/embedded.provisionprofile"),
+            overwrite = true
+        )
+        val appEntitlementsFile = macEntitlementsFile.ioFileOrNull
+        val runtimeEntitlementsFile = macRuntimeEntitlementsFile.ioFileOrNull
+
+        val macSigner = macSigner!!
+        // Resign the runtime completely (and also the app dir only)
+        // Sign all libs and executables in runtime
+        runtimeDir.walk().forEach { file ->
+            val path = file.toPath()
+            if (path.isRegularFile(LinkOption.NOFOLLOW_LINKS) && (path.isExecutable() || file.name.isDylibPath)) {
+                macSigner.sign(file, runtimeEntitlementsFile)
+            }
         }
+
+        macSigner.sign(runtimeDir, runtimeEntitlementsFile, forceEntitlements = true)
+        macSigner.sign(appDir, appEntitlementsFile, forceEntitlements = true)
     }
 
     override fun initState() {
