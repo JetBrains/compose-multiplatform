@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
+import androidx.compose.ui.test.isDialog
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
@@ -117,6 +118,32 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
         rule.onNodeWithText("May 2000").performClick()
 
         assertAgainstGolden("datePicker_yearPicker_${scheme.name}")
+    }
+
+    @Test
+    fun datePicker_inDialog() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 1)
+            val selectedDayMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 6)
+            DatePickerDialog(
+                onDismissRequest = { },
+                confirmButton = { TextButton(onClick = {}) { Text("OK") } },
+                dismissButton = { TextButton(onClick = {}) { Text("Cancel") } }
+            ) {
+                DatePicker(
+                    datePickerState = rememberDatePickerState(
+                        initialDisplayedMonthMillis = monthInUtcMillis,
+                        initialSelectedDateMillis = selectedDayMillis
+                    )
+                )
+            }
+        }
+        rule.onNode(isDialog())
+            .captureToImage()
+            .assertAgainstGolden(
+                rule = screenshotRule,
+                goldenIdentifier = "datePicker_inDialog_${scheme.name}"
+            )
     }
 
     // Returns the given date's day as milliseconds from epoch. The returned value is for the day's
