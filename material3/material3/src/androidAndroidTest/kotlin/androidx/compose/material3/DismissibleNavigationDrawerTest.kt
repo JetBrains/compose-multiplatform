@@ -26,8 +26,6 @@ import androidx.compose.material3.tokens.NavigationDrawerTokens
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.canScroll
-import androidx.compose.ui.input.consumeScrollContainerInfo
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -560,44 +558,6 @@ class DismissibleNavigationDrawerTest {
                 .onParent()
                 .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
         }
-
-    @Test
-    fun dismissibleNavigationDrawer_providesScrollableContainerInfo_enabled() {
-        var actualValue = { false }
-        rule.setMaterialContent(lightColorScheme()) {
-
-            DismissibleNavigationDrawer(
-                gesturesEnabled = true,
-                drawerContent = {},
-                content = {
-                    Box(Modifier.consumeScrollContainerInfo {
-                        actualValue = { it!!.canScroll() }
-                    })
-                }
-            )
-        }
-
-        assertThat(actualValue()).isTrue()
-    }
-
-    @Test
-    fun dismissibleNavigationDrawer_providesScrollableContainerInfo_disabled() {
-        var actualValue = { false }
-        rule.setMaterialContent(lightColorScheme()) {
-
-            DismissibleNavigationDrawer(
-                gesturesEnabled = false,
-                drawerContent = {},
-                content = {
-                    Box(Modifier.consumeScrollContainerInfo {
-                        actualValue = { it!!.canScroll() }
-                    })
-                }
-            )
-        }
-
-        assertThat(actualValue()).isFalse()
-    }
 }
 
 private val DrawerTestTag = "drawer"

@@ -978,17 +978,6 @@ package androidx.compose.ui.input {
     property public abstract int inputMode;
   }
 
-  public interface ScrollContainerInfo {
-    method public boolean canScrollHorizontally();
-    method public boolean canScrollVertically();
-  }
-
-  public final class ScrollContainerInfoKt {
-    method public static boolean canScroll(androidx.compose.ui.input.ScrollContainerInfo);
-    method public static androidx.compose.ui.Modifier consumeScrollContainerInfo(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.input.ScrollContainerInfo,kotlin.Unit> consumer);
-    method public static androidx.compose.ui.Modifier provideScrollContainerInfo(androidx.compose.ui.Modifier, androidx.compose.ui.input.ScrollContainerInfo scrollContainerInfo);
-  }
-
 }
 
 package androidx.compose.ui.input.key {

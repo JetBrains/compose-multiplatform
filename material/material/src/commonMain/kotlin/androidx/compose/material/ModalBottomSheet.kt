@@ -47,12 +47,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.input.ScrollContainerInfo
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.provideScrollContainerInfo
 import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
@@ -467,15 +465,6 @@ fun ModalBottomSheetLayout(
                 visible = sheetState.swipeableState.targetValue != Hidden
             )
         }
-
-        val containerInfo = remember(sheetState) {
-            object : ScrollContainerInfo {
-                override fun canScrollHorizontally() = false
-
-                override fun canScrollVertically() = sheetState.currentValue != Hidden
-            }
-        }
-
         Surface(
             Modifier
                 .align(Alignment.TopCenter) // We offset from the top so we'll center from there
@@ -520,7 +509,6 @@ fun ModalBottomSheetLayout(
                         } else null
                     }
                 }
-                .provideScrollContainerInfo(containerInfo)
                 .semantics {
                     if (sheetState.isVisible) {
                         dismiss {

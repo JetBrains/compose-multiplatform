@@ -30,7 +30,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
 import android.widget.FrameLayout
-import android.widget.LinearLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.compose.foundation.background
@@ -39,8 +38,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
@@ -55,8 +52,6 @@ import androidx.compose.ui.AbsoluteAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.canScroll
-import androidx.compose.ui.input.consumeScrollContainerInfo
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -91,7 +86,6 @@ import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
-import kotlin.math.roundToInt
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
@@ -99,6 +93,7 @@ import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
@@ -642,19 +637,11 @@ class AndroidViewTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun androidView_noClip() {
         rule.setContent {
-            Box(
-                Modifier
-                    .fillMaxSize()
-                    .background(Color.White)) {
+            Box(Modifier.fillMaxSize().background(Color.White)) {
                 with(LocalDensity.current) {
-                    Box(
-                        Modifier
-                            .requiredSize(150.toDp())
-                            .testTag("box")) {
+                    Box(Modifier.requiredSize(150.toDp()).testTag("box")) {
                         Box(
-                            Modifier
-                                .size(100.toDp(), 100.toDp())
-                                .align(AbsoluteAlignment.TopLeft)
+                            Modifier.size(100.toDp(), 100.toDp()).align(AbsoluteAlignment.TopLeft)
                         ) {
                             AndroidView(factory = { context ->
                                 object : View(context) {
@@ -677,92 +664,6 @@ class AndroidViewTest {
         }
         rule.onNodeWithTag("box").captureToImage().assertPixels(IntSize(150, 150)) {
             Color.Blue
-        }
-    }
-
-    @Test
-    fun scrollableViewGroup_propagates_shouldDelay() {
-        val scrollContainerInfo = mutableStateOf({ false })
-        rule.activityRule.scenario.onActivity { activity ->
-            val parentComposeView = ScrollingViewGroup(activity).apply {
-                addView(
-                    ComposeView(activity).apply {
-                        setContent {
-                            Box(modifier = Modifier.consumeScrollContainerInfo {
-                                scrollContainerInfo.value = { it?.canScroll() == true }
-                            })
-                        }
-                    })
-                }
-            activity.setContentView(parentComposeView)
-        }
-
-        rule.runOnIdle {
-            assertThat(scrollContainerInfo.value()).isTrue()
-        }
-    }
-
-    @Test
-    fun nonScrollableViewGroup_doesNotPropagate_shouldDelay() {
-        val scrollContainerInfo = mutableStateOf({ false })
-        rule.activityRule.scenario.onActivity { activity ->
-            val parentComposeView = FrameLayout(activity).apply {
-                addView(
-                    ComposeView(activity).apply {
-                        setContent {
-                            Box(modifier = Modifier.consumeScrollContainerInfo {
-                                scrollContainerInfo.value = { it?.canScroll() == true }
-                            })
-                        }
-                    })
-            }
-            activity.setContentView(parentComposeView)
-        }
-
-        rule.runOnIdle {
-            assertThat(scrollContainerInfo.value()).isFalse()
-        }
-    }
-
-    @Test
-    fun viewGroup_propagates_shouldDelayTrue() {
-        lateinit var layout: View
-        rule.setContent {
-            Column(Modifier.verticalScroll(rememberScrollState())) {
-                AndroidView(
-                    factory = {
-                        layout = LinearLayout(it)
-                        layout
-                    }
-                )
-            }
-        }
-
-        rule.runOnIdle {
-            // View#isInScrollingContainer is hidden, check the parent manually.
-            val shouldDelay = (layout.parent as ViewGroup).shouldDelayChildPressedState()
-            assertThat(shouldDelay).isTrue()
-        }
-    }
-
-    @Test
-    fun viewGroup_propagates_shouldDelayFalse() {
-        lateinit var layout: View
-        rule.setContent {
-            Column {
-                AndroidView(
-                    factory = {
-                        layout = LinearLayout(it)
-                        layout
-                    }
-                )
-            }
-        }
-
-        rule.runOnIdle {
-            // View#isInScrollingContainer is hidden, check the parent manually.
-            val shouldDelay = (layout.parent as ViewGroup).shouldDelayChildPressedState()
-            assertThat(shouldDelay).isFalse()
         }
     }
 
@@ -797,8 +698,4 @@ class AndroidViewTest {
             value,
             displayMetrics
         ).roundToInt()
-
-    class ScrollingViewGroup(context: Context) : FrameLayout(context) {
-        override fun shouldDelayChildPressedState() = true
-    }
 }

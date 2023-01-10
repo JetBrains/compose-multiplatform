@@ -37,7 +37,9 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -203,6 +205,10 @@ class ClickableInScrollableViewGroupTest {
     /**
      * Test case for a [clickable] inside an [AndroidView] inside a non-scrollable Compose container
      */
+    @Ignore(
+        "b/203141462 - currently this is not implemented so AndroidView()s will always " +
+            "appear scrollable"
+    )
     @Test
     fun clickable_androidViewInNotScrollableContainer() {
         val interactionSource = MutableInteractionSource()

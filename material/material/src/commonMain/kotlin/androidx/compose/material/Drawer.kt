@@ -43,10 +43,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.isSpecified
-import androidx.compose.ui.input.ScrollContainerInfo
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.input.provideScrollContainerInfo
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -398,14 +396,6 @@ fun ModalDrawer(
     content: @Composable () -> Unit
 ) {
     val scope = rememberCoroutineScope()
-
-    val containerInfo = remember(gesturesEnabled) {
-        object : ScrollContainerInfo {
-            override fun canScrollHorizontally() = gesturesEnabled
-
-            override fun canScrollVertically() = false
-        }
-    }
     BoxWithConstraints(modifier.fillMaxSize()) {
         val modalDrawerConstraints = constraints
         // TODO : think about Infinite max bounds case
@@ -434,7 +424,6 @@ fun ModalDrawer(
                         DrawerValue.Open -> maxValue
                     }
                 }
-                .provideScrollContainerInfo(containerInfo)
         ) {
             Box {
                 content()
@@ -575,15 +564,6 @@ fun BottomDrawer(
         } else {
             Modifier
         }
-
-        val containerInfo = remember(gesturesEnabled) {
-            object : ScrollContainerInfo {
-                override fun canScrollHorizontally() = gesturesEnabled
-
-                override fun canScrollVertically() = false
-            }
-        }
-
         val swipeable = Modifier
             .then(nestedScroll)
             .swipeable(
@@ -593,7 +573,6 @@ fun BottomDrawer(
                 enabled = gesturesEnabled,
                 resistance = null
             )
-            .provideScrollContainerInfo(containerInfo)
 
         Box(swipeable) {
             content()
