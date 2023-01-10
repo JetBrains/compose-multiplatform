@@ -180,7 +180,7 @@ internal interface SelectionAdjustment {
          * selection.
          *  b.if the previous start/end offset is a word boundary, use word based selection.
          *
-         *  Notice that this selection adjustment assumes that when isStartHandle is ture, only
+         *  Notice that this selection adjustment assumes that when isStartHandle is true, only
          *  start handle is moving(or unchanged), and vice versa.
          */
         val CharacterWithWordAccelerate = object : SelectionAdjustment {

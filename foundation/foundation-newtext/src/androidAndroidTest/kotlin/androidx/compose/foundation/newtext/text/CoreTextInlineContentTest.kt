@@ -48,7 +48,6 @@ import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -66,7 +65,6 @@ class CoreTextInlineContentTest {
 
     @OptIn(ExperimentalTextApi::class)
     @Test
-    @Ignore // not implemented yet
     fun placeholder_changeSize_updateInlineContentSize() {
         // Callback to monitor the size changes of a composable.
         val onSizeChanged: (IntSize) -> Unit = mock()
@@ -113,7 +111,6 @@ class CoreTextInlineContentTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun rtlLayout_inlineContent_placement() {
         rule.setContent {
             CompositionLocalProvider(
@@ -133,7 +130,6 @@ class CoreTextInlineContentTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun rtlTextContent_inlineContent_placement() {
         rule.setContent {
             // RTL character, supported by sample_font
@@ -149,7 +145,6 @@ class CoreTextInlineContentTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun rtlTextDirection_inlineContent_placement() {
         rule.setContent {
             // LTR character, supported by sample_font
@@ -166,7 +161,6 @@ class CoreTextInlineContentTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun bidiText_inlineContent_placement() {
         rule.setContent {
             // RTL and LTR characters, supported by sample_font
@@ -182,7 +176,6 @@ class CoreTextInlineContentTest {
     }
 
     @Test
-    @Ignore // not implemented yet
     fun bidiText_2_inlineContent_placement() {
         rule.setContent {
             // RTL and LTR characters, supported by sample_font

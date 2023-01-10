@@ -17,11 +17,9 @@
 package androidx.compose.foundation.newtext.text.modifiers
 
 import androidx.compose.foundation.newtext.text.ceilToIntPx
-import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.MultiParagraphIntrinsics
-import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.resolveDefaults
@@ -34,10 +32,11 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.constrain
 
 internal class MultiParagraphLayoutCache(
-    private val params: TextInlineContentLayoutDrawParams,
-    private val density: Density,
-    private val placeholders: List<AnnotatedString.Range<Placeholder>> = emptyList()
+    private val params: StaticTextLayoutDrawParams,
+    private val density: Density
 ) {
+    private var minMaxLinesCoercer: MinMaxLinesCoercer? = null
+
     /*@VisibleForTesting*/
     // NOTE(text-perf-review): it seems like TextDelegate essentially guarantees that we use
     // MultiParagraph. Can we have a fast-path that uses just Paragraph in simpler cases (ie,
@@ -149,7 +148,7 @@ internal class MultiParagraphLayoutCache(
                 style = resolveDefaults(params.style, layoutDirection),
                 density = density,
                 fontFamilyResolver = params.fontFamilyResolver,
-                placeholders = placeholders
+                placeholders = params.placeholders.orEmpty()
             )
         } else {
             localIntrinsics
@@ -170,14 +169,20 @@ internal class MultiParagraphLayoutCache(
         if (!layoutCache.newConstraintsProduceNewLayout(constraints, layoutDirection)) {
             return false
         }
-        val finalConstraints = if (params.maxLines != Int.MAX_VALUE || params.minLines >= 1) {
-            constraints.coerceMaxMinLines(
-                layoutDirection = layoutDirection,
+        val finalConstraints = if (params.maxLines != Int.MAX_VALUE || params.minLines > 1) {
+            val localMinMax = MinMaxLinesCoercer.from(
+                minMaxLinesCoercer,
+                layoutDirection,
+                params.style,
+                density,
+                params.fontFamilyResolver
+            ).also {
+                minMaxLinesCoercer = it
+            }
+            localMinMax.coerceMaxMinLines(
+                inConstraints = constraints,
                 minLines = params.minLines,
-                maxLines = params.maxLines,
-                paramStyle = params.style,
-                density = density,
-                fontFamilyResolver = params.fontFamilyResolver
+                maxLines = params.maxLines
             )
         } else {
             constraints
@@ -195,7 +200,7 @@ internal class MultiParagraphLayoutCache(
             TextLayoutInput(
                 params.text,
                 params.style,
-                placeholders,
+                params.placeholders.orEmpty(),
                 params.maxLines,
                 params.softWrap,
                 params.overflow,
@@ -217,6 +222,9 @@ internal class MultiParagraphLayoutCache(
     ): Boolean {
         // no layout yet
         if (this == null) return true
+
+        // async typeface changes
+        if (this.multiParagraph.intrinsics.hasStaleResolvedFonts) return true
 
         // layout direction changed
         if (layoutDirection != layoutInput.layoutDirection) return true
@@ -265,7 +273,7 @@ internal class MultiParagraphLayoutCache(
         return false
     }
 
-    private fun TextInlineContentLayoutDrawParams.paraMaxWidthFor(constraints: Constraints): Int {
+    private fun StaticTextLayoutDrawParams.paraMaxWidthFor(constraints: Constraints): Int {
         val minWidth = constraints.minWidth
         val widthMatters = softWrap || overflow == TextOverflow.Ellipsis
         val maxWidth = if (widthMatters && constraints.hasBoundedWidth) {
@@ -293,11 +301,7 @@ internal class MultiParagraphLayoutCache(
         return result
     }
 
-    fun equalForLayout(value: TextInlineContentLayoutDrawParams): Boolean {
-        return params.equalForLayout(value)
-    }
-
-    fun equalForCallbacks(value: TextInlineContentLayoutDrawParams): Boolean {
-        return params.equalForCallbacks(value)
+    fun diff(value: StaticTextLayoutDrawParams): StaticTextLayoutDrawParamsDiff {
+        return params.diff(value)
     }
 }

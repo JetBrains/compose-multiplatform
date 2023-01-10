@@ -62,6 +62,9 @@ internal fun AnnotatedString.resolveInlineContent(
     return Pair(placeholders, inlineComposables)
 }
 
+internal fun AnnotatedString.hasInlineContent(): Boolean =
+    hasStringAnnotations(INLINE_CONTENT_TAG, 0, text.length)
+
 @Composable
 internal fun InlineChildren(
     text: AnnotatedString,
@@ -81,7 +84,7 @@ internal fun InlineChildren(
 
 private typealias PlaceholderRange = AnnotatedString.Range<Placeholder>
 private typealias InlineContentRange = AnnotatedString.Range<@Composable (String) -> Unit>
-internal const val INLINE_CONTENT_TAG = "androidx.compose.foundation.newtext.text.inlineContent"
+internal const val INLINE_CONTENT_TAG = "androidx.compose.foundation.text.inlineContent"
 
 private val EmptyInlineContent: Pair<List<PlaceholderRange>, List<InlineContentRange>> =
     Pair(emptyList(), emptyList())

@@ -99,7 +99,7 @@ internal enum class SelectionMode {
             return true
         }
         // Compare the location of start and end to the bound. If both are on the same side, return
-        // false, otherwise return ture.
+        // false, otherwise return true.
         val compareStart = compare(start, bounds)
         val compareEnd = compare(end, bounds)
         return (compareStart > 0) xor (compareEnd > 0)
