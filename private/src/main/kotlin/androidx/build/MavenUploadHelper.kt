@@ -16,6 +16,7 @@
 
 package androidx.build
 
+import com.android.build.gradle.AppPlugin
 import com.android.build.gradle.LibraryPlugin
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonObject
@@ -81,6 +82,21 @@ fun Project.configureMavenArtifactUpload(
             }
         }
     }
+    // validate that all libraries that should be published actually get registered.
+    gradle.taskGraph.whenReady {
+        if (releaseTaskShouldBeRegistered(extension)) {
+            tasks.findByName(Release.PROJECT_ARCHIVE_ZIP_TASK_NAME)
+                ?: throw GradleException("Project $name is configured for publishing, but a " +
+                    "'createProjectZip' task was never registered. This is likely a bug in" +
+                    "AndroidX plugin configuration")
+        }
+    }
+}
+
+private fun Project.releaseTaskShouldBeRegistered(extension: AndroidXExtension): Boolean {
+    if (plugins.hasPlugin(AppPlugin::class.java)) { return false }
+    if (!extension.shouldRelease() && !isSnapshotBuild()) { return false }
+    return extension.shouldPublish()
 }
 
 /**
