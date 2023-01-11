@@ -1,4 +1,4 @@
-## Compatability and versioning overview
+## Compatibility and versioning overview
 
 ### Supported platforms
    * macOS (x86-64, arm64)
