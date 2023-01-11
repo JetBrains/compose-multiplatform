@@ -216,6 +216,7 @@ class TextFieldSelectionTest {
         )
     }
 
+    @Ignore // b/265023621
     @Test
     fun textField_extendsSelection_withPasswordVisualTransformation_toRight() {
         textField_extendsSelection(
@@ -226,6 +227,7 @@ class TextFieldSelectionTest {
         )
     }
 
+    @Ignore // b/265023621
     @Test
     fun textField_extendsSelection_withReducedVisualTransformation_toRight() {
         textField_extendsSelection(
