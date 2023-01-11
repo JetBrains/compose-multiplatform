@@ -42,13 +42,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 private val items = listOf(
     "Cupcake",
@@ -79,6 +84,8 @@ fun SwipeToDismissDemo() {
     LazyColumn {
         items(items) { item ->
             var unread by remember { mutableStateOf(false) }
+            val scope = rememberCoroutineScope()
+
             val dismissState = rememberDismissState(
                 confirmValueChange = {
                     if (it == DismissValue.DismissedToEnd) unread = !unread
@@ -134,6 +141,19 @@ fun SwipeToDismissDemo() {
                             ListItem(
                                 headlineText = {
                                     Text(item, fontWeight = if (unread) FontWeight.Bold else null)
+                                },
+                                modifier = Modifier.semantics {
+                                    // Provide accessible alternatives to swipe actions.
+                                    val label = if (unread) "Mark Read" else "Mark Unread"
+                                    customActions = listOf(
+                                        CustomAccessibilityAction(label) { unread = !unread; true },
+                                        CustomAccessibilityAction("Delete") {
+                                            scope.launch {
+                                                dismissState.dismiss(DismissDirection.EndToStart)
+                                            }
+                                            true
+                                        }
+                                    )
                                 },
                                 supportingText = { Text("Swipe me left or right!") },
                             )

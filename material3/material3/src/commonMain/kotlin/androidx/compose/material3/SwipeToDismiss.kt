@@ -237,6 +237,7 @@ fun SwipeToDismiss(
     directions: Set<DismissDirection> = setOf(EndToStart, StartToEnd),
 ) {
     val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
+
     Box(
         modifier
             .swipeableV2(
