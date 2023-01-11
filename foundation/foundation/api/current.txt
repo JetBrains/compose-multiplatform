@@ -1014,6 +1014,9 @@ package androidx.compose.foundation.text {
   public final class LongPressTextDragObserverKt {
   }
 
+  public final class PointerMoveDetectorKt {
+  }
+
   public final class StringHelpersKt {
   }
 
