@@ -5,7 +5,9 @@
 
 package org.jetbrains.compose.test.utils
 
+import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
+import org.gradle.util.GradleVersion
 import org.jetbrains.compose.desktop.application.internal.ComposeProperties
 import java.io.File
 import java.util.Properties
@@ -64,18 +66,48 @@ class TestProject(
         }
     }
 
-    fun gradle(vararg args: String): GradleRunner =
-        GradleRunner.create().apply {
-            withGradleVersion(TestProperties.gradleVersionForTests)
-            withProjectDir(testEnvironment.workingDir)
-            withArguments(args.toList() + additionalArgs)
-            forwardOutput()
+    internal fun gradle(vararg args: String): BuildResult {
+        if (TestProperties.gradleConfigurationCache) {
+            if (GradleVersion.version(TestProperties.gradleVersionForTests) < GradleVersion.version("8.0-rc-1")) {
+                // Gradle 7.* does not use the configuration cache in the same build.
+                // In other words, if cache misses, Gradle performs configuration,
+                // but does not, use the serialized task graph.
+                // So in order to test the cache, we need to perform dry-run before the actual run.
+                // This should be fixed in https://github.com/gradle/gradle/issues/21985 (which is planned for 8.0 RC 1)
+                gradleRunner(args.withDryRun()).build()
+            }
         }
 
-    @Suppress("DeprecatedCallableAddReplaceWith")
-    @Deprecated("Do not commit!")
-    fun gradleDebug(vararg args: String): GradleRunner =
-        gradle(*args).withDebug(true)
+        return gradleRunner(args).build()
+    }
+
+    private fun Array<out String>.withDryRun(): Array<String> {
+        var sawDryRun = false
+        val dryRunArgs = ArrayList<String>(size)
+        for (arg in this) {
+            sawDryRun = sawDryRun || arg.trim() in listOf("-m", "--dry-run")
+            dryRunArgs.add(arg)
+        }
+        if (!sawDryRun) {
+            dryRunArgs.add("--dry-run")
+        }
+        return dryRunArgs.toTypedArray()
+    }
+
+    private fun gradleRunner(args: Array<out String>): GradleRunner {
+        val allArgs = args.toMutableList()
+        allArgs.addAll(additionalArgs)
+        if (TestProperties.gradleConfigurationCache) {
+            allArgs.add("--configuration-cache")
+        }
+
+        return GradleRunner.create().apply {
+            withGradleVersion(TestProperties.gradleVersionForTests)
+            withProjectDir(testEnvironment.workingDir)
+            withArguments(allArgs)
+            forwardOutput()
+        }
+    }
 
     fun file(path: String): File =
         testEnvironment.workingDir.resolve(path)

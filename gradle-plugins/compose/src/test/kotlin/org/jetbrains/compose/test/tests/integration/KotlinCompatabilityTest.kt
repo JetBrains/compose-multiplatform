@@ -5,13 +5,10 @@
 
 package org.jetbrains.compose.test.tests.integration
 
-import org.gradle.testkit.runner.TaskOutcome
-import org.gradle.testkit.runner.UnexpectedBuildFailure
 import org.jetbrains.compose.test.utils.GradlePluginTestBase
 import org.jetbrains.compose.test.utils.TestProjects
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.assertThrows
 
 class KotlinCompatabilityTest : GradlePluginTestBase() {
     @Test
@@ -33,8 +30,8 @@ class KotlinCompatabilityTest : GradlePluginTestBase() {
         )
     ) {
         val logLine = "Kotlin MPP app is running!"
-        gradle("run").build().checks { check ->
-            check.taskOutcome(":run", TaskOutcome.SUCCESS)
+        gradle("run").checks {
+            check.taskSuccessful(":run")
             check.logContains(logLine)
         }
     }
@@ -45,8 +42,8 @@ class KotlinCompatabilityTest : GradlePluginTestBase() {
             testEnvironment = defaultTestEnvironment.copy(kotlinVersion = kotlinVersion)
         )
     ) {
-        gradle(":compileKotlinJs").build().checks { check ->
-            check.taskOutcome(":compileKotlinJs", TaskOutcome.SUCCESS)
+        gradle(":compileKotlinJs").checks {
+            check.taskSuccessful(":compileKotlinJs")
         }
     }
 }

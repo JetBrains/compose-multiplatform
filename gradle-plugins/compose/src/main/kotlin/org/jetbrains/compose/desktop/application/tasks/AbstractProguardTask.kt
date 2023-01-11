@@ -5,11 +5,7 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.file.ConfigurableFileCollection
-import org.gradle.api.file.Directory
-import org.gradle.api.file.DirectoryProperty
-import org.gradle.api.file.RegularFile
-import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.file.*
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.*
@@ -52,6 +48,9 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     @get:Input
     val proguardVersion: Property<String> = objects.notNullProperty()
 
+    @get:InputFiles
+    val proguardFiles: ConfigurableFileCollection = objects.fileCollection()
+
     @get:Input
     val javaHome: Property<String> = objects.notNullProperty(System.getProperty("java.home"))
 
@@ -74,9 +73,6 @@ abstract class AbstractProguardTask : AbstractComposeDesktopTask() {
     @TaskAction
     fun execute() {
         val javaHome = File(javaHome.get())
-        val proguardFiles = project.configurations.detachedConfiguration(
-            project.dependencies.create("com.guardsquare:proguard-gradle:${proguardVersion.get()}")
-        ).files
 
         fileOperations.clearDirs(destinationDir, workingDir)
         val destinationDir = destinationDir.ioFile.absoluteFile

@@ -18,9 +18,12 @@ internal fun <T> Collection<T>.checkContains(vararg elements: T) {
     }
 }
 
-internal fun BuildResult.checks(fn: (BuildResultChecks) -> Unit) {
-    fn(BuildResultChecks(this))
+internal fun BuildResult.checks(fn: ChecksWrapper.() -> Unit) {
+    fn(ChecksWrapper(BuildResultChecks(this)))
 }
+
+@JvmInline
+internal value class ChecksWrapper(val check: BuildResultChecks)
 
 internal class BuildResultChecks(private val result: BuildResult) {
     val log: String
@@ -32,7 +35,19 @@ internal class BuildResultChecks(private val result: BuildResult) {
         }
     }
 
-    fun taskOutcome(task: String, expectedOutcome: TaskOutcome) {
+    fun taskSuccessful(task: String) {
+        taskOutcome(task, TaskOutcome.SUCCESS)
+    }
+
+    fun taskFailed(task: String) {
+        taskOutcome(task, TaskOutcome.FAILED)
+    }
+
+    fun taskFromCache(task: String) {
+        taskOutcome(task, TaskOutcome.FROM_CACHE)
+    }
+
+    private fun taskOutcome(task: String, expectedOutcome: TaskOutcome) {
         val actualOutcome = result.task(task)?.outcome
         if (actualOutcome != expectedOutcome) {
             throw AssertionError(

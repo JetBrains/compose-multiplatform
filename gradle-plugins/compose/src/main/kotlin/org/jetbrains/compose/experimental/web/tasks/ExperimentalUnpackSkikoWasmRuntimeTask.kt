@@ -6,23 +6,26 @@
 package org.jetbrains.compose.experimental.web.tasks
 
 import org.gradle.api.DefaultTask
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.component.ModuleComponentIdentifier
+import org.gradle.api.file.ArchiveOperations
 import org.gradle.api.file.DirectoryProperty
+import org.gradle.api.file.FileCollection
 import org.gradle.api.file.FileSystemOperations
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
 import org.jetbrains.compose.internal.utils.clearDirs
-import org.jetbrains.compose.internal.utils.debug
+import java.io.File
 import javax.inject.Inject
 
 abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
     @get:InputFiles
-    lateinit var runtimeClasspath: Configuration
+    lateinit var skikoRuntimeFiles: FileCollection
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
+
+    @get:Inject
+    internal abstract val archiveOperations: ArchiveOperations
 
     @get:Inject
     internal abstract val fileOperations: FileSystemOperations
@@ -30,29 +33,18 @@ abstract class ExperimentalUnpackSkikoWasmRuntimeTask : DefaultTask() {
     @TaskAction
     fun run() {
         fileOperations.clearDirs(outputDir)
-        val runtimeArtifacts = runtimeClasspath.resolvedConfiguration.resolvedArtifacts
-        for (artifact in runtimeArtifacts) {
-            logger.debug { "Checking artifact: id=${artifact.id}, file=${artifact.file}" }
-            val id = artifact.id.componentIdentifier
-            if (id is ModuleComponentIdentifier && id.group == "org.jetbrains.skiko") {
-                logger.debug { "Found skiko artifact: $artifact" }
-                unpackSkikoRuntime(id.version)
+
+        for (file in skikoRuntimeFiles.files) {
+            if (file.name.endsWith(".jar", ignoreCase = true)) {
+                unpackJar(file)
             }
         }
     }
 
-    private fun unpackSkikoRuntime(skikoVersion: String) {
-        val skikoRuntimeConfig = project.configurations.detachedConfiguration(
-            project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
-        )
-
-        for (file in skikoRuntimeConfig.resolve()) {
-            if (file.name.endsWith(".jar", ignoreCase = true)) {
-                project.copy { copySpec ->
-                    copySpec.from(project.zipTree(file))
-                    copySpec.into(outputDir)
-                }
-            }
+    private fun unpackJar(file: File) {
+        fileOperations.copy { copySpec ->
+            copySpec.from(archiveOperations.zipTree(file))
+            copySpec.into(outputDir)
         }
     }
 }

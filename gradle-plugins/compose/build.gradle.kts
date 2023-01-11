@@ -88,6 +88,7 @@ val jar = tasks.named<Jar>("jar") {
 val supportedGradleVersions = project.property("compose.tests.gradle.versions")
     .toString().split(",")
     .map { it.trim() }
+    .map { GradleVersion.version(it) }
 
 val gradleTestsPattern = "org.jetbrains.compose.test.tests.integration.*"
 
@@ -107,9 +108,13 @@ tasks.test {
 }
 
 for (gradleVersion in supportedGradleVersions) {
-    tasks.registerVerificationTask<Test>("testGradle-$gradleVersion") {
+    tasks.registerVerificationTask<Test>("testGradle-${gradleVersion.version}") {
         classpath = tasks.test.get().classpath
-        systemProperty("compose.tests.gradle.version", gradleVersion)
+
+        if (gradleVersion >= GradleVersion.version("7.6")) {
+            systemProperty("compose.tests.gradle.configuration.cache", "true")
+        }
+        systemProperty("compose.tests.gradle.version", gradleVersion.version)
         filter {
             includeTestsMatching(gradleTestsPattern)
         }

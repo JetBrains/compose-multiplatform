@@ -22,5 +22,6 @@ object TestProjects {
     const val unpackSkiko = "application/unpackSkiko"
     const val resources = "application/resources"
     const val jsMpp = "misc/jsMpp"
+    const val skikoWasm = "misc/skikoWasm"
     const val jvmPreview = "misc/jvmPreview"
 }
