@@ -205,6 +205,7 @@ internal fun autoInvalidateUpdatedNode(node: Modifier.Node) = autoInvalidateNode
 
 @OptIn(ExperimentalComposeUiApi::class)
 private fun autoInvalidateNode(node: Modifier.Node, phase: Int) {
+    check(node.isAttached)
     if (node.isKind(Nodes.Layout) && node is LayoutModifierNode) {
         node.invalidateMeasurements()
         if (phase == Removed) {

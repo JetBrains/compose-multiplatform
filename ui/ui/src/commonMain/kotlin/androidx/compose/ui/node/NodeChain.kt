@@ -510,14 +510,18 @@ internal class NodeChain(val layoutNode: LayoutNode) {
                 val updated = next.updateUnsafe(node)
                 if (updated !== node) {
                     // if a new instance is returned, we want to detach the old one
-                    autoInvalidateRemovedNode(node)
-                    node.detach()
+                    if (node.isAttached) {
+                        autoInvalidateRemovedNode(node)
+                        node.detach()
+                    }
                     val result = replaceNode(node, updated)
-                    autoInvalidateInsertedNode(updated)
+                    if (node.isAttached) {
+                        autoInvalidateInsertedNode(updated)
+                    }
                     return result
                 } else {
                     // the node was updated. we are done.
-                    if (next.autoInvalidate) {
+                    if (next.autoInvalidate && updated.isAttached) {
                         // the modifier element is labeled as "auto invalidate", which means
                         // that since the node was updated, we need to invalidate everything
                         // relevant to it.
@@ -529,7 +533,9 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             node is BackwardsCompatNode -> {
                 node.element = next
                 // We always autoInvalidate BackwardsCompatNode.
-                autoInvalidateUpdatedNode(node)
+                if (node.isAttached) {
+                    autoInvalidateUpdatedNode(node)
+                }
                 return node
             }
             else -> error("Unknown Modifier.Node type")
