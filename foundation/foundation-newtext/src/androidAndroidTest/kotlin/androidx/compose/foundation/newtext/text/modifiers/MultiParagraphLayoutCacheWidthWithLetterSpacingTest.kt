@@ -73,18 +73,17 @@ class MultiParagraphLayoutCacheWidthWithLetterSpacingTest {
 
     private fun assertLineCount(style: TextStyle) {
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = AnnotatedString(text = "This is a callout message"),
-                style = style.copy(
-                    fontFamily = fontFamily,
-                    fontSize = fontSize
-                ),
-                fontFamilyResolver = fontFamilyResolver,
-                softWrap = true,
-                overflow = TextOverflow.Clip
+            text = AnnotatedString(text = "This is a callout message"),
+            style = style.copy(
+                fontFamily = fontFamily,
+                fontSize = fontSize
             ),
-            density = density,
-        )
+            fontFamilyResolver = fontFamilyResolver,
+            softWrap = true,
+            overflow = TextOverflow.Clip
+        ).also {
+            it.density = density
+        }
         textDelegate.layoutWithConstraints(Constraints(), LayoutDirection.Ltr)
         val layoutResult = textDelegate.layout
         assertThat(layoutResult.lineCount).isEqualTo(1)

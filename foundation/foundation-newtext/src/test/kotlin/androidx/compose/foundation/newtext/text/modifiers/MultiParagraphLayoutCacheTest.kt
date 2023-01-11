@@ -33,13 +33,12 @@ class MultiParagraphLayoutCacheTest {
     @Test(expected = IllegalStateException::class)
     fun whenMinInstrinsicWidth_withoutLayout_throws() {
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = AnnotatedString(""),
-                style = TextStyle.Default,
-                fontFamilyResolver = fontFamilyResolver
-            ),
-            density = density,
-        )
+            text = AnnotatedString(""),
+            style = TextStyle.Default,
+            fontFamilyResolver = fontFamilyResolver
+        ).also {
+            it.density = density
+        }
 
         textDelegate.minIntrinsicWidth
     }
@@ -47,13 +46,12 @@ class MultiParagraphLayoutCacheTest {
     @Test(expected = IllegalStateException::class)
     fun whenMaxIntrinsicWidth_withoutLayout_throws() {
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = AnnotatedString(""),
-                style = TextStyle.Default,
-                fontFamilyResolver = fontFamilyResolver
-            ),
-            density = density,
-        )
+            text = AnnotatedString(""),
+            style = TextStyle.Default,
+            fontFamilyResolver = fontFamilyResolver
+        ).also {
+            it.density = density
+        }
 
         textDelegate.maxIntrinsicWidth
     }

@@ -16,7 +16,9 @@
 
 package androidx.compose.foundation.newtext.text.modifiers
 
+import androidx.compose.foundation.newtext.text.DefaultMinLines
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
@@ -31,33 +33,54 @@ import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.SemanticsModifierNode
 import androidx.compose.ui.node.invalidateMeasurements
 import androidx.compose.ui.semantics.SemanticsConfiguration
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.TextLayoutResult
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal class SelectableStaticTextModifier(
-    params: StaticTextLayoutDrawParams
+    text: AnnotatedString,
+    style: TextStyle,
+    fontFamilyResolver: FontFamily.Resolver,
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = DefaultMinLines,
+    placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
+    onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
+    private val selectionController: SelectionController? = null
 ) : DelegatingNode(), LayoutModifierNode, DrawModifierNode, GlobalPositionAwareModifierNode,
     SemanticsModifierNode {
 
-    private val delegate = delegated { StaticTextModifier(params) }
+    private val delegate = delegated {
+        StaticTextModifier(
+            text = text,
+            style = style,
+            fontFamilyResolver = fontFamilyResolver,
+            onTextLayout = onTextLayout,
+            overflow = overflow,
+            softWrap = softWrap,
+            maxLines = maxLines,
+            minLines = minLines,
+            placeholders = placeholders,
+            onPlaceholderLayout = onPlaceholderLayout,
+            selectionController = selectionController
+        )
+    }
 
     init {
-        requireNotNull(params.selectionController) {
+        requireNotNull(selectionController) {
             "Do not use SelectionCapableStaticTextModifier unless selectionController != null"
         }
     }
 
-    var params: StaticTextLayoutDrawParams = params
-        set(value) {
-            field = value
-            delegate.params = value
-
-            // selection means we always have to invalidate on set to redo position
-            invalidateMeasurements()
-        }
-
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
-        params.selectionController?.updateGlobalPosition(coordinates)
+        selectionController?.updateGlobalPosition(coordinates)
     }
 
     override fun ContentDrawScope.draw() = delegate.drawNonExtension(this)
@@ -89,4 +112,40 @@ internal class SelectableStaticTextModifier(
         measurable: IntrinsicMeasurable,
         width: Int
     ): Int = delegate.maxIntrinsicHeightNonExtension(this, measurable, width)
+
+    fun update(
+        text: AnnotatedString,
+        style: TextStyle,
+        placeholders: List<AnnotatedString.Range<Placeholder>>?,
+        minLines: Int,
+        maxLines: Int,
+        softWrap: Boolean,
+        fontFamilyResolver: FontFamily.Resolver,
+        overflow: TextOverflow,
+        onTextLayout: ((TextLayoutResult) -> Unit)?,
+        onPlaceholderLayout: ((List<Rect?>) -> Unit)?,
+        selectionController: SelectionController?
+    ) {
+        delegate.doInvalidations(
+            textChanged = delegate.updateText(
+                text = text
+            ),
+            layoutChanged = delegate.updateLayoutRelatedArgs(
+                style = style,
+                placeholders = placeholders,
+                minLines = minLines,
+                maxLines = maxLines,
+                softWrap = softWrap,
+                fontFamilyResolver = fontFamilyResolver,
+                overflow = overflow
+            ),
+            callbacksChanged = delegate.updateCallbacks(
+                onTextLayout = onTextLayout,
+                onPlaceholderLayout = onPlaceholderLayout,
+                selectionController = selectionController
+            )
+        )
+        // we always relayout when we're selectable
+        invalidateMeasurements()
+    }
 }

@@ -1,7 +1,25 @@
+/*
+ * Copyright 2023 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package androidx.compose.foundation.newtext.text.modifiers
 
+import androidx.compose.foundation.newtext.text.DefaultMinLines
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.layout.AlignmentLine
@@ -23,53 +41,156 @@ import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.getTextLayoutResult
 import androidx.compose.ui.semantics.text
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextPainter
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
 
-/**
- * Modifier that does Layout and Draw for [StaticTextLayoutDrawParams]
- */
 @OptIn(ExperimentalComposeUiApi::class)
 internal class StaticTextModifier(
-    params: StaticTextLayoutDrawParams
+    private var text: AnnotatedString,
+    private var style: TextStyle,
+    private var fontFamilyResolver: FontFamily.Resolver,
+    private var onTextLayout: ((TextLayoutResult) -> Unit)? = null,
+    private var overflow: TextOverflow = TextOverflow.Clip,
+    private var softWrap: Boolean = true,
+    private var maxLines: Int = Int.MAX_VALUE,
+    private var minLines: Int = DefaultMinLines,
+    private var placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
+    private var onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
+    private var selectionController: SelectionController? = null
 ) : Modifier.Node(), LayoutModifierNode, DrawModifierNode, SemanticsModifierNode {
     private var baselineCache: Map<AlignmentLine, Int>? = null
-    private var layoutCache: MultiParagraphLayoutCache? = null
-    private var textDelegateDirty = true
 
-    internal var params: StaticTextLayoutDrawParams = params
-        set(value) {
-            validate(value)
-            field = value
-            layoutCache?.let { cache ->
-                val diff = cache.diff(value)
-                if (diff.hasSemanticsDiffs) {
-                    _semanticsConfiguration = null
-                    invalidateSemantics()
-                }
-                if (diff.hasLayoutDiffs || diff.hasCallbackDiffs) {
-                    textDelegateDirty = true
-                    invalidateMeasurements()
-                }
-                if (diff.anyDiffs) {
-                    // if anything changed we redraw
-                    invalidateDraw()
-                }
-                return
+    private var _layoutCache: MultiParagraphLayoutCache? = null
+    private val layoutCache: MultiParagraphLayoutCache
+        get() {
+            if (_layoutCache == null) {
+                _layoutCache = MultiParagraphLayoutCache(
+                    text,
+                    style,
+                    fontFamilyResolver,
+                    overflow,
+                    softWrap,
+                    maxLines,
+                    minLines,
+                    placeholders
+                )
             }
+            return _layoutCache!!
+        }
 
-            // if no layout has happened, 🎶 just invalidate everything 🎶
-            // we don't expect to hit this often, but if we do don't keep anything around from
-            // the previous params and restart all passes ⚽
+    private fun getLayoutCache(density: Density): MultiParagraphLayoutCache {
+        return layoutCache.also { it.density = density }
+    }
+
+    fun updateText(text: AnnotatedString): Boolean {
+        if (this.text == text) return false
+        this.text = text
+        return true
+    }
+
+    fun updateLayoutRelatedArgs(
+        style: TextStyle,
+        placeholders: List<AnnotatedString.Range<Placeholder>>?,
+        minLines: Int,
+        maxLines: Int,
+        softWrap: Boolean,
+        fontFamilyResolver: FontFamily.Resolver,
+        overflow: TextOverflow
+    ): Boolean {
+        var changed = false
+        if (this.style != style) {
+            this.style = style
+            changed = true
+        }
+        if (this.placeholders != placeholders) {
+            this.placeholders = placeholders
+            changed = true
+        }
+
+        if (this.minLines != minLines) {
+            this.minLines = minLines
+            changed = true
+        }
+
+        if (this.maxLines != maxLines) {
+            this.maxLines != maxLines
+            changed = true
+        }
+
+        if (this.softWrap != softWrap) {
+            this.softWrap = softWrap
+            changed = true
+        }
+
+        if (this.fontFamilyResolver != fontFamilyResolver) {
+            this.fontFamilyResolver = fontFamilyResolver
+            changed = true
+        }
+
+        if (this.overflow != overflow) {
+            this.overflow = overflow
+            changed = true
+        }
+
+        return changed
+    }
+
+    fun updateCallbacks(
+        onTextLayout: ((TextLayoutResult) -> Unit)?,
+        onPlaceholderLayout: ((List<Rect?>) -> Unit)?,
+        selectionController: SelectionController?
+    ): Boolean {
+        var changed = false
+
+        if (this.onTextLayout != onTextLayout) {
+            this.onTextLayout = onTextLayout
+            changed = true
+        }
+
+        if (this.onPlaceholderLayout != onPlaceholderLayout) {
+            this.onPlaceholderLayout = onPlaceholderLayout
+            changed = true
+        }
+
+        if (this.selectionController != selectionController) {
+            this.selectionController = selectionController
+            changed = true
+        }
+        return changed
+    }
+
+    fun doInvalidations(
+        textChanged: Boolean,
+        layoutChanged: Boolean,
+        callbacksChanged: Boolean
+    ) {
+        if (textChanged) {
             _semanticsConfiguration = null
-            textDelegateDirty = true
             invalidateSemantics()
+        }
+
+        if (textChanged || layoutChanged || callbacksChanged) {
+            layoutCache.update(
+                text = text,
+                style = style,
+                fontFamilyResolver = fontFamilyResolver,
+                overflow = overflow,
+                softWrap = softWrap,
+                maxLines = maxLines,
+                minLines = minLines,
+                placeholders = placeholders
+            )
             invalidateMeasurements()
             invalidateDraw()
         }
+    }
 
     private var _semanticsConfiguration: SemanticsConfiguration? = null
 
@@ -79,7 +200,7 @@ internal class StaticTextModifier(
         var localSemanticsTextLayoutResult = semanticsTextLayoutResult
         if (localSemanticsTextLayoutResult == null) {
             localSemanticsTextLayoutResult = { textLayoutResult ->
-                val layout = layoutCache?.layoutOrNull?.also {
+                val layout = layoutCache.layoutOrNull?.also {
                     textLayoutResult.add(it)
                 }
                 layout != null
@@ -98,29 +219,11 @@ internal class StaticTextModifier(
         get() {
             var localSemantics = _semanticsConfiguration
             if (localSemantics == null) {
-                localSemantics = generateSemantics(params.text)
+                localSemantics = generateSemantics(text)
                 _semanticsConfiguration = localSemantics
             }
             return localSemantics
         }
-
-    private fun validate(params: StaticTextLayoutDrawParams) {
-        validateMinMaxLines(params.minLines, params.maxLines)
-    }
-
-    private fun getOrUpdateTextDelegateInLayout(
-        density: Density
-    ): MultiParagraphLayoutCache {
-        val localLayoutCache = layoutCache
-        return if (!textDelegateDirty && localLayoutCache != null) {
-            localLayoutCache
-        } else {
-            val textDelegate = MultiParagraphLayoutCache(params, density)
-            this.layoutCache = textDelegate
-            textDelegateDirty = false
-            textDelegate
-        }
-    }
 
     fun measureNonExtension(
         measureScope: MeasureScope,
@@ -134,18 +237,18 @@ internal class StaticTextModifier(
         measurable: Measurable,
         constraints: Constraints
     ): MeasureResult {
-        val td = getOrUpdateTextDelegateInLayout(this)
+        val layoutCache = getLayoutCache(this)
 
-        val didChangeLayout = td.layoutWithConstraints(constraints, layoutDirection)
-        val textLayoutResult = td.layout
+        val didChangeLayout = layoutCache.layoutWithConstraints(constraints, layoutDirection)
+        val textLayoutResult = layoutCache.layout
 
         // ensure measure restarts when hasStaleResolvedFonts by reading in measure
         textLayoutResult.multiParagraph.intrinsics.hasStaleResolvedFonts
 
         if (didChangeLayout) {
             invalidateLayer()
-            params.onTextLayout?.invoke(textLayoutResult)
-            params.selectionController?.updateTextLayout(textLayoutResult)
+            onTextLayout?.invoke(textLayoutResult)
+            selectionController?.updateTextLayout(textLayoutResult)
             baselineCache = mapOf(
                 FirstBaseline to textLayoutResult.firstBaseline.roundToInt(),
                 LastBaseline to textLayoutResult.lastBaseline.roundToInt()
@@ -153,7 +256,7 @@ internal class StaticTextModifier(
         }
 
         // first share the placeholders
-        params.onPlaceholderLayout?.invoke(textLayoutResult.placeholderRects)
+        onPlaceholderLayout?.invoke(textLayoutResult.placeholderRects)
 
         // then allow children to measure _inside_ our final box, with the above placeholders
         val placeable = measurable.measure(
@@ -185,8 +288,7 @@ internal class StaticTextModifier(
         measurable: IntrinsicMeasurable,
         height: Int
     ): Int {
-        val td = getOrUpdateTextDelegateInLayout(this)
-        return td.minIntrinsicWidth
+        return getLayoutCache(this).minIntrinsicWidth
     }
 
     fun minIntrinsicHeightNonExtension(
@@ -200,42 +302,29 @@ internal class StaticTextModifier(
     override fun IntrinsicMeasureScope.minIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ): Int {
-        return getOrUpdateTextDelegateInLayout(this)
-            .intrinsicHeightAt(width, layoutDirection)
-    }
+    ): Int = getLayoutCache(this).intrinsicHeightAt(width, layoutDirection)
 
     fun maxIntrinsicWidthNonExtension(
         intrinsicMeasureScope: IntrinsicMeasureScope,
         measurable: IntrinsicMeasurable,
         height: Int
-    ): Int {
-        return intrinsicMeasureScope.maxIntrinsicWidth(measurable, height)
-    }
+    ): Int = intrinsicMeasureScope.maxIntrinsicWidth(measurable, height)
 
     override fun IntrinsicMeasureScope.maxIntrinsicWidth(
         measurable: IntrinsicMeasurable,
         height: Int
-    ): Int {
-        val td = getOrUpdateTextDelegateInLayout(this)
-        return td.maxIntrinsicWidth
-    }
+    ): Int = getLayoutCache(this).maxIntrinsicWidth
 
     fun maxIntrinsicHeightNonExtension(
         intrinsicMeasureScope: IntrinsicMeasureScope,
         measurable: IntrinsicMeasurable,
         width: Int
-    ): Int {
-        return intrinsicMeasureScope.maxIntrinsicHeight(measurable, width)
-    }
+    ): Int = intrinsicMeasureScope.maxIntrinsicHeight(measurable, width)
 
     override fun IntrinsicMeasureScope.maxIntrinsicHeight(
         measurable: IntrinsicMeasurable,
         width: Int
-    ): Int {
-        return getOrUpdateTextDelegateInLayout(this)
-            .intrinsicHeightAt(width, layoutDirection)
-    }
+    ): Int = getLayoutCache(this).intrinsicHeightAt(width, layoutDirection)
 
     fun drawNonExtension(
         contentDrawScope: ContentDrawScope
@@ -244,11 +333,11 @@ internal class StaticTextModifier(
     }
 
     override fun ContentDrawScope.draw() {
-        params.selectionController?.draw(this)
+        selectionController?.draw(this)
         drawIntoCanvas { canvas ->
-            TextPainter.paint(canvas, requireNotNull(layoutCache?.layout))
+            TextPainter.paint(canvas, requireNotNull(layoutCache.layout))
         }
-        if (!params.placeholders.isNullOrEmpty()) {
+        if (!placeholders.isNullOrEmpty()) {
             drawContent()
         }
     }
