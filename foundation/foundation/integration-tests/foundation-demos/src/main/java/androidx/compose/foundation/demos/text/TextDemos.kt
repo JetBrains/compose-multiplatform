@@ -115,6 +115,13 @@ val TextDemos = DemoCategory(
                 ComposableDemo("Text selection") { TextSelectionDemo() },
                 ComposableDemo("Text selection sample") { TextSelectionSample() },
             )
+        ),
+        DemoCategory(
+            "⚠️️ Memory benchmark ⚠️️",
+            listOf(
+                ComposableDemo("SetText") { MemoryAllocsSetText() },
+                ComposableDemo("IfNotEmptyText") { MemoryAllocsIfNotEmptyText() }
+            )
         )
     )
 )

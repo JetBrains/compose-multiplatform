@@ -81,11 +81,16 @@ internal val AnnotatedStringSaver = Saver<AnnotatedString, Any>(
     },
     restore = {
         val list = it as List<Any?>
+        // lift these to make types work
+        val spanStylesOrNull: List<AnnotatedString.Range<SpanStyle>>? =
+            restore(list[1], AnnotationRangeListSaver)
+        val paragraphStylesOrNull: List<AnnotatedString.Range<ParagraphStyle>>? =
+            restore(list[2], AnnotationRangeListSaver)
         AnnotatedString(
             text = restore(list[0])!!,
-            spanStyles = restore(list[1], AnnotationRangeListSaver)!!,
-            paragraphStyles = restore(list[2], AnnotationRangeListSaver)!!,
-            annotations = restore(list[3], AnnotationRangeListSaver)!!,
+            spanStylesOrNull = spanStylesOrNull?.ifEmpty { null },
+            paragraphStylesOrNull = paragraphStylesOrNull?.ifEmpty { null },
+            annotations = restore(list[3], AnnotationRangeListSaver),
         )
     }
 )

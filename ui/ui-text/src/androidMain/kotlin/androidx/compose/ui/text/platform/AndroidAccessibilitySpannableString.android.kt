@@ -72,7 +72,7 @@ fun AnnotatedString.toAccessibilitySpannableString(
     fontFamilyResolver: FontFamily.Resolver
 ): SpannableString {
     val spannableString = SpannableString(text)
-    spanStyles.fastForEach { (style, start, end) ->
+    spanStylesOrNull?.fastForEach { (style, start, end) ->
         // b/232238615 looking up fonts inside of accessibility does not honor overwritten
         // FontFamilyResolver. This is not safe until Font.ResourceLoader is fully removed.
         val noFontStyle = style.copy(fontFamily = null)
