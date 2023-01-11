@@ -18,17 +18,25 @@ package androidx.compose.ui.samples
 
 import android.view.View
 import android.view.ViewGroup
+import android.webkit.WebView
+import android.webkit.WebViewClient
 import android.widget.TextView
 import androidx.annotation.Sampled
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
@@ -47,8 +55,47 @@ fun AndroidViewSample() {
     AndroidView({ context -> TextView(context).apply { text = "This is a TextView" } })
     // Compose a View and update its size based on state. Note the modifiers.
     var size by remember { mutableStateOf(20) }
-    AndroidView(::View, Modifier.clickable { size += 20 }.background(Color.Blue)) { view ->
+    AndroidView(::View,
+        Modifier
+            .clickable { size += 20 }
+            .background(Color.Blue)) { view ->
         view.layoutParams = ViewGroup.LayoutParams(size, size)
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Sampled
+@Composable
+fun ReusableAndroidViewInLazyColumnSample() {
+    val urls = listOf(
+        "https://developer.android.com/jetpack/compose",
+        "https://google.github.io/accompanist/",
+        "https://android-developers.googleblog.com/",
+        "https://io.google/",
+        // ...
+    )
+    LazyVerticalGrid(columns = GridCells.Adaptive(512.dp)) {
+        items(urls) { url ->
+            AndroidView(
+                factory = { context ->
+                    WebView(context).apply {
+                        settings.javaScriptEnabled = true
+                        webViewClient = object : WebViewClient() {
+                            // Optional overrides for WebViewClient
+                        }
+                    }
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(1f),
+                update = { webView -> webView.loadUrl(url) },
+                onReset = { webView ->
+                    webView.stopLoading()
+                    webView.loadUrl("about:blank")
+                    webView.clearHistory()
+                }
+            )
+        }
     }
 }
 
@@ -57,7 +104,8 @@ fun AndroidViewSample() {
 fun AndroidDrawableInDrawScopeSample() {
     val drawable = LocalContext.current.getDrawable(R.drawable.sample_drawable)
     Box(
-        modifier = Modifier.requiredSize(100.dp)
+        modifier = Modifier
+            .requiredSize(100.dp)
             .drawBehind {
                 drawIntoCanvas { canvas ->
                     drawable?.let {

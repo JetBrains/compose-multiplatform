@@ -19,6 +19,7 @@ import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusTargetModifierNode
 import androidx.compose.ui.geometry.Offset
@@ -30,6 +31,7 @@ import androidx.compose.ui.layout.IntrinsicMeasureScope
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutInfo
 import androidx.compose.ui.layout.LayoutNodeSubcompositionsState
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureScope
@@ -37,12 +39,11 @@ import androidx.compose.ui.layout.ModifierInfo
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.layout.Remeasurement
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.node.LayoutNode.LayoutState.Idle
 import androidx.compose.ui.node.LayoutNode.LayoutState.LayingOut
-import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadLayingOut
 import androidx.compose.ui.node.LayoutNode.LayoutState.LookaheadMeasuring
+import androidx.compose.ui.node.LayoutNode.LayoutState.Measuring
 import androidx.compose.ui.node.Nodes.FocusEvent
 import androidx.compose.ui.node.Nodes.FocusProperties
 import androidx.compose.ui.node.Nodes.FocusTarget
@@ -54,6 +55,8 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.viewinterop.InteropView
+import androidx.compose.ui.viewinterop.InteropViewFactoryHolder
 
 /**
  * Enable to log changes to the LayoutNode tree.  This logging is quite chatty.
@@ -63,6 +66,7 @@ private const val DebugChanges = false
 /**
  * An element in the layout hierarchy, built with compose UI.
  */
+@OptIn(InternalComposeUiApi::class)
 internal class LayoutNode(
     // Virtual LayoutNode is the temporary concept allows us to a node which is not a real node,
     // but just a holder for its children - allows us to combine some children into something we
@@ -79,6 +83,7 @@ internal class LayoutNode(
     OwnerScope,
     LayoutInfo,
     ComposeUiNode,
+    InteroperableComposeUiNode,
     Owner.OnLayoutCompletedListener {
 
     val isPlacedInLookahead: Boolean?
@@ -183,6 +188,15 @@ internal class LayoutNode(
      */
     internal var owner: Owner? = null
         private set
+
+    /**
+     * The [InteropViewFactoryHolder] associated with this node, which is used to instantiate and
+     * manage platform View instances that are hosted in Compose.
+     */
+    internal var interopViewFactoryHolder: InteropViewFactoryHolder? = null
+
+    @InternalComposeUiApi
+    override fun getInteropView(): InteropView? = interopViewFactoryHolder?.getInteropView()
 
     /**
      * Returns true if this [LayoutNode] currently has an [LayoutNode.owner].  Semantically,
@@ -1356,6 +1370,7 @@ internal class LayoutNode(
     private var deactivated = false
 
     override fun onReuse() {
+        interopViewFactoryHolder?.onReuse()
         if (deactivated) {
             deactivated = false
             // we don't need to reset state as it was done when deactivated
@@ -1365,11 +1380,13 @@ internal class LayoutNode(
     }
 
     override fun onDeactivate() {
+        interopViewFactoryHolder?.onDeactivate()
         deactivated = true
         resetModifierState()
     }
 
     override fun onRelease() {
+        interopViewFactoryHolder?.onRelease()
         forEachCoordinatorIncludingInner { it.onRelease() }
     }
 

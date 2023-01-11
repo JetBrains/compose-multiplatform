@@ -27,8 +27,10 @@ import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.SurfaceView
 import android.view.View
+import android.view.View.OnAttachStateChangeListener
 import android.view.ViewGroup
 import android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.RelativeLayout
 import android.widget.TextView
@@ -38,17 +40,23 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.ReusableContent
+import androidx.compose.runtime.ReusableContentHost
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.AbsoluteAlignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -71,6 +79,20 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.OnCreate
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.OnRelease
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.OnReset
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.OnUpdate
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.OnViewAttach
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.OnViewDetach
+import androidx.compose.ui.viewinterop.AndroidViewTest.AndroidViewLifecycleEvent.ViewLifecycleEvent
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.Lifecycle.Event.ON_CREATE
+import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
+import androidx.lifecycle.Lifecycle.Event.ON_RESUME
+import androidx.lifecycle.Lifecycle.Event.ON_START
+import androidx.lifecycle.Lifecycle.Event.ON_STOP
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.lifecycle.testing.TestLifecycleOwner
@@ -78,25 +100,33 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.test.espresso.Espresso
+import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.action.ViewActions.typeText
+import androidx.test.espresso.assertion.ViewAssertions.doesNotExist
 import androidx.test.espresso.assertion.ViewAssertions.matches
+import androidx.test.espresso.matcher.ViewMatchers.Visibility
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.espresso.matcher.ViewMatchers.withClassName
+import androidx.test.espresso.matcher.ViewMatchers.withEffectiveVisibility
+import androidx.test.espresso.matcher.ViewMatchers.withText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
+import kotlin.math.roundToInt
 import org.hamcrest.CoreMatchers.endsWith
 import org.hamcrest.CoreMatchers.equalTo
 import org.hamcrest.CoreMatchers.instanceOf
+import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.math.roundToInt
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalComposeUiApi::class)
 class AndroidViewTest {
     @get:Rule
     val rule = createAndroidComposeRule<TestActivity>()
@@ -635,11 +665,19 @@ class AndroidViewTest {
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun androidView_noClip() {
         rule.setContent {
-            Box(Modifier.fillMaxSize().background(Color.White)) {
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(Color.White)) {
                 with(LocalDensity.current) {
-                    Box(Modifier.requiredSize(150.toDp()).testTag("box")) {
+                    Box(
+                        Modifier
+                            .requiredSize(150.toDp())
+                            .testTag("box")) {
                         Box(
-                            Modifier.size(100.toDp(), 100.toDp()).align(AbsoluteAlignment.TopLeft)
+                            Modifier
+                                .size(100.toDp(), 100.toDp())
+                                .align(AbsoluteAlignment.TopLeft)
                         ) {
                             AndroidView(factory = { context ->
                                 object : View(context) {
@@ -662,6 +700,702 @@ class AndroidViewTest {
         }
         rule.onNodeWithTag("box").captureToImage().assertPixels(IntSize(150, 150)) {
             Color.Blue
+        }
+    }
+
+    @Test
+    fun testInitialComposition_causesViewToBecomeActive() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        rule.setContent {
+            ReusableContent("never-changes") {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it).apply { text = "Test" } },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewRecomposition_onlyInvokesUpdate() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var state by mutableStateOf(0)
+        rule.setContent {
+            ReusableContent("never-changes") {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it) },
+                    update = { it.text = "Text $state" },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Text 0")))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        state++
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Text 1")))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when recomposed",
+            listOf(OnUpdate),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewDeactivation_causesViewResetAndDetach() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var attached by mutableStateOf(true)
+        rule.setContent {
+            ReusableContentHost(attached) {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it).apply { text = "Test" } },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        attached = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "removed from the composition hierarchy and retained by Compose",
+            listOf(OnReset, OnViewDetach),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewReattachment_causesViewToBecomeReusedAndReactivated() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var attached by mutableStateOf(true)
+        rule.setContent {
+            ReusableContentHost(attached) {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it).apply { text = "Test" } },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        attached = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "removed from the composition hierarchy and retained by Compose",
+            listOf(OnReset, OnViewDetach),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        attached = true
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "reattached to the composition hierarchy",
+            listOf(OnViewAttach, OnUpdate),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewDisposalWhenDetached_causesViewToBeReleased() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var active by mutableStateOf(true)
+        var emit by mutableStateOf(true)
+        rule.setContent {
+            if (emit) {
+                ReusableContentHost(active) {
+                    ReusableAndroidViewWithLifecycleTracking(
+                        factory = { TextView(it).apply { text = "Test" } },
+                        onLifecycleEvent = lifecycleEvents::add
+                    )
+                }
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        active = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "removed from the composition hierarchy and retained by Compose",
+            listOf(OnReset, OnViewDetach),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        emit = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "removed from the composition hierarchy while deactivated",
+            listOf(OnRelease),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewRemovedFromComposition_causesViewToBeReleased() {
+        var includeViewInComposition by mutableStateOf(true)
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        rule.setContent {
+            if (includeViewInComposition) {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it).apply { text = "Test" } },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        includeViewInComposition = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "removed from composition while visible",
+            listOf(OnViewDetach, OnRelease),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewReusedInComposition_invokesReuseCallbackSequence() {
+        var key by mutableStateOf(0)
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        rule.setContent {
+            ReusableContent(key) {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it) },
+                    update = { it.text = "Test" },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Test")))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        key++
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Test")))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "reused in composition",
+            listOf(OnReset, OnUpdate),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewInComposition_experiencesHostLifecycle_andDoesNotRecreateView() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        rule.setContent {
+            ReusableContentHost(active = true) {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it).apply { text = "Test" } },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+
+        rule.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
+        rule.runOnIdle { /* Ensure lifecycle callbacks propagate */ }
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "its host transitioned from RESUMED to CREATED while the view was attached",
+            listOf(
+                ViewLifecycleEvent(ON_PAUSE),
+                ViewLifecycleEvent(ON_STOP)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        rule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
+        rule.runOnIdle { /* Ensure lifecycle callbacks propagate */ }
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "its host transitioned from CREATED to RESUMED while the view was attached",
+            listOf(
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testReactivationWithChangingKey_onlyResetsOnce() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var attach by mutableStateOf(true)
+        var key by mutableStateOf(1)
+        rule.setContent {
+            ReusableContentHost(active = attach) {
+                ReusableContent(key = key) {
+                    ReusableAndroidViewWithLifecycleTracking(
+                        factory = { TextView(it).apply { text = "Test" } },
+                        onLifecycleEvent = lifecycleEvents::add
+                    )
+                }
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        attach = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "detached from the composition hierarchy",
+            listOf(OnReset, OnViewDetach),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        rule.runOnUiThread {
+            // Make sure both changes are applied in the same composition.
+            attach = true
+            key++
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "simultaneously reactivating and changing reuse keys",
+            listOf(OnViewAttach, OnUpdate),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewDetachedFromComposition_stillExperiencesHostLifecycle() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var attached by mutableStateOf(true)
+        rule.setContent {
+            ReusableContentHost(attached) {
+                ReusableAndroidViewWithLifecycleTracking(
+                    factory = { TextView(it).apply { text = "Test" } },
+                    onLifecycleEvent = lifecycleEvents::add
+                )
+            }
+        }
+
+        onView(instanceOf(TextView::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        attached = false
+
+        onView(instanceOf(TextView::class.java))
+            .check(doesNotExist())
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "removed from the composition hierarchy and retained by Compose",
+            listOf(OnReset, OnViewDetach),
+            lifecycleEvents
+        )
+        lifecycleEvents.clear()
+
+        rule.activityRule.scenario.moveToState(Lifecycle.State.CREATED)
+        rule.runOnIdle { /* Ensure lifecycle callbacks propagate */ }
+
+        assertEquals(
+            "AndroidView did not receive callbacks when its host transitioned from " +
+                "RESUMED to CREATED while the view was detached",
+            listOf(
+                ViewLifecycleEvent(ON_PAUSE),
+                ViewLifecycleEvent(ON_STOP)
+            ),
+            lifecycleEvents
+        )
+
+        lifecycleEvents.clear()
+        rule.activityRule.scenario.moveToState(Lifecycle.State.RESUMED)
+        rule.runOnIdle { /* Wait for UI to settle */ }
+
+        assertEquals(
+            "AndroidView did not receive callbacks when its host transitioned from " +
+                "CREATED to RESUMED while the view was detached",
+            listOf(
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+    }
+
+    @Test
+    fun testViewIsReused_whenMoved() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var slotWithContent by mutableStateOf(0)
+
+        rule.setContent {
+            val movableContext = remember {
+                movableContentOf {
+                    ReusableAndroidViewWithLifecycleTracking(
+                        factory = {
+                            EditText(it).apply { id = R.id.testContentViewId }
+                        },
+                        onLifecycleEvent = lifecycleEvents::add
+                    )
+                }
+            }
+
+            Column {
+                repeat(10) { slot ->
+                    if (slot == slotWithContent) {
+                        ReusableContent(Unit) {
+                            movableContext()
+                        }
+                    } else {
+                        Text("Slot $slot")
+                    }
+                }
+            }
+        }
+
+        onView(instanceOf(EditText::class.java))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+            .perform(typeText("Input"))
+
+        assertEquals(
+            "AndroidView did not experience the expected lifecycle when " +
+                "added to the composition hierarchy",
+            listOf(
+                OnCreate,
+                OnUpdate,
+                OnViewAttach,
+                ViewLifecycleEvent(ON_CREATE),
+                ViewLifecycleEvent(ON_START),
+                ViewLifecycleEvent(ON_RESUME)
+            ),
+            lifecycleEvents
+        )
+        lifecycleEvents.clear()
+        slotWithContent++
+
+        rule.runOnIdle { /* Wait for UI to settle */ }
+
+        assertEquals(
+            "AndroidView experienced unexpected lifecycle events when " +
+                "moved in the composition",
+            emptyList<AndroidViewLifecycleEvent>(),
+            lifecycleEvents
+        )
+
+        // Check that the state of the view is retained
+        onView(instanceOf(EditText::class.java))
+            .check(matches(isDisplayed()))
+            .check(matches(withText("Input")))
+    }
+
+    @Test
+    fun testViewRestoresState_whenRemovedAndRecreatedWithNoReuse() {
+        val lifecycleEvents = mutableListOf<AndroidViewLifecycleEvent>()
+        var screen by mutableStateOf("screen1")
+        rule.setContent {
+            with(rememberSaveableStateHolder()) {
+                if (screen == "screen1") {
+                    SaveableStateProvider("screen1") {
+                        ReusableAndroidViewWithLifecycleTracking(
+                            factory = {
+                                EditText(it).apply { id = R.id.testContentViewId }
+                            },
+                            onLifecycleEvent = lifecycleEvents::add
+                        )
+                    }
+                }
+            }
+        }
+
+        onView(instanceOf(EditText::class.java))
+            .check(matches(isDisplayed()))
+            .perform(typeText("User Input"))
+
+        rule.runOnIdle { screen = "screen2" }
+
+        onView(instanceOf(EditText::class.java))
+            .check(doesNotExist())
+
+        rule.runOnIdle { screen = "screen1" }
+
+        onView(instanceOf(EditText::class.java))
+            .check(matches(isDisplayed()))
+            .check(matches(withText("User Input")))
+    }
+
+    @ExperimentalComposeUiApi
+    @Composable
+    private inline fun <T : View> ReusableAndroidViewWithLifecycleTracking(
+        crossinline factory: (Context) -> T,
+        noinline onLifecycleEvent: @DisallowComposableCalls (AndroidViewLifecycleEvent) -> Unit,
+        modifier: Modifier = Modifier,
+        crossinline update: (T) -> Unit = { },
+        crossinline reuse: (T) -> Unit = { },
+        crossinline release: (T) -> Unit = { }
+    ) {
+        AndroidView(
+            factory = {
+                onLifecycleEvent(OnCreate)
+                factory(it).apply {
+                    addOnAttachStateChangeListener(
+                        object : OnAttachStateChangeListener, LifecycleEventObserver {
+                            override fun onViewAttachedToWindow(v: View) {
+                                onLifecycleEvent(OnViewAttach)
+                                findViewTreeLifecycleOwner()!!.lifecycle.addObserver(this)
+                            }
+
+                            override fun onViewDetachedFromWindow(v: View) {
+                                onLifecycleEvent(OnViewDetach)
+                            }
+
+                            override fun onStateChanged(
+                                source: LifecycleOwner,
+                                event: Lifecycle.Event
+                            ) {
+                                onLifecycleEvent(ViewLifecycleEvent(event))
+                            }
+                        }
+                    )
+                }
+            },
+            modifier = modifier,
+            update = {
+                onLifecycleEvent(OnUpdate)
+                update(it)
+            },
+            onReset = {
+                onLifecycleEvent(OnReset)
+                reuse(it)
+            },
+            onRelease = {
+                onLifecycleEvent(OnRelease)
+                release(it)
+            }
+        )
+    }
+
+    private sealed class AndroidViewLifecycleEvent {
+        override fun toString(): String {
+            return javaClass.simpleName
+        }
+
+        // Sent when the factory lambda is invoked
+        object OnCreate : AndroidViewLifecycleEvent()
+
+        object OnUpdate : AndroidViewLifecycleEvent()
+        object OnReset : AndroidViewLifecycleEvent()
+        object OnRelease : AndroidViewLifecycleEvent()
+
+        object OnViewAttach : AndroidViewLifecycleEvent()
+        object OnViewDetach : AndroidViewLifecycleEvent()
+
+        data class ViewLifecycleEvent(
+            val event: Lifecycle.Event
+        ) : AndroidViewLifecycleEvent() {
+            override fun toString() = "ViewLifecycleEvent($event)"
         }
     }
 
