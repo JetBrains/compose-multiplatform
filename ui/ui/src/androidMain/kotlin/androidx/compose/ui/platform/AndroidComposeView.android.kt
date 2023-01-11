@@ -734,13 +734,17 @@ internal class AndroidComposeView(context: Context) :
 
     private fun scheduleMeasureAndLayout(nodeToRemeasure: LayoutNode? = null) {
         if (!isLayoutRequested && isAttachedToWindow) {
-            if (wasMeasuredWithMultipleConstraints && nodeToRemeasure != null) {
-                // if nodeToRemeasure can potentially resize the root and the view was measured
-                // twice with different constraints last time it means the constraints we have could
-                // be not the final constraints and in fact our parent ViewGroup can remeasure us
-                // with larger constraints if we call requestLayout()
+            if (nodeToRemeasure != null) {
+                // if [nodeToRemeasure] can potentially resize the root we should call
+                // requestLayout() so our parent View can react on this change on the same frame.
+                // if instead we just call invalidate() and remeasure inside dispatchDraw()
+                // this will cause inconsistency as the Compose content will already have the
+                // new size, but the View hierarchy will react only on the next frame.
                 var node = nodeToRemeasure
-                while (node != null && node.measuredByParent == UsageByParent.InMeasureBlock) {
+                while (node != null &&
+                    node.measuredByParent == UsageByParent.InMeasureBlock &&
+                    node.childSizeCanAffectParentSize()
+                ) {
                     node = node.parent
                 }
                 if (node === root) {
@@ -755,6 +759,17 @@ internal class AndroidComposeView(context: Context) :
                 invalidate()
             }
         }
+    }
+
+    private fun LayoutNode.childSizeCanAffectParentSize(): Boolean {
+        // if the view was measured twice with different constraints last time it means the
+        // constraints we have could be not the final constraints and in fact our parent
+        // ViewGroup can remeasure us with different constraints if we call requestLayout().
+        return wasMeasuredWithMultipleConstraints ||
+            // when parent's [hasFixedInnerContentConstraints] is true the child size change
+            // can't affect parent size as the size is fixed. for example it happens when parent
+            // has Modifier.fillMaxSize() set on it.
+            parent?.hasFixedInnerContentConstraints == false
     }
 
     override fun measureAndLayout(sendPointerUpdate: Boolean) {
