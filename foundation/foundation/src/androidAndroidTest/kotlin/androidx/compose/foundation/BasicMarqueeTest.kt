@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -32,6 +33,7 @@ import androidx.compose.testutils.assertContainsColor
 import androidx.compose.testutils.assertDoesNotContainColor
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
@@ -50,10 +52,10 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
-import androidx.testutils.AnimationDurationScaleRule
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,10 +75,6 @@ class BasicMarqueeTest {
 
     @get:Rule
     val rule = createComposeRule()
-
-    @get:Rule
-    val animationScaleRule: AnimationDurationScaleRule =
-        AnimationDurationScaleRule.createForAllTests(1f)
 
     /**
      * Converts pxPerFrame to dps per second. The frame delay is 16ms, which means there are
@@ -103,7 +101,7 @@ class BasicMarqueeTest {
     }
 
     @Test
-    fun animationDisabled() {
+    fun doesNotAnimate_whenZeroIterations() {
         rule.setContent {
             TestMarqueeContent(
                 Modifier.basicMarqueeWithTestParams(
@@ -118,6 +116,65 @@ class BasicMarqueeTest {
             rule.waitForIdle()
             rule.onRoot().captureToImage()
                 .assertPixels { Color1 }
+        }
+    }
+
+    @Ignore("b/265177763: Not currently possible to inject a MotionDurationScale in tests.")
+    @Test fun animates_whenAnimationsDisabledBySystem() {
+        // TODO(b/265177763) Inject 0 duration scale.
+
+        rule.setContent {
+            LaunchedEffect(Unit) {
+                assertThat(coroutineContext[MotionDurationScale]?.scaleFactor).isEqualTo(0f)
+            }
+            TestMarqueeContent(
+                Modifier.basicMarqueeWithTestParams(
+                    iterations = 1,
+                    spacing = MarqueeSpacing(0.toDp())
+                )
+            )
+        }
+
+        rule.onRoot().captureToImage()
+            .assertPixels(expectedSize = IntSize(100, 100)) { Color1 }
+
+        // First stage of animation: show all the content.
+        repeat(30) { frameNum ->
+            rule.mainClock.advanceTimeByFrame()
+            rule.waitForIdle()
+            val image = rule.onRoot().captureToImage()
+            val edge1 = image.findFirstColorEdge(Color1, Color2)
+            val edge2 = image.findFirstColorEdge(Color2, Color1)
+            val expectedEdge1 = 100 - (frameNum * 10)
+            val expectedEdge2 = 100 - ((frameNum - 10) * 10)
+
+            when {
+                frameNum == 0 -> {
+                    assertThat(edge1).isEqualTo(-1)
+                    assertThat(edge2).isEqualTo(-1)
+                }
+
+                frameNum < 10 -> {
+                    assertThat(edge1).isEqualTo(expectedEdge1)
+                    assertThat(edge2).isEqualTo(-1)
+                }
+
+                frameNum == 10 -> {
+                    assertThat(edge1).isEqualTo(-1)
+                    assertThat(edge2).isEqualTo(-1)
+                }
+
+                frameNum < 20 -> {
+                    assertThat(edge1).isEqualTo(-1)
+                    assertThat(edge2).isEqualTo(expectedEdge2)
+                }
+
+                else -> {
+                    // Nothing should happen after the animation finishes.
+                    assertThat(edge1).isEqualTo(-1)
+                    assertThat(edge2).isEqualTo(-1)
+                }
+            }
         }
     }
 
@@ -1076,7 +1133,6 @@ class BasicMarqueeTest {
                 edgeStartX = x
             } else if (pixel == right) {
                 return if (edgeStartX >= 0) {
-                    println("OMG found edge: $edgeStartX - $x")
                     ((edgeStartX.toFloat() + x.toFloat()) / 2f).roundToInt()
                 } else {
                     // Never found the start of the edge.

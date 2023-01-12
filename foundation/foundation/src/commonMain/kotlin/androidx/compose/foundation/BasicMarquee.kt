@@ -26,6 +26,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.repeatable
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.FixedMotionDurationScale.scaleFactor
 import androidx.compose.foundation.MarqueeAnimationMode.Companion.Immediately
 import androidx.compose.foundation.MarqueeAnimationMode.Companion.WhileFocused
 import androidx.compose.runtime.LaunchedEffect
@@ -37,6 +38,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.focus.FocusState
@@ -62,6 +64,7 @@ import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.math.sign
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.withContext
 
 // From https://cs.android.com/android/platform/superproject/+/master:frameworks/base/core/java/android/widget/TextView.java;l=736;drc=6d97d6d7215fef247d1a90e05545cac3676f9212
 @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
@@ -256,29 +259,35 @@ private class MarqueeModifier(
             return
         }
 
-        snapshotFlow {
-            // Don't animate if content fits. (Because coroutines, the int will get boxed anyway.)
-            if (contentWidth <= containerWidth) return@snapshotFlow null
-            if (animationMode == WhileFocused && !hasFocus) return@snapshotFlow null
-            (contentWidth + spacingPx).toFloat()
-        }.collectLatest { contentWithSpacingWidth ->
-            // Don't animate when the content fits.
-            if (contentWithSpacingWidth == null) return@collectLatest
+        // Marquee animations should not be affected by motion accessibility settings.
+        // Wrap the entire flow instead of just the animation calls so kotlin doesn't have to create
+        // an extra CoroutineContext every time the flow emits.
+        withContext(FixedMotionDurationScale) {
+            snapshotFlow {
+                // Don't animate if content fits. (Because coroutines, the int will get boxed
+                // anyway.)
+                if (contentWidth <= containerWidth) return@snapshotFlow null
+                if (animationMode == WhileFocused && !hasFocus) return@snapshotFlow null
+                (contentWidth + spacingPx).toFloat()
+            }.collectLatest { contentWithSpacingWidth ->
+                // Don't animate when the content fits.
+                if (contentWithSpacingWidth == null) return@collectLatest
 
-            val spec = createMarqueeAnimationSpec(
-                iterations,
-                contentWithSpacingWidth,
-                initialDelayMillis,
-                delayMillis,
-                velocity,
-                density
-            )
+                val spec = createMarqueeAnimationSpec(
+                    iterations,
+                    contentWithSpacingWidth,
+                    initialDelayMillis,
+                    delayMillis,
+                    velocity,
+                    density
+                )
 
-            offset.snapTo(0f)
-            try {
-                offset.animateTo(contentWithSpacingWidth, spec)
-            } finally {
                 offset.snapTo(0f)
+                try {
+                    offset.animateTo(contentWithSpacingWidth, spec)
+                } finally {
+                    offset.snapTo(0f)
+                }
             }
         }
     }
@@ -399,4 +408,10 @@ fun interface MarqueeSpacing {
             (fraction * width).roundToInt()
         }
     }
+}
+
+/** A [MotionDurationScale] that always reports a [scaleFactor] of 1. */
+private object FixedMotionDurationScale : MotionDurationScale {
+    override val scaleFactor: Float
+        get() = 1f
 }
