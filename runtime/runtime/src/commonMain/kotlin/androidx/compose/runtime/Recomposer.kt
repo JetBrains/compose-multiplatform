@@ -32,7 +32,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
-import kotlin.native.concurrent.ThreadLocal
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
@@ -1243,7 +1242,8 @@ class Recomposer(
      *
      * This annotation WILL BE REMOVED with the new memory model of Kotlin/Native.
      */
-    @ThreadLocal
+    @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
+    @kotlin.native.concurrent.ThreadLocal
     companion object {
 
         private val _runningRecomposers = MutableStateFlow(persistentSetOf<RecomposerInfoImpl>())
