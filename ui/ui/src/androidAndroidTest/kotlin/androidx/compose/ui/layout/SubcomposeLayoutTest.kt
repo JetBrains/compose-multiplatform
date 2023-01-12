@@ -20,6 +20,7 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -2170,6 +2171,34 @@ class SubcomposeLayoutTest {
         rule.onNodeWithTag("0")
             .assertExists()
         assertThat(disposeCount).isEqualTo(0)
+    }
+
+    @Test
+    fun subcomposeLayout_movedToDifferentGroup() {
+        var wrapped by mutableStateOf(false)
+        rule.setContent {
+            val content = remember {
+                movableContentOf {
+                    BoxWithConstraints {
+                        Spacer(
+                            modifier = Modifier.testTag(wrapped.toString()),
+                        )
+                    }
+                }
+            }
+
+            if (wrapped) {
+                Box { content() }
+            } else {
+                content()
+            }
+        }
+
+        rule.runOnIdle {
+            wrapped = !wrapped
+        }
+
+        rule.waitForIdle()
     }
 
     @Test
