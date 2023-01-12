@@ -110,6 +110,7 @@ class DemoTest {
         onNodeWithTag(Tags.AppBarTitle).assertTextEquals(demo.title)
     }
 
+    @Ignore("b/265281736")
     @Test
     fun navigateThroughAllDemos_1() {
         navigateThroughAllDemos(SplitDemoCategories[0])
