@@ -41,8 +41,8 @@ internal class SelectableTextAnnotatedStringElement(
     private val placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
     private val onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
     private val selectionController: SelectionController? = null
-) : ModifierNodeElement<SelectableStaticTextModifier>(inspectorInfo = debugInspectorInfo { }) {
-    override fun create(): SelectableStaticTextModifier = SelectableStaticTextModifier(
+) : ModifierNodeElement<SelectableTextAnnotatedStringNode>(inspectorInfo = debugInspectorInfo { }) {
+    override fun create(): SelectableTextAnnotatedStringNode = SelectableTextAnnotatedStringNode(
         text,
         style,
         fontFamilyResolver,
@@ -56,7 +56,9 @@ internal class SelectableTextAnnotatedStringElement(
         selectionController
     )
 
-    override fun update(node: SelectableStaticTextModifier): SelectableStaticTextModifier {
+    override fun update(
+        node: SelectableTextAnnotatedStringNode
+    ): SelectableTextAnnotatedStringNode {
         node.update(
             text = text,
             style = style,

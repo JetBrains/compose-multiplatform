@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.Density
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalComposeUiApi::class)
-internal class StaticTextModifier(
+internal class TextAnnotatedStringNode(
     private var text: AnnotatedString,
     private var style: TextStyle,
     private var fontFamilyResolver: FontFamily.Resolver,

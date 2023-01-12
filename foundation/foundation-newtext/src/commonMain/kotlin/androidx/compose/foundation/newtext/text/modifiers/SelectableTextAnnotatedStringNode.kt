@@ -42,7 +42,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 
 @OptIn(ExperimentalComposeUiApi::class)
-internal class SelectableStaticTextModifier(
+internal class SelectableTextAnnotatedStringNode(
     text: AnnotatedString,
     style: TextStyle,
     fontFamilyResolver: FontFamily.Resolver,
@@ -58,7 +58,7 @@ internal class SelectableStaticTextModifier(
     SemanticsModifierNode {
 
     private val delegate = delegated {
-        StaticTextModifier(
+        TextAnnotatedStringNode(
             text = text,
             style = style,
             fontFamilyResolver = fontFamilyResolver,
