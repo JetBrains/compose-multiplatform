@@ -676,7 +676,7 @@ package androidx.compose.runtime.collection {
     method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! MutableVector(optional int capacity);
     method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T> MutableVector(int size, kotlin.jvm.functions.Function1<? super java.lang.Integer,? extends T> init);
     method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T>! mutableVectorOf();
-    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T> mutableVectorOf(T? elements);
+    method public static inline <reified T> androidx.compose.runtime.collection.MutableVector<T> mutableVectorOf(T?... elements);
   }
 
 }
