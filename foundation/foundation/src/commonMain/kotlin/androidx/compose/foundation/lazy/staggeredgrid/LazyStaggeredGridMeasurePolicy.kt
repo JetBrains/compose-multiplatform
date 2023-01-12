@@ -23,7 +23,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -39,7 +38,7 @@ import androidx.compose.ui.unit.constrainWidth
 @ExperimentalFoundationApi
 internal fun rememberStaggeredGridMeasurePolicy(
     state: LazyStaggeredGridState,
-    itemProvider: LazyLayoutItemProvider,
+    itemProvider: LazyStaggeredGridItemProvider,
     contentPadding: PaddingValues,
     reverseLayout: Boolean,
     orientation: Orientation,
@@ -67,6 +66,7 @@ internal fun rememberStaggeredGridMeasurePolicy(
         // setup information for prefetch
         state.laneWidthsPrefixSum = resolvedSlotSums
         state.isVertical = isVertical
+        state.spanProvider = itemProvider.spanProvider
 
         val beforeContentPadding = contentPadding.beforePadding(
             orientation, reverseLayout, layoutDirection

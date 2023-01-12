@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -97,7 +98,7 @@ class LazyStaggeredGridSemanticTest(
                     .crossAxisSize(itemSizeDp * 2)
             ) {
                 items(items = List(ItemCount) { it }, key = { key(it) }) {
-                    Spacer(Modifier.testTag(tag(it)).mainAxisSize(itemSizeDp))
+                    BasicText("$it", Modifier.testTag(tag(it)).mainAxisSize(itemSizeDp))
                 }
             }
         }

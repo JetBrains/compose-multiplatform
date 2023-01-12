@@ -121,7 +121,7 @@ class LazyStaggeredGridContentPaddingTest(
                 state = state
             ) {
                 items(100) {
-                    Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it"))
+                    Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it").debugBorder())
                 }
             }
         }

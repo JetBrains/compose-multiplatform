@@ -33,6 +33,8 @@ import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpOffset
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import org.junit.Rule
 
@@ -118,6 +120,15 @@ open class BaseLazyLayoutTestWithOrientation(private val orientation: Orientatio
         } else {
             assertTopPositionInRootIsEqualTo(expectedStart)
         }
+
+    fun SemanticsNodeInteraction.assertAxisBounds(
+        offset: DpOffset,
+        size: DpSize
+    ) =
+        assertMainAxisStartPositionInRootIsEqualTo(offset.y)
+            .assertCrossAxisStartPositionInRootIsEqualTo(offset.x)
+            .assertMainAxisSizeIsEqualTo(size.height)
+            .assertCrossAxisSizeIsEqualTo(size.width)
 
     fun PaddingValues(
         mainAxis: Dp = 0.dp,

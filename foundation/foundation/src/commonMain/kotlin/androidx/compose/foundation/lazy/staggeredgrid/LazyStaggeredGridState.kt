@@ -27,13 +27,16 @@ import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLaneInfo.Companion.Unset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.layout.Remeasurement
 import androidx.compose.ui.layout.RemeasurementModifier
 import androidx.compose.ui.unit.Constraints
@@ -94,12 +97,13 @@ class LazyStaggeredGridState private constructor(
      * This property is observable and when use it in composable function it will be recomposed on
      * each scroll, potentially causing performance issues.
      */
-    val firstVisibleItemIndex: Int
-        get() = scrollPosition.indices.minOfOrNull {
+    val firstVisibleItemIndex: Int by derivedStateOf(structuralEqualityPolicy()) {
+        scrollPosition.indices.minOfOrNull {
             // index array can contain -1, indicating lane being empty (cell number > itemCount)
             // if any of the lanes are empty, we always on 0th item index
             if (it == -1) 0 else it
         } ?: 0
+    }
 
     /**
      * Current offset of the item with [firstVisibleItemIndex] relative to the container start.
@@ -107,10 +111,19 @@ class LazyStaggeredGridState private constructor(
      * This property is observable and when use it in composable function it will be recomposed on
      * each scroll, potentially causing performance issues.
      */
-    val firstVisibleItemScrollOffset: Int
-        get() = scrollPosition.offsets.run {
-            if (isEmpty()) 0 else this[scrollPosition.indices.indexOfMinValue()]
+    val firstVisibleItemScrollOffset: Int by derivedStateOf(structuralEqualityPolicy()) {
+        scrollPosition.offsets.let { offsets ->
+            val firstVisibleIndex = firstVisibleItemIndex
+            val indices = scrollPosition.indices
+            var minOffset = Int.MAX_VALUE
+            for (lane in offsets.indices) {
+                if (indices[lane] == firstVisibleIndex) {
+                    minOffset = minOf(minOffset, offsets[lane])
+                }
+            }
+            if (minOffset == Int.MAX_VALUE) 0 else minOffset
         }
+    }
 
     /** holder for current scroll position **/
     internal val scrollPosition = LazyStaggeredGridScrollPosition(
@@ -133,7 +146,7 @@ class LazyStaggeredGridState private constructor(
         mutableStateOf(EmptyLazyStaggeredGridLayoutInfo)
 
     /** storage for lane assignments for each item for consistent scrolling in both directions **/
-    internal val spans = LazyStaggeredGridSpans()
+    internal val laneInfo = LazyStaggeredGridLaneInfo()
 
     override var canScrollForward: Boolean by mutableStateOf(false)
         private set
@@ -170,9 +183,11 @@ class LazyStaggeredGridState private constructor(
     /* @VisibleForTesting */
     internal var measurePassCount = 0
 
-    /** states required for prefetching **/
+    /** transient information from measure required for prefetching **/
     internal var isVertical = false
     internal var laneWidthsPrefixSum: IntArray = IntArray(0)
+    internal var spanProvider: LazyStaggeredGridSpanProvider? = null
+    /** prefetch state **/
     private var prefetchBaseIndex: Int = -1
     private val currentItemPrefetchHandles = mutableMapOf<Int, PrefetchHandle>()
 
@@ -329,15 +344,15 @@ class LazyStaggeredGridState private constructor(
 
                 // find the next item for each line and prefetch if it is valid
                 targetIndex = if (scrollingForward) {
-                    spans.findNextItemIndex(previousIndex, lane)
+                    laneInfo.findNextItemIndex(previousIndex, lane)
                 } else {
-                    spans.findPreviousItemIndex(previousIndex, lane)
+                    laneInfo.findPreviousItemIndex(previousIndex, lane)
                 }
                 if (
                     targetIndex !in (0 until info.totalItemsCount) ||
-                    previousIndex == targetIndex
+                        targetIndex in prefetchHandlesUsed
                 ) {
-                    return
+                    break
                 }
 
                 prefetchHandlesUsed += targetIndex
@@ -345,8 +360,12 @@ class LazyStaggeredGridState private constructor(
                     continue
                 }
 
-                val crossAxisSize = laneWidthsPrefixSum[lane] -
-                    if (lane == 0) 0 else laneWidthsPrefixSum[lane - 1]
+                val isFullSpan = spanProvider?.isFullSpan(targetIndex) == true
+                val slot = if (isFullSpan) 0 else lane
+                val span = if (isFullSpan) laneCount else 1
+
+                val crossAxisSize = laneWidthsPrefixSum[slot + span - 1] -
+                    if (slot == 0) 0 else laneWidthsPrefixSum[slot - 1]
 
                 val constraints = if (isVertical) {
                     Constraints.fixedWidth(crossAxisSize)
@@ -399,19 +418,22 @@ class LazyStaggeredGridState private constructor(
     }
 
     private fun fillNearestIndices(itemIndex: Int, laneCount: Int): IntArray {
-        // reposition spans if needed to ensure valid indices
-        spans.ensureValidIndex(itemIndex + laneCount)
-
-        val span = spans.getSpan(itemIndex)
-        val targetLaneIndex =
-            if (span == LazyStaggeredGridSpans.Unset) 0 else minOf(span, laneCount)
         val indices = IntArray(laneCount)
+        if (spanProvider?.isFullSpan(itemIndex) == true) {
+            indices.fill(itemIndex)
+            return indices
+        }
+
+        // reposition spans if needed to ensure valid indices
+        laneInfo.ensureValidIndex(itemIndex + laneCount)
+        val previousLane = laneInfo.getLane(itemIndex)
+        val targetLaneIndex = if (previousLane == Unset) 0 else minOf(previousLane, laneCount)
 
         // fill lanes before starting index
         var currentItemIndex = itemIndex
         for (lane in (targetLaneIndex - 1) downTo 0) {
-            indices[lane] = spans.findPreviousItemIndex(currentItemIndex, lane)
-            if (indices[lane] == -1) {
+            indices[lane] = laneInfo.findPreviousItemIndex(currentItemIndex, lane)
+            if (indices[lane] == Unset) {
                 indices.fill(-1, toIndex = lane)
                 break
             }
@@ -423,7 +445,7 @@ class LazyStaggeredGridState private constructor(
         // fill lanes after starting index
         currentItemIndex = itemIndex
         for (lane in (targetLaneIndex + 1) until laneCount) {
-            indices[lane] = spans.findNextItemIndex(currentItemIndex, lane)
+            indices[lane] = laneInfo.findNextItemIndex(currentItemIndex, lane)
             currentItemIndex = indices[lane]
         }
 

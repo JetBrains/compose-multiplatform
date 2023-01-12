@@ -214,7 +214,7 @@ sealed interface LazyStaggeredGridScope {
     /**
      * Add a single item to the staggered grid.
      *
-     * @param key a factory of stable and unique keys representing the item. The key
+     * @param key a stable and unique key representing the item. The key
      *  MUST be saveable via Bundle on Android. If set to null (by default), the position of the
      *  item will be used as a key instead.
      *  Using the same key for multiple items in the staggered grid is not allowed.
@@ -222,15 +222,18 @@ sealed interface LazyStaggeredGridScope {
      *  When you specify the key the scroll position will be maintained based on the key, which
      *  means if you add/remove items before the current visible item the item with the given key
      *  will be kept as the first visible one.
-     * @param contentType a factory of content types representing the item. Content for item of
+     * @param contentType a content type representing the item. Content for item of
      *  the same type can be reused more efficiently. null is a valid type as well and items
      *  of such type will be considered compatible.
+     * @param span a custom span for this item. Spans configure how many lanes defined by
+     *  [StaggeredGridCells] the item will occupy. By default each item will take one lane.
      * @param content composable content displayed by current item
      */
     @ExperimentalFoundationApi
     fun item(
         key: Any? = null,
         contentType: Any? = null,
+        span: StaggeredGridItemSpan? = null,
         content: @Composable LazyStaggeredGridItemScope.() -> Unit
     )
 
@@ -249,12 +252,15 @@ sealed interface LazyStaggeredGridScope {
      * @param contentType a factory of content types representing the item. Content for item of
      *  the same type can be reused more efficiently. null is a valid type as well and items
      *  of such type will be considered compatible.
+     *  @param span a factory of custom spans for this item. Spans configure how many lanes defined
+     *  by [StaggeredGridCells] the item will occupy. By default each item will take one lane.
      * @param itemContent composable content displayed by item on provided position
      */
     fun items(
         count: Int,
         key: ((index: Int) -> Any)? = null,
         contentType: (index: Int) -> Any? = { null },
+        span: ((index: Int) -> StaggeredGridItemSpan)? = null,
         itemContent: @Composable LazyStaggeredGridItemScope.(index: Int) -> Unit
     )
 }
@@ -274,14 +280,17 @@ sealed interface LazyStaggeredGridScope {
  * @param contentType a factory of content types representing the item. Content for item of
  *  the same type can be reused more efficiently. null is a valid type as well and items
  *  of such type will be considered compatible.
+ * @param span a factory of custom spans for this item. Spans configure how many lanes defined
+ *  by [StaggeredGridCells] the item will occupy. By default each item will take one lane.
  * @param itemContent composable content displayed by the provided item
  */
 @ExperimentalFoundationApi
-fun <T> LazyStaggeredGridScope.items(
+inline fun <T> LazyStaggeredGridScope.items(
     items: List<T>,
-    key: ((item: T) -> Any)? = null,
-    contentType: (item: T) -> Any? = { null },
-    itemContent: @Composable LazyStaggeredGridItemScope.(item: T) -> Unit
+    noinline key: ((item: T) -> Any)? = null,
+    crossinline contentType: (item: T) -> Any? = { null },
+    noinline span: ((item: T) -> StaggeredGridItemSpan)? = null,
+    crossinline itemContent: @Composable LazyStaggeredGridItemScope.(item: T) -> Unit
 ) {
     items(
         count = items.size,
@@ -289,6 +298,9 @@ fun <T> LazyStaggeredGridScope.items(
             { index -> key(items[index]) }
         },
         contentType = { index -> contentType(items[index]) },
+        span = span?.let {
+            { index -> span(items[index]) }
+        },
         itemContent = { index -> itemContent(items[index]) }
     )
 }
@@ -308,14 +320,17 @@ fun <T> LazyStaggeredGridScope.items(
  * @param contentType a factory of content types representing the item. Content for item of
  *  the same type can be reused more efficiently. null is a valid type as well and items
  *  of such type will be considered compatible.
+ * @param span a factory of custom spans for this item. Spans configure how many lanes defined
+ *  by [StaggeredGridCells] the item will occupy. By default each item will take one lane.
  * @param itemContent composable content displayed given item and index
  */
 @ExperimentalFoundationApi
-fun <T> LazyStaggeredGridScope.itemsIndexed(
+inline fun <T> LazyStaggeredGridScope.itemsIndexed(
     items: List<T>,
-    key: ((index: Int, item: T) -> Any)? = null,
-    contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
-    itemContent: @Composable LazyStaggeredGridItemScope.(index: Int, item: T) -> Unit
+    noinline key: ((index: Int, item: T) -> Any)? = null,
+    crossinline contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
+    noinline span: ((index: Int, item: T) -> StaggeredGridItemSpan)? = null,
+    crossinline itemContent: @Composable LazyStaggeredGridItemScope.(index: Int, item: T) -> Unit
 ) {
     items(
         count = items.size,
@@ -323,6 +338,9 @@ fun <T> LazyStaggeredGridScope.itemsIndexed(
             { index -> key(index, items[index]) }
         },
         contentType = { index -> contentType(index, items[index]) },
+        span = span?.let {
+            { index -> span(index, items[index]) }
+        },
         itemContent = { index -> itemContent(index, items[index]) }
     )
 }
@@ -342,14 +360,17 @@ fun <T> LazyStaggeredGridScope.itemsIndexed(
  * @param contentType a factory of content types representing the item. Content for item of
  *  the same type can be reused more efficiently. null is a valid type as well and items
  *  of such type will be considered compatible.
+ * @param span a factory of custom spans for this item. Spans configure how many lanes defined
+ *  by [StaggeredGridCells] the item will occupy. By default each item will take one lane.
  * @param itemContent composable content displayed by the provided item
  */
 @ExperimentalFoundationApi
-fun <T> LazyStaggeredGridScope.items(
+inline fun <T> LazyStaggeredGridScope.items(
     items: Array<T>,
-    key: ((item: T) -> Any)? = null,
-    contentType: (item: T) -> Any? = { null },
-    itemContent: @Composable LazyStaggeredGridItemScope.(item: T) -> Unit
+    noinline key: ((item: T) -> Any)? = null,
+    crossinline contentType: (item: T) -> Any? = { null },
+    noinline span: ((item: T) -> StaggeredGridItemSpan)? = null,
+    crossinline itemContent: @Composable LazyStaggeredGridItemScope.(item: T) -> Unit
 ) {
     items(
         count = items.size,
@@ -357,6 +378,9 @@ fun <T> LazyStaggeredGridScope.items(
             { index -> key(items[index]) }
         },
         contentType = { index -> contentType(items[index]) },
+        span = span?.let {
+            { index -> span(items[index]) }
+        },
         itemContent = { index -> itemContent(items[index]) }
     )
 }
@@ -376,14 +400,17 @@ fun <T> LazyStaggeredGridScope.items(
  * @param contentType a factory of content types representing the item. Content for item of
  *  the same type can be reused more efficiently. null is a valid type as well and items
  *  of such type will be considered compatible.
+ * @param span a factory of custom spans for this item. Spans configure how many lanes defined
+ *  by [StaggeredGridCells] the item will occupy. By default each item will take one lane.
  * @param itemContent composable content displayed given item and index
  */
 @ExperimentalFoundationApi
-fun <T> LazyStaggeredGridScope.itemsIndexed(
+inline fun <T> LazyStaggeredGridScope.itemsIndexed(
     items: Array<T>,
-    key: ((index: Int, item: T) -> Any)? = null,
-    contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
-    itemContent: @Composable LazyStaggeredGridItemScope.(index: Int, item: T) -> Unit
+    noinline key: ((index: Int, item: T) -> Any)? = null,
+    crossinline contentType: (index: Int, item: T) -> Any? = { _, _ -> null },
+    noinline span: ((index: Int, item: T) -> StaggeredGridItemSpan)? = null,
+    crossinline itemContent: @Composable LazyStaggeredGridItemScope.(index: Int, item: T) -> Unit
 ) {
     items(
         count = items.size,
@@ -391,6 +418,9 @@ fun <T> LazyStaggeredGridScope.itemsIndexed(
             { index -> key(index, items[index]) }
         },
         contentType = { index -> contentType(index, items[index]) },
+        span = span?.let {
+            { index -> span(index, items[index]) }
+        },
         itemContent = { index -> itemContent(index, items[index]) }
     )
 }
