@@ -24,6 +24,20 @@ import java.util.Locale
 @ExperimentalMaterial3Api
 internal expect fun createCalendarModel(): CalendarModel
 
+/**
+ * Formats a UTC timestamp into a string with a given date format skeleton.
+ *
+ * @param utcTimeMillis a UTC timestamp to format (milliseconds from epoch)
+ * @param skeleton a date format skeleton
+ * @param locale the [Locale] to use when formatting the given timestamp
+ */
+@ExperimentalMaterial3Api
+internal expect fun formatWithSkeleton(
+    utcTimeMillis: Long,
+    skeleton: String,
+    locale: Locale = Locale.getDefault()
+): String
+
 @ExperimentalMaterial3Api
 internal interface CalendarModel {
 
@@ -129,20 +143,30 @@ internal interface CalendarModel {
     fun minusMonths(from: CalendarMonth, subtractedMonthsCount: Int): CalendarMonth
 
     /**
-     * Formats a [CalendarMonth] into a string with a given date format pattern.
+     * Formats a [CalendarMonth] into a string with a given date format skeleton.
      *
      * @param month a [CalendarMonth] to format
-     * @param pattern a date format pattern
+     * @param skeleton a date format skeleton
+     * @param locale the [Locale] to use when formatting the given month
      */
-    fun format(month: CalendarMonth, pattern: String): String
+    fun formatWithSkeleton(
+        month: CalendarMonth,
+        skeleton: String,
+        locale: Locale = Locale.getDefault()
+    ): String = formatWithSkeleton(month.startUtcTimeMillis, skeleton, locale)
 
     /**
-     * Formats a [CalendarDate] into a string with a given date format pattern.
+     * Formats a [CalendarDate] into a string with a given date format skeleton.
      *
      * @param date a [CalendarDate] to format
-     * @param pattern a date format pattern
+     * @param skeleton a date format skeleton
+     * @param locale the [Locale] to use when formatting the given date
      */
-    fun format(date: CalendarDate, pattern: String): String
+    fun formatWithSkeleton(
+        date: CalendarDate,
+        skeleton: String,
+        locale: Locale = Locale.getDefault()
+    ): String = formatWithSkeleton(date.utcTimeMillis, skeleton, locale)
 
     /**
      * Parses a date string into a [CalendarDate].
@@ -171,6 +195,16 @@ internal data class CalendarDate(
 ) : Comparable<CalendarDate> {
     override operator fun compareTo(other: CalendarDate): Int =
         this.utcTimeMillis.compareTo(other.utcTimeMillis)
+
+    /**
+     * Formats the date into a string with the given skeleton format and a [Locale].
+     */
+    fun format(
+        calendarModel: CalendarModel,
+        skeleton: String,
+        locale: Locale = Locale.getDefault()
+    ): String =
+        calendarModel.formatWithSkeleton(this, skeleton, locale)
 }
 
 /**
@@ -201,9 +235,19 @@ internal data class CalendarMonth(
     /**
      * Returns the position of a [CalendarMonth] within given years range.
      */
-    internal fun indexIn(years: IntRange): Int {
+    fun indexIn(years: IntRange): Int {
         return (year - years.first) * 12 + month - 1
     }
+
+    /**
+     * Formats the month into a string with the given skeleton format and a [Locale].
+     */
+    fun format(
+        calendarModel: CalendarModel,
+        skeleton: String,
+        locale: Locale = Locale.getDefault()
+    ): String =
+        calendarModel.formatWithSkeleton(this, skeleton, locale)
 }
 
 /**

@@ -17,6 +17,10 @@
 package androidx.compose.material3
 
 import android.os.Build
+import android.text.format.DateFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Locale
 
 /**
  * Creates a [CalendarModel] to be used by the date picker.
@@ -27,5 +31,30 @@ internal actual fun createCalendarModel(): CalendarModel {
         CalendarModelImpl()
     } else {
         LegacyCalendarModelImpl()
+    }
+}
+
+/**
+ * Formats a UTC timestamp into a string with a given date format skeleton.
+ *
+ * @param utcTimeMillis a UTC timestamp to format (milliseconds from epoch)
+ * @param skeleton a date format skeleton
+ * @param locale the [Locale] to use when formatting the given timestamp
+ */
+@ExperimentalMaterial3Api
+internal actual fun formatWithSkeleton(
+    utcTimeMillis: Long,
+    skeleton: String,
+    locale: Locale
+): String {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        CalendarModelImpl.format(utcTimeMillis, skeleton, locale)
+    } else {
+        val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
+        val dateFormat = SimpleDateFormat(pattern, locale)
+        dateFormat.timeZone = LegacyCalendarModelImpl.utcTimeZone
+        val calendar = Calendar.getInstance(LegacyCalendarModelImpl.utcTimeZone)
+        calendar.timeInMillis = utcTimeMillis
+        dateFormat.format(calendar.timeInMillis)
     }
 }

@@ -124,20 +124,6 @@ internal class LegacyCalendarModelImpl : CalendarModel {
         return getMonth(earlierMonth)
     }
 
-    override fun format(month: CalendarMonth, pattern: String): String {
-        val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
-        dateFormat.timeZone = utcTimeZone
-        dateFormat.isLenient = false
-        return dateFormat.format(month.toCalendar().timeInMillis)
-    }
-
-    override fun format(date: CalendarDate, pattern: String): String {
-        val dateFormat = SimpleDateFormat(pattern, Locale.getDefault())
-        dateFormat.timeZone = utcTimeZone
-        dateFormat.isLenient = false
-        return dateFormat.format(date.toCalendar(utcTimeZone).timeInMillis)
-    }
-
     override fun parse(date: String, pattern: String): CalendarDate? {
         val dateFormat = SimpleDateFormat(pattern)
         dateFormat.timeZone = utcTimeZone
@@ -155,6 +141,14 @@ internal class LegacyCalendarModelImpl : CalendarModel {
         } catch (pe: ParseException) {
             null
         }
+    }
+
+    companion object {
+
+        /**
+         * Holds a UTC [TimeZone].
+         */
+        internal val utcTimeZone: TimeZone = TimeZone.getTimeZone("UTC")
     }
 
     /**
@@ -196,6 +190,4 @@ internal class LegacyCalendarModelImpl : CalendarModel {
         calendar[Calendar.DAY_OF_MONTH] = this.dayOfMonth
         return calendar
     }
-
-    private var utcTimeZone = TimeZone.getTimeZone("UTC")
 }

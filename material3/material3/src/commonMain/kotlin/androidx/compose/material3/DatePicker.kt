@@ -90,6 +90,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import java.lang.Integer.max
 import java.text.NumberFormat
+import java.util.Locale
 import kotlinx.coroutines.launch
 
 // TODO: External preview image.
@@ -107,7 +108,7 @@ import kotlinx.coroutines.launch
  *
  * @param datePickerState state of the date picker. See [rememberDatePickerState].
  * @param modifier the [Modifier] to be applied to this date picker
- * @param dateFormatter a [DatePickerFormatter] that provides formatting patterns for dates display
+ * @param dateFormatter a [DatePickerFormatter] that provides formatting skeletons for dates display
  * @param dateValidator a lambda that takes a date timestamp and return true if the date is a valid
  * one for selection. Invalid dates will appear disabled in the UI.
  * @param title the title to be displayed in the date picker
@@ -422,6 +423,23 @@ object DatePickerDefaults {
 
     /** The default shape for date picker dialogs. */
     val shape: Shape @Composable get() = DatePickerModalTokens.ContainerShape.toShape()
+
+    /**
+     * A date format skeleton used to format the date picker's year selection menu button (e.g.
+     * "March 2021")
+     */
+    const val YearMonthSkeleton: String = "yMMMM"
+
+    /**
+     * A date format skeleton used to format a selected date (e.g. "Mar 27, 2021")
+     */
+    const val YearAbbrMonthDaySkeleton: String = "yMMMd"
+
+    /**
+     * A date format skeleton used to format a selected date to be used as content description for
+     * screen readers (e.g. "Saturday, March 27, 2021")
+     */
+    const val YearMonthWeekdayDaySkeleton: String = "yMMMMEEEEd"
 }
 
 /**
@@ -592,50 +610,61 @@ class DatePickerColors internal constructor(
 /**
  * A date formatter used by [DatePicker].
  *
- * @param shortFormat date format for displaying a date in a short length string, and is used
- * when a selected date is at the current year (e.g. Mon, Aug 17)
- * @param mediumFormat date format for displaying a date in a medium length string, and is used
- * when a selected date is at a different year (e.g. Sep 17, 1999)
- * @param monthYearFormat date format for displaying a date as a month and a year (e.g.
- * September 2022)
+ * The date formatter will apply the best possible localized form of the given skeleton and Locale.
+ * A skeleton is similar to, and uses the same format characters as, a Unicode
+ * <a href="http://www.unicode.org/reports/tr35/#Date_Format_Patterns">UTS #35</a> pattern.
+ *
+ * One difference is that order is irrelevant. For example, "MMMMd" will return "MMMM d" in the
+ * `en_US` locale, but "d. MMMM" in the `de_CH` locale.
+ *
+ * @param yearSelectionSkeleton a date format skeleton used to format the date picker's year
+ * selection menu button (e.g. "March 2021").
+ * @param selectedDateSkeleton a date format skeleton used to format a selected date (e.g.
+ * "Mar 27, 2021")
+ * @param selectedDateDescriptionSkeleton a date format skeleton used to format a selected date to
+ * be used as content description for screen readers (e.g. "Saturday, March 27, 2021")
  */
 @ExperimentalMaterial3Api
 @Immutable
 class DatePickerFormatter constructor(
-    internal val shortFormat: String = "E, MMM d", // e.g. Mon, Aug 17
-    internal val mediumFormat: String = "MMM d, yyyy", // e.g. Aug 17, 2022,
-    internal val monthYearFormat: String = "MMMM yyyy", // e.g. September 2022
+    internal val yearSelectionSkeleton: String = DatePickerDefaults.YearMonthSkeleton,
+    internal val selectedDateSkeleton: String = DatePickerDefaults.YearAbbrMonthDaySkeleton,
+    internal val selectedDateDescriptionSkeleton: String =
+        DatePickerDefaults.YearMonthWeekdayDaySkeleton
 ) {
 
-    internal fun formatMonthYear(month: CalendarMonth?, calendarModel: CalendarModel): String? {
+    internal fun formatMonthYear(
+        month: CalendarMonth?,
+        calendarModel: CalendarModel,
+        locale: Locale = Locale.getDefault()
+    ): String? {
         if (month == null) return null
-        return calendarModel.format(month, monthYearFormat)
+        return calendarModel.formatWithSkeleton(month, yearSelectionSkeleton, locale)
     }
 
-    internal fun formatDate(date: CalendarDate?, calendarModel: CalendarModel): String? {
+    internal fun formatDate(
+        date: CalendarDate?,
+        calendarModel: CalendarModel,
+        locale: Locale = Locale.getDefault()
+    ): String? {
         if (date == null) return null
-        val pattern = if (calendarModel.today.year == date.year) {
-            shortFormat
-        } else {
-            mediumFormat
-        }
-        return calendarModel.format(date, pattern)
+        return calendarModel.formatWithSkeleton(date, selectedDateSkeleton, locale)
     }
 
     override fun equals(other: Any?): Boolean {
         if (other !is DatePickerFormatter) return false
 
-        if (monthYearFormat != other.monthYearFormat) return false
-        if (shortFormat != other.shortFormat) return false
-        if (mediumFormat != other.mediumFormat) return false
+        if (yearSelectionSkeleton != other.yearSelectionSkeleton) return false
+        if (selectedDateSkeleton != other.selectedDateSkeleton) return false
+        if (selectedDateDescriptionSkeleton != other.selectedDateDescriptionSkeleton) return false
 
         return true
     }
 
     override fun hashCode(): Int {
-        var result = monthYearFormat.hashCode()
-        result = 31 * result + shortFormat.hashCode()
-        result = 31 * result + mediumFormat.hashCode()
+        var result = yearSelectionSkeleton.hashCode()
+        result = 31 * result + selectedDateSkeleton.hashCode()
+        result = 31 * result + selectedDateDescriptionSkeleton.hashCode()
         return result
     }
 }
