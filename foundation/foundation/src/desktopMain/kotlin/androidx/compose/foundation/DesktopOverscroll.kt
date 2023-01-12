@@ -17,37 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.unit.Velocity
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal actual fun rememberOverscrollEffect(): OverscrollEffect {
-    return remember {
-        DesktopEdgeEffectOverscrollEffect()
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset = Offset.Zero
-
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {}
-
-    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
-
-    override suspend fun consumePostFling(velocity: Velocity) {}
-
-    override val isInProgress = false
-    override val effectModifier = Modifier
-}
+internal actual fun rememberOverscrollEffect(): OverscrollEffect = NoOpOverscrollEffect

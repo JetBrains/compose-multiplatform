@@ -366,11 +366,10 @@ class OverscrollTest {
 
         rule.runOnIdle {
             val offset = Offset(0f, 5f)
-            controller.consumePostScroll(
-                initialDragDelta = offset,
-                overscrollDelta = offset,
+            controller.applyToScroll(
+                offset,
                 source = NestedScrollSource.Drag
-            )
+            ) { Offset.Zero }
             // we have to disable further invalidation requests as otherwise while the overscroll
             // effect is considered active (as it is in a pulled state) this will infinitely
             // schedule next invalidation right from the drawing. this will make our test infra
@@ -406,17 +405,23 @@ class OverscrollTest {
         rule.runOnIdle {
             repeat(2) {
                 val offset = Offset(-10f, -10f)
-                assertThat(
-                    effect.consumePreScroll(offset, NestedScrollSource.Drag)
-                ).isEqualTo(Offset.Zero)
-                effect.consumePostScroll(offset, offset, NestedScrollSource.Drag)
+                var offsetConsumed: Offset? = null
+
+                effect.applyToScroll(offset, NestedScrollSource.Drag) {
+                    offsetConsumed = offset - it
+                    Offset.Zero
+                }
+                assertThat(offsetConsumed).isEqualTo(Offset.Zero)
             }
             val velocity = Velocity(-5f, -5f)
             runBlocking {
-                assertThat(
-                    effect.consumePreFling(velocity)
-                ).isEqualTo(Velocity.Zero)
-                effect.consumePostFling(velocity)
+                var velocityConsumed: Velocity? = null
+
+                effect.applyToFling(velocity) {
+                    velocityConsumed = velocity - it
+                    Velocity.Zero
+                }
+                assertThat(velocityConsumed!!).isEqualTo(Velocity.Zero)
             }
         }
     }
@@ -433,18 +438,24 @@ class OverscrollTest {
         rule.runOnIdle {
             repeat(2) {
                 val offset = Offset(0f, 10f)
-                assertThat(
-                    effect.consumePreScroll(offset, NestedScrollSource.Drag)
-                ).isEqualTo(Offset.Zero)
-                effect.consumePostScroll(offset, offset, NestedScrollSource.Drag)
+                var offsetConsumed: Offset? = null
+
+                effect.applyToScroll(offset, NestedScrollSource.Drag) {
+                    offsetConsumed = offset - it
+                    Offset.Zero
+                }
+                assertThat(offsetConsumed).isEqualTo(Offset.Zero)
             }
 
             val velocity = Velocity(0f, 5f)
             runBlocking {
-                assertThat(
-                    effect.consumePreFling(velocity)
-                ).isEqualTo(Velocity.Zero)
-                effect.consumePostFling(velocity)
+                var velocityConsumed: Velocity? = null
+
+                effect.applyToFling(velocity) {
+                    velocityConsumed = velocity - it
+                    Velocity.Zero
+                }
+                assertThat(velocityConsumed!!).isEqualTo(Velocity.Zero)
             }
         }
     }
@@ -648,32 +659,32 @@ class OverscrollTest {
 
         var preFlingVelocity = Velocity.Zero
 
-        override fun consumePreScroll(
-            scrollDelta: Offset,
-            source: NestedScrollSource
+        override fun applyToScroll(
+            delta: Offset,
+            source: NestedScrollSource,
+            performScroll: (Offset) -> Offset
         ): Offset {
-            lastPreScrollDelta = scrollDelta
+            lastPreScrollDelta = delta
             preScrollSource = source
 
-            return if (consumePreCycles) scrollDelta / 10f else Offset.Zero
-        }
+            val consumed = if (consumePreCycles) delta / 10f else Offset.Zero
 
-        override fun consumePostScroll(
-            initialDragDelta: Offset,
-            overscrollDelta: Offset,
-            source: NestedScrollSource
-        ) {
-            lastInitialDragDelta = initialDragDelta
-            lastOverscrollDelta = overscrollDelta
+            val consumedByScroll = performScroll(delta - consumed)
+
+            lastInitialDragDelta = delta
+            lastOverscrollDelta = delta - consumedByScroll - consumed
             lastNestedScrollSource = source
+
+            return delta - lastOverscrollDelta
         }
 
-        override suspend fun consumePreFling(velocity: Velocity): Velocity {
+        override suspend fun applyToFling(
+            velocity: Velocity,
+            performFling: suspend (Velocity) -> Velocity
+        ) {
             preFlingVelocity = velocity
-            return if (consumePreCycles) velocity / 10f else Velocity.Zero
-        }
-
-        override suspend fun consumePostFling(velocity: Velocity) {
+            val consumed = if (consumePreCycles) velocity / 10f else Velocity.Zero
+            performFling(velocity - consumed)
             lastVelocity = velocity
         }
 
