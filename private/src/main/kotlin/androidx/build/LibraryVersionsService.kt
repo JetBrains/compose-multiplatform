@@ -39,6 +39,9 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         Toml.parse(parameters.tomlFile.get())
     }
 
+    val useMultiplatformGroupVersions
+        get() = parameters.useMultiplatformGroupVersions.get()
+
     private fun getTable(key: String): TomlTable {
         return parsedTomlFile.getTable(key)
             ?: throw GradleException("Library versions toml file is missing [$key] table")
