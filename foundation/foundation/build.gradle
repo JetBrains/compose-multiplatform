@@ -183,6 +183,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             desktopTest {
                 dependsOn(skikoTest)
                 dependencies {
+                    implementation(kotlin("test"))
                     implementation(project(":compose:ui:ui-test-junit4"))
                     implementation(libs.truth)
                     implementation(libs.junit)

@@ -18,8 +18,8 @@ package androidx.compose.compiler.plugins.kotlin.analysis
 
 import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
 import androidx.compose.compiler.plugins.kotlin.lower.annotationClass
+import org.jetbrains.kotlin.backend.common.extensions.FirIncompatiblePluginAPI
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.ir.isFinalClass
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -203,6 +203,7 @@ fun Stability.forEach(callback: (Stability) -> Unit) {
     }
 }
 
+@OptIn(FirIncompatiblePluginAPI::class)
 class StabilityInferencer(val context: IrPluginContext) {
     private val stableMarker = context.referenceClass(ComposeFqNames.StableMarker)
     private val stabilityInferred = context.referenceClass(ComposeFqNames.StabilityInferred)

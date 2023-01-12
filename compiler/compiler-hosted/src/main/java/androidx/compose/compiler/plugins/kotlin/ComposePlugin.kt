@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.jetbrains.kotlin.extensions.internal.TypeResolutionInterceptor
@@ -60,6 +61,7 @@ object ComposeConfiguration {
         CompilerConfigurationKey<Boolean>("Generate decoy methods in IR transform")
 }
 
+@OptIn(ExperimentalCompilerApi::class)
 class ComposeCommandLineProcessor : CommandLineProcessor {
     companion object {
         val PLUGIN_ID = "androidx.compose.compiler.plugins.kotlin"
@@ -187,6 +189,7 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
     }
 }
 
+@OptIn(ExperimentalCompilerApi::class)
 class ComposeComponentRegistrar : ComponentRegistrar {
     override fun registerProjectComponents(
         project: MockProject,
@@ -205,7 +208,7 @@ class ComposeComponentRegistrar : ComponentRegistrar {
             project: Project,
             configuration: CompilerConfiguration
         ) {
-            val KOTLIN_VERSION_EXPECTATION = "1.7.10"
+            val KOTLIN_VERSION_EXPECTATION = "1.8.0"
             KotlinCompilerVersion.getVersion()?.let { version ->
                 val msgCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
                 val suppressKotlinVersionCheck = configuration.get(

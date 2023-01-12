@@ -136,7 +136,7 @@ private class MonotonicClockImpl : MonotonicFrameClock {
     ): R = suspendCoroutine { continuation ->
         window.requestAnimationFrame {
             val duration = it.toDuration(DurationUnit.MILLISECONDS)
-            val result = onFrame(duration.toLongNanoseconds())
+            val result = onFrame(duration.inWholeNanoseconds)
             continuation.resume(result)
         }
     }
