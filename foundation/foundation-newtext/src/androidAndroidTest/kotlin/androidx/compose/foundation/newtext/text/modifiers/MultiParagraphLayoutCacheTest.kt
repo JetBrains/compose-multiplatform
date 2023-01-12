@@ -52,13 +52,12 @@ class MultiParagraphLayoutCacheTest {
             val spanStyle = SpanStyle(fontSize = fontSize, fontFamily = fontFamily)
             val annotatedString = AnnotatedString(text, spanStyle)
             val textDelegate = MultiParagraphLayoutCache(
-                StaticTextLayoutDrawParams(
-                    text = annotatedString,
-                    style = TextStyle.Default,
-                    fontFamilyResolver = fontFamilyResolver,
-                ),
-                density = this
-            )
+                text = annotatedString,
+                style = TextStyle.Default,
+                fontFamilyResolver = fontFamilyResolver,
+            ).also {
+                it.density = this
+            }
 
             textDelegate.layoutWithConstraints(Constraints.fixed(0, 0), LayoutDirection.Ltr)
 
@@ -75,13 +74,12 @@ class MultiParagraphLayoutCacheTest {
             val spanStyle = SpanStyle(fontSize = fontSize, fontFamily = fontFamily)
             val annotatedString = AnnotatedString(text, spanStyle)
             val textDelegate = MultiParagraphLayoutCache(
-                StaticTextLayoutDrawParams(
-                    text = annotatedString,
-                    style = TextStyle.Default,
-                    fontFamilyResolver = fontFamilyResolver,
-                ),
-                density = this
-            )
+                text = annotatedString,
+                style = TextStyle.Default,
+                fontFamilyResolver = fontFamilyResolver,
+            ).also {
+                it.density = this
+            }
 
             textDelegate.layoutWithConstraints(Constraints.fixed(0, 0), LayoutDirection.Ltr)
 
@@ -93,13 +91,12 @@ class MultiParagraphLayoutCacheTest {
     @Test
     fun TextLayoutInput_reLayout_withDifferentHeight() {
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = AnnotatedString(text = "Hello World!"),
-                style = TextStyle.Default,
-                fontFamilyResolver = fontFamilyResolver,
-            ),
-            density = density
-        )
+            text = AnnotatedString("Hello World"),
+            style = TextStyle.Default,
+            fontFamilyResolver = fontFamilyResolver,
+        ).also {
+            it.density = density
+        }
         val width = 200
         val heightFirstLayout = 100
         val heightSecondLayout = 200
@@ -121,13 +118,12 @@ class MultiParagraphLayoutCacheTest {
     @Test
     fun TextLayoutResult_reLayout_withDifferentHeight() {
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = AnnotatedString(text = "Hello World!"),
-                style = TextStyle.Default,
-                fontFamilyResolver = fontFamilyResolver,
-            ),
-            density = density
-        )
+            text = AnnotatedString("Hello World"),
+            style = TextStyle.Default,
+            fontFamilyResolver = fontFamilyResolver,
+        ).also {
+            it.density = density
+        }
         val width = 200
         val heightFirstLayout = 100
         val heightSecondLayout = 200
@@ -151,16 +147,14 @@ class MultiParagraphLayoutCacheTest {
         val fontSize = 20f
         val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = text,
-                style = TextStyle(fontSize = fontSize.sp),
-                fontFamilyResolver = fontFamilyResolver,
-                softWrap = false,
-                overflow = TextOverflow.Ellipsis,
-            ),
-
-            density = density
-        )
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp),
+            fontFamilyResolver = fontFamilyResolver,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+        ).also {
+            it.density = density
+        }
 
         textDelegate.layoutWithConstraints(Constraints.fixed(0, 0), LayoutDirection.Ltr)
         // Makes width smaller than needed.
@@ -177,15 +171,15 @@ class MultiParagraphLayoutCacheTest {
     fun TextLayoutResult_layoutWithLimitedHeight_withEllipsis() {
         val fontSize = 20f
         val text = AnnotatedString(text = "Hello World! Hello World! Hello World! Hello World!")
+
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = text,
-                style = TextStyle(fontSize = fontSize.sp),
-                fontFamilyResolver = fontFamilyResolver,
-                overflow = TextOverflow.Ellipsis,
-            ),
-            density = density
-        )
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp),
+            fontFamilyResolver = fontFamilyResolver,
+            overflow = TextOverflow.Ellipsis,
+        ).also {
+            it.density = density
+        }
         textDelegate.layoutWithConstraints(Constraints.fixed(0, 0), LayoutDirection.Ltr)
         val constraints = Constraints(
             maxWidth = textDelegate.maxIntrinsicWidth / 4,
@@ -202,15 +196,16 @@ class MultiParagraphLayoutCacheTest {
     fun TextLayoutResult_sameWidth_inRtlAndLtr_withLetterSpacing() {
         val fontSize = 20f
         val text = AnnotatedString(text = "Hello World")
+
         val textDelegate = MultiParagraphLayoutCache(
-            StaticTextLayoutDrawParams(
-                text = text,
-                style = TextStyle(fontSize = fontSize.sp, letterSpacing = 0.5.sp),
-                fontFamilyResolver = fontFamilyResolver,
-                overflow = TextOverflow.Ellipsis,
-            ),
-            density = density
-        )
+            text = text,
+            style = TextStyle(fontSize = fontSize.sp, letterSpacing = 0.5.sp),
+            fontFamilyResolver = fontFamilyResolver,
+            overflow = TextOverflow.Ellipsis,
+        ).also {
+            it.density = density
+        }
+
         textDelegate.layoutWithConstraints(Constraints(), LayoutDirection.Ltr)
         val layoutResultLtr = textDelegate.layout
         textDelegate.layoutWithConstraints(Constraints(), LayoutDirection.Rtl)

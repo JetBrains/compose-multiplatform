@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,9 +47,9 @@ internal data class StaticTextSelectionParams(
 
 // This is _basically_ a Modifier.Node but moved into remember because we need to do pointerInput
 // TODO: Refactor when Modifier.pointerInput is available for delegation
-internal class StaticTextSelectionModifierController(
-    val selectionRegistrar: SelectionRegistrar,
-    val backgroundSelectionColor: Color
+internal class SelectionController(
+    private val selectionRegistrar: SelectionRegistrar,
+    private val backgroundSelectionColor: Color
 ) : RememberObserver {
     private var selectable: Selectable? = null
     private val selectableId = selectionRegistrar.nextSelectableId()
