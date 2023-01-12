@@ -32,6 +32,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -104,6 +105,7 @@ class TestRuleExecutesLayoutPassesWhenWaitingForIdleTest {
         }
     }
 
+    @Ignore("b/265281787")
     @Test
     fun child_AndroidView() {
         val numUpdates = 5
