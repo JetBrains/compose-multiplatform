@@ -390,7 +390,13 @@ private fun configureComposeCompilerPlugin(
 
             // Gradle hack ahead, we use of absolute paths, but is OK here because we do it in
             // doFirst which happens after Gradle task input snapshotting. AGP does the same.
-            compile.doFirst {
+
+            // JB FORK NOTE (don't upstream):
+            // In upstream it's configured using compile.doFirst {}
+            // But in JB fork we use compile.onlyIf, because since kotlin 1.8.0
+            // `freeCompilerArgs` is immutable in `doFirst` for native compilations.
+            // It used to be configured with `onlyIf` in upstream too.
+            compile.onlyIf {
                 compile.kotlinOptions.freeCompilerArgs += "-Xplugin=${kotlinPlugin.first()}"
 
                 if (enableMetricsProvider.orNull == "true") {
@@ -413,6 +419,7 @@ private fun configureComposeCompilerPlugin(
                     compile.kotlinOptions.freeCompilerArgs +=
                         listOf("-P", composeSourceOption)
                 }
+                true
             }
         }
     }
