@@ -577,8 +577,10 @@ package androidx.compose.material3 {
 
   public final class InteractiveComponentSizeKt {
     method @androidx.compose.material3.ExperimentalMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumInteractiveComponentEnforcement();
+    method @Deprecated @androidx.compose.material3.ExperimentalMaterial3Api public static androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> getLocalMinimumTouchTargetEnforcement();
     method public static androidx.compose.ui.Modifier minimumInteractiveComponentSize(androidx.compose.ui.Modifier);
     property @androidx.compose.material3.ExperimentalMaterial3Api public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumInteractiveComponentEnforcement;
+    property @Deprecated @androidx.compose.material3.ExperimentalMaterial3Api public static final androidx.compose.runtime.ProvidableCompositionLocal<java.lang.Boolean> LocalMinimumTouchTargetEnforcement;
   }
 
   @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Immutable public final class ListItemColors {
