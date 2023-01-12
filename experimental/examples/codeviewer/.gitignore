@@ -9,7 +9,7 @@ build/
 .cxx
 iosApp/Podfile.lock
 iosApp/Pods/*
-iosApp/Codeviewer.xcworkspace/*
-iosApp/Codeviewer.xcodeproj/*
-!iosApp/Codeviewer.xcodeproj/project.pbxproj
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
 shared/shared.podspec

@@ -15,7 +15,7 @@ build/
 .cxx
 iosApp/Podfile.lock
 iosApp/Pods/*
-iosApp/VisualEffects.xcworkspace/*
-iosApp/VisualEffects.xcodeproj/*
-!iosApp/VisualEffects.xcodeproj/project.pbxproj
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
 shared/shared.podspec

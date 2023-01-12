@@ -9,7 +9,7 @@ build/
 .cxx
 iosApp/Podfile.lock
 iosApp/Pods/*
-iosApp/TodoAppLite.xcworkspace/*
-iosApp/TodoAppLite.xcodeproj/*
-!iosApp/TodoAppLite.xcodeproj/project.pbxproj
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
 shared/shared.podspec
