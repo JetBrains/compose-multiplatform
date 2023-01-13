@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package androidx.compose.material.swipeable
 
 import androidx.compose.foundation.background
@@ -35,7 +37,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal fun SwipeableBox(
     swipeableState: SwipeableV2State<TestState>,
@@ -47,7 +48,28 @@ internal fun SwipeableBox(
     ),
     enabled: Boolean = true,
     reverseDirection: Boolean = false,
-    calculateAnchor: (state: TestState, layoutSize: IntSize) -> Float? = { state, layoutSize ->
+    anchors: Map<TestState, Float>
+) = SwipeableBox(
+    swipeableState = swipeableState,
+    orientation = orientation,
+    possibleStates = possibleStates,
+    enabled = enabled,
+    reverseDirection = reverseDirection,
+    calculateAnchor = { anchor, _ -> anchors[anchor] }
+)
+
+@Composable
+internal fun SwipeableBox(
+    swipeableState: SwipeableV2State<TestState>,
+    orientation: Orientation = Orientation.Horizontal,
+    possibleStates: Set<TestState> = setOf(
+        TestState.A,
+        TestState.B,
+        TestState.C
+    ),
+    enabled: Boolean = true,
+    reverseDirection: Boolean = false,
+    calculateAnchor: (anchor: TestState, layoutSize: IntSize) -> Float? = { state, layoutSize ->
         val size = (
             if (orientation == Orientation.Horizontal) layoutSize.width else layoutSize.height
             ).toFloat()
