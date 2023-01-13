@@ -158,6 +158,7 @@ package androidx.compose.ui {
     method public final boolean isAttached();
     method public void onAttach();
     method public void onDetach();
+    method public void onReset();
     method public final void sideEffect(kotlin.jvm.functions.Function0<kotlin.Unit> effect);
     property public final boolean isAttached;
     property public final androidx.compose.ui.Modifier.Node node;

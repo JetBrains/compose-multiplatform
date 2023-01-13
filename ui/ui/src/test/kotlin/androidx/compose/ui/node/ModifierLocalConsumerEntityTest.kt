@@ -280,9 +280,7 @@ class ModifierLocalConsumerEntityTest {
 
     private fun changeModifier(modifier: Modifier) {
         with(layoutNode) {
-            if (isAttached) { forEachNodeCoordinator { it.detach() } }
             this.modifier = modifier
-            if (isAttached) { forEachNodeCoordinator { it.attach() } }
             owner?.onEndApplyChanges()
         }
     }
@@ -314,9 +312,13 @@ class ModifierLocalConsumerEntityTest {
             layoutNode: LayoutNode,
             affectsLookahead: Boolean,
             forceRequest: Boolean
-        ) {}
-        override fun onAttach(node: LayoutNode) = node.forEachNodeCoordinator { it.attach() }
-        override fun onDetach(node: LayoutNode) = node.forEachNodeCoordinator { it.detach() }
+        ) {
+        }
+
+        override fun onAttach(node: LayoutNode) =
+            node.forEachNodeCoordinator { it.onLayoutNodeAttach() }
+
+        override fun onDetach(node: LayoutNode) {}
 
         override val root: LayoutNode
             get() = TODO("Not yet implemented")

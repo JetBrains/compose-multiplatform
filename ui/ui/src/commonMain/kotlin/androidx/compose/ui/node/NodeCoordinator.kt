@@ -84,6 +84,8 @@ internal abstract class NodeCoordinator(
     override val coordinates: LayoutCoordinates
         get() = this
 
+    private var released = false
+
     private fun headNode(includeTail: Boolean): Modifier.Node? {
         return if (layoutNode.outerCoordinator === this) {
             layoutNode.nodes.head
@@ -158,7 +160,7 @@ internal abstract class NodeCoordinator(
         get() = _measureResult != null
 
     override val isAttached: Boolean
-        get() = tail.isAttached
+        get() = !released && layoutNode.isAttached
 
     private var _measureResult: MeasureResult? = null
     override var measureResult: MeasureResult
@@ -926,30 +928,19 @@ internal abstract class NodeCoordinator(
     }
 
     /**
-     * Attaches the [NodeCoordinator] and its wrapped [NodeCoordinator] to an active
-     * LayoutNode.
-     *
      * This will be called when the [LayoutNode] associated with this [NodeCoordinator] is
      * attached to the [Owner].
-     *
-     * It is also called whenever the modifier chain is replaced and the [NodeCoordinator]s are
-     * recreated.
      */
-    open fun attach() {
+    fun onLayoutNodeAttach() {
         onLayerBlockUpdated(layerBlock)
     }
 
     /**
-     * Detaches the [NodeCoordinator] and its wrapped [NodeCoordinator] from an active
-     * LayoutNode.
-     *
      * This will be called when the [LayoutNode] associated with this [NodeCoordinator] is
-     * detached from the [Owner].
-     *
-     * It is also called whenever the modifier chain is replaced and the [NodeCoordinator]s are
-     * recreated.
+     * released or when the [NodeCoordinator] is released (will not be used anymore).
      */
-    open fun detach() {
+    fun onRelease() {
+        released = true
         if (layer != null) {
             onLayerBlockUpdated(null)
         }

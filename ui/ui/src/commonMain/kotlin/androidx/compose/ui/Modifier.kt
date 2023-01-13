@@ -175,11 +175,13 @@ interface Modifier {
         internal var ownerScope: ModifierNodeOwnerScope? = null
         internal var coordinator: NodeCoordinator? = null
             private set
+        internal var insertedNodeAwaitingAttachForInvalidation = false
+        internal var updatedNodeAwaitingAttachForInvalidation = false
         /**
-         * Indicates that the node is attached and part of the tree. This will get set to true
-         * right before [onAttach] is called, and set to false right after [onDetach] is called.
-         *
-         * A Node will never be attached more than once.
+         * Indicates that the node is attached to a [androidx.compose.ui.layout.Layout] which is
+         * part of the UI tree.
+         * This will get set to true right before [onAttach] is called, and set to false right
+         * after [onDetach] is called.
          *
          * @see onAttach
          * @see onDetach
@@ -194,7 +196,7 @@ interface Modifier {
         @Suppress("NOTHING_TO_INLINE")
         internal inline fun isKind(kind: NodeKind<*>) = kindSet and kind.mask != 0
 
-        internal fun attach() {
+        internal open fun attach() {
             check(!isAttached)
             check(coordinator != null)
             isAttached = true
@@ -202,7 +204,7 @@ interface Modifier {
             // TODO(lmr): run side effects?
         }
 
-        internal fun detach() {
+        internal open fun detach() {
             check(isAttached)
             check(coordinator != null)
             onDetach()
@@ -211,18 +213,44 @@ interface Modifier {
             // TODO(lmr): cancel jobs / side effects?
         }
 
+        internal open fun reset() {
+            check(isAttached)
+            onReset()
+        }
+
         /**
+         * Called when the node is attached to a [androidx.compose.ui.layout.Layout] which is
+         * part of the UI tree.
          * When called, `node` is guaranteed to be non-null. You can call sideEffect,
          * coroutineScope, etc.
          */
         open fun onAttach() {}
 
         /**
+         * Called when the node is not attached to a [androidx.compose.ui.layout.Layout] which is
+         * not a part of the UI tree anymore. Note that the node can be reattached again.
+         *
          * This should be called right before the node gets removed from the list, so you should
          * still be able to traverse inside of this method. Ideally we would not allow you to
          * trigger side effects here.
          */
         open fun onDetach() {}
+
+        /**
+         * Called when the node is about to be moved to a pool of layouts ready to be reused.
+         * For example it happens when the node is part of the item of LazyColumn after this item
+         * is scrolled out of the viewport. This means this node could be in future reused for a
+         * [androidx.compose.ui.layout.Layout] displaying a semantically different content when
+         * the list will be populating a new item.
+         *
+         * Use this callback to reset some local item specific state, like "is my component focused".
+         *
+         * This callback is called while the node is attached. Right after this callback the node
+         * will be detached and later reattached when reused.
+         *
+         * @sample androidx.compose.ui.samples.ModifierNodeResetSample
+         */
+        open fun onReset() {}
 
         /**
          * This can be called to register [effect] as a function to be executed after all of the
