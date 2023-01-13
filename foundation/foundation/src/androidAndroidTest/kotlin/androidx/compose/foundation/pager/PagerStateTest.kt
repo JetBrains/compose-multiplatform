@@ -404,6 +404,55 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
     }
 
     @Test
+    fun targetPage_performScrollBelowThreshold_shouldNotShowNextPage() {
+        // Arrange
+        val state = PagerState()
+        createPager(
+            state = state,
+            modifier = Modifier.fillMaxSize(),
+            snappingPage = PagerSnapDistance.atMost(3)
+        )
+        rule.runOnIdle { assertThat(state.targetPage).isEqualTo(state.currentPage) }
+
+        rule.mainClock.autoAdvance = false
+        // Act
+        // Moving less than threshold
+        val forwardDelta =
+            scrollForwardSign.toFloat() * with(rule.density) { DefaultPositionThreshold.toPx() / 2 }
+
+        var previousTargetPage = state.targetPage
+
+        onPager().performTouchInput {
+            down(layoutStart)
+            moveBy(Offset(forwardDelta, forwardDelta))
+        }
+
+        // Assert
+        assertThat(state.targetPage).isEqualTo(previousTargetPage)
+
+        // Reset
+        rule.mainClock.autoAdvance = true
+        onPager().performTouchInput { up() }
+        rule.runOnIdle { assertThat(state.targetPage).isEqualTo(state.currentPage) }
+
+        // Act
+        // Moving more than threshold
+        val backwardDelta = scrollForwardSign.toFloat() * with(rule.density) {
+                -DefaultPositionThreshold.toPx() / 2
+        }
+
+        previousTargetPage = state.targetPage
+
+        onPager().performTouchInput {
+            down(layoutStart)
+            moveBy(Offset(backwardDelta, backwardDelta))
+        }
+
+        // Assert
+        assertThat(state.targetPage).isEqualTo(previousTargetPage)
+    }
+
+    @Test
     fun targetPage_performScroll_shouldShowNextPage() {
         // Arrange
         val state = PagerState()
@@ -473,9 +522,9 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
             swipeWithVelocityAcrossMainAxis(20000f, forwardDelta)
         }
         rule.mainClock.advanceTimeUntil { state.targetPage != previousTarget }
-
+        var flingOriginIndex = state.firstVisiblePage?.index ?: 0
         // Assert
-        assertThat(state.targetPage).isEqualTo(state.currentPage + 3)
+        assertThat(state.targetPage).isEqualTo(flingOriginIndex + 3)
         assertThat(state.targetPage).isNotEqualTo(state.currentPage)
 
         rule.mainClock.autoAdvance = true
@@ -491,7 +540,8 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
         rule.mainClock.advanceTimeUntil { state.targetPage != previousTarget }
 
         // Assert
-        assertThat(state.targetPage).isEqualTo(state.currentPage - 3)
+        flingOriginIndex = (state.firstVisiblePage?.index ?: 0) + 1
+        assertThat(state.targetPage).isEqualTo(flingOriginIndex - 3)
         assertThat(state.targetPage).isNotEqualTo(state.currentPage)
 
         rule.mainClock.autoAdvance = true

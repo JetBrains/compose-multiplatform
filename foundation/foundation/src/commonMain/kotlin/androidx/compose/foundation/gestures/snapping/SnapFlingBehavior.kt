@@ -353,6 +353,8 @@ internal fun findClosestOffset(
         density.calculateSnappingOffsetBounds()
     }
 
+    debugLog { "Proposed Bounds: Lower=$lowerBound Upper=$upperBound" }
+
     val finalDistance = when (sign(velocity)) {
         0f -> {
             if (abs(upperBound) <= abs(lowerBound)) {
@@ -410,11 +412,16 @@ private suspend fun ScrollScope.animateDecay(
             val finalDelta = finalValue - previousValue
             consumeDelta(finalDelta)
             cancelAnimation()
+            previousValue = finalValue
         } else {
             val delta = value - previousValue
             consumeDelta(delta)
             previousValue = value
         }
+    }
+
+    debugLog {
+        "Decay Animation: Proposed Offset=$targetOffset Achieved Offset=$previousValue"
     }
     return AnimationResult(
         targetOffset - previousValue,
