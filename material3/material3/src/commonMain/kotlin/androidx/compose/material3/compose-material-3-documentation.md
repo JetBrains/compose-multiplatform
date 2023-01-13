@@ -10,7 +10,7 @@ Build Jetpack Compose UIs with <a href="https://m3.material.io" class="external"
 
 In this page, you'll find documentation for types, properties, and functions available in the `androidx.compose.material3` package.
 
-For more information, check out the <a href="https://developer.android.com/jetpack/compose/themes/material#material3" class="external" target="_blank">Material Design 3 and Material You</a> section in the Material Theming in Compose guide.
+For more information, check out <a href="https://developer.android.com/jetpack/compose/designsystems/material3" class="external" target="_blank">Material Design 3 in Compose</a>.
 
 ## Overview
 
