@@ -184,7 +184,7 @@ private class LazyStaggeredGridMeasureContext(
     }
 
     inline val SpanRange.isFullSpan: Boolean
-        get() = end - start != 1
+        get() = size != 1
 
     inline val SpanRange.laneInfo: Int
         get() = if (isFullSpan) FullSpan else start
@@ -234,7 +234,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
         // this will contain all the MeasuredItems representing the visible items
         val measuredItems = Array(laneCount) {
-            ArrayDeque<LazyStaggeredGridMeasuredItem>()
+            ArrayDeque<LazyStaggeredGridMeasuredItem>(16)
         }
 
         // include the start padding so we compose items in the padding area. before starting
@@ -315,26 +315,31 @@ private fun LazyStaggeredGridMeasureContext.measure(
         fun misalignedStart(referenceLane: Int): Boolean {
             // If we scrolled past the first item in the lane, we have a point of reference
             // to re-align items.
-            val laneRange = firstItemIndices.indices
 
             // Case 1: Each lane has laid out all items, but offsets do no match
-            val misalignedOffsets = laneRange.any { lane ->
-                findPreviousItemIndex(firstItemIndices[lane], lane) == Unset &&
-                    firstItemOffsets[lane] != firstItemOffsets[referenceLane]
+            for (lane in firstItemIndices.indices) {
+                val misalignedOffsets =
+                    findPreviousItemIndex(firstItemIndices[lane], lane) == Unset &&
+                        firstItemOffsets[lane] != firstItemOffsets[referenceLane]
+
+                if (misalignedOffsets) {
+                    return true
+                }
             }
             // Case 2: Some lanes are still missing items, and there's no space left to place them
-            val moreItemsInOtherLanes = laneRange.any { lane ->
-                findPreviousItemIndex(firstItemIndices[lane], lane) != Unset &&
-                    firstItemOffsets[lane] >= firstItemOffsets[referenceLane]
+            for (lane in firstItemIndices.indices) {
+                val moreItemsInOtherLanes =
+                    findPreviousItemIndex(firstItemIndices[lane], lane) != Unset &&
+                        firstItemOffsets[lane] >= firstItemOffsets[referenceLane]
+
+                if (moreItemsInOtherLanes) {
+                    return true
+                }
             }
             // Case 3: the first item is in the wrong lane (it should always be in
             // the first one)
             val firstItemLane = laneInfo.getLane(0)
-            val firstItemInWrongLane =
-                firstItemLane != 0 && firstItemLane != Unset && firstItemLane != FullSpan
-            // If items are not aligned, reset all measurement data we gathered before and
-            // proceed with initial measure
-            return misalignedOffsets || moreItemsInOtherLanes || firstItemInWrongLane
+            return firstItemLane != 0 && firstItemLane != Unset && firstItemLane != FullSpan
         }
 
         // define min offset (currently includes beforeContentPadding)
