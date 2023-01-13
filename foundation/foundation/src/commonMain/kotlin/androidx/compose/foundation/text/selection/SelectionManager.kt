@@ -334,10 +334,19 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         )
 
         val visibleBounds = containerCoordinates.visibleBounds()
-        this.startHandlePosition =
-            if (visibleBounds.containsInclusive(startHandlePosition)) startHandlePosition else null
-        this.endHandlePosition =
-            if (visibleBounds.containsInclusive(endHandlePosition)) endHandlePosition else null
+
+        // set the new handle position only if the handle is in visible bounds or
+        // the handle is still dragging. If handle goes out of visible bounds during drag, handle
+        // popup is also removed from composition, halting the drag gesture. This affects multiple
+        // text selection when selected text is configured with maxLines=1 and overflow=clip.
+        this.startHandlePosition = startHandlePosition.takeIf {
+            visibleBounds.containsInclusive(startHandlePosition) ||
+                draggingHandle == Handle.SelectionStart
+        }
+        this.endHandlePosition = endHandlePosition.takeIf {
+            visibleBounds.containsInclusive(endHandlePosition) ||
+                draggingHandle == Handle.SelectionEnd
+        }
     }
 
     /**
