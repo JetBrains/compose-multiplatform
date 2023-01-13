@@ -58,6 +58,7 @@ import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.ceil
 import kotlin.math.floor
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -166,6 +167,50 @@ class TextFieldCursorTest {
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun cursorBlinkingAnimation() = with(rule.density) {
+        rule.setContent {
+            // The padding helps if the test is run accidentally in landscape. Landscape makes
+            // the cursor to be next to the navigation bar which affects the red color to be a bit
+            // different - possibly anti-aliasing.
+            Box(Modifier.padding(boxPadding)) {
+                BasicTextField(
+                    value = "",
+                    onValueChange = {},
+                    textStyle = textStyle,
+                    modifier = textFieldModifier,
+                    cursorBrush = SolidColor(cursorColor),
+                    onTextLayout = onTextLayout
+                )
+            }
+        }
+
+        focusAndWait()
+
+        // cursor visible first 500 ms
+        rule.mainClock.advanceTimeBy(100)
+        with(rule.density) {
+            rule.onNode(hasSetTextAction())
+                .captureToImage()
+                .assertCursor(2.dp, this, cursorRect)
+        }
+
+        // cursor invisible during next 500 ms
+        rule.mainClock.advanceTimeBy(700)
+        rule.onNode(hasSetTextAction())
+            .captureToImage()
+            .assertShape(
+                density = rule.density,
+                shape = RectangleShape,
+                shapeColor = Color.White,
+                backgroundColor = Color.White,
+                shapeOverlapPixelCount = 0.0f
+            )
+    }
+
+    // TODO(b/265177763) Update this test to set MotionDurationScale to 0 when that's supported.
+    @Ignore("b/265177763")
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
+    fun cursorBlinkingAnimation_whenSystemDisablesAnimations() = with(rule.density) {
         rule.setContent {
             // The padding helps if the test is run accidentally in landscape. Landscape makes
             // the cursor to be next to the navigation bar which affects the red color to be a bit
