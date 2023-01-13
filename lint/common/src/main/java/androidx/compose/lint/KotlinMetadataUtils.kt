@@ -26,8 +26,8 @@ import com.intellij.psi.impl.compiled.ClsMethodImpl
 import com.intellij.psi.util.ClassUtil
 import kotlinx.metadata.KmDeclarationContainer
 import kotlinx.metadata.KmFunction
-import kotlinx.metadata.jvm.KotlinClassHeader
 import kotlinx.metadata.jvm.KotlinClassMetadata
+import kotlinx.metadata.jvm.Metadata
 import kotlinx.metadata.jvm.signature
 
 /**
@@ -48,12 +48,12 @@ fun PsiMethod.toKmFunction(): KmFunction? =
  * represents a synthetic class.
  */
 private fun PsiClass.getKmDeclarationContainer(): KmDeclarationContainer? {
-    val classKotlinMetadataAnnotation = annotations.find {
+    val classKotlinMetadataPsiAnnotation = annotations.find {
         // hasQualifiedName() not available on the min version of Lint we compile against
         it.qualifiedName == KotlinMetadataFqn
     } ?: return null
 
-    val metadata = KotlinClassMetadata.read(classKotlinMetadataAnnotation.toHeader())
+    val metadata = KotlinClassMetadata.read(classKotlinMetadataPsiAnnotation.toMetadataAnnotation())
         ?: return null
 
     return when (metadata) {
@@ -67,12 +67,9 @@ private fun PsiClass.getKmDeclarationContainer(): KmDeclarationContainer? {
 }
 
 /**
- * Returns a [KotlinClassHeader] by parsing the attributes of this @kotlin.Metadata annotation.
- *
- * See: https://github.com/udalov/kotlinx-metadata-examples/blob/master/src/main/java
- * /examples/FindKotlinGeneratedMethods.java
+ * Returns a [Metadata] by parsing the attributes of this @kotlin.Metadata PSI annotation.
  */
-private fun PsiAnnotation.toHeader(): KotlinClassHeader {
+private fun PsiAnnotation.toMetadataAnnotation(): Metadata {
     val attributes = attributes.associate { it.attributeName to it.attributeValue }
 
     fun JvmAnnotationAttributeValue.parseString(): String =
@@ -99,7 +96,7 @@ private fun PsiAnnotation.toHeader(): KotlinClassHeader {
     val packageName = attributes["pn"]?.parseString()
     val extraInt = attributes["xi"]?.parseInt()
 
-    return KotlinClassHeader(
+    return Metadata(
         kind,
         metadataVersion,
         data1,
