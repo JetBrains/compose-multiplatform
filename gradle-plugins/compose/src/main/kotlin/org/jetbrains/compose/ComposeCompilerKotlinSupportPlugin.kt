@@ -22,7 +22,7 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 
             composeCompilerArtifactProvider = ComposeCompilerArtifactProvider {
                 composeExt.kotlinCompilerPlugin.orNull ?:
-                    ComposeCompilerCompatability.compilerVersionFor(target.getKotlinPluginVersion())
+                    ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
             }
         }
     }

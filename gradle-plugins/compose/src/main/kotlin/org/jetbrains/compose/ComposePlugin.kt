@@ -142,7 +142,7 @@ class ComposePlugin : Plugin<Project> {
 
     class CompilerDependencies(private val project: Project) {
         fun forKotlin(version: String) = "org.jetbrains.compose.compiler:compiler:" +
-                ComposeCompilerCompatability.compilerVersionFor(version)
+                ComposeCompilerCompatibility.compilerVersionFor(version)
 
         /**
          * Compose Compiler that is chosen by the version of Kotlin applied to the Gradle project

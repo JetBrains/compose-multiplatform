@@ -10,7 +10,7 @@ import org.jetbrains.compose.test.utils.TestProjects
 import org.jetbrains.compose.test.utils.checks
 import org.junit.jupiter.api.Test
 
-class KotlinCompatabilityTest : GradlePluginTestBase() {
+class KotlinCompatibilityTest : GradlePluginTestBase() {
     @Test
     fun testKotlinMpp_1_7_10() = testMpp("1.7.10")
 

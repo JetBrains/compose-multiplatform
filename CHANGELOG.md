@@ -84,7 +84,7 @@ This version of Compose Multiplatform is based on the next Jetpack Compose libra
 - [Documentation for how to package apps using Conveyor](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#available-tools)
 
 ### Fixes
-- [Fix IDEA plugin compatability](https://github.com/JetBrains/compose-jb/pull/2318)
+- [Fix IDEA plugin compatibility](https://github.com/JetBrains/compose-jb/pull/2318)
 - Fixes for Right-to-Left languages support
     - [LayoutDirection is detected from the system settings](https://github.com/JetBrains/androidx/pull/264)
     - [Fix RTL selection in a multiline text](https://github.com/JetBrains/androidx/pull/285)
