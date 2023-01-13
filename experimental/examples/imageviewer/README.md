@@ -10,11 +10,10 @@ Choose a run configuration for an appropriate target in IDE and run it.
 ![run-configurations.png](run-configurations.png)
 
 To run on iOS device, please correct `iosApp/Configuration/TeamId.xcconfig` with your Apple Team ID.
-Alternatively, you may setup signing within XCode opening `iosApp/Imageviewer.xcworkspace` and then
-using "Signing & Capabilities" tab of `ImageViewer` target.
+Alternatively, you may setup signing within XCode opening `iosApp/iosApp.xcworkspace` and then
+using "Signing & Capabilities" tab of `iosApp` target.
 
-Then choose **iosApp** configuration in IDE and run it
-(may also be referred as `ImageViewer` in the Run Configurations or `iosApp (AndroidStudio)` for Android studio).
+Then choose **iosApp** configuration in IDE and run it.
 
 ## Run on desktop via Gradle
 

@@ -1,7 +1,7 @@
 local.properties
 iosApp/Podfile.lock
 iosApp/Pods/*
-iosApp/FallingBalls.xcworkspace/*
-iosApp/FallingBalls.xcodeproj/*
-!iosApp/FallingBalls.xcodeproj/project.pbxproj
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
 shared/shared.podspec
