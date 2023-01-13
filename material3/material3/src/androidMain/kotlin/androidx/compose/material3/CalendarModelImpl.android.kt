@@ -17,6 +17,7 @@
 package androidx.compose.material3
 
 import android.os.Build
+import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
 import java.time.DayOfWeek
 import java.time.Instant
@@ -128,18 +129,6 @@ internal class CalendarModelImpl : CalendarModel {
         return getMonth(earlierMonth)
     }
 
-    override fun format(month: CalendarMonth, pattern: String): String {
-        val formatter: DateTimeFormatter =
-            DateTimeFormatter.ofPattern(pattern).withDecimalStyle(DecimalStyle.ofDefaultLocale())
-        return month.toLocalDate().format(formatter)
-    }
-
-    override fun format(date: CalendarDate, pattern: String): String {
-        val formatter: DateTimeFormatter =
-            DateTimeFormatter.ofPattern(pattern).withDecimalStyle(DecimalStyle.ofDefaultLocale())
-        return date.toLocalDate().format(formatter)
-    }
-
     override fun parse(date: String, pattern: String): CalendarDate? {
         // TODO: A DateTimeFormatter can be reused.
         val formatter = DateTimeFormatter.ofPattern(pattern)
@@ -155,6 +144,33 @@ internal class CalendarModelImpl : CalendarModel {
         } catch (pe: DateTimeParseException) {
             null
         }
+    }
+
+    companion object {
+
+        /**
+         * Formats a UTC timestamp into a string with a given date format skeleton.
+         *
+         * @param utcTimeMillis a UTC timestamp to format (milliseconds from epoch)
+         * @param skeleton a date format skeleton
+         * @param locale the [Locale] to use when formatting the given timestamp
+         */
+        fun format(utcTimeMillis: Long, skeleton: String, locale: Locale): String {
+            val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
+            val formatter: DateTimeFormatter =
+                DateTimeFormatter.ofPattern(pattern, locale)
+                    .withDecimalStyle(DecimalStyle.of(locale))
+            return Instant
+                .ofEpochMilli(utcTimeMillis)
+                .atZone(utcTimeZoneId)
+                .toLocalDate()
+                .format(formatter)
+        }
+
+        /**
+         * Holds a UTC [ZoneId].
+         */
+        internal val utcTimeZoneId: ZoneId = ZoneId.of("UTC")
     }
 
     private fun getMonth(firstDayLocalDate: LocalDate): CalendarMonth {
@@ -187,6 +203,4 @@ internal class CalendarModelImpl : CalendarModel {
             this.dayOfMonth
         )
     }
-
-    private val utcTimeZoneId = ZoneId.of("UTC")
 }

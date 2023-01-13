@@ -108,9 +108,22 @@ internal class CalendarModelTest(private val model: CalendarModel) {
     fun formatDate() {
         val date =
             CalendarDate(year = 2022, month = 1, dayOfMonth = 1, utcTimeMillis = January2022Millis)
-        val month = model.plusMonths(model.getMonth(date), 2)
-        assertThat(model.format(date, "MM/dd/yyyy")).isEqualTo("01/01/2022")
-        assertThat(model.format(month, "MM/dd/yyyy")).isEqualTo("03/01/2022")
+        assertThat(model.formatWithSkeleton(date, "yMMMd")).isEqualTo("Jan 1, 2022")
+        assertThat(model.formatWithSkeleton(date, "dMMMy")).isEqualTo("Jan 1, 2022")
+        assertThat(model.formatWithSkeleton(date, "yMMMMEEEEd"))
+            .isEqualTo("Saturday, January 1, 2022")
+        // Check that the direct formatting is equal to the one the model does.
+        assertThat(model.formatWithSkeleton(date, "yMMMd")).isEqualTo(date.format(model, "yMMMd"))
+    }
+
+    @Test
+    fun formatMonth() {
+        val month = model.getMonth(year = 2022, month = 3)
+        assertThat(model.formatWithSkeleton(month, "yMMMM")).isEqualTo("March 2022")
+        assertThat(model.formatWithSkeleton(month, "MMMMy")).isEqualTo("March 2022")
+        // Check that the direct formatting is equal to the one the model does.
+        assertThat(model.formatWithSkeleton(month, "yMMMM"))
+            .isEqualTo(month.format(model, "yMMMM"))
     }
 
     @Test
@@ -175,14 +188,14 @@ internal class CalendarModelTest(private val model: CalendarModel) {
         assertThat(newModel.plusMonths(month, 3)).isEqualTo(legacyModel.plusMonths(month, 3))
         assertThat(date).isEqualTo(legacyDate)
         assertThat(newModel.getDayOfWeek(date)).isEqualTo(legacyModel.getDayOfWeek(date))
-        assertThat(newModel.format(date, "MMM d, yyyy")).isEqualTo(
-            legacyModel.format(
+        assertThat(newModel.formatWithSkeleton(date, "MMM d, yyyy")).isEqualTo(
+            legacyModel.formatWithSkeleton(
                 date,
                 "MMM d, yyyy"
             )
         )
-        assertThat(newModel.format(month, "MMM yyyy")).isEqualTo(
-            legacyModel.format(
+        assertThat(newModel.formatWithSkeleton(month, "MMM yyyy")).isEqualTo(
+            legacyModel.formatWithSkeleton(
                 month,
                 "MMM yyyy"
             )

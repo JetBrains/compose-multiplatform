@@ -295,6 +295,9 @@ package androidx.compose.material3 {
     property public final kotlin.ranges.IntRange YearRange;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape shape;
     field public static final androidx.compose.material3.DatePickerDefaults INSTANCE;
+    field public static final String YearAbbrMonthDaySkeleton = "yMMMd";
+    field public static final String YearMonthSkeleton = "yMMMM";
+    field public static final String YearMonthWeekdayDaySkeleton = "yMMMMEEEEd";
   }
 
   public final class DatePickerDialog_androidKt {
@@ -302,7 +305,7 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Immutable public final class DatePickerFormatter {
-    ctor public DatePickerFormatter(optional String shortFormat, optional String mediumFormat, optional String monthYearFormat);
+    ctor public DatePickerFormatter(optional String yearSelectionSkeleton, optional String selectedDateSkeleton, optional String selectedDateDescriptionSkeleton);
   }
 
   public final class DatePickerKt {
