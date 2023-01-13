@@ -77,7 +77,7 @@ class AnimateXAsStateClockTest {
         checkUpdatedState(clock, label = "DpAnimation",
             newInitialValue = 1.dp, newTargetValue = 2.dp,
             composeState = { state!!.value })
-        rule.runOnUiThread { clock.setStateParameters(listOf(3.dp), listOf(4.dp)) }
+        rule.runOnUiThread { clock.setStateParameters(3f, 4.0) }
         checkUpdatedState(clock, label = "DpAnimation",
             newInitialValue = 3.dp, newTargetValue = 4.dp,
             composeState = { state!!.value })
@@ -89,7 +89,7 @@ class AnimateXAsStateClockTest {
             composeState = { state!!.value })
         // Invalid parameters are ignored.
         rule.runOnUiThread {
-            clock.setStateParameters(111.dp, 111)
+            clock.setStateParameters(111.dp, "")
             clock.setStateParameters(111.dp, null)
             clock.setStateParameters(listOf(111.dp), listOf(111L))
             clock.setStateParameters(listOf(null), listOf(null))

@@ -135,8 +135,20 @@ class UtilsTest {
     }
 
     @Test
+    fun dpIsParsedAsDoubleAndFloat() {
+        val value = parseParametersToValue(10.dp, 20.0, 30f)
+        assertEquals(TargetState(20.dp, 30.dp), value)
+    }
+
+    @Test
     fun dpIsParsedAsList() {
         val value = parseParametersToValue(10.dp, listOf(20f), listOf(30f))
+        assertEquals(TargetState(20.dp, 30.dp), value)
+    }
+
+    @Test
+    fun dpIsParsedAsDoubleAndFloatList() {
+        val value = parseParametersToValue(10.dp, listOf(20.0), listOf(30f))
         assertEquals(TargetState(20.dp, 30.dp), value)
     }
 

@@ -98,11 +98,13 @@ internal fun <T, V : AnimationVector>
                     animationSpec.initialStartOffset.offsetMillis
                 else 0L
             }
+
             is InfiniteRepeatableSpec<*> -> {
                 if (animationSpec.initialStartOffset.offsetType == StartOffsetType.Delay)
                     animationSpec.initialStartOffset.offsetMillis
                 else 0L
             }
+
             is VectorizedDurationBasedAnimationSpec<*> -> animationSpec.delayMillis
             else -> 0L
         }.toLong()
@@ -163,13 +165,32 @@ internal fun <T> parseParametersToValue(currentValue: T, par1: Any, par2: Any?):
 
     currentValue ?: return null
 
+    /** Check if [par1] and [par2] are not null and have the same type. */
     fun parametersAreValid(par1: Any?, par2: Any?): Boolean {
         return par1 != null && par2 != null && par1::class == par2::class
     }
 
+    /** Check if all parameters have the same type. */
     fun parametersHasTheSameType(value: Any, par1: Any, par2: Any): Boolean {
         return value::class == par1::class && value::class == par2::class
     }
+
+    fun getDp(par: Any): Dp? {
+        return (par as? Dp) ?: (par as? Float)?.dp ?: (par as? Double)?.dp ?: (par as? Int)?.dp
+    }
+
+    fun parseDp(par1: Any, par2: Any?): TargetState<Dp>? {
+        if (currentValue !is Dp || par2 == null) return null
+        return if (par1 is Dp && par2 is Dp)
+            TargetState(par1, par2) else {
+            val dp1 = getDp(par1)
+            val dp2 = getDp(par2)
+            if (dp1 != null && dp2 != null)
+                TargetState(dp1, dp2) else null
+        }
+    }
+    // Dp could be presented as Float/Double/Int - try to parse it.
+    parseDp(par1, par2)?.let { return it as TargetState<T> }
 
     if (!parametersAreValid(par1, par2)) return null
 
@@ -231,12 +252,8 @@ internal fun <T> parseParametersToValue(currentValue: T, par1: Any, par2: Any?):
                     ),
                 )
 
-                is Dp -> {
-                    if (parametersHasTheSameType(currentValue, par1[0]!!, par2[0]!!))
-                        TargetState(par1[0], par2[0]) else TargetState(
-                        (par1[0] as Float).dp, (par2[0] as Float).dp
-                    )
-                }
+                is Dp ->
+                    parseDp(par1[0]!!, par2[0]!!)
 
                 else -> {
                     if (parametersAreValid(par1[0], par2[0]) &&
