@@ -206,7 +206,8 @@ class LayoutInspectorTreeTest {
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
                 left = 0.0.dp, top = 0.0.dp, width = 100.dp, height = 82.dp,
-                children = listOf("Text", "Icon", "Surface")
+                children = listOf("Text", "Icon", "Surface"),
+                inlined = true,
             )
             node(
                 name = "Text",
@@ -275,7 +276,8 @@ class LayoutInspectorTreeTest {
                 hasTransformations = false,
                 fileName = "LayoutInspectorTreeTest.kt",
                 left = 0.dp, top = 0.dp, width = 100.dp, height = 10.dp,
-                children = listOf("Text")
+                children = listOf("Text"),
+                inlined = true,
             )
             node(
                 name = "Text",
@@ -488,17 +490,18 @@ class LayoutInspectorTreeTest {
         val builder = LayoutInspectorTree()
         val nodes = builder.convert(androidComposeView)
         validate(nodes, builder, checkSemantics = true) {
-            node("Column", children = listOf("Text", "Row", "Row"))
+            node("Column", children = listOf("Text", "Row", "Row"), inlined = true)
             node(
                 name = "Text",
                 isRenderNode = true,
                 mergedSemantics = "[Studio]",
-                unmergedSemantics = "[Studio]"
+                unmergedSemantics = "[Studio]",
             )
             node(
                 name = "Row",
                 children = listOf("Text", "Text"),
-                mergedSemantics = "[Hello, World]"
+                mergedSemantics = "[Hello, World]",
+                inlined = true,
             )
             node("Text", isRenderNode = true, unmergedSemantics = "[Hello]")
             node("Text", isRenderNode = true, unmergedSemantics = "[World]")
@@ -506,7 +509,8 @@ class LayoutInspectorTreeTest {
                 name = "Row",
                 children = listOf("Text", "Text"),
                 mergedSemantics = "[to]",
-                unmergedSemantics = "[to]"
+                unmergedSemantics = "[to]",
+                inlined = true,
             )
             node("Text", isRenderNode = true, unmergedSemantics = "[Hello]")
             node("Text", isRenderNode = true, unmergedSemantics = "[World]")
@@ -550,7 +554,8 @@ class LayoutInspectorTreeTest {
             node(
                 name = "Column",
                 fileName = "LayoutInspectorTreeTest.kt",
-                children = listOf("Text")
+                children = listOf("Text"),
+                inlined = true,
             )
             node(
                 name = "Text",
@@ -614,7 +619,8 @@ class LayoutInspectorTreeTest {
                 name = "Column",
                 isRenderNode = true,
                 fileName = "LayoutInspectorTreeTest.kt",
-                children = listOf("Text")
+                children = listOf("Text"),
+                inlined = true,
             )
             node(
                 name = "Text",
@@ -677,6 +683,7 @@ class LayoutInspectorTreeTest {
                 name = "ComposeNode",
                 fileName = "AndroidView.android.kt",
                 hasViewIdUnder = composeView,
+                inlined = true,
             )
         }
     }
@@ -785,12 +792,13 @@ class LayoutInspectorTreeTest {
         dumpNodes(nodes, androidComposeView, builder)
 
         validate(nodes, builder, checkLineNumbers = true, checkRenderNodes = false) {
-            node("Column", lineNumber = testLine + 5, children = listOf("Title"))
+            node("Column", lineNumber = testLine + 5, children = listOf("Title"), inlined = true)
             node("Title", lineNumber = testLine + 6, children = listOf("Column"))
             node(
                 name = "Column",
                 lineNumber = titleLine + 4,
-                children = listOf("Spacer", "Text", "Text", "Spacer", "Text", "Spacer")
+                children = listOf("Spacer", "Text", "Text", "Spacer", "Text", "Spacer"),
+                inlined = true,
             )
             node("Spacer", lineNumber = titleLine + 11)
             node("Text", lineNumber = titleLine + 12)
@@ -957,6 +965,7 @@ class LayoutInspectorTreeTest {
             fileName: String? = null,
             lineNumber: Int = -1,
             isRenderNode: Boolean = false,
+            inlined: Boolean = false,
             hasViewIdUnder: View? = null,
             hasTransformations: Boolean = false,
             mergedSemantics: String = "",
@@ -978,6 +987,7 @@ class LayoutInspectorTreeTest {
             if (lineNumber != -1) {
                 assertWithMessage(message).that(node.lineNumber).isEqualTo(lineNumber)
             }
+            assertWithMessage(message).that(node.inlined).isEqualTo(inlined)
             if (checkRenderNodes) {
                 if (isRenderNode) {
                     assertWithMessage(message).that(node.id).isGreaterThan(0L)

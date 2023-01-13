@@ -111,6 +111,9 @@ private fun InspectorNode.flags(): Int {
     if (unmergedSemantics.isNotEmpty()) {
         flags = flags or ComposableNode.Flags.HAS_UNMERGED_SEMANTICS_VALUE
     }
+    if (inlined) {
+        flags = flags or ComposableNode.Flags.INLINED_VALUE
+    }
     return flags
 }
 

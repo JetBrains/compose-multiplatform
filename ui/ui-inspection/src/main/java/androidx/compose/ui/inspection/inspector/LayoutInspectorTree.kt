@@ -452,6 +452,7 @@ class LayoutInspectorTree {
         val node = newNode()
         node.name = context.name ?: ""
         node.key = group.key as? Int ?: 0
+        node.inlined = context.isInline
         val layoutInfo = group.node as? LayoutInfo
         if (layoutInfo != null) {
             return parseLayoutInfo(layoutInfo, context, node)
