@@ -320,7 +320,7 @@ class WindowStateTest {
     }
 
     @Test
-    fun maximize() = runApplicationTest(useDelay = isLinux) {
+    fun maximize() = runApplicationTest(useDelay = isLinux || isMacOs) {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 

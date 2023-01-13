@@ -25,6 +25,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runSkikoComposeUiTest
 import androidx.compose.ui.text.AnnotatedString
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
@@ -33,6 +34,7 @@ class ClickableTextTest {
 
     @Test
     fun onclick_callback() = runSkikoComposeUiTest {
+        mainClock.autoAdvance = false
         var counter = 0
         val onClick: (Int) -> Unit = { counter++ }
         setContent {
@@ -42,8 +44,10 @@ class ClickableTextTest {
                 onClick = onClick
             )
         }
+        mainClock.advanceTimeByFrame()
 
         onNodeWithTag("clickableText").performClick()
+        mainClock.advanceTimeByFrame()
 
         runOnIdle {
             assertEquals(1, counter)
@@ -52,6 +56,7 @@ class ClickableTextTest {
 
     @Test
     fun onclick_callback_whenCallbackIsUpdated() = runSkikoComposeUiTest {
+        mainClock.autoAdvance = false
         var counter1 = 0
         var counter2 = 0
         val onClick1: (Int) -> Unit = { counter1++ }
@@ -65,9 +70,11 @@ class ClickableTextTest {
             )
         }
         use2.value = true
+        mainClock.advanceTimeByFrame()
         waitForIdle()
 
         onNodeWithTag("clickableText").performClick()
+        mainClock.advanceTimeByFrame()
 
         runOnIdle {
             assertEquals(0, counter1)
