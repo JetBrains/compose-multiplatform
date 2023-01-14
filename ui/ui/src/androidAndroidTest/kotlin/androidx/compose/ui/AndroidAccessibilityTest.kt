@@ -2315,6 +2315,72 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testMultiPanesDisappear() {
+        val firstPaneTag = "Pane 1"
+        val secondPaneTag = "Pane 2"
+        var isPaneVisible by mutableStateOf(false)
+        val firstPaneTestTitle by mutableStateOf("first pane title")
+        val secondPaneTestTitle by mutableStateOf("second pane title")
+
+        container.setContent {
+            if (isPaneVisible) {
+                Column {
+                    with(LocalDensity.current) {
+                        Box(
+                            Modifier
+                                .size(100.toDp())
+                                .testTag(firstPaneTag)
+                                .semantics { paneTitle = firstPaneTestTitle }) {}
+                        Box(
+                            Modifier
+                                .size(100.toDp())
+                                .testTag(secondPaneTag)
+                                .semantics { paneTitle = secondPaneTestTitle }) {}
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(firstPaneTag).assertDoesNotExist()
+        rule.onNodeWithTag(secondPaneTag).assertDoesNotExist()
+
+        isPaneVisible = true
+        rule.onNodeWithTag(firstPaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    "first pane title"
+                )
+            )
+            .assertIsDisplayed()
+        rule.onNodeWithTag(secondPaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    "second pane title"
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+
+        isPaneVisible = false
+        rule.onNodeWithTag(firstPaneTag).assertDoesNotExist()
+        rule.onNodeWithTag(secondPaneTag).assertDoesNotExist()
+        rule.runOnIdle {
+            verify(container, times(2)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
     fun testEventForPasswordTextField() {
         val tag = "TextField"
         container.setContent {
