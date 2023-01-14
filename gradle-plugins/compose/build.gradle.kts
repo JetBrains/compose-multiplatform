@@ -1,4 +1,5 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import de.undercouch.gradle.tasks.download.Download
 
 plugins {
     kotlin("jvm")
@@ -7,6 +8,7 @@ plugins {
     id("java-gradle-plugin")
     id("maven-publish")
     id("com.github.johnrengelman.shadow") version "7.0.0"
+    id("de.undercouch.download") version "5.3.0"
 }
 
 gradlePluginConfig {
@@ -107,10 +109,46 @@ tasks.test {
     }
 }
 
+/**
+ * Gradle 8.0 removed auto downloading of requested toolchains unless a toolchain repository is configured.
+ * For now, the only option to enable auto downloading out-of-the-box is to use Foojay Disco resolver,
+ * which uses api.foojay.io service.
+ * It is not desirable to depend on little known service for provisioning JDK distributions, even for tests.
+ * Thus, the only option is to download the necessary JDK distributions ourselves.
+ */
+val jdkVersionsForTests = listOf(11, 15, 18, 19)
+val jdkForTestsRoot = project.rootProject.layout.buildDirectory.dir("jdks").get().asFile
+val downloadJdksForTests = tasks.register("downloadJdksForTests") {}
+for (jdkVersion in jdkVersionsForTests) {
+    val ext = if (hostOS == OS.Windows) ".zip" else ".tar.gz"
+    val archive = jdkForTestsRoot.resolve("$jdkVersion$ext")
+    val unpackDir = jdkForTestsRoot.resolve("$jdkVersion").apply { mkdirs() }
+    val downloadJdkTask = tasks.register("downloadJdk$jdkVersion", Download::class) {
+        src("https://corretto.aws/downloads/latest/amazon-corretto-$jdkVersion-x64-${hostOS.id}-jdk$ext")
+        dest(archive)
+        onlyIf { !dest.exists() }
+    }
+    val unpackJdkTask = tasks.register("unpackJdk$jdkVersion", Copy::class) {
+        dependsOn(downloadJdkTask)
+        val archive = archive
+        val archiveTree = when {
+            archive.name.endsWith(".tar.gz") -> tarTree(archive)
+            archive.name.endsWith(".zip") -> zipTree(archive)
+            else -> error("Unsupported archive format: ${archive.name}")
+        }
+        from(archiveTree)
+        into(unpackDir)
+        onlyIf { (unpackDir.listFiles()?.size ?: 0) == 0 }
+    }
+    downloadJdksForTests.dependsOn(unpackJdkTask)
+}
+
 for (gradleVersion in supportedGradleVersions) {
     tasks.registerVerificationTask<Test>("testGradle-${gradleVersion.version}") {
         classpath = tasks.test.get().classpath
 
+        dependsOn(downloadJdksForTests)
+        systemProperty("compose.tests.gradle.test.jdks.root", jdkForTestsRoot.absolutePath)
         if (gradleVersion >= GradleVersion.version("7.6")) {
             systemProperty("compose.tests.gradle.configuration.cache", "true")
         }

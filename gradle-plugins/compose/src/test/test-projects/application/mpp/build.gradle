@@ -16,9 +16,9 @@ kotlin {
     // like https://github.com/JetBrains/compose-jb/issues/2345
     android()
 
-    jvm("desktop")
+    jvm()
     sourceSets {
-        desktopMain {
+        jvmMain {
             dependsOn(commonMain)
 
             dependencies {

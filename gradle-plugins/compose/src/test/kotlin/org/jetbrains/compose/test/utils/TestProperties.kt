@@ -29,6 +29,8 @@ object TestProperties {
     val summaryFile: File?
         get() = System.getProperty("compose.tests.summary.file")?.let { File(it) }
 
+    val testJdksRoot: File?
+        get() = System.getProperty("compose.tests.gradle.test.jdks.root")?.let { File(it) }
 
     private fun notNullSystemProperty(property: String): String =
         System.getProperty(property) ?: error("The '$property' system property is not set")
