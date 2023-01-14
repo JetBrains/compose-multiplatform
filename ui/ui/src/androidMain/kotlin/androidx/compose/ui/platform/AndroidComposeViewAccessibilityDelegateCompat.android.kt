@@ -1891,10 +1891,11 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 
     private fun updateSemanticsNodesCopyAndPanes() {
         // TODO(b/172606324): removed this compose specific fix when talkback has a proper solution.
+        val toRemove = ArraySet<Int>()
         for (id in paneDisplayed) {
             val currentNode = currentSemanticsNodes[id]?.semanticsNode
             if (currentNode == null || !currentNode.hasPaneTitle()) {
-                paneDisplayed.remove(id)
+                toRemove.add(id)
                 sendPaneChangeEvents(
                     id,
                     AccessibilityEventCompat.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED,
@@ -1904,6 +1905,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
                 )
             }
         }
+        paneDisplayed.removeAll(toRemove)
         previousSemanticsNodes.clear()
         for (entry in currentSemanticsNodes.entries) {
             if (entry.value.semanticsNode.hasPaneTitle() && paneDisplayed.add(entry.key)) {
