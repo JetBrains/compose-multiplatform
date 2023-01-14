@@ -160,6 +160,38 @@ src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not 
     }
 
     @Test
+    fun returnsUnit_dueToTypeError() {
+        lint().files(
+            kotlin(
+                """
+                package androidx.compose.runtime.foo
+
+                import androidx.compose.runtime.Composable
+                import androidx.compose.runtime.remember
+
+                @Composable
+                fun Test() {
+                    val shouldBeError = remember { Unknown() }
+                    val stillError = remember {
+                        val local = Unknown()
+                        local
+                    }
+                    val shouldBeInt = remember { 42 }
+                    val stillInt = remember {
+                        val local = Unknown()
+                        42
+                    }
+                }
+                """
+            ),
+            Stubs.Composable,
+            Stubs.Remember
+        )
+            .run()
+            .expectClean()
+    }
+
+    @Test
     fun returnsValue_explicitUnitType() {
         lint().files(
             kotlin(

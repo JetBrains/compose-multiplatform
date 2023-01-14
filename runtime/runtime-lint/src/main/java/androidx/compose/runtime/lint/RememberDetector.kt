@@ -32,6 +32,10 @@ import com.android.tools.lint.detector.api.SourceCodeScanner
 import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
 import java.util.EnumSet
+import org.jetbrains.kotlin.psi.KtCallExpression
+import org.jetbrains.kotlin.psi.KtLambdaArgument
+import org.jetbrains.uast.UExpression
+import org.jetbrains.uast.toUElementOfType
 
 /**
  * [Detector] that checks `remember` calls to make sure they are not returning [Unit].
@@ -40,15 +44,35 @@ class RememberDetector : Detector(), SourceCodeScanner {
     override fun getApplicableMethodNames(): List<String> = listOf(Names.Runtime.Remember.shortName)
 
     override fun visitMethodCall(context: JavaContext, node: UCallExpression, method: PsiMethod) {
-        if (method.isInPackageName(Names.Runtime.PackageName)) {
-            if (node.getExpressionType().isVoidOrUnit) {
-                context.report(
-                    RememberReturnType,
-                    node,
-                    context.getNameLocation(node),
-                    "`remember` calls must not return `Unit`"
-                )
+        if (!method.isInPackageName(Names.Runtime.PackageName)) return
+        val callExpressionType = node.getExpressionType()
+        if (!callExpressionType.isVoidOrUnit) return
+
+        val sourcePsi = node.sourcePsi
+        val isReallyUnit = when {
+            node.typeArguments.singleOrNull()?.isVoidOrUnit == true -> {
+                // Call with an explicit type argument, e.g., remember<Unit> { 42 }
+                true
             }
+            sourcePsi is KtCallExpression -> {
+                // Even though the return type is Unit, we should double check if the type of
+                // the last expression of the lambda argument matches.
+                val tailLambda = sourcePsi.valueArguments.lastOrNull() as? KtLambdaArgument
+                val lambda = tailLambda?.getLambdaExpression()
+                val lastExp = lambda?.bodyExpression?.statements?.lastOrNull()
+                val lastExpType = lastExp?.toUElementOfType<UExpression>()?.getExpressionType()
+                // If unresolved (i.e., type error), the expression type will be actually `null`.
+                callExpressionType == lastExpType
+           }
+           else -> true
+        }
+        if (isReallyUnit) {
+            context.report(
+                RememberReturnType,
+                node,
+                context.getNameLocation(node),
+                "`remember` calls must not return `Unit`"
+            )
         }
     }
 
