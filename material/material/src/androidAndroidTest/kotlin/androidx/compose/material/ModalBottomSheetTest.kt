@@ -1137,4 +1137,74 @@ class ModalBottomSheetTest {
             )
             .assertWidthIsEqualTo(expectedSheetWidth)
     }
+
+    @Test
+    fun modalBottomSheet_shortSheet_anchorChangeHandler_previousTargetNotInAnchors_reconciles() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        var hasSheetContent by mutableStateOf(false) // Start out with empty sheet content
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                sheetContent = {
+                    if (hasSheetContent) {
+                        Box(Modifier.fillMaxHeight(0.4f))
+                    }
+                },
+                content = {}
+            )
+        }
+
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+        assertThat(sheetState.swipeableState.hasAnchorForValue(ModalBottomSheetValue.HalfExpanded))
+            .isFalse()
+        assertThat(sheetState.swipeableState.hasAnchorForValue(ModalBottomSheetValue.Expanded))
+            .isFalse()
+
+        scope.launch { sheetState.show() }
+        rule.waitForIdle()
+
+        assertThat(sheetState.isVisible).isTrue()
+        assertThat(sheetState.currentValue).isEqualTo(sheetState.targetValue)
+
+        hasSheetContent = true // Recompose with sheet content
+        rule.waitForIdle()
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Expanded)
+    }
+
+    @Test
+    fun modalBottomSheet_tallSheet_anchorChangeHandler_previousTargetNotInAnchors_reconciles() {
+        val sheetState = ModalBottomSheetState(ModalBottomSheetValue.Hidden)
+        var hasSheetContent by mutableStateOf(false) // Start out with empty sheet content
+        lateinit var scope: CoroutineScope
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            ModalBottomSheetLayout(
+                sheetState = sheetState,
+                sheetContent = {
+                    if (hasSheetContent) {
+                        Box(Modifier.fillMaxHeight(0.6f))
+                    }
+                },
+                content = {}
+            )
+        }
+
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.Hidden)
+        assertThat(sheetState.swipeableState.hasAnchorForValue(ModalBottomSheetValue.HalfExpanded))
+            .isFalse()
+        assertThat(sheetState.swipeableState.hasAnchorForValue(ModalBottomSheetValue.Expanded))
+            .isFalse()
+
+        scope.launch { sheetState.show() }
+        rule.waitForIdle()
+
+        assertThat(sheetState.isVisible).isTrue()
+        assertThat(sheetState.currentValue).isEqualTo(sheetState.targetValue)
+
+        hasSheetContent = true // Recompose with sheet content
+        rule.waitForIdle()
+        assertThat(sheetState.currentValue).isEqualTo(ModalBottomSheetValue.HalfExpanded)
+    }
 }
