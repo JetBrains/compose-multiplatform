@@ -77,6 +77,7 @@ val shadow = tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("shadow")
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
+    exclude("META-INF/versions/**")
 }
 
 val jar = tasks.named<Jar>("jar") {
