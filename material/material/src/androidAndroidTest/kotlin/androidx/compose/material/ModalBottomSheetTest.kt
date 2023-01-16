@@ -267,7 +267,7 @@ class ModalBottomSheetTest {
                 sheetContent = {
                     Box(
                         Modifier
-                            .fillMaxSize()
+                            .fillMaxSize(0.6f)
                             .testTag(sheetTag)
                     )
                 }
