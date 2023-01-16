@@ -355,60 +355,36 @@ private class ScrollingLogic(
      */
     fun ScrollScope.dispatchScroll(availableDelta: Offset, source: NestedScrollSource): Offset {
         val scrollDelta = availableDelta.singleAxisOffset()
-        val overscrollPreConsumed = overscrollPreConsumeDelta(scrollDelta, source)
 
-        val afterPreOverscroll = scrollDelta - overscrollPreConsumed
-        val nestedScrollDispatcher = nestedScrollDispatcher.value
-        val preConsumedByParent = nestedScrollDispatcher
-            .dispatchPreScroll(afterPreOverscroll, source)
+        val performScroll: (Offset) -> Offset = { delta ->
+            val nestedScrollDispatcher = nestedScrollDispatcher.value
+            val preConsumedByParent = nestedScrollDispatcher
+                .dispatchPreScroll(delta, source)
 
-        val scrollAvailable = afterPreOverscroll - preConsumedByParent
-        // Consume on a single axis
-        val axisConsumed =
-            scrollBy(scrollAvailable.reverseIfNeeded().toFloat()).toOffset().reverseIfNeeded()
+            val scrollAvailable = delta - preConsumedByParent
+            // Consume on a single axis
+            val axisConsumed =
+                scrollBy(scrollAvailable.reverseIfNeeded().toFloat()).toOffset().reverseIfNeeded()
 
-        val leftForParent = scrollAvailable - axisConsumed
-        val parentConsumed = nestedScrollDispatcher.dispatchPostScroll(
-            axisConsumed,
-            leftForParent,
-            source
-        )
-        overscrollPostConsumeDelta(
-            scrollAvailable,
-            leftForParent - parentConsumed,
-            source
-        )
+            val leftForParent = scrollAvailable - axisConsumed
+            val parentConsumed = nestedScrollDispatcher.dispatchPostScroll(
+                axisConsumed,
+                leftForParent,
+                source
+            )
 
-        return overscrollPreConsumed + preConsumedByParent + axisConsumed + parentConsumed
+            preConsumedByParent + axisConsumed + parentConsumed
+        }
+
+        return if (overscrollEffect != null && shouldDispatchOverscroll) {
+            overscrollEffect.applyToScroll(scrollDelta, source, performScroll)
+        } else {
+            performScroll(scrollDelta)
+        }
     }
 
     private val shouldDispatchOverscroll
         get() = scrollableState.canScrollForward || scrollableState.canScrollBackward
-
-    fun overscrollPreConsumeDelta(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset {
-        return if (overscrollEffect != null && shouldDispatchOverscroll) {
-            overscrollEffect.consumePreScroll(scrollDelta, source)
-        } else {
-            Offset.Zero
-        }
-    }
-
-    private fun overscrollPostConsumeDelta(
-        consumedByChain: Offset,
-        availableForOverscroll: Offset,
-        source: NestedScrollSource
-    ) {
-        if (overscrollEffect != null && shouldDispatchOverscroll) {
-            overscrollEffect.consumePostScroll(
-                consumedByChain,
-                availableForOverscroll,
-                source
-            )
-        }
-    }
 
     fun performRawScroll(scroll: Offset): Offset {
         return if (scrollableState.isScrollInProgress) {
@@ -424,25 +400,25 @@ private class ScrollingLogic(
         registerNestedFling(true)
 
         val availableVelocity = initialVelocity.singleAxisVelocity()
-        val preOverscrollConsumed =
-            if (overscrollEffect != null && shouldDispatchOverscroll) {
-                overscrollEffect.consumePreFling(availableVelocity)
-            } else {
-                Velocity.Zero
-            }
-        val velocity = (availableVelocity - preOverscrollConsumed)
-        val preConsumedByParent = nestedScrollDispatcher
-            .value.dispatchPreFling(velocity)
-        val available = velocity - preConsumedByParent
-        val velocityLeft = doFlingAnimation(available)
-        val consumedPost =
-            nestedScrollDispatcher.value.dispatchPostFling(
-                (available - velocityLeft),
-                velocityLeft
-            )
-        val totalLeft = velocityLeft - consumedPost
+
+        val performFling: suspend (Velocity) -> Velocity = { velocity ->
+            val preConsumedByParent = nestedScrollDispatcher
+                .value.dispatchPreFling(velocity)
+            val available = velocity - preConsumedByParent
+            val velocityLeft = doFlingAnimation(available)
+            val consumedPost =
+                nestedScrollDispatcher.value.dispatchPostFling(
+                    (available - velocityLeft),
+                    velocityLeft
+                )
+            val totalLeft = velocityLeft - consumedPost
+            velocity - totalLeft
+        }
+
         if (overscrollEffect != null && shouldDispatchOverscroll) {
-            overscrollEffect.consumePostFling(totalLeft)
+            overscrollEffect.applyToFling(availableVelocity, performFling)
+        } else {
+            performFling(availableVelocity)
         }
 
         // Self stopped flinging, reset
