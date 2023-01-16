@@ -38,7 +38,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -251,7 +250,6 @@ class LazyScrollTest { // (private val orientation: Orientation)
         assertThat(state.canScrollBackward).isFalse()
     }
 
-    @Ignore("b/259608530")
     @Test
     fun canScrollBackward() = runBlocking {
         withContext(Dispatchers.Main + AutoTestFrameClock()) {
