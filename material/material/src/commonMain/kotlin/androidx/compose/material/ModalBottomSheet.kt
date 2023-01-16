@@ -656,7 +656,7 @@ private fun ModalBottomSheetAnchorChangeHandler(
     animateTo: (target: ModalBottomSheetValue, velocity: Float) -> Unit,
     snapTo: (target: ModalBottomSheetValue) -> Unit,
 ) = AnchorChangeHandler<ModalBottomSheetValue> { previousTarget, previousAnchors, newAnchors ->
-    val previousTargetOffset = previousAnchors.getValue(previousTarget)
+    val previousTargetOffset = previousAnchors[previousTarget]
     val newTarget = when (previousTarget) {
         Hidden -> Hidden
         HalfExpanded, Expanded -> {
