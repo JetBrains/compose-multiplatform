@@ -38,15 +38,24 @@ data class TestEnvironment(
     }
 }
 
+private val testJdks = TestProperties
+    .testJdksRoot?.let { listTestJdks(it) }.orEmpty()
+
 class TestProject(
     private val name: String,
     private val testEnvironment: TestEnvironment
 ) {
     private val testProjectsRootDir = File("src/test/test-projects")
-    private val additionalArgs = listOf(
+
+    private val additionalArgs = listOfNotNull(
         "--stacktrace",
         "--init-script", testProjectsRootDir.resolve("init.gradle").absolutePath,
-        "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}"
+        "-P${ComposeProperties.VERBOSE}=${testEnvironment.composeVerbose}",
+        if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
+            null
+        } else {
+            "-Porg.gradle.java.installations.paths=${testJdks.joinToString(",")}"
+        }
     )
 
     init {
@@ -68,7 +77,7 @@ class TestProject(
 
     internal fun gradle(vararg args: String): BuildResult {
         if (TestProperties.gradleConfigurationCache) {
-            if (GradleVersion.version(TestProperties.gradleVersionForTests) < GradleVersion.version("8.0-rc-1")) {
+            if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
                 // Gradle 7.* does not use the configuration cache in the same build.
                 // In other words, if cache misses, Gradle performs configuration,
                 // but does not, use the serialized task graph.
