@@ -46,33 +46,9 @@ import androidx.compose.ui.unit.toSize
 import java.util.ArrayDeque
 import java.util.Collections
 import java.util.IdentityHashMap
-import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-
-val systemPackages = setOf(
-    -1,
-    packageNameHash("androidx.compose.animation"),
-    packageNameHash("androidx.compose.animation.core"),
-    packageNameHash("androidx.compose.desktop"),
-    packageNameHash("androidx.compose.foundation"),
-    packageNameHash("androidx.compose.foundation.layout"),
-    packageNameHash("androidx.compose.foundation.text"),
-    packageNameHash("androidx.compose.material"),
-    packageNameHash("androidx.compose.material.ripple"),
-    packageNameHash("androidx.compose.runtime"),
-    packageNameHash("androidx.compose.runtime.saveable"),
-    packageNameHash("androidx.compose.ui"),
-    packageNameHash("androidx.compose.ui.graphics.vector"),
-    packageNameHash("androidx.compose.ui.layout"),
-    packageNameHash("androidx.compose.ui.platform"),
-    packageNameHash("androidx.compose.ui.tooling"),
-    packageNameHash("androidx.compose.ui.selection"),
-    packageNameHash("androidx.compose.ui.semantics"),
-    packageNameHash("androidx.compose.ui.viewinterop"),
-    packageNameHash("androidx.compose.ui.window"),
-)
 
 /**
  * The [InspectorNode.id] will be populated with:
@@ -95,10 +71,6 @@ private val unwantedCalls = setOf(
     "ProvideAndroidCompositionLocals",
     "ProvideCommonCompositionLocals",
 )
-
-@VisibleForTesting
-fun packageNameHash(packageName: String) =
-    packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
 
 /**
  * Generator of a tree for the Layout Inspector.
