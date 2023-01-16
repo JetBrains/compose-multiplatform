@@ -34,9 +34,10 @@ internal fun JvmApplicationContext.configureWix() {
     if (project.findProperty(DOWNLOAD_WIX_PROPERTY) == "false") return
 
     val root = project.rootProject
-    val wixDir = root.buildDir.resolve("wixToolset")
-    val zipFile = wixDir.resolve("wix311.zip")
-    val unzipDir = wixDir.resolve("unpacked")
+    val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-jb")
+    val fileName = "wix311"
+    val zipFile = wixDir.resolve("$fileName.zip")
+    val unzipDir = root.projectDir.resolve(fileName)
     val download = root.tasks.maybeCreate(DOWNLOAD_WIX_TOOLSET_TASK_NAME, Download::class.java).apply {
         onlyIf { !zipFile.isFile }
         src("https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip")

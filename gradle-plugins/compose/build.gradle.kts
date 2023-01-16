@@ -64,7 +64,7 @@ dependencies {
     testImplementation(kotlin("gradle-plugin-api"))
 
     // include relocated download task to avoid potential runtime conflicts
-    embedded("de.undercouch:gradle-download-task:4.1.1")
+    embedded("de.undercouch:gradle-download-task:5.3.0")
 
     embedded("org.jetbrains.kotlinx:kotlinx-serialization-json:${BuildProperties.serializationVersion}")
     embedded("org.jetbrains.kotlinx:kotlinx-serialization-core:${BuildProperties.serializationVersion}")
@@ -79,6 +79,7 @@ val shadow = tasks.named<ShadowJar>("shadowJar") {
     archiveClassifier.set("shadow")
     configurations = listOf(embeddedDependencies)
     exclude("META-INF/gradle-plugins/de.undercouch.download.properties")
+    exclude("META-INF/versions/**")
 }
 
 val jar = tasks.named<Jar>("jar") {
