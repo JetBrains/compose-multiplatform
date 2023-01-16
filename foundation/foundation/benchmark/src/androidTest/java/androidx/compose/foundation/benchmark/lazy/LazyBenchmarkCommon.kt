@@ -43,9 +43,10 @@ class MotionEventHelper(private val view: View) {
 
     fun sendEvent(
         action: Int,
-        delta: Offset
+        delta: Offset,
+        timeDelta: Long = 10L
     ) {
-        time += 10L
+        time += timeDelta
 
         val coord = delta + (lastCoord ?: Offset.Zero)
 
