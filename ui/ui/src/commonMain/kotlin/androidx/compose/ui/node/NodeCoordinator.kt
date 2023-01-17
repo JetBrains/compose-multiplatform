@@ -295,6 +295,8 @@ internal abstract class NodeCoordinator(
      */
     private var layerPositionalProperties: LayerPositionalProperties? = null
 
+    internal val lastMeasurementConstraints: Constraints get() = measurementConstraints
+
     protected inline fun performingMeasure(
         constraints: Constraints,
         block: () -> Placeable

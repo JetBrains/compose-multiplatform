@@ -279,8 +279,8 @@ class IntrinsicsMeasurementTest {
                         placeable.place(0, 0)
                     }
                 }
+                val placeable = measurables[0].measure(constraints)
                 return layout(100, 100) {
-                    val placeable = measurables[0].measure(constraints)
                     placeable.place(0, 0)
                 }
             }

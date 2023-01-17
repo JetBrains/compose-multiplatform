@@ -474,6 +474,16 @@ internal class LayoutNode(
             "measurePolicy: $measurePolicy"
     }
 
+    internal val hasFixedInnerContentConstraints: Boolean
+        get() {
+            // it is the constraints we have after all the modifiers applied on this node,
+            // the one to be passed into user provided [measurePolicy.measure]. if those
+            // constraints are fixed this means the children size changes can't affect
+            // this LayoutNode size.
+            val innerContentConstraints = innerCoordinator.lastMeasurementConstraints
+            return innerContentConstraints.hasFixedWidth && innerContentConstraints.hasFixedHeight
+        }
+
     /**
      * Call this method from the debugger to see a dump of the LayoutNode tree structure
      */
