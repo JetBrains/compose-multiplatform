@@ -328,7 +328,6 @@ package androidx.compose.ui.text {
     method public int getEmojiSupportMatch();
     method @Deprecated public boolean getIncludeFontPadding();
     method public androidx.compose.ui.text.PlatformParagraphStyle merge(androidx.compose.ui.text.PlatformParagraphStyle? other);
-    method public void setEmojiSupportMatch(int);
     property public final int emojiSupportMatch;
     property @Deprecated public final boolean includeFontPadding;
     field public static final androidx.compose.ui.text.PlatformParagraphStyle.Companion Companion;

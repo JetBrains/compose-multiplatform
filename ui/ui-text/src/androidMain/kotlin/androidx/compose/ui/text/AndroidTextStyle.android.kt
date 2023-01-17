@@ -32,6 +32,12 @@ actual class PlatformTextStyle {
      */
     actual val paragraphStyle: PlatformParagraphStyle?
 
+    /**
+     * Convenience constructor for when you already have a [spanStyle] and [paragraphStyle].
+     *
+     * @param spanStyle platform specific span styling
+     * @param paragraphStyle platform specific paragraph styling
+     */
     constructor(
         spanStyle: PlatformSpanStyle?,
         paragraphStyle: PlatformParagraphStyle?
@@ -70,7 +76,11 @@ actual class PlatformTextStyle {
     )
 
     /**
-     * Set EmojiMatchSupport on [PlatformParagraphStyle]
+     * [EmojiSupportMatch] allows you to control emoji support replacement behavior.
+     *
+     * You can disable emoji support matches by passing [EmojiSupportMatch.None]
+     *
+     * @param emojiSupportMatch configuration for emoji support match and replacement
      */
     constructor(
         emojiSupportMatch: EmojiSupportMatch
@@ -118,17 +128,46 @@ actual class PlatformParagraphStyle {
             PlatformParagraphStyle()
     }
 
+    /**
+     * Include extra space beyond font ascent and descent.
+     *
+     * Enables turning on and off for Android [includeFontPadding](https://developer.android.com/reference/android/text/StaticLayout.Builder#setIncludePad(boolean)).
+     *
+     * includeFontPadding was added to Android in order to prevent clipping issues on tall scripts.
+     * However that issue has been fixed since Android 28. Jetpack Compose backports the fix for
+     * Android versions prior to Android 28. Therefore the original reason why includeFontPadding
+     * was needed in invalid on Compose.
+     *
+     * This configuration was added for migration of the apps in case some code or design  was
+     * relying includeFontPadding=true behavior and will be removed.
+     */
     @Deprecated("Sets includeFontPadding parameter for transitioning. Will be removed.")
     val includeFontPadding: Boolean
 
-    var emojiSupportMatch: EmojiSupportMatch
+    /**
+     * When to replace emoji with support emoji using androidx.emoji2.
+     *
+     * This is only available on Android.
+     */
+    val emojiSupportMatch: EmojiSupportMatch
 
+    /**
+     * Represents platform specific text flags
+     *
+     * @param includeFontPadding Set whether to include extra space beyond font ascent and descent.
+     */
     @Deprecated("Provides configuration options for behavior compatibility.")
     constructor(includeFontPadding: Boolean = DefaultIncludeFontPadding) {
         this.includeFontPadding = includeFontPadding
         this.emojiSupportMatch = EmojiSupportMatch.Default
     }
 
+    /**
+     * Represents platform specific text flags
+     *
+     * @param emojiSupportMatch control emoji support matches on Android
+     * @param includeFontPadding Set whether to include extra space beyond font ascent and descent.
+     */
     @Deprecated("Provides configuration options for behavior compatibility.")
     constructor(
         emojiSupportMatch: EmojiSupportMatch = EmojiSupportMatch.Default,
@@ -138,11 +177,19 @@ actual class PlatformParagraphStyle {
         this.emojiSupportMatch = emojiSupportMatch
     }
 
+    /**
+     * Represents platform specific text flags.
+     *
+     * @param emojiSupportMatch control emoji support matches on Android
+     */
     constructor(emojiSupportMatch: EmojiSupportMatch = EmojiSupportMatch.Default) {
         this.includeFontPadding = DefaultIncludeFontPadding
         this.emojiSupportMatch = emojiSupportMatch
     }
 
+    /**
+     * Default platform paragraph style
+     */
     constructor() : this(
         includeFontPadding = DefaultIncludeFontPadding,
         emojiSupportMatch = EmojiSupportMatch.Default
