@@ -20,6 +20,10 @@
     <string name="dialog" msgid="4057925834421392736">"डायलग"</string>
     <string name="expanded" msgid="5974471714631304645">"एक्स्पान्ड गरियो"</string>
     <string name="collapsed" msgid="5389587048670450460">"कोल्याप्स गरियो"</string>
+    <!-- no translation found for snackbar_dismiss (3962933905051144957) -->
+    <skip />
+    <!-- no translation found for search_bar_search (6420018528474762666) -->
+    <skip />
     <string name="suggestions_available" msgid="7189888345201419934">"सुझावहरू तल दिइएका छन्"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"मिति चयन गर्नुहोस्"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"चयन गरिएको मिति"</string>
