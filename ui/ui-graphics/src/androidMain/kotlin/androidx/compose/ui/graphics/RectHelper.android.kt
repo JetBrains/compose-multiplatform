@@ -22,6 +22,14 @@ import androidx.compose.ui.unit.IntRect
  * Creates a new instance of [android.graphics.Rect] with the same bounds
  * specified in the given [Rect]
  */
+@Deprecated(
+    "Converting Rect to android.graphics.Rect is lossy, and requires rounding. The " +
+        "behavior of toAndroidRect() truncates to an integral Rect, but you should choose the " +
+        "method of rounding most suitable for your use case.",
+    replaceWith = ReplaceWith(
+        "android.graphics.Rect(left.toInt(), top.toInt(), right.toInt(), bottom.toInt())"
+    )
+)
 fun Rect.toAndroidRect(): android.graphics.Rect {
     return android.graphics.Rect(
         left.toInt(),

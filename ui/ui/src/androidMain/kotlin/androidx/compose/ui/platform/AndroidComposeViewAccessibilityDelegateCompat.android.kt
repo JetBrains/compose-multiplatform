@@ -49,7 +49,6 @@ import androidx.compose.ui.R
 import androidx.compose.ui.fastJoinToString
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.layout.boundsInWindow
@@ -2797,7 +2796,18 @@ internal fun SemanticsOwner
     if (!root.layoutNode.isPlaced || !root.layoutNode.isAttached) {
         return nodes
     }
-    val unaccountedSpace = Region().also { it.set(root.boundsInRoot.toAndroidRect()) }
+    val unaccountedSpace = Region().also {
+        it.set(
+            root.boundsInRoot.run {
+                android.graphics.Rect(
+                    left.toInt(),
+                    top.toInt(),
+                    right.toInt(),
+                    bottom.toInt()
+                )
+            }
+        )
+    }
 
     fun findAllSemanticNodesRecursive(currentNode: SemanticsNode) {
         val notAttachedOrPlaced =
@@ -2807,7 +2817,12 @@ internal fun SemanticsOwner
         ) {
             return
         }
-        val boundsInRoot = currentNode.touchBoundsInRoot.toAndroidRect()
+        val boundsInRoot = android.graphics.Rect(
+            currentNode.touchBoundsInRoot.left.toInt(),
+            currentNode.touchBoundsInRoot.top.toInt(),
+            currentNode.touchBoundsInRoot.right.toInt(),
+            currentNode.touchBoundsInRoot.bottom.toInt(),
+        )
         val region = Region().also { it.set(boundsInRoot) }
         val virtualViewId = if (currentNode.id == root.id) {
             AccessibilityNodeProviderCompat.HOST_VIEW_ID
@@ -2836,7 +2851,12 @@ internal fun SemanticsOwner
                 }
                 nodes[virtualViewId] = SemanticsNodeWithAdjustedBounds(
                     currentNode,
-                    boundsForFakeNode.toAndroidRect()
+                    android.graphics.Rect(
+                        boundsForFakeNode.left.toInt(),
+                        boundsForFakeNode.top.toInt(),
+                        boundsForFakeNode.right.toInt(),
+                        boundsForFakeNode.bottom.toInt(),
+                    )
                 )
             } else if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
                 // Root view might have WRAP_CONTENT layout params in which case it will have zero
