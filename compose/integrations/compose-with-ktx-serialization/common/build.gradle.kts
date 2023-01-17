@@ -3,7 +3,7 @@ import org.jetbrains.compose.compose
 plugins {
     kotlin("multiplatform")
     id("org.jetbrains.compose")
-    kotlin("plugin.serialization") version "1.8.0"
+    kotlin("plugin.serialization")
 }
 
 group = "com.example"
@@ -28,8 +28,9 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 val ktxSerializationVer = project.property("kotlinx.serializationCore")
-                api(compose.runtime)
+                implementation(compose.runtime)
                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:$ktxSerializationVer")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
             }
         }
         val commonTest by getting {
@@ -40,4 +41,10 @@ kotlin {
     }
 }
 
-compose.kotlinCompilerPlugin.set("1.4.0-alpha03")
+compose {
+    val compilerPluginVersion = project.properties["compose.kotlinCompilerPluginVersion"] as? String
+    if (!compilerPluginVersion.isNullOrEmpty()) {
+        println("using compilerPluginVersion = $compilerPluginVersion")
+        kotlinCompilerPlugin.set(compilerPluginVersion)
+    }
+}
