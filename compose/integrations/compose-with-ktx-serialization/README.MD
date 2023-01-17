@@ -6,4 +6,4 @@ This simple project does 2 things (for jvm, k/js, k/native):
 
 To run:
 
-`./gradlew build -Pkotlin.version=1.8.0 -Pcompose.version=1.3.0-rc02 -Pcompose.kotlinCompilerPluginVersion=1.4.0-alpha04`
+`./gradlew build -Pkotlinx.serializationCore=1.4.1 -Pkotlin.version=1.8.0 -Pcompose.version=1.3.0-rc02 -Pcompose.kotlinCompilerPluginVersion=1.4.0-alpha04`
