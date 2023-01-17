@@ -21,6 +21,7 @@ import androidx.compose.foundation.newtext.text.copypasta.selection.LocalTextSel
 import androidx.compose.foundation.newtext.text.modifiers.SelectableTextAnnotatedStringElement
 import androidx.compose.foundation.newtext.text.modifiers.TextAnnotatedStringElement
 import androidx.compose.foundation.newtext.text.modifiers.SelectionController
+import androidx.compose.foundation.newtext.text.modifiers.TextStringSimpleElement
 import androidx.compose.foundation.newtext.text.modifiers.validateMinMaxLines
 import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.runtime.Composable
@@ -52,13 +53,14 @@ import kotlin.math.roundToInt
 /**
  * Rewrite of BasicText
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @ExperimentalTextApi
 @Composable
 fun TextUsingModifier(
     text: String,
     modifier: Modifier = Modifier,
     style: TextStyle = TextStyle.Default,
-    onTextLayout: (TextLayoutResult) -> Unit = {},
+    onTextLayout: ((TextLayoutResult) -> Unit)? = null,
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
@@ -77,8 +79,8 @@ fun TextUsingModifier(
     } else {
         null
     }
-    Layout(
-        modifier = modifier.textModifier(
+    val finalModifier = if (selectionController != null || onTextLayout != null) {
+        modifier.textModifier(
             AnnotatedString(text),
             style = style,
             onTextLayout = onTextLayout,
@@ -90,9 +92,19 @@ fun TextUsingModifier(
             placeholders = null,
             onPlaceholderLayout = null,
             selectionController = selectionController
-        ),
-        EmptyMeasurePolicy
-    )
+        )
+    } else {
+        modifier then TextStringSimpleElement(
+            text,
+            style,
+            LocalFontFamilyResolver.current,
+            overflow,
+            softWrap,
+            maxLines,
+            minLines
+        )
+    }
+    Layout(finalModifier, EmptyMeasurePolicy)
 }
 
 /**
