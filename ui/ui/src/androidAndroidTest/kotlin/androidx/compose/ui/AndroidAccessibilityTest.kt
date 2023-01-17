@@ -639,7 +639,7 @@ class AndroidAccessibilityTest {
     }
 
     @Test
-    fun testCreateAccessibilityNodeInfo_forTraversalOrder_layout() {
+    fun testCreateAccessibilityNodeInfo_forTraversalBefore_layout() {
         val overlaidText = "Overlaid node text"
         val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
         val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
@@ -669,13 +669,46 @@ class AndroidAccessibilityTest {
         // comparison (like SemanticsSort), the third text node should come before the overlaid node
         // — OverlaidNode should be read last
         assertNotEquals(ani3TraversalBeforeVal, 0)
-        if (ani3TraversalBeforeVal != null) {
-            assertEquals(ani3TraversalBeforeVal, overlaidNode.id)
-        }
+        assertEquals(ani3TraversalBeforeVal!!, overlaidNode.id)
     }
 
     @Test
-    fun testCreateAccessibilityNodeInfo_forTraversalOrder_layoutTestTags() {
+    fun testCreateAccessibilityNodeInfo_forTraversalAfter_layout() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row {
+                    Column {
+                        Row { Text(text1) }
+                        Row { Text(text2) }
+                        Row { Text(text3) }
+                    }
+                }
+                Row {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val overlaidNode = rule.onNodeWithText(overlaidText).fetchSemanticsNode()
+
+        val overlaidANI = provider.createAccessibilityNodeInfo(overlaidNode.id)
+        val overlaidTraversalAfterValue =
+            overlaidANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode should be read last
+        assertNotEquals(overlaidTraversalAfterValue, 0)
+        assertEquals(overlaidTraversalAfterValue!!, node3.id)
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTraversalBefore_layoutTestTags() {
         val overlaidText = "Overlaid node text"
         val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
         val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
@@ -711,14 +744,15 @@ class AndroidAccessibilityTest {
         // comparison (like SemanticsSort), the third text node should come before the overlaid node
         // — OverlaidNode and its row should be read last
         assertNotEquals(ani3TraversalBeforeVal, 0)
-        if (ani3TraversalBeforeVal != null) {
-            assertTrue(ani3TraversalBeforeVal < row2.id)
-        }
+        assertTrue(ani3TraversalBeforeVal!! < row2.id)
     }
 
     companion object {
         private const val EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL =
             "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL"
+
+        private const val EXTRA_DATA_TEST_TRAVERSALAFTER_VAL =
+            "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALAFTER_VAL"
     }
 
     @Test
