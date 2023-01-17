@@ -146,7 +146,6 @@ internal fun measureLazyGrid(
         ) {
             val measuredLine = measuredLineProvider.getAndMeasure(index)
             if (measuredLine.isEmpty()) {
-                --index
                 break
             }
 
@@ -251,10 +250,12 @@ internal fun measureLazyGrid(
             spanLayoutProvider = spanLayoutProvider
         )
 
+        val lastVisibleItemIndex = visibleLines.lastOrNull()?.items?.lastOrNull()?.index?.value ?: 0
         return LazyGridMeasureResult(
             firstVisibleLine = firstLine,
             firstVisibleLineScrollOffset = currentFirstLineScrollOffset,
-            canScrollForward = index.value < itemsCount || currentMainAxisOffset > maxOffset,
+            canScrollForward =
+                lastVisibleItemIndex != itemsCount - 1 || currentMainAxisOffset > maxOffset,
             consumedScroll = consumedScroll,
             measureResult = layout(layoutWidth, layoutHeight) {
                 positionedItems.fastForEach { it.place(this) }
