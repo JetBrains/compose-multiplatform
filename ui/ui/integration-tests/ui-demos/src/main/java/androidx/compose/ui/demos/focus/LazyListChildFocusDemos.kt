@@ -110,7 +110,7 @@ fun LazyListChildFocusDemos() {
                     )
                     DisposableEffect(pinnableContainer) {
                         onDispose {
-                            pinnedHandle?.unpin()
+                            pinnedHandle?.release()
                             pinnedHandle = null
                         }
                     }
