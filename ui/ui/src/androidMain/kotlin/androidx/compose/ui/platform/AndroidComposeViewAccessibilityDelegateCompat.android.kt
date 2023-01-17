@@ -2279,7 +2279,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     }
 
     private fun sendScrollEventIfNeeded(scrollObservationScope: ScrollObservationScope) {
-        if (!scrollObservationScope.isValid) {
+        if (!scrollObservationScope.isValidOwnerScope) {
             return
         }
         view.snapshotObserver.observeReads(scrollObservationScope, sendScrollEventIfNeededLambda) {
@@ -2879,7 +2879,7 @@ internal class ScrollObservationScope(
     var horizontalScrollAxisRange: ScrollAxisRange?,
     var verticalScrollAxisRange: ScrollAxisRange?
 ) : OwnerScope {
-    override val isValid get() = allScopes.contains(this)
+    override val isValidOwnerScope get() = allScopes.contains(this)
 }
 
 internal fun List<ScrollObservationScope>.findById(id: Int): ScrollObservationScope? {

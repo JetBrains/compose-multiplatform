@@ -466,7 +466,7 @@ internal class LayoutNode(
             return _zSortedChildren
         }
 
-    override val isValid: Boolean
+    override val isValidOwnerScope: Boolean
         get() = isAttached
 
     override fun toString(): String {

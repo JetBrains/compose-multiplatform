@@ -2594,10 +2594,6 @@ package androidx.compose.ui.node {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface ObserverNode extends androidx.compose.ui.node.DelegatableNode {
     method public void onObservedReadsChanged();
-    field public static final androidx.compose.ui.node.ObserverNode.Companion Companion;
-  }
-
-  @androidx.compose.ui.ExperimentalComposeUiApi public static final class ObserverNode.Companion {
   }
 
   public final class ObserverNodeKt {

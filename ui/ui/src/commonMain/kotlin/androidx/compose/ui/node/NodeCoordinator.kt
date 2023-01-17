@@ -507,7 +507,7 @@ internal abstract class NodeCoordinator(
     var layer: OwnedLayer? = null
         private set
 
-    override val isValid: Boolean
+    override val isValidOwnerScope: Boolean
         get() = layer != null && isAttached
 
     val minimumTouchTargetSize: Size
@@ -1208,7 +1208,7 @@ internal abstract class NodeCoordinator(
             "when isAttached is true"
         const val UnmeasuredError = "Asking for measurement result of unmeasured layout modifier"
         private val onCommitAffectingLayerParams: (NodeCoordinator) -> Unit = { coordinator ->
-            if (coordinator.isValid) {
+            if (coordinator.isValidOwnerScope) {
                 // coordinator.layerPositionalProperties should always be non-null here, but
                 // we'll just be careful with a null check.
                 val layerPositionalProperties = coordinator.layerPositionalProperties
