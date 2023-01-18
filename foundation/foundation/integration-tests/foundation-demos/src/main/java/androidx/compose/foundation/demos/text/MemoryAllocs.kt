@@ -16,12 +16,21 @@
 
 package androidx.compose.foundation.demos.text
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Divider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.withFrameMillis
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 /**
  * These demos are for using the memory profiler to observe initial compo and recompo memory
@@ -32,8 +41,12 @@ import androidx.compose.runtime.withFrameMillis
 @Composable
 fun MemoryAllocsSetText() {
     Column {
-        Text("Run in memory profiler to emulate setting text value when observable loads")
-        Text("This is designed to be used in the Android Studio memory profiler")
+        Preamble("""
+            @Composable
+            fun SetText(text: State<String>) {
+                Text(text.value)
+            }""".trimIndent()
+        )
         SetText(textToggler())
     }
 }
@@ -47,10 +60,34 @@ fun MemoryAllocsSetText() {
 @Composable
 fun MemoryAllocsIfNotEmptyText() {
     Column {
-        Text("Run in memory profiler to emulate calling Text after an observable loads")
-        Text("This is designed to be used in the Android Studio memory profiler")
+        Preamble("""
+            @Composable
+            fun IfNotEmptyText(text: State<String>) {
+                if (text.value.isNotEmpty()) {
+                    Text(text.value)
+                }
+            }""".trimIndent()
+        )
         IfNotEmptyText(textToggler())
     }
+}
+
+@Composable
+fun Preamble(sourceCode: String) {
+    Text("Run in memory profiler to emulate text behavior during observable loads")
+    Text(text = sourceCode,
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(Color(220, 230, 240)),
+        fontFamily = FontFamily.Monospace,
+        color = Color(41, 17, 27),
+        fontSize = 10.sp
+    )
+    Divider(
+        Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp))
+    Text("\uD83D\uDC47 running here \uD83D\uDC47")
 }
 
 @Composable
