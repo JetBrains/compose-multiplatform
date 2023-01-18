@@ -30,6 +30,8 @@ import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -40,14 +42,20 @@ import org.jetbrains.skia.Surface
 
 @ExperimentalTestApi
 @OptIn(InternalTestApi::class)
-actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
-    DesktopComposeUiTest().runTest(block)
+actual fun runComposeUiTest(effectContext: CoroutineContext, block: ComposeUiTest.() -> Unit) {
+    DesktopComposeUiTest(effectContext).runTest(block)
 }
 
+/**
+ * @param effectContext The [CoroutineContext] used to run the composition. The context for
+ * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
+ */
 @InternalTestApi
 @ExperimentalTestApi
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalCoroutinesApi::class)
-class DesktopComposeUiTest : ComposeUiTest {
+class DesktopComposeUiTest(
+    effectContext: CoroutineContext = EmptyCoroutineContext
+) : ComposeUiTest {
 
     override val density = Density(1f, 1f)
 
@@ -65,7 +73,11 @@ class DesktopComposeUiTest : ComposeUiTest {
         }
     }
     private val coroutineContext =
-        coroutineDispatcher + uncaughtExceptionHandler + infiniteAnimationPolicy
+        effectContext +
+            coroutineDispatcher +
+            uncaughtExceptionHandler +
+            infiniteAnimationPolicy
+
     private val surface = Surface.makeRasterN32Premul(1024, 768)
 
     lateinit var scene: ComposeScene

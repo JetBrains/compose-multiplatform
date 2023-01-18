@@ -18,6 +18,8 @@ package androidx.compose.ui.test
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
  * Sets up the test environment, runs the given [test][block] and then tears down the test
@@ -34,9 +36,16 @@ import androidx.compose.ui.unit.Density
  * launch the host from within the test lambda as well depends on the platform.
  *
  * Keeping a reference to the [ComposeUiTest] outside of this function is an error.
+ *
+ * @param effectContext The [CoroutineContext] used to run the composition. The context for
+ * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
+ * @param block The test function.
  */
 @ExperimentalTestApi
-expect fun runComposeUiTest(block: ComposeUiTest.() -> Unit)
+expect fun runComposeUiTest(
+    effectContext: CoroutineContext = EmptyCoroutineContext,
+    block: ComposeUiTest.() -> Unit
+)
 
 /**
  * A test environment that allows you to test and control composables, either in isolation or in

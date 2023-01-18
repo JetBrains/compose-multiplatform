@@ -25,7 +25,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -43,6 +42,7 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
@@ -55,7 +55,6 @@ import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -73,8 +72,13 @@ class BasicMarqueeTest {
         private val BackgroundColor = Color.White
     }
 
+    private val motionDurationScale = object : MotionDurationScale {
+        override var scaleFactor: Float by mutableStateOf(1f)
+    }
+
+    @OptIn(ExperimentalTestApi::class)
     @get:Rule
-    val rule = createComposeRule()
+    val rule = createComposeRule(effectContext = motionDurationScale)
 
     /**
      * Converts pxPerFrame to dps per second. The frame delay is 16ms, which means there are
@@ -119,14 +123,12 @@ class BasicMarqueeTest {
         }
     }
 
-    @Ignore("b/265177763: Not currently possible to inject a MotionDurationScale in tests.")
+    @Suppress("UnnecessaryOptInAnnotation")
+    @OptIn(ExperimentalTestApi::class)
     @Test fun animates_whenAnimationsDisabledBySystem() {
-        // TODO(b/265177763) Inject 0 duration scale.
+        motionDurationScale.scaleFactor = 0f
 
         rule.setContent {
-            LaunchedEffect(Unit) {
-                assertThat(coroutineContext[MotionDurationScale]?.scaleFactor).isEqualTo(0f)
-            }
             TestMarqueeContent(
                 Modifier.basicMarqueeWithTestParams(
                     iterations = 1,
