@@ -1079,6 +1079,10 @@ package androidx.compose.material3 {
   public final class TonalPaletteKt {
   }
 
+  @androidx.compose.material3.ExperimentalMaterial3Api public interface TooltipBoxScope {
+    method public androidx.compose.ui.Modifier tooltipAnchor(androidx.compose.ui.Modifier);
+  }
+
   @androidx.compose.material3.ExperimentalMaterial3Api public final class TooltipDefaults {
     method @androidx.compose.runtime.Composable public long getPlainTooltipContainerColor();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getPlainTooltipContainerShape();
@@ -1090,7 +1094,7 @@ package androidx.compose.material3 {
   }
 
   public final class TooltipKt {
-    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void PlainTooltipBox(kotlin.jvm.functions.Function0<kotlin.Unit> tooltip, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.TooltipState? tooltipState, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.BoxScope,kotlin.Unit> content);
+    method @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Composable public static void PlainTooltipBox(kotlin.jvm.functions.Function0<kotlin.Unit> tooltip, optional androidx.compose.ui.Modifier modifier, optional androidx.compose.material3.TooltipState tooltipState, optional androidx.compose.ui.graphics.Shape shape, optional long containerColor, optional long contentColor, kotlin.jvm.functions.Function1<? super androidx.compose.material3.TooltipBoxScope,kotlin.Unit> content);
   }
 
   @androidx.compose.material3.ExperimentalMaterial3Api @androidx.compose.runtime.Stable public final class TooltipState {

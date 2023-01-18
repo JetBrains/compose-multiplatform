@@ -52,6 +52,7 @@ internal actual fun getString(string: Strings): String {
         Strings.DateInputInvalidNotAllowed -> "Date not allowed: %1$"
         Strings.DateInputInvalidForPattern -> "Date does not match expected pattern: %1$"
         Strings.DateInputInvalidYearRange -> "Date out of expected year range %1$ - %2$"
+        Strings.TooltipLongPressLabel -> "Show tooltip"
         else -> ""
     }
 }

@@ -28,7 +28,6 @@ import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -53,6 +52,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.onLongClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -62,7 +62,6 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -80,10 +79,7 @@ import kotlinx.coroutines.launch
  *
  * @param tooltip the composable that will be used to populate the tooltip's content.
  * @param modifier the [Modifier] to be applied to the tooltip.
- * @param tooltipState handles the state of the tooltip's visibility. If nothing is passed to
- * tooltipState the tooltip will trigger on long press of the anchor content. If control
- * of when the tooltip is triggered is desired pass in a [TooltipState], please note that
- * this will deactivate the default behavior of triggering on long press of the anchor content.
+ * @param tooltipState handles the state of the tooltip's visibility.
  * @param shape the [Shape] that should be applied to the tooltip container.
  * @param containerColor [Color] that will be applied to the tooltip's container.
  * @param contentColor [Color] that will be applied to the tooltip's content.
@@ -94,17 +90,14 @@ import kotlinx.coroutines.launch
 fun PlainTooltipBox(
     tooltip: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    tooltipState: TooltipState? = null,
+    tooltipState: TooltipState = remember { TooltipState() },
     shape: Shape = TooltipDefaults.plainTooltipContainerShape,
     containerColor: Color = TooltipDefaults.plainTooltipContainerColor,
     contentColor: Color = TooltipDefaults.plainTooltipContentColor,
-    content: @Composable BoxScope.() -> Unit
+    content: @Composable TooltipBoxScope.() -> Unit
 ) {
     val tooltipAnchorPadding = with(LocalDensity.current) { TooltipAnchorPadding.roundToPx() }
     val positionProvider = remember { PlainTooltipPositionProvider(tooltipAnchorPadding) }
-    val scope = rememberCoroutineScope()
-    val showOnLongPress = tooltipState == null
-    val state = tooltipState ?: remember { TooltipState() }
 
     TooltipBox(
         tooltipContent = {
@@ -114,21 +107,13 @@ fun PlainTooltipBox(
             )
         },
         modifier = modifier,
-        tooltipState = state,
-        scope = scope,
+        tooltipState = tooltipState,
         shape = shape,
         containerColor = containerColor,
         tooltipPositionProvider = positionProvider,
         elevation = 0.dp,
         maxWidth = PlainTooltipMaxWidth,
-        content = if (showOnLongPress) { {
-            Box(
-                modifier = Modifier.appendLongClick(
-                    onLongClick = { scope.launch { state.show() } }
-                ),
-                content = content
-            )
-        } } else content
+        content = content
     )
 }
 
@@ -140,18 +125,54 @@ private fun TooltipBox(
     modifier: Modifier,
     shape: Shape,
     tooltipState: TooltipState,
-    scope: CoroutineScope,
     containerColor: Color,
     elevation: Dp,
     maxWidth: Dp,
-    content: @Composable BoxScope.() -> Unit,
+    content: @Composable TooltipBoxScope.() -> Unit,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    val longPressLabel = getString(string = Strings.TooltipLongPressLabel)
+
+    val scope = remember {
+        object : TooltipBoxScope {
+            override fun Modifier.tooltipAnchor(): Modifier {
+                return pointerInput(tooltipState) {
+                        awaitEachGesture {
+                            val longPressTimeout = viewConfiguration.longPressTimeoutMillis
+                            val pass = PointerEventPass.Initial
+
+                            // wait for the first down press
+                            awaitFirstDown(pass = pass)
+
+                            try {
+                                // listen to if there is up gesture within the longPressTimeout limit
+                                withTimeout(longPressTimeout) {
+                                    waitForUpOrCancellation(pass = pass)
+                                }
+                            } catch (_: PointerEventTimeoutCancellationException) {
+                                // handle long press - Show the tooltip
+                                coroutineScope.launch {
+                                    tooltipState.show()
+                                }
+
+                                // consume the children's click handling
+                                val event = awaitPointerEvent(pass = pass)
+                                event.changes.forEach { it.consume() }
+                            }
+                        }
+                    }.semantics(mergeDescendants = true) {
+                        onLongClick(label = longPressLabel, action = null)
+                    }
+            }
+        }
+    }
+
     Box {
         Popup(
             popupPositionProvider = tooltipPositionProvider,
             onDismissRequest = {
                 if (tooltipState.isVisible) {
-                    scope.launch { tooltipState.dismiss() }
+                    coroutineScope.launch { tooltipState.dismiss() }
                 }
             }
         ) {
@@ -172,7 +193,7 @@ private fun TooltipBox(
             )
         }
 
-        content()
+        scope.content()
     }
 }
 
@@ -291,31 +312,18 @@ private fun Modifier.animateTooltip(
     )
 }
 
-private fun Modifier.appendLongClick(
-    onLongClick: () -> Unit
-) = this.pointerInput(Unit) {
-        awaitEachGesture {
-            val longPressTimeout = viewConfiguration.longPressTimeoutMillis
-            val pass = PointerEventPass.Initial
-
-            // wait for the first down press
-            awaitFirstDown(pass = pass)
-
-            try {
-                // listen to if there is up gesture within the longPressTimeout limit
-                withTimeout(longPressTimeout) {
-                    waitForUpOrCancellation(pass = pass)
-                }
-            } catch (_: PointerEventTimeoutCancellationException) {
-                // handle long press
-                onLongClick()
-
-                // consume the children's click handling
-                val event = awaitPointerEvent(pass = pass)
-                event.changes.forEach { it.consume() }
-            }
-        }
-    }
+/**
+ * Scope of [PlainTooltipBox] and RichTooltipBox
+ */
+@ExperimentalMaterial3Api
+interface TooltipBoxScope {
+    /**
+     * [Modifier] that should be applied to the anchor composable when showing the tooltip
+     * after long pressing the anchor composable is desired. It appends a long click to
+     * the composable that this modifier is chained with.
+     */
+    fun Modifier.tooltipAnchor(): Modifier
+}
 
 /**
  * The state that is associated with an instance of a tooltip.
