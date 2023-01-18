@@ -378,6 +378,45 @@ class ScrollbarTest {
         }
     }
 
+    // See https://github.com/JetBrains/compose-jb/issues/2640
+    @Test
+    fun `drag scrollbar to bottom with content padding`() {
+        runBlocking(Dispatchers.Main) {
+            val listState = LazyListState()
+            rule.setContent {
+                LazyTestBox(
+                    state = listState,
+                    size = 300.dp,
+                    scrollbarWidth = 10.dp,
+                    contentPadding = PaddingValues(top = 100.dp, bottom = 200.dp),
+                ){
+                    val childHeights = listOf(100.dp, 200.dp, 75.dp)
+                    items(childHeights.size){ index ->
+                        Box(Modifier.size(childHeights[index]))
+                    }
+                }
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 5f), end = Offset(0f, 500f))
+            }
+            rule.awaitIdle()
+
+            // Test whether the scrollbar is at the bottom by trying to drag it up by the last pixel.
+            // If it's not at the bottom, the drag will not succeed
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 299f), end = Offset(0f, 0f))
+            }
+            rule.awaitIdle()
+
+            assertEquals(true, listState.canScrollForward)
+            val firstVisibleItem = listState.layoutInfo.visibleItemsInfo.first()
+            assertEquals(0, firstVisibleItem.index)
+            assertEquals(0, firstVisibleItem.offset)
+        }
+    }
+
     // TODO(demin): write a test when we support DesktopComposeTestRule.mainClock:
     //  see https://github.com/JetBrains/compose-jb/issues/637
 //    fun `move mouse to the slider and drag it`() {
@@ -751,54 +790,20 @@ class ScrollbarTest {
         }
     }
 
-    @Suppress("SameParameterValue")
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun LazyTestBox(
         state: LazyListState = rememberLazyListState(),
         size: Dp,
-        childSize: Dp,
-        childCount: Int,
         scrollbarWidth: Dp,
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        content: LazyListScope.() -> Unit
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
             LazyColumn(
                 Modifier.fillMaxSize().testTag("column"),
                 state,
                 contentPadding = contentPadding,
-                reverseLayout = reverseLayout
-            ) {
-                items((0 until childCount).toList()) {
-                    Box(Modifier.size(childSize).testTag("box$it"))
-                }
-            }
-
-            ScrollbarImplLocal.current.VerticalScrollbar(
-                scrollState = state,
-                reverseLayout = reverseLayout,
-                modifier = Modifier
-                    .width(scrollbarWidth)
-                    .fillMaxHeight()
-                    .testTag("scrollbar")
-            )
-        }
-    }
-
-    @Suppress("SameParameterValue")
-    @Composable
-    private fun LazyTestBox(
-        state: LazyListState,
-        size: Dp,
-        scrollbarWidth: Dp,
-        reverseLayout: Boolean = false,
-        content: LazyListScope.() -> Unit,
-    ) = withTestEnvironment {
-        Box(Modifier.size(size)) {
-            LazyColumn(
-                Modifier.fillMaxSize().testTag("column"),
-                state,
                 reverseLayout = reverseLayout,
                 content = content
             )
@@ -811,6 +816,27 @@ class ScrollbarTest {
                     .fillMaxHeight()
                     .testTag("scrollbar")
             )
+        }
+    }
+
+    @Composable
+    private fun LazyTestBox(
+        state: LazyListState = rememberLazyListState(),
+        size: Dp,
+        childSize: Dp,
+        childCount: Int,
+        scrollbarWidth: Dp,
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        reverseLayout: Boolean = false,
+    ) = LazyTestBox(
+        state = state,
+        size = size,
+        scrollbarWidth = scrollbarWidth,
+        contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+    ) {
+        items((0 until childCount).toList()) {
+            Box(Modifier.size(childSize).testTag("box$it"))
         }
     }
 

@@ -99,8 +99,13 @@ internal class LazyScrollbarAdapter(
 ) : ScrollbarAdapter {
 
     override val scrollOffset: Double
-        get() = scrollState.firstVisibleItemIndex * averageItemSize +
-            scrollState.firstVisibleItemScrollOffset
+        get() {
+            val firstVisibleItem = scrollState.layoutInfo.visibleItemsInfo.firstOrNull()
+            return if (firstVisibleItem == null)
+                0.0
+            else
+                firstVisibleItem.index * averageItemSize - firstVisibleItem.offset
+        }
 
     override val viewportSize: Double
         get() = with(scrollState.layoutInfo){
