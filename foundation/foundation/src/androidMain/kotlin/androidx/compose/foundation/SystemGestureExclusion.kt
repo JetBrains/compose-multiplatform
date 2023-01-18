@@ -98,10 +98,10 @@ private class ExcludeFromSystemGestureModifier(
         val newRect = if (exclusion == null) {
             val boundsInRoot = coordinates.boundsInRoot()
             android.graphics.Rect(
-                boundsInRoot.left.toInt(),
-                boundsInRoot.top.toInt(),
-                boundsInRoot.right.toInt(),
-                boundsInRoot.bottom.toInt()
+                boundsInRoot.left.roundToInt(),
+                boundsInRoot.top.roundToInt(),
+                boundsInRoot.right.roundToInt(),
+                boundsInRoot.bottom.roundToInt()
             )
         } else {
             calcBounds(coordinates, exclusion.invoke(coordinates))
