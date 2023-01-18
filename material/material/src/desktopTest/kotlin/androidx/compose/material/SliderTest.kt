@@ -35,6 +35,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import kotlin.math.roundToInt
 import org.junit.Assert
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -42,6 +43,11 @@ class SliderTest {
 
     @get:Rule
     val rule = createComposeRule()
+
+    @Before
+    fun before() {
+        rule.mainClock.autoAdvance = true
+    }
 
     @OptIn(ExperimentalComposeUiApi::class)
     @Test
@@ -271,6 +277,7 @@ class SliderTest {
     @Test
     fun `Slider should request focus on Tap`() {
         var hasFocus = false
+        rule.mainClock.autoAdvance = false
         rule.setContent {
             Slider(
                 value = 0.1f,
@@ -280,11 +287,13 @@ class SliderTest {
                 }.testTag("slider")
             )
         }
+        rule.mainClock.advanceTimeByFrame()
 
         rule.onNodeWithTag("slider").performTouchInput {
             down(Offset(10f, 5f))
             up()
         }
+        rule.mainClock.advanceTimeByFrame()
 
         rule.runOnIdle {
             Assert.assertEquals(true, hasFocus)
