@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.unit
 
+import androidx.compose.ui.geometry.Rect
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -233,6 +234,22 @@ class IntRectTest {
         Assert.assertEquals(
             IntRect(25, 25, 150, 150),
             lerp(rect1, rect2, 0.5f)
+        )
+    }
+
+    @Test
+    fun `to Rect`() {
+        Assert.assertEquals(
+            Rect(25.0f, 25.0f, 150.0f, 150.0f),
+            IntRect(25, 25, 150, 150).toRect()
+        )
+    }
+
+    @Test
+    fun `round Rect to IntRect`() {
+        Assert.assertEquals(
+            IntRect(2, 3, 4, 5),
+            Rect(2.4f, 2.5f, 3.9f, 5.3f).round(),
         )
     }
 }
