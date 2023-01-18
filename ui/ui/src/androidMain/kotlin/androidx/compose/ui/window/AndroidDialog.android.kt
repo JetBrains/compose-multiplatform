@@ -58,9 +58,10 @@ import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.util.fastMaxBy
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
 import androidx.lifecycle.findViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.findViewTreeSavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import java.util.UUID
@@ -349,7 +350,7 @@ private class DialogWrapper(
         (window.decorView as? ViewGroup)?.disableClipping()
         setContentView(dialogLayout)
         dialogLayout.setViewTreeLifecycleOwner(composeView.findViewTreeLifecycleOwner())
-        ViewTreeViewModelStoreOwner.set(dialogLayout, ViewTreeViewModelStoreOwner.get(composeView))
+        dialogLayout.setViewTreeViewModelStoreOwner(composeView.findViewTreeViewModelStoreOwner())
         dialogLayout.setViewTreeSavedStateRegistryOwner(
             composeView.findViewTreeSavedStateRegistryOwner()
         )

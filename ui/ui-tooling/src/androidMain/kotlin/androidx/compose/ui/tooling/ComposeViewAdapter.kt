@@ -65,7 +65,7 @@ import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.ViewModelStore
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.setViewTreeLifecycleOwner
-import androidx.lifecycle.ViewTreeViewModelStoreOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
 import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
@@ -575,7 +575,7 @@ internal class ComposeViewAdapter : FrameLayout {
         // ComposeView and lifecycle initialization
         setViewTreeLifecycleOwner(FakeSavedStateRegistryOwner)
         setViewTreeSavedStateRegistryOwner(FakeSavedStateRegistryOwner)
-        ViewTreeViewModelStoreOwner.set(this, FakeViewModelStoreOwner)
+        setViewTreeViewModelStoreOwner(FakeViewModelStoreOwner)
         addView(composeView)
 
         val composableName = attrs.getAttributeValue(TOOLS_NS_URI, "composableName") ?: return
