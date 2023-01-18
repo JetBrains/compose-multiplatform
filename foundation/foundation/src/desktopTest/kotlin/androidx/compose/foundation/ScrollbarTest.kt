@@ -18,12 +18,15 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.LocalScrollConfig
 import androidx.compose.foundation.gestures.ScrollConfig
+import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,7 +36,11 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.compositionLocalOf
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -46,6 +53,7 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MouseInjectionScope
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.DesktopComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -55,6 +63,8 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import kotlin.math.abs
+import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -62,17 +72,24 @@ import org.junit.Assert.assertEquals
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.junit.experimental.theories.DataPoint
+import org.junit.experimental.theories.Theories
+import org.junit.experimental.theories.Theory
+import org.junit.runner.RunWith
+
 
 @Suppress("WrapUnaryOperator")
 @OptIn(ExperimentalTestApi::class)
+@RunWith(Theories::class)
 class ScrollbarTest {
+
     @get:Rule
     val rule = createComposeRule()
 
-    @Test
-    fun `drag slider to the middle`() {
+    @Theory
+    fun `drag slider to the middle`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -85,10 +102,10 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `drag slider when it is hidden`() {
+    @Theory
+    fun `drag slider when it is hidden`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 1, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -100,10 +117,10 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `drag slider to the edges`() {
+    @Theory
+    fun `drag slider to the edges`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -122,10 +139,10 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `drag outside slider`() {
+    @Theory
+    fun `drag outside slider`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -138,11 +155,11 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `drag outside slider and back`() {
+    @Theory
+    fun `drag outside slider and back`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             val scale = 2f  // Content distance to corresponding scrollbar distance
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 10.dp * scale, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -201,11 +218,11 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `drag slider with varying size items`() {
+    @Theory
+    fun `drag slider with varying size items`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             val listState = LazyListState()
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 LazyTestBox(state = listState, size = 100.dp, scrollbarWidth = 10.dp){
                     item {
                         Box(Modifier.size(20.dp))
@@ -287,11 +304,11 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `scroll lazy column to bottom with content padding`() {
+    @Theory
+    fun `scroll lazy column to bottom with content padding`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             val listState = LazyListState()
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 LazyTestBox(
                     state = listState,
                     size = 100.dp,
@@ -317,6 +334,50 @@ class ScrollbarTest {
         }
     }
 
+    @Test
+    fun `thumb size on scrollbar smaller than viewport`() {
+        runBlocking(Dispatchers.Main) {
+            val scrollState = ScrollState(0)
+            rule.setContent {
+                TestBox(
+                    scrollState = scrollState,
+                    size = 200.dp,
+                    childSize = 20.dp,
+                    childCount = 20,
+                    scrollbarWidth = 10.dp,
+                    scrollbarHeight = 100.dp,
+                )
+            }
+            rule.awaitIdle()
+
+            // Thumb should be half the height of the scrollbar, as the viewport (200.dp) is half the height of the
+            // content (400.dp). So clicking on the top half of the scrollbar should do nothing.
+            for (offset in 1..50){
+                // Use moveTo -> press -> awaitIdle -> test -> release because click doesn't appear to work
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    moveTo(position = Offset(0f, offset.toFloat()))
+                    press()
+                }
+                rule.awaitIdle()
+                assertEquals(0, scrollState.value)
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    release()
+                }
+            }
+
+            // Clicking one pixel below the thumb should scroll the content by one viewport
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(position = Offset(0f, 51f))
+                press()
+            }
+            rule.awaitIdle()
+            assertEquals(200, scrollState.value)
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
+            }
+        }
+    }
+
     // TODO(demin): write a test when we support DesktopComposeTestRule.mainClock:
     //  see https://github.com/JetBrains/compose-jb/issues/637
 //    fun `move mouse to the slider and drag it`() {
@@ -335,10 +396,10 @@ class ScrollbarTest {
 
     // TODO(demin): enable after we resolve b/171889442
     @Ignore("Enable after we resolve b/171889442")
-    @Test
-    fun `mouseScroll over slider`() {
+    @Theory
+    fun `mouseScroll over slider`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -351,10 +412,10 @@ class ScrollbarTest {
 
     // TODO(demin): enable after we resolve b/171889442
     @Ignore("Enable after we resolve b/171889442")
-    @Test
-    fun `mouseScroll over scrollbar outside slider`() {
+    @Theory
+    fun `mouseScroll over scrollbar outside slider`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -367,8 +428,8 @@ class ScrollbarTest {
 
     // TODO(demin): enable after we resolve b/171889442
     @Ignore("Enable after we resolve b/171889442")
-    @Test
-    fun `vertical mouseScroll over horizontal scrollbar `() {
+    @Theory
+    fun `vertical mouseScroll over horizontal scrollbar `(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             // TODO(demin): write tests for vertical mouse scrolling over
             //  horizontalScrollbar for the case when we have two-way scrollable content:
@@ -377,10 +438,10 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `mouseScroll over column then drag to the beginning`() {
+    @Theory
+    fun `mouseScroll over column then drag to the beginning`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 10, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -397,10 +458,12 @@ class ScrollbarTest {
         }
     }
 
+    @Theory
     @Test(timeout = 3000)
-    fun `press on scrollbar outside slider`() {
+    @Suppress("JUnitMalformedDeclaration")
+    fun `press on scrollbar outside slider`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -417,10 +480,12 @@ class ScrollbarTest {
         }
     }
 
+    @Theory
     @Test(timeout = 3000)
-    fun `press on the end of scrollbar outside slider`() {
+    @Suppress("JUnitMalformedDeclaration")
+    fun `press on the end of scrollbar outside slider`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
             }
             rule.awaitIdle()
@@ -437,11 +502,13 @@ class ScrollbarTest {
         }
     }
 
+    @Theory
     @Test(timeout = 3000)
-    fun `dynamically change content then drag slider to the end`() {
+    @Suppress("JUnitMalformedDeclaration")
+    fun `dynamically change content then drag slider to the end`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             val isContentVisible = mutableStateOf(false)
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 TestBox(
                     size = 100.dp,
                     scrollbarWidth = 10.dp
@@ -466,14 +533,14 @@ class ScrollbarTest {
         }
     }
 
-    @Suppress("SameParameterValue")
-    @OptIn(ExperimentalFoundationApi::class)
+    @Theory
     @Test(timeout = 3000)
-    fun `scroll by less than one page in lazy list`() {
+    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    fun `scroll by less than one page in lazy list`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             lateinit var state: LazyListState
 
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 state = rememberLazyListState()
                 LazyTestBox(
                     state,
@@ -494,14 +561,14 @@ class ScrollbarTest {
         }
     }
 
-    @Suppress("SameParameterValue")
-    @OptIn(ExperimentalFoundationApi::class)
+    @Theory
     @Test(timeout = 3000)
-    fun `scroll in reversed lazy list`() {
+    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    fun `scroll in reversed lazy list`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             lateinit var state: LazyListState
 
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 state = rememberLazyListState()
                 LazyTestBox(
                     state,
@@ -523,14 +590,14 @@ class ScrollbarTest {
         }
     }
 
-    @Suppress("SameParameterValue")
-    @OptIn(ExperimentalFoundationApi::class)
+    @Theory
     @Test(timeout = 3000)
-    fun `scroll by more than one page in lazy list`() {
+    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    fun `scroll by more than one page in lazy list`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             lateinit var state: LazyListState
 
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 state = rememberLazyListState()
                 LazyTestBox(
                     state,
@@ -551,14 +618,14 @@ class ScrollbarTest {
         }
     }
 
-    @Suppress("SameParameterValue")
-    @OptIn(ExperimentalFoundationApi::class)
+    @Theory
     @Test(timeout = 3000)
-    fun `scroll outside of scrollbar bounds in lazy list`() {
+    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    fun `scroll outside of scrollbar bounds in lazy list`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
             lateinit var state: LazyListState
 
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 state = rememberLazyListState()
                 LazyTestBox(
                     state,
@@ -586,10 +653,10 @@ class ScrollbarTest {
         }
     }
 
-    @Test
-    fun `drag lazy slider when it is hidden`() {
+    @Theory
+    fun `drag lazy slider when it is hidden`(scrollbarImpl: ScrollbarImpl) {
         runBlocking(Dispatchers.Main) {
-            rule.setContent {
+            rule.setContent(scrollbarImpl) {
                 LazyTestBox(
                     size = 100.dp, childSize = 20.dp, childCount = 1, scrollbarWidth = 10.dp
                 )
@@ -634,27 +701,27 @@ class ScrollbarTest {
 
     @Composable
     private fun TestBox(
+        scrollState: ScrollState = rememberScrollState(),
         size: Dp,
         childSize: Dp,
         childCount: Int,
         scrollbarWidth: Dp,
+        scrollbarHeight: Dp = size
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
-            val state = rememberScrollState()
-
             Column(
-                Modifier.fillMaxSize().testTag("column").verticalScroll(state)
+                Modifier.fillMaxSize().testTag("column").verticalScroll(scrollState)
             ) {
                 repeat(childCount) {
                     Box(Modifier.size(childSize).testTag("box$it"))
                 }
             }
 
-            VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(state),
+            ScrollbarImplLocal.current.VerticalScrollbar(
+                scrollState = scrollState,
                 modifier = Modifier
                     .width(scrollbarWidth)
-                    .fillMaxHeight()
+                    .height(scrollbarHeight)
                     .testTag("scrollbar")
             )
         }
@@ -674,8 +741,8 @@ class ScrollbarTest {
                 content = scrollableContent
             )
 
-            VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(state),
+            ScrollbarImplLocal.current.VerticalScrollbar(
+                scrollState = state,
                 modifier = Modifier
                     .width(scrollbarWidth)
                     .fillMaxHeight()
@@ -708,8 +775,8 @@ class ScrollbarTest {
                 }
             }
 
-            VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(state),
+            ScrollbarImplLocal.current.VerticalScrollbar(
+                scrollState = state,
                 reverseLayout = reverseLayout,
                 modifier = Modifier
                     .width(scrollbarWidth)
@@ -736,8 +803,8 @@ class ScrollbarTest {
                 content = content
             )
 
-            VerticalScrollbar(
-                adapter = rememberScrollbarAdapter(state),
+            ScrollbarImplLocal.current.VerticalScrollbar(
+                scrollState = state,
                 reverseLayout = reverseLayout,
                 modifier = Modifier
                     .width(scrollbarWidth)
@@ -767,6 +834,253 @@ class ScrollbarTest {
         LocalScrollConfig provides TestConfig,
         content = content
     )
+
+    companion object{
+
+        // The old and new scrollbar implementations, allowing us to run the same tests on both
+        // Tests that should run on both, should:
+        // 1. Be marked as `@Theory`
+        // 2. Take a ScrollbarImpl argument
+        // 3. Set the argument as the ScrollbarImplLocal, typically via
+        //    ComposeContentTestRule.setContent(ScrollbarImpl, @Composable () -> Unit)
+        // Tests that should only run on the new implementation should just be marked with `@Test` as usual.
+
+        @JvmField
+        @DataPoint
+        val NewScrollbarImpl: ScrollbarImpl = NewScrollbar
+
+        @JvmField
+        @DataPoint
+        val OldScrollbarImpl: ScrollbarImpl = OldScrollbar
+
+    }
+
+}
+
+/**
+ * Abstracts the implementation of the scrollbar (actually just the adapter) to allow us to test both the new and old
+ * adapters.
+ */
+sealed class ScrollbarImpl {
+
+    // @Composable abstract functions can't have default arguments, so we're forced to delegate to another function
+    @Composable
+    fun VerticalScrollbar(
+        scrollState: ScrollState,
+        modifier: Modifier = Modifier,
+        reverseLayout: Boolean = false,
+        style: ScrollbarStyle = LocalScrollbarStyle.current,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    ) = VerticalScrollbarImpl(
+        scrollState = scrollState,
+        modifier = modifier,
+        reverseLayout = reverseLayout,
+        style = style,
+        interactionSource = interactionSource
+    )
+
+    @Composable
+    protected abstract fun VerticalScrollbarImpl(
+        scrollState: ScrollState,
+        modifier: Modifier,
+        reverseLayout: Boolean,
+        style: ScrollbarStyle,
+        interactionSource: MutableInteractionSource
+    )
+
+    @Composable
+    fun VerticalScrollbar(
+        scrollState: LazyListState,
+        modifier: Modifier = Modifier,
+        reverseLayout: Boolean = false,
+        style: ScrollbarStyle = LocalScrollbarStyle.current,
+        interactionSource: MutableInteractionSource = remember { MutableInteractionSource() }
+    ) = VerticalScrollbarImpl(
+        scrollState = scrollState,
+        modifier = modifier,
+        reverseLayout = reverseLayout,
+        style = style,
+        interactionSource = interactionSource
+    )
+
+    @Composable
+    protected abstract fun VerticalScrollbarImpl(
+        scrollState: LazyListState,
+        modifier: Modifier,
+        reverseLayout: Boolean,
+        style: ScrollbarStyle,
+        interactionSource: MutableInteractionSource
+    )
+
+}
+
+/**
+ * The old scrollbar implementation.
+ */
+@Suppress("DEPRECATION")
+private object OldScrollbar: ScrollbarImpl() {
+
+    // Our old implementation of the old scrollbar adapter interface
+    private class OldScrollableScrollbarAdapter(
+        private val scrollState: ScrollState
+    ) : ScrollbarAdapter {
+        override val scrollOffset: Float get() = scrollState.value.toFloat()
+
+        override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
+            scrollState.scrollTo(scrollOffset.roundToInt())
+        }
+
+        override fun maxScrollOffset(containerSize: Int) =
+            scrollState.maxValue.toFloat()
+    }
+
+    @Composable
+    override fun VerticalScrollbarImpl(
+        scrollState: ScrollState,
+        modifier: Modifier,
+        reverseLayout: Boolean,
+        style: ScrollbarStyle,
+        interactionSource: MutableInteractionSource
+    ) {
+        val oldAdapter = remember(scrollState){
+            OldScrollableScrollbarAdapter(scrollState)
+        }
+        VerticalScrollbar(
+            adapter = oldAdapter,
+            modifier = modifier,
+            reverseLayout = reverseLayout,
+            style = style,
+            interactionSource = interactionSource
+        )
+    }
+
+    // Our old implementation of the old scrollbar adapter interface
+    private class OldLazyScrollbarAdapter(
+        private val scrollState: LazyListState
+    ) : ScrollbarAdapter {
+
+        override val scrollOffset: Float
+            get() = scrollState.firstVisibleItemIndex * averageItemSize +
+                scrollState.firstVisibleItemScrollOffset
+
+        override suspend fun scrollTo(containerSize: Int, scrollOffset: Float) {
+            val distance = scrollOffset - this@OldLazyScrollbarAdapter.scrollOffset
+            if (abs(distance) <= containerSize) {
+                scrollState.scrollBy(distance)
+            } else {
+                snapTo(containerSize, scrollOffset)
+            }
+        }
+
+        private suspend fun snapTo(containerSize: Int, scrollOffset: Float) {
+            val maximumValue = maxScrollOffset(containerSize).toDouble()
+            val scrollOffsetCoerced = scrollOffset.toDouble().coerceIn(0.0, maximumValue)
+            val averageItemSize = averageItemSize.toDouble()
+
+            val index = (scrollOffsetCoerced / averageItemSize)
+                .toInt()
+                .coerceAtLeast(0)
+                .coerceAtMost(itemCount - 1)
+
+            val offset = (scrollOffsetCoerced - index * averageItemSize)
+                .toInt()
+                .coerceAtLeast(0)
+
+            scrollState.scrollToItem(index = index, scrollOffset = offset)
+        }
+
+        override fun maxScrollOffset(containerSize: Int) =
+            (averageItemSize * itemCount
+                + scrollState.layoutInfo.beforeContentPadding
+                + scrollState.layoutInfo.afterContentPadding
+                - containerSize
+                ).coerceAtLeast(0f)
+
+        private val itemCount get() = scrollState.layoutInfo.totalItemsCount
+
+        private val averageItemSize by derivedStateOf {
+            scrollState
+                .layoutInfo
+                .visibleItemsInfo
+                .asSequence()
+                .map { it.size }
+                .average()
+                .toFloat()
+        }
+
+    }
+
+    @Composable
+    override fun VerticalScrollbarImpl(
+        scrollState: LazyListState,
+        modifier: Modifier,
+        reverseLayout: Boolean,
+        style: ScrollbarStyle,
+        interactionSource: MutableInteractionSource
+    ) {
+        val oldAdapter = remember(scrollState){
+            OldLazyScrollbarAdapter(scrollState)
+        }
+        VerticalScrollbar(
+            adapter = oldAdapter,
+            modifier = modifier,
+            reverseLayout = reverseLayout,
+            style = style,
+            interactionSource = interactionSource
+        )
+    }
+
+}
+
+/**
+ * The new scrollbar implementation
+ */
+private object NewScrollbar: ScrollbarImpl() {
+
+    @Composable
+    override fun VerticalScrollbarImpl(
+        scrollState: ScrollState,
+        modifier: Modifier,
+        reverseLayout: Boolean,
+        style: ScrollbarStyle,
+        interactionSource: MutableInteractionSource
+    ) {
+        VerticalScrollbar(
+            adapter = rememberScrollbarAdapter(scrollState),
+            modifier = modifier,
+            reverseLayout = reverseLayout,
+            style = style,
+            interactionSource = interactionSource
+        )
+    }
+
+    @Composable
+    override fun VerticalScrollbarImpl(
+        scrollState: LazyListState,
+        modifier: Modifier,
+        reverseLayout: Boolean,
+        style: ScrollbarStyle,
+        interactionSource: MutableInteractionSource
+    ) {
+        VerticalScrollbar(
+            adapter = rememberScrollbarAdapter(scrollState),
+            modifier = modifier,
+            reverseLayout = reverseLayout,
+            style = style,
+            interactionSource = interactionSource
+        )
+    }
+
+}
+
+private val ScrollbarImplLocal = compositionLocalOf<ScrollbarImpl>{ NewScrollbar }
+
+private fun ComposeContentTestRule.setContent(scrollbarImpl: ScrollbarImpl, composable: @Composable () -> Unit){
+    setContent {
+        CompositionLocalProvider(ScrollbarImplLocal provides scrollbarImpl){
+            composable()
+        }
+    }
 }
 
 internal object TestConfig : ScrollConfig {
