@@ -139,7 +139,7 @@ class DemoActivity : FragmentActivity() {
         const val DEMO_NAME = "demoname"
 
         internal fun requireDemo(demoName: String, demo: Demo?) = requireNotNull(demo) {
-            "No demo called \"$demoName\" could be found."
+            "No demo called \"$demoName\" could be found. Note substring matches are allowed."
         }
     }
 }
@@ -239,20 +239,26 @@ private class Navigator private constructor(
             restore = { restored ->
                 require(restored.isNotEmpty())
                 val backStack = restored.mapTo(mutableListOf()) {
-                    requireNotNull(findDemo(rootDemo, it))
+                    requireNotNull(findDemo(rootDemo, it, exact = true))
                 }
                 val initial = backStack.removeAt(backStack.lastIndex)
                 Navigator(backDispatcher, launchActivityDemo, rootDemo, initial, backStack)
             }
         )
 
-        fun findDemo(demo: Demo, title: String): Demo? {
-            if (demo.title == title) {
-                return demo
+        fun findDemo(demo: Demo, title: String, exact: Boolean = false): Demo? {
+            if (exact) {
+                if (demo.title == title) {
+                    return demo
+                }
+            } else {
+                if (demo.title.contains(title)) {
+                    return demo
+                }
             }
             if (demo is DemoCategory) {
                 demo.demos.forEach { child ->
-                    findDemo(child, title)
+                    findDemo(child, title, exact)
                         ?.let { return it }
                 }
             }

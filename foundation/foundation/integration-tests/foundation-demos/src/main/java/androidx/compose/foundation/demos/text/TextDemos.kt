@@ -117,10 +117,10 @@ val TextDemos = DemoCategory(
             )
         ),
         DemoCategory(
-            "⚠️️ Memory benchmark ⚠️️",
+            "\uD83D\uDD75️️️ Memory allocs",
             listOf(
-                ComposableDemo("SetText") { MemoryAllocsSetText() },
-                ComposableDemo("IfNotEmptyText") { MemoryAllocsIfNotEmptyText() }
+                ComposableDemo("\uD83D\uDD75️ SetText") { MemoryAllocsSetText() },
+                ComposableDemo("\uD83D\uDD75️ IfNotEmptyText") { MemoryAllocsIfNotEmptyText() }
             )
         )
     )
