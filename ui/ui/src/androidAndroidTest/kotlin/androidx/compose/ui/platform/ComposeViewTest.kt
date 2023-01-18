@@ -17,9 +17,9 @@
 package androidx.compose.ui.platform
 
 import android.view.ViewGroup
-import androidx.compose.ui.test.R
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.tests.R
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import org.junit.Assert.assertFalse

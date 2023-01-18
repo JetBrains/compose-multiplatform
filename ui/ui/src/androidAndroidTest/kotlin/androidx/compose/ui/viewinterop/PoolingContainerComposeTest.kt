@@ -23,7 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.platform.AbstractComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
-import androidx.compose.ui.test.R
+import androidx.compose.ui.tests.R
 import androidx.customview.poolingcontainer.callPoolingContainerOnRelease
 import androidx.customview.poolingcontainer.isPoolingContainer
 import androidx.test.ext.junit.rules.ActivityScenarioRule

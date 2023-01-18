@@ -33,7 +33,6 @@ import androidx.compose.ui.input.nestedscroll.ModifierLocalNestedScroll
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.modifier.modifierLocalProvider
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.R
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -41,6 +40,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.tests.R
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
 import androidx.test.espresso.Espresso.onView
