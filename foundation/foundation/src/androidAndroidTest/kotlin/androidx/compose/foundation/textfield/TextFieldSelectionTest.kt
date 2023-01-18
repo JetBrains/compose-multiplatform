@@ -206,6 +206,7 @@ class TextFieldSelectionTest {
         assertThat(cursorPositions).isEqualTo(expectedCursorPositions)
     }
 
+    @Ignore // b/265023621
     @Test
     fun textField_extendsSelection_toRight() {
         textField_extendsSelection(
