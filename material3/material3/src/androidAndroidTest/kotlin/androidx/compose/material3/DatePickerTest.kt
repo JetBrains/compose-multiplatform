@@ -16,10 +16,15 @@
 
 package androidx.compose.material3
 
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.SemanticsProperties
+import androidx.compose.ui.test.SemanticsMatcher.Companion.expectValue
+import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertContentDescriptionEquals
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
-import androidx.compose.ui.test.assertIsOff
-import androidx.compose.ui.test.assertIsOn
+import androidx.compose.ui.test.assertIsNotSelected
+import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
@@ -31,6 +36,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import java.util.Calendar
+import java.util.Locale
 import java.util.TimeZone
 import org.junit.Rule
 import org.junit.Test
@@ -58,7 +64,7 @@ class DatePickerTest {
         }
 
         // Select the 11th day of the displayed month is selected.
-        rule.onNodeWithText("11").assertIsOn()
+        rule.onNodeWithText("11").assertIsSelected()
         rule.onNodeWithText("May 11, 2010").assertExists()
     }
 
@@ -78,7 +84,7 @@ class DatePickerTest {
         rule.onNodeWithText(defaultHeadline).assertExists()
 
         // Select the 27th day of the displayed month.
-        rule.onNodeWithText("27").assertIsOff()
+        rule.onNodeWithText("27").assertIsNotSelected()
         rule.onNodeWithText("27").performClick()
 
         rule.runOnIdle {
@@ -93,7 +99,7 @@ class DatePickerTest {
 
         rule.onNodeWithText(defaultHeadline).assertDoesNotExist()
         rule.onNodeWithText("Jan 27, 2019").assertExists()
-        rule.onNodeWithText("27").assertIsOn()
+        rule.onNodeWithText("27").assertIsSelected()
     }
 
     @Test
@@ -136,7 +142,7 @@ class DatePickerTest {
         }
 
         rule.onNodeWithText("January 2019").performClick()
-        rule.onNodeWithText("2019").assertIsOn()
+        rule.onNodeWithText("2019").assertIsSelected()
         rule.onNodeWithText("2020").performClick()
         // Select the 15th day of the displayed month in 2020.
         rule.onAllNodesWithText("15").onFirst().performClick()
@@ -153,8 +159,8 @@ class DatePickerTest {
 
         // Check that if the years are opened again, the last selected year is still marked as such
         rule.onNodeWithText("January 2020").performClick()
-        rule.onNodeWithText("2019").assertIsOff()
-        rule.onNodeWithText("2020").assertIsOn()
+        rule.onNodeWithText("2019").assertIsNotSelected()
+        rule.onNodeWithText("2020").assertIsSelected()
     }
 
     @Test
@@ -364,6 +370,43 @@ class DatePickerTest {
             )
             DatePicker(datePickerState = datePickerState)
         }
+    }
+
+    @Test
+    fun defaultSemantics() {
+        val selectedDateInUtcMillis = dayInUtcMilliseconds(year = 2010, month = 5, dayOfMonth = 11)
+        val monthInUtcMillis = dayInUtcMilliseconds(year = 2010, month = 5, dayOfMonth = 1)
+        lateinit var expectedHeadlineStringFormat: String
+        rule.setMaterialContent(lightColorScheme()) {
+            // e.g. "Current selection: %1$s"
+            expectedHeadlineStringFormat = getString(Strings.DatePickerHeadlineDescription)
+            DatePicker(
+                datePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = selectedDateInUtcMillis,
+                    initialDisplayedMonthMillis = monthInUtcMillis
+                )
+            )
+        }
+
+        val fullDateDescription = formatWithSkeleton(
+            selectedDateInUtcMillis,
+            DatePickerDefaults.YearMonthWeekdayDaySkeleton,
+            Locale.US
+        )
+
+        rule.onNodeWithContentDescription(label = "next", substring = true, ignoreCase = true)
+            .assert(expectValue(SemanticsProperties.Role, Role.Button))
+        rule.onNodeWithContentDescription(label = "previous", substring = true, ignoreCase = true)
+            .assert(expectValue(SemanticsProperties.Role, Role.Button))
+        rule.onNodeWithText("May 2010")
+            .assert(expectValue(SemanticsProperties.Role, Role.Button))
+        rule.onNodeWithText("11")
+            .assert(expectValue(SemanticsProperties.Role, Role.Button))
+            .assertContentDescriptionEquals(fullDateDescription)
+        rule.onNodeWithText("May 11, 2010")
+            .assertContentDescriptionEquals(
+                expectedHeadlineStringFormat.format(fullDateDescription)
+            )
     }
 
     // Returns the given date's day as milliseconds from epoch. The returned value is for the day's

@@ -32,7 +32,13 @@
     <string name="date_picker_title">"Select date"</string>
     <string name="date_picker_headline">"Selected date"</string>
     <string name="date_picker_switch_to_year_selection">"Switch to selecting a year"</string>
-    <string name="date_picker_switch_to_day_selection">"Switch to selecting a day"</string>
+    <string name="date_picker_switch_to_day_selection">
+        "Swipe to select a year, or tap to switch back to selecting a day"
+    </string>
     <string name="date_picker_switch_to_next_month">"Change to next month"</string>
     <string name="date_picker_switch_to_previous_month">"Change to previous month"</string>
+    <string name="date_picker_navigate_to_year_description">Navigate to year %1$s</string>
+    <string name="date_picker_headline_description">Current selection: %1$s</string>
+    <string name="date_picker_no_selection_description">None</string>
+    <string name="date_picker_year_picker_pane_title">Year picker visible</string>
 </resources>
