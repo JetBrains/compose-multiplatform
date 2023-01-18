@@ -29,7 +29,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.node.InnerNodeCoordinator
 import androidx.compose.ui.node.LayoutNode
@@ -83,6 +82,7 @@ import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.unit.IntRect
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.core.view.accessibility.AccessibilityNodeProviderCompat
@@ -959,7 +959,7 @@ class AndroidComposeViewAccessibilityDelegateCompatTest {
         assertEquals(1, nodes.size)
         assertEquals(AccessibilityNodeProviderCompat.HOST_VIEW_ID, nodes.keys.first())
         assertEquals(
-            Rect.Zero.toAndroidRect(),
+            IntRect.Zero.toAndroidRect(),
             nodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]!!.adjustedBounds
         )
     }

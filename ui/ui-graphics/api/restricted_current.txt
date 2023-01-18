@@ -767,7 +767,9 @@ package androidx.compose.ui.graphics {
 
   public final class RectHelper_androidKt {
     method public static android.graphics.Rect toAndroidRect(androidx.compose.ui.geometry.Rect);
+    method public static android.graphics.Rect toAndroidRect(androidx.compose.ui.unit.IntRect);
     method public static android.graphics.RectF toAndroidRectF(androidx.compose.ui.geometry.Rect);
+    method public static androidx.compose.ui.unit.IntRect toComposeIntRect(android.graphics.Rect);
     method public static androidx.compose.ui.geometry.Rect toComposeRect(android.graphics.Rect);
   }
 
