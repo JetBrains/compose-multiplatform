@@ -291,6 +291,9 @@ android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
     namespace "androidx.compose.ui"
+    // namespace has to be unique, but default androidx.compose.ui.test package is taken by
+    // the androidx.compose.ui:ui-test library
+    testNamespace "androidx.compose.ui.tests"
 }
 
 // Diagnostics for b/188565660
