@@ -2800,10 +2800,10 @@ internal fun SemanticsOwner
         it.set(
             root.boundsInRoot.run {
                 android.graphics.Rect(
-                    left.toInt(),
-                    top.toInt(),
-                    right.toInt(),
-                    bottom.toInt()
+                    left.roundToInt(),
+                    top.roundToInt(),
+                    right.roundToInt(),
+                    bottom.roundToInt()
                 )
             }
         )
@@ -2818,10 +2818,10 @@ internal fun SemanticsOwner
             return
         }
         val boundsInRoot = android.graphics.Rect(
-            currentNode.touchBoundsInRoot.left.toInt(),
-            currentNode.touchBoundsInRoot.top.toInt(),
-            currentNode.touchBoundsInRoot.right.toInt(),
-            currentNode.touchBoundsInRoot.bottom.toInt(),
+            currentNode.touchBoundsInRoot.left.roundToInt(),
+            currentNode.touchBoundsInRoot.top.roundToInt(),
+            currentNode.touchBoundsInRoot.right.roundToInt(),
+            currentNode.touchBoundsInRoot.bottom.roundToInt(),
         )
         val region = Region().also { it.set(boundsInRoot) }
         val virtualViewId = if (currentNode.id == root.id) {
@@ -2852,10 +2852,10 @@ internal fun SemanticsOwner
                 nodes[virtualViewId] = SemanticsNodeWithAdjustedBounds(
                     currentNode,
                     android.graphics.Rect(
-                        boundsForFakeNode.left.toInt(),
-                        boundsForFakeNode.top.toInt(),
-                        boundsForFakeNode.right.toInt(),
-                        boundsForFakeNode.bottom.toInt(),
+                        boundsForFakeNode.left.roundToInt(),
+                        boundsForFakeNode.top.roundToInt(),
+                        boundsForFakeNode.right.roundToInt(),
+                        boundsForFakeNode.bottom.roundToInt(),
                     )
                 )
             } else if (virtualViewId == AccessibilityNodeProviderCompat.HOST_VIEW_ID) {
