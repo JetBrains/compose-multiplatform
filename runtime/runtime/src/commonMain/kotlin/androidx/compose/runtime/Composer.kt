@@ -79,6 +79,16 @@ internal interface RememberManager {
      * notifications are sent.
      */
     fun sideEffect(effect: () -> Unit)
+
+    /**
+     * The [ComposeNodeLifecycleCallback] is being deactivated.
+     */
+    fun deactivating(instance: ComposeNodeLifecycleCallback)
+
+    /**
+     * The [ComposeNodeLifecycleCallback] is being released.
+     */
+    fun releasing(instance: ComposeNodeLifecycleCallback)
 }
 
 /**
@@ -1624,7 +1634,14 @@ internal class ComposerImpl(
     override fun useNode() {
         validateNodeExpected()
         runtimeCheck(!inserting) { "useNode() called while inserting" }
-        recordDown(reader.node)
+        val node = reader.node
+        recordDown(node)
+
+        if (reusing && node is ComposeNodeLifecycleCallback) {
+            recordApplierOperation { applier, _, _ ->
+                (applier.current as ComposeNodeLifecycleCallback).onReuse()
+            }
+        }
     }
 
     /**
@@ -2753,6 +2770,14 @@ internal class ComposerImpl(
             val start = reader.currentGroup
             val end = reader.currentEnd
             for (group in start until end) {
+                if (reader.isNode(group)) {
+                    val node = reader.node(group)
+                    if (node is ComposeNodeLifecycleCallback) {
+                        record { _, _, rememberManager ->
+                            rememberManager.deactivating(node)
+                        }
+                    }
+                }
                 reader.forEachData(group) { index, data ->
                     when (data) {
                         is RememberObserver -> {
@@ -4180,18 +4205,20 @@ internal fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
 
     // To ensure this order, we call `enters` as a pre-order traversal
     // of the group tree, and then call `leaves` in the inverse order.
-
     for (slot in groupSlots()) {
-        when (slot) {
-            is RememberObserver -> {
-                rememberManager.forgetting(slot)
-            }
-            is RecomposeScopeImpl -> {
-                val composition = slot.composition
-                if (composition != null) {
-                    composition.pendingInvalidScopes = true
-                    slot.release()
-                }
+        // even that in the documentation we claim ComposeNodeLifecycleCallback should be only
+        // implemented on the nodes we do not really enforce it here as doing so will be expensive.
+        if (slot is ComposeNodeLifecycleCallback) {
+            rememberManager.releasing(slot)
+        }
+        if (slot is RememberObserver) {
+            rememberManager.forgetting(slot)
+        }
+        if (slot is RecomposeScopeImpl) {
+            val composition = slot.composition
+            if (composition != null) {
+                composition.pendingInvalidScopes = true
+                slot.release()
             }
         }
     }
