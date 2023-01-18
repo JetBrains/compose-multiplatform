@@ -24,11 +24,11 @@ import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
+import androidx.compose.foundation.lazy.layout.LazyPinnedItemContainer
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
@@ -224,7 +224,7 @@ class LazyListState constructor(
     /**
      * List of extra items to compose during the measure pass.
      */
-    internal val pinnedItems = mutableStateListOf<LazyListPinnedItem>()
+    internal val pinnedItems = LazyPinnedItemContainer()
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]

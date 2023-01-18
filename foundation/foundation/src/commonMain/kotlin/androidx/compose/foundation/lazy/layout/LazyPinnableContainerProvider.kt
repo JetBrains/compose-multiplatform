@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -24,20 +24,33 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.layout.LocalPinnableContainer
 import androidx.compose.ui.layout.PinnableContainer
 
-internal interface LazyListPinnedItem {
+internal interface LazyPinnedItem {
     val index: Int
 }
 
+internal class LazyPinnedItemContainer(
+    private val pinnedItems: MutableList<LazyPinnedItem> = SnapshotStateList()
+) : List<LazyPinnedItem> by pinnedItems {
+    fun pin(item: LazyPinnedItem) {
+        pinnedItems.add(item)
+    }
+
+    fun unpin(item: LazyPinnedItem) {
+        pinnedItems.remove(item)
+    }
+}
+
 @Composable
-internal fun LazyListPinnableContainerProvider(
-    state: LazyListState,
+internal fun LazyPinnableContainerProvider(
+    owner: LazyPinnedItemContainer,
     index: Int,
     content: @Composable () -> Unit
 ) {
-    val pinnableItem = remember(state) { LazyListPinnableItem(state) }
+    val pinnableItem = remember(owner) { LazyPinnableItem(owner) }
     pinnableItem.index = index
     pinnableItem.parentPinnableContainer = LocalPinnableContainer.current
     DisposableEffect(pinnableItem) { onDispose { pinnableItem.onDisposed() } }
@@ -46,9 +59,9 @@ internal fun LazyListPinnableContainerProvider(
     )
 }
 
-private class LazyListPinnableItem(
-    private val state: LazyListState,
-) : PinnableContainer, PinnableContainer.PinnedHandle, LazyListPinnedItem {
+private class LazyPinnableItem(
+    private val owner: LazyPinnedItemContainer,
+) : PinnableContainer, PinnableContainer.PinnedHandle, LazyPinnedItem {
     /**
      * Current index associated with this item.
      */
@@ -86,7 +99,7 @@ private class LazyListPinnableItem(
 
     override fun pin(): PinnableContainer.PinnedHandle {
         if (pinsCount == 0) {
-            state.pinnedItems.add(this)
+            owner.pin(this)
             parentHandle = parentPinnableContainer?.pin()
         }
         pinsCount++
@@ -97,7 +110,7 @@ private class LazyListPinnableItem(
         check(pinsCount > 0) { "Unpin should only be called once" }
         pinsCount--
         if (pinsCount == 0) {
-            state.pinnedItems.remove(this)
+            owner.unpin(this)
             parentHandle?.unpin()
             parentHandle = null
         }

@@ -20,6 +20,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.DelegatingLazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
+import androidx.compose.foundation.lazy.layout.LazyPinnableContainerProvider
 import androidx.compose.foundation.lazy.layout.rememberLazyNearestItemsRangeState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -79,7 +80,7 @@ private class LazyListItemProviderImpl(
         intervals = intervals,
         nearestItemsRange = nearestItemsRange,
         itemContent = { interval, index ->
-            LazyListPinnableContainerProvider(state, index) {
+            LazyPinnableContainerProvider(state.pinnedItems, index) {
                 interval.value.item.invoke(itemScope, index - interval.startIndex)
             }
         }

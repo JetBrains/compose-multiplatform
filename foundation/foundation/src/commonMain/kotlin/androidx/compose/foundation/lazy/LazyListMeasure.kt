@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.fastFilter
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.layout.LazyPinnedItem
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
@@ -56,7 +57,7 @@ internal fun measureLazyList(
     placementAnimator: LazyListItemPlacementAnimator,
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
     beyondBoundsItemCount: Int,
-    pinnedItems: List<LazyListPinnedItem>,
+    pinnedItems: List<LazyPinnedItem>,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyListMeasureResult {
     require(beforeContentPadding >= 0)
@@ -337,7 +338,7 @@ private fun createItemsAfterList(
     itemProvider: LazyMeasuredItemProvider,
     itemsCount: Int,
     beyondBoundsItemCount: Int,
-    pinnedItems: List<LazyListPinnedItem>
+    pinnedItems: List<LazyPinnedItem>
 ): List<LazyMeasuredItem> {
     fun LazyListBeyondBoundsInfo.endIndex() = min(end, itemsCount - 1)
 
@@ -377,7 +378,7 @@ private fun createItemsBeforeList(
     itemProvider: LazyMeasuredItemProvider,
     itemsCount: Int,
     beyondBoundsItemCount: Int,
-    pinnedItems: List<LazyListPinnedItem>
+    pinnedItems: List<LazyPinnedItem>
 ): List<LazyMeasuredItem> {
     fun LazyListBeyondBoundsInfo.startIndex() = min(start, itemsCount - 1)
 

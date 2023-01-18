@@ -505,9 +505,6 @@ package androidx.compose.foundation.lazy {
   public final class LazyListMeasureKt {
   }
 
-  public final class LazyListPinnableContainerProviderKt {
-  }
-
   @androidx.compose.foundation.lazy.LazyScopeMarker @kotlin.jvm.JvmDefaultWithCompatibility public interface LazyListScope {
     method public default void item(optional Object? key, optional Object? contentType, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,kotlin.Unit> content);
     method @Deprecated public void item(optional Object? key, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.lazy.LazyItemScope,? extends kotlin.Unit> content);
@@ -716,6 +713,9 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class LazyNearestItemsRangeKt {
+  }
+
+  public final class LazyPinnableContainerProviderKt {
   }
 
   public final class LazySaveableStateHolderKt {
