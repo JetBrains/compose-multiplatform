@@ -35,9 +35,9 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import kotlinx.coroutines.launch
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -75,7 +75,7 @@ class TooltipTest {
             .assertWidthIsEqualTo(customWidth)
     }
 
-    @FlakyTest(bugId = 264907895)
+    @Ignore // b/264907895
     @Test
     fun plainTooltip_content_padding() {
         rule.setMaterialContent(lightColorScheme()) {
@@ -94,7 +94,7 @@ class TooltipTest {
             .assertTopPositionInRootIsEqualTo(4.dp)
     }
 
-    @FlakyTest(bugId = 264887805)
+    @Ignore // b/264887805
     @Test
     fun plainTooltip_behavior() {
         rule.setMaterialContent(lightColorScheme()) {
