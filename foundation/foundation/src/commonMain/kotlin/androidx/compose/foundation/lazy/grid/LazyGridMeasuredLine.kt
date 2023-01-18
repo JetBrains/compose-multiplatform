@@ -24,9 +24,9 @@ import androidx.compose.ui.unit.LayoutDirection
  * multiple placeables if the user emit multiple layout nodes in the item callback.
  */
 @OptIn(ExperimentalFoundationApi::class)
-internal class LazyMeasuredLine constructor(
+internal class LazyGridMeasuredLine constructor(
     val index: LineIndex,
-    val items: Array<LazyMeasuredItem>,
+    val items: Array<LazyGridMeasuredItem>,
     private val spans: List<GridItemSpan>,
     private val isVertical: Boolean,
     private val slotsPerLine: Int,

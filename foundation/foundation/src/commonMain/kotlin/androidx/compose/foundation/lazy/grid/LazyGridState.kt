@@ -25,6 +25,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.AwaitFirstLayoutModifier
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
+import androidx.compose.foundation.lazy.layout.LazyPinnedItemContainer
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -81,6 +82,7 @@ class LazyGridState constructor(
     firstVisibleItemIndex: Int = 0,
     firstVisibleItemScrollOffset: Int = 0
 ) : ScrollableState {
+
     /**
      * The holder class for the current scroll position.
      */
@@ -224,6 +226,11 @@ class LazyGridState constructor(
     internal var placementAnimator by mutableStateOf<LazyGridItemPlacementAnimator?>(null)
 
     private val animateScrollScope = LazyGridAnimateScrollScope(this)
+
+    /**
+     * Pinned items are measured and placed even when they are beyond bounds of lazy layout.
+     */
+    internal val pinnedItems = LazyPinnedItemContainer()
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]

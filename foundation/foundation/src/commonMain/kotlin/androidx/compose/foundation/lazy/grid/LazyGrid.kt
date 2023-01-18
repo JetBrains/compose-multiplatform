@@ -261,7 +261,7 @@ private fun rememberLazyGridMeasurePolicy(
             this,
             spaceBetweenLines
         ) { index, key, crossAxisSize, mainAxisSpacing, placeables ->
-            LazyMeasuredItem(
+            LazyGridMeasuredItem(
                 index = index,
                 key = key,
                 isVertical = isVertical,
@@ -285,7 +285,7 @@ private fun rememberLazyGridMeasurePolicy(
             measuredItemProvider,
             spanLayoutProvider
         ) { index, items, spans, mainAxisSpacing ->
-            LazyMeasuredLine(
+            LazyGridMeasuredLine(
                 index = index,
                 items = items,
                 spans = spans,
@@ -345,6 +345,7 @@ private fun rememberLazyGridMeasurePolicy(
             density = this,
             placementAnimator = placementAnimator,
             spanLayoutProvider = spanLayoutProvider,
+            pinnedItems = state.pinnedItems,
             layout = { width, height, placement ->
                 layout(
                     containerConstraints.constrainWidth(width + totalHorizontalPadding),

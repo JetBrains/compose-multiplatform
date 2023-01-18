@@ -58,8 +58,8 @@ internal class LazyGridItemPlacementAnimator(
     private val movingAwayKeys = LinkedHashSet<Any>()
     private val movingInFromStartBound = mutableListOf<LazyGridPositionedItem>()
     private val movingInFromEndBound = mutableListOf<LazyGridPositionedItem>()
-    private val movingAwayToStartBound = mutableListOf<LazyMeasuredItem>()
-    private val movingAwayToEndBound = mutableListOf<LazyMeasuredItem>()
+    private val movingAwayToStartBound = mutableListOf<LazyGridMeasuredItem>()
+    private val movingAwayToEndBound = mutableListOf<LazyGridMeasuredItem>()
 
     /**
      * Should be called after the measuring so we can detect position changes and start animations.

@@ -33,13 +33,13 @@ internal class LazyMeasuredItemProvider @ExperimentalFoundationApi constructor(
 ) {
     /**
      * Used to subcompose individual items of lazy grids. Composed placeables will be measured
-     * with the provided [constraints] and wrapped into [LazyMeasuredItem].
+     * with the provided [constraints] and wrapped into [LazyGridMeasuredItem].
      */
     fun getAndMeasure(
         index: ItemIndex,
         mainAxisSpacing: Int = defaultMainAxisSpacing,
         constraints: Constraints
-    ): LazyMeasuredItem {
+    ): LazyGridMeasuredItem {
         val key = itemProvider.getKey(index.value)
         val placeables = measureScope.measure(index.value, constraints)
         val crossAxisSize = if (constraints.hasFixedWidth) {
@@ -72,5 +72,5 @@ internal fun interface MeasuredItemFactory {
         crossAxisSize: Int,
         mainAxisSpacing: Int,
         placeables: List<Placeable>
-    ): LazyMeasuredItem
+    ): LazyGridMeasuredItem
 }

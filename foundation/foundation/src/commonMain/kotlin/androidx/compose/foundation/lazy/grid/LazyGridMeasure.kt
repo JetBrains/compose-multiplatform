@@ -16,9 +16,10 @@
 
 package androidx.compose.foundation.lazy.grid
 
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.fastFilter
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.layout.LazyPinnedItem
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
@@ -56,6 +57,7 @@ internal fun measureLazyGrid(
     density: Density,
     placementAnimator: LazyGridItemPlacementAnimator,
     spanLayoutProvider: LazyGridSpanLayoutProvider,
+    pinnedItems: List<LazyPinnedItem>,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyGridMeasureResult {
     require(beforeContentPadding >= 0)
@@ -94,7 +96,7 @@ internal fun measureLazyGrid(
         }
 
         // this will contain all the MeasuredItems representing the visible lines
-        val visibleLines = mutableListOf<LazyMeasuredLine>()
+        val visibleLines = mutableListOf<LazyGridMeasuredLine>()
 
         // define min and max offsets
         val minOffset = -beforeContentPadding + if (spaceBetweenLines < 0) spaceBetweenLines else 0
@@ -201,6 +203,22 @@ internal fun measureLazyGrid(
         val visibleLinesScrollOffset = -currentFirstLineScrollOffset
         var firstLine = visibleLines.first()
 
+        val firstItemIndex = firstLine.items.firstOrNull()?.index?.value ?: 0
+        val lastItemIndex = visibleLines.lastOrNull()?.items?.lastOrNull()?.index?.value ?: 0
+        val extraItemsBefore = calculateExtraItems(
+            pinnedItems,
+            measuredItemProvider,
+            itemConstraints = { measuredLineProvider.itemConstraints(it) },
+            filter = { it in 0 until firstItemIndex }
+        )
+
+        val extraItemsAfter = calculateExtraItems(
+            pinnedItems,
+            measuredItemProvider,
+            itemConstraints = { measuredLineProvider.itemConstraints(it) },
+            filter = { it in (lastItemIndex + 1) until itemsCount }
+        )
+
         // even if we compose lines to fill before content padding we should ignore lines fully
         // located there for the state's scroll position calculation (first line + first offset)
         if (beforeContentPadding > 0 || spaceBetweenLines < 0) {
@@ -229,6 +247,8 @@ internal fun measureLazyGrid(
 
         val positionedItems = calculateItemsOffsets(
             lines = visibleLines,
+            itemsBefore = extraItemsBefore,
+            itemsAfter = extraItemsAfter,
             layoutWidth = layoutWidth,
             layoutHeight = layoutHeight,
             finalMainAxisOffset = currentMainAxisOffset,
@@ -250,19 +270,24 @@ internal fun measureLazyGrid(
             spanLayoutProvider = spanLayoutProvider
         )
 
-        val lastVisibleItemIndex = visibleLines.lastOrNull()?.items?.lastOrNull()?.index?.value ?: 0
         return LazyGridMeasureResult(
             firstVisibleLine = firstLine,
             firstVisibleLineScrollOffset = currentFirstLineScrollOffset,
             canScrollForward =
-                lastVisibleItemIndex != itemsCount - 1 || currentMainAxisOffset > maxOffset,
+                lastItemIndex != itemsCount - 1 || currentMainAxisOffset > maxOffset,
             consumedScroll = consumedScroll,
             measureResult = layout(layoutWidth, layoutHeight) {
                 positionedItems.fastForEach { it.place(this) }
             },
             viewportStartOffset = -beforeContentPadding,
             viewportEndOffset = mainAxisAvailableSize + afterContentPadding,
-            visibleItemsInfo = positionedItems,
+            visibleItemsInfo = if (extraItemsBefore.isEmpty() && extraItemsAfter.isEmpty()) {
+                positionedItems
+            } else {
+                positionedItems.fastFilter {
+                    it.index in firstItemIndex..lastItemIndex
+                }
+            },
             totalItemsCount = itemsCount,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
@@ -271,12 +296,36 @@ internal fun measureLazyGrid(
     }
 }
 
+private inline fun calculateExtraItems(
+    pinnedItems: List<LazyPinnedItem>,
+    itemProvider: LazyMeasuredItemProvider,
+    itemConstraints: (ItemIndex) -> Constraints,
+    filter: (Int) -> Boolean
+): List<LazyGridMeasuredItem> {
+    var items: MutableList<LazyGridMeasuredItem>? = null
+
+    pinnedItems.fastForEach {
+        val index = ItemIndex(it.index)
+        if (filter(it.index)) {
+            val constraints = itemConstraints(index)
+            val item = itemProvider.getAndMeasure(index, constraints = constraints)
+            if (items == null) {
+                items = mutableListOf()
+            }
+            items?.add(item)
+        }
+    }
+
+    return items ?: emptyList()
+}
+
 /**
- * Calculates [LazyMeasuredLine]s offsets.
+ * Calculates [LazyGridMeasuredLine]s offsets.
  */
-@OptIn(ExperimentalFoundationApi::class)
 private fun calculateItemsOffsets(
-    lines: List<LazyMeasuredLine>,
+    lines: List<LazyGridMeasuredLine>,
+    itemsBefore: List<LazyGridMeasuredItem>,
+    itemsAfter: List<LazyGridMeasuredItem>,
     layoutWidth: Int,
     layoutHeight: Int,
     finalMainAxisOffset: Int,
@@ -297,6 +346,7 @@ private fun calculateItemsOffsets(
     val positionedItems = ArrayList<LazyGridPositionedItem>(lines.fastSumBy { it.items.size })
 
     if (hasSpareSpace) {
+        require(itemsBefore.isEmpty() && itemsAfter.isEmpty())
         val linesCount = lines.size
         fun Int.reverseAware() =
             if (!reverseLayout) this else linesCount - this - 1
@@ -335,10 +385,36 @@ private fun calculateItemsOffsets(
         }
     } else {
         var currentMainAxis = firstLineScrollOffset
+
+        itemsBefore.fastForEach {
+            currentMainAxis -= it.mainAxisSizeWithSpacings
+            positionedItems.add(it.positionExtraItem(currentMainAxis, layoutWidth, layoutHeight))
+        }
+
+        currentMainAxis = firstLineScrollOffset
         lines.fastForEach {
             positionedItems.addAll(it.position(currentMainAxis, layoutWidth, layoutHeight))
+            currentMainAxis += it.mainAxisSizeWithSpacings
+        }
+
+        itemsAfter.fastForEach {
+            positionedItems.add(it.positionExtraItem(currentMainAxis, layoutWidth, layoutHeight))
             currentMainAxis += it.mainAxisSizeWithSpacings
         }
     }
     return positionedItems
 }
+
+private fun LazyGridMeasuredItem.positionExtraItem(
+    mainAxisOffset: Int,
+    layoutWidth: Int,
+    layoutHeight: Int
+): LazyGridPositionedItem =
+    position(
+        mainAxisOffset = mainAxisOffset,
+        crossAxisOffset = 0,
+        layoutWidth = layoutWidth,
+        layoutHeight = layoutHeight,
+        row = 0,
+        column = 0
+    )
