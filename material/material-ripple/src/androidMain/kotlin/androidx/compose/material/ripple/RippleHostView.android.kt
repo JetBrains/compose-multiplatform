@@ -32,6 +32,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import java.lang.reflect.Method
+import kotlin.math.roundToInt
 
 /**
  * Empty [View] that hosts a [RippleDrawable] as its background. This is needed as
@@ -180,8 +181,8 @@ internal class RippleHostView(
         val newBounds = Rect(
             0,
             0,
-            size.width.toInt(),
-            size.height.toInt()
+            size.width.roundToInt(),
+            size.height.roundToInt()
         )
         // Drawing the background causes the view to update the bounds of the drawable
         // based on the view's bounds, so we need to adjust the view itself to match the
