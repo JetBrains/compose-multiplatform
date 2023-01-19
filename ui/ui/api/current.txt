@@ -2089,7 +2089,7 @@ package androidx.compose.ui.layout {
   }
 
   public static fun interface PinnableContainer.PinnedHandle {
-    method public void unpin();
+    method public void release();
   }
 
   public final class PinnableContainerKt {
