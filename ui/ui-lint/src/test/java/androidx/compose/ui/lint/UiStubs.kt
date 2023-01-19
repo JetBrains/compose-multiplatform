@@ -16,12 +16,12 @@
 
 package androidx.compose.ui.lint
 
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.TestFile
 
 object UiStubs {
 
-    val Density: TestFile = compiledStub(
+    val Density: TestFile = bytecodeStub(
         filename = "Density.kt",
         filepath = "androidx/compose/ui/unit",
         checksum = 0x8c5922ca,
@@ -48,7 +48,7 @@ object UiStubs {
                 """
     )
 
-    val PointerEvent: TestFile = compiledStub(
+    val PointerEvent: TestFile = bytecodeStub(
         filename = "PointerEvent.kt",
         filepath = "androidx/compose/ui/input/pointer",
         checksum = 0xbe2705da,
@@ -115,7 +115,7 @@ object UiStubs {
                 """
     )
 
-    val PointerInputScope: TestFile = compiledStub(
+    val PointerInputScope: TestFile = bytecodeStub(
         filename = "SuspendingPointerInputFilter.kt",
         filepath = "androidx/compose/ui/input/pointer",
         checksum = 0xd7db138c,
@@ -184,7 +184,7 @@ object UiStubs {
                 """
     )
 
-    val Alignment: TestFile = compiledStub(
+    val Alignment: TestFile = bytecodeStub(
         filename = "Alignment.kt",
         filepath = "androidx/compose/ui",
         checksum = 0xd737b17c,

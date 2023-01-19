@@ -18,7 +18,7 @@
 
 package androidx.compose.runtime.lint
 
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -39,7 +39,7 @@ class CompositionLocalNamingDetectorTest : LintDetectorTest() {
         mutableListOf(CompositionLocalNamingDetector.CompositionLocalNaming)
 
     // Simplified CompositionLocal.kt stubs
-    private val compositionLocalStub = compiledStub(
+    private val compositionLocalStub = bytecodeStub(
         filename = "CompositionLocal.kt",
         filepath = "androidx/compose/runtime",
         checksum = 0x48f5c823,

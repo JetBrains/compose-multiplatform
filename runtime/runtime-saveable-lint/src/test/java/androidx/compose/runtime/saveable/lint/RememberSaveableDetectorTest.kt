@@ -19,7 +19,7 @@
 package androidx.compose.runtime.saveable.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
@@ -39,7 +39,7 @@ class RememberSaveableDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(RememberSaveableDetector.RememberSaveableSaverParameter)
 
-    private val rememberSaveableStub: TestFile = compiledStub(
+    private val rememberSaveableStub: TestFile = bytecodeStub(
         filename = "RememberSaveable.kt",
         filepath = "androidx/compose/runtime/saveable",
         checksum = 0x90b6d5a7,

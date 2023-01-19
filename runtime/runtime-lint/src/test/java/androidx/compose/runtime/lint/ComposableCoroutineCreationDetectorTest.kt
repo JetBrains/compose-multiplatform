@@ -19,7 +19,7 @@
 package androidx.compose.runtime.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.checks.infrastructure.TestMode
@@ -41,7 +41,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(ComposableCoroutineCreationDetector.CoroutineCreationDuringComposition)
 
-    private val coroutineBuildersStub: TestFile = compiledStub(
+    private val coroutineBuildersStub: TestFile = bytecodeStub(
         filename = "Builders.common.kt",
         filepath = "kotlinx/coroutines",
         checksum = 0xdb1ff08e,
@@ -99,7 +99,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
         """
     )
 
-    private val flowStub: TestFile = compiledStub(
+    private val flowStub: TestFile = bytecodeStub(
         filename = "Flow.kt",
         filepath = "kotlinx/coroutines/flow",
         checksum = 0x3416a857,
@@ -129,7 +129,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
         """
     )
 
-    private val flowBuildersStub: TestFile = compiledStub(
+    private val flowBuildersStub: TestFile = bytecodeStub(
         filename = "Builders.kt",
         filepath = "kotlinx/coroutines/flow",
         checksum = 0xb581dd7,
@@ -164,7 +164,7 @@ class ComposableCoroutineCreationDetectorTest : LintDetectorTest() {
         """
     )
 
-    private val flowCollectStub: TestFile = compiledStub(
+    private val flowCollectStub: TestFile = bytecodeStub(
         filename = "Collect.kt",
         filepath = "kotlinx/coroutines/flow",
         checksum = 0x8685bc57,

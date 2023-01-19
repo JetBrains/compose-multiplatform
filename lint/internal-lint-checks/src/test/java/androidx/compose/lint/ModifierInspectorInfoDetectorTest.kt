@@ -608,6 +608,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun rememberModifierInfo() {
         lint().files(
+            Stubs.Composable,
             Stubs.Modifier,
             composedStub,
             Stubs.Remember,
@@ -647,6 +648,7 @@ class ModifierInspectorInfoDetectorTest : LintDetectorTest() {
     @Test
     fun emptyModifier() {
         lint().files(
+            Stubs.Composable,
             Stubs.Modifier,
             Stubs.Remember,
             composedStub,

@@ -19,7 +19,7 @@
 package androidx.compose.ui.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
@@ -43,7 +43,7 @@ class ComposedModifierDetectorTest : LintDetectorTest() {
     /**
      * Simplified Modifier.composed stub
      */
-    private val composedStub = compiledStub(
+    private val composedStub = bytecodeStub(
         filename = "ComposedModifier.kt",
         filepath = "androidx/compose/ui",
         checksum = 0xad91cb77,

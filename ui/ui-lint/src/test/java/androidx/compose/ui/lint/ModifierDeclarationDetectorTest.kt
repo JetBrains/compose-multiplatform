@@ -19,7 +19,7 @@
 package androidx.compose.ui.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -45,7 +45,7 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
         )
 
     // Simplified Density.kt stubs
-    private val DensityStub = compiledStub(
+    private val DensityStub = bytecodeStub(
         filename = "Density.kt",
         filepath = "androidx/compose/ui/unit",
         checksum = 0xaa534a7a,
@@ -71,7 +71,7 @@ class ModifierDeclarationDetectorTest : LintDetectorTest() {
     )
 
     // Simplified ParentDataModifier.kt / Measurable.kt merged stubs
-    private val MeasurableAndParentDataModifierStub = compiledStub(
+    private val MeasurableAndParentDataModifierStub = bytecodeStub(
         filename = "Measurable.kt",
         filepath = "androidx/compose/ui/layout",
         checksum = 0xd1bf915a,
@@ -769,7 +769,7 @@ src/androidx/compose/ui/foo/TestModifier.kt:34: Error: Modifier factory function
 
     @Test
     fun noErrors_inlineAndValueClasses() {
-        val inlineAndValueClassStub = compiledStub(
+        val inlineAndValueClassStub = bytecodeStub(
             filename = "InlineAndValueClassStub.kt",
             filepath = "androidx/compose/ui/foo",
             checksum = 0x16c1f1c4,
