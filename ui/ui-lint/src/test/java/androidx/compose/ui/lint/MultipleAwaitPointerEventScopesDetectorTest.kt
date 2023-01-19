@@ -17,7 +17,7 @@
 package androidx.compose.ui.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
@@ -40,7 +40,7 @@ class MultipleAwaitPointerEventScopesDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> =
         mutableListOf(MultipleAwaitPointerEventScopesDetector.MultipleAwaitPointerEventScopes)
 
-    private val ForEachGestureStub: TestFile = compiledStub(
+    private val ForEachGestureStub: TestFile = bytecodeStub(
         filename = "ForEachGesture.kt",
         filepath = "androidx/compose/foundation/gestures",
         checksum = 0xf41a4b04,

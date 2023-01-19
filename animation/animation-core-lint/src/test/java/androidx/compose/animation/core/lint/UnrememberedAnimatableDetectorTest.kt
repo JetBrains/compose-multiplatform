@@ -19,7 +19,7 @@
 package androidx.compose.animation.core.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
@@ -41,7 +41,7 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
         mutableListOf(UnrememberedAnimatableDetector.UnrememberedAnimatable)
 
     // Simplified Animatable Color function stub, from androidx.compose.animation
-    private val AnimatableColorStub = compiledStub(
+    private val AnimatableColorStub = bytecodeStub(
         filename = "SingleValueAnimation.kt",
         filepath = "androidx/compose/animation",
         checksum = 0x285b4455,
@@ -172,8 +172,9 @@ class UnrememberedAnimatableDetectorTest : LintDetectorTest() {
             AnimatableColorStub,
             Stubs.Color,
             Stubs.Composable,
-            Stubs.Remember
-        )
+            Stubs.Remember,
+            Stubs.SnapshotState
+            )
             .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
             .expect(
@@ -336,7 +337,8 @@ src/test/{.kt:80: Error: Creating an Animatable during composition without using
             AnimatableColorStub,
             Stubs.Color,
             Stubs.Composable,
-            Stubs.Remember
+            Stubs.Remember,
+            Stubs.SnapshotState
         )
             .run()
             .expectClean()
@@ -449,8 +451,9 @@ src/test/{.kt:80: Error: Creating an Animatable during composition without using
             AnimatableColorStub,
             Stubs.Color,
             Stubs.Composable,
-            Stubs.Remember
-        )
+            Stubs.Remember,
+            Stubs.SnapshotState
+            )
             .run()
             .expectClean()
     }

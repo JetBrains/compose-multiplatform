@@ -61,6 +61,9 @@ class RememberDetectorTest : LintDetectorTest() {
                     val unit = remember {
                         state.update(5)
                     }
+                    val unitLambda: () -> Unit = {}
+                    remember(unitLambda)
+                    val unit2 = remember(unitLambda)
                 }
 
                 @Composable
@@ -72,6 +75,9 @@ class RememberDetectorTest : LintDetectorTest() {
                     val unit = remember(number) {
                         state.update(number)
                     }
+                    val unitLambda: () -> Unit = {}
+                    remember(number, unitLambda)
+                    val unit2 = remember(number, unitLambda)
                 }
 
                 @Composable
@@ -85,6 +91,9 @@ class RememberDetectorTest : LintDetectorTest() {
                         state.update(number1)
                         state.update(number2)
                     }
+                    val unitLambda: () -> Unit = {}
+                    remember(number1, number2, unitLambda)
+                    val unit2 = remember(number1, number2, unitLambda)
                 }
 
                 @Composable
@@ -100,6 +109,9 @@ class RememberDetectorTest : LintDetectorTest() {
                         state.update(number2)
                         state.update(number3)
                     }
+                    val unitLambda: () -> Unit = {}
+                    remember(number1, number2, number3, unitLambda)
+                    val unit2 = remember(number1, number2, number3, unitLambda)
                 }
 
                 @Composable
@@ -115,6 +127,9 @@ class RememberDetectorTest : LintDetectorTest() {
                         state.update(number2)
                         state.update(number3)
                     }
+                    val unitLambda: () -> Unit = {}
+                    remember(number1, number2, number3, flag, calculation = unitLambda)
+                    val unit2 = remember(number1, number2, number3, flag, calculation = unitLambda)
                 }
             """
             ),
@@ -130,31 +145,61 @@ src/androidx/compose/runtime/foo/FooState.kt:14: Error: remember calls must not 
 src/androidx/compose/runtime/foo/FooState.kt:17: Error: remember calls must not return Unit [RememberReturnType]
                     val unit = remember {
                                ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:25: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:21: Error: remember calls must not return Unit [RememberReturnType]
+                    remember(unitLambda)
+                    ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:22: Error: remember calls must not return Unit [RememberReturnType]
+                    val unit2 = remember(unitLambda)
+                                ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:28: Error: remember calls must not return Unit [RememberReturnType]
                     remember(number) {
                     ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:28: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:31: Error: remember calls must not return Unit [RememberReturnType]
                     val unit = remember(number) {
                                ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:35: Error: remember calls must not return Unit [RememberReturnType]
+                    remember(number, unitLambda)
+                    ~~~~~~~~
 src/androidx/compose/runtime/foo/FooState.kt:36: Error: remember calls must not return Unit [RememberReturnType]
+                    val unit2 = remember(number, unitLambda)
+                                ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:42: Error: remember calls must not return Unit [RememberReturnType]
                     remember(number1, number2) {
                     ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:40: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:46: Error: remember calls must not return Unit [RememberReturnType]
                     val unit = remember(number1, number2) {
                                ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:49: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:51: Error: remember calls must not return Unit [RememberReturnType]
+                    remember(number1, number2, unitLambda)
+                    ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:52: Error: remember calls must not return Unit [RememberReturnType]
+                    val unit2 = remember(number1, number2, unitLambda)
+                                ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:58: Error: remember calls must not return Unit [RememberReturnType]
                     remember(number1, number2, number3) {
                     ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:54: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:63: Error: remember calls must not return Unit [RememberReturnType]
                     val unit = remember(number1, number2, number3) {
                                ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:64: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not return Unit [RememberReturnType]
+                    remember(number1, number2, number3, unitLambda)
+                    ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:70: Error: remember calls must not return Unit [RememberReturnType]
+                    val unit2 = remember(number1, number2, number3, unitLambda)
+                                ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:76: Error: remember calls must not return Unit [RememberReturnType]
                     remember(number1, number2, number3, flag) {
                     ~~~~~~~~
-src/androidx/compose/runtime/foo/FooState.kt:69: Error: remember calls must not return Unit [RememberReturnType]
+src/androidx/compose/runtime/foo/FooState.kt:81: Error: remember calls must not return Unit [RememberReturnType]
                     val unit = remember(number1, number2, number3, flag) {
                                ~~~~~~~~
-10 errors, 0 warnings
+src/androidx/compose/runtime/foo/FooState.kt:87: Error: remember calls must not return Unit [RememberReturnType]
+                    remember(number1, number2, number3, flag, calculation = unitLambda)
+                    ~~~~~~~~
+src/androidx/compose/runtime/foo/FooState.kt:88: Error: remember calls must not return Unit [RememberReturnType]
+                    val unit2 = remember(number1, number2, number3, flag, calculation = unitLambda)
+                                ~~~~~~~~
+20 errors, 0 warnings
             """
             )
     }

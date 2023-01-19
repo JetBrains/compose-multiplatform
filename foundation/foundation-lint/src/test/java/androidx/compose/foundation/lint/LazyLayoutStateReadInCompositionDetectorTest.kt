@@ -17,7 +17,7 @@
 package androidx.compose.foundation.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -34,7 +34,7 @@ class LazyLayoutStateReadInCompositionDetectorTest : LintDetectorTest() {
             LazyLayoutStateReadInCompositionDetector.FrequentlyChangedStateReadInComposition
         )
 
-    private val lazyGridStateStub = compiledStub(
+    private val lazyGridStateStub = bytecodeStub(
         filename = "LazyGridState.kt",
         filepath = "androidx/compose/foundation/lazy/grid",
         checksum = 0xd5891ae4,
@@ -100,7 +100,7 @@ class LazyLayoutStateReadInCompositionDetectorTest : LintDetectorTest() {
         """
     )
 
-    private val lazyListStateStub = compiledStub(
+    private val lazyListStateStub = bytecodeStub(
         filename = "LazyListState.kt",
         filepath = "androidx/compose/foundation/lazy",
         checksum = 0xb9a80c68,
