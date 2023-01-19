@@ -407,11 +407,9 @@ internal class LayoutNodeSubcompositionsState(
         }
 
         val itemIndex = root.foldedChildren.indexOf(node)
-        if (itemIndex < currentIndex) {
-            throw IllegalArgumentException(
-                "Key $slotId was already used. If you are using LazyColumn/Row please make sure " +
-                    "you provide a unique key for each item."
-            )
+        require(itemIndex >= currentIndex) {
+            "Key \"$slotId\" was already used. If you are using LazyColumn/Row please make " +
+                "sure you provide a unique key for each item."
         }
         if (currentIndex != itemIndex) {
             move(itemIndex, currentIndex)
