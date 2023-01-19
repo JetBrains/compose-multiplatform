@@ -13,6 +13,7 @@ declare -a folders=(
     "ci"
     "web"
     "tutorials"
+    "experimental/examples"
 )
 
 if [ -z "$1" ]; then
