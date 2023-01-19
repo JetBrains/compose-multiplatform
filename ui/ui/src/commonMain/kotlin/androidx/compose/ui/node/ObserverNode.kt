@@ -32,11 +32,16 @@ interface ObserverNode : DelegatableNode {
      * changes.
      */
     fun onObservedReadsChanged()
+}
 
-    @ExperimentalComposeUiApi
+@OptIn(ExperimentalComposeUiApi::class)
+internal class ModifierNodeOwnerScope(internal val observerNode: ObserverNode) : OwnerScope {
+    override val isValidOwnerScope: Boolean
+        get() = observerNode.node.isAttached
+
     companion object {
-        internal val OnObserveReadsChanged: (ObserverNode) -> Unit = {
-            if (it.node.isAttached) it.onObservedReadsChanged()
+        internal val OnObserveReadsChanged: (ModifierNodeOwnerScope) -> Unit = {
+            if (it.isValidOwnerScope) it.observerNode.onObservedReadsChanged()
         }
     }
 }
@@ -46,9 +51,10 @@ interface ObserverNode : DelegatableNode {
  */
 @ExperimentalComposeUiApi
 fun <T> T.observeReads(block: () -> Unit) where T : Modifier.Node, T : ObserverNode {
+    val target = ownerScope ?: ModifierNodeOwnerScope(this).also { ownerScope = it }
     requireOwner().snapshotObserver.observeReads(
-        target = this,
-        onChanged = ObserverNode.OnObserveReadsChanged,
+        target = target,
+        onChanged = ModifierNodeOwnerScope.OnObserveReadsChanged,
         block = block
     )
 }

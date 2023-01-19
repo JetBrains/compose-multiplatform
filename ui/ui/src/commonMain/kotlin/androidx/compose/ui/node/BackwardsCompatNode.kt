@@ -304,7 +304,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
         }
     }
 
-    override val isValid: Boolean get() = isAttached
+    override val isValidOwnerScope: Boolean get() = isAttached
     override var targetSize: IntSize
         get() = (element as IntermediateLayoutModifier).targetSize
         set(value) {

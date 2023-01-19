@@ -28,37 +28,37 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
     private val observer = SnapshotStateObserver(onChangedExecutor)
 
     private val onCommitAffectingLookaheadMeasure: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
+        if (layoutNode.isValidOwnerScope) {
             layoutNode.requestLookaheadRemeasure()
         }
     }
 
     private val onCommitAffectingMeasure: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
+        if (layoutNode.isValidOwnerScope) {
             layoutNode.requestRemeasure()
         }
     }
 
     private val onCommitAffectingLayout: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
+        if (layoutNode.isValidOwnerScope) {
             layoutNode.requestRelayout()
         }
     }
 
     private val onCommitAffectingLayoutModifier: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
+        if (layoutNode.isValidOwnerScope) {
             layoutNode.requestRelayout()
         }
     }
 
     private val onCommitAffectingLayoutModifierInLookahead: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
+        if (layoutNode.isValidOwnerScope) {
             layoutNode.requestLookaheadRelayout()
         }
     }
 
     private val onCommitAffectingLookaheadLayout: (LayoutNode) -> Unit = { layoutNode ->
-        if (layoutNode.isValid) {
+        if (layoutNode.isValidOwnerScope) {
             layoutNode.requestLookaheadRelayout()
         }
     }
@@ -121,7 +121,7 @@ internal class OwnerSnapshotObserver(onChangedExecutor: (callback: () -> Unit) -
     }
 
     internal fun clearInvalidObservations() {
-        observer.clearIf { !(it as OwnerScope).isValid }
+        observer.clearIf { !(it as OwnerScope).isValidOwnerScope }
     }
 
     internal fun clear(target: Any) {
