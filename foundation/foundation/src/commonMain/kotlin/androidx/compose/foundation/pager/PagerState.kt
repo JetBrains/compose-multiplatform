@@ -140,6 +140,15 @@ class PagerState(
             )
         }
 
+    internal val firstVisiblePage: LazyListItemInfo?
+        get() = visiblePages.lastOrNull {
+            density.calculateDistanceToDesiredSnapPosition(
+                layoutInfo,
+                it,
+                SnapAlignmentStartToStart
+            ) <= 0
+        }
+
     private val distanceToSnapPosition: Float
         get() = closestPageToSnappedPosition?.let {
             density.calculateDistanceToDesiredSnapPosition(
@@ -165,7 +174,7 @@ class PagerState(
      * @sample androidx.compose.foundation.samples.ObservingStateChangesInPagerStateSample
      *
      */
-    val currentPage: Int by derivedStateOf { closestPageToSnappedPosition?.index ?: 0 }
+    val currentPage: Int by derivedStateOf { closestPageToSnappedPosition?.index ?: initialPage }
 
     private var animationTargetPage by mutableStateOf(-1)
 
@@ -193,23 +202,23 @@ class PagerState(
      * @sample androidx.compose.foundation.samples.ObservingStateChangesInPagerStateSample
      */
     val targetPage: Int by derivedStateOf {
-        if (!isScrollInProgress) {
+        val finalPage = if (!isScrollInProgress) {
             currentPage
         } else if (animationTargetPage != -1) {
             animationTargetPage
+        } else if (snapRemainingScrollOffset == 0.0f) {
+            // act on scroll only
+            if (abs(currentPageOffsetFraction) >= abs(positionThresholdFraction)) {
+                currentPage + currentPageOffsetFraction.sign.toInt()
+            } else {
+                currentPage
+            }
         } else {
-            val offsetFromFling = snapRemainingScrollOffset
-            val scrollDirection = currentPageOffsetFraction.sign
-            val offsetFromScroll =
-                if (abs(currentPageOffsetFraction) >= abs(positionThresholdFraction)) {
-                    (abs(currentPageOffsetFraction) + 1) * pageAvailableSpace * scrollDirection
-                } else {
-                    0f
-                }
-            val pageDisplacement =
-                (offsetFromFling + offsetFromScroll) / pageAvailableSpace
-            (currentPage + pageDisplacement.roundToInt()).coerceInPageRange()
+            // act on flinging
+            val pageDisplacement = snapRemainingScrollOffset / pageAvailableSpace
+            (currentPage + pageDisplacement.roundToInt())
         }
+        finalPage.coerceInPageRange()
     }
 
     /**
@@ -250,6 +259,7 @@ class PagerState(
      * destination page will be offset from its snapped position.
      */
     suspend fun scrollToPage(page: Int, pageOffsetFraction: Float = 0f) {
+        debugLog { "Scroll from page=$currentPage to page=$page" }
         awaitScrollDependencies()
         require(pageOffsetFraction in -0.5..0.5) {
             "pageOffsetFraction $pageOffsetFraction is not within the range -0.5 to 0.5"
@@ -315,9 +325,7 @@ class PagerState(
 
         val displacement = targetOffset - currentOffset + pageOffsetToSnappedPosition
 
-        debugLog {
-            "animateScrollToPage $displacement pixels"
-        }
+        debugLog { "animateScrollToPage $displacement pixels" }
         requireNotNull(lazyListState).animateScrollBy(displacement, animationSpec)
         animationTargetPage = -1
     }
@@ -397,7 +405,7 @@ private const val MinPageOffset = -0.5f
 private const val MaxPageOffset = 0.5f
 internal val SnapAlignmentStartToStart: Density.(layoutSize: Float, itemSize: Float) -> Float =
     { _, _ -> 0f }
-private val DefaultPositionThreshold = 56.dp
+internal val DefaultPositionThreshold = 56.dp
 private const val MaxPagesForAnimateScroll = 3
 
 private class AwaitLazyListStateSet {

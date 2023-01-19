@@ -36,7 +36,7 @@ internal class EmptyPagerTests(val config: ParamConfig) : BasePagerTest(config) 
         val state = PagerState()
 
         // Act
-        createPager(state = state, modifier = Modifier.fillMaxSize(), pagerCount = { 0 })
+        createPager(state = state, modifier = Modifier.fillMaxSize(), pageCount = { 0 })
 
         // Assert
         rule.onNodeWithTag("0").assertDoesNotExist()

@@ -114,7 +114,7 @@ internal open class BasePagerTest(private val config: ParamConfig) {
     internal fun createPager(
         state: PagerState,
         modifier: Modifier = Modifier,
-        pagerCount: () -> Int = { DefaultPageCount },
+        pageCount: () -> Int = { DefaultPageCount },
         offscreenPageLimit: Int = 0,
         pageSize: PageSize = PageSize.Fill,
         userScrollEnabled: Boolean = true,
@@ -142,7 +142,7 @@ internal open class BasePagerTest(private val config: ParamConfig) {
                         .nestedScroll(nestedScrollConnection)
                 ) {
                     HorizontalOrVerticalPager(
-                        pageCount = pagerCount(),
+                        pageCount = pageCount(),
                         state = state,
                         beyondBoundsPageCount = offscreenPageLimit,
                         modifier = modifier
