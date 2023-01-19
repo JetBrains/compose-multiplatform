@@ -25,7 +25,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.lazy.AwaitFirstLayoutModifier
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
-import androidx.compose.foundation.lazy.layout.LazyPinnedItemContainer
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
@@ -228,9 +228,9 @@ class LazyGridState constructor(
     private val animateScrollScope = LazyGridAnimateScrollScope(this)
 
     /**
-     * Pinned items are measured and placed even when they are beyond bounds of lazy layout.
+     * Stores currently pinned items which are always composed.
      */
-    internal val pinnedItems = LazyPinnedItemContainer()
+    internal val pinnedItems = LazyLayoutPinnedItemList()
 
     /**
      * Instantly brings the item at [index] to the top of the viewport, offset by [scrollOffset]
