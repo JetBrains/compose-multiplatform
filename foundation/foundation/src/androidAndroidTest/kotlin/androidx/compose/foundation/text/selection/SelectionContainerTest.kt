@@ -26,12 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -40,10 +42,13 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.TouchInjectionScope
@@ -57,6 +62,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
@@ -84,7 +90,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Suppress("DEPRECATION")
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SelectionContainerTest {
@@ -394,6 +399,38 @@ class SelectionContainerTest {
 
         assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
         assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun selection_doesCopy_whenCopyKeyEventSent() {
+        lateinit var clipboardManager: ClipboardManager
+        createSelectionContainer {
+            clipboardManager = LocalClipboardManager.current
+            clipboardManager.setText(AnnotatedString("Clipboard content at start of test."))
+            Column {
+                BasicText(
+                    text = "ExpectedText",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                )
+            }
+        }
+
+        startSelection(tag1)
+
+        rule.onNodeWithTag(tag1)
+            .performKeyInput {
+                keyDown(Key.CtrlLeft)
+                keyDown(Key.C)
+                keyUp(Key.C)
+                keyUp(Key.CtrlLeft)
+            }
+
+        rule.runOnIdle {
+            assertThat(clipboardManager.getText()?.text).isEqualTo("ExpectedText")
+        }
     }
 
     private fun startSelection(
