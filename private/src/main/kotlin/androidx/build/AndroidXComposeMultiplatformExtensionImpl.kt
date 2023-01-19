@@ -182,6 +182,7 @@ fun Project.experimentalOELPublication() : Boolean = findProperty("oel.publicati
 fun Project.oelAndroidxVersion() : String? = findProperty("oel.androidx.version") as String?
 fun Project.oelAndroidxFoundationVersion() : String? = findProperty("oel.androidx.foundation.version") as String?
 fun Project.oelAndroidxMaterial3Version() : String? = findProperty("oel.androidx.material3.version") as String?
+fun Project.oelAndroidxMaterialVersion() : String? = findProperty("oel.androidx.material.version") as String?
 
 fun enableOELPublishing(project: Project) {
     if (!project.experimentalOELPublication()) return
@@ -253,12 +254,15 @@ private fun Project.publishAndroidxReference(target: KotlinTarget) {
                         "Please specify oel.androidx.material3.version property"
                     }
                     val foundationVersion = target.project.oelAndroidxFoundationVersion() ?: composeVersion
+                    val materialVersion = target.project.oelAndroidxMaterialVersion() ?: composeVersion
 
                     val groupId = target.project.group.toString()
                     val version = if (groupId.contains("org.jetbrains.compose.material3")) {
                         material3Version
                     } else if (groupId.contains("org.jetbrains.compose.foundation")) {
                         foundationVersion
+                    } else if (groupId.contains("org.jetbrains.compose.material")){
+                        materialVersion
                     } else {
                         composeVersion
                     }
