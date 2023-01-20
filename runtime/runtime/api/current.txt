@@ -576,6 +576,9 @@ package androidx.compose.runtime {
 
 package androidx.compose.runtime.collection {
 
+  public final class ActualIntMap_androidKt {
+  }
+
   public final class MutableVector<T> implements java.util.RandomAccess {
     method public boolean add(T? element);
     method public void add(int index, T? element);

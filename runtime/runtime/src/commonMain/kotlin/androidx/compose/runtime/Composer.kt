@@ -22,6 +22,7 @@ package androidx.compose.runtime
 import androidx.compose.runtime.Composer.Companion.equals
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
+import androidx.compose.runtime.collection.IntMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.snapshots.currentSnapshot
@@ -1248,7 +1249,7 @@ internal class ComposerImpl(
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
     private var parentProvider: CompositionLocalMap = persistentHashMapOf()
-    private val providerUpdates = HashMap<Int, CompositionLocalMap>()
+    private val providerUpdates = IntMap<CompositionLocalMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
     private var reusing = false
@@ -1885,12 +1886,15 @@ internal class ComposerImpl(
         record { _, _, rememberManager -> rememberManager.sideEffect(effect) }
     }
 
+    private fun currentCompositionLocalScope(): CompositionLocalMap {
+        providerCache?.let { return it }
+        return currentCompositionLocalScope(reader.parent)
+    }
+
     /**
      * Return the current [CompositionLocal] scope which was provided by a parent group.
      */
-    private fun currentCompositionLocalScope(group: Int? = null): CompositionLocalMap {
-        if (group == null)
-            providerCache?.let { return it }
+    private fun currentCompositionLocalScope(group: Int): CompositionLocalMap {
         if (inserting && writerHasAProvider) {
             var current = writer.parent
             while (current > 0) {
@@ -1906,7 +1910,7 @@ internal class ComposerImpl(
             }
         }
         if (reader.size > 0) {
-            var current = group ?: reader.parent
+            var current = group
             while (current > 0) {
                 if (reader.groupKey(current) == compositionLocalMapKey &&
                     reader.groupObjectKey(current) == compositionLocalMap

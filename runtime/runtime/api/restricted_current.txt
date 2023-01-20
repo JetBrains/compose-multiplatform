@@ -603,6 +603,9 @@ package androidx.compose.runtime {
 
 package androidx.compose.runtime.collection {
 
+  public final class ActualIntMap_androidKt {
+  }
+
   public final class MutableVector<T> implements java.util.RandomAccess {
     ctor @kotlin.PublishedApi internal MutableVector(@kotlin.PublishedApi T![] content, int size);
     method public boolean add(T? element);
