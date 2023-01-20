@@ -19,6 +19,7 @@ package androidx.compose.ui.text.intl
 import androidx.annotation.RequiresApi
 import android.os.LocaleList as AndroidLocaleList
 import java.util.Locale as JavaLocale
+import androidx.compose.ui.text.platform.createSynchronizedObject
 
 /**
  * An Android implementation of Locale object
@@ -41,8 +42,8 @@ internal class AndroidLocale(val javaLocale: JavaLocale) : PlatformLocale {
  */
 internal class AndroidLocaleDelegateAPI23 : PlatformLocaleDelegate {
 
-    override val current: List<PlatformLocale>
-        get() = listOf(AndroidLocale(JavaLocale.getDefault()))
+    override val current: LocaleList
+        get() = LocaleList(listOf(Locale(AndroidLocale(JavaLocale.getDefault()))))
 
     override fun parseLanguageTag(languageTag: String): PlatformLocale =
         AndroidLocale(JavaLocale.forLanguageTag(languageTag))
@@ -53,15 +54,29 @@ internal class AndroidLocaleDelegateAPI23 : PlatformLocaleDelegate {
  */
 @RequiresApi(api = 24)
 internal class AndroidLocaleDelegateAPI24 : PlatformLocaleDelegate {
+    private var lastPlatformLocaleList: AndroidLocaleList? = null
+    private var lastLocaleList: LocaleList? = null
+    private val lock = createSynchronizedObject()
 
-    override val current: List<PlatformLocale>
+    override val current: LocaleList
         get() {
-            val localeList = AndroidLocaleList.getDefault()
-            val result = mutableListOf<PlatformLocale>()
-            for (i in 0 until localeList.size()) {
-                result.add(AndroidLocale(localeList[i]))
+            val platformLocaleList = AndroidLocaleList.getDefault()
+            return synchronized(lock) {
+                // try to avoid any more allocs
+                lastLocaleList?.let {
+                    if (platformLocaleList === lastPlatformLocaleList) return it
+                }
+                // this is faster than adding to an empty mutableList
+                val localeList = LocaleList(
+                    List(platformLocaleList.size()) { position ->
+                        Locale(AndroidLocale(platformLocaleList[position]))
+                    }
+                )
+                // cache the platform result and compose result
+                lastPlatformLocaleList = platformLocaleList
+                lastLocaleList = localeList
+                localeList
             }
-            return result
         }
 
     override fun parseLanguageTag(languageTag: String): PlatformLocale =
