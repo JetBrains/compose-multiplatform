@@ -33,13 +33,13 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.TypefaceResult
 import androidx.compose.ui.text.intl.AndroidLocale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
 import androidx.compose.ui.text.platform.extensions.setTextMotion
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.util.fastAny
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import java.util.Locale
@@ -66,7 +66,7 @@ internal class AndroidParagraphIntrinsics constructor(
     override val minIntrinsicWidth: Float
         get() = layoutIntrinsics.minIntrinsicWidth
 
-    private val resolvedTypefaces: MutableList<TypefaceDirtyTracker> = mutableListOf()
+    private var resolvedTypefaces: TypefaceDirtyTrackerLinkedList? = null
 
     /**
      * If emojiCompat is used in the making of this Paragraph
@@ -77,7 +77,7 @@ internal class AndroidParagraphIntrinsics constructor(
         if (!style.hasEmojiCompat) { false } else { EmojiCompatStatus.fontLoaded.value }
 
     override val hasStaleResolvedFonts: Boolean
-        get() = resolvedTypefaces.fastAny { it.isStaleResolvedFont } ||
+        get() = (resolvedTypefaces?.isStaleResolvedFont ?: false) ||
             (!emojiCompatProcessed && style.hasEmojiCompat &&
                 /* short-circuit this state read */ EmojiCompatStatus.fontLoaded.value)
 
@@ -95,9 +95,13 @@ internal class AndroidParagraphIntrinsics constructor(
                     fontStyle,
                     fontSynthesis
                 )
-                val holder = TypefaceDirtyTracker(result)
-                resolvedTypefaces.add(holder)
-                holder.typeface
+                if (result !is TypefaceResult.Immutable) {
+                    val newHead = TypefaceDirtyTrackerLinkedList(result, resolvedTypefaces)
+                    resolvedTypefaces = newHead
+                    newHead.typeface
+                } else {
+                    result.value as Typeface
+                }
             }
 
         textPaint.setTextMotion(style.textMotion)
@@ -176,13 +180,16 @@ internal actual fun ActualParagraphIntrinsics(
     density = density
 )
 
-private class TypefaceDirtyTracker(val resolveResult: State<Any>) {
+private class TypefaceDirtyTrackerLinkedList(
+    private val resolveResult: State<Any>,
+    private val next: TypefaceDirtyTrackerLinkedList? = null
+) {
     val initial = resolveResult.value
     val typeface: Typeface
         get() = initial as Typeface
 
     val isStaleResolvedFont: Boolean
-        get() = resolveResult.value !== initial
+        get() = resolveResult.value !== initial || (next != null && next.isStaleResolvedFont)
 }
 
 private val TextStyle.hasEmojiCompat: Boolean
