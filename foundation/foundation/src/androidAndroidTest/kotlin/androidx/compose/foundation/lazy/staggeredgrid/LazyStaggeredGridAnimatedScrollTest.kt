@@ -188,6 +188,26 @@ class LazyStaggeredGridAnimatedScrollTest(
         assertSpringAnimation(fromIndex = 10, fromOffset = 10, toIndex = 0, toOffset = 10)
     }
 
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_forward() {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(20, -itemSizePx * 3)
+        }
+        rule.waitForIdle()
+        assertThat(state.firstVisibleItemIndex).isEqualTo(14)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_backward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(20)
+            state.animateScrollToItem(0, itemSizePx * 3)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(6)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
     private fun assertSpringAnimation(
         toIndex: Int,
         toOffset: Int = 0,
