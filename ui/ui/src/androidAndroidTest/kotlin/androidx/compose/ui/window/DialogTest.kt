@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.window
 
+import android.os.Build
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -269,6 +270,10 @@ class DialogTest {
     @Test
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun dialogTest_backHandler_isCalled_backButtonPressed() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         val clickCountPrefix = "Click: "
 
         rule.setContent {

@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.selection
 
+import android.os.Build
 import androidx.compose.foundation.TapIndicationDelay
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
@@ -623,6 +624,10 @@ class ToggleableTest {
     @Test
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_interactionSource_focus_inKeyboardMode() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
@@ -824,6 +829,10 @@ class ToggleableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithEnterKey() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
@@ -853,6 +862,10 @@ class ToggleableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithNumPadEnterKey() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
@@ -882,6 +895,10 @@ class ToggleableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithDpadCenter() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
@@ -911,6 +928,10 @@ class ToggleableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_clickWithEnterKey_triStateToggleable() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
@@ -940,6 +961,10 @@ class ToggleableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_enterKey_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -987,6 +1012,10 @@ class ToggleableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_numPadEnterKey_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -1034,6 +1063,10 @@ class ToggleableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_dpadCenter_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -1118,6 +1151,10 @@ class ToggleableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_doubleEnterKey_emitsFurtherInteractions() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -1179,6 +1216,10 @@ class ToggleableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -1239,6 +1280,10 @@ class ToggleableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun toggleableTest_interruptedClick_emitsCancelIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()

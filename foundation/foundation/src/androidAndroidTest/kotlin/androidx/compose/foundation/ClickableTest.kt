@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import android.os.Build
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -209,6 +210,10 @@ class ClickableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_clickWithEnterKey() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
@@ -237,6 +242,10 @@ class ClickableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_clickWithNumPadEnterKey() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
@@ -265,6 +274,10 @@ class ClickableTest {
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_clickWithDPadCenter() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
@@ -1277,6 +1290,10 @@ class ClickableTest {
     @Test
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_interactionSource_focus_inKeyboardMode() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
@@ -1926,6 +1943,10 @@ class ClickableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_enterKey_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -1972,6 +1993,10 @@ class ClickableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_numPadEnterKey_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -2018,6 +2043,10 @@ class ClickableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_dpadCenter_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -2100,6 +2129,10 @@ class ClickableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_doubleEnterKey_emitsFurtherInteractions() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -2160,6 +2193,10 @@ class ClickableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
@@ -2219,6 +2256,10 @@ class ClickableTest {
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun clickableTest_interruptedClick_emitsCancelIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
