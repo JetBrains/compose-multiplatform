@@ -109,6 +109,11 @@ sealed interface LazyStaggeredGridLayoutInfo {
      * Content padding in pixels applied after the items in scroll direction.
      */
     val afterContentPadding: Int
+
+    /**
+     * The spacing between items in scroll direction.
+     */
+    val mainAxisItemSpacing: Int
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -142,7 +147,8 @@ internal class LazyStaggeredGridMeasureResult(
     override val viewportStartOffset: Int,
     override val viewportEndOffset: Int,
     override val beforeContentPadding: Int,
-    override val afterContentPadding: Int
+    override val afterContentPadding: Int,
+    override val mainAxisItemSpacing: Int
 ) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult {
     override val orientation: Orientation =
         if (isVertical) Orientation.Vertical else Orientation.Horizontal
@@ -157,5 +163,6 @@ internal object EmptyLazyStaggeredGridLayoutInfo : LazyStaggeredGridLayoutInfo {
     override val viewportEndOffset: Int = 0
     override val beforeContentPadding: Int = 0
     override val afterContentPadding: Int = 0
+    override val mainAxisItemSpacing: Int = 0
     override val orientation: Orientation = Orientation.Vertical
 }

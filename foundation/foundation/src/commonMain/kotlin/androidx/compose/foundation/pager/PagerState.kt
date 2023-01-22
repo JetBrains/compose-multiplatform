@@ -434,6 +434,7 @@ private val EmptyLayoutInfo = object : LazyListLayoutInfo {
     override val viewportStartOffset: Int = 0
     override val viewportEndOffset: Int = 0
     override val totalItemsCount: Int = 0
+    override val mainAxisItemSpacing: Int = 0
 }
 
 private val UnitDensity = object : Density {

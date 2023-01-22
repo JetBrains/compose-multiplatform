@@ -76,7 +76,8 @@ internal fun measureLazyList(
             totalItemsCount = 0,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacing = spaceBetweenItems
         )
     } else {
         var currentFirstItemIndex = firstVisibleItemIndex
@@ -327,7 +328,8 @@ internal fun measureLazyList(
             totalItemsCount = itemsCount,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacing = spaceBetweenItems
         )
     }
 }

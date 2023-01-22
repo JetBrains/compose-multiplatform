@@ -1,4 +1,8 @@
 // Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.foundation.lazy.grid.LazyGridLayoutInfo#getMainAxisItemSpacing():
+    Added method androidx.compose.foundation.lazy.grid.LazyGridLayoutInfo.getMainAxisItemSpacing()
+
+
 RemovedClass: androidx.compose.foundation.lazy.LazyListPinningModifierKt:
     Removed class androidx.compose.foundation.lazy.LazyListPinningModifierKt
 RemovedClass: androidx.compose.foundation.lazy.layout.PinnableParentKt:

@@ -216,6 +216,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
                 viewportEndOffset = mainAxisAvailableSize + afterContentPadding,
                 beforeContentPadding = beforeContentPadding,
                 afterContentPadding = afterContentPadding,
+                mainAxisItemSpacing = mainAxisSpacing
             )
         }
 
@@ -738,7 +739,8 @@ private fun LazyStaggeredGridMeasureContext.measure(
             viewportStartOffset = minOffset,
             viewportEndOffset = maxOffset,
             beforeContentPadding = beforeContentPadding,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacing = mainAxisSpacing
         )
     }
 }

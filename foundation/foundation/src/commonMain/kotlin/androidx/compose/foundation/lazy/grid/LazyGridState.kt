@@ -455,4 +455,5 @@ private object EmptyLazyGridLayoutInfo : LazyGridLayoutInfo {
     override val reverseLayout = false
     override val beforeContentPadding: Int = 0
     override val afterContentPadding: Int = 0
+    override val mainAxisItemSpacing = 0
 }
