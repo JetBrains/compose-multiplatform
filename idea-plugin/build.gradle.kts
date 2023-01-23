@@ -25,6 +25,7 @@ intellij {
     type.set(projectProperties.platformType)
     version.set(projectProperties.platformVersion)
     downloadSources.set(projectProperties.platformDownloadSources)
+    updateSinceUntilBuild.set(false)
 
     plugins.set(
         listOf(
@@ -55,10 +56,6 @@ tasks {
         channels.set(projectProperties.pluginChannels)
     }
 
-    patchPluginXml {
-        sinceBuild.set(projectProperties.pluginSinceBuild)
-    }
-
     runPluginVerifier {
         ideVersions.set(projectProperties.pluginVerifierIdeVersions)
     }
@@ -70,7 +67,6 @@ class ProjectProperties(private val project: Project) {
     val platformVersion get() = stringProperty("platform.version")
     val platformDownloadSources get() = stringProperty("platform.download.sources").toBoolean()
     val pluginChannels get() = listProperty("plugin.channels")
-    val pluginSinceBuild get() = stringProperty("plugin.since.build")
     val pluginVerifierIdeVersions get() = listProperty("plugin.verifier.ide.versions")
 
     private fun stringProperty(key: String): String =
