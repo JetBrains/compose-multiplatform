@@ -36,7 +36,7 @@ class Locale internal constructor(internal val platformLocale: PlatformLocale) {
         /**
          * Returns a [Locale] object which represents current locale
          */
-        val current: Locale get() = Locale(platformLocaleDelegate.current[0])
+        val current: Locale get() = platformLocaleDelegate.current[0]
     }
 
     /**

@@ -32,8 +32,8 @@ internal class DesktopLocale(val locale: Locale) : PlatformLocale {
 }
 
 internal actual fun createPlatformLocaleDelegate() = object : PlatformLocaleDelegate {
-    override val current: List<PlatformLocale>
-        get() = listOf(DesktopLocale(Locale.getDefault()))
+    override val current: LocaleList
+        get() = LocaleList(listOf(Locale(DesktopLocale(Locale.getDefault()))))
 
     override fun parseLanguageTag(languageTag: String): PlatformLocale =
         DesktopLocale(

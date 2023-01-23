@@ -30,11 +30,12 @@ import androidx.compose.ui.util.fastMap
 @Immutable
 class LocaleList constructor(val localeList: List<Locale>) : Collection<Locale> {
     companion object {
+
         /**
          * Returns Locale object which represents current locale
          */
         val current: LocaleList
-            get() = LocaleList(platformLocaleDelegate.current.fastMap { Locale(it) })
+            get() = platformLocaleDelegate.current
     }
 
     /**
