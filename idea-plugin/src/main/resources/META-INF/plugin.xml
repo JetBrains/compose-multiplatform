@@ -13,6 +13,9 @@
 
     </description>
 
+    <!-- until-build is omitted, so we don't have to update it after each Intellij release -->
+    <idea-version since-build="213"/>
+
     <!-- Product and plugin compatibility requirements -->
     <!-- https://plugins.jetbrains.com/docs/intellij/plugin-compatibility.html -->
     <depends>com.intellij.modules.platform</depends>
