@@ -292,7 +292,7 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect(long topLeft, long bottomRight);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect(long center, int radius);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect lerp(androidx.compose.ui.unit.IntRect start, androidx.compose.ui.unit.IntRect stop, float fraction);
-    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect round(androidx.compose.ui.geometry.Rect);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect roundToIntRect(androidx.compose.ui.geometry.Rect);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.IntRect);
   }
 
