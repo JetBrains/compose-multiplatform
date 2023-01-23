@@ -45,6 +45,7 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.LayoutModifierImpl
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -2317,45 +2318,49 @@ class LayoutNodeTest {
 
     @Test
     fun modifierMatchesWrapperWithIdentity() {
-        val modifier1 = Modifier.layout { measurable, constraints ->
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
+        val measureLambda1: MeasureScope.(Measurable, Constraints) -> MeasureResult =
+            { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
             }
-        }
-        val modifier2 = Modifier.layout { measurable, constraints ->
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(1, 1)
+        val modifier1 = Modifier.layout(measureLambda1)
+
+        val measureLambda2: MeasureScope.(Measurable, Constraints) -> MeasureResult =
+            { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(1, 1)
+                }
             }
-        }
+        val modifier2 = Modifier.layout(measureLambda2)
 
         val root = LayoutNode()
         root.modifier = modifier1.then(modifier2)
 
-        val wrapper1 = root.outerCoordinator
-        val wrapper2 = root.outerCoordinator.wrapped
-
         assertEquals(
-            modifier1,
-            (wrapper1 as LayoutModifierNodeCoordinator).layoutModifierNode.toModifier()
+            measureLambda1,
+            ((root.outerCoordinator as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
         assertEquals(
-            modifier2,
-            (wrapper2 as LayoutModifierNodeCoordinator).layoutModifierNode.toModifier()
+            measureLambda2,
+            ((root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
 
         root.modifier = modifier2.then(modifier1)
 
         assertEquals(
-            modifier1,
-            (root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator)
-                .layoutModifierNode
-                .toModifier()
+            measureLambda1,
+            ((root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
         assertEquals(
-            modifier2,
-            (root.outerCoordinator as LayoutModifierNodeCoordinator).layoutModifierNode.toModifier()
+            measureLambda2,
+            ((root.outerCoordinator as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
     }
 
