@@ -110,21 +110,31 @@ internal class AndroidParagraphIntrinsics constructor(
             style = style.toSpanStyle(),
             resolveTypeface = resolveTypeface,
             density = density,
+            requiresLetterSpacing = spanStyles.isNotEmpty(),
         )
 
+        val finalSpanStyles = if (notAppliedStyle != null) {
+            // This is just a prepend operation, written in a lower alloc way
+            // equivalent to: `AnnotatedString.Range(...) + spanStyles`
+            List(spanStyles.size + 1) { position ->
+                when (position) {
+                    0 -> AnnotatedString.Range(
+                        item = notAppliedStyle,
+                        start = 0,
+                        end = text.length
+                    )
+
+                    else -> spanStyles[position - 1]
+                }
+            }
+        } else {
+            spanStyles
+        }
         charSequence = createCharSequence(
             text = text,
             contextFontSize = textPaint.textSize,
             contextTextStyle = style,
-            // NOTE(text-perf-review): this is sabotaging the optimization that
-            // createCharSequence makes where it just uses `text` if there are no spanStyles!
-            spanStyles = listOf(
-                AnnotatedString.Range(
-                    item = notAppliedStyle,
-                    start = 0,
-                    end = text.length
-                )
-            ) + spanStyles,
+            spanStyles = finalSpanStyles,
             placeholders = placeholders,
             density = density,
             resolveTypeface = resolveTypeface,

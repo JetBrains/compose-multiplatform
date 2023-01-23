@@ -44,6 +44,9 @@ val TextDemos = DemoCategory(
                         ComposableDemo("Ellipsize and letterspacing") {
                             EllipsizeWithLetterSpacing()
                         },
+                        ComposableDemo("Letterspacing") {
+                            LetterSpacingDemo()
+                        }
                     )
                 ),
                 DemoCategory(
