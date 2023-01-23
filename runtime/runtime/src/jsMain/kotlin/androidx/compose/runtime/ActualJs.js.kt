@@ -27,20 +27,6 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
-internal actual open class ThreadLocal<T> actual constructor(
-    initialValue: () -> T
-) {
-    private var value: T = initialValue()
-
-    actual fun get(): T = value
-
-    actual fun set(value: T) {
-        this.value = value
-    }
-
-    actual fun remove() {}
-}
-
 internal actual class SnapshotThreadLocal<T> actual constructor() {
     private var value: T? = null
 

@@ -25,27 +25,6 @@ import kotlinx.coroutines.ThreadContextElement
 
 internal actual typealias AtomicReference<V> = java.util.concurrent.atomic.AtomicReference<V>
 
-internal actual open class ThreadLocal<T> actual constructor(
-    private val initialValue: () -> T
-) : java.lang.ThreadLocal<T>() {
-    @Suppress("UNCHECKED_CAST")
-    actual override fun get(): T {
-        return super.get() as T
-    }
-
-    actual override fun set(value: T) {
-        super.set(value)
-    }
-
-    override fun initialValue(): T? {
-        return initialValue.invoke()
-    }
-
-    actual override fun remove() {
-        super.remove()
-    }
-}
-
 internal actual class SnapshotThreadLocal<T> {
     private val map = AtomicReference<ThreadMap>(emptyThreadMap)
     private val writeMutex = Any()

@@ -28,34 +28,6 @@ import kotlin.native.concurrent.isFrozen
 import kotlin.native.concurrent.freeze
 import kotlin.native.concurrent.ensureNeverFrozen
 
-@kotlin.native.concurrent.ThreadLocal
-private val threadLocalStorage = mutableMapOf<Any, Any?>()
-
-// TODO:
-internal actual open class ThreadLocal<T> actual constructor(
-    initialValue: () -> T
-) {
-    // TODO: not exact semantics as on JVM, initialize initial value only once, not per thread,
-    // as otherwise we have to share create factory.
-    private val initial = initialValue()
-
-    private var value: T
-        get() = threadLocalStorage.getOrPut(this, { initial }) as T
-        set(value) {
-            threadLocalStorage[this] = value
-        }
-
-    actual fun get(): T = value
-
-    actual fun set(value: T) {
-        this.value = value
-    }
-
-    actual fun remove() {
-        threadLocalStorage.remove(this)
-    }
-}
-
 /**
  * AtomicReference implementation suitable for both single and multi-threaded context.
  */
