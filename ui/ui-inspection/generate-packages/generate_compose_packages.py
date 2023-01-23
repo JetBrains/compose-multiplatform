@@ -57,7 +57,7 @@ def verify_packages(packages):
         file_packages = file.readlines()
         if len(file_packages) != len(packages): report_failure_and_exit()
         for i in range(len(file_packages)):
-            if ordered_packages[i] != file_packages[i].strip('\n'): report_failure_and_exit()
+            if packages[i] != file_packages[i].strip('\n'): report_failure_and_exit()
 
 def report_failure_and_exit():
     print(
