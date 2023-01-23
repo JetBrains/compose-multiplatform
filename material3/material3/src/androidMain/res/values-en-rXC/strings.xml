@@ -26,7 +26,11 @@
     <string name="date_picker_title" msgid="9208721003668059792">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‏‏‏‏‏‏‏‏‎‎‏‎‏‏‏‏‏‏‎‎‏‎‏‏‏‏‎‏‏‎‏‎‎‎‎‎‏‏‎‏‎‏‎‎‎‎‎‎‏‏‎‏‏‎‏‎‎‏‎‎‎‎‎Select date‎‏‎‎‏‎"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‎‏‎‎‏‏‏‏‎‎‎‎‎‎‏‏‏‎‎‏‏‏‏‎‎‎‎‎‏‏‎‎‏‎‏‏‏‏‎‎‏‏‎‏‎‏‎‎‏‎‎‎‎‏‏‏‎‏‎‎‎‎‏‎Selected date‎‏‎‎‏‎"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‎‏‎‏‏‏‏‎‏‎‏‏‎‏‏‎‎‏‎‏‏‎‎‎‏‏‏‎‏‎‎‎‎‎‏‏‎‏‏‎‎‎‏‎‎‎‎‏‎‎‏‏‎‎‏‏‏‎‏‏‏‎‏‎Switch to selecting a year‎‏‎‎‏‎"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‎‏‎‎‎‎‏‏‎‎‎‏‏‏‏‏‎‎‎‎‎‎‏‎‎‎‎‏‏‏‏‏‏‎‎‎‏‏‎‎‏‎‏‎‏‏‏‎‏‏‏‏‎‎‎‏‎‏‏‏‎‏‎Switch to selecting a day‎‏‎‎‏‎"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‎‏‎‏‎‎‎‎‎‎‎‏‏‎‏‏‏‎‏‏‎‎‎‎‎‎‎‎‎‏‎‏‏‎‎‎‎‏‏‎‎‎‎‎‏‏‏‏‏‏‏‏‎‎‏‎‎‏‎‏‏‎Swipe to select a year, or tap to switch back to selecting a day‎‏‎‎‏‎"</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‏‏‎‎‏‏‎‏‏‎‎‎‎‎‎‏‏‏‏‏‎‏‏‏‎‎‎‎‏‎‏‏‎‏‎‏‏‎‎‏‏‏‏‎‏‎‎‏‏‏‎‎‏‏‎‎‎‎‎‏‏‎‎Change to next month‎‏‎‎‏‎"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‏‎‏‎‎‏‎‏‏‎‏‎‏‏‎‏‏‏‎‏‎‏‏‎‎‎‏‎‎‏‎‏‏‏‎‏‏‎‎‏‏‏‎‏‏‎‎‏‏‎‏‎‏‎‏‏‎‎‎‎‎‏‎Change to previous month‎‏‎‎‏‎"</string>
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‎‎‎‏‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‏‏‎‏‎‎‏‎‏‎‎‏‎‎‎‎‏‎‏‏‎‏‏‏‏‏‎‏‏‏‎‎‏‎‏‎‎‏‎‏‏‎‎‎Navigate to year %1$s‎‏‎‎‏‎"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‎‎‎‎‎‎‎‎‏‏‎‏‏‏‎‏‏‏‏‏‏‏‎‎‎‏‎‎‏‏‎‎‏‏‏‎‏‎‏‎‏‏‏‏‏‎‎‏‏‎‎‏‏‏‏‎‏‏‏‏‎‏‎Current selection: %1$s‎‏‎‎‏‎"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‎‎‏‏‏‏‎‏‏‏‎‎‎‏‎‎‎‏‎‎‏‎‏‎‏‎‏‎‎‎‎‎‎‎‏‎‎‏‏‎‏‎‎‎‎‏‎‏‎‎‏‎‎‏‏‏‎‎‏‎‏‏‎None‎‏‎‎‏‎"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"‎‏‎‎‎‎‎‏‎‏‏‏‎‎‎‎‎‎‏‎‎‏‎‎‎‎‏‏‏‏‏‏‏‏‏‏‎‎‎‎‏‏‏‏‏‎‎‎‎‎‏‏‏‏‏‎‎‎‏‏‎‎‏‎‏‎‎‎‏‏‎‏‎‏‎‎‏‎‎‎‏‎‎‏‏‏‎‏‎‏‎‎‎‎‎‎‎Year picker visible‎‏‎‎‏‎"</string>
 </resources>

@@ -26,7 +26,16 @@
     <string name="date_picker_title" msgid="9208721003668059792">"Välj datum"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"Valt datum"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Byt till att välja år"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"Byt till att välja dag"</string>
+    <!-- no translation found for date_picker_switch_to_day_selection (145089358343568971) -->
+    <skip />
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Ändra till nästa månad"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Ändra till föregående månad"</string>
+    <!-- no translation found for date_picker_navigate_to_year_description (5152441868029453612) -->
+    <skip />
+    <!-- no translation found for date_picker_headline_description (4627306862713137085) -->
+    <skip />
+    <!-- no translation found for date_picker_no_selection_description (5724377114289981899) -->
+    <skip />
+    <!-- no translation found for date_picker_year_picker_pane_title (8140324713311804736) -->
+    <skip />
 </resources>

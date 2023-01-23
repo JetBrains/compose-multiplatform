@@ -26,7 +26,11 @@
     <string name="date_picker_title" msgid="9208721003668059792">"日付を選択します"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"選択した日付"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"年の選択に移行"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"日付の選択に移行"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"スワイプして年を選択するか、タップして日付の選択に戻ります"</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"翌月に変更"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"前月に変更"</string>
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"年に移動 %1$s"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"現在の選択: %1$s"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"なし"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"年の選択ツールの表示"</string>
 </resources>
