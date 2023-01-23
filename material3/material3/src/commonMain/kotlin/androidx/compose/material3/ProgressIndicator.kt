@@ -515,7 +515,7 @@ object ProgressIndicatorDefaults {
         LinearProgressIndicatorTokens.TrackColor.toColor()
 
     /** Default track color for a circular progress indicator. */
-    val circularTrackColor: Color get() = Color.Transparent
+    val circularTrackColor: Color @Composable get() = Color.Transparent
 
     /** Default stroke width for a circular progress indicator. */
     val CircularStrokeWidth: Dp = CircularProgressIndicatorTokens.ActiveIndicatorWidth
