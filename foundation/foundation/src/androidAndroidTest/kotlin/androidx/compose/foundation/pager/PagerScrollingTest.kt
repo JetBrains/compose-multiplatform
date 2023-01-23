@@ -25,6 +25,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
+import androidx.test.filters.RequiresDevice
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -176,6 +177,7 @@ internal class PagerScrollingTest(
         confirmPageIsInCorrectPosition(5)
     }
 
+    @RequiresDevice // b/266452930
     @Test
     fun swipeWithHighVelocity_overHalfPage_shouldGoToNextPage() {
         // Arrange
