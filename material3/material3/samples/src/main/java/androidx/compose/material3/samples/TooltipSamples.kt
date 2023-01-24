@@ -44,15 +44,18 @@ import kotlinx.coroutines.launch
 @Sampled
 @Composable
 fun PlainTooltipSample() {
+    val tooltipState = remember { TooltipState() }
     PlainTooltipBox(
-        tooltip = { Text("Add to favorites") }
+        tooltip = { Text("Add to favorites") },
+        tooltipState = tooltipState
     ) {
         IconButton(
-            onClick = { /* Icon button's click event */ }
+            onClick = { /* Icon button's click event */ },
+            modifier = Modifier.tooltipAnchor()
         ) {
             Icon(
                 imageVector = Icons.Filled.Favorite,
-                contentDescription = null
+                contentDescription = "Localized Description"
             )
         }
     }
@@ -65,7 +68,6 @@ fun PlainTooltipSample() {
 fun PlainTooltipWithManualInvocationSample() {
     val tooltipState = remember { TooltipState() }
     val scope = rememberCoroutineScope()
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -75,7 +77,7 @@ fun PlainTooltipWithManualInvocationSample() {
         ) {
             Icon(
                 imageVector = Icons.Filled.AddCircle,
-                contentDescription = null
+                contentDescription = "Localized Description"
             )
         }
         Spacer(Modifier.requiredHeight(30.dp))

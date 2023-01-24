@@ -98,6 +98,9 @@ internal actual fun getString(string: Strings): String {
         Strings.DateInputInvalidYearRange -> resources.getString(
             androidx.compose.material3.R.string.date_input_invalid_year_range
         )
+        Strings.TooltipLongPressLabel -> resources.getString(
+            androidx.compose.material3.R.string.tooltip_long_press_label
+        )
         else -> ""
     }
 }

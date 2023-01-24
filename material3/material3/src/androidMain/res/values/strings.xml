@@ -51,4 +51,6 @@
     <string name="date_input_invalid_year_range">
         Date out of expected year range %1$s - %2$s
     </string>
+    <!-- Spoken description of a tooltip -->
+    <string name="tooltip_long_press_label">Show tooltip</string>
 </resources>

@@ -54,6 +54,7 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val DateInputInvalidNotAllowed = Strings(28)
         val DateInputInvalidForPattern = Strings(29)
         val DateInputInvalidYearRange = Strings(30)
+        val TooltipLongPressLabel = Strings(31)
     }
 }
 
