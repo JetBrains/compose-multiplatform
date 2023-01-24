@@ -764,6 +764,29 @@ class ScrollbarTest {
         }
     }
 
+    @Test
+    fun `test empty lazy list`(){
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                LazyListTestBox(
+                    size = 100.dp, childSize = 20.dp, childCount = 0, scrollbarWidth = 10.dp
+                )
+            }
+            rule.awaitIdle()
+
+            // Just play around and make sure it doesn't crash
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                instantDrag(start = Offset(0f, 25f), end = Offset(0f, 50f))
+            }
+            rule.awaitIdle()
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 0f))
+                press()
+            }
+            rule.awaitIdle()
+        }
+    }
+
     private suspend fun tryUntilSucceeded(block: suspend () -> Unit) {
         while (true) {
             try {

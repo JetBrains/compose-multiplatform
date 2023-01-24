@@ -143,7 +143,12 @@ internal abstract class LazyLineContentAdapter: ScrollbarAdapter{
      */
     protected abstract fun averageVisibleLineSize(): Double
 
-    private val averageLineSize by derivedStateOf { averageVisibleLineSize() }
+    private val averageLineSize by derivedStateOf {
+        if (totalLineCount() == 0)
+            0.0
+        else
+            averageVisibleLineSize()
+    }
 
     override val scrollOffset: Double
         get() {
