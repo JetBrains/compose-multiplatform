@@ -27,15 +27,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.ExperimentalTime
 import kotlin.time.toDuration
 
-internal actual class SnapshotThreadLocal<T> actual constructor() {
-    private var value: T? = null
-
-    actual fun get() = value
-
-    actual fun set(value: T?) {
-        this.value = value
-    }
-}
+internal actual fun getCurrentThreadId(): Long = 0
 
 internal actual class AtomicInt actual constructor(private var value: Int) {
     actual fun get(): Int = value
@@ -88,8 +80,6 @@ internal actual fun identityHashCode(instance: Any?): Int {
         )
     }
 }
-
-internal actual fun ensureMutable(it: Any) { /* NOTHING */ }
 
 actual annotation class CompositionContextLocal {}
 
