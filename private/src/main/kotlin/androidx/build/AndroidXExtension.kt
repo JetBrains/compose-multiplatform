@@ -16,14 +16,15 @@
 
 package androidx.build
 
+import androidx.build.buildInfo.CreateLibraryBuildInfoFileTask.Companion.getFrameworksSupportCommitShaAtHead
 import androidx.build.checkapi.shouldConfigureApiTasks
 import androidx.build.transform.configureAarAsJarForConfiguration
 import groovy.lang.Closure
+import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import java.io.File
 
 /**
  * Extension for [AndroidXImplPlugin] that's responsible for holding configuration options.
@@ -31,6 +32,7 @@ import java.io.File
 open class AndroidXExtension(val project: Project) {
     @JvmField
     val LibraryVersions: Map<String, Version>
+
     @JvmField
     val AllLibraryGroups: List<LibraryGroup>
 
@@ -84,7 +86,9 @@ open class AndroidXExtension(val project: Project) {
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
-    fun setName(newName: String) { name.set(newName) }
+    fun setName(newName: String) {
+        name.set(newName)
+    }
 
     /**
      * Maven version of the library.
@@ -173,7 +177,7 @@ open class AndroidXExtension(val project: Project) {
         val groupIdText = if (projectPath.startsWith(":external")) {
             projectPath.replace(":external:", "")
         } else {
-	    "androidx.${parentPath.substring(1).replace(':', '.')}"
+            "androidx.${parentPath.substring(1).replace(':', '.')}"
         }
 
         // get the library group having that text
@@ -255,8 +259,10 @@ open class AndroidXExtension(val project: Project) {
     fun isVersionSet(): Boolean {
         return versionIsSet
     }
+
     var description: String? = null
     var inceptionYear: String? = null
+
     /**
      * targetsJavaConsumers = true, if project is intended to be accessed from Java-language
      * source code.
@@ -309,7 +315,7 @@ open class AndroidXExtension(val project: Project) {
     }
 
     internal fun isPublishConfigured(): Boolean = (
-            publish != Publish.UNSET ||
+        publish != Publish.UNSET ||
             type.publish != Publish.UNSET
         )
 
@@ -349,6 +355,12 @@ open class AndroidXExtension(val project: Project) {
 
     fun configureAarAsJarForConfiguration(name: String) {
         configureAarAsJarForConfiguration(project, name)
+    }
+
+    fun getReferenceSha(): Provider<String> {
+        return project.providers.provider {
+            project.getFrameworksSupportCommitShaAtHead()
+        }
     }
 
     companion object {
