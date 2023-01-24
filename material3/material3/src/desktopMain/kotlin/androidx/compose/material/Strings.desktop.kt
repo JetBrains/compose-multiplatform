@@ -17,8 +17,12 @@
 package androidx.compose.material3
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+
+import java.util.Locale
 
 @Composable
+@ReadOnlyComposable
 internal actual fun getString(string: Strings): String {
     return when (string) {
         Strings.NavigationMenu -> "Navigation menu"
@@ -55,3 +59,7 @@ internal actual fun getString(string: Strings): String {
         else -> ""
     }
 }
+@Composable
+@ReadOnlyComposable
+internal actual fun getString(string: Strings, vararg formatArgs: Any): String =
+    String.format(getString(string), Locale.getDefault(), *formatArgs)

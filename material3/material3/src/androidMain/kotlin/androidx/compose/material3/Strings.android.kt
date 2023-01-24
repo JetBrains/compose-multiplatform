@@ -17,11 +17,15 @@
 package androidx.compose.material3
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.ui.R
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.os.ConfigurationCompat
+import java.util.Locale
 
 @Composable
+@ReadOnlyComposable
 internal actual fun getString(string: Strings): String {
     LocalConfiguration.current
     val resources = LocalContext.current.resources
@@ -39,32 +43,42 @@ internal actual fun getString(string: Strings): String {
         Strings.SnackbarDismiss -> resources.getString(
             androidx.compose.material3.R.string.snackbar_dismiss
         )
+
         Strings.SearchBarSearch -> resources.getString(
             androidx.compose.material3.R.string.search_bar_search
         )
+
         Strings.SuggestionsAvailable ->
             resources.getString(androidx.compose.material3.R.string.suggestions_available)
+
         Strings.DatePickerTitle -> resources.getString(
             androidx.compose.material3.R.string.date_picker_title
         )
+
         Strings.DatePickerHeadline -> resources.getString(
             androidx.compose.material3.R.string.date_picker_headline
         )
+
         Strings.DatePickerYearPickerPaneTitle -> resources.getString(
             androidx.compose.material3.R.string.date_picker_year_picker_pane_title
         )
+
         Strings.DatePickerSwitchToYearSelection -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_year_selection
         )
+
         Strings.DatePickerSwitchToDaySelection -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_day_selection
         )
+
         Strings.DatePickerSwitchToNextMonth -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_next_month
         )
+
         Strings.DatePickerSwitchToPreviousMonth -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_previous_month
         )
+
         Strings.DatePickerNavigateToYearDescription -> resources.getString(
             androidx.compose.material3.R.string.date_picker_navigate_to_year_description
         )
@@ -100,4 +114,12 @@ internal actual fun getString(string: Strings): String {
         )
         else -> ""
     }
+}
+@Composable
+@ReadOnlyComposable
+internal actual fun getString(string: Strings, vararg formatArgs: Any): String {
+    val raw = getString(string)
+    val locale =
+        ConfigurationCompat.getLocales(LocalConfiguration.current).get(0) ?: Locale.getDefault()
+    return String.format(raw, locale, *formatArgs)
 }

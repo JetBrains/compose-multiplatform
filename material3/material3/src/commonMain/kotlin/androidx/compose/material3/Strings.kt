@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 
 @Immutable
 @kotlin.jvm.JvmInline
@@ -58,4 +59,9 @@ internal value class Strings private constructor(@Suppress("unused") private val
 }
 
 @Composable
+@ReadOnlyComposable
 internal expect fun getString(string: Strings): String
+
+@Composable
+@ReadOnlyComposable
+internal expect fun getString(string: Strings, vararg formatArgs: Any): String
