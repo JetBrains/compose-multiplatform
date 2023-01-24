@@ -23,8 +23,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -44,12 +45,18 @@ class PagerActivity : ComponentActivity() {
 
         setContent {
             val pagerState = rememberPagerState()
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
                 HorizontalPager(
                     modifier = Modifier
+                        .height(400.dp)
                         .semantics { contentDescription = "Pager" }
                         .background(Color.White),
                     state = pagerState,
+                    pageSize = PageSize.Fill,
                     pageCount = itemCount
                 ) {
                     PagerItem(it)
@@ -69,9 +76,8 @@ class PagerActivity : ComponentActivity() {
 private fun PagerItem(index: Int) {
     Box(
         modifier = Modifier
-            .size(200.dp, 400.dp)
-            .background(Color.Black),
-        contentAlignment = Alignment.Center
+            .fillMaxSize()
+            .background(Color.Black)
     ) {
         Text(text = index.toString(), color = Color.White)
     }
