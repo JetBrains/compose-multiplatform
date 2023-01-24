@@ -74,6 +74,30 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerNoSelectionDescription -> resources.getString(
             androidx.compose.material3.R.string.date_picker_no_selection_description
         )
+        Strings.DateInputTitle -> resources.getString(
+            androidx.compose.material3.R.string.date_input_title
+        )
+        Strings.DateInputHeadline -> resources.getString(
+            androidx.compose.material3.R.string.date_input_headline
+        )
+        Strings.DateInputLabel -> resources.getString(
+            androidx.compose.material3.R.string.date_input_label
+        )
+        Strings.DateInputHeadlineDescription -> resources.getString(
+            androidx.compose.material3.R.string.date_input_headline_description
+        )
+        Strings.DateInputNoInputHeadlineDescription -> resources.getString(
+            androidx.compose.material3.R.string.date_input_no_input_description
+        )
+        Strings.DateInputInvalidNotAllowed -> resources.getString(
+            androidx.compose.material3.R.string.date_input_invalid_not_allowed
+        )
+        Strings.DateInputInvalidForPattern -> resources.getString(
+            androidx.compose.material3.R.string.date_input_invalid_for_pattern
+        )
+        Strings.DateInputInvalidYearRange -> resources.getString(
+            androidx.compose.material3.R.string.date_input_invalid_year_range
+        )
         else -> ""
     }
 }

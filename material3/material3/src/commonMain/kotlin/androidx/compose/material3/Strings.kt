@@ -46,6 +46,14 @@ internal value class Strings private constructor(@Suppress("unused") private val
         val DatePickerNavigateToYearDescription = Strings(20)
         val DatePickerHeadlineDescription = Strings(21)
         val DatePickerNoSelectionDescription = Strings(22)
+        val DateInputTitle = Strings(23)
+        val DateInputHeadline = Strings(24)
+        val DateInputLabel = Strings(25)
+        val DateInputHeadlineDescription = Strings(26)
+        val DateInputNoInputHeadlineDescription = Strings(27)
+        val DateInputInvalidNotAllowed = Strings(28)
+        val DateInputInvalidForPattern = Strings(29)
+        val DateInputInvalidYearRange = Strings(30)
     }
 }
 

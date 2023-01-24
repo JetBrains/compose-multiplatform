@@ -16,8 +16,8 @@
 
 package androidx.compose.material3
 
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
 import java.util.Locale
 
 /**
@@ -42,9 +42,17 @@ internal actual fun formatWithSkeleton(
     // Note: there is no equivalent in Java for Android's DateFormat.getBestDateTimePattern.
     // The JDK SimpleDateFormat expects a pattern, so the results will be "2023Jan7",
     // "2023January", etc. in case a skeleton holds an actual ICU skeleton and not a pattern.
-    val dateFormat = SimpleDateFormat(skeleton, locale)
-    dateFormat.timeZone = LegacyCalendarModelImpl.utcTimeZone
-    val calendar = Calendar.getInstance(LegacyCalendarModelImpl.utcTimeZone)
-    calendar.timeInMillis = utcTimeMillis
-    return dateFormat.format(calendar.timeInMillis)
+    return LegacyCalendarModelImpl.formatWithPattern(
+        utcTimeMillis = utcTimeMillis,
+        pattern = skeleton,
+        locale = locale
+    )
 }
+
+/**
+ * A composable function that returns the default [Locale].
+ */
+@Composable
+@ReadOnlyComposable
+@ExperimentalMaterial3Api
+internal actual fun defaultLocale(): Locale = Locale.getDefault()

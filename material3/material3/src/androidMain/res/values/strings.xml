@@ -41,4 +41,14 @@
     <string name="date_picker_headline_description">Current selection: %1$s</string>
     <string name="date_picker_no_selection_description">None</string>
     <string name="date_picker_year_picker_pane_title">Year picker visible</string>
+    <string name="date_input_title">Select date</string>
+    <string name="date_input_headline">Entered date</string>
+    <string name="date_input_label">Date</string>
+    <string name="date_input_headline_description">Entered date: %1$s</string>
+    <string name="date_input_no_input_description">None</string>
+    <string name="date_input_invalid_not_allowed">Date not allowed: %1$s</string>
+    <string name="date_input_invalid_for_pattern">Date does not match expected pattern: %1$s</string>
+    <string name="date_input_invalid_year_range">
+        Date out of expected year range %1$s - %2$s
+    </string>
 </resources>

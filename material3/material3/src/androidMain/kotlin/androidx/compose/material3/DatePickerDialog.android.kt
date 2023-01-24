@@ -43,6 +43,9 @@ import androidx.compose.ui.window.DialogProperties
  * A sample for displaying a [DatePicker] in a dialog:
  * @sample androidx.compose.material3.samples.DatePickerDialogSample
  *
+ * A sample for displaying a [DateInput] in a dialog:
+ * @sample androidx.compose.material3.samples.DateInputDialogSample
+ *
  * @param onDismissRequest called when the user tries to dismiss the Dialog by clicking outside
  * or pressing the back button. This is not called when the dismiss button is clicked.
  * @param confirmButton button which is meant to confirm a proposed action, thus resolving what

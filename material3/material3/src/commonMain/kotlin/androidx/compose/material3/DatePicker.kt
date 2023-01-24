@@ -302,6 +302,7 @@ class DatePickerState constructor(
  * Contains default values used by the date pickers.
  */
 @ExperimentalMaterial3Api
+@Stable
 object DatePickerDefaults {
 
     /**
@@ -387,16 +388,22 @@ object DatePickerDefaults {
     /**
      * A default date picker headline composable lambda that displays a default headline text when
      * there is no date selection, and an actual date string when there is.
+     *
+     * @param state a [DatePickerState] that will help determine the title's headline
+     * @param dateFormatter a [DatePickerFormatter]
      */
     @Composable
     fun DatePickerHeadline(state: DatePickerState, dateFormatter: DatePickerFormatter) {
+        val defaultLocale = defaultLocale()
         val formattedDate = dateFormatter.formatDate(
             date = state.selectedDate,
-            calendarModel = state.calendarModel
+            calendarModel = state.calendarModel,
+            locale = defaultLocale
         )
         val verboseDateDescription = dateFormatter.formatDate(
             date = state.selectedDate,
             calendarModel = state.calendarModel,
+            locale = defaultLocale,
             forContentDescription = true
         ) ?: getString(Strings.DatePickerNoSelectionDescription)
 
@@ -658,7 +665,7 @@ class DatePickerFormatter constructor(
     internal fun formatMonthYear(
         month: CalendarMonth?,
         calendarModel: CalendarModel,
-        locale: Locale = Locale.getDefault()
+        locale: Locale
     ): String? {
         if (month == null) return null
         return calendarModel.formatWithSkeleton(month, yearSelectionSkeleton, locale)
@@ -667,8 +674,8 @@ class DatePickerFormatter constructor(
     internal fun formatDate(
         date: CalendarDate?,
         calendarModel: CalendarModel,
-        forContentDescription: Boolean = false,
-        locale: Locale = Locale.getDefault()
+        locale: Locale,
+        forContentDescription: Boolean = false
     ): String? {
         if (date == null) return null
         return calendarModel.formatWithSkeleton(
@@ -735,13 +742,15 @@ private fun DatePickerImpl(
         }
 
         var yearPickerVisible by rememberSaveable { mutableStateOf(false) }
+        val defaultLocale = defaultLocale()
         MonthsNavigation(
             nextAvailable = monthsListState.canScrollForward,
             previousAvailable = monthsListState.canScrollBackward,
             yearPickerVisible = yearPickerVisible,
             yearPickerText = dateFormatter.formatMonthYear(
-                datePickerState.displayedMonth,
-                datePickerState.calendarModel
+                month = datePickerState.displayedMonth,
+                calendarModel = datePickerState.calendarModel,
+                locale = defaultLocale
             ) ?: "-",
             onNextClicked = {
                 coroutineScope.launch {
@@ -817,7 +826,7 @@ private fun DatePickerImpl(
 }
 
 @Composable
-private fun DatePickerHeader(
+internal fun DatePickerHeader(
     modifier: Modifier,
     title: (@Composable () -> Unit)?,
     titleContentColor: Color,
@@ -1037,6 +1046,7 @@ private fun Month(
                                 today = dateInMillis == today.utcTimeMillis,
                                 colors = colors
                             ) {
+                                val defaultLocale = defaultLocale()
                                 Text(
                                     text = (dayNumber + 1).toLocalString(),
                                     modifier = Modifier.semantics {
@@ -1044,7 +1054,7 @@ private fun Month(
                                             formatWithSkeleton(
                                                 dateInMillis,
                                                 dateFormatter.selectedDateDescriptionSkeleton,
-                                                Locale.getDefault()
+                                                defaultLocale
                                             )
                                     },
                                     textAlign = TextAlign.Center
