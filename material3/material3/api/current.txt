@@ -503,7 +503,7 @@ package androidx.compose.material3 {
     method public int getCircularDeterminateStrokeCap();
     method public int getCircularIndeterminateStrokeCap();
     method public float getCircularStrokeWidth();
-    method public long getCircularTrackColor();
+    method @androidx.compose.runtime.Composable public long getCircularTrackColor();
     method @androidx.compose.runtime.Composable public long getLinearColor();
     method public int getLinearStrokeCap();
     method @androidx.compose.runtime.Composable public long getLinearTrackColor();
@@ -514,7 +514,7 @@ package androidx.compose.material3 {
     property public final int LinearStrokeCap;
     property public final androidx.compose.animation.core.SpringSpec<java.lang.Float> ProgressAnimationSpec;
     property @androidx.compose.runtime.Composable public final long circularColor;
-    property public final long circularTrackColor;
+    property @androidx.compose.runtime.Composable public final long circularTrackColor;
     property @androidx.compose.runtime.Composable public final long linearColor;
     property @androidx.compose.runtime.Composable public final long linearTrackColor;
     field public static final androidx.compose.material3.ProgressIndicatorDefaults INSTANCE;
