@@ -20,13 +20,17 @@
     <string name="dialog" msgid="4057925834421392736">"對話框"</string>
     <string name="expanded" msgid="5974471714631304645">"展開咗"</string>
     <string name="collapsed" msgid="5389587048670450460">"合埋咗"</string>
-    <string name="snackbar_dismiss" msgid="3962933905051144957">"關閉"</string>
-    <string name="search_bar_search" msgid="6420018528474762666">"搜尋"</string>
+    <string name="snackbar_dismiss" msgid="3962933905051144957">"閂"</string>
+    <string name="search_bar_search" msgid="6420018528474762666">"搵"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"建議如下"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"選取日期"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"所選日期"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"切換為選取年份"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"切換為選取日期"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"滑動可選取年分，或可輕按返回選取日期"</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"變更至下個月"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"變更至上個月"</string>
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"前往 %1$s 年"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"目前選項：%1$s"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"無"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"顯示年分挑選器"</string>
 </resources>

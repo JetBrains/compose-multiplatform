@@ -26,7 +26,11 @@
     <string name="date_picker_title" msgid="9208721003668059792">"తేదీని ఎంచుకోండి"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"ఎంచుకున్న తేదీ"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"ఒక సంవత్సరాన్ని ఎంచుకునే ఆప్షన్‌కు మారండి"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"ఒక రోజును ఎంచుకునే ఆప్షన్‌కు మారండి"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"సంవత్సరాన్ని ఎంచుకోవడానికి స్వైప్ చేయండి, లేదా రోజును ఎంచుకునేందుకు తిరిగి మారడానికి ట్యాప్ చేయండి"</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"వచ్చే నెలకు మార్చండి"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"మునుపటి నెలకు మార్చండి"</string>
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"%1$s సంవత్సరానికి వెళ్లండి"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"ప్రస్తుత ఎంపిక: %1$s"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"ఏదీ లేదు"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"సంవత్సరం పికర్ కనిపిస్తుంది"</string>
 </resources>

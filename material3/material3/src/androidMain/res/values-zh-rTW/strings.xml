@@ -26,7 +26,11 @@
     <string name="date_picker_title" msgid="9208721003668059792">"選取日期"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"所選日期"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"改為選取年份"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"改為選取星期幾"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"滑動可選取年分，也可輕觸返回選取日期"</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"改成下個月"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"改成上個月"</string>
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"前往 %1$s 年"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"目前選項：%1$s"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"無"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"顯示年份挑選器"</string>
 </resources>

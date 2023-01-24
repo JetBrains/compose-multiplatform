@@ -20,15 +20,22 @@
     <string name="dialog" msgid="4057925834421392736">"ଡାଏଲଗ"</string>
     <string name="expanded" msgid="5974471714631304645">"ବିସ୍ତାର କରାଯାଇଛି"</string>
     <string name="collapsed" msgid="5389587048670450460">"ସଙ୍କୁଚିତ କରାଯାଇଛି"</string>
-    <!-- no translation found for snackbar_dismiss (3962933905051144957) -->
-    <skip />
-    <!-- no translation found for search_bar_search (6420018528474762666) -->
-    <skip />
+    <string name="snackbar_dismiss" msgid="3962933905051144957">"ଖାରଜ କରନ୍ତୁ"</string>
+    <string name="search_bar_search" msgid="6420018528474762666">"ସର୍ଚ୍ଚ କରନ୍ତୁ"</string>
     <string name="suggestions_available" msgid="7189888345201419934">"ପରାମର୍ଶ ତଳେ ଦିଆଯାଇଛି"</string>
     <string name="date_picker_title" msgid="9208721003668059792">"ତାରିଖ ଚୟନ କରନ୍ତୁ"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"ଚୟନିତ ତାରିଖ"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"ବର୍ଷ ଚୟନ କରିବାକୁ ସ୍ୱିଚ କରନ୍ତୁ"</string>
-    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"ଦିନ ଚୟନ କରିବାକୁ ସ୍ୱିଚ କରନ୍ତୁ"</string>
+    <!-- no translation found for date_picker_switch_to_day_selection (145089358343568971) -->
+    <skip />
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"ପରବର୍ତ୍ତୀ ମାସକୁ ପରିବର୍ତ୍ତନ କରନ୍ତୁ"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"ପୂର୍ବବର୍ତ୍ତୀ ମାସକୁ ପରିବର୍ତ୍ତନ କରନ୍ତୁ"</string>
+    <!-- no translation found for date_picker_navigate_to_year_description (5152441868029453612) -->
+    <skip />
+    <!-- no translation found for date_picker_headline_description (4627306862713137085) -->
+    <skip />
+    <!-- no translation found for date_picker_no_selection_description (5724377114289981899) -->
+    <skip />
+    <!-- no translation found for date_picker_year_picker_pane_title (8140324713311804736) -->
+    <skip />
 </resources>
