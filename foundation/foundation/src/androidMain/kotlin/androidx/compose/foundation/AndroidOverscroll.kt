@@ -182,17 +182,27 @@ internal class AndroidEdgeEffectOverscrollEffect(
 
         var needsInvalidation = false
         if (source == NestedScrollSource.Drag) {
-            if (leftForOverscroll.x > 0) {
+            // Ignore small deltas (< 0.5) as this usually comes from floating point rounding issues
+            // and can cause scrolling to lock up (b/265363356)
+            val appliedHorizontalOverscroll = if (leftForOverscroll.x > 0.5f) {
                 pullLeft(leftForOverscroll, pointer)
-            } else if (leftForOverscroll.x < 0) {
+                true
+            } else if (leftForOverscroll.x < -0.5f) {
                 pullRight(leftForOverscroll, pointer)
+                true
+            } else {
+                false
             }
-            if (leftForOverscroll.y > 0) {
+            val appliedVerticalOverscroll = if (leftForOverscroll.y > 0.5f) {
                 pullTop(leftForOverscroll, pointer)
-            } else if (leftForOverscroll.y < 0) {
+                true
+            } else if (leftForOverscroll.y < -0.5f) {
                 pullBottom(leftForOverscroll, pointer)
+                true
+            } else {
+                false
             }
-            needsInvalidation = leftForOverscroll != Offset.Zero
+            needsInvalidation = appliedHorizontalOverscroll || appliedVerticalOverscroll
         }
         needsInvalidation = releaseOppositeOverscroll(delta) || needsInvalidation
         if (needsInvalidation) invalidateOverscroll()
@@ -463,28 +473,62 @@ internal class AndroidEdgeEffectOverscrollEffect(
     private fun pullTop(scroll: Offset, displacement: Offset): Float {
         val displacementX: Float = displacement.x / containerSize.width
         val pullY = scroll.y / containerSize.height
-        return topEffect.onPullDistanceCompat(pullY, displacementX) * containerSize.height
+        val consumed = topEffect.onPullDistanceCompat(pullY, displacementX) * containerSize.height
+        // If overscroll is showing, assume we have consumed all the provided scroll, and return
+        // that amount directly to avoid floating point rounding issues (b/265363356)
+        return if (topEffect.distanceCompat != 0f) {
+            scroll.y
+        } else {
+            consumed
+        }
     }
 
     private fun pullBottom(scroll: Offset, displacement: Offset): Float {
         val displacementX: Float = displacement.x / containerSize.width
         val pullY = scroll.y / containerSize.height
-        return -bottomEffect.onPullDistanceCompat(
+        val consumed = -bottomEffect.onPullDistanceCompat(
             -pullY,
             1 - displacementX
         ) * containerSize.height
+        // If overscroll is showing, assume we have consumed all the provided scroll, and return
+        // that amount directly to avoid floating point rounding issues (b/265363356)
+        return if (bottomEffect.distanceCompat != 0f) {
+            scroll.y
+        } else {
+            consumed
+        }
     }
 
     private fun pullLeft(scroll: Offset, displacement: Offset): Float {
         val displacementY: Float = displacement.y / containerSize.height
         val pullX = scroll.x / containerSize.width
-        return leftEffect.onPullDistanceCompat(pullX, 1 - displacementY) * containerSize.width
+        val consumed = leftEffect.onPullDistanceCompat(
+            pullX,
+            1 - displacementY
+        ) * containerSize.width
+        // If overscroll is showing, assume we have consumed all the provided scroll, and return
+        // that amount directly to avoid floating point rounding issues (b/265363356)
+        return if (leftEffect.distanceCompat != 0f) {
+            scroll.x
+        } else {
+            consumed
+        }
     }
 
     private fun pullRight(scroll: Offset, displacement: Offset): Float {
         val displacementY: Float = displacement.y / containerSize.height
         val pullX = scroll.x / containerSize.width
-        return -rightEffect.onPullDistanceCompat(-pullX, displacementY) * containerSize.width
+        val consumed = -rightEffect.onPullDistanceCompat(
+            -pullX,
+            displacementY
+        ) * containerSize.width
+        // If overscroll is showing, assume we have consumed all the provided scroll, and return
+        // that amount directly to avoid floating point rounding issues (b/265363356)
+        return if (rightEffect.distanceCompat != 0f) {
+            scroll.x
+        } else {
+            consumed
+        }
     }
 }
 
