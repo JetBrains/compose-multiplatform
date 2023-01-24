@@ -28,14 +28,6 @@ dependencies {
     implementation(project(":compose:ui:ui"))
 
     implementation("androidx.preference:preference-ktx:1.1.1")
-
-    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
-    androidTestImplementation(libs.testCore)
-    androidTestImplementation(libs.testRules)
-    androidTestImplementation(libs.testRunner)
-    androidTestImplementation(libs.espressoCore)
-    androidTestImplementation(libs.junit)
-    androidTestImplementation(libs.truth)
 }
 
 android {
