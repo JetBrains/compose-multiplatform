@@ -131,7 +131,9 @@ fun defaultScrollbarStyle() = ScrollbarStyle(
  * @param interactionSource [MutableInteractionSource] that will be used to dispatch
  * [DragInteraction.Start] when this Scrollbar is being dragged.
  */
-@Deprecated("Use VerticalScrollbar(adapter: androidx.compose.foundation.v2.ScrollbarAdapter) instead")
+@Deprecated("Use VerticalScrollbar(" +
+    "adapter: androidx.compose.foundation.v2.ScrollbarAdapter)" +
+    " instead")
 @Composable
 fun VerticalScrollbar(
     @Suppress("DEPRECATION") adapter: ScrollbarAdapter,
@@ -449,7 +451,9 @@ private class OldScrollbarAdapterAsNew(
  * us to seamlessly use the new implementations, and enjoy all their benefits.
  */
 @Suppress("DEPRECATION")
-private fun ScrollbarAdapter.asNewAdapter(trackSize: Int): androidx.compose.foundation.v2.ScrollbarAdapter =
+private fun ScrollbarAdapter.asNewAdapter(
+    trackSize: Int
+): androidx.compose.foundation.v2.ScrollbarAdapter =
     if (this is NewScrollbarAdapterAsOld)
         this.newAdapter  // Just unwrap
     else
@@ -507,8 +511,8 @@ fun rememberOldScrollbarAdapter(
 }
 
 /**
- * Create and [remember] (old) [ScrollbarAdapter] for lazy scrollable container and current instance of
- * [scrollState]
+ * Create and [remember] (old) [ScrollbarAdapter] for lazy scrollable container and current instance
+ * of [scrollState]
  */
 @Deprecated(
     message ="Use rememberScrollbarAdapter instead",

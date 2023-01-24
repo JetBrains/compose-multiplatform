@@ -165,11 +165,17 @@ class ScrollbarTest {
         runBlocking(Dispatchers.Main) {
             val scale = 2f  // Content distance to corresponding scrollbar distance
             rule.setContent(scrollbarProvider) {
-                TestBox(size = 100.dp, childSize = 10.dp * scale, childCount = 10, scrollbarWidth = 10.dp)
+                TestBox(
+                    size = 100.dp,
+                    childSize = 10.dp * scale,
+                    childCount = 10,
+                    scrollbarWidth = 10.dp
+                )
             }
             rule.awaitIdle()
 
-            // While thumb is at the top, drag it up and then down the same distance. Content should not move.
+            // While thumb is at the top, drag it up and then down the same distance.
+            // Content should not move.
             rule.onNodeWithTag("scrollbar").performMouseInput {
                 moveTo(Offset(0f, 25f))
                 press()
@@ -180,7 +186,8 @@ class ScrollbarTest {
             rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
 
-            // While thumb is at the top, drag it up and then down a bit more. Content should move by the diff.
+            // While thumb is at the top, drag it up and then down a bit more.
+            // Content should move by the diff.
             rule.onNodeWithTag("scrollbar").performMouseInput {
                 moveTo(Offset(0f, 25f))
                 press()
@@ -200,7 +207,8 @@ class ScrollbarTest {
             }
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp * scale)
 
-            // While thumb is at the bottom, drag it down and then up the same distance. Content should not move
+            // While thumb is at the bottom, drag it down and then up the same distance.
+            // Content should not move
             rule.onNodeWithTag("scrollbar").performMouseInput {
                 moveTo(Offset(0f, 75f))
                 press()
@@ -210,7 +218,8 @@ class ScrollbarTest {
             }
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-50.dp * scale)
 
-            // While thumb is at the bottom, drag it down and then up a bit more. Content should move by the diff
+            // While thumb is at the bottom, drag it down and then up a bit more.
+            // Content should move by the diff
             rule.onNodeWithTag("scrollbar").performMouseInput {
                 moveTo(Offset(0f, 75f))
                 press()
@@ -251,7 +260,8 @@ class ScrollbarTest {
                 press()
             }
 
-            // Scroll all the way down, one pixel at a time. Make sure the content moves "up" every time.
+            // Scroll all the way down, one pixel at a time.
+            // Make sure the content moves "up" every time.
             for (i in 1..100){
                 val firstVisibleItemIndexBefore = listState.firstVisibleItemIndex
                 val firstVisibleItemScrollOffsetBefore = listState.firstVisibleItemScrollOffset
@@ -264,20 +274,21 @@ class ScrollbarTest {
 
                 if (firstVisibleItemIndexAfter < firstVisibleItemIndexBefore)
                     throw AssertionError(
-                        "First visible item index decreased on iteration $i while dragging down; " +
+                        "First visible item index decreased on iteration $i when dragging down; " +
                         "before=$firstVisibleItemIndexBefore, after=$firstVisibleItemIndexAfter"
                     )
                 else if ((firstVisibleItemIndexAfter == firstVisibleItemIndexBefore) &&
                     (firstVisibleItemScrollOffsetAfter < firstVisibleItemScrollOffsetBefore))
                     throw AssertionError(
-                        "First visible item offset decreased on iteration $i while dragging down; " +
+                        "First visible item offset decreased on iteration $i when dragging down; " +
                             "item index=$firstVisibleItemIndexAfter, " +
                             "offset before=$firstVisibleItemScrollOffsetBefore, " +
                             "offset after=$firstVisibleItemScrollOffsetAfter"
                     )
             }
 
-            // Scroll back all the way up, one pixel at a time. Make sure the content moves "down" every time
+            // Scroll back all the way up, one pixel at a time.
+            // Make sure the content moves "down" every time
             for (i in 1..100){
                 val firstVisibleItemIndexBefore = listState.firstVisibleItemIndex
                 val firstVisibleItemScrollOffsetBefore = listState.firstVisibleItemScrollOffset
@@ -332,8 +343,8 @@ class ScrollbarTest {
 
             rule.awaitIdle()
 
-            // Note that if the scrolling is incorrect, this can fail not only with a wrong value, but also by not
-            // finding the box node, as it may have not scrolled into view.
+            // Note that if the scrolling is incorrect, this can fail not only with a wrong value,
+            // but also by not finding the box node, as it may have not scrolled into view.
             // Last box should be at containerSize - bottomPadding - boxSize
             rule.onNodeWithTag("box19").assertTopPositionInRootIsEqualTo(100.dp - 25.dp - 10.dp)
         }
@@ -355,10 +366,11 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            // Thumb should be half the height of the scrollbar, as the viewport (200.dp) is half the height of the
-            // content (400.dp). So clicking on the top half of the scrollbar should do nothing.
+            // Thumb should be half the height of the scrollbar, as the viewport (200.dp) is half
+            // the height of the content (400.dp). So clicking on the top half of the scrollbar
+            // should do nothing.
             for (offset in 1..50){
-                // Use moveTo -> press -> awaitIdle -> test -> release because click doesn't appear to work
+                // Use moveTo -> press -> awaitIdle -> test -> release because click doesn't work
                 rule.onNodeWithTag("scrollbar").performMouseInput {
                     moveTo(position = Offset(0f, offset.toFloat()))
                     press()
@@ -408,7 +420,7 @@ class ScrollbarTest {
             }
             rule.awaitIdle()
 
-            // Test whether the scrollbar is at the bottom by trying to drag it up by the last pixel.
+            // Test whether the scrollbar is at the bottom by trying to drag it by the last pixel.
             // If it's not at the bottom, the drag will not succeed
             rule.onNodeWithTag("scrollbar").performMouseInput {
                 instantDrag(start = Offset(0f, 299f), end = Offset(0f, 0f))
@@ -549,7 +561,9 @@ class ScrollbarTest {
     @Theory
     @Test(timeout = 3000)
     @Suppress("JUnitMalformedDeclaration")
-    fun `dynamically change content then drag slider to the end`(scrollbarProvider: ScrollbarProvider) {
+    fun `dynamically change content then drag slider to the end`(
+        scrollbarProvider: ScrollbarProvider
+    ) {
         runBlocking(Dispatchers.Main) {
             val isContentVisible = mutableStateOf(false)
             rule.setContent(scrollbarProvider) {
@@ -1001,7 +1015,8 @@ class ScrollbarTest {
         // 2. Take a ScrollbarImpl argument
         // 3. Set the argument as the ScrollbarImplLocal, typically via
         //    ComposeContentTestRule.setContent(ScrollbarImpl, @Composable () -> Unit)
-        // Tests that should only run on the new implementation should just be marked with `@Test` as usual.
+        // Tests that should only run on the new implementation should just be marked with `@Test`
+        // as usual.
 
         @JvmField
         @DataPoint
@@ -1016,8 +1031,8 @@ class ScrollbarTest {
 }
 
 /**
- * Abstracts the implementation of the scrollbar (actually just the adapter) to allow us to test both the new and old
- * adapters.
+ * Abstracts the implementation of the scrollbar (actually just the adapter) to allow us to test
+ * both the new and old adapters.
  */
 sealed class ScrollbarImpl<A: Any> {
 
@@ -1212,15 +1227,21 @@ private object NewScrollbar: ScrollbarImpl<androidx.compose.foundation.v2.Scroll
         )
     }
 
-    override fun adapterFor(scrollState: ScrollState): androidx.compose.foundation.v2.ScrollbarAdapter {
+    override fun adapterFor(
+        scrollState: ScrollState
+    ): androidx.compose.foundation.v2.ScrollbarAdapter {
         return ScrollbarAdapter(scrollState)
     }
 
-    override fun adapterFor(scrollState: LazyListState): androidx.compose.foundation.v2.ScrollbarAdapter {
+    override fun adapterFor(
+        scrollState: LazyListState
+    ): androidx.compose.foundation.v2.ScrollbarAdapter {
         return ScrollbarAdapter(scrollState)
     }
 
-    override fun adapterFor(scrollState: LazyGridState): androidx.compose.foundation.v2.ScrollbarAdapter {
+    override fun adapterFor(
+        scrollState: LazyGridState
+    ): androidx.compose.foundation.v2.ScrollbarAdapter {
         return ScrollbarAdapter(scrollState)
     }
     
