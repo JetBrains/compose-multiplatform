@@ -14,6 +14,8 @@ import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.testing.Test
+import org.gradle.jvm.toolchain.JavaLanguageVersion
+import org.gradle.jvm.toolchain.JavaToolchainService
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.register
 import org.gradle.kotlin.dsl.withType
@@ -24,22 +26,13 @@ inline fun <reified T> Project.configureIfExists(fn: T.() -> Unit) {
     extensions.findByType(T::class.java)?.fn()
 }
 
-val javaHomeForTests: String? = when {
-    // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
-    JavaVersion.current() >= JavaVersion.VERSION_15 -> System.getProperty("java.home")
-    else -> System.getenv("JDK_15")
-        ?: System.getenv("JDK_FOR_GRADLE_TESTS")
-}
-
 val isWindows = DefaultNativePlatform.getCurrentOperatingSystem().isWindows
 
 fun Test.configureJavaForComposeTest() {
-    if (javaHomeForTests != null) {
-        val executableFileName = if (isWindows) "java.exe" else "java"
-        executable = File(javaHomeForTests).resolve("bin/$executableFileName").absolutePath
-    } else {
-        doFirst { error("Use JDK 15+ to run tests or set up JDK_15/JDK_FOR_GRADLE_TESTS env. var") }
-    }
+    val toolchains =  project.extensions.getByName("javaToolchains") as JavaToolchainService
+    javaLauncher.set(toolchains.launcherFor {
+        languageVersion.set(JavaLanguageVersion.of(16))
+    })
 }
 
 fun Project.configureAllTests(fn: Test.() -> Unit = {}) {
