@@ -20,6 +20,7 @@ class ConfigBuilder {
     var appApkName: String? = null
     lateinit var applicationId: String
     var isBenchmark: Boolean = false
+    var disableDeviceTests: Boolean = false
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
     var runAllTests: Boolean = true
@@ -31,6 +32,8 @@ class ConfigBuilder {
     fun appApkName(appApkName: String) = apply { this.appApkName = appApkName }
     fun applicationId(applicationId: String) = apply { this.applicationId = applicationId }
     fun isBenchmark(isBenchmark: Boolean) = apply { this.isBenchmark = isBenchmark }
+    fun disableDeviceTests(disableDeviceTests: Boolean) =
+        apply { this.disableDeviceTests = disableDeviceTests }
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
     fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
@@ -42,7 +45,11 @@ class ConfigBuilder {
     fun build(): String {
         val sb = StringBuilder()
         sb.append(XML_HEADER_AND_LICENSE)
-            .append(CONFIGURATION_OPEN)
+        if (disableDeviceTests) {
+            return sb.toString()
+        }
+
+        sb.append(CONFIGURATION_OPEN)
             .append(MIN_API_LEVEL_CONTROLLER_OBJECT.replace("MIN_SDK", minSdk))
         tags.forEach { tag ->
             sb.append(TEST_SUITE_TAG_OPTION.replace("TEST_SUITE_TAG", tag))

@@ -76,6 +76,8 @@ fun Project.createTestConfigurationGenerationTask(
         "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
         GenerateTestConfigurationTask::class.java
     ) { task ->
+        val androidXExtension = extensions.getByType<AndroidXExtension>()
+
         task.testFolder.set(artifacts.get(SingleArtifact.APK))
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
         task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
@@ -91,12 +93,11 @@ fun Project.createTestConfigurationGenerationTask(
         } else {
             task.minSdk.set(minSdk)
         }
+        task.disableDeviceTests.set(androidXExtension.disableDeviceTests)
         val hasBenchmarkPlugin = hasBenchmarkPlugin()
         task.hasBenchmarkPlugin.set(hasBenchmarkPlugin)
         if (hasBenchmarkPlugin) {
-            task.benchmarkRunAlsoInterpreted.set(
-                extensions.getByType<AndroidXExtension>().benchmarkRunAlsoInterpreted
-            )
+            task.benchmarkRunAlsoInterpreted.set(androidXExtension.benchmarkRunAlsoInterpreted)
         }
         task.testRunner.set(testRunner)
         task.testProjectPath.set(path)
@@ -333,6 +334,8 @@ private fun Project.configureMacrobenchmarkConfigTask(
     val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
     if (path.endsWith("macrobenchmark")) {
         configTask.configure { task ->
+            val androidXExtension = extensions.getByType<AndroidXExtension>()
+
             task.testFolder.set(artifacts.get(SingleArtifact.APK))
             task.testLoader.set(artifacts.getBuiltArtifactsLoader())
             task.outputXml.fileValue(
@@ -360,6 +363,7 @@ private fun Project.configureMacrobenchmarkConfigTask(
                 )
             )
             task.minSdk.set(minSdk)
+            task.disableDeviceTests.set(androidXExtension.disableDeviceTests)
             task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
             task.testRunner.set(testRunner)
             task.testProjectPath.set(this.path)

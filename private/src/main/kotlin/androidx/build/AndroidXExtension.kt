@@ -332,6 +332,8 @@ open class AndroidXExtension(val project: Project) {
 
     var metalavaK2UastEnabled = false
 
+    var disableDeviceTests = false
+
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
             shouldConfigureApiTasks()
