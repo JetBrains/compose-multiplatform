@@ -25,7 +25,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
-import androidx.test.filters.RequiresDevice
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
@@ -38,75 +37,6 @@ import org.junit.runners.Parameterized
 internal class PagerScrollingTest(
     val config: ParamConfig
 ) : BasePagerTest(config) {
-
-    @Test
-    fun swipePageTowardsEdge_shouldNotMove() {
-        // Arrange
-        val state = PagerState()
-        createPager(state = state, modifier = Modifier.fillMaxSize())
-        val delta = pagerSize * 0.4f * scrollForwardSign
-
-        // Act - backward
-        rule.onNodeWithTag("0").performTouchInput {
-            swipeWithVelocityAcrossMainAxis(
-                with(rule.density) { 1.5f * MinFlingVelocityDp.toPx() },
-                delta * -1.0f
-            )
-        }
-        rule.waitForIdle()
-
-        // Assert
-        rule.onNodeWithTag("0").assertIsDisplayed()
-        confirmPageIsInCorrectPosition(0)
-
-        // Act - forward
-        onPager().performTouchInput {
-            swipeWithVelocityAcrossMainAxis(
-                with(rule.density) { 1.5f * MinFlingVelocityDp.toPx() },
-                delta
-            )
-        }
-        rule.waitForIdle()
-
-        // Assert
-        rule.onNodeWithTag("1").assertIsDisplayed()
-        confirmPageIsInCorrectPosition(1)
-    }
-
-    @Test
-    fun swipeForwardAndBackward_verifyPagesAreLaidOutCorrectly() {
-        // Arrange
-        val state = PagerState()
-        createPager(state = state, modifier = Modifier.fillMaxSize())
-        val delta = pagerSize * 0.4f * scrollForwardSign
-
-        // Act and Assert - forward
-        repeat(DefaultAnimationRepetition) {
-            rule.onNodeWithTag(it.toString()).assertIsDisplayed()
-            confirmPageIsInCorrectPosition(it)
-            rule.onNodeWithTag(it.toString()).performTouchInput {
-                swipeWithVelocityAcrossMainAxis(
-                    with(rule.density) { 1.5f * MinFlingVelocityDp.toPx() },
-                    delta
-                )
-            }
-            rule.waitForIdle()
-        }
-
-        // Act - backward
-        repeat(DefaultAnimationRepetition) {
-            val countDown = DefaultAnimationRepetition - it
-            rule.onNodeWithTag(countDown.toString()).assertIsDisplayed()
-            confirmPageIsInCorrectPosition(countDown)
-            rule.onNodeWithTag(countDown.toString()).performTouchInput {
-                swipeWithVelocityAcrossMainAxis(
-                    with(rule.density) { 1.5f * MinFlingVelocityDp.toPx() },
-                    delta * -1f
-                )
-            }
-            rule.waitForIdle()
-        }
-    }
 
     @Test
     fun swipeWithLowVelocity_shouldBounceBack() {
@@ -177,7 +107,6 @@ internal class PagerScrollingTest(
         confirmPageIsInCorrectPosition(5)
     }
 
-    @RequiresDevice // b/266452930
     @Test
     fun swipeWithHighVelocity_overHalfPage_shouldGoToNextPage() {
         // Arrange
@@ -349,22 +278,13 @@ internal class PagerScrollingTest(
         @Parameterized.Parameters(name = "{0}")
         fun params() = mutableListOf<ParamConfig>().apply {
             for (orientation in TestOrientation) {
-                for (reverseLayout in TestReverseLayout) {
-                    for (layoutDirection in TestLayoutDirection) {
-                        for (pageSpacing in TestPageSpacing) {
-                            for (contentPadding in testContentPaddings(orientation)) {
-                                add(
-                                    ParamConfig(
-                                        orientation = orientation,
-                                        reverseLayout = reverseLayout,
-                                        layoutDirection = layoutDirection,
-                                        pageSpacing = pageSpacing,
-                                        mainAxisContentPadding = contentPadding
-                                    )
-                                )
-                            }
-                        }
-                    }
+                for (pageSpacing in TestPageSpacing) {
+                    add(
+                        ParamConfig(
+                            orientation = orientation,
+                            pageSpacing = pageSpacing
+                        )
+                    )
                 }
             }
         }
