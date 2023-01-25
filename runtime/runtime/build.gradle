@@ -80,7 +80,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         tvosX64()
         tvosSimulatorArm64()
         mingwX64()
-        linuxArm64()
         linuxX64()
 
         targets.js {
@@ -149,8 +148,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             jsMain.dependsOn(jsNativeMain)
             nativeMain.dependsOn(jsNativeMain)
 
-            linuxArm64Main.dependsOn(nativeMain)
-            linuxArm64Test.dependsOn(nativeTest)
             linuxX64Main.dependsOn(nativeMain)
             linuxX64Test.dependsOn(nativeTest)
             mingwX64Main.dependsOn(nativeMain)
