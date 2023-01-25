@@ -28,6 +28,9 @@ sourceSets {
     // Glance
     main.java.srcDirs += "${supportRootFolder}/glance/glance-appwidget/glance-layout-generator/" +
             "src/main/kotlin"
+
+    // Stable AIDL
+    main.java.srcDirs += "${supportRootFolder}/stableaidl/stableaidl-gradle-plugin/src/main/java"
 }
 
 dependencies {
@@ -60,6 +63,10 @@ gradlePlugin {
         darwinBenchmark {
             id = "androidx.benchmark.darwin"
             implementationClass = "androidx.benchmark.darwin.gradle.DarwinBenchmarkPlugin"
+        }
+        stableaidl {
+            id = "androidx.stableaidl"
+            implementationClass = "androidx.stableaidl.StableAidlPlugin"
         }
     }
 }

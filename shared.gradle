@@ -22,6 +22,8 @@ dependencies {
     // Plugins we use and configure
     implementation(libs.androidGradlePluginz)
     implementation(libs.androidToolsCommon) // for com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+    implementation(libs.androidToolsRepository) // com.android.repository for Stable AIDL plugin
+    implementation(libs.androidToolsSdkCommon) // com.android.ide.common for Stable AIDL plugin
     implementation(libs.kotlinGradlePluginz)
 
     // variety of json parsers
