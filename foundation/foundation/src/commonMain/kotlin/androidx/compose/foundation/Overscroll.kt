@@ -53,6 +53,19 @@ interface OverscrollEffect {
      * sum of all the delta that was consumed during this operation - both by the overscroll and
      * [performScroll].
      *
+     * For example, assume we want to apply overscroll to a custom component that isn't using
+     * [androidx.compose.foundation.gestures.scrollable]. Here is a simple example of a component
+     * using [androidx.compose.foundation.gestures.draggable] instead:
+     *
+     * @sample androidx.compose.foundation.samples.OverscrollWithDraggable_Before
+     *
+     * To apply overscroll, we need to decorate the existing logic with applyToScroll, and
+     * return the amount of delta we have consumed when updating the drag position. Note that we
+     * also need to call applyToFling - this is used as an end signal for overscroll so that effects
+     * can correctly reset after any animations, when the gesture has stopped.
+     *
+     * @sample androidx.compose.foundation.samples.OverscrollWithDraggable_After
+     *
      * @param delta total scroll delta available
      * @param source the source of the delta
      * @param performScroll the scroll action that the overscroll is applied to. The [Offset]
@@ -74,6 +87,18 @@ interface OverscrollEffect {
      * OverscrollEffect can optionally consume some [Velocity] before calling [performFling], such
      * as to release any existing tension. The implementation *must* call [performFling] exactly
      * once.
+     *
+     * For example, assume we want to apply overscroll to a custom component that isn't using
+     * [androidx.compose.foundation.gestures.scrollable]. Here is a simple example of a component
+     * using [androidx.compose.foundation.gestures.draggable] instead:
+     *
+     * @sample androidx.compose.foundation.samples.OverscrollWithDraggable_Before
+     *
+     * To apply overscroll, we decorate the existing logic with applyToScroll, and return the amount
+     * of delta we have consumed when updating the drag position. We then call applyToFling using
+     * the velocity provided by onDragStopped.
+     *
+     * @sample androidx.compose.foundation.samples.OverscrollWithDraggable_After
      *
      * @param velocity total [Velocity] available
      * @param performFling the [Velocity] consuming lambda that the overscroll is applied to. The
