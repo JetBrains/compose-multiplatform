@@ -59,7 +59,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.tokens.DatePickerModalTokens
 import androidx.compose.material3.tokens.MotionTokens
-import androidx.compose.material3.tokens.TypographyKeyTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
@@ -766,7 +765,7 @@ internal fun DateEntryContainer(
 ) {
     Column(
         modifier = modifier
-            .sizeIn(minWidth = ContainerWidth)
+            .sizeIn(minWidth = DatePickerModalTokens.ContainerWidth)
             .padding(DatePickerHorizontalPadding)
     ) {
         DatePickerHeader(
@@ -1007,8 +1006,10 @@ internal fun DatePickerHeader(
     ) {
         if (title != null) {
             CompositionLocalProvider(LocalContentColor provides titleContentColor) {
-                // TODO: Use the value from the tokens, once updated (b/251240936).
-                val textStyle = MaterialTheme.typography.fromToken(HeaderSupportingTextFont)
+                val textStyle =
+                    MaterialTheme.typography.fromToken(
+                        DatePickerModalTokens.HeaderSupportingTextFont
+                    )
                 ProvideTextStyle(textStyle) {
                     Box(contentAlignment = Alignment.BottomStart) {
                         title()
@@ -1120,8 +1121,8 @@ private fun WeekDays(colors: DatePickerColors, calendarModel: CalendarModel) {
         dayNames.add(weekdays[i])
     }
     CompositionLocalProvider(LocalContentColor provides colors.weekdayContentColor) {
-        // TODO: Use the value from the tokens, once updated (b/251240936).
-        val textStyle = MaterialTheme.typography.fromToken(WeekdaysLabelTextFont)
+        val textStyle =
+            MaterialTheme.typography.fromToken(DatePickerModalTokens.WeekdaysLabelTextFont)
         ProvideTextStyle(value = textStyle) {
             Row(
                 modifier = Modifier
@@ -1169,8 +1170,7 @@ private fun Month(
 ) {
     val todayDescription = getString(string = Strings.DatePickerTodayDescription)
     ProvideTextStyle(
-        // TODO: Use the value from the tokens, once updated (b/251240936).
-        MaterialTheme.typography.fromToken(DateLabelTextFont)
+        MaterialTheme.typography.fromToken(DatePickerModalTokens.DateLabelTextFont)
     ) {
         var cellIndex = 0
         Column(
@@ -1197,7 +1197,6 @@ private fun Month(
                                 )
                             )
                         } else {
-                            // TODO a11y should announce the day and whether it's selected or not.
                             val dayNumber = cellIndex - month.daysFromStartOfWeekToFirstOfMonth
                             val dateInMillis = month.startUtcTimeMillis +
                                 (dayNumber * MillisecondsIn24Hours)
@@ -1508,10 +1507,6 @@ private fun Int.toLocalString(): String {
     return formatter.format(this)
 }
 
-// TODO: Remove after b/247694457 for updating the tokens is resolved.
-internal val ContainerWidth = 360.dp
-internal val ContainerHeight = 568.dp
-
 internal val MonthYearHeight = 56.dp
 internal val DatePickerHorizontalPadding = PaddingValues(horizontal = 12.dp)
 internal val HeaderPadding = PaddingValues(
@@ -1524,10 +1519,5 @@ private val YearsVerticalPadding = 16.dp
 
 private const val MaxCalendarRows = 6
 private const val YearsInRow: Int = 3
-
-// TODO: Remove after b/251240936 for updating the typography is resolved.
-private val WeekdaysLabelTextFont = TypographyKeyTokens.BodyLarge
-private val DateLabelTextFont = TypographyKeyTokens.BodyLarge
-private val HeaderSupportingTextFont = TypographyKeyTokens.LabelLarge
 
 private val RecommendedSizeForAccessibility = 48.dp
