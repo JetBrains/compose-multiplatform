@@ -29,9 +29,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.toArgb
 import java.lang.reflect.Method
 
@@ -179,7 +177,12 @@ internal class RippleHostView(
         // another invalidation, etc.
         ripple.trySetRadius(radius)
         ripple.setColor(color, alpha)
-        val newBounds = size.toRect().toAndroidRect()
+        val newBounds = Rect(
+            0,
+            0,
+            size.width.toInt(),
+            size.height.toInt()
+        )
         // Drawing the background causes the view to update the bounds of the drawable
         // based on the view's bounds, so we need to adjust the view itself to match the
         // canvas' bounds.

@@ -86,8 +86,8 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
@@ -1150,7 +1150,7 @@ class AndroidAccessibilityTest {
             textFieldNode.positionInWindow
         )
         val expectedTopLeftInScreenCoords = androidComposeView.localToScreen(
-            expectedRectInLocalCoords.toAndroidRect().topLeftToOffset()
+            expectedRectInLocalCoords.topLeft
         )
         assertEquals(expectedTopLeftInScreenCoords.x, rectF.left)
         assertEquals(expectedTopLeftInScreenCoords.y, rectF.top)
@@ -2932,7 +2932,7 @@ class AndroidAccessibilityTest {
         accessibilityNodeInfo.getBoundsInScreen(rect)
         val resultWidth = rect.right - rect.left
         val resultHeight = rect.bottom - rect.top
-        val resultInLocalCoords = androidComposeView.screenToLocal(rect.topLeftToOffset())
+        val resultInLocalCoords = androidComposeView.screenToLocal(rect.toComposeRect().topLeft)
 
         assertEquals(size, resultWidth)
         assertEquals(size, resultHeight)
@@ -3466,5 +3466,3 @@ class AndroidAccessibilityTest {
             )
     }
 }
-
-private fun Rect.topLeftToOffset() = Offset(this.left.toFloat(), this.top.toFloat())
