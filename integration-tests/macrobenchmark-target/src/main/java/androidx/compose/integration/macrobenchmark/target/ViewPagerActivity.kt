@@ -22,20 +22,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.PagerSnapHelper
 import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 
 class ViewPagerActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_pager)
-        val pager = findViewById<RecyclerView>(R.id.pager)
-        pager.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        val pager = findViewById<ViewPager2>(R.id.pager)
         val itemCount = intent.getIntExtra(ExtraItemCount, 3000)
         val adapter = PagerAdapter(itemCount)
-        val scroller = PagerSnapHelper()
-        scroller.attachToRecyclerView(pager)
         pager.adapter = adapter
         launchIdlenessTracking()
     }
