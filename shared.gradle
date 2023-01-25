@@ -46,6 +46,9 @@ dependencies {
     implementation(libs.kotlinPoet) // needed to compile material-icon-generator
     implementation(libs.xmlpull) // needed to compile material-icon-generator
 
+    implementation(libs.protobuf) // needed to compile baseline-profile gradle plugins
+    implementation(libs.agpTestingPlatformCoreProto) // needed to compile baseline-profile gradle plugins
+
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build
     runtimeOnly(libs.hiltAndroidGradlePluginz)

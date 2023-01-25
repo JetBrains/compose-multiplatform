@@ -1,19 +1,31 @@
 apply from: "../shared.gradle"
 
 sourceSets {
+
+    // Benchmark
     main.java.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/benchmark/gradle-plugin/src/main/resources"
 
+    // Benchmark darwin
     main.java.srcDirs += "${supportRootFolder}/benchmark/benchmark-darwin-gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/benchmark/benchmark-darwin-gradle-plugin/src/main/resources"
 
+    // Baseline profile
+    main.java.srcDirs += "${supportRootFolder}" +
+            "/benchmark/baseline-profiles-gradle-plugin/src/main/kotlin"
+    main.resources.srcDirs += "${supportRootFolder}" +
+            "/benchmark/baseline-profiles-gradle-plugin/src/main/resources"
+
+    // Inspection
     main.java.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main/kotlin"
     main.resources.srcDirs += "${supportRootFolder}/inspection/inspection-gradle-plugin/src/main" +
             "/resources"
 
+    // Compose
     main.java.srcDirs += "${supportRootFolder}/compose/material/material/icons/generator/src/main" +
             "/kotlin"
 
+    // Glance
     main.java.srcDirs += "${supportRootFolder}/glance/glance-appwidget/glance-layout-generator/" +
             "src/main/kotlin"
 }
@@ -28,6 +40,18 @@ gradlePlugin {
         benchmark {
             id = "androidx.benchmark"
             implementationClass = "androidx.benchmark.gradle.BenchmarkPlugin"
+        }
+        baselineProfilesProducer {
+            id = "androidx.baselineprofiles.producer"
+            implementationClass = "androidx.baselineprofiles.gradle.producer.BaselineProfilesProducerPlugin"
+        }
+        baselineProfilesConsumer {
+            id = "androidx.baselineprofiles.consumer"
+            implementationClass = "androidx.baselineprofiles.gradle.consumer.BaselineProfilesConsumerPlugin"
+        }
+        baselineProfilesBuildProvider {
+            id = "androidx.baselineprofiles.buildprovider"
+            implementationClass = "androidx.baselineprofiles.gradle.buildprovider.BaselineProfilesBuildProviderPlugin"
         }
         inspection {
             id = "androidx.inspection"
