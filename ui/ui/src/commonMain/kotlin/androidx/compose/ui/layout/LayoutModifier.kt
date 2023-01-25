@@ -16,15 +16,15 @@
 
 package androidx.compose.ui.layout
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 
 /**
  * A [Modifier.Element] that changes how its wrapped content is measured and laid out.
@@ -263,36 +263,27 @@ private object MeasuringIntrinsics {
  *
  * @see androidx.compose.ui.layout.LayoutModifier
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.layout(
     measure: MeasureScope.(Measurable, Constraints) -> MeasureResult
-) = this.then(
-    LayoutModifierImpl(
-        measureBlock = measure,
-        inspectorInfo = debugInspectorInfo {
-            name = "layout"
-            properties["measure"] = measure
-        }
-    )
+) = this then modifierElementOf(
+    key = measure,
+    create = { LayoutModifierImpl(measure) },
+    update = { layoutModifier -> layoutModifier.measureBlock = measure },
+    definitions = {
+        name = "layout"
+        properties["measure"] = measure
+    }
 )
 
-private class LayoutModifierImpl(
-    val measureBlock: MeasureScope.(Measurable, Constraints) -> MeasureResult,
-    inspectorInfo: InspectorInfo.() -> Unit,
-) : LayoutModifier, InspectorValueInfo(inspectorInfo) {
+@OptIn(ExperimentalComposeUiApi::class)
+internal class LayoutModifierImpl(
+    var measureBlock: MeasureScope.(Measurable, Constraints) -> MeasureResult
+) : LayoutModifierNode, Modifier.Node() {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
     ) = measureBlock(measurable, constraints)
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        val otherModifier = other as? LayoutModifierImpl ?: return false
-        return measureBlock == otherModifier.measureBlock
-    }
-
-    override fun hashCode(): Int {
-        return measureBlock.hashCode()
-    }
 
     override fun toString(): String {
         return "LayoutModifierImpl(measureBlock=$measureBlock)"
