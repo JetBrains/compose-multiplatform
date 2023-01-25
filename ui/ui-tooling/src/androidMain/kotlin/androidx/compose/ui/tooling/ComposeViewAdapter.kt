@@ -646,9 +646,9 @@ internal class ComposeViewAdapter : FrameLayout {
     }
 
     private val FakeViewModelStoreOwner = object : ViewModelStoreOwner {
-        private val viewModelStore = ViewModelStore()
+        private val vmStore = ViewModelStore()
 
-        override fun getViewModelStore() = viewModelStore
+        override val viewModelStore = vmStore
     }
 
     private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {
