@@ -25,7 +25,7 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
     WatchosX64("WatchOs"),
     WatchosSimulatorArm64("WatchOs"),
     LinuxX64("Linux"),
-    LinuxArm64("Linux"),
+    // LinuxArm64("Linux"), // No coroutines for linuxArm64 yet
     MingwX64("Mingw"),
     ;
 
@@ -57,7 +57,7 @@ enum class ComposePlatforms(vararg val alternativeNames: String) {
             ComposePlatforms.WatchosX64,
             ComposePlatforms.WatchosSimulatorArm64,
             ComposePlatforms.LinuxX64,
-            ComposePlatforms.LinuxArm64,
+            // ComposePlatforms.LinuxArm64, // No coroutines for linuxArm64 yet
             ComposePlatforms.MingwX64,
         )
 
