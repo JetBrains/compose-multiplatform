@@ -161,8 +161,8 @@ expect sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {
      * @param condition Condition that must be satisfied in order for this method to successfully
      * finish.
      *
-     * @throws ComposeTimeoutException If the condition is not satisfied after [timeoutMillis]
-     * (in wall clock time).
+     * @throws androidx.compose.ui.test.ComposeTimeoutException If the condition is not satisfied
+     * after [timeoutMillis] (in wall clock time).
      */
     fun waitUntil(timeoutMillis: Long = 1_000, condition: () -> Boolean)
 
@@ -185,5 +185,87 @@ expect sealed interface ComposeUiTest : SemanticsNodeInteractionsProvider {
      */
     fun setContent(composable: @Composable () -> Unit)
 }
+
+/**
+ * Blocks until the number of nodes matching the given [matcher] is equal to the given [count].
+ *
+ * @see ComposeUiTest.waitUntil
+ *
+ * @param matcher The matcher that will be used to filter nodes.
+ * @param count The number of nodes that are expected to
+ * @param timeoutMillis The time after which this method throws an exception if the number of nodes
+ * that match the [matcher] is not [count]. This observes wall clock time, not frame time.
+ *
+ * @throws androidx.compose.ui.test.ComposeTimeoutException If the number of nodes that match the
+ * [matcher] is not [count] after [timeoutMillis] (in wall clock time).
+ */
+@ExperimentalTestApi
+fun ComposeUiTest.waitUntilNodeCount(
+    matcher: SemanticsMatcher,
+    count: Int,
+    timeoutMillis: Long = 1_000L
+) {
+    waitUntil(timeoutMillis) {
+        onAllNodes(matcher).fetchSemanticsNodes().size == count
+    }
+}
+
+/**
+ * Blocks until at least one node matches the given [matcher].
+ *
+ * @see ComposeUiTest.waitUntil
+ *
+ * @param matcher The matcher that will be used to filter nodes.
+ * @param timeoutMillis The time after which this method throws an exception if no nodes match the
+ * given [matcher]. This observes wall clock time, not frame time.
+ *
+ * @throws androidx.compose.ui.test.ComposeTimeoutException If no nodes match the given [matcher]
+ * after [timeoutMillis] (in wall clock time).
+ */
+@ExperimentalTestApi
+fun ComposeUiTest.waitUntilAtLeastOneExists(
+    matcher: SemanticsMatcher,
+    timeoutMillis: Long = 1_000L
+) {
+    waitUntil(timeoutMillis) {
+        onAllNodes(matcher).fetchSemanticsNodes().isNotEmpty()
+    }
+}
+
+/**
+ * Blocks until exactly one node matches the given [matcher].
+ *
+ * @see ComposeUiTest.waitUntil
+ *
+ * @param matcher The matcher that will be used to filter nodes.
+ * @param timeoutMillis The time after which this method throws an exception if exactly one node
+ * does not match the given [matcher]. This observes wall clock time, not frame time.
+ *
+ * @throws androidx.compose.ui.test.ComposeTimeoutException If exactly one node does not match the
+ * given [matcher] after [timeoutMillis] (in wall clock time).
+ */
+@ExperimentalTestApi
+fun ComposeUiTest.waitUntilExactlyOneExists(
+    matcher: SemanticsMatcher,
+    timeoutMillis: Long = 1_000L
+) = waitUntilNodeCount(matcher, 1, timeoutMillis)
+
+/**
+ * Blocks until no nodes match the given [matcher].
+ *
+ * @see ComposeUiTest.waitUntil
+ *
+ * @param matcher The matcher that will be used to filter nodes.
+ * @param timeoutMillis The time after which this method throws an exception if any nodes match
+ * the given [matcher]. This observes wall clock time, not frame time.
+ *
+ * @throws androidx.compose.ui.test.ComposeTimeoutException If any nodes match the given [matcher]
+ * after [timeoutMillis] (in wall clock time).
+ */
+@ExperimentalTestApi
+fun ComposeUiTest.waitUntilDoesNotExist(
+    matcher: SemanticsMatcher,
+    timeoutMillis: Long = 1_000L
+) = waitUntilNodeCount(matcher, 0, timeoutMillis)
 
 internal const val NanoSecondsPerMilliSecond = 1_000_000L
