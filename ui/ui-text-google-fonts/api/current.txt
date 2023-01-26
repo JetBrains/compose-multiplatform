@@ -15,12 +15,6 @@ package androidx.compose.ui.text.googlefonts {
   public static final class GoogleFont.Provider {
     ctor public GoogleFont.Provider(String providerAuthority, String providerPackage, java.util.List<? extends java.util.List<byte[]>> certificates);
     ctor public GoogleFont.Provider(String providerAuthority, String providerPackage, @ArrayRes int certificates);
-    field public static final androidx.compose.ui.text.googlefonts.GoogleFont.Provider.Companion Companion;
-  }
-
-  public static final class GoogleFont.Provider.Companion {
-    method public android.net.Uri getAllFontsListUri();
-    property public final android.net.Uri AllFontsListUri;
   }
 
   public final class GoogleFontKt {
