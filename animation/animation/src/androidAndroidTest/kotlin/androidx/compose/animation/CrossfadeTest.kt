@@ -37,8 +37,8 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import org.junit.Assert
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -234,15 +234,17 @@ class CrossfadeTest {
             LaunchedEffect(Unit) {
                 // Expect no animation when targetState changed while the contentKey remains
                 // the same.
-                Assert.assertFalse(transition.isRunning)
+                assertFalse(transition.isRunning)
                 targetState = 2
-                withFrameMillis { }
-                Assert.assertFalse(transition.isRunning)
-                assertEquals(transition.currentState, transition.targetState)
-                // This state change should now change the contentKey & hence trigger an animation
-                targetState = -1
-                withFrameMillis { }
-                assertTrue(transition.isRunning)
+                withFrameMillis {
+                    assertFalse(transition.isRunning)
+                    assertEquals(transition.currentState, transition.targetState)
+                    // This state change should now change the contentKey & hence trigger an animation
+                    targetState = -1
+                }
+                withFrameMillis {
+                    assertTrue(transition.isRunning)
+                }
             }
         }
         rule.waitForIdle()

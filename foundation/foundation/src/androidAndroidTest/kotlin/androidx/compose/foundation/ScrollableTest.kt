@@ -16,12 +16,16 @@
 
 package androidx.compose.foundation
 
+import androidx.compose.animation.core.DecayAnimationSpec
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.rememberSplineBasedDecay
+import androidx.compose.foundation.gestures.DefaultFlingBehavior
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollScope
+import androidx.compose.foundation.gestures.ScrollableDefaults
 import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.awaitFirstDown
@@ -48,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
@@ -105,9 +110,11 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.hamcrest.CoreMatchers.allOf
 import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.After
+import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -2395,6 +2402,141 @@ class ScrollableTest {
         }
     }
 
+    @Test
+    fun disableSystemAnimations_defaultFlingBehaviorShouldContinueToWork() {
+
+        val controller = ScrollableState { 0f }
+        var defaultFlingBehavior: DefaultFlingBehavior? = null
+        setScrollableContent {
+            defaultFlingBehavior = ScrollableDefaults.flingBehavior() as? DefaultFlingBehavior
+            Modifier.scrollable(
+                state = controller,
+                orientation = Orientation.Horizontal,
+                flingBehavior = defaultFlingBehavior
+            )
+        }
+
+        scope.launch {
+            controller.scroll {
+                defaultFlingBehavior?.let {
+                    with(it) { performFling(1000f) }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(defaultFlingBehavior?.lastAnimationCycleCount).isGreaterThan(1)
+        }
+
+        // Simulate turning of animation
+        scope.launch {
+            controller.scroll {
+                withContext(TestScrollMotionDurationScale(0f)) {
+                    defaultFlingBehavior?.let {
+                        with(it) { performFling(1000f) }
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(defaultFlingBehavior?.lastAnimationCycleCount).isGreaterThan(1)
+        }
+    }
+
+    @Test
+    fun defaultFlingBehavior_useScrollMotionDurationScale() {
+
+        val controller = ScrollableState { 0f }
+        var defaultFlingBehavior: DefaultFlingBehavior? = null
+        var switchMotionDurationScale by mutableStateOf(true)
+
+        rule.setContentAndGetScope {
+            val flingSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay()
+            if (switchMotionDurationScale) {
+                defaultFlingBehavior =
+                    DefaultFlingBehavior(flingSpec, TestScrollMotionDurationScale(1f))
+                Box(
+                    modifier = Modifier
+                        .testTag(scrollableBoxTag)
+                        .size(100.dp)
+                        .scrollable(
+                            state = controller,
+                            orientation = Orientation.Horizontal,
+                            flingBehavior = defaultFlingBehavior
+                        )
+                )
+            } else {
+                defaultFlingBehavior =
+                    DefaultFlingBehavior(flingSpec, TestScrollMotionDurationScale(0f))
+                Box(
+                    modifier = Modifier
+                        .testTag(scrollableBoxTag)
+                        .size(100.dp)
+                        .scrollable(
+                            state = controller,
+                            orientation = Orientation.Horizontal,
+                            flingBehavior = defaultFlingBehavior
+                        )
+                )
+            }
+        }
+
+        scope.launch {
+            controller.scroll {
+                defaultFlingBehavior?.let {
+                    with(it) { performFling(1000f) }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(defaultFlingBehavior?.lastAnimationCycleCount).isGreaterThan(1)
+        }
+
+        switchMotionDurationScale = false
+        rule.waitForIdle()
+
+        scope.launch {
+            controller.scroll {
+                defaultFlingBehavior?.let {
+                    with(it) { performFling(1000f) }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(defaultFlingBehavior?.lastAnimationCycleCount).isEqualTo(1)
+        }
+    }
+
+    @Test
+    fun scrollable_noMomentum_shouldChangeScrollStateAfterRelease() {
+        val scrollState = ScrollState(0)
+        val delta = 10f
+        var touchSlop = 0f
+        setScrollableContent {
+            touchSlop = LocalViewConfiguration.current.touchSlop
+            Modifier.scrollable(scrollState, Orientation.Vertical)
+        }
+        var previousScrollValue = 0
+        rule.onNodeWithTag(scrollableBoxTag).performTouchInput {
+            down(center)
+            // generate various move events
+            repeat(30) {
+                moveBy(Offset(0f, delta), delayMillis = 8L)
+                previousScrollValue += delta.toInt()
+            }
+            // stop for a moment
+            advanceEventTime(3000L)
+            up()
+        }
+
+        rule.runOnIdle {
+            Assert.assertEquals((previousScrollValue - touchSlop).toInt(), scrollState.value)
+        }
+    }
+
     private fun setScrollableContent(scrollableModifierFactory: @Composable () -> Modifier) {
         rule.setContentAndGetScope {
             Box {
@@ -2408,33 +2550,6 @@ class ScrollableTest {
             }
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private val NoOpOverscrollEffect = object : OverscrollEffect {
-
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset = Offset.Zero
-
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {
-    }
-
-    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
-
-    override suspend fun consumePostFling(velocity: Velocity) {}
-
-    override var isEnabled: Boolean = false
-
-    override val isInProgress: Boolean
-        get() = false
-
-    override val effectModifier: Modifier get() = Modifier
 }
 
 // Very low tolerance on the difference
@@ -2455,7 +2570,7 @@ internal suspend fun savePointerInputEvents(
                         val currentEvent = awaitPointerEvent().changes
                             .firstOrNull()
 
-                        if (currentEvent != null && !currentEvent.changedToUpIgnoreConsumed()) {
+                        if (currentEvent != null) {
                             currentEvent.historical.fastForEach {
                                 tracker.addPosition(it.uptimeMillis, it.position)
                             }
@@ -2521,3 +2636,5 @@ private fun espressoSwipe(
         Press.FINGER
     )
 }
+
+internal class TestScrollMotionDurationScale(override val scaleFactor: Float) : MotionDurationScale

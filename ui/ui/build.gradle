@@ -30,6 +30,20 @@ AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
 
 dependencies {
 
+    constraints {
+        // In 1.4.0-alpha02 there was a change made in :compose:ui:ui which fixed an issue where
+        // we were over-invalidating layout. This change caused a corresponding regression in
+        // foundation's CoreText, where it was expecting a layout to happen but with this change
+        // it would not. A corresponding fix for this was added in 1.4.0-alpha02 of
+        // :compose:foundation:foundation. By adding this constraint, we are ensuring that the
+        // if an app has this ui module _and_ the foundation module as a dependency, then the
+        // version of foundation will be at least this version. This will prevent the bug in
+        // foundation from occurring. This does _NOT_ require that the app have foundation as
+        // a dependency.
+        implementation(project(":compose:foundation:foundation")) {
+            because 'prevents a critical bug in Text'
+        }
+    }
     if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         /*
          * When updating dependencies, make sure to make the an an analogous update in the
@@ -58,22 +72,23 @@ dependencies {
         implementation(libs.kotlinCoroutinesAndroid)
 
         implementation("androidx.activity:activity-ktx:1.5.1")
-        implementation("androidx.core:core:1.5.0")
+        implementation("androidx.core:core:1.9.0")
         implementation('androidx.collection:collection:1.0.0')
         implementation("androidx.customview:customview-poolingcontainer:1.0.0")
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-        implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
-        implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-        implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
-        implementation("androidx.profileinstaller:profileinstaller:1.2.0")
+        implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
+        implementation(project(":lifecycle:lifecycle-runtime"))
+        implementation(project(":lifecycle:lifecycle-viewmodel"))
+        implementation("androidx.profileinstaller:profileinstaller:1.2.1")
+        implementation("androidx.emoji2:emoji2:1.2.0")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
         testImplementation(libs.kotlinCoroutinesTest)
         testImplementation(libs.junit)
         testImplementation(libs.truth)
-        testImplementation(libs.mockitoCore)
-        testImplementation(libs.mockitoKotlin)
+        testImplementation(libs.mockitoCore4)
+        testImplementation(libs.mockitoKotlin4)
         testImplementation(libs.robolectric)
         testImplementation(project(":compose:ui:ui-test-junit4"))
         testImplementation(project(":compose:test-utils"))
@@ -101,9 +116,10 @@ dependencies {
         androidTestImplementation(project(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":internal-testutils-runtime"))
         androidTestImplementation(project(":test:screenshot:screenshot"))
+        androidTestImplementation("androidx.lifecycle:lifecycle-runtime-testing:2.5.1")
         androidTestImplementation("androidx.recyclerview:recyclerview:1.3.0-alpha02")
-        androidTestImplementation("androidx.core:core-ktx:1.1.0")
-        androidTestImplementation("androidx.activity:activity-compose:1.3.1")
+        androidTestImplementation("androidx.core:core-ktx:1.9.0")
+        androidTestImplementation("androidx.activity:activity-compose:1.5.1")
         androidTestImplementation("androidx.appcompat:appcompat:1.3.0")
         androidTestImplementation("androidx.fragment:fragment:1.3.0")
 
@@ -153,13 +169,14 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinCoroutinesAndroid)
 
                 implementation("androidx.activity:activity-ktx:1.5.1")
-                implementation("androidx.core:core:1.5.0")
+                implementation("androidx.core:core:1.9.0")
                 implementation('androidx.collection:collection:1.0.0')
                 implementation("androidx.customview:customview-poolingcontainer:1.0.0")
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-                implementation("androidx.lifecycle:lifecycle-common-java8:2.3.0")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
+                implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
+                implementation(project(":lifecycle:lifecycle-runtime"))
+                implementation(project(":lifecycle:lifecycle-viewmodel"))
+                implementation("androidx.emoji2:emoji2:1.2.0")
             }
 
             jvmMain.dependencies {
@@ -190,8 +207,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinCoroutinesTest)
                 implementation(libs.junit)
                 implementation(libs.truth)
-                implementation(libs.mockitoCore)
-                implementation(libs.mockitoKotlin)
+                implementation(libs.mockitoCore4)
+                implementation(libs.mockitoKotlin4)
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":internal-testutils-fonts"))
                 implementation(project(":compose:test-utils"))
@@ -222,8 +239,9 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:ui:ui-test-junit4"))
                 implementation(project(":internal-testutils-runtime"))
                 implementation(project(":test:screenshot:screenshot"))
+                implementation("androidx.lifecycle:lifecycle-runtime-testing:2.5.1")
                 implementation("androidx.recyclerview:recyclerview:1.3.0-alpha02")
-                implementation("androidx.core:core-ktx:1.1.0")
+                implementation("androidx.core:core-ktx:1.2.0")
                 implementation("androidx.activity:activity-compose:1.5.1")
             }
 
@@ -250,7 +268,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose UI primitives"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Compose UI primitives. This library contains the primitives that form the Compose UI Toolkit, such as drawing, measurement and layout."
     legacyDisableKotlinStrictApiMode = true
@@ -259,14 +276,6 @@ androidx {
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
         systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
-    }
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-            "-Xjvm-default=all"
-        ]
     }
 }
 
@@ -282,6 +291,9 @@ android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
     namespace "androidx.compose.ui"
+    // namespace has to be unique, but default androidx.compose.ui.test package is taken by
+    // the androidx.compose.ui:ui-test library
+    testNamespace "androidx.compose.ui.tests"
 }
 
 // Diagnostics for b/188565660

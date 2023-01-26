@@ -21,6 +21,7 @@ import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 import androidx.compose.ui.node.DelegatableNode
 import androidx.compose.ui.node.NodeCoordinator
 import androidx.compose.ui.node.NodeKind
+import androidx.compose.ui.node.OwnerScope
 import androidx.compose.ui.node.requireOwner
 
 /**
@@ -160,7 +161,7 @@ interface Modifier {
      * @see androidx.compose.ui.node.IntermediateLayoutModifierNode
      */
     @ExperimentalComposeUiApi
-    abstract class Node : DelegatableNode {
+    abstract class Node : DelegatableNode, OwnerScope {
         @Suppress("LeakingThis")
         final override var node: Node = this
             private set
@@ -184,6 +185,13 @@ interface Modifier {
          */
         var isAttached: Boolean = false
             private set
+
+        @Deprecated(
+            message = "isValid is hidden so that we can keep the OwnerScope interface internal.",
+            level = DeprecationLevel.HIDDEN
+        )
+        override val isValid: Boolean
+            get() = isAttached
 
         internal open fun updateCoordinator(coordinator: NodeCoordinator?) {
             this.coordinator = coordinator

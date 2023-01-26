@@ -19,6 +19,7 @@ package androidx.compose.foundation.lazy
 import androidx.compose.foundation.fastFilter
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.lazy.layout.LazyPinnedItem
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
@@ -55,6 +56,8 @@ internal fun measureLazyList(
     density: Density,
     placementAnimator: LazyListItemPlacementAnimator,
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
+    beyondBoundsItemCount: Int,
+    pinnedItems: List<LazyPinnedItem>,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyListMeasureResult {
     require(beforeContentPadding >= 0)
@@ -148,8 +151,10 @@ internal fun measureLazyList(
         // then composing visible items forward until we fill the whole viewport.
         // we want to have at least one item in visibleItems even if in fact all the items are
         // offscreen, this can happen if the content padding is larger than the available size.
-        while ((currentMainAxisOffset <= maxMainAxis || visibleItems.isEmpty()) &&
-            index.value < itemsCount
+        while (index.value < itemsCount &&
+            (currentMainAxisOffset < maxMainAxis ||
+                currentMainAxisOffset <= 0 || // filling beforeContentPadding area
+                visibleItems.isEmpty())
         ) {
             val measuredItem = itemProvider.getAndMeasure(index)
             currentMainAxisOffset += measuredItem.sizeWithSpacings
@@ -223,31 +228,35 @@ internal fun measureLazyList(
             }
         }
 
-        // Compose extra items before or after the visible items.
-        fun LazyListBeyondBoundsInfo.startIndex() = min(start, itemsCount - 1)
-        fun LazyListBeyondBoundsInfo.endIndex() = min(end, itemsCount - 1)
-        val extraItemsBefore =
-            if (beyondBoundsInfo.hasIntervals() &&
-                visibleItems.first().index > beyondBoundsInfo.startIndex()) {
-                mutableListOf<LazyMeasuredItem>().apply {
-                    for (i in visibleItems.first().index - 1 downTo beyondBoundsInfo.startIndex()) {
-                        add(itemProvider.getAndMeasure(DataIndex(i)))
-                    }
-                }
-            } else {
-                emptyList()
-            }
-        val extraItemsAfter =
-            if (beyondBoundsInfo.hasIntervals() &&
-                visibleItems.last().index < beyondBoundsInfo.endIndex()) {
-                mutableListOf<LazyMeasuredItem>().apply {
-                    for (i in visibleItems.last().index until beyondBoundsInfo.endIndex()) {
-                        add(itemProvider.getAndMeasure(DataIndex(i + 1)))
-                    }
-                }
-            } else {
-                emptyList()
-            }
+        // Compose extra items before
+        val extraItemsBefore = createItemsBeforeList(
+            beyondBoundsInfo = beyondBoundsInfo,
+            currentFirstItemIndex = currentFirstItemIndex,
+            itemProvider = itemProvider,
+            itemsCount = itemsCount,
+            beyondBoundsItemCount = beyondBoundsItemCount,
+            pinnedItems = pinnedItems
+        )
+
+        // Update maxCrossAxis with extra items
+        extraItemsBefore.fastForEach {
+            maxCrossAxis = maxOf(maxCrossAxis, it.crossAxisSize)
+        }
+
+        // Compose items after last item
+        val extraItemsAfter = createItemsAfterList(
+            beyondBoundsInfo = beyondBoundsInfo,
+            visibleItems = visibleItems,
+            itemProvider = itemProvider,
+            itemsCount = itemsCount,
+            beyondBoundsItemCount = beyondBoundsItemCount,
+            pinnedItems = pinnedItems
+        )
+
+        // Update maxCrossAxis with extra items
+        extraItemsAfter.fastForEach {
+            maxCrossAxis = maxOf(maxCrossAxis, it.crossAxisSize)
+        }
 
         val noExtraItems = firstItem == visibleItems.first() &&
             extraItemsBefore.isEmpty() &&
@@ -278,7 +287,6 @@ internal fun measureLazyList(
             consumedScroll = consumedScroll.toInt(),
             layoutWidth = layoutWidth,
             layoutHeight = layoutHeight,
-            reverseLayout = reverseLayout,
             positionedItems = positionedItems,
             itemProvider = itemProvider
         )
@@ -299,7 +307,7 @@ internal fun measureLazyList(
         return LazyListMeasureResult(
             firstVisibleItem = firstItem,
             firstVisibleItemScrollOffset = currentFirstItemScrollOffset,
-            canScrollForward = currentMainAxisOffset > maxOffset,
+            canScrollForward = index.value < itemsCount || currentMainAxisOffset > maxOffset,
             consumedScroll = consumedScroll,
             measureResult = layout(layoutWidth, layoutHeight) {
                 positionedItems.fastForEach {
@@ -322,6 +330,86 @@ internal fun measureLazyList(
             afterContentPadding = afterContentPadding
         )
     }
+}
+
+private fun createItemsAfterList(
+    beyondBoundsInfo: LazyListBeyondBoundsInfo,
+    visibleItems: MutableList<LazyMeasuredItem>,
+    itemProvider: LazyMeasuredItemProvider,
+    itemsCount: Int,
+    beyondBoundsItemCount: Int,
+    pinnedItems: List<LazyPinnedItem>
+): List<LazyMeasuredItem> {
+    fun LazyListBeyondBoundsInfo.endIndex() = min(end, itemsCount - 1)
+
+    var list: MutableList<LazyMeasuredItem>? = null
+
+    var end = visibleItems.last().index
+
+    fun addItem(index: Int) {
+        if (list == null) list = mutableListOf()
+        requireNotNull(list).add(
+            itemProvider.getAndMeasure(DataIndex(index))
+        )
+    }
+
+    if (beyondBoundsInfo.hasIntervals()) {
+        end = maxOf(beyondBoundsInfo.endIndex(), end)
+    }
+
+    end = minOf(end + beyondBoundsItemCount, itemsCount - 1)
+
+    for (i in visibleItems.last().index + 1..end) {
+        addItem(i)
+    }
+
+    pinnedItems.fastForEach {
+        if (it.index > end && it.index < itemsCount) {
+            addItem(it.index)
+        }
+    }
+
+    return list ?: emptyList()
+}
+
+private fun createItemsBeforeList(
+    beyondBoundsInfo: LazyListBeyondBoundsInfo,
+    currentFirstItemIndex: DataIndex,
+    itemProvider: LazyMeasuredItemProvider,
+    itemsCount: Int,
+    beyondBoundsItemCount: Int,
+    pinnedItems: List<LazyPinnedItem>
+): List<LazyMeasuredItem> {
+    fun LazyListBeyondBoundsInfo.startIndex() = min(start, itemsCount - 1)
+
+    var list: MutableList<LazyMeasuredItem>? = null
+
+    var start = currentFirstItemIndex.value
+
+    fun addItem(index: Int) {
+        if (list == null) list = mutableListOf()
+        requireNotNull(list).add(
+            itemProvider.getAndMeasure(DataIndex(index))
+        )
+    }
+
+    if (beyondBoundsInfo.hasIntervals()) {
+        start = minOf(beyondBoundsInfo.startIndex(), start)
+    }
+
+    start = maxOf(0, start - beyondBoundsItemCount)
+
+    for (i in currentFirstItemIndex.value - 1 downTo start) {
+        addItem(i)
+    }
+
+    pinnedItems.fastForEach {
+        if (it.index < start) {
+            addItem(it.index)
+        }
+    }
+
+    return list ?: emptyList()
 }
 
 /**
@@ -407,3 +495,7 @@ private fun calculateItemsOffsets(
     }
     return positionedItems
 }
+
+private val EmptyRange = Int.MIN_VALUE to Int.MIN_VALUE
+private val Int.notInEmptyRange
+    get() = this != Int.MIN_VALUE

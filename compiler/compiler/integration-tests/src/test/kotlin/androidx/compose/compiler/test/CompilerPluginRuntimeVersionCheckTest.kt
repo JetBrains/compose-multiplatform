@@ -168,6 +168,7 @@ class CompilerPluginRuntimeVersionCheckTest {
             apply plugin: "kotlin-android"
 
             android {
+                namespace "androidx.compose.compiler.test"
                 compileSdkVersion ${projectSetup.props.compileSdkVersion}
                 buildToolsVersion "${projectSetup.props.buildToolsVersion}"
                 defaultConfig {
@@ -189,6 +190,14 @@ class CompilerPluginRuntimeVersionCheckTest {
             dependencies {
                 $dependenciesBlock
             }
+
+            tasks.withType(
+                org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+            ).configureEach {
+                kotlinOptions {
+                    jvmTarget = "1.8"
+                }
+            }
             """.trimIndent()
         )
     }
@@ -206,9 +215,7 @@ class CompilerPluginRuntimeVersionCheckTest {
         addFileWithContent(
             "$MAIN_DIR/AndroidManifest.xml",
             """
-            <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-                package="androidx.compose.compiler.test">
-            </manifest>
+            <manifest/>
             """.trimIndent()
         )
     }

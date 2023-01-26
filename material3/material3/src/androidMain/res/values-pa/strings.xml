@@ -20,4 +20,15 @@
     <string name="dialog" msgid="4057925834421392736">"ਵਿੰਡੋ"</string>
     <string name="expanded" msgid="5974471714631304645">"ਵਿਸਤਾਰ ਕੀਤਾ ਗਿਆ"</string>
     <string name="collapsed" msgid="5389587048670450460">"ਸਮੇਟਿਆ ਗਿਆ"</string>
+    <!-- no translation found for snackbar_dismiss (3962933905051144957) -->
+    <skip />
+    <!-- no translation found for search_bar_search (6420018528474762666) -->
+    <skip />
+    <string name="suggestions_available" msgid="7189888345201419934">"ਸੁਝਾਅ ਹੇਠਾਂ ਹਨ"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"ਤਾਰੀਖ ਚੁਣੋ"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"ਚੁਣੀ ਗਈ ਤਾਰੀਖ"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"ਸਾਲ ਚੁਣਨ ਲਈ ਸਵਿੱਚ ਕਰੋ"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"ਦਿਨ ਚੁਣਨ ਲਈ ਸਵਿੱਚ ਕਰੋ"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"ਅਗਲੇ ਮਹੀਨੇ \'ਤੇ ਜਾਓ"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"ਪਿਛਲੇ ਮਹੀਨੇ \'ਤੇ ਜਾਓ"</string>
 </resources>

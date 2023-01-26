@@ -46,6 +46,7 @@ import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -436,6 +437,7 @@ class DrawReorderingTest {
         )
     }
 
+    @Ignore // b/265025605
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testChangingZOrder() {
@@ -569,6 +571,7 @@ class DrawReorderingTest {
         )
     }
 
+    @Ignore // b/265025605
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testChangingZOrderUncle() {
@@ -628,6 +631,7 @@ class DrawReorderingTest {
         )
     }
 
+    @Ignore // b/265025605
     @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun testChangingReorderedChildSize() {

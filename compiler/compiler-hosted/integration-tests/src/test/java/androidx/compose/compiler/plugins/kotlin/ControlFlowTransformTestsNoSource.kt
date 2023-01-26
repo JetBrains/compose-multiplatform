@@ -48,7 +48,7 @@ class ControlFlowTransformTestsNoSource : AbstractControlFlowTransformTests() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                Test(%composer, %changed or 0b0001)
+                Test(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
         """
@@ -80,7 +80,7 @@ class ControlFlowTransformTestsNoSource : AbstractControlFlowTransformTests() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                Test(%composer, %changed or 0b0001)
+                Test(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
 
@@ -114,7 +114,7 @@ class ControlFlowTransformTestsNoSource : AbstractControlFlowTransformTests() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                Test(%composer, %changed or 0b0001)
+                Test(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
             internal object ComposableSingletons%TestKt {
@@ -155,11 +155,7 @@ class ControlFlowTransformTestsNoSource : AbstractControlFlowTransformTests() {
                   traceEventStart(<>, %changed, -1, <>)
                 }
                 IW({ %composer: Composer?, %changed: Int ->
-                  if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
-                    A(%composer, 0)
-                  } else {
-                    %composer.skipToGroupEnd()
-                  }
+                  A(%composer, 0)
                 }, %composer, 0)
                 if (isTraceInProgress()) {
                   traceEventEnd()
@@ -168,7 +164,7 @@ class ControlFlowTransformTestsNoSource : AbstractControlFlowTransformTests() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                Test(%composer, %changed or 0b0001)
+                Test(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
         """

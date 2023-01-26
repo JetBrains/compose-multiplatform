@@ -17,10 +17,12 @@
 package androidx.compose.ui.text.style
 
 import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 @OptIn(ExperimentalTextApi::class)
+@SdkSuppress(minSdkVersion = 28)
 class HyphensTest : TextLineBreaker() {
     private val text = "Transformation"
 

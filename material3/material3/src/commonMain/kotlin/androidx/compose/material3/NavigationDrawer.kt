@@ -77,7 +77,6 @@ import kotlinx.coroutines.launch
 /**
  * Possible values of [DrawerState].
  */
-@ExperimentalMaterial3Api
 enum class DrawerValue {
     /**
      * The state of the drawer when it is closed.
@@ -97,13 +96,13 @@ enum class DrawerValue {
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Suppress("NotCloseable")
-@ExperimentalMaterial3Api
 @Stable
 class DrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ) {
 
+    @OptIn(ExperimentalMaterial3Api::class)
     internal val swipeableState = SwipeableState(
         initialValue = initialValue,
         animationSpec = AnimationSpec,
@@ -129,6 +128,7 @@ class DrawerState(
      * currently in. If a swipe or an animation is in progress, this corresponds the state drawer
      * was in before the swipe or animation started.
      */
+    @OptIn(ExperimentalMaterial3Api::class)
     val currentValue: DrawerValue
         get() {
             return swipeableState.currentValue
@@ -137,6 +137,7 @@ class DrawerState(
     /**
      * Whether the state is currently animating.
      */
+    @OptIn(ExperimentalMaterial3Api::class)
     val isAnimationRunning: Boolean
         get() {
             return swipeableState.isAnimationRunning
@@ -166,7 +167,7 @@ class DrawerState(
      * @param targetValue The new value to animate to.
      * @param anim The animation that will be used to animate to the new value.
      */
-    @ExperimentalMaterial3Api
+    @OptIn(ExperimentalMaterial3Api::class)
     suspend fun animateTo(targetValue: DrawerValue, anim: AnimationSpec<Float>) {
         swipeableState.animateTo(targetValue, anim)
     }
@@ -176,7 +177,7 @@ class DrawerState(
      *
      * @param targetValue The new target value
      */
-    @ExperimentalMaterial3Api
+    @OptIn(ExperimentalMaterial3Api::class)
     suspend fun snapTo(targetValue: DrawerValue) {
         swipeableState.snapTo(targetValue)
     }
@@ -188,18 +189,14 @@ class DrawerState(
      * swipe finishes. If an animation is running, this is the target value of that animation.
      * Finally, if no swipe or animation is in progress, this is the same as the [currentValue].
      */
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @ExperimentalMaterial3Api
-    @get:ExperimentalMaterial3Api
+    @OptIn(ExperimentalMaterial3Api::class)
     val targetValue: DrawerValue
         get() = swipeableState.targetValue
 
     /**
      * The current position (in pixels) of the drawer container.
      */
-    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
-    @ExperimentalMaterial3Api
-    @get:ExperimentalMaterial3Api
+    @OptIn(ExperimentalMaterial3Api::class)
     val offset: State<Float>
         get() = swipeableState.offset
 
@@ -222,7 +219,6 @@ class DrawerState(
  * @param confirmStateChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Composable
-@ExperimentalMaterial3Api
 fun rememberDrawerState(
     initialValue: DrawerValue,
     confirmStateChange: (DrawerValue) -> Boolean = { true }
@@ -251,8 +247,8 @@ fun rememberDrawerState(
  * @param scrimColor color of the scrim that obscures content when the drawer is open
  * @param content content of the rest of the UI
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@ExperimentalMaterial3Api
 fun ModalNavigationDrawer(
     drawerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -342,8 +338,8 @@ fun ModalNavigationDrawer(
  * @param gesturesEnabled whether or not the drawer can be interacted by gestures
  * @param content content of the rest of the UI
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@ExperimentalMaterial3Api
 fun DismissibleNavigationDrawer(
     drawerContent: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -423,7 +419,6 @@ fun DismissibleNavigationDrawer(
  * @param modifier the [Modifier] to be applied to this drawer
  * @param content content of the rest of the UI
  */
-@ExperimentalMaterial3Api
 @Composable
 fun PermanentNavigationDrawer(
     drawerContent: @Composable () -> Unit,
@@ -454,7 +449,6 @@ fun PermanentNavigationDrawer(
  * @param windowInsets a window insets for the sheet.
  * @param content content inside of a modal navigation drawer
  */
-@ExperimentalMaterial3Api
 @Composable
 fun ModalDrawerSheet(
     modifier: Modifier = Modifier,
@@ -492,7 +486,6 @@ fun ModalDrawerSheet(
  * @param windowInsets a window insets for the sheet.
  * @param content content inside of a dismissible navigation drawer
  */
-@ExperimentalMaterial3Api
 @Composable
 fun DismissibleDrawerSheet(
     modifier: Modifier = Modifier,
@@ -530,7 +523,6 @@ fun DismissibleDrawerSheet(
  * @param windowInsets a window insets for the sheet.
  * @param content content inside a permanent navigation drawer
  */
-@ExperimentalMaterial3Api
 @Composable
 fun PermanentDrawerSheet(
     modifier: Modifier = Modifier,
@@ -555,7 +547,6 @@ fun PermanentDrawerSheet(
     )
 }
 
-@ExperimentalMaterial3Api
 @Composable
 private fun DrawerSheet(
     windowInsets: WindowInsets,
@@ -593,7 +584,6 @@ private fun DrawerSheet(
 /**
  * Object to hold default values for [ModalNavigationDrawer]
  */
-@ExperimentalMaterial3Api
 object DrawerDefaults {
     /**
      * Default Elevation for drawer container in the [ModalNavigationDrawer] as specified in the
@@ -655,8 +645,8 @@ object DrawerDefaults {
  * for this item. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this item in different states.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-@ExperimentalMaterial3Api
 fun NavigationDrawerItem(
     label: @Composable () -> Unit,
     selected: Boolean,
@@ -702,7 +692,6 @@ fun NavigationDrawerItem(
 
 /** Represents the colors of the various elements of a drawer item. */
 @Stable
-@ExperimentalMaterial3Api
 interface NavigationDrawerItemColors {
     /**
      * Represents the icon color for this item, depending on whether it is [selected].
@@ -738,7 +727,6 @@ interface NavigationDrawerItemColors {
 }
 
 /** Defaults used in [NavigationDrawerItem]. */
-@ExperimentalMaterial3Api
 object NavigationDrawerItemDefaults {
     /**
      * Creates a [NavigationDrawerItemColors] with the provided colors according to the Material
@@ -784,7 +772,6 @@ object NavigationDrawerItemDefaults {
     val ItemPadding = PaddingValues(horizontal = 12.dp)
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 private class DefaultDrawerItemsColor(
     val selectedIconColor: Color,
     val unselectedIconColor: Color,

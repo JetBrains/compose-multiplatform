@@ -37,7 +37,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api("androidx.annotation:annotation:1.1.0")
 
         implementation(libs.kotlinStdlib)
-        implementation("androidx.compose.runtime:runtime:1.1.1")
+        implementation("androidx.compose.runtime:runtime:1.2.1")
         implementation(project(":compose:ui:ui-util"))
 
         testImplementation(libs.junit)
@@ -108,7 +108,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Unit"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Compose classes for simple units"
     legacyDisableKotlinStrictApiMode = true
@@ -116,12 +115,4 @@ androidx {
 
 android {
     namespace "androidx.compose.ui.unit"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

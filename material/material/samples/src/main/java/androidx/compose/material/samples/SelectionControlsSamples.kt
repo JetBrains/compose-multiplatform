@@ -28,6 +28,8 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material.Checkbox
 import androidx.compose.material.CheckboxDefaults
 import androidx.compose.material.MaterialTheme
@@ -47,6 +49,7 @@ import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.unit.dp
@@ -130,6 +133,22 @@ fun SwitchSample() {
         checked = checkedState.value,
         onCheckedChange = { checkedState.value = it }
     )
+
+    var pineappleOnPizza by remember { mutableStateOf(true) }
+
+    Row(
+        Modifier
+            .padding(16.dp)
+            .toggleable(
+                role = Role.Switch,
+                value = pineappleOnPizza,
+                onValueChange = { pineappleOnPizza = it },
+            )
+    ) {
+        Switch(checked = pineappleOnPizza, onCheckedChange = null)
+        Spacer(Modifier.width(8.dp))
+        Text("Pineapple on pizza?")
+    }
 }
 
 @Sampled

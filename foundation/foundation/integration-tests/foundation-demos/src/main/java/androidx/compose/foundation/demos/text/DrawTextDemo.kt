@@ -42,6 +42,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
@@ -60,7 +61,6 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlin.math.roundToLong
@@ -142,9 +142,9 @@ fun DrawTextLongString() {
             topLeft = Offset(padding, padding),
             style = TextStyle(fontSize = fontSize6),
             overflow = TextOverflow.Visible,
-            maxSize = IntSize(
-                width = (size.width - 2 * padding).toInt(),
-                height = (size.height - 2 * padding).toInt()
+            size = Size(
+                width = size.width - 2 * padding,
+                height = size.height - 2 * padding
             )
         )
     }

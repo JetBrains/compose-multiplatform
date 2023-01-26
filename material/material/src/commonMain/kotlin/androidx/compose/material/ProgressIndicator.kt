@@ -63,9 +63,11 @@ import kotlin.math.max
  *
  * @param progress The progress of this progress indicator, where 0.0 represents no progress and 1.0
  * represents full progress. Values outside of this range are coerced into the range.
+ * @param modifier the [Modifier] to be applied to this progress indicator
  * @param color The color of the progress indicator.
  * @param backgroundColor The color of the background behind the indicator, visible when the
  * progress has not reached that area of the overall indicator yet.
+ * @param strokeCap stroke cap to use for the ends of this progress indicator
  */
 @Composable
 fun LinearProgressIndicator(
@@ -73,16 +75,18 @@ fun LinearProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
-    backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
+    backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity),
+    strokeCap: StrokeCap = StrokeCap.Butt,
 ) {
+    val coercedProgress = progress.coerceIn(0f, 1f)
     Canvas(
         modifier
-            .progressSemantics(progress)
+            .progressSemantics(coercedProgress)
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
     ) {
         val strokeWidth = size.height
-        drawLinearIndicatorBackground(backgroundColor, strokeWidth)
-        drawLinearIndicator(0f, progress, color, strokeWidth)
+        drawLinearIndicatorBackground(backgroundColor, strokeWidth, strokeCap)
+        drawLinearIndicator(0f, coercedProgress, color, strokeWidth, strokeCap)
     }
 }
 
@@ -93,15 +97,18 @@ fun LinearProgressIndicator(
  *
  * ![Linear progress indicator image](https://developer.android.com/images/reference/androidx/compose/material/linear-progress-indicator.png)
  *
+ * @param modifier the [Modifier] to be applied to this progress indicator
  * @param color The color of the progress indicator.
  * @param backgroundColor The color of the background behind the indicator, visible when the
  * progress has not reached that area of the overall indicator yet.
+ * @param strokeCap stroke cap to use for the ends of this progress indicator
  */
 @Composable
 fun LinearProgressIndicator(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
-    backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
+    backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity),
+    strokeCap: StrokeCap = StrokeCap.Butt,
 ) {
     val infiniteTransition = rememberInfiniteTransition()
     // Fractional position of the 'head' and 'tail' of the two lines drawn. I.e if the head is 0.8
@@ -157,13 +164,14 @@ fun LinearProgressIndicator(
             .size(LinearIndicatorWidth, LinearIndicatorHeight)
     ) {
         val strokeWidth = size.height
-        drawLinearIndicatorBackground(backgroundColor, strokeWidth)
+        drawLinearIndicatorBackground(backgroundColor, strokeWidth, strokeCap)
         if (firstLineHead - firstLineTail > 0) {
             drawLinearIndicator(
                 firstLineHead,
                 firstLineTail,
                 color,
-                strokeWidth
+                strokeWidth,
+                strokeCap,
             )
         }
         if ((secondLineHead - secondLineTail) > 0) {
@@ -171,17 +179,47 @@ fun LinearProgressIndicator(
                 secondLineHead,
                 secondLineTail,
                 color,
-                strokeWidth
+                strokeWidth,
+                strokeCap,
             )
         }
     }
 }
 
+@Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
+@Composable
+fun LinearProgressIndicator(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
+) = LinearProgressIndicator(
+    progress,
+    modifier,
+    color,
+    backgroundColor,
+    strokeCap = StrokeCap.Butt,
+)
+
+@Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
+@Composable
+fun LinearProgressIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.primary,
+    backgroundColor: Color = color.copy(alpha = IndicatorBackgroundOpacity)
+) = LinearProgressIndicator(
+    modifier,
+    color,
+    backgroundColor,
+    strokeCap = StrokeCap.Butt,
+)
+
 private fun DrawScope.drawLinearIndicator(
     startFraction: Float,
     endFraction: Float,
     color: Color,
-    strokeWidth: Float
+    strokeWidth: Float,
+    strokeCap: StrokeCap,
 ) {
     val width = size.width
     val height = size.height
@@ -192,14 +230,35 @@ private fun DrawScope.drawLinearIndicator(
     val barStart = (if (isLtr) startFraction else 1f - endFraction) * width
     val barEnd = (if (isLtr) endFraction else 1f - startFraction) * width
 
-    // Progress line
-    drawLine(color, Offset(barStart, yOffset), Offset(barEnd, yOffset), strokeWidth)
+    // if there isn't enough space to draw the stroke caps, fall back to StrokeCap.Butt
+    if (strokeCap == StrokeCap.Butt || height > width) {
+        // Progress line
+        drawLine(color, Offset(barStart, yOffset), Offset(barEnd, yOffset), strokeWidth)
+    } else {
+        // need to adjust barStart and barEnd for the stroke caps
+        val strokeCapOffset = strokeWidth / 2
+        val coerceRange = strokeCapOffset..(width - strokeCapOffset)
+        val adjustedBarStart = barStart.coerceIn(coerceRange)
+        val adjustedBarEnd = barEnd.coerceIn(coerceRange)
+
+        if (abs(endFraction - startFraction) > 0) {
+            // Progress line
+            drawLine(
+                color,
+                Offset(adjustedBarStart, yOffset),
+                Offset(adjustedBarEnd, yOffset),
+                strokeWidth,
+                strokeCap,
+            )
+        }
+    }
 }
 
 private fun DrawScope.drawLinearIndicatorBackground(
     color: Color,
-    strokeWidth: Float
-) = drawLinearIndicator(0f, 1f, color, strokeWidth)
+    strokeWidth: Float,
+    strokeCap: StrokeCap,
+) = drawLinearIndicator(0f, 1f, color, strokeWidth, strokeCap)
 
 /**
  * Determinate <a href="https://material.io/components/progress-indicators#circular-progress-indicators" class="external" target="_blank">Material Design circular progress indicator</a>.
@@ -216,8 +275,12 @@ private fun DrawScope.drawLinearIndicatorBackground(
  *
  * @param progress The progress of this progress indicator, where 0.0 represents no progress and 1.0
  * represents full progress. Values outside of this range are coerced into the range.
+ * @param modifier the [Modifier] to be applied to this progress indicator
  * @param color The color of the progress indicator.
  * @param strokeWidth The stroke width for the progress indicator.
+ * @param backgroundColor The color of the background behind the indicator, visible when the
+ * progress has not reached that area of the overall indicator yet.
+ * @param strokeCap stroke cap to use for the ends of this progress indicator
  */
 @Composable
 fun CircularProgressIndicator(
@@ -225,19 +288,23 @@ fun CircularProgressIndicator(
     progress: Float,
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
-    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
+    backgroundColor: Color = Color.Transparent,
+    strokeCap: StrokeCap = StrokeCap.Butt,
 ) {
+    val coercedProgress = progress.coerceIn(0f, 1f)
     val stroke = with(LocalDensity.current) {
-        Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Butt)
+        Stroke(width = strokeWidth.toPx(), cap = strokeCap)
     }
     Canvas(
         modifier
-            .progressSemantics(progress)
+            .progressSemantics(coercedProgress)
             .size(CircularIndicatorDiameter)
     ) {
         // Start at 12 O'clock
         val startAngle = 270f
-        val sweep = progress * 360f
+        val sweep = coercedProgress * 360f
+        drawCircularIndicatorBackground(backgroundColor, stroke)
         drawDeterminateCircularIndicator(startAngle, sweep, color, stroke)
     }
 }
@@ -249,17 +316,23 @@ fun CircularProgressIndicator(
  *
  * ![Circular progress indicator image](https://developer.android.com/images/reference/androidx/compose/material/circular-progress-indicator.png)
  *
+ * @param modifier the [Modifier] to be applied to this progress indicator
  * @param color The color of the progress indicator.
  * @param strokeWidth The stroke width for the progress indicator.
+ * @param backgroundColor The color of the background behind the indicator, visible when the
+ * progress has not reached that area of the overall indicator yet.
+ * @param strokeCap stroke cap to use for the ends of this progress indicator
  */
 @Composable
 fun CircularProgressIndicator(
     modifier: Modifier = Modifier,
     color: Color = MaterialTheme.colors.primary,
-    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth,
+    backgroundColor: Color = Color.Transparent,
+    strokeCap: StrokeCap = StrokeCap.Square,
 ) {
     val stroke = with(LocalDensity.current) {
-        Stroke(width = strokeWidth.toPx(), cap = StrokeCap.Square)
+        Stroke(width = strokeWidth.toPx(), cap = strokeCap)
     }
 
     val transition = rememberInfiniteTransition()
@@ -315,6 +388,7 @@ fun CircularProgressIndicator(
             .progressSemantics()
             .size(CircularIndicatorDiameter)
     ) {
+        drawCircularIndicatorBackground(backgroundColor, stroke)
 
         val currentRotationAngleOffset = (currentRotation * RotationAngleOffset) % 360f
 
@@ -326,6 +400,36 @@ fun CircularProgressIndicator(
         drawIndeterminateCircularIndicator(startAngle + offset, strokeWidth, sweep, color, stroke)
     }
 }
+
+@Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
+@Composable
+fun CircularProgressIndicator(
+    progress: Float,
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.primary,
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
+) = CircularProgressIndicator(
+    progress,
+    modifier,
+    color,
+    strokeWidth,
+    backgroundColor = Color.Transparent,
+    strokeCap = StrokeCap.Butt,
+)
+
+@Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
+@Composable
+fun CircularProgressIndicator(
+    modifier: Modifier = Modifier,
+    color: Color = MaterialTheme.colors.primary,
+    strokeWidth: Dp = ProgressIndicatorDefaults.StrokeWidth
+) = CircularProgressIndicator(
+    modifier,
+    color,
+    strokeWidth,
+    backgroundColor = Color.Transparent,
+    strokeCap = StrokeCap.Square,
+)
 
 private fun DrawScope.drawCircularIndicator(
     startAngle: Float,
@@ -347,6 +451,11 @@ private fun DrawScope.drawCircularIndicator(
         style = stroke
     )
 }
+
+private fun DrawScope.drawCircularIndicatorBackground(
+    color: Color,
+    stroke: Stroke
+) = drawCircularIndicator(0f, 360f, color, stroke)
 
 /**
  * Contains the default values used for [LinearProgressIndicator] and [CircularProgressIndicator].
@@ -394,15 +503,18 @@ private fun DrawScope.drawIndeterminateCircularIndicator(
     color: Color,
     stroke: Stroke
 ) {
-    // Length of arc is angle * radius
-    // Angle (radians) is length / radius
-    // The length should be the same as the stroke width for calculating the min angle
-    val squareStrokeCapOffset =
+    val strokeCapOffset = if (stroke.cap == StrokeCap.Butt) {
+        0f
+    } else {
+        // Length of arc is angle * radius
+        // Angle (radians) is length / radius
+        // The length should be the same as the stroke width for calculating the min angle
         (180.0 / PI).toFloat() * (strokeWidth / (CircularIndicatorDiameter / 2)) / 2f
+    }
 
-    // Adding a square stroke cap draws half the stroke width behind the start point, so we want to
+    // Adding a stroke cap draws half the stroke width behind the start point, so we want to
     // move it forward by that amount so the arc visually appears in the correct place
-    val adjustedStartAngle = startAngle + squareStrokeCapOffset
+    val adjustedStartAngle = startAngle + strokeCapOffset
 
     // When the start and end angles are in the same place, we still want to draw a small sweep, so
     // the stroke caps get added on both ends and we draw the correct minimum length arc

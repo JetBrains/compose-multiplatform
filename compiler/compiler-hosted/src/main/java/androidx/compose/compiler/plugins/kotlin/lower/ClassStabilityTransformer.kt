@@ -16,11 +16,13 @@
 
 package androidx.compose.compiler.plugins.kotlin.lower
 
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
-import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
-import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.analysis.forEach
+import androidx.compose.compiler.plugins.kotlin.analysis.hasStableMarker
+import androidx.compose.compiler.plugins.kotlin.analysis.normalize
+import androidx.compose.compiler.plugins.kotlin.analysis.stabilityOf
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
@@ -64,7 +66,7 @@ class ClassStabilityTransformer(
     ClassLoweringPass,
     ModuleLoweringPass {
 
-    private val StabilityInferredClass = getTopLevelClass(ComposeFqNames.StabilityInferred)
+    private val StabilityInferredClass = getTopLevelClass(ComposeClassIds.StabilityInferred)
     private val UNSTABLE = StabilityBits.UNSTABLE.bitsForSlot(0)
     private val STABLE = StabilityBits.STABLE.bitsForSlot(0)
 
@@ -103,6 +105,7 @@ class ClassStabilityTransformer(
                 marked = true,
                 stability = Stability.Stable,
             )
+            cls.addStabilityMarkerField(irConst(STABLE))
             return cls
         }
 
@@ -160,27 +163,30 @@ class ClassStabilityTransformer(
             it.putValueArgument(0, irConst(parameterMask))
         }
 
-        val stabilityField = makeStabilityField().also { f ->
-            f.parent = cls
-            f.initializer = IrExpressionBodyImpl(
+        cls.addStabilityMarkerField(stableExpr)
+        return result
+    }
+
+    private fun IrClass.addStabilityMarkerField(stabilityExpression: IrExpression) {
+        val stabilityField = makeStabilityField().apply {
+            parent = this@addStabilityMarkerField
+            initializer = IrExpressionBodyImpl(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
-                stableExpr
+                stabilityExpression
             )
         }
 
         if (context.platform.isJvm()) {
-            cls.declarations += stabilityField
+            declarations += stabilityField
         } else {
             // This ensures proper mangles in k/js and k/native (since kotlin 1.6.0-rc2)
-            val stabilityProp = makeStabilityProp().also {
-                it.parent = cls
-                it.backingField = stabilityField
+            val stabilityProp = makeStabilityProp().apply {
+                parent = this@addStabilityMarkerField
+                backingField = stabilityField
             }
             stabilityField.correspondingPropertySymbol = stabilityProp.symbol
-            cls.declarations += stabilityProp
+            declarations += stabilityProp
         }
-
-        return result
     }
 }

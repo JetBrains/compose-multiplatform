@@ -16,20 +16,8 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection.Companion.Down
-import androidx.compose.ui.focus.FocusDirection.Companion.Enter
-import androidx.compose.ui.focus.FocusDirection.Companion.Exit
-import androidx.compose.ui.focus.FocusDirection.Companion.Left
-import androidx.compose.ui.focus.FocusDirection.Companion.Next
-import androidx.compose.ui.focus.FocusDirection.Companion.Previous
-import androidx.compose.ui.focus.FocusDirection.Companion.Right
-import androidx.compose.ui.focus.FocusDirection.Companion.Up
-import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
-import androidx.compose.ui.unit.LayoutDirection.Ltr
-import androidx.compose.ui.unit.LayoutDirection.Rtl
 
 /**
  * A [modifier][Modifier.Element] that can be used to set a custom focus traversal order.
@@ -56,6 +44,7 @@ interface FocusOrderModifier : Modifier.Element {
  */
 @Deprecated("Use FocusProperties instead")
 class FocusOrder internal constructor(private val focusProperties: FocusProperties) {
+    @Suppress("unused")
     constructor() : this(FocusPropertiesImpl())
 
     /**
@@ -203,69 +192,11 @@ fun Modifier.focusOrder(
     .focusRequester(focusRequester)
     .focusProperties(FocusOrderToProperties(focusOrderReceiver))
 
-/**
- * Search up the component tree for any parent/parents that have specified a custom focus order.
- * Allowing parents higher up the hierarchy to overwrite the focus order specified by their
- * children.
- *
- * @param focusDirection the focus direction passed to [FocusManager.moveFocus] that triggered this
- * focus search.
- * @param layoutDirection the current system [LayoutDirection].
- */
-internal fun FocusModifier.customFocusSearch(
-    focusDirection: FocusDirection,
-    layoutDirection: LayoutDirection
-): FocusRequester {
-    return when (focusDirection) {
-        Next -> focusProperties.next
-        Previous -> focusProperties.previous
-        Up -> focusProperties.up
-        Down -> focusProperties.down
-        Left -> when (layoutDirection) {
-            Ltr -> focusProperties.start
-            Rtl -> focusProperties.end
-        }.takeUnless { it == FocusRequester.Default } ?: focusProperties.left
-        Right -> when (layoutDirection) {
-            Ltr -> focusProperties.end
-            Rtl -> focusProperties.start
-        }.takeUnless { it == FocusRequester.Default } ?: focusProperties.right
-        // TODO(b/183746982): add focus order API for "In" and "Out".
-        //  Developers can to specify a custom "In" to specify which child should be visited when
-        //  the user presses dPad center. (They can also redirect the "In" to some other item).
-        //  Developers can specify a custom "Out" to specify which composable should take focus
-        //  when the user presses the back button.
-        @OptIn(ExperimentalComposeUiApi::class)
-        Enter -> {
-            @OptIn(ExperimentalComposeUiApi::class)
-            focusProperties.enter(focusDirection)
-        }
-        @OptIn(ExperimentalComposeUiApi::class)
-        Exit -> {
-            @OptIn(ExperimentalComposeUiApi::class)
-            focusProperties.exit(focusDirection)
-        }
-        else -> error("invalid FocusDirection")
-    }
-}
-
 @Suppress("DEPRECATION")
 internal class FocusOrderToProperties(
     val focusOrderReceiver: FocusOrder.() -> Unit
 ) : (FocusProperties) -> Unit {
     override fun invoke(focusProperties: FocusProperties) {
         focusOrderReceiver(FocusOrder(focusProperties))
-    }
-}
-
-/**
- * Used internally for FocusOrderModifiers so that we can compare the modifiers and can reuse
- * the ModifierLocalConsumerEntity and ModifierLocalProviderEntity.
- */
-@Suppress("DEPRECATION")
-internal class FocusOrderModifierToProperties(
-    val modifier: FocusOrderModifier
-) : (FocusProperties) -> Unit {
-    override fun invoke(focusProperties: FocusProperties) {
-        modifier.populateFocusOrder(FocusOrder(focusProperties))
     }
 }

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.node
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.text.input.TextInputService
@@ -47,4 +48,17 @@ interface RootForTest {
      * @return true if the event was consumed. False otherwise.
      */
     fun sendKeyEvent(keyEvent: KeyEvent): Boolean
+
+    /**
+     * Requests another layout (measure + placement) pass be performed for any nodes that need it.
+     * This doesn't force anything to be remeasured that wouldn't be if `requestLayout` were called.
+     * However, unlike `requestLayout`, it doesn't merely _schedule_ another layout pass to be
+     * performed, it actually performs it synchronously.
+     *
+     * This method is used in UI tests to perform layout in between frames when pumping frames as
+     * fast as possible (i.e. without waiting for the choreographer to schedule them) in order to
+     * get to idle, e.g. during a `waitForIdle` call.
+     */
+    @ExperimentalComposeUiApi
+    fun measureAndLayoutForTest() {}
 }

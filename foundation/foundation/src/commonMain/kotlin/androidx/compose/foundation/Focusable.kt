@@ -18,12 +18,9 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.lazy.layout.ModifierLocalPinnableParent
-import androidx.compose.foundation.lazy.layout.PinnableParent
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,16 +34,14 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.input.InputMode
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalReadScope
+import androidx.compose.ui.layout.LocalPinnableContainer
+import androidx.compose.ui.layout.PinnableContainer
 import androidx.compose.ui.platform.InspectableModifier
 import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.semantics.focused
 import androidx.compose.ui.semantics.requestFocus
 import androidx.compose.ui.semantics.semantics
-import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
 
 /**
@@ -73,7 +68,6 @@ fun Modifier.focusable(
 ) {
     val scope = rememberCoroutineScope()
     val focusedInteraction = remember { mutableStateOf<FocusInteraction.Focus?>(null) }
-    var pinnableParent by remember { mutableStateOf<PinnableParent?>(null) }
     var isFocused by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
@@ -120,6 +114,18 @@ fun Modifier.focusable(
             Modifier
         }
 
+        val pinnableContainer = LocalPinnableContainer.current
+        var pinHandle by remember { mutableStateOf<PinnableContainer.PinnedHandle?>(null) }
+        DisposableEffect(pinnableContainer) {
+            if (isFocused) {
+                pinHandle = pinnableContainer?.pin()
+            }
+            onDispose {
+                pinHandle?.unpin()
+                pinHandle = null
+            }
+        }
+
         Modifier
             .semantics {
                 this.focused = isFocused
@@ -128,24 +134,13 @@ fun Modifier.focusable(
                     isFocused
                 }
             }
-            .onPinnableParentAvailable { pinnableParent = it }
             .bringIntoViewRequester(bringIntoViewRequester)
             .focusRequester(focusRequester)
             .then(focusedChildModifier)
             .onFocusChanged {
                 isFocused = it.isFocused
                 if (isFocused) {
-                    // We use CoroutineStart.UNDISPATCHED because we want to pin the items
-                    // synchronously and suspend after the items are pinned.
-                    scope.launch(start = CoroutineStart.UNDISPATCHED) {
-                        var pinnedItemsHandle: PinnableParent.PinnedItemsHandle? = null
-                        try {
-                            pinnedItemsHandle = pinnableParent?.pinItems()
-                            bringIntoViewRequester.bringIntoView()
-                        } finally {
-                            pinnedItemsHandle?.unpin()
-                        }
-                    }
+                    pinHandle = pinnableContainer?.pin()
                     scope.launch {
                         focusedInteraction.value?.let { oldValue ->
                             val interaction = FocusInteraction.Unfocus(oldValue)
@@ -155,8 +150,12 @@ fun Modifier.focusable(
                         val interaction = FocusInteraction.Focus()
                         interactionSource?.emit(interaction)
                         focusedInteraction.value = interaction
+
+                        bringIntoViewRequester.bringIntoView()
                     }
                 } else {
+                    pinHandle?.unpin()
+                    pinHandle = null
                     scope.launch {
                         focusedInteraction.value?.let { oldValue ->
                             val interaction = FocusInteraction.Unfocus(oldValue)
@@ -225,41 +224,3 @@ internal fun Modifier.focusableInNonTouchMode(
 private val focusGroupInspectorInfo = InspectableModifier(
     debugInspectorInfo { name = "focusGroup" }
 )
-
-// TODO(b/195049010: This is a temporary API while we wait for the actual Pinning API. Move this
-//  function to PinnableParent.kt After we have a permanent API.
-/**
- * Convenience function to access the [Pinnable Parent ModifierLocal][ModifierLocalPinnableParent].
- */
-@Stable
-@ExperimentalFoundationApi
-private fun Modifier.onPinnableParentAvailable(
-    onPinnableParentAvailable: (PinnableParent?) -> Unit
-): Modifier = inspectable(
-    inspectorInfo = debugInspectorInfo {
-        name = "onPinnableParentAvailable"
-        properties["onPinnableParentAvailable"] = onPinnableParentAvailable
-    }
-) {
-    then(PinnableParentConsumer(onPinnableParentAvailable))
-}
-
-// TODO(b/195049010: This is a temporary API while we wait for the actual Pinning API. Move this
-//  function to PinnableParent.kt After we have a permanent API.
-@Stable
-@ExperimentalFoundationApi
-private class PinnableParentConsumer(
-    val onPinnableParentAvailable: (PinnableParent?) -> Unit
-) : ModifierLocalConsumer {
-
-    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
-        with(scope) { onPinnableParentAvailable.invoke(ModifierLocalPinnableParent.current) }
-    }
-
-    override fun equals(other: Any?): Boolean {
-        return other is PinnableParentConsumer &&
-            other.onPinnableParentAvailable == onPinnableParentAvailable
-    }
-
-    override fun hashCode() = onPinnableParentAvailable.hashCode()
-}

@@ -94,7 +94,9 @@ fun Paragraph.bitmap(
 @OptIn(ExperimentalTextApi::class)
 fun MultiParagraph.bitmap(
     brush: Brush? = null,
-    alpha: Float = Float.NaN
+    alpha: Float = Float.NaN,
+    textDecoration: TextDecoration? = null,
+    drawStyle: DrawStyle? = null
 ): Bitmap {
     val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
     val bitmap = Bitmap.createBitmap(
@@ -104,13 +106,17 @@ fun MultiParagraph.bitmap(
     )
     if (brush != null) {
         this.paint(
-            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
-            brush = brush,
-            alpha = alpha
+            androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
+            brush,
+            alpha,
+            decoration = textDecoration,
+            drawStyle = drawStyle
         )
     } else {
         this.paint(
-            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap))
+            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
+            decoration = textDecoration,
+            drawStyle = drawStyle
         )
     }
     return bitmap

@@ -233,7 +233,7 @@ fun WindowInsets.only(sides: WindowInsetsSides): WindowInsets = LimitInsets(this
  * Convert a [WindowInsets] to a [PaddingValues] and uses [LocalDensity] for DP to pixel
  * conversion. [PaddingValues] can be passed to some containers to pad internal content so that
  * it doesn't overlap the insets when fully scrolled. Ensure that the insets are
- * [consumed][consumedWindowInsets] after the padding is applied if insets are to be used further
+ * [consumed][consumeWindowInsets] after the padding is applied if insets are to be used further
  * down the hierarchy.
  *
  * @sample androidx.compose.foundation.layout.samples.paddingValuesSample
@@ -246,7 +246,7 @@ fun WindowInsets.asPaddingValues(): PaddingValues = InsetsPaddingValues(this, Lo
  * Convert a [WindowInsets] to a [PaddingValues] and uses [density] for DP to pixel conversion.
  * [PaddingValues] can be passed to some containers to pad internal content so that it doesn't
  * overlap the insets when fully scrolled. Ensure that the insets are
- * [consumed][consumedWindowInsets] after the padding is applied if insets are to be used further
+ * [consumed][consumeWindowInsets] after the padding is applied if insets are to be used further
  * down the hierarchy.
  *
  * @sample androidx.compose.foundation.layout.samples.paddingValuesSample

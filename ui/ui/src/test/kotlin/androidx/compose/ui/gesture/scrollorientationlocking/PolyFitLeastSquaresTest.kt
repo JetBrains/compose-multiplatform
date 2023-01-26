@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.gesture.scrollorientationlocking
 
-import androidx.compose.ui.input.pointer.util.PolynomialFit
 import androidx.compose.ui.input.pointer.util.polyFitLeastSquares
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
@@ -33,7 +32,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(1f, 0f), 1f))
+        assertIsCloseToEquals(actual, listOf(1f, 0f))
     }
 
     @Test
@@ -43,7 +42,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 1f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 1f))
     }
 
     @Test
@@ -53,7 +52,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 1000000f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 1000000f))
     }
 
     @Test
@@ -63,7 +62,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, -5f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, -5f))
     }
 
     @Test
@@ -73,7 +72,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(4.33333f, -.33333f), 1f))
+        assertIsCloseToEquals(actual, listOf(4.33333f, -.33333f))
     }
 
     @Test
@@ -83,7 +82,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(.181818f, -.545454f), 1f))
+        assertIsCloseToEquals(actual, listOf(.181818f, -.545454f))
     }
 
     @Test
@@ -93,7 +92,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(-3.6f, -.6f), 1f))
+        assertIsCloseToEquals(actual, listOf(-3.6f, -.6f))
     }
 
     @Test
@@ -103,7 +102,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(1f, .5f), .19999f))
+        assertIsCloseToEquals(actual, listOf(1f, .5f))
     }
 
     @Test
@@ -113,7 +112,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 2)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 1f, 0f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 1f, 0f))
     }
 
     @Test
@@ -123,7 +122,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 2)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 2f, -1f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 2f, -1f))
     }
 
     @Test
@@ -133,7 +132,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 2)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 0f, 1f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 0f, 1f))
     }
 
     @Test
@@ -143,7 +142,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 2)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, -3f, 1.5f), .8181818f))
+        assertIsCloseToEquals(actual, listOf(0f, -3f, 1.5f))
     }
 
     @Test
@@ -153,7 +152,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 3)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 1f, 0f, 0f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 1f, 0f, 0f))
     }
 
     @Test
@@ -163,7 +162,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 3)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, .66666f, 1f, -.66666f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, .66666f, 1f, -.66666f))
     }
 
     @Test
@@ -173,10 +172,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 3)
 
-        assertIsCloseToEquals(
-            actual,
-            PolynomialFit(listOf(.5f, -.083333f, .25f, -.16666f), .33333f)
-        )
+        assertIsCloseToEquals(actual, listOf(.5f, -.083333f, .25f, -.16666f))
     }
 
     @Test
@@ -186,7 +182,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(13f, 0f), 1f))
+        assertIsCloseToEquals(actual, listOf(13f, 0f))
     }
 
     @Test
@@ -196,7 +192,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 2)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 1f, 0f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 1f, 0f))
     }
 
     @Test
@@ -206,7 +202,7 @@ class PolyFitLeastSquaresTest {
 
         val actual = polyFitLeastSquares(x, y, 1)
 
-        assertIsCloseToEquals(actual, PolynomialFit(listOf(0f, 1f), 1f))
+        assertIsCloseToEquals(actual, listOf(0f, 1f))
     }
 
     @Test
@@ -290,18 +286,12 @@ class PolyFitLeastSquaresTest {
     }
 
     private fun assertIsCloseToEquals(
-        actual: PolynomialFit?,
-        expected: PolynomialFit?
+        actual: List<Float>,
+        expected: List<Float>
     ) {
-        if (expected == null) {
-            assertThat(actual).isNull()
-            return
+        assertThat(expected.size).isEqualTo(expected.size)
+        expected.forEachIndexed() { index, value ->
+            assertThat(actual[index]).isWithin(.00001f).of(value)
         }
-
-        assertThat(actual!!.coefficients.size).isEqualTo(expected.coefficients.size)
-        expected.coefficients.forEachIndexed() { index, value ->
-            assertThat(actual.coefficients[index]).isWithin(.00001f).of(value)
-        }
-        assertThat(actual.confidence).isWithin(.00001f).of(expected.confidence)
     }
 }

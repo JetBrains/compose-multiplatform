@@ -20,6 +20,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.DelegatingLazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
+import androidx.compose.foundation.lazy.layout.LazyPinnableContainerProvider
 import androidx.compose.foundation.lazy.layout.rememberLazyNearestItemsRangeState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -56,7 +57,8 @@ internal fun rememberLazyGridItemProvider(
             LazyGridItemProviderImpl(
                 gridScope.intervals,
                 gridScope.hasCustomSpans,
-                nearestItemsRangeState.value
+                state,
+                nearestItemsRangeState.value,
             )
         }
 
@@ -80,12 +82,15 @@ internal fun rememberLazyGridItemProvider(
 private class LazyGridItemProviderImpl(
     private val intervals: IntervalList<LazyGridIntervalContent>,
     override val hasCustomSpans: Boolean,
+    state: LazyGridState,
     nearestItemsRange: IntRange
 ) : LazyGridItemProvider, LazyLayoutItemProvider by LazyLayoutItemProvider(
     intervals = intervals,
     nearestItemsRange = nearestItemsRange,
     itemContent = { interval, index ->
-        interval.item.invoke(LazyGridItemScopeImpl, index)
+        LazyPinnableContainerProvider(state.pinnedItems, index) {
+            interval.value.item.invoke(LazyGridItemScopeImpl, index - interval.startIndex)
+        }
     }
 ) {
     override val spanLayoutProvider: LazyGridSpanLayoutProvider =

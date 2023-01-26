@@ -19,7 +19,9 @@ package androidx.compose.material
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,9 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.boundsInRoot
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -38,6 +42,9 @@ import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipe
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -132,6 +139,123 @@ class ExposedDropdownMenuTest {
         rule.onNodeWithTag(TrailingIconTag, useUnmergedTree = true).performClick()
 
         rule.onNodeWithTag(TFTag).assertIsFocused()
+        rule.onNodeWithTag(MenuItemTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun expandedBehaviour_doesNotExpandIfTouchEndsOutsideBounds() {
+        var textFieldBounds = Rect.Zero
+        rule.setMaterialContent {
+            var expanded by remember { mutableStateOf(false) }
+            ExposedDropdownMenuForTest(
+                expanded = expanded,
+                onExpandChange = { expanded = it },
+                onTextFieldBoundsChanged = {
+                    textFieldBounds = it
+                }
+            )
+        }
+
+        rule.onNodeWithTag(TFTag).assertIsDisplayed()
+        rule.onNodeWithTag(EDMTag).assertDoesNotExist()
+
+        // A swipe that ends outside the bounds of the anchor should not expand the menu.
+        rule.onNodeWithTag(TFTag).performTouchInput {
+            swipe(
+                start = this.center,
+                end = Offset(this.centerX, this.centerY + (textFieldBounds.height / 2) + 1),
+                durationMillis = 100
+            )
+        }
+        rule.onNodeWithTag(MenuItemTag).assertDoesNotExist()
+
+        // A swipe that ends within the bounds of the anchor should expand the menu.
+        rule.onNodeWithTag(TFTag).performTouchInput {
+            swipe(
+                start = this.center,
+                end = Offset(this.centerX, this.centerY + (textFieldBounds.height / 2) - 1),
+                durationMillis = 100
+            )
+        }
+        rule.onNodeWithTag(MenuItemTag).assertIsDisplayed()
+    }
+
+    @Test
+    fun expandedBehaviour_doesNotExpandIfTouchIsPartOfScroll() {
+        val testIndex = 2
+        var textFieldSize = IntSize.Zero
+        rule.setMaterialContent() {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                items(50) { index ->
+                    var expanded by remember { mutableStateOf(false) }
+                    var selectedOptionText by remember { mutableStateOf("") }
+
+                    ExposedDropdownMenuBox(
+                        expanded = expanded,
+                        onExpandedChange = { expanded = it },
+                        modifier = Modifier.padding(8.dp),
+                    ) {
+                        TextField(
+                            modifier = Modifier.then(
+                                if (index == testIndex) Modifier.testTag(TFTag).onSizeChanged {
+                                    textFieldSize = it
+                                } else { Modifier }
+                            ),
+                            value = selectedOptionText,
+                            onValueChange = { selectedOptionText = it },
+                            label = { Text("Label") },
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
+                            colors = ExposedDropdownMenuDefaults.textFieldColors()
+                        )
+                        ExposedDropdownMenu(
+                            modifier = if (index == testIndex) {
+                                Modifier.testTag(EDMTag)
+                            } else { Modifier },
+                            expanded = expanded,
+                            onDismissRequest = { expanded = false }
+                        ) {
+                            DropdownMenuItem(
+                                onClick = {
+                                    selectedOptionText = OptionName
+                                    expanded = false
+                                },
+                                modifier = if (index == testIndex) {
+                                    Modifier.testTag(MenuItemTag)
+                                } else { Modifier }
+                            ) {
+                                Text(OptionName)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(TFTag).assertIsDisplayed()
+        rule.onNodeWithTag(EDMTag).assertDoesNotExist()
+
+        // A swipe that causes a scroll should not expand the menu, even if it remains within the
+        // bounds of the anchor.
+        rule.onNodeWithTag(TFTag).performTouchInput {
+            swipe(
+                start = this.center,
+                end = Offset(this.centerX, this.centerY - (textFieldSize.height / 2) + 1),
+                durationMillis = 100
+            )
+        }
+        rule.onNodeWithTag(MenuItemTag).assertDoesNotExist()
+
+        // But a swipe that does not cause a scroll should expand the menu.
+        rule.onNodeWithTag(TFTag).performTouchInput {
+            swipe(
+                start = this.center,
+                end = Offset(this.centerX + (textFieldSize.width / 2) - 1, this.centerY),
+                durationMillis = 100
+            )
+        }
         rule.onNodeWithTag(MenuItemTag).assertIsDisplayed()
     }
 

@@ -25,7 +25,7 @@ import androidx.compose.foundation.EdgeEffectCompat.onAbsorbCompat
 import androidx.compose.foundation.EdgeEffectCompat.onPullDistanceCompat
 import androidx.compose.foundation.EdgeEffectCompat.onReleaseWithOppositeDelta
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.neverEqualPolicy
@@ -63,12 +63,10 @@ import kotlin.math.roundToInt
 internal actual fun rememberOverscrollEffect(): OverscrollEffect {
     val context = LocalContext.current
     val config = LocalOverscrollConfiguration.current
-    return remember(context, config) {
-        if (config != null) {
-            AndroidEdgeEffectOverscrollEffect(context, config)
-        } else {
-            NoOpOverscrollEffect
-        }
+    return if (config != null) {
+        remember(context, config) { AndroidEdgeEffectOverscrollEffect(context, config) }
+    } else {
+        NoOpOverscrollEffect
     }
 }
 
@@ -132,41 +130,44 @@ internal class AndroidEdgeEffectOverscrollEffect(
 
     private var scrollCycleInProgress: Boolean = false
 
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
+    override fun applyToScroll(
+        delta: Offset,
+        source: NestedScrollSource,
+        performScroll: (Offset) -> Offset
     ): Offset {
+        // Early return
         if (containerSize.isEmpty()) {
-            return Offset.Zero
+            return performScroll(delta)
         }
+
         if (!scrollCycleInProgress) {
             stopOverscrollAnimation()
             scrollCycleInProgress = true
         }
         val pointer = pointerPosition ?: containerSize.center
         val consumedPixelsY = when {
-            scrollDelta.y == 0f -> 0f
+            delta.y == 0f -> 0f
             topEffect.distanceCompat != 0f -> {
-                pullTop(scrollDelta, pointer).also {
+                pullTop(delta, pointer).also {
                     if (topEffect.distanceCompat == 0f) topEffect.onRelease()
                 }
             }
             bottomEffect.distanceCompat != 0f -> {
-                pullBottom(scrollDelta, pointer).also {
+                pullBottom(delta, pointer).also {
                     if (bottomEffect.distanceCompat == 0f) bottomEffect.onRelease()
                 }
             }
             else -> 0f
         }
         val consumedPixelsX = when {
-            scrollDelta.x == 0f -> 0f
+            delta.x == 0f -> 0f
             leftEffect.distanceCompat != 0f -> {
-                pullLeft(scrollDelta, pointer).also {
+                pullLeft(delta, pointer).also {
                     if (leftEffect.distanceCompat == 0f) leftEffect.onRelease()
                 }
             }
             rightEffect.distanceCompat != 0f -> {
-                pullRight(scrollDelta, pointer).also {
+                pullRight(delta, pointer).also {
                     if (rightEffect.distanceCompat == 0f) rightEffect.onRelease()
                 }
             }
@@ -174,39 +175,39 @@ internal class AndroidEdgeEffectOverscrollEffect(
         }
         val consumedOffset = Offset(consumedPixelsX, consumedPixelsY)
         if (consumedOffset != Offset.Zero) invalidateOverscroll()
-        return consumedOffset
-    }
 
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {
-        if (containerSize.isEmpty()) {
-            return
-        }
+        val leftForDelta = delta - consumedOffset
+        val consumedByDelta = performScroll(leftForDelta)
+        val leftForOverscroll = leftForDelta - consumedByDelta
+
         var needsInvalidation = false
         if (source == NestedScrollSource.Drag) {
-            val pointer = pointerPosition ?: containerSize.center
-            if (overscrollDelta.x > 0) {
-                pullLeft(overscrollDelta, pointer)
-            } else if (overscrollDelta.x < 0) {
-                pullRight(overscrollDelta, pointer)
+            if (leftForOverscroll.x > 0) {
+                pullLeft(leftForOverscroll, pointer)
+            } else if (leftForOverscroll.x < 0) {
+                pullRight(leftForOverscroll, pointer)
             }
-            if (overscrollDelta.y > 0) {
-                pullTop(overscrollDelta, pointer)
-            } else if (overscrollDelta.y < 0) {
-                pullBottom(overscrollDelta, pointer)
+            if (leftForOverscroll.y > 0) {
+                pullTop(leftForOverscroll, pointer)
+            } else if (leftForOverscroll.y < 0) {
+                pullBottom(leftForOverscroll, pointer)
             }
-            needsInvalidation = overscrollDelta != Offset.Zero || needsInvalidation
+            needsInvalidation = leftForOverscroll != Offset.Zero
         }
-        needsInvalidation = releaseOppositeOverscroll(initialDragDelta) || needsInvalidation
+        needsInvalidation = releaseOppositeOverscroll(delta) || needsInvalidation
         if (needsInvalidation) invalidateOverscroll()
+
+        return consumedOffset + consumedByDelta
     }
 
-    override suspend fun consumePreFling(velocity: Velocity): Velocity {
+    override suspend fun applyToFling(
+        velocity: Velocity,
+        performFling: suspend (Velocity) -> Velocity
+    ) {
+        // Early return
         if (containerSize.isEmpty()) {
-            return Velocity.Zero
+            performFling(velocity)
+            return
         }
         val consumedX = if (velocity.x > 0f && leftEffect.distanceCompat != 0f) {
             leftEffect.onAbsorbCompat(velocity.x.roundToInt())
@@ -228,44 +229,27 @@ internal class AndroidEdgeEffectOverscrollEffect(
         }
         val consumed = Velocity(consumedX, consumedY)
         if (consumed != Velocity.Zero) invalidateOverscroll()
-        return consumed
-    }
 
-    override suspend fun consumePostFling(velocity: Velocity) {
-        if (containerSize.isEmpty()) {
-            return
-        }
+        val remainingVelocity = velocity - consumed
+        val consumedByVelocity = performFling(remainingVelocity)
+        val leftForOverscroll = remainingVelocity - consumedByVelocity
+
         scrollCycleInProgress = false
-        if (velocity.x > 0) {
-            leftEffect.onAbsorbCompat(velocity.x.roundToInt())
-        } else if (velocity.x < 0) {
-            rightEffect.onAbsorbCompat(-velocity.x.roundToInt())
+        if (leftForOverscroll.x > 0) {
+            leftEffect.onAbsorbCompat(leftForOverscroll.x.roundToInt())
+        } else if (leftForOverscroll.x < 0) {
+            rightEffect.onAbsorbCompat(-leftForOverscroll.x.roundToInt())
         }
-        if (velocity.y > 0) {
-            topEffect.onAbsorbCompat(velocity.y.roundToInt())
-        } else if (velocity.y < 0) {
-            bottomEffect.onAbsorbCompat(-velocity.y.roundToInt())
+        if (leftForOverscroll.y > 0) {
+            topEffect.onAbsorbCompat(leftForOverscroll.y.roundToInt())
+        } else if (leftForOverscroll.y < 0) {
+            bottomEffect.onAbsorbCompat(-leftForOverscroll.y.roundToInt())
         }
-        if (velocity != Velocity.Zero) invalidateOverscroll()
+        if (leftForOverscroll != Velocity.Zero) invalidateOverscroll()
         animateToRelease()
     }
 
     private var containerSize = Size.Zero
-
-    private val isEnabledState = mutableStateOf(false)
-    override var isEnabled: Boolean = false
-        get() = isEnabledState.value
-        set(value) {
-            // Use field instead of isEnabledState to avoid a state read
-            val enabledChanged = field != value
-            isEnabledState.value = value
-            field = value
-
-            if (enabledChanged) {
-                scrollCycleInProgress = false
-                animateToRelease()
-            }
-        }
 
     override val isInProgress: Boolean
         get() {
@@ -319,27 +303,25 @@ internal class AndroidEdgeEffectOverscrollEffect(
     override val effectModifier: Modifier = Modifier
         .then(StretchOverscrollNonClippingLayer)
         .pointerInput(Unit) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    val down = awaitFirstDown(requireUnconsumed = false)
-                    pointerId = down.id
-                    pointerPosition = down.position
-                    do {
-                        val pressedChanges = awaitPointerEvent().changes.fastFilter { it.pressed }
-                        // If the same ID we are already tracking is down, use that. Otherwise, use
-                        // the next down, to move the overscroll to the next pointer.
-                        val change = pressedChanges
-                            .fastFirstOrNull { it.id == pointerId } ?: pressedChanges.firstOrNull()
-                        if (change != null) {
-                            // Update the id if we are now tracking a new down
-                            pointerId = change.id
-                            pointerPosition = change.position
-                        }
-                    } while (pressedChanges.isNotEmpty())
-                    pointerId = null
-                    // Explicitly not resetting the pointer position until the next down, so we
-                    // don't change any existing effects
-                }
+            awaitEachGesture {
+                val down = awaitFirstDown(requireUnconsumed = false)
+                pointerId = down.id
+                pointerPosition = down.position
+                do {
+                    val pressedChanges = awaitPointerEvent().changes.fastFilter { it.pressed }
+                    // If the same ID we are already tracking is down, use that. Otherwise, use
+                    // the next down, to move the overscroll to the next pointer.
+                    val change = pressedChanges
+                        .fastFirstOrNull { it.id == pointerId } ?: pressedChanges.firstOrNull()
+                    if (change != null) {
+                        // Update the id if we are now tracking a new down
+                        pointerId = change.id
+                        pointerPosition = change.position
+                    }
+                } while (pressedChanges.isNotEmpty())
+                pointerId = null
+                // Explicitly not resetting the pointer position until the next down, so we
+                // don't change any existing effects
             }
         }
         .onSizeChanged(onNewSize)
@@ -504,34 +486,6 @@ internal class AndroidEdgeEffectOverscrollEffect(
         val pullX = scroll.x / containerSize.width
         return -rightEffect.onPullDistanceCompat(-pullX, displacementY) * containerSize.width
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private val NoOpOverscrollEffect = object : OverscrollEffect {
-
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset = Offset.Zero
-
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {
-    }
-
-    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
-
-    override suspend fun consumePostFling(velocity: Velocity) {}
-
-    override var isEnabled: Boolean = false
-
-    override val isInProgress: Boolean
-        get() = false
-
-    override val effectModifier: Modifier
-        get() = Modifier
 }
 
 /**

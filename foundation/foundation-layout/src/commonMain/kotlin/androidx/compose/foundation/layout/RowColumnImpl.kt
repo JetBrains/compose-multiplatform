@@ -41,7 +41,6 @@ import androidx.compose.ui.util.fastForEach
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-import kotlin.math.sign
 
 internal fun rowColumnMeasurePolicy(
     orientation: LayoutOrientation,
@@ -50,215 +49,44 @@ internal fun rowColumnMeasurePolicy(
     crossAxisSize: SizeMode,
     crossAxisAlignment: CrossAxisAlignment
 ): MeasurePolicy {
-    fun Placeable.mainAxisSize() =
-        if (orientation == LayoutOrientation.Horizontal) width else height
-
-    fun Placeable.crossAxisSize() =
-        if (orientation == LayoutOrientation.Horizontal) height else width
-
     return object : MeasurePolicy {
         override fun MeasureScope.measure(
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {
-            @Suppress("NAME_SHADOWING")
-            val constraints = OrientationIndependentConstraints(constraints, orientation)
-            val arrangementSpacingPx = arrangementSpacing.roundToPx()
-
-            var totalWeight = 0f
-            var fixedSpace = 0
-            var crossAxisSpace = 0
-            var weightChildrenCount = 0
-
-            var anyAlignBy = false
-            val placeables = arrayOfNulls<Placeable>(measurables.size)
-            val rowColumnParentData = Array(measurables.size) { measurables[it].data }
-
-            // First measure children with zero weight.
-            var spaceAfterLastNoWeight = 0
-            for (i in measurables.indices) {
-                val child = measurables[i]
-                val parentData = rowColumnParentData[i]
-                val weight = parentData.weight
-
-                if (weight > 0f) {
-                    totalWeight += weight
-                    ++weightChildrenCount
-                } else {
-                    val mainAxisMax = constraints.mainAxisMax
-                    val placeable = child.measure(
-                        // Ask for preferred main axis size.
-                        constraints.copy(
-                            mainAxisMin = 0,
-                            mainAxisMax = if (mainAxisMax == Constraints.Infinity) {
-                                Constraints.Infinity
-                            } else {
-                                mainAxisMax - fixedSpace
-                            },
-                            crossAxisMin = 0
-                        ).toBoxConstraints(orientation)
-                    )
-                    spaceAfterLastNoWeight = min(
-                        arrangementSpacingPx,
-                        mainAxisMax - fixedSpace - placeable.mainAxisSize()
-                    )
-                    fixedSpace += placeable.mainAxisSize() + spaceAfterLastNoWeight
-                    crossAxisSpace = max(crossAxisSpace, placeable.crossAxisSize())
-                    anyAlignBy = anyAlignBy || parentData.isRelative
-                    placeables[i] = placeable
-                }
-            }
-
-            var weightedSpace = 0
-            if (weightChildrenCount == 0) {
-                // fixedSpace contains an extra spacing after the last non-weight child.
-                fixedSpace -= spaceAfterLastNoWeight
-            } else {
-                // Measure the rest according to their weights in the remaining main axis space.
-                val targetSpace =
-                    if (totalWeight > 0f && constraints.mainAxisMax != Constraints.Infinity) {
-                        constraints.mainAxisMax
-                    } else {
-                        constraints.mainAxisMin
-                    }
-                val remainingToTarget =
-                    targetSpace - fixedSpace - arrangementSpacingPx * (weightChildrenCount - 1)
-
-                val weightUnitSpace = if (totalWeight > 0) remainingToTarget / totalWeight else 0f
-                var remainder = remainingToTarget - rowColumnParentData.sumOf {
-                    (weightUnitSpace * it.weight).roundToInt()
-                }
-
-                for (i in measurables.indices) {
-                    if (placeables[i] == null) {
-                        val child = measurables[i]
-                        val parentData = rowColumnParentData[i]
-                        val weight = parentData.weight
-                        check(weight > 0) { "All weights <= 0 should have placeables" }
-                        // After the weightUnitSpace rounding, the total space going to be occupied
-                        // can be smaller or larger than remainingToTarget. Here we distribute the
-                        // loss or gain remainder evenly to the first children.
-                        val remainderUnit = remainder.sign
-                        remainder -= remainderUnit
-                        val childMainAxisSize = max(
-                            0,
-                            (weightUnitSpace * weight).roundToInt() + remainderUnit
-                        )
-                        val placeable = child.measure(
-                            OrientationIndependentConstraints(
-                                if (parentData.fill && childMainAxisSize != Constraints.Infinity) {
-                                    childMainAxisSize
-                                } else {
-                                    0
-                                },
-                                childMainAxisSize,
-                                0,
-                                constraints.crossAxisMax
-                            ).toBoxConstraints(orientation)
-                        )
-                        weightedSpace += placeable.mainAxisSize()
-                        crossAxisSpace = max(crossAxisSpace, placeable.crossAxisSize())
-                        anyAlignBy = anyAlignBy || parentData.isRelative
-                        placeables[i] = placeable
-                    }
-                }
-                weightedSpace = (weightedSpace + arrangementSpacingPx * (weightChildrenCount - 1))
-                    .coerceAtMost(constraints.mainAxisMax - fixedSpace)
-            }
-
-            var beforeCrossAxisAlignmentLine = 0
-            var afterCrossAxisAlignmentLine = 0
-            if (anyAlignBy) {
-                for (i in placeables.indices) {
-                    val placeable = placeables[i]!!
-                    val parentData = rowColumnParentData[i]
-                    val alignmentLinePosition = parentData.crossAxisAlignment
-                        ?.calculateAlignmentLinePosition(placeable)
-                    if (alignmentLinePosition != null) {
-                        beforeCrossAxisAlignmentLine = max(
-                            beforeCrossAxisAlignmentLine,
-                            alignmentLinePosition.let {
-                                if (it != AlignmentLine.Unspecified) it else 0
-                            }
-                        )
-                        afterCrossAxisAlignmentLine = max(
-                            afterCrossAxisAlignmentLine,
-                            placeable.crossAxisSize() -
-                                (
-                                    alignmentLinePosition.let {
-                                        if (it != AlignmentLine.Unspecified) {
-                                            it
-                                        } else {
-                                            placeable.crossAxisSize()
-                                        }
-                                    }
-                                    )
-                        )
-                    }
-                }
-            }
-
-            // Compute the Row or Column size and position the children.
-            val mainAxisLayoutSize = max(fixedSpace + weightedSpace, constraints.mainAxisMin)
-            val crossAxisLayoutSize = if (constraints.crossAxisMax != Constraints.Infinity &&
-                crossAxisSize == SizeMode.Expand
-            ) {
-                constraints.crossAxisMax
-            } else {
-                max(
-                    crossAxisSpace,
-                    max(
-                        constraints.crossAxisMin,
-                        beforeCrossAxisAlignmentLine + afterCrossAxisAlignmentLine
-                    )
+            val placeables = arrayOfNulls<Placeable?>(measurables.size)
+            val rowColumnMeasureHelper =
+                RowColumnMeasurementHelper(
+                    orientation,
+                    arrangement,
+                    arrangementSpacing,
+                    crossAxisSize,
+                    crossAxisAlignment,
+                    measurables,
+                    placeables
                 )
-            }
-            val layoutWidth = if (orientation == Horizontal) {
-                mainAxisLayoutSize
-            } else {
-                crossAxisLayoutSize
-            }
-            val layoutHeight = if (orientation == Horizontal) {
-                crossAxisLayoutSize
-            } else {
-                mainAxisLayoutSize
-            }
 
-            val mainAxisPositions = IntArray(measurables.size) { 0 }
+            val measureResult = rowColumnMeasureHelper
+                .measureWithoutPlacing(this,
+                    constraints, 0, measurables.size
+                )
+
+            val layoutWidth: Int
+            val layoutHeight: Int
+            if (orientation == LayoutOrientation.Horizontal) {
+                layoutWidth = measureResult.mainAxisSize
+                layoutHeight = measureResult.crossAxisSize
+            } else {
+                layoutWidth = measureResult.crossAxisSize
+                layoutHeight = measureResult.mainAxisSize
+            }
             return layout(layoutWidth, layoutHeight) {
-                val childrenMainAxisSize = IntArray(measurables.size) { index ->
-                    placeables[index]!!.mainAxisSize()
-                }
-                arrangement(
-                    mainAxisLayoutSize,
-                    childrenMainAxisSize,
-                    layoutDirection,
-                    this@measure,
-                    mainAxisPositions
+                rowColumnMeasureHelper.placeHelper(
+                    this,
+                    measureResult,
+                    0,
+                    layoutDirection
                 )
-
-                placeables.forEachIndexed { index, placeable ->
-                    placeable!!
-                    val parentData = rowColumnParentData[index]
-                    val childCrossAlignment = parentData.crossAxisAlignment ?: crossAxisAlignment
-
-                    val crossAxis = childCrossAlignment.align(
-                        size = crossAxisLayoutSize - placeable.crossAxisSize(),
-                        layoutDirection = if (orientation == Horizontal) {
-                            LayoutDirection.Ltr
-                        } else {
-                            layoutDirection
-                        },
-                        placeable = placeable,
-                        beforeCrossAxisAlignmentLine = beforeCrossAxisAlignmentLine
-                    )
-
-                    if (orientation == Horizontal) {
-                        placeable.place(mainAxisPositions[index], crossAxis)
-                    } else {
-                        placeable.place(crossAxis, mainAxisPositions[index])
-                    }
-                }
             }
         }
 
@@ -349,12 +177,14 @@ internal sealed class CrossAxisAlignment {
          */
         @Stable
         val Center: CrossAxisAlignment = CenterCrossAxisAlignment
+
         /**
          * Place children such that their start edge is aligned to the start edge of the cross
          * axis. TODO(popam): Consider rtl directionality.
          */
         @Stable
         val Start: CrossAxisAlignment = StartCrossAxisAlignment
+
         /**
          * Place children such that their end edge is aligned to the end edge of the cross
          * axis. TODO(popam): Consider rtl directionality.
@@ -528,19 +358,19 @@ internal data class OrientationIndependentConstraints(
         }
 }
 
-private val IntrinsicMeasurable.data: RowColumnParentData?
+internal val IntrinsicMeasurable.rowColumnParentData: RowColumnParentData?
     get() = parentData as? RowColumnParentData
 
-private val RowColumnParentData?.weight: Float
+internal val RowColumnParentData?.weight: Float
     get() = this?.weight ?: 0f
 
-private val RowColumnParentData?.fill: Boolean
+internal val RowColumnParentData?.fill: Boolean
     get() = this?.fill ?: true
 
-private val RowColumnParentData?.crossAxisAlignment: CrossAxisAlignment?
+internal val RowColumnParentData?.crossAxisAlignment: CrossAxisAlignment?
     get() = this?.crossAxisAlignment
 
-private val RowColumnParentData?.isRelative: Boolean
+internal val RowColumnParentData?.isRelative: Boolean
     get() = this.crossAxisAlignment?.isRelative ?: false
 
 private fun MinIntrinsicWidthMeasureBlock(orientation: LayoutOrientation) =
@@ -700,7 +530,7 @@ private fun intrinsicMainAxisSize(
     var fixedSpace = 0
     var totalWeight = 0f
     children.fastForEach { child ->
-        val weight = child.data.weight
+        val weight = child.rowColumnParentData.weight
         val size = child.mainAxisSize(crossAxisAvailable)
         if (weight == 0f) {
             fixedSpace += size
@@ -724,7 +554,7 @@ private fun intrinsicCrossAxisSize(
     var crossAxisMax = 0
     var totalWeight = 0f
     children.fastForEach { child ->
-        val weight = child.data.weight
+        val weight = child.rowColumnParentData.weight
         if (weight == 0f) {
             // Ask the child how much main axis space it wants to occupy. This cannot be more
             // than the remaining available space.
@@ -750,7 +580,7 @@ private fun intrinsicCrossAxisSize(
     }
 
     children.fastForEach { child ->
-        val weight = child.data.weight
+        val weight = child.rowColumnParentData.weight
         // Now the main axis for weighted children is known, so ask about the cross axis space.
         if (weight > 0f) {
             crossAxisMax = max(
@@ -877,6 +707,7 @@ internal class VerticalAlignModifier(
             it.crossAxisAlignment = CrossAxisAlignment.vertical(vertical)
         }
     }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         val otherModifier = other as? VerticalAlignModifier ?: return false
@@ -928,6 +759,7 @@ internal enum class SizeMode {
      * subject to the incoming layout constraints.
      */
     Wrap,
+
     /**
      * Maximize the amount of free space by expanding to fill the available space,
      * subject to the incoming layout constraints.

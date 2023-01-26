@@ -83,10 +83,38 @@ class LazyStaggeredGridScrollingBenchmark(
     }
 
     @Test
+    fun scrollProgrammatically_newItemComposed_up() {
+        benchmarkRule.toggleStateBenchmark {
+            StaggeredGridRemeasureTestCase(
+                firstItemIndex = 100,
+                scrollUp = true,
+                addNewItemOnToggle = true,
+                content = testCase.content,
+                isVertical = testCase.isVertical,
+                usePointerInput = false
+            )
+        }
+    }
+
+    @Test
     fun scrollViaPointerInput_noNewItems() {
         benchmarkRule.toggleStateBenchmark {
             StaggeredGridRemeasureTestCase(
                 addNewItemOnToggle = false,
+                content = testCase.content,
+                isVertical = testCase.isVertical,
+                usePointerInput = true
+            )
+        }
+    }
+
+    @Test
+    fun scrollViaPointerInput_newItemComposed_up() {
+        benchmarkRule.toggleStateBenchmark {
+            StaggeredGridRemeasureTestCase(
+                firstItemIndex = 100,
+                scrollUp = true,
+                addNewItemOnToggle = true,
                 content = testCase.content,
                 isVertical = testCase.isVertical,
                 usePointerInput = true
@@ -203,6 +231,8 @@ private val Horizontal = LazyStaggeredGridScrollingTestCase(
 
 @OptIn(ExperimentalFoundationApi::class)
 class StaggeredGridRemeasureTestCase(
+    val firstItemIndex: Int = 0,
+    val scrollUp: Boolean = false,
     val addNewItemOnToggle: Boolean,
     val content: @Composable StaggeredGridRemeasureTestCase.(LazyStaggeredGridState) -> Unit,
     val isVertical: Boolean,
@@ -216,10 +246,16 @@ class StaggeredGridRemeasureTestCase(
     private lateinit var motionEventHelper: MotionEventHelper
     private var touchSlop: Float = 0f
     private var scrollBy: Int = 0
+    private var targetItemOffset = 0
 
     @Composable
     fun FirstLargeItem() {
         Box(Modifier.requiredSize(30.dp))
+    }
+
+    @Composable
+    fun RegularItem() {
+        Box(Modifier.requiredSize(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
     }
 
     @Composable
@@ -228,7 +264,13 @@ class StaggeredGridRemeasureTestCase(
             with(LocalDensity.current) { 15.dp.roundToPx() }
         } else {
             5
+        } * if (scrollUp) -1 else 1
+        targetItemOffset = if (scrollUp) {
+            with(LocalDensity.current) { 20.dp.roundToPx() + scrollBy }
+        } else {
+            scrollBy
         }
+
         view = LocalView.current
         if (!::motionEventHelper.isInitialized) motionEventHelper = MotionEventHelper(view)
         touchSlop = LocalViewConfiguration.current.touchSlop
@@ -236,21 +278,16 @@ class StaggeredGridRemeasureTestCase(
         content(state)
     }
 
-    @Composable
-    fun RegularItem() {
-        Box(Modifier.requiredSize(20.dp).background(Color.Red, RoundedCornerShape(8.dp)))
-    }
-
     override fun beforeToggle() {
         runBlocking {
-            state.scrollToItem(0, 0)
+            state.scrollToItem(firstItemIndex, 0)
         }
         if (usePointerInput) {
             val size = if (isVertical) view.measuredHeight else view.measuredWidth
             motionEventHelper.sendEvent(MotionEvent.ACTION_DOWN, (size / 2f).toSingleAxisOffset())
             motionEventHelper.sendEvent(MotionEvent.ACTION_MOVE, touchSlop.toSingleAxisOffset())
         }
-        assertEquals(0, state.firstVisibleItemIndex)
+        assertEquals(firstItemIndex, state.firstVisibleItemIndex)
         assertEquals(0, state.firstVisibleItemScrollOffset)
     }
 
@@ -266,8 +303,11 @@ class StaggeredGridRemeasureTestCase(
     }
 
     override fun afterToggle() {
-        assertEquals(0, state.firstVisibleItemIndex)
-        assertEquals(scrollBy, state.firstVisibleItemScrollOffset)
+        assertEquals(
+            if (scrollUp) firstItemIndex - 2 else firstItemIndex,
+            state.firstVisibleItemIndex
+        )
+        assertEquals(targetItemOffset, state.firstVisibleItemScrollOffset)
         if (usePointerInput) {
             motionEventHelper.sendEvent(MotionEvent.ACTION_UP, Offset.Zero)
         }

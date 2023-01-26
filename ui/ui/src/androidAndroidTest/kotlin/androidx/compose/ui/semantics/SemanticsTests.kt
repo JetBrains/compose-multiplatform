@@ -25,6 +25,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Stable
@@ -120,6 +122,21 @@ class SemanticsTests {
                 popup()
             }
         )
+    }
+
+    @Test
+    fun containerProperty() {
+        rule.setContent {
+            Surface(
+                Modifier.testTag(TestTag)
+            ) {
+                Text("Hello World", modifier = Modifier.padding(8.dp))
+            }
+        }
+
+        rule.onNodeWithTag(TestTag)
+            .assert(SemanticsMatcher.expectValue(
+                SemanticsProperties.IsContainer, true))
     }
 
     @Test

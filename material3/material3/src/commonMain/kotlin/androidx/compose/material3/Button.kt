@@ -31,20 +31,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ButtonDefaults.ContentPadding
-import androidx.compose.material3.ButtonDefaults.IconSize
-import androidx.compose.material3.ButtonDefaults.IconSpacing
-import androidx.compose.material3.ButtonDefaults.MinHeight
-import androidx.compose.material3.ButtonDefaults.MinWidth
-import androidx.compose.material3.ButtonDefaults.TextButtonContentPadding
-import androidx.compose.material3.ButtonDefaults.buttonColors
-import androidx.compose.material3.ButtonDefaults.buttonElevation
-import androidx.compose.material3.ButtonDefaults.elevatedButtonColors
-import androidx.compose.material3.ButtonDefaults.elevatedButtonElevation
-import androidx.compose.material3.ButtonDefaults.filledTonalButtonColors
-import androidx.compose.material3.ButtonDefaults.filledTonalButtonElevation
-import androidx.compose.material3.ButtonDefaults.outlinedButtonColors
-import androidx.compose.material3.ButtonDefaults.textButtonColors
 import androidx.compose.material3.tokens.ElevatedButtonTokens
 import androidx.compose.material3.tokens.FilledButtonTokens
 import androidx.compose.material3.tokens.FilledTonalButtonTokens
@@ -467,8 +453,10 @@ object ButtonDefaults {
      * The default content padding used by [Button], [ElevatedButton], [FilledTonalButton], and
      * [OutlinedButton] buttons.
      *
-     * - See [TextButtonContentPadding] for content padding used by [TextButton].
-     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains [Icon].
+     * - See [TextButtonContentPadding] or [TextButtonWithIconContentPadding] for content padding
+     *  used by [TextButton].
+     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains
+     * [Icon].
      */
     val ContentPadding =
         PaddingValues(
@@ -491,12 +479,27 @@ object ButtonDefaults {
 
     private val TextButtonHorizontalPadding = 12.dp
 
-    /** The default content padding used by [TextButton] */
+    /** The default content padding used by [TextButton].
+     *
+     * - See [TextButtonWithIconContentPadding] for content padding used by [TextButton] that
+     * contains [Icon].
+     */
     val TextButtonContentPadding =
         PaddingValues(
             start = TextButtonHorizontalPadding,
             top = ContentPadding.calculateTopPadding(),
             end = TextButtonHorizontalPadding,
+            bottom = ContentPadding.calculateBottomPadding()
+        )
+
+    private val TextButtonWithIconHorizontalEndPadding = 16.dp
+
+    /** The default content padding used by [TextButton] that contains an [Icon]. */
+    val TextButtonWithIconContentPadding =
+        PaddingValues(
+            start = TextButtonHorizontalPadding,
+            top = ContentPadding.calculateTopPadding(),
+            end = TextButtonWithIconHorizontalEndPadding,
             bottom = ContentPadding.calculateBottomPadding()
         )
 

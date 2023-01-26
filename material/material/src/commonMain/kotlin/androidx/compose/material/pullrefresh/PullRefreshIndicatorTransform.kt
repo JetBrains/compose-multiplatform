@@ -18,15 +18,12 @@ package androidx.compose.material.pullrefresh
 
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.inspectable
 
 /**
  * A modifier for translating the position and scaling the size of a pull-to-refresh indicator
@@ -42,17 +39,30 @@ import androidx.compose.ui.platform.debugInspectorInfo
 fun Modifier.pullRefreshIndicatorTransform(
     state: PullRefreshState,
     scale: Boolean = false,
-) = composed(inspectorInfo = debugInspectorInfo {
+) = inspectable(inspectorInfo = debugInspectorInfo {
     name = "pullRefreshIndicatorTransform"
     properties["state"] = state
     properties["scale"] = scale
 }) {
-    var height by remember { mutableStateOf(0) }
-
     Modifier
-        .onSizeChanged { height = it.height }
+        // Essentially we only want to clip the at the top, so the indicator will not appear when
+        // the position is 0. It is preferable to clip the indicator as opposed to the layout that
+        // contains the indicator, as this would also end up clipping shadows drawn by items in a
+        // list for example - so we leave the clipping to the scrolling container. We use MAX_VALUE
+        // for the other dimensions to allow for more room for elevation / arbitrary indicators - we
+        // only ever really want to clip at the top edge.
+        .drawWithContent {
+            clipRect(
+                top = 0f,
+                left = -Float.MAX_VALUE,
+                right = Float.MAX_VALUE,
+                bottom = Float.MAX_VALUE
+            ) {
+                this@drawWithContent.drawContent()
+            }
+        }
         .graphicsLayer {
-            translationY = state.position - height
+            translationY = state.position - size.height
 
             if (scale && !state.refreshing) {
                 val scaleFraction = LinearOutSlowInEasing

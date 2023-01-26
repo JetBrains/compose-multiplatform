@@ -16,16 +16,14 @@
 
 package androidx.compose.compiler.plugins.kotlin.lower
 
-import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
+import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.analysis.ComposeWritableSlices
 import androidx.compose.compiler.plugins.kotlin.analysis.knownStable
+import androidx.compose.compiler.plugins.kotlin.analysis.stabilityOf
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContextImpl
-import org.jetbrains.kotlin.backend.common.ir.addChild
-import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.backend.common.peek
 import org.jetbrains.kotlin.backend.common.pop
@@ -33,11 +31,8 @@ import org.jetbrains.kotlin.backend.common.push
 import org.jetbrains.kotlin.backend.jvm.codegen.anyTypeArgument
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
-import org.jetbrains.kotlin.descriptors.Modality
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.IrBuilderWithScope
 import org.jetbrains.kotlin.ir.builders.declarations.addConstructor
 import org.jetbrains.kotlin.ir.builders.declarations.addGetter
 import org.jetbrains.kotlin.ir.builders.declarations.addProperty
@@ -67,7 +62,6 @@ import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.declarations.copyAttributes
-import org.jetbrains.kotlin.ir.declarations.impl.IrFunctionImpl
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -77,17 +71,19 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionReference
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionExpressionImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrFunctionReferenceImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrInstanceInitializerCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSymbol
-import org.jetbrains.kotlin.ir.symbols.impl.IrSimpleFunctionSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
+import org.jetbrains.kotlin.ir.util.addChild
+import org.jetbrains.kotlin.ir.util.copyTo
+import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.isFunctionOrKFunction
 import org.jetbrains.kotlin.ir.util.isLocal
@@ -96,10 +92,8 @@ import org.jetbrains.kotlin.ir.util.primaryConstructor
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.platform.js.isJs
 import org.jetbrains.kotlin.platform.jvm.isJvm
-import org.jetbrains.kotlin.types.typeUtil.isUnit
 
 private class CaptureCollector {
     val captures = mutableSetOf<IrValueDeclaration>()
@@ -282,11 +276,6 @@ private class ClassContext(override val declaration: IrClass) : DeclarationConte
     }
 }
 
-const val COMPOSABLE_LAMBDA = "composableLambda"
-const val COMPOSABLE_LAMBDA_N = "composableLambdaN"
-const val COMPOSABLE_LAMBDA_INSTANCE = "composableLambdaInstance"
-const val COMPOSABLE_LAMBDA_N_INSTANCE = "composableLambdaNInstance"
-
 class ComposerLambdaMemoization(
     context: IrPluginContext,
     symbolRemapper: DeepCopySymbolRemapper,
@@ -392,9 +381,7 @@ class ComposerLambdaMemoization(
     }
 
     private fun irCurrentComposer(): IrExpression {
-        val currentComposerSymbol = getTopLevelPropertyGetter(
-            ComposeFqNames.fqNameFor("currentComposer")
-        )
+        val currentComposerSymbol = getTopLevelPropertyGetter(ComposeCallableIds.currentComposer)
 
         return IrCallImpl(
             UNDEFINED_OFFSET,
@@ -571,7 +558,6 @@ class ComposerLambdaMemoization(
         return super.visitConstructorCall(expression)
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     private fun visitComposableFunctionExpression(
         expression: IrFunctionExpression,
         declarationContext: DeclarationContext
@@ -590,7 +576,7 @@ class ComposerLambdaMemoization(
         }
 
         // Do not wrap composable lambdas with return results
-        if (!functionExpression.function.descriptor.returnType.let { it == null || it.isUnit() }) {
+        if (!functionExpression.function.returnType.isUnit()) {
             metrics.recordLambda(
                 composable = true,
                 memoized = !collector.hasCaptures,
@@ -719,13 +705,13 @@ class ComposerLambdaMemoization(
         val restartFunctionFactory =
             if (useComposableFactory)
                 if (useComposableLambdaN)
-                    COMPOSABLE_LAMBDA_N
-                else COMPOSABLE_LAMBDA
+                    ComposeCallableIds.composableLambdaN
+                else ComposeCallableIds.composableLambda
             else if (useComposableLambdaN)
-                COMPOSABLE_LAMBDA_N_INSTANCE
-            else COMPOSABLE_LAMBDA_INSTANCE
+                ComposeCallableIds.composableLambdaNInstance
+            else ComposeCallableIds.composableLambdaInstance
         val restartFactorySymbol =
-            getTopLevelFunction(ComposeFqNames.internalFqNameFor(restartFunctionFactory))
+            getTopLevelFunction(restartFunctionFactory)
         val irBuilder = DeclarationIrBuilder(
             context,
             symbol = declarationContext.symbol,
@@ -733,7 +719,10 @@ class ComposerLambdaMemoization(
             endOffset = expression.endOffset
         )
 
-        (context as IrPluginContextImpl).linker.getDeclaration(restartFactorySymbol)
+        // FIXME: We should remove this call once we are sure that there is nothing relying on it.
+        //        `IrPluginContextImpl` is K1 specific and `getDeclaration` doesn't do anything on
+        //        the JVM backend where we produce lazy declarations for unbound symbols.
+        (context as? IrPluginContextImpl)?.linker?.getDeclaration(restartFactorySymbol)
         val composableLambdaExpression = irBuilder.irCall(restartFactorySymbol).apply {
             var index = 0
 
@@ -814,9 +803,7 @@ class ComposerLambdaMemoization(
         // Otherwise memoize the expression based on the stable captured values
         val rememberParameterCount = captures.size + 1 // One additional parameter for the lambda
         val declaration = functionContext.declaration
-        val rememberFunctions = getTopLevelFunctions(
-            ComposeFqNames.fqNameFor("remember")
-        ).map { it.owner }
+        val rememberFunctions = getTopLevelFunctions(ComposeCallableIds.remember).map { it.owner }
 
         val directRememberFunction = // Exclude the varargs version
             rememberFunctions.singleOrNull {
@@ -878,9 +865,15 @@ class ComposerLambdaMemoization(
 
             putValueArgument(
                 index = lambdaArgumentIndex,
-                valueArgument = irBuilder.calculationExpressionForRemember(
-                    expression = expression
-                )
+                valueArgument = irLambdaExpression(
+                    startOffset = expression.startOffset,
+                    endOffset = expression.endOffset,
+                    returnType = expression.type
+                ) { fn ->
+                    fn.body = DeclarationIrBuilder(context, fn.symbol).irBlockBody {
+                        +irReturn(expression)
+                    }
+                }
             )
         }.patchDeclarationParents(declaration).markAsSynthetic(mark = true)
     }
@@ -896,38 +889,6 @@ class ComposerLambdaMemoization(
             this is IrValueParameter &&
             (parent as? IrFunction)?.isInline == true &&
             !isNoinline
-
-    private fun IrBuilderWithScope.calculationExpressionForRemember(
-        expression: IrExpression
-    ): IrExpression {
-        return IrFunctionExpressionImpl(
-            startOffset = startOffset,
-            endOffset = endOffset,
-            type = expression.type,
-            origin = IrStatementOrigin.LAMBDA,
-            function = IrFunctionImpl(
-                startOffset = SYNTHETIC_OFFSET,
-                endOffset = SYNTHETIC_OFFSET,
-                origin = IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA,
-                symbol = IrSimpleFunctionSymbolImpl(),
-                name = SpecialNames.ANONYMOUS,
-                visibility = DescriptorVisibilities.LOCAL,
-                modality = Modality.FINAL,
-                returnType = expression.type,
-                isInline = false,
-                isExternal = false,
-                isTailrec = false,
-                isSuspend = false,
-                isOperator = false,
-                isInfix = false,
-                isExpect = false,
-            ).apply {
-                body = irBlockBody {
-                    +irReturn(target = symbol, value = expression)
-                }
-            }
-        )
-    }
 
     private fun <T : IrFunctionAccessExpression> T.markAsSynthetic(mark: Boolean): T {
         if (mark) {

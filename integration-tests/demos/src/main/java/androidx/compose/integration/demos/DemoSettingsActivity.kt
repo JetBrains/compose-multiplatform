@@ -21,12 +21,14 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.integration.demos.DemoSettingsActivity.SettingsFragment
 import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsSetting
 import androidx.compose.integration.demos.settings.DynamicThemeSetting
+import androidx.compose.integration.demos.settings.LayoutDirectionSetting
 import androidx.compose.integration.demos.settings.SoftInputModeSetting
 import androidx.preference.PreferenceCategory
 import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.plusAssign
 
 private val allSettings = listOf(
+    LayoutDirectionSetting,
     DynamicThemeSetting,
     SoftInputModeSetting,
     DecorFitsSystemWindowsSetting,

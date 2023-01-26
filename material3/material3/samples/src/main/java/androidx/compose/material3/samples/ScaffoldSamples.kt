@@ -21,7 +21,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -56,12 +56,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Preview
 @Sampled
 @Composable
 fun SimpleScaffoldWithTopBar() {
@@ -97,7 +99,7 @@ fun SimpleScaffoldWithTopBar() {
         content = { innerPadding ->
             LazyColumn(
                 // consume insets as scaffold doesn't do it by default
-                modifier = Modifier.consumedWindowInsets(innerPadding),
+                modifier = Modifier.consumeWindowInsets(innerPadding),
                 contentPadding = innerPadding
             ) {
                 items(count = 100) {
@@ -114,6 +116,7 @@ fun SimpleScaffoldWithTopBar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithSimpleSnackbar() {
@@ -147,6 +150,7 @@ fun ScaffoldWithSimpleSnackbar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithIndefiniteSnackbar() {
@@ -183,6 +187,7 @@ fun ScaffoldWithIndefiniteSnackbar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithCustomSnackbar() {
@@ -260,6 +265,7 @@ fun ScaffoldWithCustomSnackbar() {
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
+@Preview
 @Sampled
 @Composable
 fun ScaffoldWithCoroutinesSnackbar() {

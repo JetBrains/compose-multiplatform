@@ -22,6 +22,8 @@
     <string name="on">On</string>
     <!-- Spoken description of off state of a switch -->
     <string name="off">Off</string>
+    <!-- Spoken description naming a Switch Material UI widget -->
+    <string name="switch_role">Switch</string>
     <!-- Spoken description of selected state of a selectable item -->
     <string name="selected">Selected</string>
     <!-- Spoken description of not selected state of a switch -->

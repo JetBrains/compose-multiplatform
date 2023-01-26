@@ -40,6 +40,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -122,7 +123,9 @@ fun Surface(
                     border = border,
                     shadowElevation = shadowElevation
                 )
-                .semantics(mergeDescendants = false) {}
+                .semantics(mergeDescendants = false) {
+                    isContainer = true
+                }
                 .pointerInput(Unit) {},
             propagateMinConstraints = true
         ) {
@@ -218,7 +221,7 @@ fun Surface(
     ) {
         Box(
             modifier = modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(
@@ -330,7 +333,7 @@ fun Surface(
     ) {
         Box(
             modifier = modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(
@@ -443,7 +446,7 @@ fun Surface(
     ) {
         Box(
             modifier = modifier
-                .minimumTouchTargetSize()
+                .minimumInteractiveComponentSize()
                 .surface(
                     shape = shape,
                     backgroundColor = surfaceColorAtElevation(

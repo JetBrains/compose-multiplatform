@@ -36,22 +36,22 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
-        implementation("androidx.compose.animation:animation-core:1.1.1")
-        implementation("androidx.compose.foundation:foundation-layout:1.2.0")
-        implementation("androidx.compose.ui:ui-util:1.0.0")
-        api("androidx.compose.foundation:foundation:1.2.0")
-        api("androidx.compose.material:material-icons-core:1.0.2")
-        api("androidx.compose.material:material-ripple:1.0.0")
-        api("androidx.compose.runtime:runtime:1.0.1")
-        api("androidx.compose.ui:ui-graphics:1.0.1")
-        api(project(":compose:ui:ui"))
-        // TODO: pin this to 1.3.0 stable, when PlatformTextStyle is not experimental
-        api(project(":compose:ui:ui-text"))
+        implementation("androidx.activity:activity-compose:1.5.0")
+        implementation("androidx.compose.animation:animation-core:1.3.1")
+        implementation("androidx.compose.foundation:foundation-layout:1.3.1")
+        implementation("androidx.compose.ui:ui-util:1.3.1")
+        api(project(":compose:foundation:foundation"))
+        api("androidx.compose.material:material-icons-core:1.3.1")
+        api("androidx.compose.material:material-ripple:1.3.1")
+        api("androidx.compose.runtime:runtime:1.3.1")
+        api("androidx.compose.ui:ui-graphics:1.3.1")
+        api("androidx.compose.ui:ui:1.3.1")
+        api("androidx.compose.ui:ui-text:1.3.1")
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-        implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-        implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
+        implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
+        implementation(project(":lifecycle:lifecycle-viewmodel"))
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -105,11 +105,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
+                implementation("androidx.activity:activity-compose:1.5.0")
 
                 // TODO: remove next 3 dependencies when b/202810604 is fixed
                 implementation("androidx.savedstate:savedstate:1.1.0")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
+                implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
             }
 
             desktopMain.dependencies {
@@ -150,7 +151,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material3 Components"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2021"
     description = "Compose Material You Design Components library"
 }
@@ -160,12 +160,4 @@ android {
     sourceSets.androidTest.assets.srcDirs +=
             project.rootDir.absolutePath + "/../../golden/compose/material3/material3"
     namespace "androidx.compose.material3"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

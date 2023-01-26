@@ -82,7 +82,9 @@ class IconButtonTest {
         val height = 24.dp
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     IconButtonSample()
                 }
             }
@@ -191,7 +193,9 @@ class IconButtonTest {
         val height = 24.dp
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     IconToggleButtonSample()
                 }
             }

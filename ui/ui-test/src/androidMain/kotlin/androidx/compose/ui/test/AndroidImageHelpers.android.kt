@@ -38,64 +38,23 @@ import androidx.test.platform.app.InstrumentationRegistry
 import kotlin.math.roundToInt
 
 /**
- * Captures the underlying semantics node's surface into bitmap.
+ * Captures the underlying semantics node's surface into bitmap. This can be used to capture
+ * nodes in a normal composable, a dialog if API >=28 and in a Popup. Note that the mechanism
+ * used to capture the bitmap from a Popup is not the same as from a normal composable, since
+ * a PopUp is in a different window.
  *
- * This has a limitation that if there is another window covering part of this node, such a
- * window won't occur in this bitmap.
- *
- * @throws IllegalArgumentException if a single screen bitmap is taken inside of a popup.
- */
-@RequiresApi(Build.VERSION_CODES.O)
-fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
-    return captureToImage(false)
-}
-
-/**
- * Captures the underlying semantics node's surface into bitmap.
- *
- * If useAllWindows is true all windows in the current screen will be taken into consideration.
- * If useAllWindows is false only the target node window will be taken into consideration
- * and any covering window will not show up in the generated bitmap.
- *
- * @param useAllWindows If the screenshot should include all windows in the device screen
- *
- * @throws IllegalArgumentException if a single screen bitmap is taken inside of a popup.
+ * @throws IllegalArgumentException if we attempt to capture a bitmap of a dialog before API 28.
  */
 @OptIn(ExperimentalTestApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
-internal fun SemanticsNodeInteraction.captureToImage(
-    useAllWindows: Boolean = false
-): ImageBitmap {
+fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
     val node = fetchSemanticsNode("Failed to capture a node to bitmap.")
-    // TODO(b/207828394): Consider doing assertIsDisplayed here. Will need to move things around.
-
-    return if (useAllWindows) {
-        processMultiWindowScreenshot(node, testContext)
-    } else {
-        processSingleWindowScreenshot(node, testContext)
-    }
-}
-
-private fun processSingleWindowScreenshot(
-    node: SemanticsNode,
-    testContext: TestContext
-): ImageBitmap {
-    // Validate we are not in popup
+    // Validate we are in popup
     val popupParentMaybe = node.findClosestParentNode(includeSelf = true) {
         it.config.contains(SemanticsProperties.IsPopup)
     }
     if (popupParentMaybe != null) {
-//  Uncomment when captureToImage(useAllWindows = true). is published
-//      throw IllegalArgumentException(
-//            "The node that is being captured to bitmap is in a popup or is a popup itself." +
-//                "Please use captureToImage(useAllWindows = true)."
-//      )
-
-        // We do not support capturing popups to bitmap
-        throw IllegalArgumentException(
-            "The node that is being captured to bitmap is in " +
-                "a popup or is a popup itself. Popups currently cannot be captured to bitmap."
-        )
+        return processMultiWindowScreenshot(node, testContext)
     }
 
     val view = (node.root as ViewRootForTest).view
@@ -139,6 +98,7 @@ private fun processSingleWindowScreenshot(
 }
 
 @ExperimentalTestApi
+@RequiresApi(Build.VERSION_CODES.O)
 private fun processMultiWindowScreenshot(
     node: SemanticsNode,
     testContext: TestContext

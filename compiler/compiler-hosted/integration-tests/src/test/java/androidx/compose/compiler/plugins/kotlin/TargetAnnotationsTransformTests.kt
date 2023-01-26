@@ -19,7 +19,7 @@ package androidx.compose.compiler.plugins.kotlin
 import org.junit.Test
 
 @Suppress("SpellCheckingInspection") // Expected strings can have partial words
-class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
+class TargetAnnotationsTransformTests : AbstractIrTransformTest() {
     @Test
     fun testInferUIFromCall() = verify(
         """
@@ -48,7 +48,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -82,7 +82,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -113,7 +113,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -137,7 +137,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Test)<conten...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -151,7 +151,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(content, %composer, %changed or 0b0001)
+            Test(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -187,7 +187,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(content, %composer, %changed or 0b0001)
+            Test(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -232,14 +232,9 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               traceEventStart(<>, %changed, -1, <>)
             }
             InlineRow({ %composer: Composer?, %changed: Int ->
-              %composer.startReplaceableGroup(<>)
-              sourceInformation(%composer, "C<Text("...>:Test.kt")
-              if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
-                Text("test", %composer, 0b0110)
-              } else {
-                %composer.skipToGroupEnd()
-              }
-              %composer.endReplaceableGroup()
+              sourceInformationMarkerStart(%composer, <>, "C<Text("...>:Test.kt")
+              Text("test", %composer, 0b0110)
+              sourceInformationMarkerEnd(%composer)
             }, %composer, 0)
             if (isTraceInProgress()) {
               traceEventEnd()
@@ -248,7 +243,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(content, %composer, %changed or 0b0001)
+            Test(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -284,7 +279,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -341,7 +336,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -420,7 +415,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            OpenCustom(content, %composer, %changed or 0b0001)
+            OpenCustom(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -445,7 +440,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            ClosedCustom(content, %composer, %changed or 0b0001)
+            ClosedCustom(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -476,7 +471,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 }
                 val tmp0_rcvr = <this>
                 %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                  tmp0_rcvr.call(%composer, %changed or 0b0001)
+                  tmp0_rcvr.call(%composer, updateChangedFlags(%changed or 0b0001))
                 }
               }
             }
@@ -500,7 +495,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 }
                 val tmp0_rcvr = <this>
                 %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                  tmp0_rcvr.call(%composer, %changed or 0b0001)
+                  tmp0_rcvr.call(%composer, updateChangedFlags(%changed or 0b0001))
                 }
               }
             }
@@ -512,7 +507,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -535,7 +530,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Test)*<it()>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -562,7 +557,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(content, %composer, %changed or 0b0001)
+            Test(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -635,7 +630,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Leaf(%composer, %changed or 0b0001)
+            Leaf(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -645,7 +640,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Wrapper)<conten...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -659,7 +654,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Wrapper(content, %composer, %changed or 0b0001)
+            Wrapper(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -671,37 +666,37 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           if (%default and 0b0001 !== 0) {
             %dirty = %dirty or 0b0110
           } else if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(one)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(one)) 0b0100 else 0b0010
           }
           if (%default and 0b0010 !== 0) {
             %dirty = %dirty or 0b00110000
           } else if (%changed and 0b01110000 === 0) {
-            %dirty = %dirty or if (%composer.changed(two)) 0b00100000 else 0b00010000
+            %dirty = %dirty or if (%composer.changedInstance(two)) 0b00100000 else 0b00010000
           }
           if (%default and 0b0100 !== 0) {
             %dirty = %dirty or 0b000110000000
           } else if (%changed and 0b001110000000 === 0) {
-            %dirty = %dirty or if (%composer.changed(three)) 0b000100000000 else 0b10000000
+            %dirty = %dirty or if (%composer.changedInstance(three)) 0b000100000000 else 0b10000000
           }
           if (%default and 0b1000 !== 0) {
             %dirty = %dirty or 0b110000000000
           } else if (%changed and 0b0001110000000000 === 0) {
-            %dirty = %dirty or if (%composer.changed(four)) 0b100000000000 else 0b010000000000
+            %dirty = %dirty or if (%composer.changedInstance(four)) 0b100000000000 else 0b010000000000
           }
           if (%default and 0b00010000 !== 0) {
             %dirty = %dirty or 0b0110000000000000
           } else if (%changed and 0b1110000000000000 === 0) {
-            %dirty = %dirty or if (%composer.changed(five)) 0b0100000000000000 else 0b0010000000000000
+            %dirty = %dirty or if (%composer.changedInstance(five)) 0b0100000000000000 else 0b0010000000000000
           }
           if (%default and 0b00100000 !== 0) {
             %dirty = %dirty or 0b00110000000000000000
           } else if (%changed and 0b01110000000000000000 === 0) {
-            %dirty = %dirty or if (%composer.changed(six)) 0b00100000000000000000 else 0b00010000000000000000
+            %dirty = %dirty or if (%composer.changedInstance(six)) 0b00100000000000000000 else 0b00010000000000000000
           }
           if (%default and 0b01000000 !== 0) {
             %dirty = %dirty or 0b000110000000000000000000
           } else if (%changed and 0b001110000000000000000000 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b000100000000000000000000 else 0b10000000000000000000
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b000100000000000000000000 else 0b10000000000000000000
           }
           if (%dirty and 0b001011011011011011011011 !== 0b10010010010010010010 || !%composer.skipping) {
             if (%default and 0b0001 !== 0) {
@@ -786,7 +781,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Optional(one, two, three, four, five, six, content, %composer, %changed or 0b0001, %default)
+            Optional(one, two, three, four, five, six, content, %composer, updateChangedFlags(%changed or 0b0001), %default)
           }
         }
         @Composable
@@ -806,7 +801,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            UseOptional(%composer, %changed or 0b0001)
+            UseOptional(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -908,20 +903,15 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
         @ComposableInferredTarget(scheme = "[androidx.compose.ui.UiComposable[androidx.compose.ui.UiComposable]]")
         fun LocalBox(modifier: Modifier?, content: @[ExtensionFunctionType] Function3<LocalBoxScope, Composer, Int, Unit>, %composer: Composer?, %changed: Int, %default: Int) {
           %composer.startReplaceableGroup(<>)
-          sourceInformation(%composer, "C(LocalBox)P(1)<Layout...>:Test.kt")
+          sourceInformation(%composer, "CC(LocalBox)P(1)<Layout...>:Test.kt")
           if (%default and 0b0001 !== 0) {
             modifier = Companion
           }
           val tmp0_measurePolicy = localBoxMeasurePolicy
           Layout({ %composer: Composer?, %changed: Int ->
-            %composer.startReplaceableGroup(<>)
-            sourceInformation(%composer, "C<conten...>:Test.kt")
-            if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
-              content(LocalBoxScopeInstance, %composer, 0b0110 or 0b01110000 and %changed)
-            } else {
-              %composer.skipToGroupEnd()
-            }
-            %composer.endReplaceableGroup()
+            sourceInformationMarkerStart(%composer, <>, "C<conten...>:Test.kt")
+            content(LocalBoxScopeInstance, %composer, 0b0110 or 0b01110000 and %changed)
+            sourceInformationMarkerEnd(%composer)
           }, modifier, tmp0_measurePolicy, %composer, 0b000110000000 or 0b01110000 and %changed shl 0b0011, 0)
           %composer.endReplaceableGroup()
         }
@@ -989,14 +979,9 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
               traceEventStart(<>, %changed, -1, <>)
             }
             Layout({ %composer: Composer?, %changed: Int ->
-              %composer.startReplaceableGroup(<>)
-              sourceInformation(%composer, "C:Test.kt")
-              if (%changed and 0b1011 !== 0b0010 || !%composer.skipping) {
-                Unit
-              } else {
-                %composer.skipToGroupEnd()
-              }
-              %composer.endReplaceableGroup()
+              sourceInformationMarkerStart(%composer, <>, "C:Test.kt")
+              Unit
+              sourceInformationMarkerEnd(%composer)
             }, null, class <no name provided> : MeasurePolicy {
               override fun measure(%this%Layout: MeasureScope, <anonymous parameter 0>: List<Measurable>, <anonymous parameter 1>: Constraints): MeasureResult {
                 return error("")
@@ -1010,7 +995,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test1(%composer, %changed or 0b0001)
+            Test1(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -1020,7 +1005,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Test2)<Layout...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -1039,7 +1024,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test2(content, %composer, %changed or 0b0001)
+            Test2(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -1059,7 +1044,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test3(%composer, %changed or 0b0001)
+            Test3(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -1073,7 +1058,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             }
             BasicText(AnnotatedString(
               text = "Some text"
-            ), null, null, null, <unsafe-coerce>(0), false, 0, null, %composer, 0, 0b11111110)
+            ), null, null, null, <unsafe-coerce>(0), false, 0, 0, null, %composer, 0b0110, 0b000111111110)
             if (isTraceInProgress()) {
               traceEventEnd()
             }
@@ -1081,7 +1066,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test4(%composer, %changed or 0b0001)
+            Test4(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         val Local: ProvidableCompositionLocal<Int> = compositionLocalOf {
@@ -1094,7 +1079,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Test5)<Compos...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -1122,7 +1107,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test5(content, %composer, %changed or 0b0001)
+            Test5(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -1160,7 +1145,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test6(test, %composer, %changed or 0b0001)
+            Test6(test, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         @Composable
@@ -1178,7 +1163,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            T(value, %composer, %changed or 0b0001)
+            T(value, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -1272,7 +1257,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Test)<rememb...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(content)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(content)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -1315,7 +1300,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(content, %composer, %changed or 0b0001)
+            Test(content, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -1392,7 +1377,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(%composer, %changed or 0b0001)
+            Test(%composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """,
@@ -1426,7 +1411,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
           sourceInformation(%composer, "C(Test)<decora...>:Test.kt")
           val %dirty = %changed
           if (%changed and 0b1110 === 0) {
-            %dirty = %dirty or if (%composer.changed(decorator)) 0b0100 else 0b0010
+            %dirty = %dirty or if (%composer.changedInstance(decorator)) 0b0100 else 0b0010
           }
           if (%dirty and 0b1011 !== 0b0010 || !%composer.skipping) {
             if (isTraceInProgress()) {
@@ -1440,7 +1425,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(decorator, %composer, %changed or 0b0001)
+            Test(decorator, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         internal object ComposableSingletons%TestKt {
@@ -1497,7 +1482,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                NFromFile(%composer, %changed or 0b0001)
+                NFromFile(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
             @Composable
@@ -1516,7 +1501,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                NFromInference(%composer, %changed or 0b0001)
+                NFromInference(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
         """,
@@ -1564,7 +1549,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                InferN(%composer, %changed or 0b0001)
+                InferN(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
         """,
@@ -1623,7 +1608,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                OpenTarget(%composer, %changed or 0b0001)
+                OpenTarget(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
             @StabilityInferred(parameters = 0)
@@ -1652,7 +1637,7 @@ class TargetAnnotationsTransformTests : ComposeIrTransformTest() {
                 }
                 val tmp0_rcvr = <this>
                 %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                  tmp0_rcvr.Compose(%composer, %changed or 0b0001)
+                  tmp0_rcvr.Compose(%composer, updateChangedFlags(%changed or 0b0001))
                 }
               }
               static val %stable: Int = 0

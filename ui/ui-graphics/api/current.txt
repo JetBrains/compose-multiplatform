@@ -26,6 +26,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class AndroidPaint implements androidx.compose.ui.graphics.Paint {
+    ctor public AndroidPaint(android.graphics.Paint internalPaint);
     ctor public AndroidPaint();
     method public android.graphics.Paint asFrameworkPaint();
     method public float getAlpha();
@@ -71,6 +72,7 @@ package androidx.compose.ui.graphics {
 
   public final class AndroidPaint_androidKt {
     method public static androidx.compose.ui.graphics.Paint Paint();
+    method public static androidx.compose.ui.graphics.Paint toComposePaint(android.graphics.Paint);
   }
 
   public final class AndroidPath implements androidx.compose.ui.graphics.Path {
@@ -113,7 +115,9 @@ package androidx.compose.ui.graphics {
 
   public final class AndroidPathMeasure implements androidx.compose.ui.graphics.PathMeasure {
     method public float getLength();
+    method public long getPosition(float distance);
     method public boolean getSegment(float startDistance, float stopDistance, androidx.compose.ui.graphics.Path destination, boolean startWithMoveTo);
+    method public long getTangent(float distance);
     method public void setPath(androidx.compose.ui.graphics.Path? path, boolean forceClosed);
     property public float length;
   }
@@ -312,11 +316,11 @@ package androidx.compose.ui.graphics {
     method public float getGreen();
     method public float getRed();
     method public long getValue();
-    property public final float alpha;
-    property public final float blue;
-    property public final androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace;
-    property public final float green;
-    property public final float red;
+    property @androidx.compose.runtime.Stable public final float alpha;
+    property @androidx.compose.runtime.Stable public final float blue;
+    property @androidx.compose.runtime.Stable public final androidx.compose.ui.graphics.colorspace.ColorSpace colorSpace;
+    property @androidx.compose.runtime.Stable public final float green;
+    property @androidx.compose.runtime.Stable public final float red;
     property public final long value;
     field public static final androidx.compose.ui.graphics.Color.Companion Companion;
   }
@@ -589,7 +593,7 @@ package androidx.compose.ui.graphics {
   }
 
   public final class PaintKt {
-    method public static androidx.compose.ui.graphics.Paint! Paint();
+    method public static androidx.compose.ui.graphics.Paint Paint();
     field public static final float DefaultAlpha = 1.0f;
   }
 
@@ -664,7 +668,9 @@ package androidx.compose.ui.graphics {
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface PathMeasure {
     method public float getLength();
+    method public long getPosition(float distance);
     method public boolean getSegment(float startDistance, float stopDistance, androidx.compose.ui.graphics.Path destination, optional boolean startWithMoveTo);
+    method public long getTangent(float distance);
     method public void setPath(androidx.compose.ui.graphics.Path? path, boolean forceClosed);
     property public abstract float length;
   }
@@ -729,7 +735,9 @@ package androidx.compose.ui.graphics {
 
   public final class RectHelper_androidKt {
     method public static android.graphics.Rect toAndroidRect(androidx.compose.ui.geometry.Rect);
+    method public static android.graphics.Rect toAndroidRect(androidx.compose.ui.unit.IntRect);
     method public static android.graphics.RectF toAndroidRectF(androidx.compose.ui.geometry.Rect);
+    method public static androidx.compose.ui.unit.IntRect toComposeIntRect(android.graphics.Rect);
     method public static androidx.compose.ui.geometry.Rect toComposeRect(android.graphics.Rect);
   }
 
@@ -898,7 +906,7 @@ package androidx.compose.ui.graphics.colorspace {
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class ColorModel {
     method public int getComponentCount();
-    property public final int componentCount;
+    property @androidx.compose.runtime.Stable public final int componentCount;
     field public static final androidx.compose.ui.graphics.colorspace.ColorModel.Companion Companion;
   }
 

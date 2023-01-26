@@ -24,11 +24,14 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.toFontFamily
+import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -53,6 +56,16 @@ class TextMeasurerTest {
     )
 
     private val multiLineText = AnnotatedString("Lorem\nipsum\ndolor\nsit\namet")
+
+    @Test
+    fun stringAndAnnotatedString_shouldReturnTheSameInstance_whenCacheIsEnabled() {
+        val textMeasurer = textMeasurer(cacheSize = 8)
+        val textLayoutResult1 = textMeasurer.measure("Hello")
+        val textLayoutResult2 = textMeasurer.measure(AnnotatedString("Hello"))
+
+        assertThat(textLayoutResult1.multiParagraph)
+            .isSameInstanceAs(textLayoutResult2.multiParagraph)
+    }
 
     @Test
     fun width_shouldMatter_ifSoftwrapIsEnabled() {
@@ -167,6 +180,82 @@ class TextMeasurerTest {
 
         assertThat(textLayoutResult.multiParagraph.width).isNotEqualTo(200f)
         assertThat(textLayoutResult.size.width).isEqualTo(200)
+    }
+
+    @Test
+    fun textLayout_cannotBeSmallerThan_minWidth() {
+        val textLayoutResult = layoutText(
+            textLayoutInput(
+                text = AnnotatedString("A"),
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                constraints = Constraints.fixedWidth(400)
+            )
+        )
+
+        assertThat(textLayoutResult.size.width).isEqualTo(400)
+    }
+
+    @Test
+    fun textLayout_canBeSmallerThan_maxWidth() {
+        val fontSize = 10
+        val textLayoutResult = layoutText(
+            textLayoutInput(
+                text = AnnotatedString("A"),
+                style = TextStyle(fontSize = fontSize.sp),
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                constraints = Constraints(maxWidth = 400)
+            )
+        )
+
+        assertThat(textLayoutResult.size.width).isEqualTo(fontSize)
+    }
+
+    @Test
+    fun textLayout_cannotBeSmallerThan_minHeight() {
+        val textLayoutResult = layoutText(
+            textLayoutInput(
+                text = AnnotatedString("A"),
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                constraints = Constraints.fixedHeight(400)
+            )
+        )
+
+        assertThat(textLayoutResult.size.height).isEqualTo(400)
+    }
+
+    @Test
+    fun textLayout_canBeSmallerThan_maxHeight() {
+        val fontSize = 10.sp
+        val textLayoutResult = layoutText(
+            textLayoutInput(
+                text = AnnotatedString("A"),
+                style = TextStyle(fontSize = fontSize),
+                softWrap = false,
+                overflow = TextOverflow.Clip,
+                constraints = Constraints(maxHeight = 400)
+            )
+        )
+
+        assertThat(textLayoutResult.size.height).isEqualTo(10)
+    }
+
+    @Test
+    fun layoutDirection_shouldDictate_textDirection() {
+        val textLayoutResult1 = layoutText(textLayoutInput(
+            text = multiLineText,
+            layoutDirection = LayoutDirection.Rtl
+        ))
+
+        val textLayoutResult2 = layoutText(textLayoutInput(
+            text = multiLineText,
+            style = TextStyle(textDirection = TextDirection.Rtl)
+        ))
+
+        assertThat(textLayoutResult1.multiParagraph.bitmap())
+            .isEqualToBitmap(textLayoutResult2.multiParagraph.bitmap())
     }
 
     @Test
@@ -321,7 +410,8 @@ class TextMeasurerTest {
 
     private fun layoutText(
         textLayoutInput: TextLayoutInput,
-        textMeasurer: TextMeasurer? = null
+        textMeasurer: TextMeasurer? = null,
+        skipCache: Boolean = false
     ) = with(textLayoutInput) {
         (textMeasurer ?: textMeasurer()).measure(
             text = text,
@@ -331,6 +421,10 @@ class TextMeasurerTest {
             maxLines = maxLines,
             placeholders = placeholders,
             constraints = constraints,
+            layoutDirection = layoutDirection,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver,
+            skipCache = skipCache
         )
     }
 }

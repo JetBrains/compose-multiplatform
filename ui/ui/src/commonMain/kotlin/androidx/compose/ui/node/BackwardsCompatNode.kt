@@ -23,9 +23,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.BuildDrawCacheParams
 import androidx.compose.ui.draw.DrawCacheModifier
 import androidx.compose.ui.draw.DrawModifier
+import androidx.compose.ui.focus.FocusEventModifier
+import androidx.compose.ui.focus.FocusEventModifierNode
+import androidx.compose.ui.focus.FocusOrder
 import androidx.compose.ui.focus.FocusOrderModifier
-import androidx.compose.ui.focus.FocusOrderModifierToProperties
-import androidx.compose.ui.focus.FocusPropertiesModifier
+import androidx.compose.ui.focus.FocusProperties
+import androidx.compose.ui.focus.FocusPropertiesModifierNode
+import androidx.compose.ui.focus.FocusRequesterModifier
+import androidx.compose.ui.focus.FocusRequesterModifierNode
+import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -54,7 +60,6 @@ import androidx.compose.ui.modifier.ModifierLocalNode
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ModifierLocalReadScope
 import androidx.compose.ui.modifier.modifierLocalMapOf
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsModifier
 import androidx.compose.ui.unit.Constraints
@@ -83,6 +88,9 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
     ParentDataModifierNode,
     LayoutAwareModifierNode,
     GlobalPositionAwareModifierNode,
+    FocusEventModifierNode,
+    FocusPropertiesModifierNode,
+    FocusRequesterModifierNode,
     OwnerScope,
     BuildDrawCacheParams,
     Modifier.Node() {
@@ -92,7 +100,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
 
     var element: Modifier.Element = element
         set(value) {
-            if (isAttached) uninitializeModifier()
+            if (isAttached) unInitializeModifier()
             field = value
             kindSet = calculateNodeKindSetFrom(value)
             if (isAttached) initializeModifier(false)
@@ -103,10 +111,10 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
     }
 
     override fun onDetach() {
-        uninitializeModifier()
+        unInitializeModifier()
     }
 
-    private fun uninitializeModifier() {
+    private fun unInitializeModifier() {
         check(isAttached)
         val element = element
         if (isKind(Nodes.Locals)) {
@@ -118,17 +126,12 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
             if (element is ModifierLocalConsumer) {
                 element.onModifierLocalsUpdated(DetachedModifierLocalReadScope)
             }
-            if (element is FocusOrderModifier) {
-                val focusOrderElement = focusOrderElement
-                if (focusOrderElement != null) {
-                    requireOwner()
-                        .modifierLocalManager
-                        .removedProvider(this, focusOrderElement.key)
-                }
-            }
         }
         if (isKind(Nodes.Semantics)) {
             requireOwner().onSemanticsChange()
+        }
+        if (element is FocusRequesterModifier) {
+            element.focusRequester.focusRequesterNodes -= this
         }
     }
 
@@ -144,24 +147,6 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
                     updateModifierLocalConsumer()
                 else
                     sideEffect { updateModifierLocalConsumer() }
-            }
-            // Special handling for FocusOrderModifier -- we have to use modifier local
-            // consumers and providers for it.
-            if (element is FocusOrderModifier) {
-                // Have to create a new consumer/provider
-                val scope = FocusOrderModifierToProperties(element)
-                focusOrderElement = FocusPropertiesModifier(
-                    focusPropertiesScope = scope,
-                    inspectorInfo = debugInspectorInfo {
-                        name = "focusProperties"
-                        properties["scope"] = scope
-                    }
-                )
-                updateModifierLocalProvider(focusOrderElement!!)
-                if (duringAttach)
-                    updateFocusOrderModifierLocalConsumer()
-                else
-                    sideEffect { updateFocusOrderModifierLocalConsumer() }
             }
         }
         if (isKind(Nodes.Draw)) {
@@ -219,6 +204,9 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
                 }
             }
         }
+        if (element is FocusRequesterModifier) {
+            element.focusRequester.focusRequesterNodes += this
+        }
         if (isKind(Nodes.PointerInput)) {
             if (element is PointerInputModifier) {
                 element.pointerInputFilter.layoutCoordinates = coordinator
@@ -242,7 +230,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
 
     override fun onMeasureResultChanged() {
         invalidateCache = true
-        requestDraw()
+        invalidateDraw()
     }
 
     private fun updateDrawCache() {
@@ -259,10 +247,9 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
 
     internal fun onDrawCacheReadsChanged() {
         invalidateCache = true
-        requestDraw()
+        invalidateDraw()
     }
 
-    private var focusOrderElement: FocusPropertiesModifier? = null
     private var _providedValues: BackwardsCompatLocalMap? = null
     var readValues = hashSetOf<ModifierLocal<*>>()
     override val providedValues: ModifierLocalMap get() = _providedValues ?: modifierLocalMapOf()
@@ -292,18 +279,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
         }
     }
 
-    fun updateFocusOrderModifierLocalConsumer() {
-        if (isAttached) {
-            requireOwner().snapshotObserver.observeReads(
-                this,
-                updateFocusOrderModifierLocalConsumer
-            ) {
-                (focusOrderElement!! as ModifierLocalConsumer).onModifierLocalsUpdated(this)
-            }
-        }
-    }
-
-    fun updateModifierLocalProvider(element: ModifierLocalProvider<*>) {
+    private fun updateModifierLocalProvider(element: ModifierLocalProvider<*>) {
         val providedValues = _providedValues
         if (providedValues != null && providedValues.contains(element.key)) {
             providedValues.element = element
@@ -314,7 +290,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
             _providedValues = BackwardsCompatLocalMap(element)
             // we only need to notify the modifierLocalManager of an inserted provider
             // in the cases where a provider was added to the chain where it was possible
-            // that consumers below it could need to be invalidated. If this layoutnode
+            // that consumers below it could need to be invalidated. If this layout node
             // is just now being created, then that is impossible. In this case, we can just
             // do nothing and wait for the child consumers to read us. We infer this by
             // checking to see if the tail node is attached or not. If it is not, then the node
@@ -448,6 +424,18 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
         }
     }
 
+    override fun onFocusEvent(focusState: FocusState) {
+        val focusEventModifier = element
+        check(focusEventModifier is FocusEventModifier)
+        focusEventModifier.onFocusEvent(focusState)
+    }
+
+    override fun modifyFocusProperties(focusProperties: FocusProperties) {
+        val focusOrderModifier = element
+        check(focusOrderModifier is FocusOrderModifier)
+        focusProperties.apply(FocusOrderModifierToProperties(focusOrderModifier))
+    }
+
     override fun toString(): String = element.toString()
 }
 
@@ -464,6 +452,15 @@ private val updateModifierLocalConsumer = { it: BackwardsCompatNode ->
     it.updateModifierLocalConsumer()
 }
 
-private val updateFocusOrderModifierLocalConsumer = { it: BackwardsCompatNode ->
-    it.updateFocusOrderModifierLocalConsumer()
+/**
+ * Used internally for FocusOrderModifiers so that we can compare the modifiers and can reuse
+ * the ModifierLocalConsumerEntity and ModifierLocalProviderEntity.
+ */
+@Suppress("DEPRECATION")
+private class FocusOrderModifierToProperties(
+    val modifier: FocusOrderModifier
+) : (FocusProperties) -> Unit {
+    override fun invoke(focusProperties: FocusProperties) {
+        modifier.populateFocusOrder(FocusOrder(focusProperties))
+    }
 }

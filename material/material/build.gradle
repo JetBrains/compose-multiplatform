@@ -32,23 +32,23 @@ dependencies {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        api("androidx.compose.animation:animation-core:1.0.0")
-        api("androidx.compose.foundation:foundation:1.2.0")
+        api("androidx.compose.animation:animation-core:1.2.1")
+        api(project(":compose:foundation:foundation"))
         api(project(":compose:material:material-icons-core"))
         api(project(":compose:material:material-ripple"))
-        api("androidx.compose.runtime:runtime:1.2.0")
-        api("androidx.compose.ui:ui:1.2.0")
-        api("androidx.compose.ui:ui-text:1.2.0")
+        api("androidx.compose.runtime:runtime:1.2.1")
+        api("androidx.compose.ui:ui:1.2.1")
+        api("androidx.compose.ui:ui-text:1.2.1")
 
         implementation(libs.kotlinStdlibCommon)
-        implementation("androidx.compose.animation:animation:1.0.0")
-        implementation("androidx.compose.foundation:foundation-layout:1.1.1")
-        implementation("androidx.compose.ui:ui-util:1.0.0")
+        implementation("androidx.compose.animation:animation:1.2.1")
+        implementation("androidx.compose.foundation:foundation-layout:1.2.1")
+        implementation("androidx.compose.ui:ui-util:1.2.1")
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
         implementation("androidx.savedstate:savedstate:1.1.0")
-        implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-        implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
+        implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
+        implementation(project(":lifecycle:lifecycle-viewmodel"))
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -106,8 +106,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 // TODO: remove next 3 dependencies when b/202810604 is fixed
                 implementation("androidx.savedstate:savedstate:1.1.0")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.3.0")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.3.0")
+                implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.5.1")
             }
 
             desktopMain.dependencies {
@@ -156,7 +156,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material Components"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2018"
     description = "Compose Material Design Components library"
     legacyDisableKotlinStrictApiMode = true

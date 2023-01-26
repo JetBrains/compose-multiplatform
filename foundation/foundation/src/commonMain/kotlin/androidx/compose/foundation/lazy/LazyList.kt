@@ -17,7 +17,6 @@
 package androidx.compose.foundation.lazy
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.clipScrollableContainer
 import androidx.compose.foundation.gestures.FlingBehavior
@@ -63,6 +62,8 @@ internal fun LazyList(
     flingBehavior: FlingBehavior,
     /** Whether scrolling via the user gestures is allowed. */
     userScrollEnabled: Boolean,
+    /** Number of items to layout before and after the visible items */
+    beyondBoundsItemCount: Int = 0,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
     /** The vertical arrangement for items. Required when isVertical is true */
@@ -89,15 +90,15 @@ internal fun LazyList(
         itemProvider,
         state,
         beyondBoundsInfo,
-        overscrollEffect,
         contentPadding,
         reverseLayout,
         isVertical,
+        beyondBoundsItemCount,
         horizontalAlignment,
         verticalAlignment,
         horizontalArrangement,
         verticalArrangement,
-        placementAnimator
+        placementAnimator,
     )
 
     ScrollPositionUpdater(itemProvider, state)
@@ -114,8 +115,7 @@ internal fun LazyList(
                 userScrollEnabled = userScrollEnabled
             )
             .clipScrollableContainer(orientation)
-            .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout)
-            .lazyListPinningModifier(state, beyondBoundsInfo)
+            .lazyListBeyondBoundsModifier(state, beyondBoundsInfo, reverseLayout, orientation)
             .overscroll(overscrollEffect)
             .scrollable(
                 orientation = orientation,
@@ -157,14 +157,14 @@ private fun rememberLazyListMeasurePolicy(
     state: LazyListState,
     /** Keeps track of the number of items we measure and place that are beyond visible bounds. */
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
-    /** The overscroll controller. */
-    overscrollEffect: OverscrollEffect,
     /** The inner padding to be added for the whole content(nor for each individual item) */
     contentPadding: PaddingValues,
     /** reverse the direction of scrolling and layout */
     reverseLayout: Boolean,
     /** The layout orientation of the list */
     isVertical: Boolean,
+    /** Number of items to layout before and after the visible items */
+    beyondBoundsItemCount: Int,
     /** The alignment to align items horizontally. Required when isVertical is true */
     horizontalAlignment: Alignment.Horizontal? = null,
     /** The alignment to align items vertically. Required when isVertical is false */
@@ -178,7 +178,6 @@ private fun rememberLazyListMeasurePolicy(
 ) = remember<LazyLayoutMeasureScope.(Constraints) -> MeasureResult>(
     state,
     beyondBoundsInfo,
-    overscrollEffect,
     contentPadding,
     reverseLayout,
     isVertical,
@@ -316,6 +315,8 @@ private fun rememberLazyListMeasurePolicy(
             density = this,
             placementAnimator = placementAnimator,
             beyondBoundsInfo = beyondBoundsInfo,
+            beyondBoundsItemCount = beyondBoundsItemCount,
+            pinnedItems = state.pinnedItems,
             layout = { width, height, placement ->
                 layout(
                     containerConstraints.constrainWidth(width + totalHorizontalPadding),
@@ -326,19 +327,6 @@ private fun rememberLazyListMeasurePolicy(
             }
         ).also {
             state.applyMeasureResult(it)
-            refreshOverscrollInfo(overscrollEffect, it)
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private fun refreshOverscrollInfo(
-    overscrollEffect: OverscrollEffect,
-    result: LazyListMeasureResult
-) {
-    val canScrollForward = result.canScrollForward
-    val canScrollBackward = (result.firstVisibleItem?.index ?: 0) != 0 ||
-        result.firstVisibleItemScrollOffset != 0
-
-    overscrollEffect.isEnabled = canScrollForward || canScrollBackward
 }

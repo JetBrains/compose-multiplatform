@@ -68,7 +68,7 @@ fun SnapLayoutInfoProvider(
         return distanceFromItemBeforeTarget.rangeTo(distanceFromItemAfterTarget)
     }
 
-    override fun Density.snapStepSize(): Float {
+    override fun Density.calculateSnapStepSize(): Float {
         return if (singleAxisItems.isNotEmpty()) {
             val size = if (layoutInfo.orientation == Orientation.Vertical) {
                 singleAxisItems.sumOf { it.size.height }

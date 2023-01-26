@@ -18,8 +18,10 @@ package androidx.compose.ui.node
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusTargetModifierNode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
@@ -134,6 +136,113 @@ class DelegatableNodeTest {
     }
 
     @Test
+    fun visitSubtreeIf_stopsIfWeReturnFalse() {
+        // Arrange.
+        val (node1, node2, node3) = List(3) { object : Modifier.Node() {} }
+        val (node4, node5, node6) = List(3) { object : Modifier.Node() {} }
+        val visitedChildren = mutableListOf<Modifier.Node>()
+        rule.setContent {
+            Box(modifier = modifierElementOf { node1 }) {
+                Box(modifier = modifierElementOf { node2 }) {
+                    Box(modifier = modifierElementOf { node3 })
+                    Box(modifier = modifierElementOf { node4 }) {
+                        Box(modifier = modifierElementOf { node6 })
+                    }
+                    Box(modifier = modifierElementOf { node5 })
+                }
+            }
+        }
+
+        // Act.
+        rule.runOnIdle {
+            node1.visitSubtreeIf(Nodes.Any) {
+                visitedChildren.add(it)
+                // return false if we encounter node4
+                it != node4
+            }
+        }
+
+        // Assert.
+        assertThat(visitedChildren).containsExactly(node2, node3, node4, node5).inOrder()
+    }
+
+    @Test
+    fun visitSubtreeIf_continuesIfWeReturnTrue() {
+        // Arrange.
+        val (node1, node2, node3) = List(3) { object : Modifier.Node() {} }
+        val (node4, node5, node6) = List(3) { object : Modifier.Node() {} }
+        val visitedChildren = mutableListOf<Modifier.Node>()
+        rule.setContent {
+            Box(modifier = modifierElementOf { node1 }) {
+                Box(modifier = modifierElementOf { node2 }) {
+                    Box(modifier = modifierElementOf { node3 })
+                    Box(modifier = modifierElementOf { node4 }) {
+                        Box(modifier = modifierElementOf { node6 })
+                    }
+                    Box(modifier = modifierElementOf { node5 })
+                }
+            }
+        }
+
+        // Act.
+        rule.runOnIdle {
+            node1.visitSubtreeIf(Nodes.Any) {
+                visitedChildren.add(it)
+                true
+            }
+        }
+
+        // Assert.
+        assertThat(visitedChildren).containsExactly(node2, node3, node4, node6, node5).inOrder()
+    }
+
+    @Test
+    fun visitSubtree_visitsItemsInCurrentLayoutNode() {
+        // Arrange.
+        val (node1, node2, node3, node4, node5) = List(6) { object : Modifier.Node() {} }
+        val (node6, node7, node8, node9, node10) = List(6) { object : Modifier.Node() {} }
+        val visitedChildren = mutableListOf<Modifier.Node>()
+        rule.setContent {
+            Box(
+                modifier = modifierElementOf { node1 }
+                    .then(modifierElementOf { node2 })
+            ) {
+                Box(
+                    modifier = modifierElementOf { node3 }
+                        .then(modifierElementOf { node4 })
+                ) {
+                    Box(
+                        modifier = modifierElementOf { node7 }
+                            .then(modifierElementOf { node8 })
+                    )
+                }
+                Box(
+                    modifier = modifierElementOf { node5 }
+                        .then(modifierElementOf { node6 })
+                ) {
+                    Box(
+                        modifier = modifierElementOf { node9 }
+                            .then(modifierElementOf { node10 })
+                    )
+                }
+            }
+        }
+
+        // Act.
+        rule.runOnIdle {
+            node1.visitSubtreeIf(Nodes.Any) {
+                visitedChildren.add(it)
+                true
+            }
+        }
+
+        // Assert.
+        assertThat(visitedChildren)
+            .containsExactly(node2, node3, node4, node7, node8, node5, node6, node9, node10)
+            .inOrder()
+    }
+
+    @Test
     fun visitAncestorWithinCurrentLayoutNode_immediateParent() {
         // Arrange.
         val (node1, node2) = List(2) { object : Modifier.Node() {} }
@@ -217,6 +326,83 @@ class DelegatableNodeTest {
     }
 
     @Test
+    fun nearestAncestorInDifferentLayoutNode_nonContiguousParentLayoutNode() {
+        // Arrange.
+        val (node1, node2) = List(2) { object : Modifier.Node() {} }
+        rule.setContent {
+            Box(modifier = modifierElementOf { node1 }) {
+                Box {
+                    Box(modifier = modifierElementOf { node2 })
+                }
+            }
+        }
+
+        // Act.
+        val parent = rule.runOnIdle {
+            node2.nearestAncestor(Nodes.Any)
+        }
+
+        // Assert.
+        assertThat(parent).isEqualTo(node1)
+    }
+
+    @Test
+    fun visitAncestors_sameLayoutNode_calledDuringOnDetach() {
+        // Arrange.
+        val (node1, node2) = List(5) { object : Modifier.Node() {} }
+        val visitedAncestors = mutableListOf<Modifier.Node>()
+        val detachableNode = DetachableNode { node ->
+            node.visitAncestors(Nodes.Any) { visitedAncestors.add(it) }
+        }
+        val removeNode = mutableStateOf(false)
+        rule.setContent {
+            Box(
+                modifier = modifierElementOf { node1 }
+                    .then(modifierElementOf { node2 })
+                    .then(if (removeNode.value) Modifier else modifierElementOf { detachableNode })
+            )
+        }
+
+        // Act.
+        rule.runOnIdle { removeNode.value = true }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(visitedAncestors)
+                .containsAtLeastElementsIn(arrayOf(node2, node1))
+                .inOrder()
+        }
+    }
+
+    @Test
+    fun visitAncestors_multipleLayoutNodes_calledDuringOnDetach() {
+        // Arrange.
+        val (node1, node2) = List(5) { object : Modifier.Node() {} }
+        val visitedAncestors = mutableListOf<Modifier.Node>()
+        val detachableNode = DetachableNode { node ->
+            node.visitAncestors(Nodes.Any) { visitedAncestors.add(it) }
+        }
+        val removeNode = mutableStateOf(false)
+        rule.setContent {
+            Box(modifierElementOf { node1 }) {
+                Box(modifierElementOf { node2 }) {
+                    Box(if (removeNode.value) Modifier else modifierElementOf { detachableNode })
+                }
+            }
+        }
+
+        // Act.
+        rule.runOnIdle { removeNode.value = true }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(visitedAncestors)
+                .containsAtLeastElementsIn(arrayOf(node2, node1))
+                .inOrder()
+        }
+    }
+
+    @Test
     fun nearestAncestorWithinCurrentLayoutNode_immediateParent() {
         // Arrange.
         val (node1, node2) = List(2) { object : Modifier.Node() {} }
@@ -277,33 +463,157 @@ class DelegatableNodeTest {
     }
 
     @Test
-    fun nearestAncestorInDifferentLayoutNode_nonContiguousParentLayoutNode() {
+    fun findAncestors() {
         // Arrange.
-        val (node1, node2) = List(2) { object : Modifier.Node() {} }
+        val (node1, node2, node3, node4) = List(4) { FocusTargetModifierNode() }
+        val (node5, node6, node7, node8) = List(4) { FocusTargetModifierNode() }
         rule.setContent {
-            Box(modifier = modifierElementOf { node1 }) {
+            Box(
+                modifier = modifierElementOf { node1 }
+                    .then(modifierElementOf { node2 })
+            ) {
                 Box {
-                    Box(modifier = modifierElementOf { node2 })
+                    Box(modifier = modifierElementOf { node3 })
+                    Box(
+                        modifier = modifierElementOf { node4 }
+                            .then(modifierElementOf { node5 })
+                    ) {
+                        Box(
+                            modifier = modifierElementOf { node6 }
+                                .then(modifierElementOf { node7 })
+                        )
+                    }
+                    Box(modifier = modifierElementOf { node8 })
                 }
             }
         }
 
         // Act.
-        val parent = rule.runOnIdle {
-            node2.nearestAncestor(Nodes.Any)
+        val ancestors = rule.runOnIdle {
+            node6.ancestors(Nodes.FocusTarget)
         }
 
         // Assert.
-        assertThat(parent).isEqualTo(node1)
+        // This test returns all ancestors, even the root focus node. so we drop that one.
+        assertThat(ancestors?.dropLast(1)).containsExactly(node5, node4, node2, node1).inOrder()
+    }
+
+    @Test
+    fun firstChild_currentLayoutNode() {
+        // Arrange.
+        val (node1, node2, node3) = List(3) { object : Modifier.Node() {} }
+        rule.setContent {
+            Box(
+                modifier = modifierElementOf { node1 }
+                    .then(modifierElementOf { node2 })
+                    .then(modifierElementOf { node3 })
+            )
+        }
+
+        // Act.
+        val child = rule.runOnIdle {
+            node1.firstChild(Nodes.Any)
+        }
+
+        // Assert.
+        assertThat(child).isEqualTo(node2)
+    }
+
+    @Test
+    fun firstChild_currentLayoutNode_nonContiguousChild() {
+        // Arrange.
+        val (node1, node2) = List(3) { object : Modifier.Node() {} }
+        rule.setContent {
+            Box(
+                modifier = modifierElementOf { node1 }
+                    .otherModifier()
+                    .then(modifierElementOf { node2 })
+            )
+        }
+
+        // Act.
+        val child = rule.runOnIdle {
+            node1.firstChild(Nodes.Any)
+        }
+
+        // Assert.
+        assertThat(child).isEqualTo(node2)
+    }
+
+    @Test
+    fun firstChild_differentLayoutNode() {
+        // Arrange.
+        val (node1, node2, node3) = List(3) { object : Modifier.Node() {} }
+        rule.setContent {
+            Box(modifier = modifierElementOf { node1 }) {
+                Box(modifier = modifierElementOf { node2 }
+                    .then(modifierElementOf { node3 }))
+            }
+        }
+
+        // Act.
+        val child = rule.runOnIdle {
+            node1.firstChild(Nodes.Any)
+        }
+
+        // Assert.
+        assertThat(child).isEqualTo(node2)
+    }
+
+    fun firstChild_differentLayoutNode_nonContiguousChild() {
+        // Arrange.
+        val (node1, node2) = List(3) { object : Modifier.Node() {} }
+        rule.setContent {
+            Box(modifier = modifierElementOf { node1 }) {
+                Box {
+                    Box(modifier = Modifier.otherModifier()) {
+                        Box(modifier = modifierElementOf { node2 })
+                    }
+                }
+            }
+        }
+
+        // Act.
+        val child = rule.runOnIdle {
+            node1.firstChild(Nodes.Any)
+        }
+
+        // Assert.
+        assertThat(child).isEqualTo(node2)
+    }
+
+    @Test
+    fun delegatedNodeGetsCoordinator() {
+        val node = object : DelegatingNode() {
+            val inner = delegated {
+                object : Modifier.Node() { }
+            }
+        }
+
+        rule.setContent {
+            Box(modifier = modifierElementOf { node })
+        }
+
+        rule.runOnIdle {
+            assertThat(node.isAttached).isTrue()
+            assertThat(node.coordinator).isNotNull()
+            assertThat(node.inner.isAttached).isTrue()
+            assertThat(node.inner.coordinator).isNotNull()
+            assertThat(node.inner.coordinator).isEqualTo(node.coordinator)
+        }
     }
 
     private fun Modifier.otherModifier(): Modifier = this.then(Modifier)
-}
 
-@ExperimentalComposeUiApi
-internal inline fun <reified T : Modifier.Node> modifierElementOf(
-    crossinline create: () -> T,
-): Modifier = object : ModifierNodeElement<T>(null, {}) {
-    override fun create(): T = create()
-    override fun update(node: T): T = node
+    @Suppress("ModifierInspectorInfo") // b/251831790.
+    @ExperimentalComposeUiApi
+    private inline fun <reified T : Modifier.Node> modifierElementOf(crossinline create: () -> T) =
+        modifierElementOf(create) { name = "testNode" }
+
+    private class DetachableNode(val onDetach: (DetachableNode) -> Unit) : Modifier.Node() {
+        override fun onDetach() {
+            onDetach.invoke(this)
+            super.onDetach()
+        }
+    }
 }

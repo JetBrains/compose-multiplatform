@@ -94,8 +94,9 @@ fun rememberVectorPainter(
     )
 
 /**
- * Create a [VectorPainter] with the Vector defined by the provided
- * sub-composition
+ * Create a [VectorPainter] with the Vector defined by the provided sub-composition.
+ *
+ * Inside [content] use the [Group] and [Path] composables to define the vector.
  *
  * @param [defaultWidth] Intrinsic width of the Vector in [Dp]
  * @param [defaultHeight] Intrinsic height of the Vector in [Dp]

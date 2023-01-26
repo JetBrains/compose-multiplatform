@@ -76,9 +76,11 @@ import androidx.compose.ui.unit.TextUnit
  * @param softWrap whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space. If [softWrap] is false,
  * [overflow] and TextAlign may have unexpected effects.
- * @param maxLines an optional maximum number of lines for the text to span, wrapping if
+ * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
- * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
+ * [overflow] and [softWrap]. It is required that 1 <= [minLines] <= [maxLines].
+ * @param minLines The minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
  * @param onTextLayout callback that is executed when a new text layout is calculated. A
  * [TextLayoutResult] object that callback provides contains paragraph information, size of the
  * text, baselines and other details. The callback can be used to add additional decoration or
@@ -101,6 +103,7 @@ fun Text(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
 ) {
@@ -133,6 +136,51 @@ fun Text(
         overflow,
         softWrap,
         maxLines,
+        minLines
+    )
+}
+
+@Deprecated(
+    "Maintained for binary compatibility. Use version with minLines instead",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun Text(
+    text: String,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    style: TextStyle = LocalTextStyle.current
+) {
+    Text(
+        text,
+        modifier,
+        color,
+        fontSize,
+        fontStyle,
+        fontWeight,
+        fontFamily,
+        letterSpacing,
+        textDecoration,
+        textAlign,
+        lineHeight,
+        overflow,
+        softWrap,
+        maxLines,
+        1,
+        onTextLayout,
+        style
     )
 }
 
@@ -175,9 +223,11 @@ fun Text(
  * @param softWrap whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space. If [softWrap] is false,
  * [overflow] and TextAlign may have unexpected effects.
- * @param maxLines an optional maximum number of lines for the text to span, wrapping if
+ * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
- * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
+ * [overflow] and [softWrap]. It is required that 1 <= [minLines] <= [maxLines].
+ * @param minLines The minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
  * @param inlineContent a map storing composables that replaces certain ranges of the text, used to
  * insert composables into text layout. See [InlineTextContent].
  * @param onTextLayout callback that is executed when a new text layout is calculated. A
@@ -202,6 +252,7 @@ fun Text(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1,
     inlineContent: Map<String, InlineTextContent> = mapOf(),
     onTextLayout: (TextLayoutResult) -> Unit = {},
     style: TextStyle = LocalTextStyle.current
@@ -227,14 +278,61 @@ fun Text(
         )
     )
     BasicText(
+        text = text,
+        modifier = modifier,
+        style = mergedStyle,
+        onTextLayout = onTextLayout,
+        overflow = overflow,
+        softWrap = softWrap,
+        maxLines = maxLines,
+        minLines = minLines,
+        inlineContent = inlineContent
+    )
+}
+
+@Deprecated(
+    "Maintained for binary compatibility. Use version with minLines instead",
+    level = DeprecationLevel.HIDDEN
+)
+@Composable
+fun Text(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    color: Color = Color.Unspecified,
+    fontSize: TextUnit = TextUnit.Unspecified,
+    fontStyle: FontStyle? = null,
+    fontWeight: FontWeight? = null,
+    fontFamily: FontFamily? = null,
+    letterSpacing: TextUnit = TextUnit.Unspecified,
+    textDecoration: TextDecoration? = null,
+    textAlign: TextAlign? = null,
+    lineHeight: TextUnit = TextUnit.Unspecified,
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    inlineContent: Map<String, InlineTextContent> = mapOf(),
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    style: TextStyle = LocalTextStyle.current
+) {
+    Text(
         text,
         modifier,
-        mergedStyle,
-        onTextLayout,
+        color,
+        fontSize,
+        fontStyle,
+        fontWeight,
+        fontFamily,
+        letterSpacing,
+        textDecoration,
+        textAlign,
+        lineHeight,
         overflow,
         softWrap,
         maxLines,
-        inlineContent
+        1,
+        inlineContent,
+        onTextLayout,
+        style
     )
 }
 

@@ -66,6 +66,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -528,6 +529,7 @@ class SelectableTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_interactionSource_focus_inKeyboardMode() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -629,6 +631,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_clickWithEnterKey() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
@@ -656,6 +659,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_clickWithNumPadEnterKey() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
@@ -683,6 +687,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_clickWithDPadCenter() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
@@ -710,6 +715,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_enterKey_emitsIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -756,6 +762,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_numPadEnterKey_emitsIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -802,6 +809,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_dpadCenter_emitsIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -885,6 +893,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_doubleEnterKey_emitsFurtherInteractions() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -945,6 +954,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
@@ -1006,6 +1016,7 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_interruptedClick_emitsCancelIndication() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()

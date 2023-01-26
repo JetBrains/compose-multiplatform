@@ -17,6 +17,7 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.KeyboardCapitalization
@@ -53,6 +54,7 @@ class KeyboardOptions constructor(
         /**
          * Default [KeyboardOptions]. Please see parameter descriptions for default values.
          */
+        @Stable
         val Default = KeyboardOptions()
     }
 

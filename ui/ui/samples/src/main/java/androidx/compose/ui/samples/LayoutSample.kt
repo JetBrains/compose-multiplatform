@@ -208,7 +208,7 @@ fun LayoutModifierNodeSample() {
         }
     }
     fun Modifier.verticalPadding(padding: Dp) = this then modifierElementOf(
-        params = padding,
+        key = padding,
         create = { VerticalPadding(padding) },
         update = { it.padding = padding },
         definitions = {

@@ -35,13 +35,13 @@ dependencies {
          */
 
         api("androidx.annotation:annotation:1.1.0")
-        api("androidx.compose.ui:ui:1.2.0")
-        api("androidx.compose.ui:ui-unit:1.1.1")
+        api("androidx.compose.ui:ui:1.2.1")
+        api("androidx.compose.ui:ui-unit:1.2.1")
 
-        implementation("androidx.compose.runtime:runtime:1.2.0")
-        implementation("androidx.compose.ui:ui-util:1.0.0")
+        implementation("androidx.compose.runtime:runtime:1.2.1")
+        implementation("androidx.compose.ui:ui-util:1.2.1")
         implementation("androidx.core:core:1.7.0")
-        implementation("androidx.compose.animation:animation-core:1.1.1")
+        implementation("androidx.compose.animation:animation-core:1.2.1")
         implementation(libs.kotlinStdlibCommon)
 
         testImplementation(libs.testRules)
@@ -50,7 +50,7 @@ dependencies {
         testImplementation(libs.truth)
 
         androidTestImplementation(project(":compose:foundation:foundation"))
-        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0")
+        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation("androidx.activity:activity-compose:1.3.1")
         // old version of common-java8 conflicts with newer version, because both have
@@ -58,7 +58,7 @@ dependencies {
         // Outside of androidx this is resolved via constraint added to lifecycle-common,
         // but it doesn't work in androidx.
         // See aosp/1804059
-        androidTestImplementation(project(":lifecycle:lifecycle-common-java8"))
+        androidTestImplementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
@@ -91,7 +91,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation("androidx.core:core:1.7.0")
-                implementation("androidx.compose.animation:animation-core:1.1.1")
+                implementation("androidx.compose.animation:animation-core:1.2.1")
             }
 
             desktopMain.dependencies {
@@ -130,7 +130,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Layouts"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_FOUNDATION
     inceptionYear = "2019"
     description = "Compose layout implementations"
     legacyDisableKotlinStrictApiMode = true
@@ -138,12 +137,4 @@ androidx {
 
 android {
     namespace "androidx.compose.foundation.layout"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all"
-        ]
-    }
 }

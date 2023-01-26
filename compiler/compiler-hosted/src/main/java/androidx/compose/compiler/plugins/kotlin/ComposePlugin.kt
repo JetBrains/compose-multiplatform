@@ -20,17 +20,18 @@ import androidx.compose.compiler.plugins.kotlin.lower.ClassStabilityFieldSeriali
 import com.intellij.mock.MockProject
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOptionProcessingException
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
-import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
+import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
+import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.internal.TypeResolutionInterceptor
 import org.jetbrains.kotlin.serialization.DescriptorSerializerPlugin
 
@@ -60,6 +61,7 @@ object ComposeConfiguration {
         CompilerConfigurationKey<Boolean>("Generate decoy methods in IR transform")
 }
 
+@OptIn(ExperimentalCompilerApi::class)
 class ComposeCommandLineProcessor : CommandLineProcessor {
     companion object {
         val PLUGIN_ID = "androidx.compose.compiler.plugins.kotlin"
@@ -187,25 +189,22 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
     }
 }
 
-class ComposeComponentRegistrar : ComponentRegistrar {
+@OptIn(ExperimentalCompilerApi::class)
+class ComposeComponentRegistrar :
+    @Suppress("DEPRECATION") org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar {
     override fun registerProjectComponents(
         project: MockProject,
         configuration: CompilerConfiguration
     ) {
-        registerProjectExtensions(
-            project as Project,
-            configuration
-        )
+        if (checkCompilerVersion(configuration)) {
+            registerCommonExtensions(project)
+            registerIrExtension(project, configuration)
+        }
     }
 
     companion object {
-
-        @Suppress("UNUSED_PARAMETER")
-        fun registerProjectExtensions(
-            project: Project,
-            configuration: CompilerConfiguration
-        ) {
-            val KOTLIN_VERSION_EXPECTATION = "1.7.10"
+        fun checkCompilerVersion(configuration: CompilerConfiguration): Boolean {
+            val KOTLIN_VERSION_EXPECTATION = "1.8.0"
             KotlinCompilerVersion.getVersion()?.let { version ->
                 val msgCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
                 val suppressKotlinVersionCheck = configuration.get(
@@ -248,7 +247,10 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                             " Compose Compiler requires Kotlin version" +
                             " $KOTLIN_VERSION_EXPECTATION but you appear to be using Kotlin" +
                             " version $version which is not known to be compatible.  Please" +
-                            " fix your configuration (or" +
+                            " consult the Compose-Kotlin compatibility map located at" +
+                            " https://developer.android.com" +
+                            "/jetpack/androidx/releases/compose-kotlin" +
+                            " to choose a compatible version pair (or" +
                             " `suppressKotlinVersionCompatibilityCheck` but don't say I" +
                             " didn't warn you!)."
                     )
@@ -256,47 +258,13 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                     // Return without registering the Compose plugin because the registration
                     // APIs may have changed and thus throw an exception during registration,
                     // preventing the diagnostic from being emitted.
-                    return
+                    return false
                 }
             }
+            return true
+        }
 
-            val liveLiteralsEnabled = configuration.get(
-                ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY,
-                false
-            )
-            val liveLiteralsV2Enabled = configuration.get(
-                ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY,
-                false
-            )
-            val generateFunctionKeyMetaClasses = configuration.get(
-                ComposeConfiguration.GENERATE_FUNCTION_KEY_META_CLASSES_KEY,
-                false
-            )
-            val sourceInformationEnabled = configuration.get(
-                ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
-                false
-            )
-            val intrinsicRememberEnabled = configuration.get(
-                ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
-                false
-            )
-            val decoysEnabled = configuration.get(
-                ComposeConfiguration.DECOYS_ENABLED_KEY,
-                false
-            )
-            val metricsDestination = configuration.get(
-                ComposeConfiguration.METRICS_DESTINATION_KEY,
-                ""
-            ).let {
-                if (it.isBlank()) null else it
-            }
-            val reportsDestination = configuration.get(
-                ComposeConfiguration.REPORTS_DESTINATION_KEY,
-                ""
-            ).let {
-                if (it.isBlank()) null else it
-            }
-
+        fun registerCommonExtensions(project: Project) {
             StorageComponentContainerContributor.registerExtension(
                 project,
                 ComposableCallChecker()
@@ -319,10 +287,50 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 @Suppress("IllegalExperimentalApiUsage")
                 ComposeTypeResolutionInterceptorExtension()
             )
+            DescriptorSerializerPlugin.registerExtension(
+                project,
+                ClassStabilityFieldSerializationPlugin()
+            )
+        }
+
+        fun registerIrExtension(
+            project: Project,
+            configuration: CompilerConfiguration
+        ) {
+            val liveLiteralsEnabled = configuration.getBoolean(
+                ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY,
+            )
+            val liveLiteralsV2Enabled = configuration.getBoolean(
+                ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY,
+            )
+            val generateFunctionKeyMetaClasses = configuration.getBoolean(
+                ComposeConfiguration.GENERATE_FUNCTION_KEY_META_CLASSES_KEY,
+            )
+            val sourceInformationEnabled = configuration.getBoolean(
+                ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
+            )
+            val intrinsicRememberEnabled = configuration.get(
+                ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
+                true
+            )
+            val decoysEnabled = configuration.getBoolean(
+                ComposeConfiguration.DECOYS_ENABLED_KEY,
+            )
+            val metricsDestination = configuration.get(
+                ComposeConfiguration.METRICS_DESTINATION_KEY,
+                ""
+            ).ifBlank { null }
+            val reportsDestination = configuration.get(
+                ComposeConfiguration.REPORTS_DESTINATION_KEY,
+                ""
+            ).ifBlank { null }
+            val validateIr = configuration.getBoolean(
+                JVMConfigurationKeys.VALIDATE_IR
+            )
+
             IrGenerationExtension.registerExtension(
                 project,
                 ComposeIrGenerationExtension(
-                    configuration = configuration,
                     liveLiteralsEnabled = liveLiteralsEnabled,
                     liveLiteralsV2Enabled = liveLiteralsV2Enabled,
                     generateFunctionKeyMetaClasses = generateFunctionKeyMetaClasses,
@@ -331,11 +339,8 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                     decoysEnabled = decoysEnabled,
                     metricsDestination = metricsDestination,
                     reportsDestination = reportsDestination,
+                    validateIr = validateIr,
                 )
-            )
-            DescriptorSerializerPlugin.registerExtension(
-                project,
-                ClassStabilityFieldSerializationPlugin()
             )
         }
     }

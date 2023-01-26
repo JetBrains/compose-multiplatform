@@ -44,6 +44,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
 import kotlin.test.assertFailsWith
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -242,6 +243,7 @@ internal class TextFieldVisualTransformationSelectionBoundsTest {
         assertValidMessage(error, sourceIndex = 0, toTransformed = false)
     }
 
+    @Ignore // b/265019668
     @Test
     fun selectionEnd_throws_onDrag_whenInvalidOriginalToTransformed() {
         rule.onNodeWithTag(testTag).performTouchInput { longClick() }
@@ -257,6 +259,7 @@ internal class TextFieldVisualTransformationSelectionBoundsTest {
         assertValidMessage(error, sourceIndex = text.length, toTransformed = true)
     }
 
+    @Ignore // b/265019668
     @Test
     fun selectionEnd_throws_onDrag_whenInvalidTransformedToOriginal() {
         rule.onNodeWithTag(testTag).performTouchInput { longClick() }

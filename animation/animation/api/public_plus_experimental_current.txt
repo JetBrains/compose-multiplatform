@@ -6,8 +6,9 @@ package androidx.compose.animation {
   }
 
   public final class AnimatedContentKt {
-    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static <S> void AnimatedContent(S? targetState, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedContentScope<S>,androidx.compose.animation.ContentTransform> transitionSpec, optional androidx.compose.ui.Alignment contentAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.animation.AnimatedVisibilityScope,? super S,kotlin.Unit> content);
+    method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static <S> void AnimatedContent(S? targetState, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedContentScope<S>,androidx.compose.animation.ContentTransform> transitionSpec, optional androidx.compose.ui.Alignment contentAlignment, optional String label, kotlin.jvm.functions.Function2<? super androidx.compose.animation.AnimatedVisibilityScope,? super S,kotlin.Unit> content);
     method @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static <S> void AnimatedContent(androidx.compose.animation.core.Transition<S>, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedContentScope<S>,androidx.compose.animation.ContentTransform> transitionSpec, optional androidx.compose.ui.Alignment contentAlignment, optional kotlin.jvm.functions.Function1<? super S,?> contentKey, kotlin.jvm.functions.Function2<? super androidx.compose.animation.AnimatedVisibilityScope,? super S,kotlin.Unit> content);
+    method @Deprecated @androidx.compose.animation.ExperimentalAnimationApi @androidx.compose.runtime.Composable public static <S> void AnimatedContent(S? targetState, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.AnimatedContentScope<S>,? extends androidx.compose.animation.ContentTransform> transitionSpec, optional androidx.compose.ui.Alignment contentAlignment, kotlin.jvm.functions.Function2<? super androidx.compose.animation.AnimatedVisibilityScope,? super S,? extends kotlin.Unit> content);
     method @androidx.compose.animation.ExperimentalAnimationApi public static androidx.compose.animation.SizeTransform SizeTransform(optional boolean clip, optional kotlin.jvm.functions.Function2<? super androidx.compose.ui.unit.IntSize,? super androidx.compose.ui.unit.IntSize,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.unit.IntSize>> sizeAnimationSpec);
     method @androidx.compose.animation.ExperimentalAnimationApi public static infix androidx.compose.animation.ContentTransform with(androidx.compose.animation.EnterTransition, androidx.compose.animation.ExitTransition exit);
   }
@@ -132,7 +133,7 @@ package androidx.compose.animation {
     property public final androidx.compose.animation.ExitTransition None;
   }
 
-  @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExperimentalAnimationApi {
+  @kotlin.RequiresOptIn(message="This is an experimental animation API.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.FIELD, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER}) public @interface ExperimentalAnimationApi {
   }
 
   public final class FlingCalculatorKt {
@@ -141,7 +142,7 @@ package androidx.compose.animation {
   public final class SingleValueAnimationKt {
     method public static androidx.compose.animation.core.Animatable<androidx.compose.ui.graphics.Color,androidx.compose.animation.core.AnimationVector4D> Animatable(long initialValue);
     method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColorAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional String label, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,kotlin.Unit>? finishedListener);
-    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<? extends androidx.compose.ui.graphics.Color>! animateColorAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,? extends kotlin.Unit>? finishedListener);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<? extends androidx.compose.ui.graphics.Color> animateColorAsState(long targetValue, optional androidx.compose.animation.core.AnimationSpec<androidx.compose.ui.graphics.Color> animationSpec, optional kotlin.jvm.functions.Function1<? super androidx.compose.ui.graphics.Color,? extends kotlin.Unit>? finishedListener);
   }
 
   @androidx.compose.animation.ExperimentalAnimationApi public interface SizeTransform {
@@ -166,12 +167,13 @@ package androidx.compose.animation {
 
   public final class SplineBasedFloatDecayAnimationSpec_androidKt {
     method @androidx.compose.runtime.Composable public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> rememberSplineBasedDecay();
-    method @Deprecated public static <T> androidx.compose.animation.core.DecayAnimationSpec<T>! splineBasedDecayDeprecated(androidx.compose.ui.unit.Density density);
+    method @Deprecated public static <T> androidx.compose.animation.core.DecayAnimationSpec<T> splineBasedDecayDeprecated(androidx.compose.ui.unit.Density density);
   }
 
   public final class TransitionKt {
     method @androidx.compose.runtime.Composable public static inline <S> androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.Transition<S>, optional kotlin.jvm.functions.Function1<? super androidx.compose.animation.core.Transition.Segment<S>,? extends androidx.compose.animation.core.FiniteAnimationSpec<androidx.compose.ui.graphics.Color>> transitionSpec, optional String label, kotlin.jvm.functions.Function1<? super S,androidx.compose.ui.graphics.Color> targetValueByState);
-    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.InfiniteTransition, long initialValue, long targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color> animationSpec);
+    method @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.InfiniteTransition, long initialValue, long targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color> animationSpec, optional String label);
+    method @Deprecated @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<? extends androidx.compose.ui.graphics.Color> animateColor(androidx.compose.animation.core.InfiniteTransition, long initialValue, long targetValue, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color> animationSpec);
   }
 
 }

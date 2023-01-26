@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
@@ -24,6 +24,7 @@ import androidx.compose.testutils.ToggleableTestCase
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkComposeMeasureLayout
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
 import org.junit.Rule
@@ -39,10 +40,15 @@ import org.junit.runners.Parameterized
 class IfNotEmptyCallText(private val text: String) : LayeredComposeTestCase(), ToggleableTestCase {
     private var toggleText = mutableStateOf("")
 
+    private val style = TextStyle.Default.copy(fontFamily = FontFamily.Monospace)
+
     @Composable
     override fun MeasuredContent() {
         if (toggleText.value.isNotEmpty()) {
-            Text(toggleText.value, fontFamily = FontFamily.Monospace)
+            BasicText(
+                toggleText.value,
+                style = style
+            )
         }
     }
 

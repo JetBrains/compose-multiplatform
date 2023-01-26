@@ -62,7 +62,7 @@ internal abstract class NodeCoordinator(
     Measurable,
     LayoutCoordinates,
     OwnerScope,
-    (Canvas) -> Unit {
+        (Canvas) -> Unit {
 
     abstract val tail: Modifier.Node
 
@@ -83,6 +83,7 @@ internal abstract class NodeCoordinator(
 
     override val coordinates: LayoutCoordinates
         get() = this
+
     private fun headNode(includeTail: Boolean): Modifier.Node? {
         return if (layoutNode.outerCoordinator === this) {
             layoutNode.nodes.head
@@ -240,6 +241,7 @@ internal abstract class NodeCoordinator(
         }
         layoutNode.owner?.onLayoutChange(layoutNode)
         measuredSize = IntSize(width, height)
+        graphicsLayerScope.size = measuredSize.toSize()
         visitNodes(Nodes.Draw) {
             it.onMeasureResultChanged()
         }
@@ -255,11 +257,13 @@ internal abstract class NodeCoordinator(
         get() {
             var data: Any? = null
             val thisNode = tail
-            with(layoutNode.density) {
-                layoutNode.nodes.tailToHead {
-                    if (it === thisNode) return@tailToHead
-                    if (it.isKind(Nodes.ParentData) && it is ParentDataModifierNode) {
-                        data = with(it) { modifyParentData(data) }
+            if (layoutNode.nodes.has(Nodes.ParentData)) {
+                with(layoutNode.density) {
+                    layoutNode.nodes.tailToHead {
+                        if (it === thisNode) return@tailToHead
+                        if (it.isKind(Nodes.ParentData) && it is ParentDataModifierNode) {
+                            data = with(it) { modifyParentData(data) }
+                        }
                     }
                 }
             }
@@ -291,6 +295,8 @@ internal abstract class NodeCoordinator(
      */
     private var layerPositionalProperties: LayerPositionalProperties? = null
 
+    internal val lastMeasurementConstraints: Constraints get() = measurementConstraints
+
     protected inline fun performingMeasure(
         constraints: Constraints,
         block: () -> Placeable
@@ -309,15 +315,6 @@ internal abstract class NodeCoordinator(
                 }
             }
         }
-    }
-
-    /**
-     * An initialization function that is called when the [NodeCoordinator] is initially created,
-     * and also called when the [NodeCoordinator] is re-used.
-     */
-    // TODO(lmr): we should try and get rid of this since it isn't always needed!
-    fun onInitialize() {
-        layer?.invalidate()
     }
 
     /**
@@ -405,12 +402,26 @@ internal abstract class NodeCoordinator(
         }
     }
 
-    fun onLayerBlockUpdated(layerBlock: (GraphicsLayerScope.() -> Unit)?) {
+    fun updateLayerBlock(
+        layerBlock: (GraphicsLayerScope.() -> Unit)?,
+        forceLayerInvalidated: Boolean = false
+    ) {
+        val layerInvalidated = this.layerBlock !== layerBlock || forceLayerInvalidated
+        this.layerBlock = layerBlock
+        onLayerBlockUpdated(layerBlock, forceLayerInvalidated = layerInvalidated)
+    }
+
+    private fun onLayerBlockUpdated(
+        layerBlock: (GraphicsLayerScope.() -> Unit)?,
+        forceLayerInvalidated: Boolean = false
+    ) {
         val layerInvalidated = this.layerBlock !== layerBlock || layerDensity != layoutNode
-            .density || layerLayoutDirection != layoutNode.layoutDirection
+            .density || layerLayoutDirection != layoutNode.layoutDirection ||
+            forceLayerInvalidated
         this.layerBlock = layerBlock
         this.layerDensity = layoutNode.density
         this.layerLayoutDirection = layoutNode.layoutDirection
+
         if (isAttached && layerBlock != null) {
             if (layer == null) {
                 layer = layoutNode.requireOwner().createLayer(
@@ -446,6 +457,7 @@ internal abstract class NodeCoordinator(
             val layerBlock = requireNotNull(layerBlock)
             graphicsLayerScope.reset()
             graphicsLayerScope.graphicsDensity = layoutNode.density
+            graphicsLayerScope.size = size.toSize()
             snapshotObserver.observeReads(this, onCommitAffectingLayerParams) {
                 layerBlock.invoke(graphicsLayerScope)
             }
@@ -469,6 +481,7 @@ internal abstract class NodeCoordinator(
                 shape = graphicsLayerScope.shape,
                 clip = graphicsLayerScope.clip,
                 renderEffect = graphicsLayerScope.renderEffect,
+                compositingStrategy = graphicsLayerScope.compositingStrategy,
                 layoutDirection = layoutNode.layoutDirection,
                 density = layoutNode.density
             )
@@ -937,12 +950,9 @@ internal abstract class NodeCoordinator(
      * recreated.
      */
     open fun detach() {
-        onLayerBlockUpdated(layerBlock)
-        // The layer has been removed and we need to invalidate the containing layer. We've lost
-        // which layer contained this one, but all layers in this modifier chain will be invalidated
-        // in onModifierChanged(). Therefore the only possible layer that won't automatically be
-        // invalidated is the parent's layer. We'll invalidate it here:
-        layoutNode.parent?.invalidateLayer()
+        if (layer != null) {
+            onLayerBlockUpdated(null)
+        }
     }
 
     /**

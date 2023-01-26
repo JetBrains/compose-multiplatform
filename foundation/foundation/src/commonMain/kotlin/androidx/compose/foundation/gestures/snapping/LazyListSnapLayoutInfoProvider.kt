@@ -16,6 +16,9 @@
 
 package androidx.compose.foundation.gestures.snapping
 
+import androidx.compose.animation.core.DecayAnimationSpec
+import androidx.compose.animation.core.calculateTargetValue
+import androidx.compose.animation.splineBasedDecay
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.FlingBehavior
 import androidx.compose.foundation.gestures.Orientation
@@ -27,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 /**
  * A [SnapLayoutInfoProvider] for LazyLists.
@@ -48,8 +53,18 @@ fun SnapLayoutInfoProvider(
     private val layoutInfo: LazyListLayoutInfo
         get() = lazyListState.layoutInfo
 
-    // Single page snapping is the default
-    override fun Density.calculateApproachOffset(initialVelocity: Float): Float = 0f
+    // Decayed page snapping is the default
+    override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
+        val decayAnimationSpec: DecayAnimationSpec<Float> = splineBasedDecay(this)
+        val offset =
+            decayAnimationSpec.calculateTargetValue(NoDistance, initialVelocity).absoluteValue
+        val finalDecayOffset = (offset - calculateSnapStepSize()).coerceAtLeast(0f)
+        return if (finalDecayOffset == 0f) {
+            finalDecayOffset
+        } else {
+            finalDecayOffset * initialVelocity.sign
+        }
+    }
 
     override fun Density.calculateSnappingOffsetBounds(): ClosedFloatingPointRange<Float> {
         var lowerBoundOffset = Float.NEGATIVE_INFINITY
@@ -73,7 +88,7 @@ fun SnapLayoutInfoProvider(
         return lowerBoundOffset.rangeTo(upperBoundOffset)
     }
 
-    override fun Density.snapStepSize(): Float = with(layoutInfo) {
+    override fun Density.calculateSnapStepSize(): Float = with(layoutInfo) {
         if (visibleItemsInfo.isNotEmpty()) {
             visibleItemsInfo.fastSumBy { it.size } / visibleItemsInfo.size.toFloat()
         } else {
@@ -83,7 +98,7 @@ fun SnapLayoutInfoProvider(
 }
 
 /**
- * Create and remember a FlingBehavior for single page snapping in Lazy Lists. This will snap
+ * Create and remember a FlingBehavior for decayed snapping in Lazy Lists. This will snap
  * the item's center to the center of the viewport.
  *
  * @param lazyListState The [LazyListState] from the LazyList where this [FlingBehavior] will

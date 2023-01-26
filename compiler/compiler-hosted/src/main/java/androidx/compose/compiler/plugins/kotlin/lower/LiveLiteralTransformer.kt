@@ -16,12 +16,10 @@
 
 package androidx.compose.compiler.plugins.kotlin.lower
 
-import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
+import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.ir.addChild
-import org.jetbrains.kotlin.backend.common.ir.copyTo
-import org.jetbrains.kotlin.backend.common.ir.createParameterDeclarations
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.ClassKind
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -97,7 +95,10 @@ import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
+import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.copyTo
+import org.jetbrains.kotlin.ir.util.createParameterDeclarations
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
@@ -170,19 +171,17 @@ open class LiveLiteralTransformer(
     }
 
     private val liveLiteral =
-        getInternalFunction("liveLiteral")
-    private val derivedStateOf =
-        getTopLevelFunction(ComposeFqNames.fqNameFor("derivedStateOf"))
+        getTopLevelFunction(ComposeCallableIds.liveLiteral)
     private val isLiveLiteralsEnabled =
-        getInternalProperty("isLiveLiteralsEnabled")
+        getTopLevelPropertyGetter(ComposeCallableIds.isLiveLiteralsEnabled)
     private val liveLiteralInfoAnnotation =
-        getInternalClass("LiveLiteralInfo")
+        getTopLevelClass(ComposeClassIds.LiveLiteralInfo)
     private val liveLiteralFileInfoAnnotation =
-        getInternalClass("LiveLiteralFileInfo")
+        getTopLevelClass(ComposeClassIds.LiveLiteralFileInfo)
     private val stateInterface =
-        getTopLevelClass(ComposeFqNames.fqNameFor("State"))
+        getTopLevelClass(ComposeClassIds.State)
     private val NoLiveLiteralsAnnotation =
-        getTopLevelClass(ComposeFqNames.fqNameFor("NoLiveLiterals"))
+        getTopLevelClass(ComposeClassIds.NoLiveLiterals)
 
     private fun IrAnnotationContainer.hasNoLiveLiteralsAnnotation(): Boolean = annotations.any {
         it.symbol.owner == NoLiveLiteralsAnnotation.owner.primaryConstructor
@@ -271,6 +270,7 @@ open class LiveLiteralTransformer(
                 visibility = DescriptorVisibilities.PRIVATE
                 origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
             }.also { fn ->
+                fn.correspondingPropertySymbol = p.symbol
                 val thisParam = clazz.thisReceiver!!.copyTo(fn)
                 fn.dispatchReceiverParameter = thisParam
                 fn.body = DeclarationIrBuilder(context, fn.symbol).irBlockBody {
@@ -297,6 +297,7 @@ open class LiveLiteralTransformer(
                 visibility = DescriptorVisibilities.PRIVATE
                 origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
             }.also { fn ->
+                fn.correspondingPropertySymbol = p.symbol
                 val thisParam = clazz.thisReceiver!!.copyTo(fn)
                 fn.dispatchReceiverParameter = thisParam
                 fn.body = DeclarationIrBuilder(context, fn.symbol).irBlockBody {
@@ -308,6 +309,7 @@ open class LiveLiteralTransformer(
                 visibility = DescriptorVisibilities.PRIVATE
                 origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
             }.also { fn ->
+                fn.correspondingPropertySymbol = p.symbol
                 val thisParam = clazz.thisReceiver!!.copyTo(fn)
                 fn.dispatchReceiverParameter = thisParam
                 val valueParam = fn.addValueParameter("value", stateType)

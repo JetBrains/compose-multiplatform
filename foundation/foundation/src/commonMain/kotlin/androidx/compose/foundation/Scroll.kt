@@ -30,6 +30,7 @@ import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -147,6 +148,10 @@ class ScrollState(initial: Int) : ScrollableState {
 
     override val isScrollInProgress: Boolean
         get() = scrollableState.isScrollInProgress
+
+    override val canScrollForward: Boolean by derivedStateOf { value < maxValue }
+
+    override val canScrollBackward: Boolean by derivedStateOf { value > 0 }
 
     /**
      * Scroll to position in pixels with animation.
@@ -297,7 +302,7 @@ private fun Modifier.scroll(
             overscrollEffect = overscrollEffect
         )
         val layout =
-            ScrollingLayoutModifier(state, reverseScrolling, isVertical, overscrollEffect)
+            ScrollingLayoutModifier(state, reverseScrolling, isVertical)
         semantics
             .clipScrollableContainer(orientation)
             .overscroll(overscrollEffect)
@@ -314,12 +319,10 @@ private fun Modifier.scroll(
     }
 )
 
-@OptIn(ExperimentalFoundationApi::class)
 private data class ScrollingLayoutModifier(
     val scrollerState: ScrollState,
     val isReversed: Boolean,
-    val isVertical: Boolean,
-    val overscrollEffect: OverscrollEffect
+    val isVertical: Boolean
 ) : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
@@ -340,7 +343,6 @@ private data class ScrollingLayoutModifier(
         val scrollHeight = placeable.height - height
         val scrollWidth = placeable.width - width
         val side = if (isVertical) scrollHeight else scrollWidth
-        overscrollEffect.isEnabled = side != 0
         // The max value must be updated before returning from the measure block so that any other
         // chained RemeasurementModifiers that try to perform scrolling based on the new
         // measurements inside onRemeasured are able to scroll to the new max based on the newly-

@@ -17,7 +17,6 @@
 package androidx.compose.material
 
 import android.os.SystemClock.sleep
-import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -67,7 +66,6 @@ import org.junit.runner.RunWith
 
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-@OptIn(ExperimentalMaterialApi::class)
 class DrawerTest {
 
     @get:Rule
@@ -132,6 +130,7 @@ class DrawerTest {
             .assertWidthIsEqualTo(rule.rootWidth() - 56.dp)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_testOffset_shortDrawer_whenClosed() {
         rule.setMaterialContent {
@@ -150,6 +149,7 @@ class DrawerTest {
             .assertTopPositionInRootIsEqualTo(height)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_testOffset_shortDrawer_whenExpanded() {
         rule.setMaterialContent {
@@ -169,6 +169,7 @@ class DrawerTest {
             .assertTopPositionInRootIsEqualTo(expectedTop)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_testOffset_tallDrawer_whenClosed() {
         rule.setMaterialContent {
@@ -188,6 +189,7 @@ class DrawerTest {
             .assertTopPositionInRootIsEqualTo(expectedTop)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @Ignore // Disabled until b/178529942 is fixed
     fun bottomDrawer_testOffset_tallDrawer_whenOpen() {
@@ -209,6 +211,7 @@ class DrawerTest {
             .assertTopPositionInRootIsEqualTo(expectedTop)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_testOffset_tallDrawer_whenExpanded() {
         rule.setMaterialContent {
@@ -227,6 +230,7 @@ class DrawerTest {
             .assertTopPositionInRootIsEqualTo(expectedTop)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @SmallTest
     fun bottomDrawer_hasPaneTitle() {
@@ -319,12 +323,12 @@ class DrawerTest {
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
 
         // When the drawer state is set to Opened
-        drawerState.animateTo(DrawerValue.Open, TweenSpec())
+        drawerState.open()
         // Then the drawer should be opened
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(0.dp)
 
         // When the drawer state is set to Closed
-        drawerState.animateTo(DrawerValue.Closed, TweenSpec())
+        drawerState.close()
         // Then the drawer should be closed
         rule.onNodeWithTag("drawer").assertLeftPositionInRootIsEqualTo(-width)
     }
@@ -622,6 +626,7 @@ class DrawerTest {
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_bodyContent_clickable(): Unit = runBlocking(AutoTestFrameClock()) {
         var drawerClicks = 0
@@ -666,6 +671,7 @@ class DrawerTest {
         assertThat(bodyClicks).isEqualTo(1)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_drawerContent_doesntPropagateClicksWhenOpen(): Unit = runBlocking(
@@ -714,6 +720,7 @@ class DrawerTest {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_openBySwipe_shortDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
@@ -755,6 +762,7 @@ class DrawerTest {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_scrim_doesNotClickWhenTransparent() {
         val topTag = "BottomDrawer"
@@ -797,6 +805,7 @@ class DrawerTest {
         assertEquals(2, topNode.children.size)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_scrim_disabledWhenGesturesDisabled() {
         val topTag = "BottomDrawer"
@@ -829,6 +838,7 @@ class DrawerTest {
         rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenOpened)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_respectsConfirmStateChange(): Unit = runBlocking(AutoTestFrameClock()) {
@@ -876,6 +886,7 @@ class DrawerTest {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_expandBySwipe_tallDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
@@ -944,6 +955,7 @@ class DrawerTest {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_openBySwipe_onBodyContent(): Unit = runBlocking(AutoTestFrameClock()) {
         val contentTag = "contentTestTag"
@@ -971,6 +983,7 @@ class DrawerTest {
         }
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_hasDismissAction_whenExpanded(): Unit = runBlocking(AutoTestFrameClock()) {
         lateinit var drawerState: BottomDrawerState
@@ -996,6 +1009,7 @@ class DrawerTest {
             .assertTopPositionInRootIsEqualTo(height)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_noDismissActionWhenClosed_hasDissmissActionWhenOpen(): Unit = runBlocking(
@@ -1038,6 +1052,7 @@ class DrawerTest {
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Dismiss))
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_openAndClose_shortDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
@@ -1077,6 +1092,7 @@ class DrawerTest {
         rule.onNodeWithTag(bottomDrawerTag).assertTopPositionInRootIsEqualTo(topWhenClosed)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     @LargeTest
     fun bottomDrawer_openAndClose_tallDrawer(): Unit = runBlocking(AutoTestFrameClock()) {
@@ -1151,6 +1167,7 @@ class DrawerTest {
         assertEquals(2, topNode.children.size)
     }
 
+    @OptIn(ExperimentalMaterialApi::class)
     @Test
     fun bottomDrawer_scrimNode_reportToSemanticsWhenOpen_notReportToSemanticsWhenClosed() {
         val topTag = "BottomDrawer"

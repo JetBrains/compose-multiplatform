@@ -18,12 +18,14 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.ComposeTimeoutException
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.MainTestClock
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import org.junit.rules.TestRule
-import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [TestRule] that allows you to test and control composables and applications using Compose.
@@ -179,3 +181,24 @@ interface ComposeContentTestRule : ComposeTestRule {
  * launched, see [createAndroidComposeRule].
  */
 expect fun createComposeRule(): ComposeContentTestRule
+
+/**
+ * Factory method to provide an implementation of [ComposeContentTestRule].
+ *
+ * This method is useful for tests in compose libraries where it is irrelevant where the compose
+ * content is hosted (e.g. an Activity on Android). Such tests typically set compose content
+ * themselves via [setContent][ComposeContentTestRule.setContent] and only instrument and assert
+ * that content.
+ *
+ * For Android this will use the default Activity (android.app.Activity). You need to add a
+ * reference to this activity into the manifest file of the corresponding tests (usually in
+ * androidTest/AndroidManifest.xml). If your Android test requires a specific Activity to be
+ * launched, see [createAndroidComposeRule].
+ *
+ * @param effectContext The [CoroutineContext] used to run the composition. The context for
+ * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
+ */
+@ExperimentalTestApi
+expect fun createComposeRule(
+    effectContext: CoroutineContext = EmptyCoroutineContext
+): ComposeContentTestRule

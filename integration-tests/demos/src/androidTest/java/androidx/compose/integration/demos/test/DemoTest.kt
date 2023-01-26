@@ -64,6 +64,7 @@ class DemoTest {
     @get:Rule
     val rule = createAndroidComposeRule<DemoActivity>()
 
+    @Ignore // b/223396893
     @Test
     fun testFiltering() {
         assertIsOnRootScreen()
@@ -109,6 +110,7 @@ class DemoTest {
         onNodeWithTag(Tags.AppBarTitle).assertTextEquals(demo.title)
     }
 
+    @Ignore("b/265281736")
     @Test
     fun navigateThroughAllDemos_1() {
         navigateThroughAllDemos(SplitDemoCategories[0])

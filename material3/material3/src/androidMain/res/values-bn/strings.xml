@@ -20,4 +20,13 @@
     <string name="dialog" msgid="4057925834421392736">"ডায়ালগ বক্স"</string>
     <string name="expanded" msgid="5974471714631304645">"বড় করা হয়েছে"</string>
     <string name="collapsed" msgid="5389587048670450460">"আড়াল করা হয়েছে"</string>
+    <string name="snackbar_dismiss" msgid="3962933905051144957">"বাতিল করুন"</string>
+    <string name="search_bar_search" msgid="6420018528474762666">"সার্চ করুন"</string>
+    <string name="suggestions_available" msgid="7189888345201419934">"নিচে দেওয়া সাজেশন"</string>
+    <string name="date_picker_title" msgid="9208721003668059792">"তারিখ বেছে নিন"</string>
+    <string name="date_picker_headline" msgid="2846784065735639969">"বেছে নেওয়া তারিখ"</string>
+    <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"কোনও একটি বছর বেছে নিতে পাল্টে নিন"</string>
+    <string name="date_picker_switch_to_day_selection" msgid="5820832733264067677">"কোনও একটি দিন বেছে নিতে পাল্টে নিন"</string>
+    <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"আগামী মাসে পরিবর্তন করুন"</string>
+    <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"আগের মাসে পরিবর্তন করুন"</string>
 </resources>

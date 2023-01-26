@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.AnnotatedString
@@ -59,6 +60,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.intersect
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.intl.LocaleList
+import androidx.compose.ui.text.platform.style.DrawStyleSpan
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.LineHeightStyle
@@ -237,6 +239,8 @@ private fun Spannable.setSpanStyle(
 
     setShadow(style.shadow, start, end)
 
+    setDrawStyle(style.drawStyle, start, end)
+
     createLetterSpacingSpan(style.letterSpacing, density)?.let {
         lowPrioritySpans.add(
             SpanRange(it, start, end)
@@ -412,6 +416,13 @@ private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {
             start,
             end
         )
+    }
+}
+
+@OptIn(InternalPlatformTextApi::class)
+private fun Spannable.setDrawStyle(drawStyle: DrawStyle?, start: Int, end: Int) {
+    drawStyle?.let {
+        setSpan(DrawStyleSpan(it), start, end)
     }
 }
 

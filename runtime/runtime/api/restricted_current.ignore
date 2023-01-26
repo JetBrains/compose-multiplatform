@@ -1,0 +1,11 @@
+// Baseline format: 1.0
+AddedAbstractMethod: androidx.compose.runtime.Composer#disableSourceInformation():
+    Added method androidx.compose.runtime.Composer.disableSourceInformation()
+AddedAbstractMethod: androidx.compose.runtime.Composer#endToMarker(int):
+    Added method androidx.compose.runtime.Composer.endToMarker(int)
+AddedAbstractMethod: androidx.compose.runtime.Composer#getCurrentMarker():
+    Added method androidx.compose.runtime.Composer.getCurrentMarker()
+
+
+RemovedMethod: androidx.compose.runtime.collection.MutableVectorKt#mutableVectorOf(T):
+    Removed method androidx.compose.runtime.collection.MutableVectorKt.mutableVectorOf(T)

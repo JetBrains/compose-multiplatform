@@ -20,6 +20,7 @@
     <string name="indeterminate" msgid="7933458017204019916">"Частково вибрано"</string>
     <string name="on" msgid="8655164131929253426">"Увімкнено"</string>
     <string name="off" msgid="875452955155264703">"Вимкнено"</string>
+    <string name="switch_role" msgid="2561197295334830845">"Перемикач"</string>
     <string name="selected" msgid="6043586758067023">"Вибрано"</string>
     <string name="not_selected" msgid="6610465462668679431">"Не вибрано"</string>
     <string name="template_percent" msgid="5946805113151406391">"Відсотків: <xliff:g id="PERCENTAGE">%1$d</xliff:g>."</string>

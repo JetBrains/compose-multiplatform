@@ -93,6 +93,17 @@ class VersionChecker(val context: IrPluginContext) {
             8400 to "1.3.0-beta02",
             8500 to "1.3.0-beta03",
             8600 to "1.3.0-rc01",
+            8601 to "1.3.0-rc02",
+            8602 to "1.3.0",
+            8603 to "1.3.1",
+            8604 to "1.3.2",
+            8605 to "1.3.3",
+            8606 to "1.3.4",
+            9000 to "1.4.0-alpha01",
+            9001 to "1.4.0-alpha02",
+            9100 to "1.4.0-alpha03",
+            9200 to "1.4.0-alpha04",
+            9300 to "1.4.0-alpha05",
         )
 
         /**
@@ -105,7 +116,7 @@ class VersionChecker(val context: IrPluginContext) {
          * The maven version string of this compiler. This string should be updated before/after every
          * release.
          */
-        const val compilerVersion: String = "1.3.2"
+        const val compilerVersion: String = "1.4.0"
         private val minimumRuntimeVersion: String
             get() = runtimeVersionToMavenVersionTable[minimumRuntimeVersionInt] ?: "unknown"
     }
@@ -114,13 +125,13 @@ class VersionChecker(val context: IrPluginContext) {
         // version checker accesses bodies of the functions that are not deserialized in KLIB
         if (!context.platform.isJvm()) return
 
-        val versionClass = context.referenceClass(ComposeFqNames.ComposeVersion)
+        val versionClass = context.referenceClass(ComposeClassIds.ComposeVersion)
         if (versionClass == null) {
             // If the version class isn't present, it likely means that compose runtime isn't on the
             // classpath anywhere. But also for dev03-dev15 there wasn't any ComposeVersion class at
             // all, so we check for the presence of the Composer class here to try and check for the
             // case that an older version of Compose runtime is available.
-            val composerClass = context.referenceClass(ComposeFqNames.Composer)
+            val composerClass = context.referenceClass(ComposeClassIds.Composer)
             if (composerClass != null) {
                 outdatedRuntimeWithUnknownVersionNumber()
             } else {

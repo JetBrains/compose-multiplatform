@@ -28,8 +28,10 @@ import androidx.compose.ui.platform.inspectable
 import androidx.compose.ui.unit.Velocity
 
 /**
- * PullRefresh modifier to be used in conjunction with [PullRefreshState]. Provides a connection
- * to the nested scroll system. Based on Android's SwipeRefreshLayout.
+ * A nested scroll modifier that provides scroll events to [state].
+ *
+ * Note that this modifier must be added above a scrolling container, such as a lazy column, in
+ * order to receive scroll events. For example:
  *
  * @sample androidx.compose.material.samples.PullRefreshSample
  *
@@ -51,8 +53,11 @@ fun Modifier.pullRefresh(
 }
 
 /**
- * A modifier for building pull-to-refresh components. Provides a connection to the nested scroll
- * system.
+ * A nested scroll modifier that provides [onPull] and [onRelease] callbacks to aid building custom
+ * pull refresh components.
+ *
+ * Note that this modifier must be added above a scrolling container, such as a lazy column, in
+ * order to receive scroll events. For example:
  *
  * @sample androidx.compose.material.samples.CustomPullRefreshSample
  *

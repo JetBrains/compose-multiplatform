@@ -37,16 +37,14 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.platform.AbstractComposeView
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.test.swipeDown
+import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.action.CoordinatesProvider
-import androidx.test.espresso.action.GeneralLocation
-import androidx.test.espresso.action.GeneralSwipeAction
-import androidx.test.espresso.action.Press
-import androidx.test.espresso.action.Swipe
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -55,8 +53,6 @@ import kotlin.math.abs
 import kotlin.math.sign
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
-import org.hamcrest.CoreMatchers.allOf
-import org.hamcrest.CoreMatchers.instanceOf
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -1034,7 +1030,7 @@ class NestedScrollModifierTest {
                 }
             }
 
-            Column(modifier = Modifier.fillMaxSize()) {
+            Column(modifier = Modifier.fillMaxSize().testTag("mainLayout")) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -1064,55 +1060,24 @@ class NestedScrollModifierTest {
             }
         }
 
-        composeViewSwipeUp()
+        rule.onNodeWithTag("mainLayout").performTouchInput { swipeUp(bottom, centerY) }
         rule.runOnIdle {
             // swipe ups provide negative signed velocities
             assertThat(sign(lastVelocity.y)).isEqualTo(-1)
         }
-        composeViewSwipeDown()
+        rule.onNodeWithTag("mainLayout").performTouchInput { swipeDown(centerY, bottom) }
         rule.runOnIdle {
             // swipe downs provide positive signed velocities
             assertThat(sign(lastVelocity.y)).isEqualTo(1)
         }
-        composeViewSwipeDown()
+        rule.onNodeWithTag("mainLayout").performTouchInput { swipeDown(centerY, bottom) }
         rule.runOnIdle {
             // swipe downs provide positive signed velocities
             assertThat(sign(lastVelocity.y)).isEqualTo(1)
         }
     }
 
-// helper functions
-
-    private fun composeViewSwipeUp() {
-        onView(allOf(instanceOf(AbstractComposeView::class.java)))
-            .perform(
-                espressoSwipe(
-                    GeneralLocation.BOTTOM_CENTER,
-                    GeneralLocation.CENTER
-                )
-            )
-    }
-
-    private fun composeViewSwipeDown() {
-        onView(allOf(instanceOf(AbstractComposeView::class.java)))
-            .perform(
-                espressoSwipe(
-                    GeneralLocation.CENTER,
-                    GeneralLocation.BOTTOM_CENTER
-                )
-            )
-    }
-
-    private fun espressoSwipe(
-        start: CoordinatesProvider,
-        end: CoordinatesProvider
-    ): GeneralSwipeAction {
-        return GeneralSwipeAction(
-            Swipe.FAST, start, end,
-            Press.FINGER
-        )
-    }
-
+    // helper functions
     private fun testMiddleParentAdditionRemoval(
         content: @Composable (root: Modifier, middle: Modifier, child: Modifier) -> Unit
     ) {

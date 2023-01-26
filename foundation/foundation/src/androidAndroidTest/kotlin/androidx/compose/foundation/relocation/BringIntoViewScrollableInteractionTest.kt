@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -37,6 +38,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.withFrameMillis
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color.Companion.Blue
@@ -55,7 +57,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
-import androidx.test.filters.MediumTest
+import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineScope
@@ -67,7 +69,7 @@ import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
 @OptIn(ExperimentalFoundationApi::class)
-@MediumTest
+@LargeTest
 @RunWith(Parameterized::class)
 class BringIntoViewScrollableInteractionTest(private val orientation: Orientation) {
 
@@ -79,7 +81,8 @@ class BringIntoViewScrollableInteractionTest(private val orientation: Orientatio
 
     /**
      * Captures a scope from inside the composition for [runBlockingAndAwaitIdle].
-     * Make sure to call [setContentAndInitialize] instead of calling `rule.setContent` to initialize this.
+     * Make sure to call [setContentAndInitialize] instead of calling `rule.setContent` to
+     * initialize this.
      */
     private lateinit var testScope: CoroutineScope
 
@@ -931,6 +934,150 @@ class BringIntoViewScrollableInteractionTest(private val orientation: Orientatio
             requests.single().invoke()
         }
     }
+
+    @Test
+    fun bringIntoView_concurrentOverlappingRequests_completeInGeometricOrder() {
+        // Arrange.
+        val childA = BringIntoViewRequester()
+        val childB = BringIntoViewRequester()
+        val childC = BringIntoViewRequester()
+        val completedRequests = mutableListOf<BringIntoViewRequester>()
+        setContentAndInitialize {
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .size(100.toDp())
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal -> Modifier.horizontalScroll(rememberScrollState())
+                            Vertical -> Modifier.verticalScroll(rememberScrollState())
+                        }
+                    )
+            ) {
+                // Nested boxes each with their own requester.
+                Box(
+                    Modifier
+                        .then(
+                            when (orientation) {
+                                Horizontal -> Modifier.padding(start = 100.toDp())
+                                Vertical -> Modifier.padding(top = 100.toDp())
+                            }
+                        )
+                        .size(100.toDp())
+                        .background(Green.copy(alpha = 0.25f))
+                        .bringIntoViewRequester(childA)
+                ) {
+                    Box(
+                        Modifier
+                            .align(Alignment.TopStart)
+                            .size(50.toDp())
+                            .background(Green.copy(alpha = 0.25f))
+                            .bringIntoViewRequester(childB)
+                    ) {
+                        Box(
+                            Modifier
+                                .align(Alignment.TopStart)
+                                .size(25.toDp())
+                                .background(Green.copy(alpha = 0.25f))
+                                .bringIntoViewRequester(childC)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Act.
+        // Launch requests from biggest to smallest.
+        listOf(childC, childB, childA).forEach {
+            testScope.launch {
+                it.bringIntoView()
+                completedRequests += it
+            }
+        }
+        rule.waitForIdle()
+
+        // Assert.
+        // The innermost request will be the first one to fully come into view, so it should
+        // complete first, and the outermost one should complete last.
+        assertThat(completedRequests).containsExactlyElementsIn(
+            listOf(childC, childB, childA)
+        ).inOrder()
+    }
+
+    @Test
+    fun bringIntoView_concurrentOverlappingRequests_completeInGeometricOrder_whenReversed() {
+        // Arrange.
+        val childA = BringIntoViewRequester()
+        val childB = BringIntoViewRequester()
+        val childC = BringIntoViewRequester()
+        val completedRequests = mutableListOf<BringIntoViewRequester>()
+        setContentAndInitialize {
+            Box(
+                Modifier
+                    .testTag(parentBox)
+                    .size(100.toDp())
+                    .background(LightGray)
+                    .then(
+                        when (orientation) {
+                            Horizontal -> Modifier.horizontalScroll(rememberScrollState())
+                            Vertical -> Modifier.verticalScroll(rememberScrollState())
+                        }
+                    )
+            ) {
+                // Nested boxes each with their own requester.
+                Box(
+                    Modifier
+                        .then(
+                            when (orientation) {
+                                Horizontal -> Modifier.padding(start = 100.toDp())
+                                Vertical -> Modifier.padding(top = 100.toDp())
+                            }
+                        )
+                        .size(100.toDp())
+                        .background(Green.copy(alpha = 0.25f))
+                        .bringIntoViewRequester(childA)
+                ) {
+                    Box(
+                        Modifier
+                            .align(Alignment.TopStart)
+                            .size(50.toDp())
+                            .background(Green.copy(alpha = 0.25f))
+                            .bringIntoViewRequester(childB)
+                    ) {
+                        Box(
+                            Modifier
+                                .align(Alignment.TopStart)
+                                .size(25.toDp())
+                                .background(Green.copy(alpha = 0.25f))
+                                .bringIntoViewRequester(childC)
+                        )
+                    }
+                }
+            }
+        }
+
+        // Act.
+        // Launch requests from biggest to smallest.
+        listOf(childA, childB, childC).forEach {
+            testScope.launch {
+                it.bringIntoView()
+                completedRequests += it
+            }
+        }
+        rule.waitForIdle()
+
+        // Assert.
+        // The innermost request will be the first one to fully come into view, so it should
+        // complete first, and the outermost one should complete last.
+        assertThat(completedRequests).containsExactlyElementsIn(
+            listOf(childC, childB, childA)
+        ).inOrder()
+    }
+
+    // TODO(b/222093277) Once the test runtime supports layout calls between frames, write more
+    //  tests for intermediate state changes, including request cancellation, non-overlapping
+    //  request interruption, etc.
 
     private fun setContentAndInitialize(content: @Composable () -> Unit) {
         rule.setContent {

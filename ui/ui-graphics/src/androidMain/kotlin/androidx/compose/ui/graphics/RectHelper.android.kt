@@ -16,6 +16,7 @@
 package androidx.compose.ui.graphics
 
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.unit.IntRect
 
 /**
  * Creates a new instance of [android.graphics.Rect] with the same bounds
@@ -54,3 +55,17 @@ fun android.graphics.Rect.toComposeRect(): androidx.compose.ui.geometry.Rect =
         this.right.toFloat(),
         this.bottom.toFloat()
     )
+
+/**
+ * Creates a new instance of [android.graphics.Rect] with the same bounds
+ * specified in the given [IntRect]
+ */
+fun IntRect.toAndroidRect(): android.graphics.Rect =
+    android.graphics.Rect(left, top, right, bottom)
+
+/**
+ * Creates a new instance of [androidx.compose.ui.unit.IntRect] with the same bounds
+ * specified in the given [android.graphics.Rect]
+ */
+fun android.graphics.Rect.toComposeIntRect(): IntRect =
+    IntRect(left, top, right, bottom)

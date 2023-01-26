@@ -16,31 +16,13 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.ModifierLocalConsumer
-import androidx.compose.ui.modifier.ModifierLocalProvider
-import androidx.compose.ui.modifier.ModifierLocalReadScope
-import androidx.compose.ui.modifier.modifierLocalOf
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 
 /**
- * A Modifier local that stores [FocusProperties] for a sub-hierarchy.
- *
- * @see [focusProperties]
- */
-internal val ModifierLocalFocusProperties =
-    modifierLocalOf<FocusPropertiesModifier?> { null }
-
-/**
- * Properties that are applied to [focusTarget]s that can read the [ModifierLocalFocusProperties]
- * Modifier Local.
+ * Properties that are applied to [focusTarget] that is the first child of the
+ * [FocusPropertiesModifierNode] that sets these properties.
  *
  * @see [focusProperties]
  */
@@ -172,59 +154,6 @@ interface FocusProperties {
         set(_) {}
 }
 
-/**
- * This modifier allows you to specify properties that are accessible to [focusTarget]s further
- * down the modifier chain or on child layout nodes.
- *
- * @sample androidx.compose.ui.samples.FocusPropertiesSample
- */
-fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = this.then(
-    FocusPropertiesModifier(
-        focusPropertiesScope = scope,
-        inspectorInfo = debugInspectorInfo {
-            name = "focusProperties"
-            properties["scope"] = scope
-        }
-    )
-)
-
-@Stable
-internal class FocusPropertiesModifier(
-    val focusPropertiesScope: FocusProperties.() -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : ModifierLocalConsumer,
-    ModifierLocalProvider<FocusPropertiesModifier?>,
-    InspectorValueInfo(inspectorInfo) {
-
-    private var parent: FocusPropertiesModifier? by mutableStateOf(null)
-
-    override fun onModifierLocalsUpdated(scope: ModifierLocalReadScope) {
-        parent = scope.run { ModifierLocalFocusProperties.current }
-    }
-
-    override val key = ModifierLocalFocusProperties
-
-    override val value: FocusPropertiesModifier
-        get() = this
-
-    override fun equals(other: Any?) =
-        other is FocusPropertiesModifier && focusPropertiesScope == other.focusPropertiesScope
-
-    override fun hashCode() = focusPropertiesScope.hashCode()
-
-    fun calculateProperties(focusProperties: FocusProperties) {
-        // Populate with the specified focus properties.
-        focusProperties.apply(focusPropertiesScope)
-
-        // Parent can override any values set by this
-        parent?.calculateProperties(focusProperties)
-    }
-}
-
-internal fun FocusModifier.setUpdatedProperties(properties: FocusProperties) {
-    if (properties.canFocus) activateNode() else deactivateNode()
-}
-
 internal class FocusPropertiesImpl : FocusProperties {
     override var canFocus: Boolean = true
     override var next: FocusRequester = FocusRequester.Default
@@ -241,29 +170,32 @@ internal class FocusPropertiesImpl : FocusProperties {
     override var exit: (FocusDirection) -> FocusRequester = { FocusRequester.Default }
 }
 
-internal fun FocusProperties.clear() {
-    canFocus = true
-    next = FocusRequester.Default
-    previous = FocusRequester.Default
-    up = FocusRequester.Default
-    down = FocusRequester.Default
-    left = FocusRequester.Default
-    right = FocusRequester.Default
-    start = FocusRequester.Default
-    end = FocusRequester.Default
+/**
+ * This modifier allows you to specify properties that are accessible to [focusTarget]s further
+ * down the modifier chain or on child layout nodes.
+ *
+ * @sample androidx.compose.ui.samples.FocusPropertiesSample
+ */
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = this.then(
     @OptIn(ExperimentalComposeUiApi::class)
-    enter = { FocusRequester.Default }
-    @OptIn(ExperimentalComposeUiApi::class)
-    exit = { FocusRequester.Default }
-}
+    (modifierElementOf(
+        key = scope,
+        create = { FocusPropertiesModifierNodeImpl(scope) },
+        update = { it.focusPropertiesScope = scope },
+        definitions = {
+            name = "focusProperties"
+            properties["scope"] = scope
+        }
+    ))
+)
 
-internal fun FocusModifier.refreshFocusProperties() {
-    val coordinator = coordinator ?: return
-    focusProperties.clear()
-    coordinator.layoutNode.owner?.snapshotObserver?.observeReads(this,
-        FocusModifier.RefreshFocusProperties
-    ) {
-        focusPropertiesModifier?.calculateProperties(focusProperties)
+@OptIn(ExperimentalComposeUiApi::class)
+private class FocusPropertiesModifierNodeImpl(
+    var focusPropertiesScope: FocusProperties.() -> Unit,
+) : FocusPropertiesModifierNode, Modifier.Node() {
+
+    override fun modifyFocusProperties(focusProperties: FocusProperties) {
+        focusProperties.apply(focusPropertiesScope)
     }
-    setUpdatedProperties(focusProperties)
 }

@@ -42,6 +42,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.Async
 import androidx.compose.ui.text.font.FontLoadingStrategy.Companion.OptionalLocal
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -202,17 +203,23 @@ class DemoAsyncFont(
     override val style: FontStyle,
     val delay: Long,
     val typeface: Typeface = Typeface.MONOSPACE
-) : AndroidFont(Async, ExampleAsyncFontTypefaceLoader)
+) : AndroidFont(Async, ExampleAsyncFontTypefaceLoader, FontVariation.Settings(weight, style))
 
-@OptIn(ExperimentalTextApi::class)
 class DemoOptionalFont(
     override val weight: FontWeight,
     override val style: FontStyle,
-) : AndroidFont(OptionalLocal, ExampleAsyncFontTypefaceLoader)
+) : AndroidFont(
+    OptionalLocal,
+    ExampleAsyncFontTypefaceLoader,
+    FontVariation.Settings(weight, style)
+)
 
-@OptIn(ExperimentalTextApi::class)
 class DemoBlockingFont(
     override val weight: FontWeight,
     override val style: FontStyle,
     val typeface: Typeface
-) : AndroidFont(OptionalLocal, ExampleAsyncFontTypefaceLoader)
+) : AndroidFont(
+    OptionalLocal,
+    ExampleAsyncFontTypefaceLoader,
+    FontVariation.Settings(weight, style)
+)

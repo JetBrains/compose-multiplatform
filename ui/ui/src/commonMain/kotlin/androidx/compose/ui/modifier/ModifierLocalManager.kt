@@ -41,9 +41,10 @@ import androidx.compose.ui.node.visitSubtreeIf
  */
 @OptIn(ExperimentalComposeUiApi::class)
 internal class ModifierLocalManager(val owner: Owner) {
-    private val inserted = mutableVectorOf<Pair<BackwardsCompatNode, ModifierLocal<*>>>()
-    private val updated = mutableVectorOf<Pair<BackwardsCompatNode, ModifierLocal<*>>>()
-    private val removed = mutableVectorOf<Pair<LayoutNode, ModifierLocal<*>>>()
+    private val inserted = mutableVectorOf<BackwardsCompatNode>()
+    private val insertedLocal = mutableVectorOf<ModifierLocal<*>>()
+    private val removed = mutableVectorOf<LayoutNode>()
+    private val removedLocal = mutableVectorOf<ModifierLocal<*>>()
     private var invalidated: Boolean = false
 
     fun invalidate() {
@@ -60,7 +61,8 @@ internal class ModifierLocalManager(val owner: Owner) {
         // both the rmoved node and the inserted one, so we store all of the consumers we want to
         // update in a set and call update on them at the end.
         val toUpdate = hashSetOf<BackwardsCompatNode>()
-        removed.forEach { (layout, key) ->
+        removed.forEachIndexed { i, layout ->
+            val key = removedLocal[i]
             if (layout.isAttached) {
                 // if the layout is still attached, that means that this provider got removed and
                 // there's possible some consumers below it that need to be updated
@@ -68,21 +70,18 @@ internal class ModifierLocalManager(val owner: Owner) {
             }
         }
         removed.clear()
+        removedLocal.clear()
         // TODO(lmr): we could potentially opt for a more sophisticated strategy here where we
         //  start from the higher up nodes, and invalidate in a way where during traversal if we
         //  happen upon other inserted nodes we can remove them from the inserted set
-        inserted.forEach { (node, key) ->
+        inserted.forEachIndexed { i, node ->
+            val key = insertedLocal[i]
             if (node.isAttached) {
                 invalidateConsumersOfNodeForKey(node, key, toUpdate)
             }
         }
         inserted.clear()
-        updated.forEach { (node, key) ->
-            if (node.isAttached) {
-                invalidateConsumersOfNodeForKey(node, key, toUpdate)
-            }
-        }
-        updated.clear()
+        insertedLocal.clear()
         toUpdate.forEach { it.updateModifierLocalConsumer() }
     }
 
@@ -103,17 +102,20 @@ internal class ModifierLocalManager(val owner: Owner) {
     }
 
     fun updatedProvider(node: BackwardsCompatNode, key: ModifierLocal<*>) {
-        updated += node to key
+        inserted += node
+        insertedLocal += key
         invalidate()
     }
 
     fun insertedProvider(node: BackwardsCompatNode, key: ModifierLocal<*>) {
-        inserted += node to key
+        inserted += node
+        insertedLocal += key
         invalidate()
     }
 
     fun removedProvider(node: BackwardsCompatNode, key: ModifierLocal<*>) {
-        removed += node.requireLayoutNode() to key
+        removed += node.requireLayoutNode()
+        removedLocal += key
         invalidate()
     }
 }

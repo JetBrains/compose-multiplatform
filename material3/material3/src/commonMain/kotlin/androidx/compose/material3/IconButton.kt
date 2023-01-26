@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.semantics.Role
@@ -79,10 +80,10 @@ fun IconButton(
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier =
-        modifier
-            .minimumTouchTargetSize()
+        modifier = modifier
+            .minimumInteractiveComponentSize()
             .size(IconButtonTokens.StateLayerSize)
+            .clip(IconButtonTokens.StateLayerShape.toShape())
             .background(color = colors.containerColor(enabled).value)
             .clickable(
                 onClick = onClick,
@@ -140,10 +141,10 @@ fun IconToggleButton(
     content: @Composable () -> Unit
 ) {
     Box(
-        modifier =
-        modifier
-            .minimumTouchTargetSize()
+        modifier = modifier
+            .minimumInteractiveComponentSize()
             .size(IconButtonTokens.StateLayerSize)
+            .clip(IconButtonTokens.StateLayerShape.toShape())
             .background(color = colors.containerColor(enabled, checked).value)
             .toggleable(
                 value = checked,

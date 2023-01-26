@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachIndexed
-import kotlin.math.max
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -52,14 +51,15 @@ internal class LazyGridItemPlacementAnimator(
     // snapshot of the key to index map used for the last measuring.
     private var keyToIndexMap: Map<Any, Int> = emptyMap()
 
-    // keeps the first and the last items positioned in the viewport and their visible part sizes.
-    private var viewportStartItemIndex = -1
-    private var viewportStartItemNotVisiblePartSize = 0
-    private var viewportEndItemIndex = -1
-    private var viewportEndItemNotVisiblePartSize = 0
+    // keeps the index of the first visible item.
+    private var firstVisibleIndex = 0
 
     // stored to not allocate it every pass.
-    private val positionedKeys = mutableSetOf<Any>()
+    private val movingAwayKeys = LinkedHashSet<Any>()
+    private val movingInFromStartBound = mutableListOf<LazyGridPositionedItem>()
+    private val movingInFromEndBound = mutableListOf<LazyGridPositionedItem>()
+    private val movingAwayToStartBound = mutableListOf<LazyGridMeasuredItem>()
+    private val movingAwayToEndBound = mutableListOf<LazyGridMeasuredItem>()
 
     /**
      * Should be called after the measuring so we can detect position changes and start animations.
@@ -70,230 +70,190 @@ internal class LazyGridItemPlacementAnimator(
         consumedScroll: Int,
         layoutWidth: Int,
         layoutHeight: Int,
-        reverseLayout: Boolean,
         positionedItems: MutableList<LazyGridPositionedItem>,
-        measuredItemProvider: LazyMeasuredItemProvider,
+        itemProvider: LazyMeasuredItemProvider,
         spanLayoutProvider: LazyGridSpanLayoutProvider
     ) {
-        if (!positionedItems.fastAny { it.hasAnimations }) {
+        if (!positionedItems.fastAny { it.hasAnimations } && keyToItemInfoMap.isEmpty()) {
             // no animations specified - no work needed
             reset()
             return
         }
 
+        val previousFirstVisibleIndex = firstVisibleIndex
+        firstVisibleIndex = positionedItems.firstOrNull()?.index ?: 0
+        val previousKeyToIndexMap = keyToIndexMap
+        keyToIndexMap = itemProvider.keyToIndexMap
+
         val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
 
         // the consumed scroll is considered as a delta we don't need to animate
-        val notAnimatableDelta = (if (reverseLayout) -consumedScroll else consumedScroll).toOffset()
+        val notAnimatableDelta = consumedScroll.toOffset()
 
-        val newFirstItem = positionedItems.first()
-        val newLastItem = positionedItems.last()
-
-        positionedItems.fastForEach { item ->
-            val itemInfo = keyToItemInfoMap[item.key] ?: return@fastForEach
-            itemInfo.index = item.index
-            itemInfo.crossAxisSize = item.getCrossAxisSize()
-            itemInfo.crossAxisOffset = item.getCrossAxisOffset()
-        }
-
-        val averageLineMainAxisSize = run {
-            val lineOf: (Int) -> Int = {
-                if (isVertical) positionedItems[it].row else positionedItems[it].column
-            }
-
-            var totalLinesMainAxisSize = 0
-            var linesCount = 0
-
-            var lineStartIndex = 0
-            while (lineStartIndex < positionedItems.size) {
-                val currentLine = lineOf(lineStartIndex)
-                if (currentLine == -1) {
-                    // Filter out exiting items.
-                    ++lineStartIndex
-                    continue
-                }
-
-                var lineMainAxisSize = 0
-                var lineEndIndex = lineStartIndex
-                while (lineEndIndex < positionedItems.size && lineOf(lineEndIndex) == currentLine) {
-                    lineMainAxisSize = max(
-                        lineMainAxisSize,
-                        positionedItems[lineEndIndex].mainAxisSizeWithSpacings
-                    )
-                    ++lineEndIndex
-                }
-
-                totalLinesMainAxisSize += lineMainAxisSize
-                ++linesCount
-
-                lineStartIndex = lineEndIndex
-            }
-
-            totalLinesMainAxisSize / linesCount
-        }
-
-        positionedKeys.clear()
+        // first add all items we had in the previous run
+        movingAwayKeys.addAll(keyToItemInfoMap.keys)
         // iterate through the items which are visible (without animated offsets)
         positionedItems.fastForEach { item ->
-            positionedKeys.add(item.key)
-            val itemInfo = keyToItemInfoMap[item.key]
-            if (itemInfo == null) {
+            // remove items we have in the current one as they are not disappearing.
+            movingAwayKeys.remove(item.key)
+            if (item.hasAnimations) {
+                val itemInfo = keyToItemInfoMap[item.key]
                 // there is no state associated with this item yet
-                if (item.hasAnimations) {
-                    val newItemInfo = ItemInfo(
-                        item.index,
-                        item.getCrossAxisSize(),
-                        item.getCrossAxisOffset()
-                    )
-                    val previousIndex = keyToIndexMap[item.key]
-                    val offset = item.placeableOffset
-
-                    val targetPlaceableOffsetMainAxis = if (previousIndex == null) {
-                        // it is a completely new item. no animation is needed
-                        offset.mainAxis
-                    } else {
-                        val fallback = if (!reverseLayout) {
-                            offset.mainAxis
+                if (itemInfo == null) {
+                    val previousIndex = previousKeyToIndexMap[item.key]
+                    if (previousIndex != null && item.index != previousIndex) {
+                        if (previousIndex < previousFirstVisibleIndex) {
+                            // the larger index will be in the start of the list
+                            movingInFromStartBound.add(item)
                         } else {
-                            offset.mainAxis - item.mainAxisSizeWithSpacings
+                            movingInFromEndBound.add(item)
                         }
-                        calculateExpectedOffset(
-                            index = previousIndex,
-                            mainAxisSizeWithSpacings = item.mainAxisSizeWithSpacings,
-                            averageLineMainAxisSize = averageLineMainAxisSize,
-                            scrolledBy = notAnimatableDelta,
-                            fallback = fallback,
-                            reverseLayout = reverseLayout,
-                            mainAxisLayoutSize = mainAxisLayoutSize,
-                            visibleItems = positionedItems,
-                            spanLayoutProvider = spanLayoutProvider
-                        )
-                    }
-                    val targetPlaceableOffset = if (isVertical) {
-                        offset.copy(y = targetPlaceableOffsetMainAxis)
                     } else {
-                        offset.copy(x = targetPlaceableOffsetMainAxis)
+                        keyToItemInfoMap[item.key] = createItemInfo(item)
                     }
-
-                    // populate placeable info list
-                    repeat(item.placeablesCount) { placeableIndex ->
-                        newItemInfo.placeables.add(
-                            PlaceableInfo(
-                                targetPlaceableOffset,
-                                item.getMainAxisSize(placeableIndex)
-                            )
-                        )
-                    }
-                    keyToItemInfoMap[item.key] = newItemInfo
-                    startAnimationsIfNeeded(item, newItemInfo)
+                } else {
+                    // this item was visible and is still visible.
+                    itemInfo.notAnimatableDelta += notAnimatableDelta // apply new scroll delta
+                    itemInfo.crossAxisSize = item.getCrossAxisSize()
+                    itemInfo.crossAxisOffset = item.getCrossAxisOffset()
+                    startAnimationsIfNeeded(item, itemInfo)
                 }
             } else {
-                if (item.hasAnimations) {
-                    // apply new not animatable offset
-                    itemInfo.notAnimatableDelta += notAnimatableDelta
-                    startAnimationsIfNeeded(item, itemInfo)
-                } else {
-                    // no animation, clean up if needed
-                    keyToItemInfoMap.remove(item.key)
-                }
+                // no animation, clean up if needed
+                keyToItemInfoMap.remove(item.key)
             }
         }
 
-        // previously we were animating items which are visible in the end state so we had to
-        // compare the current state with the state used for the previous measuring.
-        // now we will animate disappearing items so the current state is their starting state
-        // so we can update current viewport start/end items
-
-        if (!reverseLayout) {
-            viewportStartItemIndex = newFirstItem.index
-            viewportStartItemNotVisiblePartSize = newFirstItem.offset.mainAxis
-            viewportEndItemIndex = newLastItem.index
-            viewportEndItemNotVisiblePartSize = newLastItem.offset.mainAxis +
-                newLastItem.lineMainAxisSizeWithSpacings - mainAxisLayoutSize
-        } else {
-            viewportStartItemIndex = newLastItem.index
-            viewportStartItemNotVisiblePartSize = mainAxisLayoutSize -
-                newLastItem.offset.mainAxis - newLastItem.lineMainAxisSize
-            viewportEndItemIndex = newFirstItem.index
-            viewportEndItemNotVisiblePartSize = -newFirstItem.offset.mainAxis +
-                (newFirstItem.lineMainAxisSizeWithSpacings -
-                    if (isVertical) newFirstItem.size.height else newFirstItem.size.width)
+        var currentMainAxisOffset = 0
+        movingInFromStartBound.sortByDescending { previousKeyToIndexMap[it.key] }
+        var previousLine = -1
+        var previousLineMainAxisSize = 0
+        movingInFromStartBound.fastForEach { item ->
+            val line = item.line
+            if (line != -1 && line == previousLine) {
+                previousLineMainAxisSize = maxOf(previousLineMainAxisSize, item.getMainAxisSize())
+            } else {
+                currentMainAxisOffset += previousLineMainAxisSize
+                previousLineMainAxisSize = item.getMainAxisSize()
+                previousLine = line
+            }
+            val mainAxisOffset = 0 - currentMainAxisOffset - item.getMainAxisSize()
+            val itemInfo = createItemInfo(item, mainAxisOffset)
+            keyToItemInfoMap[item.key] = itemInfo
+            startAnimationsIfNeeded(item, itemInfo)
+        }
+        currentMainAxisOffset = 0
+        previousLine = -1
+        previousLineMainAxisSize = 0
+        movingInFromEndBound.sortBy { previousKeyToIndexMap[it.key] }
+        movingInFromEndBound.fastForEach { item ->
+            val line = item.line
+            if (line != -1 && line == previousLine) {
+                previousLineMainAxisSize = maxOf(previousLineMainAxisSize, item.getMainAxisSize())
+            } else {
+                currentMainAxisOffset += previousLineMainAxisSize
+                previousLineMainAxisSize = item.getMainAxisSize()
+                previousLine = line
+            }
+            val mainAxisOffset = mainAxisLayoutSize + currentMainAxisOffset
+            val itemInfo = createItemInfo(item, mainAxisOffset)
+            keyToItemInfoMap[item.key] = itemInfo
+            startAnimationsIfNeeded(item, itemInfo)
         }
 
-        val iterator = keyToItemInfoMap.iterator()
-        while (iterator.hasNext()) {
-            val entry = iterator.next()
-            if (!positionedKeys.contains(entry.key)) {
-                // found an item which was in our map previously but is not a part of the
-                // positionedItems now
-                val itemInfo = entry.value
-                // apply new not animatable delta for this item
-                itemInfo.notAnimatableDelta += notAnimatableDelta
+        movingAwayKeys.forEach { key ->
+            // found an item which was in our map previously but is not a part of the
+            // positionedItems now
+            val itemInfo = keyToItemInfoMap.getValue(key)
+            val newIndex = keyToIndexMap[key]
 
-                val index = measuredItemProvider.keyToIndexMap[entry.key]
-
-                // whether at least one placeable is within the viewport bounds.
-                // this usually means that we will start animation for it right now
-                val withinBounds = itemInfo.placeables.fastAny {
-                    val currentTarget = it.targetOffset + itemInfo.notAnimatableDelta
-                    currentTarget.mainAxis + it.mainAxisSize > 0 &&
-                        currentTarget.mainAxis < mainAxisLayoutSize
-                }
-
-                // whether the animation associated with the item has been finished
-                val isFinished = !itemInfo.placeables.fastAny { it.inProgress }
-
-                if ((!withinBounds && isFinished) ||
-                    index == null ||
-                    itemInfo.placeables.isEmpty()
-                ) {
-                    iterator.remove()
-                } else {
-                    // not sure if this item will end up on the last line or not. assume not,
-                    // therefore leave the mainAxisSpacing to be the default one
-                    val measuredItem = measuredItemProvider.getAndMeasure(
-                        index = ItemIndex(index),
-                        constraints = if (isVertical) {
-                            Constraints.fixedWidth(itemInfo.crossAxisSize)
-                        } else {
-                            Constraints.fixedHeight(itemInfo.crossAxisSize)
-                        }
-                    )
-
-                    // calculate the target offset for the animation.
-                    val absoluteTargetOffset = calculateExpectedOffset(
-                        index = index,
-                        mainAxisSizeWithSpacings = measuredItem.mainAxisSizeWithSpacings,
-                        averageLineMainAxisSize = averageLineMainAxisSize,
-                        scrolledBy = notAnimatableDelta,
-                        fallback = mainAxisLayoutSize,
-                        reverseLayout = reverseLayout,
-                        mainAxisLayoutSize = mainAxisLayoutSize,
-                        visibleItems = positionedItems,
-                        spanLayoutProvider = spanLayoutProvider
-                    )
-                    val targetOffset = if (reverseLayout) {
-                        mainAxisLayoutSize - absoluteTargetOffset - measuredItem.mainAxisSize
+            // whether the animation associated with the item has been finished or not yet started
+            val inProgress = itemInfo.placeables.fastAny { it.inProgress }
+            if (itemInfo.placeables.isEmpty() ||
+                newIndex == null ||
+                (!inProgress && newIndex == previousKeyToIndexMap[key]) ||
+                (!inProgress && !itemInfo.isWithinBounds(mainAxisLayoutSize))
+            ) {
+                keyToItemInfoMap.remove(key)
+            } else {
+                val item = itemProvider.getAndMeasure(
+                    ItemIndex(newIndex),
+                    constraints = if (isVertical) {
+                        Constraints.fixedWidth(itemInfo.crossAxisSize)
                     } else {
-                        absoluteTargetOffset
+                        Constraints.fixedHeight(itemInfo.crossAxisSize)
                     }
-
-                    val item = measuredItem.position(
-                        targetOffset,
-                        itemInfo.crossAxisOffset,
-                        layoutWidth,
-                        layoutHeight,
-                        LazyGridItemInfo.UnknownRow,
-                        LazyGridItemInfo.UnknownColumn,
-                        measuredItem.mainAxisSize
-                    )
-                    positionedItems.add(item)
-                    startAnimationsIfNeeded(item, itemInfo)
+                )
+                if (newIndex < firstVisibleIndex) {
+                    movingAwayToStartBound.add(item)
+                } else {
+                    movingAwayToEndBound.add(item)
                 }
             }
         }
 
-        keyToIndexMap = measuredItemProvider.keyToIndexMap
+        currentMainAxisOffset = 0
+        previousLine = -1
+        previousLineMainAxisSize = 0
+        movingAwayToStartBound.sortByDescending { keyToIndexMap[it.key] }
+        movingAwayToStartBound.fastForEach { item ->
+            val line = spanLayoutProvider.getLineIndexOfItem(item.index.value).value
+            if (line != -1 && line == previousLine) {
+                previousLineMainAxisSize = maxOf(previousLineMainAxisSize, item.mainAxisSize)
+            } else {
+                currentMainAxisOffset += previousLineMainAxisSize
+                previousLineMainAxisSize = item.mainAxisSize
+                previousLine = line
+            }
+            val mainAxisOffset = 0 - currentMainAxisOffset - item.mainAxisSize
+
+            val itemInfo = keyToItemInfoMap.getValue(item.key)
+
+            val positionedItem = item.position(
+                mainAxisOffset,
+                itemInfo.crossAxisOffset,
+                layoutWidth,
+                layoutHeight,
+                LazyGridItemInfo.UnknownRow,
+                LazyGridItemInfo.UnknownColumn
+            )
+            positionedItems.add(positionedItem)
+            startAnimationsIfNeeded(positionedItem, itemInfo)
+        }
+        currentMainAxisOffset = 0
+        previousLine = -1
+        previousLineMainAxisSize = 0
+        movingAwayToEndBound.sortBy { keyToIndexMap[it.key] }
+        movingAwayToEndBound.fastForEach { item ->
+            val line = spanLayoutProvider.getLineIndexOfItem(item.index.value).value
+            if (line != -1 && line == previousLine) {
+                previousLineMainAxisSize = maxOf(previousLineMainAxisSize, item.mainAxisSize)
+            } else {
+                currentMainAxisOffset += previousLineMainAxisSize
+                previousLineMainAxisSize = item.mainAxisSize
+                previousLine = line
+            }
+            val mainAxisOffset = mainAxisLayoutSize + currentMainAxisOffset
+
+            val itemInfo = keyToItemInfoMap.getValue(item.key)
+            val positionedItem = item.position(
+                mainAxisOffset,
+                itemInfo.crossAxisOffset,
+                layoutWidth,
+                layoutHeight,
+                LazyGridItemInfo.UnknownRow,
+                LazyGridItemInfo.UnknownColumn
+            )
+
+            positionedItems.add(positionedItem)
+            startAnimationsIfNeeded(positionedItem, itemInfo)
+        }
+
+        movingInFromStartBound.clear()
+        movingInFromEndBound.clear()
+        movingAwayToStartBound.clear()
+        movingAwayToEndBound.clear()
+        movingAwayKeys.clear()
     }
 
     /**
@@ -314,8 +274,8 @@ internal class LazyGridItemPlacementAnimator(
 
         // cancel the animation if it is fully out of the bounds.
         if (item.inProgress &&
-            ((currentTarget.mainAxis < minOffset && currentValue.mainAxis < minOffset) ||
-            (currentTarget.mainAxis > maxOffset && currentValue.mainAxis > maxOffset))
+            ((currentTarget.mainAxis <= minOffset && currentValue.mainAxis < minOffset) ||
+            (currentTarget.mainAxis >= maxOffset && currentValue.mainAxis > maxOffset))
         ) {
             scope.launch {
                 item.animatedOffset.snapTo(item.targetOffset)
@@ -333,77 +293,30 @@ internal class LazyGridItemPlacementAnimator(
     fun reset() {
         keyToItemInfoMap.clear()
         keyToIndexMap = emptyMap()
-        viewportStartItemIndex = -1
-        viewportStartItemNotVisiblePartSize = 0
-        viewportEndItemIndex = -1
-        viewportEndItemNotVisiblePartSize = 0
+        firstVisibleIndex = -1
     }
 
-    /**
-     * Estimates the outside of the viewport offset for the item. Used to understand from
-     * where to start animation for the item which wasn't visible previously or where it should
-     * end for the item which is not going to be visible in the end.
-     */
-    private fun calculateExpectedOffset(
-        index: Int,
-        mainAxisSizeWithSpacings: Int,
-        averageLineMainAxisSize: Int,
-        scrolledBy: IntOffset,
-        reverseLayout: Boolean,
-        mainAxisLayoutSize: Int,
-        fallback: Int,
-        visibleItems: List<LazyGridPositionedItem>,
-        spanLayoutProvider: LazyGridSpanLayoutProvider
-    ): Int {
-        val afterViewportEnd =
-            if (!reverseLayout) viewportEndItemIndex < index else viewportEndItemIndex > index
-        val beforeViewportStart =
-            if (!reverseLayout) viewportStartItemIndex > index else viewportStartItemIndex < index
-        return when {
-            afterViewportEnd -> {
-                val fromIndex = if (!reverseLayout) {
-                    // viewportEndItemIndex is the last item in the line already
-                    viewportEndItemIndex + 1
-                } else {
-                    spanLayoutProvider.firstIndexInNextLineAfter(index)
-                }
-                val toIndex = spanLayoutProvider.lastIndexInPreviousLineBefore(
-                    if (!reverseLayout) index else viewportEndItemIndex
-                )
-                mainAxisLayoutSize + viewportEndItemNotVisiblePartSize + scrolledBy.mainAxis +
-                    // add sizes of the lines between the last visible one and this one.
-                    spanLayoutProvider.getLinesMainAxisSizesSum(
-                        fromIndex = fromIndex,
-                        toIndex = toIndex,
-                        averageLineMainAxisSize = averageLineMainAxisSize,
-                        visibleItems = visibleItems
-                    )
-            }
-            beforeViewportStart -> {
-                val fromIndex = spanLayoutProvider.firstIndexInNextLineAfter(
-                    if (!reverseLayout) index else viewportStartItemIndex
-                )
-                val toIndex = if (!reverseLayout) {
-                    // viewportStartItemIndex is the first item in the line already
-                    viewportStartItemIndex - 1
-                } else {
-                    spanLayoutProvider.lastIndexInPreviousLineBefore(index)
-                }
-                viewportStartItemNotVisiblePartSize + scrolledBy.mainAxis +
-                    // minus the size of this item as we are looking for the start offset of it.
-                    -mainAxisSizeWithSpacings +
-                    // minus sizes of the lines between the first visible one and this one.
-                    -spanLayoutProvider.getLinesMainAxisSizesSum(
-                        fromIndex = fromIndex,
-                        toIndex = toIndex,
-                        averageLineMainAxisSize = averageLineMainAxisSize,
-                        visibleItems = visibleItems
-                    )
-            }
-            else -> {
-                fallback
-            }
+    private fun createItemInfo(
+        item: LazyGridPositionedItem,
+        mainAxisOffset: Int = item.offset.mainAxis
+    ): ItemInfo {
+        val newItemInfo = ItemInfo(item.getCrossAxisSize(), item.getCrossAxisOffset())
+        val targetOffset = if (isVertical) {
+            item.offset.copy(y = mainAxisOffset)
+        } else {
+            item.offset.copy(x = mainAxisOffset)
         }
+
+        // populate placeable info list
+        repeat(item.placeablesCount) { placeableIndex ->
+            newItemInfo.placeables.add(
+                PlaceableInfo(
+                    targetOffset,
+                    item.getMainAxisSize(placeableIndex)
+                )
+            )
+        }
+        return newItemInfo
     }
 
     private fun startAnimationsIfNeeded(item: LazyGridPositionedItem, itemInfo: ItemInfo) {
@@ -424,7 +337,7 @@ internal class LazyGridItemPlacementAnimator(
 
         itemInfo.placeables.fastForEachIndexed { index, placeableInfo ->
             val currentTarget = placeableInfo.targetOffset + itemInfo.notAnimatableDelta
-            val currentOffset = item.placeableOffset
+            val currentOffset = item.offset
             placeableInfo.mainAxisSize = item.getMainAxisSize(index)
             val animationSpec = item.getAnimationSpec(index)
             if (currentTarget != currentOffset) {
@@ -456,14 +369,26 @@ internal class LazyGridItemPlacementAnimator(
         }
     }
 
+    /**
+     * Whether at least one placeable is within the viewport bounds.
+     */
+    private fun ItemInfo.isWithinBounds(mainAxisLayoutSize: Int): Boolean {
+        return placeables.fastAny {
+            val currentTarget = it.targetOffset + notAnimatableDelta
+            currentTarget.mainAxis + it.mainAxisSize > 0 &&
+                currentTarget.mainAxis < mainAxisLayoutSize
+        }
+    }
+
     private fun Int.toOffset() =
         IntOffset(if (isVertical) 0 else this, if (!isVertical) 0 else this)
 
     private val IntOffset.mainAxis get() = if (isVertical) y else x
+
+    private val LazyGridPositionedItem.line get() = if (isVertical) row else column
 }
 
 private class ItemInfo(
-    var index: Int,
     var crossAxisSize: Int,
     var crossAxisOffset: Int
 ) {
@@ -484,51 +409,3 @@ private val InterruptionSpec = spring(
     stiffness = Spring.StiffnessMediumLow,
     visibilityThreshold = IntOffset.VisibilityThreshold
 )
-
-private fun LazyGridSpanLayoutProvider.lastIndexInPreviousLineBefore(index: Int): Int {
-    val lineIndex = getLineIndexOfItem(index)
-    val lineConfiguration = getLineConfiguration(lineIndex.value)
-    return lineConfiguration.firstItemIndex - 1
-}
-
-private fun LazyGridSpanLayoutProvider.firstIndexInNextLineAfter(index: Int): Int {
-    val lineIndex = getLineIndexOfItem(index)
-    val lineConfiguration = getLineConfiguration(lineIndex.value)
-    return lineConfiguration.firstItemIndex + lineConfiguration.spans.size
-}
-
-private fun LazyGridSpanLayoutProvider.getLinesMainAxisSizesSum(
-    fromIndex: Int,
-    toIndex: Int,
-    averageLineMainAxisSize: Int,
-    visibleItems: List<LazyGridPositionedItem>
-): Int {
-    var index = fromIndex
-    var sizes = 0
-    while (index <= toIndex) {
-        val lastItemInTheLine = firstIndexInNextLineAfter(index) - 1
-        if (lastItemInTheLine <= toIndex) {
-            sizes += visibleItems.getLineSize(lastItemInTheLine, averageLineMainAxisSize)
-        }
-        index = lastItemInTheLine + 1
-    }
-    return sizes
-}
-
-private fun List<LazyGridPositionedItem>.getLineSize(itemIndex: Int, fallback: Int): Int {
-    if (isEmpty() || itemIndex < first().index || itemIndex > last().index) return fallback
-    if ((itemIndex - first().index) < (last().index - itemIndex)) {
-        for (index in indices) {
-            val item = get(index)
-            if (item.index == itemIndex) return item.lineMainAxisSizeWithSpacings
-            if (item.index > itemIndex) break
-        }
-    } else {
-        for (index in lastIndex downTo 0) {
-            val item = get(index)
-            if (item.index == itemIndex) return item.lineMainAxisSizeWithSpacings
-            if (item.index < itemIndex) break
-        }
-    }
-    return fallback
-}

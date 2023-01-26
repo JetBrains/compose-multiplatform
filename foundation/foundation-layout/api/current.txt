@@ -111,6 +111,9 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Stable public androidx.compose.ui.Modifier weight(androidx.compose.ui.Modifier, float weight, optional boolean fill);
   }
 
+  public final class FlowLayoutKt {
+  }
+
   public final class IntrinsicKt {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier height(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier requiredHeight(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.IntrinsicSize intrinsicSize);
@@ -234,6 +237,8 @@ package androidx.compose.foundation.layout {
   }
 
   public final class WindowInsetsPaddingKt {
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier consumeWindowInsets(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.WindowInsets insets);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier onConsumedWindowInsetsChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.WindowInsets,kotlin.Unit> block);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.Modifier windowInsetsPadding(androidx.compose.ui.Modifier, androidx.compose.foundation.layout.WindowInsets insets);
   }
 

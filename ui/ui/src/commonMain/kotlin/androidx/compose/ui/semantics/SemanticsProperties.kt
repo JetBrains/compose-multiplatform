@@ -96,6 +96,11 @@ object SemanticsProperties {
     val Focused = SemanticsPropertyKey<Boolean>("Focused")
 
     /**
+     * @see SemanticsPropertyReceiver.isContainer
+     */
+    val IsContainer = SemanticsPropertyKey<Boolean>("IsContainer")
+
+    /**
      * @see SemanticsPropertyReceiver.invisibleToUser
      */
     @ExperimentalComposeUiApi
@@ -307,6 +312,26 @@ object SemanticsActions {
      */
     val CustomActions =
         SemanticsPropertyKey<List<CustomAccessibilityAction>>("CustomActions")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageUp
+     */
+    val PageUp = ActionPropertyKey<() -> Boolean>("PageUp")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageLeft
+     */
+    val PageLeft = ActionPropertyKey<() -> Boolean>("PageLeft")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageDown
+     */
+    val PageDown = ActionPropertyKey<() -> Boolean>("PageDown")
+
+    /**
+     * @see SemanticsPropertyReceiver.pageRight
+     */
+    val PageRight = ActionPropertyKey<() -> Boolean>("PageRight")
 }
 
 /**
@@ -594,6 +619,12 @@ value class Role private constructor(@Suppress("unused") private val value: Int)
          * [SemanticsProperties.ContentDescription]
          */
         val Image = Role(5)
+        /**
+         * This element is associated with a drop down menu.
+         * Associated semantics properties for accessibility:
+         * [SemanticsActions.OnClick]
+         */
+        val DropdownList = Role(6)
     }
 
     override fun toString() = when (this) {
@@ -603,6 +634,7 @@ value class Role private constructor(@Suppress("unused") private val value: Int)
         RadioButton -> "RadioButton"
         Tab -> "Tab"
         Image -> "Image"
+        DropdownList -> "DropdownList"
         else -> "Unknown"
     }
 }
@@ -724,6 +756,14 @@ var SemanticsPropertyReceiver.liveRegion by SemanticsProperties.LiveRegion
  * @see SemanticsProperties.Focused
  */
 var SemanticsPropertyReceiver.focused by SemanticsProperties.Focused
+
+/**
+ * Whether this semantics node is a container. This is defined as a node whose function
+ * is to serve as a boundary or border in organizing its children.
+ *
+ * @see SemanticsProperties.IsContainer
+ */
+var SemanticsPropertyReceiver.isContainer by SemanticsProperties.IsContainer
 
 /**
  * Whether this node is specially known to be invisible to the user.
@@ -1087,4 +1127,56 @@ fun SemanticsPropertyReceiver.dismiss(
  */
 fun SemanticsPropertyReceiver.requestFocus(label: String? = null, action: (() -> Boolean)?) {
     this[SemanticsActions.RequestFocus] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page up.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageUp] is called.
+ */
+fun SemanticsPropertyReceiver.pageUp(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageUp] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page down.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageDown] is called.
+ */
+fun SemanticsPropertyReceiver.pageDown(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageDown] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page left.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageLeft] is called.
+ */
+fun SemanticsPropertyReceiver.pageLeft(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageLeft] = AccessibilityAction(label, action)
+}
+
+/**
+ * Action to page right.
+ *
+ * @param label Optional label for this action.
+ * @param action Action to be performed when the [SemanticsActions.PageRight] is called.
+ */
+fun SemanticsPropertyReceiver.pageRight(
+    label: String? = null,
+    action: (() -> Boolean)?
+) {
+    this[SemanticsActions.PageRight] = AccessibilityAction(label, action)
 }

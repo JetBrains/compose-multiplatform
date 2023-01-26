@@ -17,6 +17,7 @@
 package androidx.compose.foundation.textfield
 
 import android.view.KeyEvent
+import android.view.KeyEvent.META_ALT_ON
 import android.view.KeyEvent.META_CTRL_ON
 import android.view.KeyEvent.META_SHIFT_ON
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -241,6 +242,45 @@ class HardwareKeyboardTest {
     }
 
     @Test
+    fun textField_deleteToBeginningOfLine() {
+        keysSequenceTest(initText = "hello world\nhi world") {
+            Key.DirectionRight.downAndUp(META_CTRL_ON)
+            Key.Backspace.downAndUp(META_ALT_ON)
+            expectedText(" world\nhi world")
+            Key.Backspace.downAndUp(META_ALT_ON)
+            expectedText(" world\nhi world")
+            repeat(3) { Key.DirectionRight.downAndUp() }
+            Key.Backspace.downAndUp(META_ALT_ON)
+            expectedText("rld\nhi world")
+            Key.DirectionDown.downAndUp()
+            Key.MoveEnd.downAndUp()
+            Key.Backspace.downAndUp(META_ALT_ON)
+            expectedText("rld\n")
+            Key.Backspace.downAndUp(META_ALT_ON)
+            expectedText("rld\n")
+        }
+    }
+
+    @Test
+    fun textField_deleteToEndOfLine() {
+        keysSequenceTest(initText = "hello world\nhi world") {
+            Key.DirectionRight.downAndUp(META_CTRL_ON)
+            Key.Delete.downAndUp(META_ALT_ON)
+            expectedText("hello\nhi world")
+            Key.Delete.downAndUp(META_ALT_ON)
+            expectedText("hello\nhi world")
+            repeat(3) { Key.DirectionRight.downAndUp() }
+            Key.Delete.downAndUp(META_ALT_ON)
+            expectedText("hello\nhi")
+            Key.MoveHome.downAndUp()
+            Key.Delete.downAndUp(META_ALT_ON)
+            expectedText("hello\n")
+            Key.Delete.downAndUp(META_ALT_ON)
+            expectedText("hello\n")
+        }
+    }
+
+    @Test
     fun textField_paragraphNavigation() {
         keysSequenceTest(initText = "hello world\nhi") {
             Key.DirectionDown.downAndUp(META_CTRL_ON)
@@ -352,7 +392,7 @@ class HardwareKeyboardTest {
         sequence: SequenceScope.() -> Unit,
     ) {
         val inputService = TextInputService(mock())
-        val focusFequester = FocusRequester()
+        val focusRequester = FocusRequester()
         rule.setContent {
             CompositionLocalProvider(
                 LocalTextInputService provides inputService
@@ -363,13 +403,13 @@ class HardwareKeyboardTest {
                         fontFamily = TEST_FONT_FAMILY,
                         fontSize = 10.sp
                     ),
-                    modifier = modifier.focusRequester(focusFequester),
+                    modifier = modifier.focusRequester(focusRequester),
                     onValueChange = onValueChange
                 )
             }
         }
 
-        rule.runOnIdle { focusFequester.requestFocus() }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         sequence(SequenceScope(value) { rule.onNode(hasSetTextAction()) })
     }

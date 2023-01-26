@@ -21,9 +21,11 @@ package androidx.compose.ui.unit
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.translate
 import androidx.compose.ui.util.lerp
 import kotlin.math.absoluteValue
+import kotlin.math.roundToInt
 
 /**
  * An immutable, 2D, axis-aligned, integer bounds rectangle whose coordinates are relative
@@ -308,3 +310,25 @@ fun lerp(start: IntRect, stop: IntRect, fraction: Float): IntRect {
         lerp(start.bottom, stop.bottom, fraction)
     )
 }
+
+/**
+ * Converts an [IntRect] to a [Rect]
+ */
+@Stable
+fun IntRect.toRect(): Rect = Rect(
+    left = left.toFloat(),
+    top = top.toFloat(),
+    right = right.toFloat(),
+    bottom = bottom.toFloat()
+)
+
+/**
+ * Rounds a [Rect] to an [IntRect]
+ */
+@Stable
+fun Rect.round(): IntRect = IntRect(
+    left = left.roundToInt(),
+    top = top.roundToInt(),
+    right = right.roundToInt(),
+    bottom = bottom.roundToInt()
+)

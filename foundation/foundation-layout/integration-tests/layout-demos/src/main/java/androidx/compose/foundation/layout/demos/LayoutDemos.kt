@@ -23,6 +23,8 @@ val LayoutDemos = DemoCategory(
     "Layout",
     listOf(
         ComposableDemo("Row and column") { SimpleLayoutDemo() },
+        ComposableDemo("Flow Column") { SimpleFlowColumnDemo() },
+        ComposableDemo("Flow Row") { SimpleFlowRowDemo() },
         ComposableDemo("Rtl support") { RtlDemo() }
     )
 )

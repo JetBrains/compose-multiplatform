@@ -26,11 +26,11 @@ import android.os.Handler
 import android.os.Looper
 import androidx.annotation.ArrayRes
 import androidx.annotation.WorkerThread
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.AndroidFont
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontLoadingStrategy
 import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontVariation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.provider.FontRequest
 import androidx.core.provider.FontsContractCompat
@@ -60,7 +60,6 @@ import kotlinx.coroutines.suspendCancellableCoroutine
  */
 // contains Google in name because this function provides integration with fonts.google.com
 @Suppress("MentionsGoogle")
-@ExperimentalTextApi
 fun Font(
     googleFont: GoogleFont,
     fontProvider: GoogleFont.Provider,
@@ -91,7 +90,6 @@ fun Font(
  */
 // contains Google in name because this function provides integration with fonts.google.com
 @Suppress("MentionsGoogle")
-@ExperimentalTextApi
 class GoogleFont(val name: String, val bestEffort: Boolean = true) {
     init {
         require(name.isNotEmpty()) { "name cannot be empty" }
@@ -102,7 +100,6 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
      *
      * @see FontRequest
      */
-    @ExperimentalTextApi
     // contains Google in name because this function provides integration with fonts.google.com
     @Suppress("MentionsGoogle")
     class Provider private constructor(
@@ -180,13 +177,11 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
             return result
         }
 
-        @ExperimentalTextApi
         companion object {
             /**
              * Url with a canonical list of all Google Fonts that are currently supported on
              * Android.
              */
-            @ExperimentalTextApi
             val AllFontsListUri: Uri = Uri.parse("https://fonts.gstatic.com/s/a/directory.xml")
         }
     }
@@ -202,20 +197,18 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
  * @return true if the provider is usable for downloadable fonts, false if it's not found
  * @throws IllegalStateException if the provider is on device, but certificates don't match
  */
-@ExperimentalTextApi
 @WorkerThread
 fun GoogleFont.Provider.isAvailableOnDevice(
     @Suppress("ContextFirst") context: Context, // extension function
 ): Boolean = checkAvailable(context.packageManager, context.resources)
 
-@ExperimentalTextApi
 internal data class GoogleFontImpl constructor(
     val name: String,
     private val fontProvider: GoogleFont.Provider,
     override val weight: FontWeight,
     override val style: FontStyle,
     val bestEffort: Boolean
-) : AndroidFont(FontLoadingStrategy.Async, GoogleFontTypefaceLoader) {
+) : AndroidFont(FontLoadingStrategy.Async, GoogleFontTypefaceLoader, FontVariation.Settings()) {
     fun toFontRequest(): FontRequest {
         // note: name is not encoded or quoted per spec
         val query = "name=$name&weight=${weight.weight}" +
@@ -282,7 +275,6 @@ internal data class GoogleFontImpl constructor(
     }
 }
 
-@ExperimentalTextApi
 internal object GoogleFontTypefaceLoader : AndroidFont.TypefaceLoader {
     override fun loadBlocking(context: Context, font: AndroidFont): Typeface? {
         error("GoogleFont only support async loading: $font")
@@ -368,7 +360,6 @@ private object DefaultFontsContractCompatLoader : FontsContractCompatLoader {
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 private fun reasonToString(@FontRequestFailReason reasonCode: Int): String {
     return when (reasonCode) {
         FAIL_REASON_PROVIDER_NOT_FOUND -> "The requested provider was not found on this device."

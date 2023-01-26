@@ -6,7 +6,6 @@
 package androidx.compose.runtime.external.kotlinx.collections.immutable.implementations.immutableMap
 
 import androidx.compose.runtime.external.kotlinx.collections.immutable.internal.assert
-import kotlin.js.JsName
 
 internal const val TRIE_MAX_HEIGHT = 7
 
@@ -104,7 +103,8 @@ internal abstract class PersistentHashMapBaseIterator<K, V, T>(
 ) : Iterator<T> {
 
     protected var pathLastIndex = 0
-    @JsName("_hasNext")
+    @Suppress("OPTIONAL_DECLARATION_USAGE_IN_NON_COMMON_SOURCE")
+    @kotlin.js.JsName("_hasNext")
     private var hasNext = true
 
     init {

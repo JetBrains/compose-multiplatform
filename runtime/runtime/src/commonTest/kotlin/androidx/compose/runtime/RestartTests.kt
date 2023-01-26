@@ -20,8 +20,10 @@ import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectChanges
+import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.validate
 import kotlin.test.Test
+import kotlin.test.assertEquals
 
 class RestartTests {
     @Test
@@ -190,6 +192,40 @@ class RestartTests {
         expectChanges()
         validate()
     }
+
+    @Test // Regression test for b/245806803
+    fun restart_and_skip() = compositionTest {
+        val count = mutableStateOf(0)
+        val data = mutableStateOf(0)
+        useCountCalled = 0
+        useCount2Called = 0
+
+        compose {
+            RestartAndSkipTest(count = count.value, data = data)
+        }
+
+        assertEquals(1, useCountCalled)
+        assertEquals(1, useCount2Called)
+
+        validate {
+            this.RestartAndSkipTest(count = count.value, data = data)
+        }
+
+        count.value++
+
+        expectChanges()
+        revalidate()
+
+        assertEquals(2, useCountCalled)
+        assertEquals(2, useCount2Called)
+
+        data.value++
+        expectChanges()
+        revalidate()
+
+        assertEquals(3, useCountCalled)
+        assertEquals(2, useCount2Called)
+    }
 }
 
 @Composable
@@ -209,3 +245,30 @@ fun Repeat(count: Int, block: @Composable (index: Int) -> Unit) {
 
 @Suppress("unused")
 inline fun MockViewValidator.Repeat(count: Int, block: (index: Int) -> Unit) = repeat(count, block)
+
+@Composable
+fun RestartAndSkipTest(count: Int, data: State<Int>) {
+    RestartAndSkipTest_UseCount(count, data)
+}
+
+fun MockViewValidator.RestartAndSkipTest(count: Int, data: State<Int>) {
+    Text("Data: ${data.value}, Count: $count")
+    Text("Count: $count")
+}
+
+private var useCountCalled = 0
+
+@Composable
+fun RestartAndSkipTest_UseCount(count: Int, data: State<Int>) {
+    Text("Data: ${data.value}, Count: $count")
+    useCountCalled++
+    RestartAndSkipTest_UseCount2(count)
+}
+
+private var useCount2Called = 0
+
+@Composable
+fun RestartAndSkipTest_UseCount2(count: Int) {
+    Text("Count: $count")
+    useCount2Called++
+}

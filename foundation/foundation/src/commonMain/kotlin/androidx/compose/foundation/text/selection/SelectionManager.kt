@@ -20,7 +20,7 @@ package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TextDragObserver
@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.IntSize
 import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
-import kotlinx.coroutines.coroutineScope
 
 /**
  * A bridge class between user interaction to the text composables for text selection.
@@ -335,10 +334,19 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
         )
 
         val visibleBounds = containerCoordinates.visibleBounds()
-        this.startHandlePosition =
-            if (visibleBounds.containsInclusive(startHandlePosition)) startHandlePosition else null
-        this.endHandlePosition =
-            if (visibleBounds.containsInclusive(endHandlePosition)) endHandlePosition else null
+
+        // set the new handle position only if the handle is in visible bounds or
+        // the handle is still dragging. If handle goes out of visible bounds during drag, handle
+        // popup is also removed from composition, halting the drag gesture. This affects multiple
+        // text selection when selected text is configured with maxLines=1 and overflow=clip.
+        this.startHandlePosition = startHandlePosition.takeIf {
+            visibleBounds.containsInclusive(startHandlePosition) ||
+                draggingHandle == Handle.SelectionStart
+        }
+        this.endHandlePosition = endHandlePosition.takeIf {
+            visibleBounds.containsInclusive(endHandlePosition) ||
+                draggingHandle == Handle.SelectionEnd
+        }
     }
 
     /**
@@ -615,13 +623,9 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
      * Detect tap without consuming the up event.
      */
     private suspend fun PointerInputScope.detectNonConsumingTap(onTap: (Offset) -> Unit) {
-        forEachGesture {
-            coroutineScope {
-                awaitPointerEventScope {
-                    waitForUpOrCancellation()?.let {
-                        onTap(it.position)
-                    }
-                }
+        awaitEachGesture {
+            waitForUpOrCancellation()?.let {
+                onTap(it.position)
             }
         }
     }

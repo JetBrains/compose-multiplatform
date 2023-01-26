@@ -39,7 +39,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
         api "androidx.annotation:annotation:1.1.0"
 
-        api("androidx.compose.runtime:runtime:1.2.0")
+        api("androidx.compose.runtime:runtime:1.2.1")
         api(project(":compose:ui:ui"))
 
         androidTestImplementation project(":compose:ui:ui-test-junit4")
@@ -76,7 +76,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 api "androidx.annotation:annotation:1.1.0"
 
-                api("androidx.compose.runtime:runtime:1.2.0")
+                api("androidx.compose.runtime:runtime:1.2.1")
                 api(project(":compose:ui:ui"))
             }
             jvmMain.dependencies {
@@ -121,7 +121,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Tooling Data"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2021"
     description = "Compose tooling library data. This library provides data about compose" +
             " for different tooling purposes."
@@ -130,12 +129,4 @@ androidx {
 
 android {
     namespace "androidx.compose.ui.tooling.data"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

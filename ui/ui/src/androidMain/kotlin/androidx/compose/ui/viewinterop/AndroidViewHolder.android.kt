@@ -54,7 +54,7 @@ import androidx.core.view.NestedScrollingParent3
 import androidx.core.view.NestedScrollingParentHelper
 import androidx.core.view.ViewCompat
 import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import kotlin.math.roundToInt
@@ -135,12 +135,12 @@ internal abstract class AndroidViewHolder(
 
     internal var onDensityChanged: ((Density) -> Unit)? = null
 
-    /** Sets the [ViewTreeLifecycleOwner] for this view. */
+    /** Sets the ViewTreeLifecycleOwner for this view. */
     var lifecycleOwner: LifecycleOwner? = null
         set(value) {
             if (value !== field) {
                 field = value
-                ViewTreeLifecycleOwner.set(this, value)
+                setViewTreeLifecycleOwner(value)
             }
         }
 

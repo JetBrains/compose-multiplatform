@@ -29,8 +29,8 @@ dependencies {
     compileOnly(project(":annotation:annotation-sampled"))
 
     api(project(":compose:ui:ui-unit"))
-    implementation("androidx.compose.foundation:foundation:1.0.0")
-    implementation("androidx.compose.runtime:runtime:1.2.0")
+    implementation("androidx.compose.foundation:foundation:1.2.1")
+    implementation("androidx.compose.runtime:runtime:1.2.1")
     implementation(project(":compose:ui:ui-graphics"))
     implementation(project(":compose:ui:ui-util"))
 }
@@ -38,7 +38,6 @@ dependencies {
 androidx {
     name = "AndroidX Compose UI Graphics Components Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2019"
     description = "Contains the sample code for the Androidx Compose UI Graphics Components"
 }

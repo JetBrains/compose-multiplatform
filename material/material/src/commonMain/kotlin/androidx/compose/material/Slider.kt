@@ -30,7 +30,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
@@ -161,7 +161,7 @@ fun Slider(
     }
     BoxWithConstraints(
         modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .requiredSizeIn(minWidth = ThumbRadius * 2, minHeight = ThumbRadius * 2)
             .sliderSemantics(
                 value,
@@ -309,7 +309,7 @@ fun RangeSlider(
 
     BoxWithConstraints(
         modifier = modifier
-            .minimumTouchTargetSize()
+            .minimumInteractiveComponentSize()
             .requiredSizeIn(minWidth = ThumbRadius * 4, minHeight = ThumbRadius * 2)
     ) {
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
@@ -980,56 +980,54 @@ private fun Modifier.rangeSliderPressDragModifier(
                 onDrag
             )
             coroutineScope {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        val event = awaitFirstDown(requireUnconsumed = false)
-                        val interaction = DragInteraction.Start()
-                        var posX = if (isRtl) maxPx - event.position.x else event.position.x
-                        val compare = rangeSliderLogic.compareOffsets(posX)
-                        var draggingStart = if (compare != 0) {
-                            compare < 0
+                awaitEachGesture {
+                    val event = awaitFirstDown(requireUnconsumed = false)
+                    val interaction = DragInteraction.Start()
+                    var posX = if (isRtl) maxPx - event.position.x else event.position.x
+                    val compare = rangeSliderLogic.compareOffsets(posX)
+                    var draggingStart = if (compare != 0) {
+                        compare < 0
+                    } else {
+                        rawOffsetStart.value > posX
+                    }
+
+                    awaitSlop(event.id, event.type)?.let {
+                        val slop = viewConfiguration.pointerSlop(event.type)
+                        val shouldUpdateCapturedThumb = abs(rawOffsetEnd.value - posX) < slop &&
+                            abs(rawOffsetStart.value - posX) < slop
+                        if (shouldUpdateCapturedThumb) {
+                            val dir = it.second
+                            draggingStart = if (isRtl) dir >= 0f else dir < 0f
+                            posX += it.first.positionChange().x
+                        }
+                    }
+
+                    rangeSliderLogic.captureThumb(
+                        draggingStart,
+                        posX,
+                        interaction,
+                        this@coroutineScope
+                    )
+
+                    val finishInteraction = try {
+                        val success = horizontalDrag(pointerId = event.id) {
+                            val deltaX = it.positionChange().x
+                            onDrag.value.invoke(draggingStart, if (isRtl) -deltaX else deltaX)
+                        }
+                        if (success) {
+                            DragInteraction.Stop(interaction)
                         } else {
-                            rawOffsetStart.value > posX
-                        }
-
-                        awaitSlop(event.id, event.type)?.let {
-                            val slop = viewConfiguration.pointerSlop(event.type)
-                            val shouldUpdateCapturedThumb = abs(rawOffsetEnd.value - posX) < slop &&
-                                abs(rawOffsetStart.value - posX) < slop
-                            if (shouldUpdateCapturedThumb) {
-                                val dir = it.second
-                                draggingStart = if (isRtl) dir >= 0f else dir < 0f
-                                posX += it.first.positionChange().x
-                            }
-                        }
-
-                        rangeSliderLogic.captureThumb(
-                            draggingStart,
-                            posX,
-                            interaction,
-                            this@coroutineScope
-                        )
-
-                        val finishInteraction = try {
-                            val success = horizontalDrag(pointerId = event.id) {
-                                val deltaX = it.positionChange().x
-                                onDrag.value.invoke(draggingStart, if (isRtl) -deltaX else deltaX)
-                            }
-                            if (success) {
-                                DragInteraction.Stop(interaction)
-                            } else {
-                                DragInteraction.Cancel(interaction)
-                            }
-                        } catch (e: CancellationException) {
                             DragInteraction.Cancel(interaction)
                         }
+                    } catch (e: CancellationException) {
+                        DragInteraction.Cancel(interaction)
+                    }
 
-                        gestureEndAction.value.invoke(draggingStart)
-                        launch {
-                            rangeSliderLogic
-                                .activeInteraction(draggingStart)
-                                .emit(finishInteraction)
-                        }
+                    gestureEndAction.value.invoke(draggingStart)
+                    launch {
+                        rangeSliderLogic
+                            .activeInteraction(draggingStart)
+                            .emit(finishInteraction)
                     }
                 }
             }

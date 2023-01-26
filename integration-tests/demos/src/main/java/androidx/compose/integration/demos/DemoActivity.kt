@@ -30,6 +30,7 @@ import androidx.compose.integration.demos.common.DemoCategory
 import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsEffect
 import androidx.compose.integration.demos.settings.DecorFitsSystemWindowsSetting
 import androidx.compose.integration.demos.settings.DynamicThemeSetting
+import androidx.compose.integration.demos.settings.LayoutDirectionSetting
 import androidx.compose.integration.demos.settings.SoftInputModeEffect
 import androidx.compose.integration.demos.settings.SoftInputModeSetting
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +39,7 @@ import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,6 +53,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
@@ -95,35 +98,39 @@ class DemoActivity : FragmentActivity() {
                 window
             )
 
-            DemoTheme(DynamicThemeSetting.asState().value, this.hostView, window) {
-                val filteringMode = rememberSaveable(
-                    saver = FilterMode.Saver(onBackPressedDispatcher)
-                ) {
-                    FilterMode(onBackPressedDispatcher)
-                }
-                val onStartFiltering = { filteringMode.isFiltering = true }
-                val onEndFiltering = { filteringMode.isFiltering = false }
-                DemoApp(
-                    currentDemo = navigator.currentDemo,
-                    backStackTitle = navigator.backStackTitle,
-                    isFiltering = filteringMode.isFiltering,
-                    onStartFiltering = onStartFiltering,
-                    onEndFiltering = onEndFiltering,
-                    onNavigateToDemo = { demo ->
-                        if (filteringMode.isFiltering) {
-                            onEndFiltering()
-                            navigator.popAll()
-                        }
-                        navigator.navigateTo(demo)
-                    },
-                    canNavigateUp = !navigator.isRoot,
-                    onNavigateUp = {
-                        onBackPressed()
-                    },
-                    launchSettings = {
-                        startActivity(Intent(this, DemoSettingsActivity::class.java))
+            CompositionLocalProvider(
+                LocalLayoutDirection provides LayoutDirectionSetting.asState().value,
+            ) {
+                DemoTheme(DynamicThemeSetting.asState().value, this.hostView, window) {
+                    val filteringMode = rememberSaveable(
+                        saver = FilterMode.Saver(onBackPressedDispatcher)
+                    ) {
+                        FilterMode(onBackPressedDispatcher)
                     }
-                )
+                    val onStartFiltering = { filteringMode.isFiltering = true }
+                    val onEndFiltering = { filteringMode.isFiltering = false }
+                    DemoApp(
+                        currentDemo = navigator.currentDemo,
+                        backStackTitle = navigator.backStackTitle,
+                        isFiltering = filteringMode.isFiltering,
+                        onStartFiltering = onStartFiltering,
+                        onEndFiltering = onEndFiltering,
+                        onNavigateToDemo = { demo ->
+                            if (filteringMode.isFiltering) {
+                                onEndFiltering()
+                                navigator.popAll()
+                            }
+                            navigator.navigateTo(demo)
+                        },
+                        canNavigateUp = !navigator.isRoot,
+                        onNavigateUp = {
+                            onBackPressed()
+                        },
+                        launchSettings = {
+                            startActivity(Intent(this, DemoSettingsActivity::class.java))
+                        }
+                    )
+                }
             }
         }
     }
@@ -132,7 +139,7 @@ class DemoActivity : FragmentActivity() {
         const val DEMO_NAME = "demoname"
 
         internal fun requireDemo(demoName: String, demo: Demo?) = requireNotNull(demo) {
-            "No demo called \"$demoName\" could be found."
+            "No demo called \"$demoName\" could be found. Note substring matches are allowed."
         }
     }
 }
@@ -232,20 +239,26 @@ private class Navigator private constructor(
             restore = { restored ->
                 require(restored.isNotEmpty())
                 val backStack = restored.mapTo(mutableListOf()) {
-                    requireNotNull(findDemo(rootDemo, it))
+                    requireNotNull(findDemo(rootDemo, it, exact = true))
                 }
                 val initial = backStack.removeAt(backStack.lastIndex)
                 Navigator(backDispatcher, launchActivityDemo, rootDemo, initial, backStack)
             }
         )
 
-        fun findDemo(demo: Demo, title: String): Demo? {
-            if (demo.title == title) {
-                return demo
+        fun findDemo(demo: Demo, title: String, exact: Boolean = false): Demo? {
+            if (exact) {
+                if (demo.title == title) {
+                    return demo
+                }
+            } else {
+                if (demo.title.contains(title)) {
+                    return demo
+                }
             }
             if (demo is DemoCategory) {
                 demo.demos.forEach { child ->
-                    findDemo(child, title)
+                    findDemo(child, title, exact)
                         ?.let { return it }
                 }
             }

@@ -17,9 +17,11 @@
 package androidx.compose.ui.test
 
 @RequiresOptIn("This testing API is experimental and is likely to be changed or removed entirely")
+@Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalTestApi
 
 @RequiresOptIn(
     "This is internal API for Compose modules that may change frequently and without warning."
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class InternalTestApi

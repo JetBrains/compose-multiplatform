@@ -1,0 +1,13 @@
+// Baseline format: 1.0
+RemovedClass: androidx.compose.foundation.lazy.LazyListPinningModifierKt:
+    Removed class androidx.compose.foundation.lazy.LazyListPinningModifierKt
+RemovedClass: androidx.compose.foundation.lazy.layout.PinnableParentKt:
+    Removed class androidx.compose.foundation.lazy.layout.PinnableParentKt
+RemovedClass: androidx.compose.foundation.text.MaxLinesHeightModifierKt:
+    Removed class androidx.compose.foundation.text.MaxLinesHeightModifierKt
+
+
+RemovedMethod: androidx.compose.foundation.gestures.TapGestureDetectorKt#awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope, boolean, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>):
+    Removed method androidx.compose.foundation.gestures.TapGestureDetectorKt.awaitFirstDown(androidx.compose.ui.input.pointer.AwaitPointerEventScope,boolean,kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>)
+RemovedMethod: androidx.compose.foundation.gestures.TapGestureDetectorKt#waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope, kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>):
+    Removed method androidx.compose.foundation.gestures.TapGestureDetectorKt.waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope,kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>)

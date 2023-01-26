@@ -21,14 +21,12 @@ import java.io.File
 import java.util.Locale
 
 /**
- * Processes vector drawables in [iconDirectory] into a list of icons, removing any unwanted
+ * Processes vector drawables in [iconDirectories] into a list of icons, removing any unwanted
  * attributes (such as android: attributes that reference the theme) from the XML source.
  *
- * Drawables in [iconDirectory] should match the following structure, see download_material_icons.py
- * to update icons, using this structure.
+ * Each directory in [iconDirectories] should contain a flat list of icons to process. For example,
+ * given the existing structure in raw-icons:
  *
- * // Top level
- * [iconDirectory]
  * // Theme name
  * ├── filled
  *     // Icon name
@@ -39,13 +37,15 @@ import java.util.Locale
  * ├── twotone
  * └── sharp
  *
- * @param iconDirectory root directory containing the directory structure mentioned above
+ * Each directory in [iconDirectories] should be a theme directory (filled, outlined, etc).
+ *
+ * @param iconDirectories list of directories containing icon to process
  * @param expectedApiFile location of the checked-in API file that contains the current list of
  * all icons processed and generated
  * @param generatedApiFile location of the to-be-generated API file in the build directory,
  * that we will write to and compare with [expectedApiFile]. This way the generated file can be
  * copied to overwrite the expected file, 'confirming' any API changes as a result of changing
- * icons in [iconDirectory].
+ * icons in [iconDirectories].
  */
 class IconProcessor(
     private val iconDirectories: List<File>,
@@ -54,7 +54,7 @@ class IconProcessor(
     private val verifyApi: Boolean = true
 ) {
     /**
-     * @return a list of processed [Icon]s, from the given [iconDirectory].
+     * @return a list of processed [Icon]s, from the provided [iconDirectories].
      */
     fun process(): List<Icon> {
         val icons = loadIcons()

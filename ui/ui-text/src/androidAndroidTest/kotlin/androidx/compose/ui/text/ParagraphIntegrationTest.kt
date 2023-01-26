@@ -4415,8 +4415,8 @@ class ParagraphIntegrationTest {
                 width = paragraphWidth
             )
 
-            assertThat(baseParagraph.bitmap(drawStyle = Stroke()))
-                .isNotEqualToBitmap(baseParagraph.bitmap())
+            assertThat(baseParagraph.bitmap())
+                .isNotEqualToBitmap(baseParagraph.bitmap(drawStyle = Stroke()))
         }
     }
 

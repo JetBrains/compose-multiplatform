@@ -46,6 +46,7 @@ abstract class ModifierNodeElement<N : Modifier.Node>(
      * [ModifierNodeElement] while still having a reasonable equals implementation.
      */
     internal val params: Any? = null,
+    internal val autoInvalidate: Boolean = true,
     /**
      * This lambda will construct a debug-only set of information for use with tooling.
      *
@@ -82,11 +83,11 @@ abstract class ModifierNodeElement<N : Modifier.Node>(
  * A helpful API for constructing a [ModifierNodeElement] corresponding to a particular
  * [Modifier.Node] implementation.
  *
- * @param params An object used to determine whether or not the created node should be updated or not.
+ * @param key An object used to determine whether or not the created node should be updated or not.
  * @param create The initial creation of the node. This will be called the first time the modifier
  *  is applied to the Layout and it should construct the correspoding [Modifier.Node] instance,
  *  referencing any captured inputs necessary.
- * @param update Called when a modifier is applied to a Layout whose [params] have changed from the
+ * @param update Called when a modifier is applied to a Layout whose [key] have changed from the
  *  previous application. This lambda will have the current node instance passed in as a parameter,
  *  and it is expected that the node will be brought up to date.
  * @param definitions This lambda will construct a debug-only set of information for use with
@@ -106,11 +107,11 @@ abstract class ModifierNodeElement<N : Modifier.Node>(
 @Suppress("MissingNullability", "ModifierFactoryExtensionFunction")
 @ExperimentalComposeUiApi
 inline fun <reified T : Modifier.Node> modifierElementOf(
-    params: Any?,
+    key: Any?,
     crossinline create: () -> T,
     crossinline update: (T) -> Unit,
     crossinline definitions: InspectorInfo.() -> Unit
-): Modifier = object : ModifierNodeElement<T>(params, debugInspectorInfo(definitions)) {
+): Modifier = object : ModifierNodeElement<T>(key, true, debugInspectorInfo(definitions)) {
     override fun create(): T = create()
     override fun update(node: T): T = node.also(update)
 }
@@ -137,7 +138,7 @@ inline fun <reified T : Modifier.Node> modifierElementOf(
 inline fun <reified T : Modifier.Node> modifierElementOf(
     crossinline create: () -> T,
     crossinline definitions: InspectorInfo.() -> Unit
-): Modifier = object : ModifierNodeElement<T>(null, debugInspectorInfo(definitions)) {
+): Modifier = object : ModifierNodeElement<T>(null, true, debugInspectorInfo(definitions)) {
     override fun create(): T = create()
     override fun update(node: T): T = node
 }

@@ -19,9 +19,9 @@ package androidx.compose.ui.unit {
     method public boolean isZero();
     property public final boolean hasBoundedHeight;
     property public final boolean hasBoundedWidth;
-    property public final boolean hasFixedHeight;
-    property public final boolean hasFixedWidth;
-    property public final boolean isZero;
+    property @androidx.compose.runtime.Stable public final boolean hasFixedHeight;
+    property @androidx.compose.runtime.Stable public final boolean hasFixedWidth;
+    property @androidx.compose.runtime.Stable public final boolean isZero;
     property public final int maxHeight;
     property public final int maxWidth;
     property public final int minHeight;
@@ -136,8 +136,8 @@ package androidx.compose.ui.unit {
     method public float getY();
     method @androidx.compose.runtime.Stable public inline operator long minus(long other);
     method @androidx.compose.runtime.Stable public inline operator long plus(long other);
-    property public final float x;
-    property public final float y;
+    property @androidx.compose.runtime.Stable public final float x;
+    property @androidx.compose.runtime.Stable public final float y;
     field public static final androidx.compose.ui.unit.DpOffset.Companion Companion;
   }
 
@@ -182,8 +182,8 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public inline operator long plus(long other);
     method @androidx.compose.runtime.Stable public operator long times(int other);
     method @androidx.compose.runtime.Stable public operator long times(float other);
-    property public final float height;
-    property public final float width;
+    property @androidx.compose.runtime.Stable public final float height;
+    property @androidx.compose.runtime.Stable public final float width;
     field public static final androidx.compose.ui.unit.DpSize.Companion Companion;
   }
 
@@ -194,7 +194,7 @@ package androidx.compose.ui.unit {
     property public final long Zero;
   }
 
-  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") public @interface ExperimentalUnitApi {
+  @kotlin.RequiresOptIn(message="This API is experimental and is likely to change in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalUnitApi {
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class IntOffset {
@@ -209,8 +209,8 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public operator long rem(int operand);
     method @androidx.compose.runtime.Stable public operator long times(float operand);
     method @androidx.compose.runtime.Stable public inline operator long unaryMinus();
-    property public final int x;
-    property public final int y;
+    property @androidx.compose.runtime.Stable public final int x;
+    property @androidx.compose.runtime.Stable public final int y;
     field public static final androidx.compose.ui.unit.IntOffset.Companion Companion;
   }
 
@@ -270,18 +270,18 @@ package androidx.compose.ui.unit {
     property public final long center;
     property public final long centerLeft;
     property public final long centerRight;
-    property public final int height;
-    property public final boolean isEmpty;
+    property @androidx.compose.runtime.Stable public final int height;
+    property @androidx.compose.runtime.Stable public final boolean isEmpty;
     property public final int left;
     property public final int maxDimension;
     property public final int minDimension;
     property public final int right;
-    property public final long size;
+    property @androidx.compose.runtime.Stable public final long size;
     property public final int top;
     property public final long topCenter;
     property public final long topLeft;
     property public final long topRight;
-    property public final int width;
+    property @androidx.compose.runtime.Stable public final int width;
     field public static final androidx.compose.ui.unit.IntRect.Companion Companion;
   }
 
@@ -295,6 +295,8 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect(long topLeft, long bottomRight);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect IntRect(long center, int radius);
     method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect lerp(androidx.compose.ui.unit.IntRect start, androidx.compose.ui.unit.IntRect stop, float fraction);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.unit.IntRect round(androidx.compose.ui.geometry.Rect);
+    method @androidx.compose.runtime.Stable public static androidx.compose.ui.geometry.Rect toRect(androidx.compose.ui.unit.IntRect);
   }
 
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class IntSize {
@@ -304,8 +306,8 @@ package androidx.compose.ui.unit {
     method public int getHeight();
     method public int getWidth();
     method @androidx.compose.runtime.Stable public operator long times(int other);
-    property public final int height;
-    property public final int width;
+    property @androidx.compose.runtime.Stable public final int height;
+    property @androidx.compose.runtime.Stable public final int width;
     field public static final androidx.compose.ui.unit.IntSize.Companion Companion;
   }
 
@@ -355,7 +357,7 @@ package androidx.compose.ui.unit {
   }
 
   public final class TextUnitKt {
-    method @androidx.compose.ui.unit.ExperimentalUnitApi public static long TextUnit(float value, long type);
+    method public static long TextUnit(float value, long type);
     method public static long getEm(float);
     method public static long getEm(double);
     method public static long getEm(int);
@@ -397,8 +399,8 @@ package androidx.compose.ui.unit {
     method @androidx.compose.runtime.Stable public operator long rem(float operand);
     method @androidx.compose.runtime.Stable public operator long times(float operand);
     method @androidx.compose.runtime.Stable public operator long unaryMinus();
-    property public final float x;
-    property public final float y;
+    property @androidx.compose.runtime.Stable public final float x;
+    property @androidx.compose.runtime.Stable public final float y;
     field public static final androidx.compose.ui.unit.Velocity.Companion Companion;
   }
 

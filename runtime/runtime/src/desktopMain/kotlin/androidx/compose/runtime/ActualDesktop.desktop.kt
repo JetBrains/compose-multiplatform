@@ -81,3 +81,8 @@ internal actual fun <T> createSnapshotMutableState(
     value: T,
     policy: SnapshotMutationPolicy<T>
 ): SnapshotMutableState<T> = SnapshotMutableStateImpl(value, policy)
+
+internal actual fun logError(message: String, e: Throwable) {
+    System.err.println(message)
+    e.printStackTrace(System.err)
+}

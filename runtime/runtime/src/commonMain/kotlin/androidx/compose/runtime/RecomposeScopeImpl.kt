@@ -33,6 +33,23 @@ interface RecomposeScope {
     fun invalidate()
 }
 
+private const val changedLowBitMask = 0b001_001_001_001_001_001_001_001_001_001_0
+private const val changedHighBitMask = changedLowBitMask shl 1
+private const val changedMask = (changedLowBitMask or changedHighBitMask).inv()
+
+/**
+ * A compiler plugin utility function to change $changed flags from Different(10) to Same(01) for
+ * when captured by restart lambdas. All parameters are passed with the same value as it was
+ * previously invoked with and the changed flags should reflect that.
+ */
+@PublishedApi
+internal fun updateChangedFlags(flags: Int): Int {
+    val lowBits = flags and changedLowBitMask
+    val highBits = flags and changedHighBitMask
+    return ((flags and changedMask) or
+        (lowBits or (highBits shr 1)) or ((lowBits shl 1) and highBits))
+}
+
 private const val UsedFlag = 0x01
 private const val DefaultsInScopeFlag = 0x02
 private const val DefaultsInvalidFlag = 0x04

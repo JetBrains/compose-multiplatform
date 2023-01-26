@@ -28,16 +28,22 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.FocusRequester.Companion.Default
+import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LocalPinnableContainer
+import androidx.compose.ui.layout.PinnableContainer
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -84,15 +90,30 @@ fun LazyListChildFocusDemos() {
             var previouslyFocusedItem: FocusRequester? by remember { mutableStateOf(null) }
             LazyRow(
                 Modifier
-                    .onFocusChanged { if (it.isFocused) previouslyFocusedItem?.requestFocus() }
-                    .then(previouslyFocusedItem?.let { Modifier.focusable() } ?: Modifier)
+                    .focusProperties {
+                        @OptIn(ExperimentalComposeUiApi::class)
+                        enter = { previouslyFocusedItem ?: Default }
+                    }
             ) {
-                items(10) {
-                    val focusRequester = remember { FocusRequester() }
+                items(10) { index ->
+                    val focusRequester = remember(index) { FocusRequester() }
+                    val pinnableContainer = LocalPinnableContainer.current
+                    var pinnedHandle: PinnableContainer.PinnedHandle? = null
                     FocusableBox(Modifier
-                        .onFocusChanged { if (it.isFocused) previouslyFocusedItem = focusRequester }
+                        .onFocusChanged {
+                            if (it.isFocused) {
+                                previouslyFocusedItem = focusRequester
+                                pinnedHandle = pinnableContainer?.pin()
+                            }
+                        }
                         .focusRequester(focusRequester)
                     )
+                    DisposableEffect(pinnableContainer) {
+                        onDispose {
+                            pinnedHandle?.unpin()
+                            pinnedHandle = null
+                        }
+                    }
                 }
             }
         }

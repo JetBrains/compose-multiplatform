@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.coerceAtLeast
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.offset
+import androidx.compose.ui.util.lerp
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -118,9 +119,10 @@ import kotlin.math.roundToInt
  * instead of wrapping onto multiple lines. The keyboard will be informed to not show the return key
  * as the [ImeAction]. Note that [maxLines] parameter will be ignored as the maxLines attribute will
  * be automatically set to 1.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true.
+ * @param maxLines the maximum height in terms of maximum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
+ * @param minLines the minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this text field. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this text field in different states.
@@ -147,7 +149,8 @@ fun OutlinedTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = TextFieldDefaults.outlinedShape,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
@@ -186,6 +189,7 @@ fun OutlinedTextField(
             interactionSource = interactionSource,
             singleLine = singleLine,
             maxLines = maxLines,
+            minLines = minLines,
             decorationBox = @Composable { innerTextField ->
                 TextFieldDefaults.OutlinedTextFieldDecorationBox(
                     value = value,
@@ -269,9 +273,10 @@ fun OutlinedTextField(
  * instead of wrapping onto multiple lines. The keyboard will be informed to not show the return key
  * as the [ImeAction]. Note that [maxLines] parameter will be ignored as the maxLines attribute will
  * be automatically set to 1.
- * @param maxLines the maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1. Note that this parameter will be ignored and instead maxLines will be
- * set to 1 if [singleLine] is set to true.
+ * @param maxLines the maximum height in terms of maximum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
+ * @param minLines the minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines]. This parameter is ignored when [singleLine] is true.
  * @param interactionSource the [MutableInteractionSource] representing the stream of [Interaction]s
  * for this text field. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this text field in different states.
@@ -298,7 +303,8 @@ fun OutlinedTextField(
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     singleLine: Boolean = false,
-    maxLines: Int = Int.MAX_VALUE,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     shape: Shape = TextFieldDefaults.outlinedShape,
     colors: TextFieldColors = TextFieldDefaults.outlinedTextFieldColors()
@@ -337,6 +343,7 @@ fun OutlinedTextField(
             interactionSource = interactionSource,
             singleLine = singleLine,
             maxLines = maxLines,
+            minLines = minLines,
             decorationBox = @Composable { innerTextField ->
                 TextFieldDefaults.OutlinedTextFieldDecorationBox(
                     value = value.text,
@@ -824,14 +831,15 @@ private fun Placeable.PlacementScope.place(
 
     // label position is animated
     // in single line text field label is centered vertically before animation starts
+    var labelPositionY: Int? = null
     labelPlaceable?.let {
         val startPositionY = if (singleLine) {
             Alignment.CenterVertically.align(it.height, height)
         } else {
             topPadding
         }
-        val positionY =
-            startPositionY * (1 - animationProgress) - (it.height / 2) * animationProgress
+        val positionY = lerp(startPositionY, -(it.height / 2), animationProgress)
+        labelPositionY = positionY
         val positionX = (
             if (leadingPlaceable == null) {
                 0f
@@ -839,7 +847,7 @@ private fun Placeable.PlacementScope.place(
                 (widthOrZero(leadingPlaceable) - iconPadding) * (1 - animationProgress)
             }
             ).roundToInt() + startPadding
-        it.placeRelative(positionX, positionY.roundToInt())
+        it.placeRelative(positionX, positionY)
     }
 
     // placed center vertically and after the leading icon horizontally if single line text field
@@ -856,10 +864,20 @@ private fun Placeable.PlacementScope.place(
 
     // placed similar to the input text above
     placeholderPlaceable?.let {
-        val placeholderVerticalPosition = if (singleLine) {
-            Alignment.CenterVertically.align(it.height, height)
-        } else {
-            topPadding
+        var placeholderVerticalPosition = max(
+            if (singleLine) {
+                Alignment.CenterVertically.align(it.height, height)
+            } else {
+                topPadding
+            },
+            heightOrZero(labelPlaceable) / 2
+        )
+        // Ensure placeholder's bounding box does not cover label in unfocused state
+        // (workaround for b/261061240)
+        labelPositionY?.let { labelPositionY ->
+            if (placeholderVerticalPosition <= labelPositionY) {
+                placeholderVerticalPosition = labelPositionY + 1
+            }
         }
         it.placeRelative(widthOrZero(leadingPlaceable), placeholderVerticalPosition)
     }

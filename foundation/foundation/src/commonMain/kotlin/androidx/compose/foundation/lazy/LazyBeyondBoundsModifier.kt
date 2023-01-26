@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.lazy
 
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.lazy.LazyListBeyondBoundsInfo.Interval
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -46,10 +47,23 @@ internal fun Modifier.lazyListBeyondBoundsModifier(
     state: LazyListState,
     beyondBoundsInfo: LazyListBeyondBoundsInfo,
     reverseLayout: Boolean,
+    orientation: Orientation
 ): Modifier {
     val layoutDirection = LocalLayoutDirection.current
-    return this then remember(state, beyondBoundsInfo, reverseLayout, layoutDirection) {
-        LazyListBeyondBoundsModifierLocal(state, beyondBoundsInfo, reverseLayout, layoutDirection)
+    return this then remember(
+        state,
+        beyondBoundsInfo,
+        reverseLayout,
+        layoutDirection,
+        orientation
+    ) {
+        LazyListBeyondBoundsModifierLocal(
+            state,
+            beyondBoundsInfo,
+            reverseLayout,
+            layoutDirection,
+            orientation
+        )
     }
 }
 
@@ -57,17 +71,29 @@ private class LazyListBeyondBoundsModifierLocal(
     private val state: LazyListState,
     private val beyondBoundsInfo: LazyListBeyondBoundsInfo,
     private val reverseLayout: Boolean,
-    private val layoutDirection: LayoutDirection
+    private val layoutDirection: LayoutDirection,
+    private val orientation: Orientation
 ) : ModifierLocalProvider<BeyondBoundsLayout?>, BeyondBoundsLayout {
     override val key: ProvidableModifierLocal<BeyondBoundsLayout?>
         get() = ModifierLocalBeyondBoundsLayout
     override val value: BeyondBoundsLayout
         get() = this
+    companion object {
+        private val emptyBeyondBoundsScope = object : BeyondBoundsScope {
+            override val hasMoreContent = false
+        }
+    }
 
     override fun <T> layout(
         direction: BeyondBoundsLayout.LayoutDirection,
         block: BeyondBoundsScope.() -> T?
     ): T? {
+        // If the lazy list is empty, or if it does not have any visible items (Which implies
+        // that there isn't space to add a single item), we don't attempt to layout any more items.
+        if (state.layoutInfo.totalItemsCount <= 0 || state.layoutInfo.visibleItemsInfo.isEmpty()) {
+            return block.invoke(emptyBeyondBoundsScope)
+        }
+
         // We use a new interval each time because this function is re-entrant.
         var interval = beyondBoundsInfo.addInterval(
             state.firstVisibleItemIndex,
@@ -125,6 +151,7 @@ private class LazyListBeyondBoundsModifierLocal(
     private fun Interval.hasMoreContent(direction: BeyondBoundsLayout.LayoutDirection): Boolean {
         fun hasMoreItemsBefore() = start > 0
         fun hasMoreItemsAfter() = end < state.layoutInfo.totalItemsCount - 1
+        if (direction.isOppositeToOrientation()) return false
         return when (direction) {
             Before -> hasMoreItemsBefore()
             After -> hasMoreItemsAfter()
@@ -138,6 +165,15 @@ private class LazyListBeyondBoundsModifierLocal(
                 Ltr -> if (reverseLayout) hasMoreItemsBefore() else hasMoreItemsAfter()
                 Rtl -> if (reverseLayout) hasMoreItemsAfter() else hasMoreItemsBefore()
             }
+            else -> unsupportedDirection()
+        }
+    }
+
+    private fun BeyondBoundsLayout.LayoutDirection.isOppositeToOrientation(): Boolean {
+        return when (this) {
+            Above, Below -> orientation == Orientation.Horizontal
+            Left, Right -> orientation == Orientation.Vertical
+            Before, After -> false
             else -> unsupportedDirection()
         }
     }

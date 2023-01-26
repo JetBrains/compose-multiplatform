@@ -21,6 +21,7 @@ import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.VelocityTrackerCalculationThreshold
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -215,12 +216,12 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
     }
 
     @Test
-    fun lazyListOnlyVisibleItemsAdded() {
+    fun lazyList_noBeyondBoundItemsCount_OnlyVisibleItemsAdded() {
         val items = (1..4).map { it.toString() }
 
         rule.setContentWithTestViewConfiguration {
             Box(Modifier.mainAxisSize(200.dp)) {
-                LazyColumnOrRow {
+                LazyColumnOrRow(beyondBoundsItemCount = 0) {
                     items(items) {
                         Spacer(
                             Modifier.mainAxisSize(101.dp).then(fillParentMaxCrossAxis()).testTag(it)
@@ -238,6 +239,35 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         rule.onNodeWithTag("3")
             .assertDoesNotExist()
+
+        rule.onNodeWithTag("4")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun lazyList_withBeyondBoundItemsCount_bothVisibleAndBeyondBoundItemsCountAdded() {
+        val items = (1..4).map { it.toString() }
+
+        rule.setContentWithTestViewConfiguration {
+            Box(Modifier.mainAxisSize(200.dp)) {
+                LazyColumnOrRow(beyondBoundsItemCount = 1) {
+                    items(items) {
+                        Spacer(
+                            Modifier.mainAxisSize(101.dp).then(fillParentMaxCrossAxis()).testTag(it)
+                        )
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("3")
+            .assertIsNotDisplayed()
 
         rule.onNodeWithTag("4")
             .assertDoesNotExist()
@@ -1000,11 +1030,44 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
     }
 
     @Test
-    fun itemsAreNotRedrawnDuringScroll() {
+    fun itemsAreNotRedrawnDuringScroll_noBeyondBoundItemsCount() {
         val items = (0..20).toList()
         val redrawCount = Array(6) { 0 }
         rule.setContentWithTestViewConfiguration {
-            LazyColumnOrRow(Modifier.requiredSize(100.dp).testTag(LazyListTag)) {
+            LazyColumnOrRow(
+                modifier = Modifier.requiredSize(100.dp).testTag(LazyListTag),
+                beyondBoundsItemCount = 0
+            ) {
+                items(items) {
+                    Spacer(
+                        Modifier.requiredSize(20.dp)
+                            .drawBehind { redrawCount[it]++ }
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag(LazyListTag)
+            .scrollMainAxisBy(10.dp)
+
+        rule.runOnIdle {
+            redrawCount.forEachIndexed { index, i ->
+                assertWithMessage("Item with index $index was redrawn $i times")
+                    .that(i).isEqualTo(1)
+            }
+        }
+    }
+
+    @Test
+    fun itemsAreNotRedrawnDuringScroll_withBeyondBoundItemsCount() {
+        val items = (0..20).toList()
+        val beyondBoundsItemCount = 1
+        val redrawCount = Array(6 + beyondBoundsItemCount) { 0 }
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                modifier = Modifier.requiredSize(100.dp).testTag(LazyListTag),
+                beyondBoundsItemCount = beyondBoundsItemCount
+            ) {
                 items(items) {
                     Spacer(
                         Modifier.requiredSize(20.dp)
@@ -1973,7 +2036,7 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         // assert
         rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            val diff = abs((velocity - tracker.calculateVelocity()).toFloat())
             assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
         }
         tracker.resetTracking()
@@ -1984,7 +2047,7 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
 
         // assert
         rule.runOnIdle {
-            val diff = abs((velocity - tracker.calculateVelocity()).y)
+            val diff = abs((velocity - tracker.calculateVelocity()).toFloat())
             assertThat(diff).isLessThan(VelocityTrackerCalculationThreshold)
         }
     }
@@ -2010,7 +2073,7 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         lateinit var scope: CoroutineScope
         rule.setContent {
             scope = rememberCoroutineScope()
-            LazyColumnOrRow(Modifier.size(30.dp), state = state) {
+            LazyColumnOrRow(Modifier.size(30.dp), state = state, beyondBoundsItemCount = 0) {
                 items(500, itemContent = itemContent)
             }
         }
@@ -2082,6 +2145,67 @@ class LazyListTest(orientation: Orientation) : BaseLazyListTestWithOrientation(o
         rule.onNodeWithTag("item")
             .assertMainAxisSizeIsEqualTo(with(rule.density) { (100 * 0.95f).roundToInt().toDp() })
             .assertCrossAxisSizeIsEqualTo(0.dp)
+    }
+
+    @Test
+    fun fillingFullSize_nextItemIsNotComposed() {
+        val state = LazyListState()
+        state.prefetchingEnabled = false
+        val itemSizePx = 5f
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier
+                    .testTag(LazyListTag)
+                    .mainAxisSize(itemSize),
+                state = state
+            ) {
+                items(3) { index ->
+                    Box(fillParentMaxMainAxis().crossAxisSize(1.dp).testTag("$index"))
+                }
+            }
+        }
+
+        repeat(3) { index ->
+            rule.onNodeWithTag("$index")
+                .assertIsDisplayed()
+            rule.onNodeWithTag("${index + 1}")
+                .assertDoesNotExist()
+            rule.runOnIdle {
+                runBlocking {
+                    state.scrollBy(itemSizePx)
+                }
+            }
+        }
+    }
+
+    @Test
+    fun fillingFullSize_crossAxisSizeOfVisibleItemIsUsed() {
+        val state = LazyListState()
+        val itemSizePx = 5f
+        val itemSize = with(rule.density) { itemSizePx.toDp() }
+        rule.setContentWithTestViewConfiguration {
+            LazyColumnOrRow(
+                Modifier
+                    .testTag(LazyListTag)
+                    .mainAxisSize(itemSize),
+                state = state
+            ) {
+                items(5) { index ->
+                    Box(fillParentMaxMainAxis().crossAxisSize(index.dp))
+                }
+            }
+        }
+
+        repeat(5) { index ->
+            rule.onNodeWithTag(LazyListTag)
+                .assertCrossAxisSizeIsEqualTo(index.dp)
+            rule.runOnIdle {
+                runBlocking {
+                    state.scrollBy(itemSizePx)
+                }
+            }
+        }
     }
 
     // ********************* END OF TESTS *********************

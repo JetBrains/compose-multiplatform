@@ -52,7 +52,9 @@ import androidx.compose.ui.text.style.TextOverflow
  * [overflow] and TextAlign may have unexpected effects.
  * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
- * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
+ * [overflow] and [softWrap]. It is required that 1 <= [minLines] <= [maxLines].
+ * @param minLines The minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
  */
 @OptIn(InternalFoundationTextApi::class)
 @Composable
@@ -64,11 +66,16 @@ fun BasicText(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = 1
 ) {
     // NOTE(text-perf-review): consider precomputing layout here by pushing text to a channel...
     // something like:
     // remember(text) { precomputeTextLayout(text) }
-    require(maxLines > 0) { "maxLines should be greater than 0" }
+
+    // Unlike text field for which validation happens inside the 'heightInLines' modifier, in text
+    // 'maxLines' are not handled by the modifier but instead passed to the StaticLayout, therefore
+    // we perform validation here
+    validateMinMaxLines(minLines, maxLines)
 
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = LocalSelectionRegistrar.current
@@ -104,6 +111,7 @@ fun BasicText(
                     fontFamilyResolver = fontFamilyResolver,
                     overflow = overflow,
                     maxLines = maxLines,
+                    minLines = minLines,
                 ),
                 selectableId
             )
@@ -121,6 +129,7 @@ fun BasicText(
                 fontFamilyResolver = fontFamilyResolver,
                 overflow = overflow,
                 maxLines = maxLines,
+                minLines = minLines,
             )
         )
     }
@@ -130,7 +139,7 @@ fun BasicText(
         state.selectionBackgroundColor = LocalTextSelectionColors.current.backgroundColor
     }
 
-    Layout(modifier.then(controller.modifiers), controller.measurePolicy)
+    Layout(modifier = modifier.then(controller.modifiers), measurePolicy = controller.measurePolicy)
 }
 
 /**
@@ -151,7 +160,9 @@ fun BasicText(
  * [overflow] and TextAlign may have unexpected effects.
  * @param maxLines An optional maximum number of lines for the text to span, wrapping if
  * necessary. If the text exceeds the given number of lines, it will be truncated according to
- * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
+ * [overflow] and [softWrap]. It is required that 1 <= [minLines] <= [maxLines].
+ * @param minLines The minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
  * @param inlineContent A map store composables that replaces certain ranges of the text. It's
  * used to insert composables into text layout. Check [InlineTextContent] for more information.
  */
@@ -165,9 +176,13 @@ fun BasicText(
     overflow: TextOverflow = TextOverflow.Clip,
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
-    inlineContent: Map<String, InlineTextContent> = mapOf(),
+    minLines: Int = 1,
+    inlineContent: Map<String, InlineTextContent> = mapOf()
 ) {
-    require(maxLines > 0) { "maxLines should be greater than 0" }
+    // Unlike text field for which validation happens inside the 'heightInLines' modifier, in text
+    // 'maxLines' are not handled by the modifier but instead passed to the StaticLayout, therefore
+    // we perform validation here
+    validateMinMaxLines(minLines, maxLines)
 
     // selection registrar, if no SelectionContainer is added ambient value will be null
     val selectionRegistrar = LocalSelectionRegistrar.current
@@ -205,6 +220,7 @@ fun BasicText(
                     softWrap = softWrap,
                     fontFamilyResolver = fontFamilyResolver,
                     overflow = overflow,
+                    minLines = minLines,
                     maxLines = maxLines,
                     placeholders = placeholders
                 ),
@@ -224,6 +240,7 @@ fun BasicText(
                 fontFamilyResolver = fontFamilyResolver,
                 overflow = overflow,
                 maxLines = maxLines,
+                minLines = minLines,
                 placeholders = placeholders,
             )
         )
@@ -241,6 +258,54 @@ fun BasicText(
         },
         modifier = modifier.then(controller.modifiers),
         measurePolicy = controller.measurePolicy
+    )
+}
+
+@Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
+@Composable
+fun BasicText(
+    text: String,
+    modifier: Modifier = Modifier,
+    style: TextStyle = TextStyle.Default,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE
+) {
+    BasicText(
+        text = text,
+        modifier = modifier,
+        style = style,
+        onTextLayout = onTextLayout,
+        overflow = overflow,
+        softWrap = softWrap,
+        minLines = 1,
+        maxLines = maxLines
+    )
+}
+
+@Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
+@Composable
+fun BasicText(
+    text: AnnotatedString,
+    modifier: Modifier = Modifier,
+    style: TextStyle = TextStyle.Default,
+    onTextLayout: (TextLayoutResult) -> Unit = {},
+    overflow: TextOverflow = TextOverflow.Clip,
+    softWrap: Boolean = true,
+    maxLines: Int = Int.MAX_VALUE,
+    inlineContent: Map<String, InlineTextContent> = mapOf(),
+) {
+    BasicText(
+        text = text,
+        modifier = modifier,
+        style = style,
+        onTextLayout = onTextLayout,
+        overflow = overflow,
+        softWrap = softWrap,
+        minLines = 1,
+        maxLines = maxLines,
+        inlineContent = inlineContent
     )
 }
 

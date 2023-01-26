@@ -54,7 +54,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.layout.FirstBaseline
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.node.Ref
@@ -120,8 +119,7 @@ class TextFieldTest {
     private val ExpectedDefaultTextFieldWidth = TextFieldDefaults.MinWidth
     private val ExpectedPadding = TextFieldPadding
     private val IconPadding = HorizontalIconPadding
-    private val ExpectedBaselineOffset = 20.dp
-    private val TopPaddingFilledTextField = 4.dp
+    private val TextFieldWidth = 300.dp
     private val TextFieldTag = "textField"
 
     @get:Rule
@@ -446,7 +444,6 @@ class TextFieldTest {
     fun testTextField_labelPosition_whenFocused() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        val baseline = Ref<Float>()
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
@@ -459,8 +456,6 @@ class TextFieldTest {
                             modifier = Modifier.onGloballyPositioned {
                                 labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
-                                baseline.value = it[FirstBaseline].toFloat() +
-                                    labelPosition.value!!.y
                             }
                         )
                     }
@@ -476,12 +471,12 @@ class TextFieldTest {
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
             assertThat(labelSize.value?.width).isGreaterThan(0)
-            // label's top position
+
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.roundToPx().toFloat()
             )
-            assertThat(baseline.value).isEqualTo(
-                ExpectedBaselineOffset.roundToPx().toFloat()
+            assertThat(labelPosition.value?.y).isEqualTo(
+                TextFieldWithLabelVerticalPadding.roundToPx().toFloat()
             )
         }
     }
@@ -490,7 +485,6 @@ class TextFieldTest {
     fun testTextField_labelPosition_whenInput() {
         val labelSize = Ref<IntSize>()
         val labelPosition = Ref<Offset>()
-        val baseline = Ref<Float>()
         rule.setMaterialContent(lightColorScheme()) {
             Box {
                 TextField(
@@ -502,8 +496,6 @@ class TextFieldTest {
                             modifier = Modifier.onGloballyPositioned {
                                 labelPosition.value = it.positionInRoot()
                                 labelSize.value = it.size
-                                baseline.value =
-                                    it[FirstBaseline].toFloat() + labelPosition.value!!.y
                             }
                         )
                     }
@@ -516,18 +508,19 @@ class TextFieldTest {
             assertThat(labelSize.value).isNotNull()
             assertThat(labelSize.value?.height).isGreaterThan(0)
             assertThat(labelSize.value?.width).isGreaterThan(0)
-            // label's top position
+
             assertThat(labelPosition.value?.x).isEqualTo(
                 ExpectedPadding.roundToPx().toFloat()
             )
-            assertThat(baseline.value).isEqualTo(
-                ExpectedBaselineOffset.roundToPx().toFloat()
+            assertThat(labelPosition.value?.y).isEqualTo(
+                TextFieldWithLabelVerticalPadding.roundToPx().toFloat()
             )
         }
     }
 
     @Test
     fun testTextField_placeholderPosition_withLabel() {
+        val labelSize = Ref<IntSize>()
         val placeholderSize = Ref<IntSize>()
         val placeholderPosition = Ref<Offset>()
         rule.setMaterialContent(lightColorScheme()) {
@@ -538,7 +531,14 @@ class TextFieldTest {
                         .testTag(TextFieldTag),
                     value = "",
                     onValueChange = {},
-                    label = { Text("label") },
+                    label = {
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelSize.value = it.size
+                            }
+                        )
+                    },
                     placeholder = {
                         Text(
                             text = "placeholder",
@@ -556,17 +556,16 @@ class TextFieldTest {
 
         rule.runOnIdleWithDensity {
             // size
+            assertThat(labelSize.value).isNotNull()
             assertThat(placeholderSize.value).isNotNull()
             assertThat(placeholderSize.value?.height).isGreaterThan(0)
             assertThat(placeholderSize.value?.width).isGreaterThan(0)
             // placeholder's position
-            assertThat(placeholderPosition.value?.x).isEqualTo(
-                ExpectedPadding.roundToPx().toFloat()
-            )
-            assertThat(placeholderPosition.value?.y)
-                .isEqualTo(
-                    (ExpectedBaselineOffset.roundToPx() + TopPaddingFilledTextField.roundToPx())
-                        .toFloat()
+            assertThat(placeholderPosition.value?.x).isWithin(1f).of(ExpectedPadding.toPx())
+            assertThat(placeholderPosition.value?.y).isWithin(1f)
+                .of(
+                    TextFieldWithLabelVerticalPadding.toPx() +
+                        labelSize.value!!.height.toFloat()
                 )
         }
     }
@@ -668,7 +667,6 @@ class TextFieldTest {
     @Test
     fun testTextField_trailingAndLeading_sizeAndPosition_defaultIcon() {
         val textFieldHeight = 60.dp
-        val textFieldWidth = 300.dp
         val leadingPosition = Ref<Offset>()
         val leadingSize = Ref<IntSize>()
         val trailingPosition = Ref<Offset>()
@@ -680,7 +678,7 @@ class TextFieldTest {
                 TextField(
                     value = "text",
                     onValueChange = {},
-                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
                     leadingIcon = {
                         Icon(
                             Icons.Default.Favorite,
@@ -724,7 +722,7 @@ class TextFieldTest {
                 )
                 assertThat(trailingPosition.value?.x).isEqualTo(
                     (
-                        textFieldWidth.roundToPx() - IconPadding.roundToPx() -
+                        TextFieldWidth.roundToPx() - IconPadding.roundToPx() -
                             trailingSize.value!!.width
                         ).toFloat()
                 )
@@ -740,7 +738,6 @@ class TextFieldTest {
     @Test
     fun testTextField_trailingAndLeading_sizeAndPosition_iconButton() {
         val textFieldHeight = 80.dp
-        val textFieldWidth = 300.dp
         val density = Density(2f)
 
         var leadingPosition: Offset? = null
@@ -753,7 +750,7 @@ class TextFieldTest {
                 TextField(
                     value = "text",
                     onValueChange = {},
-                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
                     leadingIcon = {
                         IconButton(
                             onClick = {},
@@ -796,7 +793,7 @@ class TextFieldTest {
                     IntSize(size.roundToPx(), size.roundToPx())
                 )
                 assertThat(trailingPosition?.x).isEqualTo(
-                    (textFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
+                    (TextFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
                 )
                 assertThat(trailingPosition?.y)
                     .isEqualTo(
@@ -810,7 +807,6 @@ class TextFieldTest {
     @Test
     fun testTextField_trailingAndLeading_sizeAndPosition_nonDefaultSizeIcon() {
         val textFieldHeight = 80.dp
-        val textFieldWidth = 300.dp
         val density = Density(2f)
         val size = 70.dp
 
@@ -824,7 +820,7 @@ class TextFieldTest {
                 TextField(
                     value = "text",
                     onValueChange = {},
-                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    modifier = Modifier.size(TextFieldWidth, textFieldHeight),
                     leadingIcon = {
                         Box(
                             Modifier.size(size).onGloballyPositioned {
@@ -859,7 +855,7 @@ class TextFieldTest {
                     IntSize(size.roundToPx(), size.roundToPx())
                 )
                 assertThat(trailingPosition?.x).isEqualTo(
-                    (textFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
+                    (TextFieldWidth.roundToPx() - trailingSize!!.width).toFloat()
                 )
                 assertThat(trailingPosition?.y)
                     .isEqualTo(

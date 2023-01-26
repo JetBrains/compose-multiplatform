@@ -31,30 +31,16 @@ class VelocityTrackerTest {
     // and its impossible for the reader to know how well different cases are being tested.
     @Test
     fun calculateVelocity_returnsExpectedValues() {
-
-        val expected = listOf(
-            Pair(219.59280094228163f, 1304.701682306001f),
-            Pair(355.71046950050845f, 967.2112857054104f),
-            Pair(12.657970884022308f, -36.90447839251946f),
-            Pair(714.1399654786744f, -2561.534447931869f),
-            Pair(-19.668121066218564f, -2910.105747052462f),
-            Pair(646.8690114934209f, 2976.977762577527f),
-            Pair(396.6988447819592f, 2106.225572911095f),
-            Pair(298.31594440044495f, -3660.8315955215294f),
-            Pair(-1.7334232785165882f, -3288.13174127454f),
-            Pair(384.6361280392334f, -2645.6612524779835f),
-            Pair(176.37900397918557f, 2711.2542876273264f),
-            Pair(396.9328560260098f, 4280.651578291764f),
-            Pair(-71.51939428321249f, 3716.7385187526947f)
-        )
-
         val tracker = VelocityTracker()
         var i = 0
         velocityEventData.forEach {
             if (it.down) {
                 tracker.addPosition(it.uptime, it.position)
             } else {
-                checkVelocity(tracker.calculateVelocity(), expected[i].first, expected[i].second)
+                checkVelocity(
+                    tracker.calculateVelocity(),
+                    expected2DVelocities[i].first,
+                    expected2DVelocities[i].second)
                 tracker.resetTracking()
                 i += 1
             }
@@ -123,6 +109,23 @@ internal class PointerInputData(
     val uptime: Long,
     val position: Offset,
     val down: Boolean
+)
+
+// Expected velocities for "velocityEventData". See below.
+internal val expected2DVelocities = listOf(
+    Pair(219.59280094228163f, 1304.701682306001f),
+    Pair(355.71046950050845f, 967.2112857054104f),
+    Pair(12.657970884022308f, -36.90447839251946f),
+    Pair(714.1399654786744f, -2561.534447931869f),
+    Pair(-19.668121066218564f, -2910.105747052462f),
+    Pair(646.8690114934209f, 2976.977762577527f),
+    Pair(396.6988447819592f, 2106.225572911095f),
+    Pair(298.31594440044495f, -3660.8315955215294f),
+    Pair(-1.7334232785165882f, -3288.13174127454f),
+    Pair(384.6361280392334f, -2645.6612524779835f),
+    Pair(176.37900397918557f, 2711.2542876273264f),
+    Pair(396.9328560260098f, 4280.651578291764f),
+    Pair(-71.51939428321249f, 3716.7385187526947f)
 )
 
 internal val velocityEventData: List<PointerInputData> = listOf(

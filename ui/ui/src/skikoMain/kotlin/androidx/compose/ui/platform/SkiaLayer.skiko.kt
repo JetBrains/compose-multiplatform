@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
@@ -34,6 +35,7 @@ import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.asComposeCanvas
+import androidx.compose.ui.graphics.SkiaBackedCanvas
 import androidx.compose.ui.graphics.asSkiaPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
@@ -82,6 +84,7 @@ internal class SkiaLayer(
     private var shadowElevation: Float = 0f
     private var ambientShadowColor: Color = DefaultShadowColor
     private var spotShadowColor: Color = DefaultShadowColor
+    private var compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
 
     override fun destroy() {
         picture?.close()
@@ -160,6 +163,7 @@ internal class SkiaLayer(
         renderEffect: RenderEffect?,
         ambientShadowColor: Color,
         spotShadowColor: Color,
+        compositingStrategy: CompositingStrategy,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -178,6 +182,7 @@ internal class SkiaLayer(
         this.renderEffect = renderEffect
         this.ambientShadowColor = ambientShadowColor
         this.spotShadowColor = spotShadowColor
+        this.compositingStrategy = compositingStrategy
         outlineCache.shape = shape
         outlineCache.layoutDirection = layoutDirection
         outlineCache.density = density
@@ -256,7 +261,11 @@ internal class SkiaLayer(
             }
 
             val currentRenderEffect = renderEffect
-            if (alpha < 1 || currentRenderEffect != null) {
+            val requiresLayer =
+                (alpha < 1 && compositingStrategy != CompositingStrategy.ModulateAlpha) ||
+                currentRenderEffect != null ||
+                compositingStrategy == CompositingStrategy.Offscreen
+            if (requiresLayer) {
                 canvas.saveLayer(
                     bounds,
                     Paint().apply {
@@ -266,6 +275,12 @@ internal class SkiaLayer(
                 )
             } else {
                 canvas.save()
+            }
+            val skiaCanvas = canvas as SkiaBackedCanvas
+            if (compositingStrategy == CompositingStrategy.ModulateAlpha) {
+                skiaCanvas.alphaMultiplier = alpha
+            } else {
+                skiaCanvas.alphaMultiplier = 1.0f
             }
 
             drawBlock(canvas)

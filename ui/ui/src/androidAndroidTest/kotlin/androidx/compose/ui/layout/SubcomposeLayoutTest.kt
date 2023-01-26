@@ -20,6 +20,8 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
@@ -33,6 +35,7 @@ import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -48,6 +51,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -64,6 +68,7 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
@@ -1198,6 +1203,57 @@ class SubcomposeLayoutTest {
     }
 
     @Test
+    fun staticCompositionLocalChangeInMainComposition_withNonStaticLocal_invalidatesComposition() {
+        var isDark by mutableStateOf(false)
+
+        val staticLocal = staticCompositionLocalOf<Boolean> { error("Not defined") }
+        val local = compositionLocalOf<Boolean> { error("Not defined") }
+        val innerLocal = staticCompositionLocalOf<Unit> { error("\not defined") }
+
+        val content = @Composable {
+            CompositionLocalProvider(innerLocal provides Unit) {
+                val value1 = staticLocal.current
+                val value2 = local.current
+                Box(
+                    Modifier
+                        .testTag(if (value1) "dark" else "light")
+                        .requiredSize(if (value2) 50.dp else 100.dp)
+                )
+            }
+        }
+
+        rule.setContent {
+            CompositionLocalProvider(
+                staticLocal provides isDark,
+            ) {
+                CompositionLocalProvider(
+                    local provides staticLocal.current
+                ) {
+                    SubcomposeLayout { constraints ->
+                        val measurables = subcompose(Unit, content)
+                        val placeables = measurables.map {
+                            it.measure(constraints)
+                        }
+                        layout(100, 100) {
+                            placeables.forEach { it.place(IntOffset.Zero) }
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag("light")
+            .assertWidthIsEqualTo(100.dp)
+
+        isDark = true
+
+        rule.waitForIdle()
+
+        rule.onNodeWithTag("dark")
+            .assertWidthIsEqualTo(50.dp)
+    }
+
+    @Test
     fun derivedStateChangeInMainCompositionRecomposesSubcomposition() {
         var flag by mutableStateOf(true)
         var subcomposionValue: Boolean? = null
@@ -2067,6 +2123,82 @@ class SubcomposeLayoutTest {
                 current = current.parentCoordinates
             }
         }
+    }
+
+    @Test
+    fun subcomposeLayoutInsideMovableContent_compositionIsNotDisposed() {
+        var disposeCount = 0
+
+        val content = movableContentOf {
+            SubcomposeLayout(
+                state = remember { SubcomposeLayoutState(SubcomposeSlotReusePolicy(1)) }
+            ) { constraints ->
+                val placeable = subcompose(0) {
+                    Box(Modifier.testTag("0"))
+
+                    DisposableEffect(Unit) {
+                        onDispose {
+                            disposeCount++
+                        }
+                    }
+                }.single().measure(constraints)
+
+                layout(placeable.width, placeable.height) {
+                    placeable.place(IntOffset.Zero)
+                }
+            }
+        }
+
+        var wrappedWithColumn by mutableStateOf(false)
+
+        rule.setContent {
+            if (wrappedWithColumn) {
+                Column {
+                    content()
+                }
+            } else {
+                content()
+            }
+        }
+
+        rule.onNodeWithTag("0")
+            .assertExists()
+
+        rule.runOnIdle {
+            wrappedWithColumn = true
+        }
+
+        rule.onNodeWithTag("0")
+            .assertExists()
+        assertThat(disposeCount).isEqualTo(0)
+    }
+
+    @Test
+    fun subcomposeLayout_movedToDifferentGroup() {
+        var wrapped by mutableStateOf(false)
+        rule.setContent {
+            val content = remember {
+                movableContentOf {
+                    BoxWithConstraints {
+                        Spacer(
+                            modifier = Modifier.testTag(wrapped.toString()),
+                        )
+                    }
+                }
+            }
+
+            if (wrapped) {
+                Box { content() }
+            } else {
+                content()
+            }
+        }
+
+        rule.runOnIdle {
+            wrapped = !wrapped
+        }
+
+        rule.waitForIdle()
     }
 
     @Test

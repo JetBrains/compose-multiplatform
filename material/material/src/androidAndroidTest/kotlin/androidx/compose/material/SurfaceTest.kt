@@ -17,7 +17,7 @@
 package androidx.compose.material
 
 import android.os.Build
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -594,13 +594,11 @@ class SurfaceTest {
                             .fillMaxSize()
                             .testTag("clickable")
                             .pointerInput(Unit) {
-                                forEachGesture {
-                                    awaitPointerEventScope {
-                                        hitTested.value = true
-                                        val event = awaitPointerEvent(PointerEventPass.Final)
-                                        Truth.assertThat(event.changes[0].isConsumed)
-                                            .isFalse()
-                                    }
+                                awaitEachGesture {
+                                    hitTested.value = true
+                                    val event = awaitPointerEvent(PointerEventPass.Final)
+                                    Truth.assertThat(event.changes[0].isConsumed)
+                                        .isFalse()
                                 }
                             }
                     )

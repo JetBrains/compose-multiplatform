@@ -21,6 +21,7 @@ import android.graphics.Typeface
 import android.text.TextPaint
 import android.text.style.AbsoluteSizeSpan
 import android.text.style.BackgroundColorSpan
+import android.text.style.CharacterStyle
 import android.text.style.ForegroundColorSpan
 import android.text.style.LeadingMarginSpan
 import android.text.style.LocaleSpan
@@ -36,6 +37,7 @@ import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
@@ -57,12 +59,14 @@ import androidx.compose.ui.text.font.toFontFamily
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.platform.bitmap
+import androidx.compose.ui.text.platform.style.DrawStyleSpan
 import androidx.compose.ui.text.platform.style.ShaderBrushSpan
 import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextGeometricTransform
 import androidx.compose.ui.text.style.TextIndent
+import androidx.compose.ui.text.style.TextMotion
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.em
@@ -905,6 +909,80 @@ AndroidParagraphTest {
             }
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setDrawStyle() {
+        val text = "abcde"
+        val strokeWidth = 8f
+        val strokeMiter = 4f
+        val strokeCap = StrokeCap.Round
+        val strokeJoin = StrokeJoin.Bevel
+        val spanStyle = SpanStyle(drawStyle = Stroke(
+            strokeWidth,
+            strokeMiter,
+            strokeCap,
+            strokeJoin
+        ))
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(
+                AnnotatedString.Range(spanStyle, start = 0, end = text.length)
+            ),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.charSequence)
+            .hasSpan(DrawStyleSpan::class, start = 0, end = text.length) {
+                return@hasSpan it.drawStyle == Stroke(
+                    strokeWidth,
+                    strokeMiter,
+                    strokeCap,
+                    strokeJoin
+                )
+            }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testAnnotatedString_setDrawStyle_FillOnTopOfStroke() {
+        val text = "abcde"
+        val strokeWidth = 8f
+        val strokeMiter = 4f
+        val strokeCap = StrokeCap.Round
+        val strokeJoin = StrokeJoin.Bevel
+        val strokeSpanStyle = SpanStyle(drawStyle = Stroke(
+            strokeWidth,
+            strokeMiter,
+            strokeCap,
+            strokeJoin
+        ))
+        val fillSpanStyle = SpanStyle(drawStyle = Fill)
+
+        val paragraph = simpleParagraph(
+            text = text,
+            spanStyles = listOf(
+                AnnotatedString.Range(strokeSpanStyle, start = 0, end = text.length),
+                AnnotatedString.Range(fillSpanStyle, start = 1, end = 3)
+            ),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.charSequence)
+            .hasSpan(DrawStyleSpan::class, start = 0, end = text.length) {
+                return@hasSpan it.drawStyle == Stroke(
+                    strokeWidth,
+                    strokeMiter,
+                    strokeCap,
+                    strokeJoin
+                )
+            }
+        assertThat(paragraph.charSequence)
+            .hasSpanOnTop(DrawStyleSpan::class, start = 1, end = 3) {
+                return@hasSpanOnTop it.drawStyle == Fill
+            }
+    }
+
     @Test
     fun testAnnotatedString_fontFeatureSetting_setSpanOnText() {
         val text = "abc"
@@ -1284,8 +1362,7 @@ AndroidParagraphTest {
             width = 0.0f
         )
 
-        assertThat(paragraph.textPaint.brush).isEqualTo(brush)
-        assertThat(paragraph.textPaint.brushSize).isEqualTo(Size(paragraph.width, paragraph.height))
+        assertThat(paragraph.textPaint.shader).isNotNull()
     }
 
     @Test
@@ -1361,6 +1438,17 @@ AndroidParagraphTest {
     }
 
     @Test
+    fun testSpanStyle_textDecoration_underline_appliedOnTextPaint() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(textDecoration = TextDecoration.Underline),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.isUnderlineText).isTrue()
+    }
+
+    @Test
     fun testSpanStyle_textDecoration_underline_appliedAsSpan() {
         val text = "abc"
         val paragraph = simpleParagraph(
@@ -1369,21 +1457,51 @@ AndroidParagraphTest {
             width = 0.0f
         )
 
-        assertThat(paragraph.charSequence)
-            .hasSpan(TextDecorationSpan::class, 0, text.length) { it.isUnderlineText }
+        assertThat(paragraph.charSequence).hasSpan(CharacterStyle::class, 0, text.length)
     }
 
     @Test
-    fun testSpanStyle_textDecoration_lineThrough_appliedAsSpan() {
-        val text = "abc"
+    fun testSpanStyle_textDecoration_lineThrough_appliedOnTextPaint() {
         val paragraph = simpleParagraph(
-            text = text,
+            text = "",
             style = TextStyle(textDecoration = TextDecoration.LineThrough),
             width = 0.0f
         )
 
-        assertThat(paragraph.charSequence)
-            .hasSpan(TextDecorationSpan::class, 0, text.length) { it.isStrikethroughText }
+        assertThat(paragraph.textPaint.isStrikeThruText).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSpanStyle_drawStyle_stroke_appliedOnTextPaint() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Stroke(
+                width = 8f,
+                miter = 6f,
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Bevel
+            )),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(6f)
+        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.ROUND)
+        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testSpanStyle_drawStyle_fill_appliedOnTextPaint() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Fill),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
     }
 
     @Test
@@ -1411,6 +1529,7 @@ AndroidParagraphTest {
             style = TextStyle(textDecoration = null),
             width = 0.0f
         )
+        assertThat(paragraph.textPaint.isUnderlineText).isFalse()
 
         val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
@@ -1426,12 +1545,9 @@ AndroidParagraphTest {
             ),
             width = 0.0f
         )
-        // Underline text is not applied on TextPaint initially. It is set as a span.
-        // Once drawn, this span gets applied on the TextPaint.
-        val canvas = Canvas(android.graphics.Canvas())
-        paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
 
+        val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, textDecoration = TextDecoration.None)
         assertThat(paragraph.textPaint.isUnderlineText).isFalse()
     }
@@ -1445,14 +1561,65 @@ AndroidParagraphTest {
             ),
             width = 0.0f
         )
-        // Underline text is not applied on TextPaint initially. It is set as a span.
-        // Once drawn, this span gets applied on the TextPaint.
-        val canvas = Canvas(android.graphics.Canvas())
-        paragraph.paint(canvas, textDecoration = TextDecoration.Underline)
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
 
+        val canvas = Canvas(android.graphics.Canvas())
         paragraph.paint(canvas, textDecoration = null)
         assertThat(paragraph.textPaint.isUnderlineText).isTrue()
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testPaint_can_change_DrawStyle_to_Stroke() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = null),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
+
+        val stroke = Stroke(width = 4f, miter = 2f, cap = StrokeCap.Square, join = StrokeJoin.Bevel)
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = stroke)
+
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(4f)
+        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(2f)
+        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.SQUARE)
+        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testPaint_can_change_DrawStyle_to_Fill() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Stroke(8f)),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = Fill)
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun testPaint_null_drawStyle_should_be_noop() {
+        val paragraph = simpleParagraph(
+            text = "",
+            style = TextStyle(drawStyle = Stroke(8f)),
+            width = 0.0f
+        )
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
+
+        val canvas = Canvas(android.graphics.Canvas())
+        paragraph.paint(canvas, drawStyle = null)
+        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
+        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(8f)
     }
 
     @SdkSuppress(minSdkVersion = 29)
@@ -1664,24 +1831,6 @@ AndroidParagraphTest {
     }
 
     @Test
-    fun testPaint_can_change_drawStyle_to_Stroke() {
-        val paragraph = simpleParagraph(
-            text = "",
-            width = 0.0f
-        )
-        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.FILL)
-
-        val stroke = Stroke(width = 4f, miter = 2f, cap = StrokeCap.Square, join = StrokeJoin.Bevel)
-        val canvas = Canvas(android.graphics.Canvas())
-        paragraph.paint(canvas, drawStyle = stroke)
-        assertThat(paragraph.textPaint.style).isEqualTo(Paint.Style.STROKE)
-        assertThat(paragraph.textPaint.strokeWidth).isEqualTo(4f)
-        assertThat(paragraph.textPaint.strokeMiter).isEqualTo(2f)
-        assertThat(paragraph.textPaint.strokeCap).isEqualTo(Paint.Cap.SQUARE)
-        assertThat(paragraph.textPaint.strokeJoin).isEqualTo(Paint.Join.BEVEL)
-    }
-
-    @Test
     fun testSpanStyle_baselineShift_appliedAsSpan() {
         // baselineShift is reset in the Android Layout constructor.
         // therefore we cannot apply them on paint, have to use spans.
@@ -1809,6 +1958,32 @@ AndroidParagraphTest {
         )
     }
 
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun shaderBrushSpan_createsShaderOnlyOnce() {
+        val fontSize = 20
+        val text = "abcdef"
+        val shaderBrush = object : ShaderBrush() {
+            var callCount = 0
+            private val brush = Brush.linearGradient(listOf(Color.Red, Color.Blue)) as ShaderBrush
+            override fun createShader(size: Size): android.graphics.Shader {
+                callCount++
+                return brush.createShader(size)
+            }
+        }
+        val spanStyle = SpanStyle(brush = shaderBrush)
+        val paragraph = simpleParagraph(
+            text = "abcdef",
+            width = 2f * fontSize * text.length,
+            style = TextStyle(fontSize = fontSize.sp),
+            spanStyles = listOf(AnnotatedString.Range(spanStyle, 0, 2))
+        )
+
+        // Call paint on paragraph multiple times
+        repeat(5) { paragraph.bitmap() }
+        assertThat(shaderBrush.callCount).isEqualTo(1)
+    }
+
     @Test
     fun drawText_withUnderlineStyle_equalToUnderlinePaint() = with(defaultDensity) {
         val fontSize = 30.sp
@@ -1839,6 +2014,40 @@ AndroidParagraphTest {
         val bitmapNoSpan = paragraph2.bitmap(textDecoration = TextDecoration.Underline)
 
         assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun textMotionStatic_setsCorrectFlagsOnTextPaint() {
+        val textMotion = TextMotion.Static
+        val text = "abc"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(textMotion = textMotion),
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraph.textPaint.flags and TextPaint.LINEAR_TEXT_FLAG).isEqualTo(0)
+        assertThat(paragraph.textPaint.flags and TextPaint.SUBPIXEL_TEXT_FLAG).isEqualTo(0)
+        assertThat(paragraph.textPaint.hinting).isEqualTo(TextPaint.HINTING_ON)
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun textMotionAnimated_setsCorrectFlagsOnTextPaint() {
+        val textMotion = TextMotion.Animated
+        val text = "abc"
+        val paragraph = simpleParagraph(
+            text = text,
+            style = TextStyle(textMotion = textMotion),
+            width = Float.MAX_VALUE
+        )
+
+        assertThat(paragraph.textPaint.flags and TextPaint.LINEAR_TEXT_FLAG)
+            .isEqualTo(TextPaint.LINEAR_TEXT_FLAG)
+        assertThat(paragraph.textPaint.flags and TextPaint.SUBPIXEL_TEXT_FLAG)
+            .isEqualTo(TextPaint.SUBPIXEL_TEXT_FLAG)
+        assertThat(paragraph.textPaint.hinting).isEqualTo(TextPaint.HINTING_OFF)
     }
 
     private fun simpleParagraph(

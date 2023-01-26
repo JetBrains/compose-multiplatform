@@ -19,7 +19,7 @@ package androidx.compose.compiler.plugins.kotlin
 import org.intellij.lang.annotations.Language
 import org.junit.Test
 
-class StabilityPropagationTransformTests : ComposeIrTransformTest() {
+class StabilityPropagationTransformTests : AbstractIrTransformTest() {
     private fun stabilityPropagation(
         @Language("kotlin")
         unchecked: String,
@@ -83,7 +83,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
             %composer.skipToGroupEnd()
           }
           %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-            Test(x, %composer, %changed or 0b0001)
+            Test(x, %composer, updateChangedFlags(%changed or 0b0001))
           }
         }
         """
@@ -122,7 +122,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
                 traceEventEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                Test(x, %composer, %changed or 0b0001)
+                Test(x, %composer, updateChangedFlags(%changed or 0b0001))
               }
             }
         """
@@ -148,7 +148,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
                 if (isTraceInProgress()) {
                   traceEventStart(<>, %changed, -1, <>)
                 }
-                A(listOf("a"), %composer, 0)
+                A(listOf("a"), %composer, 0b0110)
                 if (isTraceInProgress()) {
                   traceEventEnd()
                 }
@@ -156,7 +156,7 @@ class StabilityPropagationTransformTests : ComposeIrTransformTest() {
                 %composer.skipToGroupEnd()
               }
               %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-                Example(%composer, %changed or 0b0001)
+                Example(%composer, updateChangedFlags(%changed or 0b0001))
               }
             }
         """

@@ -2,7 +2,7 @@
 package androidx.compose.ui.tooling.data {
 
   @androidx.compose.ui.tooling.data.UiToolingDataApi public final class CallGroup extends androidx.compose.ui.tooling.data.Group {
-    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntRect box, androidx.compose.ui.tooling.data.SourceLocation? location, Object? identity, java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.data.Group> children);
+    ctor public CallGroup(Object? key, String? name, androidx.compose.ui.unit.IntRect box, androidx.compose.ui.tooling.data.SourceLocation? location, Object? identity, java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters, java.util.Collection<?> data, java.util.Collection<? extends androidx.compose.ui.tooling.data.Group> children, boolean isInline);
     property public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
   }
 
@@ -21,10 +21,12 @@ package androidx.compose.ui.tooling.data {
     method public java.util.List<androidx.compose.ui.layout.ModifierInfo> getModifierInfo();
     method public final String? getName();
     method public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> getParameters();
+    method public final boolean isInline();
     property public final androidx.compose.ui.unit.IntRect box;
     property public final java.util.Collection<androidx.compose.ui.tooling.data.Group> children;
     property public final java.util.Collection<java.lang.Object> data;
     property public final Object? identity;
+    property public final boolean isInline;
     property public final Object? key;
     property public final androidx.compose.ui.tooling.data.SourceLocation? location;
     property public java.util.List<androidx.compose.ui.layout.ModifierInfo> modifierInfo;
@@ -89,8 +91,10 @@ package androidx.compose.ui.tooling.data {
     method public androidx.compose.ui.tooling.data.SourceLocation? getLocation();
     method public String? getName();
     method public java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> getParameters();
+    method public default boolean isInline();
     property public abstract androidx.compose.ui.unit.IntRect bounds;
     property public abstract int depth;
+    property public default boolean isInline;
     property public abstract androidx.compose.ui.tooling.data.SourceLocation? location;
     property public abstract String? name;
     property public abstract java.util.List<androidx.compose.ui.tooling.data.ParameterInformation> parameters;
@@ -116,7 +120,7 @@ package androidx.compose.ui.tooling.data {
     property public final String? sourceFile;
   }
 
-  @kotlin.RequiresOptIn(message="This API is for tooling only and is likely to change in the future.") public @interface UiToolingDataApi {
+  @kotlin.RequiresOptIn(message="This API is for tooling only and is likely to change in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface UiToolingDataApi {
   }
 
 }

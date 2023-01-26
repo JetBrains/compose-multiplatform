@@ -65,6 +65,14 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -80,10 +88,12 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.ClassName
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.InvalidId
+import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextFieldClassName
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToMap
@@ -128,6 +138,7 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
@@ -257,7 +268,9 @@ class AndroidAccessibilityTest {
         // We temporary send Switch role as a separate fake node
         val switchRoleNode = toggleableNode.replacedChildren.last()
         val switchRoleNodeInfo = provider.createAccessibilityNodeInfo(switchRoleNode.id)!!
-        assertEquals("android.widget.Switch", switchRoleNodeInfo.className)
+        assertEquals("android.view.View", switchRoleNodeInfo.className)
+// TODO(aelias)
+        // assertEquals("Switch", switchRoleNodeInfo.roleDescription)
 
         val stateDescription = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
@@ -273,6 +286,46 @@ class AndroidAccessibilityTest {
             }
         }
         assertEquals("On", stateDescription)
+        assertTrue(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forDropdown() {
+        val options = listOf("Option1", "Option2", "Option3", "Option4", "Option5")
+        val tag = "Dropdown"
+        container.setContent {
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(
+                modifier = Modifier
+                    .semantics { role = Role.DropdownList }
+                    .testTag(tag),
+                onClick = { expanded = true }) {
+                Icon(Icons.Default.MoreVert, null)
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                offset = DpOffset(24.dp, 0.dp),
+            ) {
+                options.forEach {
+                    DropdownMenuItem(onClick = {}) {
+                        Text(it)
+                    }
+                }
+            }
+        }
+
+        val dropdownIcon = rule.onNodeWithTag(tag, true)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(dropdownIcon.id)!!
+
+        assertEquals("android.widget.Spinner", accessibilityNodeInfo.className)
         assertTrue(accessibilityNodeInfo.isClickable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
         assertTrue(
@@ -556,6 +609,150 @@ class AndroidAccessibilityTest {
             )
         )
         @Suppress("DEPRECATION") accessibilityNodeInfo.recycle()
+    }
+
+    @Composable
+    fun LastElementOverLaidColumn(
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit,
+    ) {
+        var yPosition = 0
+
+        Layout(modifier = modifier, content = content) { measurables, constraints ->
+            val placeables = measurables.map { measurable ->
+                measurable.measure(constraints)
+            }
+
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                placeables.forEach { placeable ->
+                    if (placeable != placeables[placeables.lastIndex]) {
+                        placeable.placeRelative(x = 0, y = yPosition)
+                        yPosition += placeable.height
+                    } else {
+                        // if the element is our last element (our overlaid node)
+                        // then we'll put it over the middle of our previous elements
+                        placeable.placeRelative(x = 0, y = yPosition / 2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTraversalBefore_layout() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row {
+                    Column {
+                        Row { Text(text1) }
+                        Row { Text(text2) }
+                        Row { Text(text3) }
+                    }
+                }
+                Row {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val overlaidNode = rule.onNodeWithText(overlaidText).fetchSemanticsNode()
+
+        val ani3 = provider.createAccessibilityNodeInfo(node3.id)
+        val ani3TraversalBeforeVal = ani3?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode should be read last
+        assertNotEquals(ani3TraversalBeforeVal, 0)
+        assertEquals(ani3TraversalBeforeVal!!, overlaidNode.id)
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTraversalAfter_layout() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row {
+                    Column {
+                        Row { Text(text1) }
+                        Row { Text(text2) }
+                        Row { Text(text3) }
+                    }
+                }
+                Row {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val overlaidNode = rule.onNodeWithText(overlaidText).fetchSemanticsNode()
+
+        val overlaidANI = provider.createAccessibilityNodeInfo(overlaidNode.id)
+        val overlaidTraversalAfterValue =
+            overlaidANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode should be read last
+        assertNotEquals(overlaidTraversalAfterValue, 0)
+        assertEquals(overlaidTraversalAfterValue!!, node3.id)
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forTraversalBefore_layoutTestTags() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row(modifier = Modifier
+                    .semantics(true) { contentDescription = "Row1" }
+                    .testTag("Row1")
+                ) {
+                    Column(modifier = Modifier.testTag("Column1")) {
+                        Row(modifier = Modifier.testTag("Text1")) { Text(text1) }
+                        Row(modifier = Modifier.testTag("Text2")) { Text(text2) }
+                        Row(modifier = Modifier.testTag("Text3")) { Text(text3) }
+                    }
+                }
+                Row(modifier = Modifier
+                    .semantics(true) { contentDescription = "Row2" }
+                    .testTag("Row2")
+                ) {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val row2 = rule.onNodeWithTag("Row2").fetchSemanticsNode()
+
+        val ani3 = provider.createAccessibilityNodeInfo(node3.id)
+        val ani3TraversalBeforeVal = ani3?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode and its row should be read last
+        assertNotEquals(ani3TraversalBeforeVal, 0)
+        assertTrue(ani3TraversalBeforeVal!! < row2.id)
+    }
+
+    companion object {
+        private const val EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL =
+            "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL"
+
+        private const val EXTRA_DATA_TEST_TRAVERSALAFTER_VAL =
+            "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALAFTER_VAL"
     }
 
     @Test
@@ -1293,6 +1490,7 @@ class AndroidAccessibilityTest {
             textFieldNode.id,
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
         )
+        textEvent.className = TextFieldClassName
         textEvent.fromIndex = initialText.length
         textEvent.removedCount = 0
         textEvent.addedCount = text.length - initialText.length
@@ -2138,6 +2336,72 @@ class AndroidAccessibilityTest {
         rule.onNodeWithTag(paneTag).assertDoesNotExist()
         rule.runOnIdle {
             verify(container, times(1)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testMultiPanesDisappear() {
+        val firstPaneTag = "Pane 1"
+        val secondPaneTag = "Pane 2"
+        var isPaneVisible by mutableStateOf(false)
+        val firstPaneTestTitle by mutableStateOf("first pane title")
+        val secondPaneTestTitle by mutableStateOf("second pane title")
+
+        container.setContent {
+            if (isPaneVisible) {
+                Column {
+                    with(LocalDensity.current) {
+                        Box(
+                            Modifier
+                                .size(100.toDp())
+                                .testTag(firstPaneTag)
+                                .semantics { paneTitle = firstPaneTestTitle }) {}
+                        Box(
+                            Modifier
+                                .size(100.toDp())
+                                .testTag(secondPaneTag)
+                                .semantics { paneTitle = secondPaneTestTitle }) {}
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(firstPaneTag).assertDoesNotExist()
+        rule.onNodeWithTag(secondPaneTag).assertDoesNotExist()
+
+        isPaneVisible = true
+        rule.onNodeWithTag(firstPaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    "first pane title"
+                )
+            )
+            .assertIsDisplayed()
+        rule.onNodeWithTag(secondPaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    "second pane title"
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+
+        isPaneVisible = false
+        rule.onNodeWithTag(firstPaneTag).assertDoesNotExist()
+        rule.onNodeWithTag(secondPaneTag).assertDoesNotExist()
+        rule.runOnIdle {
+            verify(container, times(2)).requestSendAccessibilityEvent(
                 eq(androidComposeView),
                 argThat(
                     ArgumentMatcher {
@@ -3061,6 +3325,61 @@ class AndroidAccessibilityTest {
         val childNode = rule.onNodeWithTag("child", useUnmergedTree = true).fetchSemanticsNode()
         val childInfo = provider.createAccessibilityNodeInfo(childNode.id)!!
         assertEquals(childInfo.isScreenReaderFocusable, false)
+    }
+
+    @Test
+    fun accessibilityStateChangeListenerRemoved_onDetach() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            assertTrue(androidComposeView.isAttachedToWindow)
+        }
+
+        rule.runOnUiThread {
+            container.removeView(androidComposeView)
+        }
+
+        rule.runOnIdle {
+            assertFalse(androidComposeView.isAttachedToWindow)
+
+            val removed = delegate.accessibilityManager.removeAccessibilityStateChangeListener(
+                delegate.enabledStateListener
+            )
+            assertFalse(removed)
+        }
+    }
+
+    @Test
+    fun touchExplorationChangeListenerRemoved_onDetach() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            assertTrue(androidComposeView.isAttachedToWindow)
+        }
+
+        rule.runOnUiThread {
+            container.removeView(androidComposeView)
+        }
+
+        rule.runOnIdle {
+            assertFalse(androidComposeView.isAttachedToWindow)
+
+            val removed = delegate.accessibilityManager.removeTouchExplorationStateChangeListener(
+                delegate.touchExplorationStateListener
+            )
+            assertFalse(removed)
+        }
+    }
+
+    @Test
+    fun isEnabled_returnsFalse_whenUIAutomatorIsTheOnlyEnabledService() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            // This test implies that UIAutomator is enabled and is the only enabled a11y service
+            assertTrue(delegate.accessibilityManager.isEnabled)
+            assertFalse(delegate.isEnabled)
+        }
     }
 
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {

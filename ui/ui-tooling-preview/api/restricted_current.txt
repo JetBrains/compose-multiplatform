@@ -28,6 +28,8 @@ package androidx.compose.ui.tooling.preview {
     field public static final String PIXEL_C = "id:pixel_c";
     field public static final String PIXEL_XL = "id:pixel_xl";
     field public static final String TABLET = "spec:shape=Normal,width=1280,height=800,unit=dp,dpi=420";
+    field public static final String TV_1080p = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=420";
+    field public static final String TV_720p = "spec:shape=Normal,width=1280,height=720,unit=dp,dpi=420";
     field public static final String WEAR_OS_LARGE_ROUND = "id:wearos_large_round";
     field public static final String WEAR_OS_RECT = "id:wearos_rect";
     field public static final String WEAR_OS_SMALL_ROUND = "id:wearos_small_round";
@@ -46,6 +48,7 @@ package androidx.compose.ui.tooling.preview {
     method public abstract boolean showBackground() default false;
     method public abstract boolean showSystemUi() default false;
     method public abstract int uiMode() default 0;
+    method public abstract int wallpaper() default androidx.compose.ui.tooling.preview.Wallpapers.NONE;
     method public abstract int widthDp() default -1;
     property public abstract int apiLevel;
     property public abstract long backgroundColor;
@@ -58,6 +61,7 @@ package androidx.compose.ui.tooling.preview {
     property public abstract boolean showBackground;
     property public abstract boolean showSystemUi;
     property public abstract int uiMode;
+    property public abstract int wallpaper;
     property public abstract int widthDp;
   }
 
@@ -77,6 +81,15 @@ package androidx.compose.ui.tooling.preview {
     method public kotlin.sequences.Sequence<T> getValues();
     property public default int count;
     property public abstract kotlin.sequences.Sequence<T> values;
+  }
+
+  public final class Wallpapers {
+    field public static final int BLUE_DOMINATED_EXAMPLE = 2; // 0x2
+    field public static final int GREEN_DOMINATED_EXAMPLE = 1; // 0x1
+    field public static final androidx.compose.ui.tooling.preview.Wallpapers INSTANCE;
+    field public static final int NONE = -1; // 0xffffffff
+    field public static final int RED_DOMINATED_EXAMPLE = 0; // 0x0
+    field public static final int YELLOW_DOMINATED_EXAMPLE = 3; // 0x3
   }
 
 }

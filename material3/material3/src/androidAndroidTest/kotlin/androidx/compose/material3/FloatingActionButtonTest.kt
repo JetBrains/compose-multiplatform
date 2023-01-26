@@ -127,7 +127,9 @@ class FloatingActionButtonTest {
     fun smallFabHasSizeFromSpec() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     SmallFloatingActionButton(onClick = {}) {
                         Icon(
                             Icons.Filled.Favorite,
@@ -151,7 +153,9 @@ class FloatingActionButtonTest {
     fun smallFabHasMinTouchTarget() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides true) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides true
+                ) {
                     SmallFloatingActionButton(onClick = {}) {
                         Icon(Icons.Filled.Favorite, null)
                     }

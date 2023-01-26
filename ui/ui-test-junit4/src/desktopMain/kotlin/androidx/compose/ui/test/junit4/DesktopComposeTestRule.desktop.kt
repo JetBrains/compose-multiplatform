@@ -27,11 +27,18 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionCollection
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 @OptIn(InternalTestApi::class)
 actual fun createComposeRule(): ComposeContentTestRule = DesktopComposeTestRule()
+
+@ExperimentalTestApi
+@OptIn(InternalTestApi::class)
+actual fun createComposeRule(effectContext: CoroutineContext): ComposeContentTestRule =
+    DesktopComposeTestRule(effectContext)
 
 @InternalTestApi
 @OptIn(ExperimentalTestApi::class)
@@ -40,6 +47,11 @@ class DesktopComposeTestRule private constructor(
 ) : ComposeContentTestRule {
 
     constructor() : this(DesktopComposeUiTest())
+
+    @ExperimentalTestApi
+    constructor(
+        effectContext: CoroutineContext = EmptyCoroutineContext
+    ) : this(DesktopComposeUiTest(effectContext))
 
     var scene: ComposeScene
         get() = composeTest.scene

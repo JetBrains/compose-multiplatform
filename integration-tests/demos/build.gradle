@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.kotlinReflect)
     implementation(libs.kotlinStdlib)
 
+    implementation(project(":core:core-ktx"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:integration-tests:demos:common"))

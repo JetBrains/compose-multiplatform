@@ -116,6 +116,17 @@ private val Chips = Component(
     examples = ChipsExamples
 )
 
+private val DatePickers = Component(
+    id = nextId(),
+    name = "Date pickers",
+    description = "Date pickers let users select a date or range of dates.",
+    // No date picker icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/datepicker",
+    docsUrl = "$PackageSummaryUrl#datepicker",
+    sourceUrl = "$Material3SourceUrl/DatePicker.kt",
+    examples = DatePickerExamples
+)
+
 private val Dialogs = Component(
     id = nextId(),
     name = "Dialogs",
@@ -243,6 +254,18 @@ private val RadioButtons = Component(
     examples = RadioButtonsExamples
 )
 
+private val SearchBars = Component(
+    id = nextId(),
+    name = "Search bars",
+    description = "Search bars allow users to enter a keyword or phrase and get relevant " +
+        "information.",
+    // No search bar icon
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/SearchBar.kt",
+    examples = SearchBarExamples
+)
+
 private val Sliders = Component(
     id = nextId(),
     name = "Sliders",
@@ -301,6 +324,17 @@ private val TextFields = Component(
     examples = TextFieldsExamples
 )
 
+private val Tooltips = Component(
+    id = nextId(),
+    name = "Tooltips",
+    description = "Tooltips call user attention to an anchor component.",
+    // no tooltips icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/tooltips",
+    docsUrl = "$PackageSummaryUrl#tooltip",
+    sourceUrl = "$Material3SourceUrl/Tooltip.kt",
+    examples = TooltipsExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -320,6 +354,7 @@ val Components = listOf(
     Card,
     Checkboxes,
     Chips,
+    DatePickers,
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,
@@ -331,10 +366,12 @@ val Components = listOf(
     NavigationRail,
     ProgressIndicators,
     RadioButtons,
+    SearchBars,
     Sliders,
     Snackbars,
     Switches,
     Tabs,
     TextFields,
+    Tooltips,
     TopAppBar
 )

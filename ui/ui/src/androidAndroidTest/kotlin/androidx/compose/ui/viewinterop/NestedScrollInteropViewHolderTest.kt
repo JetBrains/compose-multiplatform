@@ -25,8 +25,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.test.R
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.tests.R
 import androidx.compose.ui.unit.Velocity
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Espresso.onView

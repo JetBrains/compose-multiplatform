@@ -23,11 +23,10 @@ plugins {
 }
 
 android {
+    defaultConfig {
+        minSdkVersion 23
+    }
     namespace "androidx.compose.integration.macrobenchmark"
-}
-
-android.defaultConfig {
-    minSdkVersion 23
 }
 
 dependencies {
@@ -42,5 +41,11 @@ dependencies {
 }
 
 // Define a task dependency so the app is installed before we run macro benchmarks.
-tasks.getByPath(":compose:integration-tests:macrobenchmark:connectedCheck")
-    .dependsOn(tasks.getByPath(":compose:integration-tests:macrobenchmark-target:installRelease"))
+afterEvaluate {
+    tasks.getByPath(":compose:integration-tests:macrobenchmark:connectedDebugAndroidTest")
+            .dependsOn(
+                    tasks.getByPath(
+                            ":compose:integration-tests:macrobenchmark-target:installRelease"
+                    )
+            )
+}

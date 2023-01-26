@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.MultiParagraph
 import androidx.compose.ui.text.style.TextDecoration
@@ -34,15 +35,16 @@ internal actual fun MultiParagraph.drawMultiParagraph(
     brush: Brush,
     alpha: Float,
     shadow: Shadow?,
-    decoration: TextDecoration?
+    decoration: TextDecoration?,
+    drawStyle: DrawStyle?
 ) {
     canvas.save()
 
     if (paragraphInfoList.size <= 1) {
-        drawParagraphs(canvas, brush, alpha, shadow, decoration)
+        drawParagraphs(canvas, brush, alpha, shadow, decoration, drawStyle)
     } else {
         when (brush) {
-            is SolidColor -> drawParagraphs(canvas, brush, alpha, shadow, decoration)
+            is SolidColor -> drawParagraphs(canvas, brush, alpha, shadow, decoration, drawStyle)
             is ShaderBrush -> {
                 var height = 0f
                 var width = 0f
@@ -54,7 +56,14 @@ internal actual fun MultiParagraph.drawMultiParagraph(
                 val matrix = Matrix()
                 shader.getLocalMatrix(matrix)
                 paragraphInfoList.fastForEach {
-                    it.paragraph.paint(canvas, ShaderBrush(shader), alpha, shadow, decoration)
+                    it.paragraph.paint(
+                        canvas = canvas,
+                        brush = ShaderBrush(shader),
+                        alpha = alpha,
+                        shadow = shadow,
+                        textDecoration = decoration,
+                        drawStyle = drawStyle
+                    )
                     canvas.translate(0f, it.paragraph.height)
                     matrix.setTranslate(0f, -it.paragraph.height)
                     shader.setLocalMatrix(matrix)
@@ -72,10 +81,11 @@ private fun MultiParagraph.drawParagraphs(
     brush: Brush,
     alpha: Float,
     shadow: Shadow?,
-    decoration: TextDecoration?
+    decoration: TextDecoration?,
+    drawStyle: DrawStyle?
 ) {
     paragraphInfoList.fastForEach {
-        it.paragraph.paint(canvas, brush, alpha, shadow, decoration)
+        it.paragraph.paint(canvas, brush, alpha, shadow, decoration, drawStyle)
         canvas.translate(0f, it.paragraph.height)
     }
 }
