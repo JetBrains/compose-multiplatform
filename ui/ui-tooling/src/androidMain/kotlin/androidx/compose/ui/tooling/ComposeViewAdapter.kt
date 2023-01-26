@@ -652,9 +652,8 @@ internal class ComposeViewAdapter : FrameLayout {
     }
 
     private val FakeOnBackPressedDispatcherOwner = object : OnBackPressedDispatcherOwner {
-        private val onBackPressedDispatcher = OnBackPressedDispatcher()
+        override val onBackPressedDispatcher = OnBackPressedDispatcher()
 
-        override fun getOnBackPressedDispatcher() = onBackPressedDispatcher
         override fun getLifecycle() = FakeSavedStateRegistryOwner.lifecycleRegistry
     }
 
