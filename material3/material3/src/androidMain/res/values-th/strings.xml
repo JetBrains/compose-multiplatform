@@ -33,4 +33,13 @@
     <string name="date_picker_headline_description" msgid="4627306862713137085">"การเลือกปัจจุบัน: %1$s"</string>
     <string name="date_picker_no_selection_description" msgid="5724377114289981899">"ไม่มี"</string>
     <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"แสดงตัวเลือกปี"</string>
+    <string name="date_input_title" msgid="3010396677286327048">"เลือกวันที่"</string>
+    <string name="date_input_headline" msgid="3499643850558715142">"วันที่ป้อน"</string>
+    <string name="date_input_label" msgid="5194825853981987218">"วันที่"</string>
+    <string name="date_input_headline_description" msgid="8562356184193964298">"วันที่ป้อน: %1$s"</string>
+    <string name="date_input_no_input_description" msgid="5722931102250207748">"ไม่มี"</string>
+    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"ไม่อนุญาตให้ใช้วันที่นี้: %1$s"</string>
+    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"วันที่ไม่ตรงกับรูปแบบที่คาดไว้: %1$s"</string>
+    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"วันที่อยู่นอกเหนือจากช่วงปีที่คาดไว้ %1$s - %2$s"</string>
+    <string name="tooltip_long_press_label" msgid="2732804537909054941">"แสดงเคล็ดลับเครื่องมือ"</string>
 </resources>

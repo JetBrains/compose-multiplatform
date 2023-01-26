@@ -26,16 +26,20 @@
     <string name="date_picker_title" msgid="9208721003668059792">"Hautatu data bat"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"Hautatutako data"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Joan urte-hautatzailera"</string>
-    <!-- no translation found for date_picker_switch_to_day_selection (145089358343568971) -->
-    <skip />
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"Pasatu hatza urte bat hautatzeko. Bestela, sakatu hau eguna hautatzeko pantailara itzultzeko."</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Aldatu hurrengo hilabetera"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Aldatu aurreko hilabetera"</string>
-    <!-- no translation found for date_picker_navigate_to_year_description (5152441868029453612) -->
-    <skip />
-    <!-- no translation found for date_picker_headline_description (4627306862713137085) -->
-    <skip />
-    <!-- no translation found for date_picker_no_selection_description (5724377114289981899) -->
-    <skip />
-    <!-- no translation found for date_picker_year_picker_pane_title (8140324713311804736) -->
-    <skip />
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"Joan %1$s urtera"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"Oraingo hautapena: %1$s"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"Bat ere ez"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"Urte-hautatzailea ikusgai dago"</string>
+    <string name="date_input_title" msgid="3010396677286327048">"Hautatu data bat"</string>
+    <string name="date_input_headline" msgid="3499643850558715142">"Idatzitako data"</string>
+    <string name="date_input_label" msgid="5194825853981987218">"Data"</string>
+    <string name="date_input_headline_description" msgid="8562356184193964298">"Idatzitako data: %1$s"</string>
+    <string name="date_input_no_input_description" msgid="5722931102250207748">"Bat ere ez"</string>
+    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"Ez da onartzen data: %1$s"</string>
+    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"Data ez dator bat espero den ereduarekin: %1$s"</string>
+    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Espero den urte tartetik (%1$s-%2$s) kanpo dago data"</string>
+    <string name="tooltip_long_press_label" msgid="2732804537909054941">"Erakutsi aholkua"</string>
 </resources>
