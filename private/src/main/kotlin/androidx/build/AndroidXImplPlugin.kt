@@ -17,7 +17,6 @@
 package androidx.build
 
 import androidx.benchmark.gradle.BenchmarkPlugin
-import androidx.build.AndroidXImplPlugin.Companion.CHECK_RELEASE_READY_TASK
 import androidx.build.AndroidXImplPlugin.Companion.TASK_TIMEOUT_MINUTES
 import androidx.build.Release.DEFAULT_PUBLISH_CONFIG
 import androidx.build.SupportConfig.BUILD_TOOLS_VERSION
@@ -30,7 +29,9 @@ import androidx.build.checkapi.JavaApiTaskConfig
 import androidx.build.checkapi.KmpApiTaskConfig
 import androidx.build.checkapi.LibraryApiTaskConfig
 import androidx.build.checkapi.configureProjectForApiTasks
+import androidx.build.dependencies.KOTLIN_VERSION
 import androidx.build.dependencyTracker.AffectedModuleDetector
+import androidx.build.docs.AndroidXKmpDocsImplPlugin
 import androidx.build.gradle.isRoot
 import androidx.build.license.configureExternalDependencyLicenseCheck
 import androidx.build.resources.configurePublicResourcesStub
@@ -53,6 +54,7 @@ import com.android.build.gradle.TestExtension
 import com.android.build.gradle.TestPlugin
 import com.android.build.gradle.TestedExtension
 import com.android.build.gradle.internal.tasks.AnalyticsRecordingTask
+import com.android.build.gradle.internal.tasks.CheckAarMetadataTask
 import com.android.build.gradle.internal.tasks.ListingFileRedirectTask
 import java.io.File
 import java.time.Duration
@@ -72,10 +74,10 @@ import org.gradle.api.plugins.JavaPlugin
 import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.tasks.Copy
 import org.gradle.api.tasks.TaskProvider
-import org.gradle.api.tasks.bundling.Jar
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.api.tasks.compile.JavaCompile
 import org.gradle.api.tasks.javadoc.Javadoc
+import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
@@ -89,11 +91,10 @@ import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
 import org.jetbrains.kotlin.gradle.plugin.KotlinMultiplatformPluginWrapper
-import org.jetbrains.kotlin.gradle.targets.native.KotlinNativeHostTestRun
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTargetWithSimulatorTests
 import org.jetbrains.kotlin.gradle.tasks.CInteropProcess
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jetbrains.kotlin.gradle.tasks.KotlinNativeCompile
-import org.jetbrains.kotlin.gradle.testing.KotlinTaskTestRun
 
 /**
  * A plugin which enables all of the Gradle customizations for AndroidX.
@@ -125,13 +126,19 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         project.configureKtlint()
+        project.configureKotlinStdlibVersion()
 
         // Configure all Jar-packing tasks for hermetic builds.
-        project.tasks.withType(Jar::class.java).configureEach { it.configureForHermeticBuild() }
+        project.tasks.withType(Zip::class.java).configureEach { it.configureForHermeticBuild() }
         project.tasks.withType(Copy::class.java).configureEach { it.configureForHermeticBuild() }
 
         // copy host side test results to DIST
-        project.tasks.withType(Test::class.java) { task -> configureTestTask(project, task) }
+        project.tasks.withType(AbstractTestTask::class.java) {
+                task -> configureTestTask(project, task)
+        }
+        project.tasks.withType(Test::class.java) {
+                task -> configureJvmTestTask(project, task)
+        }
 
         project.configureTaskTimeouts()
         project.configureMavenArtifactUpload(extension, componentFactory)
@@ -139,22 +146,27 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.configureProjectStructureValidation(extension)
         project.configureProjectVersionValidation(extension)
         project.registerProjectOrArtifact()
+        project.addCreateLibraryBuildInfoFileTasks(extension)
 
         project.configurations.create("samples")
         project.validateMultiplatformPluginHasNotBeenApplied()
+
+        project.tasks.register("printCoordinates", PrintProjectCoordinatesTask::class.java) {
+            it.configureWithAndroidXExtension(extension)
+        }
     }
 
     private fun Project.registerProjectOrArtifact() {
         // Add a method for each sub project where they can declare an optional
         // dependency on a project or its latest snapshot artifact.
-        if (!StudioType.isPlayground(this)) {
+        if (!ProjectLayoutType.isPlayground(this)) {
             // In AndroidX build, this is always enforced to the project
             extra.set(
                 PROJECT_OR_ARTIFACT_EXT_NAME,
                 KotlinClosure1<String, Project>(
                     function = {
                         // this refers to the first parameter of the closure.
-                        project(this)
+                        project.resolveProject(this)
                     }
                 )
             )
@@ -176,7 +188,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
      * Disables timestamps and ensures filesystem-independent archive ordering to maximize
      * cross-machine byte-for-byte reproducibility of artifacts.
      */
-    private fun Jar.configureForHermeticBuild() {
+    private fun Zip.configureForHermeticBuild() {
         isReproducibleFileOrder = true
         isPreserveFileTimestamps = false
     }
@@ -185,7 +197,26 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         duplicatesStrategy = DuplicatesStrategy.FAIL
     }
 
-    private fun configureTestTask(project: Project, task: Test) {
+    private fun configureJvmTestTask(project: Project, task: Test) {
+        // Robolectric 1.7 increased heap size requirements, see b/207169653.
+        task.maxHeapSize = "3g"
+
+        // For non-playground setup use robolectric offline
+        if (!ProjectLayoutType.isPlayground(project)) {
+            task.systemProperty("robolectric.offline", "true")
+            val robolectricDependencies =
+                File(
+                    project.getPrebuiltsRoot(),
+                    "androidx/external/org/robolectric/android-all-instrumented"
+                )
+            task.systemProperty(
+                "robolectric.dependency.dir",
+                robolectricDependencies.relativeTo(project.projectDir)
+            )
+        }
+    }
+
+    private fun configureTestTask(project: Project, task: AbstractTestTask) {
         val ignoreFailuresProperty = project.providers.gradleProperty(
             TEST_FAILURES_DO_NOT_FAIL_TEST_TASK
         )
@@ -194,9 +225,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             task.ignoreFailures = true
         }
         task.inputs.property("ignoreFailures", ignoreFailures)
-
-        // Robolectric 1.7 increased heap size requirements, see b/207169653.
-        task.maxHeapSize = "3g"
 
         val xmlReportDestDir = project.getHostTestResultDirectory()
         val archiveName = "${project.path}:${task.name}.zip"
@@ -224,25 +252,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             val capitalizedTestTaskName = testTaskName.replaceFirstChar {
                 if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
             }
-
-            val zipHtmlTask = project.tasks.register(
-                "zipHtmlResultsOf$capitalizedTestTaskName",
-                Zip::class.java
-            ) {
-                val destinationDirectory = File("$xmlReportDestDir-html")
-                it.destinationDirectory.set(destinationDirectory)
-                it.archiveFileName.set(archiveName)
-                it.from(project.file(task.reports.html.outputLocation))
-                it.doLast { zip ->
-                    // If the test itself didn't display output, then the report task should
-                    // remind the user where to find its output
-                    zip.logger.lifecycle(
-                        "Html results of $testTaskName zipped into " +
-                            "$destinationDirectory/$archiveName"
-                    )
-                }
-            }
-            task.finalizedBy(zipHtmlTask)
             val xmlReport = task.reports.junitXml
             if (xmlReport.required.get()) {
                 val zipXmlTask = project.tasks.register(
@@ -255,18 +264,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 }
                 task.finalizedBy(zipXmlTask)
             }
-        }
-        if (!StudioType.isPlayground(project)) { // For non-playground setup use robolectric offline
-            task.systemProperty("robolectric.offline", "true")
-            val robolectricDependencies =
-                File(
-                    project.getPrebuiltsRoot(),
-                    "androidx/external/org/robolectric/android-all-instrumented"
-                )
-            task.systemProperty(
-                "robolectric.dependency.dir",
-                robolectricDependencies.relativeTo(project.projectDir)
-            )
         }
     }
 
@@ -284,9 +281,14 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 } else {
                     task.kotlinOptions.jvmTarget = "1.8"
                 }
-                task.kotlinOptions.freeCompilerArgs += listOf(
-                    "-Xskip-metadata-version-check"
+                val kotlinCompilerArgs = mutableListOf(
+                    "-Xskip-metadata-version-check",
                 )
+                // TODO (b/259578592): enable -Xjvm-default=all for camera-camera2-pipe projects
+                if (!project.name.contains("camera-camera2-pipe")) {
+                    kotlinCompilerArgs += "-Xjvm-default=all"
+                }
+                task.kotlinOptions.freeCompilerArgs += kotlinCompilerArgs
             }
 
             // If no one else is going to register a source jar, then we should.
@@ -310,12 +312,15 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 }
             }
         }
+        // setup a partial docs artifact that can be used to generate offline docs, if requested.
+        AndroidXKmpDocsImplPlugin.setupPartialDocsArtifact(project)
         if (plugin is KotlinMultiplatformPluginWrapper) {
             project.configureKonanDirectory()
             project.extensions.findByType<LibraryExtension>()?.apply {
                 configureAndroidLibraryWithMultiplatformPluginOptions()
             }
-            project.configureKmpBuildOnServer()
+            project.configureKmpTests()
+            project.configureSourceJarForMultiplatform()
         }
     }
 
@@ -327,7 +332,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         project.extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
-            onVariants { it.configureLicensePackaging() }
+            onVariants { it.configureTests() }
             finalizeDsl {
                 project.configureAndroidProjectForLint(
                     it.lint,
@@ -351,6 +356,11 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.addToProjectMap(androidXExtension)
     }
 
+    private fun HasAndroidTest.configureTests() {
+        configureLicensePackaging()
+        excludeVersionFilesFromTestApks()
+    }
+
     private fun HasAndroidTest.configureLicensePackaging() {
         androidTest?.packaging?.resources?.apply {
             // Workaround a limitation in AGP that fails to merge these META-INF license files.
@@ -360,6 +370,30 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             // are currently dual-licensed with AL2.0 and LGPL2.1. The affected dependencies are:
             //   - net.java.dev.jna:jna:5.5.0
             excludes.add("/META-INF/LGPL2.1")
+        }
+    }
+
+    /**
+     * Excludes files telling which versions of androidx libraries were used in test apks
+     * to avoid invalidating the build cache as often
+     */
+    private fun HasAndroidTest.excludeVersionFilesFromTestApks() {
+        androidTest?.packaging?.resources?.apply {
+            excludes.add("/META-INF/androidx*.version")
+        }
+    }
+
+    fun Project.configureKotlinStdlibVersion() {
+        project.configurations.all { configuration ->
+            configuration.resolutionStrategy { strategy ->
+                strategy.eachDependency { details ->
+                    if (details.requested.group == "org.jetbrains.kotlin" &&
+                        (details.requested.name == "kotlin-stdlib-jdk7" ||
+                            details.requested.name == "kotlin-stdlib-jdk8")) {
+                        details.useVersion(KOTLIN_VERSION)
+                    }
+                }
+            }
         }
     }
 
@@ -412,7 +446,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             beforeVariants(selector().withBuildType("release")) { variant ->
                 variant.enableUnitTest = false
             }
-            onVariants { it.configureLicensePackaging() }
+            onVariants { it.configureTests() }
             finalizeDsl {
                 project.configureAndroidProjectForLint(it.lint, androidXExtension, isLibrary = true)
             }
@@ -421,7 +455,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.configurePublicResourcesStub(libraryExtension)
         project.configureSourceJarForAndroid(libraryExtension)
         project.configureVersionFileWriter(libraryExtension, androidXExtension)
-        project.addCreateLibraryBuildInfoFileTasks(androidXExtension)
         project.configureJavaCompilationWarnings(androidXExtension)
 
         project.configureDependencyVerification(androidXExtension) { taskProvider ->
@@ -449,6 +482,13 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             LibraryApiTaskConfig(libraryExtension),
             androidXExtension
         )
+
+        // Disable AAR verification when we're forcing max dep versions.
+        if (project.usingMaxDepVersions()) {
+            project.tasks.withType(CheckAarMetadataTask::class.java).configureEach { task ->
+                task.enabled = false
+            }
+        }
 
         project.addToProjectMap(androidXExtension)
     }
@@ -485,8 +525,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             }
         }
 
-        project.addCreateLibraryBuildInfoFileTasks(extension)
-
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
         project.configureNonAndroidProjectForLint(extension)
         val apiTaskConfig = if (project.multiplatformExtension != null) {
@@ -519,7 +557,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             val mavenGroup = extension.mavenGroup
             val isProbablyPublished = extension.type == LibraryType.PUBLISHED_LIBRARY ||
                 extension.type == LibraryType.UNSET
-            if (mavenGroup != null && isProbablyPublished) {
+            if (mavenGroup != null && isProbablyPublished && extension.shouldPublish()) {
                 validateProjectStructure(mavenGroup.group)
             }
         }
@@ -571,6 +609,16 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
         testOptions.animationsDisabled = true
         testOptions.unitTests.isReturnDefaultValues = true
+        testOptions.unitTests.all { task ->
+            // https://github.com/robolectric/robolectric/issues/7456
+            task.jvmArgs = listOf(
+                "--add-opens=java.base/java.lang=ALL-UNNAMED",
+                "--add-opens=java.base/java.util=ALL-UNNAMED",
+                "--add-opens=java.base/java.io=ALL-UNNAMED",
+            )
+            // Robolectric 1.7 increased heap size requirements, see b/207169653.
+            task.maxHeapSize = "3g"
+        }
         testOptions.configureVirtualDevices()
 
         // Include resources in Robolectric tests as a workaround for b/184641296 and
@@ -584,7 +632,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             check(minSdkVersion >= DEFAULT_MIN_SDK_VERSION) {
                 "minSdkVersion $minSdkVersion lower than the default of $DEFAULT_MIN_SDK_VERSION"
             }
-            check(compileSdkVersion == COMPILE_SDK_VERSION) {
+            check(compileSdkVersion == COMPILE_SDK_VERSION ||
+                project.isCustomCompileSdkAllowed()
+            ) {
                 "compileSdkVersion must not be explicitly specified, was \"$compileSdkVersion\""
             }
             project.configurations.all { configuration ->
@@ -729,7 +779,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
      * Sets the konan distribution url to the prebuilts directory.
      */
     private fun Project.configureKonanDirectory() {
-        if (StudioType.isPlayground(this)) {
+        if (ProjectLayoutType.isPlayground(this)) {
             return // playground does not use prebuilts
         }
         overrideKotlinNativeDistributionUrlToLocalDirectory()
@@ -763,7 +813,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         extensions.extraProperties["kotlin.native.distribution.baseDownloadUrl"] = url
     }
 
-    private fun Project.configureKmpBuildOnServer() {
+    private fun Project.configureKmpTests() {
         val kmpExtension = checkNotNull(
             project.extensions.findByType<KotlinMultiplatformExtension>()
         ) {
@@ -772,17 +822,12 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             KotlinMultiplatformExtension.
             """.trimIndent()
         }
-        // Add all "configured" native tests to the buildOnServer task.
-        // Note that we don't check if platform is enabled in flags because it wouldn't be
-        // configured in the first place if the target is not enabled
         kmpExtension.testableTargets.all { kotlinTarget ->
-            kotlinTarget.testRuns.all { kotlinTestRun ->
-                // Need to check for both KotlinNativeHostTest (to ensure it runs on host, not on
-                // an emulator or simulator) and also KotlinTaskTestRun to ensure it has a task.
-                // Unfortunately, there is no parent interface/class that covers both cases.
-                if (kotlinTestRun is KotlinNativeHostTestRun &&
-                    kotlinTestRun is KotlinTaskTestRun<*, *>) {
-                    project.addToBuildOnServer(kotlinTestRun.executionTask)
+            if (kotlinTarget is KotlinNativeTargetWithSimulatorTests) {
+                kotlinTarget.binaries.all {
+                    // Use std allocator to avoid the following warning:
+                    // w: Mimalloc allocator isn't supported on target <target>. Used standard mode.
+                    it.freeCompilerArgs += "-Xallocator=std"
                 }
             }
         }
@@ -816,7 +861,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             if (extension.type != LibraryType.SAMPLES) {
                 val verifyDependencyVersionsTask = project.createVerifyDependencyVersionsTask()
                 if (verifyDependencyVersionsTask != null) {
-                    project.createCheckReleaseReadyTask(listOf(verifyDependencyVersionsTask))
                     taskConfigurator(verifyDependencyVersionsTask)
                 }
             }
@@ -825,7 +869,6 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
     companion object {
         const val BUILD_TEST_APKS_TASK = "buildTestApks"
-        const val CHECK_RELEASE_READY_TASK = "checkReleaseReady"
         const val CREATE_LIBRARY_BUILD_INFO_FILES_TASK = "createLibraryBuildInfoFiles"
         const val GENERATE_TEST_CONFIGURATION_TASK = "GenerateTestConfiguration"
         const val ZIP_TEST_CONFIGS_WITH_APKS_TASK = "zipTestConfigsWithApks"
@@ -885,18 +928,6 @@ private fun Project.addToProjectMap(extension: AndroidXExtension) {
 
 val Project.multiplatformExtension
     get() = extensions.findByType(KotlinMultiplatformExtension::class.java)
-
-/**
- * Creates the [CHECK_RELEASE_READY_TASK], which aggregates tasks that must pass for a
- * project to be considered ready for public release.
- */
-private fun Project.createCheckReleaseReadyTask(taskProviderList: List<TaskProvider<out Task>>) {
-    tasks.register(CHECK_RELEASE_READY_TASK) {
-        for (taskProvider in taskProviderList) {
-            it.dependsOn(taskProvider)
-        }
-    }
-}
 
 @Suppress("UNCHECKED_CAST")
 fun Project.getProjectsMap(): ConcurrentHashMap<String, String> {

@@ -14,22 +14,18 @@
  * limitations under the License.
  */
 
-package androidx.build
+package androidx.build.docs
 
+import androidx.build.getSupportRootFolder
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
-/**
- * Configures screenshot testing using Paparazzi for AndroidX projects.
- *
- * The actual implementation is in AndroidXPaparazziImplPlugin.
- */
-class AndroidXLayoutlibPlugin : Plugin<Project> {
+class AndroidXKmpDocsPlugin : Plugin<Project> {
     override fun apply(project: Project) {
         val supportRoot = project.getSupportRootFolder()
         project.apply(
-            mapOf(
-                "from" to "$supportRoot/buildSrc/apply/applyAndroidXLayoutlibImplPlugin.gradle"
+            mapOf<String, String>(
+                "from" to "$supportRoot/buildSrc/apply/applyAndroidXKmpDocsImplPlugin.gradle"
             )
         )
     }

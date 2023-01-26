@@ -226,6 +226,9 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             task.setOutput(File(project.getDistributionDirectory(), "task_outputs.txt"))
             task.removePrefix(project.getCheckoutRoot().path)
         }
+        tasks.matching { it.name == "commonizeNativeDistribution" }.configureEach {
+            it.notCompatibleWithConfigurationCache("https://youtrack.jetbrains.com/issue/KT-54627")
+        }
     }
 
     private fun Project.setDependencyVersions() {

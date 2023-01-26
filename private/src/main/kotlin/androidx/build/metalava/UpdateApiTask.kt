@@ -32,12 +32,16 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import org.gradle.api.tasks.Optional
+import org.gradle.api.tasks.options.Option
+
 /**
  * Updates API signature text files.
  * In practice, the values they will be updated to will match the APIs defined by the source code.
  */
 @CacheableTask
 abstract class UpdateApiTask : DefaultTask() {
+
     /** Text file from which API signatures will be read. */
     @get:Input
     abstract val inputApiLocation: Property<ApiLocation>
@@ -46,12 +50,18 @@ abstract class UpdateApiTask : DefaultTask() {
     @get:Internal // outputs are declared in getTaskOutputs()
     abstract val outputApiLocations: ListProperty<ApiLocation>
 
+    /** If overriding policy, Buganizer ID where the override was approved. */
+    @get:Option(
+        option = "overridePolicyWithApproval",
+        description = "Buganizer ID where overriding Semantic Versioning policy was approved."
+    )
     @get:Input
-    var forceUpdate: Boolean = false
+    @get:Optional
+    abstract val overridePolicyWithApproval: Property<String>
 
     @InputFiles
     @PathSensitive(PathSensitivity.RELATIVE)
-    fun getTaskInputs(): List<File>? {
+    fun getTaskInputs(): List<File> {
         val inputApi = inputApiLocation.get()
         return listOf(
             inputApi.publicApiFile,
@@ -61,6 +71,7 @@ abstract class UpdateApiTask : DefaultTask() {
         )
     }
 
+    @Suppress("unused")
     @OutputFiles
     fun getTaskOutputs(): List<File> {
         return outputApiLocations.get().flatMap { outputApiLocation ->
@@ -75,12 +86,15 @@ abstract class UpdateApiTask : DefaultTask() {
 
     @TaskAction
     fun exec() {
+        // Always validate overridePolicyWithApproval, even if it's not needed.
+        val canOverridePolicy = verifyCanOverridePolicy()
+
         var permitOverwriting = true
         for (outputApi in outputApiLocations.get()) {
             val version = outputApi.version()
             if (version != null && version.isFinalApi() &&
                 outputApi.publicApiFile.exists() &&
-                !forceUpdate
+                !canOverridePolicy
             ) {
                 permitOverwriting = false
             }
@@ -115,6 +129,21 @@ abstract class UpdateApiTask : DefaultTask() {
             )
         }
     }
+
+    private fun verifyCanOverridePolicy(): Boolean {
+        if (!overridePolicyWithApproval.isPresent) return false
+
+        val buganizerId = overridePolicyWithApproval.get().toLongOrNull()
+        if (buganizerId == null || buganizerId < 250000000) {
+            throw GradleException(
+                "Invalid value for argument 'overridePolicyWithApproval'. To override Semantic " +
+                    "Versioning policy, you must specify a valid Buganizer ID indicating where " +
+                    "the policy override was approved."
+            )
+        }
+
+        return true
+    }
 }
 
 fun copy(
@@ -138,11 +167,12 @@ fun copy(
                 "Previously declared definition is $dest\n" +
                 "Current generated   definition is $source\n\n" +
                 "Did you mean to increment the library version first?\n\n" +
-                "If you have reason to overwrite the API files for the previous release " +
-                "anyway, you can run `./gradlew updateApi -Pforce` to ignore this message"
+                "If you have a valid reason to override Semantic Versioning policy, see " +
+                "go/androidx/versioning#beta-api-change for information on obtaining approval."
             throw GradleException(message)
         }
         if (source.exists()) {
+            @Suppress("UnstableApiUsage")
             Files.copy(source, dest)
             logger.lifecycle("Copied $source to $dest")
         } else {

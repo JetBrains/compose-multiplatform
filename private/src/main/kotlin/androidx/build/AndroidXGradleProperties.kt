@@ -130,6 +130,17 @@ const val KMP_GITHUB_BUILD = "androidx.github.build"
  */
 const val ALLOW_MISSING_LINT_CHECKS_PROJECT = "androidx.allow.missing.lint"
 
+/**
+ * If set to a uri, this is the location that will be used to download `xcodegen` when running
+ * Darwin benchmarks.
+ */
+const val XCODEGEN_DOWNLOAD_URI = "androidx.benchmark.darwin.xcodeGenDownloadUri"
+
+/**
+ * If true, don't restrict usage of compileSdk property.
+ */
+const val ALLOW_CUSTOM_COMPILE_SDK = "androidx.allowCustomCompileSdk"
+
 val ALL_ANDROIDX_PROPERTIES = setOf(
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
@@ -155,7 +166,9 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     ENABLED_KMP_TARGET_PLATFORMS,
-    ALLOW_MISSING_LINT_CHECKS_PROJECT
+    ALLOW_MISSING_LINT_CHECKS_PROJECT,
+    XCODEGEN_DOWNLOAD_URI,
+    ALLOW_CUSTOM_COMPILE_SDK
 )
 
 /**
@@ -242,5 +255,11 @@ fun Project.usingMaxDepVersions(): Boolean {
  */
 fun Project.allowMissingLintProject() =
     findBooleanProperty(ALLOW_MISSING_LINT_CHECKS_PROJECT) ?: false
+
+/**
+ * Whether libraries are allowed to customize the value of the compileSdk property.
+ */
+fun Project.isCustomCompileSdkAllowed(): Boolean =
+    findBooleanProperty(ALLOW_CUSTOM_COMPILE_SDK) ?: true
 
 fun Project.findBooleanProperty(propName: String) = (findProperty(propName) as? String)?.toBoolean()

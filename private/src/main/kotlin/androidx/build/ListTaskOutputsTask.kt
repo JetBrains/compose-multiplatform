@@ -22,15 +22,15 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
-import org.gradle.work.DisableCachingByDefault
 
 /**
  * Finds the outputs of every task and saves this mapping into a file
  */
-@DisableCachingByDefault(because = "Uses too many inputs to be feasible to cache, but runs quickly")
+@CacheableTask
 abstract class ListTaskOutputsTask : DefaultTask() {
     @OutputFile
     val outputFile: Property<File> = project.objects.property(File::class.java)
@@ -39,12 +39,14 @@ abstract class ListTaskOutputsTask : DefaultTask() {
     @Input
     val tasks: MutableList<Task> = mutableListOf()
 
+    @get:Input
+    val outputText by lazy { computeOutputText() }
+
     init {
         group = "Help"
-        outputs.upToDateWhen { false }
-        notCompatibleWithConfigurationCache(
-            "This task uses project object to inspect outputs of all tasks"
-        )
+        // compute the output text when the taskgraph is ready so that the output text can be
+        // saved in the configuration cache and not generate a configuration cache violation
+        project.gradle.taskGraph.whenReady({ outputText.toString() })
     }
 
     fun setOutput(f: File) {
@@ -94,14 +96,15 @@ abstract class ListTaskOutputsTask : DefaultTask() {
         return components.joinToString("")
     }
 
+    fun computeOutputText(): String {
+        val tasksByOutput = project.rootProject.findAllTasksByOutput()
+        return formatTasks(tasksByOutput)
+    }
+
     @TaskAction
     fun exec() {
-        val tasksByOutput = project.rootProject.findAllTasksByOutput()
-        val text = formatTasks(tasksByOutput)
-
         val outputFile = outputFile.get()
-        outputFile.writeText(text)
-        logger.lifecycle("Wrote ${outputFile.path}")
+        outputFile.writeText(outputText)
     }
 }
 
@@ -162,6 +165,9 @@ fun Project.findAllTasksByOutput(): Map<File, Task> {
                             "multiple tasks: " + otherTask + " and " + existingTask
                     )
                 }
+                // if there is an exempt conflict, keep the alphabetically earlier task to ensure consistency
+                if (existingTask.path > otherTask.path)
+                  continue
             }
             tasksByOutput[otherTaskOutput] = otherTask
         }

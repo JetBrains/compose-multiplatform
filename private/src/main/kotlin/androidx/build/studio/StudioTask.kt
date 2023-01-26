@@ -16,7 +16,7 @@
 
 package androidx.build.studio
 
-import androidx.build.StudioType
+import androidx.build.ProjectLayoutType
 import androidx.build.getSupportRootFolder
 import androidx.build.getVersionByName
 import com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
@@ -280,9 +280,9 @@ abstract class StudioTask : DefaultTask() {
         private const val STUDIO_TASK = "studio"
 
         fun Project.registerStudioTask() {
-            val studioTask = when (StudioType.from(this)) {
-                StudioType.ANDROIDX -> RootStudioTask::class.java
-                StudioType.PLAYGROUND -> PlaygroundStudioTask::class.java
+            val studioTask = when (ProjectLayoutType.from(this)) {
+                ProjectLayoutType.ANDROIDX -> RootStudioTask::class.java
+                ProjectLayoutType.PLAYGROUND -> PlaygroundStudioTask::class.java
             }
             tasks.register(STUDIO_TASK, studioTask)
         }

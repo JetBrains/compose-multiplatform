@@ -5,3 +5,9 @@ dependencies {
 }
 
 apply from: "../shared.gradle"
+
+// The artifacts built by this project require at runtime the artifacts from `:buildSrc:private`.
+// However, we don't want `:buildSrc:private` artifacts to be on their runtime classpath, because
+// that means that any changes to those artifacts can invalidate task up-to-datedness
+// (see ../README.md)
+tasks["jar"].dependsOn(":private:build")

@@ -81,7 +81,6 @@ sealed class LibraryType(
         val ANNOTATION_PROCESSOR_UTILS = AnnotationProcessorUtils()
         val OTHER_CODE_PROCESSOR = OtherCodeProcessor()
         val IDE_PLUGIN = IdePlugin()
-        val KMP_LIBRARY = KmpLibrary()
         val UNSET = Unset()
     }
     open class PublishedLibrary(allowCallingVisibleForTestsApis: Boolean = false) : LibraryType(
@@ -164,12 +163,6 @@ sealed class LibraryType(
         checkApi = RunApiTasks.No("IDE Plugin (consumed only by Android Studio"),
         // This is a bit complicated. IDE plugins usually have an on-device component installed by
         // Android Studio, rather than by a client of the library, but also a host-side component.
-        compilationTarget = CompilationTarget.DEVICE
-    )
-    class KmpLibrary : LibraryType(
-        publish = Publish.SNAPSHOT_AND_RELEASE,
-        sourceJars = true,
-        checkApi = RunApiTasks.Yes(),
         compilationTarget = CompilationTarget.DEVICE
     )
     class Unset : LibraryType()

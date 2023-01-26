@@ -196,11 +196,14 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Disable until it works for our projects, b/171986505
         disable.add("JavaPluginLanguageLevel")
 
-        // Disable the TODO check until we have a policy that requires it.
+        // Explicitly disable StopShip check (see b/244617216)
         disable.add("StopShip")
 
         // Broken in 7.0.0-alpha15 due to b/180408990
         disable.add("RestrictedApi")
+
+        // Disable until ag/19949626 goes in (b/261918265)
+        disable.add("MissingQuantity")
 
         // Provide stricter enforcement for project types intended to run on a device.
         if (extension.type.compilationTarget == CompilationTarget.DEVICE) {

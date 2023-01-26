@@ -117,6 +117,20 @@ private fun Project.createErrorProneConfiguration(): Configuration {
 
 // Given an existing JavaCompile task, reconfigures the task to use the ErrorProne compiler plugin
 private fun JavaCompile.configureWithErrorProne() {
+    options.isFork = true
+    options.forkOptions.jvmArgs!!.addAll(listOf(
+        "--add-exports=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.file=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.model=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.parser=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.processing=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.tree=ALL-UNNAMED",
+        "--add-exports=jdk.compiler/com.sun.tools.javac.util=ALL-UNNAMED",
+        "--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED",
+        "--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED"
+        )
+    )
     val compilerArgs = this.options.compilerArgs
     compilerArgs += listOf(
         // Tell error-prone that we are running it on android compatible libraries
@@ -126,7 +140,8 @@ private fun JavaCompile.configureWithErrorProne() {
         listOf(
             "-Xplugin:ErrorProne",
 
-            "-XepExcludedPaths:.*/(build/generated|build/errorProne|external)/.*",
+            "-XepExcludedPaths:.*/(build/generated|build/errorProne|external|" +
+                "compileTransaction/compile-output)/.*",
 
             // Consider re-enabling the following checks. Disabled as part of
             // error-prone upgrade

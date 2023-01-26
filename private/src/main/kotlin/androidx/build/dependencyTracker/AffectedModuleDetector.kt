@@ -623,6 +623,15 @@ class AffectedModuleDetectorImpl constructor(
                 ":compose:material:material:icons:generator",
                 ":compose:material:material-icons-extended"
             ),
+            // Link glance-appwidget macrobenchmark and its target.
+            setOf(
+                ":glance:glance-appwidget:integration-tests:macrobenchmark",
+                ":glance:glance-appwidget:integration-tests:macrobenchmark-target"
+            ),
+            setOf(
+                ":constraintlayout:constraintlayout-compose:integration-tests:macrobenchmark",
+                ":constraintlayout:constraintlayout-compose:integration-tests:macrobenchmark-target"
+            )
         )
 
         val IGNORED_PATHS = setOf(

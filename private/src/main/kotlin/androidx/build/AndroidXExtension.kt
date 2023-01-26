@@ -18,11 +18,11 @@ package androidx.build
 
 import androidx.build.checkapi.shouldConfigureApiTasks
 import androidx.build.transform.configureAarAsJarForConfiguration
-import com.android.build.gradle.internal.crash.afterEvaluate
 import groovy.lang.Closure
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
+import org.gradle.api.provider.Provider
 import java.io.File
 
 /**
@@ -32,41 +32,153 @@ open class AndroidXExtension(val project: Project) {
     @JvmField
     val LibraryVersions: Map<String, Version>
     @JvmField
-    val LibraryGroups: Map<String, LibraryGroup>
+    val AllLibraryGroups: List<LibraryGroup>
+
+    val libraryGroupsByGroupId: Map<String, LibraryGroup>
+    val overrideLibraryGroupsByProjectPath: Map<String, LibraryGroup>
+
+    val mavenGroup: LibraryGroup?
+
+    val listProjectsService: Provider<ListProjectsService>
+
+    private val versionService: LibraryVersionsService
 
     init {
-        val toml = project.objects.fileProperty().fileValue(
-            File(project.getSupportRootFolder(), "libraryversions.toml")
-        )
-        val content = project.providers.fileContents(toml)
+        val toml = lazyReadFile("libraryversions.toml")
+
+        // These parameters are used when building pre-release binaries for androidxdev.
+        // These parameters are only expected to be compatible with :compose:compiler:compiler .
+        // To use them may require specifying specific projects and disabling some checks
+        // like this:
+        // `./gradlew :compose:compiler:compiler:publishToMavenLocal -Pandroidx.versionExtraCheckEnabled=false`
         val composeCustomVersion = project.providers.environmentVariable("COMPOSE_CUSTOM_VERSION")
         val composeCustomGroup = project.providers.environmentVariable("COMPOSE_CUSTOM_GROUP")
-
-        val serviceProvider = project.gradle.sharedServices.registerIfAbsent(
+        // service that can compute group/version for a project
+        versionService = project.gradle.sharedServices.registerIfAbsent(
             "libraryVersionsService",
             LibraryVersionsService::class.java
         ) { spec ->
-            spec.parameters.tomlFile = content.asText
+            spec.parameters.tomlFile = toml
             spec.parameters.composeCustomVersion = composeCustomVersion
             spec.parameters.composeCustomGroup = composeCustomGroup
+            spec.parameters.useMultiplatformGroupVersions = project.provider {
+                Multiplatform.isKotlinNativeEnabled(project)
+            }
+        }.get()
+        AllLibraryGroups = versionService.libraryGroups.values.toList()
+        LibraryVersions = versionService.libraryVersions
+        libraryGroupsByGroupId = versionService.libraryGroupsByGroupId
+        overrideLibraryGroupsByProjectPath = versionService.overrideLibraryGroupsByProjectPath
+
+        mavenGroup = chooseLibraryGroup()
+        chooseProjectVersion()
+
+        // service that can compute full list of projects in settings.gradle
+        val settings = lazyReadFile("settings.gradle")
+        listProjectsService = project.gradle.sharedServices.registerIfAbsent(
+            "listProjectsService",
+            ListProjectsService::class.java
+        ) { spec ->
+            spec.parameters.settingsFile = settings
         }
-        LibraryGroups = serviceProvider.get().libraryGroups
-        LibraryVersions = serviceProvider.get().libraryVersions
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
     fun setName(newName: String) { name.set(newName) }
+
+    /**
+     * Maven version of the library.
+     *
+     * Note that, setting this is an error if the library group sets an atomic version.
+     * If the build is a multiplatform build, this value will be overridden by
+     * the [mavenMultiplatformVersion] property when it is provided.
+     *
+     * @see mavenMultiplatformVersion
+     */
     var mavenVersion: Version? = null
         set(value) {
             field = value
             chooseProjectVersion()
         }
-    var mavenGroup: LibraryGroup? = null
+        get() = if (versionService.useMultiplatformGroupVersions) {
+            mavenMultiplatformVersion ?: field
+        } else {
+            field
+        }
+
+    /**
+     * If set, this will override the [mavenVersion] property in multiplatform builds.
+     *
+     * @see mavenVersion
+     */
+    var mavenMultiplatformVersion: Version? = null
         set(value) {
             field = value
             chooseProjectVersion()
         }
-    private val ALLOWED_EXTRA_PREFIXES = listOf("-alpha", "-beta", "-rc", "-dev", "-SNAPSHOT")
+
+    fun getAllProjectPathsInSameGroup(): List<String> {
+        val allProjectPaths = listProjectsService.get().allPossibleProjectPaths
+        val ourGroup = chooseLibraryGroup()
+        if (ourGroup == null)
+            return listOf(project.path)
+        val projectPathsInSameGroup = allProjectPaths.filter { otherPath ->
+            getLibraryGroupFromProjectPath(otherPath) == ourGroup
+        }
+        return projectPathsInSameGroup
+    }
+
+    private fun lazyReadFile(fileName: String): Provider<String> {
+        val fileProperty = project.objects.fileProperty().fileValue(
+            File(project.getSupportRootFolder(), fileName)
+        )
+        return project.providers.fileContents(fileProperty).asText
+    }
+
+    private fun chooseLibraryGroup(): LibraryGroup? {
+        return getLibraryGroupFromProjectPath(project.path)
+    }
+
+    private fun substringBeforeLastColon(projectPath: String): String {
+        val lastColonIndex = projectPath.lastIndexOf(":")
+        return projectPath.substring(0, lastColonIndex)
+    }
+
+    // gets the library group from the project path, including special cases
+    private fun getLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+        val overridden = overrideLibraryGroupsByProjectPath.get(projectPath)
+        if (overridden != null)
+            return overridden
+
+        val result = getStandardLibraryGroupFromProjectPath(projectPath)
+        if (result != null)
+            return result
+
+        // samples are allowed to be nested deeper
+        if (projectPath.contains("samples")) {
+            val parentPath = substringBeforeLastColon(projectPath)
+            return getLibraryGroupFromProjectPath(parentPath)
+        }
+        return null
+    }
+
+    // simple function to get the library group from the project path, without special cases
+    private fun getStandardLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+        // Get the text of the library group, something like "androidx.core"
+        val parentPath = substringBeforeLastColon(projectPath)
+
+        if (parentPath == "")
+            return null
+        // convert parent project path to groupId
+        val groupIdText = if (projectPath.startsWith(":external")) {
+            projectPath.replace(":external:", "")
+        } else {
+	    "androidx.${parentPath.substring(1).replace(':', '.')}"
+        }
+
+        // get the library group having that text
+        return libraryGroupsByGroupId.get(groupIdText)
+    }
 
     private fun chooseProjectVersion() {
         val version: Version
@@ -101,6 +213,7 @@ open class AndroidXExtension(val project: Project) {
     }
 
     private fun verifyVersionExtraFormat(version: Version) {
+        val ALLOWED_EXTRA_PREFIXES = listOf("-alpha", "-beta", "-rc", "-dev", "-SNAPSHOT")
         val extra = version.extra
         if (extra != null) {
             if (!version.isSnapshot() && project.isVersionExtraCheckEnabled()) {
@@ -209,14 +322,6 @@ open class AndroidXExtension(val project: Project) {
     var runApiTasks: RunApiTasks = RunApiTasks.Auto
         get() = if (field == RunApiTasks.Auto && type != LibraryType.UNSET) type.checkApi else field
     var type: LibraryType = LibraryType.UNSET
-        set(value) {
-            // don't disable multiplatform if it's already enabled, because sometimes it's enabled
-            // through flags and we don't want setting `type =` to disable it accidentally.
-            if (value.shouldEnableMultiplatform()) {
-                multiplatform = true
-            }
-            field = value
-        }
     var failOnDeprecationWarnings = true
 
     var legacyDisableKotlinStrictApiMode = false
@@ -225,14 +330,7 @@ open class AndroidXExtension(val project: Project) {
 
     var bypassCoordinateValidation = false
 
-    /**
-     * Whether this project uses KMP.
-     */
-    private var multiplatform: Boolean = false
-        set(value) {
-            Multiplatform.setEnabledForProject(project, value)
-            field = value
-        }
+    var metalavaK2UastEnabled = false
 
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
@@ -262,5 +360,3 @@ class License {
     var name: String? = null
     var url: String? = null
 }
-
-private fun LibraryType.shouldEnableMultiplatform() = this is LibraryType.KmpLibrary

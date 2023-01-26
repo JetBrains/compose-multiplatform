@@ -1,10 +1,8 @@
 set noparent
 
 jeffrygaston@google.com
-sjgilbert@google.com
 aurimas@google.com
 alanv@google.com
-nickanthony@google.com
 
 per-file *AndroidXPlaygroundRootPlugin.kt = dustinlam@google.com, rahulrav@google.com, yboyar@google.com
 per-file *LintConfiguration.kt = juliamcclellan@google.com, tiem@google.com

@@ -1,3 +1,4 @@
+
 apply plugin: "kotlin"
 apply from: "../kotlin-dsl-dependency.gradle"
 apply plugin: "java-gradle-plugin"
@@ -22,7 +23,6 @@ dependencies {
     implementation(libs.androidGradlePluginz)
     implementation(libs.androidToolsCommon) // for com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
     implementation(libs.kotlinGradlePluginz)
-    implementation(libs.dokkaGradlePluginz)
 
     // variety of json parsers
     implementation(libs.gson)
@@ -52,6 +52,11 @@ dependencies {
     runtimeOnly(libs.javapoet) // for hiltAndroidGradlePluginz to workaround https://github.com/google/dagger/issues/3068
     runtimeOnly(libs.kspGradlePluginz)
     runtimeOnly(libs.wireGradlePluginz)
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 project.tasks.withType(Jar) { task ->
