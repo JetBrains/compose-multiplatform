@@ -1,3 +1,33 @@
+# 1.3.0 (January 2023)
+
+## Common
+
+### Fixes
+- [Fix configuration cache issues](https://github.com/JetBrains/compose-jb/pull/2607)
+- [Use global directory to download wix toolset](https://github.com/JetBrains/compose-jb/pull/2639)
+- [IDEA plugin - Redo: set until-build to undefined value](https://github.com/JetBrains/compose-jb/pull/2658)
+
+## Desktop
+
+### Features
+- [Desktop AlertDialog scrim color](https://github.com/JetBrains/androidx/pull/358)
+- [Material 3 DropdownMenu Skiko support](https://github.com/JetBrains/androidx/pull/347)
+
+### Fixes
+- [Make ScrollbarAdapter for LazyList take contentPadding into account](https://github.com/JetBrains/androidx/pull/365)
+- [Fix AlertDialog dismiss on click to Dialog content](https://github.com/JetBrains/androidx/pull/359)
+- [Fix shaky scrolling of LazyColumn when the items are of varying size](https://github.com/JetBrains/androidx/pull/362)
+- 
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.4.0)
+- [Runtime 1.3.3](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.3.3)
+- [UI 1.3.3](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.3.3)
+- [Foundation 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.3.1)
+- [Material 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.3.1)
+- [Material3 1.0.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.1)
+
 # 1.2.2 (December 2022)
 
 ## Desktop
