@@ -28,6 +28,7 @@ import androidx.annotation.DoNotInline
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.util.fastMap
+import kotlin.math.roundToInt
 
 /**
  * Autofill implementation for Android.
@@ -54,10 +55,10 @@ internal class AndroidAutofill(val view: View, val autofillTree: AutofillTree) :
             view,
             autofillNode.id,
             android.graphics.Rect(
-                boundingBox.left.toInt(),
-                boundingBox.top.toInt(),
-                boundingBox.right.toInt(),
-                boundingBox.bottom.toInt()
+                boundingBox.left.roundToInt(),
+                boundingBox.top.roundToInt(),
+                boundingBox.right.roundToInt(),
+                boundingBox.bottom.roundToInt()
             )
         )
     }
@@ -105,10 +106,10 @@ internal fun AndroidAutofill.populateViewStructure(root: ViewStructure) {
                         Did you call perform autofillTree before the component was positioned? """
                 )
             } else {
-                val left = boundingBox.left.toInt()
-                val top = boundingBox.top.toInt()
-                val right = boundingBox.right.toInt()
-                val bottom = boundingBox.bottom.toInt()
+                val left = boundingBox.left.roundToInt()
+                val top = boundingBox.top.roundToInt()
+                val right = boundingBox.right.roundToInt()
+                val bottom = boundingBox.bottom.roundToInt()
                 val width = right - left
                 val height = bottom - top
                 AutofillApi23Helper.setDimens(child, left, top, 0, 0, width, height)
