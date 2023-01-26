@@ -62,6 +62,7 @@ module(":web-core", "core")
 module(":web-svg", "svg")
 module(":web-integration-core", "integration-core")
 module(":compose-compiler-integration", "compose-compiler-integration")
+module(":compose-compiler-integration-lib", "compose-compiler-integration/lib")
 module(":internal-web-core-runtime", "internal-web-core-runtime")
 module(":test-utils", "test-utils")
 
