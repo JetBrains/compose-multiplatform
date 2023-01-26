@@ -77,12 +77,6 @@ import androidx.compose.ui.util.fastForEachIndexed
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-private data class SpanRange(
-    val span: Any,
-    val start: Int,
-    val end: Int
-)
-
 internal fun Spannable.setSpan(span: Any, start: Int, end: Int) {
     setSpan(span, start, end, Spanned.SPAN_EXCLUSIVE_EXCLUSIVE)
 }
@@ -182,12 +176,7 @@ internal fun Spannable.setSpanStyles(
 ) {
 
     setFontAttributes(contextTextStyle, spanStyles, resolveTypeface)
-
-    // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
-    // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
-    // applied after all spans that changes the fontSize.
-    val lowPrioritySpans = ArrayList<SpanRange>()
-
+    var hasLetterSpacing = false
     for (i in spanStyles.indices) {
         val spanStyleRange = spanStyles[i]
         val start = spanStyleRange.start
@@ -197,21 +186,39 @@ internal fun Spannable.setSpanStyles(
 
         setSpanStyle(
             spanStyleRange,
-            density,
-            lowPrioritySpans
+            density
         )
+
+        if (spanStyleRange.item.needsLetterSpacingSpan) {
+            hasLetterSpacing = true
+        }
     }
 
-    lowPrioritySpans.fastForEach { (span, start, end) ->
-        setSpan(span, start, end)
+    if (hasLetterSpacing) {
+
+        // LetterSpacingSpanPx/LetterSpacingSpanSP has lower priority than normal spans. Because
+        // letterSpacing relies on the fontSize on [Paint] to compute Px/Sp from Em. So it must be
+        // applied after all spans that changes the fontSize.
+
+        for (i in spanStyles.indices) {
+            val spanStyleRange = spanStyles[i]
+            val start = spanStyleRange.start
+            val end = spanStyleRange.end
+            val style = spanStyleRange.item
+
+            if (start < 0 || start >= length || end <= start || end > length) continue
+
+            createLetterSpacingSpan(style.letterSpacing, density)?.let {
+                setSpan(it, start, end)
+            }
+        }
     }
 }
 
 @OptIn(ExperimentalTextApi::class)
 private fun Spannable.setSpanStyle(
     spanStyleRange: AnnotatedString.Range<SpanStyle>,
-    density: Density,
-    lowPrioritySpans: ArrayList<SpanRange>
+    density: Density
 ) {
     val start = spanStyleRange.start
     val end = spanStyleRange.end
@@ -240,12 +247,6 @@ private fun Spannable.setSpanStyle(
     setShadow(style.shadow, start, end)
 
     setDrawStyle(style.drawStyle, start, end)
-
-    createLetterSpacingSpan(style.letterSpacing, density)?.let {
-        lowPrioritySpans.add(
-            SpanRange(it, start, end)
-        )
-    }
 }
 
 /**
@@ -402,6 +403,9 @@ private fun createLetterSpacingSpan(
         }
     }
 }
+
+private val SpanStyle.needsLetterSpacingSpan: Boolean
+    get() = letterSpacing.type == TextUnitType.Sp || letterSpacing.type == TextUnitType.Em
 
 @OptIn(InternalPlatformTextApi::class)
 private fun Spannable.setShadow(shadow: Shadow?, start: Int, end: Int) {

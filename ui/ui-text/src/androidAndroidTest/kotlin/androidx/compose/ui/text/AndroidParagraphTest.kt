@@ -1380,17 +1380,35 @@ AndroidParagraphTest {
     @Test
     fun testTextStyle_letterSpacingInSp_appliedAsSpan() {
         val letterSpacing = 5f
-        val text = "abc"
+        val annotatedText = buildAnnotatedString {
+            pushStyle(SpanStyle(fontWeight = FontWeight.W800))
+            append("abc")
+            pop()
+        }
         val paragraph = simpleParagraph(
-            text = text,
+            text = annotatedText.text,
+            spanStyles = annotatedText.spanStyles,
             style = TextStyle(letterSpacing = letterSpacing.sp),
             width = 0.0f
         )
 
         assertThat(paragraph.charSequence)
-            .hasSpan(LetterSpacingSpanPx::class, 0, text.length) {
+            .hasSpan(LetterSpacingSpanPx::class, 0, annotatedText.length) {
                 it.letterSpacing == letterSpacing
             }
+    }
+
+    @Test
+    fun testTextStyle_letterSpacingInSp_noSpan_whenNoAnnoattions() {
+        val letterSpacing = 5f
+        val annotatedText = "abc"
+        val paragraph = simpleParagraph(
+            text = annotatedText,
+            style = TextStyle(letterSpacing = letterSpacing.sp),
+            width = 0.0f
+        )
+
+        assertThat(paragraph.charSequence).doesNotHaveSpan(LetterSpacingSpanPx::class)
     }
 
     @Test
