@@ -136,6 +136,11 @@ private fun TooltipBox(
     val scope = remember {
         object : TooltipBoxScope {
             override fun Modifier.tooltipAnchor(): Modifier {
+                val onLongPress = {
+                    coroutineScope.launch {
+                        tooltipState.show()
+                    }
+                }
                 return pointerInput(tooltipState) {
                         awaitEachGesture {
                             val longPressTimeout = viewConfiguration.longPressTimeoutMillis
@@ -151,9 +156,7 @@ private fun TooltipBox(
                                 }
                             } catch (_: PointerEventTimeoutCancellationException) {
                                 // handle long press - Show the tooltip
-                                coroutineScope.launch {
-                                    tooltipState.show()
-                                }
+                                onLongPress()
 
                                 // consume the children's click handling
                                 val event = awaitPointerEvent(pass = pass)
@@ -161,7 +164,13 @@ private fun TooltipBox(
                             }
                         }
                     }.semantics(mergeDescendants = true) {
-                        onLongClick(label = longPressLabel, action = null)
+                        onLongClick(
+                            label = longPressLabel,
+                            action = {
+                                onLongPress()
+                                true
+                            }
+                        )
                     }
             }
         }
