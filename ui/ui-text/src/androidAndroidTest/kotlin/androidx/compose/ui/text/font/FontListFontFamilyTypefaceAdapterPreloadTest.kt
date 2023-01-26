@@ -196,7 +196,7 @@ class FontListFontFamilyTypefaceAdapterPreloadTest {
             subject.preload(fontFamily, fontLoader)
         }
         assertThat(typefaceLoader.pendingRequests()).containsExactly(asyncFont)
-        scope.advanceTimeBy(Font.MaximumAsyncTimeout)
+        scope.advanceTimeBy(Font.MaximumAsyncTimeoutMillis)
         scope.runBlockingTest {
             preloadJob.await()
         }

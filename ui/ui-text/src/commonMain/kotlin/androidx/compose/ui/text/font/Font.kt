@@ -95,7 +95,7 @@ interface Font {
          *
          * This timeout is not configurable, and timers are maintained globally.
          */
-        const val MaximumAsyncTimeout = 15_000L
+        const val MaximumAsyncTimeoutMillis = 15_000L
     }
 }
 

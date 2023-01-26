@@ -710,11 +710,11 @@ package androidx.compose.ui.text.font {
     property public abstract int style;
     property public abstract androidx.compose.ui.text.font.FontWeight weight;
     field public static final androidx.compose.ui.text.font.Font.Companion Companion;
-    field public static final long MaximumAsyncTimeout = 15000L; // 0x3a98L
+    field public static final long MaximumAsyncTimeoutMillis = 15000L; // 0x3a98L
   }
 
   public static final class Font.Companion {
-    field public static final long MaximumAsyncTimeout = 15000L; // 0x3a98L
+    field public static final long MaximumAsyncTimeoutMillis = 15000L; // 0x3a98L
   }
 
   @Deprecated public static interface Font.ResourceLoader {
