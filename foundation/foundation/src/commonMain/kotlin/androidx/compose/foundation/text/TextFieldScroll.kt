@@ -247,6 +247,12 @@ internal class TextFieldScrollerPosition(
         private set
 
     /**
+     * Size of the visible part, on the scrollable axis, in pixels.
+     */
+    var viewportSize by mutableStateOf(0)
+        private set
+
+    /**
      * Keeps the cursor position before a new symbol has been typed or the text field has been
      * dragged. We check it to understand if the [offset] needs to be updated.
      */
@@ -279,6 +285,7 @@ internal class TextFieldScrollerPosition(
             previousCursorRect = cursorRect
         }
         offset = offset.coerceIn(0f, difference)
+        viewportSize = containerSize
     }
 
     /*@VisibleForTesting*/

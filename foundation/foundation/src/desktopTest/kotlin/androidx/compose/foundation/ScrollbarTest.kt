@@ -17,6 +17,7 @@
 package androidx.compose.foundation
 
 import androidx.compose.foundation.gestures.LocalScrollConfig
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollConfig
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -24,8 +25,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -38,6 +41,8 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.TextFieldScrollState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
@@ -45,11 +50,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.platform.testTag
@@ -57,12 +64,16 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MouseInjectionScope
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
+import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.DesktopComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performMouseInput
+import androidx.compose.ui.test.pressKey
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
@@ -370,28 +381,13 @@ class ScrollbarTest {
             // the height of the content (400.dp). So clicking on the top half of the scrollbar
             // should do nothing.
             for (offset in 1..50){
-                // Use moveTo -> press -> awaitIdle -> test -> release because click doesn't work
-                rule.onNodeWithTag("scrollbar").performMouseInput {
-                    moveTo(position = Offset(0f, offset.toFloat()))
-                    press()
-                }
-                rule.awaitIdle()
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, offset.toFloat()))
                 assertEquals(0, scrollState.value)
-                rule.onNodeWithTag("scrollbar").performMouseInput {
-                    release()
-                }
             }
 
             // Clicking one pixel below the thumb should scroll the content by one viewport
-            rule.onNodeWithTag("scrollbar").performMouseInput {
-                moveTo(position = Offset(0f, 51f))
-                press()
-            }
-            rule.awaitIdle()
+            rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 51f))
             assertEquals(200, scrollState.value)
-            rule.onNodeWithTag("scrollbar").performMouseInput {
-                release()
-            }
         }
     }
 
@@ -769,17 +765,13 @@ class ScrollbarTest {
             rule.onNodeWithTag("box59").assertTopPositionInRootIsEqualTo(180.dp)
 
             // Press above the scrollbar and test the new position
-            rule.onNodeWithTag("scrollbar").performMouseInput {
-                moveTo(Offset(0f, 0f))
-                press()
-            }
-            rule.awaitIdle()
+            rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 0f))
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
         }
     }
 
     @Test
-    fun `test empty lazy list`(){
+    fun `test empty lazy list`() {
         runBlocking(Dispatchers.Main) {
             rule.setContent {
                 LazyListTestBox(
@@ -793,11 +785,206 @@ class ScrollbarTest {
                 instantDrag(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
-            rule.onNodeWithTag("scrollbar").performMouseInput {
-                moveTo(Offset(0f, 0f))
-                press()
+            rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 0f))
+        }
+    }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    private inline fun TextFieldScrollState.assertChangeInOffset(
+        expectedChange: Float,
+        action: () -> Unit
+    ){
+        val before = offset
+        action()
+        assertEquals(expectedChange, offset - before)
+    }
+
+    @Test
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+    fun `basic text field with vertical scrolling test`() {
+        runBlocking(Dispatchers.Main) {
+            val scrollState = TextFieldScrollState(Orientation.Vertical)
+            rule.setContent {
+                // Set up a text field that is exactly 10 lines tall, with text that has 20 lines,
+                // Scrollbar thumb should be 50.dp -- half the scrollbar height
+                Row{
+                    Box(
+                        modifier = Modifier.width(100.dp)
+                    ){
+                        var text by remember {
+                            mutableStateOf(
+                                TextFieldValue(
+                                    buildString {
+                                        repeat(19) { // 20 lines including the last empty one
+                                            append("A\n")
+                                        }
+                                    }
+                                )
+                            )
+                        }
+                        BasicTextField(
+                            value = text,
+                            onValueChange = {
+                                text = it
+                            },
+                            scrollState = scrollState,
+                            maxLines = 10,  // Make sure not to give the text field any pixel height
+                            modifier = Modifier
+                                .testTag("textfield"),
+                        )
+                    }
+
+                    VerticalScrollbar(
+                        adapter = rememberScrollbarAdapter(scrollState),
+                        modifier = Modifier
+                            .width(10.dp)
+                            .height(100.dp)
+                            .testTag("scrollbar")
+                    )
+                }
             }
             rule.awaitIdle()
+
+            // Click to focus
+            rule.onNodeWithTag("textfield").performMouseInput {
+                click(Offset(0f, 0f))
+            }
+            rule.awaitIdle()
+
+            suspend fun pressDownAndAwaitIdle(){
+                rule.onNodeWithTag("textfield").performKeyInput {
+                    pressKey(Key.DirectionDown)
+                }
+                rule.awaitIdle()
+            }
+
+            // Press "down" 9 times, which should bring the caret to the last visible line
+            repeat(9){
+                pressDownAndAwaitIdle()
+            }
+            // Scroll offset should not change yet
+            assertEquals(0f, scrollState.offset)
+
+            // The scrollbar thumb should still be at the top, so clicking at 0 shouldn't change
+            // the scroll offset
+            scrollState.assertChangeInOffset(0f){
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 0f))
+            }
+
+            // Press "down" one more time, which should bring the caret to the 11th line, and cause
+            // the text field to scroll down by one line (out of a possible 10)
+            pressDownAndAwaitIdle()
+            assertEquals(10f, scrollState.maxOffset / scrollState.offset)
+
+            // The scrollbar thumb should move by 1/10th of its range, which is 50 pixels, so
+            // clicking on the 5th pixel should do nothing
+            scrollState.assertChangeInOffset(0f){
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 5f))
+            }
+
+            // But clicking on the 4th pixel should scroll to top
+            scrollState.assertChangeInOffset(-scrollState.offset){
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 4f))
+            }
+
+            // Press down 9 more times to reach the bottom
+            repeat(9){
+                pressDownAndAwaitIdle()
+            }
+            assertEquals(scrollState.maxOffset, scrollState.offset)
+
+            // The scrollbar thumb should move to the bottom, so clicking on the 50th pixel should
+            // do nothing
+            scrollState.assertChangeInOffset(0f){
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 50f))
+            }
+
+            // But clicking on the 49th pixel should scroll to the very top
+            scrollState.assertChangeInOffset(-scrollState.offset){
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 49f))
+            }
+        }
+    }
+
+    @Test
+    @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
+    fun `basic text field with horizontal scrolling test`() {
+        runBlocking(Dispatchers.Main) {
+            val scrollState = TextFieldScrollState(Orientation.Horizontal)
+            rule.setContent {
+                // Set up a single-line text field with 100 characters of text and 100 pixels of
+                // width so the text has to scroll significantly.
+                // We won't be doing exact measurements in this test, due to the difficulty in
+                // measuring text width.
+                Column(
+                    modifier = Modifier
+                        .width(100.dp)
+                        .height(100.dp)
+                ){
+                    var text by remember {
+                        mutableStateOf(
+                            TextFieldValue(
+                                buildString {
+                                    repeat(100) {
+                                        append("A")
+                                    }
+                                }
+                            )
+                        )
+                    }
+                    BasicTextField(
+                        value = text,
+                        onValueChange = {
+                            text = it
+                        },
+                        scrollState = scrollState,
+                        singleLine = true,
+                        modifier = Modifier
+                            .testTag("textfield"),
+                    )
+
+                    HorizontalScrollbar(
+                        adapter = rememberScrollbarAdapter(scrollState),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(10.dp)
+                            .testTag("scrollbar")
+                    )
+                }
+            }
+            rule.awaitIdle()
+
+            // Click to focus
+            rule.onNodeWithTag("textfield").performMouseInput {
+                click(Offset(0f, 0f))
+            }
+            rule.awaitIdle()
+
+            suspend fun pressRightAndAwaitIdle(){
+                rule.onNodeWithTag("textfield").performKeyInput {
+                    pressKey(Key.DirectionRight)
+                }
+                rule.awaitIdle()
+            }
+
+            // Press "right" 100 times, which should bring the caret to the very end
+            repeat(100){
+                pressRightAndAwaitIdle()
+            }
+            assertEquals(scrollState.offset, scrollState.maxOffset)
+
+            // The scrollbar thumb should still be at the end, so clicking at the last pixel
+            // shouldn't change the scroll offset
+            scrollState.assertChangeInOffset(0f){
+                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(99f, 0f))
+            }
+
+            // Dragging the scrollbar to the very left should reset the scroll offset to 0
+            scrollState.assertChangeInOffset(-scrollState.offset){
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    instantDrag(start = Offset(99f, 0f), end = Offset(0f, 0f))
+                }
+            }
         }
     }
 
@@ -991,6 +1178,22 @@ class ScrollbarTest {
         press()
         moveTo(end)
         release()
+    }
+
+    /**
+     * A "click" for scrolling scrollbars.
+     * TODO: figure out why [MouseInjectionScope.click] doesn't work to scroll a scrollbar.
+     */
+    private suspend fun ComposeContentTestRule.clickScrollbarAndAwaitIdle(tag: String, position: Offset){
+        onNodeWithTag(tag).performMouseInput {
+            moveTo(position)
+            press()
+        }
+        awaitIdle()
+        onNodeWithTag(tag).performMouseInput {
+            release()
+        }
+        awaitIdle()
     }
 
     @Composable

@@ -29,10 +29,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.TextFieldScrollState
 import androidx.compose.foundation.v2.LazyGridScrollbarAdapter
 import androidx.compose.foundation.v2.LazyListScrollbarAdapter
 import androidx.compose.foundation.v2.ScrollableScrollbarAdapter
 import androidx.compose.foundation.v2.SliderAdapter
+import androidx.compose.foundation.v2.TextFieldScrollbarAdapter
 import androidx.compose.foundation.v2.maxScrollOffset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
@@ -569,8 +571,6 @@ fun OldScrollbarAdapter(
  *
  * [scrollState] is instance of [LazyListState] which is used by scrollable component
  *
- * Scrollbar size and position will be dynamically changed on the current visible content.
- *
  * Example:
  *     Box(Modifier.fillMaxSize()) {
  *         val state = rememberLazyListState()
@@ -635,6 +635,19 @@ fun rememberScrollbarAdapter(
 }
 
 /**
+ * Create and [remember] [androidx.compose.foundation.v2.ScrollbarAdapter] for text field with
+ * the given instance of [TextFieldScrollState].
+ */
+@ExperimentalFoundationApi
+@JvmName("rememberScrollbarAdapter2")
+@Composable
+fun rememberScrollbarAdapter(
+    scrollState: TextFieldScrollState,
+): androidx.compose.foundation.v2.ScrollbarAdapter = remember(scrollState) {
+    ScrollbarAdapter(scrollState)
+}
+
+/**
  * ScrollbarAdapter for Modifier.verticalScroll and Modifier.horizontalScroll
  *
  * [scrollState] is instance of [ScrollState] which is used by scrollable component
@@ -663,8 +676,6 @@ fun ScrollbarAdapter(
  *
  * [scrollState] is instance of [LazyListState] which is used by scrollable component
  *
- * Scrollbar size and position will be dynamically changed on the current visible content.
- *
  * Example:
  *     Box(Modifier.fillMaxSize()) {
  *         val state = rememberLazyListState()
@@ -689,8 +700,6 @@ fun ScrollbarAdapter(
  *
  * [scrollState] is instance of [LazyGridState] which is used by scrollable component
  *
- * Scrollbar size and position will be dynamically changed on the current visible content.
- *
  * Example:
  *     Box(Modifier.fillMaxSize()) {
  *         val state = rememberLazyGridState()
@@ -709,6 +718,35 @@ fun ScrollbarAdapter(
 fun ScrollbarAdapter(
     scrollState: LazyGridState
 ): androidx.compose.foundation.v2.ScrollbarAdapter = LazyGridScrollbarAdapter(scrollState)
+
+/**
+ * ScrollbarAdapter for text fields.
+ *
+ * [scrollState] is instance of [TextFieldScrollState] which is used by scrollable component
+ *
+ * Example:
+ *     Box(Modifier.fillMaxSize()) {
+ *         val scrollState = rememberTextFieldVerticalScrollState()
+ *
+ *         BasicTextField(
+ *             value = ...,
+ *             onValueChange = ...,
+ *             scrollState = state
+ *         ) {
+ *             ...
+ *         }
+ *
+ *         VerticalScrollbar(
+ *             adapter = rememberScrollbarAdapter(scrollState)
+ *             modifier = Modifier.align(Alignment.CenterEnd).fillMaxHeight(),
+ *         )
+ *     }
+ */
+@ExperimentalFoundationApi
+@JvmName("ScrollbarAdapter2")
+fun ScrollbarAdapter(
+    scrollState: TextFieldScrollState
+): androidx.compose.foundation.v2.ScrollbarAdapter = TextFieldScrollbarAdapter(scrollState)
 
 /**
  * Defines how to scroll the scrollable component
