@@ -82,4 +82,9 @@ interface LazyListLayoutInfo {
      * For example it is a bottom content padding for LazyColumn with reverseLayout set to false.
      */
     val afterContentPadding: Int get() = 0
+
+    /**
+     * The spacing between items in the direction of scrolling.
+     */
+    val mainAxisItemSpacing: Int get() = 0
 }
