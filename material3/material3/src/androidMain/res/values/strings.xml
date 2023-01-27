@@ -56,4 +56,20 @@
     <string name="date_picker_switch_to_input_mode">Switch to text input mode</string>
     <!-- Spoken description of a tooltip -->
     <string name="tooltip_long_press_label">Show tooltip</string>
+    <!-- Suffix for time in 12-hour standard, after noon. [CHAR_LIMIT=2]" -->
+    <string name="time_picker_pm">PM</string>
+    <!-- Suffix for time in 12-hour standard, before noon. [CHAR_LIMIT=2]" -->
+    <string name="time_picker_am">AM</string>
+    <!-- Description for the toggle to choose between AM and PM [CHAR_LIMIT=NONE] -->
+    <string name="time_picker_period_toggle_description">Select AM or PM</string>
+    <!-- Description for button to switch to select the hour [CHAR_LIMIT=NONE] -->
+    <string name="time_picker_hour_selection">Select hour</string>
+    <!-- Description for button to switch to select the minute [CHAR_LIMIT=NONE] -->
+    <string name="time_picker_minute_selection">Select minutes</string>
+    <!-- Spoken suffix for an hour in the clock [CHAR_LIMIT=10] -->
+    <string name="time_picker_hour_suffix">%1$d o\'clock</string>
+    <!-- Spoken suffix for an hour in the 24-hour clock [CHAR_LIMIT=10] -->
+    <string name="time_picker_hour_24h_suffix">%1$d hours</string>
+    <!-- Spoken suffix for an amount of minutes in the clock [CHAR_LIMIT=16] -->
+    <string name="time_picker_minute_suffix">%1$d minutes</string>
 </resources>

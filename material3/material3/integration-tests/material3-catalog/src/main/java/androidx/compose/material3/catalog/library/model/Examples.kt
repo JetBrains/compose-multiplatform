@@ -135,6 +135,7 @@ import androidx.compose.material3.samples.TextFieldWithPlaceholder
 import androidx.compose.material3.samples.TextFieldWithSupportingText
 import androidx.compose.material3.samples.TextTabs
 import androidx.compose.material3.samples.ThreeLineListItem
+import androidx.compose.material3.samples.TimePickerSample
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.material3.samples.TwoLineListItem
 import androidx.compose.runtime.Composable
@@ -908,6 +909,18 @@ val TabsExamples = listOf(
     ) {
         ScrollingFancyIndicatorContainerTabs()
     }
+)
+
+private const val TimePickerDescription = "Time Picker examples"
+private const val TimePickerSourceUrl = "$SampleSourceUrl/TimePicker.kt"
+val TimePickerExamples = listOf(
+    Example(
+        name = ::TimePickerSample.name,
+        description = TimePickerDescription,
+        sourceUrl = TimePickerSourceUrl
+    ) {
+        TimePickerSample()
+    },
 )
 
 private const val TextFieldsExampleDescription = "Text fields examples"
