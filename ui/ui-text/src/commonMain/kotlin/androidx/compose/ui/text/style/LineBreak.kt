@@ -17,6 +17,7 @@
 package androidx.compose.ui.text.style
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.style.LineBreak.Companion.Heading
 import androidx.compose.ui.text.style.LineBreak.Companion.Paragraph
 import androidx.compose.ui.text.style.LineBreak.Companion.Simple
@@ -41,24 +42,29 @@ import androidx.compose.ui.text.style.LineBreak.Companion.Simple
  * @sample androidx.compose.ui.text.samples.AndroidLineBreakSample
  */
 @Immutable
-expect class LineBreak {
+expect value class LineBreak private constructor(
+    private val mask: Int
+) {
     companion object {
         /**
          * Basic, fast line breaking. Ideal for text input fields, as it will cause minimal
          * text reflow when editing.
          */
+        @Stable
         val Simple: LineBreak
 
         /**
          * Looser breaking rules, suitable for short text such as titles or narrow newspaper
          * columns. For longer lines of text, use [Paragraph] for improved readability.
          */
+        @Stable
         val Heading: LineBreak
 
         /**
          * Slower, higher quality line breaking for improved readability.
          * Suitable for larger amounts of text.
          */
+        @Stable
         val Paragraph: LineBreak
     }
 }

@@ -1368,9 +1368,9 @@ package androidx.compose.ui.text.style {
     property public final int None;
   }
 
-  @androidx.compose.runtime.Immutable public final class LineBreak {
+  @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class LineBreak {
     ctor public LineBreak(int strategy, int strictness, int wordBreak);
-    method public androidx.compose.ui.text.style.LineBreak copy(optional int strategy, optional int strictness, optional int wordBreak);
+    method public int copy(optional int strategy, optional int strictness, optional int wordBreak);
     method public int getStrategy();
     method public int getStrictness();
     method public int getWordBreak();
@@ -1381,12 +1381,12 @@ package androidx.compose.ui.text.style {
   }
 
   public static final class LineBreak.Companion {
-    method public androidx.compose.ui.text.style.LineBreak getHeading();
-    method public androidx.compose.ui.text.style.LineBreak getParagraph();
-    method public androidx.compose.ui.text.style.LineBreak getSimple();
-    property public final androidx.compose.ui.text.style.LineBreak Heading;
-    property public final androidx.compose.ui.text.style.LineBreak Paragraph;
-    property public final androidx.compose.ui.text.style.LineBreak Simple;
+    method public int getHeading();
+    method public int getParagraph();
+    method public int getSimple();
+    property public final int Heading;
+    property public final int Paragraph;
+    property public final int Simple;
   }
 
   @kotlin.jvm.JvmInline public static final value class LineBreak.Strategy {
@@ -1426,6 +1426,9 @@ package androidx.compose.ui.text.style {
     method public int getPhrase();
     property public final int Default;
     property public final int Phrase;
+  }
+
+  public final class LineBreak_androidKt {
   }
 
   public final class LineHeightStyle {

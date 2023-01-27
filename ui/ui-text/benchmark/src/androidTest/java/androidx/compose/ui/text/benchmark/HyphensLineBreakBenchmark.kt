@@ -39,8 +39,8 @@ import org.junit.runners.Parameterized
 @OptIn(ExperimentalTextApi::class, InternalPlatformTextApi::class)
 class HyphensLineBreakBenchmark(
     private val textLength: Int,
-    private val hyphensWrapper: HyphensWrapper,
-    private val lineBreak: LineBreak
+    private val hyphensString: String,
+    private val lineBreakString: String
 ) {
     companion object {
         @JvmStatic
@@ -48,8 +48,15 @@ class HyphensLineBreakBenchmark(
         fun initParameters(): List<Array<Any?>> {
             return cartesian(
                 arrayOf(32, 128, 512),
-                arrayOf(Hyphens.None.wrap, Hyphens.Auto.wrap),
-                arrayOf(LineBreak.Paragraph, LineBreak.Simple, LineBreak.Heading)
+                arrayOf(
+                    Hyphens.None.toTestString(),
+                    Hyphens.Auto.toTestString()
+                ),
+                arrayOf(
+                    LineBreak.Paragraph.toTestString(),
+                    LineBreak.Simple.toTestString(),
+                    LineBreak.Heading.toTestString()
+                )
             )
         }
     }
@@ -62,10 +69,11 @@ class HyphensLineBreakBenchmark(
 
     private val width = 100
     private val textSize: Float = 10F
-    private val hyphenationFrequency = toLayoutHyphenationFrequency(hyphensWrapper.hyphens)
-    private val lineBreakStyle = toLayoutLineBreakStyle(lineBreak.strictness)
-    private val breakStrategy = toLayoutBreakStrategy(lineBreak.strategy)
-    private val lineBreakWordStyle = toLayoutLineBreakWordStyle(lineBreak.wordBreak)
+    private val hyphenationFrequency = toLayoutHyphenationFrequency(hyphensString.toHyphens())
+    private val lineBreakStyle = toLayoutLineBreakStyle(lineBreakString.toLineBreak().strictness)
+    private val breakStrategy = toLayoutBreakStrategy(lineBreakString.toLineBreak().strategy)
+    private val lineBreakWordStyle =
+        toLayoutLineBreakWordStyle(lineBreakString.toLineBreak().wordBreak)
 
     @Test
     fun constructLayout() {
@@ -143,8 +151,35 @@ class HyphensLineBreakBenchmark(
 /**
  * Required to make this test work due to a bug with value classes and Parameterized JUnit tests.
  * https://youtrack.jetbrains.com/issue/KT-35523
+ *
+ * However, it's not enough to use a wrapper because wrapper makes the test name unnecessarily
+ * long which causes Perfetto to be unable to create output files with a very long name in some
+ * file systems.
+ *
+ * Using a String instead of an Integer gives us a better test naming.
  */
-data class HyphensWrapper(val hyphens: Hyphens)
+private fun String.toLineBreak(): LineBreak = when (this) {
+    "Simple" -> LineBreak.Simple
+    "Heading" -> LineBreak.Heading
+    "Paragraph" -> LineBreak.Paragraph
+    else -> throw IllegalArgumentException("Unrecognized LineBreak value for this test")
+}
 
-val Hyphens.wrap: HyphensWrapper
-    get() = HyphensWrapper(this)
+private fun LineBreak.toTestString(): String = when (this) {
+    LineBreak.Simple -> "Simple"
+    LineBreak.Heading -> "Heading"
+    LineBreak.Paragraph -> "Paragraph"
+    else -> throw IllegalArgumentException("Unrecognized LineBreak value for this test")
+}
+
+private fun String.toHyphens(): Hyphens = when (this) {
+    "None" -> Hyphens.None
+    "Auto" -> Hyphens.Auto
+    else -> throw IllegalArgumentException("Unrecognized Hyphens value for this test")
+}
+
+private fun Hyphens.toTestString(): String = when (this) {
+    Hyphens.None -> "None"
+    Hyphens.Auto -> "Auto"
+    else -> throw IllegalArgumentException("Unrecognized Hyphens value for this test")
+}
