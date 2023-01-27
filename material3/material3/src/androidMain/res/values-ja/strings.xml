@@ -33,4 +33,13 @@
     <string name="date_picker_headline_description" msgid="4627306862713137085">"現在の選択: %1$s"</string>
     <string name="date_picker_no_selection_description" msgid="5724377114289981899">"なし"</string>
     <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"年の選択ツールの表示"</string>
+    <string name="date_input_title" msgid="3010396677286327048">"日付を選択"</string>
+    <string name="date_input_headline" msgid="3499643850558715142">"入力された日付"</string>
+    <string name="date_input_label" msgid="5194825853981987218">"日付"</string>
+    <string name="date_input_headline_description" msgid="8562356184193964298">"入力された日付: %1$s"</string>
+    <string name="date_input_no_input_description" msgid="5722931102250207748">"なし"</string>
+    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"許可されていない日付です: %1$s"</string>
+    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"想定されるパターンと日付が一致しません: %1$s"</string>
+    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"想定される年の範囲（%1$s～%2$s）から日付が外れています"</string>
+    <string name="tooltip_long_press_label" msgid="2732804537909054941">"ツールチップを表示します"</string>
 </resources>
