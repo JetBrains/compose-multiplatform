@@ -1059,6 +1059,15 @@ sealed interface Composer {
     val composition: ControlledComposition
         @TestOnly get
 
+    /**
+     * Disable the collection of source information, that may introduce groups to store the source
+     * information, in order to be able to more accurately calculate the actual number of groups a
+     * composable function generates in a release build.
+     *
+     * This function is only safe to call in a test and will produce incorrect composition results
+     * if called on a composer not under test.
+     */
+    @TestOnly
     fun disableSourceInformation()
 
     companion object {
