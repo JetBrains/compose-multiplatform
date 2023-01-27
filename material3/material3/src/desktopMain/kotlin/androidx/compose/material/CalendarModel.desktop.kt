@@ -21,10 +21,10 @@ import androidx.compose.runtime.ReadOnlyComposable
 import java.util.Locale
 
 /**
- * Creates a [CalendarModel] to be used by the date picker.
+ * Returns a [CalendarModel] to be used by the date picker.
  */
 @ExperimentalMaterial3Api
-internal actual fun createCalendarModel(): CalendarModel = LegacyCalendarModelImpl()
+internal actual fun CalendarModel(): CalendarModel = LegacyCalendarModelImpl()
 
 /**
  * Formats a UTC timestamp into a string with a given date format skeleton.

@@ -24,7 +24,7 @@ import java.util.Locale
  * Creates a [CalendarModel] to be used by the date picker.
  */
 @ExperimentalMaterial3Api
-internal expect fun createCalendarModel(): CalendarModel
+internal expect fun CalendarModel(): CalendarModel
 
 /**
  * Formats a UTC timestamp into a string with a given date format skeleton.
