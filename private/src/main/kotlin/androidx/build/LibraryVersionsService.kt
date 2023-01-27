@@ -29,14 +29,22 @@ import org.tomlj.TomlTable
  */
 abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Parameters> {
     interface Parameters : BuildServiceParameters {
-        var tomlFile: Provider<String>
+        var tomlFileName: String
+        var tomlFileContents: Provider<String>
         var composeCustomVersion: Provider<String>
         var composeCustomGroup: Provider<String>
         var useMultiplatformGroupVersions: Provider<Boolean>
     }
 
     private val parsedTomlFile: TomlParseResult by lazy {
-        Toml.parse(parameters.tomlFile.get())
+        val result = Toml.parse(parameters.tomlFileContents.get())
+        if (result.hasErrors()) {
+            val issues = result.errors().map {
+                "${parameters.tomlFileName}:${it.position()}: ${it.message}"
+            }.joinToString(separator = "\n")
+            throw Exception("${parameters.tomlFileName} file has issues.\n$issues")
+        }
+        result
     }
 
     val useMultiplatformGroupVersions

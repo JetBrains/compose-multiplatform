@@ -46,7 +46,8 @@ open class AndroidXExtension(val project: Project) {
     private val versionService: LibraryVersionsService
 
     init {
-        val toml = lazyReadFile("libraryversions.toml")
+        val tomlFileName = "libraryversions.toml"
+        val toml = lazyReadFile(tomlFileName)
 
         // These parameters are used when building pre-release binaries for androidxdev.
         // These parameters are only expected to be compatible with :compose:compiler:compiler .
@@ -60,7 +61,8 @@ open class AndroidXExtension(val project: Project) {
             "libraryVersionsService",
             LibraryVersionsService::class.java
         ) { spec ->
-            spec.parameters.tomlFile = toml
+            spec.parameters.tomlFileName = tomlFileName
+            spec.parameters.tomlFileContents = toml
             spec.parameters.composeCustomVersion = composeCustomVersion
             spec.parameters.composeCustomGroup = composeCustomGroup
             spec.parameters.useMultiplatformGroupVersions = project.provider {
