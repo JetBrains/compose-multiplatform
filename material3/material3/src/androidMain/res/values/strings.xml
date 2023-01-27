@@ -40,6 +40,7 @@
     <string name="date_picker_navigate_to_year_description">Navigate to year %1$s</string>
     <string name="date_picker_headline_description">Current selection: %1$s</string>
     <string name="date_picker_no_selection_description">None</string>
+    <string name="date_picker_today_description">Today</string>
     <string name="date_picker_year_picker_pane_title">Year picker visible</string>
     <string name="date_input_title">Select date</string>
     <string name="date_input_headline">Entered date</string>
@@ -51,6 +52,8 @@
     <string name="date_input_invalid_year_range">
         Date out of expected year range %1$s - %2$s
     </string>
+    <string name="date_picker_switch_to_calendar_mode">Switch to calendar input mode</string>
+    <string name="date_picker_switch_to_input_mode">Switch to text input mode</string>
     <!-- Spoken description of a tooltip -->
     <string name="tooltip_long_press_label">Show tooltip</string>
 </resources>
