@@ -1425,15 +1425,15 @@ package androidx.compose.ui.text.style {
     method @androidx.compose.runtime.Stable public static float lerp(float start, float stop, float fraction);
   }
 
-  public final class Hyphens {
+  @kotlin.jvm.JvmInline public final value class Hyphens {
     field public static final androidx.compose.ui.text.style.Hyphens.Companion Companion;
   }
 
   public static final class Hyphens.Companion {
-    method public androidx.compose.ui.text.style.Hyphens getAuto();
-    method public androidx.compose.ui.text.style.Hyphens getNone();
-    property public final androidx.compose.ui.text.style.Hyphens Auto;
-    property public final androidx.compose.ui.text.style.Hyphens None;
+    method public int getAuto();
+    method public int getNone();
+    property public final int Auto;
+    property public final int None;
   }
 
   @androidx.compose.runtime.Immutable public final class LineBreak {

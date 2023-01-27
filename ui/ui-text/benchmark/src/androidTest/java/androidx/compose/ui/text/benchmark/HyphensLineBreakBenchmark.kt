@@ -39,7 +39,7 @@ import org.junit.runners.Parameterized
 @OptIn(ExperimentalTextApi::class, InternalPlatformTextApi::class)
 class HyphensLineBreakBenchmark(
     private val textLength: Int,
-    private val hyphens: Hyphens,
+    private val hyphensWrapper: HyphensWrapper,
     private val lineBreak: LineBreak
 ) {
     companion object {
@@ -48,7 +48,7 @@ class HyphensLineBreakBenchmark(
         fun initParameters(): List<Array<Any?>> {
             return cartesian(
                 arrayOf(32, 128, 512),
-                arrayOf(Hyphens.None, Hyphens.Auto),
+                arrayOf(Hyphens.None.wrap, Hyphens.Auto.wrap),
                 arrayOf(LineBreak.Paragraph, LineBreak.Simple, LineBreak.Heading)
             )
         }
@@ -62,7 +62,7 @@ class HyphensLineBreakBenchmark(
 
     private val width = 100
     private val textSize: Float = 10F
-    private val hyphenationFrequency = toLayoutHyphenationFrequency(hyphens)
+    private val hyphenationFrequency = toLayoutHyphenationFrequency(hyphensWrapper.hyphens)
     private val lineBreakStyle = toLayoutLineBreakStyle(lineBreak.strictness)
     private val breakStrategy = toLayoutBreakStrategy(lineBreak.strategy)
     private val lineBreakWordStyle = toLayoutLineBreakWordStyle(lineBreak.wordBreak)
@@ -139,3 +139,12 @@ class HyphensLineBreakBenchmark(
             else -> LayoutCompat.LINE_BREAK_WORD_STYLE_NONE
         }
 }
+
+/**
+ * Required to make this test work due to a bug with value classes and Parameterized JUnit tests.
+ * https://youtrack.jetbrains.com/issue/KT-35523
+ */
+data class HyphensWrapper(val hyphens: Hyphens)
+
+val Hyphens.wrap: HyphensWrapper
+    get() = HyphensWrapper(this)
