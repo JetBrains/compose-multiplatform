@@ -205,6 +205,7 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
         rule.runOnIdle { assertThat(sentEvent).isEqualTo(receivedEvent) }
     }
 
+    @Ignore("b/264466323")
     @Test
     fun onPreFocusAwareEvent_triggered() {
         // Arrange.
