@@ -985,7 +985,7 @@ package androidx.compose.material.pullrefresh {
 
   public final class PullRefreshKt {
     method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.ui.Modifier pullRefresh(androidx.compose.ui.Modifier, androidx.compose.material.pullrefresh.PullRefreshState state, optional boolean enabled);
-    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.ui.Modifier pullRefresh(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> onPull, kotlin.jvm.functions.Function2<? super java.lang.Float,? super kotlin.coroutines.Continuation<? super kotlin.Unit>,?> onRelease, optional boolean enabled);
+    method @androidx.compose.material.ExperimentalMaterialApi public static androidx.compose.ui.Modifier pullRefresh(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super java.lang.Float,java.lang.Float> onPull, kotlin.jvm.functions.Function2<? super java.lang.Float,? super kotlin.coroutines.Continuation<? super java.lang.Float>,?> onRelease, optional boolean enabled);
   }
 
   @androidx.compose.material.ExperimentalMaterialApi public final class PullRefreshState {

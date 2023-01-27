@@ -136,14 +136,25 @@ class PullRefreshState internal constructor(
         return dragConsumed
     }
 
-    internal fun onRelease() {
-        if (!_refreshing) {
-            if (adjustedDistancePulled > threshold) {
-                onRefreshState.value()
-            }
-            animateIndicatorTo(0f)
+    internal fun onRelease(velocity: Float): Float {
+        if (refreshing) return 0f // Already refreshing, do nothing
+
+        if (adjustedDistancePulled > threshold) {
+            onRefreshState.value()
+        }
+        animateIndicatorTo(0f)
+        val consumed = when {
+            // We are flinging without having dragged the pull refresh (for example a fling inside
+            // a list) - don't consume
+            distancePulled == 0f -> 0f
+            // If the velocity is negative, the fling is upwards, and we don't want to prevent the
+            // the list from scrolling
+            velocity < 0f -> 0f
+            // We are showing the indicator, and the fling is downwards - consume everything
+            else -> velocity
         }
         distancePulled = 0f
+        return consumed
     }
 
     internal fun setRefreshing(refreshing: Boolean) {
