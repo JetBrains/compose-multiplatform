@@ -105,6 +105,16 @@ sealed interface LazyStaggeredGridLayoutInfo {
     val afterContentPadding: Int
 }
 
+/**
+ * The spacing between lines in scroll direction.
+ */
+// This is part of the LazyListLayoutInfo interface upstream with commit
+// 2fb3084cd9d48755c92c6b4876b6d5bb77d7a8f2
+// Once we rebase over that commit, this should be removed
+@OptIn(ExperimentalFoundationApi::class)
+internal val LazyStaggeredGridLayoutInfo.mainAxisItemSpacing: Int
+    get() = if (this is LazyStaggeredGridMeasureResult) mainAxisItemSpacingInternal else 0
+
 @OptIn(ExperimentalFoundationApi::class)
 internal fun LazyStaggeredGridLayoutInfo.findVisibleItem(
     itemIndex: Int
@@ -135,7 +145,8 @@ internal class LazyStaggeredGridMeasureResult(
     override val viewportStartOffset: Int,
     override val viewportEndOffset: Int,
     override val beforeContentPadding: Int,
-    override val afterContentPadding: Int
+    override val afterContentPadding: Int,
+    val mainAxisItemSpacingInternal: Int
 ) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult
 
 @OptIn(ExperimentalFoundationApi::class)

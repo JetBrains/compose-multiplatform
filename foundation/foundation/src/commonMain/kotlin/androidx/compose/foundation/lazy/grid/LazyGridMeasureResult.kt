@@ -51,7 +51,9 @@ internal class LazyGridMeasureResult(
     /** see [LazyGridLayoutInfo.orientation] */
     override val orientation: Orientation,
     /** see [LazyGridLayoutInfo.afterContentPadding] */
-    override val afterContentPadding: Int
+    override val afterContentPadding: Int,
+    /** see [LazyGridLayoutInfo.mainAxisItemSpacing] */
+    val mainAxisItemSpacingInternal: Int
 ) : LazyGridLayoutInfo, MeasureResult by measureResult {
     override val viewportSize: IntSize
         get() = IntSize(width, height)

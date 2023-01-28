@@ -74,7 +74,8 @@ internal fun measureLazyGrid(
             totalItemsCount = 0,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacingInternal = spaceBetweenLines
         )
     } else {
         var currentFirstLineIndex = firstVisibleLineIndex
@@ -262,7 +263,8 @@ internal fun measureLazyGrid(
             totalItemsCount = itemsCount,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacingInternal = spaceBetweenLines
         )
     }
 }
