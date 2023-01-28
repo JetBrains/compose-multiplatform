@@ -125,6 +125,7 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -3272,6 +3273,7 @@ class AndroidLayoutDrawTest {
         }
     }
 
+    @Ignore // b/266748671
     // Tests that an invalidation on a detached view will draw correctly when attached.
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test

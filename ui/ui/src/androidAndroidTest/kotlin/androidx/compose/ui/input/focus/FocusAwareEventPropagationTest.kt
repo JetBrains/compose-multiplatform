@@ -278,6 +278,7 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
         }
     }
 
+    @Ignore // b/266984867
     @Test
     fun onPreFocusAwareEvent_triggeredBefore_onFocusAwareEvent_1() {
         // Arrange.

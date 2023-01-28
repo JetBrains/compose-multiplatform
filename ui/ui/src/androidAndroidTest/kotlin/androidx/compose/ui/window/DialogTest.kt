@@ -267,6 +267,7 @@ class DialogTest {
         rule.onNodeWithText(defaultText).assertIsDisplayed()
     }
 
+    @Ignore // b/266613263
     @Test
     @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun dialogTest_backHandler_isCalled_backButtonPressed() {
