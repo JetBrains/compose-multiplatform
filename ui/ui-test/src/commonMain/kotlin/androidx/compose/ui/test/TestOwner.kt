@@ -19,8 +19,8 @@ package androidx.compose.ui.test
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.getAllSemanticsNodes
-import androidx.compose.ui.text.input.EditCommand
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.input.TextInputForTests
 
 /**
  * Provides necessary services to facilitate testing.
@@ -35,14 +35,11 @@ interface TestOwner {
     val mainClock: MainTestClock
 
     /**
-     * Sends the given list of text commands to the given semantics node.
+     * Runs [action] on the main thread to perform text input via the [TextInputForTests] for the
+     * active text input service for the given semantics node.
      */
-    fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>)
-
-    /**
-     * Sends the given IME action to the given semantics node.
-     */
-    fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction)
+    @OptIn(ExperimentalTextApi::class)
+    fun performTextInput(node: SemanticsNode, action: TextInputForTests.() -> Unit)
 
     /**
      * Runs the given [action] on the ui thread.

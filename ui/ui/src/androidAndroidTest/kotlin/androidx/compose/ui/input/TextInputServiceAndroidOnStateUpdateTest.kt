@@ -56,8 +56,11 @@ class TextInputServiceAndroidOnStateUpdateTest {
         inputMethodManager = mock()
         // Choreographer must be retrieved on main thread.
         val choreographer = Espresso.onIdle { Choreographer.getInstance() }
-        textInputService =
-            TextInputServiceAndroid(view, inputMethodManager, choreographer.asExecutor())
+        textInputService = TextInputServiceAndroid(
+                view,
+                inputMethodManager,
+                inputCommandProcessorExecutor = choreographer.asExecutor()
+            )
         textInputService.startInput(
             value = TextFieldValue(""),
             imeOptions = ImeOptions.Default,

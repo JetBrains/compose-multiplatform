@@ -18,12 +18,10 @@ package androidx.compose.ui.test
 
 import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.semantics.SemanticsNode
-import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.CommitTextCommand
-import androidx.compose.ui.text.input.EditCommand
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.TextInputForTests
 
 /**
  * Clears the text in this node in similar way to IME.
@@ -37,8 +35,9 @@ fun SemanticsNodeInteraction.performTextClearance() {
  *
  * @param text Text to send.
  */
+@OptIn(ExperimentalTextApi::class)
 fun SemanticsNodeInteraction.performTextInput(text: String) {
-    sendTextInputCommand(listOf(CommitTextCommand(text, 1)))
+    performTextInput { inputTextForTest(text) }
 }
 
 /**
@@ -78,28 +77,25 @@ fun SemanticsNodeInteraction.performTextReplacement(text: String) {
  * focused)
  */
 // TODO(b/269633506) Use SemanticsAction for this when available.
+@OptIn(ExperimentalTextApi::class)
 fun SemanticsNodeInteraction.performImeAction() {
     val node = getNodeAndFocus("Failed to perform IME action.")
-    val actionSpecified = node.config.getOrElse(SemanticsProperties.ImeAction) {
-        ImeAction.Default
+    wrapAssertionErrorsWithNodeInfo(selector, node) {
+        @OptIn(InternalTestApi::class)
+        testContext.testOwner.performTextInput(node) {
+            submitTextForTest()
+        }
     }
-    if (actionSpecified == ImeAction.Default) {
-        throw AssertionError(
-            buildGeneralErrorMessage(
-                "Failed to perform IME action as current node does not specify any.", selector, node
-            )
-        )
-    }
-
-    @OptIn(InternalTestApi::class)
-    testContext.testOwner.sendImeAction(node, actionSpecified)
 }
 
-internal fun SemanticsNodeInteraction.sendTextInputCommand(command: List<EditCommand>) {
+@OptIn(ExperimentalTextApi::class)
+internal fun SemanticsNodeInteraction.performTextInput(action: TextInputForTests.() -> Unit) {
     val node = getNodeAndFocus()
 
-    @OptIn(InternalTestApi::class)
-    testContext.testOwner.sendTextInputCommand(node, command)
+    wrapAssertionErrorsWithNodeInfo(selector, node) {
+        @OptIn(InternalTestApi::class)
+        testContext.testOwner.performTextInput(node, action)
+    }
 }
 
 private fun SemanticsNodeInteraction.getNodeAndFocus(
@@ -114,4 +110,28 @@ private fun SemanticsNodeInteraction.getNodeAndFocus(
     }
 
     return node
+}
+
+private inline fun <R> wrapAssertionErrorsWithNodeInfo(
+    selector: SemanticsSelector,
+    node: SemanticsNode,
+    block: () -> R
+): R {
+    try {
+        return block()
+    } catch (e: AssertionError) {
+        throw ProxyAssertionError(e.message.orEmpty(), selector, node, e)
+    }
+}
+
+private class ProxyAssertionError(
+    message: String,
+    selector: SemanticsSelector,
+    node: SemanticsNode,
+    cause: Throwable
+) : AssertionError(buildGeneralErrorMessage(message, selector, node), cause) {
+    init {
+        // Duplicate the stack trace to make troubleshooting easier.
+        stackTrace = cause.stackTrace
+    }
 }

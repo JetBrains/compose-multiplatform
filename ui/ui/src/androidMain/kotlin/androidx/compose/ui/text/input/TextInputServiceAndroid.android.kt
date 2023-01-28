@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+@file:OptIn(ExperimentalTextApi::class)
+
 package androidx.compose.ui.text.input
 
 import android.graphics.Rect as AndroidRect
@@ -27,6 +29,7 @@ import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputConnection
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.HideKeyboard
 import androidx.compose.ui.text.input.TextInputServiceAndroid.TextInputCommand.ShowKeyboard
@@ -49,6 +52,7 @@ private const val DEBUG_CLASS = "TextInputServiceAndroid"
 internal class TextInputServiceAndroid(
     val view: View,
     private val inputMethodManager: InputMethodManager,
+    private val platformTextInput: PlatformTextInput? = null,
     private val inputCommandProcessorExecutor: Executor = Choreographer.getInstance().asExecutor(),
 ) : PlatformTextInputService {
 
@@ -62,12 +66,6 @@ internal class TextInputServiceAndroid(
         ShowKeyboard,
         HideKeyboard;
     }
-
-    /**
-     * True if the currently editable composable has connected. This is used to tell the platform
-     * when it asks if the compose view is a text editor.
-     */
-    private var editorHasFocus = false
 
     /**
      *  The following three observers are set when the editable composable has initiated the input
@@ -103,7 +101,11 @@ internal class TextInputServiceAndroid(
     private val textInputCommandQueue = mutableVectorOf<TextInputCommand>()
     private var frameCallback: Runnable? = null
 
-    internal constructor(view: View) : this(view, InputMethodManagerImpl(view))
+    constructor(view: View, context: PlatformTextInput? = null) : this(
+        view,
+        InputMethodManagerImpl(view),
+        context
+    )
 
     init {
         if (DEBUG) {
@@ -114,11 +116,7 @@ internal class TextInputServiceAndroid(
     /**
      * Creates new input connection.
      */
-    fun createInputConnection(outAttrs: EditorInfo): InputConnection? {
-        if (!editorHasFocus) {
-            return null
-        }
-
+    fun createInputConnection(outAttrs: EditorInfo): InputConnection {
         outAttrs.update(imeOptions, state)
         outAttrs.updateWithEmojiCompat()
 
@@ -155,11 +153,6 @@ internal class TextInputServiceAndroid(
         }
     }
 
-    /**
-     * Returns true if some editable component is focused.
-     */
-    fun isEditorFocused(): Boolean = editorHasFocus
-
     override fun startInput(
         value: TextFieldValue,
         imeOptions: ImeOptions,
@@ -170,7 +163,7 @@ internal class TextInputServiceAndroid(
             Log.d(TAG, "$DEBUG_CLASS.startInput")
         }
 
-        editorHasFocus = true
+        platformTextInput?.requestInputFocus()
         state = value
         this.imeOptions = imeOptions
         this.onEditCommand = onEditCommand
@@ -184,7 +177,7 @@ internal class TextInputServiceAndroid(
     override fun stopInput() {
         if (DEBUG) Log.d(TAG, "$DEBUG_CLASS.stopInput")
 
-        editorHasFocus = false
+        platformTextInput?.releaseInputFocus()
         onEditCommand = {}
         onImeActionPerformed = {}
         focusedRect = null
