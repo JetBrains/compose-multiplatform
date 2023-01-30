@@ -430,6 +430,55 @@ class ScrollbarTest {
         }
     }
 
+    // See https://github.com/JetBrains/compose-jb/issues/2679
+    @Test
+    fun `drag scrollbar to bottom and top with large and small items`() {
+        runBlocking(Dispatchers.Main) {
+            val listState = LazyListState()
+            rule.setContent {
+                LazyListTestBox(
+                    state = listState,
+                    size = 300.dp,
+                    scrollbarWidth = 10.dp,
+                ){
+                    val childHeights =  List(4){ 200.dp } + List(10){ 50.dp }
+                    items(childHeights.size){ index ->
+                        Box(Modifier.size(childHeights[index]))
+                    }
+                }
+            }
+            rule.awaitIdle()
+
+            // Slowly drag to the bottom
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 5f))
+                press()
+                repeat(100){
+                    moveBy(Offset(0f, 3f))
+                }
+                release()
+            }
+            rule.awaitIdle()
+
+            // Test whether the scrollbar is at the bottom by trying to drag it by the last pixel.
+            // If it's not at the bottom, the drag will not succeed
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 299f))
+                press()
+                repeat(100){
+                    moveBy(Offset(0f, -3f))
+                }
+                release()
+            }
+            rule.awaitIdle()
+
+            assertEquals(true, listState.canScrollForward)
+            val firstVisibleItem = listState.layoutInfo.visibleItemsInfo.first()
+            assertEquals(0, firstVisibleItem.index)
+            assertEquals(0, firstVisibleItem.offset)
+        }
+    }
+
     // TODO(demin): write a test when we support DesktopComposeTestRule.mainClock:
     //  see https://github.com/JetBrains/compose-jb/issues/637
 //    fun `move mouse to the slider and drag it`() {

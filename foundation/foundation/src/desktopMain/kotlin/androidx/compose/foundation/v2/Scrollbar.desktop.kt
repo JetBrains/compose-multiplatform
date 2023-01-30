@@ -404,24 +404,27 @@ internal class SliderAdapter(
 
     val bounds get() = position..position + thumbSize
 
-    // Stores the unrestricted position during a dragging gesture
-    private var positionDuringDrag = 0.0
+    // How much of the current drag was ignored because we've reached the end of the scrollbar area
+    private var unscrolledDragDistance = 0.0
 
     /** Called when the thumb dragging starts */
     fun onDragStarted() {
-        positionDuringDrag = position
+        unscrolledDragDistance = 0.0
     }
 
     /** Called on every movement while dragging the thumb */
     fun onDragDelta(offset: Offset) {
         val dragDelta = if (isVertical) offset.y else offset.x
         val maxScrollPosition = adapter.maxScrollOffset * scrollScale
-        val sliderDelta =
-            (positionDuringDrag + dragDelta).coerceIn(0.0, maxScrollPosition) -
-                positionDuringDrag.coerceIn(0.0, maxScrollPosition)
+        val currentPosition = position
+        val targetPosition =
+            (currentPosition + dragDelta + unscrolledDragDistance).coerceIn(0.0, maxScrollPosition)
+        val sliderDelta = targetPosition - currentPosition
+
         // Have to add to position for smooth content scroll if the items are of different size
         position += sliderDelta
-        positionDuringDrag += dragDelta
+
+        unscrolledDragDistance += dragDelta - sliderDelta
     }
 
 }
