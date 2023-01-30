@@ -338,14 +338,14 @@ class TimePickerColors internal constructor(
  * @param initialMinute starting minute for this state, will be displayed in the time picker when
  * launched. Ranges from 0 to 59
  * @param is24Hour The format for this time picker `false` for 12 hour format with an AM/PM toggle
- * or `true` for 24 hour format without toggle.
+ * or `true` for 24 hour format without toggle. Defaults to follow system setting.
  */
 @Composable
 @ExperimentalMaterial3Api
 fun rememberTimePickerState(
     initialHour: Int = 0,
     initialMinute: Int = 0,
-    is24Hour: Boolean = false,
+    is24Hour: Boolean = is24HourFormat,
 ): TimePickerState = rememberSaveable(
     saver = TimePickerState.Saver()
 ) {
