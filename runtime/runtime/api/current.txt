@@ -97,6 +97,12 @@ package androidx.compose.runtime {
   @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.TYPEALIAS}) public @interface ComposeCompilerApi {
   }
 
+  public interface ComposeNodeLifecycleCallback {
+    method public void onDeactivate();
+    method public void onRelease();
+    method public void onReuse();
+  }
+
   public sealed interface Composer {
     method @androidx.compose.runtime.ComposeCompilerApi public <V, T> void apply(V? value, kotlin.jvm.functions.Function2<? super T,? super V,kotlin.Unit> block);
     method @androidx.compose.runtime.ComposeCompilerApi public boolean changed(Object? value);
