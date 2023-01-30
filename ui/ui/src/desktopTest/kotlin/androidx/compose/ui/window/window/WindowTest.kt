@@ -39,6 +39,7 @@ import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
@@ -50,6 +51,7 @@ import java.awt.Dimension
 import java.awt.GraphicsEnvironment
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
+import kotlin.test.assertEquals
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
@@ -522,4 +524,28 @@ class WindowTest {
         assertThat(isApplicationEffectEnded).isTrue()
         assertThat(isWindowEffectEnded).isTrue()
     }
+
+    @Test
+    fun `undecorated resizable window with unspecified size`() = runApplicationTest {
+        var window: ComposeWindow? = null
+
+        launchApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(width = Dp.Unspecified, height = Dp.Unspecified),
+                undecorated = true,
+                resizable = true,
+            ) {
+                window = this.window
+                Box(Modifier.size(32.dp))
+            }
+        }
+
+        awaitIdle()
+        assertEquals(32, window?.width)
+        assertEquals(32, window?.height)
+
+        window?.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+    }
+
 }
