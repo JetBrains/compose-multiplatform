@@ -61,7 +61,6 @@ import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-// TODO: Upload material 3 assets for Bottom Sheet.
 /**
  * <a href="https://m3.material.io/components/bottom-sheets/overview" class="external" target="_blank">Material Design modal bottom sheet</a>.
  *
@@ -70,6 +69,8 @@ import kotlinx.coroutines.launch
  * and icons. Like dialogs, modal bottom sheets appear in front of app content, disabling all other
  * app functionality when they appear, and remaining on screen until confirmed, dismissed, or a
  * required action has been taken.
+ *
+ * ![Bottom sheet image](https://developer.android.com/images/reference/androidx/compose/material3/bottom_sheet.png)
  *
  * A simple example of a modal bottom sheet looks like this:
  *
