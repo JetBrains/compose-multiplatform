@@ -23,6 +23,7 @@ plugins {
     id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
     id("application")
+    kotlin("plugin.serialization") version "1.8.0"
 }
 
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
@@ -117,6 +118,7 @@ kotlin {
                 implementation(project(":compose:ui:ui-graphics"))
                 implementation(project(":compose:ui:ui-text"))
                 implementation(libs.kotlinCoroutinesCore)
+                 api("org.jetbrains.kotlinx:kotlinx-serialization-core:1.4.1")
             }
         }
 

@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
@@ -44,6 +45,8 @@ import org.jetbrains.kotlin.ir.util.isEnumEntry
 import org.jetbrains.kotlin.ir.util.isFileClass
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.platform.jvm.isJvm
 
 enum class StabilityBits(val bits: Int) {
@@ -79,6 +82,7 @@ class ClassStabilityTransformer(
         irFile.transformChildrenVoid(this)
     }
 
+    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun visitClass(declaration: IrClass): IrStatement {
         val result = super.visitClass(declaration)
         val cls = result as? IrClass ?: return result
@@ -173,11 +177,20 @@ class ClassStabilityTransformer(
             cls.declarations += stabilityField
         } else {
             // This ensures proper mangles in k/js and k/native (since kotlin 1.6.0-rc2)
-            val stabilityProp = makeStabilityProp().also {
-                it.parent = cls
-                it.backingField = stabilityField
+            val stabilityProp = makeStabilityProp(stabilityField, stableExpr, cls).also {
+                val clsRef = context.referenceClass(ClassId.topLevel(FqName("kotlinx.serialization.Transient")))
+                if (clsRef != null) {
+                    it.annotations = it.annotations + IrConstructorCallImpl(
+                        type = cls.defaultType,
+                        symbol = clsRef.constructors.first(),
+                        constructorTypeArgumentsCount = 0,
+                        valueArgumentsCount = 0,
+                        startOffset = UNDEFINED_OFFSET,
+                        endOffset = UNDEFINED_OFFSET,
+                        typeArgumentsCount = 0
+                    )
+                }
             }
-            stabilityField.correspondingPropertySymbol = stabilityProp.symbol
             cls.declarations += stabilityProp
         }
 
