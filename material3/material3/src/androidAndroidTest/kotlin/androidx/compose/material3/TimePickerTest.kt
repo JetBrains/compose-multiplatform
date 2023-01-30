@@ -16,6 +16,7 @@
 
 package androidx.compose.material3
 
+import android.provider.Settings.System.TIME_12_24
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsProperties.SelectableGroup
@@ -43,6 +44,7 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
@@ -136,6 +138,32 @@ class TimePickerTest {
         rule.runOnIdle {
             assertThat(state.hour).isEqualTo(3)
         }
+    }
+
+    @Test
+    fun timePickerState_format_12h() {
+        lateinit var state: TimePickerState
+        getInstrumentation().uiAutomation.executeShellCommand(
+            "settings put system $TIME_12_24 12"
+        )
+        rule.setContent {
+            state = rememberTimePickerState()
+        }
+
+        assertThat(state.is24hour).isFalse()
+    }
+
+    @Test
+    fun timePickerState_format_24h() {
+        lateinit var state: TimePickerState
+        getInstrumentation().uiAutomation.executeShellCommand(
+            "settings put system $TIME_12_24 24"
+        )
+        rule.setContent {
+            state = rememberTimePickerState()
+        }
+
+        assertThat(state.is24hour).isTrue()
     }
 
     @Test
