@@ -335,16 +335,17 @@ package androidx.compose.material3 {
     ctor public DatePickerState(Long? initialSelectedDateMillis, Long? initialDisplayedMonthMillis, kotlin.ranges.IntRange yearRange, int initialDisplayMode);
     method public int getDisplayMode();
     method public Long? getSelectedDateMillis();
-    method public kotlin.ranges.IntRange getYearRange();
     method public void setDisplayMode(int);
     property public final int displayMode;
     property public final Long? selectedDateMillis;
-    property public final kotlin.ranges.IntRange yearRange;
     field public static final androidx.compose.material3.DatePickerState.Companion Companion;
   }
 
   public static final class DatePickerState.Companion {
     method public androidx.compose.runtime.saveable.Saver<androidx.compose.material3.DatePickerState,?> Saver();
+  }
+
+  public final class DateRangePickerKt {
   }
 
   @androidx.compose.material3.ExperimentalMaterial3Api public enum DismissDirection {

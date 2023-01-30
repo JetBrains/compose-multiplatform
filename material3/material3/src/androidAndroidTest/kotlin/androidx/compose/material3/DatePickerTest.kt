@@ -278,8 +278,8 @@ class DatePickerTest {
         }
         with(datePickerState) {
             assertThat(selectedDateMillis).isEqualTo(1649721600000L)
-            assertThat(displayedMonth).isEqualTo(
-                calendarModel.getMonth(year = 2022, month = 4)
+            assertThat(stateData.displayedMonth).isEqualTo(
+                stateData.calendarModel.getMonth(year = 2022, month = 4)
             )
         }
     }
@@ -296,8 +296,8 @@ class DatePickerTest {
             // Assert that the actual selectedDateMillis was rounded down to the start of day
             // timestamp
             assertThat(selectedDateMillis).isEqualTo(1649721600000L)
-            assertThat(displayedMonth).isEqualTo(
-                calendarModel.getMonth(year = 2022, month = 4)
+            assertThat(stateData.displayedMonth).isEqualTo(
+                stateData.calendarModel.getMonth(year = 2022, month = 4)
             )
         }
     }
@@ -316,8 +316,8 @@ class DatePickerTest {
         with(datePickerState) {
             assertThat(selectedDateMillis).isEqualTo(1649721600000L)
             // Assert that the displayed month is the current month as of today.
-            assertThat(displayedMonth).isEqualTo(
-                calendarModel.getMonth(calendarModel.today.utcTimeMillis)
+            assertThat(stateData.displayedMonth).isEqualTo(
+                stateData.calendarModel.getMonth(stateData.calendarModel.today.utcTimeMillis)
             )
         }
     }
@@ -336,8 +336,8 @@ class DatePickerTest {
         with(datePickerState) {
             assertThat(selectedDateMillis).isNull()
             // Assert that the displayed month is the current month as of today.
-            assertThat(displayedMonth).isEqualTo(
-                calendarModel.getMonth(calendarModel.today.utcTimeMillis)
+            assertThat(stateData.displayedMonth).isEqualTo(
+                stateData.calendarModel.getMonth(stateData.calendarModel.today.utcTimeMillis)
             )
         }
     }
@@ -350,34 +350,35 @@ class DatePickerTest {
             datePickerState = rememberDatePickerState()
         }
 
-        val date = datePickerState!!.calendarModel.getCanonicalDate(1649721600000L) // 04/12/2022
-        val displayedMonth = datePickerState!!.calendarModel.getMonth(date)
-        rule.runOnIdle {
-            datePickerState!!.selectedDate = date
-            datePickerState!!.displayedMonth = displayedMonth
-        }
+        with(datePickerState!!) {
+            val date =
+                stateData.calendarModel.getCanonicalDate(1649721600000L) // 04/12/2022
+            val displayedMonth = stateData.calendarModel.getMonth(date)
+            rule.runOnIdle {
+                stateData.selectedStartDate = date
+                stateData.displayedMonth = displayedMonth
+            }
 
-        datePickerState = null
+            datePickerState = null
 
-        restorationTester.emulateSavedInstanceStateRestore()
+            restorationTester.emulateSavedInstanceStateRestore()
 
-        rule.runOnIdle {
-            assertThat(datePickerState!!.selectedDate).isEqualTo(date)
-            assertThat(datePickerState!!.displayedMonth).isEqualTo(displayedMonth)
-            assertThat(datePickerState!!.selectedDateMillis).isEqualTo(1649721600000L)
+            rule.runOnIdle {
+                assertThat(stateData.selectedStartDate).isEqualTo(date)
+                assertThat(stateData.displayedMonth).isEqualTo(displayedMonth)
+                assertThat(datePickerState!!.selectedDateMillis).isEqualTo(1649721600000L)
+            }
         }
     }
 
     @Test(expected = IllegalArgumentException::class)
-    fun initialDateOutObBounds() {
-        lateinit var datePickerState: DatePickerState
+    fun initialDateOutOfBounds() {
         rule.setMaterialContent(lightColorScheme()) {
             val initialDateMillis = dayInUtcMilliseconds(year = 2051, month = 5, dayOfMonth = 11)
-            datePickerState = rememberDatePickerState(
+            rememberDatePickerState(
                 initialSelectedDateMillis = initialDateMillis,
                 yearRange = IntRange(2000, 2050)
             )
-            DatePicker(state = datePickerState)
         }
     }
 

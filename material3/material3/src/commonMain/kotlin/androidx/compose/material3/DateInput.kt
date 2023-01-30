@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun DateInputContent(
-    state: DatePickerState,
+    stateData: StateData,
     dateFormatter: DatePickerFormatter,
     dateValidator: (Long) -> Boolean,
 ) {
@@ -50,7 +50,7 @@ internal fun DateInputContent(
         modifier = Modifier
             .fillMaxWidth()
             .padding(InputTextFieldPadding),
-        state = state,
+        stateData = stateData,
         dateFormatter = dateFormatter,
         dateValidator = dateValidator
     )
@@ -60,21 +60,21 @@ internal fun DateInputContent(
 @Composable
 private fun DateInputTextField(
     modifier: Modifier,
-    state: DatePickerState,
+    stateData: StateData,
     dateFormatter: DatePickerFormatter,
     dateValidator: (Long) -> Boolean
 ) {
     // Obtain the DateInputFormat for the default Locale.
     val defaultLocale = defaultLocale()
     val dateInputFormat = remember(defaultLocale) {
-        state.calendarModel.getDateInputFormat(defaultLocale)
+        stateData.calendarModel.getDateInputFormat(defaultLocale)
     }
     var errorText by rememberSaveable { mutableStateOf("") }
     var text by rememberSaveable(stateSaver = TextFieldValue.Saver) {
         mutableStateOf(
             TextFieldValue(
-                text = with(state) {
-                    selectedDate?.let {
+                text = with(stateData) {
+                    selectedStartDate?.let {
                         calendarModel.formatWithPattern(
                             it.utcTimeMillis,
                             dateInputFormat.patternWithoutDelimiters,
@@ -108,7 +108,7 @@ private fun DateInputTextField(
             errorText = ""
             return null
         }
-        val parsedDate = state.calendarModel.parse(
+        val parsedDate = stateData.calendarModel.parse(
             dateInputText,
             dateInputFormat.patternWithoutDelimiters
         )
@@ -117,10 +117,10 @@ private fun DateInputTextField(
             return null
         }
         // Check that the date is within the valid range of years.
-        if (!state.yearRange.contains(parsedDate.year)) {
+        if (!stateData.yearRange.contains(parsedDate.year)) {
             errorText = errorDateOutOfYearRange.format(
-                state.yearRange.first,
-                state.yearRange.last
+                stateData.yearRange.first,
+                stateData.yearRange.last
             )
             return null
         }
@@ -129,7 +129,7 @@ private fun DateInputTextField(
             errorText = errorInvalidNotAllowed.format(
                 dateFormatter.formatDate(
                     date = parsedDate,
-                    calendarModel = state.calendarModel,
+                    calendarModel = stateData.calendarModel,
                     locale = defaultLocale
                 )
             )
@@ -145,7 +145,7 @@ private fun DateInputTextField(
                 input.text.all { it.isDigit() }
             ) {
                 text = input
-                state.selectedDate = validate(input)
+                stateData.selectedStartDate = validate(input)
             }
         },
         modifier = modifier

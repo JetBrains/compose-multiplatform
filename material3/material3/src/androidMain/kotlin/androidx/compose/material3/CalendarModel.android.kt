@@ -25,10 +25,10 @@ import androidx.core.os.ConfigurationCompat
 import java.util.Locale
 
 /**
- * Creates a [CalendarModel] to be used by the date picker.
+ * Returns a [CalendarModel] to be used by the date picker.
  */
 @ExperimentalMaterial3Api
-internal actual fun createCalendarModel(): CalendarModel {
+internal actual fun CalendarModel(): CalendarModel {
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         CalendarModelImpl()
     } else {

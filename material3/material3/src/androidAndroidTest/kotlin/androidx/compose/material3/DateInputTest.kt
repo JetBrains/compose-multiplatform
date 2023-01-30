@@ -153,8 +153,8 @@ class DateInputTest {
                 expectValue(
                     SemanticsProperties.Error,
                     errorMessage.format(
-                        state.yearRange.first,
-                        state.yearRange.last
+                        state.stateData.yearRange.first,
+                        state.stateData.yearRange.last
                     )
                 )
             )
