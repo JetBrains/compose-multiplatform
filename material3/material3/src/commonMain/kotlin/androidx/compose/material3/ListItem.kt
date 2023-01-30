@@ -68,7 +68,6 @@ import androidx.compose.ui.unit.dp
  * @param shadowElevation the shadow elevation of this list item
  */
 @Composable
-@ExperimentalMaterial3Api
 fun ListItem(
     headlineText: @Composable () -> Unit,
     modifier: Modifier = Modifier,
@@ -276,7 +275,6 @@ fun ListItem(
  * @param content the content to be displayed in the middle section of this list item
  */
 @Composable
-@ExperimentalMaterial3Api
 private fun ListItem(
     modifier: Modifier = Modifier,
     shape: Shape = ListItemDefaults.shape,
@@ -366,7 +364,6 @@ private fun trailingContent(
 /**
  * Contains the default values used by list items.
  */
-@ExperimentalMaterial3Api
 object ListItemDefaults {
     /** The default elevation of a list item */
     val Elevation: Dp = ListTokens.ListItemContainerElevation
@@ -430,7 +427,6 @@ object ListItemDefaults {
  *
  * - See [ListItemDefaults.colors] for the default colors used in a [ListItem].
  */
-@ExperimentalMaterial3Api
 @Immutable
 class ListItemColors internal constructor(
     private val containerColor: Color,
