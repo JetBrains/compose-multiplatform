@@ -658,7 +658,7 @@ internal class ComposeViewAdapter : FrameLayout {
     }
 
     private val FakeActivityResultRegistryOwner = object : ActivityResultRegistryOwner {
-        private val activityResultRegistry = object : ActivityResultRegistry() {
+        override val activityResultRegistry = object : ActivityResultRegistry() {
             override fun <I : Any?, O : Any?> onLaunch(
                 requestCode: Int,
                 contract: ActivityResultContract<I, O>,
@@ -668,7 +668,5 @@ internal class ComposeViewAdapter : FrameLayout {
                 throw IllegalStateException("Calling launch() is not supported in Preview")
             }
         }
-
-        override fun getActivityResultRegistry(): ActivityResultRegistry = activityResultRegistry
     }
 }
