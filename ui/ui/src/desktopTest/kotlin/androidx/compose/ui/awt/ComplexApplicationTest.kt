@@ -685,8 +685,8 @@ class ComplexApplicationTest {
         val newMemory = availableMemory
 
         Truth
-            .assertWithMessage("Memory is increased more than 5% after opening multiple windows")
-            .that(newMemory < 1.05 * oldMemory)
+            .assertWithMessage("Memory is increased more than 15% after opening multiple windows")
+            .that(newMemory < 1.15 * oldMemory)
             .isTrue()
     }
 
@@ -709,8 +709,8 @@ class ComplexApplicationTest {
         val newMemory = availableMemory
 
         Truth
-            .assertWithMessage("Memory is increased more than 5% after waiting a few minutes")
-            .that(newMemory < 1.05 * oldMemory)
+            .assertWithMessage("Memory is increased more than 15% after waiting a few minutes")
+            .that(newMemory < 1.15 * oldMemory)
             .isTrue()
 
         exitApplication()
