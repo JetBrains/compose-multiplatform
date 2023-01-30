@@ -14,10 +14,10 @@
 - [Material 3 DropdownMenu Skiko support](https://github.com/JetBrains/androidx/pull/347)
 
 ### Fixes
+- [Fix San Francisco font as a default (macOS)](https://github.com/JetBrains/androidx/pull/343)
 - [Make ScrollbarAdapter for LazyList take contentPadding into account](https://github.com/JetBrains/androidx/pull/365)
 - [Fix AlertDialog dismiss on click to Dialog content](https://github.com/JetBrains/androidx/pull/359)
 - [Fix shaky scrolling of LazyColumn when the items are of varying size](https://github.com/JetBrains/androidx/pull/362)
-- 
 
 ## Dependencies
 This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
