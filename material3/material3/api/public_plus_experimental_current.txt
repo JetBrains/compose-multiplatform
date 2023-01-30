@@ -995,7 +995,7 @@ package androidx.compose.material3 {
     ctor public SnackbarHostState();
     method public androidx.compose.material3.SnackbarData? getCurrentSnackbarData();
     method public suspend Object? showSnackbar(String message, optional String? actionLabel, optional boolean withDismissAction, optional androidx.compose.material3.SnackbarDuration duration, optional kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult>);
-    method @androidx.compose.material3.ExperimentalMaterial3Api public suspend Object? showSnackbar(androidx.compose.material3.SnackbarVisuals visuals, kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult>);
+    method public suspend Object? showSnackbar(androidx.compose.material3.SnackbarVisuals visuals, kotlin.coroutines.Continuation<? super androidx.compose.material3.SnackbarResult>);
     property public final androidx.compose.material3.SnackbarData? currentSnackbarData;
   }
 
