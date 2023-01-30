@@ -33,7 +33,9 @@ import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.isFocusable
 import androidx.compose.ui.test.isSelectable
+import androidx.compose.ui.test.isSelected
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onAllNodesWithContentDescription
 import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onLast
@@ -214,8 +216,8 @@ class TimePickerTest {
             TimePicker(state)
         }
 
-        rule.onNodeWithContentDescription(hourDescription)
-            .assertExists()
+        rule.onAllNodesWithContentDescription(hourDescription)
+            .onLast()
             .onSiblings()
             .filter(isFocusable())
             .assertCountEquals(11)
@@ -226,6 +228,18 @@ class TimePickerTest {
                     ignoreCase = true
                 )
             )
+    }
+
+    @Test
+    fun timePicker_clockFace_selected_semantics() {
+        val state = TimePickerState(initialHour = 14, initialMinute = 23, is24Hour = true)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            TimePicker(state)
+        }
+
+        rule.onAllNodesWithText("14")
+            .assertAll(isSelected())
     }
 
     @Test

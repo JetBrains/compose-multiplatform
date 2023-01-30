@@ -420,6 +420,13 @@ class TimePickerState(
 
     internal val currentAngle = Animatable(hourAngle)
 
+    internal fun isSelected(value: Int): Boolean =
+        if (selection == Selection.Minute) {
+            value == minute
+        } else {
+            hour == (value + if (isAfternoon) 12 else 0)
+        }
+
     internal suspend fun update(value: Float, fromTap: Boolean = false) {
         mutex.mutate(MutatePriority.UserInput) {
             if (selection == Selection.Hour) {
@@ -526,10 +533,10 @@ private fun PeriodToggle(state: TimePickerState, colors: TimePickerColors) {
     )
 
     val shape = PeriodSelectorContainerShape.toShape() as CornerBasedShape
-    val contentDescriptionValue = getString(Strings.TimePickerPeriodToggle)
+    val contentDescription = getString(Strings.TimePickerPeriodToggle)
     Column(
         Modifier
-            .semantics { contentDescription = contentDescriptionValue }
+            .semantics { this.contentDescription = contentDescription }
             .selectableGroup()
             .size(PeriodSelectorVerticalContainerWidth, PeriodSelectorVerticalContainerHeight)
             .border(border = borderStroke, shape = shape)
@@ -615,22 +622,23 @@ private fun TimeSelector(
     colors: TimePickerColors,
 ) {
     val selected = state.selection == selection
-    val contentDescriptionValue = getString(
+    val selectorContentDescription = getString(
         if (selection == Selection.Hour) {
             Strings.TimePickerHourSelection
         } else {
             Strings.TimePickerMinuteSelection
         }
     )
+
     val containerColor = colors.timeSelectorContainerColor(selected)
     val contentColor = colors.timeSelectorContentColor(selected)
     val scope = rememberCoroutineScope()
     Surface(
         modifier = Modifier
             .size(TimeSelectorContainerWidth, TimeSelectorContainerHeight)
-            .semantics {
+            .semantics(mergeDescendants = true) {
                 role = Role.RadioButton
-                contentDescription = contentDescriptionValue
+                this.contentDescription = selectorContentDescription
             },
         onClick = {
             if (selection != state.selection) {
@@ -644,9 +652,17 @@ private fun TimeSelector(
         shape = TimeSelectorContainerShape.toShape(),
         color = containerColor,
     ) {
+        val valueContentDescription = getString(
+            numberContentDescription(
+                selection = selection,
+                is24Hour = state.is24hour
+            ),
+            value
+        )
         Box(contentAlignment = Alignment.Center) {
             val textStyle = MaterialTheme.typography.fromToken(TimeSelectorLabelTextFont)
             Text(
+                modifier = Modifier.semantics { contentDescription = valueContentDescription },
                 text = value.toLocalString(minDigits = 2),
                 color = contentColor,
                 style = textStyle,
@@ -662,7 +678,9 @@ private fun ClockFace(state: TimePickerState, colors: TimePickerColors) {
         modifier = Modifier
             .background(shape = CircleShape, color = colors.clockDialColor)
             .size(ClockDialContainerSize)
-            .semantics { selectableGroup() },
+            .semantics {
+                selectableGroup()
+            },
         targetState = state.values,
         animationSpec = tween(durationMillis = MotionTokens.DurationMedium3.toInt())
     ) { screen ->
@@ -677,10 +695,12 @@ private fun ClockFace(state: TimePickerState, colors: TimePickerColors) {
                 LocalContentColor provides colors.clockDialContentColor(false)
             ) {
                 repeat(screen.size) {
+                    val outerValue = if (!state.is24hour) screen[it] else screen[it] % 12
                     ClockText(
                         is24Hour = state.is24hour,
                         selection = state.selection,
-                        value = if (!state.is24hour) screen[it] else screen[it] % 12
+                        value = outerValue,
+                        selected = state.isSelected(it)
                     )
                 }
 
@@ -693,10 +713,12 @@ private fun ClockFace(state: TimePickerState, colors: TimePickerColors) {
                         radius = InnerCircleRadius
                     ) {
                         repeat(ExtraHours.size) {
+                            val innerValue = ExtraHours[it]
                             ClockText(
                                 is24Hour = true,
                                 selection = state.selection,
-                                value = ExtraHours[it]
+                                value = innerValue,
+                                selected = state.isSelected(it % 11)
                             )
                         }
                     }
@@ -828,6 +850,7 @@ private fun Modifier.clockDial(state: TimePickerState): Modifier = composed(debu
 @Composable
 private fun ClockText(
     is24Hour: Boolean,
+    selected: Boolean,
     selection: Selection,
     value: Int
 ) {
@@ -837,7 +860,7 @@ private fun ClockText(
         }
     }
 
-    val description = getString(
+    val contentDescription = getString(
         numberContentDescription(
             selection = selection,
             is24Hour = is24Hour
@@ -849,9 +872,11 @@ private fun ClockText(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .minimumInteractiveComponentSize()
+            .size(MinimumInteractiveSize)
             .focusable()
-            .semantics {
-                contentDescription = description
+            .semantics(mergeDescendants = true) {
+                this.selected = selected
+                this.contentDescription = contentDescription
             }
     ) {
         Text(
@@ -968,6 +993,7 @@ private val PeriodToggleTopMargin = 12.dp
 private val DisplaySeparatorWidth = 24.dp
 
 private val MaxDistance = 74.dp
+private val MinimumInteractiveSize = 48.dp
 private val Minutes = listOf(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55)
 private val Hours = listOf(12, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11)
 private val ExtraHours = Hours.map { (it % 12 + 12) }
