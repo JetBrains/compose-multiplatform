@@ -126,7 +126,7 @@ class TooltipScreenshotTest {
     private fun PlainTooltipTest() {
         val tooltipState = remember { PlainTooltipState() }
         PlainTooltipBox(
-            tooltip = { Text("Tooltip Text") },
+            tooltip = { Text("Tooltip Description") },
             modifier = Modifier.testTag(TooltipTestTag),
             tooltipState = tooltipState
         ) {
@@ -151,7 +151,7 @@ class TooltipScreenshotTest {
                         "message for the composable that the tooltip is anchored to."
                 )
             },
-            action = { Text("Action Text") },
+            action = { TextButton(onClick = {}) { Text("Action Text") } },
             tooltipState = tooltipState,
             modifier = Modifier.testTag(TooltipTestTag)
         ) {

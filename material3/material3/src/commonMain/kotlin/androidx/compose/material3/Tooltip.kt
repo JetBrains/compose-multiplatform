@@ -47,7 +47,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.graphics.Color
@@ -247,7 +246,7 @@ private fun TooltipBox(
         }
     }
 
-    Box(contentAlignment = Alignment.TopCenter) {
+    Box {
         val transition = updateTransition(tooltipState.isVisible, label = "Tooltip transition")
         if (transition.currentState || transition.targetState) {
             Popup(
@@ -271,6 +270,7 @@ private fun TooltipBox(
                     shape = shape,
                     color = containerColor,
                     shadowElevation = elevation,
+                    tonalElevation = elevation,
                     content = tooltipContent
                 )
             }

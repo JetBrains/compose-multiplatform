@@ -17,7 +17,6 @@
 package androidx.compose.material3.samples
 
 import androidx.annotation.Sampled
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredHeight
@@ -34,6 +33,7 @@ import androidx.compose.material3.PlainTooltipState
 import androidx.compose.material3.RichTooltipBox
 import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -100,10 +100,9 @@ fun RichTooltipSample() {
     RichTooltipBox(
         title = { Text(richTooltipSubheadText) },
         action = {
-            Text(
-                text = richTooltipActionText,
-                modifier = Modifier.clickable { scope.launch { tooltipState.dismiss() } }
-            )
+            TextButton(
+                onClick = { scope.launch { tooltipState.dismiss() } }
+            ) { Text(richTooltipActionText) }
         },
         text = { Text(richTooltipText) },
         tooltipState = tooltipState
@@ -131,14 +130,13 @@ fun RichTooltipWithManualInvocationSample() {
         RichTooltipBox(
             title = { Text(richTooltipSubheadText) },
             action = {
-                Text(
-                    text = richTooltipActionText,
-                    modifier = Modifier.clickable {
+                TextButton(
+                    onClick = {
                         scope.launch {
                             tooltipState.dismiss()
                         }
                     }
-                )
+                ) { Text(richTooltipActionText) }
             },
             text = { Text(richTooltipText) },
             tooltipState = tooltipState
