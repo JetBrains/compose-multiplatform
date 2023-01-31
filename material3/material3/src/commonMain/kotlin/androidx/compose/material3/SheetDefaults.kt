@@ -20,7 +20,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.SheetValue.Collapsed
+import androidx.compose.material3.SheetValue.PartiallyExpanded
 import androidx.compose.material3.SheetValue.Hidden
 import androidx.compose.material3.SheetValue.Expanded
 import androidx.compose.material3.tokens.ScrimTokens
@@ -44,25 +44,25 @@ import kotlinx.coroutines.CancellationException
 /**
  * Create and [remember] a [SheetState].
  *
- * @param skipHalfExpanded Whether the half expanded state, if the sheet is tall enough, should
- * be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
+ * @param skipPartiallyExpanded Whether the partially expanded state, if the sheet is tall enough,
+ * should be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
  * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
  * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Composable
 @ExperimentalMaterial3Api
 fun rememberSheetState(
-    skipHalfExpanded: Boolean = false,
+    skipPartiallyExpanded: Boolean = false,
     confirmValueChange: (SheetValue) -> Boolean = { true }
 ): SheetState {
     return rememberSaveable(
-        skipHalfExpanded, confirmValueChange,
+        skipPartiallyExpanded, confirmValueChange,
         saver = SheetState.Saver(
-            skipHalfExpanded = skipHalfExpanded,
+            skipPartiallyExpanded = skipPartiallyExpanded,
             confirmValueChange = confirmValueChange
         )
     ) {
-        SheetState(skipHalfExpanded, confirmValueChange = confirmValueChange)
+        SheetState(skipPartiallyExpanded, confirmValueChange = confirmValueChange)
     }
 }
 
@@ -71,16 +71,16 @@ fun rememberSheetState(
  *
  * Contains states relating to it's swipe position as well as animations between state values.
  *
- * @param skipCollapsed Whether the collapsed state, if the bottom sheet is tall enough, should
- * be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
- * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
+ * @param skipPartiallyExpanded Whether the partially expanded state state, if the sheet is large
+ * enough, should be skipped. If true, the sheet will always expand to the [Expanded] state and move
+ * to the [Hidden] state when hiding the sheet, either programmatically or by user interaction.
  * @param initialValue The initial value of the state.
  * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
  */
 @Stable
 @ExperimentalMaterial3Api
 class SheetState(
-    internal val skipCollapsed: Boolean,
+    internal val skipPartiallyExpanded: Boolean,
     initialValue: SheetValue = Hidden,
     confirmValueChange: (SheetValue) -> Boolean = { true }
 ) {
@@ -103,7 +103,7 @@ class SheetState(
     val targetValue: SheetValue get() = swipeableState.targetValue
 
     /**
-     * Whether the bottom sheet is visible.
+     * Whether the modal bottom sheet is visible.
      */
     val isVisible: Boolean
         get() = swipeableState.currentValue != Hidden
@@ -116,18 +116,25 @@ class SheetState(
     fun requireOffset(): Float = swipeableState.requireOffset()
 
     /**
-     * Show the bottom sheet with animation and suspend until it's shown. If the sheet is taller
-     * than 50% of the parent's height, the bottom sheet will be half expanded. Otherwise it will be
-     * fully expanded.
-     *
+     * Whether the sheet has an expanded state defined.
+     */
+    val hasExpandedState: Boolean
+        get() = swipeableState.hasAnchorForValue(Expanded)
+
+    /**
+     * Whether the modal bottom sheet has a partially expanded state defined.
+     */
+    val hasPartiallyExpandedState: Boolean
+        get() = swipeableState.hasAnchorForValue(PartiallyExpanded)
+
+    /**
+     * Fully expand the bottom sheet with animation and suspend until it is fully expanded or
+     * animation has been cancelled.
+     * *
      * @throws [CancellationException] if the animation is interrupted
      */
-    suspend fun show() {
-        val targetValue = when {
-            hasCollapsedState -> Collapsed
-            else -> Expanded
-        }
-        swipeableState.animateTo(targetValue)
+    suspend fun expand() {
+        swipeableState.animateTo(Expanded)
     }
 
     /**
@@ -136,29 +143,31 @@ class SheetState(
      * @throws [CancellationException] if the animation is interrupted
      */
     suspend fun hide() {
-        swipeableState.animateTo(Hidden)
+        animateTo(Hidden)
     }
 
     /**
-     * Hide the bottom sheet with animation and suspend until it is collapsed or animation has
-     * been cancelled.
+     * Partially expand the bottom sheet with animation and suspend until it is at the partially
+     * expanded state or animation has been cancelled.
      * @throws [CancellationException] if the animation is interrupted
      */
-    suspend fun collapse() {
-        swipeableState.animateTo(Collapsed)
+    suspend fun partialExpand() {
+        swipeableState.animateTo(PartiallyExpanded)
     }
 
-    companion object {
-        /**
-         * The default [Saver] implementation for [SheetState].
-         */
-        fun Saver(
-            skipHalfExpanded: Boolean,
-            confirmValueChange: (SheetValue) -> Boolean
-        ) = Saver<SheetState, SheetValue>(
-            save = { it.currentValue },
-            restore = { SheetState(skipHalfExpanded, it, confirmValueChange) }
-        )
+    /**
+     * Show the bottom sheet with animation and suspend until it's shown. If the sheet is taller
+     * than 50% of the parent's height, the bottom sheet will be partially expanded. Otherwise it
+     * will be fully expanded.
+     *
+     * @throws [CancellationException] if the animation is interrupted
+     */
+    suspend fun show() {
+        val targetValue = when {
+            hasPartiallyExpandedState -> PartiallyExpanded
+            else -> Expanded
+        }
+        animateTo(targetValue)
     }
 
     internal var swipeableState = SwipeableV2State(
@@ -167,22 +176,33 @@ class SheetState(
         confirmValueChange = confirmValueChange,
     )
 
-    internal val hasCollapsedState: Boolean
-        get() = swipeableState.hasAnchorForValue(Collapsed)
-
-    internal val hasExpandedState: Boolean
-        get() = swipeableState.hasAnchorForValue(Expanded)
-
-    internal val offset: Float? get() = swipeableState.offset
+    /**
+     * Animate to a [targetValue].
+     * If the [targetValue] is not in the set of anchors, the [currentValue] will be updated to the
+     * [targetValue] without updating the offset.
+     *
+     * @throws CancellationException if the interaction interrupted by another interaction like a
+     * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
+     *
+     * @param targetValue The target value of the animation
+     */
+    internal suspend fun animateTo(
+        targetValue: SheetValue,
+        velocity: Float = swipeableState.lastVelocity
+    ) {
+        swipeableState.animateTo(targetValue, velocity)
+    }
 
     /**
-     * Fully expand the bottom sheet with animation and suspend until it if fully expanded or
-     * animation has been cancelled.
-     * *
-     * @throws [CancellationException] if the animation is interrupted
+     * Snap to a [targetValue] without any animation.
+     *
+     * @throws CancellationException if the interaction interrupted by another interaction like a
+     * gesture interaction or another programmatic interaction like a [animateTo] or [snapTo] call.
+     *
+     * @param targetValue The target value of the animation
      */
-    internal suspend fun expand() {
-        swipeableState.animateTo(Expanded)
+    internal suspend fun snapTo(targetValue: SheetValue) {
+        swipeableState.snapTo(targetValue)
     }
 
     /**
@@ -190,6 +210,23 @@ class SheetState(
      */
     internal suspend fun settle(velocity: Float) {
         swipeableState.settle(velocity)
+    }
+
+    internal val offset: Float? get() = swipeableState.offset
+
+    companion object {
+        /**
+         * The default [Saver] implementation for [SheetState].
+         */
+        fun Saver(
+            skipPartiallyExpanded: Boolean,
+            confirmValueChange: (SheetValue) -> Boolean
+        ) = Saver<SheetState, SheetValue>(
+            save = { it.currentValue },
+            restore = { savedValue ->
+                SheetState(skipPartiallyExpanded, savedValue, confirmValueChange)
+            }
+        )
     }
 }
 
@@ -211,7 +248,7 @@ enum class SheetValue {
     /**
      * The sheet is partially visible.
      */
-    Collapsed,
+    PartiallyExpanded,
 }
 
 /**
@@ -225,7 +262,7 @@ object BottomSheetDefaults {
         @Composable get() =
         SheetBottomTokens.DockedMinimizedContainerShape.toShape()
 
-    /** The default shape for a [ModalBottomSheet] in [Collapsed] and [Expanded] states. */
+    /** The default shape for a [ModalBottomSheet] in [PartiallyExpanded] and [Expanded] states. */
     val ExpandedShape: Shape
         @Composable get() =
         SheetBottomTokens.DockedContainerShape.toShape()
@@ -325,3 +362,4 @@ internal fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
 }
 
 private val DragHandleVerticalPadding = 22.dp
+internal val BottomSheetMaxWidth = 640.dp

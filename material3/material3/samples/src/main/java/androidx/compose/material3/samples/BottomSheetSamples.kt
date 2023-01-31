@@ -56,9 +56,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun ModalBottomSheetSample() {
     var openBottomSheet by rememberSaveable { mutableStateOf(false) }
-    var skipHalfExpanded by remember { mutableStateOf(false) }
+    var skipPartiallyExpanded by remember { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
-    val bottomSheetState = rememberSheetState(skipHalfExpanded = skipHalfExpanded)
+    val bottomSheetState = rememberSheetState(skipPartiallyExpanded = skipPartiallyExpanded)
 
     // App content
     Column(
@@ -68,14 +68,14 @@ fun ModalBottomSheetSample() {
     ) {
         Row(
             Modifier.toggleable(
-                value = skipHalfExpanded,
+                value = skipPartiallyExpanded,
                 role = Role.Checkbox,
-                onValueChange = { checked -> skipHalfExpanded = checked }
+                onValueChange = { checked -> skipPartiallyExpanded = checked }
             )
         ) {
-            Checkbox(checked = skipHalfExpanded, onCheckedChange = null)
+            Checkbox(checked = skipPartiallyExpanded, onCheckedChange = null)
             Spacer(Modifier.width(16.dp))
-            Text("Skip Half Expanded State")
+            Text("Skip partially expanded State")
         }
         Button(onClick = { openBottomSheet = !openBottomSheet }) {
             Text(text = "Show Bottom Sheet")

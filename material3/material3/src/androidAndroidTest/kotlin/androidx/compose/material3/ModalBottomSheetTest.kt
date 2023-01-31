@@ -247,7 +247,7 @@ class ModalBottomSheetTest {
             }
         }
         rule.waitForIdle()
-        assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+        assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         assertThat(sheetState.requireOffset())
             .isWithin(1f)
             .of(screenHeightPx / 2f)
@@ -371,18 +371,18 @@ class ModalBottomSheetTest {
         scope.launch {
             state.show()
         }
-        // The anchors should now be {Hidden, HalfExpanded, Expanded}
+        // The anchors should now be {Hidden, PartiallyExpanded, Expanded}
 
         rule.waitForIdle()
-        assertThat(state.currentValue).isEqualTo(SheetValue.Collapsed)
+        assertThat(state.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
 
-        amountOfItems = 100 // The anchors should now be {Hidden, HalfExpanded, Expanded}
+        amountOfItems = 100 // The anchors should now be {Hidden, PartiallyExpanded, Expanded}
 
         rule.waitForIdle()
-        assertThat(state.currentValue).isEqualTo(SheetValue.Collapsed) // We should
+        assertThat(state.currentValue).isEqualTo(SheetValue.PartiallyExpanded) // We should
         // retain the current value if possible
         assertThat(state.swipeableState.anchors).containsKey(SheetValue.Hidden)
-        assertThat(state.swipeableState.anchors).containsKey(SheetValue.Collapsed)
+        assertThat(state.swipeableState.anchors).containsKey(SheetValue.PartiallyExpanded)
         assertThat(state.swipeableState.anchors).containsKey(SheetValue.Expanded)
 
         amountOfItems = 0 // When the sheet height is 0, we should only have a hidden anchor
@@ -390,7 +390,7 @@ class ModalBottomSheetTest {
         assertThat(state.currentValue).isEqualTo(SheetValue.Hidden)
         assertThat(state.swipeableState.anchors).containsKey(SheetValue.Hidden)
         assertThat(state.swipeableState.anchors)
-            .doesNotContainKey(SheetValue.Collapsed)
+            .doesNotContainKey(SheetValue.PartiallyExpanded)
         assertThat(state.swipeableState.anchors).doesNotContainKey(SheetValue.Expanded)
     }
 
@@ -420,7 +420,7 @@ class ModalBottomSheetTest {
         rule.waitForIdle()
 
         assertThat(scrollState.value).isEqualTo(0)
-        assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+        assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
 
         rule.onNodeWithTag(sheetTag)
             .performTouchInput {
@@ -452,7 +452,7 @@ class ModalBottomSheetTest {
             }
         rule.waitForIdle()
         assertThat(scrollState.value).isEqualTo(0)
-        assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+        assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
 
         rule.onNodeWithTag(sheetTag)
             .performTouchInput {
@@ -467,7 +467,7 @@ class ModalBottomSheetTest {
     fun modalBottomSheet_missingAnchors_findsClosest() {
         val topTag = "ModalBottomSheetLayout"
         var showShortContent by mutableStateOf(false)
-        val sheetState = SheetState(skipCollapsed = false)
+        val sheetState = SheetState(skipPartiallyExpanded = false)
         lateinit var scope: CoroutineScope
 
         rule.setContent {
@@ -526,7 +526,7 @@ class ModalBottomSheetTest {
         }
 
         rule.runOnIdle {
-            assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+            assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         }
 
         rule.onNodeWithTag(sheetTag)
@@ -556,21 +556,21 @@ class ModalBottomSheetTest {
         }
 
         rule.runOnIdle {
-            assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+            assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         }
 
         rule.onNodeWithTag(sheetTag)
             .performTouchInput { swipeDown() }
 
         rule.runOnIdle {
-            assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+            assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         }
 
         rule.onNodeWithTag(sheetTag).onParent()
             .performSemanticsAction(SemanticsActions.Dismiss)
 
         rule.runOnIdle {
-            assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+            assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         }
     }
 
@@ -591,7 +591,7 @@ class ModalBottomSheetTest {
         }
 
         rule.runOnIdle {
-            assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+            assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         }
 
         scope.launch { sheetState.expand() }
@@ -608,10 +608,10 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_hideBySwiping_skipHalfExpanded() {
+    fun modalBottomSheet_hideBySwiping_skipPartiallyExpanded() {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState(skipHalfExpanded = true)
+            sheetState = rememberSheetState(skipPartiallyExpanded = true)
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
                     Modifier
@@ -635,12 +635,12 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_hideManually_skipHalfExpanded(): Unit = runBlocking(
+    fun modalBottomSheet_hideManually_skipPartiallyExpanded(): Unit = runBlocking(
         AutoTestFrameClock()
     ) {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState(skipHalfExpanded = true)
+            sheetState = rememberSheetState(skipPartiallyExpanded = true)
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
                     Modifier
@@ -657,7 +657,7 @@ class ModalBottomSheetTest {
     }
 
     @Test
-    fun modalBottomSheet_testDismissAction_tallBottomSheet_whenHalfExpanded() {
+    fun modalBottomSheet_testDismissAction_tallBottomSheet_whenPartiallyExpanded() {
         rule.setContent {
             ModalBottomSheet(onDismissRequest = {}) {
                 Box(
@@ -784,7 +784,7 @@ class ModalBottomSheetTest {
 
     @Test
     fun modalBottomSheet_shortSheet_anchorChangeHandler_previousTargetNotInAnchors_reconciles() {
-        val sheetState = SheetState(skipCollapsed = false)
+        val sheetState = SheetState(skipPartiallyExpanded = false)
         var hasSheetContent by mutableStateOf(false) // Start out with empty sheet content
         lateinit var scope: CoroutineScope
         rule.setContent {
@@ -801,7 +801,7 @@ class ModalBottomSheetTest {
         }
 
         assertThat(sheetState.currentValue).isEqualTo(SheetValue.Hidden)
-        assertThat(sheetState.swipeableState.hasAnchorForValue(SheetValue.Collapsed))
+        assertThat(sheetState.swipeableState.hasAnchorForValue(SheetValue.PartiallyExpanded))
             .isFalse()
         assertThat(sheetState.swipeableState.hasAnchorForValue(SheetValue.Expanded))
             .isFalse()
@@ -819,7 +819,7 @@ class ModalBottomSheetTest {
 
     @Test
     fun modalBottomSheet_tallSheet_anchorChangeHandler_previousTargetNotInAnchors_reconciles() {
-        val sheetState = SheetState(skipCollapsed = false)
+        val sheetState = SheetState(skipPartiallyExpanded = false)
         var hasSheetContent by mutableStateOf(false) // Start out with empty sheet content
         lateinit var scope: CoroutineScope
         rule.setContent {
@@ -836,7 +836,7 @@ class ModalBottomSheetTest {
         }
 
         assertThat(sheetState.currentValue).isEqualTo(SheetValue.Hidden)
-        assertThat(sheetState.swipeableState.hasAnchorForValue(SheetValue.Collapsed))
+        assertThat(sheetState.swipeableState.hasAnchorForValue(SheetValue.PartiallyExpanded))
             .isFalse()
         assertThat(sheetState.swipeableState.hasAnchorForValue(SheetValue.Expanded))
             .isFalse()
@@ -849,14 +849,14 @@ class ModalBottomSheetTest {
 
         hasSheetContent = true // Recompose with sheet content
         rule.waitForIdle()
-        assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+        assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
     }
 
     @Test
     fun modalBottomSheet_callsOnDismissRequest_onNestedScrollFling() {
         var callCount by mutableStateOf(0)
         val expectedCallCount = 1
-        val sheetState = SheetState(skipCollapsed = true)
+        val sheetState = SheetState(skipPartiallyExpanded = true)
 
         val nestedScrollDispatcher = NestedScrollDispatcher()
         val nestedScrollConnection = object : NestedScrollConnection {
