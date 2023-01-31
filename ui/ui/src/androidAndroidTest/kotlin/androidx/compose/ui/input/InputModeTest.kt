@@ -16,24 +16,25 @@
 
 package androidx.compose.ui.input
 
-import android.os.Build.VERSION.SDK_INT
+import android.os.Build
 import android.view.View
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.setFocusableContent
-import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
+import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.platform.LocalInputModeManager
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.filters.FlakyTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
+import androidx.test.filters.FlakyTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
-import org.junit.After
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,14 +50,17 @@ class InputModeTest(private val param: Param) {
     private lateinit var inputModeManager: InputModeManager
     private lateinit var view: View
 
-    // TODO(b/267253920): Add a compose test API to set/reset InputMode.
-    @After
-    fun resetTouchMode() = with(InstrumentationRegistry.getInstrumentation()) {
-        if (SDK_INT < 33) setInTouchMode(true) else resetInTouchMode()
+    init {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(param.inputMode == Touch)
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun initialInputMode() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         // Arrange.
         rule.setContentWithInputManager {
             Box {}
@@ -67,14 +71,19 @@ class InputModeTest(private val param: Param) {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun switchToTouchModeProgrammatically() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         // Arrange.
         rule.setContentWithInputManager {
             Box {}
         }
 
         // Act.
-        val requestGranted = rule.runOnIdle {
+        val requestGranted = rule.runOnUiThread {
             inputModeManager.requestInputMode(Touch)
         }
 
@@ -95,7 +104,12 @@ class InputModeTest(private val param: Param) {
 
     @FlakyTest(bugId = 202524920)
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun switchToKeyboardModeProgrammatically() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
         // Arrange.
         val testTag = "Box"
         rule.setContentWithInputManager {
@@ -103,23 +117,23 @@ class InputModeTest(private val param: Param) {
         }
 
         // Act.
-        val requestGranted = rule.runOnIdle {
+        val requestGranted = rule.runOnUiThread {
             inputModeManager.requestInputMode(Keyboard)
         }
 
         // Assert
         rule.runOnIdle { assertThat(requestGranted).isTrue() }
-        assertThat(inputModeManager.inputMode).isEqualTo(Keyboard)
+        rule.waitUntil { inputModeManager.inputMode == Keyboard }
     }
 
     private fun ComposeContentTestRule.setContentWithInputManager(
         composable: @Composable () -> Unit
     ) {
-        setFocusableContent {
+        this.setFocusableContent {
             inputModeManager = LocalInputModeManager.current
+            view = LocalView.current
             composable()
         }
-        runOnIdle { inputModeManager.requestInputMode(param.inputMode) }
     }
 
     // We need to wrap the inline class parameter in another class because Java can't instantiate

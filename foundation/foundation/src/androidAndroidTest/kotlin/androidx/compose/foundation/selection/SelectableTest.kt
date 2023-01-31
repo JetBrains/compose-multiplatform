@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation.selection
 
-import android.os.Build.VERSION.SDK_INT
+import android.os.Build
 import androidx.compose.foundation.TapIndicationDelay
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
@@ -40,14 +40,10 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.InputMode.Companion.Keyboard
-import androidx.compose.ui.input.InputMode.Companion.Touch
-import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -71,6 +67,7 @@ import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -96,12 +93,7 @@ class SelectableTest {
     @After
     fun after() {
         isDebugInspectorInfoEnabled = false
-    }
-
-    // TODO(b/267253920): Add a compose test API to set/reset InputMode.
-    @After
-    fun resetTouchMode() = with(InstrumentationRegistry.getInstrumentation()) {
-        if (SDK_INT < 33) setInTouchMode(true) else resetInTouchMode()
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
     }
 
     @Test
@@ -494,14 +486,13 @@ class SelectableTest {
 
     @Test
     fun selectableTest_interactionSource_focus_inTouchMode() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
         val focusRequester = FocusRequester()
-        lateinit var inputModeManager: InputModeManager
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box {
                 Box(
                     Modifier
@@ -529,8 +520,6 @@ class SelectableTest {
         }
 
         rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Touch)
             focusRequester.requestFocus()
         }
 
@@ -541,17 +530,21 @@ class SelectableTest {
     }
 
     @Test
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_interactionSource_focus_inKeyboardMode() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
         val focusRequester = FocusRequester()
         lateinit var focusManager: FocusManager
-        lateinit var inputModeManager: InputModeManager
 
         rule.setContent {
             scope = rememberCoroutineScope()
             focusManager = LocalFocusManager.current
-            inputModeManager = LocalInputModeManager.current
                 Box {
                     Box(
                         Modifier
@@ -579,8 +572,6 @@ class SelectableTest {
         }
 
         rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
             focusRequester.requestFocus()
         }
 
@@ -645,13 +636,16 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_clickWithEnterKey() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
-            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "SelectableText",
                 modifier = Modifier
@@ -661,11 +655,7 @@ class SelectableTest {
             )
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         rule.onNodeWithTag("selectable").performKeyInput { keyDown(Key.Enter) }
 
@@ -678,13 +668,16 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_clickWithNumPadEnterKey() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
-            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "SelectableText",
                 modifier = Modifier
@@ -694,11 +687,7 @@ class SelectableTest {
             )
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         rule.onNodeWithTag("selectable").performKeyInput { keyDown(Key.NumPadEnter) }
 
@@ -711,13 +700,16 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_clickWithDPadCenter() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
-            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "SelectableText",
                 modifier = Modifier
@@ -727,11 +719,7 @@ class SelectableTest {
             )
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         rule.onNodeWithTag("selectable").performKeyInput { keyDown(Key.DirectionCenter) }
 
@@ -744,15 +732,18 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_enterKey_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -767,11 +758,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -796,15 +783,18 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_numPadEnterKey_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -819,11 +809,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -848,15 +834,18 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_dpadCenter_emitsIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -871,11 +860,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
         rule.waitForIdle()
 
         val interactions = mutableListOf<Interaction>()
@@ -902,14 +887,12 @@ class SelectableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun selectableTest_otherKey_doesNotEmitIndication() {
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -924,11 +907,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -943,15 +922,18 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_doubleEnterKey_emitsFurtherInteractions() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
-
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -966,11 +948,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1009,16 +987,19 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
         var repeatCounter = 0
-
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -1038,11 +1019,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1076,16 +1053,20 @@ class SelectableTest {
 
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun selectableTest_interruptedClick_emitsCancelIndication() {
+        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
+            return // b/262909049: Do not run this test on pre-release Android U.
+        }
+
+        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         val enabled = mutableStateOf(true)
         lateinit var scope: CoroutineScope
-        lateinit var inputModeManager: InputModeManager
 
         rule.setContent {
             scope = rememberCoroutineScope()
-            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("SelectableText",
                     modifier = Modifier
@@ -1101,11 +1082,7 @@ class SelectableTest {
             }
         }
 
-        rule.runOnIdle {
-            @OptIn(ExperimentalComposeUiApi::class)
-            inputModeManager.requestInputMode(Keyboard)
-            focusRequester.requestFocus()
-        }
+        rule.runOnIdle { focusRequester.requestFocus() }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
