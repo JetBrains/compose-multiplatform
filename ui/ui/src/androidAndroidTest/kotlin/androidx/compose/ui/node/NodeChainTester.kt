@@ -20,6 +20,8 @@ package androidx.compose.ui.node
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.InspectorInfo
+import com.google.common.base.Objects
 import org.junit.Assert
 
 internal fun chainTester() = NodeChainTester()
@@ -213,11 +215,7 @@ class A : Modifier.Node() {
 }
 
 fun modifierA(params: Any? = null): Modifier.Element {
-    return object : ModifierNodeElement<A>(params, true, {}) {
-        override fun create(): A = A()
-        override fun update(node: A): A = node
-        override fun toString(): String = "a"
-    }
+    return object : TestModifierElement<A>("a", params, A()) {}
 }
 
 class B : Modifier.Node() {
@@ -225,11 +223,7 @@ class B : Modifier.Node() {
 }
 
 fun modifierB(params: Any? = null): Modifier.Element {
-    return object : ModifierNodeElement<B>(params, true, {}) {
-        override fun create(): B = B()
-        override fun update(node: B): B = node
-        override fun toString(): String = "b"
-    }
+    return object : TestModifierElement<B>("b", params, B()) {}
 }
 
 class C : Modifier.Node() {
@@ -237,31 +231,44 @@ class C : Modifier.Node() {
 }
 
 fun modifierC(params: Any? = null): Modifier.Element {
-    return object : ModifierNodeElement<C>(params, true, {}) {
-        override fun create(): C = C()
-        override fun update(node: C): C = node
-        override fun toString(): String = "c"
-    }
+    return object : TestModifierElement<C>("c", params, C()) {}
 }
 
 fun modifierD(params: Any? = null): Modifier.Element {
-    class N : Modifier.Node() {
-        override fun toString(): String = "d"
-    }
-    return object : ModifierNodeElement<N>(params, true, {}) {
-        override fun create(): N = N()
-        override fun update(node: N): N = node
-        override fun toString(): String = "d"
-    }
+    return object : TestModifierElement<Modifier.Node>("d", params,
+        object : Modifier.Node() {}
+    ) {}
 }
 
 fun managedModifier(
     name: String,
     params: Any? = null
-): ModifierNodeElement<*> = object : ModifierNodeElement<Modifier.Node>(params, true, {}) {
-    override fun create(): Modifier.Node = object : Modifier.Node() {}
-    override fun update(node: Modifier.Node): Modifier.Node = node
-    override fun toString(): String = name
+): ModifierNodeElement<*> = object : TestModifierElement<Modifier.Node>(name, params,
+    object : Modifier.Node() {}
+) {}
+
+private abstract class TestModifierElement<T : Modifier.Node>(
+    val modifierName: String,
+    val param: Any? = null,
+    val node: T
+) : ModifierNodeElement<T>() {
+    override fun create(): T = node
+    override fun update(node: T): T = this.node
+    override fun InspectorInfo.inspectableProperties() {
+        name = modifierName
+    }
+
+    override fun hashCode() = Objects.hashCode(modifierName, param)
+
+    override fun equals(other: Any?): Boolean {
+        if (other === this) return true
+        return other is TestModifierElement<*> &&
+            javaClass == other.javaClass &&
+            modifierName == other.modifierName &&
+            param == other.param
+    }
+
+    override fun toString() = modifierName
 }
 
 fun entityModifiers(vararg names: String): List<ModifierNodeElement<*>> {

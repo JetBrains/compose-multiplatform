@@ -71,6 +71,11 @@ dependencies {
         implementation("androidx.autofill:autofill:1.0.0")
         implementation(libs.kotlinCoroutinesAndroid)
 
+        // Used to generate debug information in the layout inspector. If not present,
+        // we may fall back to more limited data.
+        compileOnly(libs.kotlinReflect)
+        testImplementation(libs.kotlinReflect)
+
         implementation("androidx.activity:activity:1.7.0-beta01")
         implementation("androidx.activity:activity-ktx:1.5.1")
         implementation("androidx.core:core:1.9.0")
@@ -149,6 +154,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
 
+                // Used to generate debug information in the layout inspector. If not present,
+                // we may fall back to more limited data.
+                compileOnly(libs.kotlinReflect)
+
                 // when updating the runtime version please also update the runtime-saveable version
                 implementation(project(":compose:runtime:runtime"))
                 api(project(":compose:runtime:runtime-saveable"))
@@ -196,6 +205,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.kotlinStdlibJdk8)
                     api(libs.kotlinCoroutinesSwing)
                 }
+            }
+
+            commonTest.dependencies {
+                implementation(libs.kotlinReflect)
             }
 
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you

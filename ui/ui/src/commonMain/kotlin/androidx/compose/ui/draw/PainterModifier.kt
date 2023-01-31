@@ -39,7 +39,7 @@ import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.invalidateDraw
 import androidx.compose.ui.node.invalidateLayer
 import androidx.compose.ui.node.invalidateLayout
-import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.constrainHeight
@@ -93,25 +93,17 @@ fun Modifier.paint(
  * @sample androidx.compose.ui.samples.PainterModifierSample
  */
 @ExperimentalComposeUiApi
-private class PainterModifierNodeElement(
+private data class PainterModifierNodeElement(
     val painter: Painter,
     val sizeToIntrinsics: Boolean,
     val alignment: Alignment,
     val contentScale: ContentScale,
     val alpha: Float,
     val colorFilter: ColorFilter?
-) : ModifierNodeElement<PainterModifierNode>(
-    autoInvalidate = false,
-    inspectorInfo = debugInspectorInfo {
-        name = "paint"
-        properties["painter"] = painter
-        properties["sizeToIntrinsics"] = sizeToIntrinsics
-        properties["alignment"] = alignment
-        properties["contentScale"] = contentScale
-        properties["alpha"] = alpha
-        properties["colorFilter"] = colorFilter
-    }
-) {
+) : ModifierNodeElement<PainterModifierNode>() {
+    override val autoInvalidate: Boolean
+        get() = false
+
     override fun create(): PainterModifierNode {
         return PainterModifierNode(
             painter = painter,
@@ -145,28 +137,14 @@ private class PainterModifierNodeElement(
         return node
     }
 
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is PainterModifierNodeElement) return false
-
-        if (painter !== other.painter) return false
-        if (sizeToIntrinsics != other.sizeToIntrinsics) return false
-        if (alignment != other.alignment) return false
-        if (contentScale != other.contentScale) return false
-        if (alpha != other.alpha) return false
-        if (colorFilter != other.colorFilter) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = painter.hashCode()
-        result = 31 * result + sizeToIntrinsics.hashCode()
-        result = 31 * result + alignment.hashCode()
-        result = 31 * result + contentScale.hashCode()
-        result = 31 * result + alpha.hashCode()
-        result = 31 * result + (colorFilter?.hashCode() ?: 0)
-        return result
+    override fun InspectorInfo.inspectableProperties() {
+        name = "paint"
+        properties["painter"] = painter
+        properties["sizeToIntrinsics"] = sizeToIntrinsics
+        properties["alignment"] = alignment
+        properties["contentScale"] = contentScale
+        properties["alpha"] = alpha
+        properties["colorFilter"] = colorFilter
     }
 }
 
