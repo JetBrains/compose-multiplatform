@@ -28,6 +28,7 @@ import androidx.compose.material3.samples.AlertDialogWithIconSample
 import androidx.compose.material3.samples.AnimatedExtendedFloatingActionButtonSample
 import androidx.compose.material3.samples.AssistChipSample
 import androidx.compose.material3.samples.BottomAppBarWithFAB
+import androidx.compose.material3.samples.BottomSheetScaffoldNestedScrollSample
 import androidx.compose.material3.samples.ModalBottomSheetSample
 import androidx.compose.material3.samples.ButtonSample
 import androidx.compose.material3.samples.ButtonWithIconSample
@@ -112,6 +113,7 @@ import androidx.compose.material3.samples.ScrollingFancyIndicatorContainerTabs
 import androidx.compose.material3.samples.ScrollingTextTabs
 import androidx.compose.material3.samples.SearchBarSample
 import androidx.compose.material3.samples.SimpleBottomAppBar
+import androidx.compose.material3.samples.SimpleBottomSheetScaffoldSample
 import androidx.compose.material3.samples.SimpleCenterAlignedTopAppBar
 import androidx.compose.material3.samples.SimpleOutlinedTextFieldSample
 import androidx.compose.material3.samples.SimpleTextFieldSample
@@ -171,7 +173,17 @@ val BottomSheetExamples =
             name = ::ModalBottomSheetSample.name,
             description = BottomSheetExampleDescription,
             sourceUrl = BottomSheetExampleSourceUrl
-        ) { ModalBottomSheetSample() }
+        ) { ModalBottomSheetSample() },
+        Example(
+            name = ::SimpleBottomSheetScaffoldSample.name,
+            description = BottomSheetExampleDescription,
+            sourceUrl = BottomSheetExampleSourceUrl
+        ) { SimpleBottomSheetScaffoldSample() },
+        Example(
+            name = ::BottomSheetScaffoldNestedScrollSample.name,
+            description = BottomSheetExampleDescription,
+            sourceUrl = BottomSheetExampleSourceUrl
+        ) { BottomSheetScaffoldNestedScrollSample() }
     )
 
 private const val ButtonsExampleDescription = "Button examples"

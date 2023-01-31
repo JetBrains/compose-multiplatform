@@ -94,7 +94,7 @@ import kotlinx.coroutines.launch
 fun ModalBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberSheetState(),
+    sheetState: SheetState = rememberModalBottomSheetState(),
     shape: Shape = BottomSheetDefaults.ExpandedShape,
     containerColor: Color = BottomSheetDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
@@ -193,6 +193,21 @@ fun ModalBottomSheet(
     }
 }
 
+/**
+ * Create and [remember] a [SheetState] for [ModalBottomSheet].
+ *
+ * @param skipPartiallyExpanded Whether the partially expanded state, if the sheet is tall enough,
+ * should be skipped. If true, the sheet will always expand to the [Expanded] state and move to the
+ * [Hidden] state when hiding the sheet, either programmatically or by user interaction.
+ * @param confirmValueChange Optional callback invoked to confirm or veto a pending state change.
+ */
+@Composable
+@ExperimentalMaterial3Api
+fun rememberModalBottomSheetState(
+    skipPartiallyExpanded: Boolean = false,
+    confirmValueChange: (SheetValue) -> Boolean = { true },
+) = rememberSheetState(skipPartiallyExpanded, confirmValueChange, Hidden)
+
 @Composable
 private fun Scrim(
     color: Color,
@@ -262,18 +277,13 @@ private fun Modifier.modalBottomSheetSwipeable(
                     max(0f, screenHeight - sheetSize.height)
                 } else null
             }
-        }
-        .semantics {
+        }.semantics {
             if (sheetState.isVisible) {
                 dismiss {
                     if (sheetState.swipeableState.confirmValueChange(Hidden)) {
-                        scope
-                            .launch { sheetState.hide() }
-                            .invokeOnCompletion {
-                                if (!sheetState.isVisible) {
-                                    onDismissRequest()
-                                }
-                            }
+                        scope.launch { sheetState.hide() }.invokeOnCompletion {
+                            if (!sheetState.isVisible) { onDismissRequest() }
+                        }
                     }
                     true
                 }

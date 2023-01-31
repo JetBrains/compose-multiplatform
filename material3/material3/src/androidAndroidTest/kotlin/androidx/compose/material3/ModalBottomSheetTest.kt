@@ -107,14 +107,12 @@ class ModalBottomSheetTest {
                 ModalBottomSheet(onDismissRequest = { showBottomSheet = false }) {
                     Box(
                         Modifier
-                            .fillMaxWidth()
-                            .height(sheetHeight)
+                            .size(sheetHeight)
                             .testTag(sheetTag)
                     )
                 }
             }
         }
-
         rule.onNodeWithTag(sheetTag).assertIsDisplayed()
 
         val outsideY = with(rule.density) {
@@ -210,7 +208,7 @@ class ModalBottomSheetTest {
         lateinit var sheetState: SheetState
 
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState, dragHandle = null) {
                 Box(
                     Modifier
@@ -232,7 +230,7 @@ class ModalBottomSheetTest {
         var screenHeightPx by mutableStateOf(0f)
 
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             val context = LocalContext.current
             val density = LocalDensity.current
             val resScreenHeight = context.resources.configuration.screenHeightDp
@@ -298,7 +296,7 @@ class ModalBottomSheetTest {
         rule.setContent {
             val context = LocalContext.current
             screenHeight = context.resources.configuration.screenHeightDp.dp
-            state = rememberSheetState()
+            state = rememberModalBottomSheetState()
             ModalBottomSheet(
                 onDismissRequest = {},
                 sheetState = state,
@@ -327,7 +325,7 @@ class ModalBottomSheetTest {
         lateinit var state: SheetState
         lateinit var scope: CoroutineScope
         rule.setContent {
-            state = rememberSheetState()
+            state = rememberModalBottomSheetState()
             scope = rememberCoroutineScope()
 
             ModalBottomSheet(onDismissRequest = {}, sheetState = state, dragHandle = null) {}
@@ -349,7 +347,7 @@ class ModalBottomSheetTest {
         var amountOfItems by mutableStateOf(0)
         lateinit var scope: CoroutineScope
         rule.setContent {
-            state = rememberSheetState()
+            state = rememberModalBottomSheetState()
             ModalBottomSheet(
                 onDismissRequest = {},
                 sheetState = state,
@@ -399,7 +397,7 @@ class ModalBottomSheetTest {
         lateinit var sheetState: SheetState
         lateinit var scrollState: ScrollState
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             ModalBottomSheet(
                 onDismissRequest = {},
                 sheetState = sheetState,
@@ -515,7 +513,7 @@ class ModalBottomSheetTest {
     fun modalBottomSheet_expandBySwiping() {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
                     Modifier
@@ -541,7 +539,7 @@ class ModalBottomSheetTest {
     fun modalBottomSheet_respectsConfirmStateChange() {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState(
+            sheetState = rememberModalBottomSheetState(
                 confirmValueChange = { newState ->
                     newState != SheetValue.Hidden
                 }
@@ -579,7 +577,7 @@ class ModalBottomSheetTest {
         lateinit var sheetState: SheetState
         lateinit var scope: CoroutineScope
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             scope = rememberCoroutineScope()
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
@@ -611,7 +609,7 @@ class ModalBottomSheetTest {
     fun modalBottomSheet_hideBySwiping_skipPartiallyExpanded() {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState(skipPartiallyExpanded = true)
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
                     Modifier
@@ -640,7 +638,7 @@ class ModalBottomSheetTest {
     ) {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState(skipPartiallyExpanded = true)
+            sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
                     Modifier
@@ -679,7 +677,7 @@ class ModalBottomSheetTest {
     fun modalBottomSheet_testExpandAction_tallBottomSheet_whenHalfExpanded() {
         lateinit var sheetState: SheetState
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
                 Box(
                     Modifier
@@ -708,7 +706,7 @@ class ModalBottomSheetTest {
         var screenHeightPx by mutableStateOf(0f)
 
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             scope = rememberCoroutineScope()
             val context = LocalContext.current
             val density = LocalDensity.current
@@ -749,7 +747,7 @@ class ModalBottomSheetTest {
         var screenHeightPx by mutableStateOf(0f)
 
         rule.setContent {
-            sheetState = rememberSheetState()
+            sheetState = rememberModalBottomSheetState()
             scope = rememberCoroutineScope()
             val context = LocalContext.current
             val density = LocalDensity.current
