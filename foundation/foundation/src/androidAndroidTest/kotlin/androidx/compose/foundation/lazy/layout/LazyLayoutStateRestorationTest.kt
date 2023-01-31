@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +53,7 @@ class LazyLayoutStateRestorationTest {
         var counter2 = 100
         var realState = arrayOf(0, 0, 0)
         restorationTester.setContent {
-            LazyLayout(3) {
+            LazyLayout({ 3 }) {
                 if (it == 0) {
                     realState[0] = rememberSaveable { counter0++ }
                 } else if (it == 1) {
@@ -90,7 +89,7 @@ class LazyLayoutStateRestorationTest {
         var realState = 0
         rule.setContent {
             LazyLayout(
-                itemCount = 2,
+                itemCount = { 2 },
                 itemIsVisible = { it == visibleItem }
             ) {
                 if (it == 0) {
@@ -129,11 +128,11 @@ class LazyLayoutStateRestorationTest {
         var realState = 0
         rule.setContent {
             LazyLayout(
-                itemCount = 2,
+                itemCount = { 2 },
                 itemIsVisible = { it == visibleItem }
             ) {
                 if (it == 0) {
-                    LazyLayout(itemCount = 1) {
+                    LazyLayout(itemCount = { 1 }) {
                         realState = rememberSaveable { counter0++ }
                         DisposableEffect(Unit) {
                             onDispose {
@@ -173,7 +172,7 @@ class LazyLayoutStateRestorationTest {
         var realState = arrayOf(0, 0, 0)
         restorationTester.setContent {
             LazyLayout(
-                itemCount = 3,
+                itemCount = { 3 },
                 indexToKey = { "$it" }
             ) {
                 if (it == 0) {
@@ -203,7 +202,6 @@ class LazyLayoutStateRestorationTest {
         }
     }
 
-    @Ignore // b/260866527
     @Test
     fun stateRestoredWhenUsedWithCustomKeysAfterReordering() {
         val restorationTester = StateRestorationTester(rule)
@@ -214,8 +212,8 @@ class LazyLayoutStateRestorationTest {
         var list by mutableStateOf(listOf(0, 1, 2))
         restorationTester.setContent {
             LazyLayout(
-                itemCount = list.size,
-                indexToKey = { "${list.getOrNull(it)}" }
+                itemCount = { list.size },
+                indexToKey = { "${list[it]}" }
             ) { index ->
                 val it = list[index]
                 if (it == 0) {
@@ -230,7 +228,7 @@ class LazyLayoutStateRestorationTest {
         }
 
         rule.runOnIdle {
-            list = listOf(1, 2)
+            list = listOf(1, 2, 0)
         }
 
         rule.runOnIdle {
@@ -243,7 +241,7 @@ class LazyLayoutStateRestorationTest {
         restorationTester.emulateSavedInstanceStateRestore()
 
         rule.runOnIdle {
-            Truth.assertThat(realState[0]).isEqualTo(0)
+            Truth.assertThat(realState[0]).isEqualTo(1)
             Truth.assertThat(realState[1]).isEqualTo(10)
             Truth.assertThat(realState[2]).isEqualTo(100)
         }
@@ -259,7 +257,7 @@ class LazyLayoutStateRestorationTest {
         }
         restorationTester.setContent {
             LazyLayout(
-                itemCount = 100,
+                itemCount = { 100 },
                 itemIsVisible = { visibleRange.contains(it) }
             ) {
                 realState[it] = rememberSaveable { stateToUse }
@@ -296,15 +294,15 @@ class LazyLayoutStateRestorationTest {
     @OptIn(ExperimentalFoundationApi::class)
     @Composable
     private fun LazyLayout(
-        itemCount: Int,
+        itemCount: () -> Int,
         itemIsVisible: (Int) -> Boolean = { true },
         indexToKey: (Int) -> Any = { getDefaultLazyLayoutKey(it) },
         content: @Composable (Int) -> Unit
     ) {
         LazyLayout(
-            itemProvider = remember(itemCount, content as Any) {
+            itemProvider = remember(itemCount, indexToKey, content as Any) {
                 object : LazyLayoutItemProvider {
-                    override val itemCount: Int = itemCount
+                    override val itemCount: Int = itemCount()
 
                     @Composable
                     override fun Item(index: Int) {
@@ -316,7 +314,7 @@ class LazyLayoutStateRestorationTest {
             }
         ) { constraints ->
             val placeables = mutableListOf<Placeable>()
-            repeat(itemCount) { index ->
+            repeat(itemCount()) { index ->
                 if (itemIsVisible(index)) {
                     placeables.addAll(measure(index, constraints))
                 }
