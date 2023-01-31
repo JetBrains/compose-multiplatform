@@ -33,7 +33,6 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
-import androidx.test.filters.RequiresDevice
 import com.google.common.truth.Truth
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
@@ -83,7 +82,6 @@ class SnackbarHostTest {
         rule.waitUntil { job.isCompleted }
     }
 
-    @RequiresDevice // b/264895456
     @Test
     fun snackbarHost_fifoQueueContract() {
         var resultedInvocation = ""
@@ -113,7 +111,6 @@ class SnackbarHostTest {
         Truth.assertThat(resultedInvocation).isEqualTo("0123456789")
     }
 
-    @RequiresDevice // b/264895456
     @Test
     @LargeTest
     fun snackbarHost_returnedResult() {
@@ -142,7 +139,7 @@ class SnackbarHostTest {
             Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
         }
 
-        rule.waitUntil(timeoutMillis = 5_000) { job2.isCompleted }
+        rule.waitUntil(timeoutMillis = 7_000) { job2.isCompleted }
     }
 
     @Test

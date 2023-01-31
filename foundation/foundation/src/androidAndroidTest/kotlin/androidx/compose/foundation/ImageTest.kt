@@ -66,7 +66,6 @@ import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
-import androidx.test.filters.RequiresDevice
 import androidx.test.filters.SdkSuppress
 import org.junit.Assert
 import org.junit.Assert.assertEquals
@@ -81,8 +80,8 @@ class ImageTest {
 
     val contentTag = "ImageTest"
 
-    val imageWidth = 100
-    val imageHeight = 100
+    val imageWidth = 300
+    val imageHeight = 300
     val containerSize = imageWidth
 
     val bgColor = Color.Blue
@@ -254,7 +253,6 @@ class ImageTest {
         }
     }
 
-    @RequiresDevice // b/264704089
     @Test
     fun testImageFixedSizeIsStretched() {
         val imageComposableWidth = imageWidth * 2
