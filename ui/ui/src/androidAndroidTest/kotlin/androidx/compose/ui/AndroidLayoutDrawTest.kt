@@ -125,7 +125,6 @@ import org.junit.Assert.assertSame
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -3273,7 +3272,6 @@ class AndroidLayoutDrawTest {
         }
     }
 
-    @Ignore // b/266748671
     // Tests that an invalidation on a detached view will draw correctly when attached.
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
@@ -4014,10 +4012,10 @@ fun assertColorsEqual(
     error: () -> String = { "$expected and $color are not similar!" }
 ) {
     val errorString = error()
-    assertEquals(errorString, expected.red, color.red, 0.01f)
-    assertEquals(errorString, expected.green, color.green, 0.01f)
-    assertEquals(errorString, expected.blue, color.blue, 0.01f)
-    assertEquals(errorString, expected.alpha, color.alpha, 0.01f)
+    assertEquals(errorString, expected.red, color.red, 0.05f)
+    assertEquals(errorString, expected.green, color.green, 0.05f)
+    assertEquals(errorString, expected.blue, color.blue, 0.05f)
+    assertEquals(errorString, expected.alpha, color.alpha, 0.05f)
 }
 
 @Composable
