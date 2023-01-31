@@ -37,17 +37,53 @@ import androidx.compose.ui.text.style.LineBreak.WordBreak
  *
  * @sample androidx.compose.ui.text.samples.LineBreakSample
  * @sample androidx.compose.ui.text.samples.AndroidLineBreakSample
- *
- * @param strategy defines the algorithm that inserts line breaks
- * @param strictness defines the line breaking rules
- * @param wordBreak defines how words are broken
  */
 @Immutable
-actual class LineBreak(
-    val strategy: Strategy,
-    val strictness: Strictness,
-    val wordBreak: WordBreak
+@JvmInline
+actual value class LineBreak private constructor(
+    internal val mask: Int
 ) {
+
+    /**
+     * This represents a configuration for line breaking on Android, describing [Strategy],
+     * [Strictness], and [WordBreak].
+     *
+     * @param strategy defines the algorithm that inserts line breaks
+     * @param strictness defines the line breaking rules
+     * @param wordBreak defines how words are broken
+     */
+    constructor(
+        strategy: Strategy,
+        strictness: Strictness,
+        wordBreak: WordBreak
+    ) : this(packBytes(
+        strategy.value,
+        strictness.value,
+        wordBreak.value
+    ))
+
+    val strategy: Strategy
+        get() = Strategy(unpackByte1(mask))
+
+    val strictness: Strictness
+        get() = Strictness(unpackByte2(mask))
+
+    val wordBreak: WordBreak
+        get() = WordBreak(unpackByte3(mask))
+
+    fun copy(
+        strategy: Strategy = this.strategy,
+        strictness: Strictness = this.strictness,
+        wordBreak: WordBreak = this.wordBreak
+    ): LineBreak = LineBreak(
+        strategy = strategy,
+        strictness = strictness,
+        wordBreak = wordBreak
+    )
+
+    override fun toString(): String =
+        "LineBreak(strategy=$strategy, strictness=$strictness, wordBreak=$wordBreak)"
+
     actual companion object {
         /**
          * The greedy, fast line breaking algorithm. Ideal for text that updates often,
@@ -122,42 +158,11 @@ actual class LineBreak(
         )
     }
 
-    fun copy(
-        strategy: Strategy = this.strategy,
-        strictness: Strictness = this.strictness,
-        wordBreak: WordBreak = this.wordBreak
-    ): LineBreak = LineBreak(
-        strategy = strategy,
-        strictness = strictness,
-        wordBreak = wordBreak
-    )
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is LineBreak) return false
-
-        if (strategy != other.strategy) return false
-        if (strictness != other.strictness) return false
-        if (wordBreak != other.wordBreak) return false
-
-        return true
-    }
-
-    override fun hashCode(): Int {
-        var result = strategy.hashCode()
-        result = 31 * result + strictness.hashCode()
-        result = 31 * result + wordBreak.hashCode()
-        return result
-    }
-
-    override fun toString(): String =
-        "LineBreak(strategy=$strategy, strictness=$strictness, wordBreak=$wordBreak)"
-
     /**
      * The strategy used for line breaking.
      */
     @JvmInline
-    value class Strategy private constructor(private val value: Int) {
+    value class Strategy internal constructor(internal val value: Int) {
         companion object {
             /**
              * Basic, fast break strategy. Hyphenation, if enabled, is done only for words
@@ -216,7 +221,7 @@ actual class LineBreak(
      * line breaks can be inserted. It is useful when working with CJK scripts.
      */
     @JvmInline
-    value class Strictness private constructor(private val value: Int) {
+    value class Strictness internal constructor(internal val value: Int) {
         companion object {
             /**
              * Default breaking rules for the locale, which may correspond to [Normal] or [Strict].
@@ -260,7 +265,7 @@ actual class LineBreak(
      * Describes how line breaks should be inserted within words.
      */
     @JvmInline
-    value class WordBreak private constructor(private val value: Int) {
+    value class WordBreak internal constructor(internal val value: Int) {
         companion object {
             /**
              * Default word breaking rules for the locale.
@@ -314,3 +319,21 @@ actual class LineBreak(
         }
     }
 }
+
+/**
+ * Packs 3 bytes represented as Integers into a single Integer.
+ *
+ * A byte can represent any value between 0 and 256.
+ *
+ * Only the 8 least significant bits of any given value are packed into the returned Integer.
+ *
+ */
+private fun packBytes(i1: Int, i2: Int, i3: Int): Int {
+    return i1 or (i2 shl 8) or (i3 shl 16)
+}
+
+private fun unpackByte1(mask: Int) = 0x000000FF and mask
+
+private fun unpackByte2(mask: Int) = 0x000000FF and (mask shr 8)
+
+private fun unpackByte3(mask: Int) = 0x000000FF and (mask shr 16)
