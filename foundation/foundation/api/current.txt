@@ -710,6 +710,9 @@ package androidx.compose.foundation.lazy.layout {
   public final class LazyLayoutKt {
   }
 
+  public final class LazyLayoutPinnableItemKt {
+  }
+
   public final class LazyLayoutPrefetcher_androidKt {
   }
 
@@ -717,9 +720,6 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class LazyNearestItemsRangeKt {
-  }
-
-  public final class LazyPinnableContainerProviderKt {
   }
 
   public final class LazySaveableStateHolderKt {

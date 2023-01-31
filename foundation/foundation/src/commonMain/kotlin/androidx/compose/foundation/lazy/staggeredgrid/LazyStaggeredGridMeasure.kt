@@ -21,7 +21,6 @@ import androidx.compose.foundation.fastFold
 import androidx.compose.foundation.fastMaxOfOrNull
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
-import androidx.compose.foundation.lazy.layout.LazyPinnedItem
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLaneInfo.Companion.FullSpan
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLaneInfo.Companion.Unset
 import androidx.compose.runtime.snapshots.Snapshot
@@ -639,7 +638,6 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
         var extraItemOffset = itemScrollOffsets[0]
         val extraItemsBefore = calculateExtraItems(
-            state.pinnedItems,
             position = {
                 extraItemOffset -= it.sizeWithSpacings
                 it.position(0, extraItemOffset, 0)
@@ -663,7 +661,6 @@ private fun LazyStaggeredGridMeasureContext.measure(
 
         extraItemOffset = itemScrollOffsets[0]
         val extraItemsAfter = calculateExtraItems(
-            state.pinnedItems,
             position = {
                 val positionedItem = it.position(0, extraItemOffset, 0)
                 extraItemOffset += it.sizeWithSpacings
@@ -786,20 +783,21 @@ private fun LazyStaggeredGridMeasureContext.calculatePositionedItems(
     return positionedItems
 }
 
+@ExperimentalFoundationApi
 private inline fun LazyStaggeredGridMeasureContext.calculateExtraItems(
-    pinnedItems: List<LazyPinnedItem>,
     position: (LazyStaggeredGridMeasuredItem) -> LazyStaggeredGridPositionedItem,
     filter: (itemIndex: Int) -> Boolean
 ): List<LazyStaggeredGridPositionedItem> {
     var result: MutableList<LazyStaggeredGridPositionedItem>? = null
 
-    pinnedItems.fastForEach {
-        if (filter(it.index)) {
-            val spanRange = itemProvider.getSpanRange(it.index, 0)
+    val pinnedItems = state.pinnedItems
+    pinnedItems.fastForEach { item ->
+        if (filter(item.index)) {
+            val spanRange = itemProvider.getSpanRange(item.index, 0)
             if (result == null) {
                 result = mutableListOf()
             }
-            val measuredItem = measuredItemProvider.getAndMeasure(it.index, spanRange)
+            val measuredItem = measuredItemProvider.getAndMeasure(item.index, spanRange)
             result?.add(position(measuredItem))
         }
     }

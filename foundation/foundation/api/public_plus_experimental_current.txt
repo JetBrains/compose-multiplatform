@@ -856,6 +856,19 @@ package androidx.compose.foundation.lazy.layout {
     method @androidx.compose.runtime.Stable public default long toSp(float);
   }
 
+  public final class LazyLayoutPinnableItemKt {
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayoutPinnableItem(int index, androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList pinnedItemList, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public final class LazyLayoutPinnedItemList implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList.PinnedItem> {
+    ctor public LazyLayoutPinnedItemList();
+  }
+
+  @androidx.compose.foundation.ExperimentalFoundationApi public static sealed interface LazyLayoutPinnedItemList.PinnedItem {
+    method public int getIndex();
+    property public abstract int index;
+  }
+
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class LazyLayoutPrefetchState {
     ctor public LazyLayoutPrefetchState();
     method public androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle schedulePrefetch(int index, long constraints);
@@ -873,9 +886,6 @@ package androidx.compose.foundation.lazy.layout {
 
   public final class LazyNearestItemsRangeKt {
     method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static androidx.compose.runtime.State<kotlin.ranges.IntRange> rememberLazyNearestItemsRangeState(kotlin.jvm.functions.Function0<java.lang.Integer> firstVisibleItemIndex, kotlin.jvm.functions.Function0<java.lang.Integer> slidingWindowSize, kotlin.jvm.functions.Function0<java.lang.Integer> extraItemCount);
-  }
-
-  public final class LazyPinnableContainerProviderKt {
   }
 
   public final class LazySaveableStateHolderKt {

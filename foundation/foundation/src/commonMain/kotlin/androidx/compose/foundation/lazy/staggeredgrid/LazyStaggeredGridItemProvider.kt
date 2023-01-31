@@ -19,7 +19,7 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.DelegatingLazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
-import androidx.compose.foundation.lazy.layout.LazyPinnableContainerProvider
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnableItem
 import androidx.compose.foundation.lazy.layout.rememberLazyNearestItemsRangeState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -50,7 +50,7 @@ internal fun rememberStaggeredGridItemProvider(
                 scope.intervals,
                 nearestItemsRangeState.value,
                 itemContent = { interval, index ->
-                    LazyPinnableContainerProvider(state.pinnedItems, index) {
+                    LazyLayoutPinnableItem(index, state.pinnedItems) {
                         interval.value.item.invoke(
                             LazyStaggeredGridItemScopeImpl,
                             index - interval.startIndex

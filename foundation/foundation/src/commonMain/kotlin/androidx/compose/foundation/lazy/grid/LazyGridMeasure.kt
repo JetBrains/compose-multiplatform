@@ -16,10 +16,11 @@
 
 package androidx.compose.foundation.lazy.grid
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.fastFilter
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.layout.LazyPinnedItem
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
@@ -38,6 +39,7 @@ import kotlin.math.sign
  * Measures and calculates the positions for the currently visible items. The result is produced
  * as a [LazyGridMeasureResult] which contains all the calculations.
  */
+@OptIn(ExperimentalFoundationApi::class)
 internal fun measureLazyGrid(
     itemsCount: Int,
     measuredLineProvider: LazyMeasuredLineProvider,
@@ -57,7 +59,7 @@ internal fun measureLazyGrid(
     density: Density,
     placementAnimator: LazyGridItemPlacementAnimator,
     spanLayoutProvider: LazyGridSpanLayoutProvider,
-    pinnedItems: List<LazyPinnedItem>,
+    pinnedItems: LazyLayoutPinnedItemList,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyGridMeasureResult {
     require(beforeContentPadding >= 0)
@@ -298,23 +300,24 @@ internal fun measureLazyGrid(
     }
 }
 
+@ExperimentalFoundationApi
 private inline fun calculateExtraItems(
-    pinnedItems: List<LazyPinnedItem>,
+    pinnedItems: LazyLayoutPinnedItemList,
     itemProvider: LazyMeasuredItemProvider,
     itemConstraints: (ItemIndex) -> Constraints,
     filter: (Int) -> Boolean
 ): List<LazyGridMeasuredItem> {
     var items: MutableList<LazyGridMeasuredItem>? = null
 
-    pinnedItems.fastForEach {
-        val index = ItemIndex(it.index)
-        if (filter(it.index)) {
-            val constraints = itemConstraints(index)
-            val item = itemProvider.getAndMeasure(index, constraints = constraints)
+    pinnedItems.fastForEach { item ->
+        if (filter(item.index)) {
+            val itemIndex = ItemIndex(item.index)
+            val constraints = itemConstraints(itemIndex)
+            val measuredItem = itemProvider.getAndMeasure(itemIndex, constraints = constraints)
             if (items == null) {
                 items = mutableListOf()
             }
-            items?.add(item)
+            items?.add(measuredItem)
         }
     }
 
