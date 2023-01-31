@@ -86,6 +86,10 @@ import kotlin.math.roundToInt
  *
  * @sample androidx.compose.material3.samples.TextFieldWithIcons
  *
+ * You can also provide a prefix or suffix to the text:
+ *
+ * @sample androidx.compose.material3.samples.TextFieldWithPrefixAndSuffix
+ *
  * To handle the error input state, use [isError] parameter:
  *
  * @sample androidx.compose.material3.samples.TextFieldWithErrorState
@@ -125,6 +129,8 @@ import kotlin.math.roundToInt
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
  * container
+ * @param prefix the optional prefix to be displayed before the input text in the text field
+ * @param suffix the optional suffix to be displayed after the input text in the text field
  * @param supportingText the optional supporting text to be displayed below the text field
  * @param isError indicates if the text field's current value is in error. If set to true, the
  * label, bottom indicator and trailing icon by default will be displayed in error color
@@ -165,6 +171,8 @@ fun TextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -214,6 +222,8 @@ fun TextField(
                     label = label,
                     leadingIcon = leadingIcon,
                     trailingIcon = trailingIcon,
+                    prefix = prefix,
+                    suffix = suffix,
                     supportingText = supportingText,
                     shape = shape,
                     singleLine = singleLine,
@@ -265,6 +275,8 @@ fun TextField(
  * container
  * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
  * container
+ * @param prefix the optional prefix to be displayed before the input text in the text field
+ * @param suffix the optional suffix to be displayed after the input text in the text field
  * @param supportingText the optional supporting text to be displayed below the text field
  * @param isError indicates if the text field's current value is in error state. If set to
  * true, the label, bottom indicator and trailing icon by default will be displayed in error color
@@ -305,6 +317,8 @@ fun TextField(
     placeholder: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,
+    prefix: @Composable (() -> Unit)? = null,
+    suffix: @Composable (() -> Unit)? = null,
     supportingText: @Composable (() -> Unit)? = null,
     isError: Boolean = false,
     visualTransformation: VisualTransformation = VisualTransformation.None,
@@ -354,6 +368,8 @@ fun TextField(
                     label = label,
                     leadingIcon = leadingIcon,
                     trailingIcon = trailingIcon,
+                    prefix = prefix,
+                    suffix = suffix,
                     supportingText = supportingText,
                     shape = shape,
                     singleLine = singleLine,
@@ -365,6 +381,112 @@ fun TextField(
             }
         )
     }
+}
+
+@Deprecated("Use overload with prefix and suffix parameters", level = DeprecationLevel.HIDDEN)
+@ExperimentalMaterial3Api
+@Composable
+fun TextField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = TextFieldDefaults.filledShape,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        prefix = null,
+        suffix = null,
+        supportingText = supportingText,
+        isError = isError,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        minLines = minLines,
+        interactionSource = interactionSource,
+        shape = shape,
+        colors = colors,
+    )
+}
+
+@Deprecated("Use overload with prefix and suffix parameters", level = DeprecationLevel.HIDDEN)
+@ExperimentalMaterial3Api
+@Composable
+fun TextField(
+    value: TextFieldValue,
+    onValueChange: (TextFieldValue) -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    readOnly: Boolean = false,
+    textStyle: TextStyle = LocalTextStyle.current,
+    label: @Composable (() -> Unit)? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    leadingIcon: @Composable (() -> Unit)? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    supportingText: @Composable (() -> Unit)? = null,
+    isError: Boolean = false,
+    visualTransformation: VisualTransformation = VisualTransformation.None,
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
+    singleLine: Boolean = false,
+    maxLines: Int = if (singleLine) 1 else Int.MAX_VALUE,
+    minLines: Int = 1,
+    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+    shape: Shape = TextFieldDefaults.filledShape,
+    colors: TextFieldColors = TextFieldDefaults.textFieldColors()
+) {
+    TextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = modifier,
+        enabled = enabled,
+        readOnly = readOnly,
+        textStyle = textStyle,
+        label = label,
+        placeholder = placeholder,
+        leadingIcon = leadingIcon,
+        trailingIcon = trailingIcon,
+        prefix = null,
+        suffix = null,
+        supportingText = supportingText,
+        isError = isError,
+        visualTransformation = visualTransformation,
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        singleLine = singleLine,
+        maxLines = maxLines,
+        minLines = minLines,
+        interactionSource = interactionSource,
+        shape = shape,
+        colors = colors,
+    )
 }
 
 /**
@@ -380,6 +502,8 @@ internal fun TextFieldLayout(
     placeholder: @Composable ((Modifier) -> Unit)?,
     leading: @Composable (() -> Unit)?,
     trailing: @Composable (() -> Unit)?,
+    prefix: @Composable (() -> Unit)?,
+    suffix: @Composable (() -> Unit)?,
     singleLine: Boolean,
     animationProgress: Float,
     container: @Composable () -> Unit,
@@ -421,36 +545,54 @@ internal fun TextFieldLayout(
 
             val startTextFieldPadding = paddingValues.calculateStartPadding(layoutDirection)
             val endTextFieldPadding = paddingValues.calculateEndPadding(layoutDirection)
-            val padding = Modifier.padding(
-                start = if (leading != null) {
-                    (startTextFieldPadding - HorizontalIconPadding).coerceAtLeast(
-                        0.dp
-                    )
-                } else {
-                    startTextFieldPadding
-                },
-                end = if (trailing != null) {
-                    (endTextFieldPadding - HorizontalIconPadding).coerceAtLeast(0.dp)
-                } else {
-                    endTextFieldPadding
-                }
-            )
-            if (placeholder != null) {
-                placeholder(
-                    Modifier
-                        .layoutId(PlaceholderId)
-                        .then(padding))
+
+            val startPadding = if (leading != null) {
+                (startTextFieldPadding - HorizontalIconPadding).coerceAtLeast(0.dp)
+            } else {
+                startTextFieldPadding
             }
+            val endPadding = if (trailing != null) {
+                (endTextFieldPadding - HorizontalIconPadding).coerceAtLeast(0.dp)
+            } else {
+                endTextFieldPadding
+            }
+
+            if (prefix != null) {
+                Box(
+                    Modifier
+                        .layoutId(PrefixId)
+                        .padding(start = startPadding, end = PrefixSuffixTextPadding)
+                ) {
+                    prefix()
+                }
+            }
+            if (suffix != null) {
+                Box(
+                    Modifier
+                        .layoutId(SuffixId)
+                        .padding(start = PrefixSuffixTextPadding, end = endPadding)
+                ) {
+                    suffix()
+                }
+            }
+
             if (label != null) {
                 Box(
                     Modifier
                         .layoutId(LabelId)
-                        .then(padding)) { label() }
+                        .padding(start = startPadding, end = endPadding)) { label() }
+            }
+
+            val textPadding = Modifier.padding(
+                start = if (prefix == null) startPadding else 0.dp,
+                end = if (suffix == null) endPadding else 0.dp,
+            )
+
+            if (placeholder != null) {
+                placeholder(Modifier.layoutId(PlaceholderId).then(textPadding))
             }
             Box(
-                modifier = Modifier
-                    .layoutId(TextFieldId)
-                    .then(padding),
+                modifier = Modifier.layoutId(TextFieldId).then(textPadding),
                 propagateMinConstraints = true,
             ) {
                 textField()
@@ -487,18 +629,26 @@ private class TextFieldMeasurePolicy(
         // measure leading icon
         val leadingPlaceable =
             measurables.find { it.layoutId == LeadingId }?.measure(looseConstraints)
-        occupiedSpaceHorizontally += widthOrZero(
-            leadingPlaceable
-        )
+        occupiedSpaceHorizontally += widthOrZero(leadingPlaceable)
         occupiedSpaceVertically = max(occupiedSpaceVertically, heightOrZero(leadingPlaceable))
 
         // measure trailing icon
         val trailingPlaceable = measurables.find { it.layoutId == TrailingId }
             ?.measure(looseConstraints.offset(horizontal = -occupiedSpaceHorizontally))
-        occupiedSpaceHorizontally += widthOrZero(
-            trailingPlaceable
-        )
+        occupiedSpaceHorizontally += widthOrZero(trailingPlaceable)
         occupiedSpaceVertically = max(occupiedSpaceVertically, heightOrZero(trailingPlaceable))
+
+        // measure prefix
+        val prefixPlaceable = measurables.find { it.layoutId == PrefixId }
+            ?.measure(looseConstraints.offset(horizontal = -occupiedSpaceHorizontally))
+        occupiedSpaceHorizontally += widthOrZero(prefixPlaceable)
+        occupiedSpaceVertically = max(occupiedSpaceVertically, heightOrZero(prefixPlaceable))
+
+        // measure suffix
+        val suffixPlaceable = measurables.find { it.layoutId == SuffixId }
+            ?.measure(looseConstraints.offset(horizontal = -occupiedSpaceHorizontally))
+        occupiedSpaceHorizontally += widthOrZero(suffixPlaceable)
+        occupiedSpaceVertically = max(occupiedSpaceVertically, heightOrZero(suffixPlaceable))
 
         // measure label
         val labelConstraints = looseConstraints
@@ -545,6 +695,8 @@ private class TextFieldMeasurePolicy(
         val width = calculateWidth(
             leadingWidth = widthOrZero(leadingPlaceable),
             trailingWidth = widthOrZero(trailingPlaceable),
+            prefixWidth = widthOrZero(prefixPlaceable),
+            suffixWidth = widthOrZero(suffixPlaceable),
             textFieldWidth = textFieldPlaceable.width,
             labelWidth = widthOrZero(labelPlaceable),
             placeholderWidth = widthOrZero(placeholderPlaceable),
@@ -555,6 +707,8 @@ private class TextFieldMeasurePolicy(
             labelHeight = heightOrZero(labelPlaceable),
             leadingHeight = heightOrZero(leadingPlaceable),
             trailingHeight = heightOrZero(trailingPlaceable),
+            prefixHeight = heightOrZero(prefixPlaceable),
+            suffixHeight = heightOrZero(suffixPlaceable),
             placeholderHeight = heightOrZero(placeholderPlaceable),
             supportingHeight = heightOrZero(supportingPlaceable),
             isLabelFocused = animationProgress == 1f,
@@ -583,6 +737,8 @@ private class TextFieldMeasurePolicy(
                     placeholderPlaceable = placeholderPlaceable,
                     leadingPlaceable = leadingPlaceable,
                     trailingPlaceable = trailingPlaceable,
+                    prefixPlaceable = prefixPlaceable,
+                    suffixPlaceable = suffixPlaceable,
                     containerPlaceable = containerPlaceable,
                     supportingPlaceable = supportingPlaceable,
                     singleLine = singleLine,
@@ -599,6 +755,8 @@ private class TextFieldMeasurePolicy(
                     placeholderPlaceable = placeholderPlaceable,
                     leadingPlaceable = leadingPlaceable,
                     trailingPlaceable = trailingPlaceable,
+                    prefixPlaceable = prefixPlaceable,
+                    suffixPlaceable = suffixPlaceable,
                     containerPlaceable = containerPlaceable,
                     supportingPlaceable = supportingPlaceable,
                     singleLine = singleLine,
@@ -658,6 +816,12 @@ private class TextFieldMeasurePolicy(
         val trailingWidth = measurables.find { it.layoutId == TrailingId }?.let {
             intrinsicMeasurer(it, height)
         } ?: 0
+        val prefixWidth = measurables.find { it.layoutId == PrefixId }?.let {
+            intrinsicMeasurer(it, height)
+        } ?: 0
+        val suffixWidth = measurables.find { it.layoutId == SuffixId }?.let {
+            intrinsicMeasurer(it, height)
+        } ?: 0
         val leadingWidth = measurables.find { it.layoutId == LeadingId }?.let {
             intrinsicMeasurer(it, height)
         } ?: 0
@@ -667,6 +831,8 @@ private class TextFieldMeasurePolicy(
         return calculateWidth(
             leadingWidth = leadingWidth,
             trailingWidth = trailingWidth,
+            prefixWidth = prefixWidth,
+            suffixWidth = suffixWidth,
             textFieldWidth = textFieldWidth,
             labelWidth = labelWidth,
             placeholderWidth = placeholderWidth,
@@ -690,6 +856,12 @@ private class TextFieldMeasurePolicy(
         val leadingHeight = measurables.find { it.layoutId == LeadingId }?.let {
             intrinsicMeasurer(it, width)
         } ?: 0
+        val prefixHeight = measurables.find { it.layoutId == PrefixId }?.let {
+            intrinsicMeasurer(it, width)
+        } ?: 0
+        val suffixHeight = measurables.find { it.layoutId == SuffixId }?.let {
+            intrinsicMeasurer(it, width)
+        } ?: 0
         val placeholderHeight = measurables.find { it.layoutId == PlaceholderId }?.let {
             intrinsicMeasurer(it, width)
         } ?: 0
@@ -701,6 +873,8 @@ private class TextFieldMeasurePolicy(
             labelHeight = labelHeight,
             leadingHeight = leadingHeight,
             trailingHeight = trailingHeight,
+            prefixHeight = prefixHeight,
+            suffixHeight = suffixHeight,
             placeholderHeight = placeholderHeight,
             supportingHeight = supportingHeight,
             isLabelFocused = animationProgress == 1f,
@@ -714,15 +888,19 @@ private class TextFieldMeasurePolicy(
 private fun calculateWidth(
     leadingWidth: Int,
     trailingWidth: Int,
+    prefixWidth: Int,
+    suffixWidth: Int,
     textFieldWidth: Int,
     labelWidth: Int,
     placeholderWidth: Int,
     constraints: Constraints
 ): Int {
+    val affixTotalWidth = prefixWidth + suffixWidth
     val middleSection = maxOf(
-        textFieldWidth,
+        textFieldWidth + affixTotalWidth,
+        placeholderWidth + affixTotalWidth,
+        // Prefix/suffix does not get applied to label
         labelWidth,
-        placeholderWidth
     )
     val wrappedWidth = leadingWidth + middleSection + trailingWidth
     return max(wrappedWidth, constraints.minWidth)
@@ -733,6 +911,8 @@ private fun calculateHeight(
     labelHeight: Int,
     leadingHeight: Int,
     trailingHeight: Int,
+    prefixHeight: Int,
+    suffixHeight: Int,
     placeholderHeight: Int,
     supportingHeight: Int,
     isLabelFocused: Boolean,
@@ -759,6 +939,8 @@ private fun calculateHeight(
         maxOf(
             leadingHeight,
             trailingHeight,
+            prefixHeight,
+            suffixHeight,
             middleSectionHeight.roundToInt()
         ) + supportingHeight
     )
@@ -776,6 +958,8 @@ private fun Placeable.PlacementScope.placeWithLabel(
     placeholderPlaceable: Placeable?,
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
+    prefixPlaceable: Placeable?,
+    suffixPlaceable: Placeable?,
     containerPlaceable: Placeable,
     supportingPlaceable: Placeable?,
     singleLine: Boolean,
@@ -814,8 +998,16 @@ private fun Placeable.PlacementScope.placeWithLabel(
         val positionY = startPosition - (distance * animationProgress).roundToInt()
         it.placeRelative(widthOrZero(leadingPlaceable), positionY)
     }
-    textfieldPlaceable.placeRelative(widthOrZero(leadingPlaceable), textPosition)
-    placeholderPlaceable?.placeRelative(widthOrZero(leadingPlaceable), textPosition)
+
+    prefixPlaceable?.placeRelative(widthOrZero(leadingPlaceable), textPosition)
+    suffixPlaceable?.placeRelative(
+        width - widthOrZero(trailingPlaceable) - suffixPlaceable.width,
+        textPosition,
+    )
+
+    val textHorizontalPosition = widthOrZero(leadingPlaceable) + widthOrZero(prefixPlaceable)
+    textfieldPlaceable.placeRelative(textHorizontalPosition, textPosition)
+    placeholderPlaceable?.placeRelative(textHorizontalPosition, textPosition)
 
     supportingPlaceable?.placeRelative(0, height)
 }
@@ -831,6 +1023,8 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
     placeholderPlaceable: Placeable?,
     leadingPlaceable: Placeable?,
     trailingPlaceable: Placeable?,
+    prefixPlaceable: Placeable?,
+    suffixPlaceable: Placeable?,
     containerPlaceable: Placeable,
     supportingPlaceable: Placeable?,
     singleLine: Boolean,
@@ -854,24 +1048,34 @@ private fun Placeable.PlacementScope.placeWithoutLabel(
         Alignment.CenterVertically.align(trailingPlaceable.height, height)
     )
 
-    // Single line text field without label places its input center vertically. Multiline text
-    // field without label places its input at the top with padding
-    val textVerticalPosition = if (singleLine) {
-        Alignment.CenterVertically.align(textPlaceable.height, height)
-    } else {
-        topPadding
-    }
-    textPlaceable.placeRelative(widthOrZero(leadingPlaceable), textVerticalPosition)
-
-    // placeholder is placed similar to the text input above
-    placeholderPlaceable?.let {
-        val placeholderVerticalPosition = if (singleLine) {
-            Alignment.CenterVertically.align(placeholderPlaceable.height, height)
+    // Single line text field without label places its text components centered vertically.
+    // Multiline text field without label places its text components at the top with padding.
+    fun calculateVerticalPosition(placeable: Placeable): Int {
+        return if (singleLine) {
+            Alignment.CenterVertically.align(placeable.height, height)
         } else {
             topPadding
         }
-        it.placeRelative(widthOrZero(leadingPlaceable), placeholderVerticalPosition)
     }
+
+    prefixPlaceable?.placeRelative(
+        widthOrZero(leadingPlaceable),
+        calculateVerticalPosition(prefixPlaceable)
+    )
+
+    suffixPlaceable?.placeRelative(
+        width - widthOrZero(trailingPlaceable) - suffixPlaceable.width,
+        calculateVerticalPosition(suffixPlaceable),
+    )
+
+    val textHorizontalPosition = widthOrZero(leadingPlaceable) + widthOrZero(prefixPlaceable)
+
+    textPlaceable.placeRelative(textHorizontalPosition, calculateVerticalPosition(textPlaceable))
+
+    placeholderPlaceable?.placeRelative(
+        textHorizontalPosition,
+        calculateVerticalPosition(placeholderPlaceable)
+    )
 
     supportingPlaceable?.placeRelative(0, height)
 }

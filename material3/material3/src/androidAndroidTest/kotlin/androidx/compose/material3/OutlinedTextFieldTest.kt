@@ -853,6 +853,176 @@ class OutlinedTextFieldTest {
     }
 
     @Test
+    fun testOutlinedTextField_prefixAndSuffixPosition_withLabel() {
+        val textFieldWidth = 300.dp
+        val textFieldHeight = 60.dp
+        val labelSize = Ref<IntSize>()
+        val prefixPosition = Ref<Offset>()
+        val suffixPosition = Ref<Offset>()
+        val suffixSize = Ref<IntSize>()
+        val density = Density(2f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalDensity provides density) {
+                OutlinedTextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    label = {
+                        Text(
+                            text = "label",
+                            modifier = Modifier.onGloballyPositioned {
+                                labelSize.value = it.size
+                            }
+                        )
+                    },
+                    prefix = {
+                        Text(
+                            text = "P",
+                            modifier = Modifier.onGloballyPositioned {
+                                prefixPosition.value = it.positionInRoot()
+                            }
+                        )
+                    },
+                    suffix = {
+                        Text(
+                            text = "S",
+                            modifier = Modifier.onGloballyPositioned {
+                                suffixPosition.value = it.positionInRoot()
+                                suffixSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                // prefix
+                assertThat(prefixPosition.value?.x).isWithin(1f).of(ExpectedPadding.toPx())
+                assertThat(prefixPosition.value?.y).isWithin(1f).of(
+                    (ExpectedPadding + 8.dp).toPx())
+
+                // suffix
+                assertThat(suffixPosition.value?.x).isWithin(1f).of(
+                    (textFieldWidth - ExpectedPadding - suffixSize.value!!.width.toDp()).toPx()
+                )
+                assertThat(suffixPosition.value?.y).isWithin(1f).of(
+                    (ExpectedPadding + 8.dp).toPx())
+            }
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_prefixAndSuffixPosition_whenNoLabel() {
+        val textFieldWidth = 300.dp
+        val textFieldHeight = 60.dp
+        val prefixPosition = Ref<Offset>()
+        val suffixPosition = Ref<Offset>()
+        val suffixSize = Ref<IntSize>()
+        val density = Density(2f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalDensity provides density) {
+                OutlinedTextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    prefix = {
+                        Text(
+                            text = "P",
+                            modifier = Modifier.onGloballyPositioned {
+                                prefixPosition.value = it.positionInRoot()
+                            }
+                        )
+                    },
+                    suffix = {
+                        Text(
+                            text = "S",
+                            modifier = Modifier.onGloballyPositioned {
+                                suffixPosition.value = it.positionInRoot()
+                                suffixSize.value = it.size
+                            }
+                        )
+                    }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                // prefix
+                assertThat(prefixPosition.value?.x).isWithin(1f).of(ExpectedPadding.toPx())
+                assertThat(prefixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+
+                // suffix
+                assertThat(suffixPosition.value?.x).isWithin(1f).of(
+                    (textFieldWidth - ExpectedPadding - suffixSize.value!!.width.toDp()).toPx()
+                )
+                assertThat(suffixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+            }
+        }
+    }
+
+    @Test
+    fun testOutlinedTextField_prefixAndSuffixPosition_withIcons() {
+        val textFieldWidth = 300.dp
+        val textFieldHeight = 60.dp
+        val prefixPosition = Ref<Offset>()
+        val suffixPosition = Ref<Offset>()
+        val suffixSize = Ref<IntSize>()
+        val density = Density(2f)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            CompositionLocalProvider(LocalDensity provides density) {
+                OutlinedTextField(
+                    value = "text",
+                    onValueChange = {},
+                    modifier = Modifier.size(textFieldWidth, textFieldHeight),
+                    prefix = {
+                        Text(
+                            text = "P",
+                            modifier = Modifier.onGloballyPositioned {
+                                prefixPosition.value = it.positionInRoot()
+                            }
+                        )
+                    },
+                    suffix = {
+                        Text(
+                            text = "S",
+                            modifier = Modifier.onGloballyPositioned {
+                                suffixPosition.value = it.positionInRoot()
+                                suffixSize.value = it.size
+                            }
+                        )
+                    },
+                    leadingIcon = { Icon(Icons.Default.Favorite, null) },
+                    trailingIcon = { Icon(Icons.Default.Favorite, null) },
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            with(density) {
+                val iconSize = 24.dp // default icon size
+
+                // prefix
+                assertThat(prefixPosition.value?.x).isWithin(1f).of(
+                    (ExpectedPadding + IconPadding + iconSize).toPx())
+                assertThat(prefixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+
+                // suffix
+                assertThat(suffixPosition.value?.x).isWithin(1f).of(
+                    (textFieldWidth - IconPadding - iconSize - ExpectedPadding -
+                        suffixSize.value!!.width.toDp()).toPx()
+                )
+                assertThat(suffixPosition.value?.y).isWithin(1f).of(ExpectedPadding.toPx())
+            }
+        }
+    }
+
+    @Test
     fun testOutlinedTextField_labelPositionX_initial_withTrailingAndLeading() {
         val labelPosition = Ref<Offset>()
         rule.setMaterialContent(lightColorScheme()) {

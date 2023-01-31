@@ -132,6 +132,7 @@ import androidx.compose.material3.samples.TextFieldWithErrorState
 import androidx.compose.material3.samples.TextFieldWithHideKeyboardOnImeAction
 import androidx.compose.material3.samples.TextFieldWithIcons
 import androidx.compose.material3.samples.TextFieldWithPlaceholder
+import androidx.compose.material3.samples.TextFieldWithPrefixAndSuffix
 import androidx.compose.material3.samples.TextFieldWithSupportingText
 import androidx.compose.material3.samples.TextTabs
 import androidx.compose.material3.samples.ThreeLineListItem
@@ -967,6 +968,13 @@ val TextFieldsExamples = listOf(
         sourceUrl = TextFieldsExampleSourceUrl
     ) {
         TextFieldWithPlaceholder()
+    },
+    Example(
+        name = ::TextFieldWithPrefixAndSuffix.name,
+        description = TextFieldsExampleDescription,
+        sourceUrl = TextFieldsExampleSourceUrl
+    ) {
+        TextFieldWithPrefixAndSuffix()
     },
     Example(
         name = ::TextFieldWithErrorState.name,

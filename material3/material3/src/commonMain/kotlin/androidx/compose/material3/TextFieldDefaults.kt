@@ -285,6 +285,14 @@ object TextFieldDefaults {
      * disabled
      * @param errorSupportingTextColor the supporting text color for this text field when in error
      * state
+     * @param focusedPrefixColor the prefix color for this text field when focused
+     * @param unfocusedPrefixColor the prefix color for this text field when not focused
+     * @param disabledPrefixColor the prefix color for this text field when disabled
+     * @param errorPrefixColor the prefix color for this text field when in error state
+     * @param focusedSuffixColor the suffix color for this text field when focused
+     * @param unfocusedSuffixColor the suffix color for this text field when not focused
+     * @param disabledSuffixColor the suffix color for this text field when disabled
+     * @param errorSuffixColor the suffix color for this text field when in error state
      */
     @ExperimentalMaterial3Api
     @Composable
@@ -324,6 +332,16 @@ object TextFieldDefaults {
         disabledSupportingTextColor: Color = FilledTextFieldTokens.DisabledSupportingColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledSupportingOpacity),
         errorSupportingTextColor: Color = FilledTextFieldTokens.ErrorSupportingColor.toColor(),
+        focusedPrefixColor: Color = FilledTextFieldTokens.InputPrefixColor.toColor(),
+        unfocusedPrefixColor: Color = FilledTextFieldTokens.InputPrefixColor.toColor(),
+        disabledPrefixColor: Color = FilledTextFieldTokens.InputPrefixColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+        errorPrefixColor: Color = FilledTextFieldTokens.InputPrefixColor.toColor(),
+        focusedSuffixColor: Color = FilledTextFieldTokens.InputSuffixColor.toColor(),
+        unfocusedSuffixColor: Color = FilledTextFieldTokens.InputSuffixColor.toColor(),
+        disabledSuffixColor: Color = FilledTextFieldTokens.InputSuffixColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+        errorSuffixColor: Color = FilledTextFieldTokens.InputSuffixColor.toColor(),
     ): TextFieldColors =
         TextFieldColors(
             textColor = textColor,
@@ -354,6 +372,14 @@ object TextFieldDefaults {
             unfocusedSupportingTextColor = unfocusedSupportingTextColor,
             disabledSupportingTextColor = disabledSupportingTextColor,
             errorSupportingTextColor = errorSupportingTextColor,
+            focusedPrefixColor = focusedPrefixColor,
+            unfocusedPrefixColor = unfocusedPrefixColor,
+            disabledPrefixColor = disabledPrefixColor,
+            errorPrefixColor = errorPrefixColor,
+            focusedSuffixColor = focusedSuffixColor,
+            unfocusedSuffixColor = unfocusedSuffixColor,
+            disabledSuffixColor = disabledSuffixColor,
+            errorSuffixColor = errorSuffixColor,
         )
 
     /**
@@ -392,6 +418,14 @@ object TextFieldDefaults {
      * disabled
      * @param errorSupportingTextColor the supporting text color for this text field when in error
      * state
+     * @param focusedPrefixColor the prefix color for this text field when focused
+     * @param unfocusedPrefixColor the prefix color for this text field when not focused
+     * @param disabledPrefixColor the prefix color for this text field when disabled
+     * @param errorPrefixColor the prefix color for this text field when in error state
+     * @param focusedSuffixColor the suffix color for this text field when focused
+     * @param unfocusedSuffixColor the suffix color for this text field when not focused
+     * @param disabledSuffixColor the suffix color for this text field when disabled
+     * @param errorSuffixColor the suffix color for this text field when in error state
      */
     @ExperimentalMaterial3Api
     @Composable
@@ -431,6 +465,16 @@ object TextFieldDefaults {
         disabledSupportingTextColor: Color = OutlinedTextFieldTokens.DisabledSupportingColor
             .toColor().copy(alpha = OutlinedTextFieldTokens.DisabledSupportingOpacity),
         errorSupportingTextColor: Color = OutlinedTextFieldTokens.ErrorSupportingColor.toColor(),
+        focusedPrefixColor: Color = OutlinedTextFieldTokens.InputPrefixColor.toColor(),
+        unfocusedPrefixColor: Color = OutlinedTextFieldTokens.InputPrefixColor.toColor(),
+        disabledPrefixColor: Color = OutlinedTextFieldTokens.InputPrefixColor.toColor()
+            .copy(alpha = OutlinedTextFieldTokens.DisabledInputOpacity),
+        errorPrefixColor: Color = OutlinedTextFieldTokens.InputPrefixColor.toColor(),
+        focusedSuffixColor: Color = OutlinedTextFieldTokens.InputSuffixColor.toColor(),
+        unfocusedSuffixColor: Color = OutlinedTextFieldTokens.InputSuffixColor.toColor(),
+        disabledSuffixColor: Color = OutlinedTextFieldTokens.InputSuffixColor.toColor()
+            .copy(alpha = OutlinedTextFieldTokens.DisabledInputOpacity),
+        errorSuffixColor: Color = OutlinedTextFieldTokens.InputSuffixColor.toColor(),
     ): TextFieldColors =
         TextFieldColors(
             textColor = textColor,
@@ -461,6 +505,14 @@ object TextFieldDefaults {
             unfocusedSupportingTextColor = unfocusedSupportingTextColor,
             disabledSupportingTextColor = disabledSupportingTextColor,
             errorSupportingTextColor = errorSupportingTextColor,
+            focusedPrefixColor = focusedPrefixColor,
+            unfocusedPrefixColor = unfocusedPrefixColor,
+            disabledPrefixColor = disabledPrefixColor,
+            errorPrefixColor = errorPrefixColor,
+            focusedSuffixColor = focusedSuffixColor,
+            unfocusedSuffixColor = unfocusedSuffixColor,
+            disabledSuffixColor = disabledSuffixColor,
+            errorSuffixColor = errorSuffixColor,
         )
 
     /**
@@ -507,7 +559,10 @@ object TextFieldDefaults {
      * field container
      * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
      * container
+     * @param prefix the optional prefix to be displayed before the input text in the text field
+     * @param suffix the optional suffix to be displayed after the input text in the text field
      * @param supportingText the optional supporting text to be displayed below the text field
+     * @param shape defines the shape of this text field's container
      * @param colors [TextFieldColors] that will be used to resolve the colors used for this text
      * field in different states. See [TextFieldDefaults.textFieldColors].
      * @param contentPadding the spacing values to apply internally between the internals of text
@@ -536,6 +591,8 @@ object TextFieldDefaults {
         placeholder: @Composable (() -> Unit)? = null,
         leadingIcon: @Composable (() -> Unit)? = null,
         trailingIcon: @Composable (() -> Unit)? = null,
+        prefix: @Composable (() -> Unit)? = null,
+        suffix: @Composable (() -> Unit)? = null,
         supportingText: @Composable (() -> Unit)? = null,
         shape: Shape = filledShape,
         colors: TextFieldColors = textFieldColors(),
@@ -558,6 +615,8 @@ object TextFieldDefaults {
             label = label,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
+            prefix = prefix,
+            suffix = suffix,
             supportingText = supportingText,
             singleLine = singleLine,
             enabled = enabled,
@@ -613,6 +672,8 @@ object TextFieldDefaults {
      * field container
      * @param trailingIcon the optional trailing icon to be displayed at the end of the text field
      * container
+     * @param prefix the optional prefix to be displayed before the input text in the text field
+     * @param suffix the optional suffix to be displayed after the input text in the text field
      * @param supportingText the optional supporting text to be displayed below the text field
      * @param colors [TextFieldColors] that will be used to resolve the colors used for this text
      * field in different states. See [TextFieldDefaults.outlinedTextFieldColors].
@@ -638,6 +699,8 @@ object TextFieldDefaults {
         placeholder: @Composable (() -> Unit)? = null,
         leadingIcon: @Composable (() -> Unit)? = null,
         trailingIcon: @Composable (() -> Unit)? = null,
+        prefix: @Composable (() -> Unit)? = null,
+        suffix: @Composable (() -> Unit)? = null,
         supportingText: @Composable (() -> Unit)? = null,
         colors: TextFieldColors = outlinedTextFieldColors(),
         contentPadding: PaddingValues = outlinedTextFieldPadding(),
@@ -654,11 +717,106 @@ object TextFieldDefaults {
             label = label,
             leadingIcon = leadingIcon,
             trailingIcon = trailingIcon,
+            prefix = prefix,
+            suffix = suffix,
             supportingText = supportingText,
             singleLine = singleLine,
             enabled = enabled,
             isError = isError,
             interactionSource = interactionSource,
+            colors = colors,
+            contentPadding = contentPadding,
+            container = container
+        )
+    }
+
+    @Deprecated("Use overload with prefix and suffix parameters", level = DeprecationLevel.HIDDEN)
+    @Composable
+    @ExperimentalMaterial3Api
+    fun TextFieldDecorationBox(
+        value: String,
+        innerTextField: @Composable () -> Unit,
+        enabled: Boolean,
+        singleLine: Boolean,
+        visualTransformation: VisualTransformation,
+        interactionSource: InteractionSource,
+        isError: Boolean = false,
+        label: @Composable (() -> Unit)? = null,
+        placeholder: @Composable (() -> Unit)? = null,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        supportingText: @Composable (() -> Unit)? = null,
+        shape: Shape = filledShape,
+        colors: TextFieldColors = textFieldColors(),
+        contentPadding: PaddingValues =
+            if (label == null) {
+                textFieldWithoutLabelPadding()
+            } else {
+                textFieldWithLabelPadding()
+            },
+        container: @Composable () -> Unit = {
+            FilledContainerBox(enabled, isError, interactionSource, colors, shape)
+        }
+    ) {
+        TextFieldDecorationBox(
+            value = value,
+            innerTextField = innerTextField,
+            enabled = enabled,
+            singleLine = singleLine,
+            visualTransformation = visualTransformation,
+            interactionSource = interactionSource,
+            isError = isError,
+            label = label,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            prefix = null,
+            suffix = null,
+            supportingText = supportingText,
+            shape = shape,
+            colors = colors,
+            contentPadding = contentPadding,
+            container = container,
+        )
+    }
+
+    @Deprecated("Use overload with prefix and suffix parameters", level = DeprecationLevel.HIDDEN)
+    @Composable
+    @ExperimentalMaterial3Api
+    fun OutlinedTextFieldDecorationBox(
+        value: String,
+        innerTextField: @Composable () -> Unit,
+        enabled: Boolean,
+        singleLine: Boolean,
+        visualTransformation: VisualTransformation,
+        interactionSource: InteractionSource,
+        isError: Boolean = false,
+        label: @Composable (() -> Unit)? = null,
+        placeholder: @Composable (() -> Unit)? = null,
+        leadingIcon: @Composable (() -> Unit)? = null,
+        trailingIcon: @Composable (() -> Unit)? = null,
+        supportingText: @Composable (() -> Unit)? = null,
+        colors: TextFieldColors = outlinedTextFieldColors(),
+        contentPadding: PaddingValues = outlinedTextFieldPadding(),
+        container: @Composable () -> Unit = {
+            OutlinedBorderContainerBox(enabled, isError, interactionSource, colors)
+        }
+    ) {
+        OutlinedTextFieldDecorationBox(
+            value = value,
+            innerTextField = innerTextField,
+            enabled = enabled,
+            singleLine = singleLine,
+            visualTransformation = visualTransformation,
+            interactionSource = interactionSource,
+            isError = isError,
+            label = label,
+            placeholder = placeholder,
+            leadingIcon = leadingIcon,
+            trailingIcon = trailingIcon,
+            prefix = null,
+            suffix = null,
+            supportingText = supportingText,
             colors = colors,
             contentPadding = contentPadding,
             container = container
@@ -705,6 +863,14 @@ class TextFieldColors internal constructor(
     private val unfocusedSupportingTextColor: Color,
     private val disabledSupportingTextColor: Color,
     private val errorSupportingTextColor: Color,
+    private val focusedPrefixColor: Color,
+    private val unfocusedPrefixColor: Color,
+    private val disabledPrefixColor: Color,
+    private val errorPrefixColor: Color,
+    private val focusedSuffixColor: Color,
+    private val unfocusedSuffixColor: Color,
+    private val disabledSuffixColor: Color,
+    private val errorSuffixColor: Color,
     ) {
     /**
      * Represents the color used for the leading icon of this text field.
@@ -854,6 +1020,56 @@ class TextFieldColors internal constructor(
     }
 
     /**
+     * Represents the color used for the prefix of this text field.
+     *
+     * @param enabled whether the text field is enabled
+     * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
+     */
+    @Composable
+    internal fun prefixColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        val focused by interactionSource.collectIsFocusedAsState()
+
+        val targetValue = when {
+            !enabled -> disabledPrefixColor
+            isError -> errorPrefixColor
+            focused -> focusedPrefixColor
+            else -> unfocusedPrefixColor
+        }
+        return rememberUpdatedState(targetValue)
+    }
+
+    /**
+     * Represents the color used for the suffix of this text field.
+     *
+     * @param enabled whether the text field is enabled
+     * @param isError whether the text field's current value is in error
+     * @param interactionSource the [InteractionSource] of this text field. Helps to determine if
+     * the text field is in focus or not
+     */
+    @Composable
+    internal fun suffixColor(
+        enabled: Boolean,
+        isError: Boolean,
+        interactionSource: InteractionSource
+    ): State<Color> {
+        val focused by interactionSource.collectIsFocusedAsState()
+
+        val targetValue = when {
+            !enabled -> disabledSuffixColor
+            isError -> errorSuffixColor
+            focused -> focusedSuffixColor
+            else -> unfocusedSuffixColor
+        }
+        return rememberUpdatedState(targetValue)
+    }
+
+    /**
      * Represents the color used for the cursor of this text field.
      *
      * @param isError whether the text field's current value is in error
@@ -901,6 +1117,14 @@ class TextFieldColors internal constructor(
         if (unfocusedSupportingTextColor != other.unfocusedSupportingTextColor) return false
         if (disabledSupportingTextColor != other.disabledSupportingTextColor) return false
         if (errorSupportingTextColor != other.errorSupportingTextColor) return false
+        if (focusedPrefixColor != other.focusedPrefixColor) return false
+        if (unfocusedPrefixColor != other.unfocusedPrefixColor) return false
+        if (disabledPrefixColor != other.disabledPrefixColor) return false
+        if (errorPrefixColor != other.errorPrefixColor) return false
+        if (focusedSuffixColor != other.focusedSuffixColor) return false
+        if (unfocusedSuffixColor != other.unfocusedSuffixColor) return false
+        if (disabledSuffixColor != other.disabledSuffixColor) return false
+        if (errorSuffixColor != other.errorSuffixColor) return false
 
         return true
     }
@@ -934,6 +1158,14 @@ class TextFieldColors internal constructor(
         result = 31 * result + unfocusedSupportingTextColor.hashCode()
         result = 31 * result + disabledSupportingTextColor.hashCode()
         result = 31 * result + errorSupportingTextColor.hashCode()
+        result = 31 * result + focusedPrefixColor.hashCode()
+        result = 31 * result + unfocusedPrefixColor.hashCode()
+        result = 31 * result + disabledPrefixColor.hashCode()
+        result = 31 * result + errorPrefixColor.hashCode()
+        result = 31 * result + focusedSuffixColor.hashCode()
+        result = 31 * result + unfocusedSuffixColor.hashCode()
+        result = 31 * result + disabledSuffixColor.hashCode()
+        result = 31 * result + errorSuffixColor.hashCode()
         return result
     }
 }
