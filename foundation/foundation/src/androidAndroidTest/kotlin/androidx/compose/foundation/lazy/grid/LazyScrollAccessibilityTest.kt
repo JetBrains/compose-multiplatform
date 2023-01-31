@@ -32,7 +32,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
@@ -41,15 +40,15 @@ import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import androidx.core.view.ViewCompat
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_BACKWARD
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat.ACTION_SCROLL_FORWARD
 import androidx.test.filters.MediumTest
-import androidx.test.filters.SdkSuppress
 import com.google.common.truth.IterableSubject
 import com.google.common.truth.Truth.assertThat
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
@@ -100,6 +99,22 @@ class LazyScrollAccessibilityTest(
                 .provider as AccessibilityNodeProvider
         }
 
+    private val itemSize = 21
+    private var itemSizeDp: Dp = Dp.Unspecified
+    private val containerSize = 200
+    private var containerSizeDp: Dp = Dp.Unspecified
+    private val contentPadding = 50
+    private var contentPaddingDp: Dp = Dp.Unspecified
+
+    @Before
+    fun before() {
+        with(rule.density) {
+            itemSizeDp = itemSize.toDp()
+            containerSizeDp = containerSize.toDp()
+            contentPaddingDp = contentPadding.toDp()
+        }
+    }
+
     @Test
     fun scrollForward() {
         testRelativeDirection(58, ACTION_SCROLL_FORWARD)
@@ -148,7 +163,6 @@ class LazyScrollAccessibilityTest(
         )
     }
 
-    @SdkSuppress(minSdkVersion = 29) // b/260010883
     @Test
     fun verifyScrollActionsAtEnd() {
         createScrollableContent_StartAtEnd()
@@ -277,13 +291,13 @@ class LazyScrollAccessibilityTest(
     private fun createScrollableContent_StartInMiddle() {
         createScrollableContent {
             // Start at the middle:
-            // Content size: 100 items * 21dp per item = 2100dp
-            // Viewport size: 200dp rect - 50dp padding on both sides = 100dp
-            // Content outside viewport: 2100dp - 100dp = 2000dp
-            // -> centered when 1000dp on either side, which is 47 items + 13dp
+            // Content size: 100 items * 21 per item = 2100
+            // Viewport size: 200 rect - 50 padding on both sides = 100
+            // Content outside viewport: 2100 - 100 = 2000
+            // -> centered when 1000 on either side, which is 47 items + 13
             rememberLazyGridState(
                 47,
-                with(LocalDensity.current) { 13.dp.roundToPx() }
+                13
             )
         }
     }
@@ -294,19 +308,19 @@ class LazyScrollAccessibilityTest(
     private fun createScrollableContent_StartAtEnd() {
         createScrollableContent {
             // Start at the end:
-            // Content size: 100 items * 21dp per item = 2100dp
-            // Viewport size: 200dp rect - 50dp padding on both sides = 100dp
-            // Content outside viewport: 2100dp - 100dp = 2000dp
-            // -> at the end when offset at 2000dp, which is 95 items + 5dp
+            // Content size: 100 items * 21 per item = 2100
+            // Viewport size: 200 rect - 50 padding on both sides = 100
+            // Content outside viewport: 2100 - 100 = 2000
+            // -> at the end when offset at 2000, which is 95 items + 5
             rememberLazyGridState(
                 95,
-                with(LocalDensity.current) { 5.dp.roundToPx() }
+                5
             )
         }
     }
 
     /**
-     * Creates a grid with a viewport of 100.dp, containing 100 items each 17.dp in size.
+     * Creates a grid with a viewport of 100 px, containing 100 items each 21 px in size.
      * The items have a text with their index (ASC), and where the viewport starts is determined
      * by the given [lambda][rememberLazyGridState]. All properties from [config] are applied.
      * The viewport has padding around it to make sure scroll distance doesn't include padding.
@@ -317,18 +331,18 @@ class LazyScrollAccessibilityTest(
 
             val state = rememberLazyGridState()
 
-            Box(Modifier.requiredSize(200.dp).background(Color.White)) {
+            Box(Modifier.requiredSize(containerSizeDp).background(Color.White)) {
                 val direction = if (config.rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
                 CompositionLocalProvider(LocalLayoutDirection provides direction) {
                     LazyGrid(
                         cells = 1,
                         modifier = Modifier.testTag(scrollerTag).matchParentSize(),
                         state = state,
-                        contentPadding = PaddingValues(50.dp),
+                        contentPadding = PaddingValues(contentPaddingDp),
                         reverseLayout = config.reversed
                     ) {
                         items(100) {
-                            Box(Modifier.requiredSize(21.dp).background(Color.Yellow)) {
+                            Box(Modifier.requiredSize(itemSizeDp).background(Color.Yellow)) {
                                 BasicText("$it", Modifier.align(Alignment.Center))
                             }
                         }
