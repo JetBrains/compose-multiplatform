@@ -172,39 +172,28 @@ class LazyColumnTest {
 
     @Test
     fun removeItemsTest() {
-        val startingNumItems = 3
-        var numItems = startingNumItems
-        var numItemsModel by mutableStateOf(numItems)
+        var itemCount by mutableStateOf(3)
         val tag = "List"
         rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.testTag(tag)) {
-                items((1..numItemsModel).toList()) {
+                items((0 until itemCount).toList()) {
                     BasicText("$it")
                 }
             }
         }
 
-        while (numItems >= 0) {
-            // Confirm the number of children to ensure there are no extra items
-            rule.onNodeWithTag(tag)
-                .onChildren()
-                .assertCountEquals(numItems)
-
+        while (itemCount >= 0) {
             // Confirm the children's content
-            for (i in 1..3) {
+            for (i in 0 until 3) {
                 rule.onNodeWithText("$i").apply {
-                    if (i <= numItems) {
-                        assertExists()
+                    if (i < itemCount) {
+                        assertIsPlaced()
                     } else {
-                        assertDoesNotExist()
+                        assertIsNotPlaced()
                     }
                 }
             }
-            numItems--
-            if (numItems >= 0) {
-                // Don't set the model to -1
-                rule.runOnIdle { numItemsModel = numItems }
-            }
+            itemCount--
         }
     }
 
