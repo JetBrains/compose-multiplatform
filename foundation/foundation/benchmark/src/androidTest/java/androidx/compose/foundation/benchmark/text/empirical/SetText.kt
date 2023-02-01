@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.foundation.benchmark.text.DoFullBenchmark
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -113,5 +115,10 @@ class ChatAppSetText(size: Int) : SetTextParent(size) {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters(): Array<Any> = ChatApps.TextLengths
+    }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
     }
 }

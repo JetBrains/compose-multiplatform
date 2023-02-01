@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.foundation.benchmark.text.DoFullBenchmark
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.InlineTextContent
@@ -35,6 +36,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -122,6 +124,11 @@ class SocialAppWithInlineContent(size: Int) : SetTextWithInlineContentParent(siz
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters() = SocialApps.TextLengths
     }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
+    }
 }
 
 @LargeTest
@@ -132,6 +139,11 @@ class ChatAppWithInlineContent(size: Int) : SetTextWithInlineContentParent(size)
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters() = ChatApps.TextLengths
     }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
+    }
 }
 
 @LargeTest
@@ -141,5 +153,10 @@ class ShoppingAppWithInlineContent(size: Int) : SetTextWithInlineContentParent(s
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters() = ShoppingApps.TextLengths
+    }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
     }
 }
