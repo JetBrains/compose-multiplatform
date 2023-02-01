@@ -404,7 +404,7 @@ private fun SearchBarInputField(
     val searchSemantics = getString(Strings.SearchBarSearch)
     val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
     val textColor = LocalTextStyle.current.color.takeOrElse {
-        colors.textColor(enabled).value
+        colors.textColor(enabled, isError = false, interactionSource = interactionSource).value
     }
 
     BasicTextField(
@@ -517,7 +517,9 @@ object SearchBarDefaults {
      * Only a subset of the full list of [TextFieldColors] parameters are used in the input field.
      * All other parameters have no effect.
      *
-     * @param textColor the color used for the input text of this input field
+     * @param focusedTextColor the color used for the input text of this input field when focused
+     * @param unfocusedTextColor the color used for the input text of this input field when not
+     * focused
      * @param disabledTextColor the color used for the input text of this input field when disabled
      * @param cursorColor the cursor color for this input field
      * @param selectionColors the colors used when the input text of this input field is selected
@@ -528,9 +530,50 @@ object SearchBarDefaults {
      * @param unfocusedTrailingIconColor the trailing icon color for this input field when not
      * focused
      * @param disabledTrailingIconColor the trailing icon color for this input field when disabled
-     * @param placeholderColor the placeholder color for this input field
+     * @param focusedPlaceholderColor the placeholder color for this input field when focused
+     * @param unfocusedPlaceholderColor the placeholder color for this input field when not focused
      * @param disabledPlaceholderColor the placeholder color for this input field when disabled
      */
+    @ExperimentalMaterial3Api
+    @Composable
+    fun inputFieldColors(
+        focusedTextColor: Color = SearchBarTokens.InputTextColor.toColor(),
+        unfocusedTextColor: Color = SearchBarTokens.InputTextColor.toColor(),
+        disabledTextColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+        cursorColor: Color = FilledTextFieldTokens.CaretColor.toColor(),
+        selectionColors: TextSelectionColors = LocalTextSelectionColors.current,
+        focusedLeadingIconColor: Color = SearchBarTokens.LeadingIconColor.toColor(),
+        unfocusedLeadingIconColor: Color = SearchBarTokens.LeadingIconColor.toColor(),
+        disabledLeadingIconColor: Color = FilledTextFieldTokens.DisabledLeadingIconColor
+            .toColor().copy(alpha = FilledTextFieldTokens.DisabledLeadingIconOpacity),
+        focusedTrailingIconColor: Color = SearchBarTokens.TrailingIconColor.toColor(),
+        unfocusedTrailingIconColor: Color = SearchBarTokens.TrailingIconColor.toColor(),
+        disabledTrailingIconColor: Color = FilledTextFieldTokens.DisabledTrailingIconColor
+            .toColor().copy(alpha = FilledTextFieldTokens.DisabledTrailingIconOpacity),
+        focusedPlaceholderColor: Color = SearchBarTokens.SupportingTextColor.toColor(),
+        unfocusedPlaceholderColor: Color = SearchBarTokens.SupportingTextColor.toColor(),
+        disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+    ): TextFieldColors =
+        TextFieldDefaults.textFieldColors(
+            focusedTextColor = focusedTextColor,
+            unfocusedTextColor = unfocusedTextColor,
+            disabledTextColor = disabledTextColor,
+            cursorColor = cursorColor,
+            selectionColors = selectionColors,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
+            disabledLeadingIconColor = disabledLeadingIconColor,
+            focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
+            disabledTrailingIconColor = disabledTrailingIconColor,
+            focusedPlaceholderColor = focusedPlaceholderColor,
+            unfocusedPlaceholderColor = unfocusedPlaceholderColor,
+            disabledPlaceholderColor = disabledPlaceholderColor,
+        )
+
+    @Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
     @ExperimentalMaterial3Api
     @Composable
     fun inputFieldColors(
@@ -550,21 +593,22 @@ object SearchBarDefaults {
         placeholderColor: Color = SearchBarTokens.SupportingTextColor.toColor(),
         disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
-    ): TextFieldColors =
-        TextFieldDefaults.textFieldColors(
-            textColor = textColor,
-            disabledTextColor = disabledTextColor,
-            cursorColor = cursorColor,
-            selectionColors = selectionColors,
-            focusedLeadingIconColor = focusedLeadingIconColor,
-            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
-            disabledLeadingIconColor = disabledLeadingIconColor,
-            focusedTrailingIconColor = focusedTrailingIconColor,
-            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
-            disabledTrailingIconColor = disabledTrailingIconColor,
-            placeholderColor = placeholderColor,
-            disabledPlaceholderColor = disabledPlaceholderColor,
-        )
+    ) = inputFieldColors(
+        focusedTextColor = textColor,
+        unfocusedTextColor = textColor,
+        disabledTextColor = disabledTextColor,
+        cursorColor = cursorColor,
+        selectionColors = selectionColors,
+        focusedLeadingIconColor = focusedLeadingIconColor,
+        unfocusedLeadingIconColor = unfocusedLeadingIconColor,
+        disabledLeadingIconColor = disabledLeadingIconColor,
+        focusedTrailingIconColor = focusedTrailingIconColor,
+        unfocusedTrailingIconColor = unfocusedTrailingIconColor,
+        disabledTrailingIconColor = disabledTrailingIconColor,
+        focusedPlaceholderColor = placeholderColor,
+        unfocusedPlaceholderColor = placeholderColor,
+        disabledPlaceholderColor = disabledPlaceholderColor,
+    )
 }
 
 /**

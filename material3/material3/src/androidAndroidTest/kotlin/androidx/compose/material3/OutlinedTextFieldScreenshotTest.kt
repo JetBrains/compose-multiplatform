@@ -177,7 +177,8 @@ class OutlinedTextFieldScreenshotTest {
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.testTag(TextFieldTag).requiredWidth(280.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(textColor = Color.Magenta)
+                colors =
+                    TextFieldDefaults.outlinedTextFieldColors(unfocusedTextColor = Color.Magenta),
             )
         }
 

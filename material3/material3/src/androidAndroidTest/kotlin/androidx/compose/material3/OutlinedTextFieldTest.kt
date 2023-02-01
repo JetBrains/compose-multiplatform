@@ -206,7 +206,7 @@ class OutlinedTextFieldTest {
                         value = "",
                         onValueChange = {},
                         colors = TextFieldDefaults.outlinedTextFieldColors(
-                            textColor = Color.White,
+                            unfocusedTextColor = Color.White,
                             unfocusedBorderColor = Color.White
                         ),
                         shape = RectangleShape
