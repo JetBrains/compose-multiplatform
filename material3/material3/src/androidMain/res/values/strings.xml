@@ -54,6 +54,10 @@
     </string>
     <string name="date_picker_switch_to_calendar_mode">Switch to calendar input mode</string>
     <string name="date_picker_switch_to_input_mode">Switch to text input mode</string>
+    <string name="date_range_picker_title">Select dates</string>
+    <string name="date_range_picker_start_headline">Start date</string>
+    <string name="date_range_picker_end_headline">End date</string>
+    <string name="date_range_input_title">Enter dates</string>
     <!-- Spoken description of a tooltip -->
     <string name="tooltip_long_press_label">Show tooltip</string>
     <!-- Suffix for time in 12-hour standard, after noon. [CHAR_LIMIT=2]" -->

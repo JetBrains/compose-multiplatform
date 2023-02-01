@@ -19,21 +19,32 @@ import android.os.Build
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
 import androidx.compose.material3.DisplayMode
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -147,5 +158,42 @@ fun DateInputSample() {
         DatePicker(state = state, modifier = Modifier.padding(16.dp))
 
         Text("Entered date timestamp: ${state.selectedDateMillis ?: "no input"}")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Sampled
+@Composable
+fun DateRangePickerSample() {
+    val savedRange = remember { mutableStateOf(LongRange.EMPTY) }
+    val state = rememberDateRangePickerState()
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
+        // Add a row with "Save" and dismiss actions.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 12.dp, end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButton(onClick = { /* dismiss the UI */ }) {
+                Icon(Icons.Filled.Close, contentDescription = "Localized description")
+            }
+            TextButton(
+                onClick = {
+                    savedRange.value =
+                        state.selectedStartDateMillis!!..state.selectedEndDateMillis!!
+                },
+                enabled = state.selectedEndDateMillis != null
+            ) {
+                Text(text = "Save")
+            }
+        }
+
+        DateRangePicker(state = state, modifier = Modifier.weight(1f))
+
+        Divider()
+        Text("Saved range of timestamps: ${savedRange.value}")
     }
 }
