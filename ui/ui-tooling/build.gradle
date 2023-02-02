@@ -41,7 +41,7 @@ dependencies {
         implementation(project(":lifecycle:lifecycle-viewmodel"))
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.compose.material:material:1.0.0")
-        implementation(project(":activity:activity-compose"))
+        implementation("androidx.activity:activity-compose:1.7.0-beta01")
         implementation(project(":lifecycle:lifecycle-common"))
 
         // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
@@ -89,7 +89,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
 
                 implementation(project(":compose:material:material"))
-                implementation(project(":activity:activity-compose"))
+                implementation("androidx.activity:activity-compose:1.7.0-beta01")
                 implementation(project(":lifecycle:lifecycle-common"))
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime

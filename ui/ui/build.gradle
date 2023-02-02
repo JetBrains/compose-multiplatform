@@ -71,7 +71,7 @@ dependencies {
         implementation("androidx.autofill:autofill:1.0.0")
         implementation(libs.kotlinCoroutinesAndroid)
 
-        implementation(project(":activity:activity"))
+        implementation("androidx.activity:activity:1.7.0-beta01")
         implementation("androidx.activity:activity-ktx:1.5.1")
         implementation("androidx.core:core:1.9.0")
         implementation('androidx.collection:collection:1.0.0')
@@ -169,8 +169,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation("androidx.autofill:autofill:1.0.0")
                 implementation(libs.kotlinCoroutinesAndroid)
 
-                implementation(project(":activity:activity"))
-                implementation("androidx.activity:activity-ktx:1.5.1")
+                implementation("androidx.activity:activity:1.7.0-beta01")
                 implementation("androidx.core:core:1.9.0")
                 implementation('androidx.collection:collection:1.0.0')
                 implementation("androidx.customview:customview-poolingcontainer:1.0.0")
