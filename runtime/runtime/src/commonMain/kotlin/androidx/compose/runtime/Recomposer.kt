@@ -408,26 +408,52 @@ class Recomposer(
      */
     fun asRecomposerInfo(): RecomposerInfo = recomposerInfo
 
-    private fun recordComposerModificationsLocked() {
-        val changes = snapshotInvalidations
-        if (changes.isNotEmpty()) {
+    /**
+     * Propagate all invalidations from `snapshotInvalidations` to all the known
+     * compositions.
+     *
+     * @return `true` if the frame has work to do (e.g. [hasFrameWorkLocked])
+     */
+    private fun recordComposerModifications(): Boolean {
+        val changes = synchronized(stateLock) {
+            if (snapshotInvalidations.isEmpty()) return hasFrameWorkLocked
+            snapshotInvalidations.also { snapshotInvalidations = IdentityArraySet() }
+        }
+        val compositions = synchronized(stateLock) {
+            knownCompositions.toMutableList()
+        }
+        var complete = false
+        try {
             run {
-                knownCompositions.fastForEach { composition ->
+                compositions.fastForEach { composition ->
                     composition.recordModificationsOf(changes)
 
-                    // Avoid using knownCompositions if recording modification detected a
-                    // shutdown of the recomposer.
+                    // Stop dispatching if the recomposer if we detect the recomposer
+                    // is shutdown.
                     if (_state.value <= State.ShuttingDown) return@run
                 }
             }
             snapshotInvalidations = IdentityArraySet()
+            complete = true
+        } finally {
+            if (!complete) {
+                // If the previous loop was not complete, we have not sent all of theses
+                // changes to all the composers so try again after the exception that caused
+                // the early exit is handled and we can then retry sending the changes.
+                synchronized(stateLock) {
+                    snapshotInvalidations.addAll(changes)
+                }
+            }
+        }
+        return synchronized(stateLock) {
             if (deriveStateLocked() != null) {
                 error("called outside of runRecomposeAndApplyChanges")
             }
+            hasFrameWorkLocked
         }
     }
 
-    private inline fun recordComposerModificationsLocked(
+    private inline fun recordComposerModifications(
         onEachInvalidComposition: (ControlledComposition) -> Unit
     ) {
         val changes = snapshotInvalidations
@@ -492,14 +518,7 @@ class Recomposer(
             awaitWorkAvailable()
 
             // Don't await a new frame if we don't have frame-scoped work
-            if (
-                synchronized(stateLock) {
-                    if (!hasFrameWorkLocked) {
-                        recordComposerModificationsLocked()
-                        !hasFrameWorkLocked
-                    } else false
-                }
-            ) continue
+            if (!recordComposerModifications()) continue
 
             // Align work with the next frame to coalesce changes.
             // Note: it is possible to resume from the above with no recompositions pending,
@@ -524,9 +543,8 @@ class Recomposer(
                 trace("Recomposer:recompose") {
                     // Drain any composer invalidations from snapshot changes and record
                     // composers to work on
+                    recordComposerModifications()
                     synchronized(stateLock) {
-                        recordComposerModificationsLocked()
-
                         compositionInvalidations.fastForEach { toRecompose += it }
                         compositionInvalidations.clear()
                     }
@@ -700,17 +718,28 @@ class Recomposer(
     }
 
     private fun retryFailedCompositions() {
-        synchronized(stateLock) {
-            val failedCompositions = failedCompositions ?: return
-
-            while (failedCompositions.isNotEmpty()) {
-                val composition = failedCompositions.removeLast()
+        val compositionsToRetry = synchronized(stateLock) {
+            failedCompositions.also { failedCompositions = null }
+        } ?: return
+        try {
+            while (compositionsToRetry.isNotEmpty()) {
+                val composition = compositionsToRetry.removeLast()
                 if (composition !is CompositionImpl) continue
 
                 composition.invalidateAll()
                 composition.setContent(composition.composable)
 
                 if (errorState != null) break
+            }
+        } finally {
+            if (compositionsToRetry.isNotEmpty()) {
+                // If we did not complete the last list then add the remaining compositions back
+                // into the failedCompositions list
+                synchronized(stateLock) {
+                    failedCompositions =
+                        failedCompositions?.also { it.addAll(compositionsToRetry) }
+                            ?: compositionsToRetry
+                }
             }
         }
     }
@@ -746,21 +775,21 @@ class Recomposer(
             awaitWorkAvailable()
 
             // Don't await a new frame if we don't have frame-scoped work
-            synchronized(stateLock) {
-                recordComposerModificationsLocked { composition ->
+            recordComposerModifications { composition ->
+                synchronized(stateLock) {
                     concurrentCompositionsOutstanding++
-                    recomposeCoroutineScope.launch(composition.recomposeCoroutineContext) {
-                        val changedComposition = performRecompose(composition, null)
-                        synchronized(stateLock) {
-                            changedComposition?.let { compositionsAwaitingApply += it }
-                            concurrentCompositionsOutstanding--
-                            deriveStateLocked()
-                        }?.resume(Unit)
-                    }
                 }
-                if (hasConcurrentFrameWorkLocked) {
-                    frameSignal.requestFrameLocked()
-                } else null
+                recomposeCoroutineScope.launch(composition.recomposeCoroutineContext) {
+                    val changedComposition = performRecompose(composition, null)
+                    synchronized(stateLock) {
+                        changedComposition?.let { compositionsAwaitingApply += it }
+                        concurrentCompositionsOutstanding--
+                        deriveStateLocked()
+                    }?.resume(Unit)
+                }
+            }
+            synchronized(stateLock) {
+                if (hasConcurrentFrameWorkLocked) frameSignal.requestFrameLocked() else null
             }?.resume(Unit)
         }
         recomposeCoroutineScope.coroutineContext.job.cancelAndJoin()
@@ -799,9 +828,8 @@ class Recomposer(
                     // Drain any composer invalidations from snapshot changes and record
                     // composers to work on.
                     // We'll do these synchronously to make the current frame.
+                    recordComposerModifications()
                     synchronized(stateLock) {
-                        recordComposerModificationsLocked()
-
                         compositionsAwaitingApply.fastForEach { toApply += it }
                         compositionsAwaitingApply.clear()
                         compositionInvalidations.fastForEach { toRecompose += it }
@@ -851,14 +879,18 @@ class Recomposer(
 
     private suspend fun awaitWorkAvailable() {
         if (!hasSchedulingWork) {
+            // NOTE: Do not remove the `<Unit>` from the next line even if the IDE reports it as
+            // redundant. Removing this causes the Kotlin compiler to crash without reporting
+            // an error message
             suspendCancellableCoroutine<Unit> { co ->
                 synchronized(stateLock) {
                     if (hasSchedulingWork) {
-                        co.resume(Unit)
+                        co
                     } else {
                         workContinuation = co
+                        null
                     }
-                }
+                }?.resume(Unit)
             }
         }
     }
@@ -891,9 +923,8 @@ class Recomposer(
                 // Invalidate all registered composers when we start since we weren't observing
                 // snapshot changes on their behalf. Assume anything could have changed.
                 synchronized(stateLock) {
-                    knownCompositions.fastForEach { it.invalidateAll() }
-                    // Don't need to deriveStateLocked here; invalidate will do it if needed.
-                }
+                    knownCompositions.toMutableList()
+                }.fastForEach { it.invalidateAll() }
 
                 coroutineScope {
                     block(parentFrameClock)
