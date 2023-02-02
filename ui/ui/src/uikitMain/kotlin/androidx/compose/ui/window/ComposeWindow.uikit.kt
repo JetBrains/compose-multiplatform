@@ -165,15 +165,25 @@ internal actual class ComposeWindow : UIViewController {
                     onPasteRequested: (() -> Unit)?,
                     onCutRequested: (() -> Unit)?,
                     onSelectAllRequested: (() -> Unit)?
-                ) = skikoUIView.showTextMenu(
-                    targetRect = rect.toSkiaRect(),
-                    textActions = object: TextActions {
-                        override val copy: (() -> Unit)? = onCopyRequested
-                        override val cut: (() -> Unit)? = onCutRequested
-                        override val paste: (() -> Unit)? = onPasteRequested
-                        override val selectAll: (() -> Unit)? = onSelectAllRequested
+                ) {
+                    val skiaRect = with(density) {
+                        org.jetbrains.skia.Rect.makeLTRB(
+                            l = rect.left / density,
+                            t = rect.top / density,
+                            r = rect.right / density,
+                            b = rect.bottom / density,
+                        )
                     }
-                )
+                    skikoUIView.showTextMenu(
+                        targetRect = skiaRect,
+                        textActions = object : TextActions {
+                            override val copy: (() -> Unit)? = onCopyRequested
+                            override val cut: (() -> Unit)? = onCutRequested
+                            override val paste: (() -> Unit)? = onPasteRequested
+                            override val selectAll: (() -> Unit)? = onSelectAllRequested
+                        }
+                    )
+                }
 
                 /**
                  * TODO on UIKit native behaviour is hide text menu, when touch outside

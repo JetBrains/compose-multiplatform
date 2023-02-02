@@ -26,13 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import kotlin.math.roundToInt
@@ -40,17 +40,17 @@ import kotlin.math.roundToInt
 /**
  * Clickable padding of handler
  */
-private const val PADDING = 5f
+private val PADDING = 5.dp
 
 /**
  * Radius of handle circle
  */
-private const val RADIUS = 6f
+private val RADIUS = 6.dp
 
 /**
  * Thickness of handlers vertical line
  */
-private const val THICKNESS = 2f
+private val THICKNESS = 2.dp
 
 @Composable
 internal actual fun SelectionHandle(
@@ -62,11 +62,15 @@ internal actual fun SelectionHandle(
     modifier: Modifier,
     content: @Composable (() -> Unit)?
 ) {
+    val density = LocalDensity.current
+    val paddingPx = with(density) { PADDING.toPx() }
+    val radiusPx = with(density) { RADIUS.toPx() }
+    val thicknessPx = with(density) { THICKNESS.toPx() }
     val isLeft = isLeft(isStartHandle, direction, handlesCrossed)
     val y = if (isLeft) {
-        position.y - PADDING - lineHeight - RADIUS * 2
+        position.y - paddingPx - lineHeight - radiusPx * 2
     } else {
-        position.y - PADDING
+        position.y - paddingPx
     }
 
     val positionState: State<IntOffset> = rememberUpdatedState(
@@ -89,7 +93,7 @@ internal actual fun SelectionHandle(
         }
     ) {
         Spacer(
-            modifier.size((PADDING + RADIUS) * 2.dp)
+            modifier.size((PADDING + RADIUS) * 2)
                 .drawWithCache {
                     onDrawWithContent {
                         drawContent()
@@ -97,15 +101,15 @@ internal actual fun SelectionHandle(
                         drawRect(
                             color = handleColor,
                             topLeft = Offset(
-                                x = PADDING + RADIUS - THICKNESS / 2,
-                                y = if (isLeft) PADDING + RADIUS else PADDING - lineHeight
+                                x = paddingPx + radiusPx - thicknessPx / 2,
+                                y = if (isLeft) paddingPx + radiusPx else paddingPx - lineHeight
                             ),
-                            size = Size(THICKNESS, lineHeight + RADIUS)
+                            size = Size(thicknessPx, lineHeight + radiusPx)
                         )
                         // handle circle
                         drawCircle(
                             color = handleColor,
-                            radius = RADIUS,
+                            radius = radiusPx,
                             center = center
                         )
                     }
