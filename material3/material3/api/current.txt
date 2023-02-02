@@ -350,6 +350,17 @@ package androidx.compose.material3 {
   public final class ExposedDropdownMenuKt {
   }
 
+  @kotlin.jvm.JvmInline public final value class FabPosition {
+    field public static final androidx.compose.material3.FabPosition.Companion Companion;
+  }
+
+  public static final class FabPosition.Companion {
+    method public int getCenter();
+    method public int getEnd();
+    property public final int Center;
+    property public final int End;
+  }
+
   public final class FloatingActionButtonDefaults {
     method public androidx.compose.material3.FloatingActionButtonElevation bottomAppBarFabElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.FloatingActionButtonElevation elevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation);
@@ -597,7 +608,14 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void RadioButton(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit>? onClick, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional androidx.compose.material3.RadioButtonColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
   }
 
+  public final class ScaffoldDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.foundation.layout.WindowInsets getContentWindowInsets();
+    property @androidx.compose.runtime.Composable public final androidx.compose.foundation.layout.WindowInsets contentWindowInsets;
+    field public static final androidx.compose.material3.ScaffoldDefaults INSTANCE;
+  }
+
   public final class ScaffoldKt {
+    method @androidx.compose.runtime.Composable public static void Scaffold(optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit> topBar, optional kotlin.jvm.functions.Function0<kotlin.Unit> bottomBar, optional kotlin.jvm.functions.Function0<kotlin.Unit> snackbarHost, optional kotlin.jvm.functions.Function0<kotlin.Unit> floatingActionButton, optional int floatingActionButtonPosition, optional long containerColor, optional long contentColor, optional androidx.compose.foundation.layout.WindowInsets contentWindowInsets, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.PaddingValues,kotlin.Unit> content);
   }
 
   public final class SearchBarDefaults {
