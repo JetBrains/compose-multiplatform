@@ -42,6 +42,7 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.background
@@ -2316,6 +2317,38 @@ class SubcomposeLayoutTest {
             }
         }
         assertThat(error).isInstanceOf(IllegalArgumentException::class.java)
+    }
+
+    @Test
+    fun notSubcomposedAnymoreNodesAreNotRecomposed() {
+        var flag by mutableStateOf(true)
+        var updatedInMeasureFlag by mutableStateOf(true)
+        val state = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
+        rule.setContent {
+            SubcomposeLayout(state) {
+                updatedInMeasureFlag = flag
+                Snapshot.sendApplyNotifications()
+                if (flag) {
+                    subcompose(0) {
+                        if (updatedInMeasureFlag) {
+                            Box(Modifier.testTag("tag"))
+                        }
+                    }
+                }
+                layout(100, 100) {}
+            }
+        }
+
+        rule.runOnIdle {
+            flag = false
+        }
+
+        // the node will exist when after `need` was switched to false it will first cause
+        // remeasure, and because during the remeasure we will not subcompose the child
+        // the node will be deactivated before its block recomposes causing the Box to be
+        // removed from the hierarchy.
+        rule.onNodeWithTag("tag")
+            .assertExists()
     }
 
     private fun composeItems(
