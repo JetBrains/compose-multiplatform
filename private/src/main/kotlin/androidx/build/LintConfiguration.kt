@@ -24,6 +24,7 @@ import java.util.Locale
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.plugins.JavaPluginExtension
 import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.gradle.kotlin.dsl.getByType
@@ -270,6 +271,51 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
 
         baseline = lintBaseline.get().asFile
     }
+}
+
+/**
+ * Lint on multiplatform  projects is only applied to Java code and android source sets. To force it
+ * to run on JVM code, we add the java source sets that lint looks for, but use the sources
+ * directories of the JVM source sets if they exist.
+ */
+fun Project.configureLintForMultiplatform(extension: AndroidXExtension) = afterEvaluate {
+    // if lint has been applied through some other mechanism, this step is unnecessary
+    runCatching { project.tasks.named("lint") }.onSuccess { return@afterEvaluate }
+    val jvmTarget = project.multiplatformExtension?.targets?.findByName("jvm")
+        ?: return@afterEvaluate
+    val runtimeConfiguration = project.configurations.findByName("jvmRuntimeElements")
+        ?: return@afterEvaluate
+    val apiConfiguration = project.configurations.findByName("jvmApiElements")
+        ?: return@afterEvaluate
+    val javaExtension = project.extensions.findByType(JavaPluginExtension::class.java)
+        ?: return@afterEvaluate
+    project.configurations.maybeCreate("runtimeElements").apply {
+        extendsFrom(runtimeConfiguration)
+    }
+    project.configurations.maybeCreate("apiElements").apply {
+        extendsFrom(apiConfiguration)
+    }
+    val mainSourceSets = jvmTarget
+        .compilations
+        .getByName("main")
+        .kotlinSourceSets
+    val testSourceSets = jvmTarget
+        .compilations
+        .getByName("test")
+        .kotlinSourceSets
+    javaExtension.sourceSets.maybeCreate("main").apply {
+        java.setSrcDirs(mainSourceSets.flatMap { it.kotlin.srcDirs })
+        java.classesDirectory
+    }
+    javaExtension.sourceSets.maybeCreate("test").apply {
+        java.srcDirs.addAll(testSourceSets.flatMap { it.kotlin.srcDirs })
+    }
+    project.configureNonAndroidProjectForLint(extension)
+
+    // Disable classfile based checks because lint cannot find the classfiles for multiplatform
+    // projects, and SourceSet.java.classesDirectory is not configurable. This is not ideal, but
+    // better than having no lint checks at all.
+    extensions.getByType<Lint>().disable.add("LintError")
 }
 
 val Project.lintBaseline: RegularFileProperty get() =

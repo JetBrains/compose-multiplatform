@@ -321,6 +321,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             }
             project.configureKmpTests()
             project.configureSourceJarForMultiplatform()
+            project.configureLintForMultiplatform(extension)
         }
     }
 
@@ -526,7 +527,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
-        project.configureNonAndroidProjectForLint(extension)
+        if (project.multiplatformExtension == null) {
+            project.configureNonAndroidProjectForLint(extension)
+        }
         val apiTaskConfig = if (project.multiplatformExtension != null) {
             KmpApiTaskConfig
         } else {
