@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.ScrollConfig
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -1037,6 +1038,67 @@ class ScrollbarTest {
         }
     }
 
+    private suspend fun testLazyContentWithLineSpacing(firstBoxTag: String, lastBoxTag: String){
+        // Test the size of the scrollbar thumb by trying to drag by one pixel below where it
+        // should end
+        rule.onNodeWithTag("scrollbar").performMouseInput {
+            instantDrag(start = Offset(0f, 50f), end = Offset(0f, 200f))
+        }
+        rule.awaitIdle()
+        rule.onNodeWithTag(firstBoxTag).assertTopPositionInRootIsEqualTo(0.dp)
+
+        // Test the size of the scrollbar thumb by trying to drag by its bottommost pixel
+        // This also tests the proportionality of the scrolling
+        rule.onNodeWithTag("scrollbar").performMouseInput {
+            instantDrag(start = Offset(0f, 49f), end = Offset(0f, 54f))
+        }
+        rule.awaitIdle()
+        rule.onNodeWithTag(firstBoxTag).assertTopPositionInRootIsEqualTo((-10).dp)
+
+        // Scroll to the bottom and check the last item position
+        rule.onNodeWithTag("scrollbar").performMouseInput {
+            instantDrag(start = Offset(0f, 54f), end = Offset(0f, 99f))
+        }
+        rule.onNodeWithTag(lastBoxTag).assertTopPositionInRootIsEqualTo(80.dp)
+    }
+
+    @Test
+    fun `lazy list with line spacing`(){
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                LazyListTestBox(
+                    size = 100.dp,
+                    childSize = 20.dp,
+                    childCount = 5,
+                    scrollbarWidth = 10.dp,
+                    verticalArrangement = Arrangement.spacedBy(25.dp)
+                )
+            }
+            rule.awaitIdle()
+
+            testLazyContentWithLineSpacing("box0", "box4")
+        }
+    }
+
+    @Test
+    fun `lazy grid with line spacing`(){
+        runBlocking(Dispatchers.Main) {
+            rule.setContent {
+                LazyGridTestBox(
+                    columns = GridCells.Fixed(4),
+                    size = DpSize(100.dp, 100.dp),
+                    childSize = DpSize(20.dp, 20.dp),
+                    childCount = 18,
+                    scrollbarWidth = 10.dp,
+                    verticalArrangement = Arrangement.spacedBy(25.dp),
+                )
+            }
+            rule.awaitIdle()
+
+            testLazyContentWithLineSpacing("box0", "box17")
+        }
+    }
+
     private suspend fun tryUntilSucceeded(block: suspend () -> Unit) {
         while (true) {
             try {
@@ -1125,6 +1187,7 @@ class ScrollbarTest {
         scrollbarWidth: Dp,
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        verticalArrangement: Arrangement.Vertical = Arrangement.Top,
         content: LazyListScope.() -> Unit
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
@@ -1133,6 +1196,7 @@ class ScrollbarTest {
                 state,
                 contentPadding = contentPadding,
                 reverseLayout = reverseLayout,
+                verticalArrangement = verticalArrangement,
                 content = content
             )
 
@@ -1156,12 +1220,14 @@ class ScrollbarTest {
         scrollbarWidth: Dp,
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     ) = LazyListTestBox(
         state = state,
         size = size,
         scrollbarWidth = scrollbarWidth,
         contentPadding = contentPadding,
         reverseLayout = reverseLayout,
+        verticalArrangement = verticalArrangement
     ) {
         items(childCount) {
             Box(Modifier.size(childSize).testTag("box$it"))
@@ -1176,6 +1242,7 @@ class ScrollbarTest {
         scrollbarWidth: Dp,
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        verticalArrangement: Arrangement.Vertical = Arrangement.Top,
         content: LazyGridScope.() -> Unit
     ) = withTestEnvironment {
         Box(Modifier.size(size)) {
@@ -1185,6 +1252,7 @@ class ScrollbarTest {
                 columns = columns,
                 contentPadding = contentPadding,
                 reverseLayout = reverseLayout,
+                verticalArrangement = verticalArrangement,
                 content = content
             )
 
@@ -1209,13 +1277,15 @@ class ScrollbarTest {
         scrollbarWidth: Dp,
         contentPadding: PaddingValues = PaddingValues(0.dp),
         reverseLayout: Boolean = false,
+        verticalArrangement: Arrangement.Vertical = Arrangement.Top,
     ) = LazyGridTestBox(
         state = state,
         columns = columns,
         size = size,
         scrollbarWidth = scrollbarWidth,
         contentPadding = contentPadding,
-        reverseLayout = reverseLayout
+        reverseLayout = reverseLayout,
+        verticalArrangement
     ){
         items(childCount) {
             Box(Modifier.size(childSize).testTag("box$it"))
