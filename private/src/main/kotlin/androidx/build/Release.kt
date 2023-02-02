@@ -17,6 +17,7 @@ package androidx.build
 
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
@@ -53,6 +54,13 @@ open class GMavenZipTask : Zip() {
     init {
         // multiple artifacts in the same group might have the same maven-metadata.xml
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        if (!project.shouldAddGroupConstraints()) {
+            doFirst {
+                throw GradleException(
+                    "Cannot publish artifacts without setting -P$ADD_GROUP_CONSTRAINTS=true"
+                )
+            }
+        }
     }
 
     /**
