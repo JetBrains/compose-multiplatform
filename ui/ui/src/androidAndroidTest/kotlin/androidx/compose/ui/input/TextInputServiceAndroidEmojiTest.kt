@@ -16,13 +16,16 @@
 
 package androidx.compose.ui.input
 
+import android.view.Choreographer
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.InputMethodManager
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputServiceAndroid
+import androidx.compose.ui.text.input.asExecutor
 import androidx.emoji2.text.EmojiCompat
+import androidx.test.espresso.Espresso
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
@@ -47,7 +50,10 @@ class TextInputServiceAndroidEmojiTest {
         EmojiCompat.reset(e2)
         val view = View(InstrumentationRegistry.getInstrumentation().context)
         val inputMethodManager = mock<InputMethodManager>()
-        val textInputService = TextInputServiceAndroid(view, inputMethodManager)
+        // Choreographer must be retrieved on main thread.
+        val choreographer = Espresso.onIdle { Choreographer.getInstance() }
+        val textInputService =
+            TextInputServiceAndroid(view, inputMethodManager, choreographer.asExecutor())
 
         textInputService.startInput(TextFieldValue(""), ImeOptions.Default, {}, {})
 

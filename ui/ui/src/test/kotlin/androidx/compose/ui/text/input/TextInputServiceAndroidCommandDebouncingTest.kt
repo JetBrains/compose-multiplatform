@@ -19,6 +19,7 @@ package androidx.compose.ui.text.input
 import android.view.View
 import android.view.inputmethod.ExtractedText
 import com.google.common.truth.Truth.assertThat
+import java.util.concurrent.Executor
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
@@ -37,7 +38,8 @@ class TextInputServiceAndroidCommandDebouncingTest {
 
     private val view = mock<View>()
     private val inputMethodManager = TestInputMethodManager()
-    private val service = TextInputServiceAndroid(view, inputMethodManager)
+    private val executor = Executor { runnable -> scope.launch { runnable.run() } }
+    private val service = TextInputServiceAndroid(view, inputMethodManager, executor)
     private val dispatcher = StandardTestDispatcher()
     private val scope = TestScope(dispatcher + Job())
 
@@ -45,7 +47,6 @@ class TextInputServiceAndroidCommandDebouncingTest {
     fun setUp() {
         // Default the view to focused because when it's not focused commands should be ignored.
         whenever(view.isFocused).thenReturn(true)
-        scope.launch { service.textInputCommandEventLoop() }
     }
 
     @After

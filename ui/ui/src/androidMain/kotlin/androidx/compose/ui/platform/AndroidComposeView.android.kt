@@ -1081,18 +1081,6 @@ internal class AndroidComposeView(context: Context) :
     }
 
     /**
-     * Android has an issue where calling showSoftwareKeyboard after calling
-     * hideSoftwareKeyboard, it results in keyboard flickering and sometimes the keyboard ends up
-     * being hidden even though the most recent call was to showKeyboard.
-     *
-     * This function starts a suspended function that listens for show/hide commands and only
-     * runs the latest command.
-     */
-    suspend fun keyboardVisibilityEventLoop() {
-        textInputServiceAndroid.textInputCommandEventLoop()
-    }
-
-    /**
      * Walks the entire LayoutNode sub-hierarchy and marks all nodes as needing measurement.
      */
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
