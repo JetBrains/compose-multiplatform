@@ -28,7 +28,7 @@ internal fun KotlinJsIrTarget.configureExperimentalWebApplication(app: Experimen
         .map { skikoVersion ->
             project.dependencies.create("org.jetbrains.skiko:skiko-js-wasm-runtime:$skikoVersion")
         }
-    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME").defaultDependencies {
+    val skikoJsWasmRuntimeConfiguration = project.configurations.create("COMPOSE_SKIKO_JS_WASM_RUNTIME-$targetName").defaultDependencies {
         it.addLater(skikoJsWasmRuntimeDependency)
     }
     val unpackRuntime = project.registerTask<ExperimentalUnpackSkikoWasmRuntimeTask>(taskName) {
