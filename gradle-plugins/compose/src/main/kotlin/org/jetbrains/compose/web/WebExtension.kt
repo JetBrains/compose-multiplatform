@@ -54,7 +54,7 @@ abstract class WebExtension : ExtensionAware {
             val mppTargets = mppExt.targets.asMap.values
             val jsIRTargets = mppTargets.filterIsInstanceTo(LinkedHashSet<KotlinJsIrTarget>())
 
-            return if (jsIRTargets.size > 1) {
+            return if (jsIRTargets.size > 2) { // 2 - because k/wasm is currently a KotlinJsIrTarget
                 project.logger.error(
                     "w: Default configuration for Compose for Web is disabled: " +
                             "multiple Kotlin JS IR targets are defined. " +
