@@ -16,8 +16,8 @@
 
 package androidx.compose.foundation.benchmark.text.selection
 
+import androidx.compose.foundation.benchmark.text.filterForCi
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.benchmarkDrawPerf
 import androidx.compose.testutils.benchmark.benchmarkFirstCompose
 import androidx.compose.testutils.benchmark.benchmarkFirstDraw
 import androidx.compose.testutils.benchmark.benchmarkFirstLayout
@@ -29,6 +29,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+/**
+ * we had some issues where SelectionContainer will dramatically slow down the compose & draw
+ * time(mainly the compose time). Now it's mostly fixed.
+ *
+ * This benchmark is to observe for regressions
+ */
 @SmallTest
 @RunWith(Parameterized::class)
 class SelectionContainerBenchmark(private val childrenCount: Int) {
@@ -37,7 +43,7 @@ class SelectionContainerBenchmark(private val childrenCount: Int) {
         @Parameterized.Parameters(
             name = "childrenCount={0}"
         )
-        fun initParameters() = arrayOf(1, 10, 20)
+        fun initParameters() = arrayOf(1, 10, 20).filterForCi { min() }
     }
 
     @get:Rule
@@ -67,10 +73,5 @@ class SelectionContainerBenchmark(private val childrenCount: Int) {
     @Test
     fun layout() {
         benchmarkRule.benchmarkLayoutPerf(caseFactory)
-    }
-
-    @Test
-    fun draw() {
-        benchmarkRule.benchmarkDrawPerf(caseFactory)
     }
 }

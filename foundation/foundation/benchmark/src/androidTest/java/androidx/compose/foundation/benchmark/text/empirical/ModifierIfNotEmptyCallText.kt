@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.foundation.benchmark.text.DoFullBenchmark
 import androidx.compose.foundation.newtext.text.TextUsingModifier
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -28,6 +29,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -119,5 +121,10 @@ class ModifierChatAppIfNotEmptyCallText(size: Int) : ModifierIfNotEmptyParent(si
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters(): Array<Any> = ChatApps.TextLengths
+    }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
     }
 }

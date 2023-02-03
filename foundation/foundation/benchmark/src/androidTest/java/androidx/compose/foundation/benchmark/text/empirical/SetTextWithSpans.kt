@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.foundation.benchmark.text.DoFullBenchmark
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -27,6 +28,7 @@ import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
+import org.junit.Assume.assumeTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -113,6 +115,11 @@ class SocialAppWithSpans(size: Int, spanCount: Int) : SetTextWithSpansParent(siz
         @Parameterized.Parameters(name = "size={0}, spanCount={1}")
         fun initParameters() = SocialApps.TextLengthsWithSpans
     }
+
+    init {
+        // we only need this for full reporting
+        assumeTrue(DoFullBenchmark)
+    }
 }
 
 @LargeTest
@@ -123,6 +130,11 @@ class ChatAppWithSpans(size: Int, spanCount: Int) : SetTextWithSpansParent(size,
         @Parameterized.Parameters(name = "size={0}, spanCount={1}")
         fun initParameters() = ChatApps.TextLengthsWithSpans
     }
+
+    init {
+        // we only need this for full reporting
+        assumeTrue(DoFullBenchmark)
+    }
 }
 
 @LargeTest
@@ -132,5 +144,10 @@ class ShoppingAppWithSpans(size: Int, spanCount: Int) : SetTextWithSpansParent(s
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}, spanCount={1}")
         fun initParameters() = ShoppingApps.TextLengthsWithSpans
+    }
+
+    init {
+        // we only need this for full reporting
+        assumeTrue(DoFullBenchmark)
     }
 }
