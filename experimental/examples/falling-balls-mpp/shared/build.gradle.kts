@@ -1,6 +1,6 @@
 plugins {
     kotlin("multiplatform")
-//    kotlin("native.cocoapods")
+    kotlin("native.cocoapods")
 //    id("com.android.library")
     id("org.jetbrains.compose")
 }
@@ -10,10 +10,10 @@ version = "1.0-SNAPSHOT"
 kotlin {
 //    android()
 
-//    jvm("desktop")
+    jvm("desktop")
 
-//    ios()
-//    iosSimulatorArm64()
+    ios()
+    iosSimulatorArm64()
 
     js(IR) {
         browser()
@@ -22,32 +22,32 @@ kotlin {
         browser()
     }
 
-//    macosX64 {
-//        binaries {
-//            executable {
-//                entryPoint = "main"
-//            }
-//        }
-//    }
-//    macosArm64 {
-//        binaries {
-//            executable {
-//                entryPoint = "main"
-//            }
-//        }
-//    }
+    macosX64 {
+        binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
+    }
+    macosArm64 {
+        binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
+    }
 
-//    cocoapods {
-//        summary = "Shared code for the sample"
-//        homepage = "https://github.com/JetBrains/compose-jb"
-//        ios.deploymentTarget = "14.1"
-//        podfile = project.file("../iosApp/Podfile")
-//        framework {
-//            baseName = "shared"
-//            isStatic = true
-//        }
-//        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
-//    }
+    cocoapods {
+        summary = "Shared code for the sample"
+        homepage = "https://github.com/JetBrains/compose-jb"
+        ios.deploymentTarget = "14.1"
+        podfile = project.file("../iosApp/Podfile")
+        framework {
+            baseName = "shared"
+            isStatic = true
+        }
+        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -73,30 +73,30 @@ kotlin {
 //                implementation("junit:junit:4.13.2")
 //            }
 //        }
-//        val iosMain by getting
-//        val iosTest by getting
-//        val iosSimulatorArm64Main by getting {
-//            dependsOn(iosMain)
-//        }
-//        val iosSimulatorArm64Test by getting {
-//            dependsOn(iosTest)
-//        }
-//
-//        val desktopMain by getting {
-//            dependencies {
-//                implementation(compose.desktop.common)
-//            }
-//        }
-//
-//        val macosMain by creating {
-//            dependsOn(commonMain)
-//        }
-//        val macosX64Main by getting {
-//            dependsOn(macosMain)
-//        }
-//        val macosArm64Main by getting {
-//            dependsOn(macosMain)
-//        }
+        val iosMain by getting
+        val iosTest by getting
+        val iosSimulatorArm64Main by getting {
+            dependsOn(iosMain)
+        }
+        val iosSimulatorArm64Test by getting {
+            dependsOn(iosTest)
+        }
+
+        val desktopMain by getting {
+            dependencies {
+                implementation(compose.desktop.common)
+            }
+        }
+
+        val macosMain by creating {
+            dependsOn(commonMain)
+        }
+        val macosX64Main by getting {
+            dependsOn(macosMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
+        }
     }
 }
 
@@ -111,13 +111,4 @@ kotlin {
 //        sourceCompatibility = JavaVersion.VERSION_1_8
 //        targetCompatibility = JavaVersion.VERSION_1_8
 //    }
-//}
-
-
-compose.kotlinCompilerPlugin.set("23.1.27")
-//compose.kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.8.20-dev-6044")
-//
-//tasks.withType<org.jetbrains.kotlin.gradle.dsl.KotlinCompile<*>>() {
-//    kotlinOptions.freeCompilerArgs +=
-//        listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=1.8.20-dev-6044")
 //}

@@ -5,6 +5,9 @@ pluginManagement {
         google()
         maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+
+        maven("https://packages.jetbrains.team/maven/p/karpovich-sandbox/ksandbox")
+//        mavenLocal()
     }
 
     plugins {
@@ -26,5 +29,5 @@ rootProject.name = "falling-balls-mpp"
 
 //include(":androidApp")
 include(":shared")
-//include(":desktopApp")
-include(":jsApp")
+include(":desktopApp")
+include(":webApp")

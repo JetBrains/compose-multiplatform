@@ -11,6 +11,7 @@ kotlin {
         binaries.executable()
     }
     wasm {
+        moduleName = "myapp"
         browser()
         binaries.executable()
     }
@@ -31,12 +32,4 @@ kotlin {
 compose.experimental {
     web.application {}
 }
-
-compose.kotlinCompilerPlugin.set("23.1.27")
-//compose.kotlinCompilerPluginArgs.add("suppressKotlinVersionCompatibilityCheck=1.8.20-dev-6044")
-
-//tasks.withType<KotlinCompile<*>>() {
-//    kotlinOptions.freeCompilerArgs +=
-//        listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:suppressKotlinVersionCompatibilityCheck=1.8.20-dev-6044")
-//}
 
