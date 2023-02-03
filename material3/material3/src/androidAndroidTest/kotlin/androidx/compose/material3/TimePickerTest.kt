@@ -211,6 +211,7 @@ class TimePickerTest {
         }
 
         rule.onAllNodesWithText("14")
+            .filter(isFocusable())
             .assertAll(isSelected())
     }
 
