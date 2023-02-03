@@ -16,39 +16,73 @@
 
 package androidx.build.testConfiguration
 
+import com.google.gson.GsonBuilder
+
 class ConfigBuilder {
+    lateinit var configName: String
     var appApkName: String? = null
+    var appApkSha256: String? = null
     lateinit var applicationId: String
     var isBenchmark: Boolean = false
-    var disableDeviceTests: Boolean = false
     var isPostsubmit: Boolean = true
     lateinit var minSdk: String
     var runAllTests: Boolean = true
     var cleanupApks: Boolean = true
     val tags: MutableList<String> = mutableListOf()
     lateinit var testApkName: String
+    lateinit var testApkSha256: String
     lateinit var testRunner: String
 
+    fun configName(configName: String) = apply { this.configName = configName }
     fun appApkName(appApkName: String) = apply { this.appApkName = appApkName }
+    fun appApkSha256(appApkSha256: String) = apply { this.appApkSha256 = appApkSha256 }
     fun applicationId(applicationId: String) = apply { this.applicationId = applicationId }
     fun isBenchmark(isBenchmark: Boolean) = apply { this.isBenchmark = isBenchmark }
-    fun disableDeviceTests(disableDeviceTests: Boolean) =
-        apply { this.disableDeviceTests = disableDeviceTests }
     fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
     fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
     fun cleanupApks(cleanupApks: Boolean) = apply { this.cleanupApks = cleanupApks }
     fun tag(tag: String) = apply { this.tags.add(tag) }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
+    fun testApkSha256(testApkSha256: String) = apply { this.testApkSha256 = testApkSha256 }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
 
-    fun build(): String {
+    private data class InstrumentationArg(
+        val key: String,
+        val value: String
+    )
+
+    fun buildJson(): String {
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val instrumentationArgs = if (isBenchmark && !isPostsubmit) {
+            listOf(
+                InstrumentationArg("notAnnotation", "androidx.test.filters.FlakyTest"),
+                InstrumentationArg("androidx.benchmark.dryRunMode.enable", "true"),
+            )
+        } else {
+            listOf(
+                InstrumentationArg("notAnnotation", "androidx.test.filters.FlakyTest")
+            )
+        }
+        val values = mapOf(
+            "name" to configName,
+            "minSdkVersion" to minSdk,
+            "testSuiteTags" to tags,
+            "testApk" to testApkName,
+            "testApkSha256" to testApkSha256,
+            "appApk" to appApkName,
+            "appApkSha256" to appApkSha256,
+            "instrumentationArgs" to instrumentationArgs
+        )
+        if (isBenchmark && !isPostsubmit) {
+            values["instrumentationArgs"]
+        }
+        return gson.toJson(values)
+    }
+
+    fun buildXml(): String {
         val sb = StringBuilder()
         sb.append(XML_HEADER_AND_LICENSE)
-        if (disableDeviceTests) {
-            return sb.toString()
-        }
-
         sb.append(CONFIGURATION_OPEN)
             .append(MIN_API_LEVEL_CONTROLLER_OBJECT.replace("MIN_SDK", minSdk))
         tags.forEach { tag ->

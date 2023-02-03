@@ -72,9 +72,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     abstract val hasBenchmarkPlugin: Property<Boolean>
 
     @get:Input
-    abstract val disableDeviceTests: Property<Boolean>
-
-    @get:Input
     @get:Optional
     abstract val benchmarkRunAlsoInterpreted: Property<Boolean>
 
@@ -89,6 +86,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     @get:OutputFile
     abstract val outputXml: RegularFileProperty
+
+    @get:OutputFile
+    abstract val outputJson: RegularFileProperty
 
     /**
      * Output file where we write the sha256 for each APK file we reference
@@ -134,6 +134,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         configurations testing Android Application projects, so that both APKs get installed.
          */
         val configBuilder = ConfigBuilder()
+        configBuilder.configName = outputFile.asFile.get().name
         if (appLoader.isPresent) {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load required APK for task: $name")
@@ -146,6 +147,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 appName = appName.replace("debug-androidTest", "release")
             }
             configBuilder.appApkName(appName)
+                .appApkSha256(sha256(File(appApkBuiltArtifact.outputFile)))
             testApkSha256Report.addFile(appName, appApkBuiltArtifact)
         }
         val isPresubmit = presubmit.get()
@@ -179,52 +181,56 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             }
         }
         // This section adds metadata tags that will help filter runners to specific modules.
-        if (disableDeviceTests.get()) {
-            configBuilder.disableDeviceTests(true)
-        } else {
-            if (hasBenchmarkPlugin.get()) {
-                configBuilder.isBenchmark(true)
-                if (configBuilder.isPostsubmit) {
-                    if (benchmarkRunAlsoInterpreted.get()) {
-                        configBuilder.tag("microbenchmarks_interpreted")
-                    }
-                    configBuilder.tag("microbenchmarks")
-                } else {
-                    // in presubmit, we treat micro benchmarks as regular correctness tests as
-                    // they run with dryRunMode to check crashes don't happen, without measurement
-                    configBuilder.tag("androidx_unit_tests")
+        if (hasBenchmarkPlugin.get()) {
+            configBuilder.isBenchmark(true)
+            if (configBuilder.isPostsubmit) {
+                if (benchmarkRunAlsoInterpreted.get()) {
+                    configBuilder.tag("microbenchmarks_interpreted")
                 }
-            } else if (testProjectPath.get().endsWith("macrobenchmark")) {
-                // macro benchmarks do not have a dryRunMode, so we don't run them in presubmit
-                configBuilder.tag("macrobenchmarks")
+                configBuilder.tag("microbenchmarks")
             } else {
+                // in presubmit, we treat micro benchmarks as regular correctness tests as
+                // they run with dryRunMode to check crashes don't happen, without measurement
                 configBuilder.tag("androidx_unit_tests")
-                if (testProjectPath.get().startsWith(":compose:")) {
-                    configBuilder.tag("compose")
-                } else if (testProjectPath.get().startsWith(":wear:")) {
-                    configBuilder.tag("wear")
-                }
             }
-            val testApk = testLoader.get().load(testFolder.get())
-                ?: throw RuntimeException("Cannot load required APK for task: $name")
-            val testApkBuiltArtifact = testApk.elements.single()
-            val testName = testApkBuiltArtifact.outputFile
-                .substringAfterLast("/")
-                .renameApkForTesting(testProjectPath.get(), hasBenchmarkPlugin.get())
-            configBuilder.testApkName(testName)
-                .applicationId(testApk.applicationId)
-                .minSdk(minSdk.get().toString())
-                .testRunner(testRunner.get())
-            testApkSha256Report.addFile(testName, testApkBuiltArtifact)
-        }
-        val resolvedOutputFile: File = outputFile.asFile.get()
-        if (!resolvedOutputFile.exists()) {
-            if (!resolvedOutputFile.createNewFile()) {
-                throw RuntimeException(
-                    "Failed to create test configuration file: $resolvedOutputFile"
-                )
+        } else if (testProjectPath.get().endsWith("macrobenchmark")) {
+            // macro benchmarks do not have a dryRunMode, so we don't run them in presubmit
+            configBuilder.tag("macrobenchmarks")
+        } else {
+            configBuilder.tag("androidx_unit_tests")
+            if (testProjectPath.get().startsWith(":compose:")) {
+                configBuilder.tag("compose")
+            } else if (testProjectPath.get().startsWith(":wear:")) {
+                configBuilder.tag("wear")
             }
         }
-        resolvedOutputFile.writeText(configBuilder.build())
+        val testApk = testLoader.get().load(testFolder.get())
+            ?: throw RuntimeException("Cannot load required APK for task: $name")
+        val testApkBuiltArtifact = testApk.elements.single()
+        val testName = testApkBuiltArtifact.outputFile
+            .substringAfterLast("/")
+            .renameApkForTesting(testProjectPath.get(), hasBenchmarkPlugin.get())
+        configBuilder.testApkName(testName)
+            .applicationId(testApk.applicationId)
+            .minSdk(minSdk.get().toString())
+            .testRunner(testRunner.get())
+            .testApkSha256(sha256(File(testApkBuiltArtifact.outputFile)))
+        testApkSha256Report.addFile(testName, testApkBuiltArtifact)
+        createOrFail(outputFile).writeText(configBuilder.buildXml())
+        if (!isConstrained) {
+            createOrFail(outputJson).writeText(configBuilder.buildJson())
+        }
     }
+}
+
+private fun createOrFail(fileProperty: RegularFileProperty): File {
+    val resolvedFile: File = fileProperty.asFile.get()
+    if (!resolvedFile.exists()) {
+        if (!resolvedFile.createNewFile()) {
+            throw RuntimeException(
+                "Failed to create test configuration file: $resolvedFile"
+            )
+        }
+    }
+    return resolvedFile
 }

@@ -62,6 +62,7 @@ fun Project.createTestConfigurationGenerationTask(
     overrideProject: Project = this
 ) {
     val xmlName = "${path.asFilenamePrefix()}$variantName.xml"
+    val jsonName = "${path.asFilenamePrefix()}$variantName.json"
     val sha256XmlName = "${path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
     rootProject.tasks.named("createModuleInfo").configure {
         it as ModuleInfoGenerator
@@ -81,6 +82,7 @@ fun Project.createTestConfigurationGenerationTask(
         task.testFolder.set(artifacts.get(SingleArtifact.APK))
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
         task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
+        task.outputJson.fileValue(File(getTestConfigDirectory(), jsonName))
         task.shaReportOutput.fileValue(File(getTestConfigDirectory(), sha256XmlName))
         task.constrainedOutputXml.fileValue(File(getConstrainedTestConfigDirectory(), xmlName))
         task.constrainedShaReportOutput.fileValue(
@@ -93,7 +95,6 @@ fun Project.createTestConfigurationGenerationTask(
         } else {
             task.minSdk.set(minSdk)
         }
-        task.disableDeviceTests.set(androidXExtension.disableDeviceTests)
         val hasBenchmarkPlugin = hasBenchmarkPlugin()
         task.hasBenchmarkPlugin.set(hasBenchmarkPlugin)
         if (hasBenchmarkPlugin) {
@@ -110,9 +111,11 @@ fun Project.createTestConfigurationGenerationTask(
         AffectedModuleDetector.configureTaskGuard(task)
     }
     // Disable xml generation for projects that have no test sources
-    this.afterEvaluate {
+    // or explicitly don't want to run device tests
+    afterEvaluate {
+        val androidXExtension = extensions.getByType<AndroidXExtension>()
         generateTestConfigurationTask.configure {
-            it.enabled = this.hasAndroidTestSourceCode()
+            it.enabled = hasAndroidTestSourceCode() && !androidXExtension.disableDeviceTests
         }
     }
     this.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
@@ -334,15 +337,14 @@ private fun Project.configureMacrobenchmarkConfigTask(
     val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
     if (path.endsWith("macrobenchmark")) {
         configTask.configure { task ->
-            val androidXExtension = extensions.getByType<AndroidXExtension>()
-
+            val fileNamePrefix = "${this.path.asFilenamePrefix()}$variantName"
             task.testFolder.set(artifacts.get(SingleArtifact.APK))
             task.testLoader.set(artifacts.getBuiltArtifactsLoader())
             task.outputXml.fileValue(
-                File(
-                    this.getTestConfigDirectory(),
-                    "${this.path.asFilenamePrefix()}$variantName.xml"
-                )
+                File(getTestConfigDirectory(), "$fileNamePrefix.xml")
+            )
+            task.outputJson.fileValue(
+                File(getTestConfigDirectory(), "$fileNamePrefix.json")
             )
             task.shaReportOutput.fileValue(
                 File(
@@ -363,7 +365,6 @@ private fun Project.configureMacrobenchmarkConfigTask(
                 )
             )
             task.minSdk.set(minSdk)
-            task.disableDeviceTests.set(androidXExtension.disableDeviceTests)
             task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
             task.testRunner.set(testRunner)
             task.testProjectPath.set(this.path)
@@ -378,9 +379,10 @@ private fun Project.configureMacrobenchmarkConfigTask(
             AffectedModuleDetector.configureTaskGuard(task)
         }
         // Disable xml generation for projects that have no test sources
-        this.afterEvaluate {
+        afterEvaluate {
+            val androidXExtension = extensions.getByType<AndroidXExtension>()
             configTask.configure {
-                it.enabled = this.hasAndroidTestSourceCode()
+                it.enabled = hasAndroidTestSourceCode() && !androidXExtension.disableDeviceTests
             }
         }
         this.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!

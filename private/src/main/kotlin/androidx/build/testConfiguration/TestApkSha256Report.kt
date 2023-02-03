@@ -18,7 +18,6 @@ package androidx.build.testConfiguration
 
 import com.android.build.api.variant.BuiltArtifact
 import com.google.common.annotations.VisibleForTesting
-import com.google.common.hash.HashCode
 import com.google.common.hash.Hashing
 import com.google.common.io.BaseEncoding
 import java.io.File
@@ -39,7 +38,7 @@ import javax.xml.transform.stream.StreamResult
  */
 @VisibleForTesting
 class TestApkSha256Report {
-    private val files = mutableMapOf<String, HashCode>()
+    private val files = mutableMapOf<String, String>()
 
     /**
      * Adds the given builtArtifact to the list of shas after calculating its sha256 hash.
@@ -78,11 +77,7 @@ class TestApkSha256Report {
         }.forEach { (fileName, hash) ->
             val elm = doc.createElement("file")
             elm.setAttribute("name", fileName)
-            elm.setAttribute(
-                "sha256", BaseEncoding.base16().lowerCase().encode(
-                    hash.asBytes()
-                )
-            )
+            elm.setAttribute("sha256", hash)
             root.appendChild(elm)
         }
         val transformerFactory = TransformerFactory.newInstance()
@@ -94,15 +89,17 @@ class TestApkSha256Report {
             transformer.transform(source, result)
         }
     }
+}
 
-    @Suppress("UnstableApiUsage") // guava Hashing is marked as @Beta
-    private fun sha256(file: File): HashCode {
-        val hasher = Hashing.sha256().newHasher()
-        file.inputStream().buffered().use {
-            while (it.available() > 0) {
-                hasher.putBytes(it.readNBytes(1024))
-            }
+@Suppress("UnstableApiUsage") // guava Hashing is marked as @Beta
+internal fun sha256(file: File): String {
+    val hasher = Hashing.sha256().newHasher()
+    file.inputStream().buffered().use {
+        while (it.available() > 0) {
+            hasher.putBytes(it.readNBytes(1024))
         }
-        return hasher.hash()
     }
+    return BaseEncoding.base16().lowerCase().encode(
+        hasher.hash().asBytes()
+    )
 }
