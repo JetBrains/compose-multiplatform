@@ -96,3 +96,4 @@ private class UnresolvedDependencyDescriptor(private val dependency: UnresolvedD
     override val version: String?
         get() = dependency.selector.version
 }
+
