@@ -75,7 +75,7 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
             KotlinPlatformType.js -> isApplicableJsTarget(kotlinCompilation.target)
             KotlinPlatformType.androidJvm -> true
             KotlinPlatformType.native -> true
-            KotlinPlatformType.wasm -> false
+            KotlinPlatformType.wasm -> true
         }
 
     private fun isApplicableJsTarget(kotlinTarget: KotlinTarget): Boolean {
@@ -95,7 +95,8 @@ class ComposeCompilerKotlinSupportPlugin @Inject constructor(
     }
 
     private val platformPluginOptions = mapOf(
-        KotlinPlatformType.js to options("generateDecoys" to "true")
+        KotlinPlatformType.js to options("generateDecoys" to "false"),
+        KotlinPlatformType.wasm to options("generateDecoys" to "false")
     )
 
     private fun options(vararg options: Pair<String, String>): List<SubpluginOption> =
