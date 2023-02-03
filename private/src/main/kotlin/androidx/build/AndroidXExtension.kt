@@ -342,6 +342,8 @@ open class AndroidXExtension(val project: Project) {
 
     var disableDeviceTests = false
 
+    val additionalDeviceTestApkKeys = mutableListOf<String>()
+
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
             shouldConfigureApiTasks()

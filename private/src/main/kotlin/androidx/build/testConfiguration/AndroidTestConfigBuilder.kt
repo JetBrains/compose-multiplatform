@@ -28,10 +28,11 @@ class ConfigBuilder {
     lateinit var minSdk: String
     var runAllTests: Boolean = true
     var cleanupApks: Boolean = true
-    val tags: MutableList<String> = mutableListOf()
+    val tags = mutableListOf<String>()
     lateinit var testApkName: String
     lateinit var testApkSha256: String
     lateinit var testRunner: String
+    val additionalApkKeys = mutableListOf<String>()
 
     fun configName(configName: String) = apply { this.configName = configName }
     fun appApkName(appApkName: String) = apply { this.appApkName = appApkName }
@@ -43,6 +44,7 @@ class ConfigBuilder {
     fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
     fun cleanupApks(cleanupApks: Boolean) = apply { this.cleanupApks = cleanupApks }
     fun tag(tag: String) = apply { this.tags.add(tag) }
+    fun additionalApkKeys(keys: List<String>) = apply { additionalApkKeys.addAll(keys) }
     fun testApkName(testApkName: String) = apply { this.testApkName = testApkName }
     fun testApkSha256(testApkSha256: String) = apply { this.testApkSha256 = testApkSha256 }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
@@ -72,7 +74,8 @@ class ConfigBuilder {
             "testApkSha256" to testApkSha256,
             "appApk" to appApkName,
             "appApkSha256" to appApkSha256,
-            "instrumentationArgs" to instrumentationArgs
+            "instrumentationArgs" to instrumentationArgs,
+            "additionalApkKeys" to additionalApkKeys
         )
         if (isBenchmark && !isPostsubmit) {
             values["instrumentationArgs"]

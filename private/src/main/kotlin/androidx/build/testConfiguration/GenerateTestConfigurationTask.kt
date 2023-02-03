@@ -33,6 +33,7 @@ import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import java.io.File
+import org.gradle.api.provider.ListProperty
 
 /**
  * Writes a configuration file in
@@ -83,6 +84,9 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
 
     @get:Input
     abstract val presubmit: Property<Boolean>
+
+    @get:Input
+    abstract val additionalApkKeys: ListProperty<String>
 
     @get:OutputFile
     abstract val outputXml: RegularFileProperty
@@ -150,6 +154,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 .appApkSha256(sha256(File(appApkBuiltArtifact.outputFile)))
             testApkSha256Report.addFile(appName, appApkBuiltArtifact)
         }
+        configBuilder.additionalApkKeys(additionalApkKeys.get())
         val isPresubmit = presubmit.get()
         configBuilder.isPostsubmit(!isPresubmit)
         // Will be using the constrained configs for all devices api 26 and below.

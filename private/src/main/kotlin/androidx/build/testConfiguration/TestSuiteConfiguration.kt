@@ -81,6 +81,7 @@ fun Project.createTestConfigurationGenerationTask(
 
         task.testFolder.set(artifacts.get(SingleArtifact.APK))
         task.testLoader.set(artifacts.getBuiltArtifactsLoader())
+        task.additionalApkKeys.set(androidXExtension.additionalDeviceTestApkKeys)
         task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
         task.outputJson.fileValue(File(getTestConfigDirectory(), jsonName))
         task.shaReportOutput.fileValue(File(getTestConfigDirectory(), sha256XmlName))
@@ -337,9 +338,11 @@ private fun Project.configureMacrobenchmarkConfigTask(
     val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
     if (path.endsWith("macrobenchmark")) {
         configTask.configure { task ->
+            val androidXExtension = extensions.getByType<AndroidXExtension>()
             val fileNamePrefix = "${this.path.asFilenamePrefix()}$variantName"
             task.testFolder.set(artifacts.get(SingleArtifact.APK))
             task.testLoader.set(artifacts.getBuiltArtifactsLoader())
+            task.additionalApkKeys.set(androidXExtension.additionalDeviceTestApkKeys)
             task.outputXml.fileValue(
                 File(getTestConfigDirectory(), "$fileNamePrefix.xml")
             )
