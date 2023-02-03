@@ -874,7 +874,7 @@ private fun ClockText(
             .minimumInteractiveComponentSize()
             .size(MinimumInteractiveSize)
             .focusable()
-            .semantics(mergeDescendants = true) {
+            .semantics {
                 this.selected = selected
                 this.contentDescription = contentDescription
             }
