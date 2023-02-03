@@ -145,6 +145,12 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidMain.kotlin.srcDirs("${supportRootFolder}/text/text/src/main/java")
 
+            commonTest {
+                dependencies {
+                    implementation(libs.kotlinTest)
+                }
+            }
+
             // TODO(b/214407011): These dependencies leak into instrumented tests as well. If you
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
             //  level dependencies block instead:
@@ -157,7 +163,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoCore)
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
-                implementation(libs.kotlinTest)
                 implementation(libs.mockitoKotlin)
             }
 
@@ -174,20 +179,32 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.mockitoKotlin)
             }
 
-            desktopTest.dependencies {
-                implementation(libs.truth)
-                implementation(libs.junit)
-                implementation(libs.kotlinTest)
-                implementation(libs.skikoCurrentOs)
-                implementation(project(":compose:foundation:foundation"))
-                implementation(project(":compose:ui:ui-test-junit4"))
-                implementation(project(":internal-testutils-fonts"))
-                implementation(libs.mockitoCore)
-                implementation(libs.mockitoKotlin)
-                implementation(libs.kotlinReflect)
+            skikoTest {
+                dependsOn(commonTest)
+            }
+
+            desktopTest {
+                dependsOn(skikoTest)
+                dependencies {
+                    implementation(libs.truth)
+                    implementation(libs.junit)
+                    implementation(libs.skikoCurrentOs)
+                    implementation(project(":compose:foundation:foundation"))
+                    implementation(project(":compose:ui:ui-test-junit4"))
+                    implementation(project(":internal-testutils-fonts"))
+                    implementation(libs.mockitoCore)
+                    implementation(libs.mockitoKotlin)
+                    implementation(libs.kotlinReflect)
+                }
             }
             desktopTest.kotlin.srcDirs("src/test/java", "src/desktopTest/kotlin")
             desktopTest.resources.srcDirs("src/test/resources", "src/desktopTest/resources")
+
+            jsNativeTest {
+                dependsOn(skikoTest)
+            }
+            nativeTest.dependsOn(jsNativeTest)
+            jsTest.dependsOn(jsNativeTest)
         }
     }
     dependencies {

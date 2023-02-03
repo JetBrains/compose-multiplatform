@@ -16,13 +16,22 @@
 
 package androidx.compose.ui.text.input
 
-internal actual fun String.toCharArray(
-    destination: CharArray,
-    destinationOffset: Int,
-    startIndex: Int,
-    endIndex: Int
-) {
-    (startIndex until endIndex).forEach {
-        destination[destinationOffset + it - startIndex] = get(it)
+import kotlin.test.Test
+import kotlin.test.assertEquals
+
+class ToCharArrayTest {
+    @Test
+    fun start_from_0() {
+        val charArray = CharArray(2)
+        "ab".toCharArray(charArray, 0, 0, 1)
+        assertEquals('a', charArray[0])
     }
+
+    @Test
+    fun start_from_1() {
+        val charArray = CharArray(2)
+        "ab".toCharArray(charArray, 1, 1, 2)
+        assertEquals('b', charArray[1])
+    }
+
 }
