@@ -373,6 +373,32 @@ class IconButtonTest {
     }
 
     @Test
+    fun filledTonalIconButton_defaultSemantics() {
+        rule.setMaterialContent(lightColorScheme()) {
+            FilledTonalIconButton(onClick = { /* doSomething() */ }) {
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+            }
+        }
+        rule.onNode(hasClickAction()).apply {
+            assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            assertIsEnabled()
+        }
+    }
+
+    @Test
+    fun filledTonalIconButton_disabledSemantics() {
+        rule.setMaterialContent(lightColorScheme()) {
+            FilledTonalIconButton(onClick = {}, enabled = false) {
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+            }
+        }
+        rule.onNode(hasClickAction()).apply {
+            assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            assertIsNotEnabled()
+        }
+    }
+
+    @Test
     fun filledIconToggleButton_size() {
         rule
             .setMaterialContentForSizeAssertions {
