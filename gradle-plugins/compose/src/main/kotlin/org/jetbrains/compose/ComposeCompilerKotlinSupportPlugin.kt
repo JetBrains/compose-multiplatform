@@ -92,7 +92,8 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
     }
 
     private val platformPluginOptions = mapOf(
-        KotlinPlatformType.js to options("generateDecoys" to "true")
+        KotlinPlatformType.js to options("generateDecoys" to "false"),
+        KotlinPlatformType.wasm to options("generateDecoys" to "false")
     )
 
     private fun options(vararg options: Pair<String, String>): List<SubpluginOption> =
@@ -109,3 +110,4 @@ with non-JVM targets (Kotlin/Native, Kotlin/JS, Kotlin/WASM) is not supported.
 For more information, please visit: $COMPOSE_COMPILER_COMPATIBILITY_LINK
 """.trimMargin()
 }
+
