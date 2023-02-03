@@ -22,15 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
-import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkComposeMeasureLayout
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
 import org.junit.Assume
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -65,12 +60,9 @@ class IfNotEmptyCallText(private val text: String) : LayeredComposeTestCase(), T
 
 @LargeTest
 @RunWith(Parameterized::class)
-open class IfNotEmptyParent(private val size: Int) {
+open class IfNotEmptyParent(private val size: Int) : EmpiricalBench<IfNotEmptyCallText>() {
 
-    @get:Rule
-    val benchmarkRule = ComposeBenchmarkRule()
-
-    private val caseFactory = {
+    override val caseFactory = {
         val text = generateCacheableStringOf(size)
         IfNotEmptyCallText(text)
     }
@@ -79,16 +71,6 @@ open class IfNotEmptyParent(private val size: Int) {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters(): Array<Any> = arrayOf()
-    }
-
-    @Test
-    fun recomposeOnly() {
-        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory)
-    }
-
-    @Test
-    fun recomposeMeasureLayout() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout(caseFactory)
     }
 }
 

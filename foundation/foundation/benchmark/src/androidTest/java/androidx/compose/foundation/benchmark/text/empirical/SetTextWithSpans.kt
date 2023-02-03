@@ -22,15 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
-import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkComposeMeasureLayout
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.test.filters.LargeTest
 import org.junit.Assume.assumeTrue
-import org.junit.Rule
-import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -70,12 +65,11 @@ class SetTextWithSpans(
 
 @LargeTest
 @RunWith(Parameterized::class)
-open class SetTextWithSpansParent(private val size: Int, private val spanCount: Int) {
-
-    @get:Rule
-    val benchmarkRule = ComposeBenchmarkRule()
-
-    private val caseFactory = {
+open class SetTextWithSpansParent(
+    private val size: Int,
+    private val spanCount: Int
+) : EmpiricalBench<SetTextWithSpans>() {
+    override val caseFactory = {
         val text = generateCacheableStringOf(size)
         SetTextWithSpans(text.annotateWithSpans(spanCount))
     }
@@ -84,16 +78,6 @@ open class SetTextWithSpansParent(private val size: Int, private val spanCount: 
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}, spanCount={1}")
         fun initParameters(): List<Array<Any>> = listOf()
-    }
-
-    @Test
-    fun recomposeOnly() {
-        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory)
-    }
-
-    @Test
-    fun recomposeMeasureLayout() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout(caseFactory)
     }
 }
 
