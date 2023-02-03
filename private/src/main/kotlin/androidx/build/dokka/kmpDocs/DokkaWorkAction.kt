@@ -60,6 +60,7 @@ internal abstract class DokkaWorkAction @Inject constructor(
             it.errorOutput = errorStream
             it.classpath = parameters.classpath
             it.args(parameters.inputFile.get().asFile.canonicalPath)
+            it.isIgnoreExitValue = true
         }
         if (result.exitValue != 0) {
             throw GradleException("Failed to run Dokka.\n ${errorStream.toString(Charsets.UTF_8)}")
