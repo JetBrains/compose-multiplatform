@@ -32,6 +32,11 @@ private const val focusRequesterNotInitialized = """
    response to some event. Eg Modifier.clickable { focusRequester.requestFocus() }
 """
 
+private const val invalidFocusRequesterInvocation = """
+    Please check whether the focusRequester is FocusRequester.Cancel or FocusRequester.Default
+    before invoking any functions on the focusRequester.
+"""
+
 /**
  * The [FocusRequester] is used in conjunction with
  * [Modifier.focusRequester][androidx.compose.ui.focus.focusRequester] to send requests to
@@ -55,8 +60,6 @@ class FocusRequester {
      * @sample androidx.compose.ui.samples.RequestFocusSample
      */
     fun requestFocus() {
-        @OptIn(ExperimentalComposeUiApi::class)
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
         // TODO(b/245755256): Add another API that returns a Boolean indicating
         //  whether requestFocus succeeded or not.
         @OptIn(ExperimentalComposeUiApi::class)
@@ -73,23 +76,20 @@ class FocusRequester {
      * associated with this [FocusRequester].
      */
     @OptIn(ExperimentalComposeUiApi::class)
-    internal fun findFocusTarget(onFound: (FocusTargetModifierNode) -> Boolean): Boolean? {
-        return when (this) {
-            Cancel -> false
-            Default -> null
-            else -> {
-                var success: Boolean? = null
-                focusRequesterNodes.forEach { node ->
-                    node.visitChildren(Nodes.FocusTarget) {
-                        if (onFound(it)) {
-                            success = true
-                            return@forEach
-                        }
-                    }
+    internal fun findFocusTarget(onFound: (FocusTargetModifierNode) -> Boolean): Boolean {
+        check(this != Default) { invalidFocusRequesterInvocation }
+        check(this != Cancel) { invalidFocusRequesterInvocation }
+        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        var success = false
+        focusRequesterNodes.forEach { node ->
+            node.visitChildren(Nodes.FocusTarget) {
+                if (onFound(it)) {
+                    success = true
+                    return@forEach
                 }
-                success
             }
         }
+        return success
     }
 
     /**

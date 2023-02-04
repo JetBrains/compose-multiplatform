@@ -149,7 +149,7 @@ internal class FocusOwnerImpl(onRequestApplyChangesListener: (() -> Unit) -> Uni
                 // If we didn't find a potential next item, try to wrap around.
                 return foundNextItem || wrapAroundFocus(focusDirection)
             }
-            else -> return next.findFocusTarget { it.requestFocus() } ?: false
+            else -> return next.findFocusTarget { it.requestFocus() }
         }
     }
 

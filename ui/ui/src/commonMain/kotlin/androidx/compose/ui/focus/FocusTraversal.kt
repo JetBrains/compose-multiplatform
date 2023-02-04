@@ -102,7 +102,7 @@ internal fun FocusTargetModifierNode.focusSearch(
 ): Boolean {
     return when (focusDirection) {
         Next, Previous -> oneDimensionalFocusSearch(focusDirection, onFound)
-        Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection, onFound)
+        Left, Right, Up, Down -> twoDimensionalFocusSearch(focusDirection, onFound) ?: false
         @OptIn(ExperimentalComposeUiApi::class)
         Enter -> {
             // we search among the children of the active item.
