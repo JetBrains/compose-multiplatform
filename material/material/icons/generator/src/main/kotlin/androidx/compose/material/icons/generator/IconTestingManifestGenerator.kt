@@ -28,26 +28,33 @@ import java.io.File
 import kotlin.reflect.KProperty0
 
 /**
- * Generates a list named `AllIcons` that contains pairs mapping a [KProperty0] of the generated
- * icon to the name of the corresponding XML drawable. This is used so we can run tests comparing
- * the generated icon against the original source drawable.
+ * Generates two lists, named `CoreIcons` and `ExtendedIcons` that contains pairs mapping a
+ * [KProperty0] of the generated icon to the name of the corresponding XML drawable. This is used so
+ * we can run tests comparing the generated icon against the original source drawable.
  *
- * @property icons the list of [Icon]s to generate the manifest from
+ * @property icons the list of [Icon]s to generate the manifest from. This icons list holds all
+ * known icons, and the generator will split them to Core and Extended on [generateTo]
  */
 class IconTestingManifestGenerator(private val icons: List<Icon>) {
     /**
      * Generates the list and writes it to [outputSrcDirectory].
      */
     fun generateTo(outputSrcDirectory: File) {
-        val propertyNames: MutableList<String> = mutableListOf()
+        // Split the icons to Core and Extended lists, and generate output for each.
+        val (coreIcons, extendedIcons) = icons.partition { CoreIcons.contains(it.kotlinName) }
+        generateTo(outputSrcDirectory, coreIcons, "Core")
+        generateTo(outputSrcDirectory, extendedIcons, "Extended")
+    }
 
-        // Split up this list by themes, otherwise we get a Method too large exception.
+    private fun generateTo(outputSrcDirectory: File, icons: List<Icon>, prefix: String) {
+        val propertyNames: MutableList<String> = mutableListOf()
+        // Further split each list by themes, otherwise we get a Method too large exception.
         // We will then generate another file that returns the result of concatenating the list
         // for each theme.
         icons
             .groupBy { it.theme }
             .map { (theme, icons) ->
-                val propertyName = "${theme.themeClassName}Icons"
+                val propertyName = "$prefix${theme.themeClassName}Icons"
                 propertyNames += propertyName
                 theme to generateListOfIconsForTheme(propertyName, theme, icons)
             }
@@ -71,9 +78,9 @@ class IconTestingManifestGenerator(private val icons: List<Icon>) {
             .addStatement("return " + propertyNames.joinToString(" + "))
             .build()
 
-        FileSpec.builder(PackageNames.MaterialIconsPackage.packageName, "AllIcons")
+        FileSpec.builder(PackageNames.MaterialIconsPackage.packageName, "All${prefix}Icons")
             .addProperty(
-                PropertySpec.builder("AllIcons", type = listOfIconsType)
+                PropertySpec.builder("All${prefix}Icons", type = listOfIconsType)
                     .getter(mainGetter)
                     .build()
             ).setIndent().build().writeToWithCopyright(outputSrcDirectory)

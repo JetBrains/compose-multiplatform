@@ -42,65 +42,28 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
-import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.matchers.MSSIMMatcher
 import com.google.common.truth.Truth
-import org.junit.Rule
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.Parameterized
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.javaGetter
+import org.junit.Rule
 
 const val ProgrammaticTestTag = "programmatic"
 const val XmlTestTag = "Xml"
 
 /**
- * Test to ensure equality (both structurally, and visually) between programmatically generated
- * Material [androidx.compose.material.icons.Icons] and their XML source.
+ * Base class for Material [androidx.compose.material.icons.Icons] tests.
  */
-@Suppress("unused")
-@LargeTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-@RunWith(Parameterized::class)
-class IconComparisonTest(
-    private val iconSublist: List<Pair<KProperty0<ImageVector>, String>>,
-    private val debugParameterName: String
-) {
-
-    companion object {
-        /**
-         * Arbitrarily split [AllIcons] into equal parts. This is needed as one test with the
-         * whole of [AllIcons] will exceed the timeout allowed for a test in CI, so we split it
-         * up to stay under the limit.
-         *
-         * Additionally, we run large batches of comparisons per method, instead of one icon per
-         * method, so that we can re-use the same Activity instance between test runs. Most of the
-         * cost of a simple test like this is in Activity instantiation so re-using the same
-         * activity reduces time to run this test ~tenfold.
-         */
-        @JvmStatic
-        @Parameterized.Parameters(name = "{1}")
-        fun initIconSublist(): Array<Array<Any>> {
-            val numberOfChunks = 6
-            val listSize = ceil(AllIcons.size / numberOfChunks.toFloat()).roundToInt()
-            val subLists = AllIcons.chunked(listSize)
-            return subLists.mapIndexed { index, list ->
-                arrayOf(list, "${index + 1}of$numberOfChunks")
-            }.toTypedArray()
-        }
-    }
+abstract class BaseIconComparisonTest {
 
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     private val matcher = MSSIMMatcher(threshold = 0.99)
 
-    @Test
-    fun compareImageVectors() {
+    fun compareImageVectors(iconSublist: List<Pair<KProperty0<ImageVector>, String>>) {
         iconSublist.forEach { (property, drawableName) ->
             var xmlVector: ImageVector? = null
             val programmaticVector = property.get()
@@ -175,6 +138,7 @@ private fun ImageVector.copy(name: String): ImageVector {
                     currentGroup = vectorNode
                     currentIndex = 0
                 }
+
                 is VectorPath -> {
                     builder.addPath(
                         name = vectorNode.name,
@@ -286,16 +250,20 @@ private fun DrawVectors(programmaticVector: ImageVector, xmlVector: ImageVector)
         }
         Row(Modifier.align(Alignment.Center)) {
             Box(
-                modifier = layoutSize.paint(
-                    rememberVectorPainter(programmaticVector),
-                    colorFilter = ColorFilter.tint(Color.Red)
-                ).testTag(ProgrammaticTestTag)
+                modifier = layoutSize
+                    .paint(
+                        rememberVectorPainter(programmaticVector),
+                        colorFilter = ColorFilter.tint(Color.Red)
+                    )
+                    .testTag(ProgrammaticTestTag)
             )
             Box(
-                modifier = layoutSize.paint(
-                    rememberVectorPainter(xmlVector),
-                    colorFilter = ColorFilter.tint(Color.Red)
-                ).testTag(XmlTestTag)
+                modifier = layoutSize
+                    .paint(
+                        rememberVectorPainter(xmlVector),
+                        colorFilter = ColorFilter.tint(Color.Red)
+                    )
+                    .testTag(XmlTestTag)
             )
         }
     }
