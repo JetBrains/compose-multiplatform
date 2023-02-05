@@ -28,13 +28,6 @@ inline fun <reified T> Project.configureIfExists(fn: T.() -> Unit) {
 
 val isWindows = DefaultNativePlatform.getCurrentOperatingSystem().isWindows
 
-fun Test.configureJavaForComposeTest() {
-    val toolchains =  project.extensions.getByName("javaToolchains") as JavaToolchainService
-    javaLauncher.set(toolchains.launcherFor {
-        languageVersion.set(JavaLanguageVersion.of(16))
-    })
-}
-
 fun Project.configureAllTests(fn: Test.() -> Unit = {}) {
     fun DependencyHandler.testImplementation(notation: Any) =
         add(JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME, notation)
