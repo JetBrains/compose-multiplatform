@@ -32,6 +32,7 @@
     <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"ไปยังปี %1$s"</string>
     <string name="date_picker_headline_description" msgid="4627306862713137085">"การเลือกปัจจุบัน: %1$s"</string>
     <string name="date_picker_no_selection_description" msgid="5724377114289981899">"ไม่มี"</string>
+    <string name="date_picker_today_description" msgid="4775802721403526937">"วันนี้"</string>
     <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"แสดงตัวเลือกปี"</string>
     <string name="date_input_title" msgid="3010396677286327048">"เลือกวันที่"</string>
     <string name="date_input_headline" msgid="3499643850558715142">"วันที่ป้อน"</string>
@@ -41,5 +42,15 @@
     <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"ไม่อนุญาตให้ใช้วันที่นี้: %1$s"</string>
     <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"วันที่ไม่ตรงกับรูปแบบที่คาดไว้: %1$s"</string>
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"วันที่อยู่นอกเหนือจากช่วงปีที่คาดไว้ %1$s - %2$s"</string>
+    <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"สลับไปใช้โหมดป้อนข้อมูลปฏิทิน"</string>
+    <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"สลับไปใช้โหมดการป้อนข้อความ"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"แสดงเคล็ดลับเครื่องมือ"</string>
+    <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
+    <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
+    <string name="time_picker_period_toggle_description" msgid="7352665290700284516">"เลือก AM หรือ PM"</string>
+    <string name="time_picker_hour_selection" msgid="6081676287789101196">"เลือกชั่วโมง"</string>
+    <string name="time_picker_minute_selection" msgid="8494777394375441602">"เลือกนาที"</string>
+    <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d นาฬิกา"</string>
+    <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d ชั่วโมง"</string>
+    <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d นาที"</string>
 </resources>

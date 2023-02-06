@@ -32,14 +32,25 @@
     <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"Odlazak na %1$s. godinu"</string>
     <string name="date_picker_headline_description" msgid="4627306862713137085">"Trenutni odabir: %1$s"</string>
     <string name="date_picker_no_selection_description" msgid="5724377114289981899">"Ništa"</string>
+    <string name="date_picker_today_description" msgid="4775802721403526937">"Danas"</string>
     <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"Birač godine je vidljiv"</string>
     <string name="date_input_title" msgid="3010396677286327048">"Odaberite datum"</string>
-    <string name="date_input_headline" msgid="3499643850558715142">"Datum unosa"</string>
+    <string name="date_input_headline" msgid="3499643850558715142">"Unesen je datum"</string>
     <string name="date_input_label" msgid="5194825853981987218">"Datum"</string>
-    <string name="date_input_headline_description" msgid="8562356184193964298">"Datum unosa: %1$s"</string>
+    <string name="date_input_headline_description" msgid="8562356184193964298">"Unesen je datum: %1$s"</string>
     <string name="date_input_no_input_description" msgid="5722931102250207748">"Ništa"</string>
-    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"Datum nije dopušten: %1$s"</string>
-    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"Datum se ne podudara s očekivanim uzorkom: %1$s"</string>
-    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Datum je izvan očekivanog raspona godine %1$s – %2$s"</string>
-    <string name="tooltip_long_press_label" msgid="2732804537909054941">"Prikaži opis"</string>
+    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"Datum nije dozvoljen: %1$s"</string>
+    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"Datumi se ne podudaraju s očekivanim obrascem: %1$s"</string>
+    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Datum je izvan očekivanog raspona %1$s – %2$s"</string>
+    <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"Prebacivanje na način rada unosa kalendara"</string>
+    <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"Prebacivanje na način rada unosa teksta"</string>
+    <string name="tooltip_long_press_label" msgid="2732804537909054941">"Prikaži skočni opis"</string>
+    <string name="time_picker_pm" msgid="2232702812657998674">"poslijepodne"</string>
+    <string name="time_picker_am" msgid="5096144640014509074">"prijepodne"</string>
+    <string name="time_picker_period_toggle_description" msgid="7352665290700284516">"Odaberite prijepodne ili poslijepodne"</string>
+    <string name="time_picker_hour_selection" msgid="6081676287789101196">"Odaberite sate"</string>
+    <string name="time_picker_minute_selection" msgid="8494777394375441602">"Odaberite minute"</string>
+    <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d h"</string>
+    <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d h"</string>
+    <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d min"</string>
 </resources>
