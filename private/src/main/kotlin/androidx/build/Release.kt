@@ -17,7 +17,9 @@ package androidx.build
 
 import com.android.build.gradle.LibraryExtension
 import org.gradle.api.Action
+import org.gradle.api.GradleException
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.Internal
@@ -52,6 +54,13 @@ open class GMavenZipTask : Zip() {
     init {
         // multiple artifacts in the same group might have the same maven-metadata.xml
         duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+        if (!project.shouldAddGroupConstraints()) {
+            doFirst {
+                throw GradleException(
+                    "Cannot publish artifacts without setting -P$ADD_GROUP_CONSTRAINTS=true"
+                )
+            }
+        }
     }
 
     /**
@@ -141,6 +150,7 @@ object Release {
     const val PROJECT_ARCHIVE_ZIP_TASK_NAME = "createProjectZip"
     const val DIFF_TASK_PREFIX = "createDiffArchive"
     const val FULL_ARCHIVE_TASK_NAME = "createArchive"
+    const val ALL_ARCHIVES_TASK_NAME = "createAllArchives"
     const val DEFAULT_PUBLISH_CONFIG = "release"
     const val GROUP_ZIPS_FOLDER = "per-group-zips"
     const val PROJECT_ZIPS_FOLDER = "per-project-zips"
@@ -250,9 +260,27 @@ object Release {
     }
 
     /**
+     * Registers an archive task as a dependency of the anchor task
+     */
+    private fun Project.addToAnchorTask(task: TaskProvider<GMavenZipTask>) {
+        val archiveAnchorTask = project.rootProject.maybeRegister(
+            name = ALL_ARCHIVES_TASK_NAME,
+            onConfigure = { archiveTask: Task ->
+                archiveTask.group = "Distribution"
+                archiveTask.description = "Builds all archives for publishing"
+            },
+            onRegister = {
+            }
+        )
+        archiveAnchorTask.configure {
+            it.dependsOn(task)
+        }
+    }
+
+    /**
      * Creates and returns the task that includes all projects regardless of their release status.
      */
-    fun getGlobalFullZipTask(project: Project): TaskProvider<GMavenZipTask> {
+    private fun getGlobalFullZipTask(project: Project): TaskProvider<GMavenZipTask> {
         return project.rootProject.maybeRegister(
             name = FULL_ARCHIVE_TASK_NAME,
             onConfigure = {
@@ -266,7 +294,8 @@ object Release {
                     )
                 ).execute(it)
             },
-            onRegister = {
+            onRegister = { taskProvider: TaskProvider<GMavenZipTask> ->
+                project.addToAnchorTask(taskProvider)
             }
         )
     }
@@ -278,9 +307,9 @@ object Release {
         project: Project,
         group: String
     ): TaskProvider<GMavenZipTask> {
-        val taskProvider: TaskProvider<GMavenZipTask> = project.rootProject.maybeRegister(
+        return project.rootProject.maybeRegister(
             name = "${DIFF_TASK_PREFIX}For${groupToTaskNameSuffix(group)}",
-            onConfigure = {
+            onConfigure = { task: GMavenZipTask ->
                 GMavenZipTask.ConfigAction(
                     getParams(
                         project = project,
@@ -288,13 +317,12 @@ object Release {
                         fileNamePrefix = GROUP_ZIP_PREFIX,
                         group = group
                     )
-                ).execute(it)
+                ).execute(task)
             },
-            onRegister = {
+            onRegister = { taskProvider ->
+                project.addToAnchorTask(taskProvider)
             }
         )
-        project.addToBuildOnServer(taskProvider)
-        return taskProvider
     }
 
     private fun getProjectZipTask(
@@ -303,7 +331,7 @@ object Release {
         val taskProvider = project.tasks.register(
             PROJECT_ARCHIVE_ZIP_TASK_NAME,
             GMavenZipTask::class.java
-        ) {
+        ) { task: GMavenZipTask ->
             GMavenZipTask.ConfigAction(
                 getParams(
                     project = project,
@@ -312,9 +340,9 @@ object Release {
                 ).copy(
                     includeMetadata = true
                 )
-            ).execute(it)
+            ).execute(task)
         }
-        project.addToBuildOnServer(taskProvider)
+        project.addToAnchorTask(taskProvider)
         return taskProvider
     }
 }
