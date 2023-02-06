@@ -69,8 +69,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testAndroidxCompiler() = testProject(
         TestProjects.customCompiler, defaultTestEnvironment.copy(
-            kotlinVersion = "1.6.10",
-            composeCompilerPlugin = "\"androidx.compose.compiler:compiler:1.1.1\""
+            kotlinVersion = "1.8.0",
+            composeCompilerPlugin = "\"androidx.compose.compiler:compiler:1.4.0\""
         )
     ).checkCustomComposeCompiler()
 
