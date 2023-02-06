@@ -13,7 +13,8 @@ A clear and concise description of what the bug is.
 **Affected platforms**
 - [ ] All
 - [ ] Desktop
-- [ ] web (k/js)
+- [ ] web (k/js) - html based API
+- [ ] web (k/js) - Canvas based API
 - [ ] k/native
 - [ ] other
 
