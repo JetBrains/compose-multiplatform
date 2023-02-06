@@ -42,7 +42,7 @@ fun Events.assertReceivedLast(type: PointerEventType, offset: Offset) =
     receivedLast().assertHas(type, offset)
 
 fun PointerEvent.assertHas(type: PointerEventType, offset: Offset) {
-    assertThat(type).isEqualTo(type)
+    assertThat(this.type).isEqualTo(type)
     assertThat(changes.first().position).isEqualTo(offset)
 }
 
