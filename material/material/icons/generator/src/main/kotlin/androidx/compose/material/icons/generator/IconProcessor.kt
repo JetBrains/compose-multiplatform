@@ -184,6 +184,8 @@ private fun checkApi(expectedFile: File, generatedFile: File) {
                 |Please check the difference and copy over the changes if intended.
                 |expected file: ${expectedFile.canonicalPath}
                 |generated file: ${generatedFile.canonicalPath}
+                |Please manually un-ignore and run ExtendedIconComparisonTest locally before
+                |uploading.
             """.trimMargin()
     }
 }
