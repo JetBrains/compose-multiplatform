@@ -148,7 +148,7 @@ class ComposeScene internal constructor(
 
     @Volatile
     private var hasPendingDraws = true
-    private inline fun <T> postponeInvalidation(block: () -> T): T {
+    private inline fun <T> postponeInvalidation(crossinline block: () -> T): T {
         check(!isClosed) { "ComposeScene is closed" }
         isInvalidationDisabled = true
         val result = try {
@@ -594,7 +594,7 @@ class ComposeScene internal constructor(
      */
     fun sendKeyEvent(event: ComposeKeyEvent): Boolean = postponeInvalidation {
         defaultPointerStateTracker.onKeyEvent(event)
-        return focusedOwner?.sendKeyEvent(event) == true
+        focusedOwner?.sendKeyEvent(event) == true
     }
 
     private var isFocused = true
