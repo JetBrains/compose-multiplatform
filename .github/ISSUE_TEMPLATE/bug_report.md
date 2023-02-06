@@ -22,7 +22,7 @@ A clear and concise description of what the bug is.
 - Kotlin version*: 
 - Compose Multiplatform version*:
 - OS version(s)* (required for Desktop and iOS issues):
-- OS Architecture (x86 or ARM64): 
+- OS architecture (x86 or arm64): 
 
 **To Reproduce**
 Steps and/or the code snippet to reproduce the behavior:
