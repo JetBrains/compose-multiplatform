@@ -33,7 +33,6 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,11 +46,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -64,20 +61,28 @@ import androidx.compose.material3.tokens.SearchBarTokens
 import androidx.compose.material3.tokens.SearchViewTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.node.Ref
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
@@ -88,10 +93,13 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import kotlin.math.max
@@ -166,7 +174,7 @@ fun SearchBar(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val animationProgress: Float by animateFloatAsState(
+    val animationProgress: State<Float> = animateFloatAsState(
         targetValue = if (active) 1f else 0f,
         animationSpec = tween(
             durationMillis = AnimationDurationMillis,
@@ -174,94 +182,100 @@ fun SearchBar(
         )
     )
 
+    val density = LocalDensity.current
+
     val defaultInputFieldShape = SearchBarDefaults.inputFieldShape
     val defaultFullScreenShape = SearchBarDefaults.fullScreenShape
-    val animatedShape by remember {
-        derivedStateOf {
-            when {
-                shape == defaultInputFieldShape -> {
-                    // The shape can only be animated if it's the default spec value
-                    val animatedRadius = SearchBarCornerRadius * (1 - animationProgress)
-                    RoundedCornerShape(CornerSize(animatedRadius))
+    val useFullScreenShape by remember {
+        derivedStateOf(structuralEqualityPolicy()) { animationProgress.value == 1f }
+    }
+    val animatedShape = remember(useFullScreenShape, shape) {
+        when {
+            shape == defaultInputFieldShape ->
+                // The shape can only be animated if it's the default spec value
+                GenericShape { size, _ ->
+                    val radius = with(density) {
+                        (SearchBarCornerRadius * (1 - animationProgress.value)).toPx()
+                    }
+                    addRoundRect(RoundRect(size.toRect(), CornerRadius(radius)))
                 }
-                animationProgress == 1f -> defaultFullScreenShape
-                else -> shape
-            }
+            useFullScreenShape -> defaultFullScreenShape
+            else -> shape
         }
     }
 
-    // The main animation trickery is allowing the component to smoothly expand while keeping the
-    // input field at the same relative location on screen. For this, Modifier.windowInsetsPadding
-    // is not suitable. Instead, we convert the insets to a padding applied to the Surface, which
-    // gradually becomes padding applied to the input field as the animation proceeds.
-    val unconsumedInsets = remember { Ref<WindowInsets>() }
-    val topPadding = SearchBarVerticalPadding +
-        (unconsumedInsets.value ?: ZeroWindowInsets).asPaddingValues().calculateTopPadding()
-    val animatedSurfaceTopPadding = lerp(topPadding, 0.dp, animationProgress)
-    val animatedInputFieldPadding by remember {
+    // The main animation complexity is allowing the component to smoothly expand while keeping the
+    // input field at the same relative location on screen. `Modifier.windowInsetsPadding` does not
+    // support animation and thus is not suitable. Instead, we convert the insets to a padding
+    // applied to the Surface, which gradually becomes padding applied to the input field as the
+    // animation proceeds.
+    val unconsumedInsets = remember { MutableWindowInsets() }
+    val topPadding = remember(density) {
         derivedStateOf {
-            PaddingValues(
-                top = topPadding * animationProgress,
-                bottom = SearchBarVerticalPadding * animationProgress,
-            )
+            SearchBarVerticalPadding +
+                unconsumedInsets.asPaddingValues(density).calculateTopPadding()
         }
     }
 
-    BoxWithConstraints(
+    Surface(
+        shape = animatedShape,
+        color = colors.containerColor,
+        contentColor = contentColorFor(colors.containerColor),
+        tonalElevation = tonalElevation,
         modifier = modifier
             .zIndex(1f)
             .onConsumedWindowInsetsChanged { consumedInsets ->
-                unconsumedInsets.value = windowInsets.exclude(consumedInsets)
+                unconsumedInsets.insets = windowInsets.exclude(consumedInsets)
             }
-            .consumeWindowInsets(unconsumedInsets.value ?: ZeroWindowInsets),
-        propagateMinConstraints = true
-    ) {
-        val height: Dp
-        val width: Dp
-        with(LocalDensity.current) {
-            val startWidth = max(constraints.minWidth, SearchBarMinWidth.roundToPx())
-                .coerceAtMost(min(constraints.maxWidth, SearchBarMaxWidth.roundToPx()))
-                .toFloat()
-            val startHeight = max(constraints.minHeight, InputFieldHeight.roundToPx())
-                .coerceAtMost(constraints.maxHeight)
-                .toFloat()
-            val endWidth = constraints.maxWidth.toFloat()
-            val endHeight = constraints.maxHeight.toFloat()
+            .consumeWindowInsets(unconsumedInsets)
+            .layout { measurable, constraints ->
+                val animatedTopPadding =
+                    lerp(topPadding.value, 0.dp, animationProgress.value).roundToPx()
 
-            height = lerp(startHeight, endHeight, animationProgress).toDp()
-            width = lerp(startWidth, endWidth, animationProgress).toDp()
+                val startWidth = max(constraints.minWidth, SearchBarMinWidth.roundToPx())
+                    .coerceAtMost(min(constraints.maxWidth, SearchBarMaxWidth.roundToPx()))
+                val startHeight = max(constraints.minHeight, InputFieldHeight.roundToPx())
+                    .coerceAtMost(constraints.maxHeight)
+                val endWidth = constraints.maxWidth
+                val endHeight = constraints.maxHeight
+
+                val width = lerp(startWidth, endWidth, animationProgress.value)
+                val height =
+                    lerp(startHeight, endHeight, animationProgress.value) + animatedTopPadding
+
+                val placeable = measurable.measure(Constraints.fixed(width, height)
+                    .offset(vertical = -animatedTopPadding))
+                layout(width, height) {
+                    placeable.placeRelative(0, animatedTopPadding)
+            }
         }
+    ) {
+        Column {
+            val animatedInputFieldPadding = remember {
+                AnimatedPaddingValues(animationProgress, topPadding)
+            }
+            SearchBarInputField(
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
+                active = active,
+                onActiveChange = onActiveChange,
+                modifier = Modifier.padding(paddingValues = animatedInputFieldPadding),
+                enabled = enabled,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                colors = colors.inputFieldColors,
+                interactionSource = interactionSource,
+            )
 
-        Surface(
-            shape = animatedShape,
-            color = colors.containerColor,
-            contentColor = contentColorFor(colors.containerColor),
-            tonalElevation = tonalElevation,
-            modifier = Modifier
-                .padding(top = animatedSurfaceTopPadding)
-                .size(width = width, height = height)
-        ) {
-            Column {
-                SearchBarInputField(
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    onSearch = onSearch,
-                    active = active,
-                    onActiveChange = onActiveChange,
-                    modifier = Modifier.padding(animatedInputFieldPadding),
-                    enabled = enabled,
-                    placeholder = placeholder,
-                    leadingIcon = leadingIcon,
-                    trailingIcon = trailingIcon,
-                    colors = colors.inputFieldColors,
-                    interactionSource = interactionSource,
-                )
-
-                if (animationProgress > 0) {
-                    Column(Modifier.alpha(animationProgress)) {
-                        Divider(color = colors.dividerColor)
-                        content()
-                    }
+            val showResults by remember {
+                derivedStateOf(structuralEqualityPolicy()) { animationProgress.value > 0 }
+            }
+            if (showResults) {
+                Column(Modifier.graphicsLayer { alpha = animationProgress.value }) {
+                    Divider(color = colors.dividerColor)
+                    content()
                 }
             }
         }
@@ -645,7 +659,41 @@ class SearchBarColors internal constructor(
     }
 }
 
-private val ZeroWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0)
+@Stable
+private class AnimatedPaddingValues(
+    val animationProgress: State<Float>,
+    val topPadding: State<Dp>,
+) : PaddingValues {
+    override fun calculateTopPadding(): Dp = topPadding.value * animationProgress.value
+    override fun calculateBottomPadding(): Dp = SearchBarVerticalPadding * animationProgress.value
+
+    override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp = 0.dp
+    override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp = 0.dp
+}
+
+/**
+ * A [WindowInsets] whose values can change without changing the instance. This is useful
+ * to avoid recomposition when [WindowInsets] can change.
+ *
+ * Copied from [androidx.compose.foundation.layout.MutableWindowInsets], which is marked as
+ * experimental and thus cannot be used cross-module.
+ */
+private class MutableWindowInsets(
+    initialInsets: WindowInsets = WindowInsets(0, 0, 0, 0)
+) : WindowInsets {
+    /**
+     * The [WindowInsets] that are used for [left][getLeft], [top][getTop], [right][getRight],
+     * and [bottom][getBottom] values.
+     */
+    var insets by mutableStateOf(initialInsets)
+
+    override fun getLeft(density: Density, layoutDirection: LayoutDirection): Int =
+        insets.getLeft(density, layoutDirection)
+    override fun getTop(density: Density): Int = insets.getTop(density)
+    override fun getRight(density: Density, layoutDirection: LayoutDirection): Int =
+        insets.getRight(density, layoutDirection)
+    override fun getBottom(density: Density): Int = insets.getBottom(density)
+}
 
 // Measurement specs
 private val SearchBarCornerRadius: Dp = InputFieldHeight / 2
