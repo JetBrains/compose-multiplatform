@@ -13,17 +13,16 @@ A clear and concise description of what the bug is.
 **Affected platforms**
 - [ ] All
 - [ ] Desktop
-- [ ] web (k/js) - html based API
-- [ ] web (k/js) - Canvas based API
-- [ ] k/native
+- [ ] Web (K/JS) - HTML based API
+- [ ] Web (K/JS) - Canvas based API
+- [ ] iOS
 - [ ] other
 
 **Versions**
 - Kotlin version*: 
-- Compose multiplatform version*:
-- OS version(s)* (required for desktop and k/native issues):
-- OS Architecture (x86 or ARM64): 
-
+- Compose Multiplatform version*:
+- OS version(s)* (required for Desktop and iOS issues):
+- OS architecture (x86 or arm64): 
 
 **To Reproduce**
 Steps and/or the code snippet to reproduce the behavior:
