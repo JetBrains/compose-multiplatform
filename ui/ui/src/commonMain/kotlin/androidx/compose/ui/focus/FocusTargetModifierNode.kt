@@ -54,14 +54,21 @@ class FocusTargetModifierNode : ObserverNode, ModifierLocalNode, Modifier.Node()
         if (previousFocusState != focusState) refreshFocusEventNodes()
     }
 
-    internal fun onRemoved() {
+    /**
+     * Clears focus if this focus target has it.
+     */
+    override fun onReset() {
         when (focusState) {
             // Clear focus from the current FocusTarget.
             // This currently clears focus from the entire hierarchy, but we can change the
             // implementation so that focus is sent to the immediate focus parent.
             Active, Captured -> requireOwner().focusOwner.clearFocus(force = true)
-
-            ActiveParent, Inactive -> scheduleInvalidationForFocusEvents()
+            ActiveParent -> {
+                scheduleInvalidationForFocusEvents()
+                // This node might be reused, so reset the state to Inactive.
+                focusStateImpl = Inactive
+            }
+            Inactive -> scheduleInvalidationForFocusEvents()
         }
     }
 

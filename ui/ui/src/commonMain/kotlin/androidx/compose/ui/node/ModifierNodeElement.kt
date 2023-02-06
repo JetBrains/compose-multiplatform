@@ -56,7 +56,7 @@ abstract class ModifierNodeElement<N : Modifier.Node>(
 ) : Modifier.Element, InspectorValueInfo(inspectorInfo) {
     /**
      * This will be called the first time the modifier is applied to the Layout and it should
-     * construct and return the correspoding [Modifier.Node] instance.
+     * construct and return the corresponding [Modifier.Node] instance.
      */
     abstract fun create(): N
 
@@ -85,7 +85,7 @@ abstract class ModifierNodeElement<N : Modifier.Node>(
  *
  * @param key An object used to determine whether or not the created node should be updated or not.
  * @param create The initial creation of the node. This will be called the first time the modifier
- *  is applied to the Layout and it should construct the correspoding [Modifier.Node] instance,
+ *  is applied to the Layout and it should construct the corresponding [Modifier.Node] instance,
  *  referencing any captured inputs necessary.
  * @param update Called when a modifier is applied to a Layout whose [key] have changed from the
  *  previous application. This lambda will have the current node instance passed in as a parameter,
@@ -123,7 +123,7 @@ inline fun <reified T : Modifier.Node> modifierElementOf(
  * which accepts a "params" and "update" parameter.
  *
  * @param create The initial creation of the node. This will be called the first time the modifier
- *  is applied to the Layout and it should construct the correspoding [Modifier.Node] instance
+ *  is applied to the Layout and it should construct the corresponding [Modifier.Node] instance
  * @param definitions This lambda will construct a debug-only set of information for use with
  *  tooling.
  *

@@ -15,6 +15,7 @@
  */
 package androidx.compose.ui.node
 
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -73,7 +74,11 @@ internal class LayoutNode(
     private val isVirtual: Boolean = false,
     // The unique semantics ID that is used by all semantics modifiers attached to this LayoutNode.
     override val semanticsId: Int = generateSemanticsId()
-) : Remeasurement, OwnerScope, LayoutInfo, ComposeUiNode,
+) : ComposeNodeLifecycleCallback,
+    Remeasurement,
+    OwnerScope,
+    LayoutInfo,
+    ComposeUiNode,
     Owner.OnLayoutCompletedListener {
 
     val isPlacedInLookahead: Boolean?
@@ -400,7 +405,7 @@ internal class LayoutNode(
         invalidateMeasurements()
         parent?.invalidateMeasurements()
 
-        forEachCoordinatorIncludingInner { it.attach() }
+        forEachCoordinatorIncludingInner { it.onLayoutNodeAttach() }
         onAttach?.invoke(owner)
 
         invalidateFocusOnAttach()
@@ -425,7 +430,6 @@ internal class LayoutNode(
         }
         layoutDelegate.resetAlignmentLines()
         onDetach?.invoke(owner)
-        forEachCoordinatorIncludingInner { it.detach() }
 
         @OptIn(ExperimentalComposeUiApi::class)
         if (outerSemantics != null) {
@@ -748,7 +752,6 @@ internal class LayoutNode(
      */
     override var modifier: Modifier = Modifier
         set(value) {
-            if (value == field) return
             require(!isVirtual || modifier === Modifier) {
                 "Modifiers are not supported on virtual LayoutNodes"
             }
@@ -763,6 +766,10 @@ internal class LayoutNode(
 
             layoutDelegate.updateParentData()
         }
+
+    private fun resetModifierState() {
+        nodes.resetState()
+    }
 
     internal fun invalidateParentData() {
         layoutDelegate.invalidateParentData()
@@ -1345,6 +1352,26 @@ internal class LayoutNode(
 
     override val parentInfo: LayoutInfo?
         get() = parent
+
+    private var deactivated = false
+
+    override fun onReuse() {
+        if (deactivated) {
+            deactivated = false
+            // we don't need to reset state as it was done when deactivated
+        } else {
+            resetModifierState()
+        }
+    }
+
+    override fun onDeactivate() {
+        deactivated = true
+        resetModifierState()
+    }
+
+    override fun onRelease() {
+        forEachCoordinatorIncludingInner { it.onRelease() }
+    }
 
     internal companion object {
         private val ErrorMeasurePolicy: NoIntrinsicsMeasurePolicy =

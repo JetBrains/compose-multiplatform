@@ -210,7 +210,7 @@ private fun autoInvalidateNode(node: Modifier.Node, phase: Int) {
         node.invalidateMeasurements()
         if (phase == Removed) {
             val coordinator = node.requireCoordinator(Nodes.Layout)
-            coordinator.detach()
+            coordinator.onRelease()
         }
     }
     if (node.isKind(Nodes.GlobalPositionAware) && node is GlobalPositionAwareModifierNode) {
@@ -227,7 +227,9 @@ private fun autoInvalidateNode(node: Modifier.Node, phase: Int) {
     }
     if (node.isKind(Nodes.FocusTarget) && node is FocusTargetModifierNode) {
         when (phase) {
-            Removed -> node.onRemoved()
+            // when we previously had focus target modifier on a node and then this modifier
+            // is removed we need to notify the focus tree about so the focus state is reset.
+            Removed -> node.onReset()
             else -> node.requireOwner().focusOwner.scheduleInvalidation(node)
         }
     }

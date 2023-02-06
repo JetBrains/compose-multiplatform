@@ -26,6 +26,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -312,4 +315,21 @@ fun JustReadingOrProvidingModifierLocalNodeSample() {
             properties["logger"] = logger
         }
     )
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+@Sampled
+@Composable
+fun ModifierNodeResetSample() {
+    class SelectableNode : Modifier.Node() {
+        var selected by mutableStateOf(false)
+
+        override fun onReset() {
+            // reset `selected` to the initial value as if the node will be reused for
+            // displaying different content it shouldn't be selected straight away.
+            selected = false
+        }
+
+        // some logic which sets `selected` to true when it is selected
+    }
 }
