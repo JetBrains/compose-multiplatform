@@ -32,23 +32,25 @@
     <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"साल %1$s मा जानुहोस्"</string>
     <string name="date_picker_headline_description" msgid="4627306862713137085">"हालको छनौट: %1$s"</string>
     <string name="date_picker_no_selection_description" msgid="5724377114289981899">"कुनै पनि होइन"</string>
+    <string name="date_picker_today_description" msgid="4775802721403526937">"आज"</string>
     <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"साल पिकर देखिएको छ"</string>
-    <!-- no translation found for date_input_title (3010396677286327048) -->
-    <skip />
-    <!-- no translation found for date_input_headline (3499643850558715142) -->
-    <skip />
-    <!-- no translation found for date_input_label (5194825853981987218) -->
-    <skip />
-    <!-- no translation found for date_input_headline_description (8562356184193964298) -->
-    <skip />
-    <!-- no translation found for date_input_no_input_description (5722931102250207748) -->
-    <skip />
-    <!-- no translation found for date_input_invalid_not_allowed (6114792992433444995) -->
-    <skip />
-    <!-- no translation found for date_input_invalid_for_pattern (5281836720766682161) -->
-    <skip />
-    <!-- no translation found for date_input_invalid_year_range (8434112129235255568) -->
-    <skip />
-    <!-- no translation found for tooltip_long_press_label (2732804537909054941) -->
-    <skip />
+    <string name="date_input_title" msgid="3010396677286327048">"मिति चयन गर्नुहोस्"</string>
+    <string name="date_input_headline" msgid="3499643850558715142">"हालिएको मिति"</string>
+    <string name="date_input_label" msgid="5194825853981987218">"मिति"</string>
+    <string name="date_input_headline_description" msgid="8562356184193964298">"हालिएको मिति: %1$s"</string>
+    <string name="date_input_no_input_description" msgid="5722931102250207748">"कुनै पनि होइन"</string>
+    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"यो मिति हाल्न पाइँदैन: %1$s"</string>
+    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"हालिएको मितिको ढाँचा अपेक्षित ढाँचासँग मिलेन: %1$s"</string>
+    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"हालिएको मिति सालको अपेक्षित दायरा (%1$s - %2$s) भित्र पर्दैन"</string>
+    <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"पात्रोको इनपुट मोड प्रयोग गर्नुहोस्"</string>
+    <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"टेक्स्ट इनपुट मोड प्रयोग गर्नुहोस्"</string>
+    <string name="tooltip_long_press_label" msgid="2732804537909054941">"टुलटिप देखाइयोस्"</string>
+    <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
+    <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
+    <string name="time_picker_period_toggle_description" msgid="7352665290700284516">"पूर्वाह्न वा अपराह्न चयन गर्नुहोस्"</string>
+    <string name="time_picker_hour_selection" msgid="6081676287789101196">"घण्टा चयन गर्नुहोस्"</string>
+    <string name="time_picker_minute_selection" msgid="8494777394375441602">"मिनेट चयन गर्नुहोस्"</string>
+    <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d बजे"</string>
+    <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d घण्टा"</string>
+    <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d मिनेट"</string>
 </resources>

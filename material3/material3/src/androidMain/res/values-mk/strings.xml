@@ -32,6 +32,7 @@
     <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"Одете на годината %1$s"</string>
     <string name="date_picker_headline_description" msgid="4627306862713137085">"Тековен избор: %1$s"</string>
     <string name="date_picker_no_selection_description" msgid="5724377114289981899">"Нема"</string>
+    <string name="date_picker_today_description" msgid="4775802721403526937">"Денес"</string>
     <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"Избирачот на година е видлив"</string>
     <string name="date_input_title" msgid="3010396677286327048">"Изберете датум"</string>
     <string name="date_input_headline" msgid="3499643850558715142">"Внесен датум"</string>
@@ -41,5 +42,15 @@
     <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"Датумот не е дозволен: %1$s"</string>
     <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"Не се совпаѓа со очекуваната шема: %1$s"</string>
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Датумот не е во очекуваниот опсег на години %1$s - %2$s"</string>
+    <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"Префрли на режим за внесување во календарот"</string>
+    <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"Префрли на режим за внесување текст"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"Прикажи совет за алатка"</string>
+    <string name="time_picker_pm" msgid="2232702812657998674">"попладне"</string>
+    <string name="time_picker_am" msgid="5096144640014509074">"претпладне"</string>
+    <string name="time_picker_period_toggle_description" msgid="7352665290700284516">"Изберете претпладне или попладне"</string>
+    <string name="time_picker_hour_selection" msgid="6081676287789101196">"Изберете час"</string>
+    <string name="time_picker_minute_selection" msgid="8494777394375441602">"Изберете минути"</string>
+    <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d часот"</string>
+    <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d часот"</string>
+    <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d минути"</string>
 </resources>

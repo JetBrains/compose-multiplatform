@@ -26,34 +26,31 @@
     <string name="date_picker_title" msgid="9208721003668059792">"Selecciona a data"</string>
     <string name="date_picker_headline" msgid="2846784065735639969">"Data seleccionada"</string>
     <string name="date_picker_switch_to_year_selection" msgid="3412370019845183965">"Cambiar a seleccionar un ano"</string>
-    <!-- no translation found for date_picker_switch_to_day_selection (145089358343568971) -->
-    <skip />
+    <string name="date_picker_switch_to_day_selection" msgid="145089358343568971">"Pasa o dedo para seleccionar un ano ou toca a pantalla para volver á selección do día"</string>
     <string name="date_picker_switch_to_next_month" msgid="8313783187901412102">"Cambiar ao mes seguinte"</string>
     <string name="date_picker_switch_to_previous_month" msgid="7596294429748914881">"Cambiar ao mes anterior"</string>
-    <!-- no translation found for date_picker_navigate_to_year_description (5152441868029453612) -->
-    <skip />
-    <!-- no translation found for date_picker_headline_description (4627306862713137085) -->
-    <skip />
-    <!-- no translation found for date_picker_no_selection_description (5724377114289981899) -->
-    <skip />
-    <!-- no translation found for date_picker_year_picker_pane_title (8140324713311804736) -->
-    <skip />
-    <!-- no translation found for date_input_title (3010396677286327048) -->
-    <skip />
-    <!-- no translation found for date_input_headline (3499643850558715142) -->
-    <skip />
-    <!-- no translation found for date_input_label (5194825853981987218) -->
-    <skip />
-    <!-- no translation found for date_input_headline_description (8562356184193964298) -->
-    <skip />
-    <!-- no translation found for date_input_no_input_description (5722931102250207748) -->
-    <skip />
-    <!-- no translation found for date_input_invalid_not_allowed (6114792992433444995) -->
-    <skip />
-    <!-- no translation found for date_input_invalid_for_pattern (5281836720766682161) -->
-    <skip />
-    <!-- no translation found for date_input_invalid_year_range (8434112129235255568) -->
-    <skip />
-    <!-- no translation found for tooltip_long_press_label (2732804537909054941) -->
-    <skip />
+    <string name="date_picker_navigate_to_year_description" msgid="5152441868029453612">"Ir ao ano %1$s"</string>
+    <string name="date_picker_headline_description" msgid="4627306862713137085">"Selección actual: %1$s"</string>
+    <string name="date_picker_no_selection_description" msgid="5724377114289981899">"Ningunha"</string>
+    <string name="date_picker_today_description" msgid="4775802721403526937">"Hoxe"</string>
+    <string name="date_picker_year_picker_pane_title" msgid="8140324713311804736">"Selector de ano visible"</string>
+    <string name="date_input_title" msgid="3010396677286327048">"Seleccionar data"</string>
+    <string name="date_input_headline" msgid="3499643850558715142">"Data inserida"</string>
+    <string name="date_input_label" msgid="5194825853981987218">"Data"</string>
+    <string name="date_input_headline_description" msgid="8562356184193964298">"Data inserida: %1$s"</string>
+    <string name="date_input_no_input_description" msgid="5722931102250207748">"Ningunha"</string>
+    <string name="date_input_invalid_not_allowed" msgid="6114792992433444995">"Data non permitida: %1$s"</string>
+    <string name="date_input_invalid_for_pattern" msgid="5281836720766682161">"A data non coincide co padrón esperado: %1$s"</string>
+    <string name="date_input_invalid_year_range" msgid="8434112129235255568">"A data está fóra do intervalo de anos esperado (%1$s - %2$s)"</string>
+    <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"Cambiar ao modo de entrada de calendario"</string>
+    <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"Cambiar ao modo de introdución de texto"</string>
+    <string name="tooltip_long_press_label" msgid="2732804537909054941">"Mostrar cadro de información"</string>
+    <string name="time_picker_pm" msgid="2232702812657998674">"pm"</string>
+    <string name="time_picker_am" msgid="5096144640014509074">"am"</string>
+    <string name="time_picker_period_toggle_description" msgid="7352665290700284516">"Seleccionar a. m. ou p. m."</string>
+    <string name="time_picker_hour_selection" msgid="6081676287789101196">"Seleccionar hora"</string>
+    <string name="time_picker_minute_selection" msgid="8494777394375441602">"Seleccionar minutos"</string>
+    <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d en pto."</string>
+    <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d horas"</string>
+    <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d minutos"</string>
 </resources>
