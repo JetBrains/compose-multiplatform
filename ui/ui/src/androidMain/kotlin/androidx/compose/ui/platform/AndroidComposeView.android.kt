@@ -1159,6 +1159,9 @@ internal class AndroidComposeView(context: Context) :
             onViewTreeOwnersAvailable?.invoke(viewTreeOwners)
             onViewTreeOwnersAvailable = null
         }
+
+        _inputModeManager.inputMode = if (isInTouchMode) Touch else Keyboard
+
         viewTreeOwners!!.lifecycleOwner.lifecycle.addObserver(this)
         viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.addOnScrollChangedListener(scrollChangedListener)

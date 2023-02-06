@@ -16,25 +16,24 @@
 
 package androidx.compose.ui.input
 
-import android.os.Build
-import android.view.View
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.setFocusableContent
-import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.platform.LocalInputModeManager
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.test.filters.SdkSuppress
-import androidx.test.filters.SmallTest
 import androidx.test.filters.FlakyTest
+import androidx.test.filters.SmallTest
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
+import org.junit.After
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -48,48 +47,36 @@ class InputModeTest(private val param: Param) {
     val rule = createComposeRule()
 
     private lateinit var inputModeManager: InputModeManager
-    private lateinit var view: View
 
-    init {
+    // Manually set global state to touch mode to prevent flakiness when another test leaves the
+    // system in non-touch mode (b/267368621).
+    @Before
+    fun initializeInTouchMode() {
         InstrumentationRegistry.getInstrumentation().setInTouchMode(param.inputMode == Touch)
     }
 
-    @Test
-    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
-    fun initialInputMode() {
-        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
-            return // b/262909049: Do not run this test on pre-release Android U.
-        }
-
-        // Arrange.
-        rule.setContentWithInputManager {
-            Box {}
-        }
-
-        // Assert
-        rule.runOnIdle { assertThat(inputModeManager.inputMode).isEqualTo(param.inputMode) }
+    // TODO(b/267253920): Add a compose test API to set/reset InputMode.
+    @After
+    fun resetTouchMode() = with(InstrumentationRegistry.getInstrumentation()) {
+        if (SDK_INT < 33) setInTouchMode(true) else resetInTouchMode()
     }
 
     @Test
-    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun switchToTouchModeProgrammatically() {
-        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
-            return // b/262909049: Do not run this test on pre-release Android U.
-        }
-
         // Arrange.
         rule.setContentWithInputManager {
             Box {}
         }
+        val initialMode = rule.runOnIdle { inputModeManager.inputMode }
 
         // Act.
-        val requestGranted = rule.runOnUiThread {
+        val requestGranted = rule.runOnIdle {
             inputModeManager.requestInputMode(Touch)
         }
 
         // Assert
         rule.runOnIdle {
-            when (param.inputMode) {
+            when (initialMode) {
                 Touch -> {
                     assertThat(requestGranted).isTrue()
                     assertThat(inputModeManager.inputMode).isEqualTo(Touch)
@@ -104,12 +91,7 @@ class InputModeTest(private val param: Param) {
 
     @FlakyTest(bugId = 202524920)
     @Test
-    @SdkSuppress(maxSdkVersion = 33) // b/262909049: Failing on SDK 34
     fun switchToKeyboardModeProgrammatically() {
-        if (Build.VERSION.SDK_INT == 33 && Build.VERSION.CODENAME != "REL") {
-            return // b/262909049: Do not run this test on pre-release Android U.
-        }
-
         // Arrange.
         val testTag = "Box"
         rule.setContentWithInputManager {
@@ -117,23 +99,23 @@ class InputModeTest(private val param: Param) {
         }
 
         // Act.
-        val requestGranted = rule.runOnUiThread {
+        val requestGranted = rule.runOnIdle {
             inputModeManager.requestInputMode(Keyboard)
         }
 
         // Assert
         rule.runOnIdle { assertThat(requestGranted).isTrue() }
-        rule.waitUntil { inputModeManager.inputMode == Keyboard }
+        assertThat(inputModeManager.inputMode).isEqualTo(Keyboard)
     }
 
     private fun ComposeContentTestRule.setContentWithInputManager(
         composable: @Composable () -> Unit
     ) {
-        this.setFocusableContent {
+        setFocusableContent {
             inputModeManager = LocalInputModeManager.current
-            view = LocalView.current
             composable()
         }
+        runOnIdle { inputModeManager.requestInputMode(param.inputMode) }
     }
 
     // We need to wrap the inline class parameter in another class because Java can't instantiate
