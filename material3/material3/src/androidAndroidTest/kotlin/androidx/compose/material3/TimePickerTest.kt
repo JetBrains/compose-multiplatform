@@ -16,6 +16,10 @@
 
 package androidx.compose.material3
 
+import android.content.Context
+import android.os.Build
+import android.text.format.DateFormat
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.semantics.SemanticsProperties.SelectableGroup
@@ -45,14 +49,20 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
+import com.android.dx.mockito.inline.extended.ExtendedMockito.doReturn
+import com.android.dx.mockito.inline.extended.ExtendedMockito.mockitoSession
+import com.android.dx.mockito.inline.extended.MockedMethod
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.quality.Strictness
 
 @OptIn(ExperimentalMaterial3Api::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
+
 class TimePickerTest {
 
     @get:Rule
@@ -138,6 +148,60 @@ class TimePickerTest {
         rule.runOnIdle {
             assertThat(state.hour).isEqualTo(3)
         }
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun timePickerState_format_12h() {
+        lateinit var context: Context
+        lateinit var state: TimePickerState
+        val session = mockitoSession()
+            .spyStatic(DateFormat::class.java)
+            .strictness(Strictness.LENIENT)
+            .startMocking()
+        try {
+            rule.setMaterialContent(lightColorScheme()) {
+                context = LocalContext.current
+                doReturn(false).`when`(object : MockedMethod<Boolean> {
+                    override fun get(): Boolean {
+                        return DateFormat.is24HourFormat(context)
+                    }
+                })
+
+                state = rememberTimePickerState()
+            }
+        } finally {
+            session.finishMocking()
+        }
+
+        assertThat(state.is24hour).isFalse()
+    }
+
+    @Test
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.P)
+    fun timePickerState_format_24h() {
+        lateinit var context: Context
+        lateinit var state: TimePickerState
+        val session = mockitoSession()
+            .spyStatic(DateFormat::class.java)
+            .strictness(Strictness.LENIENT)
+            .startMocking()
+        try {
+            rule.setMaterialContent(lightColorScheme()) {
+                context = LocalContext.current
+                doReturn(true).`when`(object : MockedMethod<Boolean> {
+                    override fun get(): Boolean {
+                        return DateFormat.is24HourFormat(context)
+                    }
+                })
+
+                state = rememberTimePickerState()
+            }
+        } finally {
+            session.finishMocking()
+        }
+
+        assertThat(state.is24hour).isTrue()
     }
 
     @Test
