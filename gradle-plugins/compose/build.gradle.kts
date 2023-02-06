@@ -118,8 +118,9 @@ tasks.test {
  * Thus, the only option is to download the necessary JDK distributions ourselves.
  */
 val jdkVersionsForTests = listOf(11, 15, 18, 19)
-val jdkForTestsRoot = project.rootProject.layout.buildDirectory.dir("jdks").get().asFile
+val jdkForTestsRoot = project.gradle.gradleUserHomeDir.resolve("compose-jb-jdks")
 val downloadJdksForTests = tasks.register("downloadJdksForTests") {}
+
 for (jdkVersion in jdkVersionsForTests) {
     val ext = if (hostOS == OS.Windows) ".zip" else ".tar.gz"
     val archive = jdkForTestsRoot.resolve("$jdkVersion$ext")
@@ -161,7 +162,6 @@ for (gradleVersion in supportedGradleVersions) {
 }
 
 configureAllTests {
-    configureJavaForComposeTest()
     dependsOn(":publishToMavenLocal")
     systemProperty("compose.tests.compose.gradle.plugin.version", BuildProperties.deployVersion(project))
     val summaryDir = project.buildDir.resolve("test-summary")

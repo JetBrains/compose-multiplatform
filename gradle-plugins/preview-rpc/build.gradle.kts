@@ -26,8 +26,6 @@ val serializeClasspath by tasks.registering(SerializeClasspathTask::class) {
 }
 
 tasks.test.configure {
-    configureJavaForComposeTest()
-
     dependsOn(serializeClasspath)
     systemProperty(
         "org.jetbrains.compose.tests.rpc.classpath.file",
