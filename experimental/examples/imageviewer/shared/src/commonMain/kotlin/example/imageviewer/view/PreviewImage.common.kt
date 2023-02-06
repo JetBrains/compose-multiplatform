@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.resource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture) -> ImageBitmap) {
+fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture) -> ImageBitmap) {
     val pictures = state.value.pictures
     val index = state.value.currentImageIndex
     val imageState = remember(pictures, index) { mutableStateOf<ImageBitmap?>(null) }
@@ -50,4 +50,4 @@ internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture
 }
 
 @Composable
-internal expect fun needShowPreview(): Boolean
+expect fun needShowPreview(): Boolean

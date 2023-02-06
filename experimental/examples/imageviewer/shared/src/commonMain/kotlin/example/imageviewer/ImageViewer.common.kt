@@ -10,7 +10,7 @@ import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
 
 @Composable
-internal fun ImageViewerCommon(state: MutableState<State>, dependencies: Dependencies) {
+fun ImageViewerCommon(state: MutableState<State>, dependencies: Dependencies) {
     state.refresh(dependencies)
 
     Surface(modifier = Modifier.fillMaxSize()) {

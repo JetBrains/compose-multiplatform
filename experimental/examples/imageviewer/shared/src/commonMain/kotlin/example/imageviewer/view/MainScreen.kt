@@ -18,7 +18,7 @@ import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
 @Composable
-internal fun MainScreen(state: MutableState<State>, dependencies: Dependencies) {
+fun MainScreen(state: MutableState<State>, dependencies: Dependencies) {
     Column {
         TopContent(state, dependencies)
         ScrollableColumn(
