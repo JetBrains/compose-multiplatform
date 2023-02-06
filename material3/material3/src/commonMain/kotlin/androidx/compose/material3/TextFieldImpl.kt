@@ -133,7 +133,8 @@ internal fun CommonDecorationBox(
                 @Composable { modifier ->
                     Box(modifier.alpha(placeholderAlphaProgress)) {
                         Decoration(
-                            contentColor = colors.placeholderColor(enabled).value,
+                            contentColor =
+                                colors.placeholderColor(enabled, isError, interactionSource).value,
                             typography = MaterialTheme.typography.bodyLarge,
                             content = placeholder
                         )

@@ -185,7 +185,7 @@ class TextFieldScreenshotTest {
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag),
-                colors = TextFieldDefaults.textFieldColors(textColor = Color.Green)
+                colors = TextFieldDefaults.textFieldColors(unfocusedTextColor = Color.Green)
             )
         }
 

@@ -1335,7 +1335,8 @@ class TextFieldTest {
                         containerColor = Color.Blue,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent,
-                        textColor = Color.Transparent,
+                        focusedTextColor = Color.Transparent,
+                        unfocusedTextColor = Color.Transparent,
                         cursorColor = Color.Transparent,
                         focusedLabelColor = Color.Transparent,
                         unfocusedLabelColor = Color.Transparent
