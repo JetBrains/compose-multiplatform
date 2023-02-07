@@ -27,9 +27,6 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
@@ -72,6 +69,7 @@ import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.geometry.toRect
@@ -80,8 +78,6 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
@@ -428,24 +424,13 @@ private fun SearchBarInputField(
             .height(InputFieldHeight)
             .fillMaxWidth()
             .focusRequester(focusRequester)
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    // Must be PointerEventPass.Initial to observe events before the text field
-                    // consumes them in the Main pass
-                    awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
-                        onActiveChange(true)
-                    }
-                }
-            }
+            .onFocusChanged { if (it.isFocused) onActiveChange(true) }
             .semantics {
                 contentDescription = searchSemantics
                 if (active) {
                     stateDescription = suggestionsAvailableSemantics
                 }
                 onClick {
-                    onActiveChange(true)
                     focusRequester.requestFocus()
                     true
                 }
