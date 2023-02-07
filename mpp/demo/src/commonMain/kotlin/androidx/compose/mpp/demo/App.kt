@@ -135,11 +135,4 @@ fun myContent() {
         }
 
     }
-    LaunchedEffect(Unit) {
-        while (true) {
-            withFrameNanos {
-                // println("NANO: $it, tick: $tick")
-            }
-        }
-    }
 }

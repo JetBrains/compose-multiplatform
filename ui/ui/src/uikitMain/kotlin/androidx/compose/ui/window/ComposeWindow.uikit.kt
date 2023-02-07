@@ -221,6 +221,7 @@ internal actual class ComposeWindow : UIViewController {
         val width = size.useContents { width } * scale
         val height = size.useContents { height } * scale
         layer.setSize(width.roundToInt(), height.roundToInt())
+        layer.layer.needRedraw()
         super.viewWillTransitionToSize(size, withTransitionCoordinator)
     }
 
