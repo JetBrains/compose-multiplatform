@@ -35,7 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInParent
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -47,8 +46,8 @@ import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onParent
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.Density
@@ -60,7 +59,6 @@ import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth
 import kotlinx.coroutines.runBlocking
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -349,47 +347,6 @@ class BottomSheetScaffoldTest {
         rule.runOnIdle {
             Truth.assertThat(bottomSheetState.currentValue).isEqualTo(BottomSheetValue.Collapsed)
         }
-    }
-
-    @Test
-    @Ignore("unignore once animation sync is ready (b/147291885)")
-    fun bottomSheetScaffold_drawer_manualControl() = runBlocking {
-        var drawerChildPosition: Offset = Offset.Zero
-        lateinit var scaffoldState: BottomSheetScaffoldState
-        rule.setContent {
-            scaffoldState = rememberBottomSheetScaffoldState()
-            Box {
-                BottomSheetScaffold(
-                    scaffoldState = scaffoldState,
-                    sheetContent = {
-                        Box(Modifier.fillMaxWidth().requiredHeight(100.dp))
-                    },
-                    drawerContent = {
-                        Box(
-                            Modifier
-                                .fillMaxWidth()
-                                .height(50.dp)
-                                .background(color = Color.Blue)
-                                .onGloballyPositioned { positioned: LayoutCoordinates ->
-                                    drawerChildPosition = positioned.positionInParent()
-                                }
-                        )
-                    }
-                ) {
-                    Box(
-                        Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .background(color = Color.Blue)
-                    )
-                }
-            }
-        }
-        Truth.assertThat(drawerChildPosition.x).isLessThan(0f)
-        scaffoldState.drawerState.open()
-        Truth.assertThat(drawerChildPosition.x).isLessThan(0f)
-        scaffoldState.drawerState.close()
-        Truth.assertThat(drawerChildPosition.x).isLessThan(0f)
     }
 
     @Test
