@@ -1,3 +1,11 @@
 // Baseline format: 1.0
 ChangedType: androidx.compose.animation.TransitionKt#animateColor(androidx.compose.animation.core.InfiniteTransition, long, long, androidx.compose.animation.core.InfiniteRepeatableSpec<androidx.compose.ui.graphics.Color>):
     Method androidx.compose.animation.TransitionKt.animateColor has changed return type from androidx.compose.runtime.State<androidx.compose.ui.graphics.Color> to androidx.compose.runtime.State<? extends androidx.compose.ui.graphics.Color>
+
+
+RemovedClass: androidx.compose.animation.FlingCalculatorKt:
+    Removed class androidx.compose.animation.FlingCalculatorKt
+
+
+RemovedPackage: androidx.compose.animation.internal:
+    Removed package androidx.compose.animation.internal

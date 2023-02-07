@@ -16,9 +16,6 @@ package androidx.compose.animation.graphics.res {
     method @androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi @androidx.compose.runtime.Composable public static androidx.compose.animation.graphics.vector.AnimatedImageVector animatedVectorResource(androidx.compose.animation.graphics.vector.AnimatedImageVector.Companion, @DrawableRes int id);
   }
 
-  public final class AnimatorResources_androidKt {
-  }
-
 }
 
 package androidx.compose.animation.graphics.vector {
@@ -32,25 +29,6 @@ package androidx.compose.animation.graphics.vector {
   }
 
   public static final class AnimatedImageVector.Companion {
-  }
-
-  public final class AnimatorAnimationSpecsKt {
-  }
-
-  public final class AnimatorKt {
-  }
-
-}
-
-package androidx.compose.animation.graphics.vector.compat {
-
-  public final class XmlAnimatedVectorParser_androidKt {
-  }
-
-  public final class XmlAnimatorParser_androidKt {
-  }
-
-  public final class XmlPullParserUtils_androidKt {
   }
 
 }

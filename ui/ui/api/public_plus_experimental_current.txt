@@ -21,9 +21,6 @@ package androidx.compose.ui {
     field public static final androidx.compose.ui.AbsoluteAlignment INSTANCE;
   }
 
-  public final class ActualKt {
-  }
-
   @androidx.compose.runtime.Stable public fun interface Alignment {
     method public long align(long size, long space, androidx.compose.ui.unit.LayoutDirection layoutDirection);
     field public static final androidx.compose.ui.Alignment.Companion Companion;
@@ -175,9 +172,6 @@ package androidx.compose.ui {
   public static final class MotionDurationScale.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.ui.MotionDurationScale> {
   }
 
-  public final class TempListUtilsKt {
-  }
-
   @androidx.compose.runtime.ComposableTargetMarker(description="UI Composable") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.FILE, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.TYPE, kotlin.annotation.AnnotationTarget.TYPE_PARAMETER}) public @interface UiComposable {
   }
 
@@ -188,12 +182,6 @@ package androidx.compose.ui {
 }
 
 package androidx.compose.ui.autofill {
-
-  public final class AndroidAutofillType_androidKt {
-  }
-
-  public final class AndroidAutofill_androidKt {
-  }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface Autofill {
     method public void cancelAutofillForNode(androidx.compose.ui.autofill.AutofillNode autofillNode);
@@ -355,9 +343,6 @@ package androidx.compose.ui.draw {
 
 package androidx.compose.ui.focus {
 
-  public final class BeyondBoundsLayoutKt {
-  }
-
   public final class FocusChangedModifierKt {
     method public static androidx.compose.ui.Modifier onFocusChanged(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super androidx.compose.ui.focus.FocusState,kotlin.Unit> onFocusChanged);
   }
@@ -399,9 +384,6 @@ package androidx.compose.ui.focus {
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface FocusEventModifierNode extends androidx.compose.ui.node.DelegatableNode {
     method public void onFocusEvent(androidx.compose.ui.focus.FocusState focusState);
-  }
-
-  public final class FocusEventModifierNodeKt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusManager {
@@ -532,9 +514,6 @@ package androidx.compose.ui.focus {
     field public static final androidx.compose.ui.focus.FocusRequester.Companion.FocusRequesterFactory INSTANCE;
   }
 
-  public final class FocusRequesterKt {
-  }
-
   @Deprecated @kotlin.jvm.JvmDefaultWithCompatibility public interface FocusRequesterModifier extends androidx.compose.ui.Modifier.Element {
     method @Deprecated public androidx.compose.ui.focus.FocusRequester getFocusRequester();
     property public abstract androidx.compose.ui.focus.FocusRequester focusRequester;
@@ -567,18 +546,6 @@ package androidx.compose.ui.focus {
     method public androidx.compose.ui.focus.FocusState getFocusState();
     method public void onObservedReadsChanged();
     property public final androidx.compose.ui.focus.FocusState focusState;
-  }
-
-  public final class FocusTransactionsKt {
-  }
-
-  public final class FocusTraversalKt {
-  }
-
-  public final class OneDimensionalFocusSearchKt {
-  }
-
-  public final class TwoDimensionalFocusSearchKt {
   }
 
 }
@@ -928,13 +895,6 @@ package androidx.compose.ui.graphics.vector {
 
   public static final class VectorProperty.TrimPathStart extends androidx.compose.ui.graphics.vector.VectorProperty<java.lang.Float> {
     field public static final androidx.compose.ui.graphics.vector.VectorProperty.TrimPathStart INSTANCE;
-  }
-
-}
-
-package androidx.compose.ui.graphics.vector.compat {
-
-  public final class XmlVectorParser_androidKt {
   }
 
 }
@@ -1636,9 +1596,6 @@ package androidx.compose.ui.input.nestedscroll {
     method public static androidx.compose.ui.Modifier nestedScroll(androidx.compose.ui.Modifier, androidx.compose.ui.input.nestedscroll.NestedScrollConnection connection, optional androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher? dispatcher);
   }
 
-  public final class NestedScrollModifierLocalKt {
-  }
-
   @kotlin.jvm.JvmInline public final value class NestedScrollSource {
     field public static final androidx.compose.ui.input.nestedscroll.NestedScrollSource.Companion Companion;
   }
@@ -1850,9 +1807,6 @@ package androidx.compose.ui.input.pointer {
     property public final long uptimeMillis;
   }
 
-  public final class PointerInputEventProcessorKt {
-  }
-
   public abstract class PointerInputFilter {
     ctor public PointerInputFilter();
     method public boolean getInterceptOutOfBoundsChildEvents();
@@ -1883,15 +1837,9 @@ package androidx.compose.ui.input.pointer {
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
 
-  public final class PointerInputTestUtilKt {
-  }
-
   public final class PointerInteropFilter_androidKt {
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier motionEventSpy(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,kotlin.Unit> watcher);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static androidx.compose.ui.Modifier pointerInteropFilter(androidx.compose.ui.Modifier, optional androidx.compose.ui.input.pointer.RequestDisallowInterceptTouchEvent? requestDisallowInterceptTouchEvent, kotlin.jvm.functions.Function1<? super android.view.MotionEvent,java.lang.Boolean> onTouchEvent);
-  }
-
-  public final class PointerInteropUtils_androidKt {
   }
 
   @kotlin.jvm.JvmInline public final value class PointerKeyboardModifiers {
@@ -1976,13 +1924,6 @@ package androidx.compose.ui.input.rotary {
 
 }
 
-package androidx.compose.ui.internal {
-
-  public final class JvmDefaultWithCompatibility_jvmKt {
-  }
-
-}
-
 package androidx.compose.ui.layout {
 
   @androidx.compose.runtime.Immutable public abstract sealed class AlignmentLine {
@@ -2053,9 +1994,6 @@ package androidx.compose.ui.layout {
     property public final androidx.compose.ui.layout.ContentScale Fit;
     property public final androidx.compose.ui.layout.ContentScale Inside;
     property public final androidx.compose.ui.layout.FixedScale None;
-  }
-
-  public final class ContentScaleKt {
   }
 
   @androidx.compose.runtime.Immutable public final class FixedScale implements androidx.compose.ui.layout.ContentScale {
@@ -2179,9 +2117,6 @@ package androidx.compose.ui.layout {
     method public long localLookaheadPositionOf(androidx.compose.ui.layout.LookaheadLayoutCoordinates sourceCoordinates, optional long relativeToSource);
   }
 
-  public final class LookaheadLayoutCoordinatesKt {
-  }
-
   public final class LookaheadLayoutKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.UiComposable public static void LookaheadLayout(kotlin.jvm.functions.Function1<? super androidx.compose.ui.layout.LookaheadLayoutScope,kotlin.Unit> content, optional androidx.compose.ui.Modifier modifier, androidx.compose.ui.layout.MeasurePolicy measurePolicy);
   }
@@ -2243,9 +2178,6 @@ package androidx.compose.ui.layout {
     method public androidx.compose.ui.layout.MeasureResult measure(androidx.compose.ui.layout.MeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.Measurable>> measurables, long constraints);
     method public default int minIntrinsicHeight(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int width);
     method public default int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, java.util.List<? extends java.util.List<? extends androidx.compose.ui.layout.IntrinsicMeasurable>> measurables, int height);
-  }
-
-  public final class MultiContentMeasurePolicyKt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface OnGloballyPositionedModifier extends androidx.compose.ui.Modifier.Element {
@@ -2326,9 +2258,6 @@ package androidx.compose.ui.layout {
     property @androidx.compose.ui.ExperimentalComposeUiApi public androidx.compose.ui.layout.LayoutCoordinates? coordinates;
     property protected abstract androidx.compose.ui.unit.LayoutDirection parentLayoutDirection;
     property protected abstract int parentWidth;
-  }
-
-  public final class PlaceableKt {
   }
 
   @Deprecated @androidx.compose.ui.ExperimentalComposeUiApi @kotlin.jvm.JvmDefaultWithCompatibility public interface RelocationModifier extends androidx.compose.ui.Modifier.Element {
@@ -2492,9 +2421,6 @@ package androidx.compose.ui.modifier {
 
 package androidx.compose.ui.node {
 
-  public final class BackwardsCompatNodeKt {
-  }
-
   @androidx.compose.ui.ExperimentalComposeUiApi public interface DelegatableNode {
     method public androidx.compose.ui.Modifier.Node getNode();
     property public abstract androidx.compose.ui.Modifier.Node node;
@@ -2522,9 +2448,6 @@ package androidx.compose.ui.node {
     method public void onGloballyPositioned(androidx.compose.ui.layout.LayoutCoordinates coordinates);
   }
 
-  public final class HitTestResultKt {
-  }
-
   @androidx.compose.ui.ExperimentalComposeUiApi public interface IntermediateLayoutModifierNode extends androidx.compose.ui.node.LayoutModifierNode {
     method public long getTargetSize();
     method public void setTargetSize(long);
@@ -2549,25 +2472,10 @@ package androidx.compose.ui.node {
     method public default int minIntrinsicWidth(androidx.compose.ui.layout.IntrinsicMeasureScope, androidx.compose.ui.layout.IntrinsicMeasurable measurable, int height);
   }
 
-  public final class LayoutModifierNodeCoordinatorKt {
-  }
-
   public final class LayoutModifierNodeKt {
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateLayer(androidx.compose.ui.node.LayoutModifierNode);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateLayout(androidx.compose.ui.node.LayoutModifierNode);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateMeasurements(androidx.compose.ui.node.LayoutModifierNode);
-  }
-
-  public final class LayoutNodeDrawScopeKt {
-  }
-
-  public final class LayoutNodeKt {
-  }
-
-  public final class LayoutNodeLayoutDelegateKt {
-  }
-
-  public final class MeasureScopeWithLayoutNodeKt {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> extends androidx.compose.ui.platform.InspectorValueInfo implements androidx.compose.ui.Modifier.Element {
@@ -2579,18 +2487,6 @@ package androidx.compose.ui.node {
   public final class ModifierNodeElementKt {
     method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier modifierElementOf(Object? key, kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
     method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier modifierElementOf(kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
-  }
-
-  public final class MyersDiffKt {
-  }
-
-  public final class NodeChainKt {
-  }
-
-  public final class NodeCoordinatorKt {
-  }
-
-  public final class NodeKindKt {
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface ObserverNode extends androidx.compose.ui.node.DelegatableNode {
@@ -2614,9 +2510,6 @@ package androidx.compose.ui.node {
     method public void onCancelPointerInput();
     method public void onPointerEvent(androidx.compose.ui.input.pointer.PointerEvent pointerEvent, androidx.compose.ui.input.pointer.PointerEventPass pass, long bounds);
     method public default boolean sharePointerInputWithSiblings();
-  }
-
-  public final class PointerInputModifierNodeKt {
   }
 
   public final class Ref<T> {
@@ -2678,12 +2571,6 @@ package androidx.compose.ui.platform {
     method public long calculateRecommendedTimeoutMillis(long originalTimeoutMillis, optional boolean containsIcons, optional boolean containsText, optional boolean containsControls);
   }
 
-  public final class AndroidClipboardManager_androidKt {
-  }
-
-  public final class AndroidComposeViewAccessibilityDelegateCompat_androidKt {
-  }
-
   public final class AndroidComposeView_androidKt {
   }
 
@@ -2714,9 +2601,6 @@ package androidx.compose.ui.platform {
     method public kotlin.coroutines.CoroutineContext getMain();
     property public final kotlin.coroutines.CoroutineContext CurrentThread;
     property public final kotlin.coroutines.CoroutineContext Main;
-  }
-
-  public final class AndroidUiDispatcher_androidKt {
   }
 
   public final class AndroidUiFrameClock implements androidx.compose.runtime.MonotonicFrameClock {
@@ -2791,12 +2675,6 @@ package androidx.compose.ui.platform {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.platform.WindowInfo> LocalWindowInfo;
   }
 
-  public final class DebugUtilsKt {
-  }
-
-  public final class DisposableSaveableStateRegistry_androidKt {
-  }
-
   @kotlin.jvm.JvmDefaultWithCompatibility public interface InfiniteAnimationPolicy extends kotlin.coroutines.CoroutineContext.Element {
     method public default kotlin.coroutines.CoroutineContext.Key<?> getKey();
     method public suspend <R> Object? onInfiniteOperation(kotlin.jvm.functions.Function1<? super kotlin.coroutines.Continuation<? super R>,?> block, kotlin.coroutines.Continuation<? super R>);
@@ -2805,9 +2683,6 @@ package androidx.compose.ui.platform {
   }
 
   public static final class InfiniteAnimationPolicy.Key implements kotlin.coroutines.CoroutineContext.Key<androidx.compose.ui.platform.InfiniteAnimationPolicy> {
-  }
-
-  public final class InfiniteAnimationPolicyKt {
   }
 
   public final class InspectableModifier extends androidx.compose.ui.platform.InspectorValueInfo implements androidx.compose.ui.Modifier.Element {
@@ -2863,12 +2738,6 @@ package androidx.compose.ui.platform {
     property public Object? valueOverride;
   }
 
-  public final class InvertMatrixKt {
-  }
-
-  public final class JvmActuals_jvmKt {
-  }
-
   @androidx.compose.ui.ExperimentalComposeUiApi public final class LocalSoftwareKeyboardController {
     method @androidx.compose.runtime.Composable public androidx.compose.ui.platform.SoftwareKeyboardController? getCurrent();
     method public infix androidx.compose.runtime.ProvidedValue<androidx.compose.ui.platform.SoftwareKeyboardController> provides(androidx.compose.ui.platform.SoftwareKeyboardController softwareKeyboardController);
@@ -2878,9 +2747,6 @@ package androidx.compose.ui.platform {
 
   public final class NestedScrollInteropConnectionKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.ui.input.nestedscroll.NestedScrollConnection rememberNestedScrollInteropConnection(optional android.view.View hostView);
-  }
-
-  public final class ShapeContainingUtilKt {
   }
 
   @androidx.compose.runtime.Stable @androidx.compose.ui.ExperimentalComposeUiApi public interface SoftwareKeyboardController {
@@ -2960,9 +2826,6 @@ package androidx.compose.ui.platform {
     field public static final androidx.compose.ui.platform.ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed INSTANCE;
   }
 
-  public final class ViewCompositionStrategy_androidKt {
-  }
-
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ViewConfiguration {
     method public long getDoubleTapMinTimeMillis();
     method public long getDoubleTapTimeoutMillis();
@@ -3007,9 +2870,6 @@ package androidx.compose.ui.platform {
     property @androidx.compose.ui.ExperimentalComposeUiApi public default int keyboardModifiers;
   }
 
-  public final class WindowInfoKt {
-  }
-
   @androidx.compose.ui.InternalComposeUiApi public fun interface WindowRecomposerFactory {
     method public androidx.compose.runtime.Recomposer createRecomposer(android.view.View windowRootView);
     field public static final androidx.compose.ui.platform.WindowRecomposerFactory.Companion Companion;
@@ -3031,16 +2891,6 @@ package androidx.compose.ui.platform {
     method public static androidx.compose.runtime.CompositionContext? findViewTreeCompositionContext(android.view.View);
     method public static androidx.compose.runtime.CompositionContext? getCompositionContext(android.view.View);
     method public static void setCompositionContext(android.view.View, androidx.compose.runtime.CompositionContext?);
-  }
-
-  public final class Wrapper_androidKt {
-  }
-
-}
-
-package androidx.compose.ui.platform.accessibility {
-
-  public final class CollectionInfoKt {
   }
 
 }
@@ -3069,9 +2919,6 @@ package androidx.compose.ui.res {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static float dimensionResource(@DimenRes int id);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static int[] integerArrayResource(@ArrayRes int id);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public static int integerResource(@IntegerRes int id);
-  }
-
-  public final class Resources_androidKt {
   }
 
   public final class StringResources_androidKt {
@@ -3294,9 +3141,6 @@ package androidx.compose.ui.semantics {
     property public final androidx.compose.ui.geometry.Rect touchBoundsInRoot;
   }
 
-  public final class SemanticsNodeKt {
-  }
-
   public final class SemanticsOwner {
     method public androidx.compose.ui.semantics.SemanticsNode getRootSemanticsNode();
     method public androidx.compose.ui.semantics.SemanticsNode getUnmergedRootSemanticsNode();
@@ -3463,9 +3307,6 @@ package androidx.compose.ui.semantics {
     method public operator <T> void set(androidx.compose.ui.semantics.SemanticsPropertyKey<T> key, T? value);
   }
 
-  public final class SemanticsSortKt {
-  }
-
 }
 
 package androidx.compose.ui.state {
@@ -3492,26 +3333,7 @@ package androidx.compose.ui.text {
 
 }
 
-package androidx.compose.ui.text.input {
-
-  public final class CursorAnchorInfoBuilderKt {
-  }
-
-  public final class InputState_androidKt {
-  }
-
-  public final class RecordingInputConnection_androidKt {
-  }
-
-  public final class TextInputServiceAndroid_androidKt {
-  }
-
-}
-
 package androidx.compose.ui.viewinterop {
-
-  public final class AndroidViewHolder_androidKt {
-  }
 
   public final class AndroidView_androidKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> factory, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
@@ -3582,9 +3404,6 @@ package androidx.compose.ui.window {
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy Inherit;
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOff;
     enum_constant public static final androidx.compose.ui.window.SecureFlagPolicy SecureOn;
-  }
-
-  public final class SecureFlagPolicy_androidKt {
   }
 
 }

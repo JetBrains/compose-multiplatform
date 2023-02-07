@@ -3,5 +3,105 @@ InvalidNullConversion: androidx.compose.ui.graphics.GraphicsLayerModifierKt#grap
     Attempted to remove @NonNull annotation from method androidx.compose.ui.graphics.GraphicsLayerModifierKt.graphicsLayer(androidx.compose.ui.Modifier,float,float,float,float,float,float,float,float,float,float,long,androidx.compose.ui.graphics.Shape,boolean,androidx.compose.ui.graphics.RenderEffect,long,long)
 
 
+RemovedClass: androidx.compose.ui.ActualKt:
+    Removed class androidx.compose.ui.ActualKt
+RemovedClass: androidx.compose.ui.TempListUtilsKt:
+    Removed class androidx.compose.ui.TempListUtilsKt
+RemovedClass: androidx.compose.ui.focus.BeyondBoundsLayoutKt:
+    Removed class androidx.compose.ui.focus.BeyondBoundsLayoutKt
 RemovedClass: androidx.compose.ui.focus.FocusManagerKt:
     Removed class androidx.compose.ui.focus.FocusManagerKt
+RemovedClass: androidx.compose.ui.focus.FocusRequesterKt:
+    Removed class androidx.compose.ui.focus.FocusRequesterKt
+RemovedClass: androidx.compose.ui.focus.FocusTransactionsKt:
+    Removed class androidx.compose.ui.focus.FocusTransactionsKt
+RemovedClass: androidx.compose.ui.focus.FocusTraversalKt:
+    Removed class androidx.compose.ui.focus.FocusTraversalKt
+RemovedClass: androidx.compose.ui.focus.OneDimensionalFocusSearchKt:
+    Removed class androidx.compose.ui.focus.OneDimensionalFocusSearchKt
+RemovedClass: androidx.compose.ui.focus.TwoDimensionalFocusSearchKt:
+    Removed class androidx.compose.ui.focus.TwoDimensionalFocusSearchKt
+RemovedClass: androidx.compose.ui.input.nestedscroll.NestedScrollModifierLocalKt:
+    Removed class androidx.compose.ui.input.nestedscroll.NestedScrollModifierLocalKt
+RemovedClass: androidx.compose.ui.input.pointer.PointerInputEventProcessorKt:
+    Removed class androidx.compose.ui.input.pointer.PointerInputEventProcessorKt
+RemovedClass: androidx.compose.ui.input.pointer.PointerInputTestUtilKt:
+    Removed class androidx.compose.ui.input.pointer.PointerInputTestUtilKt
+RemovedClass: androidx.compose.ui.input.pointer.PointerInteropUtils_androidKt:
+    Removed class androidx.compose.ui.input.pointer.PointerInteropUtils_androidKt
+RemovedClass: androidx.compose.ui.layout.ContentScaleKt:
+    Removed class androidx.compose.ui.layout.ContentScaleKt
+RemovedClass: androidx.compose.ui.layout.LookaheadLayoutCoordinatesKt:
+    Removed class androidx.compose.ui.layout.LookaheadLayoutCoordinatesKt
+RemovedClass: androidx.compose.ui.layout.PlaceableKt:
+    Removed class androidx.compose.ui.layout.PlaceableKt
+RemovedClass: androidx.compose.ui.node.BackwardsCompatNodeKt:
+    Removed class androidx.compose.ui.node.BackwardsCompatNodeKt
+RemovedClass: androidx.compose.ui.node.HitTestResultKt:
+    Removed class androidx.compose.ui.node.HitTestResultKt
+RemovedClass: androidx.compose.ui.node.LayoutModifierNodeCoordinatorKt:
+    Removed class androidx.compose.ui.node.LayoutModifierNodeCoordinatorKt
+RemovedClass: androidx.compose.ui.node.LayoutNodeDrawScopeKt:
+    Removed class androidx.compose.ui.node.LayoutNodeDrawScopeKt
+RemovedClass: androidx.compose.ui.node.LayoutNodeKt:
+    Removed class androidx.compose.ui.node.LayoutNodeKt
+RemovedClass: androidx.compose.ui.node.LayoutNodeLayoutDelegateKt:
+    Removed class androidx.compose.ui.node.LayoutNodeLayoutDelegateKt
+RemovedClass: androidx.compose.ui.node.MeasureScopeWithLayoutNodeKt:
+    Removed class androidx.compose.ui.node.MeasureScopeWithLayoutNodeKt
+RemovedClass: androidx.compose.ui.node.MyersDiffKt:
+    Removed class androidx.compose.ui.node.MyersDiffKt
+RemovedClass: androidx.compose.ui.node.NodeChainKt:
+    Removed class androidx.compose.ui.node.NodeChainKt
+RemovedClass: androidx.compose.ui.node.NodeCoordinatorKt:
+    Removed class androidx.compose.ui.node.NodeCoordinatorKt
+RemovedClass: androidx.compose.ui.node.NodeKindKt:
+    Removed class androidx.compose.ui.node.NodeKindKt
+RemovedClass: androidx.compose.ui.node.PointerInputModifierNodeKt:
+    Removed class androidx.compose.ui.node.PointerInputModifierNodeKt
+RemovedClass: androidx.compose.ui.platform.AndroidClipboardManager_androidKt:
+    Removed class androidx.compose.ui.platform.AndroidClipboardManager_androidKt
+RemovedClass: androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat_androidKt:
+    Removed class androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat_androidKt
+RemovedClass: androidx.compose.ui.platform.AndroidUiDispatcher_androidKt:
+    Removed class androidx.compose.ui.platform.AndroidUiDispatcher_androidKt
+RemovedClass: androidx.compose.ui.platform.DebugUtilsKt:
+    Removed class androidx.compose.ui.platform.DebugUtilsKt
+RemovedClass: androidx.compose.ui.platform.DisposableSaveableStateRegistry_androidKt:
+    Removed class androidx.compose.ui.platform.DisposableSaveableStateRegistry_androidKt
+RemovedClass: androidx.compose.ui.platform.InfiniteAnimationPolicyKt:
+    Removed class androidx.compose.ui.platform.InfiniteAnimationPolicyKt
+RemovedClass: androidx.compose.ui.platform.InvertMatrixKt:
+    Removed class androidx.compose.ui.platform.InvertMatrixKt
+RemovedClass: androidx.compose.ui.platform.JvmActuals_jvmKt:
+    Removed class androidx.compose.ui.platform.JvmActuals_jvmKt
+RemovedClass: androidx.compose.ui.platform.ShapeContainingUtilKt:
+    Removed class androidx.compose.ui.platform.ShapeContainingUtilKt
+RemovedClass: androidx.compose.ui.platform.ViewCompositionStrategy_androidKt:
+    Removed class androidx.compose.ui.platform.ViewCompositionStrategy_androidKt
+RemovedClass: androidx.compose.ui.platform.WindowInfoKt:
+    Removed class androidx.compose.ui.platform.WindowInfoKt
+RemovedClass: androidx.compose.ui.platform.Wrapper_androidKt:
+    Removed class androidx.compose.ui.platform.Wrapper_androidKt
+RemovedClass: androidx.compose.ui.res.Resources_androidKt:
+    Removed class androidx.compose.ui.res.Resources_androidKt
+RemovedClass: androidx.compose.ui.semantics.SemanticsNodeKt:
+    Removed class androidx.compose.ui.semantics.SemanticsNodeKt
+RemovedClass: androidx.compose.ui.semantics.SemanticsSortKt:
+    Removed class androidx.compose.ui.semantics.SemanticsSortKt
+RemovedClass: androidx.compose.ui.viewinterop.AndroidViewHolder_androidKt:
+    Removed class androidx.compose.ui.viewinterop.AndroidViewHolder_androidKt
+RemovedClass: androidx.compose.ui.window.SecureFlagPolicy_androidKt:
+    Removed class androidx.compose.ui.window.SecureFlagPolicy_androidKt
+
+
+RemovedPackage: androidx.compose.ui.autofill:
+    Removed package androidx.compose.ui.autofill
+RemovedPackage: androidx.compose.ui.graphics.vector.compat:
+    Removed package androidx.compose.ui.graphics.vector.compat
+RemovedPackage: androidx.compose.ui.internal:
+    Removed package androidx.compose.ui.internal
+RemovedPackage: androidx.compose.ui.platform.accessibility:
+    Removed package androidx.compose.ui.platform.accessibility
+RemovedPackage: androidx.compose.ui.text.input:
+    Removed package androidx.compose.ui.text.input

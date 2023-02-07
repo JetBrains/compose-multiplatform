@@ -166,9 +166,6 @@ package androidx.compose.foundation.layout {
     method public float calculateTopPadding();
   }
 
-  public final class RowColumnImplKt {
-  }
-
   public final class RowKt {
     method @androidx.compose.runtime.Composable public static inline void Row(optional androidx.compose.ui.Modifier modifier, optional androidx.compose.foundation.layout.Arrangement.Horizontal horizontalArrangement, optional androidx.compose.ui.Alignment.Vertical verticalAlignment, kotlin.jvm.functions.Function1<? super androidx.compose.foundation.layout.RowScope,kotlin.Unit> content);
   }
@@ -304,13 +301,6 @@ package androidx.compose.foundation.layout {
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static androidx.compose.foundation.layout.WindowInsets getTappableElement(androidx.compose.foundation.layout.WindowInsets.Companion);
     method @androidx.compose.runtime.Composable @androidx.compose.runtime.NonRestartableComposable public static androidx.compose.foundation.layout.WindowInsets getWaterfall(androidx.compose.foundation.layout.WindowInsets.Companion);
     method public static void setConsumeWindowInsets(androidx.compose.ui.platform.ComposeView, boolean);
-  }
-
-}
-
-package androidx.compose.foundation.layout.internal {
-
-  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }

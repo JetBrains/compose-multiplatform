@@ -1,0 +1,9 @@
+// Baseline format: 1.0
+RemovedClass: androidx.compose.ui.test.junit4.AndroidSynchronization_androidKt:
+    Removed class androidx.compose.ui.test.junit4.AndroidSynchronization_androidKt
+RemovedClass: androidx.compose.ui.test.junit4.ComposeIdlingResource_androidKt:
+    Removed class androidx.compose.ui.test.junit4.ComposeIdlingResource_androidKt
+RemovedClass: androidx.compose.ui.test.junit4.ComposeRootRegistry_androidKt:
+    Removed class androidx.compose.ui.test.junit4.ComposeRootRegistry_androidKt
+RemovedClass: androidx.compose.ui.test.junit4.EspressoLink_androidKt:
+    Removed class androidx.compose.ui.test.junit4.EspressoLink_androidKt
