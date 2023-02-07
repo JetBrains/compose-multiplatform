@@ -5,7 +5,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.*
+import androidx.compose.material3.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -64,7 +64,7 @@ internal fun FullscreenImage(
         }
     }
 
-    Box(Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)) {
+    Box(Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background)) {
         Column {
             Toolbar(picture?.name ?: "", filtersState, localization, back)
             if (imageWithFilter != null) {
@@ -103,14 +103,14 @@ internal fun FullscreenImage(
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                tint = MaterialTheme.colors.primary
+                tint = MaterialTheme.colorScheme.primary
             )
         }
         FloatingActionButton(modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp), onClick = nextImage) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                tint = MaterialTheme.colors.primary
+                tint = MaterialTheme.colorScheme.primary
             )
         }
     }
@@ -152,7 +152,7 @@ private fun Toolbar(
                 maxLines = 1,
                 modifier = Modifier.padding(start = 30.dp).weight(1f)
                     .align(Alignment.CenterVertically),
-                style = MaterialTheme.typography.body1
+                style = MaterialTheme.typography.bodyMedium
             )
 
             Surface(

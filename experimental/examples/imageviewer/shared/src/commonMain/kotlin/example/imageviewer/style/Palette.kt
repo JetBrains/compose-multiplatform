@@ -1,7 +1,7 @@
 package example.imageviewer.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 
@@ -24,17 +24,21 @@ object ImageviewerColors {
 @Composable
 internal fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
-    MaterialTheme(
-        colors = MaterialTheme.colors.copy(
-            primary = ImageviewerColors.Foreground,
-            secondary = ImageviewerColors.LightGray,
-            background = ImageviewerColors.DarkGray,
-            surface = ImageviewerColors.Gray,
-            onPrimary = ImageviewerColors.Foreground,
-            onSecondary = Color.Black,
-            onBackground = ImageviewerColors.Foreground,
-            onSurface = ImageviewerColors.Foreground
+    androidx.compose.material3.MaterialTheme(
+        colorScheme = MaterialTheme.colorScheme.copy(
+            background = Color(0xFF1B1B1B),
+            onBackground = Color(0xFFFFFFFF)
         )
+//        colors = MaterialTheme.colors.copy(
+//            primary = ImageviewerColors.Foreground,
+//            secondary = ImageviewerColors.LightGray,
+//            background = ImageviewerColors.DarkGray,
+//            surface = ImageviewerColors.Gray,
+//            onPrimary = ImageviewerColors.Foreground,
+//            onSecondary = Color.Black,
+//            onBackground = ImageviewerColors.Foreground,
+//            onSurface = ImageviewerColors.Foreground
+//        )
     ) {
         content()
     }

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ImageViewer</string>
+    <string name="app_name">My Memories</string>
     <string name="loading">Loading images...</string>
     <string name="repo_empty">Repository is empty.</string>
     <string name="no_internet">No internet access.</string>

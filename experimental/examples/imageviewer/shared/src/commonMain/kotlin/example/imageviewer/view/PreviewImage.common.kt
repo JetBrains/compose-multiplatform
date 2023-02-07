@@ -1,9 +1,11 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
@@ -32,19 +34,27 @@ internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture
     }
 
     val image = imageState.value
+    Spacer(
+        modifier = Modifier.height(5.dp).fillMaxWidth()
+            .background(brush = kotlinHorizontalGradientBrush)
+    )
     Card(
-        backgroundColor = MaterialTheme.colors.background,
+//        colors = CardDefaults.cardColors()
+//        backgroundColor = MaterialTheme.colors.background,
         modifier = Modifier.height(200.dp)
+            .background(brush = kotlinHorizontalGradientBrush)
+            .padding(10.dp)
             .clickable { state.toFullscreen() },
-        shape = RectangleShape,
-        elevation = 1.dp
+        shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
+//        elevation = 1.dp
     ) {
         Image(
             bitmap = image ?: resource("empty.png").rememberImageBitmap().orEmpty(),
             contentDescription = null,
             modifier = Modifier
-                .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
-            contentScale = ContentScale.Fit
+                .fillMaxSize()//.padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
+            ,
+            contentScale = ContentScale.Crop
         )
     }
 }
