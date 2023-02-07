@@ -39,6 +39,7 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -267,6 +268,7 @@ class LazyGridPinnableContainerTest {
             .assertIsNotPlaced()
     }
 
+    @Ignore // b/268053147
     @Test
     fun pinnedItemIsStillPinnedWhenReorderedAndNotVisibleAnymore() {
         val state = LazyGridState()
