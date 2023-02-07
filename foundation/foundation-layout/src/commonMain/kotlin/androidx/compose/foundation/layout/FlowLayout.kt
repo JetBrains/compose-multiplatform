@@ -30,14 +30,16 @@ import kotlin.math.max
  * the next "row" or "line" positioned on the bottom, and then continues filling items
  * until the items run out.
  *
- * When a Modifier [RowColumnParentData.weight] is provided, it scales the item
+ * Example:
+ * @sample androidx.compose.foundation.layout.samples.SimpleFlowRow
+ *
+ * When a Modifier [RowScope.weight] is provided, it scales the item
  * based on the number items that fall on the row it was placed in.
  *
  * Example:
- * ```
- * 1 2 3 4
- * 5 6 7 8
- * ```
+ * @sample androidx.compose.foundation.layout.samples.SimpleFlowRowWithWeights
+ *
+ *
  * @param modifier The modifier to be applied to the Row.
  * @param horizontalArrangement The horizontal arrangement of the layout's children.
  * @param verticalAlignment The vertical alignment of the layout's children.
@@ -79,15 +81,15 @@ fun FlowRow(
  * It supports rtl in RTL layouts, by placing the first column to the right, and then moving
  * to the left
  *
- * When a Modifier [RowColumnParentData.weight] is provided, it scales the item
+ * Example:
+ * @sample androidx.compose.foundation.layout.samples.SimpleFlowColumn
+ *
+ * When a Modifier [ColumnScope.weight] is provided, it scales the item
  * based on the number items that fall on the column it was placed in.
  *
  * Example:
- * ```
- * 1 4
- * 2 5
- * 3 6
- * ```
+ * @sample androidx.compose.foundation.layout.samples.SimpleFlowColumnWithWeights
+ *
  * @param modifier The modifier to be applied to the Row.
  * @param verticalArrangement The vertical arrangement of the layout's children.
  * @param horizontalAlignment The horizontal alignment of the layout's children.
