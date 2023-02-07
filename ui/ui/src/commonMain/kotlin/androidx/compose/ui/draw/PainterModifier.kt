@@ -17,6 +17,7 @@
 package androidx.compose.ui.draw
 
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.Modifier
@@ -30,11 +31,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.times
 import androidx.compose.ui.layout.IntrinsicMeasurable
 import androidx.compose.ui.layout.IntrinsicMeasureScope
-import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
+import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.invalidateDraw
+import androidx.compose.ui.node.invalidateLayer
+import androidx.compose.ui.node.invalidateLayout
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntSize
@@ -54,6 +58,7 @@ import kotlin.math.roundToInt
  *
  * @sample androidx.compose.ui.samples.PainterModifierSample
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.paint(
     painter: Painter,
     sizeToIntrinsics: Boolean = true,
@@ -61,39 +66,123 @@ fun Modifier.paint(
     contentScale: ContentScale = ContentScale.Inside,
     alpha: Float = DefaultAlpha,
     colorFilter: ColorFilter? = null
-) = this.then(
-    PainterModifier(
-        painter = painter,
-        sizeToIntrinsics = sizeToIntrinsics,
-        alignment = alignment,
-        contentScale = contentScale,
-        alpha = alpha,
-        colorFilter = colorFilter,
-        inspectorInfo = debugInspectorInfo {
-            name = "paint"
-            properties["painter"] = painter
-            properties["sizeToIntrinsics"] = sizeToIntrinsics
-            properties["alignment"] = alignment
-            properties["contentScale"] = contentScale
-            properties["alpha"] = alpha
-            properties["colorFilter"] = colorFilter
-        }
-    )
+) = this then PainterModifierNodeElement(
+    painter = painter,
+    sizeToIntrinsics = sizeToIntrinsics,
+    alignment = alignment,
+    contentScale = contentScale,
+    alpha = alpha,
+    colorFilter = colorFilter
 )
+
+/**
+ * Customized [ModifierNodeElement] for painting content using [painter].
+ *
+ * IMPORTANT NOTE: This class sets [androidx.compose.ui.node.ModifierNodeElement.autoInvalidate]
+ * to false which means it MUST invalidate both draw and the layout. It invalidates both in the
+ * [PainterModifierNodeElement.update] method through [LayoutModifierNode.invalidateLayer]
+ * (invalidates draw) and [LayoutModifierNode.invalidateLayout] (invalidates layout).
+ *
+ * @param painter used to paint content
+ * @param sizeToIntrinsics `true` to size the element relative to [Painter.intrinsicSize]
+ * @param alignment specifies alignment of the [painter] relative to content
+ * @param contentScale strategy for scaling [painter] if its size does not match the content size
+ * @param alpha opacity of [painter]
+ * @param colorFilter optional [ColorFilter] to apply to [painter]
+ *
+ * @sample androidx.compose.ui.samples.PainterModifierSample
+ */
+@ExperimentalComposeUiApi
+private class PainterModifierNodeElement(
+    val painter: Painter,
+    val sizeToIntrinsics: Boolean,
+    val alignment: Alignment,
+    val contentScale: ContentScale,
+    val alpha: Float,
+    val colorFilter: ColorFilter?
+) : ModifierNodeElement<PainterModifierNode>(
+    autoInvalidate = false,
+    inspectorInfo = debugInspectorInfo {
+        name = "paint"
+        properties["painter"] = painter
+        properties["sizeToIntrinsics"] = sizeToIntrinsics
+        properties["alignment"] = alignment
+        properties["contentScale"] = contentScale
+        properties["alpha"] = alpha
+        properties["colorFilter"] = colorFilter
+    }
+) {
+    override fun create(): PainterModifierNode {
+        return PainterModifierNode(
+            painter = painter,
+            sizeToIntrinsics = sizeToIntrinsics,
+            alignment = alignment,
+            contentScale = contentScale,
+            alpha = alpha,
+            colorFilter = colorFilter,
+        )
+    }
+
+    override fun update(node: PainterModifierNode): PainterModifierNode {
+        val invalidateLayout = node.sizeToIntrinsics != sizeToIntrinsics ||
+            (sizeToIntrinsics && node.painter.intrinsicSize != painter.intrinsicSize)
+
+        node.painter = painter
+        node.sizeToIntrinsics = sizeToIntrinsics
+        node.alignment = alignment
+        node.contentScale = contentScale
+        node.alpha = alpha
+        node.colorFilter = colorFilter
+
+        // Only invalidate layout if Intrinsics have changed.
+        if (invalidateLayout) {
+            node.invalidateLayout()
+        } else {
+            // Otherwise, redraw because one of the node properties has changed.
+            node.invalidateDraw()
+        }
+
+        return node
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is PainterModifierNodeElement) return false
+
+        if (painter !== other.painter) return false
+        if (sizeToIntrinsics != other.sizeToIntrinsics) return false
+        if (alignment != other.alignment) return false
+        if (contentScale != other.contentScale) return false
+        if (alpha != other.alpha) return false
+        if (colorFilter != other.colorFilter) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = painter.hashCode()
+        result = 31 * result + sizeToIntrinsics.hashCode()
+        result = 31 * result + alignment.hashCode()
+        result = 31 * result + contentScale.hashCode()
+        result = 31 * result + alpha.hashCode()
+        result = 31 * result + (colorFilter?.hashCode() ?: 0)
+        return result
+    }
+}
 
 /**
  * [DrawModifier] used to draw the provided [Painter] followed by the contents
  * of the component itself
  */
-private class PainterModifier(
-    val painter: Painter,
-    val sizeToIntrinsics: Boolean,
-    val alignment: Alignment = Alignment.Center,
-    val contentScale: ContentScale = ContentScale.Inside,
-    val alpha: Float = DefaultAlpha,
-    val colorFilter: ColorFilter? = null,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : LayoutModifier, DrawModifier, InspectorValueInfo(inspectorInfo) {
+@OptIn(ExperimentalComposeUiApi::class)
+private class PainterModifierNode(
+    var painter: Painter,
+    var sizeToIntrinsics: Boolean,
+    var alignment: Alignment = Alignment.Center,
+    var contentScale: ContentScale = ContentScale.Inside,
+    var alpha: Float = DefaultAlpha,
+    var colorFilter: ColorFilter? = null
+) : LayoutModifierNode, Modifier.Node(), DrawModifierNode {
 
     /**
      * Helper property to determine if we should size content to the intrinsic
@@ -288,26 +377,6 @@ private class PainterModifier(
 
     private fun Size.hasSpecifiedAndFiniteWidth() = this != Size.Unspecified && width.isFinite()
     private fun Size.hasSpecifiedAndFiniteHeight() = this != Size.Unspecified && height.isFinite()
-
-    override fun hashCode(): Int {
-        var result = painter.hashCode()
-        result = 31 * result + sizeToIntrinsics.hashCode()
-        result = 31 * result + alignment.hashCode()
-        result = 31 * result + contentScale.hashCode()
-        result = 31 * result + alpha.hashCode()
-        result = 31 * result + (colorFilter?.hashCode() ?: 0)
-        return result
-    }
-
-    override fun equals(other: Any?): Boolean {
-        val otherModifier = other as? PainterModifier ?: return false
-        return painter == otherModifier.painter &&
-            sizeToIntrinsics == otherModifier.sizeToIntrinsics &&
-            alignment == otherModifier.alignment &&
-            contentScale == otherModifier.contentScale &&
-            alpha == otherModifier.alpha &&
-            colorFilter == otherModifier.colorFilter
-    }
 
     override fun toString(): String =
         "PainterModifier(" +
