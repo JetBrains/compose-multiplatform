@@ -77,7 +77,7 @@ internal fun LazyGrid(
 
     val itemProvider = rememberLazyGridItemProvider(state, content)
 
-    val semanticState = rememberLazyGridSemanticState(state, itemProvider, reverseLayout)
+    val semanticState = rememberLazyGridSemanticState(state, reverseLayout)
 
     val scope = rememberCoroutineScope()
     val placementAnimator = remember(state, isVertical) {
@@ -110,7 +110,8 @@ internal fun LazyGrid(
                 itemProvider = itemProvider,
                 state = semanticState,
                 orientation = orientation,
-                userScrollEnabled = userScrollEnabled
+                userScrollEnabled = userScrollEnabled,
+                reverseScrolling = reverseLayout
             )
             .clipScrollableContainer(orientation)
             .overscroll(overscrollEffect)

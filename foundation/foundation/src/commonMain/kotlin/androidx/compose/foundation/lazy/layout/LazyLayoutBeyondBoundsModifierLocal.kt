@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.lazy
+package androidx.compose.foundation.lazy.layout
 
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.lazy.LazyListBeyondBoundsInfo
 import androidx.compose.foundation.lazy.LazyListBeyondBoundsInfo.Interval
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.BeyondBoundsLayout
 import androidx.compose.ui.layout.BeyondBoundsLayout.BeyondBoundsScope
 import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.Above
@@ -32,43 +30,12 @@ import androidx.compose.ui.layout.BeyondBoundsLayout.LayoutDirection.Companion.R
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.modifier.ModifierLocalProvider
 import androidx.compose.ui.modifier.ProvidableModifierLocal
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.LayoutDirection.Ltr
 import androidx.compose.ui.unit.LayoutDirection.Rtl
 
-/**
- * This modifier is used to measure and place additional items when the lazyList receives a
- * request to layout items beyond the visible bounds.
- */
-@Suppress("ComposableModifierFactory")
-@Composable
-internal fun Modifier.lazyListBeyondBoundsModifier(
-    state: LazyListState,
-    beyondBoundsInfo: LazyListBeyondBoundsInfo,
-    reverseLayout: Boolean,
-    orientation: Orientation
-): Modifier {
-    val layoutDirection = LocalLayoutDirection.current
-    return this then remember(
-        state,
-        beyondBoundsInfo,
-        reverseLayout,
-        layoutDirection,
-        orientation
-    ) {
-        LazyListBeyondBoundsModifierLocal(
-            state,
-            beyondBoundsInfo,
-            reverseLayout,
-            layoutDirection,
-            orientation
-        )
-    }
-}
-
-private class LazyListBeyondBoundsModifierLocal(
-    private val state: LazyListState,
+internal class LazyLayoutBeyondBoundsModifierLocal(
+    private val state: BeyondBoundsState,
     private val beyondBoundsInfo: LazyListBeyondBoundsInfo,
     private val reverseLayout: Boolean,
     private val layoutDirection: LayoutDirection,
@@ -90,14 +57,14 @@ private class LazyListBeyondBoundsModifierLocal(
     ): T? {
         // If the lazy list is empty, or if it does not have any visible items (Which implies
         // that there isn't space to add a single item), we don't attempt to layout any more items.
-        if (state.layoutInfo.totalItemsCount <= 0 || state.layoutInfo.visibleItemsInfo.isEmpty()) {
+        if (state.itemCount <= 0 || !state.hasVisibleItems) {
             return block.invoke(emptyBeyondBoundsScope)
         }
 
         // We use a new interval each time because this function is re-entrant.
         var interval = beyondBoundsInfo.addInterval(
-            state.firstVisibleItemIndex,
-            state.layoutInfo.visibleItemsInfo.last().index
+            state.firstVisibleIndex,
+            state.lastVisibleIndex
         )
 
         var found: T? = null
@@ -107,7 +74,7 @@ private class LazyListBeyondBoundsModifierLocal(
             interval = addNextInterval(interval, direction).also {
                 beyondBoundsInfo.removeInterval(interval)
             }
-            state.remeasurement?.forceRemeasure()
+            state.remeasure()
 
             // When we invoke this block, the beyond bounds items are present.
             found = block.invoke(
@@ -120,7 +87,7 @@ private class LazyListBeyondBoundsModifierLocal(
 
         // Dispose the items that are beyond the visible bounds.
         beyondBoundsInfo.removeInterval(interval)
-        state.remeasurement?.forceRemeasure()
+        state.remeasure()
         return found
     }
 
@@ -150,7 +117,7 @@ private class LazyListBeyondBoundsModifierLocal(
 
     private fun Interval.hasMoreContent(direction: BeyondBoundsLayout.LayoutDirection): Boolean {
         fun hasMoreItemsBefore() = start > 0
-        fun hasMoreItemsAfter() = end < state.layoutInfo.totalItemsCount - 1
+        fun hasMoreItemsAfter() = end < state.itemCount - 1
         if (direction.isOppositeToOrientation()) return false
         return when (direction) {
             Before -> hasMoreItemsBefore()
