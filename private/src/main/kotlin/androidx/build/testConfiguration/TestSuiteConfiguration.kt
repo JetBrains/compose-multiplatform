@@ -38,13 +38,13 @@ import com.android.build.api.variant.ApplicationAndroidComponentsExtension
 import com.android.build.api.variant.HasAndroidTest
 import com.android.build.gradle.BaseExtension
 import com.android.build.gradle.tasks.PackageAndroidArtifact
+import java.io.File
 import org.gradle.api.Project
 import org.gradle.api.UnknownTaskException
 import org.gradle.api.file.DuplicatesStrategy
 import org.gradle.api.tasks.TaskProvider
 import org.gradle.api.tasks.bundling.Zip
 import org.gradle.kotlin.dsl.getByType
-import java.io.File
 
 /**
  * Creates and configures the test config generation task for a project. Configuration includes
@@ -236,7 +236,6 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
 ) {
     val mediaPrefix = getMediaConfigTaskPrefix(isMedia2)
     val mediaTask = getOrCreateMediaTestConfigTask(this, isMedia2)
-    val sha256ReportFileName = "$mediaPrefix$SHA_256_FILE_SUFFIX"
     mediaTask.configure {
         it as GenerateMediaTestConfigurationTask
         if (this.name.contains("client")) {
@@ -296,16 +295,40 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
                 "${mediaPrefix}ClientToTServiceToT$variantName.xml"
             )
         )
-        it.shaReportOutput.fileValue(
+        it.jsonClientPreviousServiceToTClientTests.fileValue(
             File(
                 this.getTestConfigDirectory(),
-                sha256ReportFileName
+                "${mediaPrefix}ClientPreviousServiceToTClientTests$variantName.json"
             )
         )
-        it.constrainedShaReportOutput.fileValue(
+        it.jsonClientPreviousServiceToTServiceTests.fileValue(
             File(
-                this.getConstrainedTestConfigDirectory(),
-                sha256ReportFileName
+                this.getTestConfigDirectory(),
+                "${mediaPrefix}ClientPreviousServiceToTServiceTests$variantName.json"
+            )
+        )
+        it.jsonClientToTServicePreviousClientTests.fileValue(
+            File(
+                this.getTestConfigDirectory(),
+                "${mediaPrefix}ClientToTServicePreviousClientTests$variantName.json"
+            )
+        )
+        it.jsonClientToTServicePreviousServiceTests.fileValue(
+            File(
+                this.getTestConfigDirectory(),
+                "${mediaPrefix}ClientToTServicePreviousServiceTests$variantName.json"
+            )
+        )
+        it.jsonClientToTServiceToTClientTests.fileValue(
+            File(
+                this.getTestConfigDirectory(),
+                "${mediaPrefix}ClientToTServiceToTClientTests$variantName.json"
+            )
+        )
+        it.jsonClientToTServiceToTServiceTests.fileValue(
+            File(
+                this.getTestConfigDirectory(),
+                "${mediaPrefix}ClientToTServiceToTServiceTests$variantName.json"
             )
         )
         it.minSdk.set(minSdk)

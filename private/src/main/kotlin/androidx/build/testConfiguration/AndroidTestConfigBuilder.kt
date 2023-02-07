@@ -49,11 +49,6 @@ class ConfigBuilder {
     fun testApkSha256(testApkSha256: String) = apply { this.testApkSha256 = testApkSha256 }
     fun testRunner(testRunner: String) = apply { this.testRunner = testRunner }
 
-    private data class InstrumentationArg(
-        val key: String,
-        val value: String
-    )
-
     fun buildJson(): String {
         val gson = GsonBuilder().setPrettyPrinting().create()
         val instrumentationArgs = if (isBenchmark && !isPostsubmit) {
@@ -77,9 +72,6 @@ class ConfigBuilder {
             "instrumentationArgs" to instrumentationArgs,
             "additionalApkKeys" to additionalApkKeys
         )
-        if (isBenchmark && !isPostsubmit) {
-            values["instrumentationArgs"]
-        }
         return gson.toJson(values)
     }
 
@@ -138,22 +130,25 @@ class ConfigBuilder {
 }
 
 class MediaConfigBuilder {
+    lateinit var configName: String
     lateinit var clientApkName: String
+    lateinit var clientApkSha256: String
     lateinit var clientApplicationId: String
     var isClientPrevious: Boolean = true
-    var isPostsubmit: Boolean = true
     var isServicePrevious: Boolean = true
     lateinit var minSdk: String
     var runAllTests: Boolean = true
     lateinit var serviceApkName: String
+    lateinit var serviceApkSha256: String
     lateinit var serviceApplicationId: String
     var tags: MutableList<String> = mutableListOf()
     lateinit var testRunner: String
 
+    fun configName(configName: String) = apply { this.configName = configName }
     fun clientApkName(clientApkName: String) = apply { this.clientApkName = clientApkName }
+    fun clientApkSha256(clientApkSha256: String) = apply { this.clientApkSha256 = clientApkSha256 }
     fun clientApplicationId(clientApplicationId: String) =
         apply { this.clientApplicationId = clientApplicationId }
-    fun isPostsubmit(isPostsubmit: Boolean) = apply { this.isPostsubmit = isPostsubmit }
     fun isClientPrevious(isClientPrevious: Boolean) = apply {
         this.isClientPrevious = isClientPrevious
     }
@@ -163,6 +158,9 @@ class MediaConfigBuilder {
     fun minSdk(minSdk: String) = apply { this.minSdk = minSdk }
     fun runAllTests(runAllTests: Boolean) = apply { this.runAllTests = runAllTests }
     fun serviceApkName(serviceApkName: String) = apply { this.serviceApkName = serviceApkName }
+    fun serviceApkSha256(serviceApkSha256: String) = apply {
+        this.serviceApkSha256 = serviceApkSha256
+    }
     fun serviceApplicationId(serviceApplicationId: String) =
         apply { this.serviceApplicationId = serviceApplicationId }
     fun tag(tag: String) = apply { this.tags.add(tag) }
@@ -182,6 +180,41 @@ class MediaConfigBuilder {
                 CLIENT_TOT + SERVICE_TOT
             }
         }
+    }
+
+    private fun mediaInstrumentationArgsForJson(): List<InstrumentationArg> {
+        return listOf(
+            if (isClientPrevious) {
+                InstrumentationArg(key = "client_version", value = "previous")
+            } else {
+                InstrumentationArg(key = "client_version", value = "tot")
+            },
+            if (isServicePrevious) {
+                InstrumentationArg(key = "service_version", value = "previous")
+            } else {
+                InstrumentationArg(key = "service_version", value = "tot")
+            }
+        )
+    }
+
+    fun buildJson(forClient: Boolean): String {
+        val gson = GsonBuilder().setPrettyPrinting().create()
+        val instrumentationArgs =
+            listOf(
+                InstrumentationArg("notAnnotation", "androidx.test.filters.FlakyTest")
+            ) + mediaInstrumentationArgsForJson()
+        val values = mapOf(
+            "name" to "$configName-${if (forClient) "clientTests" else "serviceTests"}",
+            "minSdkVersion" to minSdk,
+            "testSuiteTags" to tags,
+            "testApk" to if (forClient) clientApkName else serviceApkName,
+            "testApkSha256" to if (forClient) clientApkSha256 else serviceApkSha256,
+            "appApk" to if (forClient) serviceApkName else clientApkName,
+            "appApkSha256" to if (forClient) serviceApkSha256 else clientApkSha256,
+            "instrumentationArgs" to instrumentationArgs,
+            "additionalApkKeys" to listOf<String>()
+        )
+        return gson.toJson(values)
     }
 
     fun build(): String {
@@ -242,6 +275,11 @@ class MediaConfigBuilder {
         return sb.toString()
     }
 }
+
+private data class InstrumentationArg(
+    val key: String,
+    val value: String
+)
 
 /**
  * These constants are the building blocks of the xml configs, but

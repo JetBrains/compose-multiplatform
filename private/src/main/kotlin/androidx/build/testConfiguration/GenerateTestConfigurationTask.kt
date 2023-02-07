@@ -228,7 +228,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     }
 }
 
-private fun createOrFail(fileProperty: RegularFileProperty): File {
+internal fun createOrFail(fileProperty: RegularFileProperty): File {
     val resolvedFile: File = fileProperty.asFile.get()
     if (!resolvedFile.exists()) {
         if (!resolvedFile.createNewFile()) {
