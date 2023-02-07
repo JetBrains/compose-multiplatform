@@ -57,7 +57,15 @@ open class GMavenZipTask : Zip() {
         if (!project.shouldAddGroupConstraints()) {
             doFirst {
                 throw GradleException(
-                    "Cannot publish artifacts without setting -P$ADD_GROUP_CONSTRAINTS=true"
+                    """
+                    Cannot publish artifacts without setting -P$ADD_GROUP_CONSTRAINTS=true
+
+                    This property is required when building artifacts to publish
+
+                    (but this property can reduce remote cache usage so it is disabled by default)
+
+                    See AndroidXGradleProperties.kt for more information about this property
+                    """.trimIndent()
                 )
             }
         }
