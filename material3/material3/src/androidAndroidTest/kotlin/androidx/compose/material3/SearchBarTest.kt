@@ -21,6 +21,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,6 +56,7 @@ class SearchBarTest {
     val rule = createComposeRule()
 
     private val SearchBarTestTag = "SearchBar"
+    private val IconTestTag = "Icon"
     private val BackTestTag = "Back"
 
     @Test
@@ -160,6 +163,47 @@ class SearchBarTest {
     }
 
     @Test
+    fun searchBar_clickingIconButton_doesNotExpandSearchBarItself() {
+        var iconClicked = false
+
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.fillMaxSize()) {
+                var active by remember { mutableStateOf(false) }
+
+                SearchBar(
+                    modifier = Modifier.testTag(SearchBarTestTag),
+                    query = "Query",
+                    onQueryChange = {},
+                    onSearch = {},
+                    active = active,
+                    onActiveChange = { active = it },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { iconClicked = true },
+                            modifier = Modifier.testTag(IconTestTag)
+                        ) {
+                            Icon(Icons.Default.MoreVert, null)
+                        }
+                    }
+                ) {
+                    Text("Content")
+                }
+            }
+        }
+
+        rule.onNodeWithText("Content").assertDoesNotExist()
+
+        // Click icon, not search bar
+        rule.onNodeWithTag(IconTestTag).performClick()
+        assertThat(iconClicked).isTrue()
+        rule.onNodeWithText("Content").assertDoesNotExist()
+
+        // Click search bar
+        rule.onNodeWithTag(SearchBarTestTag).performClick()
+        rule.onNodeWithText("Content").assertIsDisplayed()
+    }
+
+    @Test
     fun dockedSearchBar_becomesActiveOnClick_andInactiveOnBack() {
         rule.setMaterialContent(lightColorScheme()) {
             Column(Modifier.fillMaxSize()) {
@@ -248,5 +292,46 @@ class SearchBarTest {
         }
             .assertWidthIsEqualTo(SearchBarMinWidth)
             .assertHeightIsEqualTo(SearchBarDefaults.InputFieldHeight + DockedActiveTableMinHeight)
+    }
+
+    @Test
+    fun dockedSearchBar_clickingIconButton_doesNotExpandSearchBarItself() {
+        var iconClicked = false
+
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(Modifier.fillMaxSize()) {
+                var active by remember { mutableStateOf(false) }
+
+                DockedSearchBar(
+                    modifier = Modifier.testTag(SearchBarTestTag),
+                    query = "Query",
+                    onQueryChange = {},
+                    onSearch = {},
+                    active = active,
+                    onActiveChange = { active = it },
+                    trailingIcon = {
+                        IconButton(
+                            onClick = { iconClicked = true },
+                            modifier = Modifier.testTag(IconTestTag)
+                        ) {
+                            Icon(Icons.Default.MoreVert, null)
+                        }
+                    }
+                ) {
+                    Text("Content")
+                }
+            }
+        }
+
+        rule.onNodeWithText("Content").assertDoesNotExist()
+
+        // Click icon, not search bar
+        rule.onNodeWithTag(IconTestTag).performClick()
+        assertThat(iconClicked).isTrue()
+        rule.onNodeWithText("Content").assertDoesNotExist()
+
+        // Click search bar
+        rule.onNodeWithTag(SearchBarTestTag).performClick()
+        rule.onNodeWithText("Content").assertIsDisplayed()
     }
 }
