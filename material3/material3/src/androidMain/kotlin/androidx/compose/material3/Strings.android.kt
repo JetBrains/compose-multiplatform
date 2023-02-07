@@ -123,6 +123,18 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerSwitchToInputMode -> resources.getString(
             androidx.compose.material3.R.string.date_picker_switch_to_input_mode
         )
+        Strings.DateRangePickerTitle -> resources.getString(
+            androidx.compose.material3.R.string.date_range_picker_title
+        )
+        Strings.DateRangePickerStartHeadline -> resources.getString(
+            androidx.compose.material3.R.string.date_range_picker_start_headline
+        )
+        Strings.DateRangeInputTitle -> resources.getString(
+            androidx.compose.material3.R.string.date_range_input_title
+        )
+        Strings.DateRangePickerEndHeadline -> resources.getString(
+            androidx.compose.material3.R.string.date_range_picker_end_headline
+        )
         Strings.TooltipLongPressLabel -> resources.getString(
             androidx.compose.material3.R.string.tooltip_long_press_label
         )
