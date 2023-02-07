@@ -1,3 +1,5 @@
+@file:JvmName("FontFamilyResolver_sikioKt")
+
 /*
  * Copyright 2022 The Android Open Source Project
  *
@@ -19,6 +21,7 @@ package androidx.compose.ui.text.font
 import androidx.compose.ui.text.platform.FontCache
 import androidx.compose.ui.text.ExperimentalTextApi
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmName
 
 /**
  * Create a new fontFamilyResolver for use outside of composition context
