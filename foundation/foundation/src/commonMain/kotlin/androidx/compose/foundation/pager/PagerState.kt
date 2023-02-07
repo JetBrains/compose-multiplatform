@@ -240,7 +240,7 @@ class PagerState(
         val pageUsedSpace = pageAvailableSpace.toFloat()
         if (pageUsedSpace == 0f) {
             // Default to 0 when there's no info about the page size yet.
-            0f
+            initialPageOffsetFraction
         } else {
             ((-currentPagePositionOffset) / (pageUsedSpace)).coerceIn(
                 MinPageOffset, MaxPageOffset
