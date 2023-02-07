@@ -864,6 +864,9 @@ package androidx.compose.material3 {
     property public static final androidx.compose.runtime.ProvidableCompositionLocal<androidx.compose.ui.text.TextStyle> LocalTextStyle;
   }
 
+  public final class TimeFormat_androidKt {
+  }
+
   public final class TimePickerKt {
   }
 

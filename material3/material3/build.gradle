@@ -67,8 +67,7 @@ dependencies {
         androidTestImplementation(libs.testRunner)
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.truth)
-        androidTestImplementation(libs.dexmakerMockito)
-        androidTestImplementation(libs.mockitoCore)
+        androidTestImplementation(libs.dexmakerMockitoInlineExtended)
         androidTestImplementation(libs.mockitoKotlin)
         androidTestImplementation(libs.testUiautomator)
 
@@ -134,13 +133,11 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(':compose:foundation:foundation-layout'))
                 implementation(project(":test:screenshot:screenshot"))
                 implementation(project(":core:core"))
-
                 implementation(libs.testRules)
                 implementation(libs.testRunner)
                 implementation(libs.junit)
                 implementation(libs.truth)
-                implementation(libs.dexmakerMockito)
-                implementation(libs.mockitoCore)
+                implementation(libs.dexmakerMockitoInlineExtended)
                 implementation(libs.mockitoKotlin)
                 implementation(libs.testUiautomator)
             }
