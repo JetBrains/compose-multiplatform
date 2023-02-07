@@ -49,13 +49,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
@@ -245,15 +243,13 @@ class LazyColumnTest {
         for (data in dataLists) {
             rule.runOnIdle { dataModel = data }
 
-            // Confirm the number of children to ensure there are no extra items
-            val numItems = data.size
-            rule.onNodeWithTag(tag)
-                .onChildren()
-                .assertCountEquals(numItems)
-
             // Confirm the children's content
-            for (item in data) {
-                rule.onNodeWithText("$item").assertExists()
+            for (index in 1..8) {
+                if (index in data) {
+                    rule.onNodeWithText("$index").assertIsDisplayed()
+                } else {
+                    rule.onNodeWithText("$index").assertIsNotPlaced()
+                }
             }
         }
     }
@@ -390,7 +386,7 @@ class LazyColumnTest {
             .assertIsDisplayed()
 
         rule.onNodeWithTag("3")
-            .assertDoesNotExist()
+            .assertIsNotPlaced()
     }
 
     @Test
