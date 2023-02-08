@@ -103,6 +103,74 @@ import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.roundToInt
 import kotlin.math.sign
+import kotlin.math.max
+import kotlin.math.min
+
+// TODO(mnuzen): This code is copy-pasted from experimental API in the Kotlin 1.7 standard library: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin.ranges/range-until.html.
+// Delete it when this API graduates to stable in Kotlin (when the docs page linked no longer has @ExperimentalStdlibApi annotation).
+/**
+ * Represents a range of values (for example, numbers or characters) where the upper bound is not included in the range.
+ * See the [Kotlin language documentation](https://kotlinlang.org/docs/reference/ranges.html) for more information.
+ */
+internal interface OpenEndRange<T : Comparable<T>> {
+    /**
+     * The minimum value in the range.
+     */
+    val start: T
+
+    /**
+     * The maximum value in the range (exclusive).
+     *
+     * @throws IllegalStateException can be thrown if the exclusive end bound cannot be represented
+     * with a value of type [T].
+     */
+    val endExclusive: T
+
+    /**
+     * Checks whether the specified [value] belongs to the range.
+     *
+     * A value belongs to the open-ended range if it is greater than or equal to the [start] bound and strictly less than the [endExclusive] bound.
+     */
+    operator fun contains(value: T): Boolean = value >= start && value < endExclusive
+
+    /**
+     * Checks whether the range is empty.
+     *
+     * The open-ended range is empty if its start value is greater than or equal to the end value.
+     */
+    fun isEmpty(): Boolean = start >= endExclusive
+}
+
+private class OpenEndFloatRange(
+    start: Float,
+    endExclusive: Float
+) : OpenEndRange<Float> {
+    private val _start = start
+    private val _endExclusive = endExclusive
+    override val start: Float get() = _start
+    override val endExclusive: Float get() = _endExclusive
+
+    private fun lessThanOrEquals(a: Float, b: Float): Boolean = a <= b
+
+    override fun contains(value: Float): Boolean = value >= _start && value < _endExclusive
+    override fun isEmpty(): Boolean = !(_start < _endExclusive)
+
+    override fun equals(other: Any?): Boolean {
+        return other is OpenEndFloatRange && (isEmpty() && other.isEmpty() ||
+            _start == other._start && _endExclusive == other._endExclusive)
+    }
+
+    override fun hashCode(): Int {
+        return if (isEmpty()) -1 else 31 * _start.hashCode() + _endExclusive.hashCode()
+    }
+
+    override fun toString(): String = "$_start..<$_endExclusive"
+}
+internal operator fun Float.rangeUntil(that: Float): OpenEndRange<Float> =
+    OpenEndFloatRange(this, that)
+
+private fun OpenEndRange<Float>.overlaps(it: OpenEndRange<Float>) =
+    !isEmpty() && !it.isEmpty() && max(start, it.start) < min(endExclusive, it.endExclusive)
 
 private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
     var currentParent = this.parent
@@ -444,45 +512,173 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         return info.unwrap()
     }
 
+    private fun semanticComparator(
+        layoutIsRtl: Boolean,
+    ): Comparator<SemanticsNode> {
+        // First compare the coordinates LTR
+        var comparator = compareBy<SemanticsNode> (
+            { it.layoutNode.coordinates.boundsInWindow().left },
+            { it.layoutNode.coordinates.boundsInWindow().top },
+            { it.layoutNode.coordinates.boundsInWindow().bottom },
+            { it.layoutNode.coordinates.boundsInWindow().right })
+        // Modify comparison if we're not using LTR comparison strategy to use RTL instead
+        if (layoutIsRtl) {
+            comparator = compareBy(
+                { it.layoutNode.coordinates.boundsInWindow().right },
+                { it.layoutNode.coordinates.boundsInWindow().top },
+                { it.layoutNode.coordinates.boundsInWindow().bottom },
+                { it.layoutNode.coordinates.boundsInWindow().left })
+        }
+        return comparator
+            // then compare by layoutNode's zIndex and placement order
+            .thenBy(LayoutNode.ZComparator) { it.layoutNode }
+            // then compare by semanticsId to break the tie somehow
+            .thenBy { it.id }
+    }
+
+    /**
+     * Returns the results of geometry groupings, which is determined from 1) grouping nodes into
+     * distinct, non-overlapping rows based on their top/bottom coordinates, then 2) sorting nodes
+     * within each row with the semantics comparator.
+     *
+     * This method approaches traversal order with more nuance than an approach considering only
+     * just hierarchy or only just an individual node's bounds.
+     *
+     * If [containerChildrenMapping] exists, there are additional children to add, as well as the
+     * sorted parent itself
+     */
+    private fun sortByGeometryGroupings(
+        layoutIsRtl: Boolean,
+        parentListToSort: MutableList<SemanticsNode>,
+        containerChildrenMapping: MutableMap<Int, MutableList<SemanticsNode>> = mutableMapOf()
+    ): MutableList<SemanticsNode> {
+        // RowGroupings list consists of pairs, first = a rectangle of the bounds of the row
+        // and second = the list of nodes in that row
+        val rowGroupings = mutableListOf<Pair<Rect, MutableList<SemanticsNode>>>()
+
+        // check to see if this entry overlaps with any groupings in rowGroupings
+        fun placedEntryRowOverlaps(
+            node: SemanticsNode
+        ): Boolean {
+            // Conversion to long is needed in order to utilize `until`, which has no float ver
+            val entryTopCoord = node.layoutNode.coordinates.boundsInWindow().top
+            val entryBottomCoord = node.layoutNode.coordinates.boundsInWindow().bottom
+            val entryRange = entryTopCoord.rangeUntil(entryBottomCoord)
+
+            for (currIndex in 0..rowGroupings.lastIndex) {
+                var currRect = rowGroupings[currIndex].first
+                var groupRange = currRect.top.rangeUntil(currRect.bottom)
+
+                // If it overlaps with this row group, update cover and add node
+                if (groupRange.overlaps(entryRange)) {
+                    val newRect = currRect.intersect(
+                        Rect(
+                            0f,
+                            entryTopCoord,
+                            Float.POSITIVE_INFINITY,
+                            entryBottomCoord
+                        )
+                    )
+                    // Replace the cover rectangle, copying over the old list of nodes
+                    rowGroupings[currIndex] = Pair(newRect, rowGroupings[currIndex].second)
+                    // Add current node
+                    rowGroupings[currIndex].second.add(node)
+                    // We've found an overlapping group, return true
+                    return true
+                }
+            }
+
+            // If we've made it here, then there are no groups our entry overlaps with
+            return false
+        }
+
+        for (entryIndex in 0..parentListToSort.lastIndex) {
+            val currEntry = parentListToSort[entryIndex]
+            // If this is the first entry, or vertical groups don't overlap
+            if (entryIndex == 0 || !placedEntryRowOverlaps(currEntry)) {
+                val newRect = currEntry.layoutNode.coordinates.boundsInWindow()
+                rowGroupings.add(Pair(newRect, mutableListOf(currEntry)))
+            } // otherwise, we've already iterated through, found and placed it in a matching group
+        }
+
+        // Sort the rows from top to bottom
+        rowGroupings.sortWith(compareBy({ it.first.top }, { it.first.bottom }))
+
+        val returnList = mutableListOf<SemanticsNode>()
+        rowGroupings.fastForEach { row ->
+            // Sort each individual row's parent nodes
+            row.second.sortWith(semanticComparator(layoutIsRtl))
+            row.second.fastForEach { node ->
+                // If a parent node is a container, then add its children
+                // Otherwise, simply add the parent node
+                returnList.addAll(containerChildrenMapping[node.id] ?: mutableListOf(node))
+            }
+        }
+
+        return returnList
+    }
+
+    /**
+     * This function prepares a subtree for `sortByGeometryGroupings` by retrieving all
+     * non-container nodes and adding them to the list to be geometrically sorted. We recurse on
+     * containers (if they exist) and add their sorted children to an optional mapping.
+     * The list to be sorted and child mapping is passed into `sortByGeometryGroupings`.
+     */
+    private fun subtreeSortedByGeometryGrouping(
+        layoutIsRtl: Boolean,
+        listToSort: MutableList<SemanticsNode>
+    ): MutableList<SemanticsNode> {
+        // This should be mapping of [containerID: listOfSortedChildren], only populated if there
+        // are container nodes in this level. If there are container nodes, `containerMapToChildren`
+        // would look like {containerId: [sortedChild, sortedChild], containerId: [sortedChild]}
+        val containerMapToChildren = mutableMapOf<Int, MutableList<SemanticsNode>>()
+        val geometryList = mutableListOf<SemanticsNode>()
+
+        fun depthFirstSearch(currNode: SemanticsNode) {
+            // Add this node to the list we will eventually sort
+            geometryList.add(currNode)
+            if (currNode.semanticsNodeIsStructurallySignificant) {
+                // Recurse and record the container's children, sorted
+                containerMapToChildren[currNode.id] = subtreeSortedByGeometryGrouping(
+                    layoutIsRtl, currNode.children.toMutableList()
+                )
+            } else {
+                // Otherwise, continue adding children to the list that'll be sorted regardless of
+                // hierarchy
+                currNode.children.fastForEach { child ->
+                    depthFirstSearch(child)
+                }
+            }
+        }
+
+        listToSort.fastForEach { node ->
+            depthFirstSearch(node)
+        }
+
+        return sortByGeometryGroupings(layoutIsRtl, geometryList, containerMapToChildren)
+    }
+
     private fun setTraversalValues() {
         idToBeforeMap.clear()
         idToAfterMap.clear()
-        var idToCoordinatesList = mutableListOf<Pair<Int, Rect>>()
 
-        fun depthFirstSearch(currNode: SemanticsNode) {
-            if (currNode.parent?.layoutNode?.innerCoordinator?.isAttached == true &&
-                currNode.layoutNode.innerCoordinator.isAttached
-            ) {
-                idToCoordinatesList.add(
-                    Pair(
-                        currNode.id,
-                        currNode.layoutNode.coordinates.boundsInWindow()
-                    )
-                )
-            }
-            // This retrieves the children in the order that we want (respecting child/parent
-            // hierarchies)
-            currNode.replacedChildrenSortedByBounds.fastForEach { child ->
-                depthFirstSearch(child)
-            }
-        }
+        val hostSemanticsNode =
+            currentSemanticsNodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]
+                ?.semanticsNode!!
+        val layoutIsRtl = hostSemanticsNode.isRtl
 
-        currentSemanticsNodes[AccessibilityNodeProviderCompat.HOST_VIEW_ID]?.semanticsNode?.let {
-            depthFirstSearch(
-                it
-            )
-        }
+        val semanticsOrderList = subtreeSortedByGeometryGrouping(
+            layoutIsRtl, hostSemanticsNode.children.toMutableList()
+        )
 
         // Iterate through our ordered list, and creating a mapping of current node to next node ID
         // We'll later read through this and set traversal order with IdToBeforeMap
-        for (i in 1..idToCoordinatesList.lastIndex) {
-            val prevId = idToCoordinatesList[i - 1].first
-            val currId = idToCoordinatesList[i].first
+        for (i in 1..semanticsOrderList.lastIndex) {
+            val prevId = semanticsOrderList[i - 1].id
+            val currId = semanticsOrderList[i].id
             idToBeforeMap[prevId] = currId
             idToAfterMap[currId] = prevId
         }
-
-        return
     }
 
     @VisibleForTesting
@@ -2746,6 +2942,23 @@ private fun SemanticsNode.hasPaneTitle() = config.contains(SemanticsProperties.P
 private val SemanticsNode.isPassword: Boolean get() = config.contains(SemanticsProperties.Password)
 private val SemanticsNode.isTextField get() = this.unmergedConfig.contains(SemanticsActions.SetText)
 private val SemanticsNode.isRtl get() = layoutInfo.layoutDirection == LayoutDirection.Rtl
+private val SemanticsNode.isContainer get() = config.getOrNull(SemanticsProperties.IsContainer)
+private val SemanticsNode.hasCollectionInfo get() =
+    config.contains(SemanticsProperties.CollectionInfo)
+private val SemanticsNode.isScrollable get() = config.contains(SemanticsActions.ScrollBy)
+
+private val SemanticsNode.semanticsNodeIsStructurallySignificant: Boolean
+    get() {
+        // We check if `isContainer == false` first to ensure if this flag is set, the node is not
+        // considered structural, even if it is a collection or a scrollable.
+        if (this.isContainer == false) {
+            return false
+        } else if (this.isContainer == true ||
+            this.hasCollectionInfo || this.isScrollable) {
+            return true
+        }
+        return false
+    }
 
 @OptIn(ExperimentalComposeUiApi::class)
 private fun SemanticsNode.excludeLineAndPageGranularities(): Boolean {

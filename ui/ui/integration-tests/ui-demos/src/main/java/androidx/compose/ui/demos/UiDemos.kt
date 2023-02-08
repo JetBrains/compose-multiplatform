@@ -233,10 +233,14 @@ private val ModifierDemos = DemoCategory(
     )
 )
 
-private val AccessibilityDemos = DemoCategory(
+val AccessibilityDemos = DemoCategory(
     "Accessibility",
     listOf(
-        ComposableDemo("Overlaid Nodes") { OverlaidNodeLayoutDemo() }
+        ComposableDemo("Scaffold Top Bar") { ScaffoldSample() },
+        ComposableDemo("Scaffold with Scrolling") { ScaffoldSampleScroll() },
+        ComposableDemo("Simple Top Bar with Scrolling") { ScrollingColumnDemo() },
+        ComposableDemo("Nested Containers—True") { NestedContainersTrueDemo() },
+        ComposableDemo("Nested Containers—False") { NestedContainersFalseDemo() }
     )
 )
 
