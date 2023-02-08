@@ -109,8 +109,5 @@ package androidx.compose.ui.tooling.preview.datasource {
     property public kotlin.sequences.Sequence<java.lang.String> values;
   }
 
-  public final class LoremIpsumKt {
-  }
-
 }
 

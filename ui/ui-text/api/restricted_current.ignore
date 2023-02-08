@@ -1,3 +1,95 @@
 // Baseline format: 1.0
 ChangedType: androidx.compose.ui.text.AnnotatedString.Builder#append(char):
     Method androidx.compose.ui.text.AnnotatedString.Builder.append has changed return type from void to androidx.compose.ui.text.AnnotatedString.Builder
+
+
+RemovedClass: androidx.compose.ui.text.ActualAtomicReferenceJvmKt:
+    Removed class androidx.compose.ui.text.ActualAtomicReferenceJvmKt
+RemovedClass: androidx.compose.ui.text.AndroidParagraph_androidKt:
+    Removed class androidx.compose.ui.text.AndroidParagraph_androidKt
+RemovedClass: androidx.compose.ui.text.JvmAnnotatedString_jvmKt:
+    Removed class androidx.compose.ui.text.JvmAnnotatedString_jvmKt
+RemovedClass: androidx.compose.ui.text.JvmCharHelpers_androidKt:
+    Removed class androidx.compose.ui.text.JvmCharHelpers_androidKt
+RemovedClass: androidx.compose.ui.text.MultiParagraphIntrinsicsKt:
+    Removed class androidx.compose.ui.text.MultiParagraphIntrinsicsKt
+RemovedClass: androidx.compose.ui.text.MultiParagraphKt:
+    Removed class androidx.compose.ui.text.MultiParagraphKt
+RemovedClass: androidx.compose.ui.text.SaversKt:
+    Removed class androidx.compose.ui.text.SaversKt
+RemovedClass: androidx.compose.ui.text.TempListUtilsKt:
+    Removed class androidx.compose.ui.text.TempListUtilsKt
+RemovedClass: androidx.compose.ui.text.TextMeasurerKt:
+    Removed class androidx.compose.ui.text.TextMeasurerKt
+RemovedClass: androidx.compose.ui.text.android.LayoutHelperKt:
+    Removed class androidx.compose.ui.text.android.LayoutHelperKt
+RemovedClass: androidx.compose.ui.text.android.LayoutIntrinsicsKt:
+    Removed class androidx.compose.ui.text.android.LayoutIntrinsicsKt
+RemovedClass: androidx.compose.ui.text.android.PaintExtensionsKt:
+    Removed class androidx.compose.ui.text.android.PaintExtensionsKt
+RemovedClass: androidx.compose.ui.text.android.SpannedExtensionsKt:
+    Removed class androidx.compose.ui.text.android.SpannedExtensionsKt
+RemovedClass: androidx.compose.ui.text.android.StaticLayoutFactoryKt:
+    Removed class androidx.compose.ui.text.android.StaticLayoutFactoryKt
+RemovedClass: androidx.compose.ui.text.android.TempListUtilsKt:
+    Removed class androidx.compose.ui.text.android.TempListUtilsKt
+RemovedClass: androidx.compose.ui.text.android.TextLayoutKt:
+    Removed class androidx.compose.ui.text.android.TextLayoutKt
+RemovedClass: androidx.compose.ui.text.font.AndroidFontLoader_androidKt:
+    Removed class androidx.compose.ui.text.font.AndroidFontLoader_androidKt
+RemovedClass: androidx.compose.ui.text.font.AndroidFontResolveInterceptor_androidKt:
+    Removed class androidx.compose.ui.text.font.AndroidFontResolveInterceptor_androidKt
+RemovedClass: androidx.compose.ui.text.font.AndroidFontUtils_androidKt:
+    Removed class androidx.compose.ui.text.font.AndroidFontUtils_androidKt
+RemovedClass: androidx.compose.ui.text.font.FontFamilyResolverKt:
+    Removed class androidx.compose.ui.text.font.FontFamilyResolverKt
+RemovedClass: androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapterKt:
+    Removed class androidx.compose.ui.text.font.FontListFontFamilyTypefaceAdapterKt
+RemovedClass: androidx.compose.ui.text.font.FontSynthesis_androidKt:
+    Removed class androidx.compose.ui.text.font.FontSynthesis_androidKt
+RemovedClass: androidx.compose.ui.text.font.PlatformTypefacesKt:
+    Removed class androidx.compose.ui.text.font.PlatformTypefacesKt
+RemovedClass: androidx.compose.ui.text.input.EditCommandKt:
+    Removed class androidx.compose.ui.text.input.EditCommandKt
+RemovedClass: androidx.compose.ui.text.input.EditingBufferKt:
+    Removed class androidx.compose.ui.text.input.EditingBufferKt
+RemovedClass: androidx.compose.ui.text.input.GapBufferKt:
+    Removed class androidx.compose.ui.text.input.GapBufferKt
+RemovedClass: androidx.compose.ui.text.input.GapBuffer_jvmKt:
+    Removed class androidx.compose.ui.text.input.GapBuffer_jvmKt
+RemovedClass: androidx.compose.ui.text.intl.AndroidPlatformLocale_androidKt:
+    Removed class androidx.compose.ui.text.intl.AndroidPlatformLocale_androidKt
+RemovedClass: androidx.compose.ui.text.intl.PlatformLocaleKt:
+    Removed class androidx.compose.ui.text.intl.PlatformLocaleKt
+RemovedClass: androidx.compose.ui.text.platform.AndroidMultiParagraphDrawKt:
+    Removed class androidx.compose.ui.text.platform.AndroidMultiParagraphDrawKt
+RemovedClass: androidx.compose.ui.text.platform.AndroidParagraphHelper_androidKt:
+    Removed class androidx.compose.ui.text.platform.AndroidParagraphHelper_androidKt
+RemovedClass: androidx.compose.ui.text.platform.AndroidParagraphIntrinsics_androidKt:
+    Removed class androidx.compose.ui.text.platform.AndroidParagraphIntrinsics_androidKt
+RemovedClass: androidx.compose.ui.text.platform.AndroidParagraph_androidKt:
+    Removed class androidx.compose.ui.text.platform.AndroidParagraph_androidKt
+RemovedClass: androidx.compose.ui.text.platform.AndroidStringDelegate_androidKt:
+    Removed class androidx.compose.ui.text.platform.AndroidStringDelegate_androidKt
+RemovedClass: androidx.compose.ui.text.platform.AndroidTextPaint_androidKt:
+    Removed class androidx.compose.ui.text.platform.AndroidTextPaint_androidKt
+RemovedClass: androidx.compose.ui.text.platform.Synchronization_jvmKt:
+    Removed class androidx.compose.ui.text.platform.Synchronization_jvmKt
+RemovedClass: androidx.compose.ui.text.platform.extensions.LocaleExtensions_androidKt:
+    Removed class androidx.compose.ui.text.platform.extensions.LocaleExtensions_androidKt
+RemovedClass: androidx.compose.ui.text.platform.extensions.PlaceholderExtensions_androidKt:
+    Removed class androidx.compose.ui.text.platform.extensions.PlaceholderExtensions_androidKt
+RemovedClass: androidx.compose.ui.text.platform.extensions.SpannableExtensions_androidKt:
+    Removed class androidx.compose.ui.text.platform.extensions.SpannableExtensions_androidKt
+RemovedClass: androidx.compose.ui.text.platform.extensions.TextPaintExtensions_androidKt:
+    Removed class androidx.compose.ui.text.platform.extensions.TextPaintExtensions_androidKt
+RemovedClass: androidx.compose.ui.text.style.TextDrawStyleKt:
+    Removed class androidx.compose.ui.text.style.TextDrawStyleKt
+
+
+RemovedPackage: androidx.compose.ui.text.android.style:
+    Removed package androidx.compose.ui.text.android.style
+RemovedPackage: androidx.compose.ui.text.caches:
+    Removed package androidx.compose.ui.text.caches
+RemovedPackage: androidx.compose.ui.text.internal:
+    Removed package androidx.compose.ui.text.internal

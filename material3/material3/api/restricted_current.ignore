@@ -1,3 +1,33 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.material3.AlertDialogKt:
+    Removed class androidx.compose.material3.AlertDialogKt
+RemovedClass: androidx.compose.material3.DragGestureDetectorCopyKt:
+    Removed class androidx.compose.material3.DragGestureDetectorCopyKt
+RemovedClass: androidx.compose.material3.ElevationKt:
+    Removed class androidx.compose.material3.ElevationKt
+RemovedClass: androidx.compose.material3.IncludeFontPaddingHelper_androidKt:
+    Removed class androidx.compose.material3.IncludeFontPaddingHelper_androidKt
+RemovedClass: androidx.compose.material3.MenuKt:
+    Removed class androidx.compose.material3.MenuKt
+RemovedClass: androidx.compose.material3.ShapesKt:
+    Removed class androidx.compose.material3.ShapesKt
+RemovedClass: androidx.compose.material3.Strings_androidKt:
+    Removed class androidx.compose.material3.Strings_androidKt
+RemovedClass: androidx.compose.material3.SwipeableKt:
+    Removed class androidx.compose.material3.SwipeableKt
+RemovedClass: androidx.compose.material3.SystemBarsDefaultInsets_androidKt:
+    Removed class androidx.compose.material3.SystemBarsDefaultInsets_androidKt
+RemovedClass: androidx.compose.material3.TextFieldDefaultsKt:
+    Removed class androidx.compose.material3.TextFieldDefaultsKt
+RemovedClass: androidx.compose.material3.TextFieldImplKt:
+    Removed class androidx.compose.material3.TextFieldImplKt
+RemovedClass: androidx.compose.material3.TonalPaletteKt:
+    Removed class androidx.compose.material3.TonalPaletteKt
 RemovedClass: androidx.compose.material3.TouchTargetKt:
     Removed class androidx.compose.material3.TouchTargetKt
+RemovedClass: androidx.compose.material3.TypographyKt:
+    Removed class androidx.compose.material3.TypographyKt
+
+
+RemovedPackage: androidx.compose.material3.internal:
+    Removed package androidx.compose.material3.internal

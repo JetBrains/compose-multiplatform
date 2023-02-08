@@ -1,9 +1,6 @@
 // Signature format: 4.0
 package androidx.compose.ui.text.googlefonts {
 
-  public final class FontProviderHelperKt {
-  }
-
   public final class GoogleFont {
     ctor public GoogleFont(String name, optional boolean bestEffort);
     method public boolean getBestEffort();

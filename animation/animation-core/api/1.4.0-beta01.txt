@@ -1,9 +1,6 @@
 // Signature format: 4.0
 package androidx.compose.animation.core {
 
-  public final class ActualJvmKt {
-  }
-
   public final class Animatable<T, V extends androidx.compose.animation.core.AnimationVector> {
     ctor public Animatable(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional T? visibilityThreshold, optional String label);
     ctor @Deprecated public Animatable(T? initialValue, androidx.compose.animation.core.TwoWayConverter<T,V> typeConverter, optional T? visibilityThreshold);
@@ -210,9 +207,6 @@ package androidx.compose.animation.core {
     method public static androidx.compose.animation.core.AnimationVector4D AnimationVector(float v1, float v2, float v3, float v4);
   }
 
-  public final class ComplexDoubleKt {
-  }
-
   @androidx.compose.runtime.Immutable public final class CubicBezierEasing implements androidx.compose.animation.core.Easing {
     ctor public CubicBezierEasing(float a, float b, float c, float d);
     method public float transform(float fraction);
@@ -358,9 +352,6 @@ package androidx.compose.animation.core {
     method public float getValueFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
     method public float getVelocityFromNanos(long playTimeNanos, float initialValue, float initialVelocity);
     property public abstract float absVelocityThreshold;
-  }
-
-  public final class FloatDecayAnimationSpecKt {
   }
 
   public final class FloatExponentialDecaySpec implements androidx.compose.animation.core.FloatDecayAnimationSpec {
@@ -520,9 +511,6 @@ package androidx.compose.animation.core {
   public final class SpringEstimationKt {
   }
 
-  public final class SpringSimulationKt {
-  }
-
   @androidx.compose.runtime.Immutable public final class SpringSpec<T> implements androidx.compose.animation.core.FiniteAnimationSpec<T> {
     ctor public SpringSpec(optional float dampingRatio, optional float stiffness, optional T? visibilityThreshold);
     method public float getDampingRatio();
@@ -671,9 +659,6 @@ package androidx.compose.animation.core {
     property public abstract boolean isInfinite;
   }
 
-  public final class VectorizedAnimationSpecKt {
-  }
-
   public interface VectorizedDecayAnimationSpec<V extends androidx.compose.animation.core.AnimationVector> {
     method public float getAbsVelocityThreshold();
     method public long getDurationNanos(V initialValue, V initialVelocity);
@@ -770,13 +755,6 @@ package androidx.compose.animation.core {
     method public static long getVisibilityThreshold(androidx.compose.ui.geometry.Size.Companion);
     method public static long getVisibilityThreshold(androidx.compose.ui.unit.IntSize.Companion);
     method public static androidx.compose.ui.geometry.Rect getVisibilityThreshold(androidx.compose.ui.geometry.Rect.Companion);
-  }
-
-}
-
-package androidx.compose.animation.core.internal {
-
-  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }

@@ -8,9 +8,6 @@ package androidx.compose.material3.windowsizeclass {
   @kotlin.RequiresOptIn(message="This material3-window-size-class API is experimental and is likely to change or to " + "be removed in the future.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalMaterial3WindowSizeClassApi {
   }
 
-  public final class TestOnly_jvmKt {
-  }
-
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowHeightSizeClass implements java.lang.Comparable<androidx.compose.material3.windowsizeclass.WindowHeightSizeClass> {
     method public operator int compareTo(int other);
     field public static final androidx.compose.material3.windowsizeclass.WindowHeightSizeClass.Companion Companion;

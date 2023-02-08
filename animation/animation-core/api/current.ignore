@@ -3,3 +3,19 @@ ChangedType: androidx.compose.animation.core.InfiniteTransitionKt#animateFloat(a
     Method androidx.compose.animation.core.InfiniteTransitionKt.animateFloat has changed return type from androidx.compose.runtime.State<java.lang.Float> to androidx.compose.runtime.State<? extends java.lang.Float>
 ChangedType: androidx.compose.animation.core.InfiniteTransitionKt#animateValue(androidx.compose.animation.core.InfiniteTransition, T, T, androidx.compose.animation.core.TwoWayConverter<T,V>, androidx.compose.animation.core.InfiniteRepeatableSpec<T>):
     Method androidx.compose.animation.core.InfiniteTransitionKt.animateValue has changed return type from androidx.compose.runtime.State<T> to androidx.compose.runtime.State<? extends T>
+
+
+RemovedClass: androidx.compose.animation.core.ActualJvmKt:
+    Removed class androidx.compose.animation.core.ActualJvmKt
+RemovedClass: androidx.compose.animation.core.ComplexDoubleKt:
+    Removed class androidx.compose.animation.core.ComplexDoubleKt
+RemovedClass: androidx.compose.animation.core.FloatDecayAnimationSpecKt:
+    Removed class androidx.compose.animation.core.FloatDecayAnimationSpecKt
+RemovedClass: androidx.compose.animation.core.SpringSimulationKt:
+    Removed class androidx.compose.animation.core.SpringSimulationKt
+RemovedClass: androidx.compose.animation.core.VectorizedAnimationSpecKt:
+    Removed class androidx.compose.animation.core.VectorizedAnimationSpecKt
+
+
+RemovedPackage: androidx.compose.animation.core.internal:
+    Removed package androidx.compose.animation.core.internal

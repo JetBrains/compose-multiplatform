@@ -16,20 +16,8 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performTouchInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
   }
 
-  public final class Actions_androidKt {
-  }
-
-  public final class AndroidAssertions_androidKt {
-  }
-
   public final class AndroidImageHelpers_androidKt {
     method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
-  }
-
-  public final class AndroidInputDispatcher_androidKt {
-  }
-
-  public final class AndroidOutput_androidKt {
   }
 
   public final class AssertionsKt {
@@ -77,12 +65,6 @@ package androidx.compose.ui.test {
 
   public final class ComposeTimeoutException extends java.lang.Throwable {
     ctor public ComposeTimeoutException(String? message);
-  }
-
-  public final class ErrorMessagesKt {
-  }
-
-  public final class Expect_jvmKt {
   }
 
   public final class FiltersKt {
@@ -334,9 +316,6 @@ package androidx.compose.ui.test {
     property public final String description;
   }
 
-  public final class SemanticsSelectorKt {
-  }
-
   public final class TestContext {
   }
 
@@ -380,23 +359,6 @@ package androidx.compose.ui.test {
     method public static void swipeRight(androidx.compose.ui.test.TouchInjectionScope, optional float startX, optional float endX, optional long durationMillis);
     method public static void swipeUp(androidx.compose.ui.test.TouchInjectionScope, optional float startY, optional float endY, optional long durationMillis);
     method public static void swipeWithVelocity(androidx.compose.ui.test.TouchInjectionScope, long start, long end, float endVelocity, optional long durationMillis);
-  }
-
-  public final class UtilsKt {
-  }
-
-}
-
-package androidx.compose.ui.test.android {
-
-  public final class WindowCapture_androidKt {
-  }
-
-}
-
-package androidx.compose.ui.test.internal {
-
-  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }

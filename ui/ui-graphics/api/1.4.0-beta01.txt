@@ -136,9 +136,6 @@ package androidx.compose.ui.graphics {
     method public static androidx.compose.ui.graphics.RenderEffect asComposeRenderEffect(android.graphics.RenderEffect);
   }
 
-  public final class AndroidShader_androidKt {
-  }
-
   public final class AndroidTileMode_androidKt {
     method public static boolean isSupported(int);
     method public static android.graphics.Shader.TileMode toAndroidTileMode(int);
@@ -398,9 +395,6 @@ package androidx.compose.ui.graphics {
     property public final float[] values;
   }
 
-  public final class DegreesKt {
-  }
-
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class FilterQuality {
     method public int getValue();
     property public final int value;
@@ -416,9 +410,6 @@ package androidx.compose.ui.graphics {
     property public final int Low;
     property public final int Medium;
     property public final int None;
-  }
-
-  public final class Float16Kt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ImageBitmap {
@@ -1141,9 +1132,6 @@ package androidx.compose.ui.graphics.drawscope {
     property public androidx.compose.ui.unit.LayoutDirection layoutDirection;
   }
 
-  public final class CanvasDrawScopeKt {
-  }
-
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ContentDrawScope extends androidx.compose.ui.graphics.drawscope.DrawScope {
     method public void drawContent();
   }
@@ -1264,13 +1252,6 @@ package androidx.compose.ui.graphics.drawscope {
     method public int getDefaultJoin();
     property public final int DefaultCap;
     property public final int DefaultJoin;
-  }
-
-}
-
-package androidx.compose.ui.graphics.internal {
-
-  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }
@@ -1618,9 +1599,6 @@ package androidx.compose.ui.graphics.vector {
     method public androidx.compose.ui.graphics.vector.PathNode.VerticalTo copy(float y);
     method public float getY();
     property public final float y;
-  }
-
-  public final class PathNodeKt {
   }
 
   public final class PathParser {

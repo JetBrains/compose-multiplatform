@@ -19,20 +19,8 @@ package androidx.compose.ui.test {
     method public static androidx.compose.ui.test.SemanticsNodeInteraction performTouchInput(androidx.compose.ui.test.SemanticsNodeInteraction, kotlin.jvm.functions.Function1<? super androidx.compose.ui.test.TouchInjectionScope,kotlin.Unit> block);
   }
 
-  public final class Actions_androidKt {
-  }
-
-  public final class AndroidAssertions_androidKt {
-  }
-
   public final class AndroidImageHelpers_androidKt {
     method @RequiresApi(android.os.Build.VERSION_CODES.O) public static androidx.compose.ui.graphics.ImageBitmap captureToImage(androidx.compose.ui.test.SemanticsNodeInteraction);
-  }
-
-  public final class AndroidInputDispatcher_androidKt {
-  }
-
-  public final class AndroidOutput_androidKt {
   }
 
   public final class AssertionsKt {
@@ -80,12 +68,6 @@ package androidx.compose.ui.test {
 
   public final class ComposeTimeoutException extends java.lang.Throwable {
     ctor public ComposeTimeoutException(String? message);
-  }
-
-  public final class ErrorMessagesKt {
-  }
-
-  public final class Expect_jvmKt {
   }
 
   @kotlin.RequiresOptIn(message="This testing API is experimental and is likely to be changed or removed entirely") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) public @interface ExperimentalTestApi {
@@ -431,9 +413,6 @@ package androidx.compose.ui.test {
     property public final String description;
   }
 
-  public final class SemanticsSelectorKt {
-  }
-
   public final class TestContext {
   }
 
@@ -505,25 +484,12 @@ package androidx.compose.ui.test {
     method public static void swipeWithVelocity(androidx.compose.ui.test.TouchInjectionScope, long start, long end, float endVelocity, optional long durationMillis);
   }
 
-  public final class UtilsKt {
-  }
-
-}
-
-package androidx.compose.ui.test.android {
-
-  public final class WindowCapture_androidKt {
-  }
-
 }
 
 package androidx.compose.ui.test.internal {
 
   @androidx.compose.ui.test.InternalTestApi public abstract class DelayPropagatingContinuationInterceptorWrapper extends kotlin.coroutines.AbstractCoroutineContextElement implements kotlin.coroutines.ContinuationInterceptor kotlinx.coroutines.Delay {
     ctor public DelayPropagatingContinuationInterceptorWrapper(kotlin.coroutines.ContinuationInterceptor? wrappedInterceptor);
-  }
-
-  public final class JvmDefaultWithCompatibility_jvmKt {
   }
 
 }
