@@ -50,11 +50,13 @@ internal fun rememberStaggeredGridItemProvider(
                 scope.intervals,
                 nearestItemsRangeState.value,
                 itemContent = { interval, index ->
-                    LazyLayoutPinnableItem(index, state.pinnedItems) {
-                        interval.value.item.invoke(
-                            LazyStaggeredGridItemScopeImpl,
-                            index - interval.startIndex
-                        )
+                    val localIndex = index - interval.startIndex
+                    LazyLayoutPinnableItem(
+                        key = interval.value.key?.invoke(localIndex),
+                        index = index,
+                        pinnedItemList = state.pinnedItems
+                    ) {
+                        interval.value.item.invoke(LazyStaggeredGridItemScopeImpl, localIndex)
                     }
                 }
             ), LazyStaggeredGridItemProvider {

@@ -298,7 +298,8 @@ private fun rememberLazyListMeasurePolicy(
 
         measureLazyList(
             itemsCount = itemsCount,
-            itemProvider = measuredItemProvider,
+            itemProvider = itemProvider,
+            measuredItemProvider = measuredItemProvider,
             mainAxisAvailableSize = mainAxisAvailableSize,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,

@@ -33,18 +33,20 @@ import androidx.compose.ui.layout.PinnableContainer
  * Wrapper supporting [PinnableContainer] in lazy layout items. Each pinned item
  * is considered important to keep alive even if it would be discarded otherwise.
  *
- * @param index current index of the item inside the lazy layout
- * @param pinnedItemList container to keep currently pinned items
+ * @param key key of the item inside the lazy layout
+ * @param index index of the item inside the lazy layout
+ * @param pinnedItemList container of currently pinned items
  * @param content inner content of this item
  */
 @ExperimentalFoundationApi
 @Composable
 fun LazyLayoutPinnableItem(
+    key: Any?,
     index: Int,
     pinnedItemList: LazyLayoutPinnedItemList,
     content: @Composable () -> Unit
 ) {
-    val pinnableItem = remember(pinnedItemList) { LazyLayoutPinnableItem(pinnedItemList) }
+    val pinnableItem = remember(key, pinnedItemList) { LazyLayoutPinnableItem(key, pinnedItemList) }
     pinnableItem.index = index
     pinnableItem.parentPinnableContainer = LocalPinnableContainer.current
     DisposableEffect(pinnableItem) { onDispose { pinnableItem.onDisposed() } }
@@ -79,7 +81,12 @@ class LazyLayoutPinnedItemList private constructor(
     @ExperimentalFoundationApi
     sealed interface PinnedItem {
         /**
-         * Index of the pinned item.
+         * Key of the pinned item.
+         */
+        val key: Any?
+
+        /**
+         * Last known index of the pinned item.
          * Note: it is possible for index to change during lifetime of the object.
          */
         val index: Int
@@ -88,6 +95,7 @@ class LazyLayoutPinnedItemList private constructor(
 
 @OptIn(ExperimentalFoundationApi::class)
 private class LazyLayoutPinnableItem(
+    override val key: Any?,
     private val pinnedItemList: LazyLayoutPinnedItemList,
 ) : PinnableContainer, PinnableContainer.PinnedHandle, LazyLayoutPinnedItemList.PinnedItem {
     /**

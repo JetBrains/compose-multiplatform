@@ -328,6 +328,7 @@ private fun rememberLazyGridMeasurePolicy(
         }
         measureLazyGrid(
             itemsCount = itemsCount,
+            itemProvider = itemProvider,
             measuredLineProvider = measuredLineProvider,
             measuredItemProvider = measuredItemProvider,
             mainAxisAvailableSize = mainAxisAvailableSize,
