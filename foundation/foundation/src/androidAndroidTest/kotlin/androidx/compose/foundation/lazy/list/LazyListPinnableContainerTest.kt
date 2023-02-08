@@ -41,7 +41,6 @@ import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -254,7 +253,6 @@ class LazyListPinnableContainerTest {
             .assertIsNotPlaced()
     }
 
-    @Ignore // b/268113792
     @Test
     fun pinnedItemIsStillPinnedWhenReorderedAndNotVisibleAnymore() {
         val state = LazyListState()

@@ -88,8 +88,13 @@ private class LazyGridItemProviderImpl(
     intervals = intervals,
     nearestItemsRange = nearestItemsRange,
     itemContent = { interval, index ->
-        LazyLayoutPinnableItem(index, state.pinnedItems) {
-            interval.value.item.invoke(LazyGridItemScopeImpl, index - interval.startIndex)
+        val localIndex = index - interval.startIndex
+        LazyLayoutPinnableItem(
+            key = interval.value.key?.invoke(localIndex),
+            index = index,
+            pinnedItemList = state.pinnedItems
+        ) {
+            interval.value.item.invoke(LazyGridItemScopeImpl, localIndex)
         }
     }
 ) {

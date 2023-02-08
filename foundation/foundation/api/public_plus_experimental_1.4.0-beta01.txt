@@ -787,7 +787,7 @@ package androidx.compose.foundation.lazy.layout {
   }
 
   public final class LazyLayoutPinnableItemKt {
-    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayoutPinnableItem(int index, androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList pinnedItemList, kotlin.jvm.functions.Function0<kotlin.Unit> content);
+    method @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Composable public static void LazyLayoutPinnableItem(Object? key, int index, androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList pinnedItemList, kotlin.jvm.functions.Function0<kotlin.Unit> content);
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi public final class LazyLayoutPinnedItemList implements kotlin.jvm.internal.markers.KMappedMarker java.util.List<androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList.PinnedItem> {
@@ -796,7 +796,9 @@ package androidx.compose.foundation.lazy.layout {
 
   @androidx.compose.foundation.ExperimentalFoundationApi public static sealed interface LazyLayoutPinnedItemList.PinnedItem {
     method public int getIndex();
+    method public Object? getKey();
     property public abstract int index;
+    property public abstract Object? key;
   }
 
   @androidx.compose.foundation.ExperimentalFoundationApi @androidx.compose.runtime.Stable public final class LazyLayoutPrefetchState {
