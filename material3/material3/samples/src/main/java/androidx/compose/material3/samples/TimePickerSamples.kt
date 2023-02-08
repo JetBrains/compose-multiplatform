@@ -33,8 +33,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TimeInput
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -73,15 +73,58 @@ fun TimePickerSample() {
     }
 
     if (showTimePicker) {
-        TimePickerDialog(state, onCancel = { showTimePicker = false }) {
-            val cal = Calendar.getInstance()
-            cal.set(Calendar.HOUR_OF_DAY, state.hour)
-            cal.set(Calendar.MINUTE, state.minute)
-            cal.isLenient = false
-            snackScope.launch {
-                snackState.showSnackbar("Entered time: ${formatter.format(cal.time)}")
+        TimePickerDialog(
+            onCancel = { showTimePicker = false },
+            onConfirm = {
+                val cal = Calendar.getInstance()
+                cal.set(Calendar.HOUR_OF_DAY, state.hour)
+                cal.set(Calendar.MINUTE, state.minute)
+                cal.isLenient = false
+                snackScope.launch {
+                    snackState.showSnackbar("Entered time: ${formatter.format(cal.time)}")
+                }
+                showTimePicker = false
             }
-            showTimePicker = false
+        ) {
+            TimePicker(state = state)
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+@Preview
+fun TimeInputSample() {
+    var showTimePicker by remember { mutableStateOf(false) }
+    val state = rememberTimePickerState()
+    val formatter = remember { SimpleDateFormat("hh:mm a", Locale.getDefault()) }
+    val snackState = remember { SnackbarHostState() }
+    val snackScope = rememberCoroutineScope()
+
+    Box(propagateMinConstraints = false) {
+        Button(
+            modifier = Modifier.align(Alignment.Center),
+            onClick = { showTimePicker = true }
+        ) { Text("Set Time") }
+        SnackbarHost(hostState = snackState)
+    }
+
+    if (showTimePicker) {
+        TimePickerDialog(
+            onCancel = { showTimePicker = false },
+            onConfirm = {
+                val cal = Calendar.getInstance()
+                cal.set(Calendar.HOUR_OF_DAY, state.hour)
+                cal.set(Calendar.MINUTE, state.minute)
+                cal.isLenient = false
+                snackScope.launch {
+                    snackState.showSnackbar("Entered time: ${formatter.format(cal.time)}")
+                }
+                showTimePicker = false
+            }
+        ) {
+            TimeInput(state = state)
         }
     }
 }
@@ -89,9 +132,9 @@ fun TimePickerSample() {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
-    state: TimePickerState,
-    onCancel: () -> Unit = {},
-    onConfirm: () -> Unit = {}
+    onCancel: () -> Unit,
+    onConfirm: () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     Dialog(
         onDismissRequest = onCancel,
@@ -118,7 +161,7 @@ fun TimePickerDialog(
                     text = "Select Time",
                     style = MaterialTheme.typography.labelMedium
                 )
-                TimePicker(state)
+                content()
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Spacer(modifier = Modifier.weight(1f))
                     TextButton(onClick = onCancel) { Text("Cancel") }

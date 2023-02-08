@@ -88,4 +88,8 @@
     <string name="time_picker_hour_24h_suffix">%1$d hours</string>
     <!-- Spoken suffix for an amount of minutes in the clock [CHAR_LIMIT=16] -->
     <string name="time_picker_minute_suffix">%1$d minutes</string>
+    <!-- Label for a textField that allows the user to enter minutes to set the time -->
+    <string name="time_picker_minute">Minute</string>
+    <!-- Label for a textField that allows the user to the hour to set the time -->
+    <string name="time_picker_hour">Hour</string>
 </resources>

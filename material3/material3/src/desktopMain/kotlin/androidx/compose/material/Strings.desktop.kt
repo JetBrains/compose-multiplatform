@@ -77,6 +77,8 @@ internal actual fun getString(string: Strings): String {
         Strings.TimePickerHourSuffix -> "%1$ o\\'clock"
         Strings.TimePickerMinuteSuffix -> "%1$ minutes"
         Strings.TimePicker24HourSuffix -> "%1$ hours"
+        Strings.TimePickerMinute -> "Minute"
+        Strings.TimePickerHour -> "Hour"
         else -> ""
     }
 }
