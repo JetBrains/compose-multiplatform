@@ -142,6 +142,16 @@ class TextPreparedSelectionTest {
         }
     }
 
+    @Test
+    fun when_emptyText_wordOffsetDoesNotChange() {
+        selectionTest(initText = "") {
+            Truth.assertThat(it.getPreviousWordOffset()).isEqualTo(0)
+            Truth.assertThat(it.getNextWordOffset()).isEqualTo(0)
+            Truth.assertThat(it.getLineStartByOffset()).isEqualTo(0)
+            Truth.assertThat(it.getLineEndByOffset()).isEqualTo(0)
+        }
+    }
+
     private inner class SelectionScope<T : BaseTextPreparedSelection<T>>(
         val prepared: BaseTextPreparedSelection<T>
     ) {

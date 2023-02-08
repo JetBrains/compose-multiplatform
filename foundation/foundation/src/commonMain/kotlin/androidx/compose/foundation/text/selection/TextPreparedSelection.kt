@@ -255,7 +255,7 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         return direction != ResolvedTextDirection.Rtl
     }
 
-    private fun TextLayoutResult.getNextWordOffsetForLayout(
+    private tailrec fun TextLayoutResult.getNextWordOffsetForLayout(
         currentOffset: Int = transformedEndOffset()
     ): Int {
         if (currentOffset >= originalText.length) {
@@ -269,10 +269,10 @@ internal abstract class BaseTextPreparedSelection<T : BaseTextPreparedSelection<
         }
     }
 
-    private fun TextLayoutResult.getPrevWordOffset(
+    private tailrec fun TextLayoutResult.getPrevWordOffset(
         currentOffset: Int = transformedEndOffset()
     ): Int {
-        if (currentOffset < 0) {
+        if (currentOffset <= 0) {
             return 0
         }
         val currentWord = getWordBoundary(charOffset(currentOffset))
