@@ -1,20 +1,36 @@
 // Baseline format: 1.0
 RemovedClass: androidx.compose.material.AlertDialogKt:
     Removed class androidx.compose.material.AlertDialogKt
+RemovedClass: androidx.compose.material.BackdropScaffoldKt:
+    Removed class androidx.compose.material.BackdropScaffoldKt
+RemovedClass: androidx.compose.material.BottomSheetScaffoldKt:
+    Removed class androidx.compose.material.BottomSheetScaffoldKt
+RemovedClass: androidx.compose.material.ChipKt:
+    Removed class androidx.compose.material.ChipKt
 RemovedClass: androidx.compose.material.DragGestureDetectorCopyKt:
     Removed class androidx.compose.material.DragGestureDetectorCopyKt
 RemovedClass: androidx.compose.material.ElevationKt:
     Removed class androidx.compose.material.ElevationKt
+RemovedClass: androidx.compose.material.ExposedDropdownMenuKt:
+    Removed class androidx.compose.material.ExposedDropdownMenuKt
+RemovedClass: androidx.compose.material.ListItemKt:
+    Removed class androidx.compose.material.ListItemKt
 RemovedClass: androidx.compose.material.MaterialTextSelectionColorsKt:
     Removed class androidx.compose.material.MaterialTextSelectionColorsKt
 RemovedClass: androidx.compose.material.MaterialTheme_androidKt:
     Removed class androidx.compose.material.MaterialTheme_androidKt
 RemovedClass: androidx.compose.material.MenuKt:
     Removed class androidx.compose.material.MenuKt
+RemovedClass: androidx.compose.material.ModalBottomSheetKt:
+    Removed class androidx.compose.material.ModalBottomSheetKt
 RemovedClass: androidx.compose.material.ShapesKt:
     Removed class androidx.compose.material.ShapesKt
 RemovedClass: androidx.compose.material.Strings_androidKt:
     Removed class androidx.compose.material.Strings_androidKt
+RemovedClass: androidx.compose.material.SwipeToDismissKt:
+    Removed class androidx.compose.material.SwipeToDismissKt
+RemovedClass: androidx.compose.material.SwipeableKt:
+    Removed class androidx.compose.material.SwipeableKt
 RemovedClass: androidx.compose.material.SwipeableV2Kt:
     Removed class androidx.compose.material.SwipeableV2Kt
 RemovedClass: androidx.compose.material.TextFieldDefaultsKt:
@@ -29,3 +45,5 @@ RemovedClass: androidx.compose.material.TypographyKt:
 
 RemovedPackage: androidx.compose.material.internal:
     Removed package androidx.compose.material.internal
+RemovedPackage: androidx.compose.material.pullrefresh:
+    Removed package androidx.compose.material.pullrefresh

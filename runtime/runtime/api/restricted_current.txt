@@ -842,9 +842,6 @@ package androidx.compose.runtime.snapshots {
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
   }
 
-  public final class SnapshotContextElementKt {
-  }
-
   public final class SnapshotKt {
     method @kotlin.PublishedApi internal static <T extends androidx.compose.runtime.snapshots.StateRecord> T current(T r, androidx.compose.runtime.snapshots.Snapshot snapshot);
     method @kotlin.PublishedApi internal static <T extends androidx.compose.runtime.snapshots.StateRecord> T current(T r);

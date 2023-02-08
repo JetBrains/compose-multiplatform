@@ -11,8 +11,16 @@ RemovedClass: androidx.compose.ui.test.ErrorMessagesKt:
     Removed class androidx.compose.ui.test.ErrorMessagesKt
 RemovedClass: androidx.compose.ui.test.Expect_jvmKt:
     Removed class androidx.compose.ui.test.Expect_jvmKt
+RemovedClass: androidx.compose.ui.test.KeyInjectionScopeKt:
+    Removed class androidx.compose.ui.test.KeyInjectionScopeKt
+RemovedClass: androidx.compose.ui.test.MouseInjectionScopeKt:
+    Removed class androidx.compose.ui.test.MouseInjectionScopeKt
 RemovedClass: androidx.compose.ui.test.SemanticsSelectorKt:
     Removed class androidx.compose.ui.test.SemanticsSelectorKt
+RemovedClass: androidx.compose.ui.test.TestMonotonicFrameClock_jvmKt:
+    Removed class androidx.compose.ui.test.TestMonotonicFrameClock_jvmKt
+RemovedClass: androidx.compose.ui.test.TestOwnerKt:
+    Removed class androidx.compose.ui.test.TestOwnerKt
 RemovedClass: androidx.compose.ui.test.UtilsKt:
     Removed class androidx.compose.ui.test.UtilsKt
 

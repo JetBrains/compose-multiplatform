@@ -27,6 +27,8 @@ RemovedClass: androidx.compose.runtime.internal.ThreadMapKt:
     Removed class androidx.compose.runtime.internal.ThreadMapKt
 RemovedClass: androidx.compose.runtime.snapshots.ListUtilsKt:
     Removed class androidx.compose.runtime.snapshots.ListUtilsKt
+RemovedClass: androidx.compose.runtime.snapshots.SnapshotContextElementKt:
+    Removed class androidx.compose.runtime.snapshots.SnapshotContextElementKt
 RemovedClass: androidx.compose.runtime.snapshots.SnapshotDoubleIndexHeapKt:
     Removed class androidx.compose.runtime.snapshots.SnapshotDoubleIndexHeapKt
 RemovedClass: androidx.compose.runtime.snapshots.SnapshotIdSetKt:

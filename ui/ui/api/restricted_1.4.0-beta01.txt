@@ -385,9 +385,6 @@ package androidx.compose.ui.focus {
     method public static androidx.compose.ui.Modifier focusRequester(androidx.compose.ui.Modifier, androidx.compose.ui.focus.FocusRequester focusRequester);
   }
 
-  public final class FocusRequesterModifierNodeKt {
-  }
-
   public interface FocusState {
     method public boolean getHasFocus();
     method public boolean isCaptured();
@@ -1663,9 +1660,6 @@ package androidx.compose.ui.input.pointer {
     property public abstract androidx.compose.ui.platform.ViewConfiguration viewConfiguration;
   }
 
-  public final class PointerInteropFilter_androidKt {
-  }
-
   @kotlin.jvm.JvmInline public final value class PointerKeyboardModifiers {
     ctor public PointerKeyboardModifiers(int packedValue);
   }
@@ -1929,9 +1923,6 @@ package androidx.compose.ui.layout {
     method public static androidx.compose.ui.Modifier layout(androidx.compose.ui.Modifier, kotlin.jvm.functions.Function3<? super androidx.compose.ui.layout.MeasureScope,? super androidx.compose.ui.layout.Measurable,? super androidx.compose.ui.unit.Constraints,? extends androidx.compose.ui.layout.MeasureResult> measure);
   }
 
-  public final class LookaheadLayoutKt {
-  }
-
   public interface Measurable extends androidx.compose.ui.layout.IntrinsicMeasurable {
     method public androidx.compose.ui.layout.Placeable measure(long constraints);
   }
@@ -2068,12 +2059,6 @@ package androidx.compose.ui.layout {
     property protected abstract int parentWidth;
   }
 
-  public final class RelocationModifierKt {
-  }
-
-  public final class RelocationRequesterModifierKt {
-  }
-
   public interface Remeasurement {
     method public void forceRemeasure();
   }
@@ -2168,14 +2153,8 @@ package androidx.compose.ui.modifier {
     method public void onModifierLocalsUpdated(androidx.compose.ui.modifier.ModifierLocalReadScope scope);
   }
 
-  public final class ModifierLocalConsumerKt {
-  }
-
   public final class ModifierLocalKt {
     method public static <T> androidx.compose.ui.modifier.ProvidableModifierLocal<T> modifierLocalOf(kotlin.jvm.functions.Function0<? extends T> defaultFactory);
-  }
-
-  public final class ModifierLocalNodeKt {
   }
 
   @androidx.compose.runtime.Stable @kotlin.jvm.JvmDefaultWithCompatibility public interface ModifierLocalProvider<T> extends androidx.compose.ui.Modifier.Element {
@@ -2183,9 +2162,6 @@ package androidx.compose.ui.modifier {
     method public T! getValue();
     property public abstract androidx.compose.ui.modifier.ProvidableModifierLocal<T> key;
     property public abstract T! value;
-  }
-
-  public final class ModifierLocalProviderKt {
   }
 
   public interface ModifierLocalReadScope {
@@ -2236,24 +2212,6 @@ package androidx.compose.ui.node {
     property public final kotlin.jvm.functions.Function0<androidx.compose.ui.node.ComposeUiNode> VirtualConstructor;
   }
 
-  public final class DelegatableNodeKt {
-  }
-
-  public final class DrawModifierNodeKt {
-  }
-
-  public final class LayoutModifierNodeKt {
-  }
-
-  public final class ModifierNodeElementKt {
-  }
-
-  public final class ObserverNodeKt {
-  }
-
-  public final class ParentDataModifierNodeKt {
-  }
-
   public final class Ref<T> {
     ctor public Ref();
     method public T? getValue();
@@ -2269,12 +2227,6 @@ package androidx.compose.ui.node {
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.semantics.SemanticsOwner semanticsOwner;
     property public abstract androidx.compose.ui.text.input.TextInputService textInputService;
-  }
-
-  public final class SemanticsModifierNodeKt {
-  }
-
-  public final class ViewInterop_androidKt {
   }
 
 }
@@ -2980,9 +2932,6 @@ package androidx.compose.ui.semantics {
     method public static void setVerticalScrollAxisRange(androidx.compose.ui.semantics.SemanticsPropertyReceiver, androidx.compose.ui.semantics.ScrollAxisRange);
   }
 
-  public final class SemanticsProperties_androidKt {
-  }
-
   public final class SemanticsPropertyKey<T> {
     ctor public SemanticsPropertyKey(String name, optional kotlin.jvm.functions.Function2<? super T,? super T,? extends T> mergePolicy);
     method public String getName();
@@ -3010,13 +2959,6 @@ package androidx.compose.ui.state {
 
   public final class ToggleableStateKt {
     method public static androidx.compose.ui.state.ToggleableState ToggleableState(boolean value);
-  }
-
-}
-
-package androidx.compose.ui.text {
-
-  public final class TextMeasurerHelperKt {
   }
 
 }
