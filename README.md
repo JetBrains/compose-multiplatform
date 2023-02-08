@@ -27,7 +27,7 @@ Preview functionality (check your application UI without building/running it) fo
 
 Also, see [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) docs from Google. They were originally written for Android, but most of information applies to Compose for Desktop as well.
 
-### Compose for Web
+### Compose for Web HTML
 * [Getting started](tutorials/Web/Getting_Started) 
 * [Building web UI](tutorials/Web/Building_UI)
 * [Handling Events](tutorials/Web/Events_Handling)
@@ -41,6 +41,9 @@ Compose Multiplatform uses Jetpack Compose developed by Google when you target A
 [The docs](https://developer.android.com/jetpack/compose/documentation) published by Google are great and decribe how to develop on Compose for Android.
 
 Note that when you use Compose Multiplatform, you setup your project differently. You can create a multiplatform project with Android support via IDEA Project Wizard, or by copying [multiplatform template](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template). In `androidMain` source set you can use almost all information from the docs, and in `commonMain` source set you can use information from Foundation and Design sections.
+
+### Experimental targets
+The other targets (iOS, Compose for Web Canvas) are experimental and under development. Use them at your own risk.
 
 ## Examples
    * [codeviewer](examples/codeviewer) - File Browser and Code Viewer application for Android and Desktop
