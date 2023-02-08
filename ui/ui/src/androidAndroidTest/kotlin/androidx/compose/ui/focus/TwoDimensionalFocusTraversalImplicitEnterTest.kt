@@ -181,6 +181,12 @@ class TwoDimensionalFocusTraversalImplicitEnterTest(param: Param) {
         rule.runOnIdle {
             assertThat(movedFocusSuccessfully).isFalse()
             assertThat(child.value).isFalse()
+            when (focusDirection) {
+                Left -> assertThat(right.value).isTrue()
+                Right -> assertThat(left.value).isTrue()
+                Up -> assertThat(down.value).isTrue()
+                Down -> assertThat(up.value).isTrue()
+            }
         }
     }
 
