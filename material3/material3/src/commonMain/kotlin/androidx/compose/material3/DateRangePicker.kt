@@ -16,6 +16,8 @@
 
 package androidx.compose.material3
 
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -63,6 +65,8 @@ import androidx.compose.ui.unit.dp
  * one for selection. Invalid dates will appear disabled in the UI.
  * @param title the title to be displayed in the date range picker
  * @param headline the headline to be displayed in the date range picker
+ * @param showModeToggle indicates if this DateRangePicker should show a mode toggle action that
+ * transforms it into a date range input
  * @param colors [DatePickerColors] that will be used to resolve the colors used for this date
  * range picker in different states. See [DatePickerDefaults.colors].
  */
@@ -82,14 +86,27 @@ fun DateRangePicker(
             dateFormatter
         )
     },
+    showModeToggle: Boolean = true,
     colors: DatePickerColors = DatePickerDefaults.colors()
 ) {
     DateEntryContainer(
         modifier = modifier,
         title = title,
         headline = headline,
-        // TODO(b/245821979): Add showModeToggle param and us it here for DateEntryModeToggleButton
-        modeToggleButton = null,
+        modeToggleButton = if (showModeToggle) {
+            {
+                DisplayModeToggleButton(
+                    displayMode = state.displayMode,
+                    onDisplayModeChange = { displayMode ->
+                        state.stateData.switchDisplayMode(
+                            displayMode
+                        )
+                    }
+                )
+            }
+        } else {
+            null
+        },
         headlineTextStyle = MaterialTheme.typography.fromToken(
             DatePickerModalTokens.RangeSelectionHeaderHeadlineFont
         ),
@@ -98,9 +115,8 @@ fun DateRangePicker(
         headerContentPadding = DateRangePickerHeaderPadding,
         colors = colors
     ) {
-        // TODO(b/245821979): Implement using a SwitchableDateEntryContent similar to the DatePicker
-        DateRangePickerContent(
-            stateData = state.stateData,
+        SwitchableDateEntryContent(
+            state = state,
             dateFormatter = dateFormatter,
             dateValidator = dateValidator,
             colors = colors
@@ -200,7 +216,7 @@ class DateRangePickerState private constructor(internal val stateData: StateData
      */
     @get:Suppress("AutoBoxing")
     val selectedStartDateMillis by derivedStateOf {
-        stateData.selectedStartDate?.utcTimeMillis
+        stateData.selectedStartDate.value?.utcTimeMillis
     }
 
     /**
@@ -213,7 +229,7 @@ class DateRangePickerState private constructor(internal val stateData: StateData
      */
     @get:Suppress("AutoBoxing")
     val selectedEndDateMillis by derivedStateOf {
-        stateData.selectedEndDate?.utcTimeMillis
+        stateData.selectedEndDate.value?.utcTimeMillis
     }
 
     /**
@@ -335,19 +351,19 @@ object DateRangePickerDefaults {
         with(state.stateData) {
             val defaultLocale = defaultLocale()
             val formatterStartDate = dateFormatter.formatDate(
-                date = selectedStartDate,
+                date = selectedStartDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale
             )
 
             val formatterEndDate = dateFormatter.formatDate(
-                date = selectedEndDate,
+                date = selectedEndDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale
             )
 
             val verboseStartDateDescription = dateFormatter.formatDate(
-                date = selectedStartDate,
+                date = selectedStartDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale,
                 forContentDescription = true
@@ -358,7 +374,7 @@ object DateRangePickerDefaults {
             }
 
             val verboseEndDateDescription = dateFormatter.formatDate(
-                date = selectedEndDate,
+                date = selectedEndDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale,
                 forContentDescription = true
@@ -393,6 +409,38 @@ object DateRangePickerDefaults {
                     endDatePlaceholder()
                 }
             }
+        }
+    }
+}
+
+/**
+ * Date entry content that displays a [DateRangePickerContent] or a [DateRangeInputContent]
+ * according to the state's display mode.
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SwitchableDateEntryContent(
+    state: DateRangePickerState,
+    dateFormatter: DatePickerFormatter,
+    dateValidator: (Long) -> Boolean,
+    colors: DatePickerColors
+) {
+    // TODO(b/266480386): Apply the motion spec for this once we have it. Consider replacing this
+    //  with AnimatedContent when it's out of experimental.
+    Crossfade(targetState = state.displayMode, animationSpec = spring()) { mode ->
+        when (mode) {
+            DisplayMode.Picker -> DateRangePickerContent(
+                stateData = state.stateData,
+                dateFormatter = dateFormatter,
+                dateValidator = dateValidator,
+                colors = colors
+            )
+
+            DisplayMode.Input -> DateRangeInputContent(
+                stateData = state.stateData,
+                dateFormatter = dateFormatter,
+                dateValidator = dateValidator,
+            )
         }
     }
 }
@@ -497,17 +545,17 @@ private fun updateDateSelection(
 ) {
     with(stateData) {
         val date = calendarModel.getCanonicalDate(dateInMillis)
-        val currentStart = selectedStartDate
-        val currentEnd = selectedEndDate
+        val currentStart = selectedStartDate.value
+        val currentEnd = selectedEndDate.value
         if ((currentStart == null && currentEnd == null) ||
             (currentStart != null && currentEnd != null) ||
             (currentStart != null && date < currentStart)
         ) {
             // Reset the selection to "start" only.
-            selectedStartDate = date
-            selectedEndDate = null
+            selectedStartDate.value = date
+            selectedEndDate.value = null
         } else if (currentStart != null && date > currentStart) {
-            selectedEndDate = date
+            selectedEndDate.value = date
         }
     }
 }

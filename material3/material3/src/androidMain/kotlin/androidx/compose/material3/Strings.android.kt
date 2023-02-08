@@ -132,6 +132,9 @@ internal actual fun getString(string: Strings): String {
         Strings.DateRangeInputTitle -> resources.getString(
             androidx.compose.material3.R.string.date_range_input_title
         )
+        Strings.DateRangeInputInvalidRangeInput -> resources.getString(
+            androidx.compose.material3.R.string.date_range_input_invalid_range_input
+        )
         Strings.DateRangePickerEndHeadline -> resources.getString(
             androidx.compose.material3.R.string.date_range_picker_end_headline
         )

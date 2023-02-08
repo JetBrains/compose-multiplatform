@@ -355,7 +355,7 @@ class DatePickerTest {
                 stateData.calendarModel.getCanonicalDate(1649721600000L) // 04/12/2022
             val displayedMonth = stateData.calendarModel.getMonth(date)
             rule.runOnIdle {
-                stateData.selectedStartDate = date
+                stateData.selectedStartDate.value = date
                 stateData.displayedMonth = displayedMonth
             }
 
@@ -364,7 +364,7 @@ class DatePickerTest {
             restorationTester.emulateSavedInstanceStateRestore()
 
             rule.runOnIdle {
-                assertThat(stateData.selectedStartDate).isEqualTo(date)
+                assertThat(stateData.selectedStartDate.value).isEqualTo(date)
                 assertThat(stateData.displayedMonth).isEqualTo(displayedMonth)
                 assertThat(datePickerState!!.selectedDateMillis).isEqualTo(1649721600000L)
             }

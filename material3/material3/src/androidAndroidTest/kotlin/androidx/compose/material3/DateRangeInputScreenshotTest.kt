@@ -29,8 +29,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import java.time.DayOfWeek
-import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
@@ -43,7 +41,7 @@ import org.junit.runners.Parameterized
 @LargeTest
 @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
-class DateRangePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
+class DateRangeInputScreenshotTest(private val scheme: ColorSchemeWrapper) {
 
     @get:Rule
     val rule = createComposeRule()
@@ -52,104 +50,50 @@ class DateRangePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
     private val wrap = Modifier.wrapContentSize(Alignment.Center)
-    private val wrapperTestTag = "dateRangePickerWrapper"
+    private val wrapperTestTag = "dateRangeInputWrapper"
 
     @Test
-    fun dateRangePicker_initialMonth() {
+    fun dateRangeInput_initialState() {
         rule.setMaterialContent(scheme.colorScheme) {
             Box(wrap.testTag(wrapperTestTag)) {
-                val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 1, dayOfMonth = 1)
+                DateRangePicker(
+                    state = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Input),
+                    showModeToggle = false
+                )
+            }
+        }
+        assertAgainstGolden("dateRangeInput_initialState_${scheme.name}")
+    }
+
+    @Test
+    fun dateRangeInput_withModeToggle() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                DateRangePicker(
+                    state = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Input)
+                )
+            }
+        }
+        assertAgainstGolden("dateRangeInput_withModeToggle_${scheme.name}")
+    }
+
+    @Test
+    fun dateRangeInput_withEnteredDates() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                val startDayMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 6)
+                val endDayMillis = dayInUtcMilliseconds(year = 2022, month = 1, dayOfMonth = 10)
                 DateRangePicker(
                     state = rememberDateRangePickerState(
-                        initialDisplayedMonthMillis = monthInUtcMillis
+                        initialSelectedStartDateMillis = startDayMillis,
+                        initialSelectedEndDateMillis = endDayMillis,
+                        initialDisplayMode = DisplayMode.Input
                     ),
                     showModeToggle = false
                 )
             }
         }
-        assertAgainstGolden("dateRangePicker_initialMonth_${scheme.name}")
-    }
-
-    @Test
-    fun dateRangePicker_initialMonthAndSelection() {
-        rule.setMaterialContent(scheme.colorScheme) {
-            Box(wrap.testTag(wrapperTestTag)) {
-                val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 1)
-                val startSelectionMillis =
-                    dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 6)
-                val endSelectionMillis =
-                    dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 10)
-                DateRangePicker(
-                    state = rememberDateRangePickerState(
-                        initialDisplayedMonthMillis = monthInUtcMillis,
-                        initialSelectedStartDateMillis = startSelectionMillis,
-                        initialSelectedEndDateMillis = endSelectionMillis
-                    ),
-                    showModeToggle = false
-                )
-            }
-        }
-        assertAgainstGolden("dateRangePicker_initialMonthAndSelection_${scheme.name}")
-    }
-
-    @Test
-    fun dateRangePicker_selectionSpanningMonths() {
-        rule.setMaterialContent(scheme.colorScheme) {
-            Box(wrap.testTag(wrapperTestTag)) {
-                val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 1)
-                val startSelectionMillis =
-                    dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 25)
-                val endSelectionMillis =
-                    dayInUtcMilliseconds(year = 2021, month = 4, dayOfMonth = 5)
-                DateRangePicker(
-                    state = rememberDateRangePickerState(
-                        initialDisplayedMonthMillis = monthInUtcMillis,
-                        initialSelectedStartDateMillis = startSelectionMillis,
-                        initialSelectedEndDateMillis = endSelectionMillis
-                    ),
-                    showModeToggle = false
-                )
-            }
-        }
-        assertAgainstGolden("dateRangePicker_selectionSpanningMonths_${scheme.name}")
-    }
-
-    @Test
-    fun dateRangePicker_invalidSundaySelection() {
-        rule.setMaterialContent(scheme.colorScheme) {
-            Box(wrap.testTag(wrapperTestTag)) {
-                val monthInUtcMillis = dayInUtcMilliseconds(year = 2000, month = 6, dayOfMonth = 1)
-                DateRangePicker(
-                    state = rememberDateRangePickerState(
-                        initialDisplayedMonthMillis = monthInUtcMillis
-                    ),
-                    dateValidator = { utcDateInMills ->
-                        val localDate =
-                            Instant.ofEpochMilli(utcDateInMills).atZone(ZoneId.of("UTC"))
-                                .toLocalDate()
-                        val dayOfWeek = localDate.dayOfWeek
-                        dayOfWeek != DayOfWeek.SUNDAY
-                    },
-                    showModeToggle = false
-                )
-            }
-        }
-        assertAgainstGolden("dateRangePicker_invalidSundaySelection_${scheme.name}")
-    }
-
-    @Test
-    fun dateRangePicker_withModeToggle() {
-        rule.setMaterialContent(scheme.colorScheme) {
-            Box(wrap.testTag(wrapperTestTag)) {
-                val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 1, dayOfMonth = 1)
-                DateRangePicker(
-                    state = rememberDateRangePickerState(
-                        initialDisplayedMonthMillis = monthInUtcMillis
-                    )
-                )
-            }
-        }
-        assertAgainstGolden("dateRangePicker_withModeToggle_${scheme.name}")
+        assertAgainstGolden("dateRangeInput_withEnteredDates_${scheme.name}")
     }
 
     // Returns the given date's day as milliseconds from epoch. The returned value is for the day's

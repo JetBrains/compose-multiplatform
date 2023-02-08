@@ -160,7 +160,16 @@ fun DatePicker(
         title = title,
         headline = headline,
         modeToggleButton = if (showModeToggle) {
-            { DateEntryModeToggleButton(stateData = state.stateData) }
+            {
+                DisplayModeToggleButton(
+                    displayMode = state.displayMode,
+                    onDisplayModeChange = { displayMode ->
+                        state.stateData.switchDisplayMode(
+                            displayMode
+                        )
+                    },
+                )
+            }
         } else {
             null
         },
@@ -262,7 +271,7 @@ class DatePickerState private constructor(internal val stateData: StateData) {
      */
     @get:Suppress("AutoBoxing")
     val selectedDateMillis by derivedStateOf {
-        stateData.selectedStartDate?.utcTimeMillis
+        stateData.selectedStartDate.value?.utcTimeMillis
     }
 
     /**
@@ -413,12 +422,12 @@ object DatePickerDefaults {
         with(state.stateData) {
             val defaultLocale = defaultLocale()
             val formattedDate = dateFormatter.formatDate(
-                date = selectedStartDate,
+                date = selectedStartDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale
             )
             val verboseDateDescription = dateFormatter.formatDate(
-                date = selectedStartDate,
+                date = selectedStartDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale,
                 forContentDescription = true
@@ -810,7 +819,7 @@ internal class StateData constructor(
     /**
      * A mutable state of [CalendarDate] that represents the start date for a selection.
      */
-    var selectedStartDate by mutableStateOf(
+    var selectedStartDate = mutableStateOf(
         if (initialSelectedStartDateMillis != null) {
             val date = calendarModel.getCanonicalDate(
                 initialSelectedStartDateMillis
@@ -830,7 +839,7 @@ internal class StateData constructor(
      *
      * Single date selection states that use this [StateData] should always have this as `null`.
      */
-    var selectedEndDate by mutableStateOf(
+    var selectedEndDate = mutableStateOf(
         // Set to null in case the provided value is "undefined" or <= than the start date.
         if (initialSelectedEndDateMillis != null &&
             initialSelectedStartDateMillis != null &&
@@ -896,8 +905,22 @@ internal class StateData constructor(
         get() = (yearRange.last - yearRange.first + 1) * 12
 
     fun isInRange(date: Long): Boolean {
-        return date >= (selectedStartDate?.utcTimeMillis ?: Long.MAX_VALUE) &&
-            date <= (selectedEndDate?.utcTimeMillis ?: Long.MIN_VALUE)
+        return date >= (selectedStartDate.value?.utcTimeMillis ?: Long.MAX_VALUE) &&
+            date <= (selectedEndDate.value?.utcTimeMillis ?: Long.MIN_VALUE)
+    }
+
+    fun switchDisplayMode(displayMode: DisplayMode) {
+        // Update the displayed month, if needed, and change the mode to a  date-picker.
+        selectedStartDate.value?.let {
+            displayedMonth = calendarModel.getMonth(it)
+        }
+        // When toggling back from an input mode, it's possible that the user input an invalid
+        // start date and a valid end date. If this is the case, and the start date is null, ensure
+        // that the end date is also null.
+        if (selectedStartDate.value == null && selectedEndDate.value != null) {
+            selectedEndDate.value = null
+        }
+        this.displayMode.value = displayMode
     }
 
     companion object {
@@ -907,8 +930,8 @@ internal class StateData constructor(
         fun Saver(): Saver<StateData, Any> = listSaver(
             save = {
                 listOf(
-                    it.selectedStartDate?.utcTimeMillis,
-                    it.selectedEndDate?.utcTimeMillis,
+                    it.selectedStartDate.value?.utcTimeMillis,
+                    it.selectedEndDate.value?.utcTimeMillis,
                     it.displayedMonth.startUtcTimeMillis,
                     it.yearRange.first,
                     it.yearRange.last,
@@ -968,31 +991,25 @@ internal fun DateEntryContainer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun DateEntryModeToggleButton(stateData: StateData) {
-    with(stateData) {
-        if (displayMode.value == DisplayMode.Picker) {
-            IconButton(onClick = {
-                displayMode.value = DisplayMode.Input
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = getString(Strings.DatePickerSwitchToInputMode)
-                )
-            }
-        } else {
-            IconButton(
-                onClick = {
-                    // Update the displayed month, if needed, and change the mode to a
-                    // date-picker.
-                    selectedStartDate?.let { displayedMonth = calendarModel.getMonth(it) }
-                    displayMode.value = DisplayMode.Picker
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.DateRange,
-                    contentDescription = getString(Strings.DatePickerSwitchToCalendarMode)
-                )
-            }
+internal fun DisplayModeToggleButton(
+    displayMode: DisplayMode,
+    onDisplayModeChange: (DisplayMode) -> Unit
+) {
+    if (displayMode == DisplayMode.Picker) {
+        IconButton(onClick = { onDisplayModeChange(DisplayMode.Input) }) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = getString(Strings.DatePickerSwitchToInputMode)
+            )
+        }
+    } else {
+        IconButton(
+            onClick = { onDisplayModeChange(DisplayMode.Picker) }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = getString(Strings.DatePickerSwitchToCalendarMode)
+            )
         }
     }
 }
@@ -1042,7 +1059,7 @@ private fun DatePickerContent(
     val coroutineScope = rememberCoroutineScope()
 
     val onDateSelected = { dateInMillis: Long ->
-        stateData.selectedStartDate =
+        stateData.selectedStartDate.value =
             stateData.calendarModel.getCanonicalDate(dateInMillis)
     }
 
@@ -1334,8 +1351,8 @@ internal fun Month(
             if (rangeSelectionEnabled) {
                 SelectedRangeInfo.calculateRangeInfo(
                     month,
-                    stateData.selectedStartDate,
-                    stateData.selectedEndDate
+                    stateData.selectedStartDate.value,
+                    stateData.selectedEndDate.value
                 )
             } else {
                 null
@@ -1389,8 +1406,9 @@ internal fun Month(
                             val dateInMillis = month.startUtcTimeMillis +
                                 (dayNumber * MillisecondsIn24Hours)
                             val isToday = dateInMillis == today.utcTimeMillis
-                            val startDateSelected = dateInMillis == startSelection?.utcTimeMillis
-                            val endDateSelected = dateInMillis == endSelection?.utcTimeMillis
+                            val startDateSelected =
+                                dateInMillis == startSelection.value?.utcTimeMillis
+                            val endDateSelected = dateInMillis == endSelection.value?.utcTimeMillis
                             val dayContentDescription = dayContentDescription(
                                 rangeSelectionEnabled = rangeSelectionEnabled,
                                 isToday = isToday,
@@ -1482,7 +1500,7 @@ private fun Day(
         // In the `Month` function above, the implementation checks whether the day is today and
         // sets the content description differently.
         modifier = modifier
-        .minimumInteractiveComponentSize()
+            .minimumInteractiveComponentSize()
             .requiredSize(
                 DatePickerModalTokens.DateStateLayerWidth,
                 DatePickerModalTokens.DateStateLayerHeight
@@ -1724,7 +1742,7 @@ private fun YearPickerMenuButton(
 /**
  * Returns a string representation of an integer at the current Locale.
  */
-private fun Int.toLocalString(): String {
+internal fun Int.toLocalString(): String {
     val formatter = NumberFormat.getIntegerInstance()
     // Eliminate any use of delimiters when formatting the integer.
     formatter.isGroupingUsed = false

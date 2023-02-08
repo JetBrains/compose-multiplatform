@@ -63,6 +63,7 @@ internal actual fun getString(string: Strings): String {
         Strings.DateRangePickerStartHeadline -> "Start date"
         Strings.DateRangePickerEndHeadline -> "End date"
         Strings.DateRangeInputTitle -> "Enter dates"
+        Strings.DateRangeInputInvalidRangeInput -> "Invalid date range input"
         Strings.TooltipLongPressLabel -> "Show tooltip"
         Strings.TimePickerAM -> "AM"
         Strings.TimePickerPM -> "PM"
