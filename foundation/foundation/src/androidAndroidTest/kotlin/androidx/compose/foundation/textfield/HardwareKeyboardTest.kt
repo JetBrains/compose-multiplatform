@@ -34,11 +34,13 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.nativeKeyCode
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.hasSetTextAction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.performKeyPress
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.TextFieldValue
@@ -78,6 +80,30 @@ class HardwareKeyboardTest {
             Key.Spacebar.downAndUp()
             Key.V.downAndUp(META_CTRL_ON)
             expectedText("hello hello")
+        }
+    }
+
+    @Test
+    fun textField_directCopyPaste() {
+        keysSequenceTest(initText = "hello") {
+            Key.A.downAndUp(META_CTRL_ON)
+            Key.Copy.downAndUp()
+            expectedText("hello")
+            Key.DirectionRight.downAndUp()
+            Key.Spacebar.downAndUp()
+            Key.Paste.downAndUp()
+            expectedText("hello hello")
+        }
+    }
+
+    @Test
+    fun textField_directCutPaste() {
+        keysSequenceTest(initText = "hello") {
+            Key.A.downAndUp(META_CTRL_ON)
+            Key.Cut.downAndUp()
+            expectedText("")
+            Key.Paste.downAndUp()
+            expectedText("hello")
         }
     }
 
@@ -394,6 +420,7 @@ class HardwareKeyboardTest {
         val inputService = TextInputService(mock())
         val focusRequester = FocusRequester()
         rule.setContent {
+            LocalClipboardManager.current.setText(AnnotatedString("InitialTestText"))
             CompositionLocalProvider(
                 LocalTextInputService provides inputService
             ) {

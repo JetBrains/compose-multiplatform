@@ -164,7 +164,7 @@ internal actual object MappedKeys {
     actual val Delete: Key = Key(AwtKeyEvent.VK_DELETE)
     actual val Paste: Key = Key(AwtKeyEvent.VK_PASTE)
     actual val Cut: Key = Key(AwtKeyEvent.VK_CUT)
-    val Copy: Key = Key(AwtKeyEvent.VK_COPY)
+    actual val Copy: Key = Key(AwtKeyEvent.VK_COPY)
     actual val Tab: Key = Key(AwtKeyEvent.VK_TAB)
     val Space: Key = Key(AwtKeyEvent.VK_SPACE)
 }

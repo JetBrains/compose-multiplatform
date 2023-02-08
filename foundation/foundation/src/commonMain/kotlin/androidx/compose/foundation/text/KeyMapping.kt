@@ -57,6 +57,7 @@ internal expect object MappedKeys {
     val Delete: Key
     val Paste: Key
     val Cut: Key
+    val Copy: Key
     val Tab: Key
 }
 
@@ -111,6 +112,7 @@ internal fun commonKeyMapping(
                         MappedKeys.Delete -> KeyCommand.DELETE_NEXT_CHAR
                         MappedKeys.Paste -> KeyCommand.PASTE
                         MappedKeys.Cut -> KeyCommand.CUT
+                        MappedKeys.Copy -> KeyCommand.COPY
                         MappedKeys.Tab -> KeyCommand.TAB
                         else -> null
                     }
