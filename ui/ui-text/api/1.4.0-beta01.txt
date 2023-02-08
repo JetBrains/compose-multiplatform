@@ -449,9 +449,6 @@ package androidx.compose.ui.text {
     field public static final androidx.compose.ui.text.TextPainter INSTANCE;
   }
 
-  public final class TextPainterKt {
-  }
-
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class TextRange {
     method public operator boolean contains(long other);
     method public operator boolean contains(int offset);
@@ -564,13 +561,6 @@ package androidx.compose.ui.text {
     ctor public VerbatimTtsAnnotation(String verbatim);
     method public String getVerbatim();
     property public final String verbatim;
-  }
-
-}
-
-package androidx.compose.ui.text.android {
-
-  public final class LayoutCompatKt {
   }
 
 }
@@ -1163,21 +1153,11 @@ package androidx.compose.ui.text.intl {
 
 }
 
-package androidx.compose.ui.text.platform {
-
-  public final class AndroidAccessibilitySpannableString_androidKt {
-  }
-
-}
-
 package androidx.compose.ui.text.platform.extensions {
 
   public final class TtsAnnotationExtensions_androidKt {
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.TtsAnnotation);
     method public static android.text.style.TtsSpan toSpan(androidx.compose.ui.text.VerbatimTtsAnnotation);
-  }
-
-  public final class UrlAnnotationExtensions_androidKt {
   }
 
 }

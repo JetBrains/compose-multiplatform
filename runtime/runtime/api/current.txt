@@ -799,9 +799,6 @@ package androidx.compose.runtime.snapshots {
     field public static final androidx.compose.runtime.snapshots.SnapshotApplyResult.Success INSTANCE;
   }
 
-  public final class SnapshotContextElementKt {
-  }
-
   public final class SnapshotKt {
     method public static <T extends androidx.compose.runtime.snapshots.StateRecord> T readable(T, androidx.compose.runtime.snapshots.StateObject state);
     method public static <T extends androidx.compose.runtime.snapshots.StateRecord> T readable(T, androidx.compose.runtime.snapshots.StateObject state, androidx.compose.runtime.snapshots.Snapshot snapshot);

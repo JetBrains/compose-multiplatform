@@ -1230,13 +1230,6 @@ package androidx.compose.ui.text.intl {
 
 }
 
-package androidx.compose.ui.text.platform {
-
-  public final class AndroidAccessibilitySpannableString_androidKt {
-  }
-
-}
-
 package androidx.compose.ui.text.platform.extensions {
 
   public final class TtsAnnotationExtensions_androidKt {

@@ -1,3 +1,5 @@
 // Baseline format: 1.0
+RemovedClass: androidx.compose.material3.windowsizeclass.AndroidWindowSizeClass_androidKt:
+    Removed class androidx.compose.material3.windowsizeclass.AndroidWindowSizeClass_androidKt
 RemovedClass: androidx.compose.material3.windowsizeclass.TestOnly_jvmKt:
     Removed class androidx.compose.material3.windowsizeclass.TestOnly_jvmKt

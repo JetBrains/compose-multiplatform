@@ -216,9 +216,6 @@ package androidx.compose.ui.test {
     property public default int width;
   }
 
-  public final class KeyInjectionScopeKt {
-  }
-
   public final class KeyInputHelpersKt {
     method public static boolean performKeyPress(androidx.compose.ui.test.SemanticsNodeInteraction, android.view.KeyEvent keyEvent);
   }
@@ -232,9 +229,6 @@ package androidx.compose.ui.test {
     method public void setAutoAdvance(boolean);
     property public abstract boolean autoAdvance;
     property public abstract long currentTime;
-  }
-
-  public final class MouseInjectionScopeKt {
   }
 
   public sealed interface MultiModalInjectionScope extends androidx.compose.ui.test.InjectionScope {
@@ -316,12 +310,6 @@ package androidx.compose.ui.test {
   }
 
   public final class TestContext {
-  }
-
-  public final class TestMonotonicFrameClock_jvmKt {
-  }
-
-  public final class TestOwnerKt {
   }
 
   public final class TextActionsKt {

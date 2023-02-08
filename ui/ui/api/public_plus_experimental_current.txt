@@ -2540,9 +2540,6 @@ package androidx.compose.ui.node {
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateSemantics(androidx.compose.ui.node.SemanticsModifierNode);
   }
 
-  public final class ViewInterop_androidKt {
-  }
-
 }
 
 package androidx.compose.ui.platform {

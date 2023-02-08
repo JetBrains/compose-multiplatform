@@ -21,20 +21,8 @@ RemovedClass: androidx.compose.ui.text.TempListUtilsKt:
     Removed class androidx.compose.ui.text.TempListUtilsKt
 RemovedClass: androidx.compose.ui.text.TextMeasurerKt:
     Removed class androidx.compose.ui.text.TextMeasurerKt
-RemovedClass: androidx.compose.ui.text.android.LayoutHelperKt:
-    Removed class androidx.compose.ui.text.android.LayoutHelperKt
-RemovedClass: androidx.compose.ui.text.android.LayoutIntrinsicsKt:
-    Removed class androidx.compose.ui.text.android.LayoutIntrinsicsKt
-RemovedClass: androidx.compose.ui.text.android.PaintExtensionsKt:
-    Removed class androidx.compose.ui.text.android.PaintExtensionsKt
-RemovedClass: androidx.compose.ui.text.android.SpannedExtensionsKt:
-    Removed class androidx.compose.ui.text.android.SpannedExtensionsKt
-RemovedClass: androidx.compose.ui.text.android.StaticLayoutFactoryKt:
-    Removed class androidx.compose.ui.text.android.StaticLayoutFactoryKt
-RemovedClass: androidx.compose.ui.text.android.TempListUtilsKt:
-    Removed class androidx.compose.ui.text.android.TempListUtilsKt
-RemovedClass: androidx.compose.ui.text.android.TextLayoutKt:
-    Removed class androidx.compose.ui.text.android.TextLayoutKt
+RemovedClass: androidx.compose.ui.text.TextPainterKt:
+    Removed class androidx.compose.ui.text.TextPainterKt
 RemovedClass: androidx.compose.ui.text.font.AndroidFontLoader_androidKt:
     Removed class androidx.compose.ui.text.font.AndroidFontLoader_androidKt
 RemovedClass: androidx.compose.ui.text.font.AndroidFontResolveInterceptor_androidKt:
@@ -61,20 +49,6 @@ RemovedClass: androidx.compose.ui.text.intl.AndroidPlatformLocale_androidKt:
     Removed class androidx.compose.ui.text.intl.AndroidPlatformLocale_androidKt
 RemovedClass: androidx.compose.ui.text.intl.PlatformLocaleKt:
     Removed class androidx.compose.ui.text.intl.PlatformLocaleKt
-RemovedClass: androidx.compose.ui.text.platform.AndroidMultiParagraphDrawKt:
-    Removed class androidx.compose.ui.text.platform.AndroidMultiParagraphDrawKt
-RemovedClass: androidx.compose.ui.text.platform.AndroidParagraphHelper_androidKt:
-    Removed class androidx.compose.ui.text.platform.AndroidParagraphHelper_androidKt
-RemovedClass: androidx.compose.ui.text.platform.AndroidParagraphIntrinsics_androidKt:
-    Removed class androidx.compose.ui.text.platform.AndroidParagraphIntrinsics_androidKt
-RemovedClass: androidx.compose.ui.text.platform.AndroidParagraph_androidKt:
-    Removed class androidx.compose.ui.text.platform.AndroidParagraph_androidKt
-RemovedClass: androidx.compose.ui.text.platform.AndroidStringDelegate_androidKt:
-    Removed class androidx.compose.ui.text.platform.AndroidStringDelegate_androidKt
-RemovedClass: androidx.compose.ui.text.platform.AndroidTextPaint_androidKt:
-    Removed class androidx.compose.ui.text.platform.AndroidTextPaint_androidKt
-RemovedClass: androidx.compose.ui.text.platform.Synchronization_jvmKt:
-    Removed class androidx.compose.ui.text.platform.Synchronization_jvmKt
 RemovedClass: androidx.compose.ui.text.platform.extensions.LocaleExtensions_androidKt:
     Removed class androidx.compose.ui.text.platform.extensions.LocaleExtensions_androidKt
 RemovedClass: androidx.compose.ui.text.platform.extensions.PlaceholderExtensions_androidKt:
@@ -83,13 +57,19 @@ RemovedClass: androidx.compose.ui.text.platform.extensions.SpannableExtensions_a
     Removed class androidx.compose.ui.text.platform.extensions.SpannableExtensions_androidKt
 RemovedClass: androidx.compose.ui.text.platform.extensions.TextPaintExtensions_androidKt:
     Removed class androidx.compose.ui.text.platform.extensions.TextPaintExtensions_androidKt
+RemovedClass: androidx.compose.ui.text.platform.extensions.UrlAnnotationExtensions_androidKt:
+    Removed class androidx.compose.ui.text.platform.extensions.UrlAnnotationExtensions_androidKt
 RemovedClass: androidx.compose.ui.text.style.TextDrawStyleKt:
     Removed class androidx.compose.ui.text.style.TextDrawStyleKt
 
 
+RemovedPackage: androidx.compose.ui.text.android:
+    Removed package androidx.compose.ui.text.android
 RemovedPackage: androidx.compose.ui.text.android.style:
     Removed package androidx.compose.ui.text.android.style
 RemovedPackage: androidx.compose.ui.text.caches:
     Removed package androidx.compose.ui.text.caches
 RemovedPackage: androidx.compose.ui.text.internal:
     Removed package androidx.compose.ui.text.internal
+RemovedPackage: androidx.compose.ui.text.platform:
+    Removed package androidx.compose.ui.text.platform

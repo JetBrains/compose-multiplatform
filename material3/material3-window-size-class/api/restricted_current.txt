@@ -1,9 +1,6 @@
 // Signature format: 4.0
 package androidx.compose.material3.windowsizeclass {
 
-  public final class AndroidWindowSizeClass_androidKt {
-  }
-
   @androidx.compose.runtime.Immutable @kotlin.jvm.JvmInline public final value class WindowHeightSizeClass implements java.lang.Comparable<androidx.compose.material3.windowsizeclass.WindowHeightSizeClass> {
     method public operator int compareTo(int other);
     field public static final androidx.compose.material3.windowsizeclass.WindowHeightSizeClass.Companion Companion;

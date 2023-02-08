@@ -11,6 +11,14 @@ RemovedClass: androidx.compose.foundation.Clickable_androidKt:
     Removed class androidx.compose.foundation.Clickable_androidKt
 RemovedClass: androidx.compose.foundation.DarkTheme_androidKt:
     Removed class androidx.compose.foundation.DarkTheme_androidKt
+RemovedClass: androidx.compose.foundation.FocusedBoundsKt:
+    Removed class androidx.compose.foundation.FocusedBoundsKt
+RemovedClass: androidx.compose.foundation.MagnifierKt:
+    Removed class androidx.compose.foundation.MagnifierKt
+RemovedClass: androidx.compose.foundation.OverscrollConfigurationKt:
+    Removed class androidx.compose.foundation.OverscrollConfigurationKt
+RemovedClass: androidx.compose.foundation.OverscrollKt:
+    Removed class androidx.compose.foundation.OverscrollKt
 RemovedClass: androidx.compose.foundation.TempListUtilsKt:
     Removed class androidx.compose.foundation.TempListUtilsKt
 RemovedClass: androidx.compose.foundation.gestures.AndroidScrollable_androidKt:
@@ -41,36 +49,6 @@ RemovedClass: androidx.compose.foundation.lazy.grid.LazyGridMeasureKt:
     Removed class androidx.compose.foundation.lazy.grid.LazyGridMeasureKt
 RemovedClass: androidx.compose.foundation.lazy.grid.LazySemanticsKt:
     Removed class androidx.compose.foundation.lazy.grid.LazySemanticsKt
-RemovedClass: androidx.compose.foundation.lazy.layout.IntervalListKt:
-    Removed class androidx.compose.foundation.lazy.layout.IntervalListKt
-RemovedClass: androidx.compose.foundation.lazy.layout.LazyAnimateScrollKt:
-    Removed class androidx.compose.foundation.lazy.layout.LazyAnimateScrollKt
-RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutPrefetcher_androidKt:
-    Removed class androidx.compose.foundation.lazy.layout.LazyLayoutPrefetcher_androidKt
-RemovedClass: androidx.compose.foundation.lazy.layout.LazyLayoutSemanticsKt:
-    Removed class androidx.compose.foundation.lazy.layout.LazyLayoutSemanticsKt
-RemovedClass: androidx.compose.foundation.lazy.layout.LazySaveableStateHolderKt:
-    Removed class androidx.compose.foundation.lazy.layout.LazySaveableStateHolderKt
-RemovedClass: androidx.compose.foundation.lazy.layout.PinnableParentKt:
-    Removed class androidx.compose.foundation.lazy.layout.PinnableParentKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridCellsKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridCellsKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemProviderKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridItemProviderKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridMeasureKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridMeasureKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridMeasurePolicyKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridMeasurePolicyKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridMeasureResultKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridMeasureResultKt
-RemovedClass: androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridSemanticsKt:
-    Removed class androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridSemanticsKt
-RemovedClass: androidx.compose.foundation.relocation.BringIntoViewKt:
-    Removed class androidx.compose.foundation.relocation.BringIntoViewKt
-RemovedClass: androidx.compose.foundation.relocation.BringIntoViewResponder_androidKt:
-    Removed class androidx.compose.foundation.relocation.BringIntoViewResponder_androidKt
 RemovedClass: androidx.compose.foundation.text.AndroidCursorHandle_androidKt:
     Removed class androidx.compose.foundation.text.AndroidCursorHandle_androidKt
 RemovedClass: androidx.compose.foundation.text.ContextMenu_androidKt:
@@ -163,5 +141,13 @@ RemovedMethod: androidx.compose.foundation.gestures.TapGestureDetectorKt#waitFor
     Removed method androidx.compose.foundation.gestures.TapGestureDetectorKt.waitForUpOrCancellation(androidx.compose.ui.input.pointer.AwaitPointerEventScope,kotlin.coroutines.Continuation<? super androidx.compose.ui.input.pointer.PointerInputChange>)
 
 
+RemovedPackage: androidx.compose.foundation.gestures.snapping:
+    Removed package androidx.compose.foundation.gestures.snapping
 RemovedPackage: androidx.compose.foundation.internal:
     Removed package androidx.compose.foundation.internal
+RemovedPackage: androidx.compose.foundation.lazy.layout:
+    Removed package androidx.compose.foundation.lazy.layout
+RemovedPackage: androidx.compose.foundation.lazy.staggeredgrid:
+    Removed package androidx.compose.foundation.lazy.staggeredgrid
+RemovedPackage: androidx.compose.foundation.relocation:
+    Removed package androidx.compose.foundation.relocation

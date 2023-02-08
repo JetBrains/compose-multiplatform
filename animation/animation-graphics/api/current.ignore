@@ -1,8 +1,6 @@
 // Baseline format: 1.0
-RemovedClass: androidx.compose.animation.graphics.res.AnimatorResources_androidKt:
-    Removed class androidx.compose.animation.graphics.res.AnimatorResources_androidKt
-
-
+RemovedPackage: androidx.compose.animation.graphics.res:
+    Removed package androidx.compose.animation.graphics.res
 RemovedPackage: androidx.compose.animation.graphics.vector:
     Removed package androidx.compose.animation.graphics.vector
 RemovedPackage: androidx.compose.animation.graphics.vector.compat:
