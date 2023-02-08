@@ -22,9 +22,9 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.util.fastForEachIndexed
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.window.LocalWindow
 import androidx.compose.ui.window.UndecoratedWindowResizer
 import androidx.compose.ui.window.WindowExceptionHandler
@@ -43,7 +43,6 @@ import java.awt.event.MouseListener
 import java.awt.event.MouseMotionListener
 import java.awt.event.MouseWheelListener
 import javax.swing.JLayeredPane
-import kotlin.math.max
 import org.jetbrains.skiko.SkiaLayerAnalytics
 
 internal class ComposeWindowDelegate(
@@ -167,8 +166,6 @@ internal class ComposeWindowDelegate(
                 // Measure the content
                 val contentMeasurable = measurables[0]
                 val contentPlaceable = contentMeasurable.measure(constraints)
-                val width: Int = max(constraints.minWidth, contentPlaceable.width)
-                val height: Int = max(constraints.minHeight, contentPlaceable.height)
 
                 val resizerMeasurable = measurables.getOrNull(1)
                 val resizerPlaceable = resizerMeasurable?.let{
@@ -185,7 +182,7 @@ internal class ComposeWindowDelegate(
                     )
                 }
 
-                layout(width, height){
+                layout(contentPlaceable.measuredWidth, contentPlaceable.measuredHeight){
                     contentPlaceable.place(0, 0)
                     resizerPlaceable?.place(0, 0)
                 }
@@ -194,7 +191,7 @@ internal class ComposeWindowDelegate(
     }
 
     /**
-     * Wraps the user's content placed in the window into a single placeable, so that
+     * Groups the user's content placed in the window into a single placeable, so that
      * [WindowContentLayout] can find it and the [undecoratedWindowResizer] in the list of
      * measurables.
      */
@@ -205,19 +202,14 @@ internal class ComposeWindowDelegate(
         Layout(
             { content() },
             measurePolicy = { measurables, constraints ->
-                val placeables = arrayOfNulls<Placeable>(measurables.size)
-                var width = constraints.minWidth
-                var height = constraints.minHeight
-                measurables.fastForEachIndexed { index, measurable ->
-                    val placeable = measurable.measure(constraints)
-                    placeables[index] = placeable
-                    width = max(width, placeable.width)
-                    height = max(height, placeable.height)
+                val placeables = measurables.fastMap {
+                    it.measure(constraints)
                 }
-
+                val width = placeables.maxOfOrNull { it.measuredWidth } ?: 0
+                val height = placeables.maxOfOrNull { it.measuredHeight } ?: 0
                 layout(width, height) {
-                    placeables.forEach { placeable ->
-                        placeable?.place(0, 0)
+                    placeables.fastForEach { placeable ->
+                        placeable.place(0, 0)
                     }
                 }
             }
