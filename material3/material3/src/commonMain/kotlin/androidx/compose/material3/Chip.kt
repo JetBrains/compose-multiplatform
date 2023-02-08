@@ -1319,7 +1319,7 @@ private fun Chip(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.semantics { role = Role.Button },
         enabled = enabled,
         shape = shape,
         color = colors.containerColor(enabled).value,

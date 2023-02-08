@@ -205,7 +205,7 @@ fun FilledIconButton(
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
-    modifier = modifier,
+    modifier = modifier.semantics { role = Role.Button },
     enabled = enabled,
     shape = shape,
     color = colors.containerColor(enabled).value,
@@ -266,7 +266,7 @@ fun FilledTonalIconButton(
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
-    modifier = modifier,
+    modifier = modifier.semantics { role = Role.Button },
     enabled = enabled,
     shape = shape,
     color = colors.containerColor(enabled).value,
@@ -454,7 +454,7 @@ fun OutlinedIconButton(
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
-    modifier = modifier,
+    modifier = modifier.semantics { role = Role.Button },
     enabled = enabled,
     shape = shape,
     color = colors.containerColor(enabled).value,

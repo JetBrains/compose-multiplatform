@@ -1478,8 +1478,11 @@ private fun Day(
     Surface(
         selected = selected,
         onClick = onClick,
+        // Semantic role is intentionally not set here and left to be set by the caller
+        // In the `Month` function above, the implementation checks whether the day is today and
+        // sets the content description differently.
         modifier = modifier
-            .minimumInteractiveComponentSize()
+        .minimumInteractiveComponentSize()
             .requiredSize(
                 DatePickerModalTokens.DateStateLayerWidth,
                 DatePickerModalTokens.DateStateLayerHeight
@@ -1559,10 +1562,7 @@ private fun YearPicker(
                         .requiredSize(
                             width = DatePickerModalTokens.SelectionYearContainerWidth,
                             height = DatePickerModalTokens.SelectionYearContainerHeight
-                        )
-                        .semantics {
-                            role = Role.Button
-                        },
+                        ),
                     selected = selectedYear == displayedYear,
                     currentYear = selectedYear == currentYear,
                     onClick = { onYearSelected(selectedYear) },
@@ -1608,14 +1608,14 @@ private fun Year(
     Surface(
         selected = selected,
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.semantics { role = Role.Button },
         shape = DatePickerModalTokens.SelectionYearStateLayerShape.toShape(),
         color = colors.yearContainerColor(selected = selected).value,
         contentColor = colors.yearContentColor(
             currentYear = currentYear,
             selected = selected
         ).value,
-        border = border
+        border = border,
     ) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
             content()
