@@ -63,7 +63,6 @@ fun Project.createTestConfigurationGenerationTask(
 ) {
     val xmlName = "${path.asFilenamePrefix()}$variantName.xml"
     val jsonName = "${path.asFilenamePrefix()}$variantName.json"
-    val sha256XmlName = "${path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
     rootProject.tasks.named("createModuleInfo").configure {
         it as ModuleInfoGenerator
         it.testModules.add(
@@ -84,11 +83,7 @@ fun Project.createTestConfigurationGenerationTask(
         task.additionalApkKeys.set(androidXExtension.additionalDeviceTestApkKeys)
         task.outputXml.fileValue(File(getTestConfigDirectory(), xmlName))
         task.outputJson.fileValue(File(getTestConfigDirectory(), jsonName))
-        task.shaReportOutput.fileValue(File(getTestConfigDirectory(), sha256XmlName))
         task.constrainedOutputXml.fileValue(File(getConstrainedTestConfigDirectory(), xmlName))
-        task.constrainedShaReportOutput.fileValue(
-            File(getConstrainedTestConfigDirectory(), sha256XmlName)
-        )
         task.presubmit.set(isPresubmitBuild())
         // Disable work tests on < API 18: b/178127496
         if (path.startsWith(":work:")) {
@@ -386,22 +381,10 @@ private fun Project.configureMacrobenchmarkConfigTask(
             task.outputJson.fileValue(
                 File(getTestConfigDirectory(), "$fileNamePrefix.json")
             )
-            task.shaReportOutput.fileValue(
-                File(
-                    this.getTestConfigDirectory(),
-                    "${this.path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
-                )
-            )
             task.constrainedOutputXml.fileValue(
                 File(
                     this.getTestConfigDirectory(),
                     "${this.path.asFilenamePrefix()}$variantName.xml"
-                )
-            )
-            task.constrainedShaReportOutput.fileValue(
-                File(
-                    this.getTestConfigDirectory(),
-                    "${this.path.asFilenamePrefix()}$variantName$SHA_256_FILE_SUFFIX"
                 )
             )
             task.minSdk.set(minSdk)
@@ -503,9 +486,3 @@ fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
         }
     }
 }
-
-/**
- * Suffix to add for xml files which include the SHA256 of referred APKs.
- * see: [TestApkSha256Report].
- */
-private const val SHA_256_FILE_SUFFIX = "-sha256Report.xml"

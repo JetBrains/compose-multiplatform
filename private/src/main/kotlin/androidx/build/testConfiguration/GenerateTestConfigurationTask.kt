@@ -19,9 +19,11 @@ package androidx.build.testConfiguration
 import androidx.build.dependencyTracker.ProjectSubset
 import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifactsLoader
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -32,8 +34,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import java.io.File
-import org.gradle.api.provider.ListProperty
 
 /**
  * Writes a configuration file in
@@ -94,41 +94,23 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:OutputFile
     abstract val outputJson: RegularFileProperty
 
-    /**
-     * Output file where we write the sha256 for each APK file we reference
-     */
-    @get:OutputFile
-    abstract val shaReportOutput: RegularFileProperty
-
     @get:OutputFile
     abstract val constrainedOutputXml: RegularFileProperty
 
-    /**
-     * Output file where we write the sha256 for each APK file we reference in constrained setup
-     */
-    @get:OutputFile
-    abstract val constrainedShaReportOutput: RegularFileProperty
-
     @TaskAction
     fun generateAndroidTestZip() {
-        val testApkSha256Report = TestApkSha256Report()
         writeConfigFileContent(
             outputFile = constrainedOutputXml,
-            testApkSha256Report = testApkSha256Report,
             isConstrained = true,
         )
         writeConfigFileContent(
             outputFile = outputXml,
-            testApkSha256Report = testApkSha256Report,
             isConstrained = false,
         )
-        testApkSha256Report.writeToFile(shaReportOutput.get().asFile)
-        testApkSha256Report.writeToFile(constrainedShaReportOutput.get().asFile)
     }
 
     private fun writeConfigFileContent(
         outputFile: RegularFileProperty,
-        testApkSha256Report: TestApkSha256Report,
         isConstrained: Boolean = false
     ) {
         /*
@@ -148,7 +130,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
             configBuilder.appApkName(appName)
                 .appApkSha256(sha256(File(appApkBuiltArtifact.outputFile)))
-            testApkSha256Report.addFile(appName, appApkBuiltArtifact)
         }
         configBuilder.additionalApkKeys(additionalApkKeys.get())
         val isPresubmit = presubmit.get()
@@ -216,7 +197,6 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())
             .testApkSha256(sha256(File(testApkBuiltArtifact.outputFile)))
-        testApkSha256Report.addFile(testName, testApkBuiltArtifact)
         createOrFail(outputFile).writeText(configBuilder.buildXml())
         if (!isConstrained) {
             createOrFail(outputJson).writeText(configBuilder.buildJson())
