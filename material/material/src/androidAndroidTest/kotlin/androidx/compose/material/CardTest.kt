@@ -117,7 +117,7 @@ class CardTest {
         }
         rule.onNodeWithTag("card")
             .assertHasClickAction()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsEnabled()
             // since we merge descendants we should have text on the same node
             .assertTextEquals("0")

@@ -48,6 +48,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
@@ -103,7 +106,7 @@ fun Button(
     val contentColor by colors.contentColor(enabled)
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.semantics { role = Role.Button },
         enabled = enabled,
         shape = shape,
         color = colors.backgroundColor(enabled).value,

@@ -44,6 +44,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.collect
@@ -88,7 +91,7 @@ fun FloatingActionButton(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.semantics { role = Role.Button },
         shape = shape,
         color = backgroundColor,
         contentColor = contentColor,
