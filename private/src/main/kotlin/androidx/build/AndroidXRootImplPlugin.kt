@@ -137,7 +137,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
         }
-        project.configureRootProjectForLint()
 
         tasks.register(AndroidXImplPlugin.BUILD_TEST_APKS_TASK)
 
