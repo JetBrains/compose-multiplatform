@@ -126,12 +126,8 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
                 ?: throw RuntimeException("Cannot load required APK for task: $name")
             // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appApkBuiltArtifact = appApk.elements.single()
-            var appName = appApkBuiltArtifact.outputFile.substringAfterLast("/")
+            val appName = appApkBuiltArtifact.outputFile.substringAfterLast("/")
                 .renameApkForTesting(appProjectPath.get())
-            // TODO(b/178776319): Clean up this hardcoded hack
-            if (appProjectPath.get().contains("macrobenchmark-target")) {
-                appName = appName.replace("debug-androidTest", "release")
-            }
             configBuilder.appApkName(appName)
                 .appApkSha256(sha256(File(appApkBuiltArtifact.outputFile)))
         }

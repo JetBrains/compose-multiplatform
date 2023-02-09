@@ -124,25 +124,45 @@ fun Project.createTestConfigurationGenerationTask(
  * Further configures the test config generation task for a project. This only gets called when
  * there is a test app in addition to the instrumentation app, and the only thing it configures is
  * the location of the testapp.
- *
- * @param overrideProject Allows the config task for one project to get registered to an
- * alternative project. Default is for the project to register the new config task to itself
  */
-fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
-    if (project.isMacrobenchmarkTarget()) {
+fun Project.addAppApkToTestConfigGeneration() {
+    if (isMacrobenchmarkTarget()) {
+        extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
+            onVariants(selector().withBuildType("release")) { appVariant ->
+                getOrCreateMacrobenchmarkConfigTask().configure { configTask ->
+                    configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
+                    configTask.appLoader.set(appVariant.artifacts.getBuiltArtifactsLoader())
+                    configTask.appProjectPath.set(path)
+                }
+                if (path == ":benchmark:integration-tests:macrobenchmark-target") {
+                    // Ugly workaround for b/188699825 where we hardcode that
+                    // :benchmark:integration-tests:macrobenchmark-target needs to be installed
+                    // for :benchmark:benchmark-macro tests to work.
+                    project(":benchmark:benchmark-macro").tasks.withType(
+                        GenerateTestConfigurationTask::class.java
+                    ).named(
+                        "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}debugAndroidTest"
+                    ).configure { configTask ->
+                        configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
+                        configTask.appLoader.set(appVariant.artifacts.getBuiltArtifactsLoader())
+                        configTask.appProjectPath.set(path)
+                    }
+                }
+            }
+        }
         return
     }
 
     extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
         onVariants(selector().withBuildType("debug")) { appVariant ->
-            overrideProject.tasks.named(
+            tasks.named(
                 AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK +
                     "${appVariant.name}AndroidTest"
             ) { configTask ->
                 configTask as GenerateTestConfigurationTask
                 configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
                 configTask.appLoader.set(appVariant.artifacts.getBuiltArtifactsLoader())
-                configTask.appProjectPath.set(overrideProject.path)
+                configTask.appProjectPath.set(path)
             }
         }
     }
@@ -331,15 +351,15 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
     }
 }
 
-private fun Project.getOrCreateMacrobenchmarkConfigTask(variantName: String):
+private fun Project.getOrCreateMacrobenchmarkConfigTask():
     TaskProvider<GenerateTestConfigurationTask> {
-        val parentProject = this.parent!!
+    val parentProject = this.parent!!
     return try {
         parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
-            .named("${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
+            .named(AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK)
     } catch (e: UnknownTaskException) {
         parentProject.tasks.register(
-            "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName",
+            AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK,
             GenerateTestConfigurationTask::class.java
         )
     }
@@ -351,58 +371,50 @@ private fun Project.configureMacrobenchmarkConfigTask(
     minSdk: Int,
     testRunner: String
 ) {
-    val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
-    if (path.endsWith("macrobenchmark")) {
-        configTask.configure { task ->
-            val androidXExtension = extensions.getByType<AndroidXExtension>()
-            val fileNamePrefix = "${this.path.asFilenamePrefix()}$variantName"
-            task.testFolder.set(artifacts.get(SingleArtifact.APK))
-            task.testLoader.set(artifacts.getBuiltArtifactsLoader())
-            task.additionalApkKeys.set(androidXExtension.additionalDeviceTestApkKeys)
-            task.outputXml.fileValue(
-                File(getTestConfigDirectory(), "$fileNamePrefix.xml")
+    val configTask = getOrCreateMacrobenchmarkConfigTask()
+    configTask.configure { task ->
+        val androidXExtension = extensions.getByType<AndroidXExtension>()
+        val fileNamePrefix = path.asFilenamePrefix()
+        task.testFolder.set(artifacts.get(SingleArtifact.APK))
+        task.testLoader.set(artifacts.getBuiltArtifactsLoader())
+        task.additionalApkKeys.set(androidXExtension.additionalDeviceTestApkKeys)
+        task.outputXml.fileValue(
+            File(getTestConfigDirectory(), "$fileNamePrefix$variantName.xml")
+        )
+        task.outputJson.fileValue(
+            File(getTestConfigDirectory(), "$fileNamePrefix$variantName.json")
+        )
+        task.constrainedOutputXml.fileValue(
+            File(
+                getTestConfigDirectory(),
+                "${path.asFilenamePrefix()}$variantName.xml"
             )
-            task.outputJson.fileValue(
-                File(getTestConfigDirectory(), "$fileNamePrefix.json")
-            )
-            task.constrainedOutputXml.fileValue(
-                File(
-                    this.getTestConfigDirectory(),
-                    "${this.path.asFilenamePrefix()}$variantName.xml"
-                )
-            )
-            task.minSdk.set(minSdk)
-            task.hasBenchmarkPlugin.set(this.hasBenchmarkPlugin())
-            task.testRunner.set(testRunner)
-            task.testProjectPath.set(this.path)
-            task.presubmit.set(isPresubmitBuild())
-            val detector = AffectedModuleDetector.getInstance(project)
-            task.affectedModuleDetectorSubset.set(
-                project.provider {
-                    detector.getSubset(task)
-                }
-            )
-
-            AffectedModuleDetector.configureTaskGuard(task)
-        }
-        // Disable xml generation for projects that have no test sources
-        afterEvaluate {
-            val androidXExtension = extensions.getByType<AndroidXExtension>()
-            configTask.configure {
-                it.enabled = hasAndroidTestSourceCode() && !androidXExtension.disableDeviceTests
+        )
+        task.minSdk.set(minSdk)
+        task.hasBenchmarkPlugin.set(hasBenchmarkPlugin())
+        task.testRunner.set(testRunner)
+        task.testProjectPath.set(path)
+        task.presubmit.set(isPresubmitBuild())
+        val detector = AffectedModuleDetector.getInstance(project)
+        task.affectedModuleDetectorSubset.set(
+            project.provider {
+                detector.getSubset(task)
             }
-        }
-        this.rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
-            .dependsOn(configTask)
-        this.rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
-            .dependsOn(configTask)
-    } else if (isMacrobenchmarkTarget()) {
-        configTask.configure { task ->
-            task.appFolder.set(artifacts.get(SingleArtifact.APK))
-            task.appLoader.set(artifacts.getBuiltArtifactsLoader())
-            task.appProjectPath.set(path)
+        )
+
+        AffectedModuleDetector.configureTaskGuard(task)
+    }
+    // Disable xml generation for projects that have no test sources
+    afterEvaluate {
+        val androidXExtension = extensions.getByType<AndroidXExtension>()
+        configTask.configure {
+            it.enabled = hasAndroidTestSourceCode() && !androidXExtension.disableDeviceTests
         }
     }
+    rootProject.tasks.findByName(ZIP_TEST_CONFIGS_WITH_APKS_TASK)!!
+        .dependsOn(configTask)
+    rootProject.tasks.findByName(ZIP_CONSTRAINED_TEST_CONFIGS_WITH_APKS_TASK)!!
+        .dependsOn(configTask)
 }
 
 /**
@@ -413,6 +425,10 @@ fun Project.isMacrobenchmarkTarget(): Boolean {
 }
 
 fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
+    if (isMacrobenchmarkTarget()) {
+        // macrobenchmark target projects use special setup. See addAppApkToTestConfigGeneration
+        return
+    }
     extensions.getByType(AndroidComponentsExtension::class.java).apply {
         onVariants { variant ->
             var name: String? = null
@@ -449,8 +465,7 @@ fun Project.configureTestConfigGeneration(baseExtension: BaseExtension) {
                         isMedia2 = false
                     )
                 }
-                path.endsWith("macrobenchmark") ||
-                    isMacrobenchmarkTarget() -> {
+                path.endsWith("macrobenchmark") -> {
                     configureMacrobenchmarkConfigTask(
                         name,
                         artifacts,
