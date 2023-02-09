@@ -2478,21 +2478,15 @@ package androidx.compose.ui.node {
     method @androidx.compose.ui.ExperimentalComposeUiApi public static void invalidateMeasurements(androidx.compose.ui.node.LayoutModifierNode);
   }
 
-  @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> implements androidx.compose.ui.platform.InspectableValue androidx.compose.ui.Modifier.Element {
-    ctor public ModifierNodeElement();
+  @androidx.compose.ui.ExperimentalComposeUiApi public abstract class ModifierNodeElement<N extends androidx.compose.ui.Modifier.Node> extends androidx.compose.ui.platform.InspectorValueInfo implements androidx.compose.ui.Modifier.Element {
+    ctor public ModifierNodeElement(optional Object? params, optional boolean autoInvalidate, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,kotlin.Unit> inspectorInfo);
     method public abstract N create();
-    method public abstract boolean equals(Object? other);
-    method public boolean getAutoInvalidate();
-    method public final kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> getInspectableElements();
-    method public final String? getNameFallback();
-    method public final Object? getValueOverride();
-    method public abstract int hashCode();
-    method public void inspectableProperties(androidx.compose.ui.platform.InspectorInfo);
     method public abstract N update(N node);
-    property public boolean autoInvalidate;
-    property public final kotlin.sequences.Sequence<androidx.compose.ui.platform.ValueElement> inspectableElements;
-    property public final String? nameFallback;
-    property public final Object? valueOverride;
+  }
+
+  public final class ModifierNodeElementKt {
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier modifierElementOf(Object? key, kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super T,? extends kotlin.Unit> update, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
+    method @androidx.compose.ui.ExperimentalComposeUiApi public static inline <reified T extends androidx.compose.ui.Modifier.Node> androidx.compose.ui.Modifier modifierElementOf(kotlin.jvm.functions.Function0<? extends T> create, kotlin.jvm.functions.Function1<? super androidx.compose.ui.platform.InspectorInfo,? extends kotlin.Unit> definitions);
   }
 
   @androidx.compose.ui.ExperimentalComposeUiApi public interface ObserverNode extends androidx.compose.ui.node.DelegatableNode {

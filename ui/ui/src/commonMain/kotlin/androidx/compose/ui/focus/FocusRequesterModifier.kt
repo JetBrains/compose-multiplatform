@@ -18,8 +18,7 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 
 /**
  * A [modifier][Modifier.Element] that is used to pass in a [FocusRequester] that can be used to
@@ -46,26 +45,23 @@ interface FocusRequesterModifier : Modifier.Element {
  *
  * @sample androidx.compose.ui.samples.RequestFocusSample
  */
-fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier =
-    this then FocusRequesterElement(focusRequester)
-
-@OptIn(ExperimentalComposeUiApi::class)
-private data class FocusRequesterElement(
-    val focusRequester: FocusRequester
-) : ModifierNodeElement<FocusRequesterModifierNodeImpl>() {
-    override fun create() = FocusRequesterModifierNodeImpl(focusRequester)
-
-    override fun update(node: FocusRequesterModifierNodeImpl) = node.apply {
-        focusRequester.focusRequesterNodes -= this
-        focusRequester = this@FocusRequesterElement.focusRequester
-        focusRequester.focusRequesterNodes += this
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "focusRequester"
-        properties["focusRequester"] = focusRequester
-    }
-}
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.focusRequester(focusRequester: FocusRequester): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
+    (modifierElementOf(
+        key = focusRequester,
+        create = { FocusRequesterModifierNodeImpl(focusRequester) },
+        update = {
+            it.focusRequester.focusRequesterNodes -= it
+            it.focusRequester = focusRequester
+            it.focusRequester.focusRequesterNodes += it
+        },
+        definitions = {
+            name = "focusRequester"
+            properties["focusRequester"] = focusRequester
+        }
+    ))
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class FocusRequesterModifierNodeImpl(

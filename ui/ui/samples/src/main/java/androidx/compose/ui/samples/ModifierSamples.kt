@@ -45,10 +45,9 @@ import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.DrawModifierNode
 import androidx.compose.ui.node.GlobalPositionAwareModifierNode
 import androidx.compose.ui.node.LayoutAwareModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.PointerInputModifierNode
 import androidx.compose.ui.node.SemanticsModifierNode
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.onClick
@@ -60,8 +59,7 @@ import androidx.compose.ui.unit.dp
 fun ModifierUsageSample() {
     Text(
         "Hello, World!",
-        Modifier
-            .padding(16.dp) // Outer padding; outside background
+        Modifier.padding(16.dp) // Outer padding; outside background
             .background(color = Color.Green) // Solid element background color
             .padding(16.dp) // Inner padding; inside background, around text
     )
@@ -74,10 +72,7 @@ fun ModifierFactorySample() {
 
     fun Modifier.fancy(level: Float) = this.then(FancyModifier(level))
 
-    Row(
-        Modifier
-            .fancy(1f)
-            .padding(10.dp)) {
+    Row(Modifier.fancy(1f).padding(10.dp)) {
         // content
     }
 }
@@ -164,29 +159,23 @@ fun DelegatedNodeSample() {
 @ExperimentalComposeUiApi
 @Sampled
 @Composable
-fun ModifierNodeElementSample() {
+fun ModifierElementOfSample() {
     class Circle(var color: Color) : DrawModifierNode, Modifier.Node() {
         override fun ContentDrawScope.draw() {
             drawCircle(color)
         }
     }
-    data class CircleElement(
-        val color: Color
-    ) : ModifierNodeElement<Circle>() {
-        override fun create() = Circle(color)
-        override fun update(node: Circle): Circle {
-            node.color = color
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.circle(color: Color) = this then modifierElementOf(
+        key = color,
+        create = { Circle(color) },
+        update = { it.color = color },
+        definitions = {
             name = "circle"
             properties["color"] = color
         }
-    }
-    fun Modifier.circle(color: Color) = this then CircleElement(color)
+    )
 }
 
-@Suppress("LocalVariableName")
 @ExperimentalComposeUiApi
 @Sampled
 @Composable
@@ -197,24 +186,12 @@ fun SemanticsModifierNodeSample() {
                 heading()
             }
     }
-
-    val HeadingElement = object : ModifierNodeElement<HeadingNode>() {
-        override fun create() = HeadingNode()
-
-        override fun update(node: HeadingNode): HeadingNode {
-            // Nothing to update.
-            return node
-        }
-
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.heading() = this then modifierElementOf(
+        create = { HeadingNode() },
+        definitions = {
             name = "heading"
         }
-
-        override fun hashCode(): Int = "heading".hashCode()
-        override fun equals(other: Any?) = (other === this)
-    }
-
-    fun Modifier.heading() = this then HeadingElement
+    )
 }
 
 @ExperimentalComposeUiApi
@@ -238,23 +215,15 @@ fun PointerInputModifierNodeSample() {
         }
     }
 
-    data class PointerInputElement(
-        val callback: (PointerEvent) -> Unit
-    ) : ModifierNodeElement<OnPointerEventNode>() {
-        override fun create() = OnPointerEventNode(callback)
-        override fun update(node: OnPointerEventNode): OnPointerEventNode {
-            node.callback = callback
-            return node
-        }
-
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.onPointerEvent(callback: (PointerEvent) -> Unit) = this then modifierElementOf(
+        key = callback,
+        create = { OnPointerEventNode(callback) },
+        update = { it.callback = callback },
+        definitions = {
             name = "onPointerEvent"
             properties["callback"] = callback
         }
-    }
-
-    fun Modifier.onPointerEvent(callback: (PointerEvent) -> Unit) =
-        this then PointerInputElement(callback)
+    )
 }
 
 @ExperimentalComposeUiApi
@@ -267,19 +236,15 @@ fun LayoutAwareModifierNodeSample() {
         }
     }
 
-    data class LogSizeElement(val id: String) : ModifierNodeElement<SizeLoggerNode>() {
-        override fun create(): SizeLoggerNode = SizeLoggerNode(id)
-        override fun update(node: SizeLoggerNode): SizeLoggerNode {
-            node.id = id
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.logSize(id: String) = this then modifierElementOf(
+        key = id,
+        create = { SizeLoggerNode(id) },
+        update = { it.id = id },
+        definitions = {
             name = "logSize"
             properties["id"] = id
         }
-    }
-
-    fun Modifier.logSize(id: String) = this then LogSizeElement(id)
+    )
 }
 
 @ExperimentalComposeUiApi
@@ -301,19 +266,15 @@ fun GlobalPositionAwareModifierNodeSample() {
         }
     }
 
-    data class PositionLoggerElement(val id: String) : ModifierNodeElement<PositionLoggerNode>() {
-        override fun create() = PositionLoggerNode(id)
-        override fun update(node: PositionLoggerNode): PositionLoggerNode {
-            node.id = id
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.logPosition(id: String) = this then modifierElementOf(
+        key = id,
+        create = { PositionLoggerNode(id) },
+        update = { it.id = id },
+        definitions = {
             name = "logPosition"
             properties["id"] = id
         }
-    }
-
-    fun Modifier.logPosition(id: String) = this then PositionLoggerElement(id)
+    )
 }
 
 @ExperimentalComposeUiApi
@@ -328,44 +289,32 @@ fun JustReadingOrProvidingModifierLocalNodeSample() {
         override val providedValues = modifierLocalMapOf(loggerLocal to logger)
     }
 
-    data class ProvideLoggerElement(
-        val logger: Logger
-    ) : ModifierNodeElement<ProvideLoggerNode>() {
-        override fun create() = ProvideLoggerNode(logger)
-        override fun update(node: ProvideLoggerNode): ProvideLoggerNode {
-            node.provide(loggerLocal, logger)
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
-            name = "provideLogger"
-            properties["logger"] = logger
-        }
-    }
-
-    class SizeLoggerNode(
-        var id: String
-    ) : ModifierLocalNode, LayoutAwareModifierNode, Modifier.Node() {
+    class SizeLoggerNode(var id: String) :
+        ModifierLocalNode, LayoutAwareModifierNode, Modifier.Node() {
         override fun onRemeasured(size: IntSize) {
             loggerLocal.current.log("The size of $id was $size")
         }
     }
 
-    data class SizeLoggerElement(
-        val id: String
-    ) : ModifierNodeElement<SizeLoggerNode>() {
-        override fun create() = SizeLoggerNode(id)
-        override fun update(node: SizeLoggerNode): SizeLoggerNode {
-            node.id = id
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.logSize(id: String) = this then modifierElementOf(
+        key = id,
+        create = { SizeLoggerNode(id) },
+        update = { it.id = id },
+        definitions = {
             name = "logSize"
             properties["id"] = id
         }
-    }
+    )
 
-    fun Modifier.logSize(id: String) = this then SizeLoggerElement(id)
-    fun Modifier.provideLogger(logger: Logger) = this then ProvideLoggerElement(logger)
+    fun Modifier.provideLogger(logger: Logger) = this then modifierElementOf(
+        key = logger,
+        create = { ProvideLoggerNode(logger) },
+        update = { it.provide(loggerLocal, logger) },
+        definitions = {
+            name = "provideLogger"
+            properties["logger"] = logger
+        }
+    )
 }
 
 @OptIn(ExperimentalComposeUiApi::class)

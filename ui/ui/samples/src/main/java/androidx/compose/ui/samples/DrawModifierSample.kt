@@ -40,8 +40,7 @@ import androidx.compose.ui.graphics.vector.Path
 import androidx.compose.ui.graphics.vector.PathData
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.node.DrawModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.unit.dp
 
 /**
@@ -141,17 +140,14 @@ fun DrawModifierNodeSample() {
             drawCircle(color)
         }
     }
-    data class CircleElement(val color: Color) : ModifierNodeElement<CircleNode>() {
-        override fun create() = CircleNode(color)
-        override fun update(node: CircleNode): CircleNode {
-            node.color = color
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
-            name = "color"
+    fun Modifier.circle(color: Color) = this then modifierElementOf(
+        key = color,
+        create = { CircleNode(color) },
+        update = { it.color = color },
+        definitions = {
+            name = "circle"
             properties["color"] = color
         }
-    }
-    fun Modifier.circle(color: Color) = this then CircleElement(color)
+    )
     Box(Modifier.fillMaxSize().circle(Color.Blue))
 }

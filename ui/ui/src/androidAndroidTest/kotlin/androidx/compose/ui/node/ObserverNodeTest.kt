@@ -22,7 +22,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -163,17 +162,7 @@ class ObserverNodeTest {
 
     @ExperimentalComposeUiApi
     private inline fun <reified T : Modifier.Node> Modifier.modifierElementOf(node: T): Modifier {
-        return this then ModifierElementOf(node)
-    }
-
-    private data class ModifierElementOf<T : Modifier.Node>(
-        val node: T
-    ) : ModifierNodeElement<T>() {
-        override fun create(): T = node
-        override fun update(node: T) = this.node
-        override fun InspectorInfo.inspectableProperties() {
-            name = "testNode"
-        }
+        return this.then(modifierElementOf(create = { node }, definitions = { name = "testNode" }))
     }
 
     class TestObserverNode(

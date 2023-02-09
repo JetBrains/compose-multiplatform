@@ -35,8 +35,7 @@ import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.node.LayoutModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -208,20 +207,15 @@ fun LayoutModifierNodeSample() {
             }
         }
     }
-    data class VerticalPaddingElement(
-        val padding: Dp
-    ) : ModifierNodeElement<VerticalPadding>() {
-        override fun create() = VerticalPadding(padding)
-        override fun update(node: VerticalPadding): VerticalPadding {
-            node.padding = padding
-            return node
-        }
-        override fun InspectorInfo.inspectableProperties() {
+    fun Modifier.verticalPadding(padding: Dp) = this then modifierElementOf(
+        key = padding,
+        create = { VerticalPadding(padding) },
+        update = { it.padding = padding },
+        definitions = {
             name = "verticalPadding"
             properties["padding"] = padding
         }
-    }
-    fun Modifier.verticalPadding(padding: Dp) = this then VerticalPaddingElement(padding)
+    )
     Box(Modifier.background(Color.Gray).verticalPadding(50.dp)) {
         Box(Modifier.fillMaxSize().background(Color.DarkGray))
     }

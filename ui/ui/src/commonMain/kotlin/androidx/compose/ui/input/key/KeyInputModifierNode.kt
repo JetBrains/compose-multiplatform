@@ -19,8 +19,6 @@ package androidx.compose.ui.input.key
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.DelegatableNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * Implement this interface to create a [Modifier.Node] that can intercept hardware Key events.
@@ -48,45 +46,6 @@ interface KeyInputModifierNode : DelegatableNode {
      * it will be sent back up to the root using the [onKeyEvent] function.
      */
     fun onPreKeyEvent(event: KeyEvent): Boolean
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal data class OnKeyEventElement(
-    val onKeyEvent: (KeyEvent) -> Boolean
-) : ModifierNodeElement<KeyInputInputModifierNodeImpl>() {
-    override fun create() = KeyInputInputModifierNodeImpl(
-        onEvent = onKeyEvent,
-        onPreEvent = null
-    )
-
-    override fun update(node: KeyInputInputModifierNodeImpl) = node.apply {
-        onEvent = onKeyEvent
-        onPreEvent = null
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "onKeyEvent"
-        properties["onKeyEvent"] = onKeyEvent
-    }
-}
-
-@OptIn(ExperimentalComposeUiApi::class)
-internal data class OnPreviewKeyEvent(
-    val onPreviewKeyEvent: (KeyEvent) -> Boolean
-) : ModifierNodeElement<KeyInputInputModifierNodeImpl>() {
-    override fun create(): KeyInputInputModifierNodeImpl {
-        return KeyInputInputModifierNodeImpl(onEvent = null, onPreEvent = onPreviewKeyEvent)
-    }
-
-    override fun update(node: KeyInputInputModifierNodeImpl) = node.apply {
-        onPreEvent = onPreviewKeyEvent
-        onEvent = null
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "onPreviewKeyEvent"
-        properties["onPreviewKeyEvent"] = onPreviewKeyEvent
-    }
 }
 
 @ExperimentalComposeUiApi

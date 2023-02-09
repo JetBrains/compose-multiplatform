@@ -18,8 +18,7 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 
 /**
  * A [modifier][Modifier.Element] that can be used to observe focus state events.
@@ -36,25 +35,19 @@ interface FocusEventModifier : Modifier.Element {
 /**
  * Add this modifier to a component to observe focus state events.
  */
-fun Modifier.onFocusEvent(
-    onFocusEvent: (FocusState) -> Unit
-): Modifier = this then FocusEventElement(onFocusEvent)
-
-@OptIn(ExperimentalComposeUiApi::class)
-private data class FocusEventElement(
-    val onFocusEvent: (FocusState) -> Unit
-) : ModifierNodeElement<FocusEventModifierNodeImpl>() {
-    override fun create() = FocusEventModifierNodeImpl(onFocusEvent)
-
-    override fun update(node: FocusEventModifierNodeImpl) = node.apply {
-        onFocusEvent = this@FocusEventElement.onFocusEvent
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "onFocusEvent"
-        properties["onFocusEvent"] = onFocusEvent
-    }
-}
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.onFocusEvent(onFocusEvent: (FocusState) -> Unit): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
+    (modifierElementOf(
+        key = onFocusEvent,
+        create = { FocusEventModifierNodeImpl(onFocusEvent) },
+        update = { it.onFocusEvent = onFocusEvent },
+        definitions = {
+            name = "onFocusEvent"
+            properties["onFocusEvent"] = onFocusEvent
+        }
+    ))
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class FocusEventModifierNodeImpl(

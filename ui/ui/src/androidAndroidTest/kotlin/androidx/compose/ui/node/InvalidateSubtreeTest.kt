@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.LayoutModifier
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
@@ -50,9 +50,16 @@ class InvalidateSubtreeTest {
         val counter1 = LayoutAndDrawCounter()
         val counter2 = LayoutAndDrawCounter()
         val counter3 = LayoutAndDrawCounter()
-        val captureInvalidate = CaptureInvalidateCounter { node ->
-            invalidate = { node.invalidateSubtree() }
-        }
+        val captureInvalidate = modifierElementOf(
+            create = {
+                val obj = object : Modifier.Node() {}
+                invalidate = { obj.invalidateSubtree() }
+                obj
+            },
+            definitions = debugInspectorInfo {
+                name = "Invalidate Subtree Modifier.Node"
+            }
+        )
         rule.setContent {
             Box(counter1) {
                 Box(counter2 then captureInvalidate) {
@@ -95,9 +102,16 @@ class InvalidateSubtreeTest {
         val counter2 = LayoutAndDrawCounter()
         val counter3 = LayoutAndDrawCounter()
         val counter4 = LayoutAndDrawCounter()
-        val captureInvalidate = CaptureInvalidateCounter { node ->
-            invalidate = { node.invalidateSubtree() }
-        }
+        val captureInvalidate = modifierElementOf(
+            create = {
+                val obj = object : Modifier.Node() {}
+                invalidate = { obj.invalidateSubtree() }
+                obj
+            },
+            definitions = debugInspectorInfo {
+                name = "Invalidate Subtree Modifier.Node"
+            }
+        )
         rule.setContent {
             Box(Modifier.graphicsLayer {} then counter1.graphicsLayer { }) {
                 Box(Modifier.graphicsLayer { } then
@@ -144,21 +158,5 @@ class InvalidateSubtreeTest {
             drawCount++
             drawContent()
         }
-    }
-
-    private class CaptureInvalidateCounter(
-        private val onCreate: (node: Modifier.Node) -> Unit
-    ) : ModifierNodeElement<Modifier.Node>() {
-        override fun create() = object : Modifier.Node() {}
-            .apply<Modifier.Node>(onCreate)
-
-        override fun update(node: Modifier.Node) = node
-
-        override fun InspectorInfo.inspectableProperties() {
-            name = "Invalidate Subtree Modifier.Node"
-        }
-
-        override fun hashCode() = 0
-        override fun equals(other: Any?) = (other === this)
     }
 }

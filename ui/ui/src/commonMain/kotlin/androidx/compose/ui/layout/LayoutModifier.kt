@@ -21,8 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 import androidx.compose.ui.node.LayoutModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -264,25 +263,18 @@ private object MeasuringIntrinsics {
  *
  * @see androidx.compose.ui.layout.LayoutModifier
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.layout(
     measure: MeasureScope.(Measurable, Constraints) -> MeasureResult
-) = this then LayoutModifierElement(measure)
-
-@OptIn(ExperimentalComposeUiApi::class)
-private data class LayoutModifierElement(
-    val measure: MeasureScope.(Measurable, Constraints) -> MeasureResult
-) : ModifierNodeElement<LayoutModifierImpl>() {
-    override fun create() = LayoutModifierImpl(measure)
-
-    override fun update(node: LayoutModifierImpl) = node.apply {
-        measureBlock = measure
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
+) = this then modifierElementOf(
+    key = measure,
+    create = { LayoutModifierImpl(measure) },
+    update = { layoutModifier -> layoutModifier.measureBlock = measure },
+    definitions = {
         name = "layout"
         properties["measure"] = measure
     }
-}
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal class LayoutModifierImpl(

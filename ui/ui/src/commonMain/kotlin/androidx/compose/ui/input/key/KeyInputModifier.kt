@@ -16,7 +16,9 @@
 
 package androidx.compose.ui.input.key
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.node.modifierElementOf
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -28,9 +30,19 @@ import androidx.compose.ui.Modifier
  *
  * @sample androidx.compose.ui.samples.KeyEventSample
  */
-fun Modifier.onKeyEvent(
-    onKeyEvent: (KeyEvent) -> Boolean
-): Modifier = this then OnKeyEventElement(onKeyEvent)
+@OptIn(ExperimentalComposeUiApi::class)
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.onKeyEvent(onKeyEvent: (KeyEvent) -> Boolean): Modifier = this.then(
+    modifierElementOf(
+        key = onKeyEvent,
+        create = { KeyInputInputModifierNodeImpl(onEvent = onKeyEvent, onPreEvent = null) },
+        update = { it.onEvent = onKeyEvent },
+        definitions = {
+            name = "onKeyEvent"
+            properties["onKeyEvent"] = onKeyEvent
+        }
+    )
+)
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -44,6 +56,16 @@ fun Modifier.onKeyEvent(
  *
  * @sample androidx.compose.ui.samples.KeyEventSample
  */
-fun Modifier.onPreviewKeyEvent(
-    onPreviewKeyEvent: (KeyEvent) -> Boolean
-): Modifier = this then OnPreviewKeyEvent(onPreviewKeyEvent)
+@OptIn(ExperimentalComposeUiApi::class)
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.onPreviewKeyEvent(onPreviewKeyEvent: (KeyEvent) -> Boolean): Modifier = this.then(
+    modifierElementOf(
+        key = onPreviewKeyEvent,
+        create = { KeyInputInputModifierNodeImpl(onEvent = null, onPreEvent = onPreviewKeyEvent) },
+        update = { it.onPreEvent = onPreviewKeyEvent },
+        definitions = {
+            name = "onPreviewKeyEvent"
+            properties["onPreviewKeyEvent"] = onPreviewKeyEvent
+        }
+    )
+)
