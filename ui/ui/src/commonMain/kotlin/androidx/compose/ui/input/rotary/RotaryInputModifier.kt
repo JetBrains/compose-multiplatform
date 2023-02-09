@@ -16,9 +16,7 @@
 
 package androidx.compose.ui.input.rotary
 
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.modifierElementOf
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -39,21 +37,9 @@ import androidx.compose.ui.node.modifierElementOf
  * access to a [RotaryScrollEvent] when a child does not consume it:
  * @sample androidx.compose.ui.samples.PreRotaryEventSample
  */
-@Suppress("ModifierInspectorInfo") // b/251831790.
 fun Modifier.onRotaryScrollEvent(
     onRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
-): Modifier = this.then(
-    @OptIn(ExperimentalComposeUiApi::class)
-    modifierElementOf(
-        key = onRotaryScrollEvent,
-        create = { RotaryInputModifierNodeImpl(onEvent = onRotaryScrollEvent, onPreEvent = null) },
-        update = { it.onEvent = onRotaryScrollEvent },
-        definitions = {
-            name = "onRotaryScrollEvent"
-            properties["onRotaryScrollEvent"] = onRotaryScrollEvent
-        }
-    )
-)
+): Modifier = this then OnRotaryScrollEventElement(onRotaryScrollEvent)
 
 /**
  * Adding this [modifier][Modifier] to the [modifier][Modifier] parameter of a component will
@@ -76,20 +62,6 @@ fun Modifier.onRotaryScrollEvent(
  *
  * @sample androidx.compose.ui.samples.PreRotaryEventSample
  */
-@Suppress("ModifierInspectorInfo") // b/251831790.
 fun Modifier.onPreRotaryScrollEvent(
     onPreRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
-): Modifier = this.then(
-    @OptIn(ExperimentalComposeUiApi::class)
-    modifierElementOf(
-        key = onPreRotaryScrollEvent,
-        create = {
-            RotaryInputModifierNodeImpl(onEvent = null, onPreEvent = onPreRotaryScrollEvent)
-        },
-        update = { it.onPreEvent = onPreRotaryScrollEvent },
-        definitions = {
-            name = "onPreRotaryScrollEvent"
-            properties["onPreRotaryScrollEvent"] = onPreRotaryScrollEvent
-        }
-    )
-)
+): Modifier = this then OnPreRotaryScrollEventElement(onPreRotaryScrollEvent)

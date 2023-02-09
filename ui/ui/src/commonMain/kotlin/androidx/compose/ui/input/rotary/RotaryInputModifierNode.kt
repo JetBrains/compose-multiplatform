@@ -19,6 +19,8 @@ package androidx.compose.ui.input.rotary
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.DelegatableNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * Implement this interface to create a [Modifier.Node] that can intercept rotary scroll events.
@@ -45,6 +47,46 @@ interface RotaryInputModifierNode : DelegatableNode {
      * it will be sent back up to the root using the [onRotaryScrollEvent] function.
      */
     fun onPreRotaryScrollEvent(event: RotaryScrollEvent): Boolean
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal data class OnRotaryScrollEventElement(
+    val onRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
+) : ModifierNodeElement<RotaryInputModifierNodeImpl>() {
+    override fun create() = RotaryInputModifierNodeImpl(
+        onEvent = onRotaryScrollEvent,
+        onPreEvent = null
+    )
+
+    override fun update(node: RotaryInputModifierNodeImpl) = node.apply {
+        onEvent = onRotaryScrollEvent
+        onPreEvent = null
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "onRotaryScrollEvent"
+        properties["onRotaryScrollEvent"] = onRotaryScrollEvent
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal data class OnPreRotaryScrollEventElement(
+    val onPreRotaryScrollEvent: (RotaryScrollEvent) -> Boolean
+) : ModifierNodeElement<RotaryInputModifierNodeImpl>() {
+    override fun create() = RotaryInputModifierNodeImpl(
+        onEvent = null,
+        onPreEvent = onPreRotaryScrollEvent
+    )
+
+    override fun update(node: RotaryInputModifierNodeImpl) = node.apply {
+        onPreEvent = onPreRotaryScrollEvent
+        onEvent = null
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "onPreRotaryScrollEvent"
+        properties["onPreRotaryScrollEvent"] = onPreRotaryScrollEvent
+    }
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
