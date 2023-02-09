@@ -29,8 +29,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 import androidx.compose.ui.node.DrawModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 
 /**
  * A [Modifier.Element] that draws into the space of the layout.
@@ -85,25 +84,25 @@ interface BuildDrawCacheParams {
 /**
  * Draw into a [Canvas] behind the modified content.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.drawBehind(
     onDraw: DrawScope.() -> Unit
-) = this then DrawBehindElement(onDraw)
+) = this.then(
+    modifierElementOf(
+        key = onDraw,
+        create = {
+            DrawBackgroundModifier(onDraw = onDraw)
+        },
+        update = {
+            it.onDraw = onDraw
+        },
+        definitions = debugInspectorInfo {
+            name = "drawBehind"
+            properties["onDraw"] = onDraw
+        }
+    )
 
-@OptIn(ExperimentalComposeUiApi::class)
-private data class DrawBehindElement(
-    val onDraw: DrawScope.() -> Unit
-) : ModifierNodeElement<DrawBackgroundModifier>() {
-    override fun create() = DrawBackgroundModifier(onDraw)
-
-    override fun update(node: DrawBackgroundModifier) = node.apply {
-        onDraw = this@DrawBehindElement.onDraw
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "drawBehind"
-        properties["onDraw"] = onDraw
-    }
-}
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class DrawBackgroundModifier(
@@ -244,25 +243,27 @@ class DrawResult internal constructor(internal var block: ContentDrawScope.() ->
  * Creates a [DrawModifier] that allows the developer to draw before or after the layout's
  * contents. It also allows the modifier to adjust the layout's canvas.
  */
+@OptIn(ExperimentalComposeUiApi::class)
 fun Modifier.drawWithContent(
     onDraw: ContentDrawScope.() -> Unit
-): Modifier = this then DrawWithContentElement(onDraw)
+): Modifier = this.then(
+    modifierElementOf(
+        key = onDraw,
+        create = {
+            DrawWithContentModifier(
+                onDraw = onDraw
+            )
+        },
+        update = {
+            it.onDraw = onDraw
+        },
+        definitions = debugInspectorInfo {
+            name = "drawWithContent"
+            properties["onDraw"] = onDraw
+        }
+    )
 
-@OptIn(ExperimentalComposeUiApi::class)
-private data class DrawWithContentElement(
-    val onDraw: ContentDrawScope.() -> Unit
-) : ModifierNodeElement<DrawWithContentModifier>() {
-    override fun create() = DrawWithContentModifier(onDraw)
-
-    override fun update(node: DrawWithContentModifier) = node.apply {
-        onDraw = this@DrawWithContentElement.onDraw
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "drawWithContent"
-        properties["onDraw"] = onDraw
-    }
-}
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class DrawWithContentModifier(

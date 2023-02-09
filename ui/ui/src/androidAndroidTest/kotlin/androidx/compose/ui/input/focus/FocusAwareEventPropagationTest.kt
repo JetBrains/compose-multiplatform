@@ -32,8 +32,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputInputModifierNodeImpl
 import androidx.compose.ui.input.rotary.RotaryInputModifierNodeImpl
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -531,47 +530,54 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
     }
 
     private fun Modifier.onFocusAwareEvent(onEvent: (Any) -> Boolean): Modifier = this.then(
-        FocusAwareEventElement(onEvent, nodeType, EventType.OnEvent)
+        @OptIn(ExperimentalComposeUiApi::class)
+        when (nodeType) {
+            KeyInput -> modifierElementOf(
+                key = onEvent,
+                create = { KeyInputInputModifierNodeImpl(onEvent = onEvent, onPreEvent = null) },
+                update = { it.onEvent = onEvent },
+                definitions = {
+                    name = "onEvent"
+                    properties["onEvent"] = onEvent
+                }
+            )
+
+            RotaryInput -> modifierElementOf(
+                key = onEvent,
+                create = { RotaryInputModifierNodeImpl(onEvent = onEvent, onPreEvent = null) },
+                update = { it.onEvent = onEvent },
+                definitions = {
+                    name = "onEvent"
+                    properties["onEvent"] = onEvent
+                }
+            )
+        }
     )
 
     private fun Modifier.onPreFocusAwareEvent(onEvent: (Any) -> Boolean): Modifier = this.then(
-        FocusAwareEventElement(onEvent, nodeType, EventType.PreEvent)
+        @OptIn(ExperimentalComposeUiApi::class)
+        when (nodeType) {
+            KeyInput -> modifierElementOf(
+                key = onEvent,
+                create = { KeyInputInputModifierNodeImpl(onEvent = null, onPreEvent = onEvent) },
+                update = { it.onEvent = onEvent },
+                definitions = {
+                    name = "onEvent"
+                    properties["onEvent"] = onEvent
+                }
+            )
+
+            RotaryInput -> modifierElementOf(
+                key = onEvent,
+                create = { RotaryInputModifierNodeImpl(onEvent = null, onPreEvent = onEvent) },
+                update = { it.onEvent = onEvent },
+                definitions = {
+                    name = "onEvent"
+                    properties["onEvent"] = onEvent
+                }
+            )
+        }
     )
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    private data class FocusAwareEventElement(
-        private val callback: (Any) -> Boolean,
-        private val nodeType: NodeType,
-        private val eventType: EventType
-    ) : ModifierNodeElement<Modifier.Node>() {
-        override fun create() = when (nodeType) {
-            KeyInput -> KeyInputInputModifierNodeImpl(
-                onEvent = callback.takeIf { eventType == EventType.OnEvent },
-                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
-            )
-            RotaryInput -> RotaryInputModifierNodeImpl(
-                onEvent = callback.takeIf { eventType == EventType.OnEvent },
-                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
-            )
-        }
-
-        override fun update(node: Modifier.Node) = when (nodeType) {
-            KeyInput -> (node as KeyInputInputModifierNodeImpl).apply {
-                onEvent = callback.takeIf { eventType == EventType.OnEvent }
-                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
-            }
-            RotaryInput -> (node as RotaryInputModifierNodeImpl).apply {
-                onEvent = callback.takeIf { eventType == EventType.OnEvent }
-                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
-            }
-        }
-
-        override fun InspectorInfo.inspectableProperties() {
-            name = "onEvent"
-            properties["onEvent"] = callback
-        }
-    }
-
     enum class NodeType { KeyInput, RotaryInput }
-    enum class EventType { PreEvent, OnEvent }
 }

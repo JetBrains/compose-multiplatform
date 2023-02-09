@@ -23,7 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.node.DelegatingNode
-import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
@@ -194,17 +194,15 @@ class CombinedFocusModifierNodeTest(private val delegatedFocusTarget: Boolean) {
 
     private fun Modifier.combinedFocusNode(combinedFocusNode: CombinedFocusNode): Modifier {
         return this
-            .then(CombinedFocusNodeElement(combinedFocusNode))
+            .then(
+                modifierElementOf(
+                    key = combinedFocusNode,
+                    create = { combinedFocusNode },
+                    update = { it.focusState = combinedFocusNode.focusState },
+                    definitions = { name = "CombinedFocusNode" }
+                )
+            )
             .then(if (delegatedFocusTarget) Modifier else Modifier.focusTarget())
-    }
-
-    private data class CombinedFocusNodeElement(
-        val combinedFocusNode: CombinedFocusNode
-    ) : ModifierNodeElement<CombinedFocusNode>() {
-        override fun create(): CombinedFocusNode = combinedFocusNode
-        override fun update(node: CombinedFocusNode) = node.apply {
-            focusState = combinedFocusNode.focusState
-        }
     }
 
     companion object {

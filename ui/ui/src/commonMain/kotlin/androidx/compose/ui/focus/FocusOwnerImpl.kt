@@ -31,13 +31,12 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyInputModifierNode
 import androidx.compose.ui.input.rotary.RotaryScrollEvent
 import androidx.compose.ui.node.DelegatableNode
-import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.NodeKind
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.ancestors
+import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.node.nearestAncestor
 import androidx.compose.ui.node.visitLocalChildren
-import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastForEachReversed
@@ -58,20 +57,12 @@ internal class FocusOwnerImpl(onRequestApplyChangesListener: (() -> Unit) -> Uni
      * list that contains the modifiers required by the focus system. (Eg, a root focus modifier).
      */
     // TODO(b/168831247): return an empty Modifier when there are no focusable children.
+    @Suppress("ModifierInspectorInfo") // b/251831790.
     @OptIn(ExperimentalComposeUiApi::class)
-    override val modifier: Modifier = object : ModifierNodeElement<FocusTargetModifierNode>() {
-        override fun create() = rootFocusNode
-
-        override fun update(node: FocusTargetModifierNode) = node
-
-        override fun InspectorInfo.inspectableProperties() {
-            name = "RootFocusTarget"
-        }
-
-        override fun hashCode(): Int = rootFocusNode.hashCode()
-
-        override fun equals(other: Any?) = other === this
-    }
+    override val modifier: Modifier = modifierElementOf(
+        create = { rootFocusNode },
+        definitions = { name = "RootFocusTarget" }
+    )
 
     override lateinit var layoutDirection: LayoutDirection
 

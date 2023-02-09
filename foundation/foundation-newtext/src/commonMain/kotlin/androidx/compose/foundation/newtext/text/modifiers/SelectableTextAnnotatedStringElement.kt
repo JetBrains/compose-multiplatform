@@ -20,7 +20,7 @@ import androidx.compose.foundation.newtext.text.DefaultMinLines
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
@@ -29,7 +29,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 
 @ExperimentalComposeUiApi
-internal data class SelectableTextAnnotatedStringElement(
+internal class SelectableTextAnnotatedStringElement(
     private val text: AnnotatedString,
     private val style: TextStyle,
     private val fontFamilyResolver: FontFamily.Resolver,
@@ -41,8 +41,7 @@ internal data class SelectableTextAnnotatedStringElement(
     private val placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
     private val onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
     private val selectionController: SelectionController? = null
-) : ModifierNodeElement<SelectableTextAnnotatedStringNode>() {
-
+) : ModifierNodeElement<SelectableTextAnnotatedStringNode>(inspectorInfo = debugInspectorInfo { }) {
     override fun create(): SelectableTextAnnotatedStringNode = SelectableTextAnnotatedStringNode(
         text,
         style,
@@ -102,7 +101,8 @@ internal data class SelectableTextAnnotatedStringElement(
     }
 
     override fun hashCode(): Int {
-        var result = text.hashCode()
+        var result = super.hashCode()
+        result = 31 * result + text.hashCode()
         result = 31 * result + style.hashCode()
         result = 31 * result + fontFamilyResolver.hashCode()
         result = 31 * result + (onTextLayout?.hashCode() ?: 0)
@@ -114,9 +114,5 @@ internal data class SelectableTextAnnotatedStringElement(
         result = 31 * result + (onPlaceholderLayout?.hashCode() ?: 0)
         result = 31 * result + (selectionController?.hashCode() ?: 0)
         return result
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        // Show nothing in the inspector.
     }
 }

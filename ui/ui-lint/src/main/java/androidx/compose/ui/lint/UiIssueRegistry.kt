@@ -35,7 +35,6 @@ class UiIssueRegistry : IssueRegistry() {
         ModifierDeclarationDetector.ModifierFactoryExtensionFunction,
         ModifierDeclarationDetector.ModifierFactoryReturnType,
         ModifierDeclarationDetector.ModifierFactoryUnreferencedReceiver,
-        ModifierNodeInspectablePropertiesDetector.ModifierNodeInspectableProperties,
         ModifierParameterDetector.ModifierParameter,
         ReturnFromAwaitPointerEventScopeDetector.ExitAwaitPointerEventScope,
         MultipleAwaitPointerEventScopesDetector.MultipleAwaitPointerEventScopes

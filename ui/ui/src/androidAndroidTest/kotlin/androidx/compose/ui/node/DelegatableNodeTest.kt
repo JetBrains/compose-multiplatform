@@ -23,7 +23,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusTargetModifierNode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -606,18 +605,10 @@ class DelegatableNodeTest {
 
     private fun Modifier.otherModifier(): Modifier = this.then(Modifier)
 
-    private inline fun <reified T : Modifier.Node> modifierElementOf(noinline create: () -> T) =
-        ModifierElementOf(create)
-
-    private data class ModifierElementOf<T : Modifier.Node>(
-        val factory: () -> T
-    ) : ModifierNodeElement<T>() {
-        override fun create(): T = factory()
-        override fun update(node: T) = node
-        override fun InspectorInfo.inspectableProperties() {
-            name = "testNode"
-        }
-    }
+    @Suppress("ModifierInspectorInfo") // b/251831790.
+    @ExperimentalComposeUiApi
+    private inline fun <reified T : Modifier.Node> modifierElementOf(crossinline create: () -> T) =
+        modifierElementOf(create) { name = "testNode" }
 
     private class DetachableNode(val onDetach: (DetachableNode) -> Unit) : Modifier.Node() {
         override fun onDetach() {

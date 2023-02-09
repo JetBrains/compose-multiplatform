@@ -20,7 +20,7 @@ import androidx.compose.foundation.newtext.text.DefaultMinLines
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.TextLayoutResult
@@ -41,8 +41,7 @@ internal class TextAnnotatedStringElement(
     private val placeholders: List<AnnotatedString.Range<Placeholder>>? = null,
     private val onPlaceholderLayout: ((List<Rect?>) -> Unit)? = null,
     private val selectionController: SelectionController? = null
-) : ModifierNodeElement<TextAnnotatedStringNode>() {
-
+) : ModifierNodeElement<TextAnnotatedStringNode>(inspectorInfo = debugInspectorInfo { }) {
     override fun create(): TextAnnotatedStringNode = TextAnnotatedStringNode(
         text,
         style,
@@ -106,7 +105,8 @@ internal class TextAnnotatedStringElement(
     }
 
     override fun hashCode(): Int {
-        var result = text.hashCode()
+        var result = super.hashCode()
+        result = 31 * result + text.hashCode()
         result = 31 * result + style.hashCode()
         result = 31 * result + fontFamilyResolver.hashCode()
         result = 31 * result + (onTextLayout?.hashCode() ?: 0)
@@ -118,9 +118,5 @@ internal class TextAnnotatedStringElement(
         result = 31 * result + (onPlaceholderLayout?.hashCode() ?: 0)
         result = 31 * result + (selectionController?.hashCode() ?: 0)
         return result
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        // Show nothing in the inspector.
     }
 }

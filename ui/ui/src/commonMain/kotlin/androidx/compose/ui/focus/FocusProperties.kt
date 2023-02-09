@@ -18,8 +18,7 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 
 /**
  * Properties that are applied to [focusTarget] that is the first child of the
@@ -177,25 +176,19 @@ internal class FocusPropertiesImpl : FocusProperties {
  *
  * @sample androidx.compose.ui.samples.FocusPropertiesSample
  */
-fun Modifier.focusProperties(
-    scope: FocusProperties.() -> Unit
-): Modifier = this then FocusPropertiesElement(scope)
-
-@OptIn(ExperimentalComposeUiApi::class)
-private data class FocusPropertiesElement(
-    val scope: FocusProperties.() -> Unit
-) : ModifierNodeElement<FocusPropertiesModifierNodeImpl>() {
-    override fun create() = FocusPropertiesModifierNodeImpl(scope)
-
-    override fun update(node: FocusPropertiesModifierNodeImpl) = node.apply {
-        focusPropertiesScope = scope
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
-        name = "focusProperties"
-        properties["scope"] = scope
-    }
-}
+@Suppress("ModifierInspectorInfo") // b/251831790.
+fun Modifier.focusProperties(scope: FocusProperties.() -> Unit): Modifier = this.then(
+    @OptIn(ExperimentalComposeUiApi::class)
+    (modifierElementOf(
+        key = scope,
+        create = { FocusPropertiesModifierNodeImpl(scope) },
+        update = { it.focusPropertiesScope = scope },
+        definitions = {
+            name = "focusProperties"
+            properties["scope"] = scope
+        }
+    ))
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class FocusPropertiesModifierNodeImpl(

@@ -21,8 +21,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 import androidx.compose.ui.node.LayoutAwareModifierNode
-import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.InspectorInfo
+import androidx.compose.ui.node.modifierElementOf
 
 /**
  * Invoke [onPlaced] after the parent [LayoutModifier] and parent layout has been placed and before
@@ -31,26 +30,23 @@ import androidx.compose.ui.platform.InspectorInfo
  *
  * @sample androidx.compose.ui.samples.OnPlaced
  */
+@OptIn(ExperimentalComposeUiApi::class)
 @Stable
 fun Modifier.onPlaced(
     onPlaced: (LayoutCoordinates) -> Unit
-) = this then OnPlacedElement(onPlaced)
-
-@OptIn(ExperimentalComposeUiApi::class)
-private data class OnPlacedElement(
-    val onPlaced: (LayoutCoordinates) -> Unit
-) : ModifierNodeElement<OnPlacedModifierImpl>() {
-    override fun create() = OnPlacedModifierImpl(callback = onPlaced)
-
-    override fun update(node: OnPlacedModifierImpl) = node.apply {
-        callback = onPlaced
-    }
-
-    override fun InspectorInfo.inspectableProperties() {
+) = this then modifierElementOf(
+    key = onPlaced,
+    create = {
+        OnPlacedModifierImpl(callback = onPlaced)
+    },
+    update = {
+        it.callback = onPlaced
+    },
+    definitions = {
         name = "onPlaced"
         properties["onPlaced"] = onPlaced
     }
-}
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 private class OnPlacedModifierImpl(

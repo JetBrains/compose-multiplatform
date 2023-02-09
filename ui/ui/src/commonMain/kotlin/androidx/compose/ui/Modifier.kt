@@ -146,6 +146,7 @@ interface Modifier {
      * [Modifier.Node] subclass, it is expected that it will be instantiated by adding a
      * [androidx.compose.ui.node.ModifierNodeElement] to a [Modifier] chain.
      *
+     * @see androidx.compose.ui.node.modifierElementOf
      * @see androidx.compose.ui.node.ModifierNodeElement
      * @see androidx.compose.ui.node.DelegatableNode
      * @see androidx.compose.ui.node.DelegatingNode
