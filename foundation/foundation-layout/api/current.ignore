@@ -1,9 +1,0 @@
-// Baseline format: 1.0
-RemovedClass: androidx.compose.foundation.layout.RowColumnImplKt:
-    Removed class androidx.compose.foundation.layout.RowColumnImplKt
-RemovedClass: androidx.compose.foundation.layout.WindowInsetsConnection_androidKt:
-    Removed class androidx.compose.foundation.layout.WindowInsetsConnection_androidKt
-
-
-RemovedPackage: androidx.compose.foundation.layout.internal:
-    Removed package androidx.compose.foundation.layout.internal

@@ -1,7 +1,0 @@
-// Baseline format: 1.0
-RemovedPackage: androidx.compose.animation.graphics.res:
-    Removed package androidx.compose.animation.graphics.res
-RemovedPackage: androidx.compose.animation.graphics.vector:
-    Removed package androidx.compose.animation.graphics.vector
-RemovedPackage: androidx.compose.animation.graphics.vector.compat:
-    Removed package androidx.compose.animation.graphics.vector.compat
