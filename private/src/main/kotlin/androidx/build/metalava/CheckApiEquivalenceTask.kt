@@ -81,7 +81,11 @@ abstract class CheckApiEquivalenceTask : DefaultTask() {
     }
 }
 
-private fun summarizeDiff(a: File, b: File): String {
+/**
+ * Returns the output of running the `diff` command-line tool on files [a] and [b], truncated to
+ * [maxSummaryLines] lines.
+ */
+fun summarizeDiff(a: File, b: File, maxSummaryLines: Int = 50): String {
     if (!a.exists()) {
         return "$a does not exist"
     }
@@ -93,7 +97,6 @@ private fun summarizeDiff(a: File, b: File): String {
         .start()
     process.waitFor(5, TimeUnit.SECONDS)
     var diffLines = process.inputStream.bufferedReader().readLines().toMutableList()
-    val maxSummaryLines = 50
     if (diffLines.size > maxSummaryLines) {
         diffLines = diffLines.subList(0, maxSummaryLines)
         diffLines.plusAssign("[long diff was truncated]")
