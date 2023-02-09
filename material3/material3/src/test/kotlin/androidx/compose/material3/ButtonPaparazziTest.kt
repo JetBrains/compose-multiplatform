@@ -16,6 +16,16 @@
 
 package androidx.compose.material3
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.unit.dp
 import androidx.testutils.paparazzi.androidxPaparazzi
 import org.junit.Rule
 import org.junit.Test
@@ -47,6 +57,194 @@ class ButtonPaparazziTest {
                 Surface {
                     Button(onClick = { }) {
                         Text("Button")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun disabled_button_light_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(lightColorScheme()) {
+                Surface {
+                    Button(onClick = { }, enabled = false) {
+                        Text("Button")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun disabled_button_dark_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(darkColorScheme()) {
+                Surface {
+                    Button(onClick = { }, enabled = false) {
+                        Text("Button")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun elevated_button_light_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(lightColorScheme()) {
+                Surface {
+                    Box(
+                        Modifier.requiredSize(
+                            200.dp,
+                            100.dp
+                        ).wrapContentSize().testTag("elevated button")
+                    ) {
+                        ElevatedButton(onClick = {}) { Text("Elevated Button") }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun elevated_button_dark_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(darkColorScheme()) {
+                Surface {
+                    Box(
+                        Modifier.requiredSize(
+                            200.dp,
+                            100.dp
+                        ).wrapContentSize().testTag("elevated button")
+                    ) {
+                        ElevatedButton(onClick = {}) { Text("Elevated Button") }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun disabled_elevated_button_light_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(lightColorScheme()) {
+                Surface {
+                    Box(
+                        Modifier.requiredSize(
+                            200.dp,
+                            100.dp
+                        ).wrapContentSize().testTag("elevated button")
+                    ) {
+                        ElevatedButton(onClick = {}, enabled = false) { Text("Elevated Button") }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun disabled_elevated_button_dark_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(darkColorScheme()) {
+                Surface {
+                    Box(
+                        Modifier.requiredSize(
+                            200.dp,
+                            100.dp
+                        ).wrapContentSize().testTag("elevated button")
+                    ) {
+                        ElevatedButton(onClick = {}, enabled = false) { Text("Elevated Button") }
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun button_with_icon_light_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(lightColorScheme()) {
+                Surface {
+                    Button(
+                        onClick = { /* Do something! */ },
+                        contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+                    ) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("Like")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun button_with_icon_dark_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(darkColorScheme()) {
+                Surface {
+                    Button(
+                        onClick = { /* Do something! */ },
+                        contentPadding = ButtonDefaults.ButtonWithIconContentPadding
+                    ) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("Like")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun disabled_button_with_icon_light_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(lightColorScheme()) {
+                Surface {
+                    Button(
+                        onClick = { /* Do something! */ },
+                        contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                        enabled = false,
+                    ) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("Like")
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun disabled_button_with_icon_dark_theme() {
+        paparazzi.snapshot {
+            MaterialTheme(darkColorScheme()) {
+                Surface {
+                    Button(
+                        onClick = { /* Do something! */ },
+                        contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
+                        enabled = false,
+                    ) {
+                        Icon(
+                            Icons.Filled.Favorite,
+                            contentDescription = "Localized description",
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text("Like")
                     }
                 }
             }
