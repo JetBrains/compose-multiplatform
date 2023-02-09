@@ -28,6 +28,7 @@ abstract class PrintProjectCoordinatesTask : DefaultTask() {
 
     fun configureWithAndroidXExtension(androidXExtension: AndroidXExtension) {
         projectGroup = androidXExtension.mavenGroup
+        groupExplanation = androidXExtension.explainMavenGroup()
         projectName = project.name
         version = project.version.toString()
         projectDir = project.projectDir.relativeTo(project.rootDir)
@@ -36,6 +37,9 @@ abstract class PrintProjectCoordinatesTask : DefaultTask() {
 
     @Internal // Task is always out-of-date: no need to track inputs
     var projectGroup: LibraryGroup? = null
+
+    @Internal // Task is always out-of-date: no need to track inputs
+    var groupExplanation: List<String>? = null
 
     @Internal // Task is always out-of-date: no need to track inputs
     var projectName: String? = null
@@ -59,14 +63,19 @@ abstract class PrintProjectCoordinatesTask : DefaultTask() {
                 "group.atomicGroupVersion"
             }
 
-        /* ktlint-disable no-multi-spaces */ // easier to read in table format
-        val lines = listOf(
-            listOf("filepath: $projectDir/build.gradle ", "(from settings.gradle)"),
-            listOf("group   : ${projectGroup?.group} ",   "(from AndroidXExtension.kt)"),
-            listOf("artifact: $projectName ",             "(from project name)"),
-            listOf("version : $version ",                 "(from $versionFrom)"),
+        val groupExplanation = groupExplanation!!
+        val lines = mutableListOf(
+            listOf("filepath: $projectDir/build.gradle ", "(from settings.gradle)")
         )
-        /* ktlint-enable no-multi-spaces */
+        // put each component of the explanation on its own line
+        groupExplanation.forEachIndexed { i, component ->
+            if (i == 0)
+                lines.add(listOf("group   : ${projectGroup?.group} ", "$component"))
+            else
+                lines.add(listOf("", "$component"))
+        }
+        lines.add(listOf("artifact: $projectName ", "(from project name)"))
+        lines.add(listOf("version : $version ", "(from $versionFrom)"))
         printTable(lines)
     }
 
@@ -82,7 +91,11 @@ abstract class PrintProjectCoordinatesTask : DefaultTask() {
         for (i in 0..(line.size - 1)) {
             val word = line.get(i)
             val columnSize = columnSizes.get(i)
-            result += word.padEnd(columnSize)
+            // only have to pad columns before the last column
+            if (i != line.size - 1)
+                result += word.padEnd(columnSize)
+            else
+                result += word
         }
         return result
     }
