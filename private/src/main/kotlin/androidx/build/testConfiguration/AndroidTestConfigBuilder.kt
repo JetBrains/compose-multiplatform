@@ -98,7 +98,17 @@ class ConfigBuilder {
             .append(APK_INSTALL_OPTION.replace("APK_NAME", testApkName))
         if (!appApkName.isNullOrEmpty())
             sb.append(APK_INSTALL_OPTION.replace("APK_NAME", appApkName!!))
-
+        // Temporary hardcoded hack for b/181810492
+        else if (applicationId == "androidx.benchmark.macro.test") {
+            sb.append(
+                APK_INSTALL_OPTION.replace(
+                    "APK_NAME",
+                    /* ktlint-disable max-line-length */
+                    "benchmark-integration-tests-macrobenchmark-target_macrobenchmark-target-release.apk"
+                    /* ktlint-enable max-line-length */
+                )
+            )
+        }
         sb.append(TARGET_PREPARER_CLOSE)
             .append(TEST_BLOCK_OPEN)
             .append(RUNNER_OPTION.replace("TEST_RUNNER", testRunner))

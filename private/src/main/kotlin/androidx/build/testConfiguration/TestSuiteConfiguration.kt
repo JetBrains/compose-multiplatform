@@ -130,25 +130,6 @@ fun Project.createTestConfigurationGenerationTask(
  */
 fun Project.addAppApkToTestConfigGeneration(overrideProject: Project = this) {
     if (project.isMacrobenchmarkTarget()) {
-        if (path == ":benchmark:integration-tests:macrobenchmark-target") {
-            // Really ugly workaround for b/178776319 and b/181810492 where we hardcode that
-            // :benchmark:integration-tests:macrobenchmark-target needs to be installed
-            // for :benchmark:benchmark-macro tests to work.
-            extensions.getByType<ApplicationAndroidComponentsExtension>().apply {
-                onVariants(selector().withBuildType("release")) { appVariant ->
-                    project(":benchmark:benchmark-macro").tasks.withType(
-                        GenerateTestConfigurationTask::class.java
-                    ).named(
-                        "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}debugAndroidTest"
-                    ).configure { configTask ->
-                        configTask as GenerateTestConfigurationTask
-                        configTask.appFolder.set(appVariant.artifacts.get(SingleArtifact.APK))
-                        configTask.appLoader.set(appVariant.artifacts.getBuiltArtifactsLoader())
-                        configTask.appProjectPath.set(overrideProject.path)
-                    }
-                }
-            }
-        }
         return
     }
 
@@ -373,6 +354,20 @@ private fun Project.configureMacrobenchmarkConfigTask(
     testRunner: String
 ) {
     val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
+    if (path == ":benchmark:integration-tests:macrobenchmark-target" && variantName == "release") {
+        // Really ugly workaround for b/178776319 where we hardcode that
+        // :benchmark:integration-tests:macrobenchmark-target needs to be installed
+        // for :benchmark:benchmark-macro tests to work.
+        project(":benchmark:benchmark-macro").tasks.withType(
+            GenerateTestConfigurationTask::class.java
+        ).named(
+            "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName"
+        ).configure { task ->
+            task.appFolder.set(artifacts.get(SingleArtifact.APK))
+            task.appLoader.set(artifacts.getBuiltArtifactsLoader())
+            task.appProjectPath.set(path)
+        }
+    }
     if (path.endsWith("macrobenchmark")) {
         configTask.configure { task ->
             val androidXExtension = extensions.getByType<AndroidXExtension>()
