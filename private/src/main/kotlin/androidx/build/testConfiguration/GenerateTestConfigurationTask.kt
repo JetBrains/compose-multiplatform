@@ -128,6 +128,10 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             val appApkBuiltArtifact = appApk.elements.single()
             var appName = appApkBuiltArtifact.outputFile.substringAfterLast("/")
                 .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
+            // TODO(b/178776319): Clean up this hardcoded hack
+            if (appProjectPath.get().contains("macrobenchmark-target")) {
+                appName = appName.replace("debug-androidTest", "release")
+            }
             configBuilder.appApkName(appName)
                 .appApkSha256(sha256(File(appApkBuiltArtifact.outputFile)))
         }

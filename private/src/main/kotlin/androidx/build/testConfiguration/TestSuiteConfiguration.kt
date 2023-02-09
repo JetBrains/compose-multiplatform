@@ -335,7 +335,7 @@ fun Project.createOrUpdateMediaTestConfigurationGenerationTask(
 
 private fun Project.getOrCreateMacrobenchmarkConfigTask(variantName: String):
     TaskProvider<GenerateTestConfigurationTask> {
-    val parentProject = this.parent!!
+        val parentProject = this.parent!!
     return try {
         parentProject.tasks.withType(GenerateTestConfigurationTask::class.java)
             .named("${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName")
@@ -354,20 +354,6 @@ private fun Project.configureMacrobenchmarkConfigTask(
     testRunner: String
 ) {
     val configTask = getOrCreateMacrobenchmarkConfigTask(variantName)
-    if (path == ":benchmark:integration-tests:macrobenchmark-target" && variantName == "release") {
-        // Really ugly workaround for b/178776319 where we hardcode that
-        // :benchmark:integration-tests:macrobenchmark-target needs to be installed
-        // for :benchmark:benchmark-macro tests to work.
-        project(":benchmark:benchmark-macro").tasks.withType(
-            GenerateTestConfigurationTask::class.java
-        ).named(
-            "${AndroidXImplPlugin.GENERATE_TEST_CONFIGURATION_TASK}$variantName"
-        ).configure { task ->
-            task.appFolder.set(artifacts.get(SingleArtifact.APK))
-            task.appLoader.set(artifacts.getBuiltArtifactsLoader())
-            task.appProjectPath.set(path)
-        }
-    }
     if (path.endsWith("macrobenchmark")) {
         configTask.configure { task ->
             val androidXExtension = extensions.getByType<AndroidXExtension>()
