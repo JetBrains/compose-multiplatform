@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -86,12 +87,15 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
+import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
@@ -105,6 +109,7 @@ import androidx.compose.ui.unit.dp
 import java.lang.Integer.max
 import java.text.NumberFormat
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // TODO: External preview image.
@@ -972,6 +977,7 @@ internal fun DateEntryContainer(
         modifier = modifier
             .sizeIn(minWidth = DatePickerModalTokens.ContainerWidth)
             .padding(DatePickerHorizontalPadding)
+            .semantics { isContainer = true }
     ) {
         DatePickerHeader(
             modifier = Modifier,
@@ -1028,7 +1034,10 @@ private fun SwitchableDateEntryContent(
 ) {
     // TODO(b/266480386): Apply the motion spec for this once we have it. Consider replacing this
     //  with AnimatedContent when it's out of experimental.
-    Crossfade(targetState = state.displayMode, animationSpec = spring()) { mode ->
+    Crossfade(
+        targetState = state.displayMode,
+        animationSpec = spring(),
+        modifier = Modifier.semantics { isContainer = true }) { mode ->
         when (mode) {
             DisplayMode.Picker -> DatePickerContent(
                 stateData = state.stateData,
@@ -1560,6 +1569,9 @@ private fun YearPicker(
         } else {
             colors.containerColor
         }
+        val coroutineScope = rememberCoroutineScope()
+        val scrollToEarlierYearsLabel = getString(Strings.DatePickerScrollToShowEarlierYears)
+        val scrollToLaterYearsLabel = getString(Strings.DatePickerScrollToShowLaterYears)
         LazyVerticalGrid(
             columns = GridCells.Fixed(YearsInRow),
             modifier = modifier
@@ -1580,7 +1592,24 @@ private fun YearPicker(
                         .requiredSize(
                             width = DatePickerModalTokens.SelectionYearContainerWidth,
                             height = DatePickerModalTokens.SelectionYearContainerHeight
-                        ),
+                        )
+                        .semantics {
+                            // Apply a11y custom actions to the first and last items in the years
+                            // grid. The actions will suggest to scroll to earlier or later years in
+                            // the grid.
+                            customActions = if (lazyGridState.firstVisibleItemIndex == it ||
+                                lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == it
+                            ) {
+                                customScrollActions(
+                                    state = lazyGridState,
+                                    coroutineScope = coroutineScope,
+                                    scrollUpLabel = scrollToEarlierYearsLabel,
+                                    scrollDownLabel = scrollToLaterYearsLabel
+                                )
+                            } else {
+                                emptyList()
+                            }
+                        },
                     selected = selectedYear == displayedYear,
                     currentYear = selectedYear == currentYear,
                     onClick = { onYearSelected(selectedYear) },
@@ -1737,6 +1766,44 @@ private fun YearPickerMenuButton(
             Modifier.rotate(if (expanded) 180f else 0f)
         )
     }
+}
+
+private fun customScrollActions(
+    state: LazyGridState,
+    coroutineScope: CoroutineScope,
+    scrollUpLabel: String,
+    scrollDownLabel: String
+): List<CustomAccessibilityAction> {
+    val scrollUpAction = {
+        if (!state.canScrollBackward) {
+            false
+        } else {
+            coroutineScope.launch {
+                state.scrollToItem(state.firstVisibleItemIndex - YearsInRow)
+            }
+            true
+        }
+    }
+    val scrollDownAction = {
+        if (!state.canScrollForward) {
+            false
+        } else {
+            coroutineScope.launch {
+                state.scrollToItem(state.firstVisibleItemIndex + YearsInRow)
+            }
+            true
+        }
+    }
+    return listOf(
+        CustomAccessibilityAction(
+            label = scrollUpLabel,
+            action = scrollUpAction
+        ),
+        CustomAccessibilityAction(
+            label = scrollDownLabel,
+            action = scrollDownAction
+        )
+    )
 }
 
 /**

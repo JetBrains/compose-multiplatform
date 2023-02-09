@@ -18,6 +18,7 @@ package androidx.compose.material3
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -33,6 +34,7 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -43,12 +45,20 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 
 /**
  * <a href="https://m3.material.io/components/date-pickers/overview" class="external" target="_blank">Material Design date range picker</a>.
@@ -427,7 +437,10 @@ private fun SwitchableDateEntryContent(
 ) {
     // TODO(b/266480386): Apply the motion spec for this once we have it. Consider replacing this
     //  with AnimatedContent when it's out of experimental.
-    Crossfade(targetState = state.displayMode, animationSpec = spring()) { mode ->
+    Crossfade(
+        targetState = state.displayMode,
+        animationSpec = spring(),
+        modifier = Modifier.semantics { isContainer = true }) { mode ->
         when (mode) {
             DisplayMode.Picker -> DateRangePickerContent(
                 stateData = state.stateData,
@@ -500,7 +513,17 @@ private fun VerticalMonthsList(
             DatePickerModalTokens.RangeSelectionMonthSubheadFont
         )
     ) {
-        LazyColumn(state = lazyListState) {
+        val coroutineScope = rememberCoroutineScope()
+        val scrollToPreviousMonthLabel = getString(Strings.DateRangePickerScrollToShowPreviousMonth)
+        val scrollToNextMonthLabel = getString(Strings.DateRangePickerScrollToShowNextMonth)
+        LazyColumn(
+            // Apply this to have the screen reader traverse outside the visible list of months
+            // and not scroll them by default.
+            modifier = Modifier.semantics {
+                verticalScrollAxisRange = ScrollAxisRange(value = { 0f }, maxValue = { 0f })
+            },
+            state = lazyListState
+        ) {
             items(stateData.totalMonthsInRange) {
                 val month =
                     stateData.calendarModel.plusMonths(
@@ -516,7 +539,17 @@ private fun VerticalMonthsList(
                             stateData.calendarModel,
                             defaultLocale()
                         ) ?: "-",
-                        modifier = Modifier.padding(paddingValues = CalendarMonthSubheadPadding),
+                        modifier = Modifier
+                            .padding(paddingValues = CalendarMonthSubheadPadding)
+                            .clickable { /* no-op (needed for customActions to operate */ }
+                            .semantics {
+                                customActions = customScrollActions(
+                                    state = lazyListState,
+                                    coroutineScope = coroutineScope,
+                                    scrollUpLabel = scrollToPreviousMonthLabel,
+                                    scrollDownLabel = scrollToNextMonthLabel
+                                )
+                            },
                         color = colors.subheadContentColor
                     )
                     Month(
@@ -696,6 +729,44 @@ internal fun ContentDrawScope.drawRangeBackground(
             )
         )
     }
+}
+
+private fun customScrollActions(
+    state: LazyListState,
+    coroutineScope: CoroutineScope,
+    scrollUpLabel: String,
+    scrollDownLabel: String
+): List<CustomAccessibilityAction> {
+    val scrollUpAction = {
+        if (!state.canScrollBackward) {
+            false
+        } else {
+            coroutineScope.launch {
+                state.scrollToItem(state.firstVisibleItemIndex - 1)
+            }
+            true
+        }
+    }
+    val scrollDownAction = {
+        if (!state.canScrollForward) {
+            false
+        } else {
+            coroutineScope.launch {
+                state.scrollToItem(state.firstVisibleItemIndex + 1)
+            }
+            true
+        }
+    }
+    return listOf(
+        CustomAccessibilityAction(
+            label = scrollUpLabel,
+            action = scrollUpAction
+        ),
+        CustomAccessibilityAction(
+            label = scrollDownLabel,
+            action = scrollDownAction
+        )
+    )
 }
 
 // Base header paddings that are used for the header part (title + headline). Note that for the
