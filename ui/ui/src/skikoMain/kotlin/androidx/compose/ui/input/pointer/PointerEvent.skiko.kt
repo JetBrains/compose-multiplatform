@@ -17,11 +17,6 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.isAltPressed
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.isMetaPressed
-import androidx.compose.ui.input.key.isShiftPressed
 import org.jetbrains.skiko.SkikoPointerEventKind
 import org.jetbrains.skiko.SkikoTouchEventKind
 
@@ -100,7 +95,7 @@ internal actual fun EmptyPointerKeyboardModifiers() = PointerKeyboardModifiers()
  * Describes a pointer input change event that has occurred at a particular point in time.
  */
 @OptIn(ExperimentalComposeUiApi::class)
-actual data class PointerEvent internal constructor(
+actual class PointerEvent internal constructor(
     /**
      * The changes.
      */
@@ -116,7 +111,7 @@ actual data class PointerEvent internal constructor(
      */
     actual val keyboardModifiers: PointerKeyboardModifiers,
 
-    internal val _type: PointerEventType,
+    type: PointerEventType,
 
     /**
      * The original raw native event which is sent by the platform.
@@ -128,30 +123,30 @@ actual data class PointerEvent internal constructor(
      */
     val nativeEvent: Any?,
 
-    internal val _button: PointerButton?
+    button: PointerButton?
 ) {
     internal actual constructor(
         changes: List<PointerInputChange>,
         internalPointerEvent: InternalPointerEvent?
     ) : this(
-        changes,
-        internalPointerEvent?.buttons ?: PointerButtons(0),
-        internalPointerEvent?.keyboardModifiers ?: PointerKeyboardModifiers(0),
-        internalPointerEvent?.type ?: PointerEventType.Unknown,
-        internalPointerEvent?.nativeEvent,
-        internalPointerEvent?.button
+        changes = changes,
+        buttons = internalPointerEvent?.buttons ?: PointerButtons(0),
+        keyboardModifiers = internalPointerEvent?.keyboardModifiers ?: PointerKeyboardModifiers(0),
+        type = internalPointerEvent?.type ?: PointerEventType.Unknown,
+        nativeEvent = internalPointerEvent?.nativeEvent,
+        button = internalPointerEvent?.button
     )
 
     /**
      * @param changes The changes.
      */
     actual constructor(changes: List<PointerInputChange>) : this(
-        changes,
+        changes = changes,
         buttons = PointerButtons(0),
         keyboardModifiers = PointerKeyboardModifiers(0),
-        _type = PointerEventType.Unknown,
+        type = PointerEventType.Unknown,
         nativeEvent = null,
-        _button = null
+        button = null
     )
 
     /**
@@ -159,11 +154,84 @@ actual data class PointerEvent internal constructor(
      * It has value only when event's type is [PointerEventType.Press] or [PointerEventType.Release] and
      * when button is applicable (only for Mouse and Stylus events).
      */
+    @Suppress("CanBePrimaryConstructorProperty")
     @ExperimentalComposeUiApi
-    val button: PointerButton? = _button
+    val button: PointerButton? = button
 
-    actual var type: PointerEventType = _type
+    actual var type: PointerEventType = type
         internal set
+
+
+    // Backwards compatibility for when PointerEvent was a data class
+
+    operator fun component1(): List<PointerInputChange> = changes
+
+    operator fun component2(): PointerButtons = buttons
+
+    operator fun component3(): PointerKeyboardModifiers = keyboardModifiers
+
+    // _type was internal, so no need for a component4
+
+    operator fun component5(): Any? = nativeEvent
+
+    // _button was internal, so no need for a component6
+
+    @Deprecated("Will be removed in 1.5")
+    @Suppress("LocalVariableName")
+    fun copy(
+        changes: List<PointerInputChange> = this.changes,
+        buttons: PointerButtons = this.buttons,
+        keyboardModifiers: PointerKeyboardModifiers = this.keyboardModifiers,
+        _type: PointerEventType = this.type,
+        nativeEvent: Any? = this.nativeEvent,
+        _button: PointerButton? = this.button
+    ): PointerEvent {
+        return PointerEvent(
+            changes = changes,
+            buttons = buttons,
+            keyboardModifiers = keyboardModifiers,
+            type = _type,
+            nativeEvent = nativeEvent,
+            button = _button
+        )
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other == null || this::class != other::class) return false
+
+        other as PointerEvent
+
+        if (changes != other.changes) return false
+        if (buttons != other.buttons) return false
+        if (keyboardModifiers != other.keyboardModifiers) return false
+        if (nativeEvent != other.nativeEvent) return false
+        if (button != other.button) return false
+        if (type != other.type) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = changes.hashCode()
+        result = 31 * result + buttons.hashCode()
+        result = 31 * result + keyboardModifiers.hashCode()
+        result = 31 * result + (nativeEvent?.hashCode() ?: 0)
+        result = 31 * result + (button?.hashCode() ?: 0)
+        result = 31 * result + type.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "PointerEvent(changes=$changes" +
+            ", buttons=$buttons" +
+            ", keyboardModifiers=$keyboardModifiers" +
+            ", nativeEvent=$nativeEvent" +
+            ", button=$button" +
+            ", type=$type" +
+            ")"
+    }
+
 }
 
 private object ButtonMasks {
