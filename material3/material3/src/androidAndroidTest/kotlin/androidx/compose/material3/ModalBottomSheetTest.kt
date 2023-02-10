@@ -39,6 +39,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollDispatcher
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -61,6 +66,7 @@ import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.swipeDown
 import androidx.compose.ui.test.swipeUp
+import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.coerceAtMost
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
@@ -844,5 +850,52 @@ class ModalBottomSheetTest {
         hasSheetContent = true // Recompose with sheet content
         rule.waitForIdle()
         assertThat(sheetState.currentValue).isEqualTo(SheetValue.Collapsed)
+    }
+
+    @Test
+    fun modalBottomSheet_callsOnDismissRequest_onNestedScrollFling() {
+        var callCount by mutableStateOf(0)
+        val expectedCallCount = 1
+        val sheetState = SheetState(skipCollapsed = true)
+
+        val nestedScrollDispatcher = NestedScrollDispatcher()
+        val nestedScrollConnection = object : NestedScrollConnection {
+            // No-Op
+        }
+        lateinit var scope: CoroutineScope
+
+        rule.setContent {
+            scope = rememberCoroutineScope()
+            ModalBottomSheet(onDismissRequest = { callCount += 1 }, sheetState = sheetState) {
+                Column(
+                    Modifier
+                        .testTag(sheetTag)
+                        .nestedScroll(nestedScrollConnection, nestedScrollDispatcher)
+                ) {
+                    (0..50).forEach {
+                        Text(text = "$it")
+                    }
+                }
+            }
+        }
+
+        assertThat(sheetState.currentValue).isEqualTo(SheetValue.Expanded)
+        val scrollableContentHeight = rule.onNodeWithTag(sheetTag).fetchSemanticsNode().size.height
+        // Simulate a drag + fling
+        nestedScrollDispatcher.dispatchPostScroll(
+            consumed = Offset.Zero,
+            available = Offset(x = 0f, y = scrollableContentHeight / 2f),
+            source = NestedScrollSource.Drag
+        )
+        scope.launch {
+            nestedScrollDispatcher.dispatchPostFling(
+                consumed = Velocity.Zero,
+                available = Velocity(x = 0f, y = with(rule.density) { 200.dp.toPx() })
+            )
+        }
+
+        rule.waitForIdle()
+        assertThat(sheetState.isVisible).isFalse()
+        assertThat(callCount).isEqualTo(expectedCallCount)
     }
 }
