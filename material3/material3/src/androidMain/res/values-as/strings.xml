@@ -44,6 +44,14 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"তাৰিখটো প্ৰত্যাশিত বছৰৰ পৰিসৰ %1$s - %2$sৰ বাহিৰৰ"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"কেলেণ্ডাৰ ইনপুট ম’ডলৈ সলনি কৰক"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"পাঠ ইনপুট ম’ডলৈ সলনি কৰক"</string>
+    <!-- no translation found for date_range_picker_title (690080476639943577) -->
+    <skip />
+    <!-- no translation found for date_range_picker_start_headline (5759491386723090559) -->
+    <skip />
+    <!-- no translation found for date_range_picker_end_headline (4766270708882012148) -->
+    <skip />
+    <!-- no translation found for date_range_input_title (2366412111888449406) -->
+    <skip />
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"টুলটিপ দেখুৱাওক"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"পৰাহ্ন"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"পুৱা"</string>

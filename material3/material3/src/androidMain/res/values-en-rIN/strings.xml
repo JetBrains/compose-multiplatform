@@ -44,6 +44,10 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Date out of expected year range %1$s – %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"Switch to calendar input mode"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"Switch to text input mode"</string>
+    <string name="date_range_picker_title" msgid="690080476639943577">"Select dates"</string>
+    <string name="date_range_picker_start_headline" msgid="5759491386723090559">"Start date"</string>
+    <string name="date_range_picker_end_headline" msgid="4766270708882012148">"End date"</string>
+    <string name="date_range_input_title" msgid="2366412111888449406">"Enter dates"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"Show tooltip"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
