@@ -15,8 +15,7 @@ data class PictureWithThumbnail(val picture: Picture, val thumbnail: ImageBitmap
 
 data class GalleryState(
     val currentPictureIndex: Int = 0,
-    val miniatures: List<PictureWithThumbnail> = emptyList(),
-    val pictures: List<Picture> = emptyList(),
+    val pictures: List<PictureWithThumbnail> = emptyList(),
     val screen: ScreenState = ScreenState.Miniatures
 )
 
@@ -26,7 +25,7 @@ sealed interface ScreenState {
 }
 
 val GalleryState.isContentReady get() = pictures.isNotEmpty()
-val GalleryState.picture get():Picture? = pictures.getOrNull(currentPictureIndex)
+val GalleryState.picture get(): Picture? = pictures.getOrNull(currentPictureIndex)?.picture
 
 fun <T> MutableState<T>.modifyState(modification: T.() -> T) {
     value = value.modification()
@@ -65,7 +64,9 @@ fun MutableState<GalleryState>.refresh(dependencies: Dependencies) {
                 .map { (pic, bit) -> PictureWithThumbnail(pic, bit) }
 
             modifyState {
-                copy(pictures = pictures, miniatures = miniatures)
+                // TODO: Unless I'm crazy, this might happen from a background thread.
+                // Investigate.
+                copy(pictures = miniatures)
             }
         } catch (e: CancellationException) {
             println("Rethrowing CancellationException with original cause")
@@ -83,7 +84,7 @@ fun MutableState<GalleryState>.setSelectedIndex(index: Int) = modifyState {
 }
 
 fun MutableState<GalleryState>.setSelectedPicture(picture: Picture) = modifyState {
-    copy(currentPictureIndex = miniatures.indexOfFirst { it.picture == picture })
+    copy(currentPictureIndex = pictures.indexOfFirst { it.picture == picture })
 }
 
 fun MutableState<GalleryState>.toFullscreen(index: Int = value.currentPictureIndex) = modifyState {

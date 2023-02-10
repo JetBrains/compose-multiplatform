@@ -35,7 +35,8 @@ internal fun PreviewImage(
     galleryState: MutableState<GalleryState>,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
-    val pictures = galleryState.value.pictures
+    // TODO: Make this not dependent on galleryState
+    val pictures = galleryState.value.pictures.map { it.picture }
     val index = galleryState.value.currentPictureIndex
     val imageState = remember(pictures, index) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(pictures, index) {

@@ -73,7 +73,7 @@ internal fun MainScreen(galleryState: MutableState<GalleryState>, dependencies: 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         TopContent(galleryState, dependencies)
 //        ListGalleryView(state, dependencies)
-        SquaresGalleryView(galleryState.value.miniatures) {
+        SquaresGalleryView(galleryState.value.pictures) {
             galleryState.setSelectedPicture(it)
         }
     }
@@ -125,7 +125,7 @@ private fun ListGalleryView(galleryState: MutableState<GalleryState>, dependenci
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        for ((idx, picWithThumb) in galleryState.value.miniatures.withIndex()) {
+        for ((idx, picWithThumb) in galleryState.value.pictures.withIndex()) {
             val (picture, miniature) = picWithThumb
             Miniature(
                 picture = picture,
