@@ -17,7 +17,6 @@
 package androidx.build
 
 import com.android.build.api.dsl.Lint
-import com.android.build.gradle.internal.lint.AndroidLintAnalysisTask
 import com.android.build.gradle.internal.lint.AndroidLintTask
 import java.io.File
 import java.util.Locale
@@ -25,31 +24,7 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.plugins.JavaPluginExtension
-import org.gradle.api.services.BuildService
-import org.gradle.api.services.BuildServiceParameters
 import org.gradle.kotlin.dsl.getByType
-
-/**
- * Name of the service we use to limit the number of concurrent executions of lint
- */
-public const val LINT_SERVICE_NAME = "androidxLintService"
-
-// service for limiting the number of concurrent lint tasks
-interface AndroidXLintService : BuildService<BuildServiceParameters.None>
-
-fun Project.configureRootProjectForLint() {
-    // determine many lint tasks to run in parallel
-    val memoryPerTask = 512 * 1024 * 1024
-    val maxLintMemory = Runtime.getRuntime().maxMemory() * 0.75 // save memory for other things too
-    val maxNumParallelUsages = Math.max(1, (maxLintMemory / memoryPerTask).toInt())
-
-    project.gradle.sharedServices.registerIfAbsent(
-        LINT_SERVICE_NAME,
-        AndroidXLintService::class.java
-    ) { spec ->
-        spec.maxParallelUsages.set(maxNumParallelUsages)
-    }
-}
 
 fun Project.configureNonAndroidProjectForLint(extension: AndroidXExtension) {
     apply(mapOf("plugin" to "com.android.lint"))
@@ -130,13 +105,6 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
     lint.apply {
         // Skip lintVital tasks on assemble. We explicitly run lintRelease for libraries.
         checkReleaseBuilds = false
-    }
-
-    tasks.withType(AndroidLintAnalysisTask::class.java).configureEach { task ->
-        // don't run too many copies of lint at once due to memory limitations
-        task.usesService(
-            task.project.gradle.sharedServices.registrations.getByName(LINT_SERVICE_NAME).service
-        )
     }
 
     tasks.withType(AndroidLintTask::class.java).configureEach { task ->
