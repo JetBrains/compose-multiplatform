@@ -18,6 +18,7 @@ Select one of the platforms below:
 - Web (K/JS) - Canvas based API
 - iOS
 - Other
+
 If the bug is Android-only, report it in the [Jetpack Compose tracker](https://issuetracker.google.com/issues/new?component=612128)
 
 **Versions**
