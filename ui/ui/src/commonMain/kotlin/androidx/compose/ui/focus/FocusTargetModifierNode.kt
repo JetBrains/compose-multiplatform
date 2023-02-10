@@ -25,12 +25,13 @@ import androidx.compose.ui.focus.FocusStateImpl.Inactive
 import androidx.compose.ui.layout.BeyondBoundsLayout
 import androidx.compose.ui.layout.ModifierLocalBeyondBoundsLayout
 import androidx.compose.ui.modifier.ModifierLocalNode
+import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.ObserverNode
-import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.node.requireOwner
 import androidx.compose.ui.node.visitAncestors
+import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * This modifier node can be used to create a modifier that makes a component focusable.
@@ -120,10 +121,16 @@ class FocusTargetModifierNode : ObserverNode, ModifierLocalNode, Modifier.Node()
         }
     }
 
-    internal companion object {
-        internal val FocusTargetModifierElement = modifierElementOf(
-            create = { FocusTargetModifierNode() },
-            definitions = { name = "focusTarget" }
-        )
+    internal object FocusTargetModifierElement : ModifierNodeElement<FocusTargetModifierNode>() {
+        override fun create() = FocusTargetModifierNode()
+
+        override fun update(node: FocusTargetModifierNode) = node
+
+        override fun InspectorInfo.inspectableProperties() {
+            name = "focusTarget"
+        }
+
+        override fun hashCode() = "focusTarget".hashCode()
+        override fun equals(other: Any?) = other === this
     }
 }

@@ -36,7 +36,6 @@ import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ObserverNode
-import androidx.compose.ui.node.modifierElementOf
 import androidx.compose.ui.node.observeReads
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Constraints
@@ -537,30 +536,36 @@ private fun createModifier(
     onDetach: () -> Unit = {},
     onAttach: () -> Unit = {},
 ): Modifier {
-    return modifierElementOf(
-        key = key,
-        create = {
+    class GenericModifierWithLifecycle(
+        val key: Any?
+    ) : ModifierNodeElement<Modifier.Node>() {
+        override fun create(): Modifier.Node {
             onCreate()
-            object : Modifier.Node() {
+            return object : Modifier.Node() {
                 override fun onReset() = onReset()
                 override fun onAttach() = onAttach()
                 override fun onDetach() = onDetach()
-                }
-        },
-        update = {
-            onUpdate()
+            }
         }
-    ) {}
+
+        override fun update(node: Modifier.Node) = node.apply { onUpdate() }
+
+        override fun hashCode(): Int = "ModifierNodeReuseAndDeactivationTest".hashCode()
+
+        override fun equals(other: Any?) = (other === this) ||
+            (other is GenericModifierWithLifecycle && other.key == this.key)
+    }
+    return GenericModifierWithLifecycle(key)
 }
 
 private val MeasurePolicy = MeasurePolicy { _, _ ->
     layout(100, 100) { }
 }
 
-private class StatelessModifierElement(
+private data class StatelessModifierElement(
     private val onInvalidate: () -> Unit,
     private val size: Int = 10
-) : ModifierNodeElement<StatelessModifierElement.Node>(params = size, inspectorInfo = {}) {
+) : ModifierNodeElement<StatelessModifierElement.Node>() {
     override fun create() = Node(size, onInvalidate)
 
     override fun update(node: Node) = node.also {
@@ -582,9 +587,9 @@ private class StatelessModifierElement(
     }
 }
 
-private class DelegatingModifierElement(
+private data class DelegatingModifierElement(
     private val onDelegatedNodeReset: () -> Unit,
-) : ModifierNodeElement<DelegatingModifierElement.Node>(inspectorInfo = {}) {
+) : ModifierNodeElement<DelegatingModifierElement.Node>() {
     override fun create() = Node(onDelegatedNodeReset)
 
     override fun update(node: Node) = node.also {
@@ -602,9 +607,9 @@ private class DelegatingModifierElement(
     }
 }
 
-private class LayerModifierElement(
+private data class LayerModifierElement(
     private val layerBlock: () -> Unit,
-) : ModifierNodeElement<LayerModifierElement.Node>(inspectorInfo = {}) {
+) : ModifierNodeElement<LayerModifierElement.Node>() {
     override fun create() = Node(layerBlock)
 
     override fun update(node: Node) = node.also {
@@ -626,9 +631,9 @@ private class LayerModifierElement(
     }
 }
 
-private class ObserverModifierElement(
+private data class ObserverModifierElement(
     private val observedBlock: () -> Unit,
-) : ModifierNodeElement<ObserverModifierElement.Node>(inspectorInfo = {}) {
+) : ModifierNodeElement<ObserverModifierElement.Node>() {
     override fun create() = Node(observedBlock)
 
     override fun update(node: Node) = node.also {
