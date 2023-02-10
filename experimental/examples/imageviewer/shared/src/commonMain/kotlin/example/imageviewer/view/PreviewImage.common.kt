@@ -17,30 +17,25 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.model.GalleryState
 import example.imageviewer.model.Picture
-import example.imageviewer.model.toFullscreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    galleryState: MutableState<GalleryState>,
+    picture: Picture?,
+    onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
     // TODO: Make this not dependent on galleryState
-    val pictures = galleryState.value.pictures.map { it.picture }
-    val index = galleryState.value.currentPictureIndex
-    val imageState = remember(pictures, index) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(pictures, index) {
-        val picture = pictures.getOrNull(index)
+    val imageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(picture) {
         if (picture != null) {
             imageState.value = getImage(picture)
         }
@@ -57,7 +52,7 @@ internal fun PreviewImage(
         modifier = Modifier.height(200.dp)
             .background(brush = kotlinHorizontalGradientBrush)
             .padding(10.dp)
-            .clickable { galleryState.toFullscreen() },
+            .clickable { onClick() },
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
 //        elevation = 1.dp
     ) {

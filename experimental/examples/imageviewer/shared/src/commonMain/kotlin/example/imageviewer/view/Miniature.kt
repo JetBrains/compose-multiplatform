@@ -44,7 +44,6 @@ internal fun Miniature(
     Card(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).height(70.dp)
             .fillMaxWidth(),
-        // todo: something weird going on with the left-side corners here.
         onClick = { onClickSelect() },
         shape = RoundedCornerShape(200.dp),
         border = BorderStroke(1.dp, Color.White),

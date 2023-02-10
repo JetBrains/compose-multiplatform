@@ -26,6 +26,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
@@ -43,8 +47,8 @@ import example.imageviewer.model.Picture
 import example.imageviewer.model.PictureWithThumbnail
 import example.imageviewer.model.bigUrl
 import example.imageviewer.model.isContentReady
+import example.imageviewer.model.picture
 import example.imageviewer.model.refresh
-import example.imageviewer.model.setSelectedIndex
 import example.imageviewer.model.setSelectedPicture
 import example.imageviewer.model.toFullscreen
 import example.imageviewer.style.ImageviewerColors
@@ -68,13 +72,30 @@ internal fun GalleryHeader() {
     }
 }
 
+enum class GalleryStyle {
+    SQUARES,
+    LIST
+}
+
+fun GalleryStyle.toggled(): GalleryStyle {
+    return if (this == GalleryStyle.SQUARES) GalleryStyle.LIST else GalleryStyle.SQUARES
+}
+
 @Composable
 internal fun MainScreen(galleryState: MutableState<GalleryState>, dependencies: Dependencies) {
+    var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) } // TODO: Potentially expose a toggle for this.
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         TopContent(galleryState, dependencies)
-//        ListGalleryView(state, dependencies)
-        SquaresGalleryView(galleryState.value.pictures) {
-            galleryState.setSelectedPicture(it)
+        when (galleryStyle) {
+            GalleryStyle.SQUARES -> SquaresGalleryView(galleryState.value.pictures) {
+                galleryState.setSelectedPicture(it)
+            }
+
+            GalleryStyle.LIST -> ListGalleryView(
+                galleryState.value.pictures,
+                dependencies,
+                onSelect = { galleryState.setSelectedPicture(it) },
+                onFullScreen = { galleryState.toFullscreen(it) })
         }
     }
     if (!galleryState.value.isContentReady) {
@@ -97,7 +118,12 @@ private fun SquaresGalleryView(images: List<PictureWithThumbnail>, onSelect: (Pi
 
 @Composable
 private fun MakeNewMemoryMiniature() {
-    Box(Modifier.aspectRatio(1.0f), contentAlignment = Alignment.Center) {
+    Box(
+        Modifier.aspectRatio(1.0f)
+            .clickable {
+                // TODO: Open Camera!
+            }, contentAlignment = Alignment.Center
+    ) {
         Text(
             "+",
             modifier = Modifier.fillMaxWidth(),
@@ -119,22 +145,27 @@ private fun SquareMiniature(image: ImageBitmap, onClick: () -> Unit) {
 }
 
 @Composable
-private fun ListGalleryView(galleryState: MutableState<GalleryState>, dependencies: Dependencies) {
+private fun ListGalleryView(
+    pictures: List<PictureWithThumbnail>,
+    dependencies: Dependencies,
+    onSelect: (Picture) -> Unit,
+    onFullScreen: (Int) -> Unit
+) {
     GalleryHeader()
     Spacer(modifier = Modifier.height(10.dp))
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
-        for ((idx, picWithThumb) in galleryState.value.pictures.withIndex()) {
+        for ((idx, picWithThumb) in pictures.withIndex()) {
             val (picture, miniature) = picWithThumb
             Miniature(
                 picture = picture,
                 image = miniature,
                 onClickSelect = {
-                    galleryState.setSelectedIndex(idx)
+                    onSelect(picture)
                 },
                 onClickFullScreen = {
-                    galleryState.toFullscreen(idx)
+                    onFullScreen(idx)
                 },
                 onClickInfo = {
                     dependencies.notification.notifyImageData(picture)
@@ -150,8 +181,10 @@ private fun TopContent(galleryState: MutableState<GalleryState>, dependencies: D
     TitleBar(galleryState, dependencies)
     if (needShowPreview()) {
         PreviewImage(
-            galleryState = galleryState,
-            getImage = { dependencies.imageRepository.loadContent(it.bigUrl) })
+            getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+            picture = galleryState.value.picture, onClick = {
+                galleryState.toFullscreen()
+            })
     }
 }
 
