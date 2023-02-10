@@ -3,17 +3,19 @@ package example.imageviewer.model
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.Dependencies
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 
-data class State(
-    val currentImageIndex: Int = 0,
-    val miniatures: Map<Picture, ImageBitmap> = emptyMap(),
+data class PictureWithThumbnail(val picture: Picture, val thumbnail: ImageBitmap)
+
+data class GalleryState(
+    val currentPictureIndex: Int = 0,
+    val miniatures: List<PictureWithThumbnail> = emptyList(),
     val pictures: List<Picture> = emptyList(),
     val screen: ScreenState = ScreenState.Miniatures
 )
@@ -23,41 +25,44 @@ sealed interface ScreenState {
     object FullScreen : ScreenState
 }
 
-val State.isContentReady get() = pictures.isNotEmpty()
-val State.picture get():Picture? = pictures.getOrNull(currentImageIndex)
+val GalleryState.isContentReady get() = pictures.isNotEmpty()
+val GalleryState.picture get():Picture? = pictures.getOrNull(currentPictureIndex)
 
 fun <T> MutableState<T>.modifyState(modification: T.() -> T) {
     value = value.modification()
 }
 
-fun MutableState<State>.nextImage() = modifyState {
-    var newIndex = currentImageIndex + 1
+fun MutableState<GalleryState>.nextImage() = modifyState {
+    var newIndex = currentPictureIndex + 1
     if (newIndex > pictures.lastIndex) {
         newIndex = 0
     }
-    copy(currentImageIndex = newIndex)
+    copy(currentPictureIndex = newIndex)
 }
 
-fun MutableState<State>.previousImage() = modifyState {
-    var newIndex = currentImageIndex - 1
+fun MutableState<GalleryState>.previousImage() = modifyState {
+    var newIndex = currentPictureIndex - 1
     if (newIndex < 0) {
         newIndex = pictures.lastIndex
     }
-    copy(currentImageIndex = newIndex)
+    copy(currentPictureIndex = newIndex)
 }
 
-fun MutableState<State>.refresh(dependencies: Dependencies) {
+fun MutableState<GalleryState>.refresh(dependencies: Dependencies) {
     dependencies.ioScope.launch {
         try {
             val pictures = dependencies.json.decodeFromString(
                 ListSerializer(Picture.serializer()),
                 dependencies.httpClient.get(PICTURES_DATA_URL).bodyAsText()
             )
-            val miniatures = pictures.map { picture ->
-                async {
-                    picture to dependencies.imageRepository.loadContent(picture.smallUrl)
+            val miniatures = pictures
+                .map { picture ->
+                    async {
+                        picture to dependencies.imageRepository.loadContent(picture.smallUrl)
+                    }
                 }
-            }.awaitAll().toMap()
+                .awaitAll()
+                .map { (pic, bit) -> PictureWithThumbnail(pic, bit) }
 
             modifyState {
                 copy(pictures = pictures, miniatures = miniatures)
@@ -73,13 +78,17 @@ fun MutableState<State>.refresh(dependencies: Dependencies) {
     }
 }
 
-fun MutableState<State>.setSelectedIndex(index: Int) = modifyState {
-    copy(currentImageIndex = index)
+fun MutableState<GalleryState>.setSelectedIndex(index: Int) = modifyState {
+    copy(currentPictureIndex = index)
 }
 
-fun MutableState<State>.toFullscreen(index: Int = value.currentImageIndex) = modifyState {
+fun MutableState<GalleryState>.setSelectedPicture(picture: Picture) = modifyState {
+    copy(currentPictureIndex = miniatures.indexOfFirst { it.picture == picture })
+}
+
+fun MutableState<GalleryState>.toFullscreen(index: Int = value.currentPictureIndex) = modifyState {
     copy(
-        currentImageIndex = index,
+        currentPictureIndex = index,
         screen = ScreenState.FullScreen
     )
 }

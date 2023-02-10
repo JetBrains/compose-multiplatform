@@ -18,7 +18,6 @@ import example.imageviewer.Notification
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import example.imageviewer.model.State
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
@@ -35,7 +34,7 @@ import java.io.File
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val state = remember { mutableStateOf(State()) }
+    val galleryState = remember { mutableStateOf(GalleryState()) }
     val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
@@ -50,8 +49,8 @@ fun ApplicationScope.ImageViewerDesktop() {
         onKeyEvent = {
             if (it.type == KeyEventType.KeyUp) {
                 when (it.key) {
-                    Key.DirectionLeft -> state.previousImage()
-                    Key.DirectionRight -> state.nextImage()
+                    Key.DirectionLeft -> galleryState.previousImage()
+                    Key.DirectionRight -> galleryState.nextImage()
                 }
             }
             false
@@ -62,7 +61,7 @@ fun ApplicationScope.ImageViewerDesktop() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 ImageViewerCommon(
-                    state = state,
+                    galleryState = galleryState,
                     dependencies = dependencies
                 )
                 Toast(toastState)

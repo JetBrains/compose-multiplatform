@@ -24,16 +24,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import example.imageviewer.model.GalleryState
 import example.imageviewer.model.Picture
-import example.imageviewer.model.State
 import example.imageviewer.model.toFullscreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalAnimationApi::class)
 @Composable
-internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture) -> ImageBitmap) {
-    val pictures = state.value.pictures
-    val index = state.value.currentImageIndex
+internal fun PreviewImage(
+    galleryState: MutableState<GalleryState>,
+    getImage: suspend (Picture) -> ImageBitmap
+) {
+    val pictures = galleryState.value.pictures
+    val index = galleryState.value.currentPictureIndex
     val imageState = remember(pictures, index) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(pictures, index) {
         val picture = pictures.getOrNull(index)
@@ -53,7 +56,7 @@ internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture
         modifier = Modifier.height(200.dp)
             .background(brush = kotlinHorizontalGradientBrush)
             .padding(10.dp)
-            .clickable { state.toFullscreen() },
+            .clickable { galleryState.toFullscreen() },
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
 //        elevation = 1.dp
     ) {
