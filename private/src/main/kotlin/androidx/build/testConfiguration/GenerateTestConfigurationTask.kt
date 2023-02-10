@@ -127,7 +127,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
             // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appApkBuiltArtifact = appApk.elements.single()
             var appName = appApkBuiltArtifact.outputFile.substringAfterLast("/")
-                .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
+                .renameApkForTesting(appProjectPath.get())
             // TODO(b/178776319): Clean up this hardcoded hack
             if (appProjectPath.get().contains("macrobenchmark-target")) {
                 appName = appName.replace("debug-androidTest", "release")
@@ -195,7 +195,7 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         val testApkBuiltArtifact = testApk.elements.single()
         val testName = testApkBuiltArtifact.outputFile
             .substringAfterLast("/")
-            .renameApkForTesting(testProjectPath.get(), hasBenchmarkPlugin.get())
+            .renameApkForTesting(testProjectPath.get())
         configBuilder.testApkName(testName)
             .applicationId(testApk.applicationId)
             .minSdk(minSdk.get().toString())

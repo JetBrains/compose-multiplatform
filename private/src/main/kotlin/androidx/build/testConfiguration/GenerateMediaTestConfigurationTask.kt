@@ -224,8 +224,7 @@ abstract class GenerateMediaTestConfigurationTask : DefaultTask() {
     }
 
     private fun BuiltArtifact.resolveName(path: String): String {
-        return outputFile.substringAfterLast("/")
-            .renameApkForTesting(path, false)
+        return outputFile.substringAfterLast("/").renameApkForTesting(path)
     }
 
     private fun writeConfigFileContent(
