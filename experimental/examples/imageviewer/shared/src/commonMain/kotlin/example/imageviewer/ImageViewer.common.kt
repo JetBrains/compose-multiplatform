@@ -8,6 +8,7 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.GalleryState
@@ -25,7 +26,9 @@ internal fun ImageViewerCommon(
     galleryState: MutableState<GalleryState>,
     dependencies: Dependencies
 ) {
-    galleryState.refresh(dependencies)
+    LaunchedEffect(Unit) {
+        galleryState.refresh(dependencies)
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         AnimatedVisibility(

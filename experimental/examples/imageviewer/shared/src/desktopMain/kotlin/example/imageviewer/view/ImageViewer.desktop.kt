@@ -34,6 +34,7 @@ import java.io.File
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
+    // TODO: I wish we could commonize the instantiation of galleryState.
     val galleryState = remember { mutableStateOf(GalleryState()) }
     val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.IO }
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
