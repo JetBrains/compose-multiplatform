@@ -11,12 +11,14 @@ assignees: ''
 A clear and concise description of what the bug is.
 
 **Affected platforms**
-- [ ] All
-- [ ] Desktop
-- [ ] Web (K/JS) - HTML based API
-- [ ] Web (K/JS) - Canvas based API
-- [ ] iOS
-- [ ] other
+Select one of the platforms below:
+- All
+- Desktop
+- Web (K/JS) - HTML based API
+- Web (K/JS) - Canvas based API
+- iOS
+- Other
+If the bug is Android-only, report it in the [Jetpack Compose tracker](https://issuetracker.google.com/issues/new?component=612128)
 
 **Versions**
 - Kotlin version*: 
