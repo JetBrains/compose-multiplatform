@@ -43,7 +43,7 @@ import androidx.compose.ui.test.performRotaryScrollInput
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,10 +51,6 @@ import org.junit.runners.Parameterized
 
 /**
  * Focus-aware event propagation test.
- *
- * This test verifies the event propagation logic using
- * [androidx.compose.ui.input.rotary.RotaryScrollEvent]s, but it is meant to test the generic
- * propagation logic for all focus-aware events.
  */
 @MediumTest
 @RunWith(Parameterized::class)
@@ -75,6 +71,12 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
         @JvmStatic
         @Parameterized.Parameters(name = "node = {0}")
         fun initParameters() = arrayOf(KeyInput, RotaryInput)
+    }
+
+    @Before
+    fun ignoreEventTime() {
+        // This test just checks the propagation of events and doesn't care about the event time.
+        rule.mainClock.autoAdvance = false
     }
 
     @Test
@@ -184,7 +186,6 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
         }
     }
 
-    @Ignore("b/265319988")
     @Test
     fun onFocusAwareEvent_isTriggered() {
         // Arrange.
@@ -206,7 +207,6 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
         rule.runOnIdle { assertThat(sentEvent).isEqualTo(receivedEvent) }
     }
 
-    @Ignore("b/264466323")
     @Test
     fun onPreFocusAwareEvent_triggered() {
         // Arrange.
@@ -280,7 +280,6 @@ class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
         }
     }
 
-    @Ignore // b/266984867
     @Test
     fun onPreFocusAwareEvent_triggeredBefore_onFocusAwareEvent_1() {
         // Arrange.
