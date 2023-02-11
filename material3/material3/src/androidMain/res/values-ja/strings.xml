@@ -44,6 +44,10 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"想定される年の範囲（%1$s～%2$s）から日付が外れています"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"カレンダー入力モードに切り替え"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"テキスト入力モードに切り替え"</string>
+    <string name="date_range_picker_title" msgid="690080476639943577">"日付の選択"</string>
+    <string name="date_range_picker_start_headline" msgid="5759491386723090559">"開始日"</string>
+    <string name="date_range_picker_end_headline" msgid="4766270708882012148">"終了日"</string>
+    <string name="date_range_input_title" msgid="2366412111888449406">"日付の入力"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"ツールチップを表示します"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
