@@ -23,7 +23,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.Nodes
 import androidx.compose.ui.node.visitChildren
 
-private const val focusRequesterNotInitialized = """
+private const val FocusRequesterNotInitialized = """
    FocusRequester is not initialized. Here are some possible fixes:
 
    1. Remember the FocusRequester: val focusRequester = remember { FocusRequester() }
@@ -32,7 +32,7 @@ private const val focusRequesterNotInitialized = """
    response to some event. Eg Modifier.clickable { focusRequester.requestFocus() }
 """
 
-private const val invalidFocusRequesterInvocation = """
+private const val InvalidFocusRequesterInvocation = """
     Please check whether the focusRequester is FocusRequester.Cancel or FocusRequester.Default
     before invoking any functions on the focusRequester.
 """
@@ -77,9 +77,9 @@ class FocusRequester {
      */
     @OptIn(ExperimentalComposeUiApi::class)
     internal fun findFocusTarget(onFound: (FocusTargetModifierNode) -> Boolean): Boolean {
-        check(this != Default) { invalidFocusRequesterInvocation }
-        check(this != Cancel) { invalidFocusRequesterInvocation }
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        check(this != Default) { InvalidFocusRequesterInvocation }
+        check(this != Cancel) { InvalidFocusRequesterInvocation }
+        check(focusRequesterNodes.isNotEmpty()) { FocusRequesterNotInitialized }
         var success = false
         focusRequesterNodes.forEach { node ->
             node.visitChildren(Nodes.FocusTarget) {
@@ -109,7 +109,7 @@ class FocusRequester {
      */
     @OptIn(ExperimentalComposeUiApi::class)
     fun captureFocus(): Boolean {
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        check(focusRequesterNodes.isNotEmpty()) { FocusRequesterNotInitialized }
         focusRequesterNodes.forEach {
             if (it.captureFocus()) {
                 return true
@@ -134,7 +134,7 @@ class FocusRequester {
      */
     @OptIn(ExperimentalComposeUiApi::class)
     fun freeFocus(): Boolean {
-        check(focusRequesterNodes.isNotEmpty()) { focusRequesterNotInitialized }
+        check(focusRequesterNodes.isNotEmpty()) { FocusRequesterNotInitialized }
         focusRequesterNodes.forEach {
             if (it.freeFocus()) {
                 return true
