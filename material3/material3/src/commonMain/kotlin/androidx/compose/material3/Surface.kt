@@ -197,7 +197,6 @@ fun Surface(
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
  * different [Interaction]s.
  */
-@ExperimentalMaterial3Api
 @Composable
 @NonRestartableComposable
 fun Surface(
@@ -306,7 +305,6 @@ fun Surface(
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
  * different [Interaction]s.
  */
-@ExperimentalMaterial3Api
 @Composable
 @NonRestartableComposable
 fun Surface(
@@ -417,7 +415,6 @@ fun Surface(
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
  * different [Interaction]s.
  */
-@ExperimentalMaterial3Api
 @Composable
 @NonRestartableComposable
 fun Surface(
