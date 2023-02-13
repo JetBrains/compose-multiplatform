@@ -113,7 +113,6 @@ class ComposePlugin : Plugin<Project> {
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
-        @ExperimentalComposeLibrary
         val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
