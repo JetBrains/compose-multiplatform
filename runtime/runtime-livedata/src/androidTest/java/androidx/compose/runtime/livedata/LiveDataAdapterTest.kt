@@ -63,6 +63,21 @@ class LiveDataAdapterTest {
     }
 
     @Test
+    fun preferInitializedValueInFirstComposition() {
+        val liveData = MutableLiveData("value")
+        var firstComposition by mutableStateOf(true)
+        var realValue: String? = null
+        rule.setContent {
+            if (firstComposition) {
+                realValue = liveData.observeAsState("initial").value
+                firstComposition = false
+            }
+        }
+
+        assertThat(realValue).isEqualTo("value")
+    }
+
+    @Test
     fun weReceiveUpdates() {
         val liveData = MutableLiveData<String>()
         liveData.postValue("value")
