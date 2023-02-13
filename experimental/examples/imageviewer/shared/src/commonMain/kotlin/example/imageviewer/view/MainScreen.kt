@@ -1,7 +1,9 @@
 package example.imageviewer.view
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -87,7 +89,10 @@ internal fun MainScreen(galleryState: MutableState<GalleryState>, dependencies: 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         TopContent(galleryState, dependencies)
         when (galleryStyle) {
-            GalleryStyle.SQUARES -> SquaresGalleryView(galleryState.value.pictures) {
+            GalleryStyle.SQUARES -> SquaresGalleryView(
+                galleryState.value.pictures,
+                galleryState.value.pictures.getOrNull(galleryState.value.currentPictureIndex)
+            ) {
                 galleryState.setSelectedPicture(it)
             }
 
@@ -105,13 +110,19 @@ internal fun MainScreen(galleryState: MutableState<GalleryState>, dependencies: 
 
 // todo: introduce a type for Picture - ImageBitmap pair.
 @Composable
-private fun SquaresGalleryView(images: List<PictureWithThumbnail>, onSelect: (Picture) -> Unit) {
+private fun SquaresGalleryView(
+    images: List<PictureWithThumbnail>,
+    selectedImage: PictureWithThumbnail?,
+    onSelect: (Picture) -> Unit
+) {
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
         item {
             MakeNewMemoryMiniature()
         }
-        itemsIndexed(images) { idx, (picture, bitmap) ->
-            SquareMiniature(bitmap, onClick = { onSelect(picture) })
+        itemsIndexed(images) { idx, image ->
+            val isSelected = image == selectedImage
+            val (picture, bitmap) = image
+            SquareMiniature(bitmap, onClick = { onSelect(picture) }, isHighlighted = isSelected)
         }
     }
 }
@@ -135,11 +146,15 @@ private fun MakeNewMemoryMiniature() {
 }
 
 @Composable
-private fun SquareMiniature(image: ImageBitmap, onClick: () -> Unit) {
+private fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick: () -> Unit) {
     Image(
         bitmap = image,
         contentDescription = null,
-        modifier = Modifier.aspectRatio(1.0f).clickable { onClick() },
+        modifier = Modifier.aspectRatio(1.0f).clickable { onClick() }.then(
+            if (isHighlighted) {
+                Modifier.border(BorderStroke(5.dp, Color.White))
+            } else Modifier
+        ),
         contentScale = ContentScale.Crop
     )
 }
