@@ -16,8 +16,6 @@
 
 package androidx.compose.material3
 
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -56,8 +54,15 @@ class TooltipTest {
 
     @Test
     fun plainTooltip_noContent_size() {
-        rule.setMaterialContent(lightColorScheme()) { TestPlainTooltip() }
+        rule.setMaterialContent(lightColorScheme()) { PlainTooltipTest() }
 
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(TooltipMinHeight)
             .assertWidthIsEqualTo(TooltipMinWidth)
@@ -65,7 +70,15 @@ class TooltipTest {
 
     @Test
     fun richTooltip_noContent_size() {
-        rule.setMaterialContent(lightColorScheme()) { TestRichTooltip() }
+        rule.setMaterialContent(lightColorScheme()) { RichTooltipTest() }
+
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(TooltipMinHeight)
             .assertWidthIsEqualTo(TooltipMinWidth)
@@ -75,11 +88,19 @@ class TooltipTest {
     fun plainTooltip_customSize_size() {
         val customWidth = 100.dp
         val customHeight = 100.dp
-
         rule.setMaterialContent(lightColorScheme()) {
-            TestPlainTooltip(modifier = Modifier.size(customWidth, customHeight))
+            PlainTooltipTest(
+                modifier = Modifier.size(customWidth, customHeight)
+            )
         }
 
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(customHeight)
             .assertWidthIsEqualTo(customWidth)
@@ -89,11 +110,19 @@ class TooltipTest {
     fun richTooltip_customSize_size() {
         val customWidth = 100.dp
         val customHeight = 100.dp
-
         rule.setMaterialContent(lightColorScheme()) {
-            TestRichTooltip(modifier = Modifier.size(customWidth, customHeight))
+            RichTooltipTest(
+                modifier = Modifier.size(customWidth, customHeight)
+            )
         }
 
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(customHeight)
             .assertWidthIsEqualTo(customWidth)
@@ -103,7 +132,7 @@ class TooltipTest {
     @Test
     fun plainTooltip_content_padding() {
         rule.setMaterialContent(lightColorScheme()) {
-            TestPlainTooltip(
+            PlainTooltipTest(
                 tooltipContent = {
                     Text(
                         text = "Test",
@@ -113,6 +142,13 @@ class TooltipTest {
             )
         }
 
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        rule.waitForIdle()
         rule.onNodeWithTag(TextTestTag)
             .assertLeftPositionInRootIsEqualTo(8.dp)
             .assertTopPositionInRootIsEqualTo(4.dp)
@@ -121,13 +157,20 @@ class TooltipTest {
     @Test
     fun richTooltip_content_padding() {
         rule.setMaterialContent(lightColorScheme()) {
-            TestRichTooltip(
+            RichTooltipTest(
                 title = { Text(text = "Subhead", modifier = Modifier.testTag(SubheadTestTag)) },
                 text = { Text(text = "Text", modifier = Modifier.testTag(TextTestTag)) },
-                action = { Text(text = "Action", modifier = Modifier.testTag(ActionTestTag)) },
+                action = { Text(text = "Action", modifier = Modifier.testTag(ActionTestTag)) }
             )
         }
 
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        rule.waitForIdle()
         val subhead = rule.onNodeWithTag(SubheadTestTag)
         val text = rule.onNodeWithTag(TextTestTag)
 
@@ -154,18 +197,17 @@ class TooltipTest {
     fun plainTooltip_behavior() {
         val tooltipState = PlainTooltipState()
         rule.setMaterialContent(lightColorScheme()) {
-            PlainTooltipBox(
-                tooltip = { Text(text = "Test", modifier = Modifier.testTag(TextTestTag)) },
-                tooltipState = tooltipState,
-                modifier = Modifier.testTag(ContainerTestTag)
-            ) { Anchor(tooltipState) }
+            PlainTooltipTest(
+                tooltipContent = { Text(text = "Test", modifier = Modifier.testTag(TextTestTag)) },
+                tooltipState = tooltipState
+            )
         }
-
-        // Tooltip should initially be not visible
-        assertThat(tooltipState.isVisible).isFalse()
 
         // Test will manually advance the time to check the timeout
         rule.mainClock.autoAdvance = false
+
+        // Tooltip should initially be not visible
+        assertThat(tooltipState.isVisible).isFalse()
 
         // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
@@ -185,19 +227,18 @@ class TooltipTest {
     fun richTooltip_behavior_noAction() {
         val tooltipState = RichTooltipState()
         rule.setMaterialContent(lightColorScheme()) {
-            RichTooltipBox(
+            RichTooltipTest(
                 title = { Text(text = "Subhead", modifier = Modifier.testTag(SubheadTestTag)) },
                 text = { Text(text = "Text", modifier = Modifier.testTag(TextTestTag)) },
-                tooltipState = tooltipState,
-                modifier = Modifier.testTag(ContainerTestTag)
-            ) { Anchor(tooltipState) }
+                tooltipState = tooltipState
+            )
         }
-
-        // Tooltip should initially be not visible
-        assertThat(tooltipState.isVisible).isFalse()
 
         // Test will manually advance the time to check the timeout
         rule.mainClock.autoAdvance = false
+
+        // Tooltip should initially be not visible
+        assertThat(tooltipState.isVisible).isFalse()
 
         // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
@@ -218,7 +259,7 @@ class TooltipTest {
         val tooltipState = RichTooltipState()
         rule.setMaterialContent(lightColorScheme()) {
             val scope = rememberCoroutineScope()
-            RichTooltipBox(
+            RichTooltipTest(
                 title = { Text(text = "Subhead", modifier = Modifier.testTag(SubheadTestTag)) },
                 text = { Text(text = "Text", modifier = Modifier.testTag(TextTestTag)) },
                 action = {
@@ -227,16 +268,15 @@ class TooltipTest {
                         modifier = Modifier.testTag(ActionTestTag)
                     ) { Text(text = "Action") }
                 },
-                tooltipState = tooltipState,
-                modifier = Modifier.testTag(ContainerTestTag)
-            ) { Anchor(tooltipState) }
+                tooltipState = tooltipState
+            )
         }
-
-        // Tooltip should initially be not visible
-        assertThat(tooltipState.isVisible).isFalse()
 
         // Test will manually advance the time to check the timeout
         rule.mainClock.autoAdvance = false
+
+        // Tooltip should initially be not visible
+        assertThat(tooltipState.isVisible).isFalse()
 
         // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
@@ -258,64 +298,49 @@ class TooltipTest {
     }
 
     @Composable
-    private fun TestPlainTooltip(
+    private fun PlainTooltipTest(
         modifier: Modifier = Modifier,
+        tooltipContent: @Composable () -> Unit = {},
         tooltipState: PlainTooltipState = remember { PlainTooltipState() },
-        tooltipContent: @Composable () -> Unit = {}
     ) {
-        val scope = rememberCoroutineScope()
-
         PlainTooltipBox(
             tooltip = tooltipContent,
-            modifier = modifier.testTag(ContainerTestTag),
-            tooltipState = tooltipState
-        ) {}
-
-        scope.launch { tooltipState.show() }
+            tooltipState = tooltipState,
+            modifier = modifier.testTag(ContainerTestTag)
+        ) {
+            Icon(
+                Icons.Filled.Favorite,
+                contentDescription = null,
+                modifier = Modifier
+                    .testTag(AnchorTestTag)
+                    .tooltipAnchor()
+            )
+        }
     }
 
     @Composable
-    private fun TestRichTooltip(
+    private fun RichTooltipTest(
         modifier: Modifier = Modifier,
         tooltipState: RichTooltipState = remember { RichTooltipState() },
         text: @Composable () -> Unit = {},
-        action: (@Composable () -> Unit)? = null,
-        title: (@Composable () -> Unit)? = null
+        title: (@Composable () -> Unit)? = null,
+        action: (@Composable () -> Unit)? = null
     ) {
-        val scope = rememberCoroutineScope()
-
         RichTooltipBox(
             text = text,
-            action = action,
             title = title,
-            modifier = modifier.testTag(ContainerTestTag),
-            tooltipState = tooltipState
-        ) {}
-
-        scope.launch { tooltipState.show() }
-    }
-
-    @OptIn(ExperimentalFoundationApi::class)
-    @Composable
-    private fun Anchor(
-        tooltipState: TooltipState
-    ) {
-        val scope = rememberCoroutineScope()
-
-        Icon(
-            Icons.Filled.Favorite,
-            contentDescription = null,
-            modifier = Modifier
-                .testTag(AnchorTestTag)
-                .combinedClickable(
-                    onClick = {},
-                    onLongClick = {
-                        scope.launch {
-                            tooltipState.show()
-                        }
-                    }
-                )
-        )
+            action = action,
+            tooltipState = tooltipState,
+            modifier = modifier.testTag(ContainerTestTag)
+        ) {
+            Icon(
+                Icons.Filled.Favorite,
+                contentDescription = null,
+                modifier = Modifier
+                    .testTag(AnchorTestTag)
+                    .tooltipAnchor()
+            )
+        }
     }
 }
 
@@ -323,4 +348,4 @@ private const val ContainerTestTag = "Container"
 private const val TextTestTag = "Text"
 private const val SubheadTestTag = "Subhead"
 private const val ActionTestTag = "Action"
-private const val AnchorTestTag = "Anchor'"
+private const val AnchorTestTag = "Anchor"
