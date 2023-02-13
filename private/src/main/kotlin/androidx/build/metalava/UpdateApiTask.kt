@@ -150,7 +150,7 @@ fun copy(
     source: File,
     dest: File,
     permitOverwriting: Boolean,
-    logger: Logger
+    logger: Logger? = null
 ) {
     val sourceText = if (source.exists()) {
         source.readText()
@@ -161,11 +161,18 @@ fun copy(
     val changing = overwriting || (dest.exists() != source.exists())
     if (changing) {
         if (overwriting && !permitOverwriting) {
+            val diff = summarizeDiff(source, dest, maxDiffLines + 1)
+            val diffMsg = if (compareLineCount(diff, maxDiffLines) > 0) {
+                "Diff is greater than $maxDiffLines lines, use diff tool to compare.\n\n"
+            } else {
+                "Diff:\n$diff\n\n"
+            }
             val message = "Modifying the API definition for a previously released artifact " +
                 "having a final API version (version not ending in '-alpha') is not " +
                 "allowed.\n\n" +
                 "Previously declared definition is $dest\n" +
                 "Current generated   definition is $source\n\n" +
+                diffMsg +
                 "Did you mean to increment the library version first?\n\n" +
                 "If you have a valid reason to override Semantic Versioning policy, see " +
                 "go/androidx/versioning#beta-api-change for information on obtaining approval."
@@ -174,10 +181,37 @@ fun copy(
         if (source.exists()) {
             @Suppress("UnstableApiUsage")
             Files.copy(source, dest)
-            logger.lifecycle("Copied $source to $dest")
+            logger?.lifecycle("Copied $source to $dest")
         } else {
             dest.delete()
-            logger.lifecycle("Deleted $dest because $source does not exist")
+            logger?.lifecycle("Deleted $dest because $source does not exist")
         }
     }
 }
+
+/**
+ * Returns -1 if [text] has fewer than [count] newline characters, 0 if equal, and 1 if greater
+ * than.
+ */
+fun compareLineCount(text: String, count: Int): Int {
+    var found = 0
+    var index = 0
+    while (found < count) {
+        index = text.indexOf('\n', index)
+        if (index < 0) {
+            break
+        }
+        found++
+        index++
+    }
+    return if (found < count) {
+        -1
+    } else if (found == count) {
+        0
+    } else {
+        1
+    }
+}
+
+/** Maximum number of diff lines to include in output. */
+internal const val maxDiffLines = 8
