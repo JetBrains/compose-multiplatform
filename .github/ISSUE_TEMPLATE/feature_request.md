@@ -1,8 +1,8 @@
 ---
-name: Feature request
-about: 'Suggest an idea for improving Compose Multiplatform'
+name: Enhancement
+about: 'New feature or request'
 title: ''
-labels: ''
+labels: 'enhancement'
 assignees: ''
 
 ---
