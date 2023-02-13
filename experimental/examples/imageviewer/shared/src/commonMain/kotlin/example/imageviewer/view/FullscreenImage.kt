@@ -111,22 +111,24 @@ internal fun FullscreenImage(
 
         FloatingActionButton(
             modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
+            containerColor = ImageviewerColors.KotlinGradient0,
             onClick = previousImage
         ) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowLeft,
                 contentDescription = "Previous",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
         FloatingActionButton(
             modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
+            containerColor = ImageviewerColors.KotlinGradient0,
             onClick = nextImage
         ) {
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowRight,
                 contentDescription = "Next",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onBackground
             )
         }
     }
