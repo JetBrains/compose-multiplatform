@@ -3,6 +3,7 @@ package example.imageviewer.style
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 object ImageviewerColors {
@@ -17,6 +18,18 @@ object ImageviewerColors {
     val TranslucentBlack = Color(0, 0, 0, 60)
     val TranslucentWhite = Color(255, 255, 255, 20)
     val Transparent = Color.Transparent
+
+    val KotlinGradient0 = Color(0xFF7F52FF)
+    val KotlinGradient50 = Color(0xFFC811E2)
+    val KotlinGradient100 = Color(0xFFE54857)
+
+    val kotlinHorizontalGradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            ImageviewerColors.KotlinGradient0,
+            ImageviewerColors.KotlinGradient50,
+            ImageviewerColors.KotlinGradient100
+        )
+    )
 
     fun buttonBackground(isHover: Boolean) = if (isHover) TranslucentBlack else Transparent
 }

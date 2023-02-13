@@ -34,7 +34,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
@@ -54,6 +53,7 @@ import example.imageviewer.model.refresh
 import example.imageviewer.model.setSelectedPicture
 import example.imageviewer.model.toFullscreen
 import example.imageviewer.style.ImageviewerColors
+import example.imageviewer.style.ImageviewerColors.kotlinHorizontalGradientBrush
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.orEmpty
 import org.jetbrains.compose.resources.rememberImageBitmap
@@ -138,7 +138,7 @@ private fun MakeNewMemoryMiniature() {
         Text(
             "+",
             modifier = Modifier.fillMaxWidth(),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
             fontSize = 50.sp
         )
@@ -203,22 +203,14 @@ private fun TopContent(galleryState: MutableState<GalleryState>, dependencies: D
     }
 }
 
-val kotlinHorizontalGradientBrush = Brush.horizontalGradient(
-    colors = listOf(
-        Color(0xFF7F52FF),
-        Color(0xFFC811E2),
-        Color(0xFFE54857)
-    )
-)
-
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun TitleBar(galleryState: MutableState<GalleryState>, dependencies: Dependencies) {
     TopAppBar(
         modifier = Modifier.background(brush = kotlinHorizontalGradientBrush),
         colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = Color.Transparent,
-            titleContentColor = Color.White
+            containerColor = ImageviewerColors.Transparent,
+            titleContentColor = MaterialTheme.colorScheme.onBackground
         ),
         title = {
 //            Text("UI Components")
