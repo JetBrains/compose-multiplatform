@@ -50,11 +50,13 @@ internal class PreviewEditorToolbarVisibilityUpdater(
     }
 
     private fun updateVisibility() {
-        val parentPreviewFun = parentPreviewAtCaretOrNull(editor)
-        if (parentPreviewFun != null) {
-            toolbar.scheduleShow()
-        } else {
-            toolbar.scheduleHide()
+        if (!editor.isDisposed) {
+            val parentPreviewFun = parentPreviewAtCaretOrNull(editor)
+            if (parentPreviewFun != null) {
+                toolbar.scheduleShow()
+            } else {
+                toolbar.scheduleHide()
+            }
         }
     }
 }
