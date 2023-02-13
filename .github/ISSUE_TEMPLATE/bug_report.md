@@ -31,8 +31,8 @@ If the bug is Android-only, report it in the [Jetpack Compose tracker](https://i
 **To Reproduce**
 Steps and/or the code snippet to reproduce the behavior:
 1. Go to '...'
-2. Click on '....'
-3. Scroll down to '....'
+2. Click on '...'
+3. Scroll down to '...'
 4. See error
 
 **Expected behavior**
