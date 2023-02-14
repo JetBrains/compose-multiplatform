@@ -19,8 +19,6 @@ package androidx.compose.ui
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.unit.IntRect
-import kotlinx.coroutines.runBlocking
-import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Test
 
 class ComposeSceneInputTest {
@@ -144,7 +142,7 @@ class ComposeSceneInputTest {
     fun `pressed popup should own received moves outside popup`() = ImageComposeScene(
         100,
         100
-    ).useInUIThread { scene ->
+    ).use { scene ->
         val background = FillBox()
         val cutPopup = PopupState(IntRect(-20, -20, 40, 40))
         val overlappedPopup = PopupState(IntRect(20, 20, 60, 60))
@@ -157,12 +155,16 @@ class ComposeSceneInputTest {
             independentPopup.Content()
         }
 
+        // Popup takes two iterations to complete its layout, so we need to run render an extra time
+        // TODO(maryanovsky): Remove this when https://github.com/JetBrains/compose-jb/issues/2726
+        //                    is completed.
+        while (scene.hasInvalidations())
+            scene.render()
+
         scene.sendPointerEvent(PointerEventType.Enter, Offset(-10f, -10f))
         scene.sendPointerEvent(PointerEventType.Press, Offset(-10f, -10f))
         background.events.assertReceivedNoEvents()
         cutPopup.events.assertReceived(PointerEventType.Enter, Offset(-10f, -10f) - cutPopup.origin)
-        // synthetic event
-        cutPopup.events.assertReceived(PointerEventType.Move, Offset(-10f, -10f) - cutPopup.origin)
         cutPopup.events.assertReceivedLast(
             PointerEventType.Press, Offset(-10f, -10f) - cutPopup.origin)
         overlappedPopup.events.assertReceivedNoEvents()
@@ -185,7 +187,7 @@ class ComposeSceneInputTest {
         scene.sendPointerEvent(PointerEventType.Move, Offset(80f, 80f))
         background.events.assertReceivedNoEvents()
         cutPopup.events.assertReceivedLast(
-            PointerEventType.Move, Offset(80f, 80f) - cutPopup.origin)
+            PointerEventType.Exit, Offset(80f, 80f) - cutPopup.origin)
         overlappedPopup.events.assertReceivedNoEvents()
         independentPopup.events.assertReceivedNoEvents()
 
@@ -213,7 +215,7 @@ class ComposeSceneInputTest {
         scene.sendPointerEvent(PointerEventType.Move, Offset(20f, 20f))
         background.events.assertReceivedNoEvents()
         cutPopup.events.assertReceivedLast(
-            PointerEventType.Move, Offset(20f, 20f) - cutPopup.origin)
+            PointerEventType.Enter, Offset(20f, 20f) - cutPopup.origin)
         overlappedPopup.events.assertReceivedNoEvents()
         independentPopup.events.assertReceivedNoEvents()
 
@@ -224,6 +226,14 @@ class ComposeSceneInputTest {
         overlappedPopup.events.assertReceivedNoEvents()
         independentPopup.events.assertReceivedNoEvents()
 
+        scene.sendPointerEvent(PointerEventType.Move, Offset(20f, 20f))
+        background.events.assertReceivedNoEvents()
+        cutPopup.events.assertReceivedLast(
+            PointerEventType.Exit, Offset(20f, 20f) - cutPopup.origin)
+        overlappedPopup.events.assertReceivedLast(
+            PointerEventType.Enter, Offset(20f, 20f) - overlappedPopup.origin)
+        independentPopup.events.assertReceivedNoEvents()
+
         scene.sendPointerEvent(PointerEventType.Press, Offset(20f, 20f))
         background.events.assertReceivedNoEvents()
         cutPopup.events.assertReceivedNoEvents()
@@ -231,13 +241,11 @@ class ComposeSceneInputTest {
             PointerEventType.Press, Offset(20f, 20f) - overlappedPopup.origin)
         independentPopup.events.assertReceivedNoEvents()
 
-        // TODO(demin): probably we should fire Exit/Enter events during the Release event
         scene.sendPointerEvent(PointerEventType.Move, Offset(-10f, -10f))
         background.events.assertReceivedNoEvents()
-        cutPopup.events.assertReceivedLast(
-            PointerEventType.Exit, Offset(-10f, -10f) - cutPopup.origin)
+        cutPopup.events.assertReceivedNoEvents()
         overlappedPopup.events.assertReceivedLast(
-            PointerEventType.Enter, Offset(-10f, -10f) - overlappedPopup.origin)
+            PointerEventType.Exit, Offset(-10f, -10f) - overlappedPopup.origin)
         independentPopup.events.assertReceivedNoEvents()
 
         scene.sendPointerEvent(PointerEventType.Release, Offset(-10f, -10f))
@@ -250,17 +258,6 @@ class ComposeSceneInputTest {
         independentPopup.events.assertReceivedNoEvents()
     }
 
-    // TODO(https://github.com/JetBrains/compose-jb/issues/1396):
-    //  ImageComposeScene should be able to run in the test thread.
-    //  Now we have interference with GlobalSnapshotManager, that can alter behaviour of the test because
-    //  it commits states in another thread
-    // workaround for flakiness of ImageComposeScene.
-    // Some tests can behave differently from run to run if they run in the not UI thread
-    private inline fun <R> ImageComposeScene.useInUIThread(
-        crossinline block: (ImageComposeScene) -> R
-    ): R = runBlocking(MainUIDispatcher) {
-        use(block)
-    }
 
     @Test
     fun scroll() = ImageComposeScene(100, 100).use { scene ->
