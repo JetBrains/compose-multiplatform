@@ -5,6 +5,7 @@ struct iOSApp: App {
 
 	@State private var textState: String = "text state"
 	@State private var interactResult: InteractResult = InteractResult.init(Color.teal, false)
+	@FocusState private var textFieldFocused: Bool
 
 	let gradient = LinearGradient(colors: [.blue.opacity(1.0), .green.opacity(1.0)],
 			startPoint: .topLeading,
@@ -28,13 +29,20 @@ struct iOSApp: App {
 
 							HStack {
 								TextField("Type message...", text: $textState, axis: .vertical)
+										.focused($textFieldFocused)
 										.lineLimit(3)
 										.background(Color.pink.opacity(0.0), in: RoundedRectangle(cornerRadius: 10))
 //                                    .textFieldStyle(.roundedBorder)
-								Button(action: {}) {
-									HStack {
-										Image(systemName: "play.fill")
-										Text("Send")
+								if (textState.count > 0) {
+									Button(action: {
+										textFieldFocused = false
+										textState = ""
+										sendMessage(textState)
+									}) {
+										HStack {
+											Image(systemName: "play.fill")
+											Text("Send")
+										}
 									}
 								}
 							}.padding(10)
@@ -43,11 +51,6 @@ struct iOSApp: App {
 													.fill(interactResult.swiftUIColor.opacity(0.7))
 									)
 									.padding(6)
-
-							Rectangle()
-									.fill(Color.clear)
-									.frame(height: 10)
-									.background(interactResult.swiftUIColor)
 						}
 								.navigationBarTitleDisplayMode(.inline)
 								.navigationTitle("Compose inside SwiftUI")
@@ -61,8 +64,8 @@ struct iOSApp: App {
 							Label("Compose", systemImage: "square.and.pencil")
 						}
 						.toolbar(.visible, for: .tabBar)
-						//                        .toolbarBackground(interactResult.swiftUIColor, for: .tabBar)
-						//                        .toolbarBackground(.visible, for: .tabBar)
+						.toolbarBackground(Color.purple, for: .tabBar)
+						.toolbarBackground(.visible, for: .tabBar)
 						.preferredColorScheme(interactResult.darkTheme ? .dark : .light)
 
 
@@ -77,8 +80,8 @@ struct iOSApp: App {
 							Label("SwiftUI", systemImage: "list.dash")
 						}
 						.toolbar(.visible, for: .tabBar)
-						//                        .toolbarBackground(interactResult.swiftUIColor, for: .tabBar)
-						//                        .toolbarBackground(.visible, for: .tabBar)
+						.toolbarBackground(Color.yellow, for: .tabBar)
+						.toolbarBackground(.visible, for: .tabBar)
 						.preferredColorScheme(interactResult.darkTheme ? .dark : .light)
 
 

@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -51,6 +52,7 @@ internal inline fun Messages(messages: List<Message>) {
 
 @Composable
 private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
+    val focusManager = LocalFocusManager.current
     Box(modifier = Modifier.fillMaxWidth()) {
         Surface(
             modifier = Modifier.padding(4.dp)
@@ -96,6 +98,7 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                 modifier = Modifier.align(Alignment.BottomEnd)
                     .clickable {
                         liked = !liked
+                        focusManager.clearFocus(true)
                     }
                     .padding(4.dp),
                 imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.Favorite,

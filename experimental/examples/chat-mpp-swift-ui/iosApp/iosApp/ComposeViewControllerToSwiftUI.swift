@@ -55,3 +55,7 @@ func getCGColor(_ argb:Int) -> CGColor {
     }
     return CGColor(red: clr(argb >> 16), green: clr(argb >> 8), blue: clr(argb), alpha: clr(argb >> 24))
 }
+
+public func sendMessage(_ text:String) {
+    Main_iosKt.sendMessage(text: text)
+}
