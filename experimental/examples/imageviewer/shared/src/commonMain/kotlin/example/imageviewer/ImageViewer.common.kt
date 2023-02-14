@@ -17,6 +17,7 @@ import example.imageviewer.model.bigUrl
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 
 enum class ExternalImageViewerEvent {
     Foward,
@@ -26,7 +27,7 @@ enum class ExternalImageViewerEvent {
 @Composable
 internal fun ImageViewerCommon(
     dependencies: Dependencies,
-    externalEvents: Flow<ExternalImageViewerEvent>? = null
+    externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
     val galleryScreenState = remember { GalleryScreenState() }
 
@@ -34,7 +35,7 @@ internal fun ImageViewerCommon(
         galleryScreenState.refresh(dependencies)
     }
     LaunchedEffect(Unit) {
-        externalEvents?.collect {
+        externalEvents.collect {
             when (it) {
                 ExternalImageViewerEvent.Foward -> galleryScreenState.nextImage()
                 ExternalImageViewerEvent.Back -> galleryScreenState.previousImage()
