@@ -31,6 +31,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFalse
 import kotlinx.coroutines.Dispatchers
@@ -85,6 +86,7 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
         }
     }
 
+    @SdkSuppress(maxSdkVersion = 32) // b/269176638
     @Test
     fun scrollToPage_usedOffset_shouldPlacePagesCorrectly() = runBlocking {
         // Arrange
