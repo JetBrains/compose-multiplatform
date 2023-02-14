@@ -6,31 +6,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.ContentRepository
-import example.imageviewer.model.GalleryState
 import example.imageviewer.model.adapter
 import example.imageviewer.model.createNetworkRepository
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
+import example.imageviewer.utils.rememberCoroutineIOScope
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 @Composable
 internal fun ImageViewerIos() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val galleryState = remember { mutableStateOf(GalleryState()) }
-    val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.Default }
+    val ioScope: CoroutineScope = rememberCoroutineIOScope()
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
     ImageViewerTheme {
@@ -38,7 +35,6 @@ internal fun ImageViewerIos() {
             modifier = Modifier.fillMaxSize()
         ) {
             ImageViewerCommon(
-                galleryState = galleryState,
                 dependencies = dependencies
             )
             Toast(toastState)

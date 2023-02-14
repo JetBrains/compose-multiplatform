@@ -9,7 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.GalleryState
 import example.imageviewer.model.ScreenState
@@ -20,14 +21,29 @@ import example.imageviewer.model.previousImage
 import example.imageviewer.model.refresh
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.MainScreen
+import kotlinx.coroutines.flow.Flow
+
+enum class ExternalImageViewerEvent {
+    Foward,
+    Back
+}
 
 @Composable
 internal fun ImageViewerCommon(
-    galleryState: MutableState<GalleryState>,
-    dependencies: Dependencies
+    dependencies: Dependencies,
+    externalEvents: Flow<ExternalImageViewerEvent>? = null
 ) {
+    val galleryState = remember { mutableStateOf(GalleryState()) }
     LaunchedEffect(Unit) {
         galleryState.refresh(dependencies)
+    }
+    LaunchedEffect(Unit) {
+        externalEvents?.collect {
+            when (it) {
+                ExternalImageViewerEvent.Foward -> galleryState.nextImage()
+                ExternalImageViewerEvent.Back -> galleryState.previousImage()
+            }
+        }
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
