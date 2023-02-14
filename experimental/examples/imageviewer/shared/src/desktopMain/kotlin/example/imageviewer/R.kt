@@ -18,21 +18,22 @@ object ResString {
     val refresh: String
 
     init {
-        if (System.getProperty("user.language").equals("ru")) {
+        println(System.getProperty("user.language"))
+        if (System.getProperty("user.language").equals("de")) {
             appName = "ImageViewer"
-            loading = "Загружаем изображения..."
-            repoEmpty = "Репозиторий пуст."
-            noInternet = "Нет доступа в интернет."
-            repoInvalid = "Список изображений в репозитории пуст или имеет неверный формат."
-            refreshUnavailable = "Невозможно обновить изображения."
-            loadImageUnavailable = "Невозможно загузить полное изображение."
-            lastImage = "Это последнее изображение."
-            firstImage = "Это первое изображение."
-            picture = "Изображение:"
-            size = "Размеры:"
-            pixels = "пикселей."
-            back = "Назад"
-            refresh = "Обновить"
+            loading = "Bilder werden geladen..."
+            repoEmpty = "Bildverzeichnis ist leer."
+            noInternet = "Kein Internetzugriff."
+            repoInvalid = "Bildverzeichnisch beschädigt oder leer."
+            refreshUnavailable = "Kann Bilder nicht aktualisieren."
+            loadImageUnavailable = "Kann volles Bild nicht laden."
+            lastImage = "Dies ist das letzte Bild."
+            firstImage = "Dies ist das erste Bild."
+            picture = "Bild:"
+            size = "Abmessungen:"
+            pixels = "Pixel."
+            back = "Zurück"
+            refresh = "Aktualisieren"
         } else {
             appName = "ImageViewer"
             loading = "Loading images..."
