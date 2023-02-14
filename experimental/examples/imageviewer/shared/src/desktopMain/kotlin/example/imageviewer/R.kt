@@ -18,7 +18,6 @@ object ResString {
     val refresh: String
 
     init {
-        println(System.getProperty("user.language"))
         if (System.getProperty("user.language").equals("de")) {
             appName = "ImageViewer"
             loading = "Bilder werden geladen..."
