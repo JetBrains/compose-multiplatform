@@ -81,6 +81,7 @@ internal value class Strings private constructor(
         val TimePickerMinuteSuffix = Strings(52)
         val TimePickerHour = Strings(53)
         val TimePickerMinute = Strings(54)
+        val TooltipPaneDescription = Strings(55)
     }
 }
 

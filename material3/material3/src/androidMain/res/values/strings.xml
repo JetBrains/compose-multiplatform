@@ -73,6 +73,7 @@
     -->
     <string name="date_range_input_invalid_range_input">Invalid date range input</string>
     <!-- Spoken description of a tooltip -->
+    <string name="tooltip_pane_description">Tooltip</string>
     <string name="tooltip_long_press_label">Show tooltip</string>
     <!-- Suffix for time in 12-hour standard, after noon. [CHAR_LIMIT=2]" -->
     <string name="time_picker_pm">PM</string>

@@ -80,6 +80,7 @@ internal actual fun getString(string: Strings): String {
         Strings.TimePicker24HourSuffix -> "%1$ hours"
         Strings.TimePickerMinute -> "Minute"
         Strings.TimePickerHour -> "Hour"
+        Strings.TooltipPaneDescription -> "Tooltip"
         else -> ""
     }
 }
