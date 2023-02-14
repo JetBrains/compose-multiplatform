@@ -21,7 +21,7 @@ import com.android.tools.lint.client.api.Vendor
 import com.android.tools.lint.detector.api.CURRENT_API
 
 class TestManifestIssueRegistry : IssueRegistry() {
-    override val api = 14
+    override val api = 13
     override val minApi = CURRENT_API
     override val issues get() = listOf(GradleDebugConfigurationDetector.ISSUE)
     override val vendor = Vendor(
