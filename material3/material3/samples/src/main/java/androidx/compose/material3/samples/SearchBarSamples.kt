@@ -90,8 +90,8 @@ fun SearchBarSample() {
                     items(4) { idx ->
                         val resultText = "Suggestion $idx"
                         ListItem(
-                            headlineText = { Text(resultText) },
-                            supportingText = { Text("Additional info") },
+                            headlineContent = { Text(resultText) },
+                            supportingContent = { Text("Additional info") },
                             leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
                             modifier = Modifier.clickable {
                                 text = resultText
@@ -156,8 +156,8 @@ fun DockedSearchBarSample() {
                     items(4) { idx ->
                         val resultText = "Suggestion $idx"
                         ListItem(
-                            headlineText = { Text(resultText) },
-                            supportingText = { Text("Additional info") },
+                            headlineContent = { Text(resultText) },
+                            supportingContent = { Text("Additional info") },
                             leadingContent = { Icon(Icons.Filled.Star, contentDescription = null) },
                             modifier = Modifier.clickable {
                                 text = resultText
