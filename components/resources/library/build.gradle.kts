@@ -38,8 +38,12 @@ kotlin {
         val skikoMain by creating {
             dependsOn(commonMain)
         }
+        val jvmAndAndroidMain by creating {
+            dependsOn(commonMain)
+        }
         val desktopMain by getting {
             dependsOn(skikoMain)
+            dependsOn(jvmAndAndroidMain)
         }
         val desktopTest by getting {
             dependencies {
@@ -48,7 +52,9 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
             }
         }
-        val androidMain by getting {}
+        val androidMain by getting {
+            dependsOn(jvmAndAndroidMain)
+        }
         val androidTest by getting {
             dependencies {
 
