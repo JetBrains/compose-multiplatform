@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.resources
 
+import org.jetbrains.compose.resources.vector.xmldom.Element
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSData
@@ -37,3 +38,7 @@ private class MacOSResourceImpl(path: String) : AbstractResourceImpl(path) {
 
 internal actual class MissingResourceException actual constructor(path: String) :
     Exception("Missing resource with path: $path")
+
+internal actual fun parseXML(byteArray: ByteArray): Element {
+    throw UnsupportedOperationException("XML Vector Drawables are not supported for MacOS target")
+}
