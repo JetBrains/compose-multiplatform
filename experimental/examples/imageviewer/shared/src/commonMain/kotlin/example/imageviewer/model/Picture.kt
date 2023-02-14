@@ -25,5 +25,6 @@ val mockNames = mapOf(
     "9.jpg" to "Lightful infrastructure",
     "10.jpg" to "Compose Pathway",
     "11.jpg" to "Rotary",
-    "12.jpg" to "Towering"
+    "12.jpg" to "Towering",
+    "13.jpg" to "Vasa"
 )
