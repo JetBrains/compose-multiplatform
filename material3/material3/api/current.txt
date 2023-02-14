@@ -518,6 +518,11 @@ package androidx.compose.material3 {
     method @androidx.compose.runtime.Composable public static void NavigationRailItem(boolean selected, kotlin.jvm.functions.Function0<kotlin.Unit> onClick, kotlin.jvm.functions.Function0<kotlin.Unit> icon, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional boolean alwaysShowLabel, optional androidx.compose.material3.NavigationRailItemColors colors, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource);
   }
 
+  public final class OutlinedTextFieldKt {
+    method @androidx.compose.runtime.Composable public static void OutlinedTextField(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? prefix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? suffix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? supportingText, optional boolean isError, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional int minLines, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.TextFieldColors colors);
+    method @androidx.compose.runtime.Composable public static void OutlinedTextField(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? prefix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? suffix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? supportingText, optional boolean isError, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional int minLines, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.TextFieldColors colors);
+  }
+
   public final class ProgressIndicatorDefaults {
     method @androidx.compose.runtime.Composable public long getCircularColor();
     method public int getCircularDeterminateStrokeCap();
@@ -774,6 +779,30 @@ package androidx.compose.material3 {
   }
 
   @androidx.compose.runtime.Immutable public final class TextFieldColors {
+  }
+
+  @androidx.compose.runtime.Immutable public final class TextFieldDefaults {
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getFilledShape();
+    method public float getFocusedBorderThickness();
+    method public float getMinHeight();
+    method public float getMinWidth();
+    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getOutlinedShape();
+    method public float getUnfocusedBorderThickness();
+    method public androidx.compose.foundation.layout.PaddingValues outlinedTextFieldPadding(optional float start, optional float top, optional float end, optional float bottom);
+    method public androidx.compose.foundation.layout.PaddingValues textFieldWithLabelPadding(optional float start, optional float end, optional float top, optional float bottom);
+    method public androidx.compose.foundation.layout.PaddingValues textFieldWithoutLabelPadding(optional float start, optional float top, optional float end, optional float bottom);
+    property public final float FocusedBorderThickness;
+    property public final float MinHeight;
+    property public final float MinWidth;
+    property public final float UnfocusedBorderThickness;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape filledShape;
+    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape outlinedShape;
+    field public static final androidx.compose.material3.TextFieldDefaults INSTANCE;
+  }
+
+  public final class TextFieldKt {
+    method @androidx.compose.runtime.Composable public static void TextField(String value, kotlin.jvm.functions.Function1<? super java.lang.String,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? prefix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? suffix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? supportingText, optional boolean isError, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional int minLines, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.TextFieldColors colors);
+    method @androidx.compose.runtime.Composable public static void TextField(androidx.compose.ui.text.input.TextFieldValue value, kotlin.jvm.functions.Function1<? super androidx.compose.ui.text.input.TextFieldValue,kotlin.Unit> onValueChange, optional androidx.compose.ui.Modifier modifier, optional boolean enabled, optional boolean readOnly, optional androidx.compose.ui.text.TextStyle textStyle, optional kotlin.jvm.functions.Function0<kotlin.Unit>? label, optional kotlin.jvm.functions.Function0<kotlin.Unit>? placeholder, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingIcon, optional kotlin.jvm.functions.Function0<kotlin.Unit>? prefix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? suffix, optional kotlin.jvm.functions.Function0<kotlin.Unit>? supportingText, optional boolean isError, optional androidx.compose.ui.text.input.VisualTransformation visualTransformation, optional androidx.compose.foundation.text.KeyboardOptions keyboardOptions, optional androidx.compose.foundation.text.KeyboardActions keyboardActions, optional boolean singleLine, optional int maxLines, optional int minLines, optional androidx.compose.foundation.interaction.MutableInteractionSource interactionSource, optional androidx.compose.ui.graphics.Shape shape, optional androidx.compose.material3.TextFieldColors colors);
   }
 
   public final class TextKt {

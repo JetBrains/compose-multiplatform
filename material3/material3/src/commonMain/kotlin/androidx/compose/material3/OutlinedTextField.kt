@@ -132,7 +132,7 @@ import kotlin.math.roundToInt
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.outlinedTextFieldColors].
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedTextField(
     value: String,
@@ -166,7 +166,6 @@ fun OutlinedTextField(
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     CompositionLocalProvider(LocalTextSelectionColors provides colors.selectionColors) {
-        @OptIn(ExperimentalMaterial3Api::class)
         BasicTextField(
             value = value,
             modifier = if (label != null) {
@@ -292,7 +291,7 @@ fun OutlinedTextField(
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.outlinedTextFieldColors].
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedTextField(
     value: TextFieldValue,
@@ -326,7 +325,6 @@ fun OutlinedTextField(
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     CompositionLocalProvider(LocalTextSelectionColors provides colors.selectionColors) {
-        @OptIn(ExperimentalMaterial3Api::class)
         BasicTextField(
             value = value,
             modifier = if (label != null) {
@@ -499,7 +497,6 @@ fun OutlinedTextField(
  * positioned in the middle part.
  */
 @Composable
-@ExperimentalMaterial3Api
 internal fun OutlinedTextFieldLayout(
     modifier: Modifier,
     textField: @Composable () -> Unit,
@@ -601,6 +598,7 @@ internal fun OutlinedTextFieldLayout(
             }
 
             if (supporting != null) {
+                @OptIn(ExperimentalMaterial3Api::class)
                 Box(Modifier
                     .layoutId(SupportingId)
                     .padding(TextFieldDefaults.supportingTextPadding())

@@ -158,7 +158,7 @@ import kotlin.math.roundToInt
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.textFieldColors].
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextField(
     value: String,
@@ -192,7 +192,6 @@ fun TextField(
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     CompositionLocalProvider(LocalTextSelectionColors provides colors.selectionColors) {
-        @OptIn(ExperimentalMaterial3Api::class)
         BasicTextField(
             value = value,
             modifier = modifier
@@ -304,7 +303,7 @@ fun TextField(
  * @param colors [TextFieldColors] that will be used to resolve the colors used for this text field
  * in different states. See [TextFieldDefaults.textFieldColors].
  */
-@ExperimentalMaterial3Api
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TextField(
     value: TextFieldValue,
@@ -338,7 +337,6 @@ fun TextField(
     val mergedTextStyle = textStyle.merge(TextStyle(color = textColor))
 
     CompositionLocalProvider(LocalTextSelectionColors provides colors.selectionColors) {
-        @OptIn(ExperimentalMaterial3Api::class)
         BasicTextField(
             value = value,
             modifier = modifier
@@ -494,7 +492,6 @@ fun TextField(
  * placeholder and the input field.
  */
 @Composable
-@ExperimentalMaterial3Api
 internal fun TextFieldLayout(
     modifier: Modifier,
     textField: @Composable () -> Unit,
@@ -599,6 +596,7 @@ internal fun TextFieldLayout(
             }
 
             if (supporting != null) {
+                @OptIn(ExperimentalMaterial3Api::class)
                 Box(Modifier
                     .layoutId(SupportingId)
                     .padding(TextFieldDefaults.supportingTextPadding())

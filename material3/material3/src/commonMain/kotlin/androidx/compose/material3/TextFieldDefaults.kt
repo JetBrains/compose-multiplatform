@@ -52,7 +52,6 @@ import androidx.compose.ui.unit.dp
 /**
  * Contains the default values used by [TextField] and [OutlinedTextField].
  */
-@ExperimentalMaterial3Api
 @Immutable
 object TextFieldDefaults {
     /** Default shape for an outlined text field. */
@@ -204,7 +203,6 @@ object TextFieldDefaults {
      *
      * See [PaddingValues] for more details.
      */
-    @ExperimentalMaterial3Api
     fun textFieldWithLabelPadding(
         start: Dp = TextFieldPadding,
         end: Dp = TextFieldPadding,
@@ -216,7 +214,6 @@ object TextFieldDefaults {
      * Default content padding applied to [TextField] when the label is null.
      * See [PaddingValues] for more details.
      */
-    @ExperimentalMaterial3Api
     fun textFieldWithoutLabelPadding(
         start: Dp = TextFieldPadding,
         top: Dp = TextFieldPadding,
@@ -228,7 +225,6 @@ object TextFieldDefaults {
      * Default content padding applied to [OutlinedTextField].
      * See [PaddingValues] for more details.
      */
-    @ExperimentalMaterial3Api
     fun outlinedTextFieldPadding(
         start: Dp = TextFieldPadding,
         top: Dp = TextFieldPadding,
@@ -1051,7 +1047,6 @@ object TextFieldDefaults {
  * See [TextFieldDefaults.outlinedTextFieldColors] for the default colors used in
  * [OutlinedTextField].
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Immutable
 class TextFieldColors internal constructor(
     private val focusedTextColor: Color,
@@ -1441,7 +1436,6 @@ class TextFieldColors internal constructor(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun animateBorderStrokeAsState(
     enabled: Boolean,
