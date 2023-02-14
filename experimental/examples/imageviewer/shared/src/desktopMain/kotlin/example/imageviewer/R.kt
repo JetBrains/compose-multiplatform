@@ -19,11 +19,11 @@ object ResString {
 
     init {
         if (System.getProperty("user.language").equals("de")) {
-            appName = "ImageViewer"
+            appName = "Meine Erinnerungen"
             loading = "Bilder werden geladen..."
             repoEmpty = "Bildverzeichnis ist leer."
             noInternet = "Kein Internetzugriff."
-            repoInvalid = "Bildverzeichnisch beschädigt oder leer."
+            repoInvalid = "Bildverzeichnis beschädigt oder leer."
             refreshUnavailable = "Kann Bilder nicht aktualisieren."
             loadImageUnavailable = "Kann volles Bild nicht laden."
             lastImage = "Dies ist das letzte Bild."
@@ -34,7 +34,7 @@ object ResString {
             back = "Zurück"
             refresh = "Aktualisieren"
         } else {
-            appName = "ImageViewer"
+            appName = "My Memories"
             loading = "Loading images..."
             repoEmpty = "Repository is empty."
             noInternet = "No internet access."

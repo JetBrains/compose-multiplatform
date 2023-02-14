@@ -12,4 +12,5 @@
     <string name="size">Size:</string>
     <string name="pixels">pixels.</string>
     <string name="back">back</string>
+    <string name="refresh">Refresh</string>
 </resources>
