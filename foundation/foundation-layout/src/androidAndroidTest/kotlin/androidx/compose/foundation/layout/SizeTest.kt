@@ -58,6 +58,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import org.junit.Assert.assertNotEquals
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
@@ -1486,6 +1487,7 @@ class SizeTest : LayoutTest() {
         assertEquals(Offset(root.width - size.toFloat(), 0f), childPosition.value)
     }
 
+    @SdkSuppress(maxSdkVersion = 32) // b/267699626
     @Test
     fun testWrapContentSize_rtl() = with(density) {
         val sizeDp = 200.toDp()
