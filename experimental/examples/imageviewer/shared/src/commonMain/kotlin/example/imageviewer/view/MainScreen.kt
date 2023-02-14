@@ -27,7 +27,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,15 +42,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Dependencies
-import example.imageviewer.model.GalleryState
+import example.imageviewer.model.GalleryScreenState
 import example.imageviewer.model.Picture
 import example.imageviewer.model.PictureWithThumbnail
 import example.imageviewer.model.bigUrl
-import example.imageviewer.model.isContentReady
-import example.imageviewer.model.picture
-import example.imageviewer.model.refresh
-import example.imageviewer.model.setSelectedPicture
-import example.imageviewer.model.toFullscreen
 import example.imageviewer.style.ImageviewerColors
 import example.imageviewer.style.ImageviewerColors.kotlinHorizontalGradientBrush
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -84,31 +78,37 @@ fun GalleryStyle.toggled(): GalleryStyle {
 }
 
 @Composable
-internal fun MainScreen(galleryState: MutableState<GalleryState>, dependencies: Dependencies) {
+internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: Dependencies) {
     var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) } // TODO: Potentially expose a toggle for this.
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-        TopContent(galleryState, dependencies)
+        TitleBar(galleryScreenState, dependencies)
+        if (needShowPreview()) {
+            PreviewImage(
+                getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+                picture = galleryScreenState.picture, onClick = {
+                    galleryScreenState.toFullscreen()
+                })
+        }
         when (galleryStyle) {
             GalleryStyle.SQUARES -> SquaresGalleryView(
-                galleryState.value.pictures,
-                galleryState.value.pictures.getOrNull(galleryState.value.currentPictureIndex)
+                galleryScreenState.picturesWithThumbnail,
+                galleryScreenState.picturesWithThumbnail.getOrNull(galleryScreenState.currentPictureIndex)
             ) {
-                galleryState.setSelectedPicture(it)
+                galleryScreenState.selectPicture(it)
             }
 
             GalleryStyle.LIST -> ListGalleryView(
-                galleryState.value.pictures,
+                galleryScreenState.picturesWithThumbnail,
                 dependencies,
-                onSelect = { galleryState.setSelectedPicture(it) },
-                onFullScreen = { galleryState.toFullscreen(it) })
+                onSelect = { galleryScreenState.selectPicture(it) },
+                onFullScreen = { galleryScreenState.toFullscreen(it) })
         }
     }
-    if (!galleryState.value.isContentReady) {
+    if (!galleryScreenState.isContentReady) {
         LoadingScreen(dependencies.localization.loading)
     }
 }
 
-// todo: introduce a type for Picture - ImageBitmap pair.
 @Composable
 private fun SquaresGalleryView(
     images: List<PictureWithThumbnail>,
@@ -191,21 +191,9 @@ private fun ListGalleryView(
     }
 }
 
-@Composable
-private fun TopContent(galleryState: MutableState<GalleryState>, dependencies: Dependencies) {
-    TitleBar(galleryState, dependencies)
-    if (needShowPreview()) {
-        PreviewImage(
-            getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-            picture = galleryState.value.picture, onClick = {
-                galleryState.toFullscreen()
-            })
-    }
-}
-
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun TitleBar(galleryState: MutableState<GalleryState>, dependencies: Dependencies) {
+private fun TitleBar(galleryScreenState: GalleryScreenState, dependencies: Dependencies) {
     TopAppBar(
         modifier = Modifier.background(brush = kotlinHorizontalGradientBrush),
         colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -213,7 +201,6 @@ private fun TitleBar(galleryState: MutableState<GalleryState>, dependencies: Dep
             titleContentColor = MaterialTheme.colorScheme.onBackground
         ),
         title = {
-//            Text("UI Components")
             Row(Modifier.height(50.dp)) {
                 Text(
                     dependencies.localization.appName,
@@ -229,7 +216,7 @@ private fun TitleBar(galleryState: MutableState<GalleryState>, dependencies: Dep
                         bitmap = resource("refresh.png").rememberImageBitmap().orEmpty(),
                         contentDescription = null,
                         modifier = Modifier.size(35.dp).clickable {
-                            galleryState.refresh(dependencies)
+                            galleryScreenState.refresh(dependencies)
                         }
                     )
                 }

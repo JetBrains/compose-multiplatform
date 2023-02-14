@@ -79,11 +79,11 @@ internal fun FullscreenImage(
                 })
             if (imageWithFilter != null) {
                 val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
-                val scalableState = remember(imageSize) { mutableStateOf(ScalableState(imageSize)) }
-                val visiblePartOfImage: IntRect = scalableState.value.visiblePart
+                val scalableState = remember(imageSize) { ScalableState(imageSize) }
+                val visiblePartOfImage: IntRect = scalableState.visiblePart
                 Slider(
                     modifier = Modifier.fillMaxWidth(),
-                    value = scalableState.value.scale,
+                    value = scalableState.scale,
                     valueRange = MIN_SCALE..MAX_SCALE,
                     onValueChange = { scalableState.setScale(it) },
                 )
