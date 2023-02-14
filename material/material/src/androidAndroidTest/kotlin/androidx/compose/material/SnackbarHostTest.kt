@@ -139,7 +139,8 @@ class SnackbarHostTest {
             Truth.assertThat(result).isEqualTo(SnackbarResult.Dismissed)
         }
 
-        rule.waitUntil(timeoutMillis = 7_000) { job2.isCompleted }
+        rule.mainClock.advanceTimeBy(5_000)
+        rule.waitUntil { job2.isCompleted }
     }
 
     @Test
