@@ -24,7 +24,7 @@ import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.utils.decorateWithDiskCache
 import example.imageviewer.utils.getPreferredWindowSize
-import example.imageviewer.utils.rememberCoroutineIOScope
+import example.imageviewer.utils.ioDispatcher
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.CoroutineScope
@@ -49,7 +49,7 @@ class ExternalNavigationEventBus {
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val ioScope: CoroutineScope = rememberCoroutineIOScope()
+    val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
     val externalNavigationEventBus = remember { ExternalNavigationEventBus() }
 

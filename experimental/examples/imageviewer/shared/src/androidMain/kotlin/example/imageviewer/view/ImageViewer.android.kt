@@ -23,6 +23,7 @@ import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.toImageBitmap
+import example.imageviewer.utils.ioDispatcher
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +32,7 @@ import kotlinx.coroutines.Dispatchers
 @Composable
 fun ImageViewerAndroid() {
     val context: Context = LocalContext.current
-    val ioScope = rememberCoroutineScope { Dispatchers.IO }
+    val ioScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(context, ioScope) { getDependencies(context, ioScope) }
     ImageViewerTheme {
         ImageViewerCommon(dependencies)

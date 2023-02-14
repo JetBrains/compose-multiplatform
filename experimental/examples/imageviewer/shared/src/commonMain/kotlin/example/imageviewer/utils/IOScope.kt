@@ -1,7 +1,6 @@
 package example.imageviewer.utils
 
-import androidx.compose.runtime.Composable
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 
-expect @Composable
-fun rememberCoroutineIOScope(): CoroutineScope
+expect
+val ioDispatcher: CoroutineDispatcher

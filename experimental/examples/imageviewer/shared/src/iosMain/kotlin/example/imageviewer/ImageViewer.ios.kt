@@ -6,6 +6,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
@@ -17,7 +18,7 @@ import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.rememberCoroutineIOScope
+import example.imageviewer.utils.ioDispatcher
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
 import io.ktor.client.HttpClient
@@ -27,7 +28,7 @@ import kotlinx.coroutines.CoroutineScope
 @Composable
 internal fun ImageViewerIos() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val ioScope: CoroutineScope = rememberCoroutineIOScope()
+    val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
     ImageViewerTheme {
