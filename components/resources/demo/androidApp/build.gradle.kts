@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    id("org.jetbrains.compose")
 }
 
 dependencies {
@@ -13,6 +12,12 @@ dependencies {
 }
 
 android {
+    buildFeatures {
+        compose = true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.3.2"
+    }
     compileSdk = 33
     defaultConfig {
         applicationId = "me.user.androidApp"
