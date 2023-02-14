@@ -54,10 +54,22 @@
     </string>
     <string name="date_picker_switch_to_calendar_mode">Switch to calendar input mode</string>
     <string name="date_picker_switch_to_input_mode">Switch to text input mode</string>
+    <!-- Spoken description for scrolling to display later years -->
+    <string name="date_picker_scroll_to_later_years">Scroll to show later years</string>
+    <!-- Spoken description for scrolling to display earlier years -->
+    <string name="date_picker_scroll_to_earlier_years">Scroll to show earlier years</string>
     <string name="date_range_picker_title">Select dates</string>
     <string name="date_range_picker_start_headline">Start date</string>
     <string name="date_range_picker_end_headline">End date</string>
+    <!-- Spoken description for scrolling to the next month -->
+    <string name="date_range_picker_scroll_to_next_month">Scroll to show the next month</string>
+    <!-- Spoken description for scrolling to the previous month -->
+    <string name="date_range_picker_scroll_to_previous_month">Scroll to show the previous month</string>
     <string name="date_range_input_title">Enter dates</string>
+    <!--
+    Describes an invalid date range input when a user enters a start or end date [CHAR_LIMIT=NONE]
+    -->
+    <string name="date_range_input_invalid_range_input">Invalid date range input</string>
     <!-- Spoken description of a tooltip -->
     <string name="tooltip_long_press_label">Show tooltip</string>
     <!-- Suffix for time in 12-hour standard, after noon. [CHAR_LIMIT=2]" -->

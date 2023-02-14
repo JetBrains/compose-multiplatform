@@ -302,8 +302,8 @@ class DateRangePickerTest {
                 stateData.calendarModel.getCanonicalDate(1649721600000L + MillisecondsIn24Hours)
             val displayedMonth = stateData.calendarModel.getMonth(startDate)
             rule.runOnIdle {
-                stateData.selectedStartDate = startDate
-                stateData.selectedEndDate = endDate
+                stateData.selectedStartDate.value = startDate
+                stateData.selectedEndDate.value = endDate
                 stateData.displayedMonth = displayedMonth
             }
 
@@ -312,8 +312,8 @@ class DateRangePickerTest {
             restorationTester.emulateSavedInstanceStateRestore()
 
             rule.runOnIdle {
-                assertThat(stateData.selectedStartDate).isEqualTo(startDate)
-                assertThat(stateData.selectedEndDate).isEqualTo(endDate)
+                assertThat(stateData.selectedStartDate.value).isEqualTo(startDate)
+                assertThat(stateData.selectedEndDate.value).isEqualTo(endDate)
                 assertThat(stateData.displayedMonth).isEqualTo(displayedMonth)
                 assertThat(dateRangePickerState!!.selectedStartDateMillis)
                     .isEqualTo(1649721600000L)

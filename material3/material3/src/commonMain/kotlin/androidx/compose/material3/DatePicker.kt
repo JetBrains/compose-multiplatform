@@ -48,6 +48,7 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -86,12 +87,15 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.CustomAccessibilityAction
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.ScrollAxisRange
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.horizontalScrollAxisRange
+import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
@@ -105,6 +109,7 @@ import androidx.compose.ui.unit.dp
 import java.lang.Integer.max
 import java.text.NumberFormat
 import java.util.Locale
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 // TODO: External preview image.
@@ -160,7 +165,16 @@ fun DatePicker(
         title = title,
         headline = headline,
         modeToggleButton = if (showModeToggle) {
-            { DateEntryModeToggleButton(stateData = state.stateData) }
+            {
+                DisplayModeToggleButton(
+                    displayMode = state.displayMode,
+                    onDisplayModeChange = { displayMode ->
+                        state.stateData.switchDisplayMode(
+                            displayMode
+                        )
+                    },
+                )
+            }
         } else {
             null
         },
@@ -262,7 +276,7 @@ class DatePickerState private constructor(internal val stateData: StateData) {
      */
     @get:Suppress("AutoBoxing")
     val selectedDateMillis by derivedStateOf {
-        stateData.selectedStartDate?.utcTimeMillis
+        stateData.selectedStartDate.value?.utcTimeMillis
     }
 
     /**
@@ -413,12 +427,12 @@ object DatePickerDefaults {
         with(state.stateData) {
             val defaultLocale = defaultLocale()
             val formattedDate = dateFormatter.formatDate(
-                date = selectedStartDate,
+                date = selectedStartDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale
             )
             val verboseDateDescription = dateFormatter.formatDate(
-                date = selectedStartDate,
+                date = selectedStartDate.value,
                 calendarModel = calendarModel,
                 locale = defaultLocale,
                 forContentDescription = true
@@ -810,7 +824,7 @@ internal class StateData constructor(
     /**
      * A mutable state of [CalendarDate] that represents the start date for a selection.
      */
-    var selectedStartDate by mutableStateOf(
+    var selectedStartDate = mutableStateOf(
         if (initialSelectedStartDateMillis != null) {
             val date = calendarModel.getCanonicalDate(
                 initialSelectedStartDateMillis
@@ -830,7 +844,7 @@ internal class StateData constructor(
      *
      * Single date selection states that use this [StateData] should always have this as `null`.
      */
-    var selectedEndDate by mutableStateOf(
+    var selectedEndDate = mutableStateOf(
         // Set to null in case the provided value is "undefined" or <= than the start date.
         if (initialSelectedEndDateMillis != null &&
             initialSelectedStartDateMillis != null &&
@@ -896,8 +910,22 @@ internal class StateData constructor(
         get() = (yearRange.last - yearRange.first + 1) * 12
 
     fun isInRange(date: Long): Boolean {
-        return date >= (selectedStartDate?.utcTimeMillis ?: Long.MAX_VALUE) &&
-            date <= (selectedEndDate?.utcTimeMillis ?: Long.MIN_VALUE)
+        return date >= (selectedStartDate.value?.utcTimeMillis ?: Long.MAX_VALUE) &&
+            date <= (selectedEndDate.value?.utcTimeMillis ?: Long.MIN_VALUE)
+    }
+
+    fun switchDisplayMode(displayMode: DisplayMode) {
+        // Update the displayed month, if needed, and change the mode to a  date-picker.
+        selectedStartDate.value?.let {
+            displayedMonth = calendarModel.getMonth(it)
+        }
+        // When toggling back from an input mode, it's possible that the user input an invalid
+        // start date and a valid end date. If this is the case, and the start date is null, ensure
+        // that the end date is also null.
+        if (selectedStartDate.value == null && selectedEndDate.value != null) {
+            selectedEndDate.value = null
+        }
+        this.displayMode.value = displayMode
     }
 
     companion object {
@@ -907,8 +935,8 @@ internal class StateData constructor(
         fun Saver(): Saver<StateData, Any> = listSaver(
             save = {
                 listOf(
-                    it.selectedStartDate?.utcTimeMillis,
-                    it.selectedEndDate?.utcTimeMillis,
+                    it.selectedStartDate.value?.utcTimeMillis,
+                    it.selectedEndDate.value?.utcTimeMillis,
                     it.displayedMonth.startUtcTimeMillis,
                     it.yearRange.first,
                     it.yearRange.last,
@@ -949,6 +977,7 @@ internal fun DateEntryContainer(
         modifier = modifier
             .sizeIn(minWidth = DatePickerModalTokens.ContainerWidth)
             .padding(DatePickerHorizontalPadding)
+            .semantics { isContainer = true }
     ) {
         DatePickerHeader(
             modifier = Modifier,
@@ -968,31 +997,25 @@ internal fun DateEntryContainer(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun DateEntryModeToggleButton(stateData: StateData) {
-    with(stateData) {
-        if (displayMode.value == DisplayMode.Picker) {
-            IconButton(onClick = {
-                displayMode.value = DisplayMode.Input
-            }) {
-                Icon(
-                    imageVector = Icons.Filled.Edit,
-                    contentDescription = getString(Strings.DatePickerSwitchToInputMode)
-                )
-            }
-        } else {
-            IconButton(
-                onClick = {
-                    // Update the displayed month, if needed, and change the mode to a
-                    // date-picker.
-                    selectedStartDate?.let { displayedMonth = calendarModel.getMonth(it) }
-                    displayMode.value = DisplayMode.Picker
-                }
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.DateRange,
-                    contentDescription = getString(Strings.DatePickerSwitchToCalendarMode)
-                )
-            }
+internal fun DisplayModeToggleButton(
+    displayMode: DisplayMode,
+    onDisplayModeChange: (DisplayMode) -> Unit
+) {
+    if (displayMode == DisplayMode.Picker) {
+        IconButton(onClick = { onDisplayModeChange(DisplayMode.Input) }) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = getString(Strings.DatePickerSwitchToInputMode)
+            )
+        }
+    } else {
+        IconButton(
+            onClick = { onDisplayModeChange(DisplayMode.Picker) }
+        ) {
+            Icon(
+                imageVector = Icons.Filled.DateRange,
+                contentDescription = getString(Strings.DatePickerSwitchToCalendarMode)
+            )
         }
     }
 }
@@ -1011,7 +1034,10 @@ private fun SwitchableDateEntryContent(
 ) {
     // TODO(b/266480386): Apply the motion spec for this once we have it. Consider replacing this
     //  with AnimatedContent when it's out of experimental.
-    Crossfade(targetState = state.displayMode, animationSpec = spring()) { mode ->
+    Crossfade(
+        targetState = state.displayMode,
+        animationSpec = spring(),
+        modifier = Modifier.semantics { isContainer = true }) { mode ->
         when (mode) {
             DisplayMode.Picker -> DatePickerContent(
                 stateData = state.stateData,
@@ -1042,7 +1068,7 @@ private fun DatePickerContent(
     val coroutineScope = rememberCoroutineScope()
 
     val onDateSelected = { dateInMillis: Long ->
-        stateData.selectedStartDate =
+        stateData.selectedStartDate.value =
             stateData.calendarModel.getCanonicalDate(dateInMillis)
     }
 
@@ -1334,8 +1360,8 @@ internal fun Month(
             if (rangeSelectionEnabled) {
                 SelectedRangeInfo.calculateRangeInfo(
                     month,
-                    stateData.selectedStartDate,
-                    stateData.selectedEndDate
+                    stateData.selectedStartDate.value,
+                    stateData.selectedEndDate.value
                 )
             } else {
                 null
@@ -1389,8 +1415,9 @@ internal fun Month(
                             val dateInMillis = month.startUtcTimeMillis +
                                 (dayNumber * MillisecondsIn24Hours)
                             val isToday = dateInMillis == today.utcTimeMillis
-                            val startDateSelected = dateInMillis == startSelection?.utcTimeMillis
-                            val endDateSelected = dateInMillis == endSelection?.utcTimeMillis
+                            val startDateSelected =
+                                dateInMillis == startSelection.value?.utcTimeMillis
+                            val endDateSelected = dateInMillis == endSelection.value?.utcTimeMillis
                             val dayContentDescription = dayContentDescription(
                                 rangeSelectionEnabled = rangeSelectionEnabled,
                                 isToday = isToday,
@@ -1482,7 +1509,7 @@ private fun Day(
         // In the `Month` function above, the implementation checks whether the day is today and
         // sets the content description differently.
         modifier = modifier
-        .minimumInteractiveComponentSize()
+            .minimumInteractiveComponentSize()
             .requiredSize(
                 DatePickerModalTokens.DateStateLayerWidth,
                 DatePickerModalTokens.DateStateLayerHeight
@@ -1542,6 +1569,9 @@ private fun YearPicker(
         } else {
             colors.containerColor
         }
+        val coroutineScope = rememberCoroutineScope()
+        val scrollToEarlierYearsLabel = getString(Strings.DatePickerScrollToShowEarlierYears)
+        val scrollToLaterYearsLabel = getString(Strings.DatePickerScrollToShowLaterYears)
         LazyVerticalGrid(
             columns = GridCells.Fixed(YearsInRow),
             modifier = modifier
@@ -1562,7 +1592,24 @@ private fun YearPicker(
                         .requiredSize(
                             width = DatePickerModalTokens.SelectionYearContainerWidth,
                             height = DatePickerModalTokens.SelectionYearContainerHeight
-                        ),
+                        )
+                        .semantics {
+                            // Apply a11y custom actions to the first and last items in the years
+                            // grid. The actions will suggest to scroll to earlier or later years in
+                            // the grid.
+                            customActions = if (lazyGridState.firstVisibleItemIndex == it ||
+                                lazyGridState.layoutInfo.visibleItemsInfo.lastOrNull()?.index == it
+                            ) {
+                                customScrollActions(
+                                    state = lazyGridState,
+                                    coroutineScope = coroutineScope,
+                                    scrollUpLabel = scrollToEarlierYearsLabel,
+                                    scrollDownLabel = scrollToLaterYearsLabel
+                                )
+                            } else {
+                                emptyList()
+                            }
+                        },
                     selected = selectedYear == displayedYear,
                     currentYear = selectedYear == currentYear,
                     onClick = { onYearSelected(selectedYear) },
@@ -1721,10 +1768,48 @@ private fun YearPickerMenuButton(
     }
 }
 
+private fun customScrollActions(
+    state: LazyGridState,
+    coroutineScope: CoroutineScope,
+    scrollUpLabel: String,
+    scrollDownLabel: String
+): List<CustomAccessibilityAction> {
+    val scrollUpAction = {
+        if (!state.canScrollBackward) {
+            false
+        } else {
+            coroutineScope.launch {
+                state.scrollToItem(state.firstVisibleItemIndex - YearsInRow)
+            }
+            true
+        }
+    }
+    val scrollDownAction = {
+        if (!state.canScrollForward) {
+            false
+        } else {
+            coroutineScope.launch {
+                state.scrollToItem(state.firstVisibleItemIndex + YearsInRow)
+            }
+            true
+        }
+    }
+    return listOf(
+        CustomAccessibilityAction(
+            label = scrollUpLabel,
+            action = scrollUpAction
+        ),
+        CustomAccessibilityAction(
+            label = scrollDownLabel,
+            action = scrollDownAction
+        )
+    )
+}
+
 /**
  * Returns a string representation of an integer at the current Locale.
  */
-private fun Int.toLocalString(): String {
+internal fun Int.toLocalString(): String {
     val formatter = NumberFormat.getIntegerInstance()
     // Eliminate any use of delimiters when formatting the integer.
     formatter.isGroupingUsed = false
