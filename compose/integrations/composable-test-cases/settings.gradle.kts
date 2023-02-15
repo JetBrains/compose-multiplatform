@@ -26,7 +26,12 @@ fun module(name: String, path: String) {
 gradle.startParameter.setContinueOnFailure(true)
 
 include(":common")
+
 module(":testcase-template-lib", "testcases/template/lib")
 module(":testcase-template-main", "testcases/template/main")
+
 module(":testcase-inheritance-composableInterface-lib", "testcases/inheritance/composableInterface/lib")
 module(":testcase-inheritance-composableInterface-main", "testcases/inheritance/composableInterface/main")
+
+module(":testcase-inheritance-funInterface-lib", "testcases/inheritance/funInterface/lib")
+module(":testcase-inheritance-funInterface-main", "testcases/inheritance/funInterface/main")
