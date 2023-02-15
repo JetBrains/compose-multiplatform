@@ -44,14 +44,10 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"日期超出預期的年份範圍：%1$s - %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"切換至日曆輸入模式"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"切換至文字輸入模式"</string>
-    <!-- no translation found for date_range_picker_title (690080476639943577) -->
-    <skip />
-    <!-- no translation found for date_range_picker_start_headline (5759491386723090559) -->
-    <skip />
-    <!-- no translation found for date_range_picker_end_headline (4766270708882012148) -->
-    <skip />
-    <!-- no translation found for date_range_input_title (2366412111888449406) -->
-    <skip />
+    <string name="date_range_picker_title" msgid="690080476639943577">"選取日期"</string>
+    <string name="date_range_picker_start_headline" msgid="5759491386723090559">"開始日期"</string>
+    <string name="date_range_picker_end_headline" msgid="4766270708882012148">"結束日期"</string>
+    <string name="date_range_input_title" msgid="2366412111888449406">"輸入日期"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"顯示提示"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"下午"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"上午"</string>
