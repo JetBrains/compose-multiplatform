@@ -7,7 +7,7 @@ package org.jetbrains.compose.resources.vector.xmldom
 import platform.Foundation.*
 import platform.darwin.NSObject
 
-fun parse(xml: String): Element {
+internal fun parse(xml: String): Element {
     val parser = DomXmlParser()
     NSXMLParser((xml as NSString).dataUsingEncoding(NSUTF8StringEncoding)!!).apply {
         shouldReportNamespacePrefixes = true
