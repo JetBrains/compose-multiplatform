@@ -20,19 +20,21 @@ import platform.Foundation.countryCode
 import platform.Foundation.currentLocale
 import platform.Foundation.languageCode
 import platform.Foundation.NSLocale
+import platform.Foundation.localeIdentifier
 import platform.Foundation.scriptCode
 
 internal class NativeLocale(val locale: NSLocale) : PlatformLocale {
     override val language: String
-        get() = locale.languageCode!!
+        get() = locale.languageCode
 
     override val script: String
-        get() = locale.scriptCode!!
+        get() = locale.scriptCode.orEmpty()
 
     override val region: String
-        get() = locale.countryCode!!
+        get() = locale.countryCode ?: "US"
 
-    override fun toLanguageTag(): String = TODO("implement native toLanguageTag") // locale.toLanguageTag()
+    // todo add tests to check IETF BCP47 on all platforms
+    override fun toLanguageTag(): String = locale.localeIdentifier
 }
 
 internal actual fun createPlatformLocaleDelegate(): PlatformLocaleDelegate =
