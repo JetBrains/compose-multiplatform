@@ -24,3 +24,5 @@ rootProject.name = "chat-swift-ui"
 
 include(":androidApp")
 include(":shared")
+include(":desktopApp")
+include(":jsApp")
