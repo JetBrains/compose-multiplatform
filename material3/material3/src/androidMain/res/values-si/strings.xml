@@ -44,14 +44,10 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"දිනය අපේක්ෂිත වසර පරාසයෙන් පිටත වේ %1$s - %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"දින දර්ශන ආදාන ප්‍රකාරයට මාරු වන්න"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"පෙළ ආදාන ප්‍රකාරයට මාරු වන්න"</string>
-    <!-- no translation found for date_range_picker_title (690080476639943577) -->
-    <skip />
-    <!-- no translation found for date_range_picker_start_headline (5759491386723090559) -->
-    <skip />
-    <!-- no translation found for date_range_picker_end_headline (4766270708882012148) -->
-    <skip />
-    <!-- no translation found for date_range_input_title (2366412111888449406) -->
-    <skip />
+    <string name="date_range_picker_title" msgid="690080476639943577">"දින තෝරන්න"</string>
+    <string name="date_range_picker_start_headline" msgid="5759491386723090559">"ආරම්භක දිනය"</string>
+    <string name="date_range_picker_end_headline" msgid="4766270708882012148">"අවසාන දිනය"</string>
+    <string name="date_range_input_title" msgid="2366412111888449406">"දින ඇතුළු කරන්න"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"මෙවලම් ඉඟිය පෙන්වන්න"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"ප.ව."</string>
     <string name="time_picker_am" msgid="5096144640014509074">"පෙ.ව."</string>

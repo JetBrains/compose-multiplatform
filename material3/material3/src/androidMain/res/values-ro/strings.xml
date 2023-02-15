@@ -44,14 +44,10 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Data este în afara intervalului de ani %1$s – %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"Comută la modul de introducere în calendar"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"Comută la modul de introducere a textului"</string>
-    <!-- no translation found for date_range_picker_title (690080476639943577) -->
-    <skip />
-    <!-- no translation found for date_range_picker_start_headline (5759491386723090559) -->
-    <skip />
-    <!-- no translation found for date_range_picker_end_headline (4766270708882012148) -->
-    <skip />
-    <!-- no translation found for date_range_input_title (2366412111888449406) -->
-    <skip />
+    <string name="date_range_picker_title" msgid="690080476639943577">"Selectează datele"</string>
+    <string name="date_range_picker_start_headline" msgid="5759491386723090559">"Data de începere"</string>
+    <string name="date_range_picker_end_headline" msgid="4766270708882012148">"Data de încheiere"</string>
+    <string name="date_range_input_title" msgid="2366412111888449406">"Introdu datele"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"Afișează balonul explicativ"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"p.m."</string>
     <string name="time_picker_am" msgid="5096144640014509074">"a.m."</string>
