@@ -80,9 +80,7 @@ import kotlinx.coroutines.launch
  * animates to [Hidden].
  * @param modifier Optional [Modifier] for the bottom sheet.
  * @param sheetState The state of the bottom sheet.
- * @param shape The shape of the bottom sheet. By default, the shape changes from
- * [BottomSheetDefaults.MinimizedShape] to [BottomSheetDefaults.ExpandedShape] when the
- * sheet targets [Hidden] and non-Hidden states respectively.
+ * @param shape The shape of the bottom sheet.
  * @param containerColor The color used for the background of this bottom sheet
  * @param contentColor The preferred color for content inside this bottom sheet. Defaults to either
  * the matching content color for [containerColor], or to the current [LocalContentColor] if
@@ -98,8 +96,7 @@ fun ModalBottomSheet(
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier,
     sheetState: SheetState = rememberSheetState(),
-    shape: Shape = if (sheetState.targetValue == Hidden) BottomSheetDefaults.MinimizedShape
-        else BottomSheetDefaults.ExpandedShape,
+    shape: Shape = BottomSheetDefaults.ExpandedShape,
     containerColor: Color = BottomSheetDefaults.ContainerColor,
     contentColor: Color = contentColorFor(containerColor),
     tonalElevation: Dp = BottomSheetDefaults.Elevation,
