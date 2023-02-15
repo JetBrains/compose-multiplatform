@@ -18,7 +18,7 @@ A test case contains 2 or more modules to check crossmodule compilation (the tes
 See a test case [template](./testcases/template) for an example.
 Splitting the test cases into separate small projects helps in distinguishing the potential compilation bugs.
 
-The behaviour is checked by the tests in a `...-main` module.   
+The behaviour is checked by the tests in a `...-main` module of a test case.   
 The tests create a simple text Composition and then compares the text dump with an expected value.       
 Example:
 ```kotlin
