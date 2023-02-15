@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun LoadingScreen(text: String = "") {
+fun LoadingScreen(text: String = "") {
     Box(
         modifier = Modifier.fillMaxSize().background(color = MaterialTheme.colors.background)
     ) {

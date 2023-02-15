@@ -23,7 +23,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 
 @Composable
-internal fun ImageViewerIos() {
+fun ImageViewerIos() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val state = remember { mutableStateOf(State()) }
     val ioScope: CoroutineScope = rememberCoroutineScope { Dispatchers.Default }

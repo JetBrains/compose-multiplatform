@@ -20,7 +20,7 @@ import org.jetbrains.compose.resources.resource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun Miniature(
+fun Miniature(
     picture: Picture,
     image: ImageBitmap?,
     onClickSelect: () -> Unit,

@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.rememberImageBitmap
 import org.jetbrains.compose.resources.resource
 
 @Composable
-internal fun FullscreenImage(
+fun FullscreenImage(
     picture: Picture?,
     getImage: suspend (Picture) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
