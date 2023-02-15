@@ -254,7 +254,7 @@ class BorderTest(val shape: Shape) {
         }
     }
 
-    @SdkSuppress(maxSdkVersion = 32) // b/257069369
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O, maxSdkVersion = 32) // b/257069369
     @Test
     fun border_non_simple_rounded_rect() {
         val topleft = 0f
