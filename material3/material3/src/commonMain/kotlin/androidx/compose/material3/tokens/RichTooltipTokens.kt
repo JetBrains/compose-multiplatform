@@ -24,7 +24,7 @@ internal object RichTooltipTokens {
     val ActionPressedLabelTextColor = ColorSchemeKeyTokens.Primary
     val ContainerColor = ColorSchemeKeyTokens.Surface
     val ContainerElevation = ElevationTokens.Level2
-    val ContainerShape = ShapeKeyTokens.CornerSmall
+    val ContainerShape = ShapeKeyTokens.CornerMedium
     val ContainerSurfaceTintLayerColor = ColorSchemeKeyTokens.SurfaceTint
     val SubheadColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val SubheadFont = TypographyKeyTokens.TitleSmall
