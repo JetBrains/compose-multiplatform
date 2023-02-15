@@ -7,7 +7,11 @@ package org.jetbrains.compose.resources
 
 import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Density
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.parseVectorRoot
@@ -56,16 +60,29 @@ private fun <T> LoadState<T>.orEmpty(emptyValue: T): T = when (this) {
 }
 
 /**
- * return current ImageBitmap or return empty while loading
+ * Return current ImageBitmap or return empty while loading.
  */
 @ExperimentalResourceApi
 fun LoadState<ImageBitmap>.orEmpty(): ImageBitmap = orEmpty(emptyImageBitmap)
 
 /**
- * return current ImageVector or return empty while loading
+ * Return current ImageVector or return empty while loading.
  */
 @ExperimentalResourceApi
 fun LoadState<ImageVector>.orEmpty(): ImageVector = orEmpty(emptyImageVector)
+
+/**
+ * Return Painter depending on the extension of the resource name (vector or bitmap).
+ */
+@ExperimentalResourceApi
+@Composable
+fun painterResource(res: String): Painter {
+    if (res.endsWith(".xml")) {
+        return rememberVectorPainter(resource(res).rememberImageVector(LocalDensity.current).orEmpty())
+    }
+
+    return BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
+}
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
 
