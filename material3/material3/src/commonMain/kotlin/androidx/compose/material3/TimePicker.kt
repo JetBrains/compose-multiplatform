@@ -147,10 +147,14 @@ import kotlin.math.sin
 import kotlinx.coroutines.launch
 
 /**
+ * <a href="https://m3.material.io/components/time-pickers/overview" class="external" target="_blank">Material Design time picker</a>.
+ *
  * Time pickers help users select and set a specific time.
  *
  * Shows a picker that allows the user to select time.
  * Subscribe to updates through [TimePickerState]
+ *
+ * ![Time picker image](https://developer.android.com/images/reference/androidx/compose/material3/time-picker.png)
  *
  * @sample androidx.compose.material3.samples.TimePickerSample
  *

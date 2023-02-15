@@ -142,7 +142,6 @@ import kotlinx.coroutines.launch
  * for this slider. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this slider in different states.
  */
-// TODO(b/229979132): Add m.io link
 @Composable
 fun Slider(
     value: Float,
