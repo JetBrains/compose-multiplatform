@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.Density
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.parseVectorRoot
 import androidx.compose.ui.unit.dp
+import kotlin.jvm.JvmName
 
 private val emptyImageBitmap: ImageBitmap by lazy { ImageBitmap(1, 1) }
 
@@ -88,6 +89,19 @@ fun painterResource(res: String): Painter {
     }
 
     return BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
+}
+
+@ExperimentalResourceApi
+@Composable
+@JvmName("loadStateImageVectorAsPainter")
+fun LoadState<ImageVector>.asPainter(): Painter = rememberVectorPainter(orEmpty())
+
+@ExperimentalResourceApi
+@Composable
+@JvmName("loadStateImageBitmapAsPainter")
+fun LoadState<ImageBitmap>.asPainter(): Painter {
+    val imageBitmap = orEmpty()
+    return remember(imageBitmap) { BitmapPainter(imageBitmap) }
 }
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap

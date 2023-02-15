@@ -33,5 +33,14 @@ internal fun UseResources() {
             modifier = Modifier.size(150.dp),
             contentDescription = null
         )
+        Icon(
+            painter = resource("vector.xml").rememberImageVector(LocalDensity.current).asPainter(),
+            modifier = Modifier.size(150.dp),
+            contentDescription = null
+        )
+        Image(
+            painter = resource("img.webp").rememberImageBitmap().asPainter(),
+            contentDescription = null,
+        )
     }
 }
