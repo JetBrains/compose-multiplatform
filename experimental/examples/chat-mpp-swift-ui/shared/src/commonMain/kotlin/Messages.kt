@@ -26,7 +26,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal inline fun Messages(messages: List<Message>) {
+internal inline fun Messages(messages: List<Message>, displayStub: Boolean) {
     val listState = rememberLazyListState()
     if (messages.isNotEmpty()) {
         LaunchedEffect(messages.last()) {
@@ -43,9 +43,11 @@ internal inline fun Messages(messages: List<Message>) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
             }
         }
-        item {
-            // Stub for better text field display
-            Box(Modifier.height(250.dp))
+        if (displayStub) {
+            item {
+                // Stub for better text field display
+                Box(Modifier.height(250.dp))
+            }
         }
     }
 }
@@ -62,7 +64,7 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
         ) {
             Box(
                 Modifier.background(brush = Brush.horizontalGradient(
-                    listOf(0xFFC811E2, 0xFF7F52FF).map { Color(it) })
+                    ChatColors.GRADIENT_2.map { Color(it) })
                 ).padding(10.dp),
             ) {
                 Row(verticalAlignment = Alignment.Top) {

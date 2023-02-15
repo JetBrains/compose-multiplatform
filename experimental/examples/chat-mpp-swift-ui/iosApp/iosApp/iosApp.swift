@@ -8,7 +8,7 @@ struct iOSApp: App {
 	@FocusState private var textFieldFocused: Bool
 
     let gradient = LinearGradient(
-            colors: [0xFF7F52FF, 0xFFC811E2, 0xFFE54857].map { hex in Color(getCGColor(hex)).opacity(1.0) },
+            colors: gradient3Colors(),
 			startPoint: .topLeading, endPoint: .bottomTrailing
     )
 

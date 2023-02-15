@@ -43,3 +43,7 @@ func getCGColor(_ argb:Int) -> CGColor {
 public func sendMessage(_ text:String) {
     Main_iosKt.sendMessage(text: text)
 }
+
+public func gradient3Colors() -> [Color] {
+    return Main_iosKt.gradient3Colors().map { hex in Color(getCGColor(hex.intValue)).opacity(1.0) }
+}
