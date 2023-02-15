@@ -26,7 +26,7 @@ struct iOSApp: App {
                             TextField("Type message...", text: $textState, axis: .vertical)
                                     .focused($textFieldFocused)
                                     .lineLimit(3)
-                            if (textState.count > 0) {
+                            if (!textState.isEmpty) {
                                 Button(action: {
                                     sendMessage(textState)
                                     textFieldFocused = false
@@ -38,8 +38,7 @@ struct iOSApp: App {
                                     }.tint(.white)
                                 }
                             }
-                        }
-                                .padding(10)
+                        }.padding(10)
                                 .background(RoundedRectangle(cornerRadius: 10).fill(gradient).opacity(0.8))
                                 .padding(6)
                         Rectangle().fill(Color.clear).frame(height: 0).background(gradient)
@@ -49,7 +48,9 @@ struct iOSApp: App {
                 GradientTemplate(gradient: gradient, title: "SwiftUI") {
                     Text("SwiftUI screen")
                 }.tabItem { Label("SwiftUI", systemImage: "list.dash") }
-			}.preferredColorScheme(interactResult.darkTheme ? .dark : .light)
+            }
+                    .accentColor(.white)
+                    .preferredColorScheme(interactResult.darkTheme ? .dark : .light)
 		}
 	}
 }
