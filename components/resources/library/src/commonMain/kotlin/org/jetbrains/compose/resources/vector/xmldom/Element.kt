@@ -3,7 +3,7 @@ package org.jetbrains.compose.resources.vector.xmldom
 /**
  * XML DOM Element.
  */
-interface Element: Node {
+internal interface Element: Node {
 
     fun getAttributeNS(nameSpaceURI: String, localName: String): String
 
