@@ -34,9 +34,9 @@ package androidx.compose.material3 {
   public final class AssistChipDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipBorder assistChipBorder(optional long borderColor, optional long disabledBorderColor, optional float borderWidth);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors assistChipColors(optional long containerColor, optional long labelColor, optional long leadingIconContentColor, optional long trailingIconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconContentColor, optional long disabledTrailingIconContentColor);
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation assistChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation assistChipElevation(optional float elevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors elevatedAssistChipColors(optional long containerColor, optional long labelColor, optional long leadingIconContentColor, optional long trailingIconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledLeadingIconContentColor, optional long disabledTrailingIconContentColor);
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation elevatedAssistChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation elevatedAssistChipElevation(optional float elevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
     method public float getHeight();
     method public float getIconSize();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getShape();
@@ -715,13 +715,13 @@ package androidx.compose.material3 {
 
   public final class SuggestionChipDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors elevatedSuggestionChipColors(optional long containerColor, optional long labelColor, optional long iconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledIconContentColor);
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation elevatedSuggestionChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation elevatedSuggestionChipElevation(optional float elevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
     method public float getHeight();
     method public float getIconSize();
     method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getShape();
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipBorder suggestionChipBorder(optional long borderColor, optional long disabledBorderColor, optional float borderWidth);
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipColors suggestionChipColors(optional long containerColor, optional long labelColor, optional long iconContentColor, optional long disabledContainerColor, optional long disabledLabelColor, optional long disabledIconContentColor);
-    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation suggestionChipElevation(optional float defaultElevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
+    method @androidx.compose.runtime.Composable public androidx.compose.material3.ChipElevation suggestionChipElevation(optional float elevation, optional float pressedElevation, optional float focusedElevation, optional float hoveredElevation, optional float draggedElevation, optional float disabledElevation);
     property public final float Height;
     property public final float IconSize;
     property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape shape;
