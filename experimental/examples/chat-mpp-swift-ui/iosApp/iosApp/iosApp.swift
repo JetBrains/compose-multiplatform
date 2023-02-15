@@ -3,8 +3,8 @@ import SwiftUI
 @main
 struct iOSApp: App {
 
-	@State private var textState: String = "text state"
-	@State private var interactResult: InteractResult = InteractResult.init(Color.teal, false)
+	@State private var textState: String = "text message"
+	@State private var interactResult: InteractResult = InteractResult.init(Color.teal, true)
 	@FocusState private var textFieldFocused: Bool
 
     let gradient = LinearGradient(colors: [Color(getCGColor(0xFF7F52FF)).opacity(1.0),
@@ -20,52 +20,43 @@ struct iOSApp: App {
                 NavigationView {
                     ZStack {
                         VStack {
-                            gradient
-                                .ignoresSafeArea(edges: .top)
-                                .frame(height: 0)
+                            gradient.ignoresSafeArea(edges: .top).frame(height: 0)
                             Spacer()
                         }
-
                         VStack {
                             ComposeViewControllerToSwiftUI { result in
                                 interactResult = result
                             }.position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-
                             HStack {
                                 TextField("Type message...", text: $textState, axis: .vertical)
                                         .focused($textFieldFocused)
                                         .lineLimit(3)
                                 if (textState.count > 0) {
                                     Button(action: {
+                                        sendMessage(textState)
                                         textFieldFocused = false
                                         textState = ""
-                                        sendMessage(textState)
                                     }) {
                                         HStack {
                                             Image(systemName: "play.fill")
                                             Text("Send")
-                                        }
+                                        }.tint(.white)
                                     }
                                 }
                             }
-                                    .padding(10)
-                                    .background(RoundedRectangle(cornerRadius: 10).fill(interactResult.swiftUIColor.opacity(0.7)))
-                                    .padding(6)
+                                .padding(10)
+                                .background(RoundedRectangle(cornerRadius: 10).fill(gradient).opacity(0.8))
+                                .padding(6)
+                            Rectangle().fill(Color.clear).frame(height: 0).background(gradient)
                         }
                     }
-                            .navigationBarTitleDisplayMode(.inline)
-                            .navigationTitle("Compose inside SwiftUI")
-//                            .toolbarBackground(gradient, for: .navigationBar)
-//                            .toolbarBackground(.visible, for: .navigationBar)
-                            .statusBar(hidden: false)
+                        .navigationBarTitleDisplayMode(.inline)
+                        .navigationTitle("Compose inside SwiftUI")
+                        .statusBar(hidden: false)
                 }
-						.tabItem {
-							Label("Compose", systemImage: "square.and.pencil")
-						}
-						.toolbar(.visible, for: .tabBar)
-						.toolbarBackground(gradient, for: .tabBar)
-						.toolbarBackground(.visible, for: .tabBar)
-                        .preferredColorScheme(.light)
+                    .tabItem { Label("Compose", systemImage: "square.and.pencil") }
+                    .toolbar(.visible, for: .tabBar)
+                    .preferredColorScheme(interactResult.darkTheme ? .dark : .light)
 
 				NavigationView {
 					VStack {
