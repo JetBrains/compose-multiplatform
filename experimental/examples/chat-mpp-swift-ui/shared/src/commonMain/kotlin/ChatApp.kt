@@ -21,7 +21,11 @@ val friendMessages = listOf(
 @Composable
 internal fun ChatApp(store: Store, android:Boolean = false) {
     val state by store.stateFlow.collectAsState()
-    MaterialTheme {
+    MaterialTheme(
+        colors = darkColors(
+            surface = Color(0xFFCC99FF)
+        ),
+    ) {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
                 Column(
@@ -38,8 +42,6 @@ internal fun ChatApp(store: Store, android:Boolean = false) {
                                 )
                             )
                         }
-                    } else {
-                        Box(Modifier.height(250.dp))
                     }
                 }
             }

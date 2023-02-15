@@ -7,11 +7,9 @@ struct iOSApp: App {
 	@State private var interactResult: InteractResult = InteractResult.init(Color.teal, true)
 	@FocusState private var textFieldFocused: Bool
 
-    let gradient = LinearGradient(colors: [Color(getCGColor(0xFF7F52FF)).opacity(1.0),
-                                           Color(getCGColor(0xFFC811E2)).opacity(1.0),
-                                           Color(getCGColor(0xFFE54857)).opacity(1.0)],
-			startPoint: .topLeading,
-			endPoint: .bottomTrailing
+    let gradient = LinearGradient(
+            colors: [0xFF7F52FF, 0xFFC811E2, 0xFFE54857].map { hex in Color(getCGColor(hex)).opacity(1.0) },
+			startPoint: .topLeading, endPoint: .bottomTrailing
     )
 
 	var body: some Scene {

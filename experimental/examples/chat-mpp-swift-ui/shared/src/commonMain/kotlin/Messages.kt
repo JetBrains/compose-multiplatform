@@ -3,7 +3,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -44,9 +43,10 @@ internal inline fun Messages(messages: List<Message>) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
             }
         }
-//        items(messages, key = { it.id }) { message -> //TODO not working in JS
-//            ChatMessage(isMyMessage = message.user == myUser, message)
-//        }
+        item {
+            // Stub for better text field display
+            Box(Modifier.height(250.dp))
+        }
     }
 }
 
@@ -61,8 +61,9 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
             elevation = 8.dp
         ) {
             Box(
-                Modifier.background(brush = Brush.horizontalGradient(listOf(Color(0xff8888ff), Color(0xffddddff))))
-                    .padding(10.dp),
+                Modifier.background(brush = Brush.horizontalGradient(
+                    listOf(0xFFC811E2, 0xFF7F52FF).map { Color(it) })
+                ).padding(10.dp),
             ) {
                 Row(verticalAlignment = Alignment.Top) {
                     if (isMyMessage) {
