@@ -72,7 +72,13 @@ fun LoadState<ImageBitmap>.orEmpty(): ImageBitmap = orEmpty(emptyImageBitmap)
 fun LoadState<ImageVector>.orEmpty(): ImageVector = orEmpty(emptyImageVector)
 
 /**
- * Return Painter depending on the extension of the resource name (vector or bitmap).
+ * Return a Painter from the given resource path.
+ * Can load either a BitmapPainter for rasterized images (.png, .jpg) or
+ * a VectorPainter for XML Vector Drawables (.xml).
+ *
+ * XML Vector Drawables have the same format as for Android
+ * (https://developer.android.com/reference/android/graphics/drawable/VectorDrawable)
+ * except that external references to Android resources are not supported.
  */
 @ExperimentalResourceApi
 @Composable
