@@ -3,7 +3,7 @@ package org.jetbrains.compose.resources.vector.xmldom
 import org.w3c.dom.Node as DomNode
 import org.w3c.dom.Element as DomElement
 
-open class NodeImpl(val n: DomNode): Node {
+internal open class NodeImpl(val n: DomNode): Node {
     override val nodeName: String
         get() = n.nodeName
     override val localName: String
