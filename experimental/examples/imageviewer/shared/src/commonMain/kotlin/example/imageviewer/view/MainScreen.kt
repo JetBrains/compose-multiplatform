@@ -79,9 +79,13 @@ fun GalleryStyle.toggled(): GalleryStyle {
 
 @Composable
 internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: Dependencies) {
-    var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) } // TODO: Potentially expose a toggle for this.
+    var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-        TitleBar(galleryScreenState, dependencies)
+        TitleBar(
+            onRefresh = { galleryScreenState.refresh(dependencies) },
+            onToggle = { galleryStyle = galleryStyle.toggled() },
+            dependencies
+        )
         if (needShowPreview()) {
             PreviewImage(
                 getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
@@ -92,16 +96,16 @@ internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: De
         when (galleryStyle) {
             GalleryStyle.SQUARES -> SquaresGalleryView(
                 galleryScreenState.picturesWithThumbnail,
-                galleryScreenState.picturesWithThumbnail.getOrNull(galleryScreenState.currentPictureIndex)
-            ) {
-                galleryScreenState.selectPicture(it)
-            }
+                galleryScreenState.picturesWithThumbnail.getOrNull(galleryScreenState.currentPictureIndex),
+                onSelect = { galleryScreenState.selectPicture(it) }
+            )
 
             GalleryStyle.LIST -> ListGalleryView(
                 galleryScreenState.picturesWithThumbnail,
                 dependencies,
                 onSelect = { galleryScreenState.selectPicture(it) },
-                onFullScreen = { galleryScreenState.toFullscreen(it) })
+                onFullScreen = { galleryScreenState.toFullscreen(it) }
+            )
         }
     }
     if (!galleryScreenState.isContentReady) {
@@ -193,7 +197,7 @@ private fun ListGalleryView(
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-private fun TitleBar(galleryScreenState: GalleryScreenState, dependencies: Dependencies) {
+private fun TitleBar(onRefresh: () -> Unit, onToggle: () -> Unit, dependencies: Dependencies) {
     TopAppBar(
         modifier = Modifier.background(brush = kotlinHorizontalGradientBrush),
         colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -213,10 +217,23 @@ private fun TitleBar(galleryScreenState: GalleryScreenState, dependencies: Depen
                     shape = CircleShape
                 ) {
                     Image(
+                        bitmap = resource("list_view.png").rememberImageBitmap().orEmpty(),
+                        contentDescription = null,
+                        modifier = Modifier.size(35.dp).clickable {
+                            onToggle()
+                        }
+                    )
+                }
+                Surface(
+                    color = ImageviewerColors.Transparent,
+                    modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
+                    shape = CircleShape
+                ) {
+                    Image(
                         bitmap = resource("refresh.png").rememberImageBitmap().orEmpty(),
                         contentDescription = null,
                         modifier = Modifier.size(35.dp).clickable {
-                            galleryScreenState.refresh(dependencies)
+                            onRefresh()
                         }
                     )
                 }

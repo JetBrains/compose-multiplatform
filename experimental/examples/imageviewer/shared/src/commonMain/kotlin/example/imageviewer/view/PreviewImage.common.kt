@@ -36,7 +36,6 @@ internal fun PreviewImage(
     onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
-    // TODO: Make this not dependent on galleryState
     var image by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(picture) {
         if (picture != null) {
@@ -49,17 +48,14 @@ internal fun PreviewImage(
             .background(brush = kotlinHorizontalGradientBrush)
     )
     Card(
-//        colors = CardDefaults.cardColors()
-//        backgroundColor = MaterialTheme.colors.background,
         modifier = Modifier.height(200.dp)
             .background(brush = kotlinHorizontalGradientBrush)
             .padding(10.dp)
             .clickable { onClick() },
         shape = RoundedCornerShape(10.dp, 10.dp, 10.dp, 10.dp),
-//        elevation = 1.dp
     ) {
         AnimatedContent(
-            targetState = image,// ?: resource("empty.png").rememberImageBitmap().orEmpty(),
+            targetState = image,
             transitionSpec = {
                 slideInVertically(initialOffsetY = { it }) with slideOutVertically(targetOffsetY = { -it })
             }
@@ -69,7 +65,7 @@ internal fun PreviewImage(
                     bitmap = imageBitmap,
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxSize()//.padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
+                        .fillMaxSize()
                     ,
                     contentScale = ContentScale.Crop
                 )

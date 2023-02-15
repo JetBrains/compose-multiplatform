@@ -25,9 +25,9 @@ object ImageviewerColors {
 
     val kotlinHorizontalGradientBrush = Brush.horizontalGradient(
         colors = listOf(
-            ImageviewerColors.KotlinGradient0,
-            ImageviewerColors.KotlinGradient50,
-            ImageviewerColors.KotlinGradient100
+            KotlinGradient0,
+            KotlinGradient50,
+            KotlinGradient100
         )
     )
 
@@ -37,21 +37,11 @@ object ImageviewerColors {
 @Composable
 internal fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
-    androidx.compose.material3.MaterialTheme(
+    MaterialTheme(
         colorScheme = MaterialTheme.colorScheme.copy(
             background = Color(0xFF1B1B1B),
             onBackground = Color(0xFFFFFFFF)
         )
-//        colors = MaterialTheme.colors.copy(
-//            primary = ImageviewerColors.Foreground,
-//            secondary = ImageviewerColors.LightGray,
-//            background = ImageviewerColors.DarkGray,
-//            surface = ImageviewerColors.Gray,
-//            onPrimary = ImageviewerColors.Foreground,
-//            onSecondary = Color.Black,
-//            onBackground = ImageviewerColors.Foreground,
-//            onSurface = ImageviewerColors.Foreground
-//        )
     ) {
         content()
     }
