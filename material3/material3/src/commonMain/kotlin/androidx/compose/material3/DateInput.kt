@@ -335,8 +335,8 @@ private class DateVisualTransformation(private val dateInputFormat: DateInputFor
 }
 
 internal val InputTextFieldPadding = PaddingValues(
-    start = 12.dp,
-    end = 12.dp,
+    start = 24.dp,
+    end = 24.dp,
     top = 10.dp
 )
 

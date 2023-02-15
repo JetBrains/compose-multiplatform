@@ -52,12 +52,14 @@ import androidx.compose.foundation.lazy.grid.LazyGridState
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.compose.material3.tokens.DatePickerModalTokens
 import androidx.compose.material3.tokens.MotionTokens
 import androidx.compose.runtime.Composable
@@ -83,7 +85,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -362,10 +363,13 @@ object DatePickerDefaults {
         todayContentColor: Color = DatePickerModalTokens.DateTodayLabelTextColor.toColor(),
         todayDateBorderColor: Color =
             DatePickerModalTokens.DateTodayContainerOutlineColor.toColor(),
+        // TODO(b/269510888): Replace with DatePickerModalTokens.SelectionDateInRangeLabelTextColor
+        //  when the token value is fixed.
         dayInSelectionRangeContentColor: Color =
-            DatePickerModalTokens.SelectionDateInRangeLabelTextColor.toColor(),
-        dayInSelectionRangeContainerColor: Color =
-            DatePickerModalTokens.RangeSelectionActiveIndicatorContainerColor.toColor()
+            ColorSchemeKeyTokens.OnSecondaryContainer.toColor(),
+        // TODO(b/269510888): Replace with DatePickerModalTokens
+        //  RangeSelectionActiveIndicatorContainerColor when the token value is fixed.
+        dayInSelectionRangeContainerColor: Color = ColorSchemeKeyTokens.SecondaryContainer.toColor()
     ): DatePickerColors =
         DatePickerColors(
             containerColor = containerColor,
@@ -976,11 +980,10 @@ internal fun DateEntryContainer(
     Column(
         modifier = modifier
             .sizeIn(minWidth = DatePickerModalTokens.ContainerWidth)
-            .padding(DatePickerHorizontalPadding)
             .semantics { isContainer = true }
     ) {
         DatePickerHeader(
-            modifier = Modifier,
+            modifier = Modifier.padding(DatePickerHorizontalPadding),
             title = title,
             titleContentColor = colors.titleContentColor,
             headlineContentColor = colors.headlineContentColor,
@@ -1076,6 +1079,7 @@ private fun DatePickerContent(
     val defaultLocale = defaultLocale()
     Column {
         MonthsNavigation(
+            modifier = Modifier.padding(DatePickerHorizontalPadding),
             nextAvailable = monthsListState.canScrollForward,
             previousAvailable = monthsListState.canScrollBackward,
             yearPickerVisible = yearPickerVisible,
@@ -1102,7 +1106,7 @@ private fun DatePickerContent(
         )
 
         Box {
-            Column {
+            Column(modifier = Modifier.padding(DatePickerHorizontalPadding)) {
                 WeekDays(colors, stateData.calendarModel)
                 HorizontalMonthsList(
                     onDateSelected = onDateSelected,
@@ -1129,10 +1133,12 @@ private fun DatePickerContent(
                         // Keep the height the same as the monthly calendar + weekdays height, and
                         // take into account the thickness of the divider that will be composed
                         // below it.
-                        modifier = Modifier.requiredHeight(
-                            RecommendedSizeForAccessibility * (MaxCalendarRows + 1) -
-                                DividerDefaults.Thickness
-                        ),
+                        modifier = Modifier
+                            .requiredHeight(
+                                RecommendedSizeForAccessibility * (MaxCalendarRows + 1) -
+                                    DividerDefaults.Thickness
+                            )
+                            .padding(DatePickerHorizontalPadding),
                         onYearSelected = { year ->
                             // Switch back to the monthly calendar and scroll to the selected year.
                             yearPickerVisible = !yearPickerVisible
@@ -1676,6 +1682,7 @@ private fun Year(
  */
 @Composable
 private fun MonthsNavigation(
+    modifier: Modifier,
     nextAvailable: Boolean,
     previousAvailable: Boolean,
     yearPickerVisible: Boolean,
@@ -1685,7 +1692,7 @@ private fun MonthsNavigation(
     onYearPickerButtonClicked: () -> Unit,
 ) {
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .requiredHeight(MonthYearHeight),
         horizontalArrangement = if (yearPickerVisible) {
@@ -1748,7 +1755,7 @@ private fun YearPickerMenuButton(
     TextButton(
         onClick = onClick,
         modifier = modifier,
-        shape = RectangleShape,
+        shape = CircleShape,
         colors =
         ButtonDefaults.textButtonColors(contentColor = MaterialTheme.colorScheme.onSurfaceVariant),
         elevation = null,
