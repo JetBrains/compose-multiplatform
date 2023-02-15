@@ -91,15 +91,21 @@ fun painterResource(res: String): Painter {
     return BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
 }
 
+/**
+ * Convert LoadState<ImageVector> to Painter
+ */
 @ExperimentalResourceApi
 @Composable
-@JvmName("loadStateImageVectorAsPainter")
-fun LoadState<ImageVector>.asPainter(): Painter = rememberVectorPainter(orEmpty())
+@JvmName("loadStateImageVectorToPainter")
+fun LoadState<ImageVector>.toPainter(): Painter = rememberVectorPainter(orEmpty())
 
+/**
+ * Convert LoadState<ImageBitmap> to Painter
+ */
 @ExperimentalResourceApi
 @Composable
-@JvmName("loadStateImageBitmapAsPainter")
-fun LoadState<ImageBitmap>.asPainter(): Painter {
+@JvmName("loadStateImageBitmapToPainter")
+fun LoadState<ImageBitmap>.toPainter(): Painter {
     val imageBitmap = orEmpty()
     return remember(imageBitmap) { BitmapPainter(imageBitmap) }
 }

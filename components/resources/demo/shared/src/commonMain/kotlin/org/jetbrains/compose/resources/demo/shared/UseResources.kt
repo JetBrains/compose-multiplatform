@@ -34,12 +34,12 @@ internal fun UseResources() {
             contentDescription = null
         )
         Icon(
-            painter = resource("vector.xml").rememberImageVector(LocalDensity.current).asPainter(),
+            painter = resource("vector.xml").rememberImageVector(LocalDensity.current).toPainter(),
             modifier = Modifier.size(150.dp),
             contentDescription = null
         )
         Image(
-            painter = resource("img.webp").rememberImageBitmap().asPainter(),
+            painter = resource("img.webp").rememberImageBitmap().toPainter(),
             contentDescription = null,
         )
     }
