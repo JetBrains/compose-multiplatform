@@ -11,3 +11,5 @@ fun sendMessage(text: String) {
 }
 
 fun gradient3Colors() = ChatColors.GRADIENT_3
+
+fun surfaceColor() = ChatColors.SURFACE
