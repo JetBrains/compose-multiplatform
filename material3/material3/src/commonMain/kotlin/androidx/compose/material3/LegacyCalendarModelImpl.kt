@@ -89,6 +89,10 @@ internal class LegacyCalendarModelImpl : CalendarModel {
         val firstDayCalendar = Calendar.getInstance(utcTimeZone)
         firstDayCalendar.timeInMillis = timeInMillis
         firstDayCalendar[Calendar.DAY_OF_MONTH] = 1
+        firstDayCalendar[Calendar.HOUR_OF_DAY] = 0
+        firstDayCalendar[Calendar.MINUTE] = 0
+        firstDayCalendar[Calendar.SECOND] = 0
+        firstDayCalendar[Calendar.MILLISECOND] = 0
         return getMonth(firstDayCalendar)
     }
 
