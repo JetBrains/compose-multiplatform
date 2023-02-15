@@ -149,7 +149,15 @@ class NestedScrollDispatcher {
 
     /**
      * Parent to be set when attached to nested scrolling chain. `null` is valid and means there no
-     * nested scrolling parent above
+     * nested scrolling parent above. Attaching the same dispatcher to different places in the chain
+     * will lead to the last attachment taking effect. This means that if we use a structure
+     * like so:
+     * val modifier = Modifier.nestedScroll(connection1, dispatcher)
+     *                        .nestedScroll(connection2, dispatcher)
+     *                        .nestedScroll(connection3, dispatcher)
+     * The dispatcher parent in this case will be the nested scroll modifier that holds connection2.
+     * If that nested scroll is detached, the parent will be updated accordingly to the next
+     * modifier in the chain (i.e. the one that holds connection1).
      */
     internal var parent: NestedScrollConnection? = null
 
