@@ -82,6 +82,15 @@ internal class CalendarModelTest(private val model: CalendarModel) {
     }
 
     @Test
+    fun monthCreation_withRounding() {
+        val date =
+            CalendarDate(year = 2022, month = 1, dayOfMonth = 1, utcTimeMillis = January2022Millis)
+        val monthFromDate = model.getMonth(date)
+        val monthFromMilli = model.getMonth(January2022Millis + 10000)
+        assertThat(monthFromDate).isEqualTo(monthFromMilli)
+    }
+
+    @Test
     fun monthRestore() {
         val month = model.getMonth(year = 1999, month = 12)
         assertThat(model.getMonth(month.startUtcTimeMillis)).isEqualTo(month)
