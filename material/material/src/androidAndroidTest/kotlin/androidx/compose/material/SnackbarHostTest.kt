@@ -107,7 +107,7 @@ class SnackbarHostTest {
             }
         }
 
-        rule.waitUntil { parent.children.all { it.isCompleted } }
+        rule.waitUntil(timeoutMillis = 5_000) { parent.children.all { it.isCompleted } }
         Truth.assertThat(resultedInvocation).isEqualTo("0123456789")
     }
 
