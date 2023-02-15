@@ -39,7 +39,6 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.launch
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -62,6 +61,9 @@ class TooltipTest {
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
 
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
         rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(TooltipMinHeight)
@@ -77,6 +79,9 @@ class TooltipTest {
 
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
 
         rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
@@ -100,6 +105,9 @@ class TooltipTest {
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
 
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
         rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(customHeight)
@@ -122,13 +130,15 @@ class TooltipTest {
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
 
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
         rule.waitForIdle()
         rule.onNodeWithTag(ContainerTestTag)
             .assertHeightIsEqualTo(customHeight)
             .assertWidthIsEqualTo(customWidth)
     }
 
-    @Ignore // b/264907895
     @Test
     fun plainTooltip_content_padding() {
         rule.setMaterialContent(lightColorScheme()) {
@@ -147,6 +157,9 @@ class TooltipTest {
 
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
 
         rule.waitForIdle()
         rule.onNodeWithTag(TextTestTag)
@@ -169,6 +182,9 @@ class TooltipTest {
 
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
 
         rule.waitForIdle()
         val subhead = rule.onNodeWithTag(SubheadTestTag)
@@ -213,6 +229,9 @@ class TooltipTest {
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
 
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
         // Check that the tooltip is now showing
         rule.waitForIdle()
         assertThat(tooltipState.isVisible).isTrue()
@@ -243,6 +262,9 @@ class TooltipTest {
         // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
 
         // Check that the tooltip is now showing
         rule.waitForIdle()
@@ -281,6 +303,9 @@ class TooltipTest {
         // Long press the icon
         rule.onNodeWithTag(AnchorTestTag)
             .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
 
         // Check that the tooltip is now showing
         rule.waitForIdle()
