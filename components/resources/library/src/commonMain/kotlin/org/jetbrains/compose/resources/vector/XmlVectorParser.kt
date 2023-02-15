@@ -68,7 +68,7 @@ private class BuildContext {
     }
 }
 
-fun Element.parseVectorRoot(density: Density): ImageVector {
+internal fun Element.parseVectorRoot(density: Density): ImageVector {
     val context = BuildContext()
     val builder = ImageVector.Builder(
         defaultWidth = attributeOrNull(ANDROID_NS, "width").parseDp(density),
