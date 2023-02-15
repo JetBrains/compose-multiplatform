@@ -56,6 +56,7 @@ import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.verticalScrollAxisRange
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -474,7 +475,7 @@ private fun DateRangePickerContent(
     val onDateSelected = { dateInMillis: Long ->
         updateDateSelection(stateData, dateInMillis)
     }
-    Column {
+    Column(modifier = Modifier.padding(DatePickerHorizontalPadding)) {
         WeekDays(colors, stateData.calendarModel)
         VerticalMonthsList(
             onDateSelected = onDateSelected,
@@ -594,7 +595,7 @@ private fun updateDateSelection(
 }
 
 internal val CalendarMonthSubheadPadding = PaddingValues(
-    start = 12.dp,
+    start = 24.dp,
     top = 20.dp,
     bottom = 8.dp
 )
@@ -688,21 +689,32 @@ internal fun ContentDrawScope.drawRangeBackground(
     val (x2, y2) = selectedRangeInfo.gridCoordinates.second
     // The endX and startX are offset to include only half the item's width when dealing with first
     // and last items in the selection in order to keep the selection edges rounded.
-    val startX = x1 * (itemContainerWidth + horizontalSpaceBetweenItems) +
+    var startX = x1 * (itemContainerWidth + horizontalSpaceBetweenItems) +
         (if (selectedRangeInfo.firstIsSelectionStart) itemContainerWidth / 2 else 0f) +
         horizontalSpaceBetweenItems / 2
     val startY = y1 * itemContainerHeight + stateLayerVerticalPadding
-    val endX = x2 * (itemContainerWidth + horizontalSpaceBetweenItems) +
+    var endX = x2 * (itemContainerWidth + horizontalSpaceBetweenItems) +
         (if (selectedRangeInfo.lastIsSelectionEnd) itemContainerWidth / 2 else itemContainerWidth) +
         horizontalSpaceBetweenItems / 2
     val endY = y2 * itemContainerHeight + stateLayerVerticalPadding
+
+    val isRtl = layoutDirection == LayoutDirection.Rtl
+    // Adjust the start and end in case the layout is RTL.
+    if (isRtl) {
+        startX = this.size.width - startX
+        endX = this.size.width - endX
+    }
 
     // Draw the first row background
     drawRect(
         color = color,
         topLeft = Offset(startX, startY),
         size = Size(
-            width = if (y1 == y2) endX - startX else this.size.width - startX,
+            width = when {
+                y1 == y2 -> endX - startX
+                isRtl -> -startX
+                else -> this.size.width - startX
+            },
             height = itemStateLayerHeight
         )
     )
@@ -720,11 +732,12 @@ internal fun ContentDrawScope.drawRangeBackground(
             )
         }
         // Draw the last row selection background
+        val topLeftX = if (layoutDirection == LayoutDirection.Ltr) 0f else this.size.width
         drawRect(
             color = color,
-            topLeft = Offset(0f, endY),
+            topLeft = Offset(topLeftX, endY),
             size = Size(
-                width = endX,
+                width = if (isRtl) endX - this.size.width else endX,
                 height = itemStateLayerHeight
             )
         )

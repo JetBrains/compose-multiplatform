@@ -19,13 +19,16 @@ package androidx.compose.material3
 import android.os.Build
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
@@ -112,6 +115,31 @@ class DateRangePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
             }
         }
         assertAgainstGolden("dateRangePicker_selectionSpanningMonths_${scheme.name}")
+    }
+
+    @Test
+    fun dateRangePicker_selectionSpanningMonths_rtl() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                Box(wrap.testTag(wrapperTestTag)) {
+                    val monthInUtcMillis =
+                        dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 1)
+                    val startSelectionMillis =
+                        dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 25)
+                    val endSelectionMillis =
+                        dayInUtcMilliseconds(year = 2021, month = 4, dayOfMonth = 5)
+                    DateRangePicker(
+                        state = rememberDateRangePickerState(
+                            initialDisplayedMonthMillis = monthInUtcMillis,
+                            initialSelectedStartDateMillis = startSelectionMillis,
+                            initialSelectedEndDateMillis = endSelectionMillis
+                        ),
+                        showModeToggle = false
+                    )
+                }
+            }
+        }
+        assertAgainstGolden("dateRangePicker_selectionSpanningMonths_rtl_${scheme.name}")
     }
 
     @Test
