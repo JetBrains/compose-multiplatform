@@ -16,8 +16,10 @@
 
 package androidx.compose.material.icons
 
+import android.os.Build
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 import kotlin.reflect.KProperty0
@@ -31,6 +33,7 @@ import org.junit.runners.Parameterized
  * extended Material [androidx.compose.material.icons.Icons] and their XML source.
  */
 @Suppress("unused")
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
 @LargeTest
 @RunWith(Parameterized::class)
 class ExtendedIconComparisonTest(
