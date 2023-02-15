@@ -38,11 +38,11 @@ dependencies {
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
-        implementation(project(":lifecycle:lifecycle-viewmodel"))
+        implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0-rc01")
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.compose.material:material:1.0.0")
         implementation("androidx.activity:activity-compose:1.7.0-beta02")
-        implementation(project(":lifecycle:lifecycle-common"))
+        implementation("androidx.lifecycle:lifecycle-common:2.6.0-rc01")
 
         // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
         compileOnly(project(":compose:animation:animation-tooling-internal"))
@@ -90,7 +90,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 implementation(project(":compose:material:material"))
                 implementation("androidx.activity:activity-compose:1.7.0-beta02")
-                implementation(project(":lifecycle:lifecycle-common"))
+                implementation("androidx.lifecycle:lifecycle-common:2.6.0-rc01")
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
                 compileOnly(project(":compose:animation:animation-tooling-internal"))
@@ -110,8 +110,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 // Outside of androidx this is resolved via constraint added to lifecycle-common,
                 // but it doesn't work in androidx.
                 // See aosp/1804059
-                implementation(project(":lifecycle:lifecycle-common-java8"))
-                implementation(project(":lifecycle:lifecycle-viewmodel-savedstate"))
+                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.0-rc01")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.0-rc01")
 
                 implementation(libs.junit)
                 implementation(libs.testRunner)
