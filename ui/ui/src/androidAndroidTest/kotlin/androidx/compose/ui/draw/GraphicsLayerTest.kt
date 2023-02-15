@@ -18,7 +18,6 @@ package androidx.compose.ui.draw
 
 import android.os.Build
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -1158,7 +1157,7 @@ class GraphicsLayerTest {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCompositingStrategyModulateAlpha() {
         val tag = "testTag"
@@ -1200,7 +1199,7 @@ class GraphicsLayerTest {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCompositingStrategyAlways() {
         val tag = "testTag"
@@ -1235,7 +1234,7 @@ class GraphicsLayerTest {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCompositingStrategyAuto() {
         val tag = "testTag"
@@ -1351,7 +1350,8 @@ class GraphicsLayerTest {
         assertEquals(sizePx, drawScopeWidth)
         assertEquals(sizePx, drawScopeHeight)
     }
-    @RequiresApi(Build.VERSION_CODES.O)
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun removingGraphicsLayerInvalidatesParentLayer() {
         var toggle by mutableStateOf(true)
