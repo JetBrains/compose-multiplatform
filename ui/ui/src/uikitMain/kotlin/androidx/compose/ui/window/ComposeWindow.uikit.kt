@@ -102,12 +102,18 @@ internal actual class ComposeWindow : UIViewController {
                 if (hiddenPartOfFocusedElement > 0) {
                     // If focused element hidden by keyboard, then change UIView bounds.
                     // Focused element will be visible
+                    val focusedTop = focused.top.value
+                    val composeOffsetY = if (hiddenPartOfFocusedElement < focusedTop) {
+                        hiddenPartOfFocusedElement
+                    } else {
+                        maxOf(focusedTop, 0f).toDouble()
+                    }
                     view.setClipsToBounds(true)
                     val (width, height) = getViewFrameSize()
                     view.layer.setBounds(
                         CGRectMake(
                             x = 0.0,
-                            y = hiddenPartOfFocusedElement,
+                            y = composeOffsetY,
                             width = width.toDouble(),
                             height = height.toDouble()
                         )

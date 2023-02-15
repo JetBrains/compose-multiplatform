@@ -139,8 +139,13 @@ internal class ComposeLayer(
         scene.constraints = Constraints(maxWidth = width, maxHeight = height)
     }
 
-    fun getActiveFocusRect(): DpRect? =
-        scene.mainOwner?.focusManager?.getActiveFocusModifier()?.focusRect()?.toDpRect(density)
+    fun getActiveFocusRect(): DpRect? {
+        val activeFocusModifier = scene.mainOwner?.focusManager?.getActiveFocusModifier()
+        if (activeFocusModifier?.parent == null) {
+            return null // Ignore root FocusModifier
+        }
+        return activeFocusModifier.focusRect().toDpRect(density)
+    }
 
     fun setContent(
         onPreviewKeyEvent: (ComposeKeyEvent) -> Boolean = { false },
