@@ -17,6 +17,8 @@ class CollectionOfComposablesTests {
             TextLeafNode("leaf1")
             TextLeafNode("leaf2")
             TextLeafNode("leaf3")
+        }
+        impl.add {
             TextContainerNode("node") {
                 TextLeafNode("child1")
                 TextLeafNode("child2")
