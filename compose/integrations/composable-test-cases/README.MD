@@ -18,6 +18,26 @@ A test case contains 2 or more modules to check crossmodule compilation (the tes
 See a test case [template](./testcases/template) for an example.
 Splitting the test cases into separate small projects helps in distinguishing the potential compilation bugs.
 
+The behaviour is checked by the tests in a `...-main` module.   
+The tests create a simple text Composition and then compares the text dump with an expected value.       
+Example:
+```kotlin
+@Test
+fun testExample2() = runTest {
+    val root = composeText {
+        TextLeafNode("Leaf")
+        TextContainerNode("node") {
+            TextLeafNode("child1")
+            TextLeafNode("child2")
+            TextLeafNode("child3")
+        }
+    }
+
+    assertEquals("root:{Leaf, node:{child1, child2, child3}}", root.dump())
+}
+```
+The API for the text Composition is implemented in the [common](./common) module. 
+More test examples (including recomposition cases) can be found [here](./common/src/commonTest).  
 
 ### To add a new test case:
 - Use `/testcases/template` as a starting point (copy it and rename). Place a new testcase in `/testcases` folder.
