@@ -12,10 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.data.DemoDataProvider
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.platform.painterResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.theme.typography
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
 internal fun UICards() {
     val item = remember { DemoDataProvider.item }

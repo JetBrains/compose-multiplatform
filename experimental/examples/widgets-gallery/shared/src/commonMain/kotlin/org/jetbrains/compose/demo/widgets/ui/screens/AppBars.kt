@@ -16,10 +16,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.platform.painterResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.theme.twitterColor
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
 internal fun AppBars() {
@@ -28,6 +29,7 @@ internal fun AppBars() {
     NavigationBarDemo()
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun TopAppBarsDemo() {
     SubtitleText(subtitle = "Top App bar")
