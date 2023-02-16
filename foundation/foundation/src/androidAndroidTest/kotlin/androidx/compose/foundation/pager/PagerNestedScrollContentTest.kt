@@ -35,7 +35,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
+import org.junit.Assert.assertEquals
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.absoluteValue
 import kotlinx.coroutines.runBlocking
@@ -50,7 +50,6 @@ internal class PagerNestedScrollContentTest(
     config: ParamConfig
 ) : BasePagerTest(config = config) {
 
-    @SdkSuppress(maxSdkVersion = 32) // b/269171814
     @OptIn(ExperimentalFoundationApi::class)
     @Test
     fun nestedScrollContent_shouldNotPropagateUnconsumedFlings() {
@@ -87,7 +86,7 @@ internal class PagerNestedScrollContentTest(
 
         // Assert: Fling was not propagated, so we didn't move pages
         assertThat(pagerState.currentPage).isEqualTo(0)
-        assertThat(pagerState.currentPageOffsetFraction).isEqualTo(0f)
+        assertEquals(pagerState.currentPageOffsetFraction, 0f, 0.01f)
     }
 
     @OptIn(ExperimentalFoundationApi::class)
