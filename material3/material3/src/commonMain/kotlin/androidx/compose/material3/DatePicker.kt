@@ -913,11 +913,6 @@ internal class StateData constructor(
     val totalMonthsInRange: Int
         get() = (yearRange.last - yearRange.first + 1) * 12
 
-    fun isInRange(date: Long): Boolean {
-        return date >= (selectedStartDate.value?.utcTimeMillis ?: Long.MAX_VALUE) &&
-            date <= (selectedEndDate.value?.utcTimeMillis ?: Long.MIN_VALUE)
-    }
-
     fun switchDisplayMode(displayMode: DisplayMode) {
         // Update the displayed month, if needed, and change the mode to a  date-picker.
         selectedStartDate.value?.let {
@@ -1357,10 +1352,6 @@ internal fun Month(
     dateFormatter: DatePickerFormatter,
     colors: DatePickerColors
 ) {
-    fun isInRange(date: Long): Boolean {
-        return rangeSelectionEnabled && stateData.isInRange(date)
-    }
-
     val rangeSelectionInfo: State<SelectedRangeInfo?> = remember(rangeSelectionEnabled) {
         derivedStateOf {
             if (rangeSelectionEnabled) {
@@ -1424,11 +1415,23 @@ internal fun Month(
                             val startDateSelected =
                                 dateInMillis == startSelection.value?.utcTimeMillis
                             val endDateSelected = dateInMillis == endSelection.value?.utcTimeMillis
+                            val inRange = remember(rangeSelectionEnabled, dateInMillis) {
+                                derivedStateOf {
+                                    with(stateData) {
+                                        rangeSelectionEnabled &&
+                                            dateInMillis >= (selectedStartDate.value?.utcTimeMillis
+                                            ?: Long.MAX_VALUE) &&
+                                            dateInMillis <= (selectedEndDate.value?.utcTimeMillis
+                                            ?: Long.MIN_VALUE)
+                                    }
+                                }
+                            }
                             val dayContentDescription = dayContentDescription(
                                 rangeSelectionEnabled = rangeSelectionEnabled,
                                 isToday = isToday,
                                 isStartDate = startDateSelected,
-                                isEndDate = endDateSelected
+                                isEndDate = endDateSelected,
+                                isInRange = inRange.value
                             )
                             Day(
                                 modifier = Modifier.semantics {
@@ -1445,9 +1448,7 @@ internal fun Month(
                                     dateValidator.invoke(dateInMillis)
                                 },
                                 today = isToday,
-                                inRange = remember(dateInMillis, startSelection, endSelection) {
-                                    isInRange(dateInMillis)
-                                },
+                                inRange = inRange.value,
                                 colors = colors
                             ) {
                                 val defaultLocale = defaultLocale()
@@ -1478,14 +1479,23 @@ private fun dayContentDescription(
     rangeSelectionEnabled: Boolean,
     isToday: Boolean,
     isStartDate: Boolean,
-    isEndDate: Boolean
+    isEndDate: Boolean,
+    isInRange: Boolean
 ): String? {
     val descriptionBuilder = StringBuilder()
     if (rangeSelectionEnabled) {
-        if (isStartDate) {
-            descriptionBuilder.append(getString(string = Strings.DateRangePickerStartHeadline))
-        } else if (isEndDate) {
-            descriptionBuilder.append(getString(string = Strings.DateRangePickerEndHeadline))
+        when {
+            isStartDate -> descriptionBuilder.append(
+                getString(string = Strings.DateRangePickerStartHeadline)
+            )
+
+            isEndDate -> descriptionBuilder.append(
+                getString(string = Strings.DateRangePickerEndHeadline)
+            )
+
+            isInRange -> descriptionBuilder.append(
+                getString(string = Strings.DateRangePickerDayInRange)
+            )
         }
     }
     if (isToday) {

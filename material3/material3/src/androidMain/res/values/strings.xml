@@ -65,6 +65,8 @@
     <string name="date_range_picker_scroll_to_next_month">Scroll to show the next month</string>
     <!-- Spoken description for scrolling to the previous month -->
     <string name="date_range_picker_scroll_to_previous_month">Scroll to show the previous month</string>
+    <!-- Spoken description for a selected day that is within a range of selected days -->
+    <string name="date_range_picker_day_in_range">In range</string>
     <string name="date_range_input_title">Enter dates</string>
     <!--
     Describes an invalid date range input when a user enters a start or end date [CHAR_LIMIT=NONE]

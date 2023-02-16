@@ -144,6 +144,9 @@ internal actual fun getString(string: Strings): String {
         Strings.DateRangePickerScrollToShowPreviousMonth -> resources.getString(
             androidx.compose.material3.R.string.date_range_picker_scroll_to_previous_month
         )
+        Strings.DateRangePickerDayInRange -> resources.getString(
+            androidx.compose.material3.R.string.date_range_picker_day_in_range
+        )
         Strings.DateRangeInputTitle -> resources.getString(
             androidx.compose.material3.R.string.date_range_input_title
         )

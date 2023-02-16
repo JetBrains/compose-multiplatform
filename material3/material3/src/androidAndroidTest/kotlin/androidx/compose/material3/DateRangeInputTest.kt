@@ -20,11 +20,10 @@ import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher.Companion.expectValue
 import androidx.compose.ui.test.SemanticsMatcher.Companion.keyIsDefined
 import androidx.compose.ui.test.assert
+import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithText
-import androidx.compose.ui.test.onFirst
-import androidx.compose.ui.test.onLast
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -49,14 +48,12 @@ class DateRangeInputTest {
 
     @Test
     fun dateRangeInput() {
-        lateinit var dateRangeInputLabel: String
         lateinit var state: DateRangePickerState
         lateinit var pickerStartDateHeadline: String
         lateinit var pickerEndDateHeadline: String
         rule.setMaterialContent(lightColorScheme()) {
             pickerStartDateHeadline = getString(string = Strings.DateRangePickerStartHeadline)
             pickerEndDateHeadline = getString(string = Strings.DateRangePickerEndHeadline)
-            dateRangeInputLabel = getString(string = Strings.DateInputLabel)
             val monthInUtcMillis = dayInUtcMilliseconds(year = 2019, month = 1, dayOfMonth = 1)
             state = rememberDateRangePickerState(
                 initialDisplayedMonthMillis = monthInUtcMillis,
@@ -65,14 +62,15 @@ class DateRangeInputTest {
             DateRangePicker(state = state)
         }
 
-        rule.onNodeWithText(pickerStartDateHeadline, useUnmergedTree = true).assertExists()
-        rule.onNodeWithText(pickerEndDateHeadline, useUnmergedTree = true).assertExists()
+        // Expecting 2 nodes with the text "Start date", and 2 with "End date".
+        rule.onAllNodesWithText(pickerStartDateHeadline, useUnmergedTree = true)
+            .assertCountEquals(2)
+        rule.onAllNodesWithText(pickerEndDateHeadline, useUnmergedTree = true)
+            .assertCountEquals(2)
 
         // Enter dates.
-        rule.onAllNodesWithText(dateRangeInputLabel).onFirst().performClick()
-            .performTextInput("01272019")
-        rule.onAllNodesWithText(dateRangeInputLabel).onLast().performClick()
-            .performTextInput("05102020")
+        rule.onNodeWithText(pickerStartDateHeadline).performClick().performTextInput("01272019")
+        rule.onNodeWithText(pickerEndDateHeadline).performClick().performTextInput("05102020")
 
         rule.runOnIdle {
             assertThat(state.selectedStartDateMillis).isEqualTo(
@@ -91,8 +89,11 @@ class DateRangeInputTest {
             )
         }
 
-        rule.onNodeWithText(pickerStartDateHeadline, useUnmergedTree = true).assertDoesNotExist()
-        rule.onNodeWithText(pickerEndDateHeadline, useUnmergedTree = true).assertDoesNotExist()
+        // Now expecting only one node with "Start date", and one with "End date".
+        rule.onAllNodesWithText(pickerStartDateHeadline, useUnmergedTree = true)
+            .assertCountEquals(1)
+        rule.onAllNodesWithText(pickerEndDateHeadline, useUnmergedTree = true)
+            .assertCountEquals(1)
         rule.onNodeWithText("Jan 27, 2019", useUnmergedTree = true).assertExists()
         rule.onNodeWithText("May 10, 2020", useUnmergedTree = true).assertExists()
     }
@@ -121,11 +122,13 @@ class DateRangeInputTest {
 
     @Test
     fun inputDateNotAllowed() {
-        lateinit var dateRangeInputLabel: String
+        lateinit var startDateRangeInputLabel: String
+        lateinit var endDateRangeInputLabel: String
         lateinit var errorMessage: String
         lateinit var state: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
-            dateRangeInputLabel = getString(string = Strings.DateInputLabel)
+            startDateRangeInputLabel = getString(string = Strings.DateRangePickerStartHeadline)
+            endDateRangeInputLabel = getString(string = Strings.DateRangePickerEndHeadline)
             errorMessage = getString(string = Strings.DateInputInvalidNotAllowed)
             state = rememberDateRangePickerState(initialDisplayMode = DisplayMode.Input)
             DateRangePicker(state = state,
@@ -135,10 +138,8 @@ class DateRangeInputTest {
         }
 
         // Enter dates.
-        rule.onAllNodesWithText(dateRangeInputLabel).onFirst().performClick()
-            .performTextInput("01272019")
-        rule.onAllNodesWithText(dateRangeInputLabel).onLast().performClick()
-            .performTextInput("05102020")
+        rule.onNodeWithText(startDateRangeInputLabel).performClick().performTextInput("01272019")
+        rule.onNodeWithText(endDateRangeInputLabel).performClick().performTextInput("05102020")
 
         rule.runOnIdle {
             assertThat(state.selectedStartDateMillis).isNull()
@@ -164,11 +165,13 @@ class DateRangeInputTest {
 
     @Test
     fun outOfOrderDateRange() {
-        lateinit var dateRangeInputLabel: String
+        lateinit var startDateRangeInputLabel: String
+        lateinit var endDateRangeInputLabel: String
         lateinit var errorMessage: String
         lateinit var state: DateRangePickerState
         rule.setMaterialContent(lightColorScheme()) {
-            dateRangeInputLabel = getString(string = Strings.DateInputLabel)
+            startDateRangeInputLabel = getString(string = Strings.DateRangePickerStartHeadline)
+            endDateRangeInputLabel = getString(string = Strings.DateRangePickerEndHeadline)
             errorMessage = getString(string = Strings.DateRangeInputInvalidRangeInput)
             state = rememberDateRangePickerState(
                 // Limit the years selection to 2018-2023
@@ -179,17 +182,15 @@ class DateRangeInputTest {
         }
 
         // Enter dates where the start date is later than the end date.
-        rule.onAllNodesWithText(dateRangeInputLabel).onFirst().performClick()
-            .performTextInput("01272020")
-        rule.onAllNodesWithText(dateRangeInputLabel).onLast().performClick()
-            .performTextInput("05102019")
+        rule.onNodeWithText(startDateRangeInputLabel).performClick().performTextInput("01272020")
+        rule.onNodeWithText(endDateRangeInputLabel).performClick().performTextInput("05102019")
 
         rule.runOnIdle {
             // Expecting the first stored date to still be valid, and the second one to be null.
             assertThat(state.selectedStartDateMillis).isNotNull()
             assertThat(state.selectedEndDateMillis).isNull()
         }
-        rule.onNodeWithText("05/10/2019")
+        rule.onNodeWithText("05/10/2019", useUnmergedTree = true)
             .assert(keyIsDefined(SemanticsProperties.Error))
             .assert(expectValue(SemanticsProperties.Error, errorMessage))
     }
@@ -197,12 +198,14 @@ class DateRangeInputTest {
     @Test
     fun switchToDateRangePicker() {
         lateinit var switchToPickerDescription: String
-        lateinit var dateRangeInputLabel: String
+        lateinit var startDateRangeInputLabel: String
+        lateinit var endDateRangeInputLabel: String
         lateinit var pickerStartDateHeadline: String
         lateinit var pickerEndDateHeadline: String
         rule.setMaterialContent(lightColorScheme()) {
             switchToPickerDescription = getString(string = Strings.DatePickerSwitchToCalendarMode)
-            dateRangeInputLabel = getString(string = Strings.DateInputLabel)
+            startDateRangeInputLabel = getString(string = Strings.DateRangePickerStartHeadline)
+            endDateRangeInputLabel = getString(string = Strings.DateRangePickerEndHeadline)
             pickerStartDateHeadline = getString(string = Strings.DateRangePickerStartHeadline)
             pickerEndDateHeadline = getString(string = Strings.DateRangePickerEndHeadline)
             DateRangePicker(
@@ -216,7 +219,8 @@ class DateRangeInputTest {
         rule.waitForIdle()
         rule.onNodeWithText(pickerStartDateHeadline, useUnmergedTree = true).assertIsDisplayed()
         rule.onNodeWithText(pickerEndDateHeadline, useUnmergedTree = true).assertIsDisplayed()
-        rule.onNodeWithText(dateRangeInputLabel).assertDoesNotExist()
+        rule.onNodeWithText(startDateRangeInputLabel).assertDoesNotExist()
+        rule.onNodeWithText(endDateRangeInputLabel).assertDoesNotExist()
     }
 
     @Test
