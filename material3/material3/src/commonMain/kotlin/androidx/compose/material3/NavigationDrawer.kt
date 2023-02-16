@@ -647,7 +647,6 @@ object DrawerDefaults {
  * for this item. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this item in different states.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationDrawerItem(
     label: @Composable () -> Unit,

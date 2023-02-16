@@ -193,7 +193,6 @@ fun IconToggleButton(
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledIconButton(
     onClick: () -> Unit,
@@ -254,7 +253,6 @@ fun FilledIconButton(
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledTonalIconButton(
     onClick: () -> Unit,
@@ -441,7 +439,6 @@ fun FilledTonalIconToggleButton(
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedIconButton(
     onClick: () -> Unit,

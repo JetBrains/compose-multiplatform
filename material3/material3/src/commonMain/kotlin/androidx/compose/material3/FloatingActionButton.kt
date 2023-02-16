@@ -92,7 +92,6 @@ import androidx.compose.ui.unit.dp
  * and customize the appearance / behavior of this FAB in different states.
  * @param content the content of this FAB, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,

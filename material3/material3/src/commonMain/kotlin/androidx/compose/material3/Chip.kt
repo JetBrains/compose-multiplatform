@@ -1298,7 +1298,6 @@ object SuggestionChipDefaults {
     val shape: Shape @Composable get() = SuggestionChipTokens.ContainerShape.toShape()
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Chip(
     modifier: Modifier,
