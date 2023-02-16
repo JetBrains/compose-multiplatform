@@ -51,7 +51,7 @@ dependencies {
         // TODO: remove next 3 dependencies when b/202810604 is fixed
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.lifecycle:lifecycle-runtime:2.5.1")
-        implementation(project(":lifecycle:lifecycle-viewmodel"))
+        implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0-rc01")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)

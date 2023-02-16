@@ -61,5 +61,7 @@ configurations.all {
     resolutionStrategy.dependencySubstitution {
         substitute(module("androidx.lifecycle:lifecycle-common-java8:")).
                 using project(":lifecycle:lifecycle-common-java8")
+        substitute(module("androidx.lifecycle:lifecycle-common:")).
+                using project(":lifecycle:lifecycle-common")
     }
 }
