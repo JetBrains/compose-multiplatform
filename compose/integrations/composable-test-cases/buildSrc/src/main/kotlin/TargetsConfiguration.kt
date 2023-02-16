@@ -13,13 +13,13 @@ val Project.isInIdea: Boolean
         return System.getProperty("idea.active")?.toBoolean() == true
     }
 
+val Project.isFailingJsCase: Boolean
+    get() = this.name.contains("-failingJs-")
+
 @OptIn(ExternalVariantApi::class)
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
-    js(IR) {
-        browser()
-        // nodejs() // Commented to save a bit of CI time. Testing in a browser should be enough.
-    }
+    configureJsTargets()
     ios()
     iosArm64()
     iosSimulatorArm64()
@@ -29,6 +29,13 @@ fun KotlinMultiplatformExtension.configureTargets() {
     // We use linux agents on CI. So it doesn't run the tests, but it builds the klib anyway which is time consuming.
     if (project.isInIdea) mingwX64()
     linuxX64()
+}
+
+fun KotlinMultiplatformExtension.configureJsTargets() {
+    js(IR) {
+        browser()
+        // nodejs() // Commented to save a bit of CI time. Testing in a browser should be enough.
+    }
 }
 
 @OptIn(ExternalVariantApi::class)
