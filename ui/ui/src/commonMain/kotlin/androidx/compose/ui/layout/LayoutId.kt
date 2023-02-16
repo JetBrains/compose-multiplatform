@@ -16,12 +16,12 @@
 
 package androidx.compose.ui.layout
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.node.ParentDataModifierNode
 import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 
 /**
@@ -31,41 +31,40 @@ import androidx.compose.ui.unit.Density
  * @sample androidx.compose.ui.samples.LayoutTagChildrenUsage
  */
 @Stable
-fun Modifier.layoutId(layoutId: Any) = this.then(
-    LayoutId(
-        layoutId = layoutId,
-        inspectorInfo = debugInspectorInfo {
-            name = "layoutId"
-            value = layoutId
-        }
-    )
-)
+fun Modifier.layoutId(layoutId: Any) = this then LayoutIdModifierElement(layoutId = layoutId)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private data class LayoutIdModifierElement(
+    private val layoutId: Any
+) : ModifierNodeElement<LayoutIdModifier>() {
+    override fun create() = LayoutIdModifier(layoutId)
+
+    override fun update(node: LayoutIdModifier): LayoutIdModifier = node.also {
+        it.layoutId = layoutId
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "layoutId"
+        value = layoutId
+    }
+}
 
 /**
- * A [ParentDataModifier] which tags the target with the given [id][layoutId]. The provided tag
+ * A [ParentDataModifierNode] which tags the target with the given [id][layoutId]. The provided tag
  * will act as parent data, and can be used for example by parent layouts to associate
  * composable children to [Measurable]s when doing layout, as shown below.
  */
-@Immutable
-private class LayoutId(
-    override val layoutId: Any,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : ParentDataModifier, LayoutIdParentData, InspectorValueInfo(inspectorInfo) {
+@OptIn(ExperimentalComposeUiApi::class)
+private class LayoutIdModifier(
+    layoutId: Any,
+) : ParentDataModifierNode, LayoutIdParentData, Modifier.Node() {
+
+    override var layoutId: Any = layoutId
+        internal set
+
     override fun Density.modifyParentData(parentData: Any?): Any? {
-        return this@LayoutId
+        return this@LayoutIdModifier
     }
-
-    override fun hashCode(): Int =
-        layoutId.hashCode()
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        val otherModifier = other as? LayoutId ?: return false
-        return layoutId == otherModifier.layoutId
-    }
-
-    override fun toString(): String =
-        "LayoutId(id=$layoutId)"
 }
 
 /**
