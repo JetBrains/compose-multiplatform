@@ -38,3 +38,6 @@ module(":testcase-inheritance-funInterface-main", "testcases/inheritance/funInte
 
 module(":testcase-constructors-lib", "testcases/constructors/lib")
 module(":testcase-constructors-main", "testcases/constructors/main")
+
+module(":testcase-anonymousObjects-lib", "testcases/anonymousObjects/lib")
+module(":testcase-anonymousObjects-main", "testcases/anonymousObjects/main")
