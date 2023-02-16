@@ -56,7 +56,8 @@ open class BaseLazyStaggeredGridWithOrientation(
         modifier: Modifier = Modifier,
         state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
-        mainAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        reverseLayout: Boolean = false,
+        mainAxisSpacing: Dp = 0.dp,
         crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
@@ -65,8 +66,9 @@ open class BaseLazyStaggeredGridWithOrientation(
             modifier,
             state,
             contentPadding,
-            mainAxisArrangement,
+            mainAxisSpacing,
             crossAxisArrangement,
+            reverseLayout,
             content
         )
     }
@@ -89,8 +91,9 @@ open class BaseLazyStaggeredGridWithOrientation(
         modifier: Modifier = Modifier,
         state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
-        mainAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        mainAxisSpacing: Dp = 0.dp,
         crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        reverseLayout: Boolean = false,
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
         if (orientation == Orientation.Vertical) {
@@ -98,9 +101,10 @@ open class BaseLazyStaggeredGridWithOrientation(
                 columns = cells,
                 modifier = modifier,
                 contentPadding = contentPadding,
-                verticalArrangement = mainAxisArrangement,
+                verticalItemSpacing = mainAxisSpacing,
                 horizontalArrangement = crossAxisArrangement,
                 state = state,
+                reverseLayout = reverseLayout,
                 content = content
             )
         } else {
@@ -109,8 +113,9 @@ open class BaseLazyStaggeredGridWithOrientation(
                 modifier = modifier,
                 contentPadding = contentPadding,
                 verticalArrangement = crossAxisArrangement,
-                horizontalArrangement = mainAxisArrangement,
+                horizontalItemSpacing = mainAxisSpacing,
                 state = state,
+                reverseLayout = reverseLayout,
                 content = content
             )
         }
