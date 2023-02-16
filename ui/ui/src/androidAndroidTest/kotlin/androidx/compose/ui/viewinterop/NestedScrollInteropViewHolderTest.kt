@@ -17,7 +17,6 @@
 package androidx.compose.ui.viewinterop
 
 import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
@@ -35,6 +34,7 @@ import androidx.test.espresso.contrib.RecyclerViewActions.scrollToPosition
 import androidx.test.espresso.matcher.ViewMatchers.withId
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import org.junit.Before
 import org.junit.Rule
@@ -42,7 +42,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
-@RequiresApi(Build.VERSION_CODES.M)
+@SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
 @RunWith(AndroidJUnit4::class)
 class NestedScrollInteropViewHolderTest {
     @get:Rule
