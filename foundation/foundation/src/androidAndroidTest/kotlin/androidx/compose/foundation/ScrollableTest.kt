@@ -102,7 +102,6 @@ import androidx.test.espresso.action.Press
 import androidx.test.espresso.action.Swipe
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
 import kotlin.math.abs
@@ -2342,7 +2341,6 @@ class ScrollableTest {
         }
     }
 
-    @SdkSuppress(maxSdkVersion = 32) // b/268753157
     @Test
     fun offsetsScrollable_velocityCalculationShouldConsiderLocalPositions() {
         // arrange
@@ -2593,8 +2591,8 @@ internal fun composeViewSwipeUp() {
     onView(allOf(instanceOf(AbstractComposeView::class.java)))
         .perform(
             espressoSwipe(
-                GeneralLocation.BOTTOM_CENTER,
-                GeneralLocation.CENTER
+                GeneralLocation.CENTER,
+                GeneralLocation.TOP_CENTER
             )
         )
 }
