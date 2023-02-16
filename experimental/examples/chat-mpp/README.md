@@ -25,3 +25,7 @@ Then choose **iosApp** configuration in IDE and run it.
 ## Run JS in browser with WebAssembly Skia via Gradle
 
 `./gradlew jsApp:jsBrowserDevelopmentRun`
+
+### Run MacOS via Gradle:
+- on Intel CPU: `./gradlew :shared:runDebugExecutableMacosX64`
+- on Apple Silicon: `./gradlew :shared:runDebugExecutableMacosArm64`
