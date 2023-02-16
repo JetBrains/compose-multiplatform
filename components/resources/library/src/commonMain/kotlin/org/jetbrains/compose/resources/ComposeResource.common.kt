@@ -23,15 +23,16 @@ private val emptyImageVector: ImageVector by lazy {
     ImageVector.Builder(defaultWidth = 1.dp, defaultHeight = 1.dp, viewportWidth = 1f, viewportHeight = 1f).build()
 }
 
-@OptIn(ExperimentalResourceApi::class)
+/**
+ * Get and remember resource. While loading and if resource not exists result will be null.
+ */
+@ExperimentalResourceApi
 @Composable
-private fun <T> Resource.loadResource(rememberedState: @Composable ()->MutableState<LoadState<T>>,
-                                      fromByteArrayConverter: ByteArray.()->T): LoadState<T>
-{
-    val state: MutableState<LoadState<T>> = rememberedState()
+fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> {
+    val state: MutableState<LoadState<ImageBitmap>> = remember(this) { mutableStateOf(LoadState.Loading()) }
     LaunchedEffect(this) {
         state.value = try {
-            LoadState.Success(readBytes().fromByteArrayConverter())
+            LoadState.Success(readBytes().toImageBitmap())
         } catch (e: Exception) {
             LoadState.Error(e)
         }
@@ -44,16 +45,17 @@ private fun <T> Resource.loadResource(rememberedState: @Composable ()->MutableSt
  */
 @ExperimentalResourceApi
 @Composable
-fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> =
-    loadResource ({remember(this) { mutableStateOf(LoadState.Loading()) }}, {toImageBitmap()})
-
-/**
- * Get and remember resource. While loading and if resource not exists result will be null.
- */
-@ExperimentalResourceApi
-@Composable
-fun Resource.rememberImageVector(density: Density): LoadState<ImageVector> =
-    loadResource({remember(this, density) { mutableStateOf(LoadState.Loading()) }}, {toImageVector(density)})
+fun Resource.rememberImageVector(density: Density): LoadState<ImageVector> {
+    val state: MutableState<LoadState<ImageVector>> = remember(this, density) { mutableStateOf(LoadState.Loading()) }
+    LaunchedEffect(this, density) {
+        state.value = try {
+            LoadState.Success(readBytes().toImageVector(density))
+        } catch (e: Exception) {
+            LoadState.Error(e)
+        }
+    }
+    return state.value
+}
 
 private fun <T> LoadState<T>.orEmpty(emptyValue: T): T = when (this) {
     is LoadState.Loading -> emptyValue
@@ -73,6 +75,19 @@ fun LoadState<ImageBitmap>.orEmpty(): ImageBitmap = orEmpty(emptyImageBitmap)
 @ExperimentalResourceApi
 fun LoadState<ImageVector>.orEmpty(): ImageVector = orEmpty(emptyImageVector)
 
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+private fun Resource.rememberImageBitmapSync(): ImageBitmap = remember(this) {
+    readBytesSync().toImageBitmap()
+}
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+private fun Resource.rememberImageVectorSync(density: Density): ImageVector = remember(this, density) {
+    readBytesSync().toImageVector(density)
+}
+
 /**
  * Return a Painter from the given resource path.
  * Can load either a BitmapPainter for rasterized images (.png, .jpg) or
@@ -81,16 +96,32 @@ fun LoadState<ImageVector>.orEmpty(): ImageVector = orEmpty(emptyImageVector)
  * XML Vector Drawables have the same format as for Android
  * (https://developer.android.com/reference/android/graphics/drawable/VectorDrawable)
  * except that external references to Android resources are not supported.
+ *
+ * Note that XML Vector Drawables are not supported for Web and native MacOS targets currently.
+ *
  */
 @ExperimentalResourceApi
 @Composable
 fun painterResource(res: String): Painter {
-    if (res.endsWith(".xml")) {
-        return rememberVectorPainter(resource(res).rememberImageVector(LocalDensity.current).orEmpty())
-    }
+    if (isSyncResourceLoadingSupported()) {
+        if (res.endsWith(".xml")) {
+            return rememberVectorPainter(resource(res).rememberImageVectorSync(LocalDensity.current))
+        }
 
-    return BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
+        return BitmapPainter(resource(res).rememberImageBitmapSync())
+    } else {
+        if (res.endsWith(".xml")) {
+            return rememberVectorPainter(resource(res).rememberImageVector(LocalDensity.current).orEmpty())
+        }
+
+        return BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
+    }
 }
+
+internal expect fun isSyncResourceLoadingSupported(): Boolean
+
+@OptIn(ExperimentalResourceApi::class)
+internal expect fun Resource.readBytesSync(): ByteArray
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
 

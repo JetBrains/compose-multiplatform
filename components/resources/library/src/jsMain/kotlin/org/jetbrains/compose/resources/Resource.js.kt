@@ -47,3 +47,8 @@ internal actual class MissingResourceException actual constructor(path: String) 
 internal actual fun parseXML(byteArray: ByteArray): Element {
     throw UnsupportedOperationException("XML Vector Drawables are not supported for Web target")
 }
+
+internal actual fun isSyncResourceLoadingSupported() = false
+
+@OptIn(ExperimentalResourceApi::class)
+internal actual fun Resource.readBytesSync(): ByteArray = throw UnsupportedOperationException()

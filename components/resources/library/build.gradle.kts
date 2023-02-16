@@ -35,6 +35,9 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
+        val commonButJSMain by creating {
+            dependsOn(commonMain)
+        }
         val skikoMain by creating {
             dependsOn(commonMain)
         }
@@ -44,6 +47,7 @@ kotlin {
         val desktopMain by getting {
             dependsOn(skikoMain)
             dependsOn(jvmAndAndroidMain)
+            dependsOn(commonButJSMain)
         }
         val desktopTest by getting {
             dependencies {
@@ -54,6 +58,7 @@ kotlin {
         }
         val androidMain by getting {
             dependsOn(jvmAndAndroidMain)
+            dependsOn(commonButJSMain)
         }
         val androidTest by getting {
             dependencies {
@@ -62,6 +67,7 @@ kotlin {
         }
         val iosMain by getting {
             dependsOn(skikoMain)
+            dependsOn(commonButJSMain)
         }
         val iosTest by getting
         val iosSimulatorArm64Main by getting
@@ -73,6 +79,7 @@ kotlin {
         }
         val macosMain by creating {
             dependsOn(skikoMain)
+            dependsOn(commonButJSMain)
         }
         val macosX64Main by getting {
             dependsOn(macosMain)
