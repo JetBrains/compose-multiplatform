@@ -151,20 +151,15 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
                 "/repo/m2repository",
             includeGroupRegex = """com\.android\.tools\.metalava"""
         )
-        val doclava = PlaygroundRepository(
-            "https://androidx.dev/dokka/builds/${props.dokkaBuildId}/artifacts/repository",
-            includeGroupRegex = """org\.jetbrains\.dokka"""
-        )
         val prebuilts = PlaygroundRepository(
             "https://androidx.dev/storage/prebuilts/androidx/internal/repository",
             includeGroupRegex = """androidx\..*"""
         )
-
         val dokka = PlaygroundRepository(
             "https://maven.pkg.jetbrains.space/kotlin/p/dokka/dev",
             includeGroupRegex = """org\.jetbrains\.dokka"""
         )
-        val all = listOf(sonatypeSnapshot, snapshots, metalava, doclava, dokka, prebuilts)
+        val all = listOf(sonatypeSnapshot, snapshots, metalava, dokka, prebuilts)
     }
 
     private data class PlaygroundRepository(
@@ -176,14 +171,12 @@ class AndroidXPlaygroundRootImplPlugin : Plugin<Project> {
     private data class PlaygroundProperties(
         val snapshotBuildId: String,
         val metalavaBuildId: String,
-        val dokkaBuildId: String
     ) {
         companion object {
             fun load(project: Project): PlaygroundProperties {
                 return PlaygroundProperties(
                     snapshotBuildId = project.requireProperty(PLAYGROUND_SNAPSHOT_BUILD_ID),
                     metalavaBuildId = project.requireProperty(PLAYGROUND_METALAVA_BUILD_ID),
-                    dokkaBuildId = project.requireProperty(PLAYGROUND_DOKKA_BUILD_ID)
                 )
             }
 

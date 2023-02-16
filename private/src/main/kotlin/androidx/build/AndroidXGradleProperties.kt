@@ -111,11 +111,6 @@ const val PLAYGROUND_SNAPSHOT_BUILD_ID = "androidx.playground.snapshotBuildId"
 const val PLAYGROUND_METALAVA_BUILD_ID = "androidx.playground.metalavaBuildId"
 
 /**
- * Build Id used to pull SNAPSHOT version of Dokka for Playground projects
- */
-const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
-
-/**
  * Filepath to the java agent of YourKit for profiling
  * If this value is set, profiling via YourKit will automatically be enabled
  */
@@ -178,7 +173,6 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     AffectedModuleDetector.BASE_COMMIT_ARG,
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
-    PLAYGROUND_DOKKA_BUILD_ID,
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     ENABLED_KMP_TARGET_PLATFORMS,
