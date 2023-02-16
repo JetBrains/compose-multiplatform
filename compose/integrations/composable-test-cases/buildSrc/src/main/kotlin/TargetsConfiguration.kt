@@ -8,6 +8,12 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 
+val Project.isInIdea: Boolean
+    get() {
+        return false // System.getProperty("idea.active")?.toBoolean() == true
+    }
+
+@OptIn(ExternalVariantApi::class)
 fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
     js(IR) {
@@ -20,7 +26,8 @@ fun KotlinMultiplatformExtension.configureTargets() {
     iosX64()
     macosX64()
     macosArm64()
-    mingwX64()
+    // We use linux agents on CI. So it doesn't run the tests, but it builds the klib anyway which is time consuming.
+    if (project.isInIdea) mingwX64()
     linuxX64()
 }
 
@@ -32,7 +39,7 @@ fun KotlinDependencyHandler.getLibDependencyForMain(): ProjectDependency {
 
 @OptIn(ExternalVariantApi::class)
 fun KotlinDependencyHandler.getCommonLib(): ProjectDependency {
-    return project(":common" )
+    return project(":common")
 }
 
 fun KotlinSourceSet.configureCommonTestDependencies() {
