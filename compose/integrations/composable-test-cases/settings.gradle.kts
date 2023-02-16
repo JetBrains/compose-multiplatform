@@ -41,3 +41,6 @@ module(":testcase-constructors-main", "testcases/constructors/main")
 
 module(":testcase-anonymousObjects-lib", "testcases/anonymousObjects/lib")
 module(":testcase-anonymousObjects-main", "testcases/anonymousObjects/main")
+
+module(":testcase-lambdas-lib", "testcases/lambdas/lib")
+module(":testcase-lambdas-main", "testcases/lambdas/main")

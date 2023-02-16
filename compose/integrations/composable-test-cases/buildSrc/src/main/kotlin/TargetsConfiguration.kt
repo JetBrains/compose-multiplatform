@@ -12,7 +12,7 @@ fun KotlinMultiplatformExtension.configureTargets() {
     jvm("desktop")
     js(IR) {
         browser()
-        nodejs()
+        // nodejs() // Commented to save a bit of CI time. Testing in a browser should be enough.
     }
     ios()
     iosArm64()
