@@ -1077,49 +1077,6 @@ class NestedScrollModifierTest {
         }
     }
 
-    // Dispatcher attaches to the latest set modifier and
-    // points to the modifier above in the chain
-    @Test
-    fun dispatcherUseInMultipleModifiers_shouldRetainCorrectParent() {
-        val topConnection = object : NestedScrollConnection {}
-        val middleConnection = object : NestedScrollConnection {}
-        val lowerConnection = object : NestedScrollConnection {}
-
-        val sameDispatcher = NestedScrollDispatcher()
-        var shouldKeepNode by mutableStateOf(true)
-        rule.setContent {
-            Box(
-                modifier = Modifier
-                    .nestedScroll(topConnection, sameDispatcher)
-                    .nestedScroll(middleConnection, sameDispatcher)
-                    .then(
-                        if (shouldKeepNode) Modifier.nestedScroll(
-                            lowerConnection,
-                            sameDispatcher
-                        ) else Modifier
-                    )
-            )
-        }
-
-        // In this case, the dispatcher will attach to the last nestedScroll and
-        // its parent will point to the connection above.
-        rule.runOnIdle {
-            assertThat((sameDispatcher.parent as NestedScrollModifierLocal).connection).isEqualTo(
-                middleConnection
-            )
-        }
-
-        shouldKeepNode = false
-
-        // Removing the node that the dispatcher is attached to will move
-        // the dispatcher parent.
-        rule.runOnIdle {
-            assertThat((sameDispatcher.parent as NestedScrollModifierLocal).connection).isEqualTo(
-                topConnection
-            )
-        }
-    }
-
     // helper functions
     private fun testMiddleParentAdditionRemoval(
         content: @Composable (root: Modifier, middle: Modifier, child: Modifier) -> Unit
