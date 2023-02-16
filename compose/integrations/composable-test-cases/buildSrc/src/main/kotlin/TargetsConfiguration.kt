@@ -10,7 +10,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 
 val Project.isInIdea: Boolean
     get() {
-        return false // System.getProperty("idea.active")?.toBoolean() == true
+        return System.getProperty("idea.active")?.toBoolean() == true
     }
 
 @OptIn(ExternalVariantApi::class)
