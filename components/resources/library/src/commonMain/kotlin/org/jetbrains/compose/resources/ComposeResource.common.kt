@@ -88,6 +88,20 @@ private fun Resource.rememberImageVectorSync(density: Density): ImageVector = re
     readBytesSync().toImageVector(density)
 }
 
+
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+private fun painterResource(
+    res: String,
+    rememberImageBitmap: @Composable Resource.() -> ImageBitmap,
+    rememberImageVector: @Composable Resource.(Density) -> ImageVector
+): Painter =
+    if (res.endsWith(".xml")) {
+        rememberVectorPainter(resource(res).rememberImageVector(LocalDensity.current))
+    } else {
+        BitmapPainter(resource(res).rememberImageBitmap())
+    }
+
 /**
  * Return a Painter from the given resource path.
  * Can load either a BitmapPainter for rasterized images (.png, .jpg) or
@@ -102,21 +116,13 @@ private fun Resource.rememberImageVectorSync(density: Density): ImageVector = re
  */
 @ExperimentalResourceApi
 @Composable
-fun painterResource(res: String): Painter {
+fun painterResource(res: String): Painter =
     if (isSyncResourceLoadingSupported()) {
-        if (res.endsWith(".xml")) {
-            return rememberVectorPainter(resource(res).rememberImageVectorSync(LocalDensity.current))
-        }
-
-        return BitmapPainter(resource(res).rememberImageBitmapSync())
+        painterResource(res, {rememberImageBitmapSync()}, {density->rememberImageVectorSync(density)})
     } else {
-        if (res.endsWith(".xml")) {
-            return rememberVectorPainter(resource(res).rememberImageVector(LocalDensity.current).orEmpty())
-        }
-
-        return BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
+        painterResource(res, {rememberImageBitmap().orEmpty()}, {density->rememberImageVector(density).orEmpty()})
     }
-}
+
 
 internal expect fun isSyncResourceLoadingSupported(): Boolean
 
