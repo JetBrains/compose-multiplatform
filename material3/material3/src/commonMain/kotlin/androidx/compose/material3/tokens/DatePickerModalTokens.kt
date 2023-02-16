@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_157
+// VERSION: v0_161
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -46,12 +46,12 @@ internal object DatePickerModalTokens {
     val HeaderHeadlineFont = TypographyKeyTokens.HeadlineLarge
     val HeaderSupportingTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val HeaderSupportingTextFont = TypographyKeyTokens.LabelLarge
-    val RangeSelectionActiveIndicatorContainerColor = ColorSchemeKeyTokens.PrimaryContainer
+    val RangeSelectionActiveIndicatorContainerColor = ColorSchemeKeyTokens.SecondaryContainer
     val RangeSelectionActiveIndicatorContainerHeight = 40.0.dp
     val RangeSelectionActiveIndicatorContainerShape = ShapeKeyTokens.CornerFull
     val RangeSelectionContainerElevation = ElevationTokens.Level0
     val RangeSelectionContainerShape = ShapeKeyTokens.CornerNone
-    val SelectionDateInRangeLabelTextColor = ColorSchemeKeyTokens.OnPrimaryContainer
+    val SelectionDateInRangeLabelTextColor = ColorSchemeKeyTokens.OnSecondaryContainer
     val RangeSelectionHeaderContainerHeight = 128.0.dp
     val RangeSelectionHeaderHeadlineFont = TypographyKeyTokens.TitleLarge
     val RangeSelectionMonthSubheadColor = ColorSchemeKeyTokens.OnSurfaceVariant

@@ -59,7 +59,6 @@ import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
-import androidx.compose.material3.tokens.ColorSchemeKeyTokens
 import androidx.compose.material3.tokens.DatePickerModalTokens
 import androidx.compose.material3.tokens.MotionTokens
 import androidx.compose.runtime.Composable
@@ -363,13 +362,10 @@ object DatePickerDefaults {
         todayContentColor: Color = DatePickerModalTokens.DateTodayLabelTextColor.toColor(),
         todayDateBorderColor: Color =
             DatePickerModalTokens.DateTodayContainerOutlineColor.toColor(),
-        // TODO(b/269510888): Replace with DatePickerModalTokens.SelectionDateInRangeLabelTextColor
-        //  when the token value is fixed.
         dayInSelectionRangeContentColor: Color =
-            ColorSchemeKeyTokens.OnSecondaryContainer.toColor(),
-        // TODO(b/269510888): Replace with DatePickerModalTokens
-        //  RangeSelectionActiveIndicatorContainerColor when the token value is fixed.
-        dayInSelectionRangeContainerColor: Color = ColorSchemeKeyTokens.SecondaryContainer.toColor()
+            DatePickerModalTokens.SelectionDateInRangeLabelTextColor.toColor(),
+        dayInSelectionRangeContainerColor: Color =
+            DatePickerModalTokens.RangeSelectionActiveIndicatorContainerColor.toColor()
     ): DatePickerColors =
         DatePickerColors(
             containerColor = containerColor,
