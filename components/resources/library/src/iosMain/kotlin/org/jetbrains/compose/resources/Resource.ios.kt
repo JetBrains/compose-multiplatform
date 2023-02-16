@@ -5,10 +5,8 @@
 
 package org.jetbrains.compose.resources
 
-import org.jetbrains.compose.resources.vector.xmldom.Element
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
-import org.jetbrains.compose.resources.vector.xmldom.parse
 import platform.Foundation.NSBundle
 import platform.Foundation.NSData
 import platform.Foundation.NSFileManager
@@ -36,5 +34,3 @@ private class UIKitResourceImpl(path: String) : AbstractResourceImpl(path) {
 
 internal actual class MissingResourceException actual constructor(path: String) :
     Exception("Missing resource with path: $path")
-
-internal actual fun parseXML(byteArray: ByteArray): Element = parse(byteArray.decodeToString())

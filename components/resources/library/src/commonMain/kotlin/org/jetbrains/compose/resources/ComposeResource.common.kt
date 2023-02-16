@@ -111,8 +111,7 @@ private fun painterResource(
  * (https://developer.android.com/reference/android/graphics/drawable/VectorDrawable)
  * except that external references to Android resources are not supported.
  *
- * Note that XML Vector Drawables are not supported for Web and native MacOS targets currently.
- *
+ * Note that XML Vector Drawables are not supported for Web target currently.
  */
 @ExperimentalResourceApi
 @Composable
