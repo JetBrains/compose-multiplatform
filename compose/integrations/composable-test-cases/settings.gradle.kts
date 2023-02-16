@@ -35,3 +35,6 @@ module(":testcase-inheritance-composableInterface-main", "testcases/inheritance/
 
 module(":testcase-inheritance-funInterface-lib", "testcases/inheritance/funInterface/lib")
 module(":testcase-inheritance-funInterface-main", "testcases/inheritance/funInterface/main")
+
+module(":testcase-constructors-lib", "testcases/constructors/lib")
+module(":testcase-constructors-main", "testcases/constructors/main")
