@@ -5,7 +5,7 @@ import com.example.common.TextLeafNode
 class TestConstructor constructor() {
 
     var otherComposable: (@Composable () -> Unit)? = null
-    constructor(retInt: @Composable () -> Int): this() {
+    constructor(retInt: () -> Int): this() {
         otherComposable = {
             val abc3: HasComposable2 = object : HasComposable2 {
                 @Composable
