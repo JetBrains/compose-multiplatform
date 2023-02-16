@@ -44,6 +44,9 @@ kotlin {
         val jvmAndAndroidMain by creating {
             dependsOn(commonMain)
         }
+        val nativeMain by creating {
+            dependsOn(commonMain)
+        }
         val desktopMain by getting {
             dependsOn(skikoMain)
             dependsOn(jvmAndAndroidMain)
@@ -68,6 +71,7 @@ kotlin {
         val iosMain by getting {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
+            dependsOn(nativeMain)
         }
         val iosTest by getting
         val iosSimulatorArm64Main by getting
@@ -80,6 +84,7 @@ kotlin {
         val macosMain by creating {
             dependsOn(skikoMain)
             dependsOn(commonButJSMain)
+            dependsOn(nativeMain)
         }
         val macosX64Main by getting {
             dependsOn(macosMain)
