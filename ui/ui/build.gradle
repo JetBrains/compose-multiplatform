@@ -154,10 +154,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.kotlinStdlibCommon)
                 implementation(libs.kotlinCoroutinesCore)
 
-                // Used to generate debug information in the layout inspector. If not present,
-                // we may fall back to more limited data.
-                compileOnly(libs.kotlinReflect)
-
                 // when updating the runtime version please also update the runtime-saveable version
                 implementation(project(":compose:runtime:runtime"))
                 api(project(":compose:runtime:runtime-saveable"))
