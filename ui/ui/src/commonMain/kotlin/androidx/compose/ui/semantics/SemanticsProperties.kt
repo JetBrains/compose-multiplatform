@@ -1026,11 +1026,13 @@ fun SemanticsPropertyReceiver.setText(
  * using [textSelectionRange].
  *
  * @param label Optional label for this action.
- * @param action Action to be performed when the [SemanticsActions.SetSelection] is called.
+ * @param action Action to be performed when the [SemanticsActions.SetSelection] is called. The
+ * parameters to the action are: `startIndex`, `endIndex`, and whether the indices are relative
+ * to the original text or the transformed text (when a `VisualTransformation` is applied).
  */
 fun SemanticsPropertyReceiver.setSelection(
     label: String? = null,
-    action: ((startIndex: Int, endIndex: Int, traversalMode: Boolean) -> Boolean)?
+    action: ((startIndex: Int, endIndex: Int, relativeToOriginalText: Boolean) -> Boolean)?
 ) {
     this[SemanticsActions.SetSelection] = AccessibilityAction(label, action)
 }
