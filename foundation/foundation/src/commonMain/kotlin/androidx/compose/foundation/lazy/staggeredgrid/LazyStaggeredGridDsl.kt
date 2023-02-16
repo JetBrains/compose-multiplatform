@@ -29,6 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 
@@ -39,8 +40,10 @@ import androidx.compose.ui.unit.dp
  * @param modifier modifier to apply to the layout.
  * @param state state object that can be used to control and observe staggered grid state.
  * @param contentPadding padding around the content.
- * @param verticalArrangement arrangement specifying vertical spacing between items. The item
- *  arrangement specifics are ignored for now.
+ * @param reverseLayout reverse the direction of scrolling and layout. When `true`, items are
+ * laid out in the reverse order and [LazyStaggeredGridState.firstVisibleItemIndex] == 0 means
+ * that grid is scrolled to the bottom.
+ * @param verticalItemSpacing vertical spacing between items.
  * @param horizontalArrangement arrangement specifying horizontal spacing between items. The item
  *  arrangement specifics are ignored for now.
  * @param flingBehavior logic responsible for handling fling.
@@ -58,7 +61,8 @@ fun LazyVerticalStaggeredGrid(
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp),
+    reverseLayout: Boolean = false,
+    verticalItemSpacing: Dp = 0.dp,
     horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
@@ -68,9 +72,10 @@ fun LazyVerticalStaggeredGrid(
         modifier = modifier,
         orientation = Orientation.Vertical,
         state = state,
-        verticalArrangement = verticalArrangement,
-        horizontalArrangement = horizontalArrangement,
         contentPadding = contentPadding,
+        reverseLayout = reverseLayout,
+        mainAxisSpacing = verticalItemSpacing,
+        crossAxisSpacing = horizontalArrangement.spacing,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         slotSizesSums = rememberColumnWidthSums(columns, horizontalArrangement, contentPadding),
@@ -121,10 +126,12 @@ private fun rememberColumnWidthSums(
  * @param modifier modifier to apply to the layout.
  * @param state state object that can be used to control and observe staggered grid state.
  * @param contentPadding padding around the content.
+ * @param reverseLayout reverse the direction of scrolling and layout. When `true`, items are
+ * laid out in the reverse order and [LazyStaggeredGridState.firstVisibleItemIndex] == 0 means
+ * that grid is scrolled to the end.
  * @param verticalArrangement arrangement specifying vertical spacing between items. The item
  *  arrangement specifics are ignored for now.
- * @param horizontalArrangement arrangement specifying horizontal spacing between items. The item
- *  arrangement specifics are ignored for now.
+ * @param horizontalItemSpacing horizontal spacing between items.
  * @param flingBehavior logic responsible for handling fling.
  * @param userScrollEnabled whether scroll with gestures or accessibility actions are allowed. It is
  *  still possible to scroll programmatically through state when [userScrollEnabled] is set to false
@@ -132,7 +139,6 @@ private fun rememberColumnWidthSums(
  *  [LazyStaggeredGridScope.items] to present list of items or [LazyStaggeredGridScope.item] for a
  *  single one.
  */
-// todo(b/182882362): Reverse layout and arrangement support
 @ExperimentalFoundationApi
 @Composable
 fun LazyHorizontalStaggeredGrid(
@@ -140,8 +146,9 @@ fun LazyHorizontalStaggeredGrid(
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
     verticalArrangement: Arrangement.Vertical = Arrangement.spacedBy(0.dp),
-    horizontalArrangement: Arrangement.Horizontal = Arrangement.spacedBy(0.dp),
+    horizontalItemSpacing: Dp = 0.dp,
     flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
     userScrollEnabled: Boolean = true,
     content: LazyStaggeredGridScope.() -> Unit
@@ -151,8 +158,9 @@ fun LazyHorizontalStaggeredGrid(
         orientation = Orientation.Horizontal,
         state = state,
         contentPadding = contentPadding,
-        verticalArrangement = verticalArrangement,
-        horizontalArrangement = horizontalArrangement,
+        reverseLayout = reverseLayout,
+        mainAxisSpacing = horizontalItemSpacing,
+        crossAxisSpacing = verticalArrangement.spacing,
         flingBehavior = flingBehavior,
         userScrollEnabled = userScrollEnabled,
         slotSizesSums = rememberRowHeightSums(rows, verticalArrangement, contentPadding),

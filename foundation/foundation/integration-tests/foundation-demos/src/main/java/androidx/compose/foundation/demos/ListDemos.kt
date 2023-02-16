@@ -959,7 +959,9 @@ private fun LazyStaggeredGridDemo() {
         mutableStateOf(List(100) { it })
     }
 
-    var count by remember { mutableStateOf(100) }
+    var count by remember { mutableStateOf(10) }
+    var reverseLayout by remember { mutableStateOf(false) }
+    var rtl by remember { mutableStateOf(false) }
 
     Column(Modifier.fillMaxSize()) {
         Row(
@@ -967,6 +969,12 @@ private fun LazyStaggeredGridDemo() {
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Button(onClick = { count++ }) { Text(text = "++") }
+            Button(onClick = { reverseLayout = !reverseLayout }) {
+                Text("reverse")
+            }
+            Button(onClick = { rtl = !rtl }) {
+                Text(if (rtl) "rtl" else "ltr")
+            }
             Button(onClick = {
                 indices.value = indices.value.toMutableList().apply { shuffle() }
             }) { Text(text = "shuffle") }
@@ -975,44 +983,48 @@ private fun LazyStaggeredGridDemo() {
 
         val state = rememberLazyStaggeredGridState(initialFirstVisibleItemIndex = 29)
 
-        LazyVerticalStaggeredGrid(
-            columns = StaggeredGridCells.Fixed(3),
-            modifier = Modifier.fillMaxSize(),
-            state = state,
-            contentPadding = PaddingValues(vertical = 30.dp, horizontal = 20.dp),
-            horizontalArrangement = Arrangement.spacedBy(10.dp),
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            content = {
-                items(
-                    count,
-                    span = {
-                        if (it % 30 == 0)
-                            StaggeredGridItemSpan.FullLine
-                        else
-                            StaggeredGridItemSpan.SingleLane
-                    }
-                ) {
-                    var expanded by remember { mutableStateOf(false) }
-                    val index = indices.value[it % indices.value.size]
-                    val color = colors[index]
-                    Box(
-                        modifier = Modifier
-                            .height(if (!expanded) heights[index] else heights[index] * 2)
-                            .border(2.dp, color, RoundedCornerShape(5.dp))
-                            .clickable {
-                                expanded = !expanded
-                            }
+        val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
+        CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+            LazyVerticalStaggeredGrid(
+                columns = StaggeredGridCells.Fixed(3),
+                modifier = Modifier.fillMaxSize(),
+                state = state,
+                contentPadding = PaddingValues(vertical = 30.dp, horizontal = 20.dp),
+                horizontalArrangement = Arrangement.spacedBy(10.dp),
+                verticalItemSpacing = 10.dp,
+                reverseLayout = reverseLayout,
+                content = {
+                    items(
+                        count,
+                        span = {
+                            if (it % 30 == 0)
+                                StaggeredGridItemSpan.FullLine
+                            else
+                                StaggeredGridItemSpan.SingleLane
+                        }
                     ) {
-                        Text(
-                            "$it",
-                            modifier = Modifier.align(Alignment.Center),
-                            color = color,
-                            fontSize = 36.sp
-                        )
+                        var expanded by remember { mutableStateOf(false) }
+                        val index = indices.value[it % indices.value.size]
+                        val color = colors[index]
+                        Box(
+                            modifier = Modifier
+                                .height(if (!expanded) heights[index] else heights[index] * 2)
+                                .border(2.dp, color, RoundedCornerShape(5.dp))
+                                .clickable {
+                                    expanded = !expanded
+                                }
+                        ) {
+                            Text(
+                                "$it",
+                                modifier = Modifier.align(Alignment.Center),
+                                color = color,
+                                fontSize = 36.sp
+                            )
+                        }
                     }
                 }
-            }
-        )
+            )
+        }
     }
 }
 
