@@ -25,8 +25,10 @@ private val emptyImageVector: ImageVector by lazy {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun <T> Resource.rememberLoadingResource(fromByteArrayConverter: ByteArray.()->T): LoadState<T> {
-    val state: MutableState<LoadState<T>> = remember(this) { mutableStateOf(LoadState.Loading()) }
+private fun <T> Resource.loadResource(rememberedState: @Composable ()->MutableState<LoadState<T>>,
+                                      fromByteArrayConverter: ByteArray.()->T): LoadState<T>
+{
+    val state: MutableState<LoadState<T>> = rememberedState()
     LaunchedEffect(this) {
         state.value = try {
             LoadState.Success(readBytes().fromByteArrayConverter())
@@ -43,7 +45,7 @@ private fun <T> Resource.rememberLoadingResource(fromByteArrayConverter: ByteArr
 @ExperimentalResourceApi
 @Composable
 fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> =
-    rememberLoadingResource { toImageBitmap() }
+    loadResource ({remember(this) { mutableStateOf(LoadState.Loading()) }}, {toImageBitmap()})
 
 /**
  * Get and remember resource. While loading and if resource not exists result will be null.
@@ -51,7 +53,7 @@ fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> =
 @ExperimentalResourceApi
 @Composable
 fun Resource.rememberImageVector(density: Density): LoadState<ImageVector> =
-    rememberLoadingResource { toImageVector(density) }
+    loadResource({remember(this, density) { mutableStateOf(LoadState.Loading()) }}, {toImageVector(density)})
 
 private fun <T> LoadState<T>.orEmpty(emptyValue: T): T = when (this) {
     is LoadState.Loading -> emptyValue
