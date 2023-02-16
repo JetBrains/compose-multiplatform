@@ -1,6 +1,11 @@
 ## Run:
 
-`./gradlew build -Pcompose.kotlinCompilerPluginVersion=1.4.2-rc01 -Pkotlin.version=1.8.10`
+`./gradlew build -Pcompose.kotlinCompilerPluginVersion=1.4.2-rc02 -Pkotlin.version=1.8.10`
+to build and run the tests,
+
+or
+`./gradlew allTests -Pcompose.kotlinCompilerPluginVersion=1.4.2-rc02 -Pkotlin.version=1.8.10`
+to only run the tests.
 
 It will build and run the tests for all available targets (depends on a host machine).
 See [TargetsConfiguration](./buildSrc/src/main/kotlin/TargetsConfiguration.kt) to update the targets.
