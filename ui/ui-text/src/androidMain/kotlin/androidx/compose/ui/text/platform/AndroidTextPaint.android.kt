@@ -80,7 +80,6 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     }
 
     fun setColor(color: Color) {
-        color.toArgb()
         if (color.isSpecified) {
             composePaint.color = color
             composePaint.shader = null
