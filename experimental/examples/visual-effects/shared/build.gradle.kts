@@ -34,7 +34,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
+                implementation("org.jetbrains.compose.components:components-resources:1.4.0-alpha01-dev942")
             }
         }
         val androidMain by getting {
