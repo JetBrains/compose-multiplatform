@@ -1147,7 +1147,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1172,7 +1174,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1198,7 +1202,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1230,7 +1236,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1265,7 +1273,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1279,12 +1289,14 @@ class TextFieldTest {
                 )
             )
         )
-        textNode.performKeyPress(KeyEvent(
-            NativeKeyEvent(
-                NativeKeyEvent.ACTION_UP,
-                NativeKeyEvent.KEYCODE_DEL
+        textNode.performKeyPress(
+            KeyEvent(
+                NativeKeyEvent(
+                    NativeKeyEvent.ACTION_UP,
+                    NativeKeyEvent.KEYCODE_DEL
+                )
             )
-        ))
+        )
 
         textFieldValue.value = "Hello"
 
