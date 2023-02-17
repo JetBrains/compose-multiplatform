@@ -29,6 +29,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.error
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
@@ -69,10 +71,18 @@ internal fun DateInputContent(
             errorInvalidRangeInput = "" // Not used for a single date input
         )
     }
+    val pattern = dateInputFormat.patternWithDelimiters.uppercase()
+    val labelText = getString(string = Strings.DateInputLabel)
     DateInputTextField(
         modifier = Modifier
             .fillMaxWidth()
             .padding(InputTextFieldPadding),
+        label = {
+            Text(
+                labelText,
+                modifier = Modifier.semantics { contentDescription = "$labelText, $pattern" })
+        },
+        placeholder = { Text(pattern, modifier = Modifier.clearAndSetSemantics { }) },
         stateData = stateData,
         initialDate = stateData.selectedStartDate.value,
         onDateChanged = { date -> stateData.selectedStartDate.value = date },
@@ -87,6 +97,8 @@ internal fun DateInputContent(
 @Composable
 internal fun DateInputTextField(
     modifier: Modifier,
+    label: @Composable (() -> Unit)?,
+    placeholder: @Composable (() -> Unit)?,
     stateData: StateData,
     initialDate: CalendarDate?,
     onDateChanged: (CalendarDate?) -> Unit,
@@ -155,8 +167,8 @@ internal fun DateInputTextField(
             .semantics {
                 if (errorText.value.isNotBlank()) error(errorText.value)
             },
-        label = { Text(getString(string = Strings.DateInputLabel)) },
-        placeholder = { Text(dateInputFormat.patternWithDelimiters.uppercase()) },
+        label = label,
+        placeholder = placeholder,
         supportingText = { if (errorText.value.isNotBlank()) Text(errorText.value) },
         isError = errorText.value.isNotBlank(),
         visualTransformation = DateVisualTransformation(dateInputFormat),

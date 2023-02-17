@@ -22,6 +22,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -56,8 +59,17 @@ internal fun DateRangeInputContent(
         modifier = Modifier.padding(paddingValues = InputTextFieldPadding),
         horizontalArrangement = Arrangement.spacedBy(TextFieldSpacing)
     ) {
+        val pattern = dateInputFormat.patternWithDelimiters.uppercase()
+        val startRangeText = getString(string = Strings.DateRangePickerStartHeadline)
         DateInputTextField(
             modifier = Modifier.weight(0.5f),
+            label = {
+                Text(startRangeText,
+                    modifier = Modifier.semantics {
+                        contentDescription = "$startRangeText, $pattern"
+                    })
+            },
+            placeholder = { Text(pattern, modifier = Modifier.clearAndSetSemantics { }) },
             stateData = stateData,
             initialDate = stateData.selectedStartDate.value,
             onDateChanged = { date -> stateData.selectedStartDate.value = date },
@@ -66,8 +78,16 @@ internal fun DateRangeInputContent(
             dateInputFormat = dateInputFormat,
             locale = defaultLocale
         )
+        val endRangeText = getString(string = Strings.DateRangePickerEndHeadline)
         DateInputTextField(
             modifier = Modifier.weight(0.5f),
+            label = {
+                Text(endRangeText,
+                    modifier = Modifier.semantics {
+                        contentDescription = "$endRangeText, $pattern"
+                    })
+            },
+            placeholder = { Text(pattern, modifier = Modifier.clearAndSetSemantics { }) },
             stateData = stateData,
             initialDate = stateData.selectedEndDate.value,
             onDateChanged = { date -> stateData.selectedEndDate.value = date },
