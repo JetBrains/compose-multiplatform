@@ -7,6 +7,7 @@ internal object ComposeCompilerCompatibility {
     private val kotlinToCompiler = sortedMapOf(
         "1.7.10" to "1.3.0",
         "1.7.20" to "1.3.2.2",
+        "1.8.20-Beta" to "1.3.0-dev-wasm-02",
         "1.9.0-dev-1" to "1.3.0-dev-wasm-01"
     )
 
