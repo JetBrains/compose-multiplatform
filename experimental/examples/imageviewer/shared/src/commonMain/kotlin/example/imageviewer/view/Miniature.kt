@@ -28,9 +28,7 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.model.Picture
 import example.imageviewer.model.name
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
@@ -77,7 +75,7 @@ internal fun Miniature(
             )
 
             Image(
-                resource("dots.png").rememberImageBitmap().orEmpty(),
+                painterResource("dots.png"),
                 contentDescription = null,
                 modifier = Modifier.height(70.dp)
                     .width(30.dp)

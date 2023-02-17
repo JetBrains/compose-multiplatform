@@ -49,9 +49,7 @@ import example.imageviewer.model.bigUrl
 import example.imageviewer.style.ImageviewerColors
 import example.imageviewer.style.ImageviewerColors.kotlinHorizontalGradientBrush
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun GalleryHeader() {
@@ -217,7 +215,7 @@ private fun TitleBar(onRefresh: () -> Unit, onToggle: () -> Unit, dependencies: 
                     shape = CircleShape
                 ) {
                     Image(
-                        bitmap = resource("list_view.png").rememberImageBitmap().orEmpty(),
+                        painter = painterResource("list_view.png"),
                         contentDescription = null,
                         modifier = Modifier.size(35.dp).clickable {
                             onToggle()
@@ -230,7 +228,7 @@ private fun TitleBar(onRefresh: () -> Unit, onToggle: () -> Unit, dependencies: 
                     shape = CircleShape
                 ) {
                     Image(
-                        bitmap = resource("refresh.png").rememberImageBitmap().orEmpty(),
+                        painter = painterResource("refresh.png"),
                         contentDescription = null,
                         modifier = Modifier.size(35.dp).clickable {
                             onRefresh()

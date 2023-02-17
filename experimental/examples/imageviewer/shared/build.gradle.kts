@@ -34,7 +34,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
+                implementation("org.jetbrains.compose.components:components-resources:1.4.0-alpha01-dev942")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.material3)

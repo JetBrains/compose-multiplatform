@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
@@ -26,9 +27,7 @@ import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun FullscreenImage(
@@ -157,7 +156,7 @@ private fun FullscreenImageBar(
         navigationIcon = {
             Tooltip(localization.back) {
                 Image(
-                    resource("back.png").rememberImageBitmap().orEmpty(),
+                    painterResource("back.png"),
                     contentDescription = null,
                     modifier = Modifier.size(38.dp)
                         .clip(CircleShape)
@@ -205,24 +204,24 @@ private fun FilterButton(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun getFilterImage(active: Boolean, type: FilterType): ImageBitmap {
+private fun getFilterImage(active: Boolean, type: FilterType): Painter {
     return when (type) {
         FilterType.GrayScale -> if (active) {
-            resource("grayscale_on.png").rememberImageBitmap().orEmpty()
+            painterResource("grayscale_on.png")
         } else {
-            resource("grayscale_off.png").rememberImageBitmap().orEmpty()
+            painterResource("grayscale_off.png")
         }
 
         FilterType.Pixel -> if (active) {
-            resource("pixel_on.png").rememberImageBitmap().orEmpty()
+            painterResource("pixel_on.png")
         } else {
-            resource("pixel_off.png").rememberImageBitmap().orEmpty()
+            painterResource("pixel_off.png")
         }
 
         FilterType.Blur -> if (active) {
-            resource("blur_on.png").rememberImageBitmap().orEmpty()
+            painterResource("blur_on.png")
         } else {
-            resource("blur_off.png").rememberImageBitmap().orEmpty()
+            painterResource("blur_off.png")
         }
     }
 }
