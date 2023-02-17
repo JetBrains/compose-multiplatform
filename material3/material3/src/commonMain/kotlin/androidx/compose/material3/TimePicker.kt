@@ -38,6 +38,8 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
@@ -47,6 +49,7 @@ import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.tokens.MotionTokens
+import androidx.compose.material3.tokens.TimeInputTokens
 import androidx.compose.material3.tokens.TimePickerTokens
 import androidx.compose.material3.tokens.TimePickerTokens.ClockDialColor
 import androidx.compose.material3.tokens.TimePickerTokens.ClockDialContainerSize
@@ -204,10 +207,12 @@ fun TimeInput(
         mutableStateOf(TextFieldValue(text = state.minute.toLocalString(2)))
     }
 
-    Row(modifier = modifier, verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        modifier = modifier.padding(bottom = TimeInputBottomPadding),
+        verticalAlignment = Alignment.Top
+    ) {
         TimePickerTextField(
             modifier = Modifier
-                .size(TimeSelectorContainerWidth, TimeSelectorContainerHeight)
                 .onKeyEvent { event ->
                     // Zero == 48, Nine == 57
                     val switchFocus = event.utf16CodePoint in 48..57 &&
@@ -226,7 +231,7 @@ fun TimeInput(
                     state = state,
                     value = newValue,
                     prevValue = hourValue,
-                    max = 12,
+                    max = if (state.is24hour) 23 else 12,
                 ) { hourValue = it }
             },
             state = state,
@@ -241,7 +246,6 @@ fun TimeInput(
         DisplaySeparator()
         TimePickerTextField(
             modifier = Modifier
-                .size(TimeSelectorContainerWidth, TimeSelectorContainerHeight)
                 .onPreviewKeyEvent { event ->
                     // 0 == KEYCODE_DEL
                     val switchFocus = event.utf16CodePoint == 0 &&
@@ -274,8 +278,9 @@ fun TimeInput(
             colors = colors,
         )
 
-        Spacer(modifier = Modifier.width(PeriodToggleMargin))
-        PeriodToggle(state = state, colors = colors)
+        if (!state.is24hour) {
+            PeriodToggle(state = state, colors = colors)
+        }
     }
 }
 
@@ -557,6 +562,7 @@ class TimePickerState(
     }
 
     internal fun setHour(hour: Int) {
+        isInnerCircle = hour > 12 || hour == 0
         hourAngle = RadiansPerHour * hour % 12 - FullCircle / 4
     }
 
@@ -670,7 +676,6 @@ private fun ClockDisplay(state: TimePickerState, colors: TimePickerColors) {
             colors = colors
         )
         if (!state.is24hour) {
-            Spacer(modifier = Modifier.width(PeriodToggleTopMargin))
             PeriodToggle(state, colors)
         }
     }
@@ -686,12 +691,12 @@ private fun PeriodToggle(state: TimePickerState, colors: TimePickerColors) {
 
     val shape = PeriodSelectorContainerShape.toShape() as CornerBasedShape
     val contentDescription = getString(Strings.TimePickerPeriodToggle)
-    Column(
-        Modifier
-            .semantics { this.contentDescription = contentDescription }
-            .selectableGroup()
-            .size(PeriodSelectorVerticalContainerWidth, PeriodSelectorVerticalContainerHeight)
-            .border(border = borderStroke, shape = shape)
+    Column(Modifier
+        .padding(start = PeriodToggleMargin)
+        .semantics { this.contentDescription = contentDescription }
+        .selectableGroup()
+        .size(PeriodSelectorVerticalContainerWidth, PeriodSelectorVerticalContainerHeight)
+        .border(border = borderStroke, shape = shape)
     ) {
         ToggleItem(
             checked = !state.isAfternoonToggle,
@@ -1069,7 +1074,7 @@ private fun timeInputOnChange(
         if (newValue <= max) {
             if (selection == Selection.Hour) {
                 state.setHour(newValue)
-                if (newValue > 1) {
+                if (newValue > 1 && !state.is24hour) {
                     state.selection = Selection.Minute
                 }
             } else {
@@ -1156,13 +1161,18 @@ private fun TimePickerTextField(
             }
         }
 
-        val label = if (selection == Selection.Hour) {
-            getString(Strings.TimePickerHour)
-        } else {
-            getString(Strings.TimePickerMinute)
-        }
-
-        Text(text = label)
+        Text(
+            modifier = Modifier.offset(y = SupportLabelTop),
+            text = getString(
+                if (selection == Selection.Hour) {
+                    Strings.TimePickerHour
+                } else {
+                    Strings.TimePickerMinute
+                }
+            ),
+            style = MaterialTheme.typography.fromToken(TimeInputTokens.TimeFieldSupportingTextFont)
+                .copy(color = TimeInputTokens.TimeFieldSupportingTextColor.toColor())
+        )
     }
 
     LaunchedEffect(state.selection) {
@@ -1240,7 +1250,7 @@ private fun valuesForAnimation(current: Float, new: Float): Pair<Float, Float> {
 
     if (start > PI && end < PI) {
         end += FullCircle
-    } else if (current < PI && new > PI) {
+    } else if (start < PI && end > PI) {
         start += FullCircle
     }
 
@@ -1279,9 +1289,10 @@ private val OuterCircleSizeRadius = 101.dp
 private val InnerCircleRadius = 69.dp
 private val ClockDisplayBottomMargin = 36.dp
 private val ClockFaceBottomMargin = 24.dp
-private val PeriodToggleTopMargin = 12.dp
 private val DisplaySeparatorWidth = 24.dp
 
+private val SupportLabelTop = 7.dp
+private val TimeInputBottomPadding = 24.dp
 private val MaxDistance = 74.dp
 private val MinimumInteractiveSize = 48.dp
 private val Minutes = listOf(0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55)

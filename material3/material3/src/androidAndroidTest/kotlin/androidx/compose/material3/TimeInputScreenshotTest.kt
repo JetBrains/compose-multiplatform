@@ -62,6 +62,23 @@ class TimeInputScreenshotTest(private val scheme: ColorSchemeWrapper) {
         rule.assertAgainstGolden("timeInput_12h_hourFocused_${scheme.name}")
     }
 
+    @Test
+    fun timeInput_24h_hourFocused() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(Modifier.testTag(TestTag)) {
+                TimeInput(
+                    state = rememberTimePickerState(
+                        initialHour = 22,
+                        initialMinute = 23,
+                        is24Hour = true,
+                    )
+                )
+            }
+        }
+
+        rule.assertAgainstGolden("timeInput_24h_hourFocused_${scheme.name}")
+    }
+
     private fun ComposeContentTestRule.assertAgainstGolden(goldenName: String) {
         this.onNodeWithTag(TestTag)
             .captureToImage()

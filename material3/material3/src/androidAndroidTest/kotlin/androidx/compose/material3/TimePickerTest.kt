@@ -72,7 +72,6 @@ import org.mockito.quality.Strictness
 @OptIn(ExperimentalMaterial3Api::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
-
 class TimePickerTest {
 
     @get:Rule
@@ -417,6 +416,37 @@ class TimePickerTest {
             .performClick()
 
         // Value didn't change
+        assertThat(state.hour).isEqualTo(22)
+    }
+
+    @Test
+    fun timeInput_24Hour_noAmPm_Toggle() {
+        val state = TimePickerState(initialHour = 22, initialMinute = 23, is24Hour = true)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            TimeInput(state)
+        }
+
+        rule.onNodeWithText("PM").assertDoesNotExist()
+
+        rule.onNodeWithText("AM").assertDoesNotExist()
+    }
+
+    @Test
+    @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
+    fun timeInput_24Hour_writeAfternoonHour() {
+        val state = TimePickerState(initialHour = 10, initialMinute = 23, is24Hour = true)
+
+        rule.setMaterialContent(lightColorScheme()) {
+            TimeInput(state)
+        }
+
+        rule.onNodeWithText("10")
+            .performKeyInput {
+                pressKey(Key.Two)
+                pressKey(Key.Two)
+            }
+
         assertThat(state.hour).isEqualTo(22)
     }
 }
