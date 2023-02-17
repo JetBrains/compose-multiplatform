@@ -95,6 +95,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteAllCommand
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
@@ -417,8 +419,21 @@ internal fun CoreTextField(
                 false
             }
         }
-        setText {
-            state.onValueChange(TextFieldValue(it.text, TextRange(it.text.length)))
+        setText { text ->
+            // If the action is performed while in an active text editing session, treat this like
+            // an IME command and update the text by going through the buffer. This keeps the buffer
+            // state consistent if other IME commands are performed before the next recomposition,
+            // and is used for the testing code path.
+            state.inputSession?.let { session ->
+                TextFieldDelegate.onEditCommand(
+                    ops = listOf(DeleteAllCommand(), CommitTextCommand(text, 1)),
+                    editProcessor = state.processor,
+                    state.onValueChange,
+                    session
+                )
+            } ?: run {
+                state.onValueChange(TextFieldValue(text.text, TextRange(text.text.length)))
+            }
             true
         }
         setSelection { selectionStart, selectionEnd, relativeToOriginalText ->
@@ -956,9 +971,11 @@ internal suspend fun BringIntoViewRequester.bringSelectionEndIntoView(
         selectionEndInTransformed < textLayoutResult.layoutInput.text.length -> {
             textLayoutResult.getBoundingBox(selectionEndInTransformed)
         }
+
         selectionEndInTransformed != 0 -> {
             textLayoutResult.getBoundingBox(selectionEndInTransformed - 1)
         }
+
         else -> { // empty text.
             val defaultSize = computeSizeForDefaultText(
                 textDelegate.style,

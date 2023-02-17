@@ -185,7 +185,7 @@ internal class TextFieldDelegate {
          * @param onValueChange The callback called when the new editor state arrives.
          */
         @JvmStatic
-        private fun onEditCommand(
+        internal fun onEditCommand(
             ops: List<EditCommand>,
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit,
