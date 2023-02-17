@@ -110,6 +110,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("TextFieldValue") { TextFieldValueDemo() },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
                 ComposableDemo("Focus immediately") { FocusTextFieldImmediatelyDemo() },
+                ComposableDemo("Secondary input system") { PlatformTextInputAdapterDemo() },
             )
         ),
         DemoCategory(

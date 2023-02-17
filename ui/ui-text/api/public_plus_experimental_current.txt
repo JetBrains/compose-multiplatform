@@ -1083,6 +1083,41 @@ package androidx.compose.ui.text.input {
     property public final char mask;
   }
 
+  @androidx.compose.ui.text.ExperimentalTextApi public sealed interface PlatformTextInput {
+    method public void releaseInputFocus();
+    method public void requestInputFocus();
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public interface PlatformTextInputAdapter {
+    method public android.view.inputmethod.InputConnection? createInputConnection(android.view.inputmethod.EditorInfo outAttrs);
+    method public androidx.compose.ui.text.input.TextInputForTests? getInputForTests();
+    method public default void onDisposed();
+    property public abstract androidx.compose.ui.text.input.TextInputForTests? inputForTests;
+  }
+
+  @androidx.compose.runtime.Immutable @androidx.compose.ui.text.ExperimentalTextApi public fun interface PlatformTextInputPlugin<T extends androidx.compose.ui.text.input.PlatformTextInputAdapter> {
+    method public T createAdapter(androidx.compose.ui.text.input.PlatformTextInput platformTextInput, android.view.View view);
+  }
+
+  @androidx.compose.runtime.Stable @androidx.compose.ui.text.ExperimentalTextApi public sealed interface PlatformTextInputPluginRegistry {
+    method @androidx.compose.runtime.Composable public <T extends androidx.compose.ui.text.input.PlatformTextInputAdapter> T rememberAdapter(androidx.compose.ui.text.input.PlatformTextInputPlugin<T> plugin);
+  }
+
+  @androidx.compose.ui.text.InternalTextApi public final class PlatformTextInputPluginRegistryImpl implements androidx.compose.ui.text.input.PlatformTextInputPluginRegistry {
+    ctor public PlatformTextInputPluginRegistryImpl(kotlin.jvm.functions.Function2<? super androidx.compose.ui.text.input.PlatformTextInputPlugin<?>,? super androidx.compose.ui.text.input.PlatformTextInput,? extends androidx.compose.ui.text.input.PlatformTextInputAdapter> factory);
+    method public androidx.compose.ui.text.input.PlatformTextInputAdapter? getFocusedAdapter();
+    method @androidx.compose.ui.text.InternalTextApi public <T extends androidx.compose.ui.text.input.PlatformTextInputAdapter> androidx.compose.ui.text.input.PlatformTextInputPluginRegistryImpl.AdapterHandle<T> getOrCreateAdapter(androidx.compose.ui.text.input.PlatformTextInputPlugin<T> plugin);
+    method @androidx.compose.runtime.Composable public <T extends androidx.compose.ui.text.input.PlatformTextInputAdapter> T rememberAdapter(androidx.compose.ui.text.input.PlatformTextInputPlugin<T> plugin);
+    property public final androidx.compose.ui.text.input.PlatformTextInputAdapter? focusedAdapter;
+  }
+
+  @androidx.compose.ui.text.InternalTextApi public static final class PlatformTextInputPluginRegistryImpl.AdapterHandle<T extends androidx.compose.ui.text.input.PlatformTextInputAdapter> {
+    ctor public PlatformTextInputPluginRegistryImpl.AdapterHandle(T adapter, kotlin.jvm.functions.Function0<java.lang.Boolean> onDispose);
+    method public boolean dispose();
+    method public T getAdapter();
+    property public final T adapter;
+  }
+
   public interface PlatformTextInputService {
     method public void hideSoftwareKeyboard();
     method public default void notifyFocusedRect(androidx.compose.ui.geometry.Rect rect);
@@ -1147,6 +1182,11 @@ package androidx.compose.ui.text.input {
     method public static androidx.compose.ui.text.AnnotatedString getSelectedText(androidx.compose.ui.text.input.TextFieldValue);
     method public static androidx.compose.ui.text.AnnotatedString getTextAfterSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
     method public static androidx.compose.ui.text.AnnotatedString getTextBeforeSelection(androidx.compose.ui.text.input.TextFieldValue, int maxChars);
+  }
+
+  @androidx.compose.ui.text.ExperimentalTextApi public interface TextInputForTests {
+    method public void inputTextForTest(String text);
+    method @androidx.compose.ui.text.ExperimentalTextApi public void submitTextForTest();
   }
 
   public class TextInputService {
