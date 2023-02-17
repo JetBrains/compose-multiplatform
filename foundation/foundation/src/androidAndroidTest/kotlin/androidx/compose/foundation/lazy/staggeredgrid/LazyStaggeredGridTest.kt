@@ -1693,4 +1693,159 @@ class LazyStaggeredGridTest(
         assertThat(state.firstVisibleItemIndex).isEqualTo(8)
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
     }
+
+    @Test
+    fun initialIndex_largerThanItemCount_ordersItemsCorrectly_withFullSpan() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState(20)
+            Box(Modifier.mainAxisSize(itemSizeDp * 4)) {
+                LazyStaggeredGrid(
+                    lanes = 3,
+                    state = state,
+                    modifier = Modifier
+                        .crossAxisSize(itemSizeDp * 3)
+                        .testTag(LazyStaggeredGridTag),
+                ) {
+                    item(span = StaggeredGridItemSpan.FullLine) {
+                        Spacer(
+                            Modifier
+                                .testTag("full")
+                                .mainAxisSize(itemSizeDp * 2)
+                        )
+                    }
+                    items(6) {
+                        val size = when (it) {
+                            0, 3 -> itemSizeDp * 2
+                            1, 4 -> itemSizeDp * 1.5f
+                            2, 5 -> itemSizeDp
+                            else -> error("unexpected item $it")
+                        }
+                        Spacer(
+                            Modifier
+                                .testTag("$it")
+                                .mainAxisSize(size)
+                        )
+                    }
+                }
+            }
+        }
+
+        // ┌───────────┐
+        // │           │
+        // │   full    │ <-- scroll offset
+        // │           │
+        // ├───┬───┬───┤
+        // │ 0 │ 1 │ 2 │
+        // │   │   ├───┤
+        // │   │───┤ 3 │
+        // ├───┤ 4 │   │
+        // │ 5 │   │   │
+        // └───┴───┴───┘ <-- end of grid
+
+        rule.onNodeWithTag("full")
+            .assertAxisBounds(
+                DpOffset(0.dp, -itemSizeDp), DpSize(itemSizeDp * 3, itemSizeDp * 2)
+            )
+
+        rule.onNodeWithTag("0")
+            .assertAxisBounds(
+                DpOffset(0.dp, itemSizeDp), DpSize(itemSizeDp, itemSizeDp * 2f)
+            )
+
+        rule.onNodeWithTag("1")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp, itemSizeDp), DpSize(itemSizeDp, itemSizeDp * 1.5f)
+            )
+
+        rule.onNodeWithTag("2")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp * 2f, itemSizeDp), DpSize(itemSizeDp, itemSizeDp)
+            )
+
+        rule.onNodeWithTag("3")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp * 2f, itemSizeDp * 2f), DpSize(itemSizeDp, itemSizeDp * 2)
+            )
+
+        rule.onNodeWithTag("4")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp, itemSizeDp * 2.5f), DpSize(itemSizeDp, itemSizeDp * 1.5f)
+            )
+
+        rule.onNodeWithTag("5")
+            .assertAxisBounds(
+                DpOffset(0.dp, itemSizeDp * 3), DpSize(itemSizeDp, itemSizeDp)
+            )
+    }
+
+    @Test
+    fun initialIndex_largerThanItemCount_ordersItemsCorrectly() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState(20)
+            Box(Modifier.mainAxisSize(itemSizeDp * 4)) {
+                LazyStaggeredGrid(
+                    lanes = 3,
+                    state = state,
+                    modifier = Modifier
+                        .crossAxisSize(itemSizeDp * 3)
+                        .testTag(LazyStaggeredGridTag),
+                ) {
+                    items(6) {
+                        val size = when (it) {
+                            0, 3 -> itemSizeDp * 2
+                            1, 4 -> itemSizeDp * 1.5f
+                            2, 5 -> itemSizeDp
+                            else -> error("unexpected item $it")
+                        }
+                        Spacer(
+                            Modifier
+                                .testTag("$it")
+                                .mainAxisSize(size)
+                        )
+                    }
+                }
+            }
+        }
+
+        // ┌───┬───┬───┐
+        // │ 0 │ 1 │ 2 │
+        // │   │   ├───┤
+        // │   │───┤ 3 │
+        // ├───┤ 4 │   │
+        // │ 5 │   │   │
+        // └───┴───┴───┘
+
+        rule.onNodeWithTag(LazyStaggeredGridTag)
+            .assertMainAxisSizeIsEqualTo(itemSizeDp * 3)
+
+        rule.onNodeWithTag("0")
+            .assertAxisBounds(
+                DpOffset(0.dp, 0.dp), DpSize(itemSizeDp, itemSizeDp * 2f)
+            )
+
+        rule.onNodeWithTag("1")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp, 0.dp), DpSize(itemSizeDp, itemSizeDp * 1.5f)
+            )
+
+        rule.onNodeWithTag("2")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp * 2f, 0.dp), DpSize(itemSizeDp, itemSizeDp)
+            )
+
+        rule.onNodeWithTag("3")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp * 2f, itemSizeDp), DpSize(itemSizeDp, itemSizeDp * 2)
+            )
+
+        rule.onNodeWithTag("4")
+            .assertAxisBounds(
+                DpOffset(itemSizeDp, itemSizeDp * 1.5f), DpSize(itemSizeDp, itemSizeDp * 1.5f)
+            )
+
+        rule.onNodeWithTag("5")
+            .assertAxisBounds(
+                DpOffset(0.dp, itemSizeDp * 2), DpSize(itemSizeDp, itemSizeDp)
+            )
+    }
 }

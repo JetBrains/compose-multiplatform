@@ -552,10 +552,24 @@ private fun LazyStaggeredGridMeasureContext.measure(
             val toScrollBack = mainAxisAvailableSize - currentItemOffsets[maxOffsetLane]
             firstItemOffsets.offsetBy(-toScrollBack)
             currentItemOffsets.offsetBy(toScrollBack)
+
+            var gapDetected = false
             while (
                 firstItemOffsets.any { it < beforeContentPadding }
             ) {
+                // We choose the minimum offset value and try to put items on top.
+                // Note that it is different from initial pass up where we selected largest index
+                // instead. The reason is that we already distributed items on downward pass and
+                // gap would be incorrect if those are moved.
                 val laneIndex = firstItemOffsets.indexOfMinValue()
+
+                if (laneIndex != firstItemIndices.indexOfMaxValue()) {
+                    // If min offset lane doesn't have largest value, it means items are misaligned.
+                    // The correct thing here is to restart measure. We will measure up to the end
+                    // and restart measure from there after this pass.
+                    gapDetected = true
+                }
+
                 val currentIndex =
                     if (firstItemIndices[laneIndex] == -1) {
                         itemCount
@@ -567,7 +581,7 @@ private fun LazyStaggeredGridMeasureContext.measure(
                     findPreviousItemIndex(currentIndex, laneIndex)
 
                 if (previousIndex < 0) {
-                    if (misalignedStart(laneIndex) && canRestartMeasure) {
+                    if ((gapDetected || misalignedStart(laneIndex)) && canRestartMeasure) {
                         laneInfo.reset()
                         return measure(
                             initialScrollDelta = scrollDelta,
@@ -591,12 +605,32 @@ private fun LazyStaggeredGridMeasureContext.measure(
                 val offset = firstItemOffsets.maxInRange(spanRange)
                 val gaps = if (spanRange.isFullSpan) laneInfo.getGaps(previousIndex) else null
                 spanRange.forEach { lane ->
+                    if (firstItemOffsets[lane] != offset) {
+                        // Some items below fully spanned item don't match it exactly. We skip over,
+                        // but this should be corrected through remeasure.
+                        gapDetected = true
+                    }
+
                     measuredItems[lane].addFirst(measuredItem)
                     firstItemIndices[lane] = previousIndex
                     val gap = if (gaps == null) 0 else gaps[lane]
                     firstItemOffsets[lane] = offset + measuredItem.sizeWithSpacings + gap
                 }
             }
+
+            // If incorrectly offset lanes were detected before, restart measure from the current
+            // point. Incorrectly offset items will be redistributed to the correct lanes on the
+            // downward pass.
+            if (gapDetected && canRestartMeasure) {
+                laneInfo.reset()
+                return measure(
+                    initialScrollDelta = scrollDelta,
+                    initialItemIndices = firstItemIndices,
+                    initialItemOffsets = firstItemOffsets,
+                    canRestartMeasure = false
+                )
+            }
+
             scrollDelta += toScrollBack
 
             val minOffsetLane = firstItemOffsets.indexOfMinValue()
