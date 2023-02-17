@@ -29,6 +29,7 @@ import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
 import org.jetbrains.kotlin.gradle.plugin.getKotlinPluginVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+import org.jetbrains.kotlin.gradle.dsl.KotlinJsCompile
 
 internal val composeVersion get() = ComposeBuildConfig.composeVersion
 
@@ -61,6 +62,37 @@ class ComposePlugin : Plugin<Project> {
                             composeExtension.kotlinCompilerPluginArgs.get().flatMap { arg ->
                                 listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:$arg")
                             }
+                }
+            }
+
+            project.tasks.withType(KotlinJsCompile::class.java).configureEach {
+                it.kotlinOptions.apply {
+                    freeCompilerArgs += "-Xklib-enable-signature-clash-checks=false"
+                }
+            }
+        }
+
+        project.configurations.all {
+            // TODO: remove these HACKS for version substitution when possible
+            val conf = it
+            conf.resolutionStrategy.eachDependency {
+                if (project.getKotlinPluginVersion() == "1.8.20-Beta") {
+                    if (it.requested.module.name.contains("kotlin-stdlib")) {
+                        it.useVersion("1.8.20-Beta")
+                    }
+                }
+                val isWasm = conf.name.contains("wasm", true)
+
+                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                    it.requested.module.name.contains("kotlinx-coroutines", true)
+                ) {
+                    if (isWasm) it.useVersion("1.6.4-wasm3")
+                }
+
+                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                    it.requested.module.name.contains("atomicfu", true)
+                ) {
+                    if (isWasm) it.useVersion("0.18.5-wasm0")
                 }
             }
         }
