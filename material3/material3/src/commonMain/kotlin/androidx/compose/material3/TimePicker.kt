@@ -49,6 +49,11 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.tokens.MotionTokens
 import androidx.compose.material3.tokens.TimeInputTokens
+import androidx.compose.material3.tokens.TimeInputTokens.PeriodSelectorContainerHeight
+import androidx.compose.material3.tokens.TimeInputTokens.PeriodSelectorContainerWidth
+import androidx.compose.material3.tokens.TimeInputTokens.TimeFieldContainerHeight
+import androidx.compose.material3.tokens.TimeInputTokens.TimeFieldContainerWidth
+import androidx.compose.material3.tokens.TimeInputTokens.TimeFieldSeparatorColor
 import androidx.compose.material3.tokens.TimePickerTokens
 import androidx.compose.material3.tokens.TimePickerTokens.ClockDialColor
 import androidx.compose.material3.tokens.TimePickerTokens.ClockDialContainerSize
@@ -156,6 +161,7 @@ import kotlinx.coroutines.launch
  * ![Time picker image](https://developer.android.com/images/reference/androidx/compose/material3/time-picker.png)
  *
  * @sample androidx.compose.material3.samples.TimePickerSample
+ * @sample androidx.compose.material3.samples.TimePickerSwitchableSample
  *
  * [state] state for this timepicker, allows to subscribe to changes to [TimePickerState.hour] and
  * [TimePickerState.minute], and set the initial time for this picker.
@@ -214,75 +220,90 @@ fun TimeInput(
         modifier = modifier.padding(bottom = TimeInputBottomPadding),
         verticalAlignment = Alignment.Top
     ) {
-        TimePickerTextField(
-            modifier = Modifier
-                .onKeyEvent { event ->
-                    // Zero == 48, Nine == 57
-                    val switchFocus = event.utf16CodePoint in 48..57 &&
-                        hourValue.selection.start == 2 && hourValue.text.length == 2
+        val textStyle = MaterialTheme.typography.fromToken(TimeInputTokens.TimeFieldLabelTextFont)
+            .copy(
+                textAlign = TextAlign.Center,
+                color = colors.timeSelectorContentColor(true)
+            )
 
-                    if (switchFocus) {
-                        state.selection = Selection.Minute
-                    }
+        CompositionLocalProvider(LocalTextStyle provides textStyle) {
+            TimePickerTextField(
+                modifier = Modifier
+                    .onKeyEvent { event ->
+                        // Zero == 48, Nine == 57
+                        val switchFocus = event.utf16CodePoint in 48..57 &&
+                            hourValue.selection.start == 2 && hourValue.text.length == 2
 
-                    false
+                        if (switchFocus) {
+                            state.selection = Selection.Minute
+                        }
+
+                        false
+                    },
+                value = hourValue,
+                onValueChange = { newValue ->
+                    timeInputOnChange(
+                        selection = Selection.Hour,
+                        state = state,
+                        value = newValue,
+                        prevValue = hourValue,
+                        max = if (state.is24hour) 23 else 12,
+                    ) { hourValue = it }
                 },
-            value = hourValue,
-            onValueChange = { newValue ->
-                timeInputOnChange(
-                    selection = Selection.Hour,
-                    state = state,
-                    value = newValue,
-                    prevValue = hourValue,
-                    max = if (state.is24hour) 23 else 12,
-                ) { hourValue = it }
-            },
-            state = state,
-            selection = Selection.Hour,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Next,
-                keyboardType = KeyboardType.Number
-            ),
-            keyboardActions = KeyboardActions(onNext = { state.selection = Selection.Minute }),
-            colors = colors,
-        )
-        DisplaySeparator()
-        TimePickerTextField(
-            modifier = Modifier
-                .onPreviewKeyEvent { event ->
-                    // 0 == KEYCODE_DEL
-                    val switchFocus = event.utf16CodePoint == 0 &&
-                        minuteValue.selection.start == 0
+                state = state,
+                selection = Selection.Hour,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Next,
+                    keyboardType = KeyboardType.Number
+                ),
+                keyboardActions = KeyboardActions(onNext = { state.selection = Selection.Minute }),
+                colors = colors,
+            )
+            DisplaySeparator(Modifier.size(DisplaySeparatorWidth, PeriodSelectorContainerHeight))
+            TimePickerTextField(
+                modifier = Modifier
+                    .onPreviewKeyEvent { event ->
+                        // 0 == KEYCODE_DEL
+                        val switchFocus = event.utf16CodePoint == 0 &&
+                            minuteValue.selection.start == 0
 
-                    if (switchFocus) {
-                        state.selection = Selection.Hour
-                    }
+                        if (switchFocus) {
+                            state.selection = Selection.Hour
+                        }
 
-                    switchFocus
+                        switchFocus
+                    },
+
+                value = minuteValue,
+                onValueChange = { newValue ->
+                    timeInputOnChange(
+                        selection = Selection.Minute,
+                        state = state,
+                        value = newValue,
+                        prevValue = minuteValue,
+                        max = 59,
+                    ) { minuteValue = it }
                 },
-
-            value = minuteValue,
-            onValueChange = { newValue ->
-                timeInputOnChange(
-                    selection = Selection.Minute,
-                    state = state,
-                    value = newValue,
-                    prevValue = minuteValue,
-                    max = 59,
-                ) { minuteValue = it }
-            },
-            state = state,
-            selection = Selection.Minute,
-            keyboardOptions = KeyboardOptions(
-                imeAction = ImeAction.Done,
-                keyboardType = KeyboardType.Number
-            ),
-            keyboardActions = KeyboardActions(onNext = { state.selection = Selection.Minute }),
-            colors = colors,
-        )
+                state = state,
+                selection = Selection.Minute,
+                keyboardOptions = KeyboardOptions(
+                    imeAction = ImeAction.Done,
+                    keyboardType = KeyboardType.Number
+                ),
+                keyboardActions = KeyboardActions(onNext = { state.selection = Selection.Minute }),
+                colors = colors,
+            )
+        }
 
         if (!state.is24hour) {
-            PeriodToggle(state = state, colors = colors)
+            PeriodToggle(
+                modifier = Modifier.size(
+                    PeriodSelectorContainerWidth,
+                    PeriodSelectorContainerHeight
+                ),
+                state = state,
+                colors = colors
+            )
         }
     }
 }
@@ -661,30 +682,56 @@ class TimePickerState(
 @Composable
 private fun ClockDisplay(state: TimePickerState, colors: TimePickerColors) {
     Row(horizontalArrangement = Arrangement.Center) {
-        TimeSelector(
-            modifier = Modifier,
-            value = state.hourForDisplay,
-            state = state,
-            selection = Selection.Hour,
-            colors = colors
-        )
-        DisplaySeparator()
-        TimeSelector(
-            modifier = Modifier,
-            value = state.minute,
-            state = state,
-            selection = Selection.Minute,
-            colors = colors
-        )
-        if (!state.is24hour) {
-            PeriodToggle(state, colors)
+        CompositionLocalProvider(
+            LocalTextStyle provides MaterialTheme.typography.fromToken(TimeSelectorLabelTextFont)
+        ) {
+            TimeSelector(
+                modifier = Modifier.size(
+                    TimeSelectorContainerWidth,
+                    TimeSelectorContainerHeight
+                ),
+                value = state.hourForDisplay,
+                state = state,
+                selection = Selection.Hour,
+                colors = colors,
+            )
+            DisplaySeparator(
+                Modifier.size(
+                    DisplaySeparatorWidth,
+                    PeriodSelectorVerticalContainerHeight
+                )
+            )
+            TimeSelector(
+                modifier = Modifier.size(
+                    TimeSelectorContainerWidth,
+                    TimeSelectorContainerHeight
+                ),
+                value = state.minute,
+                state = state,
+                selection = Selection.Minute,
+                colors = colors,
+            )
+            if (!state.is24hour) {
+                PeriodToggle(
+                    Modifier.size(
+                        PeriodSelectorVerticalContainerWidth,
+                        PeriodSelectorVerticalContainerHeight
+                    ),
+                    state,
+                    colors
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PeriodToggle(state: TimePickerState, colors: TimePickerColors) {
+private fun PeriodToggle(
+    modifier: Modifier,
+    state: TimePickerState,
+    colors: TimePickerColors
+) {
     val borderStroke = BorderStroke(
         TimePickerTokens.PeriodSelectorOutlineWidth,
         colors.periodSelectorBorderColor
@@ -696,7 +743,7 @@ private fun PeriodToggle(state: TimePickerState, colors: TimePickerColors) {
         .padding(start = PeriodToggleMargin)
         .semantics { this.contentDescription = contentDescription }
         .selectableGroup()
-        .size(PeriodSelectorVerticalContainerWidth, PeriodSelectorVerticalContainerHeight)
+        .then(modifier)
         .border(border = borderStroke, shape = shape)
     ) {
         ToggleItem(
@@ -753,9 +800,9 @@ private fun ColumnScope.ToggleItem(
 }
 
 @Composable
-private fun DisplaySeparator() {
+private fun DisplaySeparator(modifier: Modifier) {
     val style = copyAndSetFontPadding(
-        style = MaterialTheme.typography.fromToken(TimeSelectorLabelTextFont).copy(
+        style = LocalTextStyle.current.copy(
             textAlign = TextAlign.Center,
             lineHeightStyle = LineHeightStyle(
                 alignment = LineHeightStyle.Alignment.Center, trim = LineHeightStyle.Trim.Both
@@ -764,11 +811,15 @@ private fun DisplaySeparator() {
     )
 
     Box(
-        modifier = Modifier.size(
-            DisplaySeparatorWidth,
-            PeriodSelectorVerticalContainerHeight
-        ), contentAlignment = Alignment.Center
-    ) { Text(text = ":", style = style) }
+        modifier = modifier,
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = ":",
+            color = TimeFieldSeparatorColor.toColor(),
+            style = style
+        )
+    }
 }
 
 @Composable
@@ -797,8 +848,7 @@ private fun TimeSelector(
             .semantics(mergeDescendants = true) {
                 role = Role.RadioButton
                 this.contentDescription = selectorContentDescription
-            }
-            .size(TimeSelectorContainerWidth, TimeSelectorContainerHeight),
+            },
         onClick = {
             if (selection != state.selection) {
                 state.selection = selection
@@ -819,12 +869,10 @@ private fun TimeSelector(
             value
         )
         Box(contentAlignment = Alignment.Center) {
-            val textStyle = MaterialTheme.typography.fromToken(TimeSelectorLabelTextFont)
             Text(
                 modifier = Modifier.semantics { contentDescription = valueContentDescription },
                 text = value.toLocalString(minDigits = 2),
                 color = contentColor,
-                style = textStyle,
             )
         }
     }
@@ -1118,7 +1166,7 @@ private fun TimePickerTextField(
     Column(modifier = modifier) {
         if (!selected) {
             TimeSelector(
-                modifier = Modifier,
+                modifier = Modifier.size(TimeFieldContainerWidth, TimeFieldContainerHeight),
                 value = if (selection == Selection.Hour) state.hourForDisplay else state.minute,
                 state = state,
                 selection = selection,
@@ -1126,24 +1174,17 @@ private fun TimePickerTextField(
             )
         }
 
-        val textStyle = MaterialTheme.typography
-            .fromToken(TimeSelectorLabelTextFont)
-            .copy(
-                textAlign = TextAlign.Center,
-                color = colors.timeSelectorContentColor(true)
-            )
-
         Box(Modifier.visible(selected)) {
             BasicTextField(
                 value = value,
                 onValueChange = onValueChange,
                 modifier = Modifier
                     .focusRequester(focusRequester)
-                    .size(TimeSelectorContainerWidth, TimeSelectorContainerHeight),
+                    .size(TimeFieldContainerWidth, TimeFieldContainerHeight),
                 interactionSource = interactionSource,
                 keyboardOptions = keyboardOptions,
                 keyboardActions = keyboardActions,
-                textStyle = textStyle,
+                textStyle = LocalTextStyle.current,
                 enabled = true,
                 singleLine = true,
                 cursorBrush = Brush.verticalGradient(
@@ -1186,8 +1227,10 @@ private fun TimePickerTextField(
                     Strings.TimePickerMinute
                 }
             ),
-            style = MaterialTheme.typography.fromToken(TimeInputTokens.TimeFieldSupportingTextFont)
-                .copy(color = TimeInputTokens.TimeFieldSupportingTextColor.toColor())
+            color = TimeInputTokens.TimeFieldSupportingTextColor.toColor(),
+            style = MaterialTheme
+                .typography
+                .fromToken(TimeInputTokens.TimeFieldSupportingTextFont)
         )
     }
 
