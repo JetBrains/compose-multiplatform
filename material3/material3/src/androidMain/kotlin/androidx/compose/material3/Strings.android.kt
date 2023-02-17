@@ -176,6 +176,8 @@ internal actual fun getString(string: Strings): String {
             androidx.compose.material3.R.string.time_picker_hour)
         Strings.TimePickerMinute -> resources.getString(
             androidx.compose.material3.R.string.time_picker_minute)
+        Strings.TooltipPaneDescription -> resources.getString(
+            androidx.compose.material3.R.string.tooltip_pane_description)
         else -> ""
     }
 }

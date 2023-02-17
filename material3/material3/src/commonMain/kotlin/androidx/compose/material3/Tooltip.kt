@@ -24,7 +24,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.MutatePriority
 import androidx.compose.foundation.MutatorMutex
-import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
@@ -57,9 +56,8 @@ import androidx.compose.ui.input.pointer.PointerEventTimeoutCancellationExceptio
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.debugInspectorInfo
-import androidx.compose.ui.semantics.LiveRegionMode
-import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.onLongClick
+import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -67,7 +65,6 @@ import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -249,7 +246,8 @@ private fun TooltipBox(
     Box {
         val transition = updateTransition(tooltipState.isVisible, label = "Tooltip transition")
         if (transition.currentState || transition.targetState) {
-            Popup(
+            val tooltipPaneDescription = getString(Strings.TooltipPaneDescription)
+            TooltipPopup(
                 popupPositionProvider = tooltipPositionProvider,
                 onDismissRequest = {
                     if (tooltipState.isVisible) {
@@ -265,8 +263,7 @@ private fun TooltipBox(
                             minHeight = TooltipMinHeight
                         )
                         .animateTooltip(transition)
-                        .focusable()
-                        .semantics { liveRegion = LiveRegionMode.Polite },
+                        .semantics { paneTitle = tooltipPaneDescription },
                     shape = shape,
                     color = containerColor,
                     shadowElevation = elevation,
@@ -426,121 +423,6 @@ class RichTooltipColors(
     }
 }
 
-private class PlainTooltipPositionProvider(
-    val tooltipAnchorPadding: Int
-) : PopupPositionProvider {
-    override fun calculatePosition(
-        anchorBounds: IntRect,
-        windowSize: IntSize,
-        layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
-    ): IntOffset {
-        val x = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2
-
-        // Tooltip prefers to be above the anchor,
-        // but if this causes the tooltip to overlap with the anchor
-        // then we place it below the anchor
-        var y = anchorBounds.top - popupContentSize.height - tooltipAnchorPadding
-        if (y < 0)
-            y = anchorBounds.bottom + tooltipAnchorPadding
-        return IntOffset(x, y)
-    }
-}
-
-private data class RichTooltipPositionProvider(
-    val tooltipAnchorPadding: Int
-) : PopupPositionProvider {
-    override fun calculatePosition(
-        anchorBounds: IntRect,
-        windowSize: IntSize,
-        layoutDirection: LayoutDirection,
-        popupContentSize: IntSize
-    ): IntOffset {
-        var x = anchorBounds.right
-        // Try to shift it to the left of the anchor
-        // if the tooltip would collide with the right side of the screen
-        if (x + popupContentSize.width > windowSize.width) {
-            x = anchorBounds.left - popupContentSize.width
-            // Center if it'll also collide with the left side of the screen
-            if (x < 0) x = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2
-        }
-
-        // Tooltip prefers to be above the anchor,
-        // but if this causes the tooltip to overlap with the anchor
-        // then we place it below the anchor
-        var y = anchorBounds.top - popupContentSize.height - tooltipAnchorPadding
-        if (y < 0)
-            y = anchorBounds.bottom + tooltipAnchorPadding
-        return IntOffset(x, y)
-    }
-}
-
-private fun Modifier.textVerticalPadding(
-    subheadExists: Boolean,
-    actionExists: Boolean
-): Modifier {
-    return if (!subheadExists && !actionExists) {
-        this.padding(vertical = PlainTooltipVerticalPadding)
-    } else {
-        this
-            .paddingFromBaseline(top = HeightFromSubheadToTextFirstLine)
-            .padding(bottom = TextBottomPadding)
-    }
-}
-
-private fun Modifier.animateTooltip(
-    transition: Transition<Boolean>
-): Modifier = composed(
-    inspectorInfo = debugInspectorInfo {
-        name = "animateTooltip"
-        properties["transition"] = transition
-    }
-) {
-    val scale by transition.animateFloat(
-        transitionSpec = {
-            if (false isTransitioningTo true) {
-                // show tooltip
-                tween(
-                    durationMillis = TooltipFadeInDuration,
-                    easing = LinearOutSlowInEasing
-                )
-            } else {
-                // dismiss tooltip
-                tween(
-                    durationMillis = TooltipFadeOutDuration,
-                    easing = LinearOutSlowInEasing
-                )
-            }
-        },
-        label = "tooltip transition: scaling"
-    ) { if (it) 1f else 0.8f }
-
-    val alpha by transition.animateFloat(
-        transitionSpec = {
-            if (false isTransitioningTo true) {
-                // show tooltip
-                tween(
-                    durationMillis = TooltipFadeInDuration,
-                    easing = LinearEasing
-                )
-            } else {
-                // dismiss tooltip
-                tween(
-                    durationMillis = TooltipFadeOutDuration,
-                    easing = LinearEasing
-                )
-            }
-        },
-        label = "tooltip transition: alpha"
-    ) { if (it) 1f else 0f }
-
-    this.graphicsLayer(
-        scaleX = scale,
-        scaleY = scale,
-        alpha = alpha
-    )
-}
-
 /**
  * Scope of [PlainTooltipBox] and RichTooltipBox
  */
@@ -552,34 +434,6 @@ interface TooltipBoxScope {
      * the composable that this modifier is chained with.
      */
     fun Modifier.tooltipAnchor(): Modifier
-}
-
-/**
- * The state that is associated with an instance of a tooltip.
- * Each instance of tooltips should have its own [TooltipState] it
- * will be used to synchronize the tooltips shown via [TooltipSync].
- */
-@Stable
-@ExperimentalMaterial3Api
-internal sealed interface TooltipState {
-    /**
-     * [Boolean] that will be used to update the visibility
-     * state of the associated tooltip.
-     */
-    val isVisible: Boolean
-
-    /**
-     * Show the tooltip associated with the current [TooltipState].
-     * When this method is called all of the other tooltips currently
-     * being shown will dismiss.
-     */
-    suspend fun show()
-
-    /**
-     * Dismiss the tooltip associated with
-     * this [TooltipState] if it's currently being shown.
-     */
-    suspend fun dismiss()
 }
 
 /**
@@ -657,6 +511,83 @@ class PlainTooltipState : TooltipState {
      */
     override suspend fun dismiss() {
         TooltipSync.dismissCurrentTooltip(this)
+    }
+}
+
+/**
+ * The state that is associated with an instance of a tooltip.
+ * Each instance of tooltips should have its own [TooltipState] it
+ * will be used to synchronize the tooltips shown via [TooltipSync].
+ */
+@Stable
+@ExperimentalMaterial3Api
+internal sealed interface TooltipState {
+    /**
+     * [Boolean] that will be used to update the visibility
+     * state of the associated tooltip.
+     */
+    val isVisible: Boolean
+
+    /**
+     * Show the tooltip associated with the current [TooltipState].
+     * When this method is called all of the other tooltips currently
+     * being shown will dismiss.
+     */
+    suspend fun show()
+
+    /**
+     * Dismiss the tooltip associated with
+     * this [TooltipState] if it's currently being shown.
+     */
+    suspend fun dismiss()
+}
+
+private class PlainTooltipPositionProvider(
+    val tooltipAnchorPadding: Int
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize
+    ): IntOffset {
+        val x = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2
+
+        // Tooltip prefers to be above the anchor,
+        // but if this causes the tooltip to overlap with the anchor
+        // then we place it below the anchor
+        var y = anchorBounds.top - popupContentSize.height - tooltipAnchorPadding
+        if (y < 0)
+            y = anchorBounds.bottom + tooltipAnchorPadding
+        return IntOffset(x, y)
+    }
+}
+
+private data class RichTooltipPositionProvider(
+    val tooltipAnchorPadding: Int
+) : PopupPositionProvider {
+    override fun calculatePosition(
+        anchorBounds: IntRect,
+        windowSize: IntSize,
+        layoutDirection: LayoutDirection,
+        popupContentSize: IntSize
+    ): IntOffset {
+        var x = anchorBounds.right
+        // Try to shift it to the left of the anchor
+        // if the tooltip would collide with the right side of the screen
+        if (x + popupContentSize.width > windowSize.width) {
+            x = anchorBounds.left - popupContentSize.width
+            // Center if it'll also collide with the left side of the screen
+            if (x < 0) x = anchorBounds.left + (anchorBounds.width - popupContentSize.width) / 2
+        }
+
+        // Tooltip prefers to be above the anchor,
+        // but if this causes the tooltip to overlap with the anchor
+        // then we place it below the anchor
+        var y = anchorBounds.top - popupContentSize.height - tooltipAnchorPadding
+        if (y < 0)
+            y = anchorBounds.bottom + tooltipAnchorPadding
+        return IntOffset(x, y)
     }
 }
 
@@ -745,6 +676,78 @@ private object TooltipSync {
         }
     }
 }
+
+private fun Modifier.textVerticalPadding(
+    subheadExists: Boolean,
+    actionExists: Boolean
+): Modifier {
+    return if (!subheadExists && !actionExists) {
+        this.padding(vertical = PlainTooltipVerticalPadding)
+    } else {
+        this
+            .paddingFromBaseline(top = HeightFromSubheadToTextFirstLine)
+            .padding(bottom = TextBottomPadding)
+    }
+}
+
+private fun Modifier.animateTooltip(
+    transition: Transition<Boolean>
+): Modifier = composed(
+    inspectorInfo = debugInspectorInfo {
+        name = "animateTooltip"
+        properties["transition"] = transition
+    }
+) {
+    val scale by transition.animateFloat(
+        transitionSpec = {
+            if (false isTransitioningTo true) {
+                // show tooltip
+                tween(
+                    durationMillis = TooltipFadeInDuration,
+                    easing = LinearOutSlowInEasing
+                )
+            } else {
+                // dismiss tooltip
+                tween(
+                    durationMillis = TooltipFadeOutDuration,
+                    easing = LinearOutSlowInEasing
+                )
+            }
+        },
+        label = "tooltip transition: scaling"
+    ) { if (it) 1f else 0.8f }
+
+    val alpha by transition.animateFloat(
+        transitionSpec = {
+            if (false isTransitioningTo true) {
+                // show tooltip
+                tween(
+                    durationMillis = TooltipFadeInDuration,
+                    easing = LinearEasing
+                )
+            } else {
+                // dismiss tooltip
+                tween(
+                    durationMillis = TooltipFadeOutDuration,
+                    easing = LinearEasing
+                )
+            }
+        },
+        label = "tooltip transition: alpha"
+    ) { if (it) 1f else 0f }
+
+    this.graphicsLayer(
+        scaleX = scale,
+        scaleY = scale,
+        alpha = alpha
+    )
+}
+
+internal expect fun TooltipPopup(
+    popupPositionProvider: PopupPositionProvider,
+    onDismissRequest: () -> Unit,
+    content: @Composable () -> Unit
+)
 
 private val TooltipAnchorPadding = 4.dp
 internal val TooltipMinHeight = 24.dp
