@@ -83,6 +83,7 @@ abstract class ComposePlugin : Plugin<Project> {
             }
 
             disableSignatureClashCheck(project)
+            configureDependenciesForKWasm(project)
         }
     }
 
@@ -97,6 +98,33 @@ abstract class ComposePlugin : Plugin<Project> {
                 it.kotlinOptions.freeCompilerArgs += listOf(
                     "-Xklib-enable-signature-clash-checks=false",
                 )
+            }
+        }
+    }
+
+    private fun configureDependenciesForKWasm(project: Project) {
+        project.configurations.all {
+            // TODO: remove these HACKS for version substitution when possible
+            val conf = it
+            conf.resolutionStrategy.eachDependency {
+                if (project.getKotlinPluginVersion() == "1.8.20-Beta") {
+                    if (it.requested.module.name.contains("kotlin-stdlib")) {
+                        it.useVersion("1.8.20-Beta")
+                    }
+                }
+                val isWasm = conf.name.contains("wasm", true)
+
+                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                    it.requested.module.name.contains("kotlinx-coroutines", true)
+                ) {
+                    if (isWasm) it.useVersion("1.6.4-wasm3")
+                }
+
+                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                    it.requested.module.name.contains("atomicfu", true)
+                ) {
+                    if (isWasm) it.useVersion("0.18.5-wasm0")
+                }
             }
         }
     }
