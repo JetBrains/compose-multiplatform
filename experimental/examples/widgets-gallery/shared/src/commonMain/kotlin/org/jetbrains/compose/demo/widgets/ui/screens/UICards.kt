@@ -28,7 +28,7 @@ internal fun UICards() {
     Card(
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
         backgroundColor = MaterialTheme.colors.primary,
-        shape = RoundedCornerShape(topStart = 16.dp, bottomEnd = 16.dp)
+        shape = RoundedCornerShape(4.dp)
     ) {
         Column {
             Text(

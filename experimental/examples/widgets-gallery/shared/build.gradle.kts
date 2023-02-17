@@ -15,17 +15,25 @@ kotlin {
     ios()
     iosSimulatorArm64()
 
-    cocoapods {
-        summary = "Shared code for the sample"
-        homepage = "https://github.com/JetBrains/compose-jb"
-        ios.deploymentTarget = "14.1"
-        podfile = project.file("../iosApp/Podfile")
-        framework {
-            baseName = "shared"
-            isStatic = true
-        }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+    js(IR) {
+        browser()
     }
+    wasm {
+        browser()
+    }
+
+    // TODO: uncomment. Commented to simplify running other targets on machines w/o the env cocoapods setup
+//    cocoapods {
+//        summary = "Shared code for the sample"
+//        homepage = "https://github.com/JetBrains/compose-jb"
+//        ios.deploymentTarget = "14.1"
+//        podfile = project.file("../iosApp/Podfile")
+//        framework {
+//            baseName = "shared"
+//            isStatic = true
+//        }
+//        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+//    }
 
     sourceSets {
         val commonMain by getting {
@@ -34,7 +42,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
+                implementation("org.jetbrains.compose.components:components-resources:1.3.0-dev-wasm-02")
             }
         }
         val androidMain by getting {
@@ -57,6 +65,24 @@ kotlin {
                 implementation(compose.desktop.common)
             }
         }
+
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
+        }
+    }
+}
+
+project.afterEvaluate {
+    //Disable jsWasmMain intermediate sourceset compilation
+    tasks.named("compileJsWasmMainKotlinMetadata") {
+        enabled = false
     }
 }
 

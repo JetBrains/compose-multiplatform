@@ -3,6 +3,8 @@ pluginManagement {
         gradlePluginPortal()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        maven("https://packages.jetbrains.team/maven/p/karpovich-sandbox/ksandbox")
     }
 
     plugins {
@@ -22,6 +24,7 @@ pluginManagement {
 
 rootProject.name = "widgets-gallery"
 
-include(":androidApp")
+//include(":androidApp")
 include(":shared")
 include(":desktopApp")
+include(":webApp")
