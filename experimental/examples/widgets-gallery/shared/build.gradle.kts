@@ -34,7 +34,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.compose.components:components-resources:1.3.0-beta04-dev879")
+                implementation("org.jetbrains.compose.components:components-resources:1.4.0-alpha01-dev942")
             }
         }
         val androidMain by getting {
@@ -63,7 +63,7 @@ kotlin {
 android {
     compileSdk = 33
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
-    sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/resources")
+    sourceSets["main"].resources.srcDirs("src/commonMain/resources")
     defaultConfig {
         minSdk = 24
         targetSdk = 33
