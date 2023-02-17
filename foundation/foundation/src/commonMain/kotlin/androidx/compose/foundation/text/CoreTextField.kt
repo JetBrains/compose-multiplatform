@@ -421,16 +421,16 @@ internal fun CoreTextField(
             state.onValueChange(TextFieldValue(it.text, TextRange(it.text.length)))
             true
         }
-        setSelection { selectionStart, selectionEnd, traversalMode ->
+        setSelection { selectionStart, selectionEnd, relativeToOriginalText ->
             // in traversal mode we get selection from the `textSelectionRange` semantics which is
             // selection in original text. In non-traversal mode selection comes from the Talkback
             // and indices are relative to the transformed text
-            val start = if (traversalMode) {
+            val start = if (relativeToOriginalText) {
                 selectionStart
             } else {
                 offsetMapping.transformedToOriginal(selectionStart)
             }
-            val end = if (traversalMode) {
+            val end = if (relativeToOriginalText) {
                 selectionEnd
             } else {
                 offsetMapping.transformedToOriginal(selectionEnd)
@@ -445,7 +445,7 @@ internal fun CoreTextField(
             ) {
                 // Do not show toolbar if it's a traversal mode (with the volume keys), or
                 // if the cursor just moved to beginning or end.
-                if (traversalMode || start == end) {
+                if (relativeToOriginalText || start == end) {
                     manager.exitSelectionMode()
                 } else {
                     manager.enterSelectionMode()
