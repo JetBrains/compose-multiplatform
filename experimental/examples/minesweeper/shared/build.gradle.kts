@@ -55,7 +55,7 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.runtime)
-                implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
+                implementation("org.jetbrains.compose.components:components-resources:1.4.0-alpha01-dev942")
             }
         }
         val commonTest by getting {
