@@ -640,8 +640,8 @@ class TimePickerState(
         fun Saver(): Saver<TimePickerState, *> = Saver(
             save = {
                 listOf(
-                    it.minute,
                     it.hour,
+                    it.minute,
                     it.is24hour
                 )
             },
