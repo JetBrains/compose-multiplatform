@@ -28,7 +28,6 @@ dependencies {
 
     // variety of json parsers
     implementation(libs.gson)
-    implementation(libs.json) // b/241475613
     implementation(libs.jsonSimple)
 
     // XML parsers used in MavenUploadHelper.kt
