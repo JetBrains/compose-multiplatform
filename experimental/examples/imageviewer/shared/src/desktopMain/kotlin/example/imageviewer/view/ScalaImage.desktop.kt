@@ -1,7 +1,6 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
@@ -10,7 +9,7 @@ import example.imageviewer.model.ScalableState
 import example.imageviewer.model.addDragAmount
 import example.imageviewer.model.addScale
 
-actual fun Modifier.addUserInput(state: MutableState<ScalableState>): Modifier =
+actual fun Modifier.addUserInput(state: ScalableState): Modifier =
     pointerInput(Unit) {
         detectDragGestures { change, dragAmount: Offset ->
             state.addDragAmount(dragAmount)

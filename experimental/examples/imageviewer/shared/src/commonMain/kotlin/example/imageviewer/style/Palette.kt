@@ -1,8 +1,9 @@
 package example.imageviewer.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 object ImageviewerColors {
@@ -18,6 +19,18 @@ object ImageviewerColors {
     val TranslucentWhite = Color(255, 255, 255, 20)
     val Transparent = Color.Transparent
 
+    val KotlinGradient0 = Color(0xFF7F52FF)
+    val KotlinGradient50 = Color(0xFFC811E2)
+    val KotlinGradient100 = Color(0xFFE54857)
+
+    val kotlinHorizontalGradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            KotlinGradient0,
+            KotlinGradient50,
+            KotlinGradient100
+        )
+    )
+
     fun buttonBackground(isHover: Boolean) = if (isHover) TranslucentBlack else Transparent
 }
 
@@ -25,15 +38,9 @@ object ImageviewerColors {
 internal fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
     MaterialTheme(
-        colors = MaterialTheme.colors.copy(
-            primary = ImageviewerColors.Foreground,
-            secondary = ImageviewerColors.LightGray,
-            background = ImageviewerColors.DarkGray,
-            surface = ImageviewerColors.Gray,
-            onPrimary = ImageviewerColors.Foreground,
-            onSecondary = Color.Black,
-            onBackground = ImageviewerColors.Foreground,
-            onSurface = ImageviewerColors.Foreground
+        colorScheme = MaterialTheme.colorScheme.copy(
+            background = Color(0xFF1B1B1B),
+            onBackground = Color(0xFFFFFFFF)
         )
     ) {
         content()
