@@ -60,7 +60,7 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Surface(
             modifier = Modifier.padding(4.dp)
-                .align(if (isMyMessage) Alignment.CenterStart else Alignment.CenterEnd),
+                .align(if (isMyMessage) Alignment.CenterEnd else Alignment.CenterStart),
             shape = RoundedCornerShape(size = 20.dp),
             elevation = 8.dp
         ) {
@@ -70,7 +70,7 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                 ).padding(10.dp),
             ) {
                 Row(verticalAlignment = Alignment.Top) {
-                    if (isMyMessage) {
+                    if (!isMyMessage) {
                         UserPic(message.user)
                         Spacer(Modifier.size(8.dp))
                     }
@@ -90,7 +90,7 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                             text = message.text
                         )
                     }
-                    if (!isMyMessage) {
+                    if (isMyMessage) {
                         Spacer(Modifier.size(8.dp))
                         UserPic(message.user)
                     }
@@ -100,7 +100,7 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
         if (!isMyMessage) {
             var liked by remember { mutableStateOf(false) }
             Icon(
-                modifier = Modifier.align(Alignment.BottomEnd)
+                modifier = Modifier.align(Alignment.BottomStart)
                     .clickable {
                         liked = !liked
                         focusManager.clearFocus(true)
