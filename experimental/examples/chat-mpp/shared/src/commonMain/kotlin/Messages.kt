@@ -3,6 +3,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,10 +58,12 @@ internal inline fun Messages(messages: List<Message>, displayStub: Boolean) {
 @Composable
 private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
     val focusManager = LocalFocusManager.current
-    Box(modifier = Modifier.fillMaxWidth()) {
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = if (isMyMessage) Alignment.CenterEnd else Alignment.CenterStart
+    ) {
         Surface(
-            modifier = Modifier.padding(4.dp)
-                .align(if (isMyMessage) Alignment.CenterEnd else Alignment.CenterStart),
+            modifier = Modifier.padding(4.dp),
             shape = RoundedCornerShape(size = 20.dp),
             elevation = 8.dp
         ) {
@@ -96,20 +99,20 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                     }
                 }
             }
-        }
-        if (!isMyMessage) {
-            var liked by remember { mutableStateOf(false) }
-            Icon(
-                modifier = Modifier.align(Alignment.BottomStart)
-                    .clickable {
-                        liked = !liked
-                        focusManager.clearFocus(true)
-                    }
-                    .padding(4.dp),
-                imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.Favorite,
-                contentDescription = "Like",
-                tint = if (liked) Color.Red else Color.Gray
-            )
+            if (!isMyMessage) {
+                var liked by remember { mutableStateOf(false) }
+                Icon(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                        .clickable {
+                            liked = !liked
+                            focusManager.clearFocus(true)
+                        }
+                        .padding(3.dp),
+                    imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.Favorite,
+                    contentDescription = "Like",
+                    tint = if (liked) Color.Red else Color.Gray
+                )
+            }
         }
     }
 }
