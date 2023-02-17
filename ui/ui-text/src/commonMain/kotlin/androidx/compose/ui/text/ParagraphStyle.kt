@@ -77,6 +77,12 @@ class ParagraphStyle @ExperimentalTextApi constructor(
     val textMotion: TextMotion? = null
 ) {
 
+    // these public nullable parameters box - do it now (init) not during every paragraph resolution
+    // for future value(int) parameters please avoid boxing by defining Unspecified
+    internal val textAlignOrDefault: TextAlign = textAlign ?: TextAlign.Start
+    internal val lineBreakOrDefault: LineBreak = lineBreak ?: LineBreak.Simple
+    internal val hyphensOrDefault: Hyphens = hyphens ?: Hyphens.None
+
     @Deprecated(
         "ParagraphStyle constructors that do not take new stable parameters " +
             "like LineHeightStyle, LineBreak, Hyphens are deprecated. Please use the new stable " +
@@ -434,13 +440,13 @@ internal fun resolveParagraphStyleDefaults(
     style: ParagraphStyle,
     direction: LayoutDirection
 ) = ParagraphStyle(
-    textAlign = style.textAlign ?: TextAlign.Start,
+    textAlign = style.textAlignOrDefault,
     textDirection = resolveTextDirection(direction, style.textDirection),
     lineHeight = if (style.lineHeight.isUnspecified) DefaultLineHeight else style.lineHeight,
     textIndent = style.textIndent ?: TextIndent.None,
     platformStyle = style.platformStyle,
     lineHeightStyle = style.lineHeightStyle,
-    lineBreak = style.lineBreak ?: LineBreak.Simple,
-    hyphens = style.hyphens ?: Hyphens.None,
+    lineBreak = style.lineBreakOrDefault,
+    hyphens = style.hyphensOrDefault,
     textMotion = style.textMotion ?: TextMotion.Static
 )
