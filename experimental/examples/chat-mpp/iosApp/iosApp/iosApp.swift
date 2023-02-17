@@ -45,6 +45,8 @@ struct ComposeScreen: View {
                 }
             }.padding(10).background(RoundedRectangle(cornerRadius: 10).fill(gradient).opacity(0.8)).padding(6)
             Rectangle().fill(Color.clear).frame(height: 0).background(gradient)
+        }.onTapGesture {
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
 }
