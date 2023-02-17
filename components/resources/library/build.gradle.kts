@@ -19,6 +19,9 @@ kotlin {
     js(IR) {
         browser()
     }
+    wasm {
+        browser()
+    }
     macosX64()
     macosArm64()
 
@@ -79,6 +82,9 @@ kotlin {
         val iosSimulatorArm64Test by getting
         iosSimulatorArm64Test.dependsOn(iosTest)
         val jsMain by getting {
+            dependsOn(skikoMain)
+        }
+        val wasmMain by getting {
             dependsOn(skikoMain)
         }
         val macosMain by creating {
