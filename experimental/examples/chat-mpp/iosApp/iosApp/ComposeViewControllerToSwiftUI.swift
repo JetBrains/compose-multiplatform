@@ -9,8 +9,4 @@ struct ComposeViewControllerToSwiftUI: UIViewControllerRepresentable {
 
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
     }
-
-    func sizeThatFits(_ proposal: ProposedViewSize, uiViewController: UIViewControllerType, context: Context) -> CGSize? {
-        return uiViewController.view.frame.size
-    }
 }

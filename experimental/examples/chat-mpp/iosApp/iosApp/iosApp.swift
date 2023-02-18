@@ -25,25 +25,28 @@ struct ComposeScreen: View {
     @State private var textState: String = "text message"
     @FocusState private var textFieldFocused: Bool
     var body: some View {
-        VStack {
-            ComposeViewControllerToSwiftUI().position(x: UIScreen.main.bounds.width / 2, y: UIScreen.main.bounds.height / 2)
-            HStack {
-                TextField("Type message...", text: $textState, axis: .vertical)
-                        .focused($textFieldFocused)
-                        .lineLimit(3)
-                if (!textState.isEmpty) {
-                    Button(action: {
-                        sendMessage(textState)
-                        textFieldFocused = false
-                        textState = ""
-                    }) {
-                        HStack {
-                            Image(systemName: "play.fill")
-                            Text("Send")
-                        }.tint(.white)
+        ZStack {
+            ComposeViewControllerToSwiftUI().ignoresSafeArea(.keyboard)
+            VStack {
+                Spacer()
+                HStack {
+                    TextField("Type message...", text: $textState, axis: .vertical)
+                            .focused($textFieldFocused)
+                            .lineLimit(3)
+                    if (!textState.isEmpty) {
+                        Button(action: {
+                            sendMessage(textState)
+                            textFieldFocused = false
+                            textState = ""
+                        }) {
+                            HStack {
+                                Image(systemName: "play.fill")
+                                Text("Send")
+                            }.tint(.white)
+                        }
                     }
-                }
-            }.padding(10).background(RoundedRectangle(cornerRadius: 10).fill(gradient).opacity(0.8)).padding(6)
+                }.padding(10).background(RoundedRectangle(cornerRadius: 10).fill(gradient).opacity(0.8)).padding(6)
+            }
             Rectangle().fill(Color.clear).frame(height: 0).background(gradient)
         }.onTapGesture {
             UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)

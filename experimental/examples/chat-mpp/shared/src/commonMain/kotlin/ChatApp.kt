@@ -42,7 +42,7 @@ internal fun ChatApp(displayTextField: Boolean = true) {
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Box(Modifier.weight(1f)) {
-                        Messages(state.messages, displayStub = !displayTextField)
+                        Messages(state.messages)
                     }
                     if (displayTextField) {
                         SendMessage { text ->

@@ -27,7 +27,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal inline fun Messages(messages: List<Message>, displayStub: Boolean) {
+internal inline fun Messages(messages: List<Message>) {
     val listState = rememberLazyListState()
     if (messages.isNotEmpty()) {
         LaunchedEffect(messages.last()) {
@@ -42,14 +42,6 @@ internal inline fun Messages(messages: List<Message>, displayStub: Boolean) {
         messages.forEach { message ->
             item(key = message.id) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
-            }
-        }
-        if (displayStub) {
-            item {
-                // TODO temporary workaround here
-                // Stub if temporary workaround for better Compose display with SwiftUI interop
-                // For now, Compose view is bigger, then it should be.
-                Box(Modifier.height(250.dp))
             }
         }
     }
