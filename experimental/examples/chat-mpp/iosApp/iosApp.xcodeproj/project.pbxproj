@@ -9,12 +9,18 @@
 /* Begin PBXBuildFile section */
 		184880BA0E9910C2B5012412 /* KotlinToSwiftHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488D89B8500CD7696A04EB /* KotlinToSwiftHelper.swift */; };
 		1848810122D49D4AD3668D91 /* ComposeViewControllerToSwiftUI.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */; };
+		184881FBE98BA5BF02A0A186 /* GradientTemplate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1848892FA748717E4087E7D7 /* GradientTemplate.swift */; };
+		1848823F43E447F9A8B4AC7C /* YetAnotherSwiftUIScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488451271FAAD8FA34A2FB /* YetAnotherSwiftUIScreen.swift */; };
+		184882D8AF2A7A3642004010 /* ComposeInsideSwiftUIScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 18488CAB0978B80826E5BBB4 /* ComposeInsideSwiftUIScreen.swift */; };
 		2152FB042600AC8F00CF470E /* iosApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iosApp.swift */; };
 		C1FC908188C4E8695729CB06 /* Pods_iosApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 8DE96E47030356CE6AD9794A /* Pods_iosApp.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		18488451271FAAD8FA34A2FB /* YetAnotherSwiftUIScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = YetAnotherSwiftUIScreen.swift; sourceTree = "<group>"; };
 		18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeViewControllerToSwiftUI.swift; sourceTree = "<group>"; };
+		1848892FA748717E4087E7D7 /* GradientTemplate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientTemplate.swift; sourceTree = "<group>"; };
+		18488CAB0978B80826E5BBB4 /* ComposeInsideSwiftUIScreen.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ComposeInsideSwiftUIScreen.swift; sourceTree = "<group>"; };
 		18488D89B8500CD7696A04EB /* KotlinToSwiftHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KotlinToSwiftHelper.swift; sourceTree = "<group>"; };
 		1EB65E27D2C0F884D0A1A133 /* Pods-iosApp.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-iosApp.debug.xcconfig"; path = "Target Support Files/Pods-iosApp/Pods-iosApp.debug.xcconfig"; sourceTree = "<group>"; };
 		2152FB032600AC8F00CF470E /* iosApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = iosApp.swift; sourceTree = "<group>"; };
@@ -63,6 +69,9 @@
 				2152FB032600AC8F00CF470E /* iosApp.swift */,
 				18488656503C85EEDA66341D /* ComposeViewControllerToSwiftUI.swift */,
 				18488D89B8500CD7696A04EB /* KotlinToSwiftHelper.swift */,
+				18488CAB0978B80826E5BBB4 /* ComposeInsideSwiftUIScreen.swift */,
+				18488451271FAAD8FA34A2FB /* YetAnotherSwiftUIScreen.swift */,
+				1848892FA748717E4087E7D7 /* GradientTemplate.swift */,
 			);
 			path = iosApp;
 			sourceTree = "<group>";
@@ -189,6 +198,9 @@
 				2152FB042600AC8F00CF470E /* iosApp.swift in Sources */,
 				1848810122D49D4AD3668D91 /* ComposeViewControllerToSwiftUI.swift in Sources */,
 				184880BA0E9910C2B5012412 /* KotlinToSwiftHelper.swift in Sources */,
+				184882D8AF2A7A3642004010 /* ComposeInsideSwiftUIScreen.swift in Sources */,
+				1848823F43E447F9A8B4AC7C /* YetAnotherSwiftUIScreen.swift in Sources */,
+				184881FBE98BA5BF02A0A186 /* GradientTemplate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
