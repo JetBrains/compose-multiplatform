@@ -44,6 +44,9 @@ internal inline fun Messages(messages: List<Message>) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
             }
         }
+        item {
+            Box(Modifier.height(50.dp))
+        }
     }
 }
 
