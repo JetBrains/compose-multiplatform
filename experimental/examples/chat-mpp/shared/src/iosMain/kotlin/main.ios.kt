@@ -1,7 +1,7 @@
 import androidx.compose.ui.window.Application
 import platform.UIKit.UIViewController
 
-fun MainViewController(): UIViewController =
+fun ChapViewController(): UIViewController =
     Application("Chat") {
         ChatApp(displayTextField = false)
     }
