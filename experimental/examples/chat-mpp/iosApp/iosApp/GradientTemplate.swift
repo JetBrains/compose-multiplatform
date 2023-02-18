@@ -12,10 +12,11 @@ struct GradientTemplate<Content: View>: View {
                     gradient.ignoresSafeArea(edges: .top).frame(height: 0)
                     Spacer()
                 }
+                content()
                 VStack {
-                    content().frame(maxHeight: .infinity)
-                    Rectangle().fill(Color.clear).frame(height: 0).background(gradient)
-                }.ignoresSafeArea(.keyboard, edges: .bottom)
+                    Spacer()
+                    Rectangle().frame(height: 0).background(gradient)
+                }
             }
                     .navigationTitle(title)
                     .navigationBarTitleDisplayMode(.inline)

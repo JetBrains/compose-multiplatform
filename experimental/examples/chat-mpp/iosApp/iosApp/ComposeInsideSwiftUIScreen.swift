@@ -5,6 +5,9 @@ struct ComposeInsideSwiftUIScreen: View {
         ZStack {
             ComposeLayer()
             TextInputLayer()
+        }.onTapGesture {
+            // Hide keyboard on tap outside of TextField
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
         }
     }
 }
@@ -12,10 +15,8 @@ struct ComposeInsideSwiftUIScreen: View {
 struct ComposeLayer: View {
     var body: some View {
         GradientTemplate(title: "Compose inside SwiftUI") {
-            ComposeViewControllerToSwiftUI().ignoresSafeArea(.keyboard).onTapGesture {
-                // When tap on Compose - hide keyboard
-                UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-            }
+            ComposeViewControllerToSwiftUI()
+                .ignoresSafeArea(.keyboard) // Compose have own keyboard handler
         }
     }
 }
