@@ -25,3 +25,12 @@ Then choose **iosApp** configuration in IDE and run it.
 ## Run JS in browser with WebAssembly Skia via Gradle
 
 `./gradlew jsApp:jsBrowserDevelopmentRun`
+
+### Run MacOS via Gradle:
+- on Intel CPU: `./gradlew :shared:runDebugExecutableMacosX64`
+- on Apple Silicon: `./gradlew :shared:runDebugExecutableMacosArm64`
+
+## SwiftUI interop
+This example shows how you can set up an interop between SwiftUI and Compose.
+Pay attention to the file [ComposeViewControllerToSwiftUI.swift](iosApp%2FiosApp%2FComposeViewControllerToSwiftUI.swift).
+This file help to add Compose inside SwiftUI hierarchy.

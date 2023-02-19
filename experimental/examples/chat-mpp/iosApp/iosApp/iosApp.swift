@@ -1,15 +1,22 @@
-import UIKit
-import shared
+import SwiftUI
 
-@UIApplicationMain
-class AppDelegate: UIResponder, UIApplicationDelegate {
-    var window: UIWindow?
+let gradient = LinearGradient(
+        colors: gradient3Colors(),
+        startPoint: .topLeading, endPoint: .bottomTrailing
+)
 
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        window = UIWindow(frame: UIScreen.main.bounds)
-        let mainViewController = Main_iosKt.MainViewController()
-        window?.rootViewController = mainViewController
-        window?.makeKeyAndVisible()
-        return true
-    }
+@main
+struct iOSApp: App {
+	var body: some Scene {
+		WindowGroup {
+			TabView {
+                ComposeInsideSwiftUIScreen()
+                    .tabItem { Label("Compose", systemImage: "square.and.pencil") }
+
+                YetAnotherSwiftUIScreen()
+                    .tabItem { Label("SwiftUI", systemImage: "list.dash") }
+                
+            }.accentColor(.white).preferredColorScheme(.dark)
+		}
+	}
 }

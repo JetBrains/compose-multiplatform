@@ -3,7 +3,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -43,27 +44,31 @@ internal inline fun Messages(messages: List<Message>) {
                 ChatMessage(isMyMessage = message.user == myUser, message)
             }
         }
-//        items(messages, key = { it.id }) { message -> //TODO not working in JS
-//            ChatMessage(isMyMessage = message.user == myUser, message)
-//        }
+        item {
+            Box(Modifier.height(50.dp))
+        }
     }
 }
 
 @Composable
 private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
-    Box(modifier = Modifier.fillMaxWidth()) {
+    val focusManager = LocalFocusManager.current
+    Box(
+        modifier = Modifier.fillMaxWidth(),
+        contentAlignment = if (isMyMessage) Alignment.CenterEnd else Alignment.CenterStart
+    ) {
         Surface(
-            modifier = Modifier.padding(4.dp)
-                .align(if (isMyMessage) Alignment.CenterStart else Alignment.CenterEnd),
+            modifier = Modifier.padding(4.dp),
             shape = RoundedCornerShape(size = 20.dp),
             elevation = 8.dp
         ) {
             Box(
-                Modifier.background(brush = Brush.horizontalGradient(listOf(Color(0xff8888ff), Color(0xffddddff))))
-                    .padding(10.dp),
+                Modifier.background(brush = Brush.horizontalGradient(
+                    ChatColors.GRADIENT_2.map { Color(it) })
+                ).padding(10.dp),
             ) {
                 Row(verticalAlignment = Alignment.Top) {
-                    if (isMyMessage) {
+                    if (!isMyMessage) {
                         UserPic(message.user)
                         Spacer(Modifier.size(8.dp))
                     }
@@ -83,25 +88,26 @@ private inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                             text = message.text
                         )
                     }
-                    if (!isMyMessage) {
+                    if (isMyMessage) {
                         Spacer(Modifier.size(8.dp))
                         UserPic(message.user)
                     }
                 }
             }
-        }
-        if (!isMyMessage) {
-            var liked by remember { mutableStateOf(false) }
-            Icon(
-                modifier = Modifier.align(Alignment.BottomEnd)
-                    .clickable {
-                        liked = !liked
-                    }
-                    .padding(4.dp),
-                imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.Favorite,
-                contentDescription = "Like",
-                tint = if (liked) Color.Red else Color.Gray
-            )
+            if (!isMyMessage) {
+                var liked by remember { mutableStateOf(false) }
+                Icon(
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                        .clickable {
+                            liked = !liked
+                            focusManager.clearFocus(true)
+                        }
+                        .padding(3.dp),
+                    imageVector = if (liked) Icons.Filled.Favorite else Icons.Outlined.Favorite,
+                    contentDescription = "Like",
+                    tint = if (liked) Color.Red else Color.Gray
+                )
+            }
         }
     }
 }
