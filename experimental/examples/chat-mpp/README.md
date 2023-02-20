@@ -1,5 +1,10 @@
 # Chat example app
 
+## SwiftUI interop
+This example shows how you can set up an interop between SwiftUI and Compose.
+Pay attention to the file [ComposeViewControllerToSwiftUI.swift](iosApp%2FiosApp%2FComposeViewControllerToSwiftUI.swift).
+This file help to add Compose inside SwiftUI hierarchy.
+
 Example can run on Android, iOS, desktop or in a browser.
 
 *Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed either 
@@ -29,8 +34,3 @@ Then choose **iosApp** configuration in IDE and run it.
 ### Run MacOS via Gradle:
 - on Intel CPU: `./gradlew :shared:runDebugExecutableMacosX64`
 - on Apple Silicon: `./gradlew :shared:runDebugExecutableMacosArm64`
-
-## SwiftUI interop
-This example shows how you can set up an interop between SwiftUI and Compose.
-Pay attention to the file [ComposeViewControllerToSwiftUI.swift](iosApp%2FiosApp%2FComposeViewControllerToSwiftUI.swift).
-This file help to add Compose inside SwiftUI hierarchy.
