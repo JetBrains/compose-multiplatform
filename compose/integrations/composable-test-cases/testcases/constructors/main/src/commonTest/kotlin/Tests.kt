@@ -74,6 +74,7 @@ class Tests {
 
         assertEquals(1, recomposeCounter.receive())
         assertEquals("root:{NewClassSavesComposableIntoVar}", root.dump())
+        recomposeCounter.close()
     }
 
     @Test
@@ -98,6 +99,7 @@ class Tests {
 
         assertEquals(1, recomposeCounter.receive())
         assertEquals("root:{NewClassSavesComposableIntoLateinitVar}", root.dump())
+        recomposeCounter.close()
     }
 
     @Test
@@ -120,6 +122,7 @@ class Tests {
 
         assertEquals(1, recomposeCounter.receive())
         assertEquals("root:{}", root.dump())
+        recomposeCounter.close()
     }
 
     @Test
@@ -144,6 +147,7 @@ class Tests {
 
         assertEquals(1, recomposeCounter.receive())
         assertEquals("root:{recomposed-abc}", root.dump())
+        recomposeCounter.close()
     }
 
     @Test
@@ -168,6 +172,7 @@ class Tests {
 
         assertEquals(1, recomposeCounter.receive())
         assertEquals("root:{recomposed-abc}", root.dump())
+        recomposeCounter.close()
     }
 
     @Test

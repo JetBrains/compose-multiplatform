@@ -61,5 +61,6 @@ class Test {
         index.value = 3
         assertEquals(2, channel.receive())
         assertEquals("root:{abc3:{Hello World!}}", root.dump())
+        channel.close()
     }
 }
