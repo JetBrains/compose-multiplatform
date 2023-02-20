@@ -40,6 +40,24 @@ dependencies {
     implementation(project(":compose:ui:ui-tooling-preview"))
     debugImplementation(project(":compose:ui:ui-tooling"))
     implementation(project(":internal-testutils-fonts"))
+
+    testImplementation(project(":compose:test-utils"))
+    testImplementation(libs.testRules)
+    testImplementation(libs.testRunner)
+    testImplementation(libs.junit)
+    testImplementation(libs.truth)
+    testImplementation(libs.kotlinTest)
+    testImplementation(libs.mockitoCore4)
+    testImplementation(libs.kotlinReflect)
+    testImplementation(libs.mockitoKotlin4)
+
+    androidTestImplementation(project(":compose:test-utils"))
+    androidTestImplementation(libs.testRules)
+    androidTestImplementation(libs.testRunner)
+    androidTestImplementation(libs.junit)
+    androidTestImplementation(libs.kotlinTest)
+    androidTestImplementation(libs.truth)
+    androidTestImplementation(libs.espressoCore)
 }
 
 android {
