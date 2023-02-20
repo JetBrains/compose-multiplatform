@@ -3,7 +3,7 @@
 ## SwiftUI interop
 This example shows how you can set up an interop between SwiftUI and Compose.
 Pay attention to the file [ComposeViewControllerToSwiftUI.swift](iosApp%2FiosApp%2FComposeViewControllerToSwiftUI.swift).
-This file help to add Compose inside SwiftUI hierarchy.
+This file helps to add Compose inside SwiftUI hierarchy.
 
 Example can run on Android, iOS, desktop or in a browser.
 
