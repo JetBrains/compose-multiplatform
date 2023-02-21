@@ -626,19 +626,19 @@ package androidx.compose.material3 {
 
   public final class ListItemDefaults {
     method @androidx.compose.runtime.Composable public androidx.compose.material3.ListItemColors colors(optional long containerColor, optional long headlineColor, optional long leadingIconColor, optional long overlineColor, optional long supportingColor, optional long trailingIconColor, optional long disabledHeadlineColor, optional long disabledLeadingIconColor, optional long disabledTrailingIconColor);
-    method @androidx.compose.runtime.Composable public long getContainerColor();
-    method @androidx.compose.runtime.Composable public long getContentColor();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public long getContainerColor();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public long getContentColor();
     method public float getElevation();
-    method @androidx.compose.runtime.Composable public androidx.compose.ui.graphics.Shape getShape();
+    method @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public androidx.compose.ui.graphics.Shape getShape();
     property public final float Elevation;
-    property @androidx.compose.runtime.Composable public final long containerColor;
-    property @androidx.compose.runtime.Composable public final long contentColor;
-    property @androidx.compose.runtime.Composable public final androidx.compose.ui.graphics.Shape shape;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final long containerColor;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final long contentColor;
+    property @androidx.compose.runtime.Composable @androidx.compose.runtime.ReadOnlyComposable public final androidx.compose.ui.graphics.Shape shape;
     field public static final androidx.compose.material3.ListItemDefaults INSTANCE;
   }
 
   public final class ListItemKt {
-    method @androidx.compose.runtime.Composable public static void ListItem(kotlin.jvm.functions.Function0<kotlin.Unit> headlineText, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? overlineText, optional kotlin.jvm.functions.Function0<kotlin.Unit>? supportingText, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingContent, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingContent, optional androidx.compose.material3.ListItemColors colors, optional float tonalElevation, optional float shadowElevation);
+    method @androidx.compose.runtime.Composable public static void ListItem(kotlin.jvm.functions.Function0<kotlin.Unit> headlineContent, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function0<kotlin.Unit>? overlineContent, optional kotlin.jvm.functions.Function0<kotlin.Unit>? supportingContent, optional kotlin.jvm.functions.Function0<kotlin.Unit>? leadingContent, optional kotlin.jvm.functions.Function0<kotlin.Unit>? trailingContent, optional androidx.compose.material3.ListItemColors colors, optional float tonalElevation, optional float shadowElevation);
   }
 
   public final class MaterialTheme {

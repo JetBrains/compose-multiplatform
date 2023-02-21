@@ -23,6 +23,7 @@ import androidx.compose.material3.tokens.ShapeKeyTokens
 import androidx.compose.material3.tokens.ShapeTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.RectangleShape
@@ -177,6 +178,7 @@ internal fun Shapes.fromToken(value: ShapeKeyTokens): Shape {
 
 /** Converts a shape token key to the local shape provided by the theme */
 @Composable
+@ReadOnlyComposable
 internal fun ShapeKeyTokens.toShape(): Shape {
     return MaterialTheme.shapes.fromToken(this)
 }

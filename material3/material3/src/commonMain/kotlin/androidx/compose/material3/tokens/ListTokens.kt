@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_117
+// VERSION: v0_159
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -22,14 +22,13 @@ import androidx.compose.ui.unit.dp
 internal object ListTokens {
     val ListItemContainerColor = ColorSchemeKeyTokens.Surface
     val ListItemContainerElevation = ElevationTokens.Level0
-    val ListItemContainerHeight = 56.0.dp
     val ListItemContainerShape = ShapeKeyTokens.CornerNone
     val ListItemDisabledLabelTextColor = ColorSchemeKeyTokens.OnSurface
-    const val ListItemDisabledLabelTextOpacity = 0.3f
+    val ListItemDisabledLabelTextOpacity = 0.3f
     val ListItemDisabledLeadingIconColor = ColorSchemeKeyTokens.OnSurface
-    const val ListItemDisabledLeadingIconOpacity = 0.38f
+    val ListItemDisabledLeadingIconOpacity = 0.38f
     val ListItemDisabledTrailingIconColor = ColorSchemeKeyTokens.OnSurface
-    const val ListItemDisabledTrailingIconOpacity = 0.38f
+    val ListItemDisabledTrailingIconOpacity = 0.38f
     val ListItemDraggedContainerElevation = ElevationTokens.Level4
     val ListItemDraggedLabelTextColor = ColorSchemeKeyTokens.OnSurface
     val ListItemDraggedLeadingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
@@ -55,6 +54,7 @@ internal object ListTokens {
     val ListItemLeadingImageWidth = 56.0.dp
     val ListItemLeadingVideoShape = ShapeKeyTokens.CornerNone
     val ListItemLeadingVideoWidth = 100.0.dp
+    val ListItemOneLineContainerHeight = 56.0.dp
     val ListItemOverlineColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val ListItemOverlineFont = TypographyKeyTokens.LabelSmall
     val ListItemPressedLabelTextColor = ColorSchemeKeyTokens.OnSurface
@@ -64,9 +64,11 @@ internal object ListTokens {
     val ListItemSmallLeadingVideoHeight = 56.0.dp
     val ListItemSupportingTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val ListItemSupportingTextFont = TypographyKeyTokens.BodyMedium
+    val ListItemThreeLineContainerHeight = 88.0.dp
     val ListItemTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val ListItemTrailingIconSize = 24.0.dp
     val ListItemTrailingSupportingTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val ListItemTrailingSupportingTextFont = TypographyKeyTokens.LabelSmall
+    val ListItemTwoLineContainerHeight = 72.0.dp
     val ListItemUnselectedTrailingIconColor = ColorSchemeKeyTokens.OnSurface
 }

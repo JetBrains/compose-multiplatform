@@ -352,7 +352,7 @@ class ModalBottomSheetTest {
                 scope = rememberCoroutineScope()
                 LazyColumn {
                     items(amountOfItems) {
-                        ListItem(headlineText = { Text("$it") })
+                        ListItem(headlineContent = { Text("$it") })
                     }
                 }
             }
