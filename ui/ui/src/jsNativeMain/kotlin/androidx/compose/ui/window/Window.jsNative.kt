@@ -26,13 +26,11 @@ fun Window(
 
 ) {
     ComposeWindow().apply {
-        setTitle(title)
         setContent(content)
     }
 }
 
 internal expect class ComposeWindow() {
-    fun setTitle(title: String)
     fun setContent(
         content: @Composable () -> Unit
     )

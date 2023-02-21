@@ -58,16 +58,24 @@ import platform.UIKit.setNeedsDisplay
 import platform.UIKit.window
 import platform.darwin.NSObject
 
+fun ComposeUIViewController(content: @Composable () -> Unit): UIViewController =
+    ComposeWindow().apply {
+        setContent(content)
+    }
+
 // The only difference with macos' Window is that
 // it has return type of UIViewController rather than unit.
+@Deprecated(
+    "use ComposeUIViewController instead",
+    replaceWith = ReplaceWith(
+        "ComposeUIViewController(content = content)",
+        "androidx.compose.ui.window"
+    )
+)
 fun Application(
     title: String = "JetpackNativeWindow",
     content: @Composable () -> Unit = { }
-
-) = ComposeWindow().apply {
-    setTitle(title)
-    setContent(content)
-} as UIViewController
+):UIViewController = ComposeUIViewController(content)
 
 @ExportObjCClass
 internal actual class ComposeWindow : UIViewController {
@@ -134,10 +142,6 @@ internal actual class ComposeWindow : UIViewController {
         fun keyboardDidHide(arg: NSNotification) {
             view.setClipsToBounds(false)
         }
-    }
-
-    actual fun setTitle(title: String) {
-        println("TODO: set title to SkiaWindow")
     }
 
     override fun loadView() {

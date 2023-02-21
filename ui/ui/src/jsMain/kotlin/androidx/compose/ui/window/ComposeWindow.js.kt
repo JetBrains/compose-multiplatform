@@ -53,13 +53,6 @@ internal actual class ComposeWindow actual constructor() {
         input = jsTextInputService.input
     )
 
-    val title: String
-        get() = "TODO: get a title from SkiaWindow"
-
-    actual fun setTitle(title: String) {
-        println("TODO: set title to SkiaWindow")
-    }
-
     // TODO: generalize me.
     val canvas = document.getElementById("ComposeTarget") as HTMLCanvasElement
 
