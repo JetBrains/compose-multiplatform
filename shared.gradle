@@ -19,6 +19,9 @@ dependencies {
     implementation(gradleApi())
     compileOnly(findGradleKotlinDsl())
 
+    // Android Gradle Plugin APIs used by Stable AIDL
+    implementation(libs.androidGradlePluginApi)
+
     // Plugins we use and configure
     implementation(libs.androidGradlePluginz)
     implementation(libs.androidToolsCommon) // for com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
