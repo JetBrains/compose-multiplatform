@@ -135,6 +135,8 @@ abstract class FtlRunner : DefaultTask() {
 private val devicesToRunOn = listOf(
     "ftlpixel2api33" to "Pixel2.arm,version=33",
     "ftlpixel2api30" to "Pixel2.arm,version=30",
+    "ftlpixel2api28" to "Pixel2.arm,version=28",
+    "ftlpixel2api26" to "Pixel2.arm,version=26",
     "ftlnexus4api21" to "Nexus4,version=21",
 )
 
