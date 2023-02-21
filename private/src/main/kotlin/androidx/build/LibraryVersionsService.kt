@@ -87,7 +87,20 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
     val libraryGroupsByGroupId: Map<String, LibraryGroup> by lazy {
         val result = mutableMapOf<String, LibraryGroup>()
         for (association in libraryGroupAssociations) {
-          result.put(association.libraryGroup.group, association.libraryGroup)
+            // Check for duplicate groups
+            val groupId = association.libraryGroup.group
+            val existingAssociation = result.get(groupId)
+            if (existingAssociation != null) {
+                if (association.overrideIncludeInProjectPaths.size < 1) {
+                    throw GradleException(
+                        "Duplicate library group $groupId defined in " +
+                        "${association.declarationName} does not set overrideInclude. " +
+                        "Declarations beyond the first can only have an effect if they set " +
+                        "overrideInclude")
+                }
+            } else {
+                result.put(groupId, association.libraryGroup)
+            }
         }
         result
     }
