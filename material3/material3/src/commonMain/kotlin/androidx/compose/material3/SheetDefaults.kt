@@ -270,13 +270,14 @@ object BottomSheetDefaults {
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
-    state: SwipeableV2State<*>,
-    orientation: Orientation
+    sheetState: SheetState,
+    orientation: Orientation,
+    onFling: (velocity: Float) -> Unit
 ): NestedScrollConnection = object : NestedScrollConnection {
     override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
         val delta = available.toFloat()
         return if (delta < 0 && source == NestedScrollSource.Drag) {
-            state.dispatchRawDelta(delta).toOffset()
+            sheetState.swipeableState.dispatchRawDelta(delta).toOffset()
         } else {
             Offset.Zero
         }
@@ -288,7 +289,7 @@ internal fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
         source: NestedScrollSource
     ): Offset {
         return if (source == NestedScrollSource.Drag) {
-            state.dispatchRawDelta(available.toFloat()).toOffset()
+            sheetState.swipeableState.dispatchRawDelta(available.toFloat()).toOffset()
         } else {
             Offset.Zero
         }
@@ -296,9 +297,9 @@ internal fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
 
     override suspend fun onPreFling(available: Velocity): Velocity {
         val toFling = available.toFloat()
-        val currentOffset = state.requireOffset()
-        return if (toFling < 0 && currentOffset > state.minBound) {
-            state.settle(velocity = toFling)
+        val currentOffset = sheetState.requireOffset()
+        return if (toFling < 0 && currentOffset > sheetState.swipeableState.minBound) {
+            onFling(toFling)
             // since we go to the anchor with tween settling, consume all for the best UX
             available
         } else {
@@ -307,7 +308,7 @@ internal fun ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
     }
 
     override suspend fun onPostFling(consumed: Velocity, available: Velocity): Velocity {
-        state.settle(velocity = available.toFloat())
+        onFling(available.toFloat())
         return available
     }
 

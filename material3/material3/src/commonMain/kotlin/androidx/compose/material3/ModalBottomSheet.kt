@@ -144,10 +144,15 @@ fun ModalBottomSheet(
                         )
                     }
                     .nestedScroll(
-                        remember(sheetState.swipeableState, Orientation.Vertical) {
+                        remember(sheetState) {
                             ConsumeSwipeWithinBottomSheetBoundsNestedScrollConnection(
-                                state = sheetState.swipeableState,
-                                orientation = Orientation.Vertical
+                                sheetState = sheetState,
+                                orientation = Orientation.Vertical,
+                                onFling = {
+                                    scope.launch { sheetState.settle(it) }.invokeOnCompletion {
+                                            if (!sheetState.isVisible) onDismissRequest()
+                                        }
+                                }
                             )
                         }
                     )
@@ -158,6 +163,13 @@ fun ModalBottomSheet(
                         anchorChangeHandler = anchorChangeHandler,
                         screenHeight = fullHeight.toFloat(),
                         bottomPadding = systemBarHeight.toFloat(),
+                        onDragStopped = {
+                            scope
+                                .launch { sheetState.settle(it) }
+                                .invokeOnCompletion {
+                                    if (!sheetState.isVisible) onDismissRequest()
+                                }
+                        },
                     ),
                 shape = shape,
                 color = containerColor,
@@ -226,61 +238,63 @@ private fun Modifier.modalBottomSheetSwipeable(
     anchorChangeHandler: AnchorChangeHandler<SheetValue>,
     screenHeight: Float,
     bottomPadding: Float,
+    onDragStopped: CoroutineScope.(velocity: Float) -> Unit,
 ) = draggable(
-    state = sheetState.swipeableState.draggableState,
-    orientation = Orientation.Vertical,
-    enabled = sheetState.isVisible,
-    startDragImmediately = sheetState.swipeableState.isAnimationRunning,
-    onDragStopped = { velocity ->
-        try {
-            sheetState.settle(velocity)
-        } finally {
-            if (!sheetState.isVisible) onDismissRequest()
-        }
-    }
-).swipeAnchors(
-    state = sheetState.swipeableState,
-    anchorChangeHandler = anchorChangeHandler,
-    possibleValues = setOf(Hidden, Collapsed, Expanded),
-) { value, sheetSize ->
-    when (value) {
-        Hidden -> screenHeight + bottomPadding
-        Collapsed -> when {
-            sheetSize.height < screenHeight / 2 -> null
-            sheetState.skipCollapsed -> null
-            else -> sheetSize.height / 2f
-        }
-        Expanded -> if (sheetSize.height != 0) {
-            max(0f, screenHeight - sheetSize.height)
-        } else null
-    }
-}.semantics {
-    if (sheetState.isVisible) {
-        dismiss {
-            if (sheetState.swipeableState.confirmValueChange(Hidden)) {
-                scope.launch { sheetState.hide() }.invokeOnCompletion {
-                    if (!sheetState.isVisible) { onDismissRequest() }
+            state = sheetState.swipeableState.draggableState,
+            orientation = Orientation.Vertical,
+            enabled = sheetState.isVisible,
+            startDragImmediately = sheetState.swipeableState.isAnimationRunning,
+            onDragStopped = onDragStopped
+        )
+        .swipeAnchors(
+            state = sheetState.swipeableState,
+            anchorChangeHandler = anchorChangeHandler,
+            possibleValues = setOf(Hidden, Collapsed, Expanded),
+        ) { value, sheetSize ->
+            when (value) {
+                Hidden -> screenHeight + bottomPadding
+                Collapsed -> when {
+                    sheetSize.height < screenHeight / 2 -> null
+                    sheetState.skipCollapsed -> null
+                    else -> sheetSize.height / 2f
                 }
-            }
-            true
-        }
-        if (sheetState.swipeableState.currentValue == Collapsed) {
-            expand {
-                if (sheetState.swipeableState.confirmValueChange(Expanded)) {
-                    scope.launch { sheetState.expand() }
-                }
-                true
-            }
-        } else if (sheetState.hasCollapsedState) {
-            collapse {
-                if (sheetState.swipeableState.confirmValueChange(Collapsed)) {
-                    scope.launch { sheetState.collapse() }
-                }
-                true
+
+                Expanded -> if (sheetSize.height != 0) {
+                    max(0f, screenHeight - sheetSize.height)
+                } else null
             }
         }
-    }
-}
+        .semantics {
+            if (sheetState.isVisible) {
+                dismiss {
+                    if (sheetState.swipeableState.confirmValueChange(Hidden)) {
+                        scope
+                            .launch { sheetState.hide() }
+                            .invokeOnCompletion {
+                                if (!sheetState.isVisible) {
+                                    onDismissRequest()
+                                }
+                            }
+                    }
+                    true
+                }
+                if (sheetState.swipeableState.currentValue == Collapsed) {
+                    expand {
+                        if (sheetState.swipeableState.confirmValueChange(Expanded)) {
+                            scope.launch { sheetState.expand() }
+                        }
+                        true
+                    }
+                } else if (sheetState.hasCollapsedState) {
+                    collapse {
+                        if (sheetState.swipeableState.confirmValueChange(Collapsed)) {
+                            scope.launch { sheetState.collapse() }
+                        }
+                        true
+                    }
+                }
+            }
+        }
 
 @ExperimentalMaterial3Api
 private fun ModalBottomSheetAnchorChangeHandler(
