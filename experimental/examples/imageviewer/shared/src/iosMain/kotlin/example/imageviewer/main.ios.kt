@@ -10,12 +10,5 @@ import platform.UIKit.UIViewController
 
 fun MainViewController(): UIViewController =
     Application("Imageviewer") {
-        Column {
-            // To skip upper part of screen.
-            Box(
-                modifier = Modifier
-                    .height(30.dp)
-            )
-            ImageViewerIos()
-        }
+        ImageViewerIos()
     }
