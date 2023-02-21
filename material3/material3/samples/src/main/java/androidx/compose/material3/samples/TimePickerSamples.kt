@@ -130,7 +130,6 @@ fun TimeInputSample() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimePickerDialog(
     onCancel: () -> Unit,

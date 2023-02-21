@@ -545,15 +545,13 @@ class TimePickerState(
 
     internal var selection by mutableStateOf(Selection.Hour)
     internal var isAfternoonToggle by mutableStateOf(initialHour > 12 && !is24Hour)
-    internal var isInnerCircle by mutableStateOf(initialHour > 12 || initialHour == 0)
+    internal var isInnerCircle by mutableStateOf(initialHour >= 12)
 
-    private var hourAngle by mutableStateOf(RadiansPerHour * initialHour % 12 - FullCircle / 4)
-    private var minuteAngle by mutableStateOf(RadiansPerMinute * initialMinute - FullCircle / 4)
+    internal var hourAngle by mutableStateOf(RadiansPerHour * initialHour % 12 - FullCircle / 4)
+    internal var minuteAngle by mutableStateOf(RadiansPerMinute * initialMinute - FullCircle / 4)
 
     private val mutex = MutatorMutex()
-    private val isAfternoon by derivedStateOf {
-        (is24hour && isInnerCircle && hourAngle.toHour() != 0) || isAfternoonToggle
-    }
+    private val isAfternoon by derivedStateOf { is24hour && isInnerCircle || isAfternoonToggle }
 
     internal val currentAngle = Animatable(hourAngle)
 
@@ -831,7 +829,7 @@ private fun TimeSelector(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ClockFace(state: TimePickerState, colors: TimePickerColors) {
+internal fun ClockFace(state: TimePickerState, colors: TimePickerColors) {
     Crossfade(
         modifier = Modifier
             .background(shape = CircleShape, color = colors.clockDialColor)
