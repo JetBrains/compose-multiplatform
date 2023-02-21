@@ -38,7 +38,6 @@ dependencies {
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
-        implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0-rc01")
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.compose.material:material:1.0.0")
         implementation("androidx.activity:activity-compose:1.7.0-beta02")
@@ -87,7 +86,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation(project(":compose:animation:animation"))
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-
                 implementation(project(":compose:material:material"))
                 implementation("androidx.activity:activity-compose:1.7.0-beta02")
                 implementation("androidx.lifecycle:lifecycle-common:2.6.0-rc01")
@@ -105,13 +103,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             androidAndroidTest.dependencies {
                 implementation(project(":compose:ui:ui-test-junit4"))
-                // old version of common-java8 conflicts with newer version, because both have
-                // DefaultLifecycleEventObserver.
-                // Outside of androidx this is resolved via constraint added to lifecycle-common,
-                // but it doesn't work in androidx.
-                // See aosp/1804059
-                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.0-rc01")
-                implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.0-rc01")
 
                 implementation(libs.junit)
                 implementation(libs.testRunner)
