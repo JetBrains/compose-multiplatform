@@ -44,10 +44,17 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"പ്രതീക്ഷിക്കുന്ന കാലയളവിലെ വർഷമല്ല നൽകിയ തീയതിയുടേത് %1$s - %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"കലണ്ടർ ഇൻപുട്ട് മോഡിലേക്ക് മാറുക"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"ടെക്‌സ്‌റ്റ് ഇൻപുട്ട് മോഡിലേക്ക് മാറുക"</string>
+    <string name="date_picker_scroll_to_later_years" msgid="3226341140390493774">"പിന്നീടുള്ള വർഷങ്ങൾ കാണിക്കാൻ സ്ക്രോൾ ചെയ്യുക"</string>
+    <string name="date_picker_scroll_to_earlier_years" msgid="8911933542023210271">"മുൻ വർഷങ്ങൾ കാണിക്കാൻ സ്ക്രോൾ ചെയ്യുക"</string>
     <string name="date_range_picker_title" msgid="690080476639943577">"തീയതികൾ തിരഞ്ഞെടുക്കുക"</string>
     <string name="date_range_picker_start_headline" msgid="5759491386723090559">"ആരംഭിക്കുന്ന തീയതി"</string>
     <string name="date_range_picker_end_headline" msgid="4766270708882012148">"അവസാനിക്കുന്ന തീയതി"</string>
+    <string name="date_range_picker_scroll_to_next_month" msgid="51495506931835470">"\'അടുത്ത മാസം\' കാണിക്കാൻ സ്ക്രോൾ ചെയ്യുക"</string>
+    <string name="date_range_picker_scroll_to_previous_month" msgid="4371570854614540700">"മുമ്പത്തെ മാസം കാണിക്കാൻ സ്ക്രോൾ ചെയ്യുക"</string>
+    <string name="date_range_picker_day_in_range" msgid="9048690781645835833">"പരിധിയിൽ"</string>
     <string name="date_range_input_title" msgid="2366412111888449406">"തീയതികൾ നൽകുക"</string>
+    <string name="date_range_input_invalid_range_input" msgid="1891592555781755601">"തീയതി ശ്രേണി ഇൻപുട്ട് അസാധുവാണ്"</string>
+    <string name="tooltip_pane_description" msgid="8191239805703103845">"ടൂൾടിപ്പ്"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"ടൂൾടിപ്പ് കാണിക്കുക"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
@@ -57,4 +64,6 @@
     <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d മണി"</string>
     <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d മ."</string>
     <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d മിനിറ്റ്"</string>
+    <string name="time_picker_minute" msgid="6116528647594005945">"മിനിറ്റ്"</string>
+    <string name="time_picker_hour" msgid="7241191970823415723">"മണിക്കൂർ"</string>
 </resources>

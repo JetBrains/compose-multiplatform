@@ -44,10 +44,24 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"Date non comprise dans la fourchette prévue des années %1$s à %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"Passer au mode d\'entrée de l\'Agenda"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"Passer au mode d\'entrée de texte"</string>
+    <!-- no translation found for date_picker_scroll_to_later_years (3226341140390493774) -->
+    <skip />
+    <!-- no translation found for date_picker_scroll_to_earlier_years (8911933542023210271) -->
+    <skip />
     <string name="date_range_picker_title" msgid="690080476639943577">"Sélectionner les dates"</string>
     <string name="date_range_picker_start_headline" msgid="5759491386723090559">"Date de début"</string>
     <string name="date_range_picker_end_headline" msgid="4766270708882012148">"Date de fin"</string>
+    <!-- no translation found for date_range_picker_scroll_to_next_month (51495506931835470) -->
+    <skip />
+    <!-- no translation found for date_range_picker_scroll_to_previous_month (4371570854614540700) -->
+    <skip />
+    <!-- no translation found for date_range_picker_day_in_range (9048690781645835833) -->
+    <skip />
     <string name="date_range_input_title" msgid="2366412111888449406">"Entrer les dates"</string>
+    <!-- no translation found for date_range_input_invalid_range_input (1891592555781755601) -->
+    <skip />
+    <!-- no translation found for tooltip_pane_description (8191239805703103845) -->
+    <skip />
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"Afficher une infobulle"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
@@ -57,4 +71,8 @@
     <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d h"</string>
     <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d h"</string>
     <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d minutes"</string>
+    <!-- no translation found for time_picker_minute (6116528647594005945) -->
+    <skip />
+    <!-- no translation found for time_picker_hour (7241191970823415723) -->
+    <skip />
 </resources>
