@@ -31,7 +31,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun MemoryView(picturesWithThumbnail: SnapshotStateList<PictureWithThumbnail>) {
+internal fun MemoryView(picturesWithThumbnail: List<PictureWithThumbnail>) {
     val scrollState = rememberScrollState()
     Column(
         modifier = Modifier
