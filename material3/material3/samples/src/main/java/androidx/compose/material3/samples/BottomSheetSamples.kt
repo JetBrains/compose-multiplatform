@@ -141,7 +141,10 @@ fun SimpleBottomSheetScaffoldSample() {
     val scope = rememberCoroutineScope()
     val scaffoldState = rememberBottomSheetScaffoldState()
 
-    BottomSheetScaffold(sheetContent = {
+    BottomSheetScaffold(
+        scaffoldState = scaffoldState,
+        sheetPeekHeight = 128.dp,
+        sheetContent = {
         Box(
             Modifier
                 .fillMaxWidth()
