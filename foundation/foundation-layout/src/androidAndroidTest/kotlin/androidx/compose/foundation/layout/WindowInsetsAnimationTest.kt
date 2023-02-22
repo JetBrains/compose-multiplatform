@@ -27,6 +27,7 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
+import androidx.test.filters.SdkSuppress
 import java.util.concurrent.TimeUnit
 import org.junit.After
 import org.junit.Before
@@ -53,6 +54,7 @@ class WindowInsetsAnimationTest {
         }
     }
 
+    @SdkSuppress(minSdkVersion = 22) // b/266742122
     @OptIn(ExperimentalLayoutApi::class)
     @Test
     fun imeAnimationWhenShowingIme() {
