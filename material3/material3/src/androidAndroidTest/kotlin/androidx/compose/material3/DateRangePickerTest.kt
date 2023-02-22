@@ -18,9 +18,10 @@ package androidx.compose.material3
 
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
+import androidx.compose.ui.test.hasClickAction
+import androidx.compose.ui.test.hasText
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onFirst
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -198,8 +199,12 @@ class DateRangePickerTest {
             .assertExists()
 
         // First date selection: Select the 10th day of the displayed month.
-        rule.onAllNodesWithText("10").onFirst().assertIsNotSelected()
-        rule.onAllNodesWithText("10").onFirst().performClick()
+        rule.onAllNodes(hasText("10", substring = true) and hasClickAction())
+            .onFirst()
+            .assertIsNotSelected()
+        rule.onAllNodes(hasText("10", substring = true) and hasClickAction())
+            .onFirst()
+            .performClick()
 
         // Assert the state holds a valid start date.
         rule.runOnIdle {
@@ -218,11 +223,17 @@ class DateRangePickerTest {
             .assertDoesNotExist()
         rule.onNodeWithText("Jan 10, 2019", useUnmergedTree = true).assertExists()
         rule.onNodeWithText(defaultEndSelectionHeadline, useUnmergedTree = true).assertExists()
-        rule.onAllNodesWithText("10").onFirst().assertIsSelected()
+        rule.onAllNodes(hasText("10", substring = true) and hasClickAction())
+            .onFirst()
+            .assertIsSelected()
 
         // Second date selection: Select the 14th day of the displayed month.
-        rule.onAllNodesWithText("14").onFirst().assertIsNotSelected()
-        rule.onAllNodesWithText("14").onFirst().performClick()
+        rule.onAllNodes(hasText("14", substring = true) and hasClickAction())
+            .onFirst()
+            .assertIsNotSelected()
+        rule.onAllNodes(hasText("14", substring = true) and hasClickAction())
+            .onFirst()
+            .performClick()
 
         // Assert the state holds a valid end date.
         rule.runOnIdle {
@@ -255,7 +266,9 @@ class DateRangePickerTest {
         }
 
         // First date selection: Select the 15th day of the first displayed month in the list.
-        rule.onAllNodesWithText("15").onFirst().performClick()
+        rule.onAllNodes(hasText("15", substring = true) and hasClickAction())
+            .onFirst()
+            .performClick()
 
         // Assert the state holds a valid start date.
         rule.runOnIdle {
@@ -270,7 +283,9 @@ class DateRangePickerTest {
         }
 
         // Select a second date that is earlier than the first date.
-        rule.onAllNodesWithText("12").onFirst().performClick()
+        rule.onAllNodes(hasText("12", substring = true) and hasClickAction())
+            .onFirst()
+            .performClick()
 
         // Assert the state now holds the second selection as the start date.
         rule.runOnIdle {
