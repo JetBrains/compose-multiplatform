@@ -20,6 +20,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -173,10 +174,7 @@ fun SearchBar(
 ) {
     val animationProgress: State<Float> = animateFloatAsState(
         targetValue = if (active) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = AnimationDurationMillis,
-            easing = MotionTokens.EasingLegacyCubicBezier,
-        )
+        animationSpec = if (active) AnimationEnterFloatSpec else AnimationExitFloatSpec
     )
 
     val density = LocalDensity.current
@@ -693,12 +691,32 @@ internal val SearchBarVerticalPadding: Dp = 8.dp
 private val SearchBarIconOffsetX: Dp = 4.dp
 
 // Animation specs
-private const val AnimationDurationMillis: Int = MotionTokens.DurationMedium2.toInt()
-private val SizeAnimationSpec: FiniteAnimationSpec<IntSize> =
-    tween(durationMillis = AnimationDurationMillis, easing = MotionTokens.EasingLegacyCubicBezier)
-private val OpacityAnimationSpec: FiniteAnimationSpec<Float> =
-    tween(durationMillis = AnimationDurationMillis, easing = MotionTokens.EasingLegacyCubicBezier)
+private const val AnimationEnterDurationMillis: Int = MotionTokens.DurationLong4.toInt()
+private const val AnimationExitDurationMillis: Int = MotionTokens.DurationMedium3.toInt()
+private const val AnimationDelayMillis: Int = MotionTokens.DurationShort2.toInt()
+private val AnimationEnterEasing = MotionTokens.EasingEmphasizedDecelerateCubicBezier
+private val AnimationExitEasing = CubicBezierEasing(0.0f, 1.0f, 0.0f, 1.0f)
+private val AnimationEnterFloatSpec: FiniteAnimationSpec<Float> = tween(
+    durationMillis = AnimationEnterDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationEnterEasing,
+)
+private val AnimationExitFloatSpec: FiniteAnimationSpec<Float> = tween(
+    durationMillis = AnimationExitDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationExitEasing,
+)
+private val AnimationEnterSizeSpec: FiniteAnimationSpec<IntSize> = tween(
+    durationMillis = AnimationEnterDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationEnterEasing,
+)
+private val AnimationExitSizeSpec: FiniteAnimationSpec<IntSize> = tween(
+    durationMillis = AnimationExitDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationExitEasing,
+)
 private val DockedEnterTransition: EnterTransition =
-    fadeIn(OpacityAnimationSpec) + expandVertically(SizeAnimationSpec)
+    fadeIn(AnimationEnterFloatSpec) + expandVertically(AnimationEnterSizeSpec)
 private val DockedExitTransition: ExitTransition =
-    fadeOut(OpacityAnimationSpec) + shrinkVertically(SizeAnimationSpec)
+    fadeOut(AnimationExitFloatSpec) + shrinkVertically(AnimationExitSizeSpec)
