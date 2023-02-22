@@ -37,7 +37,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-internal fun MemoryView(
+internal fun MemoryScreen(
     memoryPage: MemoryPage,
     picturesWithThumbnail: List<PictureWithThumbnail>,
     onSelectRelatedMemory: (Int) -> Unit,

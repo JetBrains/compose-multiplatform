@@ -7,46 +7,22 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.Dependencies
+import example.imageviewer.ExternalImageViewerEvent
 import io.ktor.client.request.get
 import io.ktor.client.statement.bodyAsText
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.serialization.builtins.ListSerializer
 
 data class PictureWithThumbnail(val picture: Picture, val thumbnail: ImageBitmap)
 
-sealed class Page
-
-class MemoryPage(val pictureIndex: Int): Page() {
-    val scrollState = ScrollState(0)
-}
-
-class CameraPage : Page()
-
-class FullScreenPage(val picture: Picture) : Page()
-
-
-class GalleryState: Page() {
-    var currentPictureIndex by mutableStateOf(0)
+class GalleryState {
     val picturesWithThumbnail = mutableStateListOf<PictureWithThumbnail>()
 
     val isContentReady get() = picturesWithThumbnail.isNotEmpty()
-
-    val picture get(): Picture? = picturesWithThumbnail.getOrNull(currentPictureIndex)?.picture
-
-    fun nextImage() {
-        currentPictureIndex = (currentPictureIndex + 1).mod(picturesWithThumbnail.lastIndex)
-    }
-
-    fun previousImage() {
-        currentPictureIndex = (currentPictureIndex - 1).mod(picturesWithThumbnail.lastIndex)
-    }
-
-    fun selectPicture(picture: Picture) {
-        currentPictureIndex = picturesWithThumbnail.indexOfFirst { it.picture == picture }
-    }
 
     fun refresh(dependencies: Dependencies) {
         dependencies.ioScope.launch {

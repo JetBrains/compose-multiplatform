@@ -13,14 +13,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.CameraPage
 import example.imageviewer.model.FullScreenPage
+import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.GalleryState
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.Page
 import example.imageviewer.model.bigUrl
 import example.imageviewer.view.CameraScreen
 import example.imageviewer.view.FullscreenImage
-import example.imageviewer.view.MainScreen
-import example.imageviewer.view.MemoryView
+import example.imageviewer.view.GalleryScreen
+import example.imageviewer.view.MemoryScreen
 import example.imageviewer.view.NavigationStack
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -37,18 +38,11 @@ internal fun ImageViewerCommon(
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
     val galleryState = remember { GalleryState() }
-    val navigationStack = remember { NavigationStack<Page>(listOf(galleryState)) }
+    val rootGalleryPage = GalleryPage(galleryState, externalEvents)
+    val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
     LaunchedEffect(Unit) {
         galleryState.refresh(dependencies)
-    }
-    LaunchedEffect(Unit) {
-        externalEvents.collect {
-            when (it) {
-                ExternalImageViewerEvent.Foward -> galleryState.nextImage()
-                ExternalImageViewerEvent.Back -> galleryState.previousImage()
-            }
-        }
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -58,39 +52,48 @@ internal fun ImageViewerCommon(
             val multiplier = if (previousIdx < currentIdx) 1 else -1
             slideInHorizontally { w -> multiplier * w } with
                     slideOutHorizontally { w -> multiplier * -1 * w }
-        }) { (index, targetState) ->
-            when (targetState) {
-                is GalleryState -> {
-                    MainScreen(targetState, dependencies, onClickPreviewPicture = { fullScreenPicture ->
-                        val idx = targetState.picturesWithThumbnail.indexOfFirst { it.picture == fullScreenPicture }
-                        navigationStack.push(MemoryPage(idx))
-                    }, onMakeNewMemory = {
-                        navigationStack.push(CameraPage())
-                    })
+        }) { (index, page) ->
+            when (page) {
+                is GalleryPage -> {
+                    GalleryScreen(
+                        page,
+                        galleryState,
+                        dependencies,
+                        onClickPreviewPicture = { fullScreenPicture ->
+                            val idx =
+                                galleryState.picturesWithThumbnail.indexOfFirst { it.picture == fullScreenPicture }
+                            navigationStack.push(MemoryPage(idx))
+                        },
+                        onMakeNewMemory = {
+                            navigationStack.push(CameraPage())
+                        })
                 }
 
                 is FullScreenPage -> {
                     FullscreenImage(
-                        picture = targetState.picture,
+                        picture = page.picture,
                         getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {
                             navigationStack.back()
-                        },
-                        nextImage = { /*fullGalleryScreenState.nextImage()*/ },
-                        previousImage = { /*fullGalleryScreenState.previousImage()*/ },
+                        }
                     )
                 }
 
                 is MemoryPage -> {
-                    MemoryView(targetState, galleryState.picturesWithThumbnail, onSelectRelatedMemory = {
-                        navigationStack.push(MemoryPage(it))
-                    }, onBack = {
-                        navigationStack.back()
-                    }, onHeaderClick = {
-                        navigationStack.push(FullScreenPage(galleryState.picturesWithThumbnail[it].picture))
-                    })
+                    MemoryScreen(
+                        page,
+                        galleryState.picturesWithThumbnail,
+                        onSelectRelatedMemory = {
+                            navigationStack.push(MemoryPage(it))
+                        },
+                        onBack = {
+                            navigationStack.back()
+                        },
+                        onHeaderClick = {
+                            navigationStack.push(FullScreenPage(galleryState.picturesWithThumbnail[it].picture))
+                        })
                 }
 
                 is CameraPage -> {

@@ -36,8 +36,6 @@ internal fun FullscreenImage(
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
-    nextImage: () -> Unit,
-    previousImage: () -> Unit,
 ) {
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
@@ -106,29 +104,6 @@ internal fun FullscreenImage(
             } else {
                 LoadingScreen()
             }
-        }
-
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
-            containerColor = ImageviewerColors.KotlinGradient0,
-            onClick = previousImage
-        ) {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
-        }
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-            containerColor = ImageviewerColors.KotlinGradient0,
-            onClick = nextImage
-        ) {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowRight,
-                contentDescription = "Next",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
         }
     }
 

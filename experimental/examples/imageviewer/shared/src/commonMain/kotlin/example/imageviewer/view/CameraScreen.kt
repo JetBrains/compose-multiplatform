@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 
 @Composable
-fun CameraScreen(onBack: () -> Unit) {
+internal fun CameraScreen(onBack: () -> Unit) {
     Box(Modifier.fillMaxSize().background(Color.Black).clickable { onBack() }, contentAlignment = Alignment.Center) {
         Text("Nothing here yet 📸", textAlign = TextAlign.Center, color = Color.White)
     }

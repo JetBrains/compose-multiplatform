@@ -1,9 +1,10 @@
 package example.imageviewer.view
 
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.toMutableStateList
 
-class NavigationStack<T>(initial: List<T>) {
-    private val stack = initial.toMutableStateList()
+class NavigationStack<T>(initial: T) {
+    private val stack = mutableStateListOf(initial)
     fun push(t: T) {
         stack.add(t)
     }

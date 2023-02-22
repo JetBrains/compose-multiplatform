@@ -27,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,6 +43,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Dependencies
+import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.GalleryState
 import example.imageviewer.model.Picture
 import example.imageviewer.model.PictureWithThumbnail
@@ -71,43 +74,47 @@ enum class GalleryStyle {
     LIST
 }
 
-fun GalleryStyle.toggled(): GalleryStyle {
-    return if (this == GalleryStyle.SQUARES) GalleryStyle.LIST else GalleryStyle.SQUARES
-}
-
 @Composable
-internal fun MainScreen(galleryScreenState: GalleryState, dependencies: Dependencies, onClickPreviewPicture: (Picture) -> Unit, onMakeNewMemory: () -> Unit) {
-    var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
+internal fun GalleryScreen(galleryPage: GalleryPage, galleryState: GalleryState, dependencies: Dependencies, onClickPreviewPicture: (Picture) -> Unit, onMakeNewMemory: () -> Unit) {
+    LaunchedEffect(Unit) {
+        galleryPage.externalEvents.collect {
+            when (it) {
+                ExternalImageViewerEvent.Foward -> galleryPage.nextImage()
+                ExternalImageViewerEvent.Back -> galleryPage.previousImage()
+            }
+        }
+    }
+
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         TitleBar(
-            onRefresh = { galleryScreenState.refresh(dependencies) },
-            onToggle = { galleryStyle = galleryStyle.toggled() },
+            onRefresh = { galleryState.refresh(dependencies) },
+            onToggle = { galleryPage.toggleGalleryStyle() },
             dependencies
         )
         if (needShowPreview()) {
             PreviewImage(
                 getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-                picture = galleryScreenState.picture, onClick = {
-                    galleryScreenState.picture?.let(onClickPreviewPicture)
+                picture = galleryPage.picture, onClick = {
+                    galleryPage.picture?.let(onClickPreviewPicture)
                 })
         }
-        when (galleryStyle) {
+        when (galleryPage.galleryStyle) {
             GalleryStyle.SQUARES -> SquaresGalleryView(
-                galleryScreenState.picturesWithThumbnail,
-                galleryScreenState.picturesWithThumbnail.getOrNull(galleryScreenState.currentPictureIndex),
-                onSelect = { galleryScreenState.selectPicture(it) },
+                galleryState.picturesWithThumbnail,
+                galleryState.picturesWithThumbnail.getOrNull(galleryPage.currentPictureIndex),
+                onSelect = { galleryPage.selectPicture(it) },
                 onMakeNewMemory
             )
 
             GalleryStyle.LIST -> ListGalleryView(
-                galleryScreenState.picturesWithThumbnail,
+                galleryState.picturesWithThumbnail,
                 dependencies,
-                onSelect = { galleryScreenState.selectPicture(it) },
+                onSelect = { galleryPage.selectPicture(it) },
                 onFullScreen = { onClickPreviewPicture(it) }
             )
         }
     }
-    if (!galleryScreenState.isContentReady) {
+    if (!galleryState.isContentReady) {
         LoadingScreen(dependencies.localization.loading)
     }
 }
