@@ -42,7 +42,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Dependencies
-import example.imageviewer.model.GalleryScreenState
+import example.imageviewer.model.GalleryState
 import example.imageviewer.model.Picture
 import example.imageviewer.model.PictureWithThumbnail
 import example.imageviewer.model.bigUrl
@@ -76,7 +76,7 @@ fun GalleryStyle.toggled(): GalleryStyle {
 }
 
 @Composable
-internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: Dependencies) {
+internal fun MainScreen(galleryScreenState: GalleryState, dependencies: Dependencies, onClickPreviewPicture: (Picture) -> Unit, onMakeNewMemory: () -> Unit) {
     var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         TitleBar(
@@ -88,21 +88,22 @@ internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: De
             PreviewImage(
                 getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                 picture = galleryScreenState.picture, onClick = {
-                    galleryScreenState.toFullscreen()
+                    galleryScreenState.picture?.let(onClickPreviewPicture)
                 })
         }
         when (galleryStyle) {
             GalleryStyle.SQUARES -> SquaresGalleryView(
                 galleryScreenState.picturesWithThumbnail,
                 galleryScreenState.picturesWithThumbnail.getOrNull(galleryScreenState.currentPictureIndex),
-                onSelect = { galleryScreenState.selectPicture(it) }
+                onSelect = { galleryScreenState.selectPicture(it) },
+                onMakeNewMemory
             )
 
             GalleryStyle.LIST -> ListGalleryView(
                 galleryScreenState.picturesWithThumbnail,
                 dependencies,
                 onSelect = { galleryScreenState.selectPicture(it) },
-                onFullScreen = { galleryScreenState.toFullscreen(it) }
+                onFullScreen = { onClickPreviewPicture(it) }
             )
         }
     }
@@ -115,11 +116,12 @@ internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: De
 private fun SquaresGalleryView(
     images: List<PictureWithThumbnail>,
     selectedImage: PictureWithThumbnail?,
-    onSelect: (Picture) -> Unit
+    onSelect: (Picture) -> Unit,
+    onMakeNewMemory: () -> Unit,
 ) {
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
         item {
-            MakeNewMemoryMiniature()
+            MakeNewMemoryMiniature(onMakeNewMemory)
         }
         itemsIndexed(images) { idx, image ->
             val isSelected = image == selectedImage
@@ -130,11 +132,11 @@ private fun SquaresGalleryView(
 }
 
 @Composable
-private fun MakeNewMemoryMiniature() {
+private fun MakeNewMemoryMiniature(onClick: () -> Unit) {
     Box(
         Modifier.aspectRatio(1.0f)
             .clickable {
-                // TODO: Open Camera!
+                onClick()
             }, contentAlignment = Alignment.Center
     ) {
         Text(
@@ -148,7 +150,7 @@ private fun MakeNewMemoryMiniature() {
 }
 
 @Composable
-private fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick: () -> Unit) {
+internal fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick: () -> Unit) {
     Image(
         bitmap = image,
         contentDescription = null,
@@ -166,7 +168,7 @@ private fun ListGalleryView(
     pictures: List<PictureWithThumbnail>,
     dependencies: Dependencies,
     onSelect: (Picture) -> Unit,
-    onFullScreen: (Int) -> Unit
+    onFullScreen: (Picture) -> Unit
 ) {
     GalleryHeader()
     Spacer(modifier = Modifier.height(10.dp))
@@ -182,7 +184,7 @@ private fun ListGalleryView(
                     onSelect(picture)
                 },
                 onClickFullScreen = {
-                    onFullScreen(idx)
+                    onFullScreen(picture)
                 },
                 onClickInfo = {
                     dependencies.notification.notifyImageData(picture)

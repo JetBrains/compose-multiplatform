@@ -1,5 +1,6 @@
 package example.imageviewer.model
 
+import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -16,10 +17,21 @@ import kotlinx.serialization.builtins.ListSerializer
 
 data class PictureWithThumbnail(val picture: Picture, val thumbnail: ImageBitmap)
 
-class GalleryScreenState {
+sealed class Page
+
+class MemoryPage(val pictureIndex: Int): Page() {
+    val scrollState = ScrollState(0)
+}
+
+class CameraPage : Page()
+
+class FullScreenPage(val picture: Picture) : Page()
+
+
+class GalleryState: Page() {
     var currentPictureIndex by mutableStateOf(0)
     val picturesWithThumbnail = mutableStateListOf<PictureWithThumbnail>()
-    var screen by mutableStateOf<ScreenState>(ScreenState.Miniatures)
+
     val isContentReady get() = picturesWithThumbnail.isNotEmpty()
 
     val picture get(): Picture? = picturesWithThumbnail.getOrNull(currentPictureIndex)?.picture
@@ -34,11 +46,6 @@ class GalleryScreenState {
 
     fun selectPicture(picture: Picture) {
         currentPictureIndex = picturesWithThumbnail.indexOfFirst { it.picture == picture }
-    }
-
-    fun toFullscreen(idx: Int = currentPictureIndex) {
-        currentPictureIndex = idx
-        screen = ScreenState.FullScreen
     }
 
     fun refresh(dependencies: Dependencies) {
@@ -69,9 +76,4 @@ class GalleryScreenState {
             }
         }
     }
-}
-
-sealed interface ScreenState {
-    object Miniatures : ScreenState
-    object FullScreen : ScreenState
 }

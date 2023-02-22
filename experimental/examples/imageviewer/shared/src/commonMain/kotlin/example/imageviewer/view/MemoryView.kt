@@ -5,75 +5,110 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PictureWithThumbnail
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-internal fun MemoryView(picturesWithThumbnail: List<PictureWithThumbnail>) {
-    val scrollState = rememberScrollState()
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState),
-    ) {
-        Box(
+internal fun MemoryView(
+    memoryPage: MemoryPage,
+    picturesWithThumbnail: List<PictureWithThumbnail>,
+    onSelectRelatedMemory: (Int) -> Unit,
+    onBack: () -> Unit,
+    onHeaderClick: (Int) -> Unit
+) {
+    Column {
+        TopAppBar(
+            modifier = Modifier.background(brush = ImageviewerColors.kotlinHorizontalGradientBrush),
+            colors = TopAppBarDefaults.smallTopAppBarColors(
+                containerColor = ImageviewerColors.Transparent,
+                titleContentColor = MaterialTheme.colorScheme.onBackground
+            ),
+            title = {
+                Text("")
+            },
+            navigationIcon = {
+                Tooltip("Back") {
+                    Image(
+                        painterResource("back.png"),
+                        contentDescription = null,
+                        modifier = Modifier.size(38.dp)
+                            .clip(CircleShape)
+                            .clickable { onBack() }
+                    )
+                }
+            },
+        )
+        val scrollState = memoryPage.scrollState
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
-                .background(Color.White)
-                .graphicsLayer {
-                    translationY = 0.5f * scrollState.value
-                },
-            contentAlignment = Alignment.Center
+                .verticalScroll(scrollState),
         ) {
-            MemoryHeader()
-        }
-        Box(modifier = Modifier.background(ImageviewerColors.kotlinHorizontalGradientBrush)) {
-            Column {
-                Headliner("Where it happened")
-                LocationVisualizer()
-                Headliner("What happened")
-                Collapsible(
-                    """
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(300.dp)
+                    .background(Color.White)
+                    .graphicsLayer {
+                        translationY = 0.5f * scrollState.value
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                MemoryHeader(picturesWithThumbnail[memoryPage.pictureIndex].thumbnail, onClick = { onHeaderClick(memoryPage.pictureIndex) })
+            }
+            Box(modifier = Modifier.background(ImageviewerColors.kotlinHorizontalGradientBrush)) {
+                Column {
+                    Headliner("Where it happened")
+                    LocationVisualizer()
+                    Headliner("What happened")
+                    Collapsible(
+                        """
                         I took a picture with my iPhone 14 at 17:45. The picture ended up being 3024 x 4032 pixels. ✨
                         
                         I took multiple additional photos of the same subject, but they turned out not quite as well, so I decided to keep this specific one as a memory.
                         
                         I might upload this picture to Unsplash at some point, since other people might also enjoy this picture. So it would make sense to not keep it to myself! 😄
                         """.trimIndent()
-                )
-                Headliner("Related memories")
-                RelatedMemoriesVisualizer(picturesWithThumbnail)
-                Spacer(Modifier.height(50.dp))
-                Text(
-                    "Delete this memory",
-                    Modifier.fillMaxWidth(),
-                    textAlign = TextAlign.Center,
-                    color = Color.White
-                )
-                Spacer(Modifier.height(50.dp))
+                    )
+                    Headliner("Related memories")
+                    RelatedMemoriesVisualizer(picturesWithThumbnail, onSelectRelatedMemory)
+                    Spacer(Modifier.height(50.dp))
+                    Text(
+                        "Delete this memory",
+                        Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = Color.White
+                    )
+                    Spacer(Modifier.height(50.dp))
+                }
             }
         }
     }
@@ -81,10 +116,11 @@ internal fun MemoryView(picturesWithThumbnail: List<PictureWithThumbnail>) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun MemoryHeader() {
-    Box {
+private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
         Image(
-            painterResource("dummy.jpg"),
+            bitmap,
             "Memory",
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
@@ -164,20 +200,30 @@ internal fun LocationVisualizer() {
 }
 
 @Composable
-internal fun RelatedMemoriesVisualizer(ps: List<PictureWithThumbnail>) {
+internal fun RelatedMemoriesVisualizer(
+    ps: List<PictureWithThumbnail>,
+    onSelectRelatedMemory: (Int) -> Unit
+) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
             .height(200.dp)
     ) {
         LazyRow(modifier = Modifier.fillMaxSize()) {
-            items(ps) {
-                RelatedMemory(it)
+            itemsIndexed(ps) { idx, item ->
+                RelatedMemory(idx, item, onSelectRelatedMemory)
             }
         }
     }
 }
 
 @Composable
-internal fun RelatedMemory(pictureWithThumbnail: PictureWithThumbnail) {
-    SquareMiniature(pictureWithThumbnail.thumbnail, false, onClick = {})
+internal fun RelatedMemory(
+    index: Int,
+    pictureWithThumbnail: PictureWithThumbnail,
+    onSelectRelatedMemory: (Int) -> Unit
+) {
+    SquareMiniature(
+        pictureWithThumbnail.thumbnail,
+        false,
+        onClick = { onSelectRelatedMemory(index) })
 }
