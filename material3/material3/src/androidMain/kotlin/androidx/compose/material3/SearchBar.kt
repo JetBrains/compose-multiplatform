@@ -101,15 +101,16 @@ import androidx.compose.ui.zIndex
 import kotlin.math.max
 import kotlin.math.min
 
-// TODO(260864875): Add material.io link and image when available
 /**
- * Material Design search bar
+ * <a href="https://m3.material.io/components/search/overview" class="external" target="_blank">Material Design search</a>.
  *
  * A search bar represents a floating search field that allows users to enter a keyword or phrase
  * and get relevant information. It can be used as a way to navigate through an app via search
  * queries.
  *
  * An active search bar expands into a search "view" and can be used to display dynamic suggestions.
+ *
+ * ![Search bar image](https://developer.android.com/images/reference/androidx/compose/material3/search-bar.png)
  *
  * A [SearchBar] expands to occupy the entirety of its allowed size when active. For full-screen
  * behavior as specified by Material guidelines, parent layouts of the [SearchBar] must not pass
@@ -282,15 +283,16 @@ fun SearchBar(
     }
 }
 
-// TODO(260864875): Add material.io link and image when available
 /**
- * Material Design search bar
+ * <a href="https://m3.material.io/components/search/overview" class="external" target="_blank">Material Design search</a>.
  *
  * A search bar represents a floating search field that allows users to enter a keyword or phrase
  * and get relevant information. It can be used as a way to navigate through an app via search
  * queries.
  *
  * An active search bar expands into a search "view" and can be used to display dynamic suggestions.
+ *
+ * ![Search bar image](https://developer.android.com/images/reference/androidx/compose/material3/docked-search-bar.png)
  *
  * A [DockedSearchBar] displays search results in a bounded table below the input field. It is meant
  * to be an alternative to [SearchBar] when expanding to full-screen size is undesirable on large
