@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.CameraPage
 import example.imageviewer.model.FullScreenPage
 import example.imageviewer.model.GalleryPage
-import example.imageviewer.model.GalleryState
+import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.Page
 import example.imageviewer.model.bigUrl
@@ -37,12 +39,13 @@ internal fun ImageViewerCommon(
     dependencies: Dependencies,
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
-    val galleryState = remember { GalleryState() }
-    val rootGalleryPage = GalleryPage(galleryState, externalEvents)
+    val photoGallery = remember { PhotoGallery(dependencies) }
+    val galleryStateFlow by photoGallery.galleryStateFlow.collectAsState()
+    val rootGalleryPage = GalleryPage(photoGallery, externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
     LaunchedEffect(Unit) {
-        galleryState.refresh(dependencies)
+        photoGallery.updatePictures()
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -57,12 +60,10 @@ internal fun ImageViewerCommon(
                 is GalleryPage -> {
                     GalleryScreen(
                         page,
-                        galleryState,
+                        photoGallery,
                         dependencies,
-                        onClickPreviewPicture = { fullScreenPicture ->
-                            val idx =
-                                galleryState.picturesWithThumbnail.indexOfFirst { it.picture == fullScreenPicture }
-                            navigationStack.push(MemoryPage(idx))
+                        onClickPreviewPicture = { previewPictureId ->
+                            navigationStack.push(MemoryPage(previewPictureId))
                         },
                         onMakeNewMemory = {
                             navigationStack.push(CameraPage())
@@ -71,7 +72,8 @@ internal fun ImageViewerCommon(
 
                 is FullScreenPage -> {
                     FullscreenImage(
-                        picture = page.picture,
+                        galleryId = page.galleryId,
+                        gallery = photoGallery,
                         getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
@@ -84,15 +86,15 @@ internal fun ImageViewerCommon(
                 is MemoryPage -> {
                     MemoryScreen(
                         page,
-                        galleryState.picturesWithThumbnail,
-                        onSelectRelatedMemory = {
-                            navigationStack.push(MemoryPage(it))
+                        photoGallery,
+                        onSelectRelatedMemory = { galleryId ->
+                            navigationStack.push(MemoryPage(galleryId))
                         },
                         onBack = {
                             navigationStack.back()
                         },
-                        onHeaderClick = {
-                            navigationStack.push(FullScreenPage(galleryState.picturesWithThumbnail[it].picture))
+                        onHeaderClick = { galleryId ->
+                            navigationStack.push(FullScreenPage(galleryId))
                         })
                 }
 

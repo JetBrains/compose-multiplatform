@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,8 +30,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.model.GalleryEntryWithMetadata
+import example.imageviewer.model.GalleryId
+import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.MemoryPage
-import example.imageviewer.model.PictureWithThumbnail
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -39,11 +42,13 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
-    picturesWithThumbnail: List<PictureWithThumbnail>,
-    onSelectRelatedMemory: (Int) -> Unit,
+    photoGallery: PhotoGallery,
+    onSelectRelatedMemory: (GalleryId) -> Unit,
     onBack: () -> Unit,
-    onHeaderClick: (Int) -> Unit
+    onHeaderClick: (GalleryId) -> Unit
 ) {
+    val pictures by photoGallery.galleryStateFlow.collectAsState()
+    val picture = pictures.first { it.id == memoryPage.galleryId }
     Column {
         TopAppBar(
             modifier = Modifier.background(brush = ImageviewerColors.kotlinHorizontalGradientBrush),
@@ -82,7 +87,7 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                MemoryHeader(picturesWithThumbnail[memoryPage.pictureIndex].thumbnail, onClick = { onHeaderClick(memoryPage.pictureIndex) })
+                MemoryHeader(picture.thumbnail, onClick = { onHeaderClick(memoryPage.galleryId) })
             }
             Box(modifier = Modifier.background(ImageviewerColors.kotlinHorizontalGradientBrush)) {
                 Column {
@@ -99,7 +104,7 @@ internal fun MemoryScreen(
                         """.trimIndent()
                     )
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(picturesWithThumbnail, onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
                     Spacer(Modifier.height(50.dp))
                     Text(
                         "Delete this memory",
@@ -114,7 +119,6 @@ internal fun MemoryScreen(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -201,8 +205,8 @@ internal fun LocationVisualizer() {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<PictureWithThumbnail>,
-    onSelectRelatedMemory: (Int) -> Unit
+    ps: List<GalleryEntryWithMetadata>,
+    onSelectRelatedMemory: (GalleryId) -> Unit
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
@@ -219,11 +223,11 @@ internal fun RelatedMemoriesVisualizer(
 @Composable
 internal fun RelatedMemory(
     index: Int,
-    pictureWithThumbnail: PictureWithThumbnail,
-    onSelectRelatedMemory: (Int) -> Unit
+    galleryEntry: GalleryEntryWithMetadata,
+    onSelectRelatedMemory: (GalleryId) -> Unit
 ) {
     SquareMiniature(
-        pictureWithThumbnail.thumbnail,
+        galleryEntry.thumbnail,
         false,
-        onClick = { onSelectRelatedMemory(index) })
+        onClick = { onSelectRelatedMemory(galleryEntry.id) })
 }

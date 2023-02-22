@@ -28,10 +28,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,10 +42,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.model.GalleryEntryWithMetadata
+import example.imageviewer.model.GalleryId
 import example.imageviewer.model.GalleryPage
-import example.imageviewer.model.GalleryState
-import example.imageviewer.model.Picture
-import example.imageviewer.model.PictureWithThumbnail
+import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
 import example.imageviewer.style.ImageviewerColors
 import example.imageviewer.style.ImageviewerColors.kotlinHorizontalGradientBrush
@@ -75,7 +73,14 @@ enum class GalleryStyle {
 }
 
 @Composable
-internal fun GalleryScreen(galleryPage: GalleryPage, galleryState: GalleryState, dependencies: Dependencies, onClickPreviewPicture: (Picture) -> Unit, onMakeNewMemory: () -> Unit) {
+internal fun GalleryScreen(
+    galleryPage: GalleryPage,
+    photoGallery: PhotoGallery,
+    dependencies: Dependencies,
+    onClickPreviewPicture: (GalleryId) -> Unit,
+    onMakeNewMemory: () -> Unit
+) {
+    val pictures by photoGallery.galleryStateFlow.collectAsState()
     LaunchedEffect(Unit) {
         galleryPage.externalEvents.collect {
             when (it) {
@@ -87,7 +92,7 @@ internal fun GalleryScreen(galleryPage: GalleryPage, galleryState: GalleryState,
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         TitleBar(
-            onRefresh = { galleryState.refresh(dependencies) },
+            onRefresh = { photoGallery.updatePictures() },
             onToggle = { galleryPage.toggleGalleryStyle() },
             dependencies
         )
@@ -95,35 +100,35 @@ internal fun GalleryScreen(galleryPage: GalleryPage, galleryState: GalleryState,
             PreviewImage(
                 getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                 picture = galleryPage.picture, onClick = {
-                    galleryPage.picture?.let(onClickPreviewPicture)
+                    galleryPage.pictureId?.let(onClickPreviewPicture)
                 })
         }
         when (galleryPage.galleryStyle) {
             GalleryStyle.SQUARES -> SquaresGalleryView(
-                galleryState.picturesWithThumbnail,
-                galleryState.picturesWithThumbnail.getOrNull(galleryPage.currentPictureIndex),
+                pictures,
+                galleryPage.pictureId,
                 onSelect = { galleryPage.selectPicture(it) },
                 onMakeNewMemory
             )
 
             GalleryStyle.LIST -> ListGalleryView(
-                galleryState.picturesWithThumbnail,
+                pictures,
                 dependencies,
                 onSelect = { galleryPage.selectPicture(it) },
                 onFullScreen = { onClickPreviewPicture(it) }
             )
         }
     }
-    if (!galleryState.isContentReady) {
+    if (pictures.isEmpty()) {
         LoadingScreen(dependencies.localization.loading)
     }
 }
 
 @Composable
 private fun SquaresGalleryView(
-    images: List<PictureWithThumbnail>,
-    selectedImage: PictureWithThumbnail?,
-    onSelect: (Picture) -> Unit,
+    images: List<GalleryEntryWithMetadata>,
+    selectedImage: GalleryId?,
+    onSelect: (GalleryId) -> Unit,
     onMakeNewMemory: () -> Unit,
 ) {
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
@@ -131,9 +136,13 @@ private fun SquaresGalleryView(
             MakeNewMemoryMiniature(onMakeNewMemory)
         }
         itemsIndexed(images) { idx, image ->
-            val isSelected = image == selectedImage
+            val isSelected = image.id == selectedImage
             val (picture, bitmap) = image
-            SquareMiniature(bitmap, onClick = { onSelect(picture) }, isHighlighted = isSelected)
+            SquareMiniature(
+                image.thumbnail,
+                onClick = { onSelect(picture) },
+                isHighlighted = isSelected
+            )
         }
     }
 }
@@ -172,10 +181,10 @@ internal fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick
 
 @Composable
 private fun ListGalleryView(
-    pictures: List<PictureWithThumbnail>,
+    pictures: List<GalleryEntryWithMetadata>,
     dependencies: Dependencies,
-    onSelect: (Picture) -> Unit,
-    onFullScreen: (Picture) -> Unit
+    onSelect: (GalleryId) -> Unit,
+    onFullScreen: (GalleryId) -> Unit
 ) {
     GalleryHeader()
     Spacer(modifier = Modifier.height(10.dp))
@@ -183,15 +192,15 @@ private fun ListGalleryView(
         modifier = Modifier.fillMaxSize()
     ) {
         for ((idx, picWithThumb) in pictures.withIndex()) {
-            val (picture, miniature) = picWithThumb
+            val (galleryId, picture, miniature) = picWithThumb
             Miniature(
                 picture = picture,
                 image = miniature,
                 onClickSelect = {
-                    onSelect(picture)
+                    onSelect(galleryId)
                 },
                 onClickFullScreen = {
-                    onFullScreen(picture)
+                    onFullScreen(galleryId)
                 },
                 onClickInfo = {
                     dependencies.notification.notifyImageData(picture)
