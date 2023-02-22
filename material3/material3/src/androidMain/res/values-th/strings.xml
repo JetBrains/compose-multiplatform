@@ -44,10 +44,22 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"วันที่อยู่นอกเหนือจากช่วงปีที่คาดไว้ %1$s - %2$s"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"สลับไปใช้โหมดป้อนข้อมูลปฏิทิน"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"สลับไปใช้โหมดการป้อนข้อความ"</string>
+    <!-- no translation found for date_picker_scroll_to_later_years (3226341140390493774) -->
+    <skip />
+    <!-- no translation found for date_picker_scroll_to_earlier_years (8911933542023210271) -->
+    <skip />
     <string name="date_range_picker_title" msgid="690080476639943577">"เลือกวันที่"</string>
     <string name="date_range_picker_start_headline" msgid="5759491386723090559">"วันที่เริ่มต้น"</string>
     <string name="date_range_picker_end_headline" msgid="4766270708882012148">"วันที่สิ้นสุด"</string>
+    <!-- no translation found for date_range_picker_scroll_to_next_month (51495506931835470) -->
+    <skip />
+    <!-- no translation found for date_range_picker_scroll_to_previous_month (4371570854614540700) -->
+    <skip />
+    <string name="date_range_picker_day_in_range" msgid="9048690781645835833">"อยู่ในช่วงวันที่ที่เลือก"</string>
     <string name="date_range_input_title" msgid="2366412111888449406">"ป้อนวันที่"</string>
+    <!-- no translation found for date_range_input_invalid_range_input (1891592555781755601) -->
+    <skip />
+    <string name="tooltip_pane_description" msgid="8191239805703103845">"เคล็ดลับเครื่องมือ"</string>
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"แสดงเคล็ดลับเครื่องมือ"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"PM"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"AM"</string>
@@ -57,4 +69,8 @@
     <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d นาฬิกา"</string>
     <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%1$d ชั่วโมง"</string>
     <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%1$d นาที"</string>
+    <!-- no translation found for time_picker_minute (6116528647594005945) -->
+    <skip />
+    <!-- no translation found for time_picker_hour (7241191970823415723) -->
+    <skip />
 </resources>

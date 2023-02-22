@@ -44,10 +44,19 @@
     <string name="date_input_invalid_year_range" msgid="8434112129235255568">"তাৰিখটো প্ৰত্যাশিত বছৰৰ পৰিসৰ %1$s - %2$sৰ বাহিৰৰ"</string>
     <string name="date_picker_switch_to_calendar_mode" msgid="9029369254443419167">"কেলেণ্ডাৰ ইনপুট ম’ডলৈ সলনি কৰক"</string>
     <string name="date_picker_switch_to_input_mode" msgid="1496750567914156598">"পাঠ ইনপুট ম’ডলৈ সলনি কৰক"</string>
+    <string name="date_picker_scroll_to_later_years" msgid="3226341140390493774">"পাছৰ বছৰবোৰ দেখুৱাবলৈ স্ক্ৰ’ল কৰক"</string>
+    <string name="date_picker_scroll_to_earlier_years" msgid="8911933542023210271">"আগৰ বছৰবোৰ দেখুৱাবলৈ স্ক্ৰ’ল কৰক"</string>
     <string name="date_range_picker_title" msgid="690080476639943577">"তাৰিখ বাছনি কৰক"</string>
     <string name="date_range_picker_start_headline" msgid="5759491386723090559">"আৰম্ভণিৰ তাৰিখ"</string>
     <string name="date_range_picker_end_headline" msgid="4766270708882012148">"সমাপ্তিৰ তাৰিখ"</string>
+    <string name="date_range_picker_scroll_to_next_month" msgid="51495506931835470">"পৰৱৰ্তী মাহটো দেখুৱাবলৈ স্ক্ৰ’ল কৰক"</string>
+    <string name="date_range_picker_scroll_to_previous_month" msgid="4371570854614540700">"পূৰ্বৱৰ্তী মাহটো দেখুৱাবলৈ স্ক্ৰ’ল কৰক"</string>
+    <!-- no translation found for date_range_picker_day_in_range (9048690781645835833) -->
+    <skip />
     <string name="date_range_input_title" msgid="2366412111888449406">"তাৰিখ দিয়ক"</string>
+    <string name="date_range_input_invalid_range_input" msgid="1891592555781755601">"অমান্য তাৰিখৰ পৰিসৰৰ ইনপুট"</string>
+    <!-- no translation found for tooltip_pane_description (8191239805703103845) -->
+    <skip />
     <string name="tooltip_long_press_label" msgid="2732804537909054941">"টুলটিপ দেখুৱাওক"</string>
     <string name="time_picker_pm" msgid="2232702812657998674">"পৰাহ্ন"</string>
     <string name="time_picker_am" msgid="5096144640014509074">"পুৱা"</string>
@@ -57,4 +66,6 @@
     <string name="time_picker_hour_suffix" msgid="6952032626122080528">"%1$d বাজিছে"</string>
     <string name="time_picker_hour_24h_suffix" msgid="4149641012513526783">"%d ঘণ্টা"</string>
     <string name="time_picker_minute_suffix" msgid="3206486707779478173">"%d মিনিট"</string>
+    <string name="time_picker_minute" msgid="6116528647594005945">"মিনিট"</string>
+    <string name="time_picker_hour" msgid="7241191970823415723">"ঘণ্টা"</string>
 </resources>
