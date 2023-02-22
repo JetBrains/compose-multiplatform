@@ -1,27 +1,30 @@
 plugins {
-    id("com.android.library")
     kotlin("multiplatform")
+    id("com.android.library")
     id("org.jetbrains.compose")
 }
+
+version = "1.0-SNAPSHOT"
 
 kotlin {
     android()
     jvm("desktop")
 
     sourceSets {
-        named("commonMain") {
+        val commonMain by getting {
             dependencies {
-                api(compose.runtime)
-                api(compose.foundation)
-                api(compose.material)
+                implementation(compose.runtime)
+                implementation(compose.foundation)
+                implementation(compose.material)
+
                 // Needed only for preview.
                 implementation(compose.preview)
             }
         }
-        named("androidMain") {
+        val androidMain by getting {
             dependencies {
-                api("androidx.appcompat:appcompat:1.5.1")
-                api("androidx.core:core-ktx:1.8.0")
+                implementation("androidx.appcompat:appcompat:1.5.1")
+                implementation("androidx.core:core-ktx:1.8.0")
             }
         }
     }
