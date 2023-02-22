@@ -79,9 +79,10 @@ internal class IdentityArrayMap<Key : Any, Value : Any?>(capacity: Int = 16) {
         }
     }
 
-    fun remove(key: Key): Boolean {
+    fun remove(key: Key): Value? {
         val index = find(key)
         if (index >= 0) {
+            val value = values[index]
             val size = size
             val keys = keys
             val values = values
@@ -101,9 +102,10 @@ internal class IdentityArrayMap<Key : Any, Value : Any?>(capacity: Int = 16) {
             keys[newSize] = null
             values[newSize] = null
             this.size = newSize
-            return true
+            @Suppress("UNCHECKED_CAST")
+            return value as Value
         }
-        return false
+        return null
     }
 
     fun clear() {
