@@ -15,4 +15,4 @@ pluginManagement {
     }
 }
 
-include(":common", ":android", ":desktop")
+include(":shared", ":androidApp", ":desktopApp")

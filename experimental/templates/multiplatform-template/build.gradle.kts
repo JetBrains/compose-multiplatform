@@ -9,7 +9,7 @@ plugins {
     id("org.jetbrains.compose") apply false
 }
 
-subprojects {
+allprojects {
     repositories {
         google()
         mavenCentral()
