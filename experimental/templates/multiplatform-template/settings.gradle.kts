@@ -6,13 +6,22 @@ pluginManagement {
     }
 
     plugins {
-        kotlin("jvm").version(extra["kotlin.version"] as String)
-        kotlin("multiplatform").version(extra["kotlin.version"] as String)
-        kotlin("android").version(extra["kotlin.version"] as String)
-        id("com.android.application").version(extra["agp.version"] as String)
-        id("com.android.library").version(extra["agp.version"] as String)
-        id("org.jetbrains.compose").version(extra["compose.version"] as String)
+        val kotlinVersion = extra["kotlin.version"] as String
+        val agpVersion = extra["agp.version"] as String
+        val composeVersion = extra["compose.version"] as String
+
+        kotlin("jvm").version(kotlinVersion)
+        kotlin("multiplatform").version(kotlinVersion)
+        kotlin("android").version(kotlinVersion)
+        id("com.android.base").version(agpVersion)
+        id("com.android.application").version(agpVersion)
+        id("com.android.library").version(agpVersion)
+        id("org.jetbrains.compose").version(composeVersion)
     }
 }
 
-include(":shared", ":androidApp", ":desktopApp")
+rootProject.name = "My application"
+
+include(":androidApp")
+include(":shared")
+include(":desktopApp")
