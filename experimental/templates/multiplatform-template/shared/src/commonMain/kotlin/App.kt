@@ -8,7 +8,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 @Composable
-fun App() {
+internal fun App() {
     MaterialTheme {
         var text by remember { mutableStateOf("Hello, World!") }
 

@@ -1,6 +1,6 @@
 package com.myapplication
 
-import App
+import MainView
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
@@ -10,7 +10,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            App()
+            MainView()
         }
     }
 }
