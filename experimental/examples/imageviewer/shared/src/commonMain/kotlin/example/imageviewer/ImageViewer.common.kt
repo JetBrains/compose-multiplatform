@@ -40,13 +40,8 @@ internal fun ImageViewerCommon(
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
     val photoGallery = remember { PhotoGallery(dependencies) }
-    val galleryStateFlow by photoGallery.galleryStateFlow.collectAsState()
     val rootGalleryPage = GalleryPage(photoGallery, externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
-
-    LaunchedEffect(Unit) {
-        photoGallery.updatePictures()
-    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {

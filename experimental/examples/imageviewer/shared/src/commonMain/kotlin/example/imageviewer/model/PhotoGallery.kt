@@ -26,6 +26,10 @@ class PhotoGallery(val deps: Dependencies) {
     private val _galleryStateFlow = MutableStateFlow<List<GalleryEntryWithMetadata>>(listOf())
     val galleryStateFlow: StateFlow<List<GalleryEntryWithMetadata>> = _galleryStateFlow
 
+    init {
+        updatePictures()
+    }
+
     fun updatePictures() {
         deps.ioScope.launch {
             try {
