@@ -38,7 +38,7 @@ dependencies {
         implementation(libs.kotlinStdlibCommon)
         implementation("androidx.activity:activity-compose:1.5.0")
         implementation("androidx.compose.animation:animation-core:1.3.1")
-        implementation("androidx.compose.foundation:foundation-layout:1.3.1")
+        implementation(project(":compose:foundation:foundation-layout"))
         implementation("androidx.compose.ui:ui-util:1.3.1")
         api(project(":compose:foundation:foundation"))
         api("androidx.compose.material:material-icons-core:1.3.1")

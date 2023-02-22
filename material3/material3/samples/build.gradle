@@ -33,7 +33,7 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.5.0")
     implementation("androidx.compose.animation:animation:1.2.1")
     implementation("androidx.compose.foundation:foundation:1.2.1")
-    implementation("androidx.compose.foundation:foundation-layout:1.2.1")
+    implementation(project(":compose:foundation:foundation-layout"))
     implementation("androidx.compose.material:material:1.2.1")
     implementation(project(":compose:material3:material3"))
     implementation("androidx.compose.runtime:runtime:1.2.1")
