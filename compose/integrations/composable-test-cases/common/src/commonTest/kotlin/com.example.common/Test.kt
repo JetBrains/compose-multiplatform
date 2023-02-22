@@ -42,10 +42,11 @@ class Test {
     }
 
     @Test
-    fun testRecomposition() = runTest(UnconfinedTestDispatcher()) {
+    fun testRecomposition() = runTest {
         val index = mutableStateOf(1)
 
-        val root = composeText {
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
             TextContainerNode("abc${index.value}") {
                 TextLeafNode("Hello World!")
             }
@@ -54,11 +55,13 @@ class Test {
         assertEquals("root:{abc1:{Hello World!}}", root.dump())
 
         index.value = 2
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{abc2:{Hello World!}}", root.dump())
 
         index.value = 3
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{abc3:{Hello World!}}", root.dump())
+
+        job.cancel()
     }
 }

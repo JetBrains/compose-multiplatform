@@ -1,10 +1,9 @@
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
-import com.example.common.RecompositionObserver
 import com.example.common.TextLeafNode
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -53,13 +52,14 @@ class Tests {
     }
 
     @Test
-    fun testClassSavesComposableIntoVar() = runTest(UnconfinedTestDispatcher()) {
+    fun testClassSavesComposableIntoVar() = runTest {
         val impl = ClassSavesComposableIntoVar {
             TextLeafNode("ClassSavesComposableIntoVar")
         }
 
+        val job = Job()
         var scope: RecomposeScope? = null
-        val root = composeText {
+        val root = composeText(coroutineContext + job) {
             scope = currentRecomposeScope
             impl.composableVar()
         }
@@ -71,18 +71,20 @@ class Tests {
         }
         scope!!.invalidate()
 
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{NewClassSavesComposableIntoVar}", root.dump())
+        job.cancel()
     }
 
     @Test
-    fun testClassSavesComposableIntoLateinitVar() = runTest(UnconfinedTestDispatcher()) {
+    fun testClassSavesComposableIntoLateinitVar() = runTest {
         val impl = ClassSavesComposableIntoLateinitVar {
             TextLeafNode("ClassSavesComposableIntoLateinitVar")
         }
 
         var scope: RecomposeScope? = null
-        val root = composeText {
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
             scope = currentRecomposeScope
             impl.composableVar()
         }
@@ -94,18 +96,20 @@ class Tests {
         }
         scope!!.invalidate()
 
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{NewClassSavesComposableIntoLateinitVar}", root.dump())
+        job.cancel()
     }
 
     @Test
-    fun testClassSavesComposableIntoNullableVar() = runTest(UnconfinedTestDispatcher()) {
+    fun testClassSavesComposableIntoNullableVar() = runTest {
         val impl = ClassSavesComposableIntoNullableVar {
             TextLeafNode("ClassSavesComposableIntoNullableVar")
         }
 
         var scope: RecomposeScope? = null
-        val root = composeText {
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
             scope = currentRecomposeScope
             impl.composableVar?.invoke()
         }
@@ -115,18 +119,20 @@ class Tests {
         impl.composableVar = null
         scope!!.invalidate()
 
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{}", root.dump())
+        job.cancel()
     }
 
     @Test
-    fun testClassSavesTypedComposableIntoVar() = runTest(UnconfinedTestDispatcher()) {
+    fun testClassSavesTypedComposableIntoVar() = runTest {
         val impl = ClassSavesTypedComposableIntoVar<String> {
             TextLeafNode("ClassSavesTypedComposableIntoVar-$it")
         }
 
         var scope: RecomposeScope? = null
-        val root = composeText {
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
             scope = currentRecomposeScope
             impl.composableVar("abc")
         }
@@ -138,18 +144,20 @@ class Tests {
         }
         scope!!.invalidate()
 
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{recomposed-abc}", root.dump())
+        job.cancel()
     }
 
     @Test
-    fun testClassSavesTypedComposableIntoLateinitVar() = runTest(UnconfinedTestDispatcher()) {
+    fun testClassSavesTypedComposableIntoLateinitVar() = runTest {
         val impl = ClassSavesTypedComposableIntoLateinitVar<String> {
             TextLeafNode("ClassSavesTypedComposableIntoLateinitVar-$it")
         }
 
         var scope: RecomposeScope? = null
-        val root = composeText {
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
             scope = currentRecomposeScope
             impl.composableVar("abc")
         }
@@ -161,8 +169,9 @@ class Tests {
         }
         scope!!.invalidate()
 
-        RecompositionObserver.waitUntilChangesApplied()
+        testScheduler.advanceUntilIdle()
         assertEquals("root:{recomposed-abc}", root.dump())
+        job.cancel()
     }
 
     @Test
