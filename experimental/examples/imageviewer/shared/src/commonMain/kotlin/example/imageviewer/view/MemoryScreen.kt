@@ -32,8 +32,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.GalleryId
-import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.MemoryPage
+import example.imageviewer.model.PhotoGallery
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
