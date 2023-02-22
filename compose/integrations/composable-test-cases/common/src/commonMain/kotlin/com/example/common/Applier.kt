@@ -9,12 +9,9 @@ import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.channels.Channel
 import kotlinx.datetime.Clock
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.time.DurationUnit
 
 open class StringsNodeWrapper(
     var text: String? = null,
@@ -70,12 +67,9 @@ private object GlobalSnapshotManager {
     }
 }
 
-private class MonotonicClockImpl(
-    private val afterFrameNotification: Channel<Int>
-) : MonotonicFrameClock {
+private class MonotonicClockImpl : MonotonicFrameClock {
 
     private val NANOS_PER_MILLI = 1_000_000
-    private var frameCounter = 0
     override suspend fun <R> withFrameNanos(
         onFrame: (Long) -> R
     ): R = suspendCoroutine { continuation ->
@@ -83,17 +77,43 @@ private class MonotonicClockImpl(
         val currentNanos = now.toEpochMilliseconds() * NANOS_PER_MILLI + now.nanosecondsOfSecond
         val result = onFrame(currentNanos)
         continuation.resume(result)
-        afterFrameNotification.trySend(++frameCounter)
+        RecompositionObserver.onRecomposed()
     }
 }
 
-fun composeText(
-    afterFrameNotification: Channel<Int> = Channel(onBufferOverflow = BufferOverflow.DROP_OLDEST),
-    content: @Composable () -> Unit,
-): StringsNodeWrapper {
-    GlobalSnapshotManager.ensureStarted()
+object RecompositionObserver {
+    private var counter = 0
 
-    val context = MonotonicClockImpl(afterFrameNotification)
+    suspend fun waitUntilChangesApplied(timeoutMs: Long = 100) {
+        val currentValue = counter
+        waitUntil(currentValue + 1, timeoutMs)
+    }
+
+    private suspend fun waitUntil(equals: Int, timeoutMs: Long = 100) {
+        withContext(Dispatchers.Default) {
+            val start = Clock.System.now()
+            while (counter != equals) {
+                val duration = Clock.System.now() - start
+                if (duration.inWholeMilliseconds > timeoutMs) {
+                    error("Timeout error. $timeoutMs ms exceeded. Expected counter - $equals, but actual = $counter")
+                }
+                yield()
+            }
+        }
+    }
+
+    internal fun onRecomposed() = counter++
+
+    internal fun reset() {
+        counter = 0
+    }
+}
+
+fun composeText(content: @Composable () -> Unit): StringsNodeWrapper {
+    GlobalSnapshotManager.ensureStarted()
+    RecompositionObserver.reset()
+
+    val context = MonotonicClockImpl()
     val recomposer = Recomposer(context)
 
     CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {

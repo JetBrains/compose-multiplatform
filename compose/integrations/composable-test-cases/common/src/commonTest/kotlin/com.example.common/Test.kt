@@ -2,7 +2,6 @@ package com.example.common
 
 import androidx.compose.runtime.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -43,10 +42,9 @@ class Test {
 
     @Test
     fun testRecomposition() = runTest {
-        val channel = Channel<Int>()
         val index = mutableStateOf(1)
 
-        val root = composeText(channel) {
+        val root = composeText {
             TextContainerNode("abc${index.value}") {
                 TextLeafNode("Hello World!")
             }
@@ -55,12 +53,11 @@ class Test {
         assertEquals("root:{abc1:{Hello World!}}", root.dump())
 
         index.value = 2
-        assertEquals(1, channel.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{abc2:{Hello World!}}", root.dump())
 
         index.value = 3
-        assertEquals(2, channel.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{abc3:{Hello World!}}", root.dump())
-        channel.close()
     }
 }

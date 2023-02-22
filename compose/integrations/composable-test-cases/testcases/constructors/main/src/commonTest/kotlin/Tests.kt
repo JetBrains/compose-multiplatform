@@ -1,10 +1,9 @@
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.currentRecomposeScope
-import com.example.common.TextContainerNode
+import com.example.common.RecompositionObserver
 import com.example.common.TextLeafNode
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -59,8 +58,7 @@ class Tests {
         }
 
         var scope: RecomposeScope? = null
-        val recomposeCounter = Channel<Int>()
-        val root = composeText(recomposeCounter) {
+        val root = composeText {
             scope = currentRecomposeScope
             impl.composableVar()
         }
@@ -72,9 +70,8 @@ class Tests {
         }
         scope!!.invalidate()
 
-        assertEquals(1, recomposeCounter.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{NewClassSavesComposableIntoVar}", root.dump())
-        recomposeCounter.close()
     }
 
     @Test
@@ -84,8 +81,7 @@ class Tests {
         }
 
         var scope: RecomposeScope? = null
-        val recomposeCounter = Channel<Int>()
-        val root = composeText(recomposeCounter) {
+        val root = composeText {
             scope = currentRecomposeScope
             impl.composableVar()
         }
@@ -97,9 +93,8 @@ class Tests {
         }
         scope!!.invalidate()
 
-        assertEquals(1, recomposeCounter.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{NewClassSavesComposableIntoLateinitVar}", root.dump())
-        recomposeCounter.close()
     }
 
     @Test
@@ -109,8 +104,7 @@ class Tests {
         }
 
         var scope: RecomposeScope? = null
-        val recomposeCounter = Channel<Int>()
-        val root = composeText(recomposeCounter) {
+        val root = composeText {
             scope = currentRecomposeScope
             impl.composableVar?.invoke()
         }
@@ -120,9 +114,8 @@ class Tests {
         impl.composableVar = null
         scope!!.invalidate()
 
-        assertEquals(1, recomposeCounter.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{}", root.dump())
-        recomposeCounter.close()
     }
 
     @Test
@@ -132,8 +125,7 @@ class Tests {
         }
 
         var scope: RecomposeScope? = null
-        val recomposeCounter = Channel<Int>()
-        val root = composeText(recomposeCounter) {
+        val root = composeText {
             scope = currentRecomposeScope
             impl.composableVar("abc")
         }
@@ -145,9 +137,8 @@ class Tests {
         }
         scope!!.invalidate()
 
-        assertEquals(1, recomposeCounter.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{recomposed-abc}", root.dump())
-        recomposeCounter.close()
     }
 
     @Test
@@ -157,8 +148,7 @@ class Tests {
         }
 
         var scope: RecomposeScope? = null
-        val recomposeCounter = Channel<Int>()
-        val root = composeText(recomposeCounter) {
+        val root = composeText {
             scope = currentRecomposeScope
             impl.composableVar("abc")
         }
@@ -170,9 +160,8 @@ class Tests {
         }
         scope!!.invalidate()
 
-        assertEquals(1, recomposeCounter.receive())
+        RecompositionObserver.waitUntilChangesApplied()
         assertEquals("root:{recomposed-abc}", root.dump())
-        recomposeCounter.close()
     }
 
     @Test
