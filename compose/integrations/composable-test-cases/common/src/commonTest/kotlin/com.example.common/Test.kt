@@ -2,6 +2,7 @@ package com.example.common
 
 import androidx.compose.runtime.*
 import kotlinx.coroutines.*
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -41,7 +42,7 @@ class Test {
     }
 
     @Test
-    fun testRecomposition() = runTest {
+    fun testRecomposition() = runTest(UnconfinedTestDispatcher()) {
         val index = mutableStateOf(1)
 
         val root = composeText {

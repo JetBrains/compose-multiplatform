@@ -75,6 +75,7 @@ private class MonotonicClockImpl : MonotonicFrameClock {
     ): R = suspendCoroutine { continuation ->
         val now = Clock.System.now()
         val currentNanos = now.toEpochMilliseconds() * NANOS_PER_MILLI + now.nanosecondsOfSecond
+        println("Debug: withFrameNanos, n = $currentNanos")
         val result = onFrame(currentNanos)
         continuation.resume(result)
         RecompositionObserver.onRecomposed()
@@ -113,7 +114,7 @@ fun composeText(content: @Composable () -> Unit): StringsNodeWrapper {
     GlobalSnapshotManager.ensureStarted()
     RecompositionObserver.reset()
 
-    val context = MonotonicClockImpl()
+    val context = Dispatchers.Default + MonotonicClockImpl()
     val recomposer = Recomposer(context)
 
     CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {

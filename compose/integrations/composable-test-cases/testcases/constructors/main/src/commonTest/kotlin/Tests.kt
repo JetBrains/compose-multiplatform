@@ -4,6 +4,7 @@ import com.example.common.RecompositionObserver
 import com.example.common.TextLeafNode
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Ignore
 import kotlin.test.Test
@@ -52,7 +53,7 @@ class Tests {
     }
 
     @Test
-    fun testClassSavesComposableIntoVar() = runTest {
+    fun testClassSavesComposableIntoVar() = runTest(UnconfinedTestDispatcher()) {
         val impl = ClassSavesComposableIntoVar {
             TextLeafNode("ClassSavesComposableIntoVar")
         }
@@ -75,7 +76,7 @@ class Tests {
     }
 
     @Test
-    fun testClassSavesComposableIntoLateinitVar() = runTest {
+    fun testClassSavesComposableIntoLateinitVar() = runTest(UnconfinedTestDispatcher()) {
         val impl = ClassSavesComposableIntoLateinitVar {
             TextLeafNode("ClassSavesComposableIntoLateinitVar")
         }
@@ -98,7 +99,7 @@ class Tests {
     }
 
     @Test
-    fun testClassSavesComposableIntoNullableVar() = runTest {
+    fun testClassSavesComposableIntoNullableVar() = runTest(UnconfinedTestDispatcher()) {
         val impl = ClassSavesComposableIntoNullableVar {
             TextLeafNode("ClassSavesComposableIntoNullableVar")
         }
@@ -119,7 +120,7 @@ class Tests {
     }
 
     @Test
-    fun testClassSavesTypedComposableIntoVar() = runTest {
+    fun testClassSavesTypedComposableIntoVar() = runTest(UnconfinedTestDispatcher()) {
         val impl = ClassSavesTypedComposableIntoVar<String> {
             TextLeafNode("ClassSavesTypedComposableIntoVar-$it")
         }
@@ -142,7 +143,7 @@ class Tests {
     }
 
     @Test
-    fun testClassSavesTypedComposableIntoLateinitVar() = runTest {
+    fun testClassSavesTypedComposableIntoLateinitVar() = runTest(UnconfinedTestDispatcher()) {
         val impl = ClassSavesTypedComposableIntoLateinitVar<String> {
             TextLeafNode("ClassSavesTypedComposableIntoLateinitVar-$it")
         }
