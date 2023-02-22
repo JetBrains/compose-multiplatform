@@ -1,6 +1,7 @@
 import UIKit
 import SwiftUI
 import shared
+import AVKit
 
 struct ComposeView: UIViewControllerRepresentable {
     private let openCamera: () -> ()
@@ -15,6 +16,7 @@ struct ComposeView: UIViewControllerRepresentable {
     func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
 
+
 struct ContentView: View {
     @State var cameraScreen:Bool = false
     var body: some View {
@@ -26,6 +28,7 @@ struct ContentView: View {
         }
     }
 }
+
 
 struct CameraScreen: View {
     private let closeHandler: () -> ()
@@ -41,6 +44,7 @@ struct CameraScreen: View {
         }
     }
 }
+
 
 struct UIKitCamera : UIViewControllerRepresentable {
     private let closeHandler: () -> ()
@@ -60,9 +64,18 @@ struct UIKitCamera : UIViewControllerRepresentable {
     }
 }
 
-class CameraUIViewController: UIViewController {
+
+final class CameraUIViewController: UIViewController {
     typealias VoidFunc = () -> ()
     var closeHandler: VoidFunc?
+    
+    let captureSession = AVCaptureSession()
+    
+    var camera: AVCaptureDevice?
+    
+    var capturedImage: UIImage?
+    var capturePhotoOutput: AVCapturePhotoOutput!
+    var cameraPreviewLayer: AVCaptureVideoPreviewLayer!
     
     private let cameraContainer = UIView()
     private let captureButton: UIButton = {
@@ -115,13 +128,102 @@ class CameraUIViewController: UIViewController {
         
         closeButton.addTarget(self, action: #selector(closeController), for: .touchUpInside)
         captureButton.addTarget(self, action: #selector(capture), for: .touchUpInside)
-    }
-    
-    @objc func capture() {
         
+        #if targetEnvironment(simulator)
+        showAlert(for: .simulatorUsed)
+        #else
+        configureSessionIfAllowed()
+        #endif
     }
     
-    @objc func closeController() {
+    private func configureSessionIfAllowed() {
+        switch AVCaptureDevice.authorizationStatus(for: .video) {
+        case .authorized:
+            configureCamera()
+            
+        case .denied, .restricted:
+            showAlert(for: .permissionDenied)
+            
+        case .notDetermined:
+            AVCaptureDevice.requestAccess(for: .video, completionHandler: { permissionGranted in
+                if permissionGranted {
+                    DispatchQueue.main.async {
+                        self.configureCamera()
+                    }
+                }
+            })
+            
+        @unknown default:
+            showAlert(for: .unknownAuthStatus)
+        }
+    }
+    
+    private func configureCamera() {
+        captureSession.sessionPreset = .photo
+        
+        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera], mediaType: .video, position: .back).devices.forEach{ device in
+            if device.position == .back {
+                camera = device
+            }
+        }
+        
+        guard let camera = camera, let captureDeviceInput = try? AVCaptureDeviceInput(device: camera) else { return }
+        
+        capturePhotoOutput = AVCapturePhotoOutput()
+        
+        captureSession.addInput(captureDeviceInput)
+        captureSession.addOutput(capturePhotoOutput)
+        
+        cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
+        view.layer.addSublayer(cameraPreviewLayer)
+        cameraPreviewLayer?.videoGravity = .resizeAspectFill
+        cameraPreviewLayer?.frame = view.layer.frame
+        
+        captureSession.startRunning()
+    }
+    
+    @objc private func capture() {
+        let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
+        photoSettings.isHighResolutionPhotoEnabled = true
+        
+        capturePhotoOutput.isHighResolutionCaptureEnabled = true
+        capturePhotoOutput.capturePhoto(with: photoSettings, delegate: self)
+    }
+    
+    @objc private func closeController() {
         closeHandler?()
+    }
+    
+    private func showAlert(for type: AlertType) {
+        // TODO: This won't work due to CameraUIViewController.view is not in the windows hierarchy. Navigation should be fixed.
+        let alert = UIAlertController(title: "Warning", message: type.message, preferredStyle: .alert)
+        alert.addAction(.init(title: "Ok", style: .default, handler: { [weak self] action in
+            self?.closeHandler?()
+        }))
+        
+        self.present(alert, animated: true)
+    }
+}
+
+extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
+    func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
+        guard let photoData = photo.fileDataRepresentation() else { return }
+        capturedImage = UIImage(data: photoData)
+    }
+}
+
+fileprivate extension CameraUIViewController {
+    enum AlertType {
+        case simulatorUsed
+        case permissionDenied
+        case unknownAuthStatus
+        
+        var message: String {
+            switch self {
+            case .permissionDenied: return "Permission of camera usage should be granted"
+            case .simulatorUsed: return "Camera is not available on simulator, please use real device"
+            case .unknownAuthStatus: return "Unknown camera permission status"
+            }
+        }
     }
 }
