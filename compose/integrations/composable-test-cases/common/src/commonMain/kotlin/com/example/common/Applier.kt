@@ -114,8 +114,7 @@ fun composeText(content: @Composable () -> Unit): StringsNodeWrapper {
     GlobalSnapshotManager.ensureStarted()
     RecompositionObserver.reset()
 
-//    val context = Dispatchers.Default + MonotonicClockImpl()
-    val context = MonotonicClockImpl()
+    val context = Dispatchers.Default + MonotonicClockImpl()
     val recomposer = Recomposer(context)
 
     CoroutineScope(context).launch(start = CoroutineStart.UNDISPATCHED) {
