@@ -29,7 +29,30 @@ struct ContentView: View {
 
 struct CameraScreen: View {
     var body: some View {
-        Text("Camera screen")//todo
+        VStack {
+            Text("Camera screen")
+            UIKitCamera()
+        }
     }
 }
 
+struct UIKitCamera : UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        CameraUIViewController()
+    }
+
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {
+
+    }
+}
+
+class CameraUIViewController: UIViewController {
+    override func loadView() {
+        super.loadView()
+        self.view = {
+            let result = UIView()
+            result.backgroundColor = UIColor.purple
+            return result
+        }()
+    }
+}
