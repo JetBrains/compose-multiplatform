@@ -95,7 +95,8 @@ internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: De
             GalleryStyle.SQUARES -> SquaresGalleryView(
                 galleryScreenState.picturesWithThumbnail,
                 galleryScreenState.picturesWithThumbnail.getOrNull(galleryScreenState.currentPictureIndex),
-                onSelect = { galleryScreenState.selectPicture(it) }
+                onSelect = { galleryScreenState.selectPicture(it) },
+                openCamera = dependencies.openCamera,
             )
 
             GalleryStyle.LIST -> ListGalleryView(
@@ -115,11 +116,12 @@ internal fun MainScreen(galleryScreenState: GalleryScreenState, dependencies: De
 private fun SquaresGalleryView(
     images: List<PictureWithThumbnail>,
     selectedImage: PictureWithThumbnail?,
-    onSelect: (Picture) -> Unit
+    onSelect: (Picture) -> Unit,
+    openCamera: () -> Unit,
 ) {
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
         item {
-            MakeNewMemoryMiniature()
+            MakeNewMemoryMiniature(openCamera)
         }
         itemsIndexed(images) { idx, image ->
             val isSelected = image == selectedImage
@@ -130,11 +132,11 @@ private fun SquaresGalleryView(
 }
 
 @Composable
-private fun MakeNewMemoryMiniature() {
+private fun MakeNewMemoryMiniature(openCamera: ()->Unit) {
     Box(
         Modifier.aspectRatio(1.0f)
             .clickable {
-                // TODO: Open Camera!
+                openCamera()
             }, contentAlignment = Alignment.Center
     ) {
         Text(
