@@ -35,21 +35,11 @@ kotlin {
                 implementation(compose.material)
             }
         }
-        val androidMain by getting {
-            dependencies {
-                implementation("androidx.appcompat:appcompat:1.5.1")
-                implementation("androidx.core:core-ktx:1.8.0")
-            }
-        }
+        val androidMain by getting
         val iosMain by getting
-        val iosTest by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
         }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
-
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
