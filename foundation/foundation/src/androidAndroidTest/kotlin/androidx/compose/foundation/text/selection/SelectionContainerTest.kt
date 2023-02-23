@@ -180,15 +180,14 @@ class SelectionContainerTest {
                     )
                 }
 
+            rule.mainClock.advanceTimeByFrame()
             // Assert. Should select "Demo".
-            rule.runOnIdle {
-                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
-                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
-                verify(
-                    hapticFeedback,
-                    times(1)
-                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
+            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
+            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
+            verify(
+                hapticFeedback,
+                times(1)
+            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
             // Check the position of the anchors of the selection handles. We don't need to compare
             // to the absolute position since the semantics report selection relative to the
@@ -200,7 +199,6 @@ class SelectionContainerTest {
         }
     }
 
-    //    @Ignore("b/230622412")
     @Test
     fun long_press_select_a_word_rtl_layout() {
         with(rule.density) {
@@ -225,15 +223,15 @@ class SelectionContainerTest {
                     )
                 }
 
+            rule.mainClock.advanceTimeByFrame()
+
             // Assert. Should select "Demo".
-            rule.runOnIdle {
-                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
-                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
-                verify(
-                    hapticFeedback,
-                    times(1)
-                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
+            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
+            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
+            verify(
+                hapticFeedback,
+                times(1)
+            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
             // Check the position of the anchors of the selection handles. We don't need to compare
             // to the absolute position since the semantics report selection relative to the
