@@ -38,6 +38,7 @@ class PhotoGallery(val deps: Dependencies) {
             } catch (e: CancellationException) {
                 println("Rethrowing CancellationException with original cause")
                 // https://kotlinlang.org/docs/exception-handling.html#exceptions-aggregation
+                throw e
             } catch (e: Exception) {
                 e.printStackTrace()
                 deps.notification.notifyNoInternet()
