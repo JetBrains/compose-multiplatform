@@ -5,12 +5,8 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
@@ -31,20 +27,20 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun FullscreenImage(
-    picture: Picture?,
+    galleryId: GalleryId?,
+    gallery: PhotoGallery,
     getImage: suspend (Picture) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
-    nextImage: () -> Unit,
-    previousImage: () -> Unit,
 ) {
+    val picture = gallery.galleryStateFlow.value.first { it.id == galleryId }.picture
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
-    val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(picture) {
-        if (picture != null) {
+    val originalImageState = remember(galleryId) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(galleryId) {
+        if (galleryId != null) {
             originalImageState.value = getImage(picture)
         }
     }
@@ -65,7 +61,7 @@ internal fun FullscreenImage(
         Column {
             FullscreenImageBar(
                 localization,
-                picture?.name,
+                picture.name,
                 back,
                 availableFilters,
                 selectedFilters,
@@ -106,29 +102,6 @@ internal fun FullscreenImage(
             } else {
                 LoadingScreen()
             }
-        }
-
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomStart).padding(10.dp),
-            containerColor = ImageviewerColors.KotlinGradient0,
-            onClick = previousImage
-        ) {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowLeft,
-                contentDescription = "Previous",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
-        }
-        FloatingActionButton(
-            modifier = Modifier.align(Alignment.BottomEnd).padding(10.dp),
-            containerColor = ImageviewerColors.KotlinGradient0,
-            onClick = nextImage
-        ) {
-            Icon(
-                imageVector = Icons.Filled.KeyboardArrowRight,
-                contentDescription = "Next",
-                tint = MaterialTheme.colorScheme.onBackground
-            )
         }
     }
 
