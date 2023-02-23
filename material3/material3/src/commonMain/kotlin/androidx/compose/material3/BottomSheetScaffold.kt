@@ -31,7 +31,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -253,20 +253,6 @@ private fun StandardBottomSheet(
 
                     Hidden -> null
                 }
-            }
-            // TODO(b/267198889): Move semantics to Drag Handle
-            .semantics {
-                if (state.swipeableState.anchors.size > 1 && sheetSwipeEnabled) {
-                    if (state.currentValue == PartiallyExpanded) {
-                        if (state.swipeableState.confirmValueChange(Expanded)) {
-                            expand { scope.launch { state.expand() }; true }
-                        }
-                    } else {
-                        if (state.swipeableState.confirmValueChange(PartiallyExpanded)) {
-                            collapse { scope.launch { state.partialExpand() }; true }
-                        }
-                    }
-                }
             },
         shape = shape,
         color = containerColor,
@@ -275,7 +261,26 @@ private fun StandardBottomSheet(
     ) {
         Column(Modifier.fillMaxWidth()) {
             if (dragHandle != null) {
-                Box(Modifier.align(Alignment.CenterHorizontally)) {
+                Box(Modifier
+                    .align(CenterHorizontally)
+                    .semantics {
+                        with(state) {
+                            // Provides semantics to interact with the bottomsheet if there is more
+                            // than one anchor to swipe to and swiping is enabled.
+                            if (swipeableState.anchors.size > 1 && sheetSwipeEnabled) {
+                                if (currentValue == PartiallyExpanded) {
+                                    if (swipeableState.confirmValueChange(Expanded)) {
+                                        expand { scope.launch { expand() }; true }
+                                    }
+                                } else {
+                                    if (swipeableState.confirmValueChange(PartiallyExpanded)) {
+                                        collapse { scope.launch { partialExpand() }; true }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                ) {
                     dragHandle()
                 }
             }
