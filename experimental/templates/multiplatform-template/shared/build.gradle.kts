@@ -35,7 +35,13 @@ kotlin {
                 implementation(compose.material)
             }
         }
-        val androidMain by getting
+        val androidMain by getting {
+            dependencies {
+                api("androidx.activity:activity-compose:1.6.1")
+                api("androidx.appcompat:appcompat:1.6.1")
+                api("androidx.core:core-ktx:1.9.0")
+            }
+        }
         val iosMain by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
