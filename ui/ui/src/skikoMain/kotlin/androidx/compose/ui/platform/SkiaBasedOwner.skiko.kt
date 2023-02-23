@@ -410,6 +410,8 @@ internal class SkiaBasedOwner(
     }
 
     override fun onEndApplyChanges() {
+        clearInvalidObservations()
+
         // Listeners can add more items to the list and we want to ensure that they
         // are executed after being added, so loop until the list is empty
         while (endApplyChangesListeners.isNotEmpty()) {
