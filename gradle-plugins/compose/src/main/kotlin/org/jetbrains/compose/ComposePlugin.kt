@@ -121,6 +121,7 @@ class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
+        val resources get() = composeDependency("org.jetbrains.compose.components:components-resources")
         val web: WebDependencies get() = WebDependencies
     }
 
