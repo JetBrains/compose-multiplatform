@@ -41,7 +41,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerBasedShape
@@ -1111,7 +1110,10 @@ private fun TimePickerTextField(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val focusRequester = remember { FocusRequester() }
-    val textFieldColors = TextFieldDefaults.outlinedTextFieldColors()
+    val textFieldColors = TextFieldDefaults.outlinedTextFieldColors(
+        containerColor = colors.timeSelectorContainerColor(true),
+        focusedTextColor = colors.timeSelectorContentColor(true),
+    )
     val selected = selection == state.selection
     Column(modifier = modifier) {
         if (!selected) {
@@ -1126,7 +1128,10 @@ private fun TimePickerTextField(
 
         val textStyle = MaterialTheme.typography
             .fromToken(TimeSelectorLabelTextFont)
-            .copy(textAlign = TextAlign.Center)
+            .copy(
+                textAlign = TextAlign.Center,
+                color = colors.timeSelectorContentColor(true)
+            )
 
         Box(Modifier.visible(selected)) {
             BasicTextField(
@@ -1159,6 +1164,15 @@ private fun TimePickerTextField(
                     enabled = true,
                     interactionSource = interactionSource,
                     contentPadding = PaddingValues(0.dp),
+                    container = {
+                        TextFieldDefaults.OutlinedBorderContainerBox(
+                            enabled = true,
+                            isError = false,
+                            interactionSource = interactionSource,
+                            shape = TimeInputTokens.TimeFieldContainerShape.toShape(),
+                            colors = textFieldColors,
+                        )
+                    }
                 )
             }
         }

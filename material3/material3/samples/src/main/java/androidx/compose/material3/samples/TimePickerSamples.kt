@@ -24,6 +24,7 @@ import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
@@ -164,8 +165,14 @@ fun TimePickerDialog(
                 content()
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Spacer(modifier = Modifier.weight(1f))
-                    TextButton(onClick = onCancel) { Text("Cancel") }
-                    TextButton(onClick = onConfirm) { Text("OK") }
+                    TextButton(
+                        modifier = Modifier.height(40.dp),
+                        onClick = onCancel
+                    ) { Text("Cancel") }
+                    TextButton(
+                        modifier = Modifier.height(40.dp),
+                        onClick = onConfirm
+                    ) { Text("OK") }
                 }
             }
         }
