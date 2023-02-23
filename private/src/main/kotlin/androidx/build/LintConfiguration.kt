@@ -111,7 +111,7 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Remove the lint and column attributes from generated lint baseline XML.
         if (task.name.startsWith("updateLintBaseline")) {
             task.doLast {
-                task.outputs.files.find { it.name == "lint-baseline.xml" }?.let { file ->
+                task.projectInputs.lintOptions.baseline.orNull?.asFile?.let { file ->
                     if (file.exists()) {
                         file.writeText(removeLineAndColumnAttributes(file.readText()))
                     }
