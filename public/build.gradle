@@ -56,6 +56,10 @@ gradlePlugin {
             id = "androidx.baselineprofiles.apkprovider"
             implementationClass = "androidx.baselineprofiles.gradle.apkprovider.BaselineProfilesApkProviderPlugin"
         }
+        baselineProfilesWrapper {
+            id = "androidx.baselineprofiles"
+            implementationClass = "androidx.baselineprofiles.gradle.wrapper.BaselineProfilesWrapperPlugin"
+        }
         inspection {
             id = "androidx.inspection"
             implementationClass = "androidx.inspection.gradle.InspectionPlugin"
