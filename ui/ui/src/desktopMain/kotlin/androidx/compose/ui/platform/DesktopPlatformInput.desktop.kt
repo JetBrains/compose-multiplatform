@@ -106,35 +106,17 @@ internal class PlatformInput(private val component: PlatformComponent) :
         }
     }
 
-    fun onInputEvent(event: InputMethodEvent) {
+    fun inputMethodTextChanged(event: InputMethodEvent) {
         if (!event.isConsumed) {
-            when (event.id) {
-                InputMethodEvent.INPUT_METHOD_TEXT_CHANGED -> {
-                    replaceInputMethodText(event)
-                    event.consume()
-                }
-                InputMethodEvent.CARET_POSITION_CHANGED -> {
-                    inputMethodCaretPositionChanged(event)
-                    event.consume()
-                }
-            }
+            replaceInputMethodText(event)
+            event.consume()
         }
-    }
-
-    private fun inputMethodCaretPositionChanged(
-        @Suppress("UNUSED_PARAMETER") event: InputMethodEvent
-    ) {
-        // Which OSes and which input method could produce such events? We need to have some
-        // specific cases in mind before implementing this
     }
 
     private fun replaceInputMethodText(event: InputMethodEvent) {
         currentInput?.let { input ->
-            if (event.text == null) {
-                return
-            }
-            val committed = event.text.toStringUntil(event.committedCharacterCount)
-            val composing = event.text.toStringFrom(event.committedCharacterCount)
+            val committed = event.text?.toStringUntil(event.committedCharacterCount).orEmpty()
+            val composing = event.text?.toStringFrom(event.committedCharacterCount).orEmpty()
             val ops = mutableListOf<EditCommand>()
 
             if (needToDeletePreviousChar && isMac && input.value.selection.min > 0 && composing.isEmpty()) {
@@ -142,11 +124,7 @@ internal class PlatformInput(private val component: PlatformComponent) :
                 ops.add(DeleteSurroundingTextInCodePointsCommand(1, 0))
             }
 
-            // newCursorPosition == 1 leads to effectively ignoring of this parameter in EditCommands
-            // processing. the cursor will be set after the inserted text.
-            if (committed.isNotEmpty()) {
-                ops.add(CommitTextCommand(committed, 1))
-            }
+            ops.add(CommitTextCommand(committed, 1))
             if (composing.isNotEmpty()) {
                 ops.add(SetComposingTextCommand(composing, 1))
             }

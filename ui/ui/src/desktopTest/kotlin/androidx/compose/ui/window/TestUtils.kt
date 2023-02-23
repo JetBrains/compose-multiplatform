@@ -36,7 +36,6 @@ import kotlinx.coroutines.yield
 import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Assume.assumeFalse
 
-@OptIn(ExperimentalCoroutinesApi::class)
 internal fun runApplicationTest(
     /**
      * Use delay(500) additionally to `yield` in `await*` functions
@@ -45,9 +44,15 @@ internal fun runApplicationTest(
      * (non-flaky).
      *
      * We have to use `useDelay` in some Linux Tests, because Linux can behave in
-     * non-deterministic way when we change position/size very fast (see the snippet below)
+     * non-deterministic way when we change position/size very fast (see the snippet below).
      */
     useDelay: Boolean = false,
+    // TODO ui-test solved this issue by passing InfiniteAnimationPolicy to CoroutineContext. Do the same way here
+    /**
+     * Hint for `awaitIdle` that the content contains animations (ProgressBar, TextField cursor, etc).
+     * In this case, we use `delay` instead of waiting for state changes to end.
+     */
+    hasAnimations: Boolean = false,
     timeoutMillis: Long = 30000,
     body: suspend WindowTestScope.() -> Unit
 ) {
@@ -57,7 +62,7 @@ internal fun runApplicationTest(
         withTimeout(timeoutMillis) {
             val exceptionHandler = TestExceptionHandler()
             withExceptionHandler(exceptionHandler) {
-                val scope = WindowTestScope(this, useDelay, exceptionHandler)
+                val scope = WindowTestScope(this, useDelay, hasAnimations, exceptionHandler)
                 scope.body()
                 scope.exitTestApplication()
             }
@@ -100,6 +105,7 @@ internal class TestExceptionHandler : Thread.UncaughtExceptionHandler {
 internal class WindowTestScope(
     private val scope: CoroutineScope,
     private val useDelay: Boolean,
+    private val hasAnimations: Boolean,
     private val exceptionHandler: TestExceptionHandler
 ) : CoroutineScope by CoroutineScope(scope.coroutineContext + Job()) {
     var isOpen by mutableStateOf(true)
@@ -132,8 +138,13 @@ internal class WindowTestScope(
         awaitEDT()
 
         Snapshot.sendApplyNotifications()
-        for (recomposerInfo in Recomposer.runningRecomposers.value - initialRecomposers) {
-            recomposerInfo.state.takeWhile { it > Recomposer.State.Idle }.collect()
+
+        if (hasAnimations) {
+            delay(500)
+        } else {
+            for (recomposerInfo in Recomposer.runningRecomposers.value - initialRecomposers) {
+                recomposerInfo.state.takeWhile { it > Recomposer.State.Idle }.collect()
+            }
         }
 
         exceptionHandler.throwIfCaught()

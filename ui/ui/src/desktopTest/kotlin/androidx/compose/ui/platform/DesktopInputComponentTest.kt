@@ -56,7 +56,7 @@ class DesktopInputComponentTest {
 
         val familyEmoji = "\uD83D\uDC68\u200D\uD83D\uDC69\u200D\uD83D\uDC66\u200D\uD83D\uDC66"
 
-        input.onInputEvent(
+        input.inputMethodTextChanged(
             InputMethodEvent(
                 DummyComponent,
                 InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,
@@ -104,7 +104,7 @@ class DesktopInputComponentTest {
         component.enabledInput!!.getSelectedText(null)
         input.charKeyPressed = false
 
-        input.onInputEvent(
+        input.inputMethodTextChanged(
             InputMethodEvent(
                 DummyComponent,
                 InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,

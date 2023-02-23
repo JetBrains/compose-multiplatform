@@ -331,17 +331,14 @@ internal class ComposeLayer(
         _component.addInputMethodListener(object : InputMethodListener {
             override fun caretPositionChanged(event: InputMethodEvent?) {
                 if (isDisposed) return
-                if (event != null) {
-                    catchExceptions {
-                        platform.textInputService.onInputEvent(event)
-                    }
-                }
+                // Which OSes and which input method could produce such events? We need to have some
+                // specific cases in mind before implementing this
             }
 
             override fun inputMethodTextChanged(event: InputMethodEvent) {
                 if (isDisposed) return
                 catchExceptions {
-                    platform.textInputService.onInputEvent(event)
+                    platform.textInputService.inputMethodTextChanged(event)
                 }
             }
         })

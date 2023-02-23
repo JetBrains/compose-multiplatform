@@ -22,34 +22,21 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import java.awt.AWTEvent
 import java.awt.Component
 import java.awt.Container
-import java.awt.EventQueue
 import java.awt.Image
-import java.awt.Toolkit
 import java.awt.Window
-import java.awt.event.InvocationEvent
+import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
+import java.awt.font.TextHitInfo
 import java.awt.image.BufferedImage
 import java.awt.image.MultiResolutionImage
-import java.lang.reflect.InvocationTargetException
-import java.lang.reflect.Method
-import java.util.Objects
-import java.util.concurrent.atomic.AtomicReference
+import java.text.AttributedString
 import javax.swing.Icon
 import javax.swing.ImageIcon
-import javax.swing.JFrame
-import javax.swing.SwingUtilities
-import kotlin.coroutines.resume
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.yield
-import org.jetbrains.annotations.NonNls
-import org.jetbrains.annotations.TestOnly
-import org.jetbrains.skiko.MainUIDispatcher
 
 fun testImage(color: Color): Painter = run {
     val bitmap = ImageBitmap(100, 100)
@@ -72,19 +59,40 @@ internal val isMacOs = os.startsWith("mac")
 
 fun Window.sendKeyEvent(
     code: Int,
+    char: Char = code.toChar(),
+    id: Int = KeyEvent.KEY_PRESSED,
+    location: Int = KeyEvent.KEY_LOCATION_STANDARD,
     modifiers: Int = 0
 ): Boolean {
     val event = KeyEvent(
         // if we would just use `focusOwner` then it will be null if the window is minimized
         mostRecentFocusOwner,
-        KeyEvent.KEY_PRESSED,
+        id,
         0,
         modifiers,
         code,
-        code.toChar(),
-        KeyEvent.KEY_LOCATION_STANDARD
+        char,
+        location
     )
-    dispatchEvent(event)
+    mostRecentFocusOwner!!.dispatchEvent(event)
+    return event.isConsumed
+}
+
+fun Window.sendInputEvent(
+    text: String?,
+    committedCharacterCount: Int,
+): Boolean {
+    val event = InputMethodEvent(
+        // if we would just use `focusOwner` then it will be null if the window is minimized
+        mostRecentFocusOwner,
+        InputMethodEvent.INPUT_METHOD_TEXT_CHANGED,
+        0,
+        text?.let(::AttributedString)?.iterator,
+        committedCharacterCount,
+        TextHitInfo.leading(0),
+        TextHitInfo.leading(0)
+    )
+    mostRecentFocusOwner!!.dispatchEvent(event)
     return event.isConsumed
 }
 
