@@ -47,15 +47,13 @@ import androidx.compose.ui.graphics.isSpecified
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.collapse
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.expand
-import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.window.Popup
 import kotlin.math.max
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -117,7 +115,15 @@ fun ModalBottomSheet(
     }
     val systemBarHeight = WindowInsets.systemBarsForVisualComponents.getBottom(LocalDensity.current)
 
-    Popup {
+    ModalBottomSheetPopup(
+        onDismissRequest = {
+            if (sheetState.currentValue == Expanded && sheetState.hasPartiallyExpandedState) {
+                scope.launch { sheetState.partialExpand() }
+            } else { // Is expanded without collapsed state or is collapsed.
+                scope.launch { sheetState.hide() }.invokeOnCompletion { onDismissRequest() }
+            }
+        }
+    ) {
         BoxWithConstraints(Modifier.fillMaxSize()) {
             val fullHeight = constraints.maxHeight
             Scrim(
@@ -214,7 +220,6 @@ private fun Scrim(
     onDismissRequest: () -> Unit,
     visible: Boolean
 ) {
-    val sheetDescription = getString(Strings.CloseSheet)
     if (color.isSpecified) {
         val alpha by animateFloatAsState(
             targetValue = if (visible) 1f else 0f,
@@ -226,11 +231,7 @@ private fun Scrim(
                     detectTapGestures {
                         onDismissRequest()
                     }
-                }
-                .semantics(mergeDescendants = true) {
-                    contentDescription = sheetDescription
-                    onClick { onDismissRequest(); true }
-                }
+                }.clearAndSetSemantics {}
         } else {
             Modifier
         }
@@ -332,3 +333,8 @@ private fun ModalBottomSheetAnchorChangeHandler(
         }
     }
 }
+
+internal expect fun ModalBottomSheetPopup(
+    onDismissRequest: () -> Unit,
+    content: @Composable () -> Unit
+)
