@@ -1,9 +1,5 @@
-import androidx.compose.ui.window.Application
-import platform.UIKit.UIViewController
+import androidx.compose.ui.window.ComposeUIViewController
 
 actual fun getPlatformName(): String = "iOS"
 
-fun MainViewController() : UIViewController =
-    Application("Demo") {
-        App()
-    }
+fun MainViewController() = ComposeUIViewController { App() }
