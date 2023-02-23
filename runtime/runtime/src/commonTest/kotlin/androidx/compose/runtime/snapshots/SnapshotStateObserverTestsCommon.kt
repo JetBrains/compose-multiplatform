@@ -692,6 +692,30 @@ class SnapshotStateObserverTestsCommon {
         }
     }
 
+    @Test
+    fun readingValueAfterClearInvalidates() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            val changeBlock: (Any) -> Unit = { changes++ }
+            // record observation
+            stateObserver.observeReads("scope", changeBlock) {
+                // read state
+                state.value
+            }
+
+            // clear scope
+            stateObserver.clear("scope")
+
+            // record again
+            stateObserver.observeReads("scope", changeBlock) {
+                // read state
+                state.value
+            }
+        }
+        assertEquals(1, changes)
+    }
+
     private fun runSimpleTest(
         block: (modelObserver: SnapshotStateObserver, data: MutableState<Int>) -> Unit
     ) {

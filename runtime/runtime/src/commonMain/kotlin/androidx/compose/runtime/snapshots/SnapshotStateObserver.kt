@@ -466,7 +466,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
          * Clear observations for [scope].
          */
         fun clearScopeObservations(scope: Any) {
-            val recordedValues = scopeToValues[scope] ?: return
+            val recordedValues = scopeToValues.remove(scope) ?: return
             recordedValues.forEach { value, _ ->
                 removeObservation(scope, value)
             }
