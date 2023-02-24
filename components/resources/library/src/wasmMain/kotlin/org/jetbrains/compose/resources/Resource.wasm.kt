@@ -15,6 +15,9 @@ import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.wasm.unsafe.*
+import kotlin.wasm.unsafe.withScopedMemoryAllocator
+import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 
 @ExperimentalResourceApi
 actual fun resource(path: String): Resource = JSResourceImpl(path)
@@ -42,12 +45,32 @@ private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
     }
 }
 
-private fun ArrayBuffer.toByteArray(): ByteArray {
-    val source = Int8Array(this, 0, byteLength)
-    return kotlin.ByteArray(byteLength) {
-        source.get(it)
-    }
-}
-
 internal actual class MissingResourceException actual constructor(path: String) :
     Exception("Missing resource with path: $path")
+
+
+private fun ArrayBuffer.toByteArray(): ByteArray {
+    val source = Int8Array(this, 0, byteLength)
+    return jsInt8ArrayToKotlinByteArray(source)
+}
+
+@JsFun(
+    """ (src, size, dstAddr) => {
+        const mem8 = new Int8Array(wasmExports.memory.buffer, dstAddr, size);
+        mem8.set(src);
+    }
+"""
+)
+internal external fun jsExportInt8ArrayToWasm(src: Int8Array, size: Int, dstAddr: Int)
+
+internal fun jsInt8ArrayToKotlinByteArray(x: Int8Array): ByteArray {
+    val size = x.length
+
+    @OptIn(UnsafeWasmMemoryApi::class)
+    return withScopedMemoryAllocator { allocator ->
+        val memBuffer = allocator.allocate(size)
+        val dstAddress = memBuffer.address.toInt()
+        jsExportInt8ArrayToWasm(x, size, dstAddress)
+        ByteArray(size) { i -> (memBuffer + i).loadByte() }
+    }
+}
