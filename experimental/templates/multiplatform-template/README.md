@@ -8,7 +8,7 @@ Note that iOS target is experimental so far.
 
 ## How to run
 
-Choose a run configuration for an appropriate target in IDE and run it.
+Choose a run configuration for an appropriate target in Android Studio and run it.
 
 ## Configuring iOS application and running it on a real iOS device
 
