@@ -3,7 +3,7 @@
 Сan run on desktop, Android and iOS.
 Note that iOS target is experimental so far.
 
-*Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed 
+*Prerequisites*: to run on iOS, you should have "Kotlin Multiplatform Mobile" plugin installed 
                  in Android Studio with [installed CocoaPods](https://kotlinlang.org/docs/native-cocoapods.html).
 
 ## How to run
