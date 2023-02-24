@@ -50,3 +50,9 @@ please do the following:
 ## Desktop useful gradle tasks
 - `./gradlew run` - run application
 - `./gradlew package` - package native distribution into `build/compose/binaries`
+
+## Android
+To run on Android, you can use the latest stable version of AndroidStudio or use Gradle:
+
+`./gradlew installDebug` - install Android application on an Android device (on a real device or on an emulator)
+
