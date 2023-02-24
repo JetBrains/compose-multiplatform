@@ -15,6 +15,9 @@ kotlin {
     js(IR) {
         browser()
     }
+    wasm {
+        browser()
+    }
     macosX64 {
         binaries {
             executable {

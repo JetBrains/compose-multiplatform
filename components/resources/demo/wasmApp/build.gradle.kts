@@ -3,22 +3,23 @@ plugins {
     id("org.jetbrains.compose")
 }
 
-val copyResources = tasks.create("copyJsResourcesWorkaround", Copy::class.java) {
+val copyResources = tasks.create("copyWasmResourcesWorkaround", Copy::class.java) {
     from(project(":resources:demo:shared").file("src/commonMain/resources"))
-    into("build/processedResources/js/main")
+    into("build/processedResources/wasm/main")
 }
 
 afterEvaluate {
-    project.tasks.getByName("jsProcessResources").finalizedBy(copyResources)
+    project.tasks.getByName("wasmProcessResources").finalizedBy(copyResources)
 }
 
 kotlin {
-    js(IR) {
+    wasm {
+        moduleName = "myapp"
         browser()
         binaries.executable()
     }
     sourceSets {
-        val jsMain by getting  {
+        val wasmMain by getting  {
             dependencies {
                 implementation(project(":resources:demo:shared"))
             }
