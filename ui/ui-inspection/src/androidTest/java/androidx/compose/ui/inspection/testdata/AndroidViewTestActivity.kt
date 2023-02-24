@@ -17,6 +17,7 @@
 package androidx.compose.ui.inspection.testdata
 
 import android.os.Bundle
+import android.view.View
 import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -25,6 +26,9 @@ import androidx.compose.material.Text
 import androidx.compose.ui.viewinterop.AndroidView
 
 class AndroidViewTestActivity : ComponentActivity() {
+
+    lateinit var androidView: View
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -33,6 +37,7 @@ class AndroidViewTestActivity : ComponentActivity() {
                 AndroidView({ context ->
                     TextView(context).apply {
                         text = "AndroidView"
+                        androidView = this
                     }
                 })
             }

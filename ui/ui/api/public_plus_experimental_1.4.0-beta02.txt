@@ -2457,6 +2457,10 @@ package androidx.compose.ui.node {
   @kotlin.RequiresOptIn(message="This API is internal to library.") @kotlin.annotation.Retention(kotlin.annotation.AnnotationRetention.BINARY) @kotlin.annotation.Target(allowedTargets={kotlin.annotation.AnnotationTarget.CLASS, kotlin.annotation.AnnotationTarget.FUNCTION, kotlin.annotation.AnnotationTarget.PROPERTY, kotlin.annotation.AnnotationTarget.PROPERTY_GETTER, kotlin.annotation.AnnotationTarget.PROPERTY_SETTER}) public @interface InternalCoreApi {
   }
 
+  @androidx.compose.ui.InternalComposeUiApi public sealed interface InteroperableComposeUiNode {
+    method public android.view.View? getInteropView();
+  }
+
   @androidx.compose.ui.ExperimentalComposeUiApi public interface LayoutAwareModifierNode extends androidx.compose.ui.node.DelegatableNode {
     method public default void onLookaheadPlaced(androidx.compose.ui.layout.LookaheadLayoutCoordinates coordinates);
     method public default void onPlaced(androidx.compose.ui.layout.LayoutCoordinates coordinates);
@@ -3344,6 +3348,7 @@ package androidx.compose.ui.viewinterop {
 
   public final class AndroidView_androidKt {
     method @androidx.compose.runtime.Composable @androidx.compose.ui.UiComposable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> factory, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update);
+    method @androidx.compose.runtime.Composable @androidx.compose.ui.ExperimentalComposeUiApi @androidx.compose.ui.UiComposable public static <T extends android.view.View> void AndroidView(kotlin.jvm.functions.Function1<? super android.content.Context,? extends T> factory, kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onReset, optional androidx.compose.ui.Modifier modifier, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> update, optional kotlin.jvm.functions.Function1<? super T,kotlin.Unit> onRelease);
     method public static kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> getNoOpUpdate();
     property public static final kotlin.jvm.functions.Function1<android.view.View,kotlin.Unit> NoOpUpdate;
   }
