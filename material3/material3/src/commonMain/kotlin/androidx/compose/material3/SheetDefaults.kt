@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
@@ -287,8 +289,11 @@ object BottomSheetDefaults {
         color: Color = SheetBottomTokens.DockedDragHandleColor.toColor()
             .copy(SheetBottomTokens.DockedDragHandleOpacity),
     ) {
+        val dragHandleDescription = getString(Strings.BottomSheetDragHandleDescription)
         Surface(
-            modifier = modifier.padding(vertical = DragHandleVerticalPadding),
+            modifier = modifier
+                .padding(vertical = DragHandleVerticalPadding)
+                .semantics { contentDescription = dragHandleDescription },
             color = color,
             shape = shape
         ) {

@@ -95,7 +95,10 @@ class ModalBottomSheetTest {
     val rule = createAndroidComposeRule<ComponentActivity>()
 
     private val sheetHeight = 256.dp
+    private val dragHandleSize = 44.dp
+
     private val sheetTag = "sheetContentTag"
+    private val dragHandleTag = "dragHandleTag"
     private val BackTestTag = "Back"
 
     @Test
@@ -544,7 +547,11 @@ class ModalBottomSheetTest {
                     newState != SheetValue.Hidden
                 }
             )
-            ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
+            ModalBottomSheet(
+                onDismissRequest = {},
+                sheetState = sheetState,
+                dragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) }
+            ) {
                 Box(
                     Modifier
                         .fillMaxSize()
@@ -564,7 +571,7 @@ class ModalBottomSheetTest {
             assertThat(sheetState.currentValue).isEqualTo(SheetValue.PartiallyExpanded)
         }
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .performSemanticsAction(SemanticsActions.Dismiss)
 
         rule.runOnIdle {
@@ -657,7 +664,10 @@ class ModalBottomSheetTest {
     @Test
     fun modalBottomSheet_testDismissAction_tallBottomSheet_whenPartiallyExpanded() {
         rule.setContent {
-            ModalBottomSheet(onDismissRequest = {}) {
+            ModalBottomSheet(
+                onDismissRequest = {},
+                dragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) }
+            ) {
                 Box(
                     Modifier
                         .fillMaxSize()
@@ -666,7 +676,7 @@ class ModalBottomSheetTest {
             }
         }
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
@@ -678,7 +688,11 @@ class ModalBottomSheetTest {
         lateinit var sheetState: SheetState
         rule.setContent {
             sheetState = rememberModalBottomSheetState()
-            ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
+            ModalBottomSheet(
+                onDismissRequest = {},
+                sheetState = sheetState,
+                dragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) }
+            ) {
                 Box(
                     Modifier
                         .fillMaxSize()
@@ -687,7 +701,7 @@ class ModalBottomSheetTest {
             }
         }
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
@@ -715,7 +729,11 @@ class ModalBottomSheetTest {
                 screenHeightPx = resScreenHeight.dp.roundToPx().toFloat()
             }
 
-            ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
+            ModalBottomSheet(
+                onDismissRequest = {},
+                sheetState = sheetState,
+                dragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) }
+            ) {
                 Box(
                     Modifier
                         .fillMaxSize()
@@ -728,7 +746,7 @@ class ModalBottomSheetTest {
         }
         rule.waitForIdle()
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))
@@ -756,7 +774,11 @@ class ModalBottomSheetTest {
                 screenHeightPx = resScreenHeight.dp.roundToPx().toFloat()
             }
 
-            ModalBottomSheet(onDismissRequest = {}, sheetState = sheetState) {
+            ModalBottomSheet(
+                onDismissRequest = {},
+                sheetState = sheetState,
+                dragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) }
+            ) {
                 Box(
                     Modifier
                         .fillMaxSize()
@@ -769,7 +791,7 @@ class ModalBottomSheetTest {
         }
         rule.waitForIdle()
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Dismiss))

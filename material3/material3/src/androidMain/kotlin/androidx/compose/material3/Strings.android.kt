@@ -153,6 +153,9 @@ internal actual fun getString(string: Strings): String {
         Strings.DateRangeInputInvalidRangeInput -> resources.getString(
             androidx.compose.material3.R.string.date_range_input_invalid_range_input
         )
+        Strings.BottomSheetDragHandleDescription -> resources.getString(
+            androidx.compose.material3.R.string.bottom_sheet_drag_handle_description
+        )
         Strings.TooltipLongPressLabel -> resources.getString(
             androidx.compose.material3.R.string.tooltip_long_press_label
         )

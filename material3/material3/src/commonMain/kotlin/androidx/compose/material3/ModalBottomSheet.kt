@@ -163,8 +163,6 @@ fun ModalBottomSheet(
                     )
                     .modalBottomSheetSwipeable(
                         sheetState = sheetState,
-                        scope = scope,
-                        onDismissRequest = onDismissRequest,
                         anchorChangeHandler = anchorChangeHandler,
                         screenHeight = fullHeight.toFloat(),
                         bottomPadding = systemBarHeight.toFloat(),
@@ -183,7 +181,40 @@ fun ModalBottomSheet(
             ) {
                 Column(Modifier.fillMaxWidth()) {
                     if (dragHandle != null) {
-                        Box(Modifier.align(Alignment.CenterHorizontally)) {
+                        Box(Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .semantics {
+                                // Provides semantics to interact with the bottomsheet based on its
+                                // current value.
+                                with(sheetState) {
+                                    dismiss {
+                                        if (swipeableState.confirmValueChange(Hidden)) {
+                                            scope.launch { hide() }.invokeOnCompletion {
+                                                if (!isVisible) { onDismissRequest() }
+                                            }
+                                        }
+                                        true
+                                    }
+                                    if (currentValue == PartiallyExpanded) {
+                                        expand {
+                                            if (swipeableState.confirmValueChange(Expanded)) {
+                                                scope.launch { sheetState.expand() }
+                                            }
+                                            true
+                                        }
+                                    } else if (hasPartiallyExpandedState) {
+                                        collapse {
+                                            if (
+                                                swipeableState.confirmValueChange(PartiallyExpanded)
+                                            ) {
+                                                scope.launch { partialExpand() }
+                                            }
+                                            true
+                                        }
+                                    }
+                                }
+                            }
+                        ) {
                             dragHandle()
                         }
                     }
@@ -248,8 +279,6 @@ private fun Scrim(
 @ExperimentalMaterial3Api
 private fun Modifier.modalBottomSheetSwipeable(
     sheetState: SheetState,
-    scope: CoroutineScope,
-    onDismissRequest: () -> Unit,
     anchorChangeHandler: AnchorChangeHandler<SheetValue>,
     screenHeight: Float,
     bottomPadding: Float,
@@ -277,32 +306,6 @@ private fun Modifier.modalBottomSheetSwipeable(
                 Expanded -> if (sheetSize.height != 0) {
                     max(0f, screenHeight - sheetSize.height)
                 } else null
-            }
-        }.semantics {
-            if (sheetState.isVisible) {
-                dismiss {
-                    if (sheetState.swipeableState.confirmValueChange(Hidden)) {
-                        scope.launch { sheetState.hide() }.invokeOnCompletion {
-                            if (!sheetState.isVisible) { onDismissRequest() }
-                        }
-                    }
-                    true
-                }
-                if (sheetState.swipeableState.currentValue == PartiallyExpanded) {
-                    expand {
-                        if (sheetState.swipeableState.confirmValueChange(Expanded)) {
-                            scope.launch { sheetState.expand() }
-                        }
-                        true
-                    }
-                } else if (sheetState.hasPartiallyExpandedState) {
-                    collapse {
-                        if (sheetState.swipeableState.confirmValueChange(PartiallyExpanded)) {
-                            scope.launch { sheetState.partialExpand() }
-                        }
-                        true
-                    }
-                }
             }
         }
 

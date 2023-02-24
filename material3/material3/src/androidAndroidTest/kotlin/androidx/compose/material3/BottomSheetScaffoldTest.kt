@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -83,9 +84,10 @@ class BottomSheetScaffoldTest {
     private val restorationTester = StateRestorationTester(rule)
 
     private val sheetHeight = 256.dp
-    private val dragHandleHeight = 44.dp
+    private val dragHandleSize = 44.dp
     private val peekHeight = 75.dp
     private val sheetTag = "sheetContentTag"
+    private val dragHandleTag = "dragHandleTag"
 
     @Test
     fun test_stateSavedAndRestored() {
@@ -140,7 +142,7 @@ class BottomSheetScaffoldTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .requiredHeight(dragHandleHeight)
+                            .requiredHeight(dragHandleSize)
                             .testTag(sheetTag))
                 },
                 sheetPeekHeight = peekHeight
@@ -150,7 +152,7 @@ class BottomSheetScaffoldTest {
         }
 
         rule.onNodeWithTag(sheetTag)
-            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - (sheetHeight + dragHandleHeight))
+            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - (sheetHeight + dragHandleSize))
     }
 
     @Test
@@ -164,22 +166,23 @@ class BottomSheetScaffoldTest {
                             .requiredHeight(sheetHeight)
                             .testTag(sheetTag))
                 },
-                sheetDragHandle = null,
+                sheetDragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) },
                 sheetPeekHeight = peekHeight
             ) {
                 Text("Content")
             }
         }
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Collapse))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Expand))
             .performSemanticsAction(SemanticsActions.Expand)
 
         rule.waitForIdle()
+        val expectedSheetHeight = sheetHeight + dragHandleSize
 
-        rule.onNodeWithTag(sheetTag)
-            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - sheetHeight)
+        rule.onNodeWithTag(dragHandleTag)
+            .assertTopPositionInRootIsEqualTo(rule.rootHeight() - expectedSheetHeight)
     }
 
     @Test
@@ -197,21 +200,21 @@ class BottomSheetScaffoldTest {
                             .requiredHeight(sheetHeight)
                             .testTag(sheetTag))
                 },
-                sheetDragHandle = null,
+                sheetDragHandle = { Box(Modifier.testTag(dragHandleTag).size(dragHandleSize)) },
                 sheetPeekHeight = peekHeight
             ) {
                 Text("Content")
             }
         }
 
-        rule.onNodeWithTag(sheetTag).onParent()
+        rule.onNodeWithTag(dragHandleTag).onParent()
             .assert(SemanticsMatcher.keyNotDefined(SemanticsActions.Expand))
             .assert(SemanticsMatcher.keyIsDefined(SemanticsActions.Collapse))
             .performSemanticsAction(SemanticsActions.Collapse)
 
         rule.waitForIdle()
 
-        rule.onNodeWithTag(sheetTag)
+        rule.onNodeWithTag(dragHandleTag)
             .assertTopPositionInRootIsEqualTo(rule.rootHeight() - peekHeight)
     }
 
@@ -261,14 +264,14 @@ class BottomSheetScaffoldTest {
                     Box(
                         Modifier
                             .fillMaxWidth()
-                            .requiredHeight(dragHandleHeight)
+                            .requiredHeight(dragHandleSize)
                             .testTag(sheetTag))
                 },
                 sheetPeekHeight = peekHeight,
                 content = { Text("Content") }
             )
         }
-        val expectedHeight = sheetHeight + dragHandleHeight
+        val expectedHeight = sheetHeight + dragHandleSize
 
         rule.onNodeWithTag(sheetTag)
             .assertTopPositionInRootIsEqualTo(rule.rootHeight() - peekHeight)
