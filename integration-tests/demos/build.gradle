@@ -27,6 +27,10 @@ dependencies {
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
 
+    implementation("androidx.lifecycle:lifecycle-livedata:2.6.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-core:2.6.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.0")
+
     implementation("androidx.preference:preference-ktx:1.1.1")
 }
 

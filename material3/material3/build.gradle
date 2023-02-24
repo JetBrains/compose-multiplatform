@@ -50,8 +50,10 @@ dependencies {
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-        implementation("androidx.lifecycle:lifecycle-runtime:2.6.0-rc01")
-        implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0-rc01")
+        implementation("androidx.lifecycle:lifecycle-runtime:2.6.0")
+        implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0")
+
+        implementation("androidx.lifecycle:lifecycle-common-java8:2.6.0")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -108,8 +110,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
                 // TODO: remove next 3 dependencies when b/202810604 is fixed
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.6.0-rc01")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0-rc01")
+                implementation("androidx.lifecycle:lifecycle-runtime:2.6.0")
+                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0")
+
+                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.0")
             }
 
             desktopMain.dependencies {
