@@ -25,13 +25,17 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import org.jetbrains.skiko.SkikoPointerEvent
+import org.jetbrains.skiko.SkikoPointerEventKind
 
 @Composable
 internal actual fun platformScrollConfig(): ScrollConfig = JsConfig
 
 private object JsConfig : ScrollConfig {
     override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset =
-        event.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta } * -64.dp.toPx()
+        (event.nativeEvent as SkikoPointerEvent).takeIf { it.kind == SkikoPointerEventKind.SCROLL }?.let {
+            Offset(-it.deltaX.toFloat(), -it.deltaY.toFloat()) / 2f
+        } ?: Offset.Zero
 }
 
 
