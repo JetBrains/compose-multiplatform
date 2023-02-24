@@ -182,6 +182,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
             }
         } else if (after.size == 0) {
             // common case where we we are removing all the modifiers.
+            coordinatorSyncNeeded = true
             var i = before.size - 1
             // for the linear traversal we want to start with the "unpadded" tail
             var node: Modifier.Node? = tail.parent

@@ -1384,4 +1384,32 @@ class GraphicsLayerTest {
             assertEquals(Color.Red.toArgb(), getPixel(10, (size * 2.5f).roundToInt()))
         }
     }
+
+    @Test
+    fun removingGraphicsLayerModifierResetsItsAction() {
+        var addGraphicsLayer by mutableStateOf(true)
+        lateinit var coordinates: LayoutCoordinates
+        rule.setContent {
+            Box(
+                if (addGraphicsLayer) {
+                    Modifier.graphicsLayer(translationX = 10f)
+                } else {
+                    Modifier
+                }
+            ) {
+                Layout(Modifier.onGloballyPositioned { coordinates = it }) { _, _ ->
+                    layout(10, 10) {}
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(Rect(10f, 0f, 20f, 10f), coordinates.boundsInRoot())
+            addGraphicsLayer = false
+        }
+
+        rule.runOnIdle {
+            assertEquals(Rect(0f, 0f, 10f, 10f), coordinates.boundsInRoot())
+        }
+    }
 }
