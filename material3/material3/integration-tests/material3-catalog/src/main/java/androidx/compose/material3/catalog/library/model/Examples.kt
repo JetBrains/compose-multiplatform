@@ -141,6 +141,7 @@ import androidx.compose.material3.samples.TextTabs
 import androidx.compose.material3.samples.ThreeLineListItem
 import androidx.compose.material3.samples.TimeInputSample
 import androidx.compose.material3.samples.TimePickerSample
+import androidx.compose.material3.samples.TimePickerSwitchableSample
 import androidx.compose.material3.samples.TriStateCheckboxSample
 import androidx.compose.material3.samples.TwoLineListItem
 import androidx.compose.runtime.Composable
@@ -949,6 +950,13 @@ val TimePickerExamples = listOf(
         sourceUrl = TimePickerSourceUrl
     ) {
         TimeInputSample()
+    },
+    Example(
+        name = ::TimePickerSwitchableSample.name,
+        description = TimePickerDescription,
+        sourceUrl = TimePickerSourceUrl
+    ) {
+        TimePickerSwitchableSample()
     },
 )
 
