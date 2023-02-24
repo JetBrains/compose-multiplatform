@@ -52,7 +52,7 @@ please do the following:
 - `./gradlew package` - package native distribution into `build/compose/binaries`
 
 ## Android
-To run on Android, you can use the latest stable version of AndroidStudio or use Gradle:
+To run on Android, you can use the latest stable version of Android Studio or use Gradle:
 
 `./gradlew installDebug` - install Android application on an Android device (on a real device or on an emulator)
 
