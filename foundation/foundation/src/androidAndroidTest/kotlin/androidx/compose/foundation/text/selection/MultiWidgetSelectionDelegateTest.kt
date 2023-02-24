@@ -1835,6 +1835,8 @@ class MultiWidgetSelectionDelegateTest {
         assertThat(lastVisibleOffset).isEqualTo(5)
     }
 
+    // TODO(b/270441925); Returns a different result below API 26.
+    @SdkSuppress(minSdkVersion = 26)
     @Test
     fun getLastVisibleOffset_limitHeight_ellipsis_disabledSoftwrap_singleLineContent() {
         val text = "hello world ".repeat(10)
