@@ -1,4 +1,4 @@
-# Getting Started with Compose Multiplatform
+# Getting Started with Compose for Desktop
 
 ## What is covered
 
