@@ -1,7 +1,7 @@
 import UIKit
 import shared
 
-@UIApplicationMain
+@main
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
