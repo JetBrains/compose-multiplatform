@@ -11,7 +11,7 @@ using the Compose Multiplatform UI framework.
 So any of these platforms can be used for this tutorial.
 
 The following software must be preinstalled:
-   * JDK 11 or later
+   * JDK 17 or later
    * IntelliJ IDEA Community Edition or Ultimate Edition 2020.3 or later (other editors could be used, but we assume you are using IntelliJ IDEA in this tutorial)
 
 ## Creating a new project
@@ -20,9 +20,6 @@ The following software must be preinstalled:
 
 Starting with the version 2020.3, Kotlin support in IDEA comes with the new project wizard,
 which creates a Compose application automatically.
-
-Note that JDK must be at least JDK 11, and to use the native distribution
-packaging, JDK 15 or later must be used.
 
 <img alt="Create new project 1" src="wizard1.png" height="500" />
 
