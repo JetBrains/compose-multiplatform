@@ -6,7 +6,7 @@ In this tutorial, we will create a simple web UI application using the Compose U
 ## Prerequisites
 
 You need to have the following software installed before you begin:
-* JDK 17 or later
+* JDK 11 or later
 * IntelliJ IDEA Community Edition or Ultimate Edition 2020.2 or later (you can use other editors, but for this tutorial we assume you are using IntelliJ IDEA)
 
 
