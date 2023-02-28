@@ -4,7 +4,7 @@
 Note that iOS target is experimental so far.
 
 ## Desktop
-This template contains 'desktopApp' run configuration that you can use to run the desktop target in Android Studio or Intellij IDEA.
+This template contains  `desktopApp` run configuration that you can use to run the desktop target in Android Studio or Intellij IDEA.
 
 Useful Gradle tasks:
 - `./gradlew run` - run application
