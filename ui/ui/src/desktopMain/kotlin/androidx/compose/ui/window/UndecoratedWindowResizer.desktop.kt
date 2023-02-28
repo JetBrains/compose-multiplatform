@@ -51,7 +51,7 @@ internal class UndecoratedWindowResizer(
     private var initialWindowSize = Dimension()
 
     @Composable
-    fun Content() {
+    fun Content(modifier: Modifier) {
         if (enabled) {
             Layout(
                 {
@@ -64,7 +64,7 @@ internal class UndecoratedWindowResizer(
                     Side(Cursor.SW_RESIZE_CURSOR, Side.Left or Side.Bottom)
                     Side(Cursor.SE_RESIZE_CURSOR, Side.Right or Side.Bottom)
                 },
-                Modifier,
+                modifier = modifier,
                 measurePolicy = { measurables, constraints ->
                     val b = borderThickness.roundToPx()
                     fun Measurable.measureSide(width: Int, height: Int) = measure(
