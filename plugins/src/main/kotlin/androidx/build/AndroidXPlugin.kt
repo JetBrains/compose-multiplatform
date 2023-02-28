@@ -43,7 +43,7 @@ class AndroidXPlugin : Plugin<Project> {
          */
         @JvmStatic
         fun isPlayground(project: Project): Boolean {
-            return StudioType.isPlayground(project)
+            return ProjectLayoutType.isPlayground(project)
         }
     }
 }

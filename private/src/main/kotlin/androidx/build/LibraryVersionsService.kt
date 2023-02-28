@@ -22,24 +22,42 @@ import org.gradle.api.services.BuildService
 import org.gradle.api.services.BuildServiceParameters
 import org.tomlj.Toml
 import org.tomlj.TomlParseResult
+import org.tomlj.TomlTable
 
 /**
  * Loads Library groups and versions from a specified TOML file.
  */
 abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Parameters> {
     interface Parameters : BuildServiceParameters {
-        var tomlFile: Provider<String>
+        var tomlFileName: String
+        var tomlFileContents: Provider<String>
         var composeCustomVersion: Provider<String>
         var composeCustomGroup: Provider<String>
+        var useMultiplatformGroupVersions: Provider<Boolean>
     }
 
     private val parsedTomlFile: TomlParseResult by lazy {
-        Toml.parse(parameters.tomlFile.get())
+        val result = Toml.parse(parameters.tomlFileContents.get())
+        if (result.hasErrors()) {
+            val issues = result.errors().map {
+                "${parameters.tomlFileName}:${it.position()}: ${it.message}"
+            }.joinToString(separator = "\n")
+            throw Exception("${parameters.tomlFileName} file has issues.\n$issues")
+        }
+        result
     }
 
+    val useMultiplatformGroupVersions
+        get() = parameters.useMultiplatformGroupVersions.get()
+
+    private fun getTable(key: String): TomlTable {
+        return parsedTomlFile.getTable(key)
+            ?: throw GradleException("Library versions toml file is missing [$key] table")
+    }
+
+    // map from name of constant to Version
     val libraryVersions: Map<String, Version> by lazy {
-        val versions = parsedTomlFile.getTable("versions")
-            ?: throw GradleException("Library versions toml file is missing [versions] table")
+        val versions = getTable("versions")
         versions.keySet().associateWith { versionName ->
             val versionValue =
                 if (versionName.startsWith("COMPOSE") &&
@@ -56,10 +74,72 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
         }
     }
 
+    // map of library groups keyed by their variable name in the toml file
     val libraryGroups: Map<String, LibraryGroup> by lazy {
-        val groups = parsedTomlFile.getTable("groups")
-            ?: throw GradleException("Library versions toml file is missing [groups] table")
-        groups.keySet().associateWith { name ->
+        val result = mutableMapOf<String, LibraryGroup>()
+        for (association in libraryGroupAssociations) {
+          result.put(association.declarationName, association.libraryGroup)
+        }
+        result
+    }
+
+    // map of library groups keyed by group name
+    val libraryGroupsByGroupId: Map<String, LibraryGroup> by lazy {
+        val result = mutableMapOf<String, LibraryGroup>()
+        for (association in libraryGroupAssociations) {
+            // Check for duplicate groups
+            val groupId = association.libraryGroup.group
+            val existingAssociation = result.get(groupId)
+            if (existingAssociation != null) {
+                if (association.overrideIncludeInProjectPaths.size < 1) {
+                    throw GradleException(
+                        "Duplicate library group $groupId defined in " +
+                        "${association.declarationName} does not set overrideInclude. " +
+                        "Declarations beyond the first can only have an effect if they set " +
+                        "overrideInclude")
+                }
+            } else {
+                result.put(groupId, association.libraryGroup)
+            }
+        }
+        result
+    }
+
+    // map from project name to group override if applicable
+    val overrideLibraryGroupsByProjectPath: Map<String, LibraryGroup> by lazy {
+       val result = mutableMapOf<String, LibraryGroup>()
+       for (association in libraryGroupAssociations) {
+           for (overridePath in association.overrideIncludeInProjectPaths) {
+               result.put(overridePath, association.libraryGroup)
+           }
+       }
+       result
+    }
+
+    private val libraryGroupAssociations: List<LibraryGroupAssociation> by lazy {
+        val groups = getTable("groups")
+        val useMultiplatformGroupVersion =
+            parameters.useMultiplatformGroupVersions.orElse(false).get()
+
+        fun readGroupVersion(groupDefinition: TomlTable, groupName: String, key: String): Version? {
+            val versionRef = groupDefinition.getString(key) ?: return null
+            if (!versionRef.startsWith(VersionReferencePrefix)) {
+                throw GradleException(
+                    "Group entry $key is expected to start with $VersionReferencePrefix"
+                )
+            }
+            // name without `versions.`
+            val atomicGroupVersionName = versionRef.removePrefix(
+                VersionReferencePrefix
+            )
+            return libraryVersions[atomicGroupVersionName] ?: error(
+                "Group entry $groupName specifies $atomicGroupVersionName, but such version " +
+                    "doesn't exist"
+            )
+        }
+        val result = mutableListOf<LibraryGroupAssociation>()
+        for (name in groups.keySet()) {
+            // get group name
             val groupDefinition = groups.getTable(name)!!
             val groupName = groupDefinition.getString("group")!!
             val finalGroupName = if (name.startsWith("COMPOSE") &&
@@ -68,29 +148,50 @@ abstract class LibraryVersionsService : BuildService<LibraryVersionsService.Para
                 groupName.replace("androidx.compose", parameters.composeCustomGroup.get())
             } else groupName
 
-            if (groupDefinition.contains(AtomicGroupVersion)) {
-                val atomicGroupVersionReference = groupDefinition.getString(AtomicGroupVersion)!!
-                if (!atomicGroupVersionReference.startsWith(VersionReferencePrefix)) {
-                    throw GradleException(
-                        "Group entry $AtomicGroupVersion is expected to start with " +
-                            VersionReferencePrefix
-                    )
-                }
-                // name without `versions.`
-                val atomicGroupVersionName = atomicGroupVersionReference.removePrefix(
-                    VersionReferencePrefix
-                )
-                check(libraryVersions.containsKey(atomicGroupVersionName)) {
-                    "Group entry $name specifies $atomicGroupVersionName, but such version " +
-                        "doesn't exist"
-                }
-                LibraryGroup(finalGroupName, libraryVersions[atomicGroupVersionName])
-            } else {
-                LibraryGroup(finalGroupName, null)
+            // get group version, if any
+            val atomicGroupVersion = readGroupVersion(
+                groupDefinition = groupDefinition,
+                groupName = groupName,
+                key = AtomicGroupVersion
+            )
+            val multiplatformGroupVersion = readGroupVersion(
+                groupDefinition = groupDefinition,
+                groupName = groupName,
+                key = MultiplatformGroupVersion
+            )
+            check(
+                multiplatformGroupVersion == null || atomicGroupVersion != null
+            ) {
+                "Cannot specify $MultiplatformGroupVersion for $name without specifying an " +
+                    AtomicGroupVersion
             }
+            val groupVersion = when {
+                useMultiplatformGroupVersion -> multiplatformGroupVersion ?: atomicGroupVersion
+                else -> atomicGroupVersion
+            }
+
+            val overrideApplyToProjects = (
+                groupDefinition.getArray("overrideInclude")?.toList() ?: listOf()
+            ).map({ it -> it as String })
+
+            val group = LibraryGroup(finalGroupName, groupVersion)
+            val association = LibraryGroupAssociation(name, group, overrideApplyToProjects)
+            result.add(association)
         }
+        result
     }
 }
 
+// a LibraryGroupSpec knows how to associate a LibraryGroup with the appropriate projects
+data class LibraryGroupAssociation(
+    // the name of the variable to which it is assigned in the toml file
+    val declarationName: String,
+    // the group
+    val libraryGroup: LibraryGroup,
+    // the paths of any additional projects that this group should be assigned to
+    val overrideIncludeInProjectPaths: List<String>
+)
+
 private const val VersionReferencePrefix = "versions."
 private const val AtomicGroupVersion = "atomicGroupVersion"
+private const val MultiplatformGroupVersion = "multiplatformGroupVersion"

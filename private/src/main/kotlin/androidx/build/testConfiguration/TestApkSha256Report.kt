@@ -14,23 +14,21 @@
  * limitations under the License.
  */
 
-package androidx.build
+package androidx.build.testConfiguration
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import com.google.common.hash.Hashing
+import com.google.common.io.BaseEncoding
+import java.io.File
 
-/**
- * Configures screenshot testing using Paparazzi for AndroidX projects.
- *
- * The actual implementation is in AndroidXPaparazziImplPlugin.
- */
-class AndroidXLayoutlibPlugin : Plugin<Project> {
-    override fun apply(project: Project) {
-        val supportRoot = project.getSupportRootFolder()
-        project.apply(
-            mapOf(
-                "from" to "$supportRoot/buildSrc/apply/applyAndroidXLayoutlibImplPlugin.gradle"
-            )
-        )
+@Suppress("UnstableApiUsage") // guava Hashing is marked as @Beta
+internal fun sha256(file: File): String {
+    val hasher = Hashing.sha256().newHasher()
+    file.inputStream().buffered().use {
+        while (it.available() > 0) {
+            hasher.putBytes(it.readNBytes(1024))
+        }
     }
+    return BaseEncoding.base16().lowerCase().encode(
+        hasher.hash().asBytes()
+    )
 }

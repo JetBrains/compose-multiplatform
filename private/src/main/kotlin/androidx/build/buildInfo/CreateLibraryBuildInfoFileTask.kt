@@ -23,9 +23,7 @@ import androidx.build.getBuildInfoDirectory
 import androidx.build.getGroupZipPath
 import androidx.build.getProjectZipPath
 import androidx.build.getSupportRootFolder
-import androidx.build.gitclient.Commit
 import androidx.build.gitclient.GitClient
-import androidx.build.gitclient.GitCommitRange
 import androidx.build.jetpad.LibraryBuildInfoFile
 import com.google.common.annotations.VisibleForTesting
 import com.google.gson.GsonBuilder
@@ -244,21 +242,7 @@ abstract class CreateLibraryBuildInfoFileTask : DefaultTask() {
                 GitClient.getChangeInfoPath(project).get(),
                 GitClient.getManifestPath(project).get()
             )
-            val commitList: List<Commit> =
-                gitClient
-                    .getGitLog(
-                        GitCommitRange(
-                            fromExclusive = "",
-                            untilInclusive = "HEAD",
-                            n = 1
-                        ),
-                        keepMerges = true,
-                        fullProjectDir = getSupportRootFolder()
-                    )
-            if (commitList.isEmpty()) {
-                throw RuntimeException("Failed to find git commit for HEAD!")
-            }
-            return commitList.first().sha
+            return gitClient.getHeadSha(getSupportRootFolder())
         }
     }
 }
