@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.focusGroup
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -143,7 +145,7 @@ class TwoDimensionalFocusTraversalImplicitExitTest(param: Param) {
      *                   |   Up   |
      *                   |________|
      *                 ________________
-     *                |  focusedItem  |
+     *                |  parent       |
      *   _________    |   _________   |    _________
      *  |  Left  |    |  | child0 |   |   |  Right |
      *  |________|    |  |________|   |   |________|
@@ -156,15 +158,236 @@ class TwoDimensionalFocusTraversalImplicitExitTest(param: Param) {
     fun moveFocusExit_blockFocusChange() {
         // Arrange.
         val (up, down, left, right, parent) = List(5) { mutableStateOf(false) }
-        val customFocusEnter = Modifier.focusProperties { exit = { Cancel } }
+        val customFocusExit = Modifier.focusProperties { exit = { Cancel } }
         rule.setContentForTest {
             FocusableBox(up, 30, 0, 10, 10)
             FocusableBox(left, 0, 30, 10, 10)
-            FocusableBox(parent, 20, 20, 70, 50, deactivated = true, modifier = customFocusEnter) {
+            FocusableBox(parent, 20, 20, 70, 50, deactivated = true, modifier = customFocusExit) {
                 FocusableBox(focusedItem, 30, 30, 10, 10, initialFocus)
             }
             FocusableBox(right, 100, 35, 10, 10)
             FocusableBox(down, 30, 90, 10, 10)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(up.value).isFalse()
+            assertThat(left.value).isFalse()
+            assertThat(right.value).isFalse()
+            assertThat(down.value).isFalse()
+            assertThat(focusedItem.value).isTrue()
+        }
+    }
+
+    /**
+     *                    _________
+     *                   |   Up   |
+     *                   |________|
+     *                 ________________
+     *                |  parent       |
+     *   _________    |   _________   |    _________
+     *  |  Left  |    |  | source |   |   |  Right |
+     *  |________|    |  |________|   |   |________|
+     *                |_______________|
+     *                    _________
+     *                   |  Down  |
+     *                   |________|
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun moveFocusExit_cancelExit() {
+        // Arrange.
+        val (up, down, left, right, parent) = List(5) { mutableStateOf(false) }
+        var (upItem, downItem, leftItem, rightItem) = FocusRequester.createRefs()
+
+        val customFocusExit = Modifier
+            .focusProperties { exit = { Cancel } }
+            .focusGroup()
+
+        rule.setContentForTest {
+            FocusableBox(up, 30, 0, 10, 10, upItem)
+            FocusableBox(left, 0, 30, 10, 10, leftItem)
+            FocusableBox(parent, 20, 20, 30, 30, modifier = customFocusExit) {
+                FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus)
+            }
+            FocusableBox(right, 60, 30, 10, 10, rightItem)
+            FocusableBox(down, 30, 60, 10, 10, downItem)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(up.value).isFalse()
+            assertThat(left.value).isFalse()
+            assertThat(right.value).isFalse()
+            assertThat(down.value).isFalse()
+            assertThat(focusedItem.value).isTrue()
+        }
+    }
+
+    /**
+     *   _________        _________
+     *  |  dest  |       |   Up   |
+     *  |________|       |________|
+     *                 ________________
+     *                |  parent       |
+     *   _________    |   _________   |    _________
+     *  |  Left  |    |  | source |   |   |  Right |
+     *  |________|    |  |________|   |   |________|
+     *                |_______________|
+     *                    _________
+     *                   |  Down  |
+     *                   |________|
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun moveFocusExit_redirectExit() {
+        // Arrange.
+        val destItem = FocusRequester()
+        val (dest, parent) = List(4) { mutableStateOf(false) }
+        val (up, down, left, right) = List(4) { mutableStateOf(false) }
+        var (upItem, downItem, leftItem, rightItem) = FocusRequester.createRefs()
+
+        val customFocusExit = Modifier
+            .focusProperties {
+                exit = {
+                    initialFocus.requestFocus()
+                    Cancel
+                }
+            }
+            .focusGroup()
+
+        rule.setContentForTest {
+            FocusableBox(dest, 0, 0, 10, 10, destItem)
+            FocusableBox(up, 30, 0, 10, 10, upItem)
+            FocusableBox(left, 0, 30, 10, 10, leftItem)
+            FocusableBox(parent, 20, 20, 30, 30, modifier = customFocusExit) {
+                FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus)
+            }
+            FocusableBox(right, 60, 30, 10, 10, rightItem)
+            FocusableBox(down, 30, 60, 10, 10, downItem)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(up.value).isFalse()
+            assertThat(left.value).isFalse()
+            assertThat(right.value).isFalse()
+            assertThat(down.value).isFalse()
+            assertThat(focusedItem.value).isTrue()
+        }
+    }
+
+    /**
+     *                      _________
+     *                     |   Up   |
+     *                     |________|
+     *               _________________________
+     *              | grandparent            |
+     *              |  _____________________ |
+     *              | | parent             | |
+     *   _________  | |     _________      | |  _________
+     *  |  Left  |  | |    | source |      | | |  Right |
+     *  |________|  | |    |________|      | | |________|
+     *              | |____________________| |
+     *              |________________________|
+     *                      _________
+     *                     |  Down  |
+     *                     |________|
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun moveFocusExit_multipleParents_cancelExit() {
+        // Arrange.
+        val (grandparent, parent) = List(4) { mutableStateOf(false) }
+        val (up, down, left, right) = List(4) { mutableStateOf(false) }
+        var (upItem, downItem, leftItem, rightItem) = FocusRequester.createRefs()
+
+        val customFocusExit = Modifier
+            .focusProperties { exit = { Cancel } }
+            .focusGroup()
+
+        rule.setContentForTest {
+            FocusableBox(up, 40, 0, 10, 10, upItem)
+            FocusableBox(left, 0, 40, 10, 10, leftItem)
+            FocusableBox(grandparent, 20, 20, 50, 50, modifier = Modifier.focusGroup()) {
+                FocusableBox(parent, 10, 10, 30, 30, modifier = customFocusExit) {
+                    FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus)
+                }
+            }
+            FocusableBox(right, 80, 40, 10, 10, rightItem)
+            FocusableBox(down, 40, 80, 10, 10, downItem)
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(focusDirection) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isFalse()
+            assertThat(up.value).isFalse()
+            assertThat(left.value).isFalse()
+            assertThat(right.value).isFalse()
+            assertThat(down.value).isFalse()
+            assertThat(focusedItem.value).isTrue()
+        }
+    }
+
+    /**
+     *   _________            _________
+     *  |  dest  |           |   Up   |
+     *  |________|           |________|
+     *                  _____________________
+     *                 | grandparent+parent |
+     *   _________     |      _________     |    _________
+     *  |  Left  |     |     | source |     |   |  Right |
+     *  |________|     |     |________|     |   |________|
+     *                 |____________________|
+     *                        _________
+     *                       |  Down  |
+     *                       |________|
+     */
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun moveFocusExit_multipleParents_redirectExit() {
+        // Arrange.
+        val destItem = FocusRequester()
+        val (dest, grandparent, parent) = List(4) { mutableStateOf(false) }
+        val (up, down, left, right) = List(4) { mutableStateOf(false) }
+        var (upItem, downItem, leftItem, rightItem) = FocusRequester.createRefs()
+
+        val customFocusExit = Modifier
+            .focusGroup()
+            .focusProperties {
+                exit = {
+                    initialFocus.requestFocus()
+                    Cancel
+                }
+            }
+            .focusGroup()
+
+        rule.setContentForTest {
+            FocusableBox(dest, 0, 0, 10, 10, destItem)
+            FocusableBox(up, 40, 0, 10, 10, upItem)
+            FocusableBox(left, 0, 40, 10, 10, leftItem)
+            FocusableBox(grandparent, 20, 20, 50, 50, modifier = Modifier.focusGroup()) {
+                FocusableBox(parent, 10, 10, 30, 30, modifier = customFocusExit) {
+                    FocusableBox(focusedItem, 10, 10, 10, 10, initialFocus)
+                }
+            }
+            FocusableBox(right, 80, 40, 10, 10, rightItem)
+            FocusableBox(down, 40, 80, 10, 10, downItem)
         }
 
         // Act.

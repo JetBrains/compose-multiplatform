@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.geometry.Offset
 /**
  * Convert the [org.jetbrains.skia.PathMeasure] instance into a Compose-compatible PathMeasure
  */
@@ -49,6 +50,28 @@ internal class SkiaBackedPathMeasure(
 
     override val length: Float
         get() = skia.length
+
+    override fun getPosition(
+        distance: Float
+    ): Offset {
+        val result = skia.getPosition(distance)
+        return if (result != null) {
+            Offset(result.x, result.y)
+        } else {
+            Offset.Unspecified
+        }
+    }
+
+    override fun getTangent(
+        distance: Float
+    ): Offset {
+        val result = skia.getTangent(distance)
+        return if (result != null) {
+            Offset(result.x, result.y)
+        } else {
+            Offset.Unspecified
+        }
+    }
 }
 
 actual fun PathMeasure(): PathMeasure =

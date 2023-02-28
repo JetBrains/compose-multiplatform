@@ -75,7 +75,7 @@ interface Applier<N> {
      * inserted.
      *
      * Some trees are faster to build top-down, in which case the [insertTopDown] method should
-     * be used to insert the [instance]. Other tress are faster to build bottom-up in which case
+     * be used to insert the [instance]. Other trees are faster to build bottom-up in which case
      * [insertBottomUp] should be used.
      *
      * To give example of building a tree top-down vs. bottom-up consider the following tree,

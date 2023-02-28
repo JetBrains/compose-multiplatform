@@ -17,15 +17,11 @@
 package androidx.compose.ui.test
 
 import androidx.compose.runtime.snapshots.Snapshot
-import kotlin.coroutines.AbstractCoroutineContextElement
+import androidx.compose.ui.test.internal.DelayPropagatingContinuationInterceptorWrapper
 import kotlin.coroutines.AbstractCoroutineContextKey
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.ContinuationInterceptor
 import kotlin.coroutines.CoroutineContext
-import kotlinx.coroutines.Delay
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.InternalCoroutinesApi
-import kotlinx.coroutines.test.TestDispatcher
 
 /**
  * A [ContinuationInterceptor] that delegates intercepting to the given [TestDispatcher][delegate],
@@ -40,16 +36,15 @@ import kotlinx.coroutines.test.TestDispatcher
  * recompose during the same call to `advanceTimeBy`, if state was changed by coroutines that were
  * dispatched more than a frame before the end of that advancement.
  */
-@OptIn(ExperimentalStdlibApi::class, ExperimentalCoroutinesApi::class, InternalCoroutinesApi::class)
+@OptIn(ExperimentalStdlibApi::class, InternalTestApi::class)
 internal class ApplyingContinuationInterceptor(
-    private val delegate: TestDispatcher
-) : AbstractCoroutineContextElement(ContinuationInterceptor), ContinuationInterceptor,
-    Delay by delegate {
+    private val delegate: ContinuationInterceptor
+) : DelayPropagatingContinuationInterceptorWrapper(delegate) {
 
     companion object Key : AbstractCoroutineContextKey<
         ContinuationInterceptor,
         ApplyingContinuationInterceptor
-    >(
+        >(
         ContinuationInterceptor,
         { it as? ApplyingContinuationInterceptor }
     )

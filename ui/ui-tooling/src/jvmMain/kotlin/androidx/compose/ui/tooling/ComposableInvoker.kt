@@ -52,7 +52,10 @@ object ComposableInvoker {
     ): Method {
         val actualTypes: Array<Class<*>> = arrayOf(*args)
         return declaredMethods.firstOrNull {
-            methodName == it.name && compatibleTypes(it.parameterTypes, actualTypes)
+            // Methods with inlined classes as parameter will have the name mangled
+            // so we need to check for methodName-xxxx as well
+            (methodName == it.name || it.name.startsWith("$methodName-")) &&
+                compatibleTypes(it.parameterTypes, actualTypes)
         } ?: throw NoSuchMethodException("$methodName not found")
     }
 
@@ -72,11 +75,16 @@ object ComposableInvoker {
                 methodName,
                 *args.mapNotNull { it?.javaClass }.toTypedArray(),
                 Composer::class.java, // composer param
-                *kotlin.Int::class.java.dup(changedParams) // changed params
+                *kotlin.Int::class.java.dup(changedParams) // changed param
             )
         } catch (e: ReflectiveOperationException) {
             try {
-                declaredMethods.find { it.name == methodName }
+                declaredMethods.find {
+                    it.name == methodName ||
+                        // Methods with inlined classes as parameter will have the name mangled
+                        // so we need to check for methodName-xxxx as well
+                        it.name.startsWith("$methodName-")
+                }
             } catch (e: ReflectiveOperationException) {
                 null
             }
@@ -200,7 +208,10 @@ object ComposableInvoker {
                 method.invokeComposableMethod(instance, composer, *args)
             }
         } catch (e: ReflectiveOperationException) {
-            throw ClassNotFoundException("Composable Method '$className.$methodName' not found", e)
+            PreviewLogger.logWarning(
+                "Failed to invoke Composable Method '$className.$methodName'"
+            )
+            throw e
         }
     }
 }

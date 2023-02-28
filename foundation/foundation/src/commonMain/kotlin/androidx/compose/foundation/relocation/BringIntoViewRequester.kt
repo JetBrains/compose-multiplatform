@@ -29,16 +29,16 @@ import androidx.compose.ui.unit.toSize
 
 /**
  * Can be used to send [bringIntoView] requests. Pass it as a parameter to
- * [Modifier.bringIntoView()][bringIntoView].
+ * [Modifier.bringIntoViewRequester()][bringIntoViewRequester].
  *
- * For instance, you can call [BringIntoViewRequester.bringIntoView][bringIntoView] to
- * make all the scrollable parents scroll so that the specified item is brought into parent
- * bounds. This sample demonstrates this use case:
+ * For instance, you can call [bringIntoView()][bringIntoView] to make all the
+ * scrollable parents scroll so that the specified item is brought into the
+ * parent bounds.
  *
  * Here is a sample where a composable is brought into view:
  * @sample androidx.compose.foundation.samples.BringIntoViewSample
  *
- * Here is a sample where a part of a composable is brought into view:
+ * Here is a sample where part of a composable is brought into view:
  * @sample androidx.compose.foundation.samples.BringPartOfComposableIntoViewSample
  */
 @ExperimentalFoundationApi
@@ -82,15 +82,20 @@ fun BringIntoViewRequester(): BringIntoViewRequester {
 }
 
 /**
- * This is a modifier that can be used to send bringIntoView requests.
+ * Modifier that can be used to send
+ * [bringIntoView][BringIntoViewRequester.bringIntoView] requests.
  *
- * Here is an example where the a [bringIntoViewRequester] can be used to bring an item into parent
- * bounds. It demonstrates how a composable can ask its parents to scroll so that the component
- * using this modifier is brought into the bounds of all its parents.
+ * The following example uses a `bringIntoViewRequester` to bring an item into
+ * the parent bounds. The example demonstrates how a composable can ask its
+ * parents to scroll so that the component using this modifier is brought into
+ * the bounds of all its parents.
+ *
  * @sample androidx.compose.foundation.samples.BringIntoViewSample
  *
- * @param bringIntoViewRequester an instance of [BringIntoViewRequester]. This hoisted object can be
- * used to send bringIntoView requests to parents of the current composable.
+ * @param bringIntoViewRequester An instance of [BringIntoViewRequester]. This
+ *     hoisted object can be used to send
+ *     [bringIntoView][BringIntoViewRequester.bringIntoView] requests to parents
+ *     of the current composable.
  */
 @ExperimentalFoundationApi
 fun Modifier.bringIntoViewRequester(

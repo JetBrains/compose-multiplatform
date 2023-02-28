@@ -19,7 +19,7 @@
 package androidx.compose.material3.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -40,7 +40,7 @@ class ScaffoldPaddingDetectorTest : LintDetectorTest() {
         mutableListOf(ScaffoldPaddingDetector.UnusedMaterial3ScaffoldPaddingParameter)
 
     // Simplified Scaffold.kt stubs
-    private val ScaffoldStub = compiledStub(
+    private val ScaffoldStub = bytecodeStub(
         filename = "Scaffold.kt",
         filepath = "androidx/compose/material3",
         checksum = 0xfee46355,

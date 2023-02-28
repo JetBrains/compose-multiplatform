@@ -94,6 +94,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -610,6 +611,7 @@ class PainterModifierTest {
             .assertHeightIsEqualTo(composableHeight)
     }
 
+    @Ignore // b/265030745
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testBitmapPainterScalesContent(): Unit = with(rule.density) {

@@ -407,11 +407,9 @@ internal class LayoutNodeSubcompositionsState(
         }
 
         val itemIndex = root.foldedChildren.indexOf(node)
-        if (itemIndex < currentIndex) {
-            throw IllegalArgumentException(
-                "Key $slotId was already used. If you are using LazyColumn/Row please make sure " +
-                    "you provide a unique key for each item."
-            )
+        require(itemIndex >= currentIndex) {
+            "Key \"$slotId\" was already used. If you are using LazyColumn/Row please make " +
+                "sure you provide a unique key for each item."
         }
         if (currentIndex != itemIndex) {
             move(itemIndex, currentIndex)
@@ -477,6 +475,7 @@ internal class LayoutNodeSubcompositionsState(
     fun disposeOrReuseStartingFromIndex(startIndex: Int) {
         reusableCount = 0
         val lastReusableIndex = root.foldedChildren.size - precomposedCount - 1
+        var needApplyNotification = false
         if (startIndex <= lastReusableIndex) {
             // construct the set of available slot ids
             reusableSlotIdsSet.clear()
@@ -487,25 +486,33 @@ internal class LayoutNodeSubcompositionsState(
             slotReusePolicy.getSlotsToRetain(reusableSlotIdsSet)
             // iterating backwards so it is easier to remove items
             var i = lastReusableIndex
-            while (i >= startIndex) {
-                val node = root.foldedChildren[i]
-                val nodeState = nodeToNodeState[node]!!
-                val slotId = nodeState.slotId
-                if (reusableSlotIdsSet.contains(slotId)) {
-                    node.measuredByParent = UsageByParent.NotUsed
-                    reusableCount++
-                    nodeState.active = false
-                } else {
-                    ignoreRemeasureRequests {
-                        nodeToNodeState.remove(node)
-                        nodeState.composition?.dispose()
-                        root.removeAt(i, 1)
+            Snapshot.withoutReadObservation {
+                while (i >= startIndex) {
+                    val node = root.foldedChildren[i]
+                    val nodeState = nodeToNodeState[node]!!
+                    val slotId = nodeState.slotId
+                    if (reusableSlotIdsSet.contains(slotId)) {
+                        node.measuredByParent = UsageByParent.NotUsed
+                        reusableCount++
+                        if (nodeState.active) {
+                            nodeState.active = false
+                            needApplyNotification = true
+                        }
+                    } else {
+                        ignoreRemeasureRequests {
+                            nodeToNodeState.remove(node)
+                            nodeState.composition?.dispose()
+                            root.removeAt(i, 1)
+                        }
                     }
+                    // remove it from slotIdToNode so it is not considered active
+                    slotIdToNode.remove(slotId)
+                    i--
                 }
-                // remove it from slotIdToNode so it is not considered active
-                slotIdToNode.remove(slotId)
-                i--
             }
+        }
+        if (needApplyNotification) {
+            Snapshot.sendApplyNotifications()
         }
 
         makeSureStateIsConsistent()

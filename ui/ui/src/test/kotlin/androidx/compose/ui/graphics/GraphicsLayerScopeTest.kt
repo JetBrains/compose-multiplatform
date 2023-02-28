@@ -57,6 +57,7 @@ class GraphicsLayerScopeTest {
             ) = Outline.Rectangle(size.toRect())
         }
         scope.clip = true
+        scope.size = Size(100f, 200f)
         scope.reset()
         scope.assertCorrectDefaultValuesAreCorrect()
     }
@@ -68,6 +69,16 @@ class GraphicsLayerScopeTest {
         with(scope) {
             assertEquals(4.0f, 2f.dp.toPx())
             assertEquals(6.0f, 3f.dp.toSp().toPx())
+        }
+    }
+
+    @Test
+    fun testGraphicsLayerSize() {
+        val scope = GraphicsLayerScope() as ReusableGraphicsLayerScope
+        scope.size = Size(2560f, 1400f)
+        with(scope) {
+            assertEquals(2560f, size.width)
+            assertEquals(1400f, size.height)
         }
     }
 
@@ -85,5 +96,6 @@ class GraphicsLayerScopeTest {
         assertThat(transformOrigin).isEqualTo(TransformOrigin.Center)
         assertThat(shape).isEqualTo(RectangleShape)
         assertThat(clip).isEqualTo(false)
+        assertThat(size).isEqualTo(Size.Unspecified)
     }
 }

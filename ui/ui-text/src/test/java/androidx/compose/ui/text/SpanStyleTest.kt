@@ -19,6 +19,9 @@ package androidx.compose.ui.text
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
@@ -56,6 +59,7 @@ class SpanStyleTest {
         assertThat(style.background).isEqualTo(Color.Unspecified)
         assertThat(style.textDecoration).isNull()
         assertThat(style.fontFamily).isNull()
+        assertThat(style.drawStyle).isNull()
     }
 
     @OptIn(ExperimentalTextApi::class)
@@ -197,6 +201,15 @@ class SpanStyleTest {
         val style = SpanStyle(fontFamily = fontFamily)
 
         assertThat(style.fontFamily).isEqualTo(fontFamily)
+    }
+
+    @Test
+    fun `constructor with customized drawStyle`() {
+        val stroke = Stroke(width = 4f)
+
+        val style = SpanStyle(drawStyle = stroke)
+
+        assertThat(style.drawStyle).isEqualTo(stroke)
     }
 
     @Test
@@ -503,6 +516,28 @@ class SpanStyleTest {
         assertThat(mergedStyle.color).isEqualTo(Color.Unspecified)
         assertThat(mergedStyle.brush).isEqualTo(brush)
         assertThat(mergedStyle.alpha).isEqualTo(0.3f)
+    }
+
+    @Test
+    fun `merge with other's drawStyle is null should use this' drawStyle`() {
+        val drawStyle1 = Stroke(cap = StrokeCap.Butt)
+        val style = SpanStyle(drawStyle = drawStyle1)
+
+        val newSpanStyle = style.merge(SpanStyle(drawStyle = null))
+
+        assertThat(newSpanStyle.drawStyle).isEqualTo(drawStyle1)
+    }
+
+    @Test
+    fun `merge with other's drawStyle is set should use other's drawStyle`() {
+        val drawStyle1 = Stroke(cap = StrokeCap.Butt)
+        val drawStyle2 = Fill
+        val style = SpanStyle(drawStyle = drawStyle1)
+        val otherStyle = SpanStyle(drawStyle = drawStyle2)
+
+        val newSpanStyle = style.merge(otherStyle)
+
+        assertThat(newSpanStyle.drawStyle).isEqualTo(otherStyle.drawStyle)
     }
 
     @Test

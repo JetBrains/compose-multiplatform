@@ -23,9 +23,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
@@ -64,6 +63,21 @@ class LiveDataAdapterTest {
     }
 
     @Test
+    fun preferInitializedValueInFirstComposition() {
+        val liveData = MutableLiveData("value")
+        var firstComposition by mutableStateOf(true)
+        var realValue: String? = null
+        rule.setContent {
+            if (firstComposition) {
+                realValue = liveData.observeAsState("initial").value
+                firstComposition = false
+            }
+        }
+
+        assertThat(realValue).isEqualTo("value")
+    }
+
+    @Test
     fun weReceiveUpdates() {
         val liveData = MutableLiveData<String>()
         liveData.postValue("value")
@@ -86,16 +100,14 @@ class LiveDataAdapterTest {
         val liveData = MutableLiveData<String>()
         liveData.postValue("value")
         var realValue: String? = null
-        val lifecycleOwner = rule.runOnUiThread { RegistryOwner() }
+        val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED)
         rule.setContent {
             CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
                 realValue = liveData.observeAsState().value
             }
         }
 
-        rule.runOnIdle {
-            lifecycleOwner.lifecycle.currentState = Lifecycle.State.DESTROYED
-        }
+        lifecycleOwner.currentState = Lifecycle.State.DESTROYED
 
         rule.runOnIdle {
             liveData.postValue("value2")
@@ -110,7 +122,7 @@ class LiveDataAdapterTest {
     fun observerRemovedWhenDisposed() {
         val liveData = MutableLiveData<String>()
         var emit by mutableStateOf(false)
-        val lifecycleOwner = rule.runOnUiThread { RegistryOwner() }
+        val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED)
         rule.setContent {
             CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
                 if (emit) {
@@ -119,16 +131,16 @@ class LiveDataAdapterTest {
             }
         }
 
-        val initialCount = rule.runOnIdle { lifecycleOwner.lifecycle.observerCount }
+        val initialCount = rule.runOnIdle { lifecycleOwner.observerCount }
 
         rule.runOnIdle { emit = true }
 
-        assertThat(rule.runOnIdle { lifecycleOwner.lifecycle.observerCount })
+        assertThat(rule.runOnIdle { lifecycleOwner.observerCount })
             .isEqualTo(initialCount + 1)
 
         rule.runOnIdle { emit = false }
 
-        assertThat(rule.runOnIdle { lifecycleOwner.lifecycle.observerCount })
+        assertThat(rule.runOnIdle { lifecycleOwner.observerCount })
             .isEqualTo(initialCount)
     }
 
@@ -136,17 +148,15 @@ class LiveDataAdapterTest {
     fun noUpdatesWhenActivityStopped() {
         val liveData = MutableLiveData<String>()
         var realValue: String? = null
-        val lifecycleOwner = rule.runOnUiThread { RegistryOwner() }
+        val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED)
         rule.setContent {
             CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
                 realValue = liveData.observeAsState().value
             }
         }
 
-        rule.runOnIdle {
-            // activity stopped
-            lifecycleOwner.lifecycle.currentState = Lifecycle.State.CREATED
-        }
+        // activity stopped
+        lifecycleOwner.currentState = Lifecycle.State.CREATED
 
         rule.runOnIdle {
             liveData.postValue("value2")
@@ -156,9 +166,7 @@ class LiveDataAdapterTest {
             assertThat(realValue).isNull()
         }
 
-        rule.runOnIdle {
-            lifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
-        }
+        lifecycleOwner.currentState = Lifecycle.State.RESUMED
 
         rule.runOnIdle {
             assertThat(realValue).isEqualTo("value2")
@@ -170,11 +178,7 @@ class LiveDataAdapterTest {
         val liveData = MutableLiveData<String>()
         liveData.postValue("value")
         var realValue: String? = "to-be-updated"
-        val lifecycleOwner = rule.runOnUiThread {
-            RegistryOwner().apply {
-                lifecycle.currentState = Lifecycle.State.STARTED
-            }
-        }
+        val lifecycleOwner = TestLifecycleOwner()
         rule.setContent {
             CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
                 realValue = liveData.observeAsState(null).value
@@ -189,11 +193,7 @@ class LiveDataAdapterTest {
         val liveData = MutableLiveData<String>()
         liveData.postValue("value")
         var realValue = "to-be-updated"
-        val lifecycleOwner = rule.runOnUiThread {
-            RegistryOwner().apply {
-                lifecycle.currentState = Lifecycle.State.CREATED
-            }
-        }
+        val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.CREATED)
         rule.setContent {
             CompositionLocalProvider(LocalLifecycleOwner provides lifecycleOwner) {
                 realValue = liveData.observeAsState().value!!
@@ -202,11 +202,4 @@ class LiveDataAdapterTest {
 
         assertThat(realValue).isEqualTo("value")
     }
-}
-
-private class RegistryOwner : LifecycleOwner {
-    var registry = LifecycleRegistry(this).also {
-        it.currentState = Lifecycle.State.RESUMED
-    }
-    override fun getLifecycle() = registry
 }

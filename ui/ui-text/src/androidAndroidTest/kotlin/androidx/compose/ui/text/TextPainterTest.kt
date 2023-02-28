@@ -19,13 +19,17 @@
 package androidx.compose.ui.text
 
 import android.graphics.Bitmap
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.font.toFontFamily
@@ -33,7 +37,6 @@ import androidx.compose.ui.text.matchers.assertThat
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -52,12 +55,12 @@ class TextPainterTest {
     private var defaultDensity = Density(density = 1f)
     private var layoutDirection = LayoutDirection.Ltr
 
-    private val longText = AnnotatedString(
-        "Lorem ipsum dolor sit amet, consectetur " +
-            "adipiscing elit. Curabitur augue leo, finibus vitae felis ac, pretium condimentum " +
-            "augue. Nullam non libero sed lectus aliquet venenatis non at purus. Fusce id arcu " +
-            "eu mauris pulvinar laoreet."
-    )
+    private val longString = "Lorem ipsum dolor sit amet, consectetur " +
+        "adipiscing elit. Curabitur augue leo, finibus vitae felis ac, pretium condimentum " +
+        "augue. Nullam non libero sed lectus aliquet venenatis non at purus. Fusce id arcu " +
+        "eu mauris pulvinar laoreet."
+
+    private val longText = AnnotatedString(longString)
 
     @Test
     fun drawTextWithMeasurer_shouldBeEqualTo_drawTextLayoutResult() {
@@ -76,11 +79,169 @@ class TextPainterTest {
                 measurer,
                 text = longText,
                 style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 20.sp),
-                maxSize = IntSize(400, 400)
+                size = Size(400f, 400f)
             )
         }
 
         assertThat(bitmap).isEqualToBitmap(bitmap2)
+    }
+
+    @Test
+    fun drawTextString_sizeUnspecified_shouldFitTheTextInside() {
+        // We check whether drawing with unspecified size tries to fit the text in a given
+        // canvas area.
+        val measurer = textMeasurer()
+
+        // No size constrained
+        val bitmap = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f)
+            )
+        }
+
+        // size constrained but larger than drawing area
+        val bitmap2 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(200f, 200f)
+            )
+        }
+
+        // size constrained to drawing area
+        val bitmap3 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(100f, 100f)
+            )
+        }
+
+        // when size is not constrained by Size.Unspecified, default behavior should limit size to
+        // drawing area. Hence bitmap != bitmap2, bitmap == bitmap3
+        assertThat(bitmap).isNotEqualToBitmap(bitmap2)
+        assertThat(bitmap).isEqualToBitmap(bitmap3)
+    }
+
+    @Test
+    fun drawTextString_widthUnspecified_shouldFitTheTextHorizontally() {
+        val measurer = textMeasurer()
+
+        // No width constrained
+        val bitmap = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(Float.NaN, 200f)
+            )
+        }
+
+        // width constrained but larger than drawing area
+        val bitmap2 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(200f, 200f)
+            )
+        }
+
+        // width constrained to drawing area
+        val bitmap3 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(100f, 200f)
+            )
+        }
+
+        // when width is not constrained by Float.NaN, default behavior should limit width to
+        // drawing area. Hence bitmap != bitmap2, bitmap == bitmap3
+        assertThat(bitmap).isNotEqualToBitmap(bitmap2)
+        assertThat(bitmap).isEqualToBitmap(bitmap3)
+    }
+
+    @Test
+    fun drawTextString_heightUnspecified_shouldFitTheTextVertically() {
+        val measurer = textMeasurer()
+
+        // No height constrained
+        val bitmap = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(200f, Float.NaN)
+            )
+        }
+
+        // height constrained but larger than drawing area
+        val bitmap2 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(200f, 200f)
+            )
+        }
+
+        // height constrained to drawing area
+        val bitmap3 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longString,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(200f, 100f)
+            )
+        }
+
+        // when height is not constrained by Float.NaN, default behavior should limit height to
+        // drawing area. Hence bitmap != bitmap2, bitmap == bitmap3
+        assertThat(bitmap).isNotEqualToBitmap(bitmap2)
+        assertThat(bitmap).isEqualToBitmap(bitmap3)
+    }
+
+    @Test
+    fun drawTextAnnotatedString_sizeUnspecified_shouldFitTheTextInside() {
+        // We check whether drawing with unspecified size tries to fit the text in a given
+        // canvas area.
+        val measurer = textMeasurer()
+
+        val bitmap = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longText,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f)
+            )
+        }
+
+        val bitmap2 = draw(300f, 300f, 200f, 200f) {
+            drawText(
+                measurer,
+                text = longText,
+                style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 12.sp),
+                topLeft = Offset(100f, 100f),
+                size = Size(200f, 200f)
+            )
+        }
+
+        assertThat(bitmap).isNotEqualToBitmap(bitmap2)
     }
 
     @Test
@@ -96,7 +257,7 @@ class TextPainterTest {
                     fontFamily = fontFamilyMeasureFont,
                     fontSize = 20.sp
                 ),
-                maxSize = IntSize(400, 400)
+                size = Size(400f, 400f)
             )
         }
         val bitmap2 = draw {
@@ -108,7 +269,7 @@ class TextPainterTest {
                     fontFamily = fontFamilyMeasureFont,
                     fontSize = 20.sp
                 ),
-                maxSize = IntSize(400, 400)
+                size = Size(400f, 400f)
             )
         }
 
@@ -124,7 +285,7 @@ class TextPainterTest {
                 textMeasurer = measurer,
                 text = longText,
                 style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 20.sp),
-                maxSize = IntSize(400, 400)
+                size = Size(400f, 400f)
             )
         }
         val bitmap2 = draw {
@@ -132,7 +293,7 @@ class TextPainterTest {
                 textMeasurer = measurer,
                 text = longText,
                 style = TextStyle(fontFamily = fontFamilyMeasureFont, fontSize = 24.sp),
-                maxSize = IntSize(400, 400)
+                size = Size(400f, 400f)
             )
         }
 
@@ -271,6 +432,41 @@ class TextPainterTest {
         }
         val bitmap2 = draw {
             drawText(textLayoutResultHalfOpaque)
+        }
+
+        assertThat(bitmap).isEqualToBitmap(bitmap2)
+    }
+
+    @Test
+    fun drawTextLayout_shouldChangeDrawStyle() {
+        val fillDrawStyle = Fill
+        val strokeDrawStyle = Stroke(8f, cap = StrokeCap.Round)
+        val measurer = textMeasurer()
+        val textLayoutResultFill = measurer.measure(
+            text = longText,
+            style = TextStyle(
+                drawStyle = fillDrawStyle,
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 20.sp
+            ),
+            constraints = Constraints(maxWidth = 400, maxHeight = 400)
+        )
+
+        val textLayoutResultStroke = measurer.measure(
+            text = longText,
+            style = TextStyle(
+                drawStyle = strokeDrawStyle,
+                fontFamily = fontFamilyMeasureFont,
+                fontSize = 20.sp
+            ),
+            constraints = Constraints(maxWidth = 400, maxHeight = 400)
+        )
+
+        val bitmap = draw {
+            drawText(textLayoutResultFill, drawStyle = strokeDrawStyle)
+        }
+        val bitmap2 = draw {
+            drawText(textLayoutResultStroke)
         }
 
         assertThat(bitmap).isEqualToBitmap(bitmap2)
@@ -442,11 +638,13 @@ class TextPainterTest {
     )
 
     fun draw(
-        width: Float = 1000f,
-        height: Float = 1000f,
+        bitmapWidth: Float = 1000f,
+        bitmapHeight: Float = 1000f,
+        canvasWidth: Float = bitmapWidth,
+        canvasHeight: Float = bitmapHeight,
         block: DrawScope.() -> Unit
     ): Bitmap {
-        val size = Size(width, height)
+        val size = Size(bitmapWidth, bitmapHeight)
         val bitmap = Bitmap.createBitmap(
             size.width.toIntPx(),
             size.height.toIntPx(),
@@ -458,7 +656,7 @@ class TextPainterTest {
             defaultDensity,
             layoutDirection,
             canvas,
-            size,
+            Size(canvasWidth, canvasHeight),
             block
         )
         return bitmap

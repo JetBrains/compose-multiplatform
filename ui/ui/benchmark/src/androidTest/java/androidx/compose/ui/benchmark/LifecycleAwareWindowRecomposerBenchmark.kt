@@ -24,8 +24,7 @@ import androidx.benchmark.junit4.measureRepeated
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.platform.createLifecycleAwareWindowRecomposer
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleObserver
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -49,23 +48,14 @@ class LifecycleAwareWindowRecomposerBenchmark {
     @UiThreadTest
     fun createRecomposer() {
         val rootView = rule.activityTestRule.activity.window.decorView.rootView
-        val lifecycle = object : Lifecycle() {
-            override fun addObserver(observer: LifecycleObserver) {
-                if (observer is LifecycleEventObserver) {
-                    observer.onStateChanged({ this }, Event.ON_CREATE)
-                }
-            }
-
-            override fun removeObserver(observer: LifecycleObserver) {}
-            override fun getCurrentState(): State = State.CREATED
-        }
+        val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.CREATED)
         var view: View? = null
         rule.benchmarkRule.measureRepeated {
             runWithTimingDisabled {
                 view = View(rule.activityTestRule.activity)
                 (rootView as ViewGroup).addView(view)
             }
-            view!!.createLifecycleAwareWindowRecomposer(lifecycle = lifecycle)
+            view!!.createLifecycleAwareWindowRecomposer(lifecycle = lifecycleOwner.lifecycle)
             runWithTimingDisabled {
                 (rootView as ViewGroup).removeAllViews()
                 view = null

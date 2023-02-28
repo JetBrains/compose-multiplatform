@@ -69,6 +69,18 @@ private val BottomAppBars = Component(
     examples = BottomAppBarsExamples
 )
 
+private val BottomSheets = Component(
+    id = nextId(),
+    name = "Bottom Sheet",
+    description = "Bottom sheets are surfaces containing supplementary content, anchored to the " +
+        "bottom of the screen.",
+    // No bottom sheet icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/bottom-sheets",
+    docsUrl = "$DocsUrl#bottomsheet",
+    sourceUrl = "$Material3SourceUrl/ModalBottomSheet.kt",
+    examples = BottomSheetExamples
+)
+
 private val Buttons = Component(
     id = nextId(),
     name = "Buttons",
@@ -114,6 +126,17 @@ private val Chips = Component(
     docsUrl = "$DocsUrl#chips",
     sourceUrl = "$Material3SourceUrl/Chip.kt",
     examples = ChipsExamples
+)
+
+private val DatePickers = Component(
+    id = nextId(),
+    name = "Date pickers",
+    description = "Date pickers let users select a date or range of dates.",
+    // No date picker icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/datepicker",
+    docsUrl = "$PackageSummaryUrl#datepicker",
+    sourceUrl = "$Material3SourceUrl/DatePicker.kt",
+    examples = DatePickerExamples
 )
 
 private val Dialogs = Component(
@@ -243,6 +266,18 @@ private val RadioButtons = Component(
     examples = RadioButtonsExamples
 )
 
+private val SearchBars = Component(
+    id = nextId(),
+    name = "Search bars",
+    description = "Search bars allow users to enter a keyword or phrase and get relevant " +
+        "information.",
+    // No search bar icon
+    guidelinesUrl = "", // No guidelines yet
+    docsUrl = "", // No docs yet
+    sourceUrl = "$Material3SourceUrl/SearchBar.kt",
+    examples = SearchBarExamples
+)
+
 private val Sliders = Component(
     id = nextId(),
     name = "Sliders",
@@ -301,6 +336,28 @@ private val TextFields = Component(
     examples = TextFieldsExamples
 )
 
+private val Tooltips = Component(
+    id = nextId(),
+    name = "Tooltips",
+    description = "Tooltips call user attention to an anchor component.",
+    // no tooltips icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/tooltips",
+    docsUrl = "$PackageSummaryUrl#tooltip",
+    sourceUrl = "$Material3SourceUrl/Tooltip.kt",
+    examples = TooltipsExamples
+)
+
+private val TimePickers = Component(
+    id = nextId(),
+    name = "Time Picker",
+    description = "Time picker allows the user to choose time of day.",
+    // No time picker icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/time-picker",
+    docsUrl = "$DocsUrl#time-pickers",
+    sourceUrl = "$Material3SourceUrl/TimePicker.kt",
+    examples = TimePickerExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -316,10 +373,12 @@ private val TopAppBar = Component(
 val Components = listOf(
     Badge,
     BottomAppBars,
+    BottomSheets,
     Buttons,
     Card,
     Checkboxes,
     Chips,
+    DatePickers,
     Dialogs,
     ExtendedFloatingActionButton,
     FloatingActionButtons,
@@ -331,10 +390,13 @@ val Components = listOf(
     NavigationRail,
     ProgressIndicators,
     RadioButtons,
+    SearchBars,
     Sliders,
     Snackbars,
     Switches,
     Tabs,
     TextFields,
+    Tooltips,
+    TimePickers,
     TopAppBar
 )

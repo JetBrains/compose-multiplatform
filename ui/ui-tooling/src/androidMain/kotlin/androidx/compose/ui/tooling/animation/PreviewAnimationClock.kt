@@ -18,24 +18,23 @@ package androidx.compose.ui.tooling.animation
 
 import android.util.Log
 import androidx.annotation.VisibleForTesting
-import androidx.compose.animation.core.Animatable
-import androidx.compose.animation.core.Transition
-import androidx.compose.animation.core.TweenSpec
-import androidx.compose.animation.core.SnapSpec
-import androidx.compose.animation.core.RepeatableSpec
-import androidx.compose.animation.core.InfiniteRepeatableSpec
-import androidx.compose.animation.core.KeyframesSpec
-import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.DecayAnimation
-import androidx.compose.animation.core.InfiniteTransition
-import androidx.compose.animation.core.StartOffsetType
 import androidx.compose.animation.core.TargetBasedAnimation
-import androidx.compose.animation.core.VectorizedDurationBasedAnimationSpec
+import androidx.compose.animation.core.Transition
 import androidx.compose.animation.tooling.ComposeAnimatedProperty
 import androidx.compose.animation.tooling.ComposeAnimation
-import androidx.compose.animation.tooling.ComposeAnimationType
 import androidx.compose.animation.tooling.TransitionInfo
-import java.util.concurrent.TimeUnit
+import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation.Companion.parse
+import androidx.compose.ui.tooling.animation.AnimatedContentComposeAnimation.Companion.parseAnimatedContent
+import androidx.compose.ui.tooling.animation.InfiniteTransitionComposeAnimation.Companion.parse
+import androidx.compose.ui.tooling.animation.clock.AnimateXAsStateClock
+import androidx.compose.ui.tooling.animation.clock.AnimatedVisibilityClock
+import androidx.compose.ui.tooling.animation.clock.ComposeAnimationClock
+import androidx.compose.ui.tooling.animation.clock.InfiniteTransitionClock
+import androidx.compose.ui.tooling.animation.clock.TransitionClock
+import androidx.compose.ui.tooling.animation.clock.millisToNanos
+import androidx.compose.ui.tooling.animation.states.AnimatedVisibilityState
+import androidx.compose.ui.tooling.animation.states.TargetState
 
 /**
  * Used to keep track and control animations in the context of Compose Previews. This class is
@@ -43,11 +42,20 @@ import java.util.concurrent.TimeUnit
  * will be called via reflection, either directly from Android Studio or through
  * `ComposeViewAdapter`.
  *
- * Users will be able to select specific frames of tracked animations when inspecting them in
- * Android Studio through [setClockTime], and read the values of their animated properties by
- * calling [getAnimatedProperties].
+ * Methods to be intercepted in Android Studio:
+ * * [notifySubscribe]
+ * * [notifyUnsubscribe]
  *
- * @suppress
+ * Methods to be called from Android Studio:
+ * * [updateFromAndToStates]
+ * * [updateAnimatedVisibilityState]
+ * * [getAnimatedVisibilityState]
+ * * [getMaxDuration]
+ * * [getMaxDurationPerIteration]
+ * * [getAnimatedProperties]
+ * * [getTransitions]
+ * * [setClockTime]
+ * * [setClockTimes]
  */
 internal open class PreviewAnimationClock(private val setAnimationsTimeCallback: () -> Unit = {}) {
 
@@ -55,173 +63,158 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
 
     private val DEBUG = false
 
-    /**
-     * Set of tracked [TransitionComposeAnimation]s, each one having a [Transition] object that
-     * is used in [setClockTime], where we call
-     * [Transition.setPlaytimeAfterInitialAndTargetStateEstablished],
-     * and in [getAnimatedProperties], where we get the animation values.
-     */
+    /** Map of subscribed [TransitionComposeAnimation]s and corresponding [TransitionClock]s. */
     @VisibleForTesting
-    internal val trackedTransitions = linkedSetOf<TransitionComposeAnimation>()
+    internal val transitionClocks =
+        mutableMapOf<TransitionComposeAnimation<*>, TransitionClock<*>>()
 
     /**
-     * Set of tracked [AnimatedVisibilityComposeAnimation]s, each one having a [Transition] object
-     * representing the parent and used in [setClockTime], where we call
-     * [Transition.setPlaytimeAfterInitialAndTargetStateEstablished]. Each
-     * [AnimatedVisibilityComposeAnimation] also has another [Transition] object representing the
-     * child transition used in [getAnimatedProperties], where we get the animation values.
+     * Map of subscribed [AnimatedVisibilityComposeAnimation]s and corresponding [AnimatedVisibilityClock].
      */
     @VisibleForTesting
-    internal val trackedAnimatedVisibility = linkedSetOf<AnimatedVisibilityComposeAnimation>()
+    internal val animatedVisibilityClocks =
+        mutableMapOf<AnimatedVisibilityComposeAnimation, AnimatedVisibilityClock>()
 
-    /** Set of detected but not supported animations. */
+    /** Map of subscribed [AnimateXAsStateComposeAnimation]s and corresponding [AnimateXAsStateClock]s. */
     @VisibleForTesting
-    internal val trackedUnsupported = linkedSetOf<UnsupportedComposeAnimation>()
+    internal val animateXAsStateClocks =
+        mutableMapOf<AnimateXAsStateComposeAnimation<*, *>, AnimateXAsStateClock<*, *>>()
 
-    /**
-     * Maps [Transition]s to their corresponding cached [TransitionState], which we use to seek
-     * the animations when updating the clock time.
-     */
+    /** Map of subscribed [InfiniteTransitionComposeAnimation]s and corresponding [InfiniteTransitionClock]s. */
     @VisibleForTesting
-    internal val transitionStates = hashMapOf<Transition<Any>, TransitionState>()
-    private val transitionStatesLock = Any()
+    internal val infiniteTransitionClocks =
+        mutableMapOf<InfiniteTransitionComposeAnimation, InfiniteTransitionClock>()
 
-    /**
-     * Maps [Transition]s to their corresponding cached [AnimatedVisibilityState], which we use
-     * to seek the animations when updating the clock time.
-     */
+    /** Map of subscribed [AnimatedContentComposeAnimation]s and corresponding [TransitionClock]s. */
     @VisibleForTesting
-    internal val animatedVisibilityStates = hashMapOf<Transition<Any>, AnimatedVisibilityState>()
-    private val animatedVisibilityStatesLock = Any()
+    internal val animatedContentClocks =
+        mutableMapOf<AnimatedContentComposeAnimation<*>, TransitionClock<*>>()
 
-    private val animateXAsStateSubscriber =
-        UnsupportedComposeAnimationSubscriber<Animatable<*, *>>()
+    private val allClocksExceptInfinite: List<ComposeAnimationClock<*, *>>
+        get() = transitionClocks.values +
+            animatedVisibilityClocks.values +
+            animateXAsStateClocks.values +
+            animatedContentClocks.values
 
-    private val animateContentSizeSubscriber = UnsupportedComposeAnimationSubscriber<Any>()
+    /** All subscribed animations clocks. */
+    private val allClocks: List<ComposeAnimationClock<*, *>>
+        get() = allClocksExceptInfinite +
+            infiniteTransitionClocks.values
 
-    private val targetBasedAnimationSubscriber =
-        UnsupportedComposeAnimationSubscriber<TargetBasedAnimation<*, *>>()
+    private fun findClock(animation: ComposeAnimation): ComposeAnimationClock<*, *>? {
+        return transitionClocks[animation] ?: animatedVisibilityClocks[animation]
+        ?: animateXAsStateClocks[animation]
+        ?: infiniteTransitionClocks[animation] ?: animatedContentClocks[animation]
+    }
 
-    private val decayAnimationSubscriber =
-        UnsupportedComposeAnimationSubscriber<DecayAnimation<*, *>>()
-
-    private val animatedContentSubscriber = UnsupportedComposeAnimationSubscriber<Transition<*>>()
-
-    private val infiniteTransitionSubscriber =
-        UnsupportedComposeAnimationSubscriber<InfiniteTransition>()
-
-    /**
-     * Keeps and subscribes the list of unsupported animations.
-     * Each animation can only be subscribed once.
-     */
-    private inner class UnsupportedComposeAnimationSubscriber<T> {
-        private val animations = linkedSetOf<T>()
-        private val lock = Any()
-
-        fun trackAnimation(animation: T, label: String) {
-            if (!UnsupportedComposeAnimation.apiAvailable) return
-            synchronized(lock) {
-                if (animations.contains(animation)) {
-                    if (DEBUG) {
-                        Log.d(TAG, "Animation $animation is already being tracked")
-                    }
-                    return@trackAnimation
-                }
-                animations.add(animation)
-            }
-
-            if (DEBUG) {
-                Log.d(TAG, "Animation $animation is now tracked")
-            }
-
-            UnsupportedComposeAnimation.create(label)?.let {
-                trackedUnsupported.add(it)
+    fun trackTransition(animation: Transition<*>) {
+        trackAnimation(animation) {
+            animation.parse()?.let {
+                transitionClocks[it] = TransitionClock(it)
                 notifySubscribe(it)
             }
         }
+    }
 
-        fun clear() {
-            animations.clear()
+    @Suppress("UNCHECKED_CAST")
+    fun trackAnimatedVisibility(animation: Transition<*>, onSeek: () -> Unit = {}) {
+        // All AnimatedVisibility animations should be Transition<Boolean>.
+        // If it's not the case - ignore it.
+        if (animation.currentState !is Boolean) return
+        trackAnimation(animation) {
+            animation as Transition<Boolean>
+            val composeAnimation = animation.parseAnimatedVisibility()
+            onSeek()
+            animatedVisibilityClocks[composeAnimation] =
+                AnimatedVisibilityClock(composeAnimation).apply {
+                    setClockTime(0L)
+                }
+            notifySubscribe(composeAnimation)
         }
     }
 
-    fun trackTransition(transition: Transition<Any>) {
-        synchronized(transitionStatesLock) {
-            if (transitionStates.containsKey(transition)) {
-                if (DEBUG) {
-                    Log.d(TAG, "Transition $transition is already being tracked")
-                }
-                return@trackTransition
+    fun trackAnimateXAsState(animation: AnimationSearch.AnimateXAsStateSearchInfo<*, *>) {
+        trackAnimation(animation.animatable) {
+            animation.parse()?.let {
+                animateXAsStateClocks[it] = AnimateXAsStateClock(it)
+                notifySubscribe(it)
             }
-            transitionStates[transition] =
-                TransitionState(transition.currentState, transition.targetState)
         }
+    }
+
+    fun trackAnimateContentSize(animation: Any) {
+        trackUnsupported(animation, "animateContentSize")
+    }
+
+    fun trackTargetBasedAnimations(animation: TargetBasedAnimation<*, *>) {
+        trackUnsupported(animation, "TargetBasedAnimation")
+    }
+
+    fun trackDecayAnimations(animation: DecayAnimation<*, *>) {
+        trackUnsupported(animation, "DecayAnimation")
+    }
+
+    fun trackAnimatedContent(animation: Transition<*>) {
+        trackAnimation(animation) {
+            animation.parseAnimatedContent()?.let {
+                animatedContentClocks[it] = TransitionClock(it)
+                notifySubscribe(it)
+            }
+        }
+    }
+
+    fun trackInfiniteTransition(animation: AnimationSearch.InfiniteTransitionSearchInfo) {
+        trackAnimation(animation.infiniteTransition) {
+            animation.parse()?.let {
+                infiniteTransitionClocks[it] = InfiniteTransitionClock(it) {
+                    // Let InfiniteTransitionClock be aware about max duration of other animations.
+                    val otherClockMaxDuration =
+                        allClocksExceptInfinite.maxOfOrNull { clock -> clock.getMaxDuration() } ?: 0
+                    val infiniteMaxDurationPerIteration =
+                        infiniteTransitionClocks.values.maxOfOrNull { clock ->
+                            clock.getMaxDurationPerIteration()
+                        } ?: 0
+                    maxOf(otherClockMaxDuration, infiniteMaxDurationPerIteration)
+                }
+                notifySubscribe(it)
+            }
+        }
+    }
+
+    @VisibleForTesting
+    val trackedUnsupportedAnimations = linkedSetOf<UnsupportedComposeAnimation>()
+
+    private fun trackUnsupported(animation: Any, label: String) {
+        trackAnimation(animation) {
+            UnsupportedComposeAnimation.create(label)?.let {
+                trackedUnsupportedAnimations.add(it)
+                notifySubscribe(it)
+            }
+        }
+    }
+
+    /** Tracked animations. */
+    private val trackedAnimations = linkedSetOf<Any>()
+    private val lock = Any()
+
+    private fun trackAnimation(animation: Any, createClockAndSubscribe: (Any) -> Unit): Boolean {
+        synchronized(lock) {
+            if (trackedAnimations.contains(animation)) {
+                if (DEBUG) {
+                    Log.d(TAG, "Animation $animation is already being tracked")
+                }
+                return false
+            }
+            trackedAnimations.add(animation)
+        }
+
+        createClockAndSubscribe(animation)
 
         if (DEBUG) {
-            Log.d(TAG, "Transition $transition is now tracked")
+            Log.d(TAG, "Animation $animation is now tracked")
         }
 
-        val composeAnimation = transition.parse()
-        trackedTransitions.add(composeAnimation)
-        notifySubscribe(composeAnimation)
-    }
-
-    fun trackAnimatedVisibility(parent: Transition<Any>, onSeek: () -> Unit = {}) {
-        synchronized(animatedVisibilityStatesLock) {
-            if (animatedVisibilityStates.containsKey(parent)) {
-                if (DEBUG) {
-                    Log.d(TAG, "AnimatedVisibility transition $parent is already being tracked")
-                }
-                return@trackAnimatedVisibility
-            }
-            // If the Composable is visible, set Exit as the default animation, otherwise use Enter
-            animatedVisibilityStates[parent] =
-                if (parent.currentState as Boolean) {
-                    AnimatedVisibilityState.Exit
-                } else {
-                    AnimatedVisibilityState.Enter
-                }
-        }
-
-        if (DEBUG) {
-            Log.d(TAG, "AnimatedVisibility transition $parent is now tracked")
-        }
-
-        val composeAnimation = parent.parseAnimatedVisibility()
-        // Call seek on the first frame to get the correct duration
-        val (current, target) = animatedVisibilityStates[parent]!!.toCurrentTargetPair()
-        parent.setPlaytimeAfterInitialAndTargetStateEstablished(
-            initialState = current,
-            targetState = target,
-            0
-        )
-        onSeek()
-        trackedAnimatedVisibility.add(composeAnimation)
-        notifySubscribe(composeAnimation)
-    }
-
-    fun trackAnimateXAsState(animatable: Animatable<*, *>) {
-        animateXAsStateSubscriber.trackAnimation(animatable, animatable.label)
-    }
-
-    fun trackAnimateContentSize(sizeAnimationModifier: Any) {
-        animateContentSizeSubscriber.trackAnimation(sizeAnimationModifier, "animateContentSize")
-    }
-
-    fun trackTargetBasedAnimations(targetBasedAnimation: TargetBasedAnimation<*, *>) {
-        targetBasedAnimationSubscriber.trackAnimation(targetBasedAnimation, "TargetBasedAnimation")
-    }
-
-    fun trackDecayAnimations(decayAnimation: DecayAnimation<*, *>) {
-        decayAnimationSubscriber.trackAnimation(decayAnimation, "DecayAnimation")
-    }
-
-    fun trackAnimatedContent(animatedContent: Transition<*>) {
-        animatedContentSubscriber.trackAnimation(animatedContent, "AnimatedContent")
-    }
-
-    fun trackInfiniteTransition(infiniteTransition: InfiniteTransition) {
-        infiniteTransitionSubscriber.trackAnimation(infiniteTransition, "InfiniteTransition")
+        return true
     }
 
     @VisibleForTesting
@@ -238,64 +231,40 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
     }
 
     /**
-     * Updates the [TransitionState] corresponding to the given [ComposeAnimation] in the
-     * [transitionStates] map, creating a [TransitionState] with the given `from` and `to` states.
+     * Updates the [TargetState] corresponding to the given [ComposeAnimation].
+     *
+     * Expected to be called via reflection from Android Studio.
      */
     fun updateFromAndToStates(composeAnimation: ComposeAnimation, fromState: Any, toState: Any) {
-        if (composeAnimation.type != ComposeAnimationType.TRANSITION_ANIMATION) return
-
-        if (trackedTransitions.contains(composeAnimation)) {
-            val transitionComposeAnimation = composeAnimation as TransitionComposeAnimation
-            synchronized(transitionStatesLock) {
-                transitionStates[transitionComposeAnimation.animationObject] =
-                    TransitionState(fromState, toState)
-            }
-        }
+        findClock(composeAnimation)?.setStateParameters(fromState, toState)
     }
 
     /**
-     * Updates the given [AnimatedVisibilityComposeAnimation]'s cached [AnimatedVisibilityState]
-     * with the given state.
+     * Updates the given [AnimatedVisibilityClock]'s with the given state.
+     *
+     * Expected to be called via reflection from Android Studio.
      */
-    fun updateAnimatedVisibilityState(
-        composeAnimation: AnimatedVisibilityComposeAnimation,
-        state: Any
-    ) {
-        if (trackedAnimatedVisibility.contains(composeAnimation)) {
-            synchronized(animatedVisibilityStatesLock) {
-                animatedVisibilityStates[composeAnimation.animationObject] =
-                    state as AnimatedVisibilityState
-            }
-        }
+    fun updateAnimatedVisibilityState(composeAnimation: ComposeAnimation, state: Any) {
+        animatedVisibilityClocks[composeAnimation]?.setStateParameters(state)
     }
 
     /**
-     * Returns the cached [AnimatedVisibilityState] corresponding to the given
-     * [AnimatedVisibilityComposeAnimation] object. Falls back to [AnimatedVisibilityState.Enter]
-     * if there is no state currently mapped to the [AnimatedVisibilityComposeAnimation].
+     * Returns the [AnimatedVisibilityState] corresponding to the given
+     * [AnimatedVisibilityClock] object. Falls back to [AnimatedVisibilityState.Enter].
+     *
+     * Expected to be called via reflection from Android Studio.
      */
-    fun getAnimatedVisibilityState(
-        composeAnimation: AnimatedVisibilityComposeAnimation
-    ): AnimatedVisibilityState {
-        return animatedVisibilityStates[composeAnimation.animationObject]
-            // Fallback to Enter by default
-            ?: AnimatedVisibilityState.Enter
+    fun getAnimatedVisibilityState(composeAnimation: ComposeAnimation): AnimatedVisibilityState {
+        return animatedVisibilityClocks[composeAnimation]?.state ?: AnimatedVisibilityState.Enter
     }
 
     /**
      * Returns the duration (ms) of the longest animation being tracked.
+     *
+     * Expected to be called via reflection from Android Studio.
      */
     fun getMaxDuration(): Long {
-        // TODO(b/160126628): support other animation types, e.g. AnimatedValue
-        val transitionsDuration = trackedTransitions.map { composeAnimation ->
-            nanosToMillis(composeAnimation.animationObject.totalDurationNanos)
-        }.maxOrNull() ?: -1
-
-        val animatedVisibilityDuration = trackedAnimatedVisibility.map { composeAnimation ->
-            nanosToMillis(composeAnimation.childTransition?.totalDurationNanos ?: return@map -1)
-        }.maxOrNull() ?: -1
-
-        return maxOf(transitionsDuration, animatedVisibilityDuration)
+        return allClocks.maxOfOrNull { it.getMaxDuration() } ?: 0
     }
 
     /**
@@ -303,94 +272,53 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * can be different from [getMaxDuration], for instance, when there is one or more repeatable
      * animations with multiple iterations.
      *
-     * TODO(b/177895209): re-add support repeatable/infinite animations.
+     * Expected to be called via reflection from Android Studio.
      */
     fun getMaxDurationPerIteration(): Long {
-        // TODO(b/160126628): support other animation types, e.g. AnimatedValue
-        val transitionsDuration = trackedTransitions.map { composeAnimation ->
-            nanosToMillis(composeAnimation.animationObject.totalDurationNanos)
-        }.maxOrNull() ?: -1
-
-        val animatedVisibilityDuration = trackedAnimatedVisibility.map { composeAnimation ->
-            nanosToMillis(composeAnimation.childTransition?.totalDurationNanos ?: return@map -1)
-        }.maxOrNull() ?: -1
-
-        return maxOf(transitionsDuration, animatedVisibilityDuration)
+        return allClocks.maxOfOrNull { it.getMaxDurationPerIteration() } ?: 0
     }
 
     /**
-     *  Returns a list of the given [Transition]'s animated properties. The properties are
+     *  Returns a list of the given [ComposeAnimation]'s animated properties. The properties are
      *  wrapped into a [ComposeAnimatedProperty] object containing the property label and the
      *  corresponding value at the current time.
+     *
+     * Expected to be called via reflection from Android Studio.
      */
     fun getAnimatedProperties(animation: ComposeAnimation): List<ComposeAnimatedProperty> {
-        if (trackedTransitions.contains(animation)) {
-            val transition = (animation as TransitionComposeAnimation).animationObject
-            // In case the transition have child transitions, make sure to return their
-            // descendant animations as well.
-            return transition.allAnimations().mapNotNull {
-                ComposeAnimatedProperty(it.label, it.value ?: return@mapNotNull null)
-            }
-        } else if (trackedAnimatedVisibility.contains(animation)) {
-            (animation as AnimatedVisibilityComposeAnimation).childTransition?.let { child ->
-                return child.allAnimations().mapNotNull {
-                    ComposeAnimatedProperty(it.label, it.value ?: return@mapNotNull null)
-                }
-            }
-        }
-        return emptyList()
+        return findClock(animation)?.getAnimatedProperties() ?: emptyList()
     }
 
     /**
-     * Returns a list of the given [Transition]'s animated properties. The properties animation is
+     * Returns a list of the given [ComposeAnimation]'s animated properties. The properties are
      * wrapped into a [TransitionInfo] object containing the property label, start and time
      * of animation and values of the animation.
+     *
+     * Expected to be called via reflection from Android Studio.
      */
     fun getTransitions(animation: ComposeAnimation, stepMillis: Long): List<TransitionInfo> {
-        if (trackedTransitions.contains(animation)) {
-            val transition = (animation as TransitionComposeAnimation).animationObject
-            return transition.allAnimations().map {
-                it.createTransitionInfo(stepMillis)
-            }
-        } else if (trackedAnimatedVisibility.contains(animation)) {
-            (animation as AnimatedVisibilityComposeAnimation).childTransition?.let { child ->
-                return child.allAnimations().map {
-                    it.createTransitionInfo(stepMillis)
-                }
-            }
-        }
-        return emptyList()
+        return findClock(animation)?.getTransitions(stepMillis) ?: emptyList()
     }
 
     /**
-     * Seeks each animation being tracked to the given [animationTimeMs]. Expected to be called
-     * via reflection from Android Studio.
+     * Seeks each animation being tracked to the given [animationTimeMillis].
+     *
+     * Expected to be called via reflection from Android Studio.
      */
-    fun setClockTime(animationTimeMs: Long) {
-        setClockTimes((trackedTransitions + trackedAnimatedVisibility)
-            .associateWith { animationTimeMs })
+    fun setClockTime(animationTimeMillis: Long) {
+        val timeNanos = millisToNanos(animationTimeMillis)
+        allClocks.forEach { it.setClockTime(timeNanos) }
+        setAnimationsTimeCallback.invoke()
     }
 
     /**
-     * Seeks each animation being tracked to the given [animationTimeMillis]. Expected to be called
-     * via reflection from Android Studio.
+     * Seeks each animation being tracked to the given [animationTimeMillis].
+     *
+     * Expected to be called via reflection from Android Studio.
      */
     fun setClockTimes(animationTimeMillis: Map<ComposeAnimation, Long>) {
         animationTimeMillis.forEach { (composeAnimation, millis) ->
-            val timeNs = TimeUnit.MILLISECONDS.toNanos(millis)
-            if (trackedTransitions.contains(composeAnimation)) {
-                (composeAnimation as TransitionComposeAnimation).animationObject.let {
-                    val states = transitionStates[it] ?: return@let
-                    it.setPlaytimeAfterInitialAndTargetStateEstablished(
-                        states.current, states.target, timeNs)
-                }
-            } else if (trackedAnimatedVisibility.contains(composeAnimation)) {
-                (composeAnimation as AnimatedVisibilityComposeAnimation).animationObject.let {
-                    val (current, target) =
-                        animatedVisibilityStates[it]?.toCurrentTargetPair() ?: return@let
-                    it.setPlaytimeAfterInitialAndTargetStateEstablished(current, target, timeNs)
-                }
-            }
+            findClock(composeAnimation)?.setClockTime(millisToNanos(millis))
         }
         setAnimationsTimeCallback.invoke()
     }
@@ -399,97 +327,11 @@ internal open class PreviewAnimationClock(private val setAnimationsTimeCallback:
      * Unsubscribes the currently tracked animations and clears all the caches.
      */
     fun dispose() {
-        trackedTransitions.forEach { notifyUnsubscribe(it) }
-        trackedAnimatedVisibility.forEach { notifyUnsubscribe(it) }
-        trackedUnsupported.forEach { notifyUnsubscribe(it) }
-
-        trackedAnimatedVisibility.clear()
-        trackedTransitions.clear()
-        animatedVisibilityStates.clear()
-        transitionStates.clear()
-        // Clear information about unsupported animations
-        trackedUnsupported.clear()
-        animatedContentSubscriber.clear()
-        animateXAsStateSubscriber.clear()
-        targetBasedAnimationSubscriber.clear()
-        decayAnimationSubscriber.clear()
-        animateContentSizeSubscriber.clear()
-        infiniteTransitionSubscriber.clear()
-    }
-
-    @VisibleForTesting
-    internal data class TransitionState(val current: Any, val target: Any)
-
-    /**
-     * Creates [TransitionInfo] from [Transition.TransitionAnimationState].
-     * * [TransitionInfo.startTimeMillis] is an animation delay if it has one.
-     * * [TransitionInfo.endTimeMillis] is an animation duration as it's already includes the delay.
-     * * [TransitionInfo.specType] is a java class name of the spec.
-     * * [TransitionInfo.values] a map of animation values from [TransitionInfo.startTimeMillis]
-     * to [TransitionInfo.endTimeMillis] with [stepMs] sampling.
-     */
-    private fun <T, V : AnimationVector, S>
-    Transition<S>.TransitionAnimationState<T, V>.createTransitionInfo(stepMs: Long = 1):
-        TransitionInfo {
-            val endTimeMs = nanosToMillis(this.animation.durationNanos)
-            val startTimeMs: Long by lazy {
-                val animationSpec = this.animationSpec
-                when (animationSpec) {
-                    is TweenSpec<*> -> animationSpec.delay
-                    is SnapSpec<*> -> animationSpec.delay
-                    is KeyframesSpec<*> -> animationSpec.config.delayMillis
-                    is RepeatableSpec<*> -> {
-                        if (animationSpec.initialStartOffset.offsetType == StartOffsetType.Delay)
-                            animationSpec.initialStartOffset.offsetMillis
-                        else 0L
-                    }
-                    is InfiniteRepeatableSpec<*> -> {
-                        if (animationSpec.initialStartOffset.offsetType == StartOffsetType.Delay)
-                            animationSpec.initialStartOffset.offsetMillis
-                        else 0L
-                    }
-                    is VectorizedDurationBasedAnimationSpec<*> -> animationSpec.delayMillis
-                    else -> 0L
-                }.toLong()
-            }
-            val values: Map<Long, T> by lazy {
-                val values: MutableMap<Long, T> = mutableMapOf()
-                // Always add start and end points.
-                values[startTimeMs] = this.animation.getValueFromNanos(
-                    millisToNanos(startTimeMs)
-                )
-                values[endTimeMs] = this.animation.getValueFromNanos(millisToNanos(endTimeMs))
-
-                for (millis in startTimeMs..endTimeMs step stepMs) {
-                    values[millis] = this.animation.getValueFromNanos(millisToNanos(millis))
-                }
-                values
-            }
-            return TransitionInfo(
-                this.label, this.animationSpec.javaClass.name,
-                startTimeMs, endTimeMs, values
-            )
-        }
-
-    /**
-     * Converts the given time in nanoseconds to milliseconds, rounding up when needed.
-     */
-    private fun nanosToMillis(timeNs: Long) = (timeNs + 999_999) / 1_000_000
-
-    /**
-     * Converts the given time in milliseconds to nanoseconds.
-     */
-    private fun millisToNanos(timeMs: Long) = timeMs * 1_000_000L
-
-    private fun AnimatedVisibilityState.toCurrentTargetPair() =
-        if (this == AnimatedVisibilityState.Enter) false to true else true to false
-
-    /**
-     * Return all the animations of a [Transition], as well as all the animations of its every
-     * descendant [Transition]s.
-     */
-    private fun Transition<*>.allAnimations(): List<Transition<*>.TransitionAnimationState<*, *>> {
-        val descendantAnimations = transitions.flatMap { it.allAnimations() }
-        return animations + descendantAnimations
+        allClocks.forEach { notifyUnsubscribe(it.animation) }
+        trackedUnsupportedAnimations.forEach { notifyUnsubscribe(it) }
+        trackedUnsupportedAnimations.clear()
+        transitionClocks.clear()
+        animatedVisibilityClocks.clear()
+        trackedAnimations.clear()
     }
 }

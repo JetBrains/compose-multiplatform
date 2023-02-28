@@ -43,13 +43,13 @@ dependencies {
         implementation(projectOrArtifact(":compose:runtime:runtime"))
         implementation(projectOrArtifact(":compose:ui:ui-unit"))
         implementation(projectOrArtifact(":compose:ui:ui-graphics"))
-        implementation(projectOrArtifact(":activity:activity-compose"))
+        implementation("androidx.activity:activity-compose:1.3.1")
         // old version of common-java8 conflicts with newer version, because both have
         // DefaultLifecycleEventObserver.
         // Outside of androidx this is resolved via constraint added to lifecycle-common,
         // but it doesn't work in androidx.
         // See aosp/1804059
-        implementation(projectOrArtifact(":lifecycle:lifecycle-common-java8"))
+        implementation("androidx.lifecycle:lifecycle-common-java8:2.5.1")
         implementation(libs.testCore)
         implementation(libs.testRules)
 
@@ -121,12 +121,4 @@ androidx {
 
 android {
     namespace "androidx.compose.testutils"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

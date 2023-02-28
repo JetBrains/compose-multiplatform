@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.textfield
 
+import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import android.view.KeyEvent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.text.BasicTextField
@@ -73,24 +74,35 @@ class TextFieldUndoTest {
 
         rule.waitForIdle()
 
-        // undo command
-        rule.onNode(hasSetTextAction()).performKeyPress(downEvent(Key.Z, KeyEvent.META_CTRL_ON))
+        fun verifyRedoShortcut(redoKeyEvent: ComposeKeyEvent) {
+            // undo command
+            rule.onNode(hasSetTextAction()).performKeyPress(downEvent(Key.Z, KeyEvent.META_CTRL_ON))
 
-        rule.runOnIdle {
-            assertThat(state.value).isEqualTo("hi")
+            rule.runOnIdle {
+                assertThat(state.value).isEqualTo("hi")
+            }
+
+            // redo command
+            rule.onNode(hasSetTextAction()).performKeyPress(redoKeyEvent)
+
+            rule.runOnIdle {
+                assertThat(state.value).isEqualTo("hello")
+            }
         }
 
-        // redo command
-        rule.onNode(hasSetTextAction()).performKeyPress(
+        verifyRedoShortcut(
             downEvent(
                 Key.Z,
                 KeyEvent.META_CTRL_ON or KeyEvent.META_SHIFT_ON
             )
         )
 
-        rule.runOnIdle {
-            assertThat(state.value).isEqualTo("hello")
-        }
+        verifyRedoShortcut(
+            downEvent(
+                Key.Y,
+                KeyEvent.META_CTRL_ON
+            )
+        )
     }
 }
 

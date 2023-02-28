@@ -44,7 +44,6 @@ dependencies {
 androidx {
     name = "Compose RxJava 3 integration"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_RUNTIME
     inceptionYear = "2020"
     description = "Compose integration with RxJava 3"
     legacyDisableKotlinStrictApiMode = true
@@ -52,12 +51,4 @@ androidx {
 
 android {
     namespace "androidx.compose.runtime.rxjava3"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

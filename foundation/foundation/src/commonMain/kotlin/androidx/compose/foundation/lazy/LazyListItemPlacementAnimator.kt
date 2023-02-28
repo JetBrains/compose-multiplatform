@@ -49,14 +49,15 @@ internal class LazyListItemPlacementAnimator(
     // snapshot of the key to index map used for the last measuring.
     private var keyToIndexMap: Map<Any, Int> = emptyMap()
 
-    // keeps the first and the last items positioned in the viewport and their visible part sizes.
-    private var viewportStartItemIndex = -1
-    private var viewportStartItemNotVisiblePartSize = 0
-    private var viewportEndItemIndex = -1
-    private var viewportEndItemNotVisiblePartSize = 0
+    // keeps the index of the first visible item index.
+    private var firstVisibleIndex = 0
 
     // stored to not allocate it every pass.
-    private val positionedKeys = mutableSetOf<Any>()
+    private val movingAwayKeys = LinkedHashSet<Any>()
+    private val movingInFromStartBound = mutableListOf<LazyListPositionedItem>()
+    private val movingInFromEndBound = mutableListOf<LazyListPositionedItem>()
+    private val movingAwayToStartBound = mutableListOf<LazyMeasuredItem>()
+    private val movingAwayToEndBound = mutableListOf<LazyMeasuredItem>()
 
     /**
      * Should be called after the measuring so we can detect position changes and start animations.
@@ -67,178 +68,128 @@ internal class LazyListItemPlacementAnimator(
         consumedScroll: Int,
         layoutWidth: Int,
         layoutHeight: Int,
-        reverseLayout: Boolean,
         positionedItems: MutableList<LazyListPositionedItem>,
         itemProvider: LazyMeasuredItemProvider
     ) {
-        if (!positionedItems.fastAny { it.hasAnimations }) {
+        if (!positionedItems.fastAny { it.hasAnimations } && keyToItemInfoMap.isEmpty()) {
             // no animations specified - no work needed
             reset()
             return
         }
 
+        val previousFirstVisibleIndex = firstVisibleIndex
+        firstVisibleIndex = positionedItems.firstOrNull()?.index ?: 0
+        val previousKeyToIndexMap = keyToIndexMap
+        keyToIndexMap = itemProvider.keyToIndexMap
+
         val mainAxisLayoutSize = if (isVertical) layoutHeight else layoutWidth
 
         // the consumed scroll is considered as a delta we don't need to animate
-        val notAnimatableDelta = (if (reverseLayout) -consumedScroll else consumedScroll).toOffset()
+        val notAnimatableDelta = consumedScroll.toOffset()
 
-        val newFirstItem = positionedItems.first()
-        val newLastItem = positionedItems.last()
-
-        var totalItemsSize = 0
-        // update known indexes and calculate the average size
-        positionedItems.fastForEach { item ->
-            keyToItemInfoMap[item.key]?.index = item.index
-            totalItemsSize += item.sizeWithSpacings
-        }
-        val averageItemSize = totalItemsSize / positionedItems.size
-
-        positionedKeys.clear()
+        // first add all items we had in the previous run
+        movingAwayKeys.addAll(keyToItemInfoMap.keys)
         // iterate through the items which are visible (without animated offsets)
         positionedItems.fastForEach { item ->
-            positionedKeys.add(item.key)
-            val itemInfo = keyToItemInfoMap[item.key]
-            if (itemInfo == null) {
+            // remove items we have in the current one as they are still visible.
+            movingAwayKeys.remove(item.key)
+            if (item.hasAnimations) {
+                val itemInfo = keyToItemInfoMap[item.key]
                 // there is no state associated with this item yet
-                if (item.hasAnimations) {
-                    val newItemInfo = ItemInfo(item.index)
-                    val previousIndex = keyToIndexMap[item.key]
-                    val firstPlaceableOffset = item.getOffset(0)
-                    val firstPlaceableSize = item.getMainAxisSize(0)
-
-                    val targetFirstPlaceableOffsetMainAxis = if (previousIndex == null) {
-                        // it is a completely new item. no animation is needed
-                        firstPlaceableOffset.mainAxis
-                    } else {
-                        val fallback = if (!reverseLayout) {
-                            firstPlaceableOffset.mainAxis
+                if (itemInfo == null) {
+                    val previousIndex = previousKeyToIndexMap[item.key]
+                    if (previousIndex != null && item.index != previousIndex) {
+                        if (previousIndex < previousFirstVisibleIndex) {
+                            // the larger index will be in the start of the list
+                            movingInFromStartBound.add(item)
                         } else {
-                            firstPlaceableOffset.mainAxis - item.sizeWithSpacings +
-                                firstPlaceableSize
+                            movingInFromEndBound.add(item)
                         }
-                        calculateExpectedOffset(
-                            index = previousIndex,
-                            sizeWithSpacings = item.sizeWithSpacings,
-                            averageItemsSize = averageItemSize,
-                            scrolledBy = notAnimatableDelta,
-                            fallback = fallback,
-                            reverseLayout = reverseLayout,
-                            mainAxisLayoutSize = mainAxisLayoutSize,
-                            visibleItems = positionedItems
-                        ) + if (reverseLayout) {
-                            item.size - firstPlaceableSize
-                        } else {
-                            0
-                        }
-                    }
-                    val targetFirstPlaceableOffset = if (isVertical) {
-                        firstPlaceableOffset.copy(y = targetFirstPlaceableOffsetMainAxis)
                     } else {
-                        firstPlaceableOffset.copy(x = targetFirstPlaceableOffsetMainAxis)
+                       keyToItemInfoMap[item.key] = createItemInfo(item)
                     }
-
-                    // populate placeable info list
-                    repeat(item.placeablesCount) { placeableIndex ->
-                        val diffToFirstPlaceableOffset =
-                            item.getOffset(placeableIndex) - firstPlaceableOffset
-                        newItemInfo.placeables.add(
-                            PlaceableInfo(
-                                targetFirstPlaceableOffset + diffToFirstPlaceableOffset,
-                                item.getMainAxisSize(placeableIndex)
-                            )
-                        )
-                    }
-                    keyToItemInfoMap[item.key] = newItemInfo
-                    startAnimationsIfNeeded(item, newItemInfo)
+                } else {
+                    // this item was visible and is still visible.
+                    itemInfo.notAnimatableDelta += notAnimatableDelta // apply new scroll delta
+                    startAnimationsIfNeeded(item, itemInfo)
                 }
             } else {
-                if (item.hasAnimations) {
-                    // apply new not animatable offset
-                    itemInfo.notAnimatableDelta += notAnimatableDelta
-                    startAnimationsIfNeeded(item, itemInfo)
+                // no animation, clean up if needed
+                keyToItemInfoMap.remove(item.key)
+            }
+        }
+
+        var currentMainAxisOffset = 0
+        movingInFromStartBound.sortByDescending { previousKeyToIndexMap[it.key] }
+        movingInFromStartBound.fastForEach { item ->
+            val mainAxisOffset = 0 - currentMainAxisOffset - item.size
+            currentMainAxisOffset += item.size
+            val itemInfo = createItemInfo(item, mainAxisOffset)
+            keyToItemInfoMap[item.key] = itemInfo
+            startAnimationsIfNeeded(item, itemInfo)
+        }
+        currentMainAxisOffset = 0
+        movingInFromEndBound.sortBy { previousKeyToIndexMap[it.key] }
+        movingInFromEndBound.fastForEach { item ->
+            val mainAxisOffset = mainAxisLayoutSize + currentMainAxisOffset
+            currentMainAxisOffset += item.size
+            val itemInfo = createItemInfo(item, mainAxisOffset)
+            keyToItemInfoMap[item.key] = itemInfo
+            startAnimationsIfNeeded(item, itemInfo)
+        }
+
+        movingAwayKeys.forEach { key ->
+            // found an item which was in our map previously but is not a part of the
+            // positionedItems now
+            val itemInfo = keyToItemInfoMap.getValue(key)
+            val newIndex = keyToIndexMap[key]
+
+            // whether the animation associated with the item has been finished or not yet started
+            val inProgress = itemInfo.placeables.fastAny { it.inProgress }
+            if (itemInfo.placeables.isEmpty() ||
+                newIndex == null ||
+                (!inProgress && newIndex == previousKeyToIndexMap[key]) ||
+                (!inProgress && !itemInfo.isWithinBounds(mainAxisLayoutSize))
+            ) {
+                keyToItemInfoMap.remove(key)
+            } else {
+                val item = itemProvider.getAndMeasure(DataIndex(newIndex))
+                if (newIndex < firstVisibleIndex) {
+                    movingAwayToStartBound.add(item)
                 } else {
-                    // no animation, clean up if needed
-                    keyToItemInfoMap.remove(item.key)
+                    movingAwayToEndBound.add(item)
                 }
             }
         }
 
-        // previously we were animating items which are visible in the end state so we had to
-        // compare the current state with the state used for the previous measuring.
-        // now we will animate disappearing items so the current state is their starting state
-        // so we can update current viewport start/end items
-        if (!reverseLayout) {
-            viewportStartItemIndex = newFirstItem.index
-            viewportStartItemNotVisiblePartSize = newFirstItem.offset
-            viewportEndItemIndex = newLastItem.index
-            viewportEndItemNotVisiblePartSize =
-                newLastItem.offset + newLastItem.sizeWithSpacings - mainAxisLayoutSize
-        } else {
-            viewportStartItemIndex = newLastItem.index
-            viewportStartItemNotVisiblePartSize =
-                mainAxisLayoutSize - newLastItem.offset - newLastItem.size
-            viewportEndItemIndex = newFirstItem.index
-            viewportEndItemNotVisiblePartSize =
-                -newFirstItem.offset + (newFirstItem.sizeWithSpacings - newFirstItem.size)
+        currentMainAxisOffset = 0
+        movingAwayToStartBound.sortByDescending { keyToIndexMap[it.key] }
+        movingAwayToStartBound.fastForEach { item ->
+            val mainAxisOffset = 0 - currentMainAxisOffset - item.size
+            currentMainAxisOffset += item.size
+
+            val itemInfo = keyToItemInfoMap.getValue(item.key)
+            val positionedItem = item.position(mainAxisOffset, layoutWidth, layoutHeight)
+            positionedItems.add(positionedItem)
+            startAnimationsIfNeeded(positionedItem, itemInfo)
+        }
+        currentMainAxisOffset = 0
+        movingAwayToEndBound.sortBy { keyToIndexMap[it.key] }
+        movingAwayToEndBound.fastForEach { item ->
+            val mainAxisOffset = mainAxisLayoutSize + currentMainAxisOffset
+            currentMainAxisOffset += item.size
+
+            val itemInfo = keyToItemInfoMap.getValue(item.key)
+            val positionedItem = item.position(mainAxisOffset, layoutWidth, layoutHeight)
+            positionedItems.add(positionedItem)
+            startAnimationsIfNeeded(positionedItem, itemInfo)
         }
 
-        val iterator = keyToItemInfoMap.iterator()
-        while (iterator.hasNext()) {
-            val entry = iterator.next()
-            if (!positionedKeys.contains(entry.key)) {
-                // found an item which was in our map previously but is not a part of the
-                // positionedItems now
-                val itemInfo = entry.value
-                // apply new not animatable delta for this item
-                itemInfo.notAnimatableDelta += notAnimatableDelta
-
-                val index = itemProvider.keyToIndexMap[entry.key]
-
-                // whether at least one placeable is within the viewport bounds.
-                // this usually means that we will start animation for it right now
-                val withinBounds = itemInfo.placeables.fastAny {
-                    val currentTarget = it.targetOffset + itemInfo.notAnimatableDelta
-                    currentTarget.mainAxis + it.size > 0 &&
-                        currentTarget.mainAxis < mainAxisLayoutSize
-                }
-
-                // whether the animation associated with the item has been finished
-                val isFinished = !itemInfo.placeables.fastAny { it.inProgress }
-
-                if ((!withinBounds && isFinished) ||
-                    index == null ||
-                    itemInfo.placeables.isEmpty()
-                ) {
-                    iterator.remove()
-                } else {
-
-                    val measuredItem = itemProvider.getAndMeasure(DataIndex(index))
-
-                    // calculate the target offset for the animation.
-                    val absoluteTargetOffset = calculateExpectedOffset(
-                        index = index,
-                        sizeWithSpacings = measuredItem.sizeWithSpacings,
-                        averageItemsSize = averageItemSize,
-                        scrolledBy = notAnimatableDelta,
-                        fallback = mainAxisLayoutSize,
-                        reverseLayout = reverseLayout,
-                        mainAxisLayoutSize = mainAxisLayoutSize,
-                        visibleItems = positionedItems
-                    )
-                    val targetOffset = if (reverseLayout) {
-                        mainAxisLayoutSize - absoluteTargetOffset - measuredItem.size
-                    } else {
-                        absoluteTargetOffset
-                    }
-
-                    val item = measuredItem.position(targetOffset, layoutWidth, layoutHeight)
-                    positionedItems.add(item)
-                    startAnimationsIfNeeded(item, itemInfo)
-                }
-            }
-        }
-
-        keyToIndexMap = itemProvider.keyToIndexMap
+        movingInFromStartBound.clear()
+        movingInFromEndBound.clear()
+        movingAwayToStartBound.clear()
+        movingAwayToEndBound.clear()
+        movingAwayKeys.clear()
     }
 
     /**
@@ -259,8 +210,8 @@ internal class LazyListItemPlacementAnimator(
 
         // cancel the animation if it is fully out of the bounds.
         if (item.inProgress &&
-            ((currentTarget.mainAxis < minOffset && currentValue.mainAxis < minOffset) ||
-            (currentTarget.mainAxis > maxOffset && currentValue.mainAxis > maxOffset))
+            ((currentTarget.mainAxis <= minOffset && currentValue.mainAxis <= minOffset) ||
+            (currentTarget.mainAxis >= maxOffset && currentValue.mainAxis >= maxOffset))
         ) {
             scope.launch {
                 item.animatedOffset.snapTo(item.targetOffset)
@@ -278,88 +229,34 @@ internal class LazyListItemPlacementAnimator(
     fun reset() {
         keyToItemInfoMap.clear()
         keyToIndexMap = emptyMap()
-        viewportStartItemIndex = -1
-        viewportStartItemNotVisiblePartSize = 0
-        viewportEndItemIndex = -1
-        viewportEndItemNotVisiblePartSize = 0
+        firstVisibleIndex = -1
     }
 
-    /**
-     * Estimates the outside of the viewport offset for the item. Used to understand from
-     * where to start animation for the item which wasn't visible previously or where it should
-     * end for the item which is not going to be visible in the end.
-     */
-    private fun calculateExpectedOffset(
-        index: Int,
-        sizeWithSpacings: Int,
-        averageItemsSize: Int,
-        scrolledBy: IntOffset,
-        reverseLayout: Boolean,
-        mainAxisLayoutSize: Int,
-        fallback: Int,
-        visibleItems: List<LazyListPositionedItem>
-    ): Int {
-        val afterViewportEnd =
-            if (!reverseLayout) viewportEndItemIndex < index else viewportEndItemIndex > index
-        val beforeViewportStart =
-            if (!reverseLayout) viewportStartItemIndex > index else viewportStartItemIndex < index
-        return when {
-            afterViewportEnd -> {
-                var itemsSizes = 0
-                // add sizes of the items between the last visible one and this one.
-                val range = if (!reverseLayout) {
-                    viewportEndItemIndex + 1 until index
-                } else {
-                    index + 1 until viewportEndItemIndex
-                }
-                for (i in range) {
-                    itemsSizes += visibleItems.getItemSize(
-                        itemIndex = i,
-                        fallback = averageItemsSize
-                    )
-                }
-                mainAxisLayoutSize + viewportEndItemNotVisiblePartSize + itemsSizes +
-                    scrolledBy.mainAxis
-            }
-            beforeViewportStart -> {
-                // add the size of this item as we need the start offset of this item.
-                var itemsSizes = sizeWithSpacings
-                // add sizes of the items between the first visible one and this one.
-                val range = if (!reverseLayout) {
-                    index + 1 until viewportStartItemIndex
-                } else {
-                    viewportStartItemIndex + 1 until index
-                }
-                for (i in range) {
-                    itemsSizes += visibleItems.getItemSize(
-                        itemIndex = i,
-                        fallback = averageItemsSize
-                    )
-                }
-                viewportStartItemNotVisiblePartSize - itemsSizes + scrolledBy.mainAxis
-            }
-            else -> {
-                fallback
-            }
-        }
-    }
+    private fun createItemInfo(
+        item: LazyListPositionedItem,
+        mainAxisOffset: Int = item.getOffset(0).mainAxis
+    ): ItemInfo {
+        val newItemInfo = ItemInfo()
+        val firstPlaceableOffset = item.getOffset(0)
 
-    private fun List<LazyListPositionedItem>.getItemSize(itemIndex: Int, fallback: Int): Int {
-        if (isEmpty() || itemIndex < first().index || itemIndex > last().index) return fallback
-        if ((itemIndex - first().index) < (last().index - itemIndex)) {
-            for (index in indices) {
-                val item = get(index)
-                if (item.index == itemIndex) return item.sizeWithSpacings
-                if (item.index > itemIndex) break
-            }
+        val targetFirstPlaceableOffset = if (isVertical) {
+            firstPlaceableOffset.copy(y = mainAxisOffset)
         } else {
-            for (index in lastIndex downTo 0) {
-                val item = get(index)
-                if (item.index == itemIndex) return item.sizeWithSpacings
-                if (item.index < itemIndex) break
-            }
+            firstPlaceableOffset.copy(x = mainAxisOffset)
         }
-        return fallback
+
+        // populate placeable info list
+        repeat(item.placeablesCount) { placeableIndex ->
+            val diffToFirstPlaceableOffset =
+                item.getOffset(placeableIndex) - firstPlaceableOffset
+            newItemInfo.placeables.add(
+                PlaceableInfo(
+                    targetFirstPlaceableOffset + diffToFirstPlaceableOffset,
+                    item.getMainAxisSize(placeableIndex)
+                )
+            )
+        }
+        return newItemInfo
     }
 
     private fun startAnimationsIfNeeded(item: LazyListPositionedItem, itemInfo: ItemInfo) {
@@ -381,7 +278,7 @@ internal class LazyListItemPlacementAnimator(
         itemInfo.placeables.fastForEachIndexed { index, placeableInfo ->
             val currentTarget = placeableInfo.targetOffset + itemInfo.notAnimatableDelta
             val currentOffset = item.getOffset(index)
-            placeableInfo.size = item.getMainAxisSize(index)
+            placeableInfo.mainAxisSize = item.getMainAxisSize(index)
             val animationSpec = item.getAnimationSpec(index)
             if (currentTarget != currentOffset) {
                 placeableInfo.targetOffset = currentOffset - itemInfo.notAnimatableDelta
@@ -412,20 +309,31 @@ internal class LazyListItemPlacementAnimator(
         }
     }
 
+    /**
+     * Whether at least one placeable is within the viewport bounds.
+     */
+    private fun ItemInfo.isWithinBounds(mainAxisLayoutSize: Int): Boolean {
+        return placeables.fastAny {
+            val currentTarget = it.targetOffset + notAnimatableDelta
+            currentTarget.mainAxis + it.mainAxisSize > 0 &&
+                currentTarget.mainAxis < mainAxisLayoutSize
+        }
+    }
+
     private fun Int.toOffset() =
         IntOffset(if (isVertical) 0 else this, if (!isVertical) 0 else this)
 
     private val IntOffset.mainAxis get() = if (isVertical) y else x
 }
 
-private class ItemInfo(var index: Int) {
+private class ItemInfo {
     var notAnimatableDelta: IntOffset = IntOffset.Zero
     val placeables = mutableListOf<PlaceableInfo>()
 }
 
 private class PlaceableInfo(
     initialOffset: IntOffset,
-    var size: Int
+    var mainAxisSize: Int
 ) {
     val animatedOffset = Animatable(initialOffset, IntOffset.VectorConverter)
     var targetOffset: IntOffset = initialOffset

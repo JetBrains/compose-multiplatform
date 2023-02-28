@@ -23,6 +23,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -61,63 +64,61 @@ fun OverscrollSample() {
     // on the scrollable container.
     class OffsetOverscrollEffect(val scope: CoroutineScope) : OverscrollEffect {
         private val overscrollOffset = Animatable(0f)
-        override fun consumePreScroll(
-            scrollDelta: Offset,
-            source: NestedScrollSource
+
+        override fun applyToScroll(
+            delta: Offset,
+            source: NestedScrollSource,
+            performScroll: (Offset) -> Offset
         ): Offset {
             // in pre scroll we relax the overscroll if needed
             // relaxation: when we are in progress of the overscroll and user scrolls in the
             // different direction = substract the overscroll first
-            val sameDirection = sign(scrollDelta.y) == sign(overscrollOffset.value)
-            return if (abs(overscrollOffset.value) > 0.5 && !sameDirection && isEnabled) {
+            val sameDirection = sign(delta.y) == sign(overscrollOffset.value)
+            val consumedByPreScroll = if (abs(overscrollOffset.value) > 0.5 && !sameDirection) {
                 val prevOverscrollValue = overscrollOffset.value
-                val newOverscrollValue = overscrollOffset.value + scrollDelta.y
+                val newOverscrollValue = overscrollOffset.value + delta.y
                 if (sign(prevOverscrollValue) != sign(newOverscrollValue)) {
                     // sign changed, coerce to start scrolling and exit
                     scope.launch { overscrollOffset.snapTo(0f) }
-                    Offset(x = 0f, y = scrollDelta.y + prevOverscrollValue)
+                    Offset(x = 0f, y = delta.y + prevOverscrollValue)
                 } else {
                     scope.launch {
-                        overscrollOffset.snapTo(overscrollOffset.value + scrollDelta.y)
+                        overscrollOffset.snapTo(overscrollOffset.value + delta.y)
                     }
-                    scrollDelta.copy(x = 0f)
+                    delta.copy(x = 0f)
                 }
             } else {
                 Offset.Zero
             }
-        }
-
-        override fun consumePostScroll(
-            initialDragDelta: Offset,
-            overscrollDelta: Offset,
-            source: NestedScrollSource
-        ) {
+            val leftForScroll = delta - consumedByPreScroll
+            val consumedByScroll = performScroll(leftForScroll)
+            val overscrollDelta = leftForScroll - consumedByScroll
             // if it is a drag, not a fling, add the delta left to our over scroll value
-            if (abs(overscrollDelta.y) > 0.5 && isEnabled && source == NestedScrollSource.Drag) {
+            if (abs(overscrollDelta.y) > 0.5 && source == NestedScrollSource.Drag) {
                 scope.launch {
                     // multiply by 0.1 for the sake of parallax effect
                     overscrollOffset.snapTo(overscrollOffset.value + overscrollDelta.y * 0.1f)
                 }
             }
+            return consumedByPreScroll + consumedByScroll
         }
 
-        override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
-
-        override suspend fun consumePostFling(velocity: Velocity) {
+        override suspend fun applyToFling(
+            velocity: Velocity,
+            performFling: suspend (Velocity) -> Velocity
+        ) {
+            val consumed = performFling(velocity)
             // when the fling happens - we just gradually animate our overscroll to 0
-            if (isEnabled) {
-                overscrollOffset.animateTo(
-                    targetValue = 0f,
-                    initialVelocity = velocity.y,
-                    animationSpec = spring()
-                )
-            }
+            val remaining = velocity - consumed
+            overscrollOffset.animateTo(
+                targetValue = 0f,
+                initialVelocity = remaining.y,
+                animationSpec = spring()
+            )
         }
-
-        override var isEnabled: Boolean by mutableStateOf(true)
 
         override val isInProgress: Boolean
-            get() = overscrollOffset.isRunning
+            get() = overscrollOffset.value != 0f
 
         // as we're building an offset modifiers, let's offset of our value we calculated
         override val effectModifier: Modifier = Modifier.offset {
@@ -157,5 +158,81 @@ fun OverscrollSample() {
                 // show the overscroll only on the text, not the containers (just for fun)
                 .overscroll(overscroll)
         )
+    }
+}
+
+@Sampled
+@Composable
+fun OverscrollWithDraggable_Before() {
+    var dragPosition by remember { mutableStateOf(0f) }
+    val minPosition = -1000f
+    val maxPosition = 1000f
+
+    val draggableState = rememberDraggableState { delta ->
+        val newPosition = (dragPosition + delta).coerceIn(minPosition, maxPosition)
+        dragPosition = newPosition
+    }
+
+    Box(
+        Modifier
+            .size(100.dp)
+            .draggable(draggableState, orientation = Orientation.Horizontal),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Drag position $dragPosition")
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun OverscrollWithDraggable_After() {
+    var dragPosition by remember { mutableStateOf(0f) }
+    val minPosition = -1000f
+    val maxPosition = 1000f
+
+    val overscrollEffect = ScrollableDefaults.overscrollEffect()
+
+    val draggableState = rememberDraggableState { delta ->
+        // Horizontal, so convert the delta to a horizontal offset
+        val deltaAsOffset = Offset(delta, 0f)
+        // Wrap the original logic inside applyToScroll
+        overscrollEffect.applyToScroll(deltaAsOffset, NestedScrollSource.Drag) { remainingOffset ->
+            val remainingDelta = remainingOffset.x
+            val newPosition = (dragPosition + remainingDelta).coerceIn(minPosition, maxPosition)
+            // Calculate how much delta we have consumed
+            val consumed = newPosition - dragPosition
+            dragPosition = newPosition
+            // Return how much offset we consumed, so that we can show overscroll for what is left
+            Offset(consumed, 0f)
+        }
+    }
+
+    Box(
+        Modifier
+            // Draw overscroll on the box
+            .overscroll(overscrollEffect)
+            .size(100.dp)
+            .draggable(
+                draggableState,
+                orientation = Orientation.Horizontal,
+                onDragStopped = {
+                    overscrollEffect.applyToFling(Velocity(it, 0f)) { velocity ->
+                        if (dragPosition == minPosition || dragPosition == maxPosition) {
+                            // If we are at the min / max bound, give overscroll all of the velocity
+                            Velocity.Zero
+                        } else {
+                            // If we aren't at the min / max bound, consume all of the velocity so
+                            // overscroll won't show. Normally in this case something like
+                            // Modifier.scrollable would use the velocity to update the scroll state
+                            // with a fling animation, but just do nothing to keep this simpler.
+                            velocity
+                        }
+                    }
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Drag position $dragPosition")
     }
 }

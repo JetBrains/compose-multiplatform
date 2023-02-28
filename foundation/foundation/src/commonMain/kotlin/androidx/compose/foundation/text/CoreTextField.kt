@@ -95,6 +95,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteAllCommand
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
@@ -154,8 +156,10 @@ import kotlinx.coroutines.launch
  * provided, there will be no cursor drawn
  * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in the
  * text will be positioned as if there was unlimited horizontal space.
- * @param maxLines The maximum height in terms of maximum number of visible lines. Should be
- * equal or greater than 1.
+ * @param maxLines The maximum height in terms of maximum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
+ * @param minLines The minimum height in terms of minimum number of visible lines. It is required
+ * that 1 <= [minLines] <= [maxLines].
  * @param imeOptions Contains different IME configuration options.
  * @param keyboardActions when the input service emits an IME action, the corresponding callback
  * is called. Note that this IME action may be different from what you specified in
@@ -185,6 +189,7 @@ internal fun CoreTextField(
     cursorBrush: Brush = SolidColor(Color.Unspecified),
     softWrap: Boolean = true,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = DefaultMinLines,
     imeOptions: ImeOptions = ImeOptions.Default,
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     enabled: Boolean = true,
@@ -192,7 +197,7 @@ internal fun CoreTextField(
     decorationBox: @Composable (innerTextField: @Composable () -> Unit) -> Unit =
         @Composable { innerTextField -> innerTextField() }
 ) {
-    val focusRequester = FocusRequester()
+    val focusRequester = remember { FocusRequester() }
 
     // CompositionLocals
     // If the text field is disabled or read-only, we should not deal with the input service
@@ -286,7 +291,8 @@ internal fun CoreTextField(
                 textInputService,
                 state,
                 value,
-                imeOptions
+                imeOptions,
+                offsetMapping
             )
 
             // The focusable modifier itself will request the entire focusable be brought into view
@@ -392,6 +398,7 @@ internal fun CoreTextField(
                 state.showCursorHandle =
                     manager.isSelectionHandleInVisibleBound(isStartHandle = true)
             }
+            notifyFocusedRect(state, value, offsetMapping)
         }
         state.layoutResult?.innerTextFieldCoordinates = it
     }
@@ -412,20 +419,33 @@ internal fun CoreTextField(
                 false
             }
         }
-        setText {
-            state.onValueChange(TextFieldValue(it.text, TextRange(it.text.length)))
+        setText { text ->
+            // If the action is performed while in an active text editing session, treat this like
+            // an IME command and update the text by going through the buffer. This keeps the buffer
+            // state consistent if other IME commands are performed before the next recomposition,
+            // and is used for the testing code path.
+            state.inputSession?.let { session ->
+                TextFieldDelegate.onEditCommand(
+                    ops = listOf(DeleteAllCommand(), CommitTextCommand(text, 1)),
+                    editProcessor = state.processor,
+                    state.onValueChange,
+                    session
+                )
+            } ?: run {
+                state.onValueChange(TextFieldValue(text.text, TextRange(text.text.length)))
+            }
             true
         }
-        setSelection { selectionStart, selectionEnd, traversalMode ->
+        setSelection { selectionStart, selectionEnd, relativeToOriginalText ->
             // in traversal mode we get selection from the `textSelectionRange` semantics which is
             // selection in original text. In non-traversal mode selection comes from the Talkback
             // and indices are relative to the transformed text
-            val start = if (traversalMode) {
+            val start = if (relativeToOriginalText) {
                 selectionStart
             } else {
                 offsetMapping.transformedToOriginal(selectionStart)
             }
-            val end = if (traversalMode) {
+            val end = if (relativeToOriginalText) {
                 selectionEnd
             } else {
                 offsetMapping.transformedToOriginal(selectionEnd)
@@ -440,7 +460,7 @@ internal fun CoreTextField(
             ) {
                 // Do not show toolbar if it's a traversal mode (with the volume keys), or
                 // if the cursor just moved to beginning or end.
-                if (traversalMode || start == end) {
+                if (relativeToOriginalText || start == end) {
                     manager.exitSelectionMode()
                 } else {
                     manager.enterSelectionMode()
@@ -524,6 +544,7 @@ internal fun CoreTextField(
     // gesture and semantics modifiers.
     val decorationBoxModifier = modifier
         .then(focusModifier)
+        .interceptDPadAndMoveFocus(state, focusManager)
         .previewKeyEventToDeselectOnBack(state, manager)
         .then(textKeyInputModifier)
         .textFieldScrollable(scrollerPosition, interactionSource, enabled)
@@ -548,7 +569,11 @@ internal fun CoreTextField(
                 // min height is set for maxLines == 1 in order to prevent text cuts for single line
                 // TextFields
                 .heightIn(min = state.minHeightForSingleLineField)
-                .maxLinesHeight(maxLines, textStyle)
+                .heightInLines(
+                    textStyle = textStyle,
+                    minLines = minLines,
+                    maxLines = maxLines
+                )
                 .textFieldScroll(
                     scrollerPosition,
                     value,
@@ -582,6 +607,7 @@ internal fun CoreTextField(
                             if (prevResult != result) {
                                 state.layoutResult = TextLayoutResultProxy(result)
                                 onTextLayout(result)
+                                notifyFocusedRect(state, value, offsetMapping)
                             }
 
                             // calculate the min height for single line text to prevent text cuts.
@@ -882,11 +908,13 @@ private fun tapToFocus(
     }
 }
 
+@OptIn(InternalFoundationTextApi::class)
 private fun notifyTextInputServiceOnFocusChange(
     textInputService: TextInputService,
     state: TextFieldState,
     value: TextFieldValue,
-    imeOptions: ImeOptions
+    imeOptions: ImeOptions,
+    offsetMapping: OffsetMapping
 ) {
     if (state.hasFocus) {
         state.inputSession = TextFieldDelegate.onFocus(
@@ -897,6 +925,7 @@ private fun notifyTextInputServiceOnFocusChange(
             state.onValueChange,
             state.onImeActionPerformed
         )
+        notifyFocusedRect(state, value, offsetMapping)
     } else {
         onBlur(state)
     }
@@ -942,9 +971,11 @@ internal suspend fun BringIntoViewRequester.bringSelectionEndIntoView(
         selectionEndInTransformed < textLayoutResult.layoutInput.text.length -> {
             textLayoutResult.getBoundingBox(selectionEndInTransformed)
         }
+
         selectionEndInTransformed != 0 -> {
             textLayoutResult.getBoundingBox(selectionEndInTransformed - 1)
         }
+
         else -> { // empty text.
             val defaultSize = computeSizeForDefaultText(
                 textDelegate.style,
@@ -1028,3 +1059,29 @@ internal expect fun CursorHandle(
     modifier: Modifier,
     content: @Composable (() -> Unit)?
 )
+
+// TODO(b/262648050) Try to find a better API.
+@OptIn(InternalFoundationTextApi::class)
+private fun notifyFocusedRect(
+    state: TextFieldState,
+    value: TextFieldValue,
+    offsetMapping: OffsetMapping
+) {
+    // If this reports state reads it causes an invalidation cycle.
+    // This function doesn't need to be invalidated anyway because it's already explicitly called
+    // after updating text layout or position.
+    Snapshot.withoutReadObservation {
+        val layoutResult = state.layoutResult ?: return
+        val inputSession = state.inputSession ?: return
+        val layoutCoordinates = state.layoutCoordinates ?: return
+        TextFieldDelegate.notifyFocusedRect(
+            value,
+            state.textDelegate,
+            layoutResult.value,
+            layoutCoordinates,
+            inputSession,
+            state.hasFocus,
+            offsetMapping
+        )
+    }
+}

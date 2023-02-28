@@ -21,7 +21,7 @@ import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.detectTapAndPress
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -275,25 +275,23 @@ private fun Modifier.scrollbarDrag(
     val currentOnDelta by rememberUpdatedState(onDelta)
     val currentOnFinished by rememberUpdatedState(onFinished)
     pointerInput(Unit) {
-        forEachGesture {
-            awaitPointerEventScope {
-                val down = awaitFirstDown(requireUnconsumed = false)
-                val interaction = DragInteraction.Start()
-                currentInteractionSource.tryEmit(interaction)
-                currentDraggedInteraction.value = interaction
-                val isSuccess = drag(down.id) { change ->
-                    currentOnDelta.invoke(change.positionChange())
-                    change.consume()
-                }
-                val finishInteraction = if (isSuccess) {
-                    DragInteraction.Stop(interaction)
-                } else {
-                    DragInteraction.Cancel(interaction)
-                }
-                currentInteractionSource.tryEmit(finishInteraction)
-                currentDraggedInteraction.value = null
-                currentOnFinished.invoke()
+        awaitEachGesture {
+            val down = awaitFirstDown(requireUnconsumed = false)
+            val interaction = DragInteraction.Start()
+            currentInteractionSource.tryEmit(interaction)
+            currentDraggedInteraction.value = interaction
+            val isSuccess = drag(down.id) { change ->
+                currentOnDelta.invoke(change.positionChange())
+                change.consume()
             }
+            val finishInteraction = if (isSuccess) {
+                DragInteraction.Stop(interaction)
+            } else {
+                DragInteraction.Cancel(interaction)
+            }
+            currentInteractionSource.tryEmit(finishInteraction)
+            currentDraggedInteraction.value = null
+            currentOnFinished.invoke()
         }
     }
 }

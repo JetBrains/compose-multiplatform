@@ -20,6 +20,8 @@ import android.graphics.Paint
 import android.graphics.Typeface
 import androidx.compose.runtime.State
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.EmojiSupportMatch
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphIntrinsics
 import androidx.compose.ui.text.Placeholder
 import androidx.compose.ui.text.SpanStyle
@@ -31,17 +33,18 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontSynthesis
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.font.TypefaceResult
 import androidx.compose.ui.text.intl.AndroidLocale
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.platform.extensions.applySpanStyle
+import androidx.compose.ui.text.platform.extensions.setTextMotion
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.util.fastAny
 import androidx.core.text.TextUtilsCompat
 import androidx.core.view.ViewCompat
 import java.util.Locale
 
-@OptIn(InternalPlatformTextApi::class)
+@OptIn(InternalPlatformTextApi::class, ExperimentalTextApi::class)
 internal class AndroidParagraphIntrinsics constructor(
     val text: String,
     val style: TextStyle,
@@ -63,10 +66,20 @@ internal class AndroidParagraphIntrinsics constructor(
     override val minIntrinsicWidth: Float
         get() = layoutIntrinsics.minIntrinsicWidth
 
-    private val resolvedTypefaces: MutableList<TypefaceDirtyTracker> = mutableListOf()
+    private var resolvedTypefaces: TypefaceDirtyTrackerLinkedList? = null
+
+    /**
+     * If emojiCompat is used in the making of this Paragraph
+     *
+     * This value will never change
+     */
+    private val emojiCompatProcessed: Boolean =
+        if (!style.hasEmojiCompat) { false } else { EmojiCompatStatus.fontLoaded.value }
 
     override val hasStaleResolvedFonts: Boolean
-        get() = resolvedTypefaces.fastAny { it.isStaleResolvedFont }
+        get() = (resolvedTypefaces?.isStaleResolvedFont ?: false) ||
+            (!emojiCompatProcessed && style.hasEmojiCompat &&
+                /* short-circuit this state read */ EmojiCompatStatus.fontLoaded.value)
 
     internal val textDirectionHeuristic = resolveTextDirectionHeuristics(
         style.textDirection,
@@ -74,41 +87,58 @@ internal class AndroidParagraphIntrinsics constructor(
     )
 
     init {
-        val resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface = {
-                fontFamily, fontWeight, fontStyle, fontSynthesis ->
-            val result = fontFamilyResolver.resolve(
-                fontFamily,
-                fontWeight,
-                fontStyle,
-                fontSynthesis
-            )
-            val holder = TypefaceDirtyTracker(result)
-            resolvedTypefaces.add(holder)
-            holder.typeface
-        }
+        val resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface =
+            { fontFamily, fontWeight, fontStyle, fontSynthesis ->
+                val result = fontFamilyResolver.resolve(
+                    fontFamily,
+                    fontWeight,
+                    fontStyle,
+                    fontSynthesis
+                )
+                if (result !is TypefaceResult.Immutable) {
+                    val newHead = TypefaceDirtyTrackerLinkedList(result, resolvedTypefaces)
+                    resolvedTypefaces = newHead
+                    newHead.typeface
+                } else {
+                    result.value as Typeface
+                }
+            }
+
+        textPaint.setTextMotion(style.textMotion)
 
         val notAppliedStyle = textPaint.applySpanStyle(
             style = style.toSpanStyle(),
             resolveTypeface = resolveTypeface,
             density = density,
+            requiresLetterSpacing = spanStyles.isNotEmpty(),
         )
 
+        val finalSpanStyles = if (notAppliedStyle != null) {
+            // This is just a prepend operation, written in a lower alloc way
+            // equivalent to: `AnnotatedString.Range(...) + spanStyles`
+            List(spanStyles.size + 1) { position ->
+                when (position) {
+                    0 -> AnnotatedString.Range(
+                        item = notAppliedStyle,
+                        start = 0,
+                        end = text.length
+                    )
+
+                    else -> spanStyles[position - 1]
+                }
+            }
+        } else {
+            spanStyles
+        }
         charSequence = createCharSequence(
             text = text,
             contextFontSize = textPaint.textSize,
             contextTextStyle = style,
-            // NOTE(text-perf-review): this is sabotaging the optimization that
-            // createCharSequence makes where it just uses `text` if there are no spanStyles!
-            spanStyles = listOf(
-                AnnotatedString.Range(
-                    item = notAppliedStyle,
-                    start = 0,
-                    end = text.length
-                )
-            ) + spanStyles,
+            spanStyles = finalSpanStyles,
             placeholders = placeholders,
             density = density,
             resolveTypeface = resolveTypeface,
+            useEmojiCompat = emojiCompatProcessed
         )
 
         layoutIntrinsics = LayoutIntrinsics(charSequence, textPaint, textDirectionHeuristic)
@@ -160,11 +190,17 @@ internal actual fun ActualParagraphIntrinsics(
     density = density
 )
 
-private class TypefaceDirtyTracker(val resolveResult: State<Any>) {
+private class TypefaceDirtyTrackerLinkedList(
+    private val resolveResult: State<Any>,
+    private val next: TypefaceDirtyTrackerLinkedList? = null
+) {
     val initial = resolveResult.value
     val typeface: Typeface
         get() = initial as Typeface
 
     val isStaleResolvedFont: Boolean
-        get() = resolveResult.value !== initial
+        get() = resolveResult.value !== initial || (next != null && next.isStaleResolvedFont)
 }
+
+private val TextStyle.hasEmojiCompat: Boolean
+    get() = platformStyle?.paragraphStyle?.emojiSupportMatch != EmojiSupportMatch.None

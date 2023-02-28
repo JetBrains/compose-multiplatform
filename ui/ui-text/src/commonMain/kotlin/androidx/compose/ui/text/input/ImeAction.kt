@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.text.input
 
+import androidx.compose.runtime.Stable
+
 /**
  * Signals the keyboard what type of action should be displayed. It is not guaranteed if
  * the keyboard will show the requested action.
@@ -43,6 +45,7 @@ value class ImeAction internal constructor(@Suppress("unused") private val value
          * keyboards will mostly show one of [Done] or [None] actions based on the single/multi
          * line configuration.
          */
+        @Stable
         val Default: ImeAction = ImeAction(1)
 
         /**
@@ -50,34 +53,40 @@ value class ImeAction internal constructor(@Suppress("unused") private val value
          * action which mostly will be newline, however this action is not carried into the app via
          * any [Keyboard Action][androidx.compose.foundation.text.KeyboardAction].
          */
+        @Stable
         val None: ImeAction = ImeAction(0)
 
         /**
          * Represents that the user would like to go to the target of the text in the input i.e.
          * visiting a URL.
          */
+        @Stable
         val Go: ImeAction = ImeAction(2)
 
         /**
          * Represents that the user wants to execute a search, i.e. web search query.
          */
+        @Stable
         val Search: ImeAction = ImeAction(3)
 
         /**
          * Represents that the user wants to send the text in the input, i.e. an SMS.
          */
+        @Stable
         val Send: ImeAction = ImeAction(4)
 
         /**
          * Represents that the user wants to return to the previous input i.e. going back to the
          * previous field in a form.
          */
+        @Stable
         val Previous: ImeAction = ImeAction(5)
 
         /**
          * Represents that the user is done with the current input, and wants to move to the next
          * one i.e. moving to the next field in a form.
          */
+        @Stable
         val Next: ImeAction = ImeAction(6)
 
         /**
@@ -85,6 +94,7 @@ value class ImeAction internal constructor(@Suppress("unused") private val value
          * kind of finalization behavior should now take place i.e. the field was the last element in
          * a group and the data input is finalized.
          */
+        @Stable
         val Done: ImeAction = ImeAction(7)
     }
 }

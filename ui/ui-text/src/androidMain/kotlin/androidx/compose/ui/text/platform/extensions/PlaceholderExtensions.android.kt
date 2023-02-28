@@ -26,6 +26,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.TextUnitType
 import androidx.compose.ui.util.fastForEach
+import androidx.emoji2.text.EmojiSpan
 
 internal fun Spannable.setPlaceholders(
     placeholders: List<AnnotatedString.Range<Placeholder>>,
@@ -44,6 +45,9 @@ private fun Spannable.setPlaceholder(
     end: Int,
     density: Density
 ) {
+    getSpans(start, end, EmojiSpan::class.java).forEach {
+        removeSpan(it)
+    }
     setSpan(
         with(placeholder) {
             PlaceholderSpan(

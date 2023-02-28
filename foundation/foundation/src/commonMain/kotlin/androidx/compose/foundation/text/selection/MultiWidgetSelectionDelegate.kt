@@ -30,6 +30,40 @@ internal class MultiWidgetSelectionDelegate(
     private val layoutResultCallback: () -> TextLayoutResult?
 ) : Selectable {
 
+    private var _previousTextLayoutResult: TextLayoutResult? = null
+
+    // previously calculated `lastVisibleOffset` for the `_previousTextLayoutResult`
+    private var _previousLastVisibleOffset: Int = -1
+
+    /**
+     * TextLayoutResult is not expected to change repeatedly in a BasicText composable. At least
+     * most TextLayoutResult changes would likely affect Selection logic in some way. Therefore,
+     * this value only caches the last visible offset calculation for the latest seen
+     * TextLayoutResult instance. Object equality check is not worth the extra calculation as
+     * instance check is enough to accomplish whether a text layout has changed in a meaningful
+     * way.
+     */
+    private val TextLayoutResult.lastVisibleOffset: Int
+        @Synchronized get() {
+            if (_previousTextLayoutResult !== this) {
+                val lastVisibleLine = when {
+                    !didOverflowHeight || multiParagraph.didExceedMaxLines -> lineCount - 1
+                    else -> { // size.height < multiParagraph.height
+                        var finalVisibleLine = getLineForVerticalPosition(size.height.toFloat())
+                            .coerceAtMost(lineCount - 1)
+                        // if final visible line's top is equal to or larger than text layout
+                        // result's height, we need to check above lines one by one until we find
+                        // a line that fits in boundaries.
+                        while (getLineTop(finalVisibleLine) >= size.height) finalVisibleLine--
+                        finalVisibleLine
+                    }
+                }
+                _previousLastVisibleOffset = getLineEnd(lastVisibleLine, true)
+                _previousTextLayoutResult = this
+            }
+            return _previousLastVisibleOffset
+        }
+
     override fun updateSelection(
         startHandlePosition: Offset,
         endHandlePosition: Offset,
@@ -92,9 +126,11 @@ internal class MultiWidgetSelectionDelegate(
         if (getLayoutCoordinates() == null) return Offset.Zero
 
         val textLayoutResult = layoutResultCallback() ?: return Offset.Zero
+        val offset = if (isStartHandle) selection.start.offset else selection.end.offset
+        val coercedOffset = offset.coerceIn(0, textLayoutResult.lastVisibleOffset)
         return getSelectionHandleCoordinates(
             textLayoutResult = textLayoutResult,
-            offset = if (isStartHandle) selection.start.offset else selection.end.offset,
+            offset = coercedOffset,
             isStart = isStartHandle,
             areHandlesCrossed = selection.handlesCrossed
         )
@@ -122,13 +158,18 @@ internal class MultiWidgetSelectionDelegate(
 
     override fun getRangeOfLineContaining(offset: Int): TextRange {
         val textLayoutResult = layoutResultCallback() ?: return TextRange.Zero
-        val textLength = textLayoutResult.layoutInput.text.length
-        if (textLength < 1) return TextRange.Zero
-        val line = textLayoutResult.getLineForOffset(offset.coerceIn(0, textLength - 1))
+        val visibleTextLength = textLayoutResult.lastVisibleOffset
+        if (visibleTextLength < 1) return TextRange.Zero
+        val line = textLayoutResult.getLineForOffset(offset.coerceIn(0, visibleTextLength - 1))
         return TextRange(
             start = textLayoutResult.getLineStart(line),
             end = textLayoutResult.getLineEnd(line, visibleEnd = true)
         )
+    }
+
+    override fun getLastVisibleOffset(): Int {
+        val textLayoutResult = layoutResultCallback() ?: return 0
+        return textLayoutResult.lastVisibleOffset
     }
 }
 

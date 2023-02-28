@@ -128,12 +128,27 @@ interface LayoutModifierNode : Remeasurement, DelegatableNode {
     )
 }
 
+/**
+ * This will invalidate the current node's layer, and ensure that the layer is redrawn for the next
+ * frame.
+ */
 @ExperimentalComposeUiApi
-internal fun LayoutModifierNode.invalidateLayer() =
+fun LayoutModifierNode.invalidateLayer() =
     requireCoordinator(Nodes.Layout).invalidateLayer()
 
+/**
+ * This will invalidate the current node's layout pass, and ensure that relayout of this node will
+ * happen for the next frame.
+ */
 @ExperimentalComposeUiApi
-internal fun LayoutModifierNode.requestRelayout() = requireLayoutNode().requestRelayout()
+fun LayoutModifierNode.invalidateLayout() = requireLayoutNode().requestRelayout()
+
+/**
+ * This invalidates the current node's measure result, and ensures that a remeasurement of this node
+ * will happen for the next frame.
+ */
+@ExperimentalComposeUiApi
+fun LayoutModifierNode.invalidateMeasurements() = requireLayoutNode().invalidateMeasurements()
 
 @ExperimentalComposeUiApi
 internal fun LayoutModifierNode.requestRemeasure() = requireLayoutNode().requestRemeasure()

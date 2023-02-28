@@ -16,7 +16,7 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.input.key.KeyInputModifier
+import androidx.compose.ui.focus.FocusOwner
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
@@ -26,7 +26,7 @@ import java.awt.Cursor
 
 internal actual fun sendKeyEvent(
     platformInputService: PlatformInput,
-    keyInputModifier: KeyInputModifier,
+    focusOwner: FocusOwner,
     keyEvent: KeyEvent
 ): Boolean {
     when {
@@ -35,8 +35,7 @@ internal actual fun sendKeyEvent(
         keyEvent.type == KeyEventType.KeyUp ->
             platformInputService.charKeyPressed = false
     }
-
-    return keyInputModifier.processKeyInput(keyEvent)
+    return focusOwner.dispatchKeyEvent(keyEvent)
 }
 
 private val defaultCursor = Cursor(Cursor.DEFAULT_CURSOR)

@@ -24,10 +24,10 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.unit.IntSize
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -223,6 +223,7 @@ internal class FakeSelectable : Selectable {
     var getTextCalledTimes = 0
     var selectionToReturn: Selection? = null
     var textToReturn: AnnotatedString? = null
+    var lastVisibleOffsetToReturn: Int = 0
 
     var handlePosition = Offset.Zero
     var boundingBox = Rect.Zero
@@ -287,6 +288,10 @@ internal class FakeSelectable : Selectable {
         return TextRange.Zero
     }
 
+    override fun getLastVisibleOffset(): Int {
+        return lastVisibleOffsetToReturn
+    }
+
     fun clear() {
         lastEndHandlePosition = null
         lastStartHandlePosition = null
@@ -299,5 +304,6 @@ internal class FakeSelectable : Selectable {
         getTextCalledTimes = 0
         selectionToReturn = null
         textToReturn = null
+        lastVisibleOffsetToReturn = 0
     }
 }

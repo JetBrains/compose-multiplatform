@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics
 
+import androidx.compose.ui.geometry.Offset
+
 actual fun PathMeasure(): PathMeasure = AndroidPathMeasure(android.graphics.PathMeasure())
 
 class AndroidPathMeasure internal constructor(
@@ -24,6 +26,10 @@ class AndroidPathMeasure internal constructor(
 
     override val length: Float
         get() = internalPathMeasure.length
+
+    private var positionArray: FloatArray? = null
+
+    private var tangentArray: FloatArray? = null
 
     override fun getSegment(
         startDistance: Float,
@@ -41,5 +47,39 @@ class AndroidPathMeasure internal constructor(
 
     override fun setPath(path: Path?, forceClosed: Boolean) {
         internalPathMeasure.setPath(path?.asAndroidPath(), forceClosed)
+    }
+
+    override fun getPosition(
+        distance: Float
+    ): Offset {
+        if (positionArray == null) {
+            positionArray = FloatArray(2)
+        }
+        if (tangentArray == null) {
+            tangentArray = FloatArray(2)
+        }
+        val result = internalPathMeasure.getPosTan(distance, positionArray, tangentArray)
+        return if (result) {
+            Offset(positionArray!![0], positionArray!![1])
+        } else {
+            Offset.Unspecified
+        }
+    }
+
+    override fun getTangent(
+        distance: Float
+    ): Offset {
+        if (positionArray == null) {
+            positionArray = FloatArray(2)
+        }
+        if (tangentArray == null) {
+            tangentArray = FloatArray(2)
+        }
+        val result = internalPathMeasure.getPosTan(distance, positionArray, tangentArray)
+        return if (result) {
+            Offset(tangentArray!![0], tangentArray!![1])
+        } else {
+            Offset.Unspecified
+        }
     }
 }

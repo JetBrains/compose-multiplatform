@@ -17,7 +17,9 @@
 package androidx.compose.material3
 
 import android.os.Build
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -28,6 +30,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.platform.LocalInputModeManager
@@ -39,6 +42,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performMouseInput
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
@@ -150,7 +154,8 @@ class IconButtonScreenshotTest {
         rule.setMaterialContent(lightColorScheme()) {
             localInputModeManager = LocalInputModeManager.current
             Box(wrap.testTag(wrapperTestTag)) {
-                IconButton(onClick = { /* doSomething() */ },
+                IconButton(
+                    onClick = { /* doSomething() */ },
                     modifier = Modifier
                         .focusRequester(focusRequester)
                 ) {
@@ -166,6 +171,21 @@ class IconButtonScreenshotTest {
         }
 
         assertAgainstGolden("iconButton_lightTheme_focused")
+    }
+
+    @Test
+    fun iconButton_largeContentClipped() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                IconButton(onClick = { /* doSomething() */ }) {
+                    Box(
+                        Modifier
+                            .size(100.dp)
+                            .background(Color.Blue))
+                }
+            }
+        }
+        assertAgainstGolden("iconButton_largeContentClipped")
     }
 
     @Test
@@ -214,6 +234,21 @@ class IconButtonScreenshotTest {
             }
         }
         assertAgainstGolden("iconToggleButton_checked_darkTheme")
+    }
+
+    @Test
+    fun iconToggleButton_largeContentClipped() {
+        rule.setMaterialContent(lightColorScheme()) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                IconToggleButton(checked = true, onCheckedChange = { /* doSomething() */ }) {
+                    Box(
+                        Modifier
+                            .size(100.dp)
+                            .background(Color.Blue))
+                }
+            }
+        }
+        assertAgainstGolden("iconToggleButton_largeContentClipped")
     }
 
     @Test

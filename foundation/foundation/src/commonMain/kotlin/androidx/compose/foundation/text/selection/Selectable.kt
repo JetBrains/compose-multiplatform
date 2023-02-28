@@ -20,7 +20,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.MultiParagraph
+import androidx.compose.ui.text.TextLayoutInput
 import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.unit.Constraints
 
 /**
  * Provides [Selection] information for a composable to SelectionContainer. Composables who can
@@ -117,7 +120,17 @@ internal interface Selectable {
      * Return the offsets of the start and end of the line containing [offset], or [TextRange.Zero]
      * if the selectable is empty. These offsets are in the same "coordinate space" as
      * [getBoundingBox], and despite being returned in a [TextRange], may not refer to offsets in
-     * actual text if the selectable contains other types of content.
+     * actual text if the selectable contains other types of content. This function returns
+     * the last visible line's boundaries if offset is larger than text length or the character at
+     * given offset would fall on a line which is hidden by maxLines or Constraints.
      */
     fun getRangeOfLineContaining(offset: Int): TextRange
+
+    /**
+     * Returns the last visible character's offset. Some lines can be hidden due to either
+     * [TextLayoutInput.maxLines] or [Constraints.maxHeight] being smaller than
+     * [MultiParagraph.height]. If overflow is set to clip and a line is partially visible, it
+     * counts as the last visible line.
+     */
+    fun getLastVisibleOffset(): Int
 }

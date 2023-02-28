@@ -62,6 +62,7 @@ import androidx.compose.ui.unit.LayoutDirection
     AnnotationTarget.FIELD,
     AnnotationTarget.PROPERTY_GETTER,
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class ExperimentalAnimationApi
 
 /**
@@ -116,6 +117,17 @@ sealed class EnterTransition {
             )
         )
     }
+
+    override fun toString(): String =
+        if (this == None) {
+            "EnterTransition.None"
+        } else {
+            data.run {
+                "EnterTransition: \n" + "Fade - " + fade?.toString() + ",\nSlide - " +
+                    slide?.toString() + ",\nShrink - " + changeSize?.toString() +
+                    ",\nScale - " + scale?.toString()
+            }
+        }
 
     override fun equals(other: Any?): Boolean {
         return other is EnterTransition && other.data == data
@@ -193,6 +205,17 @@ sealed class ExitTransition {
     override fun equals(other: Any?): Boolean {
         return other is ExitTransition && other.data == data
     }
+
+    override fun toString(): String =
+        if (this == None) {
+            "ExitTransition.None"
+        } else {
+            data.run {
+                "ExitTransition: \n" + "Fade - " + fade?.toString() + ",\nSlide - " +
+                    slide?.toString() + ",\nShrink - " + changeSize?.toString() +
+                    ",\nScale - " + scale?.toString()
+            }
+        }
 
     override fun hashCode(): Int = data.hashCode()
 

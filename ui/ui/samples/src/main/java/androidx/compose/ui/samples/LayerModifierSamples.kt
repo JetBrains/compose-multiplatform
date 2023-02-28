@@ -18,12 +18,19 @@ package androidx.compose.ui.samples
 
 import androidx.annotation.Sampled
 import androidx.compose.animation.core.Animatable
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.drawscope.inset
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.unit.dp
 
 @Sampled
 @Composable
@@ -44,5 +51,31 @@ fun AnimateFadeIn() {
     )
     LaunchedEffect(animatedAlpha) {
         animatedAlpha.animateTo(1f)
+    }
+}
+
+@Sampled
+@Composable
+fun CompositingStrategyModulateAlpha() {
+    Canvas(
+        modifier =
+            Modifier.size(100.dp)
+            .background(Color.Black)
+            .graphicsLayer(
+                alpha = 0.5f,
+                compositingStrategy = CompositingStrategy.ModulateAlpha
+            )
+    ) {
+        // Configuring an alpha less than 1.0 and specifying
+        // CompositingStrategy.ModulateAlpha ends up with the overlapping region
+        // of the 2 draw rect calls to blend transparent blue and transparent red
+        // against the black background instead of just transparent blue which is what would
+        // occur with CompositingStrategy.Auto or CompositingStrategy.Offscreen
+        inset(0f, 0f, size.width / 3, size.height / 3) {
+            drawRect(color = Color.Red)
+        }
+        inset(size.width / 3, size.height / 3, 0f, 0f) {
+            drawRect(color = Color.Blue)
+        }
     }
 }

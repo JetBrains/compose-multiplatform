@@ -180,6 +180,272 @@ class AnnotatedStringBuilderTest {
     }
 
     @Test
+    fun append_withAnnotatedStringAndRange_appendsTheText() {
+        val text = "a"
+        val annotatedString = AnnotatedString(
+            text = text,
+            spanStylesOrNull = listOf(
+                text.inclusiveRangeOf('a', 'a', item = SpanStyle(color = Color.Red))
+            ),
+            paragraphStylesOrNull = listOf(
+                text.inclusiveRangeOf('a', 'a', item = ParagraphStyle(lineHeight = 20.sp))
+            ),
+            annotations = listOf(
+                text.inclusiveRangeOf('a', 'a', item = "prefix", tag = "prefixTag")
+            )
+        )
+
+        // We want to test the cross product of the following cases:
+        // - Range beginning at start, ending at end-1, completely overlapping [start,end), and
+        //   completely inside (start, end-1).
+        // - SpanStyle, ParagraphStyle, annotation
+        val appendedText = "bcdef"
+        val appendedSpanStyles = listOf(
+            appendedText.inclusiveRangeOf('b', 'f', item = SpanStyle(color = Color.Blue)),
+            appendedText.inclusiveRangeOf('c', 'f', item = SpanStyle(color = Color.Green)),
+            appendedText.inclusiveRangeOf('b', 'e', item = SpanStyle(color = Color.Yellow)),
+            appendedText.inclusiveRangeOf('c', 'e', item = SpanStyle(color = Color.Magenta)),
+        )
+        // Paragraph styles can't overlap.
+        val appendedParagraphStyles = listOf(
+            appendedText.inclusiveRangeOf('b', 'b', item = ParagraphStyle(lineHeight = 30.sp)),
+            appendedText.inclusiveRangeOf('c', 'c', item = ParagraphStyle(lineHeight = 40.sp)),
+            appendedText.inclusiveRangeOf('d', 'd', item = ParagraphStyle(lineHeight = 50.sp)),
+            appendedText.inclusiveRangeOf('e', 'e', item = ParagraphStyle(lineHeight = 60.sp)),
+            appendedText.inclusiveRangeOf('f', 'f', item = ParagraphStyle(lineHeight = 70.sp)),
+        )
+        val appendedAnnotations = listOf(
+            appendedText.inclusiveRangeOf('b', 'f', item = 1, tag = "tag1"),
+            appendedText.inclusiveRangeOf('c', 'f', item = 2, tag = "tag2"),
+            appendedText.inclusiveRangeOf('b', 'e', item = 3, tag = "tag3"),
+            appendedText.inclusiveRangeOf('c', 'e', item = 4, tag = "tag4"),
+        )
+        val appendedAnnotatedString = AnnotatedString(
+            text = appendedText,
+            spanStylesOrNull = appendedSpanStyles,
+            paragraphStylesOrNull = appendedParagraphStyles,
+            annotations = appendedAnnotations
+        )
+
+        val buildResult = with(AnnotatedString.Builder(annotatedString)) {
+            // Append everything but the first and last characters of the appended string.
+            append(
+                appendedAnnotatedString,
+                start = appendedText.indexOf('c'),
+                end = appendedText.indexOf('e') + 1
+            )
+            toAnnotatedString()
+        }
+
+        val expectedString = "acde"
+        val expectedSpanStyles = listOf(
+            expectedString.inclusiveRangeOf('a', 'a', item = SpanStyle(color = Color.Red)),
+            expectedString.inclusiveRangeOf('c', 'e', item = SpanStyle(color = Color.Blue)),
+            expectedString.inclusiveRangeOf('c', 'e', item = SpanStyle(color = Color.Green)),
+            expectedString.inclusiveRangeOf('c', 'e', item = SpanStyle(color = Color.Yellow)),
+            expectedString.inclusiveRangeOf('c', 'e', item = SpanStyle(color = Color.Magenta)),
+        )
+        val expectedParagraphStyles = listOf(
+            expectedString.inclusiveRangeOf('a', 'a', item = ParagraphStyle(lineHeight = 20.sp)),
+            expectedString.inclusiveRangeOf('c', 'c', item = ParagraphStyle(lineHeight = 40.sp)),
+            expectedString.inclusiveRangeOf('d', 'd', item = ParagraphStyle(lineHeight = 50.sp)),
+            expectedString.inclusiveRangeOf('e', 'e', item = ParagraphStyle(lineHeight = 60.sp)),
+        )
+        val expectedAnnotations = listOf(
+            expectedString.inclusiveRangeOf('a', 'a', item = "prefix", tag = "prefixTag"),
+            expectedString.inclusiveRangeOf('c', 'e', item = 1, tag = "tag1"),
+            expectedString.inclusiveRangeOf('c', 'e', item = 2, tag = "tag2"),
+            expectedString.inclusiveRangeOf('c', 'e', item = 3, tag = "tag3"),
+            expectedString.inclusiveRangeOf('c', 'e', item = 4, tag = "tag4"),
+        )
+
+        assertThat(buildResult.text).isEqualTo(expectedString)
+        assertThat(buildResult.spanStyles).isEqualTo(expectedSpanStyles)
+        assertThat(buildResult.paragraphStyles).isEqualTo(expectedParagraphStyles)
+        assertThat(buildResult.annotations).isEqualTo(expectedAnnotations)
+    }
+
+    @Test
+    fun append_withCharSequence_appendsTheText_whenAnnotatedString() {
+        val color = Color.Red
+        val text = "a"
+        val lineHeight = 20.sp
+        val annotatedString = createAnnotatedString(
+            text = text,
+            color = color,
+            lineHeight = lineHeight
+        )
+
+        val appendedColor = Color.Blue
+        val appendedText = "b"
+        val appendedLineHeight = 30.sp
+        val appendedAnnotatedString = createAnnotatedString(
+            text = appendedText,
+            color = appendedColor,
+            lineHeight = appendedLineHeight
+        )
+
+        val buildResult = with(AnnotatedString.Builder(annotatedString)) {
+            // Cast forces dispatch to the more general method, using the return value ensures
+            // the right method was selected.
+            append(appendedAnnotatedString as CharSequence)
+                .toAnnotatedString()
+        }
+
+        val expectedString = "$text$appendedText"
+        val expectedSpanStyles = listOf(
+            Range(
+                item = SpanStyle(color),
+                start = 0,
+                end = text.length
+            ),
+            Range(
+                item = SpanStyle(appendedColor),
+                start = text.length,
+                end = expectedString.length
+            )
+        )
+
+        val expectedParagraphStyles = listOf(
+            Range(
+                item = ParagraphStyle(lineHeight = lineHeight),
+                start = 0,
+                end = text.length
+            ),
+            Range(
+                item = ParagraphStyle(lineHeight = appendedLineHeight),
+                start = text.length,
+                end = expectedString.length
+            )
+        )
+
+        assertThat(buildResult.text).isEqualTo(expectedString)
+        assertThat(buildResult.spanStyles).isEqualTo(expectedSpanStyles)
+        assertThat(buildResult.paragraphStyles).isEqualTo(expectedParagraphStyles)
+    }
+
+    @Test
+    fun append_withCharSequence_appendsTheText_whenNotAnnotatedString() {
+        val text = "a"
+        val appendedText = object : CharSequence by "bc" {}
+        val annotatedString = with(AnnotatedString.Builder(text)) {
+            append(appendedText)
+            toAnnotatedString()
+        }
+
+        val expectedString = "abc"
+
+        assertThat(annotatedString.text).isEqualTo(expectedString)
+        assertThat(annotatedString.spanStyles).isEmpty()
+        assertThat(annotatedString.paragraphStyles).isEmpty()
+    }
+
+    // The edge cases for range-based AnnotatedString append are tested in depth by other tests that
+    // just call the append(AnnotatedString, Int, Int) method – the CharSequence overload just
+    // delegates to that, so this test is much more basic.
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun append_withCharSequenceAndRange_appendsTheText_whenAnnotatedString() {
+        val color = Color.Red
+        val text = "a"
+        val lineHeight = 20.sp
+        val annotatedString = createAnnotatedString(
+            text = text,
+            color = color,
+            lineHeight = lineHeight
+        )
+
+        // b-g will have a style span.
+        // c-f will have a paragraph span.
+        // de will have an annotation.
+        val appendedText = "b(c(de)f)g"
+        val appendedColor = Color.Blue
+        val appendedLineHeight = 30.sp
+        val appendedAnnotationTag = "tag"
+        val appendedAnnotation = "annotation"
+        val appendedAnnotatedString = buildAnnotatedString {
+            withStyle(SpanStyle(color = appendedColor)) {
+                append("b(")
+                withStyle(ParagraphStyle(lineHeight = appendedLineHeight)) {
+                    append("c(")
+                    withAnnotation(appendedAnnotationTag, appendedAnnotation) {
+                        append("de")
+                    }
+                    append(")f")
+                }
+                append(")g")
+            }
+        }
+
+        val buildResult = with(AnnotatedString.Builder(annotatedString)) {
+            // Cast forces dispatch to the more general method, using the return value ensures
+            // the right method was selected.
+            append(
+                appendedAnnotatedString as CharSequence,
+                start = appendedText.indexOf('c'),
+                end = appendedText.indexOf('f') + 1
+            ).toAnnotatedString()
+        }
+
+        val expectedString = "ac(de)f"
+        val expectedSpanStyles = listOf(
+            Range(
+                item = SpanStyle(color),
+                start = 0,
+                end = text.length
+            ),
+            Range(
+                item = SpanStyle(appendedColor),
+                start = text.length,
+                end = expectedString.length
+            )
+        )
+
+        val expectedParagraphStyles = listOf(
+            Range(
+                item = ParagraphStyle(lineHeight = lineHeight),
+                start = 0,
+                end = text.length
+            ),
+            Range(
+                item = ParagraphStyle(lineHeight = appendedLineHeight),
+                start = text.length,
+                end = expectedString.length
+            )
+        )
+
+        val expectedAnnotations = listOf(
+            Range(
+                tag = appendedAnnotationTag,
+                item = appendedAnnotation,
+                start = expectedString.indexOf('d'),
+                end = expectedString.indexOf('e') + 1
+            )
+        )
+
+        assertThat(buildResult.text).isEqualTo(expectedString)
+        assertThat(buildResult.spanStyles).isEqualTo(expectedSpanStyles)
+        assertThat(buildResult.paragraphStyles).isEqualTo(expectedParagraphStyles)
+        assertThat(buildResult.annotations).isEqualTo(expectedAnnotations)
+    }
+
+    @Test
+    fun append_withCharSequenceAndRange_appendsTheText_whenNotAnnotatedString() {
+        val text = "a"
+        val appendedText = object : CharSequence by "bcde" {}
+        val annotatedString = with(AnnotatedString.Builder(text)) {
+            append(appendedText, 1, 3)
+            toAnnotatedString()
+        }
+
+        val expectedString = "acd"
+
+        assertThat(annotatedString.text).isEqualTo(expectedString)
+        assertThat(annotatedString.spanStyles).isEmpty()
+        assertThat(annotatedString.paragraphStyles).isEmpty()
+    }
+
+    @Test
     fun pushStyle() {
         val text = "Test"
         val style = SpanStyle(color = Color.Red)
@@ -584,6 +850,35 @@ class AnnotatedStringBuilderTest {
     }
 
     @Test
+    fun hasStringAnnotationTrue() {
+        val text = "Test"
+        val annotation = "Annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushStringAnnotation(tag, annotation)
+            append(text)
+            pop()
+        }.toAnnotatedString()
+
+        assertThat(buildResult.hasStringAnnotations(tag, 0, text.length)).isTrue()
+    }
+
+    @Test
+    fun hasStringAnnotationFalse() {
+        val text = "Test"
+        val annotation = "Annotation"
+        val tag = "tag"
+        val buildResult = AnnotatedString.Builder().apply {
+            pushStringAnnotation(tag, annotation)
+            append(text)
+            pop()
+            append(text)
+        }.toAnnotatedString()
+
+        assertThat(buildResult.hasStringAnnotations(tag, text.length, buildResult.length)).isFalse()
+    }
+
+    @Test
     fun pushAnnotation_multiple_nested() {
         val annotation1 = "Annotation1"
         val annotation2 = "Annotation2"
@@ -853,4 +1148,19 @@ class AnnotatedStringBuilderTest {
             )
         )
     }
+
+    /**
+     * Returns a [Range] from the index of [start] to the index of [end], both inclusive.
+     */
+    private fun <T> String.inclusiveRangeOf(
+        start: Char,
+        end: Char,
+        item: T,
+        tag: String = ""
+    ) = Range(
+        tag = tag,
+        item = item,
+        start = indexOf(start),
+        end = indexOf(end) + 1
+    )
 }

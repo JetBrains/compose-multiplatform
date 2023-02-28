@@ -32,7 +32,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -58,10 +57,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.math.roundToInt
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.launch
 
 /**
  * Possible values of [DrawerState].
@@ -113,10 +112,11 @@ class DrawerState(
     confirmStateChange: (DrawerValue) -> Boolean = { true }
 ) {
 
-    internal val swipeableState = SwipeableState(
+    internal val swipeableState = SwipeableV2State(
         initialValue = initialValue,
         animationSpec = AnimationSpec,
-        confirmStateChange = confirmStateChange
+        confirmValueChange = confirmStateChange,
+        velocityThreshold = DrawerVelocityThreshold
     )
 
     /**
@@ -158,7 +158,7 @@ class DrawerState(
      *
      * @return the reason the open animation ended
      */
-    suspend fun open() = animateTo(DrawerValue.Open, AnimationSpec)
+    suspend fun open() = swipeableState.animateTo(DrawerValue.Open)
 
     /**
      * Close the drawer with animation and suspend until it if fully closed or animation has been
@@ -167,17 +167,25 @@ class DrawerState(
      *
      * @return the reason the close animation ended
      */
-    suspend fun close() = animateTo(DrawerValue.Closed, AnimationSpec)
+    suspend fun close() = swipeableState.animateTo(DrawerValue.Closed)
 
     /**
      * Set the state of the drawer with specific animation
      *
      * @param targetValue The new value to animate to.
-     * @param anim The animation that will be used to animate to the new value.
+     * @param anim Set the state of the drawer with specific animation
      */
     @ExperimentalMaterialApi
-    suspend fun animateTo(targetValue: DrawerValue, anim: AnimationSpec<Float>) {
-        swipeableState.animateTo(targetValue, anim)
+    @Deprecated(
+        message = "This method has been replaced by the open and close methods. The animation " +
+            "spec is now an implementation detail of ModalDrawer.",
+        level = DeprecationLevel.ERROR
+    )
+    suspend fun animateTo(
+        targetValue: DrawerValue,
+        @Suppress("UNUSED_PARAMETER") anim: AnimationSpec<Float>
+    ) {
+        swipeableState.animateTo(targetValue)
     }
 
     /**
@@ -185,7 +193,6 @@ class DrawerState(
      *
      * @param targetValue The new target value
      */
-    @ExperimentalMaterialApi
     suspend fun snapTo(targetValue: DrawerValue) {
         swipeableState.snapTo(targetValue)
     }
@@ -204,13 +211,18 @@ class DrawerState(
         get() = swipeableState.targetValue
 
     /**
-     * The current position (in pixels) of the drawer sheet.
+     * The current position (in pixels) of the drawer sheet, or null before the offset is
+     * initialized.
+     * @see [SwipeableV2State.offset] for more information.
      */
     @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @get:Suppress("AutoBoxing")
     @ExperimentalMaterialApi
     @get:ExperimentalMaterialApi
-    val offset: State<Float>
+    val offset: Float?
         get() = swipeableState.offset
+
+    internal fun requireOffset(): Float = swipeableState.requireOffset()
 
     companion object {
         /**
@@ -394,19 +406,24 @@ fun ModalDrawer(
         val minValue = -modalDrawerConstraints.maxWidth.toFloat()
         val maxValue = 0f
 
-        val anchors = mapOf(minValue to DrawerValue.Closed, maxValue to DrawerValue.Open)
         val isRtl = LocalLayoutDirection.current == LayoutDirection.Rtl
         Box(
-            Modifier.swipeable(
-                state = drawerState.swipeableState,
-                anchors = anchors,
-                thresholds = { _, _ -> FractionalThreshold(0.5f) },
-                orientation = Orientation.Horizontal,
-                enabled = gesturesEnabled,
-                reverseDirection = isRtl,
-                velocityThreshold = DrawerVelocityThreshold,
-                resistance = null
-            )
+            Modifier
+                .swipeableV2(
+                    state = drawerState.swipeableState,
+                    orientation = Orientation.Horizontal,
+                    enabled = gesturesEnabled,
+                    reverseDirection = isRtl
+                )
+                .swipeAnchors(
+                    drawerState.swipeableState,
+                    possibleValues = setOf(DrawerValue.Closed, DrawerValue.Open)
+                ) { value, _ ->
+                    when (value) {
+                        DrawerValue.Closed -> minValue
+                        DrawerValue.Open -> maxValue
+                    }
+                }
         ) {
             Box {
                 content()
@@ -416,13 +433,13 @@ fun ModalDrawer(
                 onClose = {
                     if (
                         gesturesEnabled &&
-                        drawerState.swipeableState.confirmStateChange(DrawerValue.Closed)
+                        drawerState.swipeableState.confirmValueChange(DrawerValue.Closed)
                     ) {
                         scope.launch { drawerState.close() }
                     }
                 },
                 fraction = {
-                    calculateFraction(minValue, maxValue, drawerState.offset.value)
+                    calculateFraction(minValue, maxValue, drawerState.requireOffset())
                 },
                 color = scrimColor
             )
@@ -437,7 +454,13 @@ fun ModalDrawer(
                             maxHeight = modalDrawerConstraints.maxHeight.toDp()
                         )
                 }
-                    .offset { IntOffset(drawerState.offset.value.roundToInt(), 0) }
+                    .offset {
+                        IntOffset(
+                            drawerState
+                                .requireOffset()
+                                .roundToInt(), 0
+                        )
+                    }
                     .padding(end = EndDrawerPadding)
                     .semantics {
                         paneTitle = navigationMenu
@@ -445,7 +468,7 @@ fun ModalDrawer(
                             dismiss {
                                 if (
                                     drawerState.swipeableState
-                                        .confirmStateChange(DrawerValue.Closed)
+                                        .confirmValueChange(DrawerValue.Closed)
                                 ) {
                                     scope.launch { drawerState.close() }
                                 }; true

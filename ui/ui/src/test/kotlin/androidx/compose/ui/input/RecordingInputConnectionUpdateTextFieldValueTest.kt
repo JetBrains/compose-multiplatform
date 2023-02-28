@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.input
 
-import android.view.View
 import android.view.inputmethod.ExtractedText
 import android.view.inputmethod.InputConnection
 import androidx.compose.ui.text.TextRange
@@ -25,17 +24,17 @@ import androidx.compose.ui.text.input.InputMethodManager
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.argumentCaptor
-import com.nhaarman.mockitokotlin2.eq
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.never
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.mockito.kotlin.any
+import org.mockito.kotlin.argumentCaptor
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.never
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
 
 @RunWith(JUnit4::class)
 class RecordingInputConnectionUpdateTextFieldValueTest {
@@ -56,48 +55,45 @@ class RecordingInputConnectionUpdateTextFieldValueTest {
     @Test
     fun test_update_input_state() {
         val imm: InputMethodManager = mock()
-        val view: View = mock()
 
         val inputState = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
-        ic.updateInputState(inputState, imm, view)
+        ic.updateInputState(inputState, imm)
 
-        verify(imm, times(1)).updateSelection(eq(view), eq(0), eq(0), eq(-1), eq(-1))
-        verify(imm, never()).updateExtractedText(any(), any(), any())
+        verify(imm, times(1)).updateSelection(eq(0), eq(0), eq(-1), eq(-1))
+        verify(imm, never()).updateExtractedText(any(), any())
     }
 
     @Test
     fun test_update_input_state_inactive() {
         val imm: InputMethodManager = mock()
-        val view: View = mock()
 
         val previousTextFieldValue = ic.mTextFieldValue
         ic.closeConnection()
 
         val inputState = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
-        ic.updateInputState(inputState, imm, view)
+        ic.updateInputState(inputState, imm)
 
         assertThat(ic.mTextFieldValue).isEqualTo(previousTextFieldValue)
-        verify(imm, never()).updateSelection(any(), any(), any(), any(), any())
-        verify(imm, never()).updateExtractedText(any(), any(), any())
+        verify(imm, never()).updateSelection(any(), any(), any(), any())
+        verify(imm, never()).updateExtractedText(any(), any())
     }
 
     @Test
     fun test_update_input_state_extracted_text_monitor() {
         val imm: InputMethodManager = mock()
-        val view: View = mock()
 
         ic.getExtractedText(null, InputConnection.GET_EXTRACTED_TEXT_MONITOR)
 
         val inputState = TextFieldValue(text = "Hello, World.", selection = TextRange.Zero)
 
-        ic.updateInputState(inputState, imm, view)
+        ic.updateInputState(inputState, imm)
 
-        verify(imm, times(1)).updateSelection(eq(view), eq(0), eq(0), eq(-1), eq(-1))
+        verify(imm, times(1)).updateSelection(eq(0), eq(0), eq(-1), eq(-1))
 
         val captor = argumentCaptor<ExtractedText>()
 
-        verify(imm, times(1)).updateExtractedText(any(), any(), captor.capture())
+        verify(imm, times(1)).updateExtractedText(any(), captor.capture())
 
         assertThat(captor.allValues.size).isEqualTo(1)
         assertThat(captor.firstValue.text).isEqualTo("Hello, World.")

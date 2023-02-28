@@ -45,14 +45,14 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.packInts
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.anyOrNull
-import com.nhaarman.mockitokotlin2.isNull
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.spy
-import com.nhaarman.mockitokotlin2.times
-import com.nhaarman.mockitokotlin2.verify
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.isNull
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.spy
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -510,7 +510,8 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
-    fun showSelectionToolbar_trigger_textToolbar_showMenu_Clipboard_empty_not_show_paste() {
+    fun showSelectionToolbar_trigger_textToolbar_showMenu_noText_inClipboard_not_show_paste() {
+        whenever(clipboardManager.hasText()).thenReturn(false)
         manager.value = TextFieldValue(
             text = text + text,
             selection = TextRange("Hello".length, text.length)
@@ -522,8 +523,23 @@ class TextFieldSelectionManagerTest {
     }
 
     @Test
+    fun showSelectionToolbar_trigger_textToolbar_showMenu_hasText_inClipboard_show_paste() {
+        whenever(clipboardManager.hasText()).thenReturn(true)
+        manager.value = TextFieldValue(
+            text = text + text,
+            selection = TextRange("Hello".length, text.length)
+        )
+
+        manager.showSelectionToolbar()
+
+        verify(textToolbar, times(1))
+            .showMenu(anyOrNull(), anyOrNull(), any(), anyOrNull(), anyOrNull())
+    }
+
+    @Test
     fun showSelectionToolbar_trigger_textToolbar_showMenu_selection_collapse_not_show_copy_cut() {
         whenever(clipboardManager.getText()).thenReturn(AnnotatedString(text))
+        whenever(clipboardManager.hasText()).thenReturn(true)
         manager.value = TextFieldValue(
             text = text + text,
             selection = TextRange(0, 0)
@@ -536,7 +552,7 @@ class TextFieldSelectionManagerTest {
 
     @Test
     fun showSelectionToolbar_trigger_textToolbar_showMenu_no_text_show_paste_only() {
-        whenever(clipboardManager.getText()).thenReturn(AnnotatedString(text))
+        whenever(clipboardManager.hasText()).thenReturn(true)
         manager.value = TextFieldValue()
 
         manager.showSelectionToolbar()
@@ -547,6 +563,7 @@ class TextFieldSelectionManagerTest {
     @Test
     fun showSelectionToolbar_trigger_textToolbar_no_menu() {
         whenever(clipboardManager.getText()).thenReturn(null)
+        whenever(clipboardManager.hasText()).thenReturn(false)
         manager.value = TextFieldValue()
 
         manager.showSelectionToolbar()
@@ -558,6 +575,7 @@ class TextFieldSelectionManagerTest {
     fun showSelectionToolbar_passwordTextField_not_show_copy_cut() {
         manager.visualTransformation = PasswordVisualTransformation()
         whenever(clipboardManager.getText()).thenReturn(AnnotatedString(text))
+        whenever(clipboardManager.hasText()).thenReturn(true)
         manager.value = TextFieldValue(text, TextRange(0, 5))
 
         manager.showSelectionToolbar()

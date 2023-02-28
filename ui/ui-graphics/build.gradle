@@ -36,7 +36,7 @@ if(!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         api("androidx.annotation:annotation:1.2.0")
         api(project(":compose:ui:ui-unit"))
 
-        implementation("androidx.compose.runtime:runtime:1.1.1")
+        implementation("androidx.compose.runtime:runtime:1.2.1")
         implementation(project(":compose:ui:ui-util"))
         implementation(libs.kotlinStdlibCommon)
 
@@ -148,7 +148,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Graphics"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2020"
     description = "Compose graphics"
     legacyDisableKotlinStrictApiMode = true
@@ -165,13 +164,5 @@ android {
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
         systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
-    }
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
     }
 }

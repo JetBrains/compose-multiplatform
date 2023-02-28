@@ -47,6 +47,7 @@ import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -65,6 +66,23 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.BottomAppBar
+import androidx.compose.material.DrawerValue
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.FabPosition
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.rememberDrawerState
+import androidx.compose.material.rememberScaffoldState
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
@@ -78,13 +96,17 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.toComposeRect
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.ClassName
 import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.InvalidId
+import androidx.compose.ui.platform.AndroidComposeViewAccessibilityDelegateCompat.Companion.TextFieldClassName
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.getAllUncoveredSemanticsNodesToMap
 import androidx.compose.ui.platform.testTag
@@ -96,6 +118,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.getOrNull
 import androidx.compose.ui.semantics.invisibleToUser
+import androidx.compose.ui.semantics.isContainer
 import androidx.compose.ui.semantics.paneTitle
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -128,7 +151,11 @@ import androidx.compose.ui.text.input.TransformedText
 import androidx.compose.ui.text.intl.LocaleList
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.util.fastForEach
+import androidx.compose.ui.util.fastMap
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.core.view.ViewCompat
@@ -163,6 +190,7 @@ import org.mockito.ArgumentMatcher
 import org.mockito.ArgumentMatchers.any
 import org.mockito.internal.matchers.apachecommons.ReflectionEquals
 import java.lang.reflect.Method
+import kotlin.math.max
 
 @LargeTest
 @RunWith(AndroidJUnit4::class)
@@ -257,7 +285,9 @@ class AndroidAccessibilityTest {
         // We temporary send Switch role as a separate fake node
         val switchRoleNode = toggleableNode.replacedChildren.last()
         val switchRoleNodeInfo = provider.createAccessibilityNodeInfo(switchRoleNode.id)!!
-        assertEquals("android.widget.Switch", switchRoleNodeInfo.className)
+        assertEquals("android.view.View", switchRoleNodeInfo.className)
+// TODO(aelias)
+        // assertEquals("Switch", switchRoleNodeInfo.roleDescription)
 
         val stateDescription = when {
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.R -> {
@@ -273,6 +303,46 @@ class AndroidAccessibilityTest {
             }
         }
         assertEquals("On", stateDescription)
+        assertTrue(accessibilityNodeInfo.isClickable)
+        assertTrue(accessibilityNodeInfo.isVisibleToUser)
+        assertTrue(
+            accessibilityNodeInfo.actionList.contains(
+                AccessibilityNodeInfo.AccessibilityAction(ACTION_CLICK, null)
+            )
+        )
+    }
+
+    @Test
+    fun testCreateAccessibilityNodeInfo_forDropdown() {
+        val options = listOf("Option1", "Option2", "Option3", "Option4", "Option5")
+        val tag = "Dropdown"
+        container.setContent {
+            var expanded by remember { mutableStateOf(false) }
+            IconButton(
+                modifier = Modifier
+                    .semantics { role = Role.DropdownList }
+                    .testTag(tag),
+                onClick = { expanded = true }) {
+                Icon(Icons.Default.MoreVert, null)
+            }
+            DropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false },
+                offset = DpOffset(24.dp, 0.dp),
+            ) {
+                options.forEach {
+                    DropdownMenuItem(onClick = {}) {
+                        Text(it)
+                    }
+                }
+            }
+        }
+
+        val dropdownIcon = rule.onNodeWithTag(tag, true)
+            .fetchSemanticsNode("couldn't find node with tag $tag")
+        val accessibilityNodeInfo = provider.createAccessibilityNodeInfo(dropdownIcon.id)!!
+
+        assertEquals("android.widget.Spinner", accessibilityNodeInfo.className)
         assertTrue(accessibilityNodeInfo.isClickable)
         assertTrue(accessibilityNodeInfo.isVisibleToUser)
         assertTrue(
@@ -556,6 +626,832 @@ class AndroidAccessibilityTest {
             )
         )
         @Suppress("DEPRECATION") accessibilityNodeInfo.recycle()
+    }
+
+    @Composable
+    fun LastElementOverLaidColumn(
+        modifier: Modifier = Modifier,
+        content: @Composable () -> Unit,
+    ) {
+        var yPosition = 0
+
+        Layout(modifier = modifier, content = content) { measurables, constraints ->
+            val placeables = measurables.map { measurable ->
+                measurable.measure(constraints)
+            }
+
+            layout(constraints.maxWidth, constraints.maxHeight) {
+                placeables.forEach { placeable ->
+                    if (placeable != placeables[placeables.lastIndex]) {
+                        placeable.placeRelative(x = 0, y = yPosition)
+                        yPosition += placeable.height
+                    } else {
+                        // if the element is our last element (our overlaid node)
+                        // then we'll put it over the middle of our previous elements
+                        placeable.placeRelative(x = 0, y = yPosition / 2)
+                    }
+                }
+            }
+        }
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_forTraversalBefore_overlaidNodeLayout() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row {
+                    Column {
+                        Row { Text(text1) }
+                        Row { Text(text2) }
+                        Row { Text(text3) }
+                    }
+                }
+                Row {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val overlaidNode = rule.onNodeWithText(overlaidText).fetchSemanticsNode()
+
+        val ani3 = provider.createAccessibilityNodeInfo(node3.id)
+        val ani3TraversalBeforeVal = ani3?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode should be read last
+        assertNotEquals(ani3TraversalBeforeVal, 0)
+        assertEquals(ani3TraversalBeforeVal, overlaidNode.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_forTraversalAfter_overlaidNodeLayout() {
+        val overlaidText = "Overlaid node text"
+        val text1 = "Lorem1 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text2 = "Lorem2 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        val text3 = "Lorem3 ipsum dolor sit amet, consectetur adipiscing elit.\n"
+        container.setContent {
+            LastElementOverLaidColumn(modifier = Modifier.padding(8.dp)) {
+                Row {
+                    Column {
+                        Row { Text(text1) }
+                        Row { Text(text2) }
+                        Row { Text(text3) }
+                    }
+                }
+                Row {
+                    Text(overlaidText)
+                }
+            }
+        }
+
+        val node3 = rule.onNodeWithText(text3).fetchSemanticsNode()
+        val overlaidNode = rule.onNodeWithText(overlaidText).fetchSemanticsNode()
+
+        val overlaidANI = provider.createAccessibilityNodeInfo(overlaidNode.id)
+        val overlaidTraversalAfterValue =
+            overlaidANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // Nodes 1, 2, and 3 are all children of a larger column; this means with a hierarchy
+        // comparison (like SemanticsSort), the third text node should come before the overlaid node
+        // — OverlaidNode should be read last
+        assertNotEquals(overlaidTraversalAfterValue, 0)
+        assertEquals(overlaidTraversalAfterValue, node3.id)
+    }
+
+    @Composable
+    fun CardRow(
+        modifier: Modifier,
+        columnNumber: Int,
+        topSampleText: String,
+        bottomSampleText: String
+    ) {
+        Row(
+            modifier,
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.End
+        ) {
+            Column {
+                Text(topSampleText + columnNumber)
+                Text(bottomSampleText + columnNumber)
+            }
+        }
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_nestedContainers_outerFalse() {
+        var topSampleText = "Top text in column "
+        var bottomSampleText = "Bottom text in column "
+        container.setContent {
+            Column(
+                Modifier
+                    .testTag("Test Tag")
+                    .semantics { isContainer = false }
+            ) {
+                Row() { Modifier.semantics { isContainer = false }
+                    CardRow(
+                        Modifier.semantics { isContainer = true },
+                        1,
+                        topSampleText,
+                        bottomSampleText)
+                    CardRow(
+                        Modifier.semantics { isContainer = true },
+                        2,
+                        topSampleText,
+                        bottomSampleText)
+                }
+            }
+        }
+
+        val topText1 = rule.onNodeWithText(topSampleText + 1).fetchSemanticsNode()
+        val topText2 = rule.onNodeWithText(topSampleText + 2).fetchSemanticsNode()
+        val bottomText1 = rule.onNodeWithText(bottomSampleText + 1).fetchSemanticsNode()
+        val bottomText2 = rule.onNodeWithText(bottomSampleText + 2).fetchSemanticsNode()
+
+        val topText1ANI = provider.createAccessibilityNodeInfo(topText1.id)
+        val topText2ANI = provider.createAccessibilityNodeInfo(topText2.id)
+
+        val topText1Before = topText1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val topText2Before = topText2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Here we have the following hierarchy of containers:
+        // `isContainer = false`
+        //    `isContainer = false`
+        //       `isContainer = true`
+        //       `isContainer = true`
+        // meaning the behavior should be as if the first two `isContainer = false` are not present
+        // and all of column 1 should be read before column 2.
+        assertEquals(topText1Before, bottomText1.id)
+        assertEquals(topText2Before, bottomText2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_nestedContainers_outerTrue() {
+        var topSampleText = "Top text in column "
+        var bottomSampleText = "Bottom text in column "
+        container.setContent {
+            Column(
+                Modifier
+                    .testTag("Test Tag")
+                    .semantics { isContainer = true }
+            ) {
+                Row() { Modifier.semantics { isContainer = true }
+                    CardRow(
+                        Modifier
+                            .testTag("Row 1")
+                            .semantics { isContainer = false },
+                        1,
+                        topSampleText,
+                        bottomSampleText)
+                    CardRow(
+                        Modifier
+                            .testTag("Row 2")
+                            .semantics { isContainer = false },
+                        2,
+                        topSampleText,
+                        bottomSampleText)
+                }
+            }
+        }
+
+        val bottomText1 = rule.onNodeWithText(bottomSampleText + 1).fetchSemanticsNode()
+        val bottomText2 = rule.onNodeWithText(bottomSampleText + 2).fetchSemanticsNode()
+
+        val bottomText1ANI = provider.createAccessibilityNodeInfo(bottomText1.id)
+        val bottomText1Before = bottomText1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Here we have the following hierarchy of containers:
+        // `isContainer = true`
+        //    `isContainer = true`
+        //       `isContainer = false`
+        //       `isContainer = false`
+        // In this case, we expect all the top text to be read first, then all the bottom text
+        assertEquals(bottomText1Before, bottomText2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_tripleNestedContainers() {
+        var topSampleText = "Top "
+        var bottomSampleText = "Bottom "
+        container.setContent {
+            Row {
+                CardRow(
+                    Modifier.semantics { isContainer = false },
+                    1,
+                    topSampleText,
+                    bottomSampleText)
+                CardRow(
+                    Modifier.semantics { isContainer = false },
+                    2,
+                    topSampleText,
+                    bottomSampleText)
+                CardRow(
+                    Modifier.semantics { isContainer = true },
+                    3,
+                    topSampleText,
+                    bottomSampleText)
+            }
+        }
+
+        val bottomText1 = rule.onNodeWithText(bottomSampleText + 1).fetchSemanticsNode()
+        val bottomText2 = rule.onNodeWithText(bottomSampleText + 2).fetchSemanticsNode()
+        val bottomText3 = rule.onNodeWithText(bottomSampleText + 3).fetchSemanticsNode()
+        val topText3 = rule.onNodeWithText(topSampleText + 3).fetchSemanticsNode()
+
+        val bottomText1ANI = provider.createAccessibilityNodeInfo(bottomText1.id)
+        val bottomText1Before = bottomText1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        val topText3ANI = provider.createAccessibilityNodeInfo(topText3.id)
+        val topText3Before = topText3ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Here we have the following hierarchy of containers:
+        // `isContainer = false`
+        // `isContainer = false`
+        // `isContainer = true`
+        // In this case, we expect to read in the order of: Top 1, Top 2, Bottom 1, Bottom 2,
+        // then Top 3, Bottom 3. The first two containers are effectively merged since they are both
+        // set to false, while the third container is structurally significant.
+        assertEquals(bottomText1Before, bottomText2.id)
+        assertEquals(topText3Before, bottomText3.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_nestedContainers_hierarchy() {
+        var topSampleText = "Top text in column "
+        var bottomSampleText = "Bottom text in column "
+
+        container.setContent {
+            Row {
+                CardRow(
+                    Modifier
+                        // adding a vertical scroll here makes the column scrollable, which would
+                        // normally make it structurally significant
+                        .verticalScroll(rememberScrollState())
+                        // but adding in `container = false` should negate that
+                        .semantics { isContainer = false },
+                    1,
+                    topSampleText,
+                    bottomSampleText
+                )
+                CardRow(
+                    Modifier
+                        // adding a vertical scroll here makes the column scrollable, which would
+                        // normally make it structurally significant
+                        .verticalScroll(rememberScrollState())
+                        // but adding in `container = false` should negate that
+                        .semantics { isContainer = false },
+                    2,
+                    topSampleText,
+                    bottomSampleText
+                )
+            }
+        }
+
+        val bottomText1 = rule.onNodeWithText(bottomSampleText + 1).fetchSemanticsNode()
+        val bottomText2 = rule.onNodeWithText(bottomSampleText + 2).fetchSemanticsNode()
+
+        val bottomText1ANI = provider.createAccessibilityNodeInfo(bottomText1.id)
+        val bottomText1Before = bottomText1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // In this case, we expect all the top text to be read first, then all the bottom text
+        assertEquals(bottomText1Before, bottomText2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_SimpleTopAppBar() {
+        val topAppBarText = "Top App Bar"
+        val textBoxTag = "Text Box"
+        container.setContent {
+            Box(Modifier.testTag(textBoxTag)) {
+                Text(text = "Lorem ipsum ".repeat(200))
+            }
+
+            TopAppBar(
+                title = {
+                    Text(text = topAppBarText)
+                }
+            )
+        }
+
+        val textBoxNode = rule.onNodeWithTag(textBoxTag).fetchSemanticsNode()
+        val topAppBarNode = rule.onNodeWithText(topAppBarText).fetchSemanticsNode()
+
+        val topAppBarANI = provider.createAccessibilityNodeInfo(topAppBarNode.id)
+        val topAppTraverseBefore = topAppBarANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        assertThat(topAppTraverseBefore).isLessThan(textBoxNode.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_SimpleScrollingTopAppBar() {
+        val topAppBarText = "Top App Bar"
+        val sampleText = "Sample text "
+        val sampleText1 = "Sample text 1"
+        val sampleText2 = "Sample text 2"
+        var counter = 1
+
+        container.setContent {
+            Column(
+                Modifier
+                    .verticalScroll(rememberScrollState())
+            ) {
+                TopAppBar(title = { Text(text = topAppBarText) })
+                repeat(100) {
+                    Text(sampleText + counter++)
+                }
+            }
+        }
+
+        val topAppBarNode = rule.onNodeWithText(topAppBarText).fetchSemanticsNode()
+        val topAppBarANI = provider.createAccessibilityNodeInfo(topAppBarNode.id)
+        val topAppTraverseBefore = topAppBarANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        val node1 = rule.onNodeWithText(sampleText1).fetchSemanticsNode()
+        val ANI1 = provider.createAccessibilityNodeInfo(node1.id)
+        val traverseBefore1 = ANI1?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        val node2 = rule.onNodeWithText(sampleText2).fetchSemanticsNode()
+
+        // Assert that the top bar comes before the first node (node 1) and that the first node
+        // comes before the second (node 2)
+        assertEquals(topAppTraverseBefore, node1.id)
+        assertEquals(traverseBefore1, node2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_ScaffoldTopBar() {
+        val topAppBarText = "Top App Bar"
+        val contentText = "Content"
+        val bottomAppBarText = "Bottom App Bar"
+        container.setContent {
+            val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+            Scaffold(
+                scaffoldState = scaffoldState,
+                topBar = { TopAppBar(title = { Text(topAppBarText) }) },
+                floatingActionButtonPosition = FabPosition.End,
+                floatingActionButton = { FloatingActionButton(onClick = {}) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "fab icon")
+                } },
+                drawerContent = { Text(text = "Drawer Menu 1") },
+                content = { padding -> Text(contentText, modifier = Modifier.padding(padding)) },
+                bottomBar = { BottomAppBar {
+                    Text(bottomAppBarText) } }
+            )
+        }
+        val topAppBarNode = rule.onNodeWithText(topAppBarText).fetchSemanticsNode()
+        val contentNode = rule.onNodeWithText(contentText).fetchSemanticsNode()
+        val bottomAppBarNode = rule.onNodeWithText(bottomAppBarText).fetchSemanticsNode()
+
+        val topAppBarANI = provider.createAccessibilityNodeInfo(topAppBarNode.id)
+        val contentANI = provider.createAccessibilityNodeInfo(contentNode.id)
+        val topAppTraverseBefore = topAppBarANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val contentTraverseBefore = contentANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        assertEquals(topAppTraverseBefore, contentNode.id)
+        assertThat(contentTraverseBefore).isLessThan(bottomAppBarNode.id)
+    }
+
+    @Composable
+    fun ScrollColumn(testTag: String) {
+        var counter = 0
+        var sampleText = "Sample text in column"
+        Column(
+            Modifier
+                .verticalScroll(rememberScrollState())
+                .testTag(testTag)
+        ) {
+            repeat(100) {
+                Text(sampleText + counter++)
+            }
+        }
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_ScaffoldScrollingTopBar() {
+        val topAppBarText = "Top App Bar"
+        val contentText = "Content"
+        val bottomAppBarText = "Bottom App Bar"
+        val fabIconDescription = "fab icon"
+
+        container.setContent {
+            val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
+            Scaffold(
+                scaffoldState = scaffoldState,
+                topBar = { TopAppBar(title = { Text(topAppBarText) }) },
+                floatingActionButtonPosition = FabPosition.End,
+                floatingActionButton = { FloatingActionButton(onClick = {}) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = fabIconDescription)
+                } },
+                drawerContent = { Text(text = "Drawer Menu 1") },
+                content = { ScrollColumn(contentText) },
+                bottomBar = { BottomAppBar {
+                    Text(bottomAppBarText) } }
+            )
+        }
+
+        val topAppBarNode = rule.onNodeWithText(topAppBarText).fetchSemanticsNode()
+        val contentNode = rule.onNodeWithTag(contentText).fetchSemanticsNode()
+        val bottomAppBarNode = rule.onNodeWithText(bottomAppBarText).fetchSemanticsNode()
+
+        val topAppBarANI = provider.createAccessibilityNodeInfo(topAppBarNode.id)
+        val contentANI = provider.createAccessibilityNodeInfo(contentNode.id)
+
+        val topAppTraverseBefore = topAppBarANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val contentTraverseBefore = contentANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        assertThat(topAppTraverseBefore).isLessThan(contentNode.id)
+        assertThat(contentTraverseBefore).isLessThan(bottomAppBarNode.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_vertical_zIndex() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        container.setContent {
+            Column(Modifier.testTag(rootTag)) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .zIndex(1f)
+                        .testTag(childTag1)
+                ) {}
+                SimpleTestLayout(
+                    Modifier.requiredSize(50.dp).testTag(childTag2)
+                ) {}
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child1TraverseBefore = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child2TraverseAfter = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child1 to come before child2
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child1TraverseBefore).isLessThan(child2.id)
+        assertThat(child2TraverseAfter).isLessThan(child1.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_horizontal_zIndex() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        container.setContent {
+            Row(
+                Modifier.testTag(rootTag)
+            ) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .zIndex(1f)
+                        .testTag(childTag1)
+                ) {}
+                SimpleTestLayout(
+                    Modifier.requiredSize(50.dp).testTag(childTag2)
+                ) {}
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child1TraverseBefore = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child2TraverseAfter = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child1 to come before child2
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child1TraverseBefore).isLessThan(child2.id)
+        assertThat(child2TraverseAfter).isLessThan(child1.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_vertical_offset() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        container.setContent {
+            Box(
+                Modifier.testTag(rootTag)
+            ) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .offset(x = 0.dp, y = 50.dp)
+                        .testTag(childTag1)
+                ) {}
+                SimpleTestLayout(
+                    Modifier.requiredSize(50.dp).testTag(childTag2)
+                ) {}
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child2TraverseBefore = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child1TraverseAfter = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child2 to come before child1
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child2TraverseBefore).isLessThan(child1.id)
+        assertThat(child1TraverseAfter).isLessThan(child2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_horizontal_offset() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        container.setContent {
+            Box(
+                Modifier.testTag(rootTag)
+            ) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .offset(x = 50.dp, y = 0.dp)
+                        .testTag(childTag1)
+                ) {}
+                SimpleTestLayout(
+                    Modifier.requiredSize(50.dp).testTag(childTag2)
+                ) {}
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child2TraverseBefore = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child1TraverseAfter = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child2 to come before child1
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child2TraverseBefore).isLessThan(child1.id)
+        assertThat(child1TraverseAfter).isLessThan(child2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_vertical_offset_overlapped() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        container.setContent {
+            Box(
+                Modifier.testTag(rootTag)
+            ) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .offset(x = 0.dp, y = 20.dp)
+                        .testTag(childTag1)
+                ) {}
+                SimpleTestLayout(
+                    Modifier.requiredSize(50.dp).testTag(childTag2)
+                ) {}
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child2TraverseBefore = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child1TraverseAfter = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child2 to come before child1
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child2TraverseBefore).isLessThan(child1.id)
+        assertThat(child1TraverseAfter).isLessThan(child2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_horizontal_offset_overlapped() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        container.setContent {
+            Box(
+                Modifier.testTag(rootTag)
+            ) {
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .offset(x = 20.dp, y = 0.dp)
+                        .testTag(childTag1)
+                ) {}
+                SimpleTestLayout(
+                    Modifier
+                        .requiredSize(50.dp)
+                        .offset(x = 0.dp, y = 20.dp)
+                        .testTag(childTag2)
+                ) {}
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child2TraverseBefore = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child1TraverseAfter = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child2 to come before child1
+        assertEquals(2, root.replacedChildren.size)
+        assertEquals(child2TraverseBefore, child1.id)
+        assertEquals(child1TraverseAfter, child2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_vertical_subcompose() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        val density = Density(1f)
+        val size = with(density) { 100.dp.roundToPx() }.toFloat()
+        container.setContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                SimpleSubcomposeLayout(
+                    Modifier.testTag(rootTag),
+                    {
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(childTag1)
+                        ) {}
+                    },
+                    Offset(0f, size),
+                    {
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(childTag2)
+                        ) {}
+                    },
+                    Offset(0f, 0f)
+                )
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child2TraverseBefore = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child1TraverseAfter = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child2 to come before child1
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child2TraverseBefore).isLessThan(child1.id)
+        assertThat(child1TraverseAfter).isLessThan(child2.id)
+    }
+
+    @Test
+    fun testSortedAccessibilityNodeInfo_horizontal_subcompose() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        val density = Density(1f)
+        val size = with(density) { 100.dp.roundToPx() }.toFloat()
+        container.setContent {
+            CompositionLocalProvider(LocalDensity provides density) {
+                SimpleSubcomposeLayout(
+                    Modifier.testTag(rootTag),
+                    {
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(childTag1)
+                        ) {}
+                    },
+                    Offset(size, 0f),
+                    {
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(childTag2)
+                        ) {}
+                    },
+                    Offset(0f, 0f)
+                )
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        val child1 = rule.onNodeWithTag(childTag1).fetchSemanticsNode()
+        val child2 = rule.onNodeWithTag(childTag2).fetchSemanticsNode()
+
+        val child1ANI = provider.createAccessibilityNodeInfo(child1.id)
+        val child2ANI = provider.createAccessibilityNodeInfo(child2.id)
+        val child2TraverseBefore = child2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val child1TraverseAfter = child1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALAFTER_VAL)
+
+        // We want child2 to come before child1
+        assertEquals(2, root.replacedChildren.size)
+        assertThat(child2TraverseBefore).isLessThan(child1.id)
+        assertThat(child1TraverseAfter).isLessThan(child2.id)
+    }
+
+    @Test
+    fun testChildrenSortedByBounds_rtl() {
+        val rootTag = "root"
+        val childTag1 = "child1"
+        val childTag2 = "child2"
+        val childTag3 = "child3"
+        val rtlChildTag1 = "rtlChild1"
+        val rtlChildTag2 = "rtlChild2"
+        val rtlChildTag3 = "rtlChild3"
+        container.setContent {
+            Column(Modifier.testTag(rootTag)) {
+                Row {
+                    SimpleTestLayout(
+                        Modifier
+                            .requiredSize(100.dp)
+                            .testTag(childTag1)
+                    ) {}
+                    SimpleTestLayout(
+                        Modifier
+                            .requiredSize(100.dp)
+                            .testTag(childTag2)
+                    ) {}
+                    SimpleTestLayout(
+                        Modifier
+                            .requiredSize(100.dp)
+                            .testTag(childTag3)
+                    ) {}
+                }
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
+                    // Will display rtlChild3 rtlChild2 rtlChild1
+                    Row {
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(rtlChildTag1)
+                        ) {}
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(rtlChildTag2)
+                        ) {}
+                        SimpleTestLayout(
+                            Modifier
+                                .requiredSize(100.dp)
+                                .testTag(rtlChildTag3)
+                        ) {}
+                    }
+                }
+            }
+        }
+
+        val root = rule.onNodeWithTag(rootTag).fetchSemanticsNode()
+        assertEquals(6, root.replacedChildren.size)
+
+        val rtlChild1 = rule.onNodeWithTag(rtlChildTag1).fetchSemanticsNode()
+        val rtlChild2 = rule.onNodeWithTag(rtlChildTag2).fetchSemanticsNode()
+        val rtlChild3 = rule.onNodeWithTag(rtlChildTag3).fetchSemanticsNode()
+
+        val rtlChild1ANI = provider.createAccessibilityNodeInfo(rtlChild1.id)
+        val rtlChild2ANI = provider.createAccessibilityNodeInfo(rtlChild2.id)
+
+        val rtl1TraverseBefore = rtlChild1ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+        val rtl2TraverseBefore = rtlChild2ANI?.extras?.getInt(EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL)
+
+        // Rtl
+        assertThat(rtl1TraverseBefore).isLessThan(rtlChild2.id)
+        assertThat(rtl2TraverseBefore).isLessThan(rtlChild3.id)
+    }
+
+    companion object {
+        private const val EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL =
+            "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALBEFORE_VAL"
+
+        private const val EXTRA_DATA_TEST_TRAVERSALAFTER_VAL =
+            "android.view.accessibility.extra.EXTRA_DATA_TEST_TRAVERSALAFTER_VAL"
     }
 
     @Test
@@ -953,7 +1849,7 @@ class AndroidAccessibilityTest {
             textFieldNode.positionInWindow
         )
         val expectedTopLeftInScreenCoords = androidComposeView.localToScreen(
-            expectedRectInLocalCoords.toAndroidRect().topLeftToOffset()
+            expectedRectInLocalCoords.topLeft
         )
         assertEquals(expectedTopLeftInScreenCoords.x, rectF.left)
         assertEquals(expectedTopLeftInScreenCoords.y, rectF.top)
@@ -1293,6 +2189,7 @@ class AndroidAccessibilityTest {
             textFieldNode.id,
             AccessibilityEvent.TYPE_VIEW_TEXT_CHANGED
         )
+        textEvent.className = TextFieldClassName
         textEvent.fromIndex = initialText.length
         textEvent.removedCount = 0
         textEvent.addedCount = text.length - initialText.length
@@ -2151,6 +3048,72 @@ class AndroidAccessibilityTest {
     }
 
     @Test
+    fun testMultiPanesDisappear() {
+        val firstPaneTag = "Pane 1"
+        val secondPaneTag = "Pane 2"
+        var isPaneVisible by mutableStateOf(false)
+        val firstPaneTestTitle by mutableStateOf("first pane title")
+        val secondPaneTestTitle by mutableStateOf("second pane title")
+
+        container.setContent {
+            if (isPaneVisible) {
+                Column {
+                    with(LocalDensity.current) {
+                        Box(
+                            Modifier
+                                .size(100.toDp())
+                                .testTag(firstPaneTag)
+                                .semantics { paneTitle = firstPaneTestTitle }) {}
+                        Box(
+                            Modifier
+                                .size(100.toDp())
+                                .testTag(secondPaneTag)
+                                .semantics { paneTitle = secondPaneTestTitle }) {}
+                    }
+                }
+            }
+        }
+
+        rule.onNodeWithTag(firstPaneTag).assertDoesNotExist()
+        rule.onNodeWithTag(secondPaneTag).assertDoesNotExist()
+
+        isPaneVisible = true
+        rule.onNodeWithTag(firstPaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    "first pane title"
+                )
+            )
+            .assertIsDisplayed()
+        rule.onNodeWithTag(secondPaneTag)
+            .assert(
+                SemanticsMatcher.expectValue(
+                    SemanticsProperties.PaneTitle,
+                    "second pane title"
+                )
+            )
+            .assertIsDisplayed()
+        waitForSubtreeEventToSend()
+
+        isPaneVisible = false
+        rule.onNodeWithTag(firstPaneTag).assertDoesNotExist()
+        rule.onNodeWithTag(secondPaneTag).assertDoesNotExist()
+        rule.runOnIdle {
+            verify(container, times(2)).requestSendAccessibilityEvent(
+                eq(androidComposeView),
+                argThat(
+                    ArgumentMatcher {
+                        it.eventType == AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED &&
+                            it.contentChangeTypes ==
+                            AccessibilityEvent.CONTENT_CHANGE_TYPE_PANE_DISAPPEARED
+                    }
+                )
+            )
+        }
+    }
+
+    @Test
     fun testEventForPasswordTextField() {
         val tag = "TextField"
         container.setContent {
@@ -2668,7 +3631,7 @@ class AndroidAccessibilityTest {
         accessibilityNodeInfo.getBoundsInScreen(rect)
         val resultWidth = rect.right - rect.left
         val resultHeight = rect.bottom - rect.top
-        val resultInLocalCoords = androidComposeView.screenToLocal(rect.topLeftToOffset())
+        val resultInLocalCoords = androidComposeView.screenToLocal(rect.toComposeRect().topLeft)
 
         assertEquals(size, resultWidth)
         assertEquals(size, resultHeight)
@@ -2714,7 +3677,7 @@ class AndroidAccessibilityTest {
         val child = rule.onNodeWithTag("child").fetchSemanticsNode()
 
         rule.runOnIdle {
-            child.layoutNode.innerCoordinator.detach()
+            child.layoutNode.innerCoordinator.onRelease()
         }
 
         rule.runOnIdle {
@@ -2742,8 +3705,8 @@ class AndroidAccessibilityTest {
         val grandChild1 = rule.onNodeWithTag("grandChild1").fetchSemanticsNode()
         val grandChild2 = rule.onNodeWithTag("grandChild2").fetchSemanticsNode()
         rule.runOnIdle {
-            grandChild1.layoutNode.innerCoordinator.detach()
-            grandChild2.layoutNode.innerCoordinator.detach()
+            grandChild1.layoutNode.innerCoordinator.onRelease()
+            grandChild2.layoutNode.innerCoordinator.onRelease()
         }
 
         rule.runOnIdle {
@@ -3063,6 +4026,61 @@ class AndroidAccessibilityTest {
         assertEquals(childInfo.isScreenReaderFocusable, false)
     }
 
+    @Test
+    fun accessibilityStateChangeListenerRemoved_onDetach() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            assertTrue(androidComposeView.isAttachedToWindow)
+        }
+
+        rule.runOnUiThread {
+            container.removeView(androidComposeView)
+        }
+
+        rule.runOnIdle {
+            assertFalse(androidComposeView.isAttachedToWindow)
+
+            val removed = delegate.accessibilityManager.removeAccessibilityStateChangeListener(
+                delegate.enabledStateListener
+            )
+            assertFalse(removed)
+        }
+    }
+
+    @Test
+    fun touchExplorationChangeListenerRemoved_onDetach() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            assertTrue(androidComposeView.isAttachedToWindow)
+        }
+
+        rule.runOnUiThread {
+            container.removeView(androidComposeView)
+        }
+
+        rule.runOnIdle {
+            assertFalse(androidComposeView.isAttachedToWindow)
+
+            val removed = delegate.accessibilityManager.removeTouchExplorationStateChangeListener(
+                delegate.touchExplorationStateListener
+            )
+            assertFalse(removed)
+        }
+    }
+
+    @Test
+    fun isEnabled_returnsFalse_whenUIAutomatorIsTheOnlyEnabledService() {
+        delegate.accessibilityForceEnabledForTesting = false
+
+        rule.runOnIdle {
+            // This test implies that UIAutomator is enabled and is the only enabled a11y service
+            assertTrue(delegate.accessibilityManager.isEnabled)
+            assertFalse(delegate.isEnabled)
+        }
+    }
+
     private fun eventIndex(list: List<AccessibilityEvent>, event: AccessibilityEvent): Int {
         for (i in list.indices) {
             if (ReflectionEquals(list[i], null).matches(event)) {
@@ -3148,4 +4166,78 @@ class AndroidAccessibilityTest {
     }
 }
 
-private fun Rect.topLeftToOffset() = Offset(this.left.toFloat(), this.top.toFloat())
+/**
+ * A simple test layout that does the bare minimum required to lay out an arbitrary number of
+ * children reasonably.  Useful for Semantics hierarchy testing
+ */
+@Composable
+private fun SimpleTestLayout(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
+    Layout(modifier = modifier, content = content) { measurables, constraints ->
+        if (measurables.isEmpty()) {
+            layout(constraints.minWidth, constraints.minHeight) {}
+        } else {
+            val placeables = measurables.map {
+                it.measure(constraints)
+            }
+            val (width, height) = with(placeables.filterNotNull()) {
+                Pair(
+                    max(
+                        maxByOrNull { it.width }?.width ?: 0,
+                        constraints.minWidth
+                    ),
+                    max(
+                        maxByOrNull { it.height }?.height ?: 0,
+                        constraints.minHeight
+                    )
+                )
+            }
+            layout(width, height) {
+                for (placeable in placeables) {
+                    placeable.placeRelative(0, 0)
+                }
+            }
+        }
+    }
+}
+
+/**
+ * A simple SubComposeLayout which lays [contentOne] at [positionOne] and lays [contentTwo] at
+ * [positionTwo]. [contentOne] is placed first and [contentTwo] is placed second. Therefore, the
+ * semantics node for [contentOne] is before semantics node for [contentTwo] in
+ * [SemanticsNode.children].
+ */
+@Composable
+private fun SimpleSubcomposeLayout(
+    modifier: Modifier = Modifier,
+    contentOne: @Composable () -> Unit,
+    positionOne: Offset,
+    contentTwo: @Composable () -> Unit,
+    positionTwo: Offset
+) {
+    SubcomposeLayout(modifier) { constraints ->
+        val layoutWidth = constraints.maxWidth
+        val layoutHeight = constraints.maxHeight
+
+        val looseConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+
+        layout(layoutWidth, layoutHeight) {
+            val placeablesOne = subcompose(TestSlot.First, contentOne).fastMap {
+                it.measure(looseConstraints)
+            }
+
+            val placeablesTwo = subcompose(TestSlot.Second, contentTwo).fastMap {
+                it.measure(looseConstraints)
+            }
+
+            // Placing to control drawing order to match default elevation of each placeable
+            placeablesOne.fastForEach {
+                it.place(positionOne.x.toInt(), positionOne.y.toInt())
+            }
+            placeablesTwo.fastForEach {
+                it.place(positionTwo.x.toInt(), positionTwo.y.toInt())
+            }
+        }
+    }
+}
+
+private enum class TestSlot { First, Second }

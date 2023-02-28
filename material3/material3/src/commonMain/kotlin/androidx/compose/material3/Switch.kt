@@ -146,7 +146,11 @@ fun Switch(
     Box(
         modifier
             .then(
-                if (onCheckedChange != null) Modifier.minimumTouchTargetSize() else Modifier
+                if (onCheckedChange != null) {
+                    Modifier.minimumInteractiveComponentSize()
+                } else {
+                    Modifier
+                }
             )
             .then(toggleableModifier)
             .wrapContentSize(Alignment.Center)

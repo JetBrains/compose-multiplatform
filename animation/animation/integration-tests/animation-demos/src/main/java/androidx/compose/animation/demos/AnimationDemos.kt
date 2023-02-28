@@ -56,6 +56,7 @@ import androidx.compose.animation.demos.vectorgraphics.AnimatedVectorGraphicsDem
 import androidx.compose.animation.demos.visualaid.ColumnConfigurationDemo
 import androidx.compose.animation.demos.visualaid.EasingInfoDemo
 import androidx.compose.animation.demos.visualaid.RowConfigurationDemo
+import androidx.compose.animation.demos.visualinspection.AnimatedContentWithInterruptions
 import androidx.compose.animation.demos.visualinspection.AnimatedVisibilityContentSizeChange
 import androidx.compose.animation.demos.visualinspection.EnterExitCombination
 import androidx.compose.animation.demos.visualinspection.SlideInContentVariedSizes
@@ -138,6 +139,9 @@ val AnimationDemos = DemoCategory(
             listOf(
                 ComposableDemo("AnimatedContent alignment/slideInto") {
                     SlideInContentVariedSizes()
+                },
+                ComposableDemo("AnimatedContent with interruptions") {
+                    AnimatedContentWithInterruptions()
                 },
                 ComposableDemo("Enter/ExitTransition Combo") { EnterExitCombination() },
                 ComposableDemo("AnimatedVisibility with Content Size Change") {

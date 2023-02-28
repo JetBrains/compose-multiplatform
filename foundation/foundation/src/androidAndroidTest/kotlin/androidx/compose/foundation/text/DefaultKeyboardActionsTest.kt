@@ -24,19 +24,18 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusProperties
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performImeAction
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.ImeAction.Companion.Done
 import androidx.compose.ui.text.input.ImeAction.Companion.Go
+import androidx.compose.ui.text.input.ImeAction.Companion.Next
+import androidx.compose.ui.text.input.ImeAction.Companion.Previous
 import androidx.compose.ui.text.input.ImeAction.Companion.Search
 import androidx.compose.ui.text.input.ImeAction.Companion.Send
-import androidx.compose.ui.text.input.ImeAction.Companion.Previous
-import androidx.compose.ui.text.input.ImeAction.Companion.Next
-import androidx.compose.ui.text.input.ImeAction.Companion.Done
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.test.filters.LargeTest
@@ -82,8 +81,7 @@ class DefaultKeyboardActionsTest(param: Param) {
         val keyboardHelper = KeyboardHelper(rule)
 
         rule.setContent {
-            keyboardHelper.view = LocalView.current
-
+            keyboardHelper.initialize()
             Column {
                 CoreTextField(
                     value = value1,
@@ -164,8 +162,7 @@ class DefaultKeyboardActionsTest(param: Param) {
         val keyboardHelper = KeyboardHelper(rule)
 
         rule.setContent {
-            keyboardHelper.view = LocalView.current
-
+            keyboardHelper.initialize()
             Column {
                 CoreTextField(
                     value = value1,

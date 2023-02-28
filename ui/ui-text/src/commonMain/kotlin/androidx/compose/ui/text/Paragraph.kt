@@ -17,6 +17,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -24,17 +25,17 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.internal.JvmDefaultWithCompatibility
 import androidx.compose.ui.text.platform.ActualParagraph
 import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import kotlin.math.ceil
-import androidx.compose.ui.text.internal.JvmDefaultWithCompatibility
 
 internal const val DefaultMaxLines = Int.MAX_VALUE
 
@@ -246,11 +247,12 @@ expect sealed interface Paragraph {
      * @param color Applies to the default text paint color that's used by this paragraph. Text
      * color spans are not affected. [Color.Unspecified] is treated as no-op.
      * @param shadow Applies to the default text paint shadow that's used by this paragraph. Text
-     * shadow spans are not affected. Passing this value as [Shadow.None] or `null` removes any
-     * existing shadow on this paragraph.
+     * shadow spans are not affected. [Shadow.None] removes any existing shadow on this paragraph,
+     * `null` does not change the currently set [Shadow] configuration.
      * @param textDecoration Applies to the default text paint that's used by this paragraph. Spans
-     * that specify a TextDecoration are not affected. Passing this value as [TextDecoration.None]
-     * or `null` removes any existing TextDecoration on this paragraph.
+     * that specify a TextDecoration are not affected. [TextDecoration.None] removes any existing
+     * TextDecoration on this paragraph, `null` does not change the currently set [TextDecoration]
+     * configuration.
      */
     fun paint(
         canvas: Canvas,
@@ -268,14 +270,16 @@ expect sealed interface Paragraph {
      * @param color Applies to the default text paint color that's used by this paragraph. Text
      * color spans are not affected. [Color.Unspecified] is treated as no-op.
      * @param shadow Applies to the default text paint shadow that's used by this paragraph. Text
-     * shadow spans are not affected. Passing this value as [Shadow.None] or `null` removes any
-     * existing shadow on this paragraph.
+     * shadow spans are not affected. [Shadow.None] removes any existing shadow on this paragraph,
+     * `null` does not change the currently set [Shadow] configuration.
      * @param textDecoration Applies to the default text paint that's used by this paragraph. Spans
-     * that specify a TextDecoration are not affected. Passing this value as [TextDecoration.None]
-     * or `null` removes any existing TextDecoration on this paragraph.
+     * that specify a TextDecoration are not affected. [TextDecoration.None] removes any existing
+     * TextDecoration on this paragraph, `null` does not change the currently set [TextDecoration]
+     * configuration.
      * @param drawStyle Applies to the default text paint style that's used by this paragraph. Spans
-     * that specify a DrawStyle are not affected. Passing this value as `null` is treated equally
-     * to passing it as [Fill].
+     * that specify a DrawStyle are not affected. Passing this value as `null` does not change the
+     * currently set DrawStyle.
+     * @param blendMode Blending algorithm to be applied to the Paragraph while painting.
      */
     @ExperimentalTextApi
     fun paint(
@@ -283,7 +287,8 @@ expect sealed interface Paragraph {
         color: Color = Color.Unspecified,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
     )
 
     /**
@@ -300,14 +305,16 @@ expect sealed interface Paragraph {
      * alpha spans are not affected. [Float.NaN] is treated as no-op. All other values are coerced
      * into [0f, 1f] range.
      * @param shadow Applies to the default text paint shadow that's used by this paragraph. Text
-     * shadow spans are not affected. Passing this value as [Shadow.None] or `null` removes any
-     * existing shadow on this paragraph.
+     * shadow spans are not affected. [Shadow.None] removes any existing shadow on this paragraph,
+     * `null` does not change the currently set [Shadow] configuration.
      * @param textDecoration Applies to the default text paint that's used by this paragraph. Spans
-     * that specify a TextDecoration are not affected. Passing this value as [TextDecoration.None]
-     * or `null` removes any existing TextDecoration on this paragraph.
+     * that specify a TextDecoration are not affected. [TextDecoration.None] removes any existing
+     * TextDecoration on this paragraph, `null` does not change the currently set [TextDecoration]
+     * configuration.
      * @param drawStyle Applies to the default text paint style that's used by this paragraph. Spans
-     * that specify a DrawStyle are not affected. Passing this value as `null` is treated equally
-     * to passing it as [Fill].
+     * that specify a DrawStyle are not affected. Passing this value as `null` does not change the
+     * currently set DrawStyle.
+     * @param blendMode Blending algorithm to be applied to the Paragraph while painting.
      */
     @ExperimentalTextApi
     fun paint(
@@ -316,7 +323,8 @@ expect sealed interface Paragraph {
         alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
     )
 }
 

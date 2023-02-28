@@ -31,37 +31,44 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Sampled
 @Composable
 fun ButtonSample() {
     Button(onClick = { /* Do something! */ }) { Text("Button") }
 }
 
+@Preview
 @Sampled
 @Composable
 fun ElevatedButtonSample() {
     ElevatedButton(onClick = { /* Do something! */ }) { Text("Elevated Button") }
 }
 
+@Preview
 @Sampled
 @Composable
 fun FilledTonalButtonSample() {
     FilledTonalButton(onClick = { /* Do something! */ }) { Text("Filled Tonal Button") }
 }
 
+@Preview
 @Sampled
 @Composable
 fun OutlinedButtonSample() {
     OutlinedButton(onClick = { /* Do something! */ }) { Text("Outlined Button") }
 }
 
+@Preview
 @Sampled
 @Composable
 fun TextButtonSample() {
     TextButton(onClick = { /* Do something! */ }) { Text("Text Button") }
 }
 
+@Preview
 @Sampled
 @Composable
 fun ButtonWithIconSample() {

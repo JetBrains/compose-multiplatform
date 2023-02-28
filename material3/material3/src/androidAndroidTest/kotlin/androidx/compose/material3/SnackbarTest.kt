@@ -32,6 +32,7 @@ import androidx.compose.ui.test.getAlignmentLinePosition
 import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
@@ -81,6 +82,35 @@ class SnackbarTest {
         rule.onNodeWithText("UNDO")
             .performClick()
 
+        assertThat(clicked).isTrue()
+    }
+
+    @Test
+    fun snackbar_withDismiss_semantics() {
+        var clicked = false
+        val snackbarVisuals =
+            object : SnackbarVisuals {
+                override val message: String = "Data message"
+                override val actionLabel: String? = null
+                override val withDismissAction: Boolean = true
+                override val duration: SnackbarDuration = SnackbarDuration.Indefinite
+            }
+        val snackbarData =
+            object : SnackbarData {
+                override val visuals: SnackbarVisuals = snackbarVisuals
+                override fun performAction() {}
+                override fun dismiss() {
+                    clicked = true
+                }
+            }
+        lateinit var dismissContentDescription: String
+        rule.setMaterialContent(lightColorScheme()) {
+            dismissContentDescription = getString(string = Strings.SnackbarDismiss)
+            Box { Snackbar(snackbarData = snackbarData) }
+        }
+
+        assertThat(clicked).isFalse()
+        rule.onNodeWithContentDescription(dismissContentDescription).performClick()
         assertThat(clicked).isTrue()
     }
 

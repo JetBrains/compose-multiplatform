@@ -115,16 +115,25 @@ fun CustomPullRefreshSample() {
         }
     }
 
-    suspend fun onRelease() {
-        if (refreshing) return // Already refreshing - don't call refresh again.
+    fun onRelease(velocity: Float): Float {
+        if (refreshing) return 0f // Already refreshing - don't call refresh again.
         if (currentDistance > threshold) refresh()
 
-        animate(initialValue = currentDistance, targetValue = 0f) { value, _ ->
-            currentDistance = value
+        refreshScope.launch {
+            animate(initialValue = currentDistance, targetValue = 0f) { value, _ ->
+                currentDistance = value
+            }
+        }
+
+        // Only consume if the fling is downwards and the indicator is visible
+        return if (velocity > 0f && currentDistance > 0f) {
+            velocity
+        } else {
+            0f
         }
     }
 
-    Box(Modifier.pullRefresh(::onPull, { onRelease() })) {
+    Box(Modifier.pullRefresh(::onPull, ::onRelease)) {
         LazyColumn {
             if (!refreshing) {
                 items(itemCount) {

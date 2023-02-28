@@ -185,7 +185,7 @@ class TextFieldScreenshotTest {
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.requiredWidth(280.dp).testTag(TextFieldTag),
-                colors = TextFieldDefaults.textFieldColors(textColor = Color.Green)
+                colors = TextFieldDefaults.textFieldColors(unfocusedTextColor = Color.Green)
             )
         }
 
@@ -586,6 +586,90 @@ class TextFieldScreenshotTest {
         }
 
         assertAgainstGolden("textField_leadingTrailingIcons_error")
+    }
+
+    @Test
+    fun textField_prefixSuffix_withLabelAndInput() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        assertAgainstGolden("textField_prefixSuffix_withLabelAndInput")
+    }
+
+    @Test
+    fun textField_prefixSuffix_withLabelAndInput_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        assertAgainstGolden("textField_prefixSuffix_withLabelAndInput_darkTheme")
+    }
+
+    @Test
+    fun textField_prefixSuffix_withLabelAndInput_focused() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("textField_prefixSuffix_withLabelAndInput_focused")
+    }
+
+    @Test
+    fun textField_prefixSuffix_withPlaceholder() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("Placeholder") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        assertAgainstGolden("textField_prefixSuffix_withPlaceholder")
+    }
+
+    @Test
+    fun textField_prefixSuffix_withLeadingTrailingIcons() {
+        rule.setMaterialContent(lightColorScheme()) {
+            TextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) },
+            )
+        }
+
+        assertAgainstGolden("textField_prefixSuffix_withLeadingTrailingIcons")
     }
 
     @Test

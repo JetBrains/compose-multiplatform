@@ -60,7 +60,6 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
-import androidx.compose.ui.layout.layout
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalDensity
@@ -105,6 +104,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Rule
@@ -967,6 +967,87 @@ class ScrollTest(private val config: Config) {
         }
         rule.waitForIdle()
         assertThat(sizeParam).isEqualTo(Constraints.Infinity)
+    }
+
+    @Test
+    fun canNotScrollForwardOrBackward() {
+        val scrollState = ScrollState(initial = 0)
+
+        composeScroller(scrollState)
+
+        rule.runOnIdle {
+            assertTrue(scrollState.maxValue == 0)
+            assertFalse(scrollState.canScrollForward)
+            assertFalse(scrollState.canScrollBackward)
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = 26)
+    @Test
+    fun canScrollForward() {
+        val scrollState = ScrollState(initial = 0)
+        val size = 30
+
+        composeScroller(scrollState, mainAxisSize = size)
+
+        validateScroller(mainAxis = size)
+
+        rule.runOnIdle {
+            assertTrue(scrollState.value == 0)
+            assertTrue(scrollState.maxValue > 0)
+            assertTrue(scrollState.canScrollForward)
+            assertFalse(scrollState.canScrollBackward)
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = 26)
+    @Test
+    fun canScrollBackward() {
+        val scrollState = ScrollState(initial = 0)
+        val scrollDistance = 10
+        val size = 30
+
+        composeScroller(scrollState, mainAxisSize = size)
+
+        validateScroller(mainAxis = size)
+
+        rule.waitForIdle()
+        assertEquals(scrollDistance, scrollState.maxValue)
+        scope.launch {
+            scrollState.scrollTo(scrollDistance)
+        }
+
+        rule.runOnIdle {
+            assertTrue(scrollState.value == scrollDistance)
+            assertTrue(scrollState.maxValue == scrollDistance)
+            assertFalse(scrollState.canScrollForward)
+            assertTrue(scrollState.canScrollBackward)
+        }
+    }
+
+    @SdkSuppress(minSdkVersion = 26)
+    @Test
+    fun canScrollForwardAndBackward() {
+        val scrollState = ScrollState(initial = 0)
+        val scrollDistance = 5
+        val size = 30
+
+        composeScroller(scrollState, mainAxisSize = size)
+
+        validateScroller(mainAxis = size)
+
+        rule.waitForIdle()
+        assertEquals(scrollDistance, scrollState.maxValue / 2)
+        scope.launch {
+            scrollState.scrollTo(scrollDistance)
+        }
+
+        rule.runOnIdle {
+            assertTrue(scrollState.value == scrollDistance)
+            assertTrue(scrollState.maxValue == scrollDistance * 2)
+            assertTrue(scrollState.canScrollForward)
+            assertTrue(scrollState.canScrollBackward)
+        }
     }
 
     private fun Modifier.intrinsicMainAxisSize(size: IntrinsicSize): Modifier =

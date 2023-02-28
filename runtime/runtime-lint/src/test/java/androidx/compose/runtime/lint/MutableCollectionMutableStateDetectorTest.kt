@@ -19,7 +19,7 @@
 package androidx.compose.runtime.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.kotlinAndCompiledStub
+import androidx.compose.lint.test.kotlinAndBytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestMode
 import com.android.tools.lint.detector.api.Detector
@@ -43,7 +43,7 @@ class MutableCollectionMutableStateDetectorTest : LintDetectorTest() {
     /**
      * Extensions / subclasses around Kotlin mutable collections, both in source and compiled form.
      */
-    private val KotlinMutableCollectionExtensions = kotlinAndCompiledStub(
+    private val KotlinMutableCollectionExtensions = kotlinAndBytecodeStub(
         filename = "MutableCollectionExtensions.kt",
         filepath = "stubs",
         checksum = 0x90938fc8,
@@ -462,7 +462,7 @@ class MutableCollectionMutableStateDetectorTest : LintDetectorTest() {
      * Extensions / subclasses around Kotlin immutable collections, both in source and compiled
      * form.
      */
-    private val KotlinImmutableCollectionExtensions = kotlinAndCompiledStub(
+    private val KotlinImmutableCollectionExtensions = kotlinAndBytecodeStub(
         filename = "ImmutableCollectionExtensions.kt",
         filepath = "stubs",
         checksum = 0xf50711c2,
@@ -1400,7 +1400,7 @@ src/test/test.kt:25: Warning: Creating a MutableState object with a mutable coll
             ),
             Stubs.SnapshotState,
             Stubs.Composable,
-            KotlinMutableCollectionExtensions.compiled
+            KotlinMutableCollectionExtensions.bytecode
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
             .run()
@@ -1576,7 +1576,7 @@ src/test/test.kt:25: Warning: Creating a MutableState object with a mutable coll
             ),
             Stubs.SnapshotState,
             Stubs.Composable,
-            KotlinImmutableCollectionExtensions.compiled
+            KotlinImmutableCollectionExtensions.bytecode
         )
             .skipTestModes(TestMode.TYPE_ALIAS)
             .run()

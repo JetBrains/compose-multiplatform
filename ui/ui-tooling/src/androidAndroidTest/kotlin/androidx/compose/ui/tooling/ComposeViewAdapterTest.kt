@@ -19,24 +19,23 @@ package androidx.compose.ui.tooling
 import android.app.Activity
 import android.os.Build
 import android.os.Bundle
-import androidx.compose.animation.core.InternalAnimationApi
+import androidx.compose.ui.tooling.animation.AnimateXAsStateComposeAnimation
 import androidx.compose.ui.tooling.animation.PreviewAnimationClock
 import androidx.compose.ui.tooling.animation.UnsupportedComposeAnimation
 import androidx.compose.ui.tooling.data.UiToolingDataApi
 import androidx.compose.ui.tooling.test.R
 import androidx.test.filters.LargeTest
 import androidx.test.filters.MediumTest
+import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicBoolean
 import org.junit.Assert.assertArrayEquals
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
-import org.junit.Assert.fail
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicBoolean
 
 @MediumTest
 @OptIn(UiToolingDataApi::class)
@@ -123,6 +122,87 @@ class ComposeViewAdapterTest {
     }
 
     @Test
+    fun lazyColumn() {
+        run {
+            composeViewAdapter.stitchTrees = false
+            val viewInfos = assertRendersCorrectly(
+                "androidx.compose.ui.tooling.LazyColumnPreviewKt",
+                "SimpleLazyComposablePreview"
+            )
+
+            assertEquals(
+                """
+                    |<root>
+                    .|LazyColumnPreview.kt:35
+                    |<root>
+                    .|LazyColumnPreview.kt:35
+                    |<root>
+                    .|LazyColumnPreview.kt:35
+                    |<root>
+                    .|LazyColumnPreview.kt:31
+                    ..|LazyColumnPreview.kt:32
+                """.trimIndent(),
+                viewInfos.toDebugString {
+                it.fileName == "LazyColumnPreview.kt"
+            }.trimIndent())
+        }
+
+        run {
+            composeViewAdapter.stitchTrees = true
+            val viewInfos = assertRendersCorrectly(
+                "androidx.compose.ui.tooling.LazyColumnPreviewKt",
+                "SimpleLazyComposablePreview"
+            )
+
+            assertEquals(
+                1,
+                viewInfos.size
+            )
+            assertEquals(
+                """
+                    |<root>
+                    .|LazyColumnPreview.kt:31
+                    ..|LazyColumnPreview.kt:32
+                    ...|LazyColumnPreview.kt:35
+                    ...|LazyColumnPreview.kt:35
+                    ...|LazyColumnPreview.kt:35
+                """.trimIndent(),
+                viewInfos.toDebugString() {
+                    it.fileName == "LazyColumnPreview.kt"
+                }.trimIndent())
+        }
+    }
+
+    @Test
+    fun complexTreeStitchLazyColumn() {
+        run {
+            composeViewAdapter.stitchTrees = true
+            val viewInfos = assertRendersCorrectly(
+                "androidx.compose.ui.tooling.LazyColumnPreviewKt",
+                "ComplexLazyComposablePreview"
+            )
+
+            assertEquals(1, viewInfos.size)
+            assertEquals(
+                """
+                    |<root>
+                    .|LazyColumnPreview.kt:45
+                    ..|LazyColumnPreview.kt:46
+                    ...|LazyColumnPreview.kt:49
+                    ...|LazyColumnPreview.kt:50
+                    ....|LazyColumnPreview.kt:53
+                    .....|LazyColumnPreview.kt:54
+                    ....|LazyColumnPreview.kt:53
+                    .....|LazyColumnPreview.kt:54
+                """.trimIndent(),
+                viewInfos.toDebugString() {
+                    it.fileName == "LazyColumnPreview.kt"
+                }.trimIndent()
+            )
+        }
+    }
+
+    @Test
     fun animatedVisibilityIsTracked() {
         val clock = PreviewAnimationClock()
 
@@ -133,10 +213,10 @@ class ComposeViewAdapterTest {
             )
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
+            assertTrue(clock.animatedVisibilityClocks.isEmpty())
         }
 
-        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
+        waitFor(1, TimeUnit.SECONDS) {
             // Handle the case where onLayout was called too soon. Calling requestLayout will
             // make sure onLayout will be called again.
             composeViewAdapter.requestLayout()
@@ -144,62 +224,147 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            val animation = clock.trackedAnimatedVisibility.single()
+            val animation = clock.animatedVisibilityClocks.values.single().animation
             assertEquals("My Animated Visibility", animation.label)
         }
     }
 
     @Test
     fun transitionAnimatedVisibilityIsTrackedAsTransition() {
-        checkTransitionIsSubscribed("TransitionAnimatedVisibilityPreview", "transition.AV")
+        checkAnimationsAreSubscribed(
+            "TransitionAnimatedVisibilityPreview",
+            emptyList(),
+            listOf("transition.AV")
+        )
     }
 
     @Test
     fun animatedContentIsSubscribed() {
-        checkAnimationsAreSubscribed("AnimatedContentPreview", listOf("AnimatedContent"))
+        checkAnimationsAreSubscribed(
+            "AnimatedContentPreview",
+            animatedContent = listOf("AnimatedContent")
+        )
+    }
+
+    @Test
+    fun animatedContentAndTransitionIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "AnimatedContentAndTransitionPreview",
+            transitions = listOf("checkBoxAnim"),
+            animatedContent = listOf("AnimatedContent")
+        )
     }
 
     @Test
     fun transitionAnimationsAreSubscribedToTheClock() {
-        checkTransitionIsSubscribed("CheckBoxPreview", "checkBoxAnim")
+        checkAnimationsAreSubscribed(
+            "TransitionPreview",
+            emptyList(),
+            listOf("checkBoxAnim")
+        )
     }
 
     @Test
     fun transitionAnimationsWithSubcomposition() {
-        checkTransitionIsSubscribed("CheckBoxScaffoldPreview", "checkBoxAnim")
+        checkAnimationsAreSubscribed(
+            "TransitionWithScaffoldPreview",
+            emptyList(),
+            listOf("checkBoxAnim")
+        )
     }
 
     @Test
     fun animateXAsStateIsSubscribed() {
         checkAnimationsAreSubscribed(
             "AnimateAsStatePreview",
-            listOf("DpAnimation", "IntAnimation")
+            animateXAsState = listOf("DpAnimation", "IntAnimation")
         )
     }
 
     @Test
-    fun animateContentSizeIsSubscribed() {
-        checkAnimationsAreSubscribed("AnimateContentSizePreview", listOf("animateContentSize"))
+    fun animateXAsStateIsNotSubscribed() {
+        AnimateXAsStateComposeAnimation.testOverrideAvailability(false)
+        checkAnimationsAreSubscribed(
+            "AllAnimations",
+            unsupported = listOf(
+                "animateContentSize",
+                "TargetBasedAnimation",
+                "DecayAnimation",
+            ),
+            transitions = listOf("checkBoxAnim", "Crossfade"),
+            animatedContent = listOf("AnimatedContent"),
+            animateXAsState = emptyList(),
+            infiniteTransitions = listOf("InfiniteTransition")
+        )
+        AnimateXAsStateComposeAnimation.testOverrideAvailability(true)
+    }
+
+    @Test
+    fun animateContentSizeIsNotSubscribed() {
+        checkAnimationsAreSubscribed("AnimateContentSizePreview")
+    }
+
+    @Test
+    fun animateContentSizeAndTransitionIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "AnimateContentSizeAndTransitionPreview",
+            listOf("animateContentSize"),
+            listOf("checkBoxAnim")
+        )
     }
 
     @Test
     fun crossFadeIsSubscribed() {
-        checkTransitionIsSubscribed("CrossFadePreview", "Crossfade")
+        checkAnimationsAreSubscribed(
+            "CrossFadePreview",
+            emptyList(),
+            listOf("Crossfade")
+        )
     }
 
     @Test
-    fun targetBasedAnimationIsSubscribed() {
-        checkAnimationsAreSubscribed("TargetBasedAnimationPreview", listOf("TargetBasedAnimation"))
+    fun targetBasedAnimationIsNotSubscribed() {
+        checkAnimationsAreSubscribed("TargetBasedAnimationPreview")
     }
 
     @Test
-    fun decayAnimationIsSubscribed() {
-        checkAnimationsAreSubscribed("DecayAnimationPreview", listOf("DecayAnimation"))
+    fun decayAnimationIsNotSubscribed() {
+        checkAnimationsAreSubscribed("DecayAnimationPreview")
     }
 
     @Test
     fun infiniteTransitionIsSubscribed() {
-        checkAnimationsAreSubscribed("InfiniteTransitionPreview", listOf("InfiniteTransition"))
+        checkAnimationsAreSubscribed(
+            "InfiniteTransitionPreview",
+            infiniteTransitions = listOf("InfiniteTransition")
+        )
+    }
+
+    @Test
+    fun targetBasedAndTransitionIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "TargetBasedAndTransitionPreview",
+            listOf("TargetBasedAnimation"),
+            listOf("checkBoxAnim")
+        )
+    }
+
+    @Test
+    fun decayAndTransitionIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "DecayAndTransitionPreview",
+            listOf("DecayAnimation"),
+            listOf("checkBoxAnim")
+        )
+    }
+
+    @Test
+    fun infiniteAndTransitionIsSubscribed() {
+        checkAnimationsAreSubscribed(
+            "InfiniteAndTransitionPreview",
+            transitions = listOf("checkBoxAnim"),
+            infiniteTransitions = listOf("InfiniteTransition")
+        )
     }
 
     @Test
@@ -207,8 +372,11 @@ class ComposeViewAdapterTest {
         UnsupportedComposeAnimation.testOverrideAvailability(false)
         checkAnimationsAreSubscribed(
             "AllAnimations",
-            emptyList(),
-            listOf("checkBoxAnim", "Crossfade")
+            unsupported = emptyList(),
+            transitions = listOf("checkBoxAnim", "Crossfade"),
+            animateXAsState = listOf("DpAnimation", "IntAnimation"),
+            animatedContent = listOf("AnimatedContent"),
+            infiniteTransitions = listOf("InfiniteTransition")
         )
         UnsupportedComposeAnimation.testOverrideAvailability(true)
     }
@@ -222,10 +390,23 @@ class ComposeViewAdapterTest {
         )
     }
 
+    @Test
+    fun materialAnimationsAreSubscribed() {
+        checkAnimationsAreSubscribed(
+            "MaterialPreview",
+            unsupported = emptyList(),
+            transitions = listOf("ToggleableState"),
+            animateXAsState = listOf("ColorAnimation", "ColorAnimation", "ColorAnimation")
+        )
+    }
+
     private fun checkAnimationsAreSubscribed(
         preview: String,
-        unsupported: List<String>,
-        transitions: List<String> = emptyList()
+        unsupported: List<String> = emptyList(),
+        transitions: List<String> = emptyList(),
+        animateXAsState: List<String> = emptyList(),
+        animatedContent: List<String> = emptyList(),
+        infiniteTransitions: List<String> = emptyList()
     ) {
         val clock = PreviewAnimationClock()
 
@@ -236,12 +417,14 @@ class ComposeViewAdapterTest {
             )
             composeViewAdapter.clock = clock
             assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.trackedTransitions.isEmpty())
-            assertTrue(clock.trackedUnsupported.isEmpty())
-            assertTrue(clock.trackedAnimatedVisibility.isEmpty())
+            assertTrue(clock.transitionClocks.isEmpty())
+            assertTrue(clock.trackedUnsupportedAnimations.isEmpty())
+            assertTrue(clock.animatedVisibilityClocks.isEmpty())
+            assertTrue(clock.animatedContentClocks.isEmpty())
+            assertTrue(clock.infiniteTransitionClocks.isEmpty())
         }
 
-        waitFor("Composable to have animations", 5, TimeUnit.SECONDS) {
+        waitFor(5, TimeUnit.SECONDS) {
             // Handle the case where onLayout was called too soon. Calling requestLayout will
             // make sure onLayout will be called again.
             composeViewAdapter.requestLayout()
@@ -249,36 +432,16 @@ class ComposeViewAdapterTest {
         }
 
         activityTestRule.runOnUiThread {
-            assertEquals(unsupported, clock.trackedUnsupported.map { it.label })
-            assertEquals(transitions, clock.trackedTransitions.map { it.label })
-            assertEquals(0, clock.trackedAnimatedVisibility.size)
-        }
-    }
-
-    @OptIn(InternalAnimationApi::class)
-    private fun checkTransitionIsSubscribed(composableName: String, label: String) {
-        val clock = PreviewAnimationClock()
-
-        activityTestRule.runOnUiThread {
-            composeViewAdapter.init(
-                "androidx.compose.ui.tooling.TestAnimationPreviewKt",
-                composableName
-            )
-            composeViewAdapter.clock = clock
-            assertFalse(composeViewAdapter.hasAnimations())
-            assertTrue(clock.trackedTransitions.isEmpty())
-        }
-
-        waitFor("Composable to have animations", 1, TimeUnit.SECONDS) {
-            // Handle the case where onLayout was called too soon. Calling requestLayout will
-            // make sure onLayout will be called again.
-            composeViewAdapter.requestLayout()
-            composeViewAdapter.hasAnimations()
-        }
-
-        activityTestRule.runOnUiThread {
-            val animation = clock.trackedTransitions.single()
-            assertEquals(label, animation.label)
+            assertEquals(unsupported, clock.trackedUnsupportedAnimations.map { it.label })
+            assertEquals(transitions, clock.transitionClocks.values.map { it.animation.label })
+            assertEquals(animateXAsState,
+                clock.animateXAsStateClocks.values.map { it.animation.label })
+            assertEquals(
+                animatedContent,
+                clock.animatedContentClocks.values.map { it.animation.label })
+            assertEquals(infiniteTransitions,
+                clock.infiniteTransitionClocks.values.map { it.animation.label })
+            assertEquals(0, clock.animatedVisibilityClocks.size)
         }
     }
 
@@ -365,6 +528,19 @@ class ComposeViewAdapterTest {
         )
     }
 
+    /**
+     * Verifies the use of inline classes as preview default parameters. Methods with inline
+     * classes as parameters will get the name mangled so we need to ensure we invoke correctly
+     * the right method.
+     */
+    @Test
+    fun defaultParametersComposableTest4() {
+        assertRendersCorrectly(
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "DefaultParametersPreview4"
+        )
+    }
+
     @Test
     fun previewInClass() {
         assertRendersCorrectly(
@@ -416,8 +592,8 @@ class ComposeViewAdapterTest {
     @Test
     fun multipreviewTest() {
         assertRendersCorrectly(
-                "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
-                "Multipreview"
+            "androidx.compose.ui.tooling.SimpleComposablePreviewKt",
+            "Multipreview"
         )
     }
 
@@ -443,8 +619,10 @@ class ComposeViewAdapterTest {
         repeat(5) {
             activityTestRule.runOnUiThread {
                 assertEquals(1, compositionCount.get())
-                assertTrue("At most, $expectedDrawCount draw is expected ($onDrawCounter happened)",
-                    onDrawCounter <= expectedDrawCount)
+                assertTrue(
+                    "At most, $expectedDrawCount draw is expected ($onDrawCounter happened)",
+                    onDrawCounter <= expectedDrawCount
+                )
             }
             Thread.sleep(250)
         }
@@ -510,7 +688,6 @@ class ComposeViewAdapterTest {
      * timing out. The condition is evaluated on the UI thread.
      */
     private fun waitFor(
-        conditionLabel: String,
         timeout: Long,
         timeUnit: TimeUnit,
         conditionExpression: () -> Boolean
@@ -523,7 +700,8 @@ class ComposeViewAdapterTest {
                 conditionSatisfied.set(conditionExpression())
             }
             if ((System.nanoTime() - now) > timeoutNanos) {
-                fail("Timed out while waiting for condition <$conditionLabel> to be satisfied.")
+                // Some previews are expected not to have animations.
+                return
             }
             Thread.sleep(200)
         }

@@ -18,7 +18,6 @@ package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.ui.Modifier
@@ -122,7 +121,7 @@ class LazyStaggeredGridContentPaddingTest(
                 state = state
             ) {
                 items(100) {
-                    Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it"))
+                    Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it").debugBorder())
                 }
             }
         }
@@ -309,5 +308,35 @@ class LazyStaggeredGridContentPaddingTest(
         rule.onNodeWithTag(LazyStaggeredGrid)
             .assertMainAxisSizeIsEqualTo(20.dp)
             .assertCrossAxisSizeIsEqualTo(itemSizeDp * 2)
+    }
+
+    @Test
+    fun scrollsCorrectlyWithKeyAndLargeMainAxisContentPadding() {
+        state = LazyStaggeredGridState(initialFirstVisibleItemIndex = 0)
+        rule.setContent {
+            LazyStaggeredGrid(
+                lanes = 2,
+                modifier = Modifier
+                    .testTag(LazyStaggeredGrid)
+                    .axisSize(itemSizeDp * 2, itemSizeDp * 5),
+                contentPadding = PaddingValues(
+                    mainAxis = itemSizeDp * 2,
+                    crossAxis = 0.dp
+                ),
+                state = state
+            ) {
+                items(1000, key = { it }) {
+                    Spacer(Modifier.mainAxisSize(itemSizeDp).testTag("$it"))
+                }
+            }
+        }
+
+        repeat(10) {
+            state.scrollBy(itemSizeDp * 20)
+        }
+
+        rule.runOnIdle {
+            assertThat(state.firstVisibleItemIndex).isEqualTo(400)
+        }
     }
 }

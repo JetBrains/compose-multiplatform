@@ -33,7 +33,9 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsNotDisplayed
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.test.filters.LargeTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -88,7 +90,7 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(4)
+        waitForPrefetch(5)
 
         rule.onNodeWithTag("4")
             .assertExists()
@@ -128,7 +130,7 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(8)
+        waitForPrefetch(9)
 
         rule.onNodeWithTag("8")
             .assertExists()
@@ -224,7 +226,7 @@ class LazyStaggeredGridPrefetcherTest(
             }
         }
 
-        waitForPrefetch(12)
+        waitForPrefetch(13)
 
         rule.onNodeWithTag("12")
             .assertExists()
@@ -364,7 +366,7 @@ class LazyStaggeredGridPrefetcherTest(
             runBlocking(AutoTestFrameClock()) {
                 state.scrollBy(itemsSizePx.toFloat())
             }
-            // then we synchronously dispose LazyColumn
+            // then we synchronously dispose
             emit = false
             remeasure.forceRemeasure()
         }
@@ -519,6 +521,133 @@ class LazyStaggeredGridPrefetcherTest(
         // └─┴─┘
 
         waitForPrefetch(9)
+    }
+
+    @Test
+    fun fullSpanIsPrefetchedCorrectly() {
+        val nodeConstraints = mutableMapOf<Int, Constraints>()
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                2,
+                Modifier.mainAxisSize(itemsSizeDp * 5f).crossAxisSize(itemsSizeDp * 2f),
+                state,
+            ) {
+                items(
+                    count = 100,
+                    span = {
+                        if (it % 10 == 0)
+                            StaggeredGridItemSpan.FullLine
+                        else
+                            StaggeredGridItemSpan.SingleLane
+                    }
+                ) {
+                    DisposableEffect(it) {
+                        activeNodes.add(it)
+                        onDispose {
+                            activeNodes.remove(it)
+                            activeMeasuredNodes.remove(it)
+                        }
+                    }
+                    Spacer(
+                        Modifier
+                            .border(Dp.Hairline, Color.Black)
+                            .testTag("$it")
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                activeMeasuredNodes.add(it)
+                                nodeConstraints.put(it, constraints)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, 0)
+                                }
+                            }
+                            .mainAxisSize(if (it == 0) itemsSizeDp else itemsSizeDp * 2)
+                    )
+                }
+            }
+        }
+
+        // ┌─┬─┐
+        // │5├─┤
+        // ├─┤6│
+        // │7├─┤
+        // ├─┤8│
+        // └─┴─┘
+
+        state.scrollBy(itemsSizeDp * 5f)
+        assertThat(activeNodes).contains(9)
+
+        waitForPrefetch(10)
+        val expectedConstraints = if (vertical) {
+            Constraints.fixedWidth(itemsSizePx * 2)
+        } else {
+            Constraints.fixedHeight(itemsSizePx * 2)
+        }
+        assertThat(nodeConstraints[10]).isEqualTo(expectedConstraints)
+    }
+
+    @Test
+    fun fullSpanIsPrefetchedCorrectly_scrollingBack() {
+        rule.setContent {
+            state = rememberLazyStaggeredGridState()
+            LazyStaggeredGrid(
+                2,
+                Modifier.mainAxisSize(itemsSizeDp * 5f),
+                state,
+            ) {
+                items(
+                    count = 100,
+                    span = {
+                        if (it % 10 == 0)
+                            StaggeredGridItemSpan.FullLine
+                        else
+                            StaggeredGridItemSpan.SingleLane
+                    }
+                ) {
+                    DisposableEffect(it) {
+                        activeNodes.add(it)
+                        onDispose {
+                            activeNodes.remove(it)
+                            activeMeasuredNodes.remove(it)
+                        }
+                    }
+                    Spacer(
+                        Modifier
+                            .mainAxisSize(if (it == 0) itemsSizeDp else itemsSizeDp * 2)
+                            .border(Dp.Hairline, Color.Black)
+                            .testTag("$it")
+                            .layout { measurable, constraints ->
+                                val placeable = measurable.measure(constraints)
+                                activeMeasuredNodes.add(it)
+                                layout(placeable.width, placeable.height) {
+                                    placeable.place(0, 0)
+                                }
+                            }
+                    )
+                }
+            }
+        }
+
+        state.scrollBy(itemsSizeDp * 13f + 2.dp)
+        rule.waitForIdle()
+
+        // second scroll to make sure subcompose marks elements as /not/ active
+        state.scrollBy(2.dp)
+        rule.waitForIdle()
+
+        // ┌──┬──┐
+        // │11│12│
+        // ├──┼──┤
+        // │13│14│
+        // ├──┼──┤
+        // └──┴──┘
+
+        assertThat(activeNodes).contains(11)
+        assertThat(activeNodes).doesNotContain(10)
+
+        state.scrollBy(-1.dp)
+
+        waitForPrefetch(10)
     }
 
     private fun waitForPrefetch(index: Int) {

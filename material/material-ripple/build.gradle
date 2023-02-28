@@ -33,12 +33,12 @@ dependencies {
          * When updating dependencies, make sure to make the an an analogous update in the
          * corresponding block below
          */
-        api("androidx.compose.foundation:foundation:1.1.1")
-        api("androidx.compose.runtime:runtime:1.1.1")
+        api("androidx.compose.foundation:foundation:1.2.1")
+        api("androidx.compose.runtime:runtime:1.2.1")
 
         implementation(libs.kotlinStdlibCommon)
-        implementation("androidx.compose.animation:animation:1.0.0")
-        implementation("androidx.compose.ui:ui-util:1.0.0")
+        implementation("androidx.compose.animation:animation:1.2.1")
+        implementation("androidx.compose.ui:ui-util:1.2.1")
 
         testImplementation(libs.testRules)
         testImplementation(libs.testRunner)
@@ -100,7 +100,6 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material Ripple"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2020"
     description = "Material ripple used to build interactive components"
     // Disable strict API mode for MPP builds as it will fail to compile androidAndroidTest
@@ -111,12 +110,4 @@ androidx {
 
 android {
     namespace "androidx.compose.material.ripple"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

@@ -33,18 +33,31 @@ dependencies {
     implementation(project(":compose:ui:ui-test"))
     implementation(project(":compose:ui:ui-test-junit4"))
 
-    implementation("androidx.compose.animation:animation:1.2.0")
-    implementation("androidx.compose.material:material:1.1.0")
+    implementation("androidx.compose.animation:animation:1.2.1")
+    implementation("androidx.compose.material:material:1.2.1")
 }
 
 androidx {
     name = "AndroidX Compose Testing Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2022"
     description = "Contains samples for AndroidX Compose Testing."
 }
 
 android {
     namespace "androidx.compose.ui.test.samples"
+}
+
+// Workaround for https://github.com/gradle/gradle/issues/19882
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute(module("androidx.lifecycle:lifecycle-common:")).
+                using project(":lifecycle:lifecycle-common")
+        substitute(module("androidx.lifecycle:lifecycle-runtime:")).
+                using project(":lifecycle:lifecycle-runtime")
+        substitute(module("androidx.lifecycle:lifecycle-runtime-ktx:")).
+                using project(":lifecycle:lifecycle-runtime-ktx")
+        substitute(module("androidx.lifecycle:lifecycle-viewmodel:")).
+                using project(":lifecycle:lifecycle-viewmodel")
+    }
 }

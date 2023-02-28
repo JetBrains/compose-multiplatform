@@ -36,10 +36,10 @@ dependencies {
 
         api("androidx.annotation:annotation:1.1.0")
 
-        implementation("androidx.compose.runtime:runtime:1.1.1")
-        implementation("androidx.compose.ui:ui:1.2.0")
-        implementation("androidx.compose.ui:ui-unit:1.0.0")
-        implementation("androidx.compose.ui:ui-util:1.0.0")
+        implementation("androidx.compose.runtime:runtime:1.2.1")
+        implementation("androidx.compose.ui:ui:1.2.1")
+        implementation("androidx.compose.ui:ui-unit:1.2.1")
+        implementation("androidx.compose.ui:ui-util:1.2.1")
         implementation(libs.kotlinStdlib)
         api(libs.kotlinCoroutinesCore)
 
@@ -54,7 +54,7 @@ dependencies {
         androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.junit)
         androidTestImplementation(project(":compose:animation:animation"))
-        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.0.0")
+        androidTestImplementation("androidx.compose.ui:ui-test-junit4:1.2.1")
         androidTestImplementation(project(":compose:test-utils"))
 
         lintPublish project(":compose:animation:animation-core-lint")
@@ -135,7 +135,6 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Animation Core"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2019"
     description = "Animation engine and animation primitives that are the building blocks of the Compose animation library"
     legacyDisableKotlinStrictApiMode = true
@@ -143,12 +142,4 @@ androidx {
 
 android {
     namespace "androidx.compose.animation.core"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all"
-        ]
-    }
 }

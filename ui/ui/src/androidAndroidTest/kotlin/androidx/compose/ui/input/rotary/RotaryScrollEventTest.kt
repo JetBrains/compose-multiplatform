@@ -22,11 +22,14 @@ import android.view.ViewConfiguration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
+import androidx.compose.ui.focus.setFocusableContent
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -44,7 +47,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalComposeUiApi::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class RotaryScrollEventTest {
@@ -211,6 +213,84 @@ class RotaryScrollEventTest {
             assertThat(receivedEvents.size).isEqualTo(2)
             assertThat(receivedEvents[1].uptimeMillis - receivedEvents[0].uptimeMillis)
                 .isEqualTo(TIME_DELTA)
+        }
+    }
+
+    @Test
+    fun onRotaryKeyEvent_afterUpdate() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var keyEventFromOnKeyEvent1: RotaryScrollEvent? = null
+        var keyEventFromOnKeyEvent2: RotaryScrollEvent? = null
+        var onRotaryScrollEvent: (event: RotaryScrollEvent) -> Boolean by mutableStateOf(
+            value = {
+                keyEventFromOnKeyEvent1 = it
+                true
+            }
+        )
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onRotaryScrollEvent(onRotaryScrollEvent)
+                    .focusTarget()
+            )
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Act.
+        rule.runOnIdle {
+            onRotaryScrollEvent = {
+                keyEventFromOnKeyEvent2 = it
+                true
+            }
+        }
+        @OptIn(ExperimentalTestApi::class)
+        rule.onRoot().performRotaryScrollInput { rotateToScrollVertically(3.0f) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(keyEventFromOnKeyEvent1).isNull()
+            assertThat(keyEventFromOnKeyEvent2).isNotNull()
+        }
+    }
+
+    @Test
+    fun onRotaryPreviewKeyEvent_afterUpdate() {
+        // Arrange.
+        val focusRequester = FocusRequester()
+        var keyEventFromOnPreRotaryScrollEvent1: RotaryScrollEvent? = null
+        var keyEventFromOnPreRotaryScrollEvent2: RotaryScrollEvent? = null
+        var onPreRotaryScrollEvent: (event: RotaryScrollEvent) -> Boolean by mutableStateOf(
+            value = {
+                keyEventFromOnPreRotaryScrollEvent1 = it
+                true
+            }
+        )
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .onPreRotaryScrollEvent(onPreRotaryScrollEvent)
+                    .focusTarget()
+            )
+        }
+        rule.runOnIdle { focusRequester.requestFocus() }
+
+        // Act.
+        rule.runOnIdle {
+            onPreRotaryScrollEvent = {
+                keyEventFromOnPreRotaryScrollEvent2 = it
+                true
+            }
+        }
+        @OptIn(ExperimentalTestApi::class)
+        rule.onRoot().performRotaryScrollInput { rotateToScrollVertically(3.0f) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(keyEventFromOnPreRotaryScrollEvent1).isNull()
+            assertThat(keyEventFromOnPreRotaryScrollEvent2).isNotNull()
         }
     }
 

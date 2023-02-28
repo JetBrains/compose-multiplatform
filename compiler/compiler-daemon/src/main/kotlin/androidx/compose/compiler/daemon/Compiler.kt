@@ -58,6 +58,7 @@ data class DaemonCompilerSettings(val composePluginPath: String? = null) {
     }
 }
 
+@JvmDefaultWithCompatibility
 interface DaemonCompiler {
     fun compile(
         args: Array<String>,
@@ -97,7 +98,7 @@ object IncrementalDaemonCompiler : DaemonCompiler {
         workingDir = Files.createTempDirectory("workingDir").toFile(),
         reporter = BuildReporter(DoNothingICReporter, DoNothingBuildMetricsReporter),
         usePreciseJavaTracking = true,
-        outputFiles = emptyList(),
+        outputDirs = null,
         buildHistoryFile = Files.createTempFile("build-history", ".bin").toFile(),
         modulesApiHistory = EmptyModulesApiHistory,
         kotlinSourceFilesExtensions = DEFAULT_KOTLIN_SOURCE_FILES_EXTENSIONS,

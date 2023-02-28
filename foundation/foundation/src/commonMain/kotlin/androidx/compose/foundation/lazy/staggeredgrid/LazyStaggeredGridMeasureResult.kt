@@ -17,6 +17,7 @@
 package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -63,6 +64,11 @@ sealed interface LazyStaggeredGridItemInfo {
 @ExperimentalFoundationApi
 sealed interface LazyStaggeredGridLayoutInfo {
     /**
+     * Orientation of the staggered grid.
+     */
+    val orientation: Orientation
+
+    /**
      * The list of [LazyStaggeredGridItemInfo] per each visible item ordered by index.
      */
     val visibleItemsInfo: List<LazyStaggeredGridItemInfo>
@@ -103,6 +109,11 @@ sealed interface LazyStaggeredGridLayoutInfo {
      * Content padding in pixels applied after the items in scroll direction.
      */
     val afterContentPadding: Int
+
+    /**
+     * The spacing between items in scroll direction.
+     */
+    val mainAxisItemSpacing: Int
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -129,14 +140,19 @@ internal class LazyStaggeredGridMeasureResult(
     val measureResult: MeasureResult,
     val canScrollForward: Boolean,
     val canScrollBackward: Boolean,
+    val isVertical: Boolean,
     override val totalItemsCount: Int,
     override val visibleItemsInfo: List<LazyStaggeredGridItemInfo>,
     override val viewportSize: IntSize,
     override val viewportStartOffset: Int,
     override val viewportEndOffset: Int,
     override val beforeContentPadding: Int,
-    override val afterContentPadding: Int
-) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult
+    override val afterContentPadding: Int,
+    override val mainAxisItemSpacing: Int
+) : LazyStaggeredGridLayoutInfo, MeasureResult by measureResult {
+    override val orientation: Orientation =
+        if (isVertical) Orientation.Vertical else Orientation.Horizontal
+}
 
 @OptIn(ExperimentalFoundationApi::class)
 internal object EmptyLazyStaggeredGridLayoutInfo : LazyStaggeredGridLayoutInfo {
@@ -147,4 +163,6 @@ internal object EmptyLazyStaggeredGridLayoutInfo : LazyStaggeredGridLayoutInfo {
     override val viewportEndOffset: Int = 0
     override val beforeContentPadding: Int = 0
     override val afterContentPadding: Int = 0
+    override val mainAxisItemSpacing: Int = 0
+    override val orientation: Orientation = Orientation.Vertical
 }

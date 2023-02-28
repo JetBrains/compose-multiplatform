@@ -88,7 +88,9 @@ class IconButtonTest {
     fun iconButton_sizeWithoutMinTargetEnforcement() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     IconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
@@ -176,7 +178,9 @@ class IconButtonTest {
     fun iconToggleButton_sizeWithoutMinTargetEnforcement() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     IconToggleButton(checked = true, onCheckedChange = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
@@ -296,7 +300,9 @@ class IconButtonTest {
     fun filledIconButton_sizeWithoutMinTargetEnforcement() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     FilledIconButton(onClick = { /* doSomething() */ }) {
                         Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
                     }
@@ -367,6 +373,32 @@ class IconButtonTest {
     }
 
     @Test
+    fun filledTonalIconButton_defaultSemantics() {
+        rule.setMaterialContent(lightColorScheme()) {
+            FilledTonalIconButton(onClick = { /* doSomething() */ }) {
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+            }
+        }
+        rule.onNode(hasClickAction()).apply {
+            assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            assertIsEnabled()
+        }
+    }
+
+    @Test
+    fun filledTonalIconButton_disabledSemantics() {
+        rule.setMaterialContent(lightColorScheme()) {
+            FilledTonalIconButton(onClick = {}, enabled = false) {
+                Icon(Icons.Filled.Favorite, contentDescription = "Localized description")
+            }
+        }
+        rule.onNode(hasClickAction()).apply {
+            assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            assertIsNotEnabled()
+        }
+    }
+
+    @Test
     fun filledIconToggleButton_size() {
         rule
             .setMaterialContentForSizeAssertions {
@@ -384,7 +416,9 @@ class IconButtonTest {
     fun filledIconToggleButton_sizeWithoutMinTargetEnforcement() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     FilledIconToggleButton(
                         checked = true,
                         onCheckedChange = { /* doSomething() */ }) {
@@ -482,7 +516,9 @@ class IconButtonTest {
     fun outlinedIconButton_sizeWithoutMinTargetEnforcement() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     OutlinedIconButton(onClick = { /* doSomething() */ }) {
                         Icon(
                             Icons.Outlined.FavoriteBorder,
@@ -578,7 +614,9 @@ class IconButtonTest {
     fun outlinedIconToggleButton_sizeWithoutMinTargetEnforcement() {
         rule
             .setMaterialContentForSizeAssertions {
-                CompositionLocalProvider(LocalMinimumTouchTargetEnforcement provides false) {
+                CompositionLocalProvider(
+                    LocalMinimumInteractiveComponentEnforcement provides false
+                ) {
                     OutlinedIconToggleButton(
                         checked = true,
                         onCheckedChange = { /* doSomething() */ }) {

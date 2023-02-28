@@ -34,8 +34,8 @@ if (!AndroidXComposePlugin.isMultiplatformEnabled(project)) {
          * corresponding block below
          */
 
-        api("androidx.compose.ui:ui:1.0.0")
-        implementation("androidx.compose.runtime:runtime:1.1.1")
+        api("androidx.compose.ui:ui:1.2.1")
+        implementation("androidx.compose.runtime:runtime:1.2.1")
         implementation(libs.kotlinStdlib)
 
         samples(project(":compose:material:material-icons-core:material-icons-core-samples"))
@@ -79,7 +79,6 @@ IconGenerationTask.registerCoreIconProject(
 androidx {
     name = "Compose Material Icons Core"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL
     inceptionYear = "2020"
     description = "Compose Material Design core icons. This module contains the most commonly used set of Material icons."
     legacyDisableKotlinStrictApiMode = true

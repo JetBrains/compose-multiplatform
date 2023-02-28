@@ -119,6 +119,27 @@ class ChipTest {
     }
 
     @Test
+    fun disabledSemantics_filterChip() {
+        rule.setMaterialContent {
+            Box {
+                FilterChip(
+                    selected = true,
+                    modifier = Modifier.testTag(TestChipTag),
+                    onClick = {},
+                    enabled = false
+                ) {
+                    Text(TestChipTag)
+                }
+            }
+        }
+
+        rule.onNodeWithTag(TestChipTag)
+            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Checkbox))
+            .assertIsNotEnabled()
+            .assertHasClickAction()
+    }
+
+    @Test
     fun onClick() {
         var counter = 0
         val onClick: () -> Unit = { ++counter }
@@ -157,6 +178,32 @@ class ChipTest {
         }
         rule.onNodeWithTag(TestChipTag)
             // Confirm the chip starts off enabled, with a click action
+            .assertHasClickAction()
+            .assertIsEnabled()
+            .performClick()
+            // Then confirm it's disabled with click action after clicking it
+            .assertHasClickAction()
+            .assertIsNotEnabled()
+    }
+
+    @Test
+    fun canBeDisabled_filterChip() {
+        rule.setMaterialContent {
+            var enabled by remember { mutableStateOf(true) }
+            val onClick = { enabled = false }
+            Box {
+                FilterChip(
+                    selected = true,
+                    modifier = Modifier.testTag(TestChipTag),
+                    onClick = onClick,
+                    enabled = enabled
+                ) {
+                    Text("Hello")
+                }
+            }
+        }
+        rule.onNodeWithTag(TestChipTag)
+            // Confirm the filter chip starts off enabled, with a click action
             .assertHasClickAction()
             .assertIsEnabled()
             .performClick()
@@ -274,14 +321,19 @@ class ChipTest {
                 }
             ) {
                 Spacer(
-                    Modifier.requiredSize(10.dp).onGloballyPositioned {
-                        item1Bounds = it.boundsInRoot()
-                    }
+                    Modifier
+                        .requiredSize(10.dp)
+                        .onGloballyPositioned {
+                            item1Bounds = it.boundsInRoot()
+                        }
                 )
                 Spacer(
-                    Modifier.requiredWidth(10.dp).requiredHeight(5.dp).onGloballyPositioned {
-                        item2Bounds = it.boundsInRoot()
-                    }
+                    Modifier
+                        .requiredWidth(10.dp)
+                        .requiredHeight(5.dp)
+                        .onGloballyPositioned {
+                            item2Bounds = it.boundsInRoot()
+                        }
                 )
             }
         }
@@ -298,7 +350,9 @@ class ChipTest {
         rule.setMaterialContent {
             Box(Modifier.fillMaxSize()) {
                 Chip(
-                    modifier = Modifier.align(Alignment.Center).testTag(TestChipTag)
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .testTag(TestChipTag)
                         .requiredSize(10.dp),
                     onClick = { clicked = !clicked }
                 ) {

@@ -366,6 +366,7 @@ class TextStyleLayoutAttributesTest {
             getProperty("textGeometricTransform"),
             getProperty("localeList"),
             getProperty("background"),
+            getProperty("drawStyle"),
             getProperty("textAlign"),
             getProperty("textDirection"),
             getProperty("lineHeight"),
@@ -378,7 +379,8 @@ class TextStyleLayoutAttributesTest {
             getProperty("spanStyle"),
             getProperty("lineHeightStyle"),
             getProperty("hyphens"),
-            getProperty("lineBreak")
+            getProperty("lineBreak"),
+            getProperty("textMotion")
         )
 
         val textStyleProperties = TextStyle::class.memberProperties.map { Property(it) }

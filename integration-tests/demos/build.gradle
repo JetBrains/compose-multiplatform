@@ -18,6 +18,7 @@ dependencies {
     implementation(libs.kotlinReflect)
     implementation(libs.kotlinStdlib)
 
+    implementation(project(":core:core-ktx"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:integration-tests:demos:common"))
@@ -26,15 +27,11 @@ dependencies {
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
 
-    implementation("androidx.preference:preference-ktx:1.1.1")
+    implementation("androidx.lifecycle:lifecycle-livedata:2.6.0")
+    implementation("androidx.lifecycle:lifecycle-livedata-core:2.6.0")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-savedstate:2.6.0")
 
-    androidTestImplementation(project(":compose:ui:ui-test-junit4"))
-    androidTestImplementation(libs.testCore)
-    androidTestImplementation(libs.testRules)
-    androidTestImplementation(libs.testRunner)
-    androidTestImplementation(libs.espressoCore)
-    androidTestImplementation(libs.junit)
-    androidTestImplementation(libs.truth)
+    implementation("androidx.preference:preference-ktx:1.1.1")
 }
 
 android {

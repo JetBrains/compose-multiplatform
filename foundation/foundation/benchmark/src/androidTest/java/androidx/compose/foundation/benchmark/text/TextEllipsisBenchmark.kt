@@ -17,16 +17,9 @@
 package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.benchmarkDrawPerf
-import androidx.compose.testutils.benchmark.benchmarkFirstCompose
-import androidx.compose.testutils.benchmark.benchmarkFirstDraw
 import androidx.compose.testutils.benchmark.benchmarkFirstLayout
 import androidx.compose.testutils.benchmark.benchmarkFirstMeasure
-import androidx.compose.testutils.benchmark.benchmarkLayoutPerf
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasureLayout
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -47,7 +40,7 @@ class TextEllipsisBenchmark(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "length={0}")
-        fun initParameters(): Array<Any> = arrayOf(32, 128, 512)
+        fun initParameters(): Array<Any> = arrayOf(32, 128, 512).filterForCi { max() }
     }
 
     @get:Rule
@@ -79,15 +72,6 @@ class TextEllipsisBenchmark(
     }
 
     /**
-     * Measure the time taken to compose a a Text composable from scratch with the given input.
-     * This is the time taken to call the a Text composable function.
-     */
-    @Test
-    fun first_compose() {
-        benchmarkRule.benchmarkFirstCompose(caseFactory)
-    }
-
-    /**
      * Measure the time taken by the first time measure the a Text composable with the given input.
      * This is mainly the time used to measure all the Measurables in the a Text composable.
      */
@@ -106,59 +90,10 @@ class TextEllipsisBenchmark(
     }
 
     /**
-     * Measure the time taken by first time draw the a Text composable with the given input.
+     * Measure the time taken to layout the a Text composable when alignment gets toggled.
      */
     @Test
-    fun first_draw() {
-        benchmarkRule.benchmarkFirstDraw(caseFactory)
-    }
-
-    /**
-     * Measure the time taken by layout the a Text composable after the layout constrains changed.
-     * This is mainly the time used to re-measure and re-layout the composable.
-     */
-    @Test
-    fun layout() {
-        benchmarkRule.benchmarkLayoutPerf(caseFactory)
-    }
-
-    /**
-     * Measure the time taken by redrawing the a Text composable.
-     */
-    @Test
-    fun draw() {
-        benchmarkRule.benchmarkDrawPerf(caseFactory)
-    }
-
-    /**
-     * Measure the time taken to recompose the a Text composable when color gets toggled.
-     */
-    @Test
-    fun toggleAlignment_recompose() {
-        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory)
-    }
-
-    /**
-     * Measure the time taken to measure the a Text composable when color gets toggled.
-     */
-    @Test
-    fun toggleAlignment_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(caseFactory)
-    }
-
-    /**
-     * Measure the time taken to layout the a Text composable when color gets toggled.
-     */
-    @Test
-    fun toggleAlignment_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(caseFactory)
-    }
-
-    /**
-     * Measure the time taken to draw the a Text composable when color gets toggled.
-     */
-    @Test
-    fun toggleAlignment_draw() {
-        benchmarkRule.toggleStateBenchmarkDraw(caseFactory)
+    fun toggleAlignment_measureLayout() {
+        benchmarkRule.toggleStateBenchmarkMeasureLayout(caseFactory, assertOneRecomposition = false)
     }
 }

@@ -103,23 +103,23 @@ internal val DefaultRowMeasurePolicy = rowColumnMeasurePolicy(
 internal fun rowMeasurePolicy(
     horizontalArrangement: Arrangement.Horizontal,
     verticalAlignment: Alignment.Vertical
-) = remember(horizontalArrangement, verticalAlignment) {
-    if (horizontalArrangement == Arrangement.Start && verticalAlignment == Alignment.Top) {
+) = if (horizontalArrangement == Arrangement.Start && verticalAlignment == Alignment.Top) {
         DefaultRowMeasurePolicy
     } else {
-        rowColumnMeasurePolicy(
-            orientation = LayoutOrientation.Horizontal,
-            arrangement = { totalSize, size, layoutDirection, density, outPosition ->
-                with(horizontalArrangement) {
-                    density.arrange(totalSize, size, layoutDirection, outPosition)
-                }
-            },
-            arrangementSpacing = horizontalArrangement.spacing,
-            crossAxisAlignment = CrossAxisAlignment.vertical(verticalAlignment),
-            crossAxisSize = SizeMode.Wrap
-        )
+        remember(horizontalArrangement, verticalAlignment) {
+            rowColumnMeasurePolicy(
+                orientation = LayoutOrientation.Horizontal,
+                arrangement = { totalSize, size, layoutDirection, density, outPosition ->
+                    with(horizontalArrangement) {
+                        density.arrange(totalSize, size, layoutDirection, outPosition)
+                    }
+                },
+                arrangementSpacing = horizontalArrangement.spacing,
+                crossAxisAlignment = CrossAxisAlignment.vertical(verticalAlignment),
+                crossAxisSize = SizeMode.Wrap
+            )
+        }
     }
-}
 
 /**
  * Scope for the children of [Row].

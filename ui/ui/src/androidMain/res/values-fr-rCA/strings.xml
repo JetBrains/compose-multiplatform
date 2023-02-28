@@ -20,6 +20,7 @@
     <string name="indeterminate" msgid="7933458017204019916">"Partiellement vérifié"</string>
     <string name="on" msgid="8655164131929253426">"Activé"</string>
     <string name="off" msgid="875452955155264703">"Désactivé"</string>
+    <string name="switch_role" msgid="2561197295334830845">"Basculer"</string>
     <string name="selected" msgid="6043586758067023">"Sélectionné"</string>
     <string name="not_selected" msgid="6610465462668679431">"Non sélectionné"</string>
     <string name="template_percent" msgid="5946805113151406391">"<xliff:g id="PERCENTAGE">%1$d</xliff:g> pour cent."</string>

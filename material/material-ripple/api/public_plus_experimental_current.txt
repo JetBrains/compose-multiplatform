@@ -13,9 +13,6 @@ package androidx.compose.material.ripple {
     property public final float pressedAlpha;
   }
 
-  public final class RippleAnimationKt {
-  }
-
   public final class RippleKt {
     method @androidx.compose.runtime.Composable public static androidx.compose.foundation.Indication rememberRipple(optional boolean bounded, optional float radius, optional long color);
   }

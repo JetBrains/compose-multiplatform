@@ -294,7 +294,7 @@ class FontListFontFamilyTypefaceAdapterTest {
                 assertThat(it).currentAsyncTypefaceValue(Typeface.DEFAULT)
             },
             doCompleteAsync = {
-                scope.advanceTimeBy(Font.MaximumAsyncTimeout)
+                scope.advanceTimeBy(Font.MaximumAsyncTimeoutMillis)
                 scope.runCurrent()
                 typefaceLoader.completeOne(asyncFontFallback, expected)
             }

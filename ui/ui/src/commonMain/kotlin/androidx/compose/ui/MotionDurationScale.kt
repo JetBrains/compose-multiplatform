@@ -24,6 +24,12 @@ import kotlin.coroutines.CoroutineContext
  * the motion will end in the next frame callback. Otherwise, the duration [scaleFactor] will be
  * used as a multiplier to scale the duration of the motion. The larger the scale, the longer the
  * motion will take to finish, and therefore the slower it will be perceived.
+ *
+ * ## Testing
+ *
+ * To control the motion duration scale in tests, create an implementation of this interface and
+ * pass it to the `effectContext` parameter either where you call `runComposeUiTest` or where you
+ * create your test rule.
  */
 @Stable
 interface MotionDurationScale : CoroutineContext.Element {

@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.focus
 
+import android.view.KeyEvent as AndroidKeyEvent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
@@ -25,45 +26,63 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.setFocusableContent
+import androidx.compose.ui.input.focus.FocusAwareEventPropagationTest.NodeType.KeyInput
+import androidx.compose.ui.input.focus.FocusAwareEventPropagationTest.NodeType.RotaryInput
+import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.KeyInputInputModifierNodeImpl
+import androidx.compose.ui.input.rotary.RotaryInputModifierNodeImpl
+import androidx.compose.ui.input.rotary.RotaryScrollEvent
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyPress
+import androidx.compose.ui.test.performRotaryScrollInput
 import androidx.compose.ui.unit.dp
-import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import androidx.compose.ui.input.rotary.RotaryScrollEvent as FocusAwareTestEvent
-import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent as onPreFocusAwareEvent
-import androidx.compose.ui.input.rotary.onRotaryScrollEvent as onFocusAwareEvent
-import androidx.compose.ui.test.performRotaryScrollInput as performFocusAwareInput
+import org.junit.runners.Parameterized
 
 /**
  * Focus-aware event propagation test.
- *
- * This test verifies the event propagation logic using
- * [androidx.compose.ui.input.rotary.RotaryScrollEvent]s, but it is meant to test the generic
- * propagation logic for all focus-aware events.
  */
-@OptIn(ExperimentalComposeUiApi::class)
 @MediumTest
-@RunWith(AndroidJUnit4::class)
-class FocusAwareEventPropagationTest {
+@RunWith(Parameterized::class)
+class FocusAwareEventPropagationTest(private val nodeType: NodeType) {
     @get:Rule
     val rule = createComposeRule()
 
-    @OptIn(ExperimentalComposeUiApi::class)
-    private val sentEvent: FocusAwareTestEvent =
-        FocusAwareTestEvent(1f, 2f, 3L)
-    private var receivedEvent: FocusAwareTestEvent? = null
+    private val sentEvent: Any = when (nodeType) {
+        KeyInput ->
+            KeyEvent(AndroidKeyEvent(AndroidKeyEvent.ACTION_DOWN, AndroidKeyEvent.KEYCODE_A))
+        RotaryInput ->
+            RotaryScrollEvent(1f, 1f, 0L)
+    }
+    private var receivedEvent: Any? = null
     private val initialFocus = FocusRequester()
+
+    companion object {
+        @JvmStatic
+        @Parameterized.Parameters(name = "node = {0}")
+        fun initParameters() = arrayOf(KeyInput, RotaryInput)
+    }
+
+    @Before
+    fun ignoreEventTime() {
+        // This test just checks the propagation of events and doesn't care about the event time.
+        rule.mainClock.autoAdvance = false
+    }
 
     @Test
     fun noFocusable_doesNotDeliverEvent() {
         // Arrange.
+        var error: IllegalStateException? = null
         rule.setContent {
             Box(
                 modifier = Modifier.onFocusAwareEvent {
@@ -74,15 +93,24 @@ class FocusAwareEventPropagationTest {
         }
 
         // Act.
-        rule.onRoot().performFocusAwareInput(sentEvent)
+        try {
+            rule.onRoot().performFocusAwareInput(sentEvent)
+        } catch (exception: IllegalStateException) {
+            error = exception
+        }
 
         // Assert.
         assertThat(receivedEvent).isNull()
+        when (nodeType) {
+            KeyInput -> assertThat(error!!.message).contains("do not have an active focus target")
+            RotaryInput -> assertThat(error).isNull()
+        }
     }
 
     @Test
     fun unfocusedFocusable_doesNotDeliverEvent() {
         // Arrange.
+        var error: IllegalStateException? = null
         rule.setFocusableContent {
             Box(
                 modifier = Modifier
@@ -95,10 +123,18 @@ class FocusAwareEventPropagationTest {
         }
 
         // Act.
-        rule.onRoot().performFocusAwareInput(sentEvent)
+        try {
+            rule.onRoot().performFocusAwareInput(sentEvent)
+        } catch (exception: IllegalStateException) {
+            error = exception
+        }
 
         // Assert.
         assertThat(receivedEvent).isNull()
+        when (nodeType) {
+            KeyInput -> assertThat(error!!.message).contains("do not have an active focus target")
+            RotaryInput -> assertThat(error).isNull()
+        }
     }
 
     @Test
@@ -120,7 +156,10 @@ class FocusAwareEventPropagationTest {
         rule.onRoot().performFocusAwareInput(sentEvent)
 
         // Assert.
-        assertThat(receivedEvent).isNull()
+        when (nodeType) {
+            KeyInput -> assertThat(receivedEvent).isEqualTo(sentEvent)
+            RotaryInput -> assertThat(receivedEvent).isNull()
+        }
     }
 
     @Test
@@ -141,7 +180,10 @@ class FocusAwareEventPropagationTest {
         rule.onRoot().performFocusAwareInput(sentEvent)
 
         // Assert.
-        assertThat(receivedEvent).isNull()
+        when (nodeType) {
+            KeyInput -> assertThat(receivedEvent).isEqualTo(sentEvent)
+            RotaryInput -> assertThat(receivedEvent).isNull()
+        }
     }
 
     @Test
@@ -162,15 +204,11 @@ class FocusAwareEventPropagationTest {
         rule.onRoot().performFocusAwareInput(sentEvent)
 
         // Assert.
-        rule.runOnIdle {
-            // performFocusAwareInput generates a vertical scroll
-            assertThat(sentEvent.verticalScrollPixels)
-                .isEqualTo(receivedEvent?.verticalScrollPixels)
-        }
+        rule.runOnIdle { assertThat(sentEvent).isEqualTo(receivedEvent) }
     }
 
     @Test
-    fun onPreviewKeyEvent_triggered() {
+    fun onPreFocusAwareEvent_triggered() {
         // Arrange.
         ContentWithInitialFocus {
             Box(
@@ -187,11 +225,7 @@ class FocusAwareEventPropagationTest {
         rule.onRoot().performFocusAwareInput(sentEvent)
 
         // Assert.
-        rule.runOnIdle {
-            // performFocusAwareInput generates a vertical scroll
-            assertThat(sentEvent.verticalScrollPixels)
-                .isEqualTo(receivedEvent?.verticalScrollPixels)
-        }
+        rule.runOnIdle { assertThat(sentEvent).isEqualTo(receivedEvent) }
     }
 
     @Test
@@ -472,10 +506,19 @@ class FocusAwareEventPropagationTest {
         .then(if (initiallyFocused) Modifier.focusRequester(initialFocus) else Modifier)
         .focusTarget()
 
-    private fun SemanticsNodeInteraction.performFocusAwareInput(sentEvent: FocusAwareTestEvent) {
-        @OptIn(ExperimentalTestApi::class)
-        performFocusAwareInput {
-            rotateToScrollVertically(sentEvent.verticalScrollPixels)
+    private fun SemanticsNodeInteraction.performFocusAwareInput(sentEvent: Any) {
+        when (nodeType) {
+            KeyInput -> {
+                check(sentEvent is KeyEvent)
+                performKeyPress(sentEvent)
+            }
+            RotaryInput -> {
+                check(sentEvent is RotaryScrollEvent)
+                @OptIn(ExperimentalTestApi::class)
+                performRotaryScrollInput {
+                    rotateToScrollVertically(sentEvent.verticalScrollPixels)
+                }
+            }
         }
     }
 
@@ -485,4 +528,49 @@ class FocusAwareEventPropagationTest {
         }
         rule.runOnIdle { initialFocus.requestFocus() }
     }
+
+    private fun Modifier.onFocusAwareEvent(onEvent: (Any) -> Boolean): Modifier = this.then(
+        FocusAwareEventElement(onEvent, nodeType, EventType.OnEvent)
+    )
+
+    private fun Modifier.onPreFocusAwareEvent(onEvent: (Any) -> Boolean): Modifier = this.then(
+        FocusAwareEventElement(onEvent, nodeType, EventType.PreEvent)
+    )
+
+    @OptIn(ExperimentalComposeUiApi::class)
+    private data class FocusAwareEventElement(
+        private val callback: (Any) -> Boolean,
+        private val nodeType: NodeType,
+        private val eventType: EventType
+    ) : ModifierNodeElement<Modifier.Node>() {
+        override fun create() = when (nodeType) {
+            KeyInput -> KeyInputInputModifierNodeImpl(
+                onEvent = callback.takeIf { eventType == EventType.OnEvent },
+                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
+            )
+            RotaryInput -> RotaryInputModifierNodeImpl(
+                onEvent = callback.takeIf { eventType == EventType.OnEvent },
+                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
+            )
+        }
+
+        override fun update(node: Modifier.Node) = when (nodeType) {
+            KeyInput -> (node as KeyInputInputModifierNodeImpl).apply {
+                onEvent = callback.takeIf { eventType == EventType.OnEvent }
+                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
+            }
+            RotaryInput -> (node as RotaryInputModifierNodeImpl).apply {
+                onEvent = callback.takeIf { eventType == EventType.OnEvent }
+                onPreEvent = callback.takeIf { eventType == EventType.PreEvent }
+            }
+        }
+
+        override fun InspectorInfo.inspectableProperties() {
+            name = "onEvent"
+            properties["onEvent"] = callback
+        }
+    }
+
+    enum class NodeType { KeyInput, RotaryInput }
+    enum class EventType { PreEvent, OnEvent }
 }

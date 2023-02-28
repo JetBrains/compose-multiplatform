@@ -15,12 +15,14 @@
  */
 package androidx.compose.ui.text
 
+import android.graphics.Paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.AnnotatedString.Range
 import androidx.compose.ui.text.FontTestData.Companion.BASIC_MEASURE_FONT
 import androidx.compose.ui.text.font.toFontFamily
@@ -41,6 +43,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.filters.SmallTest
+import androidx.test.filters.Suppress
 import androidx.test.platform.app.InstrumentationRegistry
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -1176,7 +1179,11 @@ class MultiParagraphIntegrationTest {
         )
 
         val bitmapWithSpan = multiParagraph.bitmap()
-        val bitmapNoSpan = multiParagraph2.bitmap()
+        // Our text rendering stack relies on the fact that given textstyle is also passed to draw
+        // functions of TextLayoutResult, MultiParagraph, Paragraph. If Underline is not specified
+        // here, it would be removed while drawing the MultiParagraph. We are simply mimicking
+        // what TextPainter does.
+        val bitmapNoSpan = multiParagraph2.bitmap(textDecoration = TextDecoration.Underline)
 
         assertThat(bitmapWithSpan).isEqualToBitmap(bitmapNoSpan)
     }
@@ -1580,6 +1587,31 @@ class MultiParagraphIntegrationTest {
 
         assertThat(multiParagraph.bitmap(brush))
             .isEqualToBitmap(multiParagraph2.bitmap(brush, 0.5f))
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun multiParagraph_appliesDrawStyle_toAllParagraphs() = with(defaultDensity) {
+        val fontSize = 20.sp
+        val fontSizeInPx = fontSize.toPx()
+        val multiParagraph = simpleMultiParagraph(
+            text = buildAnnotatedString {
+                withStyle(ParagraphStyle(textAlign = TextAlign.Right)) {
+                    append("Lorem")
+                }
+                withStyle(ParagraphStyle()) {
+                    append("Ipsum")
+                }
+            },
+            style = TextStyle(fontSize = fontSize),
+            width = fontSizeInPx * 5
+        )
+
+        multiParagraph.bitmap(drawStyle = Stroke())
+
+        multiParagraph.paragraphInfoList.map { it.paragraph }.forEach {
+            assertThat((it as AndroidParagraph).textPaint.style).isEqualTo(Paint.Style.STROKE)
+        }
     }
 
     private fun MultiParagraph.disableAntialias() {

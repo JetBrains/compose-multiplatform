@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation
 
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.draggable
@@ -43,11 +44,15 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.InputMode.Companion.Touch
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
@@ -104,7 +109,12 @@ class ClickableTest {
     @After
     fun after() {
         isDebugInspectorInfoEnabled = false
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
+    }
+
+    // TODO(b/267253920): Add a compose test API to set/reset InputMode.
+    @After
+    fun resetTouchMode() = with(InstrumentationRegistry.getInstrumentation()) {
+        if (SDK_INT < 33) setInTouchMode(true) else resetInTouchMode()
     }
 
     @Test
@@ -207,10 +217,11 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun clickableTest_clickWithEnterKey() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                     "ClickableText",
                     modifier = Modifier
@@ -219,8 +230,10 @@ class ClickableTest {
                         .clickable { counter++ }
             )
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         rule.onNodeWithTag("myClickable").performKeyInput { keyDown(Key.Enter) }
 
@@ -234,10 +247,11 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun clickableTest_clickWithNumPadEnterKey() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "ClickableText",
                 modifier = Modifier
@@ -246,8 +260,10 @@ class ClickableTest {
                     .clickable { counter++ }
             )
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         rule.onNodeWithTag("myClickable").performKeyInput { keyDown(Key.NumPadEnter) }
 
@@ -261,10 +277,11 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun clickableTest_clickWithDPadCenter() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         var counter = 0
         val focusRequester = FocusRequester()
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "ClickableText",
                 modifier = Modifier
@@ -273,8 +290,10 @@ class ClickableTest {
                     .clickable { counter++ }
             )
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         rule.onNodeWithTag("myClickable").performKeyInput { keyDown(Key.DirectionCenter) }
 
@@ -1229,13 +1248,13 @@ class ClickableTest {
 
     @Test
     fun clickableTest_interactionSource_focus_inTouchMode() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
         val focusRequester = FocusRequester()
-
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box {
                 BasicText(
                     "ClickableText",
@@ -1248,6 +1267,10 @@ class ClickableTest {
                         ) {}
                 )
             }
+        }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Touch)
         }
 
         val interactions = mutableListOf<Interaction>()
@@ -1272,15 +1295,15 @@ class ClickableTest {
 
     @Test
     fun clickableTest_interactionSource_focus_inKeyboardMode() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
         val focusRequester = FocusRequester()
         lateinit var focusManager: FocusManager
-
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
             focusManager = LocalFocusManager.current
+            inputModeManager = LocalInputModeManager.current
                 Box {
                     BasicText(
                         "ClickableText",
@@ -1293,6 +1316,10 @@ class ClickableTest {
                             ) {}
                     )
                 }
+        }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
         }
 
         val interactions = mutableListOf<Interaction>()
@@ -1920,12 +1947,13 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_enterKey_emitsIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -1938,8 +1966,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1965,12 +1995,13 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_numPadEnterKey_emitsIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -1983,8 +2014,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -2010,12 +2043,13 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_dpadCenter_emitsIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -2028,8 +2062,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
         rule.waitForIdle()
 
         val interactions = mutableListOf<Interaction>()
@@ -2056,12 +2092,13 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_otherKey_doesNotEmitIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -2074,8 +2111,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -2091,12 +2130,13 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_doubleEnterKey_emitsFurtherInteractions() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -2109,8 +2149,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -2150,13 +2192,14 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         var repeatCounter = 0
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -2174,8 +2217,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -2208,14 +2253,14 @@ class ClickableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun clickableTest_interruptedClick_emitsCancelIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         val enabled = mutableStateOf(true)
         lateinit var scope: CoroutineScope
-
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ClickableText",
                     modifier = Modifier
@@ -2229,8 +2274,10 @@ class ClickableTest {
                 )
             }
         }
-
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {

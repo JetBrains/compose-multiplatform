@@ -22,21 +22,23 @@ import androidx.compose.runtime.mock.Text
 import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.snapshots.Snapshot
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
-import kotlinx.coroutines.test.TestScope
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.runTest
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class RecomposerTests {
@@ -303,6 +305,117 @@ class RecomposerTests {
         advance()
 
         assertEquals(1, recompostions)
+    }
+
+    @Test
+    fun constructRecomposerWithCancelledJob() {
+        Recomposer(Job().apply { cancel() })
+    }
+
+    @Test // regression test for b/243862703
+    fun cancelWithPendingInvalidations() {
+        val dispatcher = StandardTestDispatcher()
+        runTest(dispatcher) {
+            val testClock = TestMonotonicFrameClock(this)
+            withContext(testClock) {
+
+                val recomposer = Recomposer(coroutineContext)
+                var launched = false
+                val runner = launch {
+                    launched = true
+                    recomposer.runRecomposeAndApplyChanges()
+                }
+                val compositionOne = Composition(UnitApplier(), recomposer)
+                val compositionTwo = Composition(UnitApplier(), recomposer)
+                var state by mutableStateOf(0)
+                var lastCompositionOneState = -1
+                var lastCompositionTwoState = -1
+                compositionOne.setContent {
+                    lastCompositionOneState = state
+                    LaunchedEffect(Unit) {
+                        delay(1_000)
+                    }
+                }
+                compositionTwo.setContent {
+                    lastCompositionTwoState = state
+                    LaunchedEffect(Unit) {
+                        delay(1_000)
+                    }
+                }
+
+                assertEquals(0, lastCompositionOneState, "initial composition")
+                assertEquals(0, lastCompositionTwoState, "initial composition")
+
+                dispatcher.scheduler.runCurrent()
+
+                assertNotNull(
+                    withTimeoutOrNull(3_000) { recomposer.awaitIdle() },
+                    "timed out waiting for recomposer idle for recomposition"
+                )
+
+                dispatcher.scheduler.runCurrent()
+
+                assertTrue(launched, "Recomposer was never started")
+
+                Snapshot.withMutableSnapshot {
+                    state = 1
+                }
+
+                recomposer.cancel()
+
+                assertNotNull(
+                    withTimeoutOrNull(3_000) { recomposer.awaitIdle() },
+                    "timed out waiting for recomposer idle for recomposition"
+                )
+
+                assertNotNull(
+                    withTimeoutOrNull(3_000) { runner.join() },
+                    "timed out waiting for recomposer runner job"
+                )
+            }
+        }
+    }
+
+    @Test
+    fun stateChangesDuringApplyChangesAreNotifiedBeforeFrameFinished() = compositionTest {
+        val count = mutableStateOf(0)
+        val countFromEffect = mutableStateOf(0)
+        val applications = mutableListOf<Set<Any>>()
+        var recompositions = 0
+
+        @Composable
+        fun CountRecorder(count: Int) {
+            SideEffect {
+                countFromEffect.value = count
+            }
+        }
+
+        compose {
+            recompositions++
+            CountRecorder(count.value)
+        }
+
+        assertEquals(0, countFromEffect.value)
+        assertEquals(1, recompositions)
+
+        // Change the count and send the apply notification to invalidate the composition.
+        count.value = 1
+
+        // Register the apply observer after changing state to invalidate composition, but
+        // before actually allowing the recomposition to happen.
+        Snapshot.registerApplyObserver { applied, _ ->
+            applications += applied
+        }
+        assertTrue(applications.isEmpty())
+
+        assertEquals(1, advanceCount())
+
+        // Make sure we actually recomposed.
+        assertEquals(2, recompositions)
+
+        // The Recomposer should have received notification for the node's state.
+        @Suppress("RemoveExplicitTypeArguments")
+        assertEquals<List<Set<Any>>>(listOf(setOf(countFromEffect)), applications)
     }
 }
 

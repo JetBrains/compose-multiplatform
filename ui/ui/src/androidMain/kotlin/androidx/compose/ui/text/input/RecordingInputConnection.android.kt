@@ -21,7 +21,6 @@ import android.os.Handler
 import android.text.TextUtils
 import android.util.Log
 import android.view.KeyEvent
-import android.view.View
 import android.view.inputmethod.CompletionInfo
 import android.view.inputmethod.CorrectionInfo
 import android.view.inputmethod.EditorInfo
@@ -94,7 +93,6 @@ internal class RecordingInputConnection(
     fun updateInputState(
         state: TextFieldValue,
         inputMethodManager: InputMethodManager,
-        view: View
     ) {
         if (!isActive) return
 
@@ -104,7 +102,6 @@ internal class RecordingInputConnection(
 
         if (extractedTextMonitorMode) {
             inputMethodManager.updateExtractedText(
-                view,
                 currentExtractedTextRequestToken,
                 state.toExtractedText()
             )
@@ -121,7 +118,7 @@ internal class RecordingInputConnection(
             )
         }
         inputMethodManager.updateSelection(
-            view, state.selection.min, state.selection.max, compositionStart, compositionEnd
+            state.selection.min, state.selection.max, compositionStart, compositionEnd
         )
     }
 

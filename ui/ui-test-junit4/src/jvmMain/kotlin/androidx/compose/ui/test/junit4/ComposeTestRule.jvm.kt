@@ -18,12 +18,15 @@ package androidx.compose.ui.test.junit4
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.test.ComposeTimeoutException
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.IdlingResource
 import androidx.compose.ui.test.MainTestClock
+import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import org.junit.rules.TestRule
-import kotlin.jvm.JvmDefaultWithCompatibility
 
 /**
  * A [TestRule] that allows you to test and control composables and applications using Compose.
@@ -125,9 +128,71 @@ interface ComposeTestRule : TestRule, SemanticsNodeInteractionsProvider {
      * @param condition Condition that must be satisfied in order for this method to successfully
      * finish.
      *
-     * @throws ComposeTimeoutException If the condition is not satisfied after [timeoutMillis].
+     * @throws androidx.compose.ui.test.ComposeTimeoutException If the condition is not satisfied
+     * after [timeoutMillis].
      */
     fun waitUntil(timeoutMillis: Long = 1_000, condition: () -> Boolean)
+
+    /**
+     * Blocks until the number of nodes matching the given [matcher] is equal to the given [count].
+     *
+     * @see ComposeTestRule.waitUntil
+     *
+     * @param matcher The matcher that will be used to filter nodes.
+     * @param count The number of nodes that are expected to
+     * @param timeoutMillis The time after which this method throws an exception if the number of
+     * nodes that match the [matcher] is not [count]. This observes wall clock time, not frame time.
+     *
+     * @throws androidx.compose.ui.test.ComposeTimeoutException If the number of nodes that match
+     * the [matcher] is not [count] after [timeoutMillis] (in wall clock time).
+     */
+    @ExperimentalTestApi
+    fun waitUntilNodeCount(matcher: SemanticsMatcher, count: Int, timeoutMillis: Long = 1_000L)
+
+    /**
+     * Blocks until at least one node matches the given [matcher].
+     *
+     * @see ComposeTestRule.waitUntil
+     *
+     * @param matcher The matcher that will be used to filter nodes.
+     * @param timeoutMillis The time after which this method throws an exception if no nodes match
+     * the given [matcher]. This observes wall clock time, not frame time.
+     *
+     * @throws androidx.compose.ui.test.ComposeTimeoutException If no nodes match the given
+     * [matcher] after [timeoutMillis] (in wall clock time).
+     */
+    @ExperimentalTestApi
+    fun waitUntilAtLeastOneExists(matcher: SemanticsMatcher, timeoutMillis: Long = 1_000L)
+
+    /**
+     * Blocks until exactly one node matches the given [matcher].
+     *
+     * @see ComposeTestRule.waitUntil
+     *
+     * @param matcher The matcher that will be used to filter nodes.
+     * @param timeoutMillis The time after which this method throws an exception if exactly one node
+     * does not match the given [matcher]. This observes wall clock time, not frame time.
+     *
+     * @throws androidx.compose.ui.test.ComposeTimeoutException If exactly one node does not match
+     * the given [matcher] after [timeoutMillis] (in wall clock time).
+     */
+    @ExperimentalTestApi
+    fun waitUntilExactlyOneExists(matcher: SemanticsMatcher, timeoutMillis: Long = 1_000L)
+
+    /**
+     * Blocks until no nodes match the given [matcher].
+     *
+     * @see ComposeTestRule.waitUntil
+     *
+     * @param matcher The matcher that will be used to filter nodes.
+     * @param timeoutMillis The time after which this method throws an exception if any nodes match
+     * the given [matcher]. This observes wall clock time, not frame time.
+     *
+     * @throws androidx.compose.ui.test.ComposeTimeoutException If any nodes match the given
+     * [matcher] after [timeoutMillis] (in wall clock time).
+     */
+    @ExperimentalTestApi
+    fun waitUntilDoesNotExist(matcher: SemanticsMatcher, timeoutMillis: Long = 1_000L)
 
     /**
      * Registers an [IdlingResource] in this test.
@@ -179,3 +244,24 @@ interface ComposeContentTestRule : ComposeTestRule {
  * launched, see [createAndroidComposeRule].
  */
 expect fun createComposeRule(): ComposeContentTestRule
+
+/**
+ * Factory method to provide an implementation of [ComposeContentTestRule].
+ *
+ * This method is useful for tests in compose libraries where it is irrelevant where the compose
+ * content is hosted (e.g. an Activity on Android). Such tests typically set compose content
+ * themselves via [setContent][ComposeContentTestRule.setContent] and only instrument and assert
+ * that content.
+ *
+ * For Android this will use the default Activity (android.app.Activity). You need to add a
+ * reference to this activity into the manifest file of the corresponding tests (usually in
+ * androidTest/AndroidManifest.xml). If your Android test requires a specific Activity to be
+ * launched, see [createAndroidComposeRule].
+ *
+ * @param effectContext The [CoroutineContext] used to run the composition. The context for
+ * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
+ */
+@ExperimentalTestApi
+expect fun createComposeRule(
+    effectContext: CoroutineContext = EmptyCoroutineContext
+): ComposeContentTestRule

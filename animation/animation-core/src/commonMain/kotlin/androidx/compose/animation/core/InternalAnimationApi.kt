@@ -21,4 +21,5 @@ package androidx.compose.animation.core
     AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY,
     AnnotationTarget.FIELD, AnnotationTarget.PROPERTY_GETTER
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class InternalAnimationApi

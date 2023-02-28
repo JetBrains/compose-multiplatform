@@ -27,6 +27,7 @@ import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -102,7 +103,7 @@ class MenuScreenshotTest {
         Box(Modifier.testTag(testTag).padding(20.dp), contentAlignment = Alignment.Center) {
             DropdownMenuContent(
                 expandedStates = MutableTransitionState(initialState = true),
-                transformOriginState = mutableStateOf(TransformOrigin.Center)
+                transformOriginState = remember { mutableStateOf(TransformOrigin.Center) }
             ) {
                 DropdownMenuItem(
                     text = { Text("Edit") },

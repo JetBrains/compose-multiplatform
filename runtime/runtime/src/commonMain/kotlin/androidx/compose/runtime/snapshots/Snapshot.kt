@@ -743,13 +743,13 @@ open class MutableSnapshot internal constructor(
         applied = true
 
         // Notify any apply observers that changes applied were seen
-        if (globalModified != null && globalModified.isNotEmpty()) {
+        if (!globalModified.isNullOrEmpty()) {
             observers.fastForEach {
                 it(globalModified, this)
             }
         }
 
-        if (modified != null && modified.isNotEmpty()) {
+        if (!modified.isNullOrEmpty()) {
             observers.fastForEach {
                 it(modified, this)
             }
@@ -760,6 +760,9 @@ open class MutableSnapshot internal constructor(
         // before unpinning records that need to be retained in this case.
         sync {
             releasePinnedSnapshotsForCloseLocked()
+
+            globalModified?.forEach(::overwriteUnusedRecordsLocked)
+            modified?.forEach(::overwriteUnusedRecordsLocked)
         }
 
         return SnapshotApplyResult.Success
@@ -1117,9 +1120,9 @@ abstract class StateRecord {
      * records that are already in the list cannot be moved in the list as this the change must
      * be atomic to all threads that cannot happen without a lock which this list cannot afford.
      *
-     * It is unsafe to remove a record as it might be in the process of being reused (see [used]).
+     * It is unsafe to remove a record as it might be in the process of being reused (see [usedLocked]).
      * If a record is removed care must be taken to ensure that it is not being claimed by some
-     * other thread. This would require changes to [used].
+     * other thread. This would require changes to [usedLocked].
      */
     internal var next: StateRecord? = null
 
@@ -1766,6 +1769,10 @@ private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
         }
     }
 
+    sync {
+        modified?.forEach(::overwriteUnusedRecordsLocked)
+    }
+
     return result
 }
 
@@ -1838,8 +1845,9 @@ fun <T : StateRecord> T.readable(state: StateObject): T {
         // or will find a valid record. Being in a sync block prevents other threads from writing
         // to this state object until the read completes.
         val syncSnapshot = Snapshot.current
-        readable(this, syncSnapshot.id, syncSnapshot.invalid)
-    } ?: readError()
+        @Suppress("UNCHECKED_CAST")
+        readable(state.firstStateRecord as T, syncSnapshot.id, syncSnapshot.invalid) ?: readError()
+    }
 }
 
 /**
@@ -1864,7 +1872,7 @@ private fun readError(): Nothing {
  * record created in an abandoned snapshot. It is also true if the record is valid in the
  * previous snapshot and is obscured by another record also valid in the previous state record.
  */
-private fun used(state: StateObject): StateRecord? {
+private fun usedLocked(state: StateObject): StateRecord? {
     var current: StateRecord? = state.firstStateRecord
     var validRecord: StateRecord? = null
     val reuseLimit = pinningTable.lowestOrDefault(nextSnapshotId) - 1
@@ -1872,8 +1880,8 @@ private fun used(state: StateObject): StateRecord? {
     while (current != null) {
         val currentId = current.snapshotId
         if (currentId == INVALID_SNAPSHOT) {
-            // Any records that were marked invalid by an abandoned snapshot can be used
-            // immediately.
+            // Any records that were marked invalid by an abandoned snapshot or is marked reachable
+            // can be used immediately.
             return current
         }
         if (valid(current, reuseLimit, invalid)) {
@@ -1888,6 +1896,56 @@ private fun used(state: StateObject): StateRecord? {
         current = current.next
     }
     return null
+}
+
+/**
+ * Clear records that cannot be selected in any currently open snapshot.
+ *
+ * This method uses the same technique as [usedLocked] which uses the [pinningTable] to
+ * determine lowest id in the invalid set for all snapshots. Only the record with the greatest
+ * id of all records less or equal to this lowest id can possibly be selected in any snapshot
+ * and all other records below that number can be overwritten.
+ *
+ * However, this technique doesn't find all records that will not be selected by any open snapshot
+ * as a record that has an id above that number could be reusable but will not be found.
+ *
+ * For example if snapshot 1 is open and 2 is created and modifies [state] then is applied, 3 is
+ * open and then 4 is open, and then 1 is applied. When 3 modifies [state] and then applies, as 1 is
+ * pinned by 4, it is uncertain whether the record for 2 is needed by 4 so it must be kept even if 4
+ * also modified [state] and would not select 2. Accurately determine if a record is selectable
+ * would require keeping a list of all open [Snapshot] instances which currently is not kept and
+ * would require keeping a list of all open [Snapshot] instances which currently is not kept and
+ * traversing that list for each record.
+ *
+ * If any such records are possible this method returns true. In other words, this method returns
+ * true if any records might be reusable but this function could not prove there were or not.
+ */
+private fun overwriteUnusedRecordsLocked(state: StateObject): Boolean {
+    var current: StateRecord? = state.firstStateRecord
+    var validRecord: StateRecord? = null
+    val reuseLimit = pinningTable.lowestOrDefault(nextSnapshotId) - 1
+    var uncertainRecords = 0
+    while (current != null) {
+        val currentId = current.snapshotId
+        if (currentId != INVALID_SNAPSHOT) {
+            if (currentId <= reuseLimit) {
+                if (validRecord == null) {
+                    validRecord = current
+                } else {
+                    val recordToOverwrite = if (current.snapshotId < validRecord.snapshotId) {
+                        current
+                    } else {
+                        validRecord.also { validRecord = current }
+                    }
+                    recordToOverwrite.snapshotId = INVALID_SNAPSHOT
+                    validRecord?.let { recordToOverwrite.assign(it) }
+                }
+            } else uncertainRecords++
+        }
+        current = current.next
+    }
+
+    return uncertainRecords < 1
 }
 
 @PublishedApi
@@ -1924,7 +1982,7 @@ internal fun <T : StateRecord> T.overwritableRecord(
 
     if (candidate.snapshotId == id) return candidate
 
-    val newData = newOverwritableRecord(state)
+    val newData = sync { newOverwritableRecordLocked(state) }
     newData.snapshotId = id
 
     snapshot.recordModified(state)
@@ -1932,7 +1990,10 @@ internal fun <T : StateRecord> T.overwritableRecord(
     return newData
 }
 
-internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot: Snapshot): T {
+internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot: Snapshot) =
+    sync { newWritableRecordLocked(state, snapshot) }
+
+private fun <T : StateRecord> T.newWritableRecordLocked(state: StateObject, snapshot: Snapshot): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
 
@@ -1945,13 +2006,13 @@ internal fun <T : StateRecord> T.newWritableRecord(state: StateObject, snapshot:
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    val newData = newOverwritableRecord(state)
+    val newData = newOverwritableRecordLocked(state)
     newData.assign(this)
     newData.snapshotId = snapshot.id
     return newData
 }
 
-internal fun <T : StateRecord> T.newOverwritableRecord(state: StateObject): T {
+internal fun <T : StateRecord> T.newOverwritableRecordLocked(state: StateObject): T {
     // Calling used() on a state object might return the same record for each thread calling
     // used() therefore selecting the record to reuse should be guarded.
 
@@ -1964,7 +2025,7 @@ internal fun <T : StateRecord> T.newOverwritableRecord(state: StateObject): T {
     // cache the result of readable() as the mutating thread calls to writable() can change the
     // result of readable().
     @Suppress("UNCHECKED_CAST")
-    return (used(state) as T?)?.apply {
+    return (usedLocked(state) as T?)?.apply {
         snapshotId = Int.MAX_VALUE
     } ?: create().apply {
         snapshotId = Int.MAX_VALUE

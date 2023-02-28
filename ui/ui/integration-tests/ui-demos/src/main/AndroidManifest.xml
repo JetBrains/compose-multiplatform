@@ -49,11 +49,19 @@
             android:name=".viewinterop.ComposeInAndroidCoordinatorLayout"
             android:configChanges="orientation|screenSize"
             android:label="Compose in Coordinator Layout Activity" />
-
+        <activity
+            android:name=".viewinterop.ComposeInSwipeToRefreshLayout"
+            android:configChanges="orientation|screenSize"
+            android:label="Compose in Sliding Pane Layout Activity" />
         <activity
             android:name=".viewinterop.ViewComposeViewNestedScrollInteropDemo"
             android:configChanges="orientation|screenSize"
             android:label="Coordinator Layout Activity with Compose > View" />
+
+        <activity
+            android:name=".viewinterop.BottomSheetFragmentNestedScrollInteropDemo"
+            android:configChanges="orientation|screenSize"
+            android:label="Material Bottom Sheet Fragment" />
 
         <activity
             android:name=".PainterResourcesDemoActivity"

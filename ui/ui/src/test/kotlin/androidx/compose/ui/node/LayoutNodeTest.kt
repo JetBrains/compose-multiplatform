@@ -23,11 +23,12 @@ import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.draw.DrawModifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusOwner
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
@@ -44,6 +45,7 @@ import androidx.compose.ui.input.pointer.PointerInputFilter
 import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.layout.AlignmentLine
 import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.LayoutModifierImpl
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
@@ -59,8 +61,10 @@ import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.platform.invertTo
 import androidx.compose.ui.semantics.SemanticsConfiguration
 import androidx.compose.ui.semantics.SemanticsModifier
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PlatformTextInputPluginRegistry
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -753,7 +757,9 @@ class LayoutNodeTest {
     fun nodeCoordinatorAttachedWhenLayoutNodeAttached() {
         val layoutNode = LayoutNode()
         // 2 modifiers at the start
-        val layoutModifier = Modifier.graphicsLayer { }.graphicsLayer { }
+        val layoutModifier = Modifier
+            .graphicsLayer { }
+            .graphicsLayer { }
 
         layoutNode.modifier = layoutModifier
         val oldNodeCoordinator = layoutNode.outerCoordinator
@@ -933,10 +939,10 @@ class LayoutNodeTest {
         assertEquals(0f, matrix.map(Offset(1f, 1f)).x, 0.001f)
         assertEquals(1f, matrix.map(Offset(1f, 1f)).y, 0.001f)
 
-        child.innerCoordinator.onLayerBlockUpdated {
+        child.innerCoordinator.updateLayerBlock({
             scaleX = 0.5f
             scaleY = 0.25f
-        }
+        })
 
         child.innerCoordinator.transformFrom(parent.innerCoordinator, matrix)
 
@@ -1381,8 +1387,14 @@ class LayoutNodeTest {
         val semanticsModifier2 = object : SemanticsModifierNode, Modifier.Node() {
             override val semanticsConfiguration: SemanticsConfiguration = semanticsConfiguration
         }
-        val semanticsModifierElement1 = modifierElementOf(null, { semanticsModifier1 }, { }, { })
-        val semanticsModifierElement2 = modifierElementOf(null, { semanticsModifier2 }, { }, { })
+        data class TestSemanticsModifierElement(
+            private val node: Modifier.Node
+        ) : ModifierNodeElement<Modifier.Node>() {
+            override fun create() = node
+            override fun update(node: Modifier.Node) = node
+        }
+        val semanticsModifierElement1 = TestSemanticsModifierElement(semanticsModifier1)
+        val semanticsModifierElement2 = TestSemanticsModifierElement(semanticsModifier2)
         val layoutNode1 = LayoutNode(0, 0, 5, 5, semanticsModifierElement1, DpSize(48.dp, 48.dp))
         val layoutNode2 = LayoutNode(6, 6, 11, 11, semanticsModifierElement2, DpSize(48.dp, 48.dp))
         val outerNode = LayoutNode(0, 0, 11, 11).apply { attach(MockOwner()) }
@@ -1597,6 +1609,7 @@ class LayoutNodeTest {
                             childPointerInputFilter
                         )
                     )
+
             2 ->
                 assertThat(hit.toFilters())
                     .isEqualTo(
@@ -1605,6 +1618,7 @@ class LayoutNodeTest {
                             middlePointerInputFilter
                         )
                     )
+
             1 ->
                 assertThat(hit.toFilters())
                     .isEqualTo(
@@ -1612,6 +1626,7 @@ class LayoutNodeTest {
                             parentPointerInputFilter
                         )
                     )
+
             else -> throw IllegalStateException()
         }
     }
@@ -2311,45 +2326,49 @@ class LayoutNodeTest {
 
     @Test
     fun modifierMatchesWrapperWithIdentity() {
-        val modifier1 = Modifier.layout { measurable, constraints ->
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(0, 0)
+        val measureLambda1: MeasureScope.(Measurable, Constraints) -> MeasureResult =
+            { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(0, 0)
+                }
             }
-        }
-        val modifier2 = Modifier.layout { measurable, constraints ->
-            val placeable = measurable.measure(constraints)
-            layout(placeable.width, placeable.height) {
-                placeable.place(1, 1)
+        val modifier1 = Modifier.layout(measureLambda1)
+
+        val measureLambda2: MeasureScope.(Measurable, Constraints) -> MeasureResult =
+            { measurable, constraints ->
+                val placeable = measurable.measure(constraints)
+                layout(placeable.width, placeable.height) {
+                    placeable.place(1, 1)
+                }
             }
-        }
+        val modifier2 = Modifier.layout(measureLambda2)
 
         val root = LayoutNode()
         root.modifier = modifier1.then(modifier2)
 
-        val wrapper1 = root.outerCoordinator
-        val wrapper2 = root.outerCoordinator.wrapped
-
         assertEquals(
-            modifier1,
-            (wrapper1 as LayoutModifierNodeCoordinator).layoutModifierNode.toModifier()
+            measureLambda1,
+            ((root.outerCoordinator as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
         assertEquals(
-            modifier2,
-            (wrapper2 as LayoutModifierNodeCoordinator).layoutModifierNode.toModifier()
+            measureLambda2,
+            ((root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
 
         root.modifier = modifier2.then(modifier1)
 
         assertEquals(
-            modifier1,
-            (root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator)
-                .layoutModifierNode
-                .toModifier()
+            measureLambda1,
+            ((root.outerCoordinator.wrapped as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
         assertEquals(
-            modifier2,
-            (root.outerCoordinator as LayoutModifierNodeCoordinator).layoutModifierNode.toModifier()
+            measureLambda2,
+            ((root.outerCoordinator as LayoutModifierNodeCoordinator)
+                .layoutModifierNode as LayoutModifierImpl).measureBlock
         )
     }
 
@@ -2375,13 +2394,13 @@ class LayoutNodeTest {
         val owner = MockOwner()
         node.attach(owner)
         assertEquals(0, owner.layoutChangeCount)
-        node.innerCoordinator.onLayerBlockUpdated { scaleX = 0.5f }
+        node.innerCoordinator.updateLayerBlock({ scaleX = 0.5f })
         assertEquals(1, owner.layoutChangeCount)
         repeat(2) {
-            node.innerCoordinator.onLayerBlockUpdated { scaleX = 1f }
+            node.innerCoordinator.updateLayerBlock({ scaleX = 1f })
         }
         assertEquals(2, owner.layoutChangeCount)
-        node.innerCoordinator.onLayerBlockUpdated(null)
+        node.innerCoordinator.updateLayerBlock(null)
         assertEquals(3, owner.layoutChangeCount)
     }
 
@@ -2402,8 +2421,12 @@ class LayoutNodeTest {
                 drawContent()
             }
         }
-        val a = Modifier.then(EmptyLayoutModifier()).then(drawAndLayoutModifier)
-        val b = Modifier.then(EmptyLayoutModifier()).then(drawAndLayoutModifier)
+        val a = Modifier
+            .then(EmptyLayoutModifier())
+            .then(drawAndLayoutModifier)
+        val b = Modifier
+            .then(EmptyLayoutModifier())
+            .then(drawAndLayoutModifier)
         val node = LayoutNode(20, 20, 100, 100)
         val owner = MockOwner()
         node.attach(owner)
@@ -2417,7 +2440,10 @@ class LayoutNodeTest {
     fun nodeCoordinator_alpha() {
         val root = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
         val layoutNode1 = LayoutNode().apply {
-            this.modifier = Modifier.graphicsLayer { }.graphicsLayer { }.drawBehind {}
+            this.modifier = Modifier
+                .graphicsLayer { }
+                .graphicsLayer { }
+                .drawBehind {}
         }
         val layoutNode2 = LayoutNode().apply { this.modifier = Modifier.drawBehind {} }
         val owner = MockOwner()
@@ -2427,12 +2453,12 @@ class LayoutNodeTest {
         root.attach(owner)
 
         // provide alpha to the graphics layer
-        layoutNode1.outerCoordinator.wrapped!!.onLayerBlockUpdated {
+        layoutNode1.outerCoordinator.wrapped!!.updateLayerBlock({
             alpha = 0f
-        }
-        layoutNode1.outerCoordinator.wrapped!!.wrapped!!.onLayerBlockUpdated {
+        })
+        layoutNode1.outerCoordinator.wrapped!!.wrapped!!.updateLayerBlock({
             alpha = 0.5f
-        }
+        })
 
         assertFalse(layoutNode1.outerCoordinator.isTransparent())
         assertTrue(layoutNode1.innerCoordinator.isTransparent())
@@ -2501,9 +2527,12 @@ internal class MockOwner(
         get() = Density(1f)
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalTextApi::class)
+    override val platformTextInputPluginRegistry: PlatformTextInputPluginRegistry
+        get() = TODO("Not yet implemented")
     override val pointerIconService: PointerIconService
         get() = TODO("Not yet implemented")
-    override val focusManager: FocusManager
+    override val focusOwner: FocusOwner
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
@@ -2609,6 +2638,7 @@ internal class MockOwner(
                 renderEffect: RenderEffect?,
                 ambientShadowColor: Color,
                 spotShadowColor: Color,
+                compositingStrategy: CompositingStrategy,
                 layoutDirection: LayoutDirection,
                 density: Density
             ) {
@@ -2750,6 +2780,7 @@ fun PointerInputModifierNode.toFilter(): PointerInputFilter {
         ?: error("Incorrectly assumed Modifier.Element was a PointerInputModifier")
     return modifier.pointerInputFilter
 }
+
 @OptIn(ExperimentalComposeUiApi::class)
 fun List<PointerInputModifierNode>.toFilters(): List<PointerInputFilter> = map { it.toFilter() }
 

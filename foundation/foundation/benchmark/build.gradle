@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import androidx.build.LibraryType
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -29,6 +31,7 @@ dependencies {
     androidTestImplementation project(":compose:ui:ui-text:ui-text-benchmark")
     androidTestImplementation project(":compose:foundation:foundation-layout")
     androidTestImplementation project(":compose:foundation:foundation")
+    androidTestImplementation project(":compose:foundation:foundation-do-not-ship-newtext")
     androidTestImplementation project(":compose:material:material")
     androidTestImplementation project(":compose:benchmark-utils")
     androidTestImplementation(libs.testRules)
@@ -41,4 +44,12 @@ dependencies {
 
 android {
     namespace "androidx.compose.foundation.benchmark"
+    defaultConfig {
+        // must be one of: 'None', 'StackSampling', or 'MethodTracing'
+        testInstrumentationRunnerArguments["androidx.benchmark.profiling.mode"]= 'None'
+    }
+}
+
+androidx {
+    type = LibraryType.INTERNAL_TEST_LIBRARY
 }

@@ -268,7 +268,8 @@ internal class LazyLayoutPrefetcher(
     private class PrefetchRequest(
         val index: Int,
         val constraints: Constraints
-    ) : LazyLayoutPrefetchState.PrefetchHandle {
+    ) : @Suppress("SEALED_INHERITOR_IN_DIFFERENT_MODULE")
+    LazyLayoutPrefetchState.PrefetchHandle {
 
         var precomposeHandle: PrecomposedSlotHandle? = null
         var canceled = false

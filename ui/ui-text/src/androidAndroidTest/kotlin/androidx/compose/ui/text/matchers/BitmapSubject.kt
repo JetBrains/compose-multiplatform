@@ -51,7 +51,7 @@ internal class BitmapSubject private constructor(
      * @param bitmap the [Bitmap] to be matched.
      */
     fun isNotEqualToBitmap(bitmap: Bitmap) {
-        if (subject != bitmap) return
+        if (subject == null) return
         check("sameAs()").that(subject.sameAs(bitmap)).isFalse()
     }
 
