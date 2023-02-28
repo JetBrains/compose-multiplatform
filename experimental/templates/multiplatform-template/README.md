@@ -43,8 +43,14 @@ To run on a real iOS device you need:
 After that you can open the project in Android Studio, and it will show the registered iOS device in `iosApp` 
 run configuration.
 
-**Hint:** If you managed to run a sample iOS project in XCode on a real iOS device you may find your `TEAM_ID` 
-opening XCode project in a text editor and searching `DEVELOPMENT_TEAM` substring in it.
+**Hint:**
+If you use a free Personal Team for signing applications to run on a real device, 
+and you do not have access to the link above to know your Team ID, you may still find your Team ID value,
+using the following workaround:
+- manage to run a sample iOS project in XCode on a real iOS device 
+- open XCode project in a text editor and search `DEVELOPMENT_TEAM` substring in it
+- the value of `DEVELOPMENT_TEAM` property is your personal Team ID
+
 
 ### Configuring the iOS application
 
