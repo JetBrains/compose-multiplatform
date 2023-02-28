@@ -18,6 +18,7 @@
 
 package androidx.compose.runtime.snapshots
 
+import androidx.compose.runtime.AtomicInt
 import androidx.compose.runtime.AtomicReference
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisallowComposableCalls
@@ -280,6 +281,13 @@ sealed class Snapshot(
          * global snapshot is used.
          */
         val current get() = currentSnapshot()
+
+        /**
+         * Returns whether any threads are currently in the process of notifying observers about
+         * changes to the global snapshot.
+         */
+        val isApplyObserverNotificationPending: Boolean
+            get() = pendingApplyObserverCount.get() > 0
 
         /**
          * Take a snapshot of the current value of all state objects. The values are preserved until
@@ -1754,20 +1762,36 @@ private fun <T> takeNewGlobalSnapshot(
     return result
 }
 
+/**
+ * Counts the number of threads currently inside `advanceGlobalSnapshot`, notifying observers of
+ * changes to the global snapshot.
+ */
+private var pendingApplyObserverCount = AtomicInt(0)
+
 private fun <T> advanceGlobalSnapshot(block: (invalid: SnapshotIdSet) -> T): T {
     var previousGlobalSnapshot = snapshotInitializer as GlobalSnapshot
+
+    var modified: IdentityArraySet<StateObject>? = null // Effectively val; can be with contracts
     val result = sync {
         previousGlobalSnapshot = currentGlobalSnapshot.get()
+        modified = previousGlobalSnapshot.modified
+        if (modified != null) {
+            pendingApplyObserverCount.add(1)
+        }
         takeNewGlobalSnapshot(previousGlobalSnapshot, block)
     }
 
     // If the previous global snapshot had any modified states then notify the registered apply
     // observers.
-    val modified = previousGlobalSnapshot.modified
-    if (modified != null) {
-        val observers: List<(Set<Any>, Snapshot) -> Unit> = sync { applyObservers.toMutableList() }
-        observers.fastForEach { observer ->
-            observer(modified, previousGlobalSnapshot)
+    modified?.let {
+        try {
+            val observers: List<(Set<Any>, Snapshot) -> Unit> =
+                sync { applyObservers.toMutableList() }
+            observers.fastForEach { observer ->
+                observer(it, previousGlobalSnapshot)
+            }
+        } finally {
+            pendingApplyObserverCount.add(-1)
         }
     }
 

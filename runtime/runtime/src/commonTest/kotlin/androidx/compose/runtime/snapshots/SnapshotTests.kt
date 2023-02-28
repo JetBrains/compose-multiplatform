@@ -271,6 +271,33 @@ class SnapshotTests {
     }
 
     @Test
+    fun applyObserverNotificationIsPendingWhileSendingApplyNotifications() {
+        val state = mutableStateOf(0)
+
+        var notificationsPendingWhileObserving = false
+        val unregister = Snapshot.registerApplyObserver { _, _ ->
+            notificationsPendingWhileObserving = Snapshot.isApplyObserverNotificationPending
+        }
+
+        try {
+            // Normally not pending
+            assertFalse(Snapshot.isApplyObserverNotificationPending)
+
+            state.value = 1
+
+            Snapshot.sendApplyNotifications()
+
+            // Was pending while sending apply notifications
+            assertTrue(notificationsPendingWhileObserving)
+
+            // Not pending afterwards
+            assertFalse(Snapshot.isApplyObserverNotificationPending)
+        } finally {
+            unregister.dispose()
+        }
+    }
+
+    @Test
     fun aNestedSnapshotCanBeTaken() {
         val state = mutableStateOf(0)
 
