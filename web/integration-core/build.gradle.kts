@@ -28,6 +28,11 @@ kotlin {
         }
         binaries.executable()
     }
+    wasm {
+        moduleName = "myApp"
+        browser()
+        binaries.executable()
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -38,12 +43,24 @@ kotlin {
             }
         }
 
+        val jsWasmMain by creating {
+            dependencies {
+                implementation(kotlin("stdlib"))
+                implementation(npm("highlight.js", "10.7.2"))
+            }
+        }
+
         val jsMain by getting {
+            dependsOn(jsWasmMain)
             dependencies {
                 implementation(kotlin("stdlib-js"))
                 implementation(npm("highlight.js", "10.7.2"))
             }
         }
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
 
         val jsTest by getting {
             dependencies {

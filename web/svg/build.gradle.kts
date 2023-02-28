@@ -18,6 +18,8 @@ kotlin {
         binaries.executable()
     }
 
+    wasm { browser() }
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -26,22 +28,41 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation(project(":internal-web-core-runtime"))
-                implementation(kotlin("stdlib-js"))
+                implementation(kotlin("stdlib-common"))
                 implementation(project(":web-core"))
             }
         }
 
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val jsWasmTest by creating {
+            dependencies {
+                implementation(project(":test-utils"))
+                implementation(kotlin("test"))
+            }
+        }
         val jsTest by getting {
             languageSettings {
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
-            dependencies {
-                implementation(project(":test-utils"))
-                implementation(kotlin("test-js"))
+            dependsOn(jsWasmTest)
+        }
+
+        val wasmTest by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
+            dependsOn(jsWasmTest)
         }
     }
 }

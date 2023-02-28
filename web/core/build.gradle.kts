@@ -18,6 +18,7 @@ kotlin {
         }
         binaries.executable()
     }
+    wasm { browser() }
 
     sourceSets {
         val commonMain by getting {
@@ -26,16 +27,36 @@ kotlin {
             }
         }
 
-        val jsMain by getting {
-            languageSettings {
-                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
-            }
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
             dependencies {
                 implementation(project(":internal-web-core-runtime"))
             }
         }
 
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+            }
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+            }
+        }
+
+        val jsWasmTest by creating {
+            dependencies {
+                implementation(project(":test-utils"))
+                implementation(kotlin("test"))
+            }
+        }
+
         val jsTest by getting {
+            dependsOn(jsWasmTest)
             languageSettings {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
@@ -44,6 +65,13 @@ kotlin {
                 implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
             }
+        }
+        val wasmTest by getting {
+            languageSettings {
+                optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
+                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
+            }
+            dependsOn(jsWasmTest)
         }
 
         val jvmMain by getting {

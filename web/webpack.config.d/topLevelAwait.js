@@ -1,0 +1,3 @@
+config.experiments = {
+    topLevelAwait: true,
+}

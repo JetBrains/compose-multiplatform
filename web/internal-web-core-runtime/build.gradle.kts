@@ -16,6 +16,9 @@ kotlin {
             }
         }
     }
+    wasm {
+        browser {}
+    }
 
     sourceSets {
         val commonMain by getting {
@@ -24,10 +27,30 @@ kotlin {
             }
         }
 
-        val jsTest by getting {
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
+        val jsWasmTest by creating {
             dependencies {
-                implementation(kotlin("test-js"))
+                implementation(kotlin("test"))
             }
+        }
+
+        val jsTest by getting {
+            dependsOn(jsWasmTest)
+        }
+
+        val wasmTest by getting {
+            dependsOn(jsWasmTest)
         }
     }
 }

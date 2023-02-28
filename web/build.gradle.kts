@@ -147,6 +147,8 @@ subprojects {
     }
 
     repositories {
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        maven("https://packages.jetbrains.team/maven/p/karpovich-sandbox/ksandbox")
         gradlePluginPortal()
         mavenLocal()
         mavenCentral()
@@ -170,4 +172,11 @@ subprojects {
             showStackTraces = true
         }
     }
+
+//    project.afterEvaluate {
+//        //Disable jsWasmMain intermediate sourceset publication
+//        tasks.findByName("compileJsWasmMainKotlinMetadata")?.configure<Task> {
+//            enabled = false
+//        }
+//    }
 }

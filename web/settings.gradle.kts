@@ -28,6 +28,8 @@ pluginManagement {
                 url = uri(urlPath)
             }
         }
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/wasm/experimental")
+        maven("https://packages.jetbrains.team/maven/p/karpovich-sandbox/ksandbox")
         mavenLocal()
         maven {
             url = uri("https://maven.pkg.jetbrains.space/public/p/compose/dev")

@@ -9,7 +9,12 @@ const NewReporter = function(baseReporterDecorator, config, emitter) {
     const fs = require('fs');
     const kotlinVersion = fs.readFileSync(path.resolve(__dirname, "../../../buildSrc/build/kotlin.version"), 'utf8');
 
-    const kotlinReporterModule = require(`../../../build/js/packages_imported/kotlin-test-js-runner/${kotlinVersion}/karma-kotlin-reporter`);
+    var kotlinReporterModule;
+    try {
+        kotlinReporterModule = require(`../../../build/js/packages_imported/kotlin-test-js-runner/${kotlinVersion}/karma-kotlin-reporter`);
+    } catch (e) { // For some reason kotlin 1.8.20-Beta provides kotlin-test-js-runner 0.0.1
+        kotlinReporterModule = require(`../../../build/js/packages_imported/kotlin-test-js-runner/0.0.1/karma-kotlin-reporter`);
+    }
     const KotlinReporter = kotlinReporterModule['reporter:karma-kotlin-reporter'][1];
     this.$inject = KotlinReporter.$inject
 

@@ -1,0 +1,23 @@
+package org.jetbrains.compose.web.events
+
+import androidx.compose.web.events.SyntheticEvent
+import org.jetbrains.compose.web.NativeEventExtension
+import org.w3c.dom.DataTransfer
+import org.w3c.dom.events.Event
+import org.w3c.dom.events.EventTarget
+
+// @param nativeEvent: Event - we don't use [org.w3c.dom.events.InputEvent] here,
+// since for cases it can be just [org.w3c.dom.events.Event]
+class SyntheticInputEvent<ValueType, Element : EventTarget> internal constructor(
+    val value: ValueType,
+    nativeEvent: Event
+) : SyntheticEvent<Element>(
+    nativeEvent = nativeEvent
+) {
+    private val nativeEventExtension: NativeEventExtension = nativeEvent as NativeEventExtension
+
+    val data: String? = nativeEventExtension.data
+    val dataTransfer: DataTransfer? = nativeEventExtension.dataTransfer
+    val inputType: String? = nativeEventExtension.inputType
+    val isComposing: Boolean = nativeEventExtension.isComposing
+}
