@@ -2,6 +2,7 @@ import UIKit
 import SwiftUI
 import shared
 import AVKit
+import WebKit
 
 struct ComposeView: UIViewControllerRepresentable {
     private let openCamera: () -> ()
@@ -76,6 +77,7 @@ final class CameraUIViewController: UIViewController {
     var capturedImage: UIImage?
     var capturePhotoOutput: AVCapturePhotoOutput!
     var cameraPreviewLayer: AVCaptureVideoPreviewLayer!
+    var webView: WKWebView!
     
     private let cameraContainer = UIView()
     private let captureButton: UIButton = {
@@ -132,7 +134,9 @@ final class CameraUIViewController: UIViewController {
         #if targetEnvironment(simulator)
         showAlert(for: .simulatorUsed)
         #else
-        configureSessionIfAllowed()
+        DispatchQueue.global().async {
+            self.configureSessionIfAllowed()
+        }
         #endif
     }
     
@@ -161,7 +165,7 @@ final class CameraUIViewController: UIViewController {
     private func configureCamera() {
         captureSession.sessionPreset = .photo
         
-        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera], mediaType: .video, position: .back).devices.forEach{ device in
+        AVCaptureDevice.DiscoverySession(deviceTypes: [.builtInDualCamera, .builtInDualWideCamera, .builtInTelephotoCamera, .builtInTripleCamera, .builtInTrueDepthCamera, .builtInUltraWideCamera, .builtInWideAngleCamera], mediaType: .video, position: .back).devices.forEach{ device in
             if device.position == .back {
                 camera = device
             }
@@ -174,10 +178,12 @@ final class CameraUIViewController: UIViewController {
         captureSession.addInput(captureDeviceInput)
         captureSession.addOutput(capturePhotoOutput)
         
-        cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: captureSession)
-        view.layer.addSublayer(cameraPreviewLayer)
-        cameraPreviewLayer?.videoGravity = .resizeAspectFill
-        cameraPreviewLayer?.frame = view.layer.frame
+        DispatchQueue.main.async {
+            self.cameraPreviewLayer = AVCaptureVideoPreviewLayer(session: self.captureSession)
+            self.cameraContainer.layer.addSublayer(self.cameraPreviewLayer)
+            self.cameraPreviewLayer?.videoGravity = .resizeAspectFill
+            self.cameraPreviewLayer?.frame = self.view.layer.frame
+        }
         
         captureSession.startRunning()
     }
