@@ -83,7 +83,6 @@ import androidx.compose.ui.unit.dp
 import kotlin.math.abs
 import kotlin.math.roundToInt
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Ignore
@@ -381,13 +380,19 @@ class ScrollbarTest {
             // Thumb should be half the height of the scrollbar, as the viewport (200.dp) is half
             // the height of the content (400.dp). So clicking on the top half of the scrollbar
             // should do nothing.
-            for (offset in 1..50){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, offset.toFloat()))
+            for (offset in 1..50) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(0f, offset.toFloat()))
+                }
+                rule.awaitIdle()
                 assertEquals(0, scrollState.value)
             }
 
             // Clicking one pixel below the thumb should scroll the content by one viewport
-            rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 51f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                click(position = Offset(0f, 51f))
+            }
+            rule.awaitIdle()
             assertEquals(200, scrollState.value)
         }
     }
@@ -561,9 +566,7 @@ class ScrollbarTest {
     }
 
     @Theory
-    @Test(timeout = 3000)
-    @Suppress("JUnitMalformedDeclaration")
-    fun `press on scrollbar outside slider`(scrollbarProvider: ScrollbarProvider) {
+    fun `press on track just below slider`(scrollbarProvider: ScrollbarProvider) {
         runBlocking(Dispatchers.Main) {
             rule.setContent(scrollbarProvider) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
@@ -575,17 +578,20 @@ class ScrollbarTest {
                 press()
             }
 
-            tryUntilSucceeded {
-                rule.awaitIdle()
-                rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
+            // Give enough time for many scrolls
+            rule.mainClock.advanceTimeBy(timeUntilScrollsByPressOnTrack(10))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
             }
+
+            // Expect only one page-down scroll
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
         }
     }
 
     @Theory
-    @Test(timeout = 3000)
-    @Suppress("JUnitMalformedDeclaration")
-    fun `press on the end of scrollbar outside slider`(scrollbarProvider: ScrollbarProvider) {
+    fun `press on the end of track outside slider`(scrollbarProvider: ScrollbarProvider) {
         runBlocking(Dispatchers.Main) {
             rule.setContent(scrollbarProvider) {
                 TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
@@ -597,10 +603,96 @@ class ScrollbarTest {
                 press()
             }
 
-            tryUntilSucceeded {
-                rule.awaitIdle()
-                rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-300.dp)
+            // 3 page-down scrolls are required to reach the end.
+            rule.mainClock.advanceTimeBy(timeUntilScrollsByPressOnTrack(3))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
             }
+
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-300.dp)
+        }
+    }
+
+    @Theory
+    fun `press on track outside slider then move forward`(
+        scrollbarProvider: ScrollbarProvider
+    ) {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent(scrollbarProvider) {
+                TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 26f))
+                press()
+                moveTo(Offset(0f, 51f)) // Move immediately to allow 2 scrolls
+            }
+
+            // 2 page-down scrolls are required to reach 50-75 thumb range
+            rule.mainClock.advanceTimeBy(timeUntilScrollsByPressOnTrack(2))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
+            }
+
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-200.dp)
+        }
+    }
+
+    @Theory
+    fun `press on track outside slider then move back`(
+        scrollbarProvider: ScrollbarProvider
+    ) {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent(scrollbarProvider) {
+                TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 51f))
+                press()
+                moveTo(Offset(0f, 26f)) // Move immediately to allow only a single scroll
+            }
+
+            // Give enough time for many scrolls
+            rule.mainClock.advanceTimeBy(timeUntilScrollsByPressOnTrack(10))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
+            }
+
+            // Expect only one scroll to have occurred
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-100.dp)
+        }
+    }
+
+    @Theory
+    fun `press on track outside slider then move outside scrollbar`(
+        scrollbarProvider: ScrollbarProvider
+    ) {
+        runBlocking(Dispatchers.Main) {
+            rule.setContent(scrollbarProvider) {
+                TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
+            }
+            rule.awaitIdle()
+
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                moveTo(Offset(0f, 99f))
+                press()
+                moveTo(Offset(-20f, 99f)) // Move outside the scrollbar
+            }
+
+            // 3 scrolls are needed to move to the bottom
+            rule.mainClock.advanceTimeBy(timeUntilScrollsByPressOnTrack(3))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                release()
+            }
+
+            rule.awaitIdle()
+            rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(-300.dp)
         }
     }
 
@@ -815,7 +907,10 @@ class ScrollbarTest {
             rule.onNodeWithTag("box59").assertTopPositionInRootIsEqualTo(180.dp)
 
             // Press above the scrollbar and test the new position
-            rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 0f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                click(position = Offset(0f, 0f))
+            }
+            rule.awaitIdle()
             rule.onNodeWithTag("box0").assertTopPositionInRootIsEqualTo(0.dp)
         }
     }
@@ -835,7 +930,10 @@ class ScrollbarTest {
                 instantDrag(start = Offset(0f, 25f), end = Offset(0f, 50f))
             }
             rule.awaitIdle()
-            rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 0f))
+            rule.onNodeWithTag("scrollbar").performMouseInput {
+                click(position = Offset(0f, 0f))
+            }
+            rule.awaitIdle()
         }
     }
 
@@ -917,8 +1015,11 @@ class ScrollbarTest {
 
             // The scrollbar thumb should still be at the top, so clicking at 0 shouldn't change
             // the scroll offset
-            scrollState.assertChangeInOffset(0f){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 0f))
+            scrollState.assertChangeInOffset(0f) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(0f, 0f))
+                }
+                rule.awaitIdle()
             }
 
             // Press "down" one more time, which should bring the caret to the 11th line, and cause
@@ -928,13 +1029,19 @@ class ScrollbarTest {
 
             // The scrollbar thumb should move by 1/10th of its range, which is 50 pixels, so
             // clicking on the 5th pixel should do nothing
-            scrollState.assertChangeInOffset(0f){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 5f))
+            scrollState.assertChangeInOffset(0f) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(0f, 5f))
+                }
+                rule.awaitIdle()
             }
 
             // But clicking on the 4th pixel should scroll to top
-            scrollState.assertChangeInOffset(-scrollState.offset){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 4f))
+            scrollState.assertChangeInOffset(-scrollState.offset) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(0f, 4f))
+                }
+                rule.awaitIdle()
             }
 
             // Press down 9 more times to reach the bottom
@@ -945,13 +1052,19 @@ class ScrollbarTest {
 
             // The scrollbar thumb should move to the bottom, so clicking on the 50th pixel should
             // do nothing
-            scrollState.assertChangeInOffset(0f){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 50f))
+            scrollState.assertChangeInOffset(0f) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(0f, 50f))
+                }
+                rule.awaitIdle()
             }
 
             // But clicking on the 49th pixel should scroll to the very top
-            scrollState.assertChangeInOffset(-scrollState.offset){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(0f, 49f))
+            scrollState.assertChangeInOffset(-scrollState.offset) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(0f, 49f))
+                }
+                rule.awaitIdle()
             }
         }
     }
@@ -1025,8 +1138,11 @@ class ScrollbarTest {
 
             // The scrollbar thumb should still be at the end, so clicking at the last pixel
             // shouldn't change the scroll offset
-            scrollState.assertChangeInOffset(0f){
-                rule.clickScrollbarAndAwaitIdle("scrollbar", position = Offset(99f, 0f))
+            scrollState.assertChangeInOffset(0f) {
+                rule.onNodeWithTag("scrollbar").performMouseInput {
+                    click(position = Offset(99f, 0f))
+                }
+                rule.awaitIdle()
             }
 
             // Dragging the scrollbar to the very left should reset the scroll offset to 0
@@ -1099,32 +1215,13 @@ class ScrollbarTest {
         }
     }
 
-    private suspend fun tryUntilSucceeded(block: suspend () -> Unit) {
-        while (true) {
-            try {
-                block()
-                break
-            } catch (e: Throwable) {
-                delay(10)
-            }
-        }
-    }
-
-    @OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
+    @OptIn(InternalTestApi::class)
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
         (this as DesktopComposeTestRule).scene.sendPointerEvent(
             PointerEventType.Scroll,
             Offset(x.toFloat(), y.toFloat()),
             scrollDelta = Offset(x = 0f, y = delta),
             nativeEvent = awtWheelEvent()
-        )
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class, InternalTestApi::class)
-    private fun ComposeTestRule.performMouseMove(x: Int, y: Int) {
-        (this as DesktopComposeTestRule).scene.sendPointerEvent(
-            PointerEventType.Move,
-            Offset(x.toFloat(), y.toFloat())
         )
     }
 
@@ -1297,22 +1394,6 @@ class ScrollbarTest {
         press()
         moveTo(end)
         release()
-    }
-
-    /**
-     * A "click" for scrolling scrollbars.
-     * TODO: figure out why [MouseInjectionScope.click] doesn't work to scroll a scrollbar.
-     */
-    private suspend fun ComposeContentTestRule.clickScrollbarAndAwaitIdle(tag: String, position: Offset){
-        onNodeWithTag(tag).performMouseInput {
-            moveTo(position)
-            press()
-        }
-        awaitIdle()
-        onNodeWithTag(tag).performMouseInput {
-            release()
-        }
-        awaitIdle()
     }
 
     @Composable
@@ -1592,6 +1673,16 @@ internal object TestConfig : ScrollConfig {
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 private val PointerEvent.totalScrollDelta
     get() = this.changes.fastFold(Offset.Zero) { acc, c -> acc + c.scrollDelta }
+
+/**
+ * Returns the time needed for the given number of page-scrolls when pressing the scrollbar track
+ * outside the thumb.
+ */
+private fun timeUntilScrollsByPressOnTrack(count: Int) = when {
+    count <= 1 -> 0L
+    count == 2 -> DelayBeforeSecondScrollOnTrackPress
+    else -> DelayBeforeSecondScrollOnTrackPress + (count - 2) * DelayBetweenScrollsOnTrackPress
+}
+

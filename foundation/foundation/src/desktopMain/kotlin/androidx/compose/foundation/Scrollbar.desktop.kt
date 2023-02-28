@@ -19,7 +19,8 @@ package androidx.compose.foundation
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.TweenSpec
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.detectTapAndPress
+import androidx.compose.foundation.gestures.awaitHorizontalDragOrCancellation
+import androidx.compose.foundation.gestures.awaitVerticalDragOrCancellation
 import androidx.compose.foundation.gestures.drag
 import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.interaction.DragInteraction
@@ -40,12 +41,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocal
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
@@ -54,6 +55,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.input.pointer.PointerInputScope
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChange
 import androidx.compose.ui.layout.Layout
@@ -67,8 +69,10 @@ import androidx.compose.ui.unit.constrainHeight
 import androidx.compose.ui.unit.constrainWidth
 import androidx.compose.ui.unit.dp
 import kotlin.math.roundToInt
-import kotlin.math.sign
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * [CompositionLocal] used to pass [ScrollbarStyle] down the tree.
@@ -336,7 +340,6 @@ private typealias NewScrollbarAdapterFactory<T> = (
     trackSize: Int,
 ) -> androidx.compose.foundation.v2.ScrollbarAdapter
 
-
 /**
  * The actual implementation of the scrollbar.
  *
@@ -416,7 +419,7 @@ internal fun <T> OldOrNewScrollbar(
         },
         modifier
             .hoverable(interactionSource = interactionSource)
-            .scrollOnPressOutsideThumb(isVertical, sliderAdapter, adapter),
+            .scrollOnPressTrack(isVertical, sliderAdapter),
         measurePolicy
     )
 }
@@ -780,7 +783,7 @@ interface ScrollbarAdapter {
 
 }
 
-private fun computeSlidePositionAndSize(sliderAdapter: SliderAdapter): Pair<Int, Int> {
+private fun computeSliderPositionAndSize(sliderAdapter: SliderAdapter): Pair<Int, Int> {
     val adapterPosition = sliderAdapter.position
     val position = adapterPosition.roundToInt()
     val size = (sliderAdapter.thumbSize + adapterPosition - position).roundToInt()
@@ -794,7 +797,7 @@ private fun verticalMeasurePolicy(
     scrollThickness: Int
 ) = MeasurePolicy { measurables, constraints ->
     setContainerSize(constraints.maxHeight)
-    val (position, height) = computeSlidePositionAndSize(sliderAdapter)
+    val (position, height) = computeSliderPositionAndSize(sliderAdapter)
 
     val placeable = measurables.first().measure(
         Constraints.fixed(
@@ -813,7 +816,7 @@ private fun horizontalMeasurePolicy(
     scrollThickness: Int
 ) = MeasurePolicy { measurables, constraints ->
     setContainerSize(constraints.maxWidth)
-    val (position, width) = computeSlidePositionAndSize(sliderAdapter)
+    val (position, width) = computeSliderPositionAndSize(sliderAdapter)
 
     val placeable = measurables.first().measure(
         Constraints.fixed(
@@ -859,48 +862,172 @@ private fun Modifier.scrollbarDrag(
     }
 }
 
-private fun Modifier.scrollOnPressOutsideThumb(
+private fun Modifier.scrollOnPressTrack(
     isVertical: Boolean,
     sliderAdapter: SliderAdapter,
-    scrollbarAdapter: androidx.compose.foundation.v2.ScrollbarAdapter,
 ) = composed {
-    var targetOffset: Offset? by remember { mutableStateOf(null) }
-
-    if (targetOffset != null) {
-        val targetPosition = if (isVertical) targetOffset!!.y else targetOffset!!.x
-
-        LaunchedEffect(targetPosition) {
-            var delay = PressTimeoutMillis * 3
-            while (targetPosition !in sliderAdapter.bounds) {
-                val oldSign = sign(targetPosition - sliderAdapter.position)
-                scrollbarAdapter.scrollTo(
-                    scrollbarAdapter.scrollOffset + oldSign * scrollbarAdapter.viewportSize
-                )
-                val newSign = sign(targetPosition - sliderAdapter.position)
-
-                if (oldSign != newSign) {
-                    break
-                }
-
-                delay(delay)
-                delay = PressTimeoutMillis
-            }
-        }
+    val coroutineScope = rememberCoroutineScope()
+    val scroller = remember(sliderAdapter, coroutineScope) {
+        TrackPressScroller(coroutineScope, sliderAdapter)
     }
-    Modifier.pointerInput(Unit) {
-        detectTapAndPress(
-            onPress = { offset ->
-                targetOffset = offset
-                tryAwaitRelease()
-                targetOffset = null
-            },
-            onTap = {}
+    Modifier.pointerInput(scroller) {
+        detectScrollViaTrackGestures(
+            isVertical = isVertical,
+            scroller = scroller
         )
     }
 }
 
 /**
- * The time that must elapse before a tap gesture sends onTapDown, if there's
- * any doubt that the gesture is a tap.
+ * Responsible for scrolling when the scrollbar track is pressed (outside the thumb).
  */
-private const val PressTimeoutMillis: Long = 100L
+private class TrackPressScroller(
+    private val coroutineScope: CoroutineScope,
+    private val sliderAdapter: SliderAdapter
+) {
+
+    /**
+     * The current direction of scroll (1: down/right, -1: up/left, 0: not scrolling)
+     */
+    private var direction = 0
+
+    /**
+     * The currently pressed location (in pixels) on the scrollable axis.
+     */
+    private var offset: Float? = null
+
+    /**
+     * The job that keeps scrolling while the track is pressed.
+     */
+    private var job: Job? = null
+
+    /**
+     * Calculates the direction of scrolling towards the given offset (in pixels).
+     */
+    private fun directionOfScrollTowards(offset: Float): Int {
+        val thumbRange = sliderAdapter.bounds
+        return when {
+            offset < thumbRange.start -> -1
+            offset > thumbRange.endInclusive -> 1
+            else -> 0
+        }
+    }
+
+    /**
+     * Scrolls once towards the current offset, if it matches the direction of the current gesture.
+     */
+    private suspend fun scrollTowardsCurrentOffset() {
+        offset?.let {
+            val currentDirection = directionOfScrollTowards(it)
+            if (currentDirection != direction)
+                return
+            with(sliderAdapter.adapter) {
+                scrollTo(scrollOffset + currentDirection * viewportSize)
+            }
+        }
+    }
+
+    /**
+     * Starts the job that scrolls continuously towards the current offset.
+     */
+    private fun startScrolling() {
+        job?.cancel()
+        job = coroutineScope.launch {
+            scrollTowardsCurrentOffset()
+            delay(DelayBeforeSecondScrollOnTrackPress)
+            while (true) {
+                scrollTowardsCurrentOffset()
+                delay(DelayBetweenScrollsOnTrackPress)
+            }
+        }
+    }
+
+    /**
+     * Invoked on the first press for a gesture.
+     */
+    fun onPress(offset: Float) {
+        this.offset = offset
+        this.direction = directionOfScrollTowards(offset)
+
+        if (direction != 0)
+            startScrolling()
+    }
+
+    /**
+     * Invoked when the pointer moves while pressed during the gesture.
+     */
+    fun onMovePressed(offset: Float) {
+        this.offset = offset
+    }
+
+    /**
+     * Cleans up when the gesture finishes.
+     */
+    private fun cleanupAfterGesture(){
+        job?.cancel()
+        direction = 0
+        offset = null
+    }
+
+    /**
+     * Invoked when the button is released.
+     */
+    fun onRelease() {
+        cleanupAfterGesture()
+    }
+
+    /**
+     * Invoked when the gesture is cancelled.
+     */
+    fun onGestureCancelled() {
+        cleanupAfterGesture()
+        // Maybe revert to the initial position?
+    }
+
+}
+
+/**
+ * Detects the pointer events relevant for the "scroll by pressing on the track outside the thumb"
+ * gesture and calls the corresponding methods in the [scroller].
+ */
+private suspend fun PointerInputScope.detectScrollViaTrackGestures(
+    isVertical: Boolean,
+    scroller: TrackPressScroller
+) {
+    fun Offset.onScrollAxis() = if (isVertical) y else x
+
+    forEachGesture {
+        awaitPointerEventScope {
+            val down = awaitFirstDown()
+            scroller.onPress(down.position.onScrollAxis())
+
+            while (true) {
+                val drag =
+                    if (isVertical)
+                        awaitVerticalDragOrCancellation(down.id)
+                    else
+                        awaitHorizontalDragOrCancellation(down.id)
+
+                if (drag == null) {
+                    scroller.onGestureCancelled()
+                    break
+                } else if (!drag.pressed) {
+                    scroller.onRelease()
+                    break
+                } else
+                    scroller.onMovePressed(drag.position.onScrollAxis())
+            }
+        }
+    }
+}
+
+/**
+ * The delay between the 1st and 2nd scroll while the scrollbar track is pressed outside the thumb.
+ */
+internal const val DelayBeforeSecondScrollOnTrackPress: Long = 300L
+
+/**
+ * The delay between each subsequent (after the 2nd) scroll while the scrollbar track is pressed
+ * outside the thumb.
+ */
+internal const val DelayBetweenScrollsOnTrackPress: Long = 100L

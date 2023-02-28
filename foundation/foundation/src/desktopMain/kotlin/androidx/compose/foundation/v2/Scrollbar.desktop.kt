@@ -377,7 +377,7 @@ internal class TextFieldScrollbarAdapter(
 }
 
 internal class SliderAdapter(
-    private val adapter: ScrollbarAdapter,
+    val adapter: ScrollbarAdapter,
     private val trackSize: Int,
     private val minHeight: Float,
     private val reverseLayout: Boolean,
