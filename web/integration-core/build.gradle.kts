@@ -116,3 +116,10 @@ afterEvaluate {
         versions.webpackCli.version = "4.10.0"
     }
 }
+
+project.afterEvaluate {
+    //Disable jsWasmMain intermediate sourceset publication
+    tasks.named("compileJsWasmMainKotlinMetadata") {
+        enabled = false
+    }
+}

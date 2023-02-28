@@ -69,6 +69,10 @@ subprojects {
                         password = COMPOSE_REPO_KEY ?: ""
                     }
                 }
+                maven {
+                    name = "LocalDir"
+                    url = rootProject.buildDir.resolve("repo").toURI()
+                }
             }
             publications.all {
                 this as MavenPublication
@@ -172,11 +176,4 @@ subprojects {
             showStackTraces = true
         }
     }
-
-//    project.afterEvaluate {
-//        //Disable jsWasmMain intermediate sourceset publication
-//        tasks.findByName("compileJsWasmMainKotlinMetadata")?.configure<Task> {
-//            enabled = false
-//        }
-//    }
 }
