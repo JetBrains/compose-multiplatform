@@ -77,7 +77,6 @@ final class CameraUIViewController: UIViewController {
     var capturedImage: UIImage?
     var capturePhotoOutput: AVCapturePhotoOutput!
     var cameraPreviewLayer: AVCaptureVideoPreviewLayer!
-    var webView: WKWebView!
     
     private let cameraContainer = UIView()
     private let captureButton: UIButton = {
