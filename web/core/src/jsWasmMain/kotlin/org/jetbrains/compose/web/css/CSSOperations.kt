@@ -15,7 +15,7 @@ operator fun <T: CSSUnit> CSSSizeValue<T>.minus(b: CSSSizeValue<T>): CSSSizeValu
 operator fun <T: CSSUnit> CSSSizeValue<T>.unaryMinus(): CSSSizeValue<T> = CSSUnitValueTyped(-value, unit)
 operator fun <T: CSSUnit> CSSSizeValue<T>.unaryPlus(): CSSSizeValue<T> = CSSUnitValueTyped(value, unit)
 
-external interface CSSCalcOperation<T : CSSUnit>: CSSNumericValue<T>
+interface CSSCalcOperation<T : CSSUnit>: CSSNumericValue<T>
 
 data class CSSCalcValue<T : CSSUnit>(
     var op: CSSCalcOperation<out T>

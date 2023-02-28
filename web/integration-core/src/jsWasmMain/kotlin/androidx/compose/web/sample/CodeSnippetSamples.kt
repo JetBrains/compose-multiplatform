@@ -72,7 +72,7 @@ fun CodeSnippet(code: String, language: String = "kotlin") {
             }
         ) {
             DisposableEffect(code) {
-                scopeElement.setHighlightedCode(code)
+//                scopeElement.setHighlightedCode(code)
                 onDispose {  }
             }
         }

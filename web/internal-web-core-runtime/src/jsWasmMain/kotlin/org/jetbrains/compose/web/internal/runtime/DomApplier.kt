@@ -3,8 +3,8 @@ package org.jetbrains.compose.web.internal.runtime
 import androidx.compose.runtime.AbstractApplier
 import kotlinx.dom.clear
 import org.w3c.dom.*
+import org.w3c.dom.events.*
 import org.w3c.dom.css.CSSStyleDeclaration
-import org.w3c.dom.events.EventListener
 
 @ComposeWebInternalApi
 class DomApplier(
@@ -35,9 +35,17 @@ class DomApplier(
 
 
 @ComposeWebInternalApi
-interface NamedEventListener : EventListener {
-    val name: String
+abstract class NamedEventListener {
+    abstract val name: String
+
+    val l: EventListener = createEventListener {
+        handleEvent(it)
+    }
+
+    abstract fun handleEvent(event: Event)
 }
+
+internal expect fun createEventListener(handleEvent: (Event) -> Unit): EventListener
 
 @ComposeWebInternalApi
 open class DomNodeWrapper(open val node: Node) {

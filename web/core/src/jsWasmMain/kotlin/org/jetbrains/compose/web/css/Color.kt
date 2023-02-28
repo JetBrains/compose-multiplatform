@@ -2,7 +2,7 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
+interface CSSColorValue : StylePropertyValue, CSSVariableValueAs<CSSColorValue>
 
 object Color {
 

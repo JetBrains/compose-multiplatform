@@ -7,6 +7,6 @@
 
 package org.jetbrains.compose.web.css
 
-external interface CSSKeywordValue : CSSStyleValue
+interface CSSKeywordValue : CSSStyleValue
 
 inline fun CSSKeywordValue(value: String): CSSKeywordValue = CSSStyleValue(value).asDynamic().unsafeCast<CSSKeywordValue>()

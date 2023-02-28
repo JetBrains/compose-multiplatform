@@ -15,7 +15,9 @@ import org.w3c.dom.HTMLInputElement
 import org.w3c.dom.HTMLTextAreaElement
 
 
-private val controlledInputsValuesWeakMap: JsWeakMap = js("new WeakMap();").unsafeCast<JsWeakMap>()
+private val controlledInputsValuesWeakMap: JsWeakMap = createJsWeakMap()
+
+internal expect fun createJsWeakMap(): JsWeakMap
 
 internal fun restoreControlledInputState(inputElement: HTMLInputElement) {
     val type = InputType.fromString(inputElement.type)

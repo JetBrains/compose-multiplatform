@@ -35,7 +35,9 @@ open class SyntheticMouseEvent internal constructor(
     val offsetY: Double = nativeEvent.offsetY
     val pageX: Double = nativeEvent.pageX
     val pageY: Double = nativeEvent.pageY
-    val region: String? = nativeEvent.region
+    val region: String
+        get() = TODO("region not implemented")
+
     val relatedTarget: EventTarget? = nativeEvent.relatedTarget
     val screenX: Int = nativeEvent.screenX
     val screenY: Int = nativeEvent.screenY

@@ -20,7 +20,7 @@ import org.w3c.dom.events.*
 open class SyntheticEventListener<T : SyntheticEvent<*>> internal constructor(
     val event: String,
     val listener: (T) -> Unit
-) : EventListener, NamedEventListener {
+) : NamedEventListener() {
 
     override val name: String = event
 

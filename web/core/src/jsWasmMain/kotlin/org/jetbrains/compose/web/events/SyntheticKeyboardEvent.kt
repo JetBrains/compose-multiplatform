@@ -17,7 +17,8 @@ class SyntheticKeyboardEvent internal constructor(
     val ctrlKey: Boolean = nativeEvent.ctrlKey
     val isComposing: Boolean = nativeEvent.isComposing
     val key: String = nativeEvent.key
-    val locale: String = (nativeEvent as NativeEventExtension).locale
+    val locale: String
+        get() = (nativeEvent as NativeEventExtension).locale
     val location: Int = nativeEvent.location
     val metaKey: Boolean = nativeEvent.metaKey
     val repeat: Boolean = nativeEvent.repeat

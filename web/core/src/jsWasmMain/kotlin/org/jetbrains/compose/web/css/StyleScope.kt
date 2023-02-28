@@ -66,7 +66,7 @@ interface StyleScope {
 internal inline fun variableValue(variableName: String, fallback: StylePropertyValue? = null) =
     "var(--$variableName${fallback?.let { ", $it" } ?: ""})"
 
-external interface CSSVariableValueAs<out T : StylePropertyValue>
+interface CSSVariableValueAs<out T : StylePropertyValue>
 
 inline fun <TValue> CSSVariableValue(value: StylePropertyValue) =
     value.asDynamic().unsafeCast<TValue>()

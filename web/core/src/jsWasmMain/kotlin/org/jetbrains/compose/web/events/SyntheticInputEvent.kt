@@ -14,10 +14,14 @@ class SyntheticInputEvent<ValueType, Element : EventTarget> internal constructor
 ) : SyntheticEvent<Element>(
     nativeEvent = nativeEvent
 ) {
-    private val nativeEventExtension: NativeEventExtension = nativeEvent as NativeEventExtension
+    private val nativeEventExtension: NativeEventExtension? = nativeEvent as? NativeEventExtension
 
-    val data: String? = nativeEventExtension.data
-    val dataTransfer: DataTransfer? = nativeEventExtension.dataTransfer
-    val inputType: String? = nativeEventExtension.inputType
-    val isComposing: Boolean = nativeEventExtension.isComposing
+    val data: String?
+        get() = nativeEventExtension?.data
+    val dataTransfer: DataTransfer?
+        get() = nativeEventExtension?.dataTransfer
+    val inputType: String?
+        get() = nativeEventExtension?.inputType
+    val isComposing: Boolean
+        get() = nativeEventExtension?.isComposing ?: false
 }

@@ -44,19 +44,23 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
 
     fun updateEventListeners(list: List<NamedEventListener>) {
         currentListeners.forEach {
-            node.removeEventListener(it.name, it)
+            node.removeEventListener(it.name, it.l)
         }
 
         currentListeners = list
 
         currentListeners.forEach {
-            node.addEventListener(it.name, it)
+            node.addEventListener(it.name, it.l)
         }
     }
 
     fun updateProperties(applicators: List<Pair<(Element, Any) -> Unit, Any>>) {
         applicators.forEach { (applicator, item) ->
-            applicator(node, item)
+            try {
+                applicator(node, item)
+            } catch (e: Throwable) {
+                println("Error in updateProperties: $e")
+            }
         }
     }
 
@@ -79,14 +83,7 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
     }
 
     fun updateAttrs(attrs: Map<String, String>) {
-        node.getAttributeNames().forEach { name ->
-            when (name) {
-                "style", "class" -> {
-                    // skip style and class here, they're managed in corresponding methods
-                }
-                else -> node.removeAttribute(name)
-            }
-        }
+        removeAttributesExceptStyleAndClass(node)
 
         attrs.forEach {
             node.setAttribute(it.key, it.value)
@@ -101,6 +98,7 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
     }
 }
 
+internal expect fun removeAttributesExceptStyleAndClass(node: Element)
 
 @OptIn(ComposeWebInternalApi::class)
 @Composable

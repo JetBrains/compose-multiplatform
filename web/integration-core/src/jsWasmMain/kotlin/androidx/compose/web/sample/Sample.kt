@@ -94,7 +94,10 @@ fun CounterApp(counter: MutableState<Int>) {
                 margin(15.px)
             }
 
-            onClick { counter.value = counter.value + 1 }
+            onClick {
+                println("CounterValue = ${counter.value}")
+                counter.value = counter.value + 1
+            }
         }
     ) {
         Text("Increment ${counter.value}")

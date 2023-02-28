@@ -13,6 +13,7 @@ import androidx.compose.runtime.DisposableEffectScope
 import androidx.compose.runtime.MonotonicFrameClock
 import androidx.compose.runtime.Recomposer
 import kotlinx.browser.document
+import kotlinx.browser.window
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.launch
@@ -25,6 +26,23 @@ import org.jetbrains.compose.web.internal.runtime.GlobalSnapshotManagerDispatche
 import org.w3c.dom.Element
 import org.w3c.dom.HTMLBodyElement
 import org.w3c.dom.get
+import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
+
+private class MonotonicClockImpl : MonotonicFrameClock {
+
+    override suspend fun <R> withFrameNanos(
+        onFrame: (Long) -> R
+    ): R = suspendCoroutine { continuation ->
+        window.requestAnimationFrame {
+            val duration = it.toDuration(DurationUnit.MILLISECONDS)
+            val result = onFrame(duration.inWholeNanoseconds)
+            continuation.resume(result)
+        }
+    }
+}
 
 /**
  * Use this method to mount the composition at the certain [root]
@@ -37,7 +55,7 @@ import org.w3c.dom.get
 @OptIn(ComposeWebInternalApi::class)
 fun <TElement : Element> renderComposable(
     root: TElement,
-    monotonicFrameClock: MonotonicFrameClock = DefaultMonotonicFrameClock,
+    monotonicFrameClock: MonotonicFrameClock = MonotonicClockImpl(),
     content: @Composable DOMScope<TElement>.() -> Unit
 ): Composition {
     GlobalSnapshotManager.ensureStarted()
