@@ -11,7 +11,7 @@ import org.w3c.dom.HTMLElement
 
 private fun HTMLElement.setHighlightedCode(code: String) {
     innerText = code
-    HighlightJs.highlightElement(this)
+//    HighlightJs.highlightElement(this)
 }
 
 private val SimpleCounterSnippet = CodeSnippetData(
