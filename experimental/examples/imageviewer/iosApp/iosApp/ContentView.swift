@@ -129,6 +129,10 @@ final class CameraUIViewController: UIViewController {
         
         closeButton.addTarget(self, action: #selector(closeController), for: .touchUpInside)
         captureButton.addTarget(self, action: #selector(capture), for: .touchUpInside)
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
         
         #if targetEnvironment(simulator)
         showAlert(for: .simulatorUsed)
