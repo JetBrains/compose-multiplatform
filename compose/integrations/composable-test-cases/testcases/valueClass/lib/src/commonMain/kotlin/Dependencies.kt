@@ -48,3 +48,11 @@ value class VCPrivateAll private constructor(private val value: Int) {
         val V2 = VCPrivateAll(2002)
     }
 }
+
+@JvmInline
+value class VCPrivateAllNonPrimitive private constructor(private val value: String) {
+    companion object {
+        val V1 = VCPrivateAllNonPrimitive("V1")
+        val V2 = VCPrivateAllNonPrimitive("V2")
+    }
+}

@@ -156,4 +156,22 @@ class Tests {
         job.cancel()
     }
 
+    @Test
+    fun testVCPrivateAllNonPrimitive() = runTest {
+        var v: VCPrivateAllNonPrimitive by mutableStateOf(VCPrivateAllNonPrimitive.V1)
+
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
+            TakeVCPrivateAllNonPrimitive(v)
+        }
+
+        assertEquals("root:{Value = VCPrivateAllNonPrimitive(value=V1)}", root.dump())
+
+        v = VCPrivateAllNonPrimitive.V2
+        testScheduler.advanceUntilIdle()
+
+        assertEquals("root:{Value = VCPrivateAllNonPrimitive(value=V2)}", root.dump())
+        job.cancel()
+    }
+
 }

@@ -41,6 +41,10 @@ fun TakeVCPrivateCtorInternalVal(a: VCPrivateCtorInternalVal) {
 fun TakeVCPrivateAll(a: VCPrivateAll) {
     TextLeafNode("Value = $a")
 }
+@Composable
+fun TakeVCPrivateAllNonPrimitive(a: VCPrivateAllNonPrimitive) {
+    TextLeafNode("Value = $a")
+}
 
 @JvmInline
 value class SameModuleVCAllPrivate private constructor(private val value: Int) {
