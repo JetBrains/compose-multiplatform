@@ -113,6 +113,9 @@ if (casesToRun.isDefault()) {
     module(":testcase-anonymousObjects-lib", "testcases/anonymousObjects/lib")
     module(":testcase-anonymousObjects-main", "testcases/anonymousObjects/main")
 
+    module(":testcase-valueClass-lib", "testcases/valueClass/lib")
+    module(":testcase-valueClass-main", "testcases/valueClass/main")
+
     module(":testcase-lambdas-lib", "testcases/lambdas/lib")
     module(":testcase-lambdas-main", "testcases/lambdas/main")
 }
