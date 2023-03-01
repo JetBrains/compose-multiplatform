@@ -3,6 +3,8 @@
 Сan run on desktop, Android and iOS.
 Note that iOS target is experimental so far.
 
+You may download this template as a [zip file](../archives/multiplatform-template.zip). 
+
 ## Desktop
 This template contains  `desktopApp` run configuration that you can use to run the desktop target in Android Studio or Intellij IDEA.
 

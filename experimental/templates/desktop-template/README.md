@@ -1,4 +1,6 @@
-Compose Desktop Application
+# Compose Desktop Application
+
+You may download this template as a [zip file](../archives/desktop-template.zip). 
 
 - `./gradlew run` - run application
 - `./gradlew package` - package native distribution into `build/compose/binaries`
