@@ -137,4 +137,23 @@ class Tests {
 //        assertEquals("root:{Value = VCPrivateAll(value=2002)}", root.dump())
 //        job.cancel()
 //    }
+
+    @Test
+    fun testTakeSameModuleVCAllPrivate() = runTest {
+        var v: SameModuleVCAllPrivate by mutableStateOf(SameModuleVCAllPrivate.V1)
+
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
+            TakeSameModuleVCAllPrivate(v)
+        }
+
+        assertEquals("root:{Value = SameModuleVCAllPrivate(value=11011)}", root.dump())
+
+        v = SameModuleVCAllPrivate.V2
+        testScheduler.advanceUntilIdle()
+
+        assertEquals("root:{Value = SameModuleVCAllPrivate(value=22022)}", root.dump())
+        job.cancel()
+    }
+
 }

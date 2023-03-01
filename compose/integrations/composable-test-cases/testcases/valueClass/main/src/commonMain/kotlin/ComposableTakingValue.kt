@@ -1,5 +1,6 @@
 import androidx.compose.runtime.Composable
 import com.example.common.TextLeafNode
+import kotlin.jvm.JvmInline
 
 @Composable
 fun TakeVCAllPublic(a: VCAllPublic) {
@@ -38,5 +39,18 @@ fun TakeVCPrivateCtorInternalVal(a: VCPrivateCtorInternalVal) {
 
 @Composable
 fun TakeVCPrivateAll(a: VCPrivateAll) {
+    TextLeafNode("Value = $a")
+}
+
+@JvmInline
+value class SameModuleVCAllPrivate private constructor(private val value: Int) {
+    companion object {
+        val V1 = SameModuleVCAllPrivate(11011)
+        val V2 = SameModuleVCAllPrivate(22022)
+    }
+}
+
+@Composable
+fun TakeSameModuleVCAllPrivate(a: SameModuleVCAllPrivate) {
     TextLeafNode("Value = $a")
 }
