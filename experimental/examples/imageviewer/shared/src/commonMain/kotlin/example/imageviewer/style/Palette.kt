@@ -19,6 +19,16 @@ object ImageviewerColors {
     val TranslucentWhite = Color(255, 255, 255, 20)
     val Transparent = Color.Transparent
 
+    val background = Color(0xFFFFFFFF)
+    val onBackground = Color(0xFF19191C)
+
+    val fullScreenImageBackground = Color(0xFF19191C)
+
+    val uiLightBlack = Color(25, 25, 28, 128)
+    val textOnImage = Color.White
+    val noteBlockBackground = Color(0xFFF3F3F4)
+
+
     val KotlinGradient0 = Color(0xFF7F52FF)
     val KotlinGradient50 = Color(0xFFC811E2)
     val KotlinGradient100 = Color(0xFFE54857)
@@ -39,8 +49,8 @@ internal fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
     MaterialTheme(
         colorScheme = MaterialTheme.colorScheme.copy(
-            background = Color(0xFF1B1B1B),
-            onBackground = Color(0xFFFFFFFF)
+            background = ImageviewerColors.background,
+            onBackground = ImageviewerColors.onBackground
         )
     ) {
         content()

@@ -1,6 +1,8 @@
 package example.imageviewer.view
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -9,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -22,9 +25,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -49,38 +55,17 @@ internal fun MemoryScreen(
 ) {
     val pictures by photoGallery.galleryStateFlow.collectAsState()
     val picture = pictures.first { it.id == memoryPage.galleryId }
-    Column {
-        TopAppBar(
-            modifier = Modifier.background(brush = ImageviewerColors.kotlinHorizontalGradientBrush),
-            colors = TopAppBarDefaults.smallTopAppBarColors(
-                containerColor = ImageviewerColors.Transparent,
-                titleContentColor = MaterialTheme.colorScheme.onBackground
-            ),
-            title = {
-                Text("")
-            },
-            navigationIcon = {
-                Tooltip("Back") {
-                    Image(
-                        painterResource("back.png"),
-                        contentDescription = null,
-                        modifier = Modifier.size(38.dp)
-                            .clip(CircleShape)
-                            .clickable { onBack() }
-                    )
-                }
-            },
-        )
+    Box {
         val scrollState = memoryPage.scrollState
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState),
+                .verticalScroll(scrollState)
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(300.dp)
+                    .height(393.dp)
                     .background(Color.White)
                     .graphicsLayer {
                         translationY = 0.5f * scrollState.value
@@ -89,11 +74,11 @@ internal fun MemoryScreen(
             ) {
                 MemoryHeader(picture.thumbnail, onClick = { onHeaderClick(memoryPage.galleryId) })
             }
-            Box(modifier = Modifier.background(ImageviewerColors.kotlinHorizontalGradientBrush)) {
+            Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
-                    Headliner("Where it happened")
+                    Headliner("Place")
                     LocationVisualizer()
-                    Headliner("What happened")
+                    Headliner("Note")
                     Collapsible(
                         """
                         I took a picture with my iPhone 14 at 17:45. The picture ended up being 3024 x 4032 pixels. ✨
@@ -106,22 +91,74 @@ internal fun MemoryScreen(
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
                     Spacer(Modifier.height(50.dp))
-                    Text(
-                        "Delete this memory",
-                        Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        color = Color.White
-                    )
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(
+                            8.dp,
+                            Alignment.CenterHorizontally
+                        ),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Image(
+                            painterResource("trash.png"),
+                            contentDescription = null,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            text = "Delete Memory",
+                            textAlign = TextAlign.Left,
+                            color = ImageviewerColors.onBackground,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Normal
+                        )
+                    }
                     Spacer(Modifier.height(50.dp))
                 }
             }
         }
+        TopAppBar(
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp),
+            colors = TopAppBarDefaults.smallTopAppBarColors(
+                containerColor = ImageviewerColors.Transparent,
+                titleContentColor = MaterialTheme.colorScheme.onBackground
+            ),
+            title = {
+                Text("")
+            },
+            navigationIcon = {
+                Tooltip("Back") {
+                    CircularButton(painterResource("arrowleft.png"), onClick = { onBack() })
+                }
+            },
+        )
     }
+}
+
+@Composable
+internal fun CircularButton(image: Painter, onClick: () -> Unit) {
+    Box(
+        Modifier.size(40.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
+            .clickable { onClick() }, contentAlignment = Alignment.Center
+    ) {
+        Image(
+            image,
+            contentDescription = null,
+            modifier = Modifier.size(20.dp)
+        )
+    }
+
 }
 
 @Composable
 private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
+    val shadowTextStyle = LocalTextStyle.current.copy(
+        shadow = Shadow(
+            color = Color.Black,
+            offset = Offset(4f, 4f),
+            blurRadius = 4f
+        )
+    )
     Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
         Image(
             bitmap,
@@ -129,35 +166,27 @@ private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(modifier = Modifier.align(Alignment.Center)) {
+        Column(
+            modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
+        ) {
             Text(
                 "Your Memory",
-                textAlign = TextAlign.Center,
+                textAlign = TextAlign.Left,
                 color = Color.White,
-                fontSize = 50.sp,
+                fontSize = 20.sp,
                 modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.Black
+                fontWeight = FontWeight.SemiBold,
+                style = shadowTextStyle
             )
-            Spacer(Modifier.height(30.dp))
-            Box(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .border(
-                        width = 2.dp,
-                        color = Color.Black,
-                        shape = RoundedCornerShape(100.dp)
-                    )
-                    .clip(
-                        RoundedCornerShape(100.dp)
-                    )
-                    .background(Color.Black.copy(alpha = 0.7f)).padding(10.dp)
-            ) {
-                Text(
-                    "19th of April 2023",
-                    textAlign = TextAlign.Center,
-                    color = Color.White
-                )
-            }
+            Spacer(Modifier.height(5.dp))
+
+            Text(
+                "19th of April 2023",
+                textAlign = TextAlign.Left,
+                color = Color.White,
+                fontWeight = FontWeight.Normal,
+                style = shadowTextStyle
+            )
         }
     }
 }
@@ -169,12 +198,18 @@ internal fun Collapsible(s: String) {
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
     Text(
         text,
+        fontSize = 12.sp,
         modifier = Modifier
             .padding(10.dp, 0.dp)
             .clip(RoundedCornerShape(10.dp))
-            .background(Color.White)
+            .background(ImageviewerColors.noteBlockBackground)
             .padding(10.dp)
-            .animateContentSize()
+            .animateContentSize(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioLowBouncy,
+                    stiffness = Spring.StiffnessLow
+                )
+            )
             .clickable(interactionSource = interctionSource, indication = null) {
                 isCollapsed = !isCollapsed
             },
@@ -185,10 +220,10 @@ internal fun Collapsible(s: String) {
 internal fun Headliner(s: String) {
     Text(
         text = s,
-        fontWeight = FontWeight.Bold,
-        fontSize = 32.sp,
-        color = Color.White,
-        modifier = Modifier.padding(10.dp, 30.dp, 10.dp, 10.dp)
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 20.sp,
+        color = Color.Black,
+        modifier = Modifier.padding(start = 12.dp, top = 32.dp, end = 12.dp, bottom = 16.dp)
     )
 }
 
@@ -212,7 +247,10 @@ internal fun RelatedMemoriesVisualizer(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
             .height(200.dp)
     ) {
-        LazyRow(modifier = Modifier.fillMaxSize()) {
+        LazyRow(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
             itemsIndexed(ps) { idx, item ->
                 RelatedMemory(idx, item, onSelectRelatedMemory)
             }
@@ -226,8 +264,10 @@ internal fun RelatedMemory(
     galleryEntry: GalleryEntryWithMetadata,
     onSelectRelatedMemory: (GalleryId) -> Unit
 ) {
-    SquareMiniature(
-        galleryEntry.thumbnail,
-        false,
-        onClick = { onSelectRelatedMemory(galleryEntry.id) })
+    Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
+        SquareMiniature(
+            galleryEntry.thumbnail,
+            false,
+            onClick = { onSelectRelatedMemory(galleryEntry.id) })
+    }
 }
