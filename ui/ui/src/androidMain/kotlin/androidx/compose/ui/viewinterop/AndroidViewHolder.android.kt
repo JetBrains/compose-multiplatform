@@ -204,7 +204,7 @@ internal open class AndroidViewHolder(
 
     override fun onDeactivate() {
         reset()
-        removeView(view)
+        removeAllViewsInLayout()
     }
 
     override fun onRelease() {
@@ -212,6 +212,13 @@ internal open class AndroidViewHolder(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        if (view?.parent !== this) {
+            setMeasuredDimension(
+                MeasureSpec.getSize(widthMeasureSpec),
+                MeasureSpec.getSize(heightMeasureSpec)
+            )
+            return
+        }
         view?.measure(widthMeasureSpec, heightMeasureSpec)
         setMeasuredDimension(view?.measuredWidth ?: 0, view?.measuredHeight ?: 0)
         lastWidthMeasureSpec = widthMeasureSpec
@@ -339,6 +346,10 @@ internal open class AndroidViewHolder(
                 measurables: List<Measurable>,
                 constraints: Constraints
             ): MeasureResult {
+                if (childCount == 0) {
+                    return layout(constraints.minWidth, constraints.minHeight) {}
+                }
+
                 if (constraints.minWidth != 0) {
                     getChildAt(0).minimumWidth = constraints.minWidth
                 }
