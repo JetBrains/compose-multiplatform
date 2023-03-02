@@ -1,9 +1,7 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,15 +13,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -32,14 +28,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
 import example.imageviewer.model.GalleryEntryWithMetadata
@@ -48,24 +40,9 @@ import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
 import example.imageviewer.style.ImageviewerColors
-import example.imageviewer.style.ImageviewerColors.kotlinHorizontalGradientBrush
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@Composable
-internal fun GalleryHeader() {
-    Row(
-        horizontalArrangement = Arrangement.Center,
-        modifier = Modifier.padding(10.dp).fillMaxWidth()
-    ) {
-        Text(
-            "My Gallery",
-            fontSize = 25.sp,
-            color = MaterialTheme.colorScheme.onBackground,
-            fontStyle = FontStyle.Italic
-        )
-    }
-}
 
 enum class GalleryStyle {
     SQUARES,
@@ -91,32 +68,36 @@ internal fun GalleryScreen(
     }
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-        TitleBar(
-            onRefresh = { photoGallery.updatePictures() },
-            onToggle = { galleryPage.toggleGalleryStyle() },
-            dependencies
-        )
-        if (needShowPreview()) {
-            PreviewImage(
-                getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-                picture = galleryPage.picture, onClick = {
-                    galleryPage.pictureId?.let(onClickPreviewPicture)
-                })
+        Box {
+            if (needShowPreview()) {
+                PreviewImage(
+                    getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+                    picture = galleryPage.picture, onClick = {
+                        galleryPage.pictureId?.let(onClickPreviewPicture)
+                    })
+            }
+            TitleBar(
+                onRefresh = { photoGallery.updatePictures() },
+                onToggle = { galleryPage.toggleGalleryStyle() },
+                dependencies
+            )
         }
-        when (galleryPage.galleryStyle) {
-            GalleryStyle.SQUARES -> SquaresGalleryView(
-                pictures,
-                galleryPage.pictureId,
-                onSelect = { galleryPage.selectPicture(it) },
-                onMakeNewMemory
-            )
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+            when (galleryPage.galleryStyle) {
+                GalleryStyle.SQUARES -> SquaresGalleryView(
+                    pictures,
+                    galleryPage.pictureId,
+                    onSelect = { galleryPage.selectPicture(it) },
+                )
 
-            GalleryStyle.LIST -> ListGalleryView(
-                pictures,
-                dependencies,
-                onSelect = { galleryPage.selectPicture(it) },
-                onFullScreen = { onClickPreviewPicture(it) }
-            )
+                GalleryStyle.LIST -> ListGalleryView(
+                    pictures,
+                    dependencies,
+                    onSelect = { galleryPage.selectPicture(it) },
+                    onFullScreen = { onClickPreviewPicture(it) }
+                )
+            }
+            MakeNewMemoryMiniature(onMakeNewMemory)
         }
     }
     if (pictures.isEmpty()) {
@@ -129,54 +110,95 @@ private fun SquaresGalleryView(
     images: List<GalleryEntryWithMetadata>,
     selectedImage: GalleryId?,
     onSelect: (GalleryId) -> Unit,
-    onMakeNewMemory: () -> Unit,
 ) {
-    LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 128.dp)) {
-        item {
-            MakeNewMemoryMiniature(onMakeNewMemory)
-        }
-        itemsIndexed(images) { idx, image ->
-            val isSelected = image.id == selectedImage
-            val (picture, bitmap) = image
-            SquareMiniature(
-                image.thumbnail,
-                onClick = { onSelect(picture) },
-                isHighlighted = isSelected
-            )
+    Column {
+        Spacer(Modifier.height(1.dp))
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 130.dp),
+            verticalArrangement = Arrangement.spacedBy(1.dp),
+            horizontalArrangement = Arrangement.spacedBy(1.dp)
+        ) {
+            itemsIndexed(images) { idx, image ->
+                val isSelected = image.id == selectedImage
+                val (picture, bitmap) = image
+                SquareMiniature(
+                    image.thumbnail,
+                    onClick = { onSelect(picture) },
+                    isHighlighted = isSelected
+                )
+            }
         }
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun MakeNewMemoryMiniature(onClick: () -> Unit) {
-    Box(
-        Modifier.aspectRatio(1.0f)
-            .clickable {
-                onClick()
-            }, contentAlignment = Alignment.Center
-    ) {
-        Text(
-            "+",
-            modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.onBackground,
-            textAlign = TextAlign.Center,
-            fontSize = 50.sp
-        )
+    Column {
+        Box(
+            Modifier
+                .clip(CircleShape)
+                .width(52.dp)
+                .background(ImageviewerColors.uiLightBlack)
+                .aspectRatio(1.0f)
+                .clickable {
+                    onClick()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Image(
+                painter = painterResource("plus.png"),
+                contentDescription = null,
+                modifier = Modifier
+                    .width(18.dp)
+                    .height(18.dp),
+            )
+        }
+        Spacer(Modifier.height(32.dp))
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick: () -> Unit) {
-    Image(
-        bitmap = image,
-        contentDescription = null,
-        modifier = Modifier.aspectRatio(1.0f).clickable { onClick() }.then(
-            if (isHighlighted) {
-                Modifier.border(BorderStroke(5.dp, Color.White))
-            } else Modifier
-        ),
-        contentScale = ContentScale.Crop
-    )
+    Box(
+        Modifier.aspectRatio(1.0f).clickable { onClick() },
+        contentAlignment = Alignment.BottomEnd
+    ) {
+        Image(
+            bitmap = image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize().clickable { onClick() }.then(
+                if (isHighlighted) {
+                    Modifier//.border(BorderStroke(5.dp, Color.White))
+                } else Modifier
+            ),
+            contentScale = ContentScale.Crop
+        )
+        if (isHighlighted) {
+            Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack))
+            Box(
+                Modifier
+                    .padding(end = 4.dp, bottom = 4.dp)
+                    .clip(CircleShape)
+                    .width(32.dp)
+                    .background(ImageviewerColors.uiLightBlack)
+                    .aspectRatio(1.0f)
+                    .clickable {
+                        onClick()
+                    },
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = painterResource("eye.png"),
+                    contentDescription = null,
+                    modifier = Modifier
+                        .width(17.dp)
+                        .height(17.dp),
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -186,8 +208,6 @@ private fun ListGalleryView(
     onSelect: (GalleryId) -> Unit,
     onFullScreen: (GalleryId) -> Unit
 ) {
-    GalleryHeader()
-    Spacer(modifier = Modifier.height(10.dp))
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -215,44 +235,14 @@ private fun ListGalleryView(
 @Composable
 private fun TitleBar(onRefresh: () -> Unit, onToggle: () -> Unit, dependencies: Dependencies) {
     TopAppBar(
-        modifier = Modifier.background(brush = kotlinHorizontalGradientBrush),
+        modifier = Modifier.padding(start = 12.dp, end = 12.dp),
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = ImageviewerColors.Transparent,
             titleContentColor = MaterialTheme.colorScheme.onBackground
         ),
         title = {
-            Row(Modifier.height(50.dp)) {
-                Text(
-                    dependencies.localization.appName,
-                    modifier = Modifier.weight(1f).align(Alignment.CenterVertically),
-                    fontWeight = FontWeight.Bold
-                )
-                Surface(
-                    color = ImageviewerColors.Transparent,
-                    modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
-                    shape = CircleShape
-                ) {
-                    Image(
-                        painter = painterResource("list_view.png"),
-                        contentDescription = null,
-                        modifier = Modifier.size(35.dp).clickable {
-                            onToggle()
-                        }
-                    )
-                }
-                Surface(
-                    color = ImageviewerColors.Transparent,
-                    modifier = Modifier.padding(end = 20.dp).align(Alignment.CenterVertically),
-                    shape = CircleShape
-                ) {
-                    Image(
-                        painter = painterResource("refresh.png"),
-                        contentDescription = null,
-                        modifier = Modifier.size(35.dp).clickable {
-                            onRefresh()
-                        }
-                    )
-                }
+            Row(Modifier.height(50.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+                CircularButton(painterResource("list_view.png")) { onToggle() }
             }
         })
 }

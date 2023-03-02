@@ -5,8 +5,10 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
@@ -57,7 +59,7 @@ internal fun FullscreenImage(
             null
         }
     }
-    Box(Modifier.fillMaxSize().background(color = MaterialTheme.colorScheme.background)) {
+    Box(Modifier.fillMaxSize().background(color = ImageviewerColors.fullScreenImageBackground)) {
         Column {
             FullscreenImageBar(
                 localization,
@@ -73,31 +75,52 @@ internal fun FullscreenImage(
                     }
                 })
             if (imageWithFilter != null) {
-                val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
-                val scalableState = remember(imageSize) { ScalableState(imageSize) }
-                val visiblePartOfImage: IntRect = scalableState.visiblePart
-                Slider(
-                    modifier = Modifier.fillMaxWidth(),
-                    value = scalableState.scale,
-                    valueRange = MIN_SCALE..MAX_SCALE,
-                    onValueChange = { scalableState.setScale(it) },
-                )
-                Box(
-                    modifier = Modifier.fillMaxSize()
-                        .onGloballyPositioned { coordinates ->
-                            scalableState.changeBoxSize(coordinates.size)
+                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                    val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
+                    val scalableState = remember(imageSize) { ScalableState(imageSize) }
+                    val visiblePartOfImage: IntRect = scalableState.visiblePart
+                    Column {
+                        Slider(
+                            modifier = Modifier.fillMaxWidth(),
+                            value = scalableState.scale,
+                            valueRange = MIN_SCALE..MAX_SCALE,
+                            onValueChange = { scalableState.setScale(it) },
+                        )
+                        Box(
+                            modifier = Modifier.fillMaxSize()
+                                .onGloballyPositioned { coordinates ->
+                                    scalableState.changeBoxSize(coordinates.size)
+                                }
+                                .addUserInput(scalableState)
+                        ) {
+                            Image(
+                                modifier = Modifier.fillMaxSize(),
+                                painter = BitmapPainter(
+                                    imageWithFilter,
+                                    srcOffset = visiblePartOfImage.topLeft,
+                                    srcSize = visiblePartOfImage.size
+                                ),
+                                contentDescription = null
+                            )
                         }
-                        .addUserInput(scalableState)
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(),
-                        painter = BitmapPainter(
-                            imageWithFilter,
-                            srcOffset = visiblePartOfImage.topLeft,
-                            srcSize = visiblePartOfImage.size
-                        ),
-                        contentDescription = null
-                    )
+                    }
+                    Box(
+                        Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                            .background(ImageviewerColors.fullScreenImageBackground).padding(16.dp)
+                    ) {
+                        Row(
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        ) {
+                            FilterButtons(availableFilters, selectedFilters, {
+                                if (it !in selectedFilters) {
+                                    selectedFilters += it
+                                } else {
+                                    selectedFilters -= it
+                                }
+                            })
+                        }
+                    }
                 }
             } else {
                 LoadingScreen()
@@ -118,7 +141,7 @@ private fun FullscreenImageBar(
     onSelectFilter: (FilterType) -> Unit
 ) {
     TopAppBar(
-        modifier = Modifier.background(brush = ImageviewerColors.kotlinHorizontalGradientBrush),
+        modifier = Modifier.background(color = ImageviewerColors.fullScreenImageBackground),
         colors = TopAppBarDefaults.smallTopAppBarColors(
             containerColor = ImageviewerColors.Transparent,
             titleContentColor = MaterialTheme.colorScheme.onBackground
@@ -128,25 +151,28 @@ private fun FullscreenImageBar(
         },
         navigationIcon = {
             Tooltip(localization.back) {
-                Image(
-                    painterResource("back.png"),
-                    contentDescription = null,
-                    modifier = Modifier.size(38.dp)
-                        .clip(CircleShape)
-                        .clickable { onBack() }
+                CircularButton(
+                    painterResource("arrowleft.png"),
+                    onClick = { onBack() }
                 )
             }
         },
-        actions = {
-            for (type in filters) {
-                FilterButton(active = type in selectedFilters,
-                    type,
-                    onClick = {
-                        onSelectFilter(type)
-                    })
-            }
-        }
     )
+}
+
+@Composable
+private fun FilterButtons(
+    filters: List<FilterType>,
+    selectedFilters: Set<FilterType>,
+    onSelectFilter: (FilterType) -> Unit
+) {
+    for (type in filters) {
+        FilterButton(active = type in selectedFilters,
+            type,
+            onClick = {
+                onSelectFilter(type)
+            })
+    }
 }
 
 
@@ -165,14 +191,13 @@ private fun FilterButton(
             Image(
                 getFilterImage(active, type = type),
                 contentDescription = null,
-                Modifier.size(38.dp)
+                Modifier.size(40.dp)
                     .hoverable(interactionSource)
                     .background(color = ImageviewerColors.buttonBackground(filterButtonHover))
                     .clickable { onClick() }
             )
         }
     }
-    Spacer(Modifier.width(20.dp))
 }
 
 @OptIn(ExperimentalResourceApi::class)
