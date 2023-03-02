@@ -40,7 +40,7 @@ dependencies {
         api(project(":compose:ui:ui-tooling-data"))
         implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.compose.material:material:1.0.0")
-        implementation("androidx.activity:activity-compose:1.7.0-rc01")
+        implementation("androidx.activity:activity-compose:1.7.0")
         implementation("androidx.lifecycle:lifecycle-common:2.6.0")
 
         // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
@@ -87,7 +87,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:animation:animation"))
                 implementation("androidx.savedstate:savedstate-ktx:1.2.0")
                 implementation(project(":compose:material:material"))
-                implementation("androidx.activity:activity-compose:1.7.0-rc01")
+                implementation("androidx.activity:activity-compose:1.7.0")
                 implementation("androidx.lifecycle:lifecycle-common:2.6.0")
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
