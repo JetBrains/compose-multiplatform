@@ -80,8 +80,9 @@ internal fun ImageViewerCommon(
 
                 is MemoryPage -> {
                     MemoryScreen(
-                        page,
-                        photoGallery,
+                        memoryPage = page,
+                        photoGallery = photoGallery,
+                        localization = dependencies.localization,
                         onSelectRelatedMemory = { galleryId ->
                             navigationStack.push(MemoryPage(galleryId))
                         },

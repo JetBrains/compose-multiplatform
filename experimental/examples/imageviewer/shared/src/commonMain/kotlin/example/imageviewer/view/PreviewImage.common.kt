@@ -80,8 +80,4 @@ internal fun PreviewImage(
         }
     }
 
-
 }
-
-@Composable
-internal expect fun needShowPreview(): Boolean
