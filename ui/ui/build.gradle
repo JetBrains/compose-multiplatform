@@ -289,7 +289,7 @@ androidx {
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     tasks.findByName("desktopTest").configure {
-        systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/../../golden"
+        systemProperties["GOLDEN_PATH"] = project.rootDir.absolutePath + "/golden"
     }
 }
 
@@ -311,7 +311,7 @@ android {
 // Screenshot tests related setup
 android {
     sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/compose/ui/ui"
+            project.rootDir.absolutePath + "/golden/compose/ui/ui"
     namespace "androidx.compose.ui"
 }
 

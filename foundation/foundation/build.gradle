@@ -207,7 +207,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 // Screenshot tests related setup
 android {
     sourceSets.androidTest.assets.srcDirs +=
-            project.rootDir.absolutePath + "/../../golden/compose/foundation/foundation"
+            project.rootDir.absolutePath + "/golden/compose/foundation/foundation"
     namespace "androidx.compose.foundation"
 }
 
