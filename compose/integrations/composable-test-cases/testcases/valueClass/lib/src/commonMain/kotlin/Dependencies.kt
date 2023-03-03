@@ -4,10 +4,16 @@ import kotlin.jvm.JvmInline
 value class VCAllPublic(val value: Int)
 
 @JvmInline
+value class VCNestedVCAllPublic(val value: VCAllPublic)
+
+@JvmInline
 value class VCInternalVal(internal val value: Int)
 
 @JvmInline
 value class VCPrivateVal(private val value: Int)
+
+@JvmInline
+value class VCNestedVCPrivateVal(val value: VCPrivateVal)
 
 @JvmInline
 value class VCInternalCtor internal constructor(val value: Int) {

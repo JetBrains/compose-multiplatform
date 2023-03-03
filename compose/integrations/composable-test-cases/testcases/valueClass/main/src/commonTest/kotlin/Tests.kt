@@ -24,6 +24,15 @@ class Tests {
     }
 
     @Test
+    fun testTakeVCNestedVCAllPublic() = runTest {
+        val root = composeText {
+            TakeVCNestedVCAllPublic(VCNestedVCAllPublic(VCAllPublic(123)))
+        }
+
+        assertEquals("root:{Value = VCNestedVCAllPublic(value=VCAllPublic(value=123))}", root.dump())
+    }
+
+    @Test
     fun testTakeVCInternalVal() = runTest {
         val root = composeText {
             TakeVCInternalVal(VCInternalVal(200))
@@ -32,21 +41,26 @@ class Tests {
         assertEquals("root:{Value = VCInternalVal(value=200)}", root.dump())
     }
 
-    // TODO: testTakeVCPrivateVal is failing with k/native
+    @Test
+    fun testTakeVCPrivateVal() = runTest {
+        val root = composeText {
+            TakeVCPrivateVal(VCPrivateVal(300))
+        }
 
-    // The root cause java.lang.IllegalStateException was thrown at: org.jetbrains.kotlin.backend.konan.BoxingKt.getTypeConversionImpl(Boxing.kt:42)
-    //	at org.jetbrains.kotlin.backend.common.CodegenUtil.reportBackendException(CodegenUtil.kt:241)
-    // ..
+        assertEquals("root:{Value = VCPrivateVal(value=300)}", root.dump())
+    }
+
+    // TODO: fix for k/native
+
     // Caused by: java.lang.IllegalStateException: actual type is VCPrivateVal, expected kotlin.Int
-    //	at org.jetbrains.kotlin.backend.konan.BoxingKt.getTypeConversionImpl(Boxing.kt:42)
-
+    //	at org.jetbrains.kotlin.backend.konan.BoxingKt.getTypeConversion(Boxing.kt:30)
 //    @Test
-//    fun testTakeVCPrivateVal() = runTest {
+//    fun testTakeVCNestedVCPrivateVal() = runTest {
 //        val root = composeText {
-//            TakeVCPrivateVal(VCPrivateVal(300))
+//            TakeVCNestedVCPrivateVal(VCNestedVCPrivateVal(VCPrivateVal(321)))
 //        }
 //
-//        assertEquals("root:{Value = VCPrivateVal(value=300)}", root.dump())
+//        assertEquals("root:{Value = VCNestedVCPrivateVal(value=VCPrivateVal(value=321))}", root.dump())
 //    }
 
     @Test
@@ -76,67 +90,69 @@ class Tests {
         job.cancel()
     }
 
-    // TODO: testTakeVCPrivateCtor is failing with k/native
+    @Test
+    fun testTakeVCPrivateCtor() = runTest {
+        var v: VCPrivateCtor by mutableStateOf(VCPrivateCtor.V1)
 
-    // Caused by: java.lang.IllegalStateException: actual type is VCPrivateCtor, expected kotlin.Int
-    //at org.jetbrains.kotlin.backend.konan.BoxingKt.getTypeConversionImpl(Boxing.kt:42)
-//    @Test
-//    fun testTakeVCPrivateCtor() = runTest {
-//        var v: VCPrivateCtor by mutableStateOf(VCPrivateCtor.V1)
-//
-//        val job = Job()
-//        val root = composeText(coroutineContext + job) {
-//            TakeVCPrivateCtor(v)
-//        }
-//
-//        assertEquals("root:{Value = VCPrivateCtor(value=1111)}", root.dump())
-//
-//        v = VCPrivateCtor.V2
-//        testScheduler.advanceUntilIdle()
-//
-//        assertEquals("root:{Value = VCPrivateCtor(value=2222)}", root.dump())
-//        job.cancel()
-//    }
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
+            TakeVCPrivateCtor(v)
+        }
 
+        assertEquals("root:{Value = VCPrivateCtor(value=1111)}", root.dump())
 
-    // TODO: testTakeVCPrivateCtorInternalVal is failing with k/native
-    // Caused by: java.lang.IllegalStateException: actual type is VCPrivateCtorInternalVal, expected kotlin.Int
-//    @Test
-//    fun testTakeVCPrivateCtorInternalVal() = runTest {
-//        var v: VCPrivateCtorInternalVal by mutableStateOf(VCPrivateCtorInternalVal.V1)
-//
-//        val job = Job()
-//        val root = composeText(coroutineContext + job) {
-//            TakeVCPrivateCtorInternalVal(v)
-//        }
-//
-//        assertEquals("root:{Value = VCPrivateCtorInternalVal(value=101)}", root.dump())
-//
-//        v = VCPrivateCtorInternalVal.V2
-//        testScheduler.advanceUntilIdle()
-//
-//        assertEquals("root:{Value = VCPrivateCtorInternalVal(value=202)}", root.dump())
-//        job.cancel()
-//    }
+        v = VCPrivateCtor.V2
+        testScheduler.advanceUntilIdle()
 
-    // TODO: testTakeVCPrivateAll is failing with k/native
-//    @Test
-//    fun testTakeVCPrivateAll() = runTest {
-//        var v: VCPrivateAll by mutableStateOf(VCPrivateAll.V1)
-//
-//        val job = Job()
-//        val root = composeText(coroutineContext + job) {
-//            TakeVCPrivateAll(v)
-//        }
-//
-//        assertEquals("root:{Value = VCPrivateAll(value=1001)}", root.dump())
-//
-//        v = VCPrivateAll.V2
-//        testScheduler.advanceUntilIdle()
-//
-//        assertEquals("root:{Value = VCPrivateAll(value=2002)}", root.dump())
-//        job.cancel()
-//    }
+        assertEquals("root:{Value = VCPrivateCtor(value=2222)}", root.dump())
+        job.cancel()
+    }
+
+    @Test
+    fun testTakeVCPrivateCtorInternalVal() = runTest {
+        var v: VCPrivateCtorInternalVal by mutableStateOf(VCPrivateCtorInternalVal.V1)
+
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
+            TakeVCPrivateCtorInternalVal(v)
+        }
+
+        assertEquals("root:{Value = VCPrivateCtorInternalVal(value=101)}", root.dump())
+
+        v = VCPrivateCtorInternalVal.V2
+        testScheduler.advanceUntilIdle()
+
+        assertEquals("root:{Value = VCPrivateCtorInternalVal(value=202)}", root.dump())
+        job.cancel()
+    }
+
+    @Test
+    fun testTakeVCPrivateAll() = runTest {
+        var v: VCPrivateAll by mutableStateOf(VCPrivateAll.V1)
+
+        val job = Job()
+        val root = composeText(coroutineContext + job) {
+            TakeVCPrivateAll(v)
+        }
+
+        assertEquals("root:{Value = VCPrivateAll(value=1001)}", root.dump())
+
+        v = VCPrivateAll.V2
+        testScheduler.advanceUntilIdle()
+
+        assertEquals("root:{Value = VCPrivateAll(value=2002)}", root.dump())
+        job.cancel()
+    }
+
+    @Test
+    fun testTakeVCPrivateAllWithDefaultValue() = runTest {
+        val root = composeText {
+            TakeVCPrivateAllWithDefaultValue()
+            TakeVCPrivateAllWithDefaultValue(VCPrivateAll.V2)
+        }
+
+        assertEquals("root:{Value = VCPrivateAll(value=1001), Value = VCPrivateAll(value=2002)}", root.dump())
+    }
 
     @Test
     fun testTakeSameModuleVCAllPrivate() = runTest {

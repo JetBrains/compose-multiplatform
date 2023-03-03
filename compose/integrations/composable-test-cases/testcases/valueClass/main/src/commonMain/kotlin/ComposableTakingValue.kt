@@ -8,12 +8,22 @@ fun TakeVCAllPublic(a: VCAllPublic) {
 }
 
 @Composable
+fun TakeVCNestedVCAllPublic(a: VCNestedVCAllPublic) {
+    TextLeafNode("Value = $a")
+}
+
+@Composable
 fun TakeVCInternalVal(a: VCInternalVal) {
     TextLeafNode("Value = $a")
 }
 
 @Composable
 fun TakeVCPrivateVal(a: VCPrivateVal) {
+    TextLeafNode("Value = $a")
+}
+
+@Composable
+fun TakeVCNestedVCPrivateVal(a: VCNestedVCPrivateVal) {
     TextLeafNode("Value = $a")
 }
 
@@ -44,6 +54,11 @@ fun TakeVCPrivateAll(a: VCPrivateAll) {
 @Composable
 fun TakeVCPrivateAllNonPrimitive(a: VCPrivateAllNonPrimitive) {
     TextLeafNode("Value = $a")
+}
+
+@Composable
+fun TakeVCPrivateAllWithDefaultValue(myabcaccc: VCPrivateAll = VCPrivateAll.V1) {
+    TextLeafNode("Value = $myabcaccc")
 }
 
 @JvmInline
