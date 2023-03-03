@@ -52,7 +52,7 @@ class AndroidXLayoutlibImplPlugin : Plugin<Project> {
      */
     private fun Test.configureTestTask(paparazziNative: FileCollection) {
         val platformDirectory = project.getSdkPath().resolve("platforms/$COMPILE_SDK_VERSION")
-        val goldenRootDirectory = project.getSupportRootFolder().resolve("../../golden")
+        val goldenRootDirectory = project.getSupportRootFolder().resolve("golden")
         val modulePath = project.path.replace(':', '/').trim('/')
         val android = project.the<BaseExtension>()
         val packageName = requireNotNull(android.namespace) {
