@@ -69,7 +69,7 @@ Run jvm desktop sample:
 ```
 another jvm desktop samples: 
 ```bash
-./scripts/runGradle run1 run2 run3 run4 runWindowApi runVsync runLayout
+./scripts/runGradle run1 run2 run3 runSwing runWindowApi runVsync runLayout
 ```
 
 Run wasm sample:

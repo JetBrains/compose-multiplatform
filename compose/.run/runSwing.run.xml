@@ -1,5 +1,5 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="run4 (desktop)" type="GradleRunConfiguration" factoryName="Gradle" folderName="desktop">
+  <configuration default="false" name="runSwing (desktop)" type="GradleRunConfiguration" factoryName="Gradle" folderName="desktop">
     <ExternalSystemSettings>
       <option name="executionName" />
       <option name="externalProjectPath" value="$PROJECT_DIR$/frameworks/support/compose/desktop/desktop/samples" />
@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value="run4" />
+          <option value="runSwing" />
         </list>
       </option>
       <option name="vmOptions" value="" />

@@ -155,10 +155,14 @@ tasks.register("run") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
 }
 
-for (i in 1..4) {
+for (i in 1..3) {
     tasks.register("run$i") {
         dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run$i")
     }
+}
+
+tasks.register("runSwing") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runSwing")
 }
 
 tasks.register("runWindowApi") {
