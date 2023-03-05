@@ -1,10 +1,13 @@
 package example.imageviewer.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 
 object ImageviewerColors {
     val Gray = Color.DarkGray
@@ -53,6 +56,8 @@ internal fun ImageViewerTheme(content: @Composable () -> Unit) {
             onBackground = ImageviewerColors.onBackground
         )
     ) {
-        content()
+        ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
+            content()
+        }
     }
 }
