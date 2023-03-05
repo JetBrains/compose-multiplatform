@@ -58,10 +58,8 @@ In your multiplatform project, navigate to `iosApp/Configuration/Config.xcconfig
 
 <details>
 <summary>Alternative approaches</summary>
-To see your local team ID, you try running the following in your Terminal:
-```bash
-security find-certificate -c "Apple Development" -p | openssl x509 -noout -text | grep --color 'OU=\w\w\w\w*'
-```
+
+To see your local team ID, you try running `security find-certificate -c "Apple Development" -p | openssl x509 -noout -text | grep --color 'OU=\w\w\w\w*'` in your terminal.
 
 If you're running into trouble with the method described above, you can try this alternative method. 
 - Run the `iosApp` run configuration from Android Studio (it will fail)
