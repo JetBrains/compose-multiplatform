@@ -140,16 +140,8 @@ private fun FullscreenImageBar(
     selectedFilters: Set<FilterType>,
     onSelectFilter: (FilterType) -> Unit
 ) {
-    TopAppBar(
-        modifier = Modifier.background(color = ImageviewerColors.fullScreenImageBackground),
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = ImageviewerColors.Transparent,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        title = {
-            Text("${localization.picture} ${pictureName ?: "Unknown"}")
-        },
-        navigationIcon = {
+    TopLayout(
+        alignLeftContent = {
             Tooltip(localization.back) {
                 CircularButton(
                     painterResource("arrowleft.png"),
@@ -157,6 +149,7 @@ private fun FullscreenImageBar(
                 )
             }
         },
+        alignRightContent = {},
     )
 }
 

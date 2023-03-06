@@ -8,6 +8,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -22,6 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -34,19 +36,13 @@ internal fun PreviewImage(
     onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
-    var image by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(picture) {
-        if (picture != null) {
-            image = getImage(picture)
-        }
-    }
-    Box(Modifier.fillMaxWidth().height(393.dp), contentAlignment = Alignment.Center) {
+    Box(Modifier.fillMaxWidth().height(393.dp).background(Color.Black), contentAlignment = Alignment.Center) {
         Box(
             modifier = Modifier.fillMaxSize()
                 .clickable { onClick() },
         ) {
             AnimatedContent(
-                targetState = image,
+                targetState = picture,
                 transitionSpec = {
                     slideInHorizontally(
                         initialOffsetX = { it }, animationSpec = spring(
@@ -61,10 +57,16 @@ internal fun PreviewImage(
                     )
 //                    slideInVertically(initialOffsetY = { it }) with slideOutVertically(targetOffsetY = { -it })
                 }
-            ) { imageBitmap ->
-                if (imageBitmap != null) {
+            ) { currentPicture ->
+                var image by remember(currentPicture) { mutableStateOf<ImageBitmap?>(null) }
+                LaunchedEffect(currentPicture) {
+                    if (currentPicture != null) {
+                        image = getImage(currentPicture)
+                    }
+                }
+                if (image != null) {
                     Image(
-                        bitmap = imageBitmap,
+                        bitmap = image!!,
                         contentDescription = null,
                         modifier = Modifier
                             .fillMaxSize(),
@@ -80,8 +82,4 @@ internal fun PreviewImage(
         }
     }
 
-
 }
-
-@Composable
-internal expect fun needShowPreview(): Boolean

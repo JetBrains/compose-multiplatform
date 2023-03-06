@@ -1,19 +1,11 @@
+@file:OptIn(ExperimentalResourceApi::class)
+
 package example.imageviewer.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
@@ -39,6 +31,7 @@ import example.imageviewer.model.GalleryId
 import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
+import example.imageviewer.notchPadding
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -69,17 +62,19 @@ internal fun GalleryScreen(
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box {
-            if (needShowPreview()) {
-                PreviewImage(
-                    getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-                    picture = galleryPage.picture, onClick = {
-                        galleryPage.pictureId?.let(onClickPreviewPicture)
-                    })
-            }
-            TitleBar(
-                onRefresh = { photoGallery.updatePictures() },
-                onToggle = { galleryPage.toggleGalleryStyle() },
-                dependencies
+            PreviewImage(
+                getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+                picture = galleryPage.picture, onClick = {
+                    galleryPage.pictureId?.let(onClickPreviewPicture)
+                }
+            )
+            TopLayout(
+                alignLeftContent = {},
+                alignRightContent = {
+                    CircularButton(painterResource("list_view.png")) {
+                        galleryPage.toggleGalleryStyle()
+                    }
+                },
             )
         }
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
@@ -229,20 +224,4 @@ private fun ListGalleryView(
             Spacer(modifier = Modifier.height(10.dp))
         }
     }
-}
-
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
-@Composable
-private fun TitleBar(onRefresh: () -> Unit, onToggle: () -> Unit, dependencies: Dependencies) {
-    TopAppBar(
-        modifier = Modifier.padding(start = 12.dp, end = 12.dp),
-        colors = TopAppBarDefaults.smallTopAppBarColors(
-            containerColor = ImageviewerColors.Transparent,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
-        ),
-        title = {
-            Row(Modifier.height(50.dp).fillMaxWidth(), horizontalArrangement = Arrangement.End) {
-                CircularButton(painterResource("list_view.png")) { onToggle() }
-            }
-        })
 }

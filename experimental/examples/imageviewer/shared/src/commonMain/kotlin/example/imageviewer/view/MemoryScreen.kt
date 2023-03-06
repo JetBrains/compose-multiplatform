@@ -3,25 +3,17 @@ package example.imageviewer.view
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,12 +22,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.Localization
 import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.GalleryId
 import example.imageviewer.model.MemoryPage
@@ -49,6 +41,7 @@ import org.jetbrains.compose.resources.painterResource
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
     photoGallery: PhotoGallery,
+    localization: Localization,
     onSelectRelatedMemory: (GalleryId) -> Unit,
     onBack: () -> Unit,
     onHeaderClick: (GalleryId) -> Unit
@@ -116,37 +109,18 @@ internal fun MemoryScreen(
                 }
             }
         }
-        TopAppBar(
-            modifier = Modifier.padding(start = 12.dp, end = 12.dp),
-            colors = TopAppBarDefaults.smallTopAppBarColors(
-                containerColor = ImageviewerColors.Transparent,
-                titleContentColor = MaterialTheme.colorScheme.onBackground
-            ),
-            title = {
-                Text("")
-            },
-            navigationIcon = {
-                Tooltip("Back") {
-                    CircularButton(painterResource("arrowleft.png"), onClick = { onBack() })
+        TopLayout(
+            alignLeftContent = {
+                Tooltip(localization.back) {
+                    CircularButton(
+                        painterResource("arrowleft.png"),
+                        onClick = { onBack() }
+                    )
                 }
             },
+            alignRightContent = {},
         )
     }
-}
-
-@Composable
-internal fun CircularButton(image: Painter, onClick: () -> Unit) {
-    Box(
-        Modifier.size(40.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
-            .clickable { onClick() }, contentAlignment = Alignment.Center
-    ) {
-        Image(
-            image,
-            contentDescription = null,
-            modifier = Modifier.size(20.dp)
-        )
-    }
-
 }
 
 @Composable
