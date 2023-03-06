@@ -37,7 +37,10 @@ import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ObserverNode
 import androidx.compose.ui.node.observeReads
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -499,6 +502,47 @@ class ModifierNodeReuseAndDeactivationTest {
             assertThat(receivedValue).isEqualTo(1)
         }
     }
+
+    @Test
+    fun placingChildWithReusedUnchangedModifier() {
+        // regression test for b/271430143
+        var active by mutableStateOf(true)
+        var modifier by mutableStateOf(StatelessLayoutElement1.then(StatelessLayoutElement2))
+        var childX by mutableStateOf(0)
+
+        rule.setContent {
+            ReusableContentHost(active) {
+                ReusableContent(0) {
+                    Layout(content = {
+                        Layout(
+                            modifier = modifier.testTag("child"),
+                            measurePolicy = MeasurePolicy
+                        )
+                    }) { measurables, constraints ->
+                        val placeable = measurables.first().measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            childX.toString()
+                            placeable.place(childX, 0)
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            active = false
+        }
+
+        rule.runOnIdle {
+            active = true
+            modifier = StatelessLayoutElement1
+            // force relayout parent
+            childX = 10
+        }
+
+        rule.onNodeWithTag("child")
+            .assertLeftPositionInRootIsEqualTo(with(rule.density) { 10.toDp() })
+    }
 }
 
 @Composable
@@ -654,6 +698,44 @@ private data class ObserverModifierElement(
 
         override fun onObservedReadsChanged() {
             observe()
+        }
+    }
+}
+
+private object StatelessLayoutElement1 : ModifierNodeElement<StatelessLayoutModifier1>() {
+    override fun create() = StatelessLayoutModifier1()
+    override fun update(node: StatelessLayoutModifier1) = node
+    override fun hashCode(): Int = 241
+    override fun equals(other: Any?) = other === this
+}
+
+private class StatelessLayoutModifier1 : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
+}
+
+private object StatelessLayoutElement2 : ModifierNodeElement<StatelessLayoutModifier2>() {
+    override fun create() = StatelessLayoutModifier2()
+    override fun update(node: StatelessLayoutModifier2) = node
+    override fun hashCode(): Int = 242
+    override fun equals(other: Any?) = other === this
+}
+
+private class StatelessLayoutModifier2 : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
         }
     }
 }
