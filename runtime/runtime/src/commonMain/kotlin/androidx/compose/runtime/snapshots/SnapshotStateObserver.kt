@@ -24,6 +24,7 @@ import androidx.compose.runtime.collection.IdentityArrayIntMap
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
 import androidx.compose.runtime.collection.IdentityScopeMap
+import androidx.compose.runtime.collection.fastForEach
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.runtime.composeRuntimeError
 import androidx.compose.runtime.observeDerivedStateRecalculations
@@ -515,7 +516,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
          */
         fun recordInvalidation(changes: Set<Any>): Boolean {
             var hasValues = false
-            for (value in changes) {
+            changes.fastForEach { value ->
                 if (value in dependencyToDerivedStates) {
                     // Find derived state that is invalidated by this change
                     dependencyToDerivedStates.forEachScopeOf(value) { derivedState ->

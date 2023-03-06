@@ -182,6 +182,54 @@ class IdentityArraySetTest {
         assertTrue(setOfT.containsAll(listOf(stuff[0], stuff[1], stuff[2])))
     }
 
+    @Test
+    fun addAll_Collection() {
+        set.addAll(list)
+
+        assertEquals(list.size, set.size)
+        for (value in list) {
+            assertTrue(value in set)
+        }
+    }
+
+    @Test
+    fun addAll_IdentityArraySet() {
+        val anotherSet = IdentityArraySet<Stuff>()
+        anotherSet.addAll(list)
+
+        set.addAll(anotherSet)
+
+        for (value in list) {
+            assertTrue(value in set)
+        }
+
+        set.addAll(anotherSet)
+
+        assertEquals(anotherSet.size, set.size)
+        for (value in list) {
+            assertTrue(value in set)
+        }
+
+        val stuff = Array(100) { Stuff(it) }
+        for (i in 0 until 100 step 2) {
+            anotherSet.add(stuff[i])
+        }
+        set.addAll(anotherSet)
+
+        for (i in stuff.indices) {
+            val value = stuff[i]
+            if (i % 2 == 0) {
+                assertTrue(value in set, "Expected to have element $i in $set")
+            } else {
+                assertFalse(value in set, "Didn't expect to have element $i in $set")
+            }
+        }
+
+        for (value in list) {
+            assertTrue(value in set)
+        }
+    }
+
     private fun testRemoveValueAtIndex(index: Int) {
         val value = set[index]
         val initialSize = set.size

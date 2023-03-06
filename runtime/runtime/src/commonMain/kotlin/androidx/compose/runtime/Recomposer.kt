@@ -199,7 +199,7 @@ class Recomposer(
     private var runnerJob: Job? = null
     private var closeCause: Throwable? = null
     private val knownCompositions = mutableListOf<ControlledComposition>()
-    private var snapshotInvalidations = mutableSetOf<Any>()
+    private var snapshotInvalidations = IdentityArraySet<Any>()
     private val compositionInvalidations = mutableListOf<ControlledComposition>()
     private val compositionsAwaitingApply = mutableListOf<ControlledComposition>()
     private val compositionValuesAwaitingInsert = mutableListOf<MovableContentStateReference>()
@@ -280,7 +280,7 @@ class Recomposer(
     private fun deriveStateLocked(): CancellableContinuation<Unit>? {
         if (_state.value <= State.ShuttingDown) {
             knownCompositions.clear()
-            snapshotInvalidations = mutableSetOf()
+            snapshotInvalidations = IdentityArraySet()
             compositionInvalidations.clear()
             compositionsAwaitingApply.clear()
             compositionValuesAwaitingInsert.clear()
@@ -296,7 +296,7 @@ class Recomposer(
                 State.Inactive
             }
             runnerJob == null -> {
-                snapshotInvalidations = mutableSetOf()
+                snapshotInvalidations = IdentityArraySet()
                 compositionInvalidations.clear()
                 if (broadcastFrameClock.hasAwaiters) State.InactivePendingWork else State.Inactive
             }
@@ -420,7 +420,7 @@ class Recomposer(
                     if (_state.value <= State.ShuttingDown) return@run
                 }
             }
-            snapshotInvalidations = mutableSetOf()
+            snapshotInvalidations = IdentityArraySet()
             if (deriveStateLocked() != null) {
                 error("called outside of runRecomposeAndApplyChanges")
             }
@@ -435,7 +435,7 @@ class Recomposer(
             knownCompositions.fastForEach { composition ->
                 composition.recordModificationsOf(changes)
             }
-            snapshotInvalidations = mutableSetOf()
+            snapshotInvalidations = IdentityArraySet()
         }
         compositionInvalidations.fastForEach(onEachInvalidComposition)
         compositionInvalidations.clear()
@@ -657,7 +657,7 @@ class Recomposer(
 
                 compositionsAwaitingApply.clear()
                 compositionInvalidations.clear()
-                snapshotInvalidations = mutableSetOf()
+                snapshotInvalidations = IdentityArraySet()
 
                 compositionValuesAwaitingInsert.clear()
                 compositionValuesRemoved.clear()
