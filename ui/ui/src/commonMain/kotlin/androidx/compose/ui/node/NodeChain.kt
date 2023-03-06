@@ -241,7 +241,7 @@ internal class NodeChain(val layoutNode: LayoutNode) {
         var node: Modifier.Node? = tail.parent
         while (node != null) {
             if (node.isKind(Nodes.Layout) && node is LayoutModifierNode) {
-                val next = if (node.isAttached) {
+                val next = if (node.coordinator != null) {
                     val c = node.coordinator as LayoutModifierNodeCoordinator
                     val prevNode = c.layoutModifierNode
                     c.layoutModifierNode = node
