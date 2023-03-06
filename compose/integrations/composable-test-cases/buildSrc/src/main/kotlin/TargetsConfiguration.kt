@@ -18,6 +18,8 @@ val Project.isFailingJsCase: Boolean
 
 @OptIn(ExternalVariantApi::class)
 fun KotlinMultiplatformExtension.configureTargets() {
+    val addMinGw = project.isInIdea
+
     jvm("desktop")
     configureJsTargets()
     ios()
@@ -27,8 +29,32 @@ fun KotlinMultiplatformExtension.configureTargets() {
     macosX64()
     macosArm64()
     // We use linux agents on CI. So it doesn't run the tests, but it builds the klib anyway which is time consuming.
-    if (project.isInIdea) mingwX64()
+    if (addMinGw) mingwX64()
     linuxX64()
+
+    val commonMain = sourceSets.getByName("commonMain")
+    val nativeMain = sourceSets.create("nativeMain")
+    nativeMain.dependsOn(commonMain)
+
+    val iosMain = sourceSets.getByName("iosMain")
+    iosMain.dependsOn(nativeMain)
+    sourceSets.getByName("iosSimulatorArm64Main").dependsOn(iosMain)
+    sourceSets.getByName("iosArm64Main").dependsOn(iosMain)
+    sourceSets.getByName("iosX64Main").dependsOn(iosMain)
+
+    val macosMain = sourceSets.create("macosMain")
+    macosMain.dependsOn(nativeMain)
+    sourceSets.getByName("macosX64Main").dependsOn(macosMain)
+    sourceSets.getByName("macosArm64Main").dependsOn(macosMain)
+
+    val linuxMain = sourceSets.create("linuxMain")
+    linuxMain.dependsOn(nativeMain)
+    sourceSets.getByName("linuxX64Main").dependsOn(linuxMain)
+
+    if (addMinGw) {
+        sourceSets.getByName("mingwX64Main").dependsOn(nativeMain)
+    }
+
 }
 
 fun KotlinMultiplatformExtension.configureJsTargets() {
