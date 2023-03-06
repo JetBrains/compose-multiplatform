@@ -1,10 +1,9 @@
-import androidx.compose.ui.window.Application
+import androidx.compose.ui.window.ComposeUIViewController
 import platform.UIKit.UIViewController
 
-fun ChatViewController(): UIViewController =
-    Application("Chat") {
-        ChatApp(displayTextField = false)
-    }
+fun ChatViewController(): UIViewController = ComposeUIViewController {
+    ChatApp(displayTextField = false)
+}
 
 fun sendMessage(text: String) {
     store.send(Action.SendMessage(Message(myUser, timestampMs(), text)))

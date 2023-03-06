@@ -3,13 +3,9 @@
  * Use of this source code is governed by the Apache 2.0 license that can be found in the LICENSE.txt file.
  */
 
-import androidx.compose.ui.window.Application
+import androidx.compose.ui.window.ComposeUIViewController
 import platform.UIKit.UIViewController
 
-fun MainViewController() : UIViewController =
-    Application("Minesweeper") {
-        Game()
-    }
-
+fun MainViewController() : UIViewController = ComposeUIViewController { Game() }
 
 actual fun hasRightClick() = false
