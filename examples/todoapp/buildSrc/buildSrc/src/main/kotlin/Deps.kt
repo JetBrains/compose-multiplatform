@@ -12,7 +12,7 @@ fun initDeps(project: Project) {
 object Deps {
     object JetpackComposeWorkaround {
         // Workaround for https://github.com/JetBrains/compose-jb/issues/2340
-        val VERSION: String = "1.2.1"
+        val VERSION: String = "1.4.0-rc01"
     }
 
     object JetBrains {
