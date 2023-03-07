@@ -72,6 +72,8 @@ internal fun MemoryScreen(
                         Modifier.padding(horizontal = 12.dp)
                             .clip(locationShape)
                             .border(1.dp, Color.Gray, locationShape)
+                            .fillMaxWidth()
+                            .height(200.dp)
                     )
                     Headliner("Note")
                     Collapsible(
