@@ -2,6 +2,8 @@
 
 Use this template to start developing your own Compose Multiplatform application targeting desktop, Android, and iOS (experimental).
 
+You may download this template as a [zip file](../archives/multiplatform-template.zip?raw=true). 
+
 ## Desktop
 This template contains  `desktopApp` run configuration that you can use to run the desktop target in Android Studio or IntelliJ IDEA.
 
