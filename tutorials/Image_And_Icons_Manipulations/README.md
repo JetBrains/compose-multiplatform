@@ -67,7 +67,7 @@ fun main() = singleWindowApplication {
     val density = LocalDensity.current
     Column {
         AsyncImage(
-            load = { loadImageBitmap(File("sample.png")) },
+            load = { loadImageBitmap(File("sample.png")) },//Use the absoulte path where ever required.
             painterFor = { remember { BitmapPainter(it) } },
             contentDescription = "Sample",
             modifier = Modifier.width(200.dp)
@@ -80,7 +80,7 @@ fun main() = singleWindowApplication {
             modifier = Modifier.width(200.dp)
         )
         AsyncImage(
-            load = { loadXmlImageVector(File("compose-logo.xml"), density) },
+            load = { loadXmlImageVector(File("compose-logo.xml"), density) },//Use the absoulte path where ever required.
             painterFor = { rememberVectorPainter(it) },
             contentDescription = "Compose logo",
             contentScale = ContentScale.FillWidth,
