@@ -1,37 +1,39 @@
+package my.abc
+
 import androidx.compose.runtime.Composable
 import com.example.common.TextContainerNode
 import com.example.common.TextLeafNode
 
 @Composable
 actual fun SimpleComposable() {
-    TextLeafNode("SimpleComposable-Native")
+    TextLeafNode("SimpleComposable-Desktop")
 }
 
 @Composable
 actual fun WithDefaultIntParam(i: Int) {
-    TextLeafNode("SimpleComposable-Native-$i")
+    TextLeafNode("SimpleComposable-Desktop-$i")
 }
 
 @Composable
 actual fun WithDefaultStringParam(s: String) {
-    TextLeafNode("SimpleComposable-Native-$s")
+    TextLeafNode("SimpleComposable-Desktop-$s")
 }
 
 actual fun TakesComposableLambda(l: @Composable () -> Unit) {
     savedComposableLambda = {
-        TextContainerNode("Native", l)
+        TextContainerNode("Desktop", l)
     }
 }
 
 actual fun TakesComposableLambdaWithDefault(l: @Composable () -> Unit) {
     savedComposableLambda = {
-        TextContainerNode("Native", l)
+        TextContainerNode("Desktop", l)
     }
 }
 
 actual fun TakesComposableLambdaWithDefaultInt(i: Int, l: @Composable () -> Unit) {
     savedComposableLambda = {
-        TextContainerNode("Native-$i", l)
+        TextContainerNode("Desktop-$i", l)
     }
 }
 
@@ -40,7 +42,7 @@ actual fun ExpectComposableDefaultValueProvidedByAnotherComposable(
     value: String,
     content: @Composable (v: String) -> Unit
 ) {
-    content("Native-$value")
+   content("Desktop-$value")
 }
 
 @Composable
@@ -48,7 +50,7 @@ actual fun UseRememberInDefaultValueOfExpectFun(
     value: String,
     content: @Composable (v: String) -> Unit
 ) {
-    content("Native-$value")
+    content("Desktop-$value")
 }
 
 @Composable
@@ -56,7 +58,7 @@ actual fun <T> ExpectWithTypeParameter(
     value: T,
     content: @Composable (T) -> Unit
 ) {
-    TextContainerNode("Native") {
+    TextContainerNode("Desktop") {
         content(value)
     }
 }
@@ -66,7 +68,7 @@ actual fun <T> ExpectWithTypeParameterAndDefaultLambda(
     value: T,
     transform: (T) -> T
 ) {
-    TextContainerNode("Native") {
+    TextContainerNode("Desktop") {
         TextLeafNode(transform(value).toString())
     }
 }
@@ -76,7 +78,7 @@ actual fun <T> ExpectWithTypeParameterAndDefaultComposableLambda(
     value: T,
     content: @Composable (T) -> Unit
 ) {
-    TextContainerNode("Native") {
+    TextContainerNode("Desktop") {
         content(value)
     }
 }
