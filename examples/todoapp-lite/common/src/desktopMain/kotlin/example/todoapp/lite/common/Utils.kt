@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 internal actual val MARGIN_SCROLLBAR: Dp = 8.dp
 
 @Suppress("ACTUAL_WITHOUT_EXPECT") // Workaround https://youtrack.jetbrains.com/issue/KT-37316
-internal actual typealias ScrollbarAdapter = androidx.compose.foundation.ScrollbarAdapter
+internal actual typealias ScrollbarAdapter = androidx.compose.foundation.v2.ScrollbarAdapter
 
 @Composable
 internal actual fun rememberScrollbarAdapter(scrollState: LazyListState): ScrollbarAdapter =
