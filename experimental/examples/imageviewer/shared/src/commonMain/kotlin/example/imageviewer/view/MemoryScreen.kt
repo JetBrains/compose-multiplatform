@@ -3,15 +3,12 @@ package example.imageviewer.view
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -70,7 +67,12 @@ internal fun MemoryScreen(
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
                     Headliner("Place")
-                    LocationVisualizer(Modifier.padding(horizontal = 12.dp).clip(RoundedCornerShape(10.dp)))
+                    val locationShape = RoundedCornerShape(10.dp)
+                    LocationVisualizer(
+                        Modifier.padding(horizontal = 12.dp)
+                            .clip(locationShape)
+                            .border(1.dp, Color.Gray, locationShape)
+                    )
                     Headliner("Note")
                     Collapsible(
                         """
