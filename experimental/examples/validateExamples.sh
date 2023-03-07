@@ -24,6 +24,6 @@ runGradle codeviewer packageDistributionForCurrentOS
 runGradle falling-balls-mpp packageDistributionForCurrentOS
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle minesweeper packageDistributionForCurrentOS
-runGradle todoapp-lite packageDistributionForCurrentOS
+# runGradle todoapp-lite packageDistributionForCurrentOS  # Disabled due to scrollbars until upgrade to compose 1.4.0
 runGradle visual-effects packageDistributionForCurrentOS
 runGradle widgets-gallery packageDistributionForCurrentOS
