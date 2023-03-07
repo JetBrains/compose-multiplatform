@@ -34,5 +34,5 @@ internal fun RootContent(modifier: Modifier = Modifier) {
 private val RootState.editingItem: TodoItem?
     get() = editingItemId?.let(items::firstById)
 
-private fun List<TodoItem>.firstById(id: Long): TodoItem =
-    first { it.id == id }
+private fun List<TodoItem>.firstById(id: Long): TodoItem? =
+    firstOrNull { it.id == id }
