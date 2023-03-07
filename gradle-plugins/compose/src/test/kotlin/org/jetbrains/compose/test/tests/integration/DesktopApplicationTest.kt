@@ -503,4 +503,19 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             check.taskSuccessful(":runDistributable")
         }
     }
+
+    @Test
+    fun testWixUnzip() {
+        Assumptions.assumeTrue(currentOS == OS.Windows) { "The test is only relevant for Windows" }
+
+        with(testProject(TestProjects.jvm)) {
+            gradle(":unzipWix").checks {
+                check.taskSuccessful(":unzipWix")
+
+                file("build/wix311").checkExists()
+                file("build/wix311/light.exe").checkExists()
+                file("wix311").checkNotExists()
+            }
+        }
+    }
 }
