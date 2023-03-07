@@ -70,7 +70,7 @@ internal fun MemoryScreen(
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
                     Headliner("Place")
-                    LocationVisualizer()
+                    LocationVisualizer(Modifier.padding(horizontal = 12.dp).clip(RoundedCornerShape(10.dp)))
                     Headliner("Note")
                     Collapsible(
                         """
@@ -198,17 +198,6 @@ internal fun Headliner(s: String) {
         fontSize = 20.sp,
         color = Color.Black,
         modifier = Modifier.padding(start = 12.dp, top = 32.dp, end = 12.dp, bottom = 16.dp)
-    )
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-internal fun LocationVisualizer() {
-    Image(
-        painterResource("dummy_map.png"),
-        "Map",
-        contentScale = ContentScale.Crop,
-        modifier = Modifier.fillMaxWidth().height(200.dp)
     )
 }
 
