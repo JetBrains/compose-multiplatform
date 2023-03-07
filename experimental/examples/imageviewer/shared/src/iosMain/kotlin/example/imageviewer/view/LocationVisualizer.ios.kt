@@ -23,7 +23,7 @@ internal actual fun LocationVisualizer(modifier: Modifier) {
                 ),
                 animated = false
             )
-            mkMapView.addAnnotation(MKPointAnnotation(cityAmsterdam, "I am here", null))
+            mkMapView.addAnnotation(MKPointAnnotation(cityAmsterdam, title = null, subtitle = null))
             mkMapView
         },
     )
