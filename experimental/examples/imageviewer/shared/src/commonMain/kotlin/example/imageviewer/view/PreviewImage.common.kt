@@ -1,11 +1,10 @@
 package example.imageviewer.view
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -27,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import example.imageviewer.model.Picture
 
@@ -47,19 +47,18 @@ internal fun PreviewImage(
                 .fillMaxSize()
                 .clickable(interactionSource, indication = null, onClick = onClick),
         ) {
+            val mySpring = spring<IntOffset>(
+                dampingRatio = Spring.DampingRatioLowBouncy,
+                stiffness = Spring.StiffnessLow
+            )
             AnimatedContent(
                 targetState = picture,
                 transitionSpec = {
-                    slideInHorizontally(
-                        initialOffsetX = { it }, animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    ) with slideOutHorizontally(
-                        targetOffsetX = { -it }, animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
+                    slideIntoContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left, animationSpec = mySpring
+                    ) with slideOutOfContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = mySpring
                     )
                 }
             ) { currentPicture ->
