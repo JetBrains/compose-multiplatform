@@ -29,6 +29,7 @@ import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.GalleryId
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PhotoGallery
+import example.imageviewer.model.Picture
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -38,6 +39,7 @@ import org.jetbrains.compose.resources.painterResource
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
     photoGallery: PhotoGallery,
+    getImage: suspend (Picture) -> ImageBitmap,
     localization: Localization,
     onSelectRelatedMemory: (GalleryId) -> Unit,
     onBack: () -> Unit,
@@ -45,6 +47,10 @@ internal fun MemoryScreen(
 ) {
     val pictures by photoGallery.galleryStateFlow.collectAsState()
     val picture = pictures.first { it.id == memoryPage.galleryId }
+    var headerImage by remember(picture) { mutableStateOf(picture.thumbnail) }
+    LaunchedEffect(picture) {
+        headerImage = getImage(picture.picture)
+    }
     Box {
         val scrollState = memoryPage.scrollState
         Column(
@@ -62,7 +68,7 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                MemoryHeader(picture.thumbnail, onClick = { onHeaderClick(memoryPage.galleryId) })
+                MemoryHeader(headerImage, onClick = { onHeaderClick(memoryPage.galleryId) })
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
@@ -166,20 +172,22 @@ internal fun BoxScope.MemoryTextOverlay() {
         modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
     ) {
         Text(
-            "Your Memory",
+            "28. Feb",
             textAlign = TextAlign.Left,
             color = Color.White,
             fontSize = 20.sp,
+            lineHeight = 22.sp,
             modifier = Modifier.fillMaxWidth(),
             fontWeight = FontWeight.SemiBold,
             style = shadowTextStyle
         )
-        Spacer(Modifier.height(5.dp))
-
+        Spacer(Modifier.height(1.dp))
         Text(
-            "19th of April 2023",
+            "London",
             textAlign = TextAlign.Left,
             color = Color.White,
+            fontSize = 14.sp,
+            lineHeight = 16.sp,
             fontWeight = FontWeight.Normal,
             style = shadowTextStyle
         )

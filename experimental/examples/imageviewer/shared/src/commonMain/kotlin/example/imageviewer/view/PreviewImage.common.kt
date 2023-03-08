@@ -3,8 +3,8 @@ package example.imageviewer.view
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -26,14 +26,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.Picture
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    picture: Picture?,
+    picture: GalleryEntryWithMetadata?,
     onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
@@ -47,25 +47,22 @@ internal fun PreviewImage(
                 .fillMaxSize()
                 .clickable(interactionSource, indication = null, onClick = onClick),
         ) {
-            val mySpring = spring<IntOffset>(
-                dampingRatio = Spring.DampingRatioLowBouncy,
-                stiffness = Spring.StiffnessLow
-            )
             AnimatedContent(
                 targetState = picture,
                 transitionSpec = {
                     slideIntoContainer(
-                        towards = AnimatedContentScope.SlideDirection.Left, animationSpec = mySpring
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                     ) with slideOutOfContainer(
                         towards = AnimatedContentScope.SlideDirection.Left,
-                        animationSpec = mySpring
+                        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
                     )
                 }
             ) { currentPicture ->
-                var image by remember(currentPicture) { mutableStateOf<ImageBitmap?>(null) }
+                var image by remember(currentPicture) { mutableStateOf(currentPicture?.thumbnail) }
                 LaunchedEffect(currentPicture) {
                     if (currentPicture != null) {
-                        image = getImage(currentPicture)
+                        image = getImage(currentPicture.picture)
                     }
                 }
                 if (image != null) {
@@ -82,11 +79,9 @@ internal fun PreviewImage(
                 } else {
                     Spacer(
                         modifier = Modifier.fillMaxSize()
-
                     )
                 }
             }
         }
     }
-
 }

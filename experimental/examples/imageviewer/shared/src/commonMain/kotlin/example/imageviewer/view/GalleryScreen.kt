@@ -61,7 +61,7 @@ internal fun GalleryScreen(
         Box {
             PreviewImage(
                 getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-                picture = galleryPage.picture, onClick = {
+                picture = galleryPage.galleryEntry, onClick = {
                     galleryPage.pictureId?.let(onClickPreviewPicture)
                 }
             )

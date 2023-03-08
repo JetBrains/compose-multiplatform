@@ -88,6 +88,7 @@ internal fun ImageViewerCommon(
                     MemoryScreen(
                         memoryPage = page,
                         photoGallery = photoGallery,
+                        getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                         localization = dependencies.localization,
                         onSelectRelatedMemory = { galleryId ->
                             navigationStack.push(MemoryPage(galleryId))
