@@ -72,15 +72,6 @@ internal fun MemoryScreen(
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
-                    Headliner("Place")
-                    val locationShape = RoundedCornerShape(10.dp)
-                    LocationVisualizer(
-                        Modifier.padding(horizontal = 12.dp)
-                            .clip(locationShape)
-                            .border(1.dp, Color.Gray, locationShape)
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
                     Headliner("Note")
                     Collapsible(
                         """
@@ -93,6 +84,15 @@ internal fun MemoryScreen(
                     )
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    Headliner("Place")
+                    val locationShape = RoundedCornerShape(10.dp)
+                    LocationVisualizer(
+                        Modifier.padding(horizontal = 12.dp)
+                            .clip(locationShape)
+                            .border(1.dp, Color.Gray, locationShape)
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
                     Spacer(Modifier.height(50.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -238,7 +238,7 @@ internal fun RelatedMemoriesVisualizer(
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
-            .height(200.dp)
+        //.height(200.dp)
     ) {
         LazyRow(
             modifier = Modifier.fillMaxSize(),
