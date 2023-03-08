@@ -58,7 +58,7 @@ fun ApplicationScope.ImageViewerDesktop() {
         title = "Image Viewer",
         state = WindowState(
             position = WindowPosition.Aligned(Alignment.Center),
-            size = getPreferredWindowSize(800, 1000)
+            size = getPreferredWindowSize(720, 857)
         ),
         icon = painterResource("ic_imageviewer_round.png"),
         // https://github.com/JetBrains/compose-jb/issues/2741

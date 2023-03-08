@@ -74,7 +74,7 @@ internal fun GalleryScreen(
                 },
             )
         }
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             when (galleryPage.galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
                     pictures,
@@ -104,7 +104,7 @@ private fun SquaresGalleryView(
     onSelect: (GalleryId) -> Unit,
 ) {
     Column {
-        Spacer(Modifier.height(1.dp))
+        Spacer(Modifier.height(4.dp))
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 130.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp),
@@ -125,8 +125,8 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun MakeNewMemoryMiniature(onClick: () -> Unit) {
-    Column {
+private fun BoxScope.MakeNewMemoryMiniature(onClick: () -> Unit) {
+    Column(modifier = Modifier.align(Alignment.BottomCenter)) {
         Box(
             Modifier
                 .clip(CircleShape)
@@ -203,6 +203,7 @@ private fun ListGalleryView(
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
+        Spacer(modifier = Modifier.height(10.dp))
         for ((idx, picWithThumb) in pictures.withIndex()) {
             val (galleryId, picture, miniature) = picWithThumb
             Miniature(

@@ -51,7 +51,7 @@ fun applyPixelFilter(bitmap: BufferedImage): BufferedImage {
     val w: Int = bitmap.width
     val h: Int = bitmap.height
 
-    var result = scaleBitmapAspectRatio(bitmap, w / 20, h / 20)
+    var result = scaleBitmapAspectRatio(bitmap, w / 4, h / 4)
     result = scaleBitmapAspectRatio(result, w, h)
 
     return result
@@ -65,8 +65,8 @@ fun applyBlurFilter(bitmap: BufferedImage): BufferedImage {
     graphics.drawImage(bitmap, 0, 0, null)
     graphics.dispose()
 
-    val radius = 11
-    val size = 11
+    val radius = 3
+    val size = 3
     val weight: Float = 1.0f / (size * size)
     val matrix = FloatArray(size * size)
 
