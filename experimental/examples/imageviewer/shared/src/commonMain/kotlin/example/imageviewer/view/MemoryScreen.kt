@@ -157,8 +157,8 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
 internal fun BoxScope.MemoryTextOverlay() {
     val shadowTextStyle = LocalTextStyle.current.copy(
         shadow = Shadow(
-            color = Color.Black,
-            offset = Offset(4f, 4f),
+            color = Color.Black.copy(0.75f),
+            offset = Offset(0f, 0f),
             blurRadius = 4f
         )
     )
