@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,7 +28,6 @@ import example.imageviewer.model.GalleryId
 import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
-import example.imageviewer.notchPadding
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -42,6 +38,7 @@ enum class GalleryStyle {
     LIST
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun GalleryScreen(
     galleryPage: GalleryPage,

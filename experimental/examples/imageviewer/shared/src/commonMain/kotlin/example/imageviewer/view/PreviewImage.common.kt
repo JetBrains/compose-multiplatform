@@ -10,6 +10,7 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -36,10 +37,15 @@ internal fun PreviewImage(
     onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
-    Box(Modifier.fillMaxWidth().height(393.dp).background(Color.Black), contentAlignment = Alignment.Center) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Box(
+        Modifier.fillMaxWidth().height(393.dp).background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
         Box(
-            modifier = Modifier.fillMaxSize()
-                .clickable { onClick() },
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(interactionSource, indication = null, onClick = onClick),
         ) {
             AnimatedContent(
                 targetState = picture,
@@ -55,7 +61,6 @@ internal fun PreviewImage(
                             stiffness = Spring.StiffnessLow
                         )
                     )
-//                    slideInVertically(initialOffsetY = { it }) with slideOutVertically(targetOffsetY = { -it })
                 }
             ) { currentPicture ->
                 var image by remember(currentPicture) { mutableStateOf<ImageBitmap?>(null) }
@@ -65,13 +70,16 @@ internal fun PreviewImage(
                     }
                 }
                 if (image != null) {
-                    Image(
-                        bitmap = image!!,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
+                    Box(Modifier.fillMaxSize()) {
+                        Image(
+                            bitmap = image!!,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        MemoryTextOverlay()
+                    }
                 } else {
                     Spacer(
                         modifier = Modifier.fillMaxSize()

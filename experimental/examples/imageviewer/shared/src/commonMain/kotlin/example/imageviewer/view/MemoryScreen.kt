@@ -130,13 +130,7 @@ internal fun MemoryScreen(
 @Composable
 private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
-    val shadowTextStyle = LocalTextStyle.current.copy(
-        shadow = Shadow(
-            color = Color.Black,
-            offset = Offset(4f, 4f),
-            blurRadius = 4f
-        )
-    )
+
     Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
         Image(
             bitmap,
@@ -144,28 +138,51 @@ private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
-        ) {
-            Text(
-                "Your Memory",
-                textAlign = TextAlign.Left,
-                color = Color.White,
-                fontSize = 20.sp,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.SemiBold,
-                style = shadowTextStyle
-            )
-            Spacer(Modifier.height(5.dp))
+        MagicButtonOverlay(onClick)
+        MemoryTextOverlay()
+    }
+}
 
-            Text(
-                "19th of April 2023",
-                textAlign = TextAlign.Left,
-                color = Color.White,
-                fontWeight = FontWeight.Normal,
-                style = shadowTextStyle
-            )
-        }
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 16.dp)
+    ) {
+        CircularButton(painterResource("magic.png"), onClick)
+    }
+}
+
+@Composable
+internal fun BoxScope.MemoryTextOverlay() {
+    val shadowTextStyle = LocalTextStyle.current.copy(
+        shadow = Shadow(
+            color = Color.Black,
+            offset = Offset(4f, 4f),
+            blurRadius = 4f
+        )
+    )
+    Column(
+        modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
+    ) {
+        Text(
+            "Your Memory",
+            textAlign = TextAlign.Left,
+            color = Color.White,
+            fontSize = 20.sp,
+            modifier = Modifier.fillMaxWidth(),
+            fontWeight = FontWeight.SemiBold,
+            style = shadowTextStyle
+        )
+        Spacer(Modifier.height(5.dp))
+
+        Text(
+            "19th of April 2023",
+            textAlign = TextAlign.Left,
+            color = Color.White,
+            fontWeight = FontWeight.Normal,
+            style = shadowTextStyle
+        )
     }
 }
 
@@ -176,7 +193,7 @@ internal fun Collapsible(s: String) {
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
     Text(
         text,
-        fontSize = 12.sp,
+        fontSize = 16.sp,
         modifier = Modifier
             .padding(10.dp, 0.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -190,7 +207,8 @@ internal fun Collapsible(s: String) {
             )
             .clickable(interactionSource = interctionSource, indication = null) {
                 isCollapsed = !isCollapsed
-            },
+            }
+            .fillMaxWidth(),
     )
 }
 
