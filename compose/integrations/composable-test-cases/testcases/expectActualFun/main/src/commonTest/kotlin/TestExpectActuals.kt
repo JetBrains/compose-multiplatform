@@ -1,7 +1,9 @@
+import androidx.compose.runtime.mutableStateOf
 import com.example.common.TextLeafNode
 import my.abc.*
 import com.example.common.composeText
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -94,7 +96,7 @@ class TestExpectActuals {
     }
 
     @Test
-    fun TestExpectComposableDefaultValueProvidedByAnotherComposable() = runTest {
+    fun testExpectComposableDefaultValueProvidedByAnotherComposable() = runTest {
         val root = composeText {
             ExpectComposableDefaultValueProvidedByAnotherComposable {
                 TextLeafNode(it)
@@ -104,7 +106,7 @@ class TestExpectActuals {
     }
 
     @Test
-    fun TestUseRememberInDefaultValueOfExpectFun() = runTest {
+    fun testUseRememberInDefaultValueOfExpectFun() = runTest {
         val root = composeText {
             UseRememberInDefaultValueOfExpectFun {
                 TextLeafNode(it)
@@ -114,7 +116,7 @@ class TestExpectActuals {
     }
 
     @Test
-    fun TestExpectWithTypeParameter() = runTest {
+    fun testExpectWithTypeParameter() = runTest {
         val root = composeText {
             ExpectWithTypeParameter("TTT") { s ->
                 TextLeafNode(s)
@@ -132,12 +134,29 @@ class TestExpectActuals {
     }
 
     @Test
-    fun TestExpectWithTypeParameterAndDefaultValue() = runTest {
+    fun testExpectWithTypeParameterAndDefaultValue() = runTest {
         val root = composeText {
-            ExpectWithTypeParameterAndDefaultComposableLambda("QWERTY") { s ->
-                TextLeafNode(s)
-            }
+            ExpectWithTypeParameterAndDefaultComposableLambda("QWERTY")
         }
         assertEquals("root:{${currentPlatform.name()}:{QWERTY}}", root.dump())
+    }
+
+    @Test
+    fun testExpectWithTypeParameterInReturnAndDefaultComposableLambda() = runTest {
+        val argument = mutableStateOf("aAbBcCdDeE")
+        val job = Job()
+
+        val root = composeText(coroutineContext + job) {
+            val text = ExpectWithTypeParameterInReturnAndDefaultComposableLambda(argument.value)
+            TextLeafNode(text)
+        }
+
+        assertEquals("root:{aAbBcCdDeE}", root.dump())
+        argument.value = "1123581321"
+
+        testScheduler.advanceUntilIdle()
+        assertEquals("root:{1123581321}", root.dump())
+
+        job.cancel()
     }
 }

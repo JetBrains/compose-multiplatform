@@ -83,3 +83,69 @@ actual fun <T> ExpectWithTypeParameterAndDefaultComposableLambda(
         content(value)
     }
 }
+
+@Composable
+actual fun <T> ExpectWithTypeParameterInReturnAndDefaultComposableLambda(
+    value: T,
+    calculate: @Composable (T) -> T
+): T {
+    return calculate(value)
+}
+
+actual class ExpectClass actual constructor() {
+
+    @Composable
+    actual fun ExpectComposableFunWithDefaultInt(i: Int) {
+        TextLeafNode("Web(i = $i)")
+    }
+}
+
+actual class ExpectClassWithString actual constructor() {
+
+    @Composable
+    actual fun ExpectComposableFunWithDefaultComposableLambda(
+        s: String, transform: @Composable (String) -> String
+    ) {
+        TextLeafNode("Web(s = ${transform(s)})")
+    }
+}
+
+actual class ExpectClassWithStringProperty actual constructor(s: String) {
+
+    actual val property: String = s
+
+    @Composable
+    actual fun ExpectComposableFunWithDefaultComposableLambda(
+        transform: @Composable (String) -> String
+    ) {
+        TextLeafNode("Web(s = ${transform(property)})")
+    }
+}
+
+actual class ExpectClassWithT<T> actual constructor() {
+
+    @Composable
+    actual fun ExpectComposableFunWithDefaultComposableLambda(t: T, transform: @Composable (T) -> T) {
+        TextLeafNode("Web(t = ${transform(t)})")
+    }
+}
+
+actual class ExpectClassWithTProp<T> actual constructor(t: T) {
+
+    actual val tVal: T = t
+
+    @Composable
+    actual fun ExpectComposableFunWithDefaultComposableLambda(transform: @Composable (T) -> T) {
+        TextLeafNode("Web(tProp = ${transform(tVal)})")
+    }
+}
+
+actual class ExpectClassWithTProp2<T> actual constructor(t: T) {
+
+    actual val tVal: T = t
+
+    @Composable
+    actual fun ExpectComposableFunWithDefaultComposableLambda(t: T) {
+        TextLeafNode("Web(tProp = $t)")
+    }
+}

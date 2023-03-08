@@ -66,3 +66,56 @@ expect fun <T> ExpectWithTypeParameterAndDefaultComposableLambda(
 fun <T> createDefaultContent(value: T): @Composable (T) -> Unit {
     return { TextLeafNode(value.toString()) }
 }
+
+@Composable
+expect fun <T> ExpectWithTypeParameterInReturnAndDefaultComposableLambda(
+    value: T,
+    calculate: @Composable (T) -> T = { value }
+): T
+
+expect class ExpectClass() {
+
+    @Composable
+    fun ExpectComposableFunWithDefaultInt(i: Int = 11011)
+}
+
+expect class ExpectClassWithString() {
+
+    @Composable
+    fun ExpectComposableFunWithDefaultComposableLambda(
+        s: String,
+        transform: @Composable (String) -> String = { s }
+    )
+}
+
+expect class ExpectClassWithStringProperty constructor(s: String) {
+
+    val property: String
+
+    @Composable
+    fun ExpectComposableFunWithDefaultComposableLambda(
+        transform: @Composable (String) -> String = { property }
+    )
+}
+
+expect class ExpectClassWithT<T>() {
+
+    @Composable
+    fun ExpectComposableFunWithDefaultComposableLambda(t: T, transform: @Composable (T) -> T = { t })
+}
+
+expect class ExpectClassWithTProp<T>(t: T) {
+
+    val tVal: T
+
+    @Composable
+    fun ExpectComposableFunWithDefaultComposableLambda(transform: @Composable (T) -> T = { tVal })
+}
+
+expect class ExpectClassWithTProp2<T>(t: T) {
+
+    val tVal: T
+
+    @Composable
+    fun ExpectComposableFunWithDefaultComposableLambda(t: T = tVal)
+}
