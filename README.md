@@ -70,6 +70,8 @@ The other targets (iOS, Compose for Web Canvas) are experimental and under devel
 * [components](components) - custom components of Compose Multiplatform
    * [Split Pane](components/SplitPane)
 * [experimental](experimental) - experimental components and examples
+   * [Compose Multiplatform template project](https://github.com/JetBrains/compose-multiplatform-template) 
+     that includes experimental iOS target 
    * [examples](experimental/examples) - examples that use new experimental functionality
    * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
    * [Video Player](experimental/components/VideoPlayer)
