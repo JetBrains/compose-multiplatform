@@ -112,7 +112,8 @@ class SemanticsNode internal constructor(
     /**
      * The size of the bounding box for this node, with no clipping applied
      */
-    val size: IntSize get() = findCoordinatorToGetBounds().size
+    val size: IntSize
+        get() = findCoordinatorToGetBounds()?.size ?: IntSize.Zero
 
     /**
      * The bounding box for this node relative to the root of this Compose hierarchy, with
@@ -120,46 +121,44 @@ class SemanticsNode internal constructor(
      * Rect([positionInRoot], [size].toSize())
      */
     val boundsInRoot: Rect
-        get() {
-            if (!layoutNode.isAttached) return Rect.Zero
-            return findCoordinatorToGetBounds().boundsInRoot()
-        }
+        get() = findCoordinatorToGetBounds()?.takeIf { it.isAttached }?.boundsInRoot()
+            ?: Rect.Zero
 
     /**
      * The position of this node relative to the root of this Compose hierarchy, with no clipping
      * applied
      */
     val positionInRoot: Offset
-        get() {
-            if (!layoutNode.isAttached) return Offset.Zero
-            return findCoordinatorToGetBounds().positionInRoot()
-        }
+        get() = findCoordinatorToGetBounds()?.takeIf { it.isAttached }?.positionInRoot()
+            ?: Offset.Zero
 
     /**
      * The bounding box for this node relative to the screen, with clipping applied. To get the
      * bounds with no clipping applied, use PxBounds([positionInWindow], [size].toSize())
      */
     val boundsInWindow: Rect
-        get() {
-            if (!layoutNode.isAttached) return Rect.Zero
-            return findCoordinatorToGetBounds().boundsInWindow()
-        }
+        get() = findCoordinatorToGetBounds()?.takeIf { it.isAttached }?.boundsInWindow()
+            ?: Rect.Zero
 
     /**
      * The position of this node relative to the screen, with no clipping applied
      */
     val positionInWindow: Offset
-        get() {
-            if (!layoutNode.isAttached) return Offset.Zero
-            return findCoordinatorToGetBounds().positionInWindow()
-        }
+        get() = findCoordinatorToGetBounds()?.takeIf { it.isAttached }?.positionInWindow()
+            ?: Offset.Zero
+
+    /**
+     * Whether this node is transparent.
+     */
+    internal val isTransparent: Boolean
+        get() = findCoordinatorToGetBounds()?.isTransparent() ?: false
 
     /**
      * Returns the position of an [alignment line][AlignmentLine], or [AlignmentLine.Unspecified]
      * if the line is not provided.
      */
     fun getAlignmentLinePosition(alignmentLine: AlignmentLine): Int {
-        return findCoordinatorToGetBounds()[alignmentLine]
+        return findCoordinatorToGetBounds()?.get(alignmentLine) ?: AlignmentLine.Unspecified
     }
 
     // CHILDREN
@@ -325,13 +324,11 @@ class SemanticsNode internal constructor(
      * of use cases it means that accessibility bounds will be equal to the clickable area.
      * Otherwise the outermost semantics will be used to report bounds, size and position.
      */
-    internal fun findCoordinatorToGetBounds(): NodeCoordinator {
-        return if (unmergedConfig.isMergingSemanticsOfDescendants) {
-            (layoutNode.outerMergingSemantics ?: outerSemanticsNode)
-                .requireCoordinator(Nodes.Semantics)
-        } else {
-            outerSemanticsNode.requireCoordinator(Nodes.Semantics)
-        }
+    internal fun findCoordinatorToGetBounds(): NodeCoordinator? {
+        if (isFake) return parent?.findCoordinatorToGetBounds()
+        val semanticsModifierNode = layoutNode.outerMergingSemantics
+            .takeIf { unmergedConfig.isMergingSemanticsOfDescendants } ?: outerSemanticsNode
+        return semanticsModifierNode.requireCoordinator(Nodes.Semantics)
     }
 
     // Fake nodes

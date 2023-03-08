@@ -878,16 +878,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
         }
 
         // Mark invisible nodes
-        val wrapperToCheckTransparency = if (semanticsNode.isFake) {
-            // when node is fake, its parent that is the original semantics node should define the
-            // alpha value
-            semanticsNode.parent?.findCoordinatorToGetBounds()
-        } else {
-            semanticsNode.findCoordinatorToGetBounds()
-        }
-        val isTransparent = wrapperToCheckTransparency?.isTransparent() ?: false
-        info.isVisibleToUser = !isTransparent &&
-            semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.InvisibleToUser) == null
+        info.isVisibleToUser = semanticsNode.isVisible
 
         semanticsNode.unmergedConfig.getOrNull(SemanticsProperties.LiveRegion)?.let {
             info.liveRegion = when (it) {
@@ -1937,13 +1928,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             // The node below is not added to the tree; it's a wrapper around outer semantics to
             // use the methods available to the SemanticsNode
             val semanticsNode = SemanticsNode(wrapper, false)
-            val wrapperToCheckAlpha = semanticsNode.findCoordinatorToGetBounds()
 
             // Do not 'find' invisible nodes when exploring by touch. This will prevent us from
             // sending events for invisible nodes
-            if (!semanticsNode.unmergedConfig.contains(SemanticsProperties.InvisibleToUser) &&
-                !wrapperToCheckAlpha.isTransparent()
-            ) {
+            if (semanticsNode.isVisible) {
                 val layoutNode = wrapper.requireLayoutNode()
                 val androidView = view
                     .androidViewsHandler
@@ -2975,6 +2963,10 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
 }
 
 private fun SemanticsNode.enabled() = (config.getOrNull(SemanticsProperties.Disabled) == null)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private val SemanticsNode.isVisible: Boolean
+    get() = !isTransparent && !unmergedConfig.contains(SemanticsProperties.InvisibleToUser)
 
 private fun SemanticsNode.propertiesDeleted(
     oldNode: AndroidComposeViewAccessibilityDelegateCompat.SemanticsNodeCopy

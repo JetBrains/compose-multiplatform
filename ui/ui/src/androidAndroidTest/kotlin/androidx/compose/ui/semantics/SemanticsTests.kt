@@ -19,6 +19,7 @@ package androidx.compose.ui.semantics
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.BasicText
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.SubcomposeLayout
@@ -50,6 +52,7 @@ import androidx.compose.ui.test.onAllNodesWithText
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastMap
@@ -330,6 +333,32 @@ class SemanticsTests {
         val children = node.children
         assertThat(children.count()).isEqualTo(1)
         assertThat(children.last().isFake).isFalse()
+    }
+
+    @Test
+    fun fakeSemanticsNode_usesValuesFromParent() {
+        val tag = "tag1"
+        rule.setContent {
+            SimpleTestLayout(
+                Modifier
+                    .offset(10.dp, 10.dp)
+                    .clickable(role = Role.Button, onClick = {})
+                    .testTag(tag)
+            ) {
+                BasicText("text")
+            }
+        }
+
+        val node = rule.onNodeWithTag(tag, true).fetchSemanticsNode()
+        val fakeNode = node.replacedChildren.first { it.isFake }
+
+        // Ensure that the fake node uses the properties of the parent.
+        assertThat(fakeNode.size).isNotEqualTo(IntSize.Zero)
+        assertThat(fakeNode.boundsInRoot).isNotEqualTo(Rect.Zero)
+        assertThat(fakeNode.positionInRoot).isNotEqualTo(Offset.Zero)
+        assertThat(fakeNode.boundsInWindow).isNotEqualTo(Rect.Zero)
+        assertThat(fakeNode.positionInWindow).isNotEqualTo(Offset.Zero)
+        assertThat(fakeNode.isTransparent).isFalse()
     }
 
     @Test
