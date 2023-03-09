@@ -21,7 +21,6 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.interop.LocalLayerContainer
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.Platform
@@ -34,7 +33,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import kotlin.math.roundToInt
 import androidx.compose.ui.unit.toOffset
 import kotlin.math.roundToInt
 import kotlinx.cinterop.CValue
@@ -54,13 +52,16 @@ import platform.Foundation.NSValue
 import platform.UIKit.CGRectValue
 import platform.UIKit.UIScreen
 import platform.UIKit.UIView
+import platform.UIKit.UIViewAutoresizingFlexibleHeight
+import platform.UIKit.UIViewAutoresizingFlexibleWidth
 import platform.UIKit.UIViewController
 import platform.UIKit.UIViewControllerTransitionCoordinatorProtocol
 import platform.UIKit.addSubview
 import platform.UIKit.reloadInputViews
+import platform.UIKit.setAutoresizesSubviews
+import platform.UIKit.setAutoresizingMask
 import platform.UIKit.setClipsToBounds
 import platform.UIKit.setNeedsDisplay
-import platform.UIKit.window
 import platform.darwin.NSObject
 
 fun ComposeUIViewController(content: @Composable () -> Unit): UIViewController =
@@ -154,6 +155,10 @@ internal actual class ComposeWindow : UIViewController {
         val skikoUIView = SkikoUIView(skiaLayer).load()
         val rootView = UIView() // rootView needs to interop with UIKit
         rootView.addSubview(skikoUIView)
+        rootView.setAutoresizesSubviews(true)
+        skikoUIView.setAutoresizingMask(
+            UIViewAutoresizingFlexibleWidth or UIViewAutoresizingFlexibleHeight
+        )
         view = rootView
         val uiKitTextInputService = UIKitTextInputService(
             showSoftwareKeyboard = {
@@ -244,7 +249,14 @@ internal actual class ComposeWindow : UIViewController {
         val width = size.useContents { width } * scale
         val height = size.useContents { height } * scale
         layer.setSize(width.roundToInt(), height.roundToInt())
-        layer.layer.needRedraw()
+        layer.layer.needRedraw() // TODO: remove? the following block should be enough
+        withTransitionCoordinator.animateAlongsideTransition(animation = null) {
+            // Docs: https://developer.apple.com/documentation/uikit/uiviewcontrollertransitioncoordinator/1619295-animatealongsidetransition
+            // Request a frame once more on animation completion.
+            // Consider adding redrawImmediately() in SkiaLayer for ios to sync with current frame.
+            // This fixes an interop use case when Compose is embedded in SwiftUi.
+            layer.layer.needRedraw()
+        }
         super.viewWillTransitionToSize(size, withTransitionCoordinator)
     }
 

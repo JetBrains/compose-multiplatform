@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,20 @@
  * limitations under the License.
  */
 
-import UIKit
+import Foundation
 import SwiftUI
 import shared
 
-class SceneDelegate: UIResponder, UIWindowSceneDelegate {
-    var window: UIWindow?
+struct ContentView: View {
+    var body: some View {
+        ComposeView()
+    }
+}
 
-    func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
-        if let windowScene = scene as? UIWindowScene {
-            let window = UIWindow(windowScene: windowScene)
-            window.rootViewController = SwiftHelper().getViewController()
-            self.window = window
-            window.makeKeyAndVisible()
-        }
+struct ComposeView: UIViewControllerRepresentable {
+    func makeUIViewController(context: Context) -> UIViewController {
+        SwiftHelper().getViewController()
     }
 
+    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
 }
