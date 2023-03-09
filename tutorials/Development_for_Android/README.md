@@ -31,4 +31,4 @@ dependencies {
 
 ## Useful reading about porting Android apps to Desktop
 
-[Porting ViewModel](https://github.com/JetBrains/compose-jb/discussions/1587)
+[Porting ViewModel](https://github.com/JetBrains/compose-multiplatform/discussions/1587)

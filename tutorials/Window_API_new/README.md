@@ -185,7 +185,7 @@ object TrayIcon : Painter() {
 
 ## Open and close multiple windows
 
-If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-jb/tree/master/examples/notepad) for more complex use cases):
+If an application has multiple windows, then it is better to put its state into a separate class and open/close window in response to `mutableStateListOf` changes (see [notepad example](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/notepad) for more complex use cases):
 ```kotlin
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.key
@@ -653,4 +653,4 @@ fun main() = application {
 ```
 
 _**Important note:** Window transparency is implemented based on JDK implementation, that contains **known issue on Linux** in case of moving a Window between two monitors with different density. So when you move an App, the Window stops being transparent. And it seems nothing can be done with this situation on Compose side.
-[An issue about it](https://github.com/JetBrains/compose-jb/issues/1339)_
+[An issue about it](https://github.com/JetBrains/compose-multiplatform/issues/1339)_
