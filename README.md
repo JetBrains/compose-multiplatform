@@ -1,6 +1,6 @@
 [![official project](http://jb.gg/badges/official.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
-[![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-jb?color=brightgreen&label=latest%20release)](https://github.com/JetBrains/compose-jb/releases/latest)
-[![Latest build](https://img.shields.io/github/v/release/JetBrains/compose-jb?color=orange&include_prereleases&label=latest%20build)](https://github.com/JetBrains/compose-jb/releases)
+[![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=brightgreen&label=latest%20release)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
+[![Latest build](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=orange&include_prereleases&label=latest%20build)](https://github.com/JetBrains/compose-multiplatform/releases)
 
 # Compose Multiplatform, by JetBrains
 ![](artwork/readme/apps.png)
@@ -22,7 +22,7 @@ Preview functionality (check your application UI without building/running it) fo
 * [Tab focus navigation](tutorials/Tab_Navigation)
 * [Swing interoperability](tutorials/Swing_Integration)
 * [Navigation](tutorials/Navigation)
-* [Accessibility](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Accessibility)
+* [Accessibility](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Accessibility)
 * [Building a native distribution](tutorials/Native_distributions_and_local_execution)
 
 Also, see [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) docs from Google. They were originally written for Android, but most of information applies to Compose for Desktop as well.
@@ -40,7 +40,7 @@ Compose Multiplatform uses Jetpack Compose developed by Google when you target A
 
 [The docs](https://developer.android.com/jetpack/compose/documentation) published by Google are great and decribe how to develop on Compose for Android.
 
-Note that when you use Compose Multiplatform, you setup your project differently. You can create a multiplatform project with Android support via IDEA Project Wizard, or by copying [multiplatform template](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template). In `androidMain` source set you can use almost all information from the docs, and in `commonMain` source set you can use information from Foundation and Design sections.
+Note that when you use Compose Multiplatform, you setup your project differently. You can create a multiplatform project with Android support via IDEA Project Wizard, or by copying [multiplatform template](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/multiplatform-template). In `androidMain` source set you can use almost all information from the docs, and in `commonMain` source set you can use information from Foundation and Design sections.
 
 ### Experimental targets
 The other targets (iOS, Compose for Web Canvas) are experimental and under development. Use them at your own risk.
@@ -70,6 +70,8 @@ The other targets (iOS, Compose for Web Canvas) are experimental and under devel
 * [components](components) - custom components of Compose Multiplatform
    * [Split Pane](components/SplitPane)
 * [experimental](experimental) - experimental components and examples
+   * [Compose Multiplatform template project](https://github.com/JetBrains/compose-multiplatform-template) 
+     that includes experimental iOS target 
    * [examples](experimental/examples) - examples that use new experimental functionality
    * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
    * [Video Player](experimental/components/VideoPlayer)
@@ -78,7 +80,7 @@ The other targets (iOS, Compose for Web Canvas) are experimental and under devel
        
 ## Versions ##
 
-* [The latest stable release](https://github.com/JetBrains/compose-jb/releases/latest)
-* [The latest dev release](https://github.com/JetBrains/compose-jb/releases)
+* [The latest stable release](https://github.com/JetBrains/compose-multiplatform/releases/latest)
+* [The latest dev release](https://github.com/JetBrains/compose-multiplatform/releases)
 * [Compatibility and versioning overview](VERSIONING.md)
 * [Changelog](CHANGELOG.md)

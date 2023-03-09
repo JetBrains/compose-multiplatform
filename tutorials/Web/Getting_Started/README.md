@@ -12,7 +12,7 @@ You need to have the following software installed before you begin:
 
 ## Creating a new project
 
-You can create the project by [downloading the template here](https://github.com/JetBrains/compose-jb/tree/master/templates/web-template) or using the Project Wizard in IDEA:
+You can create the project by [downloading the template here](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/web-template) or using the Project Wizard in IDEA:
 
 <img alt="Create new project" src="wizard.png" height="500" />
 

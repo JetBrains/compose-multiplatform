@@ -39,7 +39,7 @@ Just search for "Compose Multiplatform".
 ### Update the wizard plugin
 
 The Compose plugin version used in the wizard above might not be the latest. Update to the latest plugin version by editing the `build.gradle.kts` file and updating the version information as shown below. 
-For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-jb/releases) site and the [Kotlin](https://kotlinlang.org/) site.
+For the latest versions, see the [latest versions](https://github.com/JetBrains/compose-multiplatform/releases) site and the [Kotlin](https://kotlinlang.org/) site.
 ```
 plugins {
     kotlin("jvm") version "1.8.0"
@@ -55,8 +55,8 @@ The recommended way to build Compose for Desktop projects is with Gradle.
 JetBrains provides a simple way of building Compose for Desktop projects
 using a special Gradle plugin.
 
-You can clone an existing template for a [desktop](https://github.com/JetBrains/compose-jb/tree/master/templates/desktop-template) or
-[multiplatform](https://github.com/JetBrains/compose-jb/tree/master/templates/multiplatform-template) application, or create it from scratch.
+You can clone an existing template for a [desktop](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/desktop-template) or
+[multiplatform](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/multiplatform-template) application, or create it from scratch.
 
 First create a new directory, named `sample`.
 ```shell script
@@ -160,6 +160,6 @@ Running and debugging the `main()` function using run gutter is also supported.
 
 ## Next steps
 
-Congratulations on getting your first Compose Multiplatform project working!  We encourage you to continue playing around with the areas that interest you, and look forward to seeing what you build!  When you're ready to continue learning, we have many more great tutorials available here: [Compose Multiplatform Tutorials](https://github.com/JetBrains/compose-jb#tutorials).
+Congratulations on getting your first Compose Multiplatform project working!  We encourage you to continue playing around with the areas that interest you, and look forward to seeing what you build!  When you're ready to continue learning, we have many more great tutorials available here: [Compose Multiplatform Tutorials](https://github.com/JetBrains/compose-multiplatform#tutorials).
 
-We also have some more advanced [Compose Multiplatorm Example Projects](https://github.com/JetBrains/compose-jb#examples) that you can learn from.
+We also have some more advanced [Compose Multiplatorm Example Projects](https://github.com/JetBrains/compose-multiplatform#examples) that you can learn from.

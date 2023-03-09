@@ -163,8 +163,8 @@ The fourth point is not that obvious but might be very important. Separating nav
 
 You can find some integration tests in the TodoApp example:
 
-- [TodoMainTest](https://github.com/JetBrains/compose-jb/blob/master/examples/todoapp/common/main/src/commonTest/kotlin/example/todo/common/main/integration/TodoMainTest.kt) - integration tests for the Main screen.
-- [TodoRootTest](https://github.com/JetBrains/compose-jb/blob/master/examples/todoapp/common/root/src/commonTest/kotlin/example/todo/common/root/integration/TodoRootTest.kt) - integration tests for navigation between the Main and the Edit screens.
+- [TodoMainTest](https://github.com/JetBrains/compose-multiplatform/blob/master/examples/todoapp/common/main/src/commonTest/kotlin/example/todo/common/main/integration/TodoMainTest.kt) - integration tests for the Main screen.
+- [TodoRootTest](https://github.com/JetBrains/compose-multiplatform/blob/master/examples/todoapp/common/root/src/commonTest/kotlin/example/todo/common/root/integration/TodoRootTest.kt) - integration tests for navigation between the Main and the Edit screens.
 
 This pattern is encouraged by the Decompose library. If this is your choice, then you can just use its recommended approach. 
 
@@ -174,7 +174,7 @@ The only responsibility of the user interface is to listen for components' state
 
 The following resources can help with this pattern:
 - The Decompose [documentation](https://arkivanov.github.io/Decompose/)
-- The [TodoApp](https://github.com/JetBrains/compose-jb/tree/master/examples/todoapp) example
+- The [TodoApp](https://github.com/JetBrains/compose-multiplatform/tree/master/examples/todoapp) example
 - The article "[Fully cross-platform Kotlin applications (almost)](https://proandroiddev.com/fully-cross-platform-kotlin-applications-almost-29c7054f8f28)"
 
 ### A very basic example:
