@@ -2,7 +2,7 @@ import UIKit
 import SwiftUI
 import shared
 import AVKit
-import WebKit
+import CoreLocation
 
 struct ComposeView: UIViewControllerRepresentable {
     private let openCamera: () -> ()
@@ -71,12 +71,15 @@ final class CameraUIViewController: UIViewController {
     var closeHandler: VoidFunc?
     
     let captureSession = AVCaptureSession()
+    let locationManager = CLLocationManager()
     
     var camera: AVCaptureDevice?
     
-    var capturedImage: UIImage?
+    var lastCapturedImage: UIImage?
     var capturePhotoOutput: AVCapturePhotoOutput!
     var cameraPreviewLayer: AVCaptureVideoPreviewLayer!
+    
+    private let imageStorage = ImageStorage()
     
     private let cameraContainer = UIView()
     private let captureButton: UIButton = {
@@ -138,18 +141,19 @@ final class CameraUIViewController: UIViewController {
         showAlert(for: .simulatorUsed)
         #else
         DispatchQueue.global().async {
-            self.configureSessionIfAllowed()
+            self.configureCaptureSessionIfAllowed()
+            self.configureLocationServicesIfAllowed()
         }
         #endif
     }
     
-    private func configureSessionIfAllowed() {
+    private func configureCaptureSessionIfAllowed() {
         switch AVCaptureDevice.authorizationStatus(for: .video) {
         case .authorized:
             configureCamera()
             
         case .denied, .restricted:
-            showAlert(for: .permissionDenied)
+            showAlert(for: .cameraPermissionDenied)
             
         case .notDetermined:
             AVCaptureDevice.requestAccess(for: .video, completionHandler: { permissionGranted in
@@ -194,6 +198,8 @@ final class CameraUIViewController: UIViewController {
     @objc private func capture() {
         let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
         photoSettings.isHighResolutionPhotoEnabled = true
+        let currentMetadata = photoSettings.metadata
+//        photoSettings.metadata = currentMetadata.merging(getLocationMetadata(), uniquingKeysWith: { _, geoMetaDataKey -> Any in return geoMetaDataKey })
         
         capturePhotoOutput.isHighResolutionCaptureEnabled = true
         capturePhotoOutput.capturePhoto(with: photoSettings, delegate: self)
@@ -212,27 +218,158 @@ final class CameraUIViewController: UIViewController {
         
         self.present(alert, animated: true)
     }
+    
+    private func getLocationMetadata() -> [String: Any] {
+        var metadata = [String: Any]()
+        
+        guard let location = locationManager.location else {
+            print("ImageViewer: couldn't get location, geo metadata will be empty")
+            return [:]
+        }
+        
+        metadata = [
+            kCGImagePropertyGPSLatitude as String: location.coordinate.latitude,
+            kCGImagePropertyGPSLongitude as String: location.coordinate.longitude,
+            kCGImagePropertyGPSAltitudeRef as String: 0,
+            kCGImagePropertyGPSAltitude as String: location.altitude,
+            kCGImagePropertyGPSTimeStamp as String: location.timestamp,
+            kCGImagePropertyGPSDateStamp as String: location.timestamp,
+        ]
+        
+        return metadata
+    }
 }
 
 extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let photoData = photo.fileDataRepresentation() else { return }
-        capturedImage = UIImage(data: photoData)
+        lastCapturedImage = UIImage(data: photoData)
+        imageStorage.set(imageData: photoData)
+    }
+}
+
+extension CameraUIViewController: CLLocationManagerDelegate {
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        switch status {
+        case .authorizedAlways, .authorizedWhenInUse:
+            configureLocationServices()
+        default:
+            print("ImageViewer: location permission wasn't granted, photos will be without location information")
+            return
+        }
+    }
+    
+    private func configureLocationServicesIfAllowed() {
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        locationManager.requestWhenInUseAuthorization()
+    }
+    
+    private func configureLocationServices() {
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.startUpdatingLocation()
+        }
     }
 }
 
 fileprivate extension CameraUIViewController {
     enum AlertType {
         case simulatorUsed
-        case permissionDenied
+        case cameraPermissionDenied
         case unknownAuthStatus
         
         var message: String {
             switch self {
-            case .permissionDenied: return "Permission of camera usage should be granted"
+            case .cameraPermissionDenied: return "Permission of camera usage should be granted"
             case .simulatorUsed: return "Camera is not available on simulator, please use real device"
             case .unknownAuthStatus: return "Unknown camera permission status"
             }
+        }
+    }
+}
+
+fileprivate class ImageStorage {
+    private let fm = FileManager.default
+    private let df: DateFormatter = {
+        let df = DateFormatter()
+        df.dateFormat = "yyyy-MM-dd-mm-ss.SSS"
+        return df
+    }()
+    
+    private static let relativePath = "ImageViewer/takenPhotos/"
+    
+    init() {
+        guard let pathUrl = getRelativePathUrl() else {
+            return
+        }
+        
+        let fileExists = fm.fileExists(atPath: pathUrl.path)
+        guard !fileExists else {
+            return
+        }
+        
+        do {
+            try fm.createDirectory(at: pathUrl, withIntermediateDirectories: true)
+        } catch {
+            print("ImageViewer: Error while creating directory for storaging photos, please see description:\n\(error.localizedDescription)")
+        }
+    }
+    
+    func set(imageData: Data) {
+        let fileName = df.string(from: Date()) + "_taken.jpg"
+        guard let fileUrl = makeFileUrl(for: fileName) else { return }
+        do {
+            try imageData.write(to: fileUrl)
+        } catch {
+            print("ImageViewer: Error while saving photo, please see description:\n\(error.localizedDescription)")
+        }
+    }
+    
+    func getAll() -> [UIImage]? {
+        guard let imagesUrl = getRelativePathUrl() else { return nil }
+        
+        var resultArray = [UIImage?]()
+        do {
+            let imageUrls = try fm.contentsOfDirectory(atPath: imagesUrl.path)
+            for imageUrlString in imageUrls {
+                DispatchQueue.global(qos: .utility).async {
+                    let image = self.get(imagePathString: imageUrlString)
+                    DispatchQueue.global().async(flags: .barrier) {
+                        resultArray.append(image)
+                    }
+                }
+            }
+        } catch {
+            print("ImageViewer: Error while fetching images from fileStorage, see description:\n\(error.localizedDescription)")
+            return nil
+        }
+        return resultArray.compactMap{$0}
+    }
+    
+    func get(imageName: String) -> UIImage? {
+        guard let url = makeFileUrl(for: imageName), let data = try? Data(contentsOf: url) else { return nil }
+        return UIImage(data: data)
+    }
+    
+    func get(imagePathString: String) -> UIImage? {
+        guard let url = URL(string: imagePathString), let data = try? Data(contentsOf: url) else { return nil }
+        return UIImage(data: data)
+    }
+    
+    private func makeFileUrl(for name: String) -> URL? {
+        guard let url = getRelativePathUrl() else { return nil }
+        if #available(iOS 16, *) {
+            return url.appending(component: name)
+        } else {
+            return url.appendingPathComponent(name)
+        }
+    }
+    
+    private func getRelativePathUrl() -> URL? {
+        guard let url = fm.urls(for: .documentDirectory, in: .userDomainMask).first else { return nil }
+        if #available(iOS 16, *) {
+            return url.appending(component: Self.relativePath)
+        } else {
+            return url.appendingPathComponent(Self.relativePath)
         }
     }
 }
