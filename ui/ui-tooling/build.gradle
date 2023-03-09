@@ -38,7 +38,7 @@ dependencies {
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
-        implementation("androidx.savedstate:savedstate-ktx:1.2.0")
+        implementation("androidx.savedstate:savedstate-ktx:1.2.1")
         implementation("androidx.compose.material:material:1.0.0")
         implementation("androidx.activity:activity-compose:1.7.0")
         implementation("androidx.lifecycle:lifecycle-common:2.6.0")
@@ -85,7 +85,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation(project(":compose:animation:animation"))
-                implementation("androidx.savedstate:savedstate-ktx:1.2.0")
+                implementation("androidx.savedstate:savedstate-ktx:1.2.1")
                 implementation(project(":compose:material:material"))
                 implementation("androidx.activity:activity-compose:1.7.0")
                 implementation("androidx.lifecycle:lifecycle-common:2.6.0")

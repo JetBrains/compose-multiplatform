@@ -47,7 +47,7 @@ dependencies {
         implementation("androidx.compose.ui:ui-util:1.2.1")
 
         // TODO: remove next 3 dependencies when b/202810604 is fixed
-        implementation("androidx.savedstate:savedstate:1.2.0")
+        implementation("androidx.savedstate:savedstate:1.2.1")
         implementation("androidx.lifecycle:lifecycle-runtime:2.6.0")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0")
 
@@ -106,7 +106,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api("androidx.annotation:annotation:1.1.0")
 
                 // TODO: remove next 3 dependencies when b/202810604 is fixed
-                implementation("androidx.savedstate:savedstate:1.2.0")
+                implementation("androidx.savedstate:savedstate:1.2.1")
                 implementation("androidx.lifecycle:lifecycle-runtime:2.6.0")
                 implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.0")
             }
