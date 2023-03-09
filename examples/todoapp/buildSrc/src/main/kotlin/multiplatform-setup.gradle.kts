@@ -52,7 +52,7 @@ kotlin {
             }
         }
 
-        named("androidTest") {
+        named("androidUnitTest") {
             dependencies {
                 implementation(Deps.JetBrains.Kotlin.testJunit)
             }
