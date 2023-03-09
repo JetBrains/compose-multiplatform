@@ -238,7 +238,6 @@ internal fun RelatedMemoriesVisualizer(
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
-        //.height(200.dp)
     ) {
         LazyRow(
             modifier = Modifier.fillMaxSize(),
