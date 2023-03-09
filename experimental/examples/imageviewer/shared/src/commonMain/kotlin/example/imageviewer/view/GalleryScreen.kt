@@ -10,10 +10,7 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,7 +28,6 @@ import example.imageviewer.model.GalleryId
 import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
-import example.imageviewer.notchPadding
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -42,6 +38,7 @@ enum class GalleryStyle {
     LIST
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun GalleryScreen(
     galleryPage: GalleryPage,
@@ -64,7 +61,7 @@ internal fun GalleryScreen(
         Box {
             PreviewImage(
                 getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-                picture = galleryPage.picture, onClick = {
+                picture = galleryPage.galleryEntry, onClick = {
                     galleryPage.pictureId?.let(onClickPreviewPicture)
                 }
             )
@@ -77,7 +74,7 @@ internal fun GalleryScreen(
                 },
             )
         }
-        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             when (galleryPage.galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
                     pictures,
@@ -107,7 +104,7 @@ private fun SquaresGalleryView(
     onSelect: (GalleryId) -> Unit,
 ) {
     Column {
-        Spacer(Modifier.height(1.dp))
+        Spacer(Modifier.height(4.dp))
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 130.dp),
             verticalArrangement = Arrangement.spacedBy(1.dp),
@@ -128,8 +125,8 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun MakeNewMemoryMiniature(onClick: () -> Unit) {
-    Column {
+private fun BoxScope.MakeNewMemoryMiniature(onClick: () -> Unit) {
+    Column(modifier = Modifier.align(Alignment.BottomCenter)) {
         Box(
             Modifier
                 .clip(CircleShape)
@@ -206,6 +203,7 @@ private fun ListGalleryView(
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
+        Spacer(modifier = Modifier.height(10.dp))
         for ((idx, picWithThumb) in pictures.withIndex()) {
             val (galleryId, picture, miniature) = picWithThumb
             Miniature(

@@ -29,6 +29,7 @@ import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.GalleryId
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PhotoGallery
+import example.imageviewer.model.Picture
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -38,6 +39,7 @@ import org.jetbrains.compose.resources.painterResource
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
     photoGallery: PhotoGallery,
+    getImage: suspend (Picture) -> ImageBitmap,
     localization: Localization,
     onSelectRelatedMemory: (GalleryId) -> Unit,
     onBack: () -> Unit,
@@ -45,6 +47,10 @@ internal fun MemoryScreen(
 ) {
     val pictures by photoGallery.galleryStateFlow.collectAsState()
     val picture = pictures.first { it.id == memoryPage.galleryId }
+    var headerImage by remember(picture) { mutableStateOf(picture.thumbnail) }
+    LaunchedEffect(picture) {
+        headerImage = getImage(picture.picture)
+    }
     Box {
         val scrollState = memoryPage.scrollState
         Column(
@@ -62,19 +68,10 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                MemoryHeader(picture.thumbnail, onClick = { onHeaderClick(memoryPage.galleryId) })
+                MemoryHeader(headerImage, onClick = { onHeaderClick(memoryPage.galleryId) })
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
-                    Headliner("Place")
-                    val locationShape = RoundedCornerShape(10.dp)
-                    LocationVisualizer(
-                        Modifier.padding(horizontal = 12.dp)
-                            .clip(locationShape)
-                            .border(1.dp, Color.Gray, locationShape)
-                            .fillMaxWidth()
-                            .height(200.dp)
-                    )
                     Headliner("Note")
                     Collapsible(
                         """
@@ -87,6 +84,15 @@ internal fun MemoryScreen(
                     )
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    Headliner("Place")
+                    val locationShape = RoundedCornerShape(10.dp)
+                    LocationVisualizer(
+                        Modifier.padding(horizontal = 12.dp)
+                            .clip(locationShape)
+                            .border(1.dp, Color.Gray, locationShape)
+                            .fillMaxWidth()
+                            .height(200.dp)
+                    )
                     Spacer(Modifier.height(50.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -130,13 +136,7 @@ internal fun MemoryScreen(
 @Composable
 private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
-    val shadowTextStyle = LocalTextStyle.current.copy(
-        shadow = Shadow(
-            color = Color.Black,
-            offset = Offset(4f, 4f),
-            blurRadius = 4f
-        )
-    )
+
     Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
         Image(
             bitmap,
@@ -144,28 +144,53 @@ private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
             contentScale = ContentScale.Crop,
             modifier = Modifier.fillMaxSize()
         )
-        Column(
-            modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
-        ) {
-            Text(
-                "Your Memory",
-                textAlign = TextAlign.Left,
-                color = Color.White,
-                fontSize = 20.sp,
-                modifier = Modifier.fillMaxWidth(),
-                fontWeight = FontWeight.SemiBold,
-                style = shadowTextStyle
-            )
-            Spacer(Modifier.height(5.dp))
+        MagicButtonOverlay(onClick)
+        MemoryTextOverlay()
+    }
+}
 
-            Text(
-                "19th of April 2023",
-                textAlign = TextAlign.Left,
-                color = Color.White,
-                fontWeight = FontWeight.Normal,
-                style = shadowTextStyle
-            )
-        }
+@OptIn(ExperimentalResourceApi::class)
+@Composable
+internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
+    Column(
+        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 16.dp)
+    ) {
+        CircularButton(painterResource("magic.png"), onClick)
+    }
+}
+
+@Composable
+internal fun BoxScope.MemoryTextOverlay() {
+    val shadowTextStyle = LocalTextStyle.current.copy(
+        shadow = Shadow(
+            color = Color.Black.copy(0.75f),
+            offset = Offset(0f, 0f),
+            blurRadius = 4f
+        )
+    )
+    Column(
+        modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
+    ) {
+        Text(
+            "28. Feb",
+            textAlign = TextAlign.Left,
+            color = Color.White,
+            fontSize = 20.sp,
+            lineHeight = 22.sp,
+            modifier = Modifier.fillMaxWidth(),
+            fontWeight = FontWeight.SemiBold,
+            style = shadowTextStyle
+        )
+        Spacer(Modifier.height(1.dp))
+        Text(
+            "London",
+            textAlign = TextAlign.Left,
+            color = Color.White,
+            fontSize = 14.sp,
+            lineHeight = 16.sp,
+            fontWeight = FontWeight.Normal,
+            style = shadowTextStyle
+        )
     }
 }
 
@@ -176,7 +201,7 @@ internal fun Collapsible(s: String) {
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
     Text(
         text,
-        fontSize = 12.sp,
+        fontSize = 16.sp,
         modifier = Modifier
             .padding(10.dp, 0.dp)
             .clip(RoundedCornerShape(10.dp))
@@ -190,7 +215,8 @@ internal fun Collapsible(s: String) {
             )
             .clickable(interactionSource = interctionSource, indication = null) {
                 isCollapsed = !isCollapsed
-            },
+            }
+            .fillMaxWidth(),
     )
 }
 
@@ -212,7 +238,6 @@ internal fun RelatedMemoriesVisualizer(
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
-            .height(200.dp)
     ) {
         LazyRow(
             modifier = Modifier.fillMaxSize(),

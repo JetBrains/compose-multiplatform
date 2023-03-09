@@ -25,14 +25,23 @@ class GalleryPage(
     var galleryStyle by mutableStateOf(GalleryStyle.SQUARES)
 
     fun toggleGalleryStyle() {
-        galleryStyle = if(galleryStyle == GalleryStyle.SQUARES) GalleryStyle.LIST else GalleryStyle.SQUARES
+        galleryStyle =
+            if (galleryStyle == GalleryStyle.SQUARES) GalleryStyle.LIST else GalleryStyle.SQUARES
     }
 
     var currentPictureIndex by mutableStateOf(0)
 
     val picture get(): Picture? = photoGallery.galleryStateFlow.value.getOrNull(currentPictureIndex)?.picture
 
-    val pictureId get(): GalleryId? = photoGallery.galleryStateFlow.value.getOrNull(currentPictureIndex)?.id
+    val galleryEntry: GalleryEntryWithMetadata?
+        get() = photoGallery.galleryStateFlow.value.getOrNull(
+            currentPictureIndex
+        )
+
+    val pictureId
+        get(): GalleryId? = photoGallery.galleryStateFlow.value.getOrNull(
+            currentPictureIndex
+        )?.id
 
     fun nextImage() {
         currentPictureIndex =

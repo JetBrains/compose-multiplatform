@@ -1,6 +1,15 @@
 package example.imageviewer.utils
 
-import org.jetbrains.skia.*
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorInfo
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.FilterTileMode
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageFilter
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Paint
 
 fun scaleBitmapAspectRatio(
 	bitmap: Bitmap,
@@ -50,7 +59,7 @@ fun applyPixelFilter(bitmap: Bitmap): Bitmap {
 	val width = bitmap.width
 	val height = bitmap.height
 
-	var result = scaleBitmapAspectRatio(bitmap, width / 20, height / 20)
+	var result = scaleBitmapAspectRatio(bitmap, width / 4, height / 4)
 	result = scaleBitmapAspectRatio(result, width, height)
 
 	return result
@@ -61,7 +70,7 @@ fun applyBlurFilter(bitmap: Bitmap): Bitmap {
 		allocN32Pixels(bitmap.width, bitmap.height)
 	}
 	val blur = Paint().apply {
-		imageFilter = ImageFilter.makeBlur(10f, 10f, FilterTileMode.CLAMP)
+		imageFilter = ImageFilter.makeBlur(3f, 3f, FilterTileMode.CLAMP)
 	}
 
 	val canvas = Canvas(result)
