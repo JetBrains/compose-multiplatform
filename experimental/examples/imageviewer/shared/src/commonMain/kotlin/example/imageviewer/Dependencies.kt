@@ -4,20 +4,20 @@ import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.ContentRepository
+import example.imageviewer.model.WrappedHttpClient
 import example.imageviewer.model.Picture
 import example.imageviewer.model.name
-import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.json.Json
+//import kotlinx.serialization.json.Json
 
 interface Dependencies {
-    val httpClient: HttpClient
+    val httpClient: WrappedHttpClient
     val ioScope: CoroutineScope
     fun getFilter(type: FilterType): BitmapFilter
     val localization: Localization
     val imageRepository: ContentRepository<ImageBitmap>
     val notification: Notification
-    val json: Json get() = jsonReader
+//    val json: Json get() = jsonReader
 }
 
 interface Notification {
@@ -75,6 +75,6 @@ interface Localization {
     val refreshUnavailable: String
 }
 
-private val jsonReader: Json = Json {
-    ignoreUnknownKeys = true
-}
+//private val jsonReader: Json = Json {
+//    ignoreUnknownKeys = true
+//}

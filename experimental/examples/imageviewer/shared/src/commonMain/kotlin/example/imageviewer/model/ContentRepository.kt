@@ -1,16 +1,17 @@
 package example.imageviewer.model
 
-import io.ktor.client.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-
 interface ContentRepository<T> {
     suspend fun loadContent(url: String): T
 }
 
-fun createNetworkRepository(ktorClient: HttpClient) = object : ContentRepository<ByteArray> {
+interface WrappedHttpClient {
+    suspend fun getAsBytes(urlString: String): ByteArray
+}
+
+fun createNetworkRepository(ktorClient: WrappedHttpClient) = object : ContentRepository<ByteArray> {
     override suspend fun loadContent(url: String): ByteArray =
-        ktorClient.get(urlString = url).readBytes()
+        ktorClient.getAsBytes(url)
+//        ktorClient.get(urlString = url).readBytes()
 }
 
 fun <A, B> ContentRepository<A>.adapter(transform: (A) -> B): ContentRepository<B> {
