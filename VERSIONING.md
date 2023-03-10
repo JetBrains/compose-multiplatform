@@ -32,6 +32,7 @@ Kotlin version | Minimal Compose version | Notes
 1.7.10 | 1.2.0
 1.7.20 | 1.2.0 | JS is not supported (fixed in the 1.2.1)
 1.7.20 | 1.2.1
+1.8.0  | 1.3.0 | 1.3.0 is not supported by earlier k/native versions
 
 ### Using the latest Kotlin version 
 
@@ -44,10 +45,10 @@ The compilation process of composable functions is handled by the Compose compil
 First, check [this page](https://developer.android.com/jetpack/androidx/releases/compose-kotlin#pre-release_kotlin_compatibility) to find a compatible version. If there is one, use it this way:
 ```
 compose {
-    kotlinCompilerPlugin.set("androidx.compose.compiler:compiler:1.4.0-alpha02")
+    kotlinCompilerPlugin.set("androidx.compose.compiler:compiler:1.4.0")
 }
 ```
-(`1.4.0-alpha02` corresponds Kotlin 1.7.21)
+(`1.4.0` corresponds Kotlin 1.8.0)
 
 #### Disabling Kotlin compatibility check
 
