@@ -6,18 +6,16 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.BitmapPainter
+
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
+import org.jetbrains.compose.resources.painterResource
 import kotlin.math.max
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun loadImage(res: String): Painter = BitmapPainter(resource(res).rememberImageBitmap().orEmpty())
+internal fun loadImage(res: String): Painter = painterResource(res)
 
 expect fun hasRightClick(): Boolean
 

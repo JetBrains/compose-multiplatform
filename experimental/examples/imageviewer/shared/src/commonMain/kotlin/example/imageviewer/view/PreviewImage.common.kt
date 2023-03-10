@@ -1,53 +1,87 @@
 package example.imageviewer.view
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.with
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.model.*
-import example.imageviewer.model.State
-import example.imageviewer.style.*
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.orEmpty
-import org.jetbrains.compose.resources.rememberImageBitmap
-import org.jetbrains.compose.resources.resource
+import example.imageviewer.model.GalleryEntryWithMetadata
+import example.imageviewer.model.Picture
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalAnimationApi::class)
 @Composable
-internal fun PreviewImage(state: MutableState<State>, getImage: suspend (Picture) -> ImageBitmap) {
-    val pictures = state.value.pictures
-    val index = state.value.currentImageIndex
-    val imageState = remember(pictures, index) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(pictures, index) {
-        val picture = pictures.getOrNull(index)
-        if (picture != null) {
-            imageState.value = getImage(picture)
+internal fun PreviewImage(
+    picture: GalleryEntryWithMetadata?,
+    onClick: () -> Unit,
+    getImage: suspend (Picture) -> ImageBitmap
+) {
+    val interactionSource = remember { MutableInteractionSource() }
+    Box(
+        Modifier.fillMaxWidth().height(393.dp).background(Color.Black),
+        contentAlignment = Alignment.Center
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .clickable(interactionSource, indication = null, onClick = onClick),
+        ) {
+            AnimatedContent(
+                targetState = picture,
+                transitionSpec = {
+                    slideIntoContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                    ) with slideOutOfContainer(
+                        towards = AnimatedContentScope.SlideDirection.Left,
+                        animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
+                    )
+                }
+            ) { currentPicture ->
+                var image by remember(currentPicture) { mutableStateOf(currentPicture?.thumbnail) }
+                LaunchedEffect(currentPicture) {
+                    if (currentPicture != null) {
+                        image = getImage(currentPicture.picture)
+                    }
+                }
+                if (image != null) {
+                    Box(Modifier.fillMaxSize()) {
+                        Image(
+                            bitmap = image!!,
+                            contentDescription = null,
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                        MemoryTextOverlay()
+                    }
+                } else {
+                    Spacer(
+                        modifier = Modifier.fillMaxSize()
+                    )
+                }
+            }
         }
     }
-
-    val image = imageState.value
-    Card(
-        backgroundColor = MaterialTheme.colors.background,
-        modifier = Modifier.height(200.dp)
-            .clickable { state.toFullscreen() },
-        shape = RectangleShape,
-        elevation = 1.dp
-    ) {
-        Image(
-            bitmap = image ?: resource("empty.png").rememberImageBitmap().orEmpty(),
-            contentDescription = null,
-            modifier = Modifier
-                .fillMaxWidth().padding(start = 1.dp, top = 1.dp, end = 1.dp, bottom = 5.dp),
-            contentScale = ContentScale.Fit
-        )
-    }
 }
-
-@Composable
-internal expect fun needShowPreview(): Boolean

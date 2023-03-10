@@ -20,12 +20,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
-import org.jetbrains.compose.resources.*
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun Words() {
-    val density = LocalDensity.current
     val duration = 5000
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -46,8 +46,7 @@ internal fun Words() {
         )
     )
 
-    // TODO: use vector image (.svg or .xml)
-    val logoImg = resource("compose-community-primary.png").rememberImageBitmap().orEmpty()
+    val logoImg = painterResource("compose-community-primary.xml")
 
     val baseLogo = DpOffset(350.dp, 270.dp)
 

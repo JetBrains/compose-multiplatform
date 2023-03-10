@@ -1,8 +1,14 @@
-import androidx.compose.ui.window.Application
+import androidx.compose.ui.window.ComposeUIViewController
 import platform.UIKit.UIViewController
 
-fun MainViewController(): UIViewController =
-    Application("Chat") {
-        ChatApp()
-    }
+fun ChatViewController(): UIViewController = ComposeUIViewController {
+    ChatApp(displayTextField = false)
+}
 
+fun sendMessage(text: String) {
+    store.send(Action.SendMessage(Message(myUser, timestampMs(), text)))
+}
+
+fun gradient3Colors() = ChatColors.GRADIENT_3
+
+fun surfaceColor() = ChatColors.SURFACE

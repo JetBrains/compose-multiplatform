@@ -3,16 +3,18 @@ package example.imageviewer.view
 import android.content.Context
 import android.widget.Toast
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import example.imageviewer.*
+import example.imageviewer.Dependencies
+import example.imageviewer.ImageViewerCommon
+import example.imageviewer.Localization
+import example.imageviewer.Notification
+import example.imageviewer.PopupNotification
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.ContentRepository
-import example.imageviewer.model.State
 import example.imageviewer.model.adapter
 import example.imageviewer.model.createNetworkRepository
 import example.imageviewer.model.filtration.BlurFilter
@@ -20,21 +22,20 @@ import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import example.imageviewer.style.ImageViewerTheme
-import io.ktor.client.*
-import io.ktor.client.engine.okhttp.*
+import example.imageviewer.toImageBitmap
+import example.imageviewer.utils.ioDispatcher
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 
 @Composable
 fun ImageViewerAndroid() {
     val context: Context = LocalContext.current
-    val ioScope = rememberCoroutineScope { Dispatchers.IO }
+    val ioScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(context, ioScope) { getDependencies(context, ioScope) }
-    val state = remember { mutableStateOf(State()) }
     ImageViewerTheme {
-        ImageViewerCommon(state, dependencies)
+        ImageViewerCommon(dependencies)
     }
 }
 
@@ -70,9 +71,7 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
 
     override val notification: Notification = object : PopupNotification(localization) {
         override fun showPopUpMessage(text: String) {
-            GlobalScope.launch(Dispatchers.Main) {
-                Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
-            }
+            Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
     }
 }

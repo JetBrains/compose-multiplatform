@@ -1,7 +1,11 @@
 package example.imageviewer.utils
 
 import android.content.Context
-import android.graphics.*
+import android.graphics.Bitmap
+import android.graphics.Canvas
+import android.graphics.ColorMatrix
+import android.graphics.ColorMatrixColorFilter
+import android.graphics.Paint
 import android.renderscript.Allocation
 import android.renderscript.Element
 import android.renderscript.RenderScript
@@ -49,7 +53,7 @@ fun applyPixelFilter(bitmap: Bitmap): Bitmap {
     var result: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     val w: Int = bitmap.width
     val h: Int = bitmap.height
-    result = scaleBitmapAspectRatio(result, w / 20, h / 20)
+    result = scaleBitmapAspectRatio(result, w / 4, h / 4)
     result = scaleBitmapAspectRatio(result, w, h)
 
     return result
@@ -67,7 +71,7 @@ fun applyBlurFilter(bitmap: Bitmap, context: Context): Bitmap {
     val theIntrinsic: ScriptIntrinsicBlur =
         ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
 
-    theIntrinsic.setRadius(25f)
+    theIntrinsic.setRadius(3f)
     theIntrinsic.setInput(tmpIn)
     theIntrinsic.forEach(tmpOut)
 

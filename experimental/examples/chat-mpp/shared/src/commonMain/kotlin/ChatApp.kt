@@ -3,6 +3,9 @@ import androidx.compose.material.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 
 val myUser = User("Me")
@@ -12,34 +15,43 @@ val friendMessages = listOf(
     "Nice to see you!",
     "Multiline\ntext\nmessage"
 )
+val store = CoroutineScope(SupervisorJob()).createStore()
 
 @Composable
-internal fun ChatApp() {
-    val coroutineScope = rememberCoroutineScope()
-    val store = remember { coroutineScope.createStore() }
-    val state by store.stateFlow.collectAsState()
+internal fun ChatAppWithScaffold(displayTextField: Boolean = true) {
+    Theme {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text("Chat sample") },
+                    backgroundColor = MaterialTheme.colors.background,
+                )
+            }) {
+            ChatApp(displayTextField = displayTextField)
+        }
+    }
+}
 
-    MaterialTheme {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Scaffold(
-                topBar = {
-                    TopAppBar(
-                        title = { Text("Chat sample") }
-                    )
-                }
-            ) {
+@Composable
+internal fun ChatApp(displayTextField: Boolean = true) {
+    val state by store.stateFlow.collectAsState()
+    Theme {
+        Surface {
+            Box(modifier = Modifier.fillMaxSize()) {
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
                     Box(Modifier.weight(1f)) {
                         Messages(state.messages)
                     }
-                    SendMessage { text ->
-                        store.send(
-                            Action.SendMessage(
-                                Message(myUser, timeMs = timestampMs(), text)
+                    if (displayTextField) {
+                        SendMessage { text ->
+                            store.send(
+                                Action.SendMessage(
+                                    Message(myUser, timeMs = timestampMs(), text)
+                                )
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -58,5 +70,17 @@ internal fun ChatApp() {
             )
             delay(5000)
         }
+    }
+}
+
+@Composable
+internal fun Theme(content: @Composable () -> Unit) {
+    MaterialTheme(
+        colors = darkColors(
+            surface = Color(ChatColors.SURFACE),
+            background = Color(ChatColors.BACKGROUND),
+        ),
+    ) {
+        content()
     }
 }
