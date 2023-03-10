@@ -27,6 +27,8 @@ import example.imageviewer.utils.getPreferredWindowSize
 import example.imageviewer.utils.ioDispatcher
 import io.ktor.client.*
 import io.ktor.client.engine.cio.*
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -116,7 +118,12 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
             override val refreshUnavailable: String get() = ResString.refreshUnavailable
         }
 
-        override val httpClient: HttpClient = HttpClient(CIO)
+        override val httpClient: WrappedHttpClient = object : WrappedHttpClient {
+            val ktorClient = HttpClient(CIO)
+            override suspend fun getAsBytes(urlString: String): ByteArray {
+                return ktorClient.get(urlString).readBytes()
+            }
+        }
 
         val userHome: String? = System.getProperty("user.home")
         override val imageRepository: ContentRepository<ImageBitmap> =
