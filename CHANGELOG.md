@@ -2,10 +2,11 @@
 
 ## Common
 
+- Added support for Kotlin 1.8.10
+
 ### Fixes
 - [Layout in movableContent](https://github.com/JetBrains/compose-multiplatform-core/pull/413)
 - [Unzip wix to build directory](https://github.com/JetBrains/compose-multiplatform/pull/2838)
-- [Skiko typo](https://github.com/JetBrains/compose-multiplatform-core/pull/395)
 
 ## Desktop
 
