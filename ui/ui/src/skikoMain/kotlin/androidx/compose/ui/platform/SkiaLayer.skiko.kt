@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Outline
@@ -40,13 +41,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.toSkiaRRect
 import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.node.InvokeOnCanvas
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import kotlin.math.max
 import org.jetbrains.skia.ClipMode
 import org.jetbrains.skia.Picture
 import org.jetbrains.skia.PictureRecorder
@@ -65,6 +66,12 @@ internal class SkiaLayer(
         OutlineCache(density, size, RectangleShape, LayoutDirection.Ltr)
     // Internal for testing
     internal val matrix = Matrix()
+    private val inverseMatrix: Matrix
+        get() = Matrix().apply {
+            setFrom(matrix)
+            invert()
+        }
+
     private val pictureRecorder = PictureRecorder()
     private var picture: Picture? = null
     private var isDestroyed = false
@@ -75,6 +82,7 @@ internal class SkiaLayer(
     private var rotationX: Float = 0f
     private var rotationY: Float = 0f
     private var rotationZ: Float = 0f
+    private var cameraDistance: Float = DefaultCameraDistance
     private var scaleX: Float = 1f
     private var scaleY: Float = 1f
     private var alpha: Float = 1f
@@ -112,11 +120,19 @@ internal class SkiaLayer(
     }
 
     override fun mapOffset(point: Offset, inverse: Boolean): Offset {
-        return getMatrix(inverse).map(point)
+        return if (inverse) {
+            inverseMatrix
+        } else {
+            matrix
+        }.map(point)
     }
 
     override fun mapBounds(rect: MutableRect, inverse: Boolean) {
-        getMatrix(inverse).map(rect)
+        if (inverse) {
+            inverseMatrix
+        } else {
+            matrix
+        }.map(rect)
     }
 
     override fun isInLayer(position: Offset): Boolean {
@@ -131,17 +147,6 @@ internal class SkiaLayer(
         }
 
         return isInOutline(outlineCache.outline, x, y)
-    }
-
-    private fun getMatrix(inverse: Boolean): Matrix {
-        return if (inverse) {
-            Matrix().apply {
-                setFrom(matrix)
-                invert()
-            }
-        } else {
-            matrix
-        }
     }
 
     override fun updateLayerProperties(
@@ -170,6 +175,7 @@ internal class SkiaLayer(
         this.rotationX = rotationX
         this.rotationY = rotationY
         this.rotationZ = rotationZ
+        this.cameraDistance = max(cameraDistance, 0.001f)
         this.scaleX = scaleX
         this.scaleY = scaleY
         this.alpha = alpha
@@ -186,27 +192,26 @@ internal class SkiaLayer(
         invalidate()
     }
 
-    // TODO(demin): support perspective projection for rotationX/rotationY (as in Android)
-    // TODO(njawad) Add camera distance leveraging Sk3DView along with rotationX/rotationY
-    // see https://cs.android.com/search?q=RenderProperties.cpp&sq= updateMatrix method
-    // for how 3d transformations along with camera distance are applied. b/173402019
     private fun updateMatrix() {
         val pivotX = transformOrigin.pivotFractionX * size.width
         val pivotY = transformOrigin.pivotFractionY * size.height
 
         matrix.reset()
+        matrix.translate(x = -pivotX, y = -pivotY)
         matrix *= Matrix().apply {
-            translate(x = -pivotX, y = -pivotY)
-        }
-        matrix *= Matrix().apply {
-            translate(translationX, translationY)
-            rotateX(rotationX)
-            rotateY(rotationY)
             rotateZ(rotationZ)
+            rotateY(rotationY)
+            rotateX(rotationX)
             scale(scaleX, scaleY)
         }
         matrix *= Matrix().apply {
-            translate(x = pivotX, y = pivotY)
+            // the camera location is passed in inches, set in pt
+            val depth = cameraDistance * 72f
+            set(row = 2, column = 3, v = -1f / depth)
+            set(row = 2, column = 2, v = 0f)
+        }
+        matrix *= Matrix().apply {
+            translate(x = pivotX + translationX, y = pivotY + translationY)
         }
     }
 
@@ -234,11 +239,11 @@ internal class SkiaLayer(
     }
 
     override fun transform(matrix: Matrix) {
-        matrix.timesAssign(getMatrix(inverse = false))
+        matrix.timesAssign(this.matrix)
     }
 
     override fun inverseTransform(matrix: Matrix) {
-        matrix.timesAssign(getMatrix(inverse = true))
+        matrix.timesAssign(inverseMatrix)
     }
 
     private fun performDrawLayer(canvas: Canvas, bounds: Rect) {

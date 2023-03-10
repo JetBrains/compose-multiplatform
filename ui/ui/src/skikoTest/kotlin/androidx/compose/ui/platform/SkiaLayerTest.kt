@@ -19,6 +19,7 @@ package androidx.compose.ui.platform
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.DefaultCameraDistance
 import androidx.compose.ui.graphics.DefaultShadowColor
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.RenderEffect
@@ -139,7 +140,8 @@ class SkiaLayerTest {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationX = 45f,
-            transformOrigin = TransformOrigin(0f, 0f)
+            transformOrigin = TransformOrigin(0f, 0f),
+            cameraDistance = Float.MAX_VALUE
         )
         val matrix = layer.matrix
 
@@ -153,7 +155,8 @@ class SkiaLayerTest {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationX = 45f,
-            transformOrigin = TransformOrigin(1f, 1f)
+            transformOrigin = TransformOrigin(1f, 1f),
+            cameraDistance = Float.MAX_VALUE
         )
         val matrix = layer.matrix
 
@@ -167,7 +170,8 @@ class SkiaLayerTest {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationY = 45f,
-            transformOrigin = TransformOrigin(0f, 0f)
+            transformOrigin = TransformOrigin(0f, 0f),
+            cameraDistance = Float.MAX_VALUE
         )
         val matrix = layer.matrix
 
@@ -181,7 +185,8 @@ class SkiaLayerTest {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             rotationY = 45f,
-            transformOrigin = TransformOrigin(1f, 1f)
+            transformOrigin = TransformOrigin(1f, 1f),
+            cameraDistance = Float.MAX_VALUE
         )
         val matrix = layer.matrix
 
@@ -254,29 +259,31 @@ class SkiaLayerTest {
             translationX = 60f,
             translationY = 7f,
             rotationX = 45f,
-            transformOrigin = TransformOrigin(0f, 0f)
+            transformOrigin = TransformOrigin(0f, 0f),
+            cameraDistance = Float.MAX_VALUE
         )
         val matrix = layer.matrix
 
         val y = (10 * cos45).roundToInt()
-        val translationY = (7 * cos45).roundToInt()
+        val translationY = 7
         assertEquals(IntOffset(0 + 60, 0 + translationY), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(100 + 60, y + translationY), matrix.map(Offset(100f, 10f)).round())
     }
 
     @Test
-    fun translation_rotationY_left_top_origi() {
+    fun translation_rotationY_left_top_origin() {
         layer.resize(IntSize(100, 10))
         layer.updateProperties(
             translationX = 60f,
             translationY = 7f,
             rotationY = 45f,
-            transformOrigin = TransformOrigin(0f, 0f)
+            transformOrigin = TransformOrigin(0f, 0f),
+            cameraDistance = Float.MAX_VALUE
         )
         val matrix = layer.matrix
 
         val x = (100 * cos45).roundToInt()
-        val translationX = (60 * cos45).roundToInt()
+        val translationX = 60
         assertEquals(IntOffset(0 + translationX, 0 + 7), matrix.map(Offset(0f, 0f)).round())
         assertEquals(IntOffset(x + translationX, 10 + 7), matrix.map(Offset(100f, 10f)).round())
     }
@@ -383,7 +390,7 @@ class SkiaLayerTest {
         rotationX: Float = 0f,
         rotationY: Float = 0f,
         rotationZ: Float = 0f,
-        cameraDistance: Float = 0f,
+        cameraDistance: Float = DefaultCameraDistance,
         transformOrigin: TransformOrigin = TransformOrigin.Center,
         shape: Shape = RectangleShape,
         clip: Boolean = false,
