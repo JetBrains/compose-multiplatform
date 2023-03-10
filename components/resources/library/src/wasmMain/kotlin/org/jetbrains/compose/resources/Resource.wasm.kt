@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.resources
 
+import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
@@ -51,3 +52,12 @@ private fun ArrayBuffer.toByteArray(): ByteArray {
 
 internal actual class MissingResourceException actual constructor(path: String) :
     Exception("Missing resource with path: $path")
+
+internal actual fun isSyncResourceLoadingSupported(): Boolean = false
+
+@OptIn(ExperimentalResourceApi::class)
+internal actual fun Resource.readBytesSync(): ByteArray = throw UnsupportedOperationException()
+
+internal actual fun parseXML(byteArray: ByteArray): Element {
+    throw UnsupportedOperationException("XML Vector Drawables are not supported for Web target")
+}
