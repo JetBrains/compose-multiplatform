@@ -5,6 +5,7 @@
 
 package org.jetbrains.compose.resources
 
+import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
