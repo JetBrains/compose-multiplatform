@@ -1,3 +1,5 @@
+@file:Suppress("OPT_IN_IS_NOT_ENABLED")
+
 plugins {
     kotlin("multiplatform")
     kotlin("native.cocoapods")
@@ -27,8 +29,6 @@ kotlin {
         extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
-    val composeVersion = extra["compose.version"] as String
-
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -36,25 +36,21 @@ kotlin {
                 implementation(compose.foundation)
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.compose.components:components-resources:$composeVersion")
-            }
+                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.components.resources)           }
         }
         val androidMain by getting {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
-                implementation("androidx.appcompat:appcompat:1.5.1")
-                implementation("androidx.core:core-ktx:1.8.0")
+                api("androidx.activity:activity-compose:1.6.1")
+                api("androidx.appcompat:appcompat:1.6.1")
+                api("androidx.core:core-ktx:1.9.0")
             }
         }
         val iosMain by getting
-        val iosTest by getting
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
         }
-        val iosSimulatorArm64Test by getting {
-            dependsOn(iosTest)
-        }
-
         val desktopMain by getting {
             kotlin.srcDirs("src/jvmMain/kotlin")
             dependencies {
@@ -69,11 +65,11 @@ android {
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     sourceSets["main"].res.srcDirs("src/androidMain/res", "src/commonMain/resources")
     defaultConfig {
-        minSdk = 24
+        minSdk = 26
         targetSdk = 33
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
 }

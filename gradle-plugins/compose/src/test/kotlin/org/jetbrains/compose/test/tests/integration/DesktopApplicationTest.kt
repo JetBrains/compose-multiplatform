@@ -69,8 +69,8 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     @Test
     fun testAndroidxCompiler() = testProject(
         TestProjects.customCompiler, defaultTestEnvironment.copy(
-            kotlinVersion = "1.6.10",
-            composeCompilerPlugin = "\"androidx.compose.compiler:compiler:1.1.1\""
+            kotlinVersion = "1.8.0",
+            composeCompilerPlugin = "\"androidx.compose.compiler:compiler:1.4.0\""
         )
     ).checkCustomComposeCompiler()
 
@@ -97,14 +97,19 @@ class DesktopApplicationTest : GradlePluginTestBase() {
             composeCompilerPlugin = "dependencies.compiler.forKotlin(\"1.7.20\")",
             composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.7.21\""
         )
-    ).checkCustomComposeCompiler()
+    ).checkCustomComposeCompiler(checkKJS = true)
 
-    private fun TestProject.checkCustomComposeCompiler() {
+    private fun TestProject.checkCustomComposeCompiler(checkKJS: Boolean = false) {
         gradle(":runDistributable").checks {
             val actualMainImage = file("main-image.actual.png")
             val expectedMainImage = file("main-image.expected.png")
             assert(actualMainImage.readBytes().contentEquals(expectedMainImage.readBytes())) {
                 "The actual image '$actualMainImage' does not match the expected image '$expectedMainImage'"
+            }
+        }
+        if (checkKJS) {
+            gradle(":jsBrowserProductionWebpack").checks {
+                check.taskSuccessful(":jsBrowserProductionWebpack")
             }
         }
     }

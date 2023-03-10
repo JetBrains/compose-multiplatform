@@ -34,5 +34,11 @@ compose.desktop {
                 upgradeUuid = "6565BEAD-713A-4DE7-A469-6B10FC4A6861"
             }
         }
+
+        buildTypes.release {
+            proguard {
+                configurationFiles.from(project.file("compose-desktop.pro"))
+            }
+        }
     }
 }

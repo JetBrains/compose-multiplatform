@@ -16,8 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.platform.Res
-import org.jetbrains.compose.demo.widgets.platform.painterResource
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
 internal fun Chips() {
@@ -57,6 +58,7 @@ internal fun Chips() {
 
 //Inspired from jetcaster sample. I hope compose can add simple Chip UI element that can
 // support images or icons with multiple states.
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun CustomImageChip(
     text: String,

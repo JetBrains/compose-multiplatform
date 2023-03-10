@@ -15,7 +15,7 @@ git config --global submodule.recurse true
 - Java 11 (should be specified in JAVA_HOME)
 - [macOs/Linux] Android SDK downloaded via `./compose/frameworks/support/jbdeps/android-sdk/downloadAndroidSdk`
 - [Windows] Android SDK downloaded from Android Studio and specified in ANDROID_SDK_ROOT
-- [Optional, macOs] For AppCode IDE, specify environment variable ANDROID_SDK_ROOT=[YOUR_PATH]/compose-jb/compose/frameworks/support/jbdeps/android-sdk/darwin (in ~/.zshrc)
+- [Optional, macOs] For AppCode IDE, specify environment variable `export ANDROID_SDK_ROOT=[YOUR_PATH]/compose-jb/compose/frameworks/support/jbdeps/android-sdk/darwin` (in ~/.zshrc)
 
 ## Developing in IDE
 1. Download Android Studio from [the official site](https://developer.android.com/studio/archive) (it is mandatory to use the version, written [here](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L11)). As an alternative you can use IDEA, which is compatible with [this AGP version](https://github.com/JetBrains/androidx/blob/jb-main/gradle/libs.versions.toml#L5), or you can disable Android plugin in IDEA plugins, to develop non-Android targets.
@@ -69,7 +69,7 @@ Run jvm desktop sample:
 ```
 another jvm desktop samples: 
 ```bash
-./scripts/runGradle run1 run2 run3 run4 runWindowApi runVsync runLayout
+./scripts/runGradle run1 run2 run3 runSwing runWindowApi runVsync runLayout
 ```
 
 Run wasm sample:

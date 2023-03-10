@@ -2,7 +2,7 @@ import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
-    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.multiplatform"
     id "org.jetbrains.compose"
 }
 
@@ -11,9 +11,27 @@ repositories {
     jetbrainsCompose()
 }
 
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib"
-    implementation compose.desktop.currentOs
+kotlin {
+    jvm("desktop")
+    js(IR) {
+        browser()
+        binaries.executable()
+    }
+    sourceSets {
+        desktopMain {
+            dependencies {
+                implementation "org.jetbrains.kotlin:kotlin-stdlib"
+                implementation compose.desktop.currentOs
+            }
+        }
+
+        jsMain {
+            dependencies {
+                implementation compose.runtime
+                implementation compose.web.core
+            }
+        }
+    }
 }
 
 compose {

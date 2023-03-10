@@ -8,11 +8,14 @@ ROOT="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"/..
 declare -a folders=(
     "templates"
     "examples"
+    #"experimental/examples"
     "gradle-plugins"
     "components"
     "ci"
     "web"
     "tutorials"
+    "compose/integrations/composable-test-cases"
+    "compose/integrations/compose-with-ktx-serialization"
 )
 
 if [ -z "$1" ]; then

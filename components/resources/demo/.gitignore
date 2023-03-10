@@ -1,6 +1,6 @@
 iosApp/Podfile.lock
 iosApp/Pods/*
-iosApp/ResourcesDemo.xcworkspace/*
-iosApp/ResourcesDemo.xcodeproj/*
-!iosApp/ResourcesDemo.xcodeproj/project.pbxproj
+iosApp/iosApp.xcworkspace/*
+iosApp/iosApp.xcodeproj/*
+!iosApp/iosApp.xcodeproj/project.pbxproj
 shared/shared.podspec

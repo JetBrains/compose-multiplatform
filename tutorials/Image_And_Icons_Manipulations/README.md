@@ -73,7 +73,7 @@ fun main() = singleWindowApplication {
             modifier = Modifier.width(200.dp)
         )
         AsyncImage(
-            load = { loadSvgPainter("https://github.com/JetBrains/compose-jb/raw/master/artwork/idea-logo.svg", density) },
+            load = { loadSvgPainter("https://github.com/JetBrains/compose-multiplatform/raw/master/artwork/idea-logo.svg", density) },
             painterFor = { it },
             contentDescription = "Idea logo",
             contentScale = ContentScale.FillWidth,

@@ -5,7 +5,7 @@ import platform.AppKit.NSApplication
 fun main() {
     NSApplication.sharedApplication()
     Window("Chat App") {
-        ChatApp()
+        ChatAppWithScaffold()
     }
     NSApp?.run()
 }

@@ -90,9 +90,9 @@ class ComposePlugin : Plugin<Project> {
             // TODO: remove these HACKS for version substitution when possible
             val conf = it
             conf.resolutionStrategy.eachDependency {
-                if (project.getKotlinPluginVersion() == "1.8.20-Beta") {
+                if (project.getKotlinPluginVersion() == "1.8.20-RC") {
                     if (it.requested.module.name.contains("kotlin-stdlib")) {
-                        it.useVersion("1.8.20-Beta")
+                        it.useVersion("1.8.20-RC")
                     }
                 }
                 val isWasm = conf.name.contains("wasm", true)
@@ -145,7 +145,6 @@ class ComposePlugin : Plugin<Project> {
         val animationGraphics get() = composeDependency("org.jetbrains.compose.animation:animation-graphics")
         val foundation get() = composeDependency("org.jetbrains.compose.foundation:foundation")
         val material get() = composeDependency("org.jetbrains.compose.material:material")
-        @ExperimentalComposeLibrary
         val material3 get() = composeDependency("org.jetbrains.compose.material3:material3")
         val runtime get() = composeDependency("org.jetbrains.compose.runtime:runtime")
         val ui get() = composeDependency("org.jetbrains.compose.ui:ui")
@@ -154,6 +153,7 @@ class ComposePlugin : Plugin<Project> {
         val uiTooling get() = composeDependency("org.jetbrains.compose.ui:ui-tooling")
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
+        val components get() = CommonComponentsDependencies
         val web: WebDependencies get() = WebDependencies
     }
 
@@ -180,6 +180,11 @@ class ComposePlugin : Plugin<Project> {
          * Compose Compiler that is chosen by the version of Kotlin applied to the Gradle project
          */
         val auto get() = forKotlin(project.getKotlinPluginVersion())
+    }
+
+    object CommonComponentsDependencies {
+        @ExperimentalComposeLibrary
+        val resources = composeDependency("org.jetbrains.compose.components:components-resources")
     }
 
     object DesktopComponentsDependencies {

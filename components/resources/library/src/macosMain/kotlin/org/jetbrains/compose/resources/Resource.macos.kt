@@ -37,3 +37,4 @@ private class MacOSResourceImpl(path: String) : AbstractResourceImpl(path) {
 
 internal actual class MissingResourceException actual constructor(path: String) :
     Exception("Missing resource with path: $path")
+

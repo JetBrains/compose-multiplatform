@@ -115,11 +115,9 @@ tasks.register("testComposeJbWeb") {
 }
 
 tasks.register("testUIKit") {
-    if (System.getProperty("os.arch") == "aarch64") {
-        dependsOnComposeTask(":compose:ui:ui:uikitSimArm64Test")
-    } else {
-        dependsOnComposeTask(":compose:ui:ui:uikitX64Test")
-    }
+    val subtaskName = if (System.getProperty("os.arch") == "aarch64") "uikitSimArm64Test" else "uikitX64Test"
+    dependsOnComposeTask(":compose:ui:ui-text:$subtaskName")
+    dependsOnComposeTask(":compose:ui:ui:$subtaskName")
 }
 
 tasks.register("buildNativeDemo") {
@@ -157,10 +155,14 @@ tasks.register("run") {
     dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run")
 }
 
-for (i in 1..4) {
+for (i in 1..3) {
     tasks.register("run$i") {
         dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:run$i")
     }
+}
+
+tasks.register("runSwing") {
+    dependsOnComposeTask(":compose:desktop:desktop:desktop-samples:runSwing")
 }
 
 tasks.register("runWindowApi") {

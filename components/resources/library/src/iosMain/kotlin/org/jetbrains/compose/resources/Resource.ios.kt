@@ -5,7 +5,6 @@
 
 package org.jetbrains.compose.resources
 
-
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.usePinned
 import platform.Foundation.NSBundle

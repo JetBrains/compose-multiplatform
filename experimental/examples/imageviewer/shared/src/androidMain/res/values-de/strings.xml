@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ImageViewer</string>
+    <string name="loading">Bilder werden geladen...</string>
+    <string name="repo_empty">Bildverzeichnis ist leer.</string>
+    <string name="no_internet">Kein Internetzugriff.</string>
+    <string name="repo_invalid">Bildverzeichnis beschädigt oder leer.</string>
+    <string name="refresh_unavailable">Kann Bilder nicht aktualisieren.</string>
+    <string name="load_image_unavailable">Kann volles Bild nicht laden.</string>
+    <string name="last_image">Dies ist das letzte Bild.</string>
+    <string name="first_image">Dies ist das erste Bild.</string>
+    <string name="picture">Bild:</string>
+    <string name="size">Abmessungen:</string>
+    <string name="pixels">Pixel.</string>
+    <string name="back">Zurück</string>
+    <string name="refresh">Aktualisieren</string>
+</resources>

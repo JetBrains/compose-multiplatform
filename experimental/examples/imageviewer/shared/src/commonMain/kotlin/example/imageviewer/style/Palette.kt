@@ -1,9 +1,13 @@
 package example.imageviewer.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.sp
 
 object ImageviewerColors {
     val Gray = Color.DarkGray
@@ -18,6 +22,28 @@ object ImageviewerColors {
     val TranslucentWhite = Color(255, 255, 255, 20)
     val Transparent = Color.Transparent
 
+    val background = Color(0xFFFFFFFF)
+    val onBackground = Color(0xFF19191C)
+
+    val fullScreenImageBackground = Color(0xFF19191C)
+
+    val uiLightBlack = Color(25, 25, 28, 180)
+    val textOnImage = Color.White
+    val noteBlockBackground = Color(0xFFF3F3F4)
+
+
+    val KotlinGradient0 = Color(0xFF7F52FF)
+    val KotlinGradient50 = Color(0xFFC811E2)
+    val KotlinGradient100 = Color(0xFFE54857)
+
+    val kotlinHorizontalGradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            KotlinGradient0,
+            KotlinGradient50,
+            KotlinGradient100
+        )
+    )
+
     fun buttonBackground(isHover: Boolean) = if (isHover) TranslucentBlack else Transparent
 }
 
@@ -25,17 +51,13 @@ object ImageviewerColors {
 internal fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
     MaterialTheme(
-        colors = MaterialTheme.colors.copy(
-            primary = ImageviewerColors.Foreground,
-            secondary = ImageviewerColors.LightGray,
-            background = ImageviewerColors.DarkGray,
-            surface = ImageviewerColors.Gray,
-            onPrimary = ImageviewerColors.Foreground,
-            onSecondary = Color.Black,
-            onBackground = ImageviewerColors.Foreground,
-            onSurface = ImageviewerColors.Foreground
+        colorScheme = MaterialTheme.colorScheme.copy(
+            background = ImageviewerColors.background,
+            onBackground = ImageviewerColors.onBackground
         )
     ) {
-        content()
+        ProvideTextStyle(LocalTextStyle.current.copy(letterSpacing = 0.sp)) {
+            content()
+        }
     }
 }
