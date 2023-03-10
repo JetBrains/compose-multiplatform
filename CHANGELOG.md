@@ -1,3 +1,31 @@
+# 1.3.1 (March 2023)
+
+## Common
+
+- Added support for Kotlin 1.8.10
+
+### Fixes
+- [Layout in movableContent](https://github.com/JetBrains/compose-multiplatform-core/pull/413)
+- [Unzip wix to build directory](https://github.com/JetBrains/compose-multiplatform/pull/2838)
+
+## Desktop
+
+### Fixes
+- [Korean text input](https://github.com/JetBrains/compose-multiplatform-core/pull/406)
+- [Size UndecoratedWindowResizer to the size of the window](https://github.com/JetBrains/compose-multiplatform-core/pull/388)
+- [Fix sizing a window with unspecified size to its content's size](https://github.com/JetBrains/compose-multiplatform-core/pull/401)
+
+## Dependencies
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+- [Compiler 1.4.2](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.4.2)
+- [Runtime 1.3.3](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.3.3)
+- [UI 1.3.3](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.3.3)
+- [Foundation 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.3.1)
+- [Material 1.3.1](https://developer.android.com/jetpack/androidx/releases/compose-material#1.3.1)
+- [Material3 1.0.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.1)
+
+___
+
 # 1.3.0 (January 2023)
 
 ## Common
