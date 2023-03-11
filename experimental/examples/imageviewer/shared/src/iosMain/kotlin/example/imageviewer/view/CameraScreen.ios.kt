@@ -55,8 +55,8 @@ internal actual fun CameraView(modifier: Modifier) {
             captureSession.addInput(captureDeviceInput)
             captureSession.addOutput(capturePhotoOutput)
 
-            val cameraContainer = UIView()
             val cameraPreviewLayer = AVCaptureVideoPreviewLayer(session = captureSession)
+            val cameraContainer = UIView()
             cameraContainer.layer.addSublayer(cameraPreviewLayer)
             cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
             cameraPreviewLayer.frame = UIScreen.mainScreen.applicationFrame

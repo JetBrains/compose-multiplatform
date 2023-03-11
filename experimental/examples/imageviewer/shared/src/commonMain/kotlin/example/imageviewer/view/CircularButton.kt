@@ -15,9 +15,9 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.style.ImageviewerColors
 
 @Composable
-internal fun CircularButton(image: Painter, onClick: () -> Unit) {
+internal fun CircularButton(modifier: Modifier, image: Painter, onClick: () -> Unit) {
     Box(
-        Modifier.size(40.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
+        modifier.size(40.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
             .clickable { onClick() }, contentAlignment = Alignment.Center
     ) {
         Image(
@@ -26,4 +26,9 @@ internal fun CircularButton(image: Painter, onClick: () -> Unit) {
             modifier = Modifier.size(20.dp)
         )
     }
+}
+
+@Composable
+internal fun CircularButton(image: Painter, onClick: () -> Unit) {
+    CircularButton(Modifier, image, onClick)
 }
