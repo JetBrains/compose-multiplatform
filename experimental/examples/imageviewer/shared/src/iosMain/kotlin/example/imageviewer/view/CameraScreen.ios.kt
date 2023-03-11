@@ -5,6 +5,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
 import platform.AVFoundation.*
@@ -23,14 +24,21 @@ internal actual fun CameraView(modifier: Modifier) {
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
             AVAuthorizationStatusAuthorized -> cameraAccess = true
             AVAuthorizationStatusDenied, AVAuthorizationStatusRestricted -> println("TODO describe to user")//todo
-            AVAuthorizationStatusNotDetermined -> AVCaptureDevice.requestAccessForMediaType(mediaType = AVMediaTypeVideo) {
+            AVAuthorizationStatusNotDetermined -> AVCaptureDevice.requestAccessForMediaType(
+                mediaType = AVMediaTypeVideo
+            ) {
                 cameraAccess = true
             }
         }
     }
 
     if (cameraAccess) {
-        UIKitInteropView(modifier) {
+        //todo Stub on simulator
+        UIKitInteropView(
+            modifier = modifier,
+            background = Color.Black,
+            update = { println("UIKitInteropView, update") },
+        ) {
             val captureSession = AVCaptureSession()
             captureSession.sessionPreset = AVCaptureSessionPresetPhoto
             val position = if (true) AVCaptureDevicePositionFront else AVCaptureDevicePositionBack

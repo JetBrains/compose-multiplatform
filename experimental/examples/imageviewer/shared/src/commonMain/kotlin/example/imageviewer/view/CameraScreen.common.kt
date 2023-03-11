@@ -23,7 +23,6 @@ internal fun CameraScreen(onBack: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             CameraView(Modifier.fillMaxSize())
-            Box(Modifier.fillMaxWidth().height(30.dp).background(Color.Blue).align(Alignment.TopCenter))
             Button(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
                 onClick = {
