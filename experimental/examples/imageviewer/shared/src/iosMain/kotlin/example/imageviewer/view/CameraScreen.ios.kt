@@ -29,22 +29,6 @@ import platform.UIKit.*
 import platform.darwin.NSObject
 import platform.posix.memcpy
 
-private val capturePhotoOutput = AVCapturePhotoOutput()
-private val photoCaptureDelegate = object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
-    override fun captureOutput(
-        output: AVCapturePhotoOutput,
-        didFinishProcessingPhoto: AVCapturePhoto,
-        error: NSError?
-    ) {
-        println("before captureOutput")
-        val photoData = didFinishProcessingPhoto.fileDataRepresentation() ?: error("fileDataRepresentation is null")
-        val uiImage = UIImage(photoData)
-        uiImage.size.useContents { println("w: $width, h: $height") }
-        cameraImages.add(uiImage.toImageBitmap())
-        //super.captureOutput(output, didFinishProcessingPhoto, error)
-    }
-}
-
 @Composable
 internal actual fun CameraView(modifier: Modifier) {
     var cameraAccess by remember { mutableStateOf(false) }
@@ -60,6 +44,22 @@ internal actual fun CameraView(modifier: Modifier) {
         }
     }
 
+    val capturePhotoOutput = remember { AVCapturePhotoOutput() }
+    val photoCaptureDelegate = remember {
+        object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+            override fun captureOutput(
+                output: AVCapturePhotoOutput,
+                didFinishProcessingPhoto: AVCapturePhoto,
+                error: NSError?
+            ) {
+                val photoData = didFinishProcessingPhoto.fileDataRepresentation() ?: error("fileDataRepresentation is null")
+                val uiImage = UIImage(photoData)
+                uiImage.size.useContents { println("uiImage, w: $width, h: $height") }
+                cameraImages.add(uiImage.toImageBitmap())
+            }
+        }
+    }
+
     Box(
         Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -69,7 +69,9 @@ internal actual fun CameraView(modifier: Modifier) {
             UIKitInteropView(
                 modifier = modifier,
                 background = Color.Black,
-                update = { println("UIKitInteropView, update") },
+                update = {
+
+                 },
             ) {
                 val captureSession = AVCaptureSession()
                 captureSession.sessionPreset = AVCaptureSessionPresetPhoto
