@@ -8,13 +8,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +30,7 @@ import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
+val cameraImages = mutableStateListOf<ImageBitmap>()
 
 enum class GalleryStyle {
     SQUARES,
@@ -89,7 +88,11 @@ internal fun GalleryScreen(
                     onFullScreen = { onClickPreviewPicture(it) }
                 )
             }
-            MakeNewMemoryMiniature(onMakeNewMemory)
+            CircularButton(
+                Modifier.align(Alignment.BottomCenter).padding(48.dp),
+                painterResource("plus.png"),
+                onMakeNewMemory
+            )
         }
     }
     if (pictures.isEmpty()) {
@@ -119,34 +122,10 @@ private fun SquaresGalleryView(
                     isHighlighted = isSelected
                 )
             }
+            items(cameraImages) {
+                Image(bitmap = it, modifier = Modifier.size(100.dp), contentDescription = null)
+            }
         }
-    }
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-private fun BoxScope.MakeNewMemoryMiniature(onClick: () -> Unit) {
-    Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-        Box(
-            Modifier
-                .clip(CircleShape)
-                .width(52.dp)
-                .background(ImageviewerColors.uiLightBlack)
-                .aspectRatio(1.0f)
-                .clickable {
-                    onClick()
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource("plus.png"),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(18.dp)
-                    .height(18.dp),
-            )
-        }
-        Spacer(Modifier.height(32.dp))
     }
 }
 
