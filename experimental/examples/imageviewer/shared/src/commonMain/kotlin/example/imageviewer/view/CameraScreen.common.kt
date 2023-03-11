@@ -18,19 +18,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun CameraScreen(onBack: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
-        Box(
-            Modifier.fillMaxSize().background(Color.Black),
-            contentAlignment = Alignment.Center
-        ) {
-            CameraView(Modifier.fillMaxSize())
-            Button(
-                modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
-                onClick = {
-
-                }) {
-                Text("Compose Button - Take a photo")
-            }
-        }
+        CameraView(Modifier.fillMaxSize())
         TopLayout(
             alignLeftContent = {
                 Tooltip("TODO localization.back") {//todo
