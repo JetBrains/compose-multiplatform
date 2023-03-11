@@ -19,7 +19,7 @@ internal fun TopLayout(
         Modifier
             .fillMaxWidth()
             .notchPadding()
-            .padding(horizontal = 12.dp)
+            .padding(12.dp)
     ) {
         Row(Modifier.align(Alignment.CenterStart)) {
             alignLeftContent()
