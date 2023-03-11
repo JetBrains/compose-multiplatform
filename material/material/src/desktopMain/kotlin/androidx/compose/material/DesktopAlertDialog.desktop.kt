@@ -46,6 +46,7 @@ import androidx.compose.ui.window.rememberDialogState
 import java.awt.event.KeyEvent
 import androidx.compose.ui.window.Dialog as CoreDialog
 import androidx.compose.foundation.background
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.type
@@ -153,7 +154,8 @@ fun AlertDialog(
         AlertDialog(
             onDismissRequest = onDismissRequest,
             shape = shape,
-        ) {
+            modifier = modifier,
+        ) { modifier ->
             AlertDialogContent(
                 buttons = buttons,
                 modifier = modifier.width(IntrinsicSize.Min),
@@ -178,7 +180,7 @@ interface AlertDialogProvider {
      * @param onDismissRequest Callback that will be called when the user closes the dialog
      * @param content Content of the dialog
      */
-    @Deprecated("Will be removed in 1.5; use the overload that takes the dialog shape")
+    @Deprecated("Will be removed in 1.5; use the other overload")
     @Composable
     fun AlertDialog(
         onDismissRequest: () -> Unit,
@@ -197,10 +199,11 @@ interface AlertDialogProvider {
     fun AlertDialog(
         onDismissRequest: () -> Unit,
         shape: Shape,
-        content: @Composable () -> Unit
+        modifier: Modifier,
+        content: @Composable (Modifier) -> Unit
     ) = AlertDialog(
         onDismissRequest = onDismissRequest,
-        content = content
+        content = { content(modifier) }
     )
 }
 
@@ -212,7 +215,7 @@ interface AlertDialogProvider {
 @ExperimentalMaterialApi
 object PopupAlertDialogProvider : AlertDialogProvider {
 
-    @Deprecated("Will be removed in 1.5; use the overload that takes the dialog shape")
+    @Deprecated("Will be removed in 1.5; use the other overload")
     @Composable
     override fun AlertDialog(
         onDismissRequest: () -> Unit,
@@ -221,7 +224,8 @@ object PopupAlertDialogProvider : AlertDialogProvider {
         AlertDialog(
             onDismissRequest = onDismissRequest,
             shape = RectangleShape,
-            content = content
+            modifier = Modifier,
+            content = { content() }
         )
     }
 
@@ -229,7 +233,8 @@ object PopupAlertDialogProvider : AlertDialogProvider {
     override fun AlertDialog(
         onDismissRequest: () -> Unit,
         shape: Shape,
-        content: @Composable () -> Unit
+        modifier: Modifier,
+        content: @Composable (Modifier) -> Unit
     ) {
         // Popups on the desktop are by default embedded in the component in which
         // they are defined and aligned within its bounds. But an [AlertDialog] needs
@@ -267,17 +272,15 @@ object PopupAlertDialogProvider : AlertDialogProvider {
                     },
                 contentAlignment = Alignment.Center
             ) {
-                Surface(
-                    modifier = Modifier.pointerInput(onDismissRequest) {
-                        detectTapGestures(onPress = {
-                            // Workaround to disable clicks on Surface background
-                            // https://github.com/JetBrains/compose-jb/issues/2581
-                        })
-                    },
-                    shape = shape,
-                    color = Color.Transparent,
-                    elevation = 24.dp,
-                    content = content
+                content(
+                    modifier
+                        .shadow(elevation = 24.dp, shape = shape)
+                        .pointerInput(onDismissRequest) {
+                            detectTapGestures(onPress = {
+                                // Workaround to disable clicks on Surface background
+                                // https://github.com/JetBrains/compose-jb/issues/2581
+                            })
+                        }
                 )
             }
         }
