@@ -11,10 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
-import kotlinx.cinterop.CValue
-import kotlinx.cinterop.useContents
+import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
@@ -24,11 +25,9 @@ import platform.CoreMedia.CMTime
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 import platform.MapKit.MKMapView
-import platform.UIKit.UIApplication
-import platform.UIKit.UIImage
-import platform.UIKit.UIScreen
-import platform.UIKit.UIView
+import platform.UIKit.*
 import platform.darwin.NSObject
+import platform.posix.memcpy
 
 private val capturePhotoOutput = AVCapturePhotoOutput()
 private val photoCaptureDelegate = object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
@@ -41,6 +40,7 @@ private val photoCaptureDelegate = object : NSObject(), AVCapturePhotoCaptureDel
         val photoData = didFinishProcessingPhoto.fileDataRepresentation() ?: error("fileDataRepresentation is null")
         val uiImage = UIImage(photoData)
         uiImage.size.useContents { println("w: $width, h: $height") }
+        cameraImages.add(uiImage.toImageBitmap())
         //super.captureOutput(output, didFinishProcessingPhoto, error)
     }
 }
@@ -115,3 +115,13 @@ internal actual fun CameraView(modifier: Modifier) {
     }
 }
 
+private fun UIImage.toImageBitmap(): ImageBitmap {
+    //todo https://github.com/touchlab/DroidconKotlin/blob/fe5b7e8bb6cdf5d00eeaf7ee13f1f96b71857e8f/shared-ui/src/iosMain/kotlin/co/touchlab/droidcon/ui/util/ToSkiaImage.kt
+    val pngRepresentation = UIImagePNGRepresentation(this)!!
+    val byteArray = ByteArray(pngRepresentation.length.toInt()).apply {
+        usePinned {
+            memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
+        }
+    }
+    return org.jetbrains.skia.Image.makeFromEncoded(byteArray).toComposeImageBitmap()
+}
