@@ -19,6 +19,7 @@ import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
 import platform.CoreMedia.CMSampleBufferRef
 import platform.CoreMedia.CMTime
@@ -41,22 +42,7 @@ internal actual fun CameraView(modifier: Modifier) {
             ) {
                 cameraAccess = true
             }
-        }
-    }
-
-    val capturePhotoOutput = remember { AVCapturePhotoOutput() }
-    val photoCaptureDelegate = remember {
-        object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
-            override fun captureOutput(
-                output: AVCapturePhotoOutput,
-                didFinishProcessingPhoto: AVCapturePhoto,
-                error: NSError?
-            ) {
-                val photoData = didFinishProcessingPhoto.fileDataRepresentation() ?: error("fileDataRepresentation is null")
-                val uiImage = UIImage(photoData)
-                uiImage.size.useContents { println("uiImage, w: $width, h: $height") }
-                cameraImages.add(uiImage.toImageBitmap())
-            }
+            //todo Stub on simulator
         }
     }
 
@@ -65,30 +51,52 @@ internal actual fun CameraView(modifier: Modifier) {
         contentAlignment = Alignment.Center
     ) {
         if (cameraAccess) {
-            //todo Stub on simulator
+            val capturePhotoOutput = remember { AVCapturePhotoOutput() }
+            val photoCaptureDelegate = remember {
+                object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+                    override fun captureOutput(
+                        output: AVCapturePhotoOutput,
+                        didFinishProcessingPhoto: AVCapturePhoto,
+                        error: NSError?
+                    ) {
+                        val photoData = didFinishProcessingPhoto.fileDataRepresentation() ?: error("fileDataRepresentation is null")
+                        val uiImage = UIImage(photoData)
+                        uiImage.size.useContents { println("uiImage, w: $width, h: $height") }
+                        cameraImages.add(uiImage.toImageBitmap())
+                    }
+                }
+            }
+            val captureSession = remember {
+                AVCaptureSession().also { captureSession->
+                    captureSession.sessionPreset = AVCaptureSessionPresetPhoto
+                    val position = if (true) AVCaptureDevicePositionFront else AVCaptureDevicePositionBack
+                    val camera: AVCaptureDevice = discoverySessionWithDeviceTypes(
+                        deviceTypes = listOf(
+                            AVCaptureDeviceTypeBuiltInWideAngleCamera
+                        ),
+                        mediaType = AVMediaTypeVideo,
+                        position = position,
+                    ).devices.first() as AVCaptureDevice
+                    val captureDeviceInput: AVCaptureDeviceInput =
+                        deviceInputWithDevice(device = camera, error = null)!!
+                    captureSession.addInput(captureDeviceInput)
+                    captureSession.addOutput(capturePhotoOutput)
+                }
+            }
+            val cameraPreviewLayer = remember {
+                AVCaptureVideoPreviewLayer(session = captureSession)
+            }
             UIKitInteropView(
                 modifier = modifier,
                 background = Color.Black,
                 update = {
 
                  },
+                resize = { view: UIView, rect: CValue<CGRect> ->
+                    view.layer.setFrame(rect)
+                    cameraPreviewLayer.setFrame(rect)
+                },
             ) {
-                val captureSession = AVCaptureSession()
-                captureSession.sessionPreset = AVCaptureSessionPresetPhoto
-                val position = if (true) AVCaptureDevicePositionFront else AVCaptureDevicePositionBack
-                val camera: AVCaptureDevice = discoverySessionWithDeviceTypes(
-                    deviceTypes = listOf(
-                        AVCaptureDeviceTypeBuiltInWideAngleCamera
-                    ),
-                    mediaType = AVMediaTypeVideo,
-                    position = position,
-                ).devices.first() as AVCaptureDevice
-                val captureDeviceInput: AVCaptureDeviceInput =
-                    deviceInputWithDevice(device = camera, error = null)!!
-                captureSession.addInput(captureDeviceInput)
-                captureSession.addOutput(capturePhotoOutput)
-
-                val cameraPreviewLayer = AVCaptureVideoPreviewLayer(session = captureSession)
                 val cameraContainer = UIView()
                 cameraContainer.layer.addSublayer(cameraPreviewLayer)
                 cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
@@ -97,22 +105,21 @@ internal actual fun CameraView(modifier: Modifier) {
                 captureSession.startRunning()
                 cameraContainer
             }
+            Button(
+                modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
+                onClick = {
+                    val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG))
+                    photoSettings.setHighResolutionPhotoEnabled(true)
+                    val currentMetadata = photoSettings.metadata
+                    //todo location metadata
+                    //photoSettings.metadata = currentMetadata.merging(getLocationMetadata(), uniquingKeysWith: { _, geoMetaDataKey -> Any in return geoMetaDataKey })
+                    capturePhotoOutput.setHighResolutionCaptureEnabled(true)
+                    capturePhotoOutput.capturePhotoWithSettings(settings = photoSettings, delegate = photoCaptureDelegate)
+                }) {
+                androidx.compose.material3.Text("Compose Button - Take a photo")
+            }
         } else {
             Text("Camera not available")
-        }
-
-        Button(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
-            onClick = {
-                val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG))
-                photoSettings.setHighResolutionPhotoEnabled(true)
-                val currentMetadata = photoSettings.metadata
-                //todo location metadata
-                //photoSettings.metadata = currentMetadata.merging(getLocationMetadata(), uniquingKeysWith: { _, geoMetaDataKey -> Any in return geoMetaDataKey })
-                capturePhotoOutput.setHighResolutionCaptureEnabled(true)
-                capturePhotoOutput.capturePhotoWithSettings(settings = photoSettings, delegate = photoCaptureDelegate)
-            }) {
-            androidx.compose.material3.Text("Compose Button - Take a photo")
         }
     }
 }
