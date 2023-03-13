@@ -41,6 +41,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.round
 import kotlinx.atomicfu.atomic
+import kotlinx.cinterop.CValue
+import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
@@ -55,6 +57,7 @@ import platform.darwin.dispatch_get_main_queue
 private val STUB_CALLBACK_WITH_RECEIVER: Any.() -> Unit = {}
 private val NoOpUpdate: UIView.() -> Unit = STUB_CALLBACK_WITH_RECEIVER
 private val NoOpDispose: UIView.() -> Unit = STUB_CALLBACK_WITH_RECEIVER
+private val DefaultResize: UIView.(CValue<CGRect>) -> Unit = { rect -> this.setFrame(rect) }
 
 /**
  * @param modifier The modifier to be applied to the layout. Size should be specified in modifier.
@@ -62,7 +65,10 @@ private val NoOpDispose: UIView.() -> Unit = STUB_CALLBACK_WITH_RECEIVER
  * @param background A color of UIView background.
  * @param update A callback to be invoked after the layout is inflated.
  * @param dispose A callback that will be called when the view leaves the composition.
+ * @param resize May be used to custom resize logic.
  * @param factory The block creating the [UIView] to be composed.
+ * TODO adapt UIKitInteropView to reuse inside LazyColumn like in Android:
+ * https://developer.android.com/reference/kotlin/androidx/compose/ui/viewinterop/package-summary#AndroidView(kotlin.Function1,kotlin.Function1,androidx.compose.ui.Modifier,kotlin.Function1,kotlin.Function1)
  */
 @Composable
 fun <T : UIView> UIKitInteropView(
@@ -70,6 +76,7 @@ fun <T : UIView> UIKitInteropView(
     background: Color = Color.White,
     update: (T) -> Unit = NoOpUpdate,
     dispose: (T) -> Unit = NoOpDispose,
+    resize: (view: T, rect: CValue<CGRect>) -> Unit = DefaultResize,
     factory: () -> T,
 ) {
     val componentInfo = remember { ComponentInfo<T>() }
@@ -86,8 +93,9 @@ fun <T : UIView> UIKitInteropView(
                 val rect = newRectInPixels / density
                 componentInfo.container.setFrame(rect.toCGRect())
                 if (rectInPixels.width != newRectInPixels.width || rectInPixels.height != newRectInPixels.height) {
-                    componentInfo.component.setFrame(
-                        CGRectMake(0.0, 0.0, rect.width.toDouble(), rect.height.toDouble())
+                    resize(
+                        componentInfo.component,
+                        CGRectMake(0.0, 0.0, rect.width.toDouble(), rect.height.toDouble()),
                     )
                 }
                 rectInPixels = newRectInPixels
