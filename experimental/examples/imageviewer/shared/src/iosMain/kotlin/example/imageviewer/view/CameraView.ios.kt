@@ -161,7 +161,7 @@ private fun BoxScope.AuthorizedCamera() {
                     delegate = photoCaptureDelegate
                 )
             }) {
-            Text("Compose Button - Take a photo")
+            Text("Compose Button - take a photo 📸")
         }
     } else {
         SimulatorStub()
