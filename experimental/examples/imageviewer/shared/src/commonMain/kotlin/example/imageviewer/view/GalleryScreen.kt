@@ -8,7 +8,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -30,7 +29,6 @@ import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-val cameraImages = mutableStateListOf<ImageBitmap>()
 
 enum class GalleryStyle {
     SQUARES,
@@ -89,9 +87,9 @@ internal fun GalleryScreen(
                 )
             }
             CircularButton(
-                Modifier.align(Alignment.BottomCenter).padding(48.dp),
-                painterResource("plus.png"),
-                onMakeNewMemory
+                image = painterResource("plus.png"),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(48.dp),
+                onClick = onMakeNewMemory,
             )
         }
     }
@@ -121,9 +119,6 @@ private fun SquaresGalleryView(
                     onClick = { onSelect(picture) },
                     isHighlighted = isSelected
                 )
-            }
-            items(cameraImages) {
-                Image(bitmap = it, modifier = Modifier.size(100.dp), contentDescription = null)
             }
         }
     }

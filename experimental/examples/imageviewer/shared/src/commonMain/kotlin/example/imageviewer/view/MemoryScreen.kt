@@ -155,7 +155,7 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
         modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 16.dp)
     ) {
-        CircularButton(painterResource("magic.png"), onClick)
+        CircularButton(painterResource("magic.png"), onClick = onClick)
     }
 }
 

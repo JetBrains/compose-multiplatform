@@ -1,37 +1,28 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.Text
-import androidx.compose.material3.Button
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
-import kotlinx.cinterop.*
+import kotlinx.cinterop.CValue
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
 import platform.CoreGraphics.CGRect
-import platform.CoreGraphics.CGRectMake
-import platform.CoreMedia.CMSampleBufferRef
-import platform.CoreMedia.CMTime
 import platform.Foundation.NSError
-import platform.Foundation.NSURL
-import platform.MapKit.MKMapView
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
-import platform.UIKit.*
+import platform.UIKit.UIDevice
+import platform.UIKit.UIDeviceOrientation
+import platform.UIKit.UIImage
+import platform.UIKit.UIView
 import platform.darwin.NSObject
-import platform.posix.memcpy
 
 @Composable
 internal actual fun CameraView(modifier: Modifier) {
@@ -64,8 +55,7 @@ internal actual fun CameraView(modifier: Modifier) {
                     ) {
                         val photoData = didFinishProcessingPhoto.fileDataRepresentation() ?: error("fileDataRepresentation is null")
                         val uiImage = UIImage(photoData)
-                        uiImage.size.useContents { println("uiImage, w: $width, h: $height") }
-                        cameraImages.add(uiImage.toImageBitmap())
+                        //todo use this uiImage in main application
                     }
                 }
             }
@@ -94,9 +84,8 @@ internal actual fun CameraView(modifier: Modifier) {
                 background = Color.Black,
                 update = {
 
-                 },
+                },
                 resize = { view: UIView, rect: CValue<CGRect> ->
-                    rect.useContents { println("resize, w: ${size.width}, resize: h: ${size.height}") }
                     cameraPreviewLayer.connection?.apply {
                         videoOrientation = when (UIDevice.currentDevice.orientation) {
                             UIDeviceOrientation.UIDeviceOrientationPortrait -> AVCaptureVideoOrientationPortrait
@@ -122,30 +111,20 @@ internal actual fun CameraView(modifier: Modifier) {
             Button(
                 modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
                 onClick = {
-                    val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG))
+                    val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
+                        format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
+                    )
                     photoSettings.setHighResolutionPhotoEnabled(true)
-                    val currentMetadata = photoSettings.metadata
-                    //todo location metadata
-                    //photoSettings.metadata = currentMetadata.merging(getLocationMetadata(), uniquingKeysWith: { _, geoMetaDataKey -> Any in return geoMetaDataKey })
                     capturePhotoOutput.setHighResolutionCaptureEnabled(true)
-                    capturePhotoOutput.capturePhotoWithSettings(settings = photoSettings, delegate = photoCaptureDelegate)
+                    capturePhotoOutput.capturePhotoWithSettings(
+                        settings = photoSettings,
+                        delegate = photoCaptureDelegate
+                    )
                 }) {
-                androidx.compose.material3.Text("Compose Button - Take a photo")
+                Text("Compose Button - Take a photo")
             }
         } else {
             Text("Camera not available")
         }
     }
-}
-
-private fun UIImage.toImageBitmap(): ImageBitmap {
-    return this.toSkiaImage()!!.toComposeImageBitmap()
-    //todo https://github.com/touchlab/DroidconKotlin/blob/fe5b7e8bb6cdf5d00eeaf7ee13f1f96b71857e8f/shared-ui/src/iosMain/kotlin/co/touchlab/droidcon/ui/util/ToSkiaImage.kt
-    val pngRepresentation = UIImagePNGRepresentation(this)!!
-    val byteArray = ByteArray(pngRepresentation.length.toInt()).apply {
-        usePinned {
-            memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
-        }
-    }
-    return org.jetbrains.skia.Image.makeFromEncoded(byteArray).toComposeImageBitmap()
 }
