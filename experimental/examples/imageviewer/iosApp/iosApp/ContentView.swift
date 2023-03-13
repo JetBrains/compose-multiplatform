@@ -3,6 +3,7 @@ import SwiftUI
 import shared
 import AVKit
 import CoreLocation
+import UniformTypeIdentifiers
 
 struct ComposeView: UIViewControllerRepresentable {
     private let openCamera: () -> ()
@@ -97,13 +98,15 @@ final class CameraUIViewController: UIViewController {
         return button
     }()
     
+    private let lastCapturedThumbnail = UIImageView()
+    
     override func loadView() {
         super.loadView()
         let contentView = UIView()
         contentView.backgroundColor = .purple
         self.view = contentView
 
-        [cameraContainer, captureButton, closeButton].forEach{
+        [cameraContainer, captureButton, closeButton, lastCapturedThumbnail].forEach{
             contentView.addSubview($0)
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
@@ -124,6 +127,13 @@ final class CameraUIViewController: UIViewController {
          closeButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
          closeButton.heightAnchor.constraint(equalToConstant: 36),
          closeButton.widthAnchor.constraint(equalToConstant: 36)]
+            .forEach { $0.isActive = true }
+        
+        [lastCapturedThumbnail.trailingAnchor.constraint(equalTo: cameraContainer.trailingAnchor, constant: 16),
+         lastCapturedThumbnail.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+         lastCapturedThumbnail.heightAnchor.constraint(equalToConstant: 100),
+         lastCapturedThumbnail.widthAnchor.constraint(equalToConstant: 100)
+        ]
             .forEach { $0.isActive = true }
     }
     
@@ -198,8 +208,6 @@ final class CameraUIViewController: UIViewController {
     @objc private func capture() {
         let photoSettings = AVCapturePhotoSettings(format: [AVVideoCodecKey: AVVideoCodecType.jpeg])
         photoSettings.isHighResolutionPhotoEnabled = true
-        let currentMetadata = photoSettings.metadata
-//        photoSettings.metadata = currentMetadata.merging(getLocationMetadata(), uniquingKeysWith: { _, geoMetaDataKey -> Any in return geoMetaDataKey })
         
         capturePhotoOutput.isHighResolutionCaptureEnabled = true
         capturePhotoOutput.capturePhoto(with: photoSettings, delegate: self)
@@ -218,33 +226,83 @@ final class CameraUIViewController: UIViewController {
         
         self.present(alert, animated: true)
     }
-    
-    private func getLocationMetadata() -> [String: Any] {
-        var metadata = [String: Any]()
-        
-        guard let location = locationManager.location else {
-            print("ImageViewer: couldn't get location, geo metadata will be empty")
-            return [:]
-        }
-        
-        metadata = [
-            kCGImagePropertyGPSLatitude as String: location.coordinate.latitude,
-            kCGImagePropertyGPSLongitude as String: location.coordinate.longitude,
-            kCGImagePropertyGPSAltitudeRef as String: 0,
-            kCGImagePropertyGPSAltitude as String: location.altitude,
-            kCGImagePropertyGPSTimeStamp as String: location.timestamp,
-            kCGImagePropertyGPSDateStamp as String: location.timestamp,
-        ]
-        
-        return metadata
-    }
 }
 
 extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
     func photoOutput(_ output: AVCapturePhotoOutput, didFinishProcessingPhoto photo: AVCapturePhoto, error: Error?) {
         guard let photoData = photo.fileDataRepresentation() else { return }
         lastCapturedImage = UIImage(data: photoData)
-        imageStorage.set(imageData: photoData)
+        
+        guard let updatedData = attachedGPSTo(photoData: photoData) else { return }
+        imageStorage.set(imageData: updatedData, fileName: "testImage")
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
+            self.showLastTakenImagePreview()
+        }
+    }
+    
+    func showLastTakenImagePreview() {
+        guard let takenImageData = imageStorage.getData(imageName: "testImage") else { return }
+        let takenImageCFData = takenImageData as CFData
+        guard let imageSource = CGImageSourceCreateWithData(takenImageCFData, nil),
+              let takenImageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil)
+        else { return }
+        
+        print("ImageViewer: print last taken image properties after reading from file")
+        print(takenImageProperties as Dictionary)
+        
+        guard let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else { return }
+        
+        lastCapturedThumbnail.image = UIImage(cgImage: cgImage)
+        
+    }
+    
+    func attachedGPSTo(photoData: Data?) -> Data? {
+        guard let sourcePhotoData = photoData,
+              let imageSource = CGImageSourceCreateWithData(sourcePhotoData as CFData, nil),
+              let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil),
+              let mutableImagePropertiesCF = CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, imageProperties)
+        else { return nil }
+        
+        var mutableImageProperties = mutableImagePropertiesCF as Dictionary
+        mutableImageProperties[kCGImagePropertyGPSDictionary] = getLocationMetadata()
+        let updatedProperties = mutableImageProperties as CFDictionary
+        
+        guard let destPhotoData = CFDataCreateMutable(nil, 0),
+              let imageDestination = CGImageDestinationCreateWithData(destPhotoData, UTType.jpeg.identifier as CFString, 1, nil)
+        else { return nil }
+        
+        CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0, updatedProperties)
+        
+        guard CGImageDestinationFinalize(imageDestination) else {
+            print("ImageViewer: Updating metadata with GPS Dictionary wasn't successfull")
+            return nil
+        }
+        
+        return destPhotoData as Data
+    }
+    
+    private func getLocationMetadata() -> CFDictionary {
+        var metadata = [CFString: Any]()
+        
+        guard let location = locationManager.location else {
+            print("ImageViewer: couldn't get location, geo metadata will be empty")
+            return [:] as CFDictionary
+        }
+        
+        metadata = [
+            kCGImagePropertyGPSLatitude: location.coordinate.latitude,
+            kCGImagePropertyGPSLongitude: location.coordinate.longitude,
+            kCGImagePropertyGPSAltitudeRef: 0,
+            kCGImagePropertyGPSAltitude: location.altitude,
+            kCGImagePropertyGPSTimeStamp: location.timestamp,
+            kCGImagePropertyGPSDateStamp: location.timestamp,
+        ]
+        
+        print("ImageViewer: print geo data of captured image properties before writing to file")
+        print(metadata as Dictionary)
+        
+        return metadata as CFDictionary
     }
 }
 
@@ -314,8 +372,8 @@ fileprivate class ImageStorage {
         }
     }
     
-    func set(imageData: Data) {
-        let fileName = df.string(from: Date()) + "_taken.jpg"
+    func set(imageData: Data, fileName: String? = nil) {
+        let fileName = fileName != nil ? fileName! : df.string(from: Date()) + "_taken.jpg"
         guard let fileUrl = makeFileUrl(for: fileName) else { return }
         do {
             try imageData.write(to: fileUrl)
@@ -331,8 +389,9 @@ fileprivate class ImageStorage {
         do {
             let imageUrls = try fm.contentsOfDirectory(atPath: imagesUrl.path)
             for imageUrlString in imageUrls {
+                print("url: \(imageUrlString)")
                 DispatchQueue.global(qos: .utility).async {
-                    let image = self.get(imagePathString: imageUrlString)
+                    let image = self.get(imageName: imageUrlString)
                     DispatchQueue.global().async(flags: .barrier) {
                         resultArray.append(image)
                     }
@@ -353,6 +412,11 @@ fileprivate class ImageStorage {
     func get(imagePathString: String) -> UIImage? {
         guard let url = URL(string: imagePathString), let data = try? Data(contentsOf: url) else { return nil }
         return UIImage(data: data)
+    }
+    
+    func getData(imageName: String) -> Data? {
+        guard let url = makeFileUrl(for: imageName), let data = try? Data(contentsOf: url) else { return nil }
+        return data
     }
     
     private func makeFileUrl(for name: String) -> URL? {
