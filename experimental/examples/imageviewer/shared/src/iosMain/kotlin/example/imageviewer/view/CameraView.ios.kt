@@ -33,7 +33,7 @@ private sealed interface CameraAccess {
 }
 
 @Composable
-internal actual fun CameraView(modifier: Modifier) {//todo maybe modifier arg redundant
+internal actual fun CameraView(modifier: Modifier) {
     var cameraAccess: CameraAccess by remember { mutableStateOf(CameraAccess.Undefined) }
     LaunchedEffect(Unit) {
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
