@@ -164,12 +164,12 @@ private fun BoxScope.AuthorizedCamera() {
             Text("Compose Button - Take a photo")
         }
     } else {
-        SimlulatorStub()
+        SimulatorStub()
     }
 }
 
 @Composable
-private fun SimlulatorStub() {
+private fun SimulatorStub() {
     Text(
         """
             Camera is not available on simulator.
