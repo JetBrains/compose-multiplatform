@@ -87,7 +87,7 @@ private fun BoxScope.AuthorizedCamera() {
                 val photoData = didFinishProcessingPhoto.fileDataRepresentation()
                     ?: error("fileDataRepresentation is null")
                 val uiImage = UIImage(photoData)
-                //todo pass image to mainApplication
+                //todo pass image to gallery page
             }
         }
     }
