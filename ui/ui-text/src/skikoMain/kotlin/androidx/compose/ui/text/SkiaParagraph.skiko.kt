@@ -17,9 +17,10 @@
 package androidx.compose.ui.text
 
 import org.jetbrains.skia.Rect as SkRect
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
@@ -52,20 +53,23 @@ internal class SkiaParagraph(
 
     private val paragraphIntrinsics = intrinsics as SkiaParagraphIntrinsics
 
-    private val layouter = paragraphIntrinsics.layouter()
+    private val layouter = paragraphIntrinsics.layouter().apply {
+        setParagraphStyle(
+            maxLines = maxLines,
+            ellipsis = ellipsisChar
+        )
+    }
 
     /**
      * Paragraph isn't always immutable, it could be changed via [paint] method without
      * rerunning layout
      */
-    private var para = layouter.layoutParagraph(
-        width = width,
-        maxLines = maxLines,
-        ellipsis = ellipsisChar
+    private var paragraph = layouter.layoutParagraph(
+        width = width
     )
 
     init {
-        para.layout(width)
+        paragraph.layout(width)
     }
 
     private val text: String
@@ -75,7 +79,7 @@ internal class SkiaParagraph(
         get() = constraints.maxWidth.toFloat()
 
     override val height: Float
-        get() = para.height
+        get() = paragraph.height
 
     override val minIntrinsicWidth: Float
         get() = paragraphIntrinsics.minIntrinsicWidth
@@ -90,24 +94,24 @@ internal class SkiaParagraph(
         get() = lineMetrics.lastOrNull()?.run { baseline.toFloat() } ?: 0f
 
     override val didExceedMaxLines: Boolean
-        get() = para.didExceedMaxLines()
+        get() = paragraph.didExceedMaxLines()
 
     override val lineCount: Int
         // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321
         get() = if (text == "") {
             1
         } else {
-            para.lineNumber.toInt()
+            paragraph.lineNumber.toInt()
         }
 
     override val placeholderRects: List<Rect?>
         get() =
-            para.rectsForPlaceholders.map {
+            paragraph.rectsForPlaceholders.map {
                 it.rect.toComposeRect()
             }
 
     override fun getPathForRange(start: Int, end: Int): Path {
-        val boxes = para.getRectsForRange(
+        val boxes = paragraph.getRectsForRange(
             start,
             end,
             RectHeightMode.MAX,
@@ -247,7 +251,7 @@ internal class SkiaParagraph(
             val metrics = layouter.defaultFont.metrics
             val ascent = -metrics.ascent.toDouble()
             val descent = metrics.descent.toDouble()
-            val baseline = para.alphabeticBaseline.toDouble()
+            val baseline = paragraph.alphabeticBaseline.toDouble()
             val height = with(layouter.paragraphStyle.strutStyle) {
                 if (isEnabled && !isHeightForced && isHeightOverridden && fontSize > 0.0f) {
                     (height * fontSize).toDouble()
@@ -264,13 +268,13 @@ internal class SkiaParagraph(
             )
         } else {
             @Suppress("UNCHECKED_CAST", "USELESS_CAST")
-            para.lineMetrics as Array<LineMetrics>
+            paragraph.lineMetrics as Array<LineMetrics>
         }
 
     private fun getBoxForwardByOffset(offset: Int): TextBox? {
         var to = offset + 1
         while (to <= text.length) {
-            val box = para.getRectsForRange(
+            val box = paragraph.getRectsForRange(
                 offset, to,
                 RectHeightMode.STRUT, RectWidthMode.TIGHT
             ).firstOrNull()
@@ -286,7 +290,7 @@ internal class SkiaParagraph(
         var from = offset - 1
         val isRtl = paragraphIntrinsics.textDirection == ResolvedTextDirection.Rtl
         while (from >= 0) {
-            val box = para.getRectsForRange(
+            val box = paragraph.getRectsForRange(
                 from, end,
                 RectHeightMode.STRUT, RectWidthMode.TIGHT
             ).firstOrNull()
@@ -314,7 +318,7 @@ internal class SkiaParagraph(
                             val rect = SkRect(width, box.rect.bottom, width, bottom)
                             TextBox(rect, box.direction)
                         } else {
-                            val nextBox =  para.getRectsForRange(
+                            val nextBox =  paragraph.getRectsForRange(
                                 offset, offset + 1,
                                 RectHeightMode.STRUT, RectWidthMode.TIGHT
                             ).first()
@@ -343,7 +347,7 @@ internal class SkiaParagraph(
         }
 
     override fun getOffsetForPosition(position: Offset): Int {
-        val glyphPosition = para.getGlyphPositionAtCoordinate(position.x, position.y).position
+        val glyphPosition = paragraph.getGlyphPositionAtCoordinate(position.x, position.y).position
 
         // Below we apply a workaround for skiko/skia issue:
         //
@@ -373,7 +377,7 @@ internal class SkiaParagraph(
 
         val rects = if (isNotEmptyLine) {
             // expectedLine width doesn't include whitespaces. Therefore we look at the Rectangle representing the line
-            para.getRectsForRange(
+            paragraph.getRectsForRange(
                 start = expectedLine.startIndex,
                 end = if (expectedLine.isHardBreak) expectedLine.endIndex else expectedLine.endIndex - 1,
                 rectHeightMode = RectHeightMode.STRUT,
@@ -393,9 +397,9 @@ internal class SkiaParagraph(
         var correctedGlyphPosition = glyphPosition
 
         if (position.x <= leftX) { // when clicked to the left of a text line
-            correctedGlyphPosition = para.getGlyphPositionAtCoordinate(leftX + 1f, position.y).position
+            correctedGlyphPosition = paragraph.getGlyphPositionAtCoordinate(leftX + 1f, position.y).position
         } else if (position.x >= rightX) { // when clicked to the right of a text line
-            correctedGlyphPosition = para.getGlyphPositionAtCoordinate(rightX - 1f, position.y).position
+            correctedGlyphPosition = paragraph.getGlyphPositionAtCoordinate(rightX - 1f, position.y).position
             val isNeutralChar = text.getOrNull(correctedGlyphPosition)?.isNeutralDirectionality() ?: false
             // For RTL blocks, the position is still not correct, so we have to subtract 1 from the returned result
             if (!isNeutralChar && getBoxBackwardByOffset(correctedGlyphPosition)?.direction == Direction.RTL) {
@@ -413,34 +417,34 @@ internal class SkiaParagraph(
 
     override fun getWordBoundary(offset: Int): TextRange {
         return when {
-            (text.getOrNull(offset)?.isLetterOrDigit() ?: false) -> para.getWordBoundary(offset).let {
+            (text.getOrNull(offset)?.isLetterOrDigit() ?: false) -> paragraph.getWordBoundary(offset).let {
                 TextRange(it.start, it.end)
             }
             (text.getOrNull(offset - 1)?.isLetterOrDigit() ?: false) ->
-                para.getWordBoundary(offset - 1).let {
+                paragraph.getWordBoundary(offset - 1).let {
                     TextRange(it.start, it.end)
                 }
             else -> TextRange(offset, offset)
         }
     }
 
-    // TODO(b/229518449): Implement an alternative to paint function that takes a brush.
     override fun paint(
         canvas: Canvas,
         color: Color,
         shadow: Shadow?,
         textDecoration: TextDecoration?
     ) {
-        para = layouter.layoutParagraph(
-            width = width,
-            maxLines = maxLines,
-            ellipsis = ellipsisChar,
-            color = color,
-            shadow = shadow,
-            textDecoration = textDecoration
-        )
-
-        para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
+        paragraph = with(layouter) {
+            setTextStyle(
+                color = color,
+                shadow = shadow,
+                textDecoration = textDecoration
+            )
+            layoutParagraph(
+                width = width
+            )
+        }
+        paragraph.paint(canvas.nativeCanvas, 0.0f, 0.0f)
     }
 
     @ExperimentalTextApi
@@ -451,19 +455,20 @@ internal class SkiaParagraph(
         textDecoration: TextDecoration?,
         drawStyle: DrawStyle?
     ) {
-        para = layouter.layoutParagraph(
-            width = width,
-            maxLines = maxLines,
-            ellipsis = ellipsisChar,
-            color = color,
-            shadow = shadow,
-            textDecoration = textDecoration
-        )
-
-        para.paint(canvas.nativeCanvas, 0.0f, 0.0f)
+        paragraph = with(layouter) {
+            setTextStyle(
+                color = color,
+                shadow = shadow,
+                textDecoration = textDecoration
+            )
+            setDrawStyle(drawStyle)
+            layoutParagraph(
+                width = width
+            )
+        }
+        paragraph.paint(canvas.nativeCanvas, 0.0f, 0.0f)
     }
 
-    // TODO(b/229518449): Implement this paint function that draws text with a Brush.
     @ExperimentalTextApi
     override fun paint(
         canvas: Canvas,
@@ -473,8 +478,19 @@ internal class SkiaParagraph(
         textDecoration: TextDecoration?,
         drawStyle: DrawStyle?
     ) {
-        throw UnsupportedOperationException(
-            "Using brush for painting the paragraph is a separate functionality that " +
-                "is not supported on this platform")
+        paragraph = with(layouter) {
+            setTextStyle(
+                brush = brush,
+                brushSize = Size(width, height),
+                alpha = alpha,
+                shadow = shadow,
+                textDecoration = textDecoration
+            )
+            setDrawStyle(drawStyle)
+            layoutParagraph(
+                width = width
+            )
+        }
+        paragraph.paint(canvas.nativeCanvas, 0.0f, 0.0f)
     }
 }

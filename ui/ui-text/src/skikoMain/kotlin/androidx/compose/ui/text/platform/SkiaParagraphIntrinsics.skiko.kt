@@ -62,7 +62,13 @@ internal class SkiaParagraphIntrinsics(
     }
 
     private fun newLayouter() = ParagraphLayouter(
-        text, textDirection, style, spanStyles, placeholders, density, fontFamilyResolver
+        text = text,
+        textDirection = textDirection,
+        style = style,
+        spanStyles = spanStyles,
+        placeholders = placeholders,
+        density = density,
+        fontFamilyResolver = fontFamilyResolver
     )
 
     override var minIntrinsicWidth = 0f
