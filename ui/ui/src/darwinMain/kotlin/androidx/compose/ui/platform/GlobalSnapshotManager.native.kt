@@ -33,7 +33,7 @@ import kotlinx.coroutines.Dispatchers
  *
  * Composition bootstrapping mechanisms for a particular platform/framework should call
  * [ensureStarted] during setup to initialize periodic global snapshot notifications.
- * For desktop, these notifications are always sent on [Dispatchers.Swing]. Other platforms
+ * For UIKit, these notifications are always sent on [Dispatchers.Main]. Other platforms
  * may establish different policies for these notifications.
  */
 internal actual object GlobalSnapshotManager {
@@ -43,7 +43,7 @@ internal actual object GlobalSnapshotManager {
     actual fun ensureStarted() {
         if (started.compareAndSet(0, 1)) {
             val channel = Channel<Unit>(Channel.CONFLATED)
-            CoroutineScope(Dispatchers.Default).launch {
+            CoroutineScope(Dispatchers.Main).launch {
                 channel.consumeEach {
                     Snapshot.sendApplyNotifications()
                 }
