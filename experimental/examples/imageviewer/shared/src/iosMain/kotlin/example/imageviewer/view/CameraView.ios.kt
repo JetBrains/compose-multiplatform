@@ -58,7 +58,7 @@ internal actual fun CameraView(modifier: Modifier) {
         Modifier.fillMaxSize().background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
-        when(cameraAccess) {
+        when (cameraAccess) {
             CameraAccess.Undefined -> {
                 Text("Camera needs user permission", color = Color.White)
             }
@@ -100,7 +100,7 @@ private fun BoxScope.AuthorizedCamera() {
     }
     if (camera != null) {
         val captureSession: AVCaptureSession = remember {
-            AVCaptureSession().also { captureSession->
+            AVCaptureSession().also { captureSession ->
                 captureSession.sessionPreset = AVCaptureSessionPresetPhoto
                 val captureDeviceInput: AVCaptureDeviceInput =
                     deviceInputWithDevice(device = camera, error = null)!!
@@ -114,9 +114,6 @@ private fun BoxScope.AuthorizedCamera() {
         UIKitInteropView(
             modifier = Modifier.fillMaxSize(),
             background = Color.Black,
-            update = {
-
-            },
             resize = { view: UIView, rect: CValue<CGRect> ->
                 cameraPreviewLayer.connection?.apply {
                     videoOrientation = when (UIDevice.currentDevice.orientation) {
