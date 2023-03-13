@@ -60,7 +60,7 @@ internal actual fun CameraView(modifier: Modifier) {
     ) {
         when (cameraAccess) {
             CameraAccess.Undefined -> {
-                Text("Camera needs user permission", color = Color.White)
+                // Waiting for the user to accept permission
             }
 
             CameraAccess.Denied -> {
@@ -170,7 +170,7 @@ private fun SimulatorStub() {
     Text(
         """
             Camera is not available on simulator.
-            Please try to run on real iOS device.
+            Please try to run on a real iOS device.
         """.trimIndent(), color = Color.White
     )
 }

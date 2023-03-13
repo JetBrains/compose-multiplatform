@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 internal actual fun CameraView(modifier: Modifier) {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         Text(
-            text = "For now CameraView is not working on Desktop",
+            text = "Camera is not available on Desktop for now.",
             color = Color.White,
             modifier = Modifier.align(Alignment.Center)
         )
