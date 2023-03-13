@@ -1,5 +1,6 @@
 package example.imageviewer.view
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,8 @@ import platform.CoreMedia.CMTime
 import platform.Foundation.NSError
 import platform.Foundation.NSURL
 import platform.MapKit.MKMapView
+import platform.QuartzCore.CATransaction
+import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.*
 import platform.darwin.NSObject
 import platform.posix.memcpy
@@ -93,15 +96,26 @@ internal actual fun CameraView(modifier: Modifier) {
 
                  },
                 resize = { view: UIView, rect: CValue<CGRect> ->
+                    rect.useContents { println("resize, w: ${size.width}, resize: h: ${size.height}") }
+                    cameraPreviewLayer.connection?.apply {
+                        videoOrientation = when (UIDevice.currentDevice.orientation) {
+                            UIDeviceOrientation.UIDeviceOrientationPortrait -> AVCaptureVideoOrientationPortrait
+                            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft -> AVCaptureVideoOrientationLandscapeRight
+                            UIDeviceOrientation.UIDeviceOrientationLandscapeRight -> AVCaptureVideoOrientationLandscapeLeft
+                            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown -> AVCaptureVideoOrientationPortraitUpsideDown
+                            else -> videoOrientation
+                        }
+                    }
+                    CATransaction.begin()
+                    CATransaction.setValue(true, kCATransactionDisableActions)
                     view.layer.setFrame(rect)
                     cameraPreviewLayer.setFrame(rect)
+                    CATransaction.commit()
                 },
             ) {
                 val cameraContainer = UIView()
                 cameraContainer.layer.addSublayer(cameraPreviewLayer)
                 cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-                cameraPreviewLayer.frame = UIScreen.mainScreen.applicationFrame
-
                 captureSession.startRunning()
                 cameraContainer
             }
@@ -125,6 +139,7 @@ internal actual fun CameraView(modifier: Modifier) {
 }
 
 private fun UIImage.toImageBitmap(): ImageBitmap {
+    return this.toSkiaImage()!!.toComposeImageBitmap()
     //todo https://github.com/touchlab/DroidconKotlin/blob/fe5b7e8bb6cdf5d00eeaf7ee13f1f96b71857e8f/shared-ui/src/iosMain/kotlin/co/touchlab/droidcon/ui/util/ToSkiaImage.kt
     val pngRepresentation = UIImagePNGRepresentation(this)!!
     val byteArray = ByteArray(pngRepresentation.length.toInt()).apply {

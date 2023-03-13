@@ -17,7 +17,7 @@ import example.imageviewer.style.ImageviewerColors
 @Composable
 internal fun CircularButton(modifier: Modifier, image: Painter, onClick: () -> Unit) {
     Box(
-        modifier.size(40.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
+        modifier.size(50.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
             .clickable { onClick() }, contentAlignment = Alignment.Center
     ) {
         Image(
