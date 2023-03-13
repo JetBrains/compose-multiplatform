@@ -18,7 +18,6 @@ interface Dependencies {
     val imageRepository: ContentRepository<ImageBitmap>
     val notification: Notification
     val json: Json get() = jsonReader
-    val openCamera: () -> Unit get() = {}
 }
 
 interface Notification {

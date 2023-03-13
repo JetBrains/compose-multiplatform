@@ -26,10 +26,10 @@ import io.ktor.client.engine.darwin.Darwin
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-internal fun ImageViewerIos(openCamera: () -> Unit) {
+internal fun ImageViewerIos() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
-    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState, openCamera) }
+    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
     ImageViewerTheme {
         Surface(
@@ -43,7 +43,7 @@ internal fun ImageViewerIos(openCamera: () -> Unit) {
     }
 }
 
-fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>, openCamera: ()->Unit) = object : Dependencies {
+fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
         FilterType.GrayScale -> GrayScaleFilter()
@@ -78,6 +78,4 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
             toastState.value = ToastState.Shown(text)
         }
     }
-
-    override val openCamera: () -> Unit  = openCamera
 }

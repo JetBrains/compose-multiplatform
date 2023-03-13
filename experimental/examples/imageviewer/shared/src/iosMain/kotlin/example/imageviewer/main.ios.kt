@@ -8,7 +8,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Application
 import platform.UIKit.UIViewController
 
-fun MainViewController(openCamera: ()->Unit): UIViewController =
+fun MainViewController(): UIViewController =
     Application("Imageviewer") {
-        ImageViewerIos(openCamera)
+        ImageViewerIos()
     }
