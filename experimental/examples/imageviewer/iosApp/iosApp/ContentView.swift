@@ -234,29 +234,24 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
         lastCapturedImage = UIImage(data: photoData)
         
         guard let updatedData = attachedGPSTo(photoData: photoData) else { return }
-        imageStorage.set(imageData: updatedData, fileName: "testImage")
+        imageStorage.set(imageData: updatedData)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(2)) {
-            self.showLastTakenImagePreview()
+        // Reading last taken photo from Storage example
+        DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(2)) {
+            let allImagesData = self.imageStorage.getDataForAllImages()
+            let lastTakenPhoto = allImagesData?.last
+            if let coords = self.fetchCoordinatesFrom(photoData: lastTakenPhoto) {
+                print("ImageViewer: Coordinates of last taken photo: \(coords)")
+            }
+            if let cgLastTakenImage = self.fetchImageFrom(photoData: lastTakenPhoto) {
+                DispatchQueue.main.async {
+                    self.lastCapturedThumbnail.image = UIImage(cgImage: cgLastTakenImage)
+                }
+            }
         }
     }
     
-    func showLastTakenImagePreview() {
-        guard let takenImageData = imageStorage.getData(imageName: "testImage") else { return }
-        let takenImageCFData = takenImageData as CFData
-        guard let imageSource = CGImageSourceCreateWithData(takenImageCFData, nil),
-              let takenImageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil)
-        else { return }
-        
-        print("ImageViewer: print last taken image properties after reading from file")
-        print(takenImageProperties as Dictionary)
-        
-        guard let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil) else { return }
-        
-        lastCapturedThumbnail.image = UIImage(cgImage: cgImage)
-        
-    }
-    
+    // MARK: Attaching GPS data to photo metadata
     func attachedGPSTo(photoData: Data?) -> Data? {
         guard let sourcePhotoData = photoData,
               let imageSource = CGImageSourceCreateWithData(sourcePhotoData as CFData, nil),
@@ -299,10 +294,31 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
             kCGImagePropertyGPSDateStamp: location.timestamp,
         ]
         
-        print("ImageViewer: print geo data of captured image properties before writing to file")
-        print(metadata as Dictionary)
-        
         return metadata as CFDictionary
+    }
+    
+    // MARK: Parsing coordinates and CGImage from data stored in the file system
+    func fetchCoordinatesFrom(photoData: Data?) -> (latitude: Double, longitude: Double)? {
+        guard let photoData = photoData else { return nil }
+        let cfData = photoData as CFData
+        guard let imageSource = CGImageSourceCreateWithData(cfData, nil),
+              let imagePropertiesCF = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil)
+        else { return nil }
+        let imageProperties = imagePropertiesCF as Dictionary
+        guard let gpsData = imageProperties[kCGImagePropertyGPSDictionary],
+              let longitude = gpsData[kCGImagePropertyGPSLongitude] as? Double,
+              let latitude = gpsData[kCGImagePropertyGPSLatitude] as? Double
+        else { return nil }
+        return (latitude: latitude, longitude: longitude)
+    }
+    
+    func fetchImageFrom(photoData: Data?) -> CGImage? {
+        guard let photoData = photoData else { return nil }
+        let cfData = photoData as CFData
+        guard let imageSource = CGImageSourceCreateWithData(cfData, nil),
+              let cgImage = CGImageSourceCreateImageAtIndex(imageSource, 0, nil)
+        else { return nil }
+        return cgImage
     }
 }
 
@@ -372,8 +388,8 @@ fileprivate class ImageStorage {
         }
     }
     
-    func set(imageData: Data, fileName: String? = nil) {
-        let fileName = fileName != nil ? fileName! : df.string(from: Date()) + "_taken.jpg"
+    func set(imageData: Data, label: String? = nil) {
+        let fileName = label != nil ? label! : df.string(from: Date()) + "_taken.jpg"
         guard let fileUrl = makeFileUrl(for: fileName) else { return }
         do {
             try imageData.write(to: fileUrl)
@@ -382,20 +398,15 @@ fileprivate class ImageStorage {
         }
     }
     
-    func getAll() -> [UIImage]? {
+    func getDataForAllImages() -> [Data]? {
         guard let imagesUrl = getRelativePathUrl() else { return nil }
         
-        var resultArray = [UIImage?]()
+        var resultArray = [Data?]()
         do {
             let imageUrls = try fm.contentsOfDirectory(atPath: imagesUrl.path)
             for imageUrlString in imageUrls {
-                print("url: \(imageUrlString)")
-                DispatchQueue.global(qos: .utility).async {
-                    let image = self.get(imageName: imageUrlString)
-                    DispatchQueue.global().async(flags: .barrier) {
-                        resultArray.append(image)
-                    }
-                }
+                let imageData = self.getDataFor(imageName: imageUrlString)
+                resultArray.append(imageData)
             }
         } catch {
             print("ImageViewer: Error while fetching images from fileStorage, see description:\n\(error.localizedDescription)")
@@ -404,17 +415,7 @@ fileprivate class ImageStorage {
         return resultArray.compactMap{$0}
     }
     
-    func get(imageName: String) -> UIImage? {
-        guard let url = makeFileUrl(for: imageName), let data = try? Data(contentsOf: url) else { return nil }
-        return UIImage(data: data)
-    }
-    
-    func get(imagePathString: String) -> UIImage? {
-        guard let url = URL(string: imagePathString), let data = try? Data(contentsOf: url) else { return nil }
-        return UIImage(data: data)
-    }
-    
-    func getData(imageName: String) -> Data? {
+    func getDataFor(imageName: String) -> Data? {
         guard let url = makeFileUrl(for: imageName), let data = try? Data(contentsOf: url) else { return nil }
         return data
     }
