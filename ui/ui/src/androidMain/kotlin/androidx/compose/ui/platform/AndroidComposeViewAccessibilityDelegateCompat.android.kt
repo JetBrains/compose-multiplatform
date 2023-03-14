@@ -525,17 +525,17 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
     ): Comparator<SemanticsNode> {
         // First compare the coordinates LTR
         var comparator = compareBy<SemanticsNode>(
-            { it.layoutNode.coordinates.boundsInWindow().left },
-            { it.layoutNode.coordinates.boundsInWindow().top },
-            { it.layoutNode.coordinates.boundsInWindow().bottom },
-            { it.layoutNode.coordinates.boundsInWindow().right })
+            { it.boundsInWindow.left },
+            { it.boundsInWindow.top },
+            { it.boundsInWindow.bottom },
+            { it.boundsInWindow.right })
         // Modify comparison if we're not using LTR comparison strategy to use RTL instead
         if (layoutIsRtl) {
             comparator = compareBy(
-                { it.layoutNode.coordinates.boundsInWindow().right },
-                { it.layoutNode.coordinates.boundsInWindow().top },
-                { it.layoutNode.coordinates.boundsInWindow().bottom },
-                { it.layoutNode.coordinates.boundsInWindow().left })
+                { it.boundsInWindow.right },
+                { it.boundsInWindow.top },
+                { it.boundsInWindow.bottom },
+                { it.boundsInWindow.left })
         }
         return comparator
             // then compare by layoutNode's zIndex and placement order
@@ -569,8 +569,8 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             node: SemanticsNode
         ): Boolean {
             // Conversion to long is needed in order to utilize `until`, which has no float ver
-            val entryTopCoord = node.layoutNode.coordinates.boundsInWindow().top
-            val entryBottomCoord = node.layoutNode.coordinates.boundsInWindow().bottom
+            val entryTopCoord = node.boundsInWindow.top
+            val entryBottomCoord = node.boundsInWindow.bottom
             val entryRange = entryTopCoord.rangeUntil(entryBottomCoord)
 
             for (currIndex in 0..rowGroupings.lastIndex) {
@@ -604,7 +604,7 @@ internal class AndroidComposeViewAccessibilityDelegateCompat(val view: AndroidCo
             val currEntry = parentListToSort[entryIndex]
             // If this is the first entry, or vertical groups don't overlap
             if (entryIndex == 0 || !placedEntryRowOverlaps(currEntry)) {
-                val newRect = currEntry.layoutNode.coordinates.boundsInWindow()
+                val newRect = currEntry.boundsInWindow
                 rowGroupings.add(Pair(newRect, mutableListOf(currEntry)))
             } // otherwise, we've already iterated through, found and placed it in a matching group
         }
