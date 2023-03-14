@@ -439,7 +439,10 @@ private fun Project.releaseComponentName() = when {
 
 private fun Project.validateCoordinatesAndGetGroup(extension: AndroidXExtension): LibraryGroup {
     val mavenGroup = extension.mavenGroup
-        ?: throw Exception("You must specify mavenGroup for $name project")
+    if (mavenGroup == null) {
+        val groupExplanation = extension.explainMavenGroup().joinToString("\n")
+        throw Exception("You must specify mavenGroup for $path :\n$groupExplanation")
+    }
     val strippedGroupId = mavenGroup.group.substringAfterLast(".")
     if (
         !extension.bypassCoordinateValidation &&

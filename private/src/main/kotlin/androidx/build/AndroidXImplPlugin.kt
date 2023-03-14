@@ -154,6 +154,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.tasks.register("printCoordinates", PrintProjectCoordinatesTask::class.java) {
             it.configureWithAndroidXExtension(extension)
         }
+        project.configureConstraintsWithinGroup(extension)
     }
 
     private fun Project.registerProjectOrArtifact() {
@@ -321,6 +322,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
             }
             project.configureKmpTests()
             project.configureSourceJarForMultiplatform()
+            project.configureLintForMultiplatform(extension)
         }
     }
 
@@ -526,7 +528,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         // Standard lint, docs, and Metalava configuration for AndroidX projects.
-        project.configureNonAndroidProjectForLint(extension)
+        if (project.multiplatformExtension == null) {
+            project.configureNonAndroidProjectForLint(extension)
+        }
         val apiTaskConfig = if (project.multiplatformExtension != null) {
             KmpApiTaskConfig
         } else {
@@ -686,6 +690,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         project.configureTestConfigGeneration(this)
+        project.configureFtlRunner()
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         when (this) {
@@ -748,14 +753,18 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
 
             config.dependencyConstraints.configureEach { dependencyConstraint ->
                 dependencyConstraint.apply {
-                    // Remove strict constraints on test dependencies and listenablefuture:1.0
-                    if (isTestConfig ||
-                        group == "com.google.guava" &&
-                        name == "listenablefuture" &&
-                        version == "1.0"
-                    ) {
-                        version { versionConstraint ->
-                            versionConstraint.strictly("")
+                    // Clear strict constraints on test dependencies and listenablefuture:1.0
+                    // Don't clear non-strict constraints because they might refer to projects,
+                    // and clearing their versions might be unsupported and unnecessary
+                    if (versionConstraint.strictVersion != "") {
+                        if (isTestConfig ||
+                            (group == "com.google.guava" &&
+                            name == "listenablefuture" &&
+                            version == "1.0")
+                        ) {
+                            version { versionConstraint ->
+                                versionConstraint.strictly("")
+                            }
                         }
                     }
                 }
@@ -840,6 +849,7 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         }
 
         project.addAppApkToTestConfigGeneration()
+        project.addAppApkToFtlRunner()
 
         val buildTestApksTask = project.rootProject.tasks.named(BUILD_TEST_APKS_TASK)
         applicationVariants.all { variant ->
@@ -865,6 +875,71 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 }
             }
         }
+    }
+
+    // If this project wants other project in the same group to have the same version,
+    // this function configures those constraints.
+    private fun Project.configureConstraintsWithinGroup(
+        extension: AndroidXExtension
+    ) {
+        if (!project.shouldAddGroupConstraints()) {
+            return
+        }
+        project.afterEvaluate {
+            // make sure that the project has a group
+            val projectGroup = extension.mavenGroup
+            if (projectGroup == null)
+                return@afterEvaluate
+            // make sure that this group is configured to use a single version
+            val requiredVersion = projectGroup.atomicGroupVersion
+            if (requiredVersion == null)
+                return@afterEvaluate
+
+            // We don't want to emit the same constraint into our .module file more than once,
+            // and we don't want to try to apply a constraint to a configuration that doesn't accept them,
+            // so we create a configuration to hold the constraints and make each other constraint extend it
+            val constraintConfiguration = project.configurations.create("groupConstraints")
+            project.configurations.configureEach { configuration ->
+                if (configuration != constraintConfiguration)
+                    configuration.extendsFrom(constraintConfiguration)
+            }
+
+            val otherProjectPathsInSameGroup = extension.getAllProjectPathsInSameGroup()
+            val constraints = project.dependencies.constraints
+            val allProjectsExist = buildContainsAllStandardProjects()
+            for (otherPath in otherProjectPathsInSameGroup) {
+                // don't need a constraint pointing at self
+                if (otherPath == project.path)
+                    continue
+                // We only enable constraints for builds that we intend to be able to publish from.
+                //   If a project isn't included in a build we intend to be able to publish from,
+                //   the project isn't going to be published.
+                // Sometimes this can happen when a project subset is enabled:
+                //   The KMP project subset enabled by androidx_multiplatform_mac.sh contains
+                //   :benchmark:benchmark-common but not :benchmark:benchmark-benchmark
+                //   This is ok because we don't intend to publish that artifact from that build
+                val otherProjectShouldExist = allProjectsExist || findProject(otherPath) != null
+                if (otherProjectShouldExist) {
+                    val dependencyConstraint = project(otherPath)
+                    constraints.add(
+                        constraintConfiguration.name,
+                        dependencyConstraint
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Tells whether this build contains the usual set of all projects (`./gradlew projects`)
+     * Sometimes developers request to include fewer projects because this may run more quickly
+     */
+    private fun Project.buildContainsAllStandardProjects(): Boolean {
+        if (getProjectSubset() != null)
+            return false
+        if (ProjectLayoutType.isPlayground(this))
+            return false
+        return true
     }
 
     companion object {
@@ -968,20 +1043,8 @@ private fun Project.configureJavaCompilationWarnings(androidXExtension: AndroidX
  * Guarantees unique names for the APKs, and modifies some of the suffixes. The APK name is used
  * to determine what gets run by our test runner
  */
-fun String.renameApkForTesting(projectPath: String, hasBenchmarkPlugin: Boolean): String {
-    val name =
-        if (projectPath.contains("media") && projectPath.contains("version-compat-tests")) {
-            // Exclude media*:version-compat-tests modules from
-            // existing support library presubmit tests.
-            this.replace("-debug-androidTest", "")
-        } else if (hasBenchmarkPlugin) {
-            this.replace("-androidTest", "-androidBenchmark")
-        } else if (projectPath.endsWith("macrobenchmark")) {
-            this.replace("-androidTest", "-androidMacrobenchmark")
-        } else {
-            this
-        }
-    return "${projectPath.asFilenamePrefix()}_$name"
+fun String.renameApkForTesting(projectPath: String): String {
+    return "${projectPath.asFilenamePrefix()}_$this"
 }
 
 fun Project.hasBenchmarkPlugin(): Boolean {

@@ -19,14 +19,18 @@ dependencies {
     implementation(gradleApi())
     compileOnly(findGradleKotlinDsl())
 
+    // Android Gradle Plugin APIs used by Stable AIDL
+    implementation(libs.androidGradlePluginApi)
+
     // Plugins we use and configure
     implementation(libs.androidGradlePluginz)
     implementation(libs.androidToolsCommon) // for com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+    implementation(libs.androidToolsRepository) // com.android.repository for Stable AIDL plugin
+    implementation(libs.androidToolsSdkCommon) // com.android.ide.common for Stable AIDL plugin
     implementation(libs.kotlinGradlePluginz)
 
     // variety of json parsers
     implementation(libs.gson)
-    implementation(libs.json) // b/241475613
     implementation(libs.jsonSimple)
 
     // XML parsers used in MavenUploadHelper.kt
@@ -45,6 +49,9 @@ dependencies {
     implementation(libs.protobufGradlePluginz) // needed to compile inspection plugin
     implementation(libs.kotlinPoet) // needed to compile material-icon-generator
     implementation(libs.xmlpull) // needed to compile material-icon-generator
+
+    implementation(libs.protobuf) // needed to compile baseline-profile gradle plugins
+    implementation(libs.agpTestingPlatformCoreProto) // needed to compile baseline-profile gradle plugins
 
     // dependencies that aren't used by buildSrc directly but that we resolve here so that the
     // root project doesn't need to re-resolve them and their dependencies on every build

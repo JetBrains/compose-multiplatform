@@ -157,6 +157,7 @@ class AndroidXComposeImplPlugin : Plugin<Project> {
                     error.add("MissingColorAlphaChannel")
                     error.add("ModifierFactoryReturnType")
                     error.add("ModifierFactoryExtensionFunction")
+                    error.add("ModifierNodeInspectableProperties")
                     error.add("ModifierParameter")
                     error.add("MutableCollectionMutableState")
                     error.add("UnnecessaryComposedModifier")

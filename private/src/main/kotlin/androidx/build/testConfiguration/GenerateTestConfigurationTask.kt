@@ -19,9 +19,11 @@ package androidx.build.testConfiguration
 import androidx.build.dependencyTracker.ProjectSubset
 import androidx.build.renameApkForTesting
 import com.android.build.api.variant.BuiltArtifactsLoader
+import java.io.File
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
@@ -32,7 +34,6 @@ import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.PathSensitive
 import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 /**
  * Writes a configuration file in
@@ -84,44 +85,32 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
     @get:Input
     abstract val presubmit: Property<Boolean>
 
+    @get:Input
+    abstract val additionalApkKeys: ListProperty<String>
+
     @get:OutputFile
     abstract val outputXml: RegularFileProperty
 
-    /**
-     * Output file where we write the sha256 for each APK file we reference
-     */
     @get:OutputFile
-    abstract val shaReportOutput: RegularFileProperty
+    abstract val outputJson: RegularFileProperty
 
     @get:OutputFile
     abstract val constrainedOutputXml: RegularFileProperty
 
-    /**
-     * Output file where we write the sha256 for each APK file we reference in constrained setup
-     */
-    @get:OutputFile
-    abstract val constrainedShaReportOutput: RegularFileProperty
-
     @TaskAction
     fun generateAndroidTestZip() {
-        val testApkSha256Report = TestApkSha256Report()
         writeConfigFileContent(
             outputFile = constrainedOutputXml,
-            testApkSha256Report = testApkSha256Report,
             isConstrained = true,
         )
         writeConfigFileContent(
             outputFile = outputXml,
-            testApkSha256Report = testApkSha256Report,
             isConstrained = false,
         )
-        testApkSha256Report.writeToFile(shaReportOutput.get().asFile)
-        testApkSha256Report.writeToFile(constrainedShaReportOutput.get().asFile)
     }
 
     private fun writeConfigFileContent(
         outputFile: RegularFileProperty,
-        testApkSha256Report: TestApkSha256Report,
         isConstrained: Boolean = false
     ) {
         /*
@@ -131,20 +120,18 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         configurations testing Android Application projects, so that both APKs get installed.
          */
         val configBuilder = ConfigBuilder()
+        configBuilder.configName = outputFile.asFile.get().name
         if (appLoader.isPresent) {
             val appApk = appLoader.get().load(appFolder.get())
                 ?: throw RuntimeException("Cannot load required APK for task: $name")
             // We don't need to check hasBenchmarkPlugin because benchmarks shouldn't have test apps
             val appApkBuiltArtifact = appApk.elements.single()
-            var appName = appApkBuiltArtifact.outputFile.substringAfterLast("/")
-                .renameApkForTesting(appProjectPath.get(), hasBenchmarkPlugin = false)
-            // TODO(b/178776319): Clean up this hardcoded hack
-            if (appProjectPath.get().contains("macrobenchmark-target")) {
-                appName = appName.replace("debug-androidTest", "release")
-            }
+            val appName = appApkBuiltArtifact.outputFile.substringAfterLast("/")
+                .renameApkForTesting(appProjectPath.get())
             configBuilder.appApkName(appName)
-            testApkSha256Report.addFile(appName, appApkBuiltArtifact)
+                .appApkSha256(sha256(File(appApkBuiltArtifact.outputFile)))
         }
+        configBuilder.additionalApkKeys(additionalApkKeys.get())
         val isPresubmit = presubmit.get()
         configBuilder.isPostsubmit(!isPresubmit)
         // Will be using the constrained configs for all devices api 26 and below.
@@ -204,21 +191,27 @@ abstract class GenerateTestConfigurationTask : DefaultTask() {
         val testApkBuiltArtifact = testApk.elements.single()
         val testName = testApkBuiltArtifact.outputFile
             .substringAfterLast("/")
-            .renameApkForTesting(testProjectPath.get(), hasBenchmarkPlugin.get())
+            .renameApkForTesting(testProjectPath.get())
         configBuilder.testApkName(testName)
             .applicationId(testApk.applicationId)
             .minSdk(minSdk.get().toString())
             .testRunner(testRunner.get())
-        testApkSha256Report.addFile(testName, testApkBuiltArtifact)
-
-        val resolvedOutputFile: File = outputFile.asFile.get()
-        if (!resolvedOutputFile.exists()) {
-            if (!resolvedOutputFile.createNewFile()) {
-                throw RuntimeException(
-                    "Failed to create test configuration file: $resolvedOutputFile"
-                )
-            }
+            .testApkSha256(sha256(File(testApkBuiltArtifact.outputFile)))
+        createOrFail(outputFile).writeText(configBuilder.buildXml())
+        if (!isConstrained) {
+            createOrFail(outputJson).writeText(configBuilder.buildJson())
         }
-        resolvedOutputFile.writeText(configBuilder.build())
     }
+}
+
+internal fun createOrFail(fileProperty: RegularFileProperty): File {
+    val resolvedFile: File = fileProperty.asFile.get()
+    if (!resolvedFile.exists()) {
+        if (!resolvedFile.createNewFile()) {
+            throw RuntimeException(
+                "Failed to create test configuration file: $resolvedFile"
+            )
+        }
+    }
+    return resolvedFile
 }

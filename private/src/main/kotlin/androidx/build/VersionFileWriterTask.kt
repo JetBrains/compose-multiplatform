@@ -48,7 +48,7 @@ abstract class VersionFileWriterTask : DefaultTask() {
         val outputFile = File(outputDir.get().asFile, relativePath.get())
         outputFile.parentFile.mkdirs()
         val writer = PrintWriter(outputFile)
-        writer.println(version)
+        writer.println(version.get())
         writer.close()
     }
 }

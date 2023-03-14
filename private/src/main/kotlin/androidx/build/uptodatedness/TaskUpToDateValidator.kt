@@ -118,7 +118,16 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":lint-checks:integration-tests:copyDebugAndroidLintReports",
 
     // https://youtrack.jetbrains.com/issue/KT-49933
-    "generateProjectStructureMetadata"
+    "generateProjectStructureMetadata",
+
+    // https://github.com/google/protobuf-gradle-plugin/issues/667
+    ":datastore:datastore-preferences-proto:extractIncludeTestProto",
+    ":glance:glance-appwidget-proto:extractIncludeTestProto",
+    ":health:connect:connect-client-proto:extractIncludeTestProto",
+    ":privacysandbox:tools:tools-core:extractIncludeTestProto",
+    ":test:screenshot:screenshot-proto:extractIncludeTestProto",
+    ":wear:protolayout:protolayout-proto:extractIncludeTestProto",
+    ":wear:tiles:tiles-proto:extractIncludeTestProto"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once

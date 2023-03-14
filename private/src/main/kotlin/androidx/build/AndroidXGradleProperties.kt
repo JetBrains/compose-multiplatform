@@ -21,6 +21,21 @@ import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 /**
+ * Whether to enable constraints for projects in same-version groups
+ *
+ * This is expected to be true during builds that publish artifacts externally
+ * This is expected to be false during most other builds because:
+ *   Developers may be interested in including only a subset of projects in ANDROIDX_PROJECTS to
+ *     make Studio run more quickly.
+ *   If a build contains only a subset of projects, we cannot necessarily add constraints between
+ *     all pairs of projects in the same group.
+ *   We want most builds to have high remote cache usage, so we want constraints to be
+ *     similar across most builds
+ * See go/androidx-group-constraints for more information
+ */
+const val ADD_GROUP_CONSTRAINTS = "androidx.constraints"
+
+/**
  * Setting this property makes Test tasks succeed even if there
  * are some failing tests. Useful when running tests in CI where build
  * passes test results as XML to test reporter.
@@ -96,11 +111,6 @@ const val PLAYGROUND_SNAPSHOT_BUILD_ID = "androidx.playground.snapshotBuildId"
 const val PLAYGROUND_METALAVA_BUILD_ID = "androidx.playground.metalavaBuildId"
 
 /**
- * Build Id used to pull SNAPSHOT version of Dokka for Playground projects
- */
-const val PLAYGROUND_DOKKA_BUILD_ID = "androidx.playground.dokkaBuildId"
-
-/**
  * Filepath to the java agent of YourKit for profiling
  * If this value is set, profiling via YourKit will automatically be enabled
  */
@@ -142,6 +152,7 @@ const val XCODEGEN_DOWNLOAD_URI = "androidx.benchmark.darwin.xcodeGenDownloadUri
 const val ALLOW_CUSTOM_COMPILE_SDK = "androidx.allowCustomCompileSdk"
 
 val ALL_ANDROIDX_PROPERTIES = setOf(
+    ADD_GROUP_CONSTRAINTS,
     ALTERNATIVE_PROJECT_URL,
     VERSION_EXTRA_CHECK_ENABLED,
     VALIDATE_PROJECT_STRUCTURE,
@@ -162,7 +173,6 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     AffectedModuleDetector.BASE_COMMIT_ARG,
     PLAYGROUND_SNAPSHOT_BUILD_ID,
     PLAYGROUND_METALAVA_BUILD_ID,
-    PLAYGROUND_DOKKA_BUILD_ID,
     PROFILE_YOURKIT_AGENT_PATH,
     KMP_GITHUB_BUILD,
     ENABLED_KMP_TARGET_PLATFORMS,
@@ -170,6 +180,13 @@ val ALL_ANDROIDX_PROPERTIES = setOf(
     XCODEGEN_DOWNLOAD_URI,
     ALLOW_CUSTOM_COMPILE_SDK
 )
+
+/**
+ * Whether to enable constraints for projects in same-version groups
+ * See the property definition for more details
+ */
+fun Project.shouldAddGroupConstraints(): Boolean =
+    findBooleanProperty(ADD_GROUP_CONSTRAINTS) ?: false
 
 /**
  * Returns alternative project url that will be used as "url" property

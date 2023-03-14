@@ -16,14 +16,15 @@
 
 package androidx.build
 
+import androidx.build.buildInfo.CreateLibraryBuildInfoFileTask.Companion.getFrameworksSupportCommitShaAtHead
 import androidx.build.checkapi.shouldConfigureApiTasks
 import androidx.build.transform.configureAarAsJarForConfiguration
 import groovy.lang.Closure
+import java.io.File
 import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
-import java.io.File
 
 /**
  * Extension for [AndroidXImplPlugin] that's responsible for holding configuration options.
@@ -31,6 +32,7 @@ import java.io.File
 open class AndroidXExtension(val project: Project) {
     @JvmField
     val LibraryVersions: Map<String, Version>
+
     @JvmField
     val AllLibraryGroups: List<LibraryGroup>
 
@@ -44,7 +46,8 @@ open class AndroidXExtension(val project: Project) {
     private val versionService: LibraryVersionsService
 
     init {
-        val toml = lazyReadFile("libraryversions.toml")
+        val tomlFileName = "libraryversions.toml"
+        val toml = lazyReadFile(tomlFileName)
 
         // These parameters are used when building pre-release binaries for androidxdev.
         // These parameters are only expected to be compatible with :compose:compiler:compiler .
@@ -58,7 +61,8 @@ open class AndroidXExtension(val project: Project) {
             "libraryVersionsService",
             LibraryVersionsService::class.java
         ) { spec ->
-            spec.parameters.tomlFile = toml
+            spec.parameters.tomlFileName = tomlFileName
+            spec.parameters.tomlFileContents = toml
             spec.parameters.composeCustomVersion = composeCustomVersion
             spec.parameters.composeCustomGroup = composeCustomGroup
             spec.parameters.useMultiplatformGroupVersions = project.provider {
@@ -84,7 +88,9 @@ open class AndroidXExtension(val project: Project) {
     }
 
     var name: Property<String?> = project.objects.property(String::class.java)
-    fun setName(newName: String) { name.set(newName) }
+    fun setName(newName: String) {
+        name.set(newName)
+    }
 
     /**
      * Maven version of the library.
@@ -128,6 +134,15 @@ open class AndroidXExtension(val project: Project) {
         return projectPathsInSameGroup
     }
 
+    /**
+     * Returns a string explaining the value of mavenGroup
+     */
+    fun explainMavenGroup(): List<String> {
+        val explanationBuilder = mutableListOf<String>()
+        chooseLibraryGroup(explanationBuilder)
+        return explanationBuilder
+    }
+
     private fun lazyReadFile(fileName: String): Provider<String> {
         val fileProperty = project.objects.fileProperty().fileValue(
             File(project.getSupportRootFolder(), fileName)
@@ -135,8 +150,8 @@ open class AndroidXExtension(val project: Project) {
         return project.providers.fileContents(fileProperty).asText
     }
 
-    private fun chooseLibraryGroup(): LibraryGroup? {
-        return getLibraryGroupFromProjectPath(project.path)
+    private fun chooseLibraryGroup(explanationBuilder: MutableList<String>? = null): LibraryGroup? {
+        return getLibraryGroupFromProjectPath(project.path, explanationBuilder)
     }
 
     private fun substringBeforeLastColon(projectPath: String): String {
@@ -145,39 +160,60 @@ open class AndroidXExtension(val project: Project) {
     }
 
     // gets the library group from the project path, including special cases
-    private fun getLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+    private fun getLibraryGroupFromProjectPath(
+        projectPath: String,
+        explanationBuilder: MutableList<String>? = null
+    ): LibraryGroup? {
         val overridden = overrideLibraryGroupsByProjectPath.get(projectPath)
+        if (explanationBuilder != null) {
+            explanationBuilder.add(
+                "Library group (in libraryversions.toml) having" +
+                " overrideInclude=[\"$projectPath\"] is $overridden"
+            )
+        }
         if (overridden != null)
             return overridden
 
-        val result = getStandardLibraryGroupFromProjectPath(projectPath)
+        val result = getStandardLibraryGroupFromProjectPath(projectPath, explanationBuilder)
         if (result != null)
             return result
 
         // samples are allowed to be nested deeper
         if (projectPath.contains("samples")) {
             val parentPath = substringBeforeLastColon(projectPath)
-            return getLibraryGroupFromProjectPath(parentPath)
+            return getLibraryGroupFromProjectPath(parentPath, explanationBuilder)
         }
         return null
     }
 
     // simple function to get the library group from the project path, without special cases
-    private fun getStandardLibraryGroupFromProjectPath(projectPath: String): LibraryGroup? {
+    private fun getStandardLibraryGroupFromProjectPath(
+        projectPath: String,
+        explanationBuilder: MutableList<String>?
+    ): LibraryGroup? {
         // Get the text of the library group, something like "androidx.core"
         val parentPath = substringBeforeLastColon(projectPath)
 
-        if (parentPath == "")
+        if (parentPath == "") {
+            if (explanationBuilder != null)
+                explanationBuilder.add("Parent path for $projectPath is empty")
             return null
+        }
         // convert parent project path to groupId
         val groupIdText = if (projectPath.startsWith(":external")) {
             projectPath.replace(":external:", "")
         } else {
-	    "androidx.${parentPath.substring(1).replace(':', '.')}"
+            "androidx.${parentPath.substring(1).replace(':', '.')}"
         }
 
         // get the library group having that text
-        return libraryGroupsByGroupId.get(groupIdText)
+        val result = libraryGroupsByGroupId.get(groupIdText)
+        if (explanationBuilder != null) {
+            explanationBuilder.add(
+                "Library group (in libraryversions.toml) having group=\"$groupIdText\" is $result"
+            )
+        }
+        return result
     }
 
     private fun chooseProjectVersion() {
@@ -255,8 +291,10 @@ open class AndroidXExtension(val project: Project) {
     fun isVersionSet(): Boolean {
         return versionIsSet
     }
+
     var description: String? = null
     var inceptionYear: String? = null
+
     /**
      * targetsJavaConsumers = true, if project is intended to be accessed from Java-language
      * source code.
@@ -309,7 +347,7 @@ open class AndroidXExtension(val project: Project) {
     }
 
     internal fun isPublishConfigured(): Boolean = (
-            publish != Publish.UNSET ||
+        publish != Publish.UNSET ||
             type.publish != Publish.UNSET
         )
 
@@ -332,6 +370,10 @@ open class AndroidXExtension(val project: Project) {
 
     var metalavaK2UastEnabled = false
 
+    var disableDeviceTests = false
+
+    val additionalDeviceTestApkKeys = mutableListOf<String>()
+
     fun shouldEnforceKotlinStrictApiMode(): Boolean {
         return !legacyDisableKotlinStrictApiMode &&
             shouldConfigureApiTasks()
@@ -349,6 +391,12 @@ open class AndroidXExtension(val project: Project) {
 
     fun configureAarAsJarForConfiguration(name: String) {
         configureAarAsJarForConfiguration(project, name)
+    }
+
+    fun getReferenceSha(): Provider<String> {
+        return project.providers.provider {
+            project.getFrameworksSupportCommitShaAtHead()
+        }
     }
 
     companion object {

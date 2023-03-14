@@ -128,6 +128,9 @@ val taskNamesKnownToDuplicateOutputs = setOf(
     "generateReleaseProtos",
     // Release APKs
     "copyReleaseApk",
+    // The following tests intentionally have the same output of golden images
+    "updateGoldenDesktopTest",
+    "updateGoldenDebugUnitTest"
 )
 
 val taskTypesKnownToDuplicateOutputs = setOf(

@@ -107,9 +107,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
             buildOnServerTask.dependsOn(it)
         }
 
-        val createArchiveTask = Release.getGlobalFullZipTask(this)
-        buildOnServerTask.dependsOn(createArchiveTask)
-
         extra.set("projects", ConcurrentHashMap<String, String>())
         subprojects { project ->
             project.afterEvaluate {
@@ -140,7 +137,6 @@ abstract class AndroidXRootImplPlugin : Plugin<Project> {
                 buildOnServerTask.dependsOn("${project.path}:jar")
             }
         }
-        project.configureRootProjectForLint()
 
         tasks.register(AndroidXImplPlugin.BUILD_TEST_APKS_TASK)
 
