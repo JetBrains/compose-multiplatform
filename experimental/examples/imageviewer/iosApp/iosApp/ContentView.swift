@@ -233,8 +233,8 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
         guard let photoData = photo.fileDataRepresentation() else { return }
         lastCapturedImage = UIImage(data: photoData)
         
-        guard let updatedData = attachedGPSTo(photoData: photoData) else { return }
-        imageStorage.set(imageData: updatedData)
+        guard let updatedData = attachedGPSTo(photoData: photoData as NSData) else { return }
+        imageStorage.set(imageData: updatedData as NSData)
         
         // Reading last taken photo from Storage example
         DispatchQueue.global().asyncAfter(deadline: .now() + .seconds(2)) {
@@ -252,7 +252,7 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
     }
     
     // MARK: Attaching GPS data to photo metadata
-    func attachedGPSTo(photoData: Data?) -> Data? {
+    func attachedGPSTo(photoData: NSData?) -> NSData? {
         guard let sourcePhotoData = photoData,
               let imageSource = CGImageSourceCreateWithData(sourcePhotoData as CFData, nil),
               let imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, nil),
@@ -274,7 +274,7 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
             return nil
         }
         
-        return destPhotoData as Data
+        return destPhotoData as NSData
     }
     
     private func getLocationMetadata() -> CFDictionary {
@@ -298,7 +298,7 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
     }
     
     // MARK: Parsing coordinates and CGImage from data stored in the file system
-    func fetchCoordinatesFrom(photoData: Data?) -> (latitude: Double, longitude: Double)? {
+    func fetchCoordinatesFrom(photoData: NSData?) -> (latitude: Double, longitude: Double)? {
         guard let photoData = photoData else { return nil }
         let cfData = photoData as CFData
         guard let imageSource = CGImageSourceCreateWithData(cfData, nil),
@@ -312,7 +312,7 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
         return (latitude: latitude, longitude: longitude)
     }
     
-    func fetchImageFrom(photoData: Data?) -> CGImage? {
+    func fetchImageFrom(photoData: NSData?) -> CGImage? {
         guard let photoData = photoData else { return nil }
         let cfData = photoData as CFData
         guard let imageSource = CGImageSourceCreateWithData(cfData, nil),
@@ -388,7 +388,7 @@ fileprivate class ImageStorage {
         }
     }
     
-    func set(imageData: Data, label: String? = nil) {
+    func set(imageData: NSData, label: String? = nil) {
         let fileName = label != nil ? label! : df.string(from: Date()) + "_taken.jpg"
         guard let fileUrl = makeFileUrl(for: fileName) else { return }
         do {
@@ -398,10 +398,10 @@ fileprivate class ImageStorage {
         }
     }
     
-    func getDataForAllImages() -> [Data]? {
+    func getDataForAllImages() -> [NSData]? {
         guard let imagesUrl = getRelativePathUrl() else { return nil }
         
-        var resultArray = [Data?]()
+        var resultArray = [NSData?]()
         do {
             let imageUrls = try fm.contentsOfDirectory(atPath: imagesUrl.path)
             for imageUrlString in imageUrls {
@@ -415,8 +415,8 @@ fileprivate class ImageStorage {
         return resultArray.compactMap{$0}
     }
     
-    func getDataFor(imageName: String) -> Data? {
-        guard let url = makeFileUrl(for: imageName), let data = try? Data(contentsOf: url) else { return nil }
+    func getDataFor(imageName: String) -> NSData? {
+        guard let url = makeFileUrl(for: imageName), let data = try? NSData(contentsOf: url) else { return nil }
         return data
     }
     
