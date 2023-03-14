@@ -19,7 +19,7 @@ package androidx.compose.foundation.newtext.text.modifiers
 import androidx.compose.foundation.newtext.text.DefaultMinLines
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.node.ModifierNodeElement
-import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.platform.InspectorInfo
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,7 +33,8 @@ internal class TextStringSimpleElement(
     private val softWrap: Boolean = true,
     private val maxLines: Int = Int.MAX_VALUE,
     private val minLines: Int = DefaultMinLines,
-) : ModifierNodeElement<TextStringSimpleNode>(inspectorInfo = debugInspectorInfo { }) {
+) : ModifierNodeElement<TextStringSimpleNode>() {
+
     override fun create(): TextStringSimpleNode = TextStringSimpleNode(
         text,
         style,
@@ -81,8 +82,7 @@ internal class TextStringSimpleElement(
     }
 
     override fun hashCode(): Int {
-        var result = super.hashCode()
-        result = 31 * result + text.hashCode()
+        var result = text.hashCode()
         result = 31 * result + style.hashCode()
         result = 31 * result + fontFamilyResolver.hashCode()
         result = 31 * result + overflow.hashCode()
@@ -90,5 +90,9 @@ internal class TextStringSimpleElement(
         result = 31 * result + maxLines
         result = 31 * result + minLines
         return result
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        // Show nothing in the inspector.
     }
 }

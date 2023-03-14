@@ -31,12 +31,14 @@ Parameter sets should be one of:
 * SocialApps - benchmarks that are unique te social apps (e.g. more spans)
 * ShoppingApps - benchmarks that are unique to shopping apps (e.g. more spans)
 
+To run the full suite, set [DoFullBenchmark]
+
 ## Use-case naming
 
-Name new benchmarks after the developer task being performed. 
+Name new benchmarks after the developer task being performed.
 
 For example 
-* `SetText` the task of setting text after loading it from some source 
+* `SetText` the task of setting text after loading it from some source
 * `IfNotEmptyCallText` the task of adding Text, only if not empty
 
 Benchmarks should attempt to provide a realistic async loading "default" value as state between

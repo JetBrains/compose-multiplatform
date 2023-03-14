@@ -125,6 +125,10 @@ private val PlatformPackage = FqName("androidx.compose.ui.platform")
  *      )
  *  )
  * ```
+ *
+ * This inspector only applies to Modifiers implemented prior to Modifier.Node. For the
+ * corresponding Modifier.Node inspection, see `ModifierNodeInspectablePropertiesDetector` in
+ * `:compose:ui:ui-lint`.
  */
 class ModifierInspectorInfoDetector : Detector(), SourceCodeScanner {
     override fun createUastHandler(context: JavaContext): UElementHandler = ModifierHandler(context)

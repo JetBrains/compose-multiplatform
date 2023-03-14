@@ -58,10 +58,10 @@ fun SwipeToDismissListItems() {
         dismissContent = {
             Card {
                 ListItem(
-                    headlineText = {
+                    headlineContent = {
                         Text("Cupcake")
                     },
-                    supportingText = { Text("Swipe me left or right!") }
+                    supportingContent = { Text("Swipe me left or right!") }
                 )
                 Divider()
             }

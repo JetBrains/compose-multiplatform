@@ -17,7 +17,6 @@
 package androidx.compose.material3
 
 import android.os.Build
-import android.text.format.DateFormat
 import androidx.annotation.RequiresApi
 import java.time.DayOfWeek
 import java.time.Instant
@@ -70,15 +69,16 @@ internal class CalendarModelImpl : CalendarModel {
             }
         }
 
-    override val dateInputFormat: DateInputFormat
-        get() = datePatternAsInputFormat(
+    override fun getDateInputFormat(locale: Locale): DateInputFormat {
+        return datePatternAsInputFormat(
             DateTimeFormatterBuilder.getLocalizedDateTimePattern(
                 /* dateStyle = */ FormatStyle.SHORT,
                 /* timeStyle = */ null,
-                /* chrono = */ Chronology.ofLocale(Locale.getDefault()),
-                /* locale = */ Locale.getDefault()
+                /* chrono = */ Chronology.ofLocale(locale),
+                /* locale = */ locale
             )
         )
+    }
 
     override fun getCanonicalDate(timeInMillis: Long): CalendarDate {
         val localDate =
@@ -129,6 +129,9 @@ internal class CalendarModelImpl : CalendarModel {
         return getMonth(earlierMonth)
     }
 
+    override fun formatWithPattern(utcTimeMillis: Long, pattern: String, locale: Locale): String =
+        CalendarModelImpl.formatWithPattern(utcTimeMillis, pattern, locale)
+
     override fun parse(date: String, pattern: String): CalendarDate? {
         // TODO: A DateTimeFormatter can be reused.
         val formatter = DateTimeFormatter.ofPattern(pattern)
@@ -149,14 +152,13 @@ internal class CalendarModelImpl : CalendarModel {
     companion object {
 
         /**
-         * Formats a UTC timestamp into a string with a given date format skeleton.
+         * Formats a UTC timestamp into a string with a given date format pattern.
          *
          * @param utcTimeMillis a UTC timestamp to format (milliseconds from epoch)
-         * @param skeleton a date format skeleton
+         * @param pattern a date format pattern
          * @param locale the [Locale] to use when formatting the given timestamp
          */
-        fun format(utcTimeMillis: Long, skeleton: String, locale: Locale): String {
-            val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
+        fun formatWithPattern(utcTimeMillis: Long, pattern: String, locale: Locale): String {
             val formatter: DateTimeFormatter =
                 DateTimeFormatter.ofPattern(pattern, locale)
                     .withDecimalStyle(DecimalStyle.of(locale))

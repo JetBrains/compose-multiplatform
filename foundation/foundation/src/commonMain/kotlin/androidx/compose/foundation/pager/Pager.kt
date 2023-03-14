@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.util.fastFirstOrNull
 import androidx.compose.ui.util.fastForEach
 import androidx.compose.ui.util.fastSumBy
 import kotlin.math.absoluteValue
@@ -600,12 +601,12 @@ private fun SnapLayoutInfoProvider(
                     SnapAlignmentStartToStart
                 )
 
-                // Find item that is closest to the center
+                // Find item that is closest to the snap position, but before it
                 if (offset <= 0 && offset > lowerBoundOffset) {
                     lowerBoundOffset = offset
                 }
 
-                // Find item that is closest to center, but after it
+                // Find item that is closest to the snap position, but after it
                 if (offset >= 0 && offset < upperBoundOffset) {
                     upperBoundOffset = offset
                 }
@@ -624,10 +625,14 @@ private fun SnapLayoutInfoProvider(
 
         override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
             val effectivePageSizePx = pagerState.pageSize + pagerState.pageSpacing
-            val scrollOffset = pagerState.currentPageOffsetFraction * effectivePageSizePx
             val animationOffsetPx =
                 decayAnimationSpec.calculateTargetValue(0f, initialVelocity)
-            val startPage = pagerState.currentPage
+            val startPage = pagerState.firstVisiblePage?.let {
+                if (initialVelocity < 0) it.index + 1 else it.index
+            } ?: pagerState.currentPage
+
+            val scrollOffset =
+                layoutInfo.visibleItemsInfo.fastFirstOrNull { it.index == startPage }?.offset ?: 0
 
             debugLog {
                 "Initial Offset=$scrollOffset " +
@@ -659,11 +664,13 @@ private fun SnapLayoutInfoProvider(
 
             val proposedFlingOffset = (correctedTargetPage - startPage) * effectivePageSizePx
 
-            val flingApproachOffsetPx =
-                (proposedFlingOffset.absoluteValue - scrollOffset.absoluteValue).coerceAtLeast(0f)
+            debugLog { "Proposed Fling Approach Offset=$proposedFlingOffset" }
 
-            return if (flingApproachOffsetPx == 0f) {
-                flingApproachOffsetPx
+            val flingApproachOffsetPx =
+                (proposedFlingOffset.absoluteValue - scrollOffset.absoluteValue).coerceAtLeast(0)
+
+            return if (flingApproachOffsetPx == 0) {
+                flingApproachOffsetPx.toFloat()
             } else {
                 flingApproachOffsetPx * initialVelocity.sign
             }.also {

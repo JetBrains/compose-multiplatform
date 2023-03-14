@@ -22,6 +22,7 @@ package androidx.compose.runtime
 import androidx.compose.runtime.Composer.Companion.equals
 import androidx.compose.runtime.collection.IdentityArrayMap
 import androidx.compose.runtime.collection.IdentityArraySet
+import androidx.compose.runtime.collection.IntMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.PersistentMap
 import androidx.compose.runtime.external.kotlinx.collections.immutable.persistentHashMapOf
 import androidx.compose.runtime.snapshots.currentSnapshot
@@ -78,6 +79,16 @@ internal interface RememberManager {
      * notifications are sent.
      */
     fun sideEffect(effect: () -> Unit)
+
+    /**
+     * The [ComposeNodeLifecycleCallback] is being deactivated.
+     */
+    fun deactivating(instance: ComposeNodeLifecycleCallback)
+
+    /**
+     * The [ComposeNodeLifecycleCallback] is being released.
+     */
+    fun releasing(instance: ComposeNodeLifecycleCallback)
 }
 
 /**
@@ -1058,6 +1069,15 @@ sealed interface Composer {
     val composition: ControlledComposition
         @TestOnly get
 
+    /**
+     * Disable the collection of source information, that may introduce groups to store the source
+     * information, in order to be able to more accurately calculate the actual number of groups a
+     * composable function generates in a release build.
+     *
+     * This function is only safe to call in a test and will produce incorrect composition results
+     * if called on a composer not under test.
+     */
+    @TestOnly
     fun disableSourceInformation()
 
     companion object {
@@ -1248,7 +1268,7 @@ internal class ComposerImpl(
     private val invalidations: MutableList<Invalidation> = mutableListOf()
     private val entersStack = IntStack()
     private var parentProvider: CompositionLocalMap = persistentHashMapOf()
-    private val providerUpdates = HashMap<Int, CompositionLocalMap>()
+    private val providerUpdates = IntMap<CompositionLocalMap>()
     private var providersInvalid = false
     private val providersInvalidStack = IntStack()
     private var reusing = false
@@ -1614,7 +1634,14 @@ internal class ComposerImpl(
     override fun useNode() {
         validateNodeExpected()
         runtimeCheck(!inserting) { "useNode() called while inserting" }
-        recordDown(reader.node)
+        val node = reader.node
+        recordDown(node)
+
+        if (reusing && node is ComposeNodeLifecycleCallback) {
+            recordApplierOperation { applier, _, _ ->
+                (applier.current as ComposeNodeLifecycleCallback).onReuse()
+            }
+        }
     }
 
     /**
@@ -1885,12 +1912,15 @@ internal class ComposerImpl(
         record { _, _, rememberManager -> rememberManager.sideEffect(effect) }
     }
 
+    private fun currentCompositionLocalScope(): CompositionLocalMap {
+        providerCache?.let { return it }
+        return currentCompositionLocalScope(reader.parent)
+    }
+
     /**
      * Return the current [CompositionLocal] scope which was provided by a parent group.
      */
-    private fun currentCompositionLocalScope(group: Int? = null): CompositionLocalMap {
-        if (group == null)
-            providerCache?.let { return it }
+    private fun currentCompositionLocalScope(group: Int): CompositionLocalMap {
         if (inserting && writerHasAProvider) {
             var current = writer.parent
             while (current > 0) {
@@ -1906,7 +1936,7 @@ internal class ComposerImpl(
             }
         }
         if (reader.size > 0) {
-            var current = group ?: reader.parent
+            var current = group
             while (current > 0) {
                 if (reader.groupKey(current) == compositionLocalMapKey &&
                     reader.groupObjectKey(current) == compositionLocalMap
@@ -2740,6 +2770,14 @@ internal class ComposerImpl(
             val start = reader.currentGroup
             val end = reader.currentEnd
             for (group in start until end) {
+                if (reader.isNode(group)) {
+                    val node = reader.node(group)
+                    if (node is ComposeNodeLifecycleCallback) {
+                        record { _, _, rememberManager ->
+                            rememberManager.deactivating(node)
+                        }
+                    }
+                }
                 reader.forEachData(group) { index, data ->
                     when (data) {
                         is RememberObserver -> {
@@ -4167,18 +4205,20 @@ internal fun SlotWriter.removeCurrentGroup(rememberManager: RememberManager) {
 
     // To ensure this order, we call `enters` as a pre-order traversal
     // of the group tree, and then call `leaves` in the inverse order.
-
     for (slot in groupSlots()) {
-        when (slot) {
-            is RememberObserver -> {
-                rememberManager.forgetting(slot)
-            }
-            is RecomposeScopeImpl -> {
-                val composition = slot.composition
-                if (composition != null) {
-                    composition.pendingInvalidScopes = true
-                    slot.release()
-                }
+        // even that in the documentation we claim ComposeNodeLifecycleCallback should be only
+        // implemented on the nodes we do not really enforce it here as doing so will be expensive.
+        if (slot is ComposeNodeLifecycleCallback) {
+            rememberManager.releasing(slot)
+        }
+        if (slot is RememberObserver) {
+            rememberManager.forgetting(slot)
+        }
+        if (slot is RecomposeScopeImpl) {
+            val composition = slot.composition
+            if (composition != null) {
+                composition.pendingInvalidScopes = true
+                slot.release()
             }
         }
     }

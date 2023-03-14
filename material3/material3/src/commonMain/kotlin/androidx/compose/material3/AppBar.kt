@@ -1225,7 +1225,11 @@ private fun TwoRowsTopAppBar(
                 actions = actionsRow,
             )
             TopAppBarLayout(
-                modifier = Modifier.clipToBounds(),
+                modifier = Modifier
+                    // only apply the horizontal sides of the window insets padding, since the top
+                    // padding will always be applied by the layout above
+                    .windowInsetsPadding(windowInsets.only(WindowInsetsSides.Horizontal))
+                    .clipToBounds(),
                 heightPx = maxHeightPx - pinnedHeightPx + (scrollBehavior?.state?.heightOffset
                     ?: 0f),
                 navigationIconContentColor =

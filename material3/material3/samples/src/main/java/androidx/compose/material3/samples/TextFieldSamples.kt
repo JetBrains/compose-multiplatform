@@ -120,6 +120,23 @@ fun TextFieldWithPlaceholder() {
 @Preview
 @Sampled
 @Composable
+fun TextFieldWithPrefixAndSuffix() {
+    var text by rememberSaveable { mutableStateOf("") }
+
+    TextField(
+        value = text,
+        onValueChange = { text = it },
+        singleLine = true,
+        label = { Text("Label") },
+        prefix = { Text("www.") },
+        suffix = { Text(".com") },
+        placeholder = { Text("google") },
+    )
+}
+
+@Preview
+@Sampled
+@Composable
 fun TextFieldWithErrorState() {
     val errorMessage = "Text input too long"
     var text by rememberSaveable { mutableStateOf("") }

@@ -18,7 +18,6 @@ package androidx.compose.ui.draw
 
 import android.os.Build
 import android.view.View
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -1158,7 +1157,7 @@ class GraphicsLayerTest {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCompositingStrategyModulateAlpha() {
         val tag = "testTag"
@@ -1200,7 +1199,7 @@ class GraphicsLayerTest {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCompositingStrategyAlways() {
         val tag = "testTag"
@@ -1235,7 +1234,7 @@ class GraphicsLayerTest {
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun testCompositingStrategyAuto() {
         val tag = "testTag"
@@ -1351,7 +1350,8 @@ class GraphicsLayerTest {
         assertEquals(sizePx, drawScopeWidth)
         assertEquals(sizePx, drawScopeHeight)
     }
-    @RequiresApi(Build.VERSION_CODES.O)
+
+    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     @Test
     fun removingGraphicsLayerInvalidatesParentLayer() {
         var toggle by mutableStateOf(true)
@@ -1382,6 +1382,34 @@ class GraphicsLayerTest {
         rule.onNodeWithTag("lazy").captureToImage().asAndroidBitmap().apply {
             assertEquals(Color.Red.toArgb(), getPixel(10, (size * 1.5f).roundToInt()))
             assertEquals(Color.Red.toArgb(), getPixel(10, (size * 2.5f).roundToInt()))
+        }
+    }
+
+    @Test
+    fun removingGraphicsLayerModifierResetsItsAction() {
+        var addGraphicsLayer by mutableStateOf(true)
+        lateinit var coordinates: LayoutCoordinates
+        rule.setContent {
+            Box(
+                if (addGraphicsLayer) {
+                    Modifier.graphicsLayer(translationX = 10f)
+                } else {
+                    Modifier
+                }
+            ) {
+                Layout(Modifier.onGloballyPositioned { coordinates = it }) { _, _ ->
+                    layout(10, 10) {}
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(Rect(10f, 0f, 20f, 10f), coordinates.boundsInRoot())
+            addGraphicsLayer = false
+        }
+
+        rule.runOnIdle {
+            assertEquals(Rect(0f, 0f, 10f, 10f), coordinates.boundsInRoot())
         }
     }
 }

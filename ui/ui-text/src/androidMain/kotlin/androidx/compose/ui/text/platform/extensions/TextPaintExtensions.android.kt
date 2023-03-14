@@ -49,7 +49,8 @@ internal fun AndroidTextPaint.applySpanStyle(
     style: SpanStyle,
     resolveTypeface: (FontFamily?, FontWeight, FontStyle, FontSynthesis) -> Typeface,
     density: Density,
-): SpanStyle {
+    requiresLetterSpacing: Boolean = false,
+): SpanStyle? {
     when (style.fontSize.type) {
         TextUnitType.Sp -> with(density) {
             textSize = style.fontSize.toPx()
@@ -82,12 +83,6 @@ internal fun AndroidTextPaint.applySpanStyle(
         }
     }
 
-    when (style.letterSpacing.type) {
-        TextUnitType.Em -> { letterSpacing = style.letterSpacing.value }
-        TextUnitType.Sp -> {} // Sp will be handled by applying a span
-        else -> {} // Do nothing
-    }
-
     if (style.fontFeatureSettings != null && style.fontFeatureSettings != "") {
         fontFeatureSettings = style.fontFeatureSettings
     }
@@ -110,28 +105,53 @@ internal fun AndroidTextPaint.applySpanStyle(
     setTextDecoration(style.textDecoration)
     setDrawStyle(style.drawStyle)
 
-    // letterSpacing with unit Sp needs to be handled by span.
+    // apply para level leterspacing
+    if (style.letterSpacing.type == TextUnitType.Sp && style.letterSpacing.value != 0.0f) {
+        val emWidth = textSize * textScaleX
+        val letterSpacingPx = with(density) {
+            style.letterSpacing.toPx()
+        }
+        // Do nothing if emWidth is 0.0f.
+        if (emWidth != 0.0f) {
+            letterSpacing = letterSpacingPx / emWidth
+        }
+    } else if (style.letterSpacing.type == TextUnitType.Em) {
+        letterSpacing = style.letterSpacing.value
+    }
+
+    return generateFallbackSpanStyle(
+        style.letterSpacing,
+        requiresLetterSpacing,
+        style.background,
+        style.baselineShift
+    )
+}
+
+private fun generateFallbackSpanStyle(
+    letterSpacing: TextUnit,
+    requiresLetterSpacing: Boolean,
+    background: Color,
+    baselineShift: BaselineShift?
+): SpanStyle? {
+    // letterSpacing needs to be reset at every metricsEffectingSpan transition - so generate
+    // a span for it only if there are other spans
+    val hasLetterSpacing = requiresLetterSpacing &&
+        (letterSpacing.type == TextUnitType.Sp && letterSpacing.value != 0f)
+
     // baselineShift and bgColor is reset in the Android Layout constructor,
     // therefore we cannot apply them on paint, have to use spans.
-    return SpanStyle(
-        letterSpacing = if (style.letterSpacing.type == TextUnitType.Sp &&
-            style.letterSpacing.value != 0f
-        ) {
-            style.letterSpacing
-        } else {
-            TextUnit.Unspecified
-        },
-        background = if (style.background == Color.Transparent) {
-            Color.Unspecified // No need to add transparent background for default text style.
-        } else {
-            style.background
-        },
-        baselineShift = if (style.baselineShift == BaselineShift.None) {
-            null
-        } else {
-            style.baselineShift
-        }
-    )
+    val hasBackgroundColor = background != Color.Unspecified && background != Color.Transparent
+    val hasBaselineShift = baselineShift != null && baselineShift != BaselineShift.None
+
+    return if (!hasLetterSpacing && !hasBackgroundColor && !hasBaselineShift) {
+        null
+    } else {
+        SpanStyle(
+            letterSpacing = if (hasLetterSpacing) { letterSpacing } else { TextUnit.Unspecified },
+            background = if (hasBackgroundColor) { background } else { Color.Unspecified },
+            baselineShift = if (hasBaselineShift) { baselineShift } else { null }
+        )
+    }
 }
 
 @OptIn(ExperimentalTextApi::class)

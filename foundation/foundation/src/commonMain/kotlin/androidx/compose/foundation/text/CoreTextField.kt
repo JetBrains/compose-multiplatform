@@ -95,6 +95,8 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.CommitTextCommand
+import androidx.compose.ui.text.input.DeleteAllCommand
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
@@ -417,20 +419,33 @@ internal fun CoreTextField(
                 false
             }
         }
-        setText {
-            state.onValueChange(TextFieldValue(it.text, TextRange(it.text.length)))
+        setText { text ->
+            // If the action is performed while in an active text editing session, treat this like
+            // an IME command and update the text by going through the buffer. This keeps the buffer
+            // state consistent if other IME commands are performed before the next recomposition,
+            // and is used for the testing code path.
+            state.inputSession?.let { session ->
+                TextFieldDelegate.onEditCommand(
+                    ops = listOf(DeleteAllCommand(), CommitTextCommand(text, 1)),
+                    editProcessor = state.processor,
+                    state.onValueChange,
+                    session
+                )
+            } ?: run {
+                state.onValueChange(TextFieldValue(text.text, TextRange(text.text.length)))
+            }
             true
         }
-        setSelection { selectionStart, selectionEnd, traversalMode ->
+        setSelection { selectionStart, selectionEnd, relativeToOriginalText ->
             // in traversal mode we get selection from the `textSelectionRange` semantics which is
             // selection in original text. In non-traversal mode selection comes from the Talkback
             // and indices are relative to the transformed text
-            val start = if (traversalMode) {
+            val start = if (relativeToOriginalText) {
                 selectionStart
             } else {
                 offsetMapping.transformedToOriginal(selectionStart)
             }
-            val end = if (traversalMode) {
+            val end = if (relativeToOriginalText) {
                 selectionEnd
             } else {
                 offsetMapping.transformedToOriginal(selectionEnd)
@@ -445,7 +460,7 @@ internal fun CoreTextField(
             ) {
                 // Do not show toolbar if it's a traversal mode (with the volume keys), or
                 // if the cursor just moved to beginning or end.
-                if (traversalMode || start == end) {
+                if (relativeToOriginalText || start == end) {
                     manager.exitSelectionMode()
                 } else {
                     manager.enterSelectionMode()
@@ -956,9 +971,11 @@ internal suspend fun BringIntoViewRequester.bringSelectionEndIntoView(
         selectionEndInTransformed < textLayoutResult.layoutInput.text.length -> {
             textLayoutResult.getBoundingBox(selectionEndInTransformed)
         }
+
         selectionEndInTransformed != 0 -> {
             textLayoutResult.getBoundingBox(selectionEndInTransformed - 1)
         }
+
         else -> { // empty text.
             val defaultSize = computeSizeForDefaultText(
                 textDelegate.style,

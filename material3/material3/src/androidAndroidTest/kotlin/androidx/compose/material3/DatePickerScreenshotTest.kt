@@ -61,13 +61,29 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
             Box(wrap.testTag(wrapperTestTag)) {
                 val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 1, dayOfMonth = 1)
                 DatePicker(
-                    datePickerState = rememberDatePickerState(
+                    state = rememberDatePickerState(
+                        initialDisplayedMonthMillis = monthInUtcMillis
+                    ),
+                    showModeToggle = false
+                )
+            }
+        }
+        assertAgainstGolden("datePicker_initialMonth_${scheme.name}")
+    }
+
+    @Test
+    fun datePicker_withModeToggle() {
+        rule.setMaterialContent(scheme.colorScheme) {
+            Box(wrap.testTag(wrapperTestTag)) {
+                val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 1, dayOfMonth = 1)
+                DatePicker(
+                    state = rememberDatePickerState(
                         initialDisplayedMonthMillis = monthInUtcMillis
                     )
                 )
             }
         }
-        assertAgainstGolden("datePicker_initialMonth_${scheme.name}")
+        assertAgainstGolden("datePicker_withModeToggle_${scheme.name}")
     }
 
     @Test
@@ -77,10 +93,11 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
                 val monthInUtcMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 1)
                 val selectedDayMillis = dayInUtcMilliseconds(year = 2021, month = 3, dayOfMonth = 6)
                 DatePicker(
-                    datePickerState = rememberDatePickerState(
+                    state = rememberDatePickerState(
                         initialDisplayedMonthMillis = monthInUtcMillis,
                         initialSelectedDateMillis = selectedDayMillis
-                    )
+                    ),
+                    showModeToggle = false
                 )
             }
         }
@@ -93,10 +110,11 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
             Box(wrap.testTag(wrapperTestTag)) {
                 val monthInUtcMillis = dayInUtcMilliseconds(year = 2000, month = 6, dayOfMonth = 1)
                 DatePicker(
-                    datePickerState = rememberDatePickerState(
+                    state = rememberDatePickerState(
                         initialDisplayedMonthMillis = monthInUtcMillis
                     ),
-                    dateValidator = { false }
+                    dateValidator = { false },
+                    showModeToggle = false
                 )
             }
         }
@@ -109,9 +127,10 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
             Box(wrap.testTag(wrapperTestTag)) {
                 val monthInUtcMillis = dayInUtcMilliseconds(year = 2000, month = 5, dayOfMonth = 1)
                 DatePicker(
-                    datePickerState = rememberDatePickerState(
+                    state = rememberDatePickerState(
                         initialDisplayedMonthMillis = monthInUtcMillis
-                    )
+                    ),
+                    showModeToggle = false
                 )
             }
         }
@@ -131,10 +150,11 @@ class DatePickerScreenshotTest(private val scheme: ColorSchemeWrapper) {
                 dismissButton = { TextButton(onClick = {}) { Text("Cancel") } }
             ) {
                 DatePicker(
-                    datePickerState = rememberDatePickerState(
+                    state = rememberDatePickerState(
                         initialDisplayedMonthMillis = monthInUtcMillis,
                         initialSelectedDateMillis = selectedDayMillis
-                    )
+                    ),
+                    showModeToggle = false
                 )
             }
         }

@@ -16,10 +16,12 @@
 
 package androidx.compose.foundation.lazy.grid
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.fastFilter
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.lazy.layout.LazyPinnedItem
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList
+import androidx.compose.foundation.lazy.layout.findIndexByKey
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.Placeable
 import androidx.compose.ui.unit.Constraints
@@ -38,8 +40,10 @@ import kotlin.math.sign
  * Measures and calculates the positions for the currently visible items. The result is produced
  * as a [LazyGridMeasureResult] which contains all the calculations.
  */
+@OptIn(ExperimentalFoundationApi::class)
 internal fun measureLazyGrid(
     itemsCount: Int,
+    itemProvider: LazyGridItemProvider,
     measuredLineProvider: LazyMeasuredLineProvider,
     measuredItemProvider: LazyMeasuredItemProvider,
     mainAxisAvailableSize: Int,
@@ -57,7 +61,7 @@ internal fun measureLazyGrid(
     density: Density,
     placementAnimator: LazyGridItemPlacementAnimator,
     spanLayoutProvider: LazyGridSpanLayoutProvider,
-    pinnedItems: List<LazyPinnedItem>,
+    pinnedItems: LazyLayoutPinnedItemList,
     layout: (Int, Int, Placeable.PlacementScope.() -> Unit) -> MeasureResult
 ): LazyGridMeasureResult {
     require(beforeContentPadding >= 0)
@@ -76,7 +80,8 @@ internal fun measureLazyGrid(
             totalItemsCount = 0,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacing = spaceBetweenLines
         )
     } else {
         var currentFirstLineIndex = firstVisibleLineIndex
@@ -208,6 +213,7 @@ internal fun measureLazyGrid(
         val extraItemsBefore = calculateExtraItems(
             pinnedItems,
             measuredItemProvider,
+            itemProvider,
             itemConstraints = { measuredLineProvider.itemConstraints(it) },
             filter = { it in 0 until firstItemIndex }
         )
@@ -215,6 +221,7 @@ internal fun measureLazyGrid(
         val extraItemsAfter = calculateExtraItems(
             pinnedItems,
             measuredItemProvider,
+            itemProvider,
             itemConstraints = { measuredLineProvider.itemConstraints(it) },
             filter = { it in (lastItemIndex + 1) until itemsCount }
         )
@@ -291,28 +298,35 @@ internal fun measureLazyGrid(
             totalItemsCount = itemsCount,
             reverseLayout = reverseLayout,
             orientation = if (isVertical) Orientation.Vertical else Orientation.Horizontal,
-            afterContentPadding = afterContentPadding
+            afterContentPadding = afterContentPadding,
+            mainAxisItemSpacing = spaceBetweenLines
         )
     }
 }
 
+@ExperimentalFoundationApi
 private inline fun calculateExtraItems(
-    pinnedItems: List<LazyPinnedItem>,
-    itemProvider: LazyMeasuredItemProvider,
+    pinnedItems: LazyLayoutPinnedItemList,
+    measuredItemProvider: LazyMeasuredItemProvider,
+    itemProvider: LazyGridItemProvider,
     itemConstraints: (ItemIndex) -> Constraints,
     filter: (Int) -> Boolean
 ): List<LazyGridMeasuredItem> {
     var items: MutableList<LazyGridMeasuredItem>? = null
 
-    pinnedItems.fastForEach {
-        val index = ItemIndex(it.index)
-        if (filter(it.index)) {
-            val constraints = itemConstraints(index)
-            val item = itemProvider.getAndMeasure(index, constraints = constraints)
+    pinnedItems.fastForEach { item ->
+        val index = itemProvider.findIndexByKey(item.key, item.index)
+        if (filter(index)) {
+            val itemIndex = ItemIndex(index)
+            val constraints = itemConstraints(itemIndex)
+            val measuredItem = measuredItemProvider.getAndMeasure(
+                itemIndex,
+                constraints = constraints
+            )
             if (items == null) {
                 items = mutableListOf()
             }
-            items?.add(item)
+            items?.add(measuredItem)
         }
     }
 

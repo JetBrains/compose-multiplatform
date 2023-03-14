@@ -4012,10 +4012,10 @@ fun assertColorsEqual(
     error: () -> String = { "$expected and $color are not similar!" }
 ) {
     val errorString = error()
-    assertEquals(errorString, expected.red, color.red, 0.01f)
-    assertEquals(errorString, expected.green, color.green, 0.01f)
-    assertEquals(errorString, expected.blue, color.blue, 0.01f)
-    assertEquals(errorString, expected.alpha, color.alpha, 0.01f)
+    assertEquals(errorString, expected.red, color.red, 0.05f)
+    assertEquals(errorString, expected.green, color.green, 0.05f)
+    assertEquals(errorString, expected.blue, color.blue, 0.05f)
+    assertEquals(errorString, expected.alpha, color.alpha, 0.05f)
 }
 
 @Composable

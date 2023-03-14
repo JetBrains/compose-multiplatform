@@ -17,6 +17,7 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
@@ -24,6 +25,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.ShaderBrush
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -277,6 +279,7 @@ expect sealed interface Paragraph {
      * @param drawStyle Applies to the default text paint style that's used by this paragraph. Spans
      * that specify a DrawStyle are not affected. Passing this value as `null` does not change the
      * currently set DrawStyle.
+     * @param blendMode Blending algorithm to be applied to the Paragraph while painting.
      */
     @ExperimentalTextApi
     fun paint(
@@ -284,7 +287,8 @@ expect sealed interface Paragraph {
         color: Color = Color.Unspecified,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
     )
 
     /**
@@ -310,6 +314,7 @@ expect sealed interface Paragraph {
      * @param drawStyle Applies to the default text paint style that's used by this paragraph. Spans
      * that specify a DrawStyle are not affected. Passing this value as `null` does not change the
      * currently set DrawStyle.
+     * @param blendMode Blending algorithm to be applied to the Paragraph while painting.
      */
     @ExperimentalTextApi
     fun paint(
@@ -318,7 +323,8 @@ expect sealed interface Paragraph {
         alpha: Float = Float.NaN,
         shadow: Shadow? = null,
         textDecoration: TextDecoration? = null,
-        drawStyle: DrawStyle? = null
+        drawStyle: DrawStyle? = null,
+        blendMode: BlendMode = DrawScope.DefaultBlendMode
     )
 }
 

@@ -121,7 +121,7 @@ fun Modifier.focusable(
                 pinHandle = pinnableContainer?.pin()
             }
             onDispose {
-                pinHandle?.unpin()
+                pinHandle?.release()
                 pinHandle = null
             }
         }
@@ -154,7 +154,7 @@ fun Modifier.focusable(
                         bringIntoViewRequester.bringIntoView()
                     }
                 } else {
-                    pinHandle?.unpin()
+                    pinHandle?.release()
                     pinHandle = null
                     scope.launch {
                         focusedInteraction.value?.let { oldValue ->

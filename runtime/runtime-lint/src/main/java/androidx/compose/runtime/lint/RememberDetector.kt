@@ -33,7 +33,7 @@ import com.intellij.psi.PsiMethod
 import org.jetbrains.uast.UCallExpression
 import java.util.EnumSet
 import org.jetbrains.kotlin.psi.KtCallExpression
-import org.jetbrains.kotlin.psi.KtLambdaArgument
+import org.jetbrains.kotlin.psi.KtLambdaExpression
 import org.jetbrains.uast.UExpression
 import org.jetbrains.uast.toUElementOfType
 
@@ -56,13 +56,20 @@ class RememberDetector : Detector(), SourceCodeScanner {
             }
             sourcePsi is KtCallExpression -> {
                 // Even though the return type is Unit, we should double check if the type of
-                // the last expression of the lambda argument matches.
-                val tailLambda = sourcePsi.valueArguments.lastOrNull() as? KtLambdaArgument
-                val lambda = tailLambda?.getLambdaExpression()
-                val lastExp = lambda?.bodyExpression?.statements?.lastOrNull()
-                val lastExpType = lastExp?.toUElementOfType<UExpression>()?.getExpressionType()
-                // If unresolved (i.e., type error), the expression type will be actually `null`.
-                callExpressionType == lastExpType
+                // the lambda expression matches
+                val calculationParameterIndex = method.parameters.lastIndex
+                val argument = node.getArgumentForParameter(calculationParameterIndex)?.sourcePsi
+                // If the argument is a lambda, check the expression inside
+                if (argument is KtLambdaExpression) {
+                    val lastExp = argument.bodyExpression?.statements?.lastOrNull()
+                    val lastExpType = lastExp?.toUElementOfType<UExpression>()?.getExpressionType()
+                    // If unresolved (i.e., type error), the expression type will be actually `null`
+                    callExpressionType == lastExpType
+                } else {
+                    // Otherwise return true, since it is a reference to something else that is
+                    // unit (such as a variable)
+                    true
+                }
            }
            else -> true
         }

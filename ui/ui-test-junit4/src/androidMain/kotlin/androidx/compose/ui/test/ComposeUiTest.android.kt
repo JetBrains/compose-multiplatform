@@ -43,8 +43,8 @@ import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
 import androidx.compose.ui.test.junit4.awaitComposeRoots
 import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.compose.ui.test.junit4.waitForComposeRoots
-import androidx.compose.ui.text.input.EditCommand
-import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.input.TextInputForTests
 import androidx.compose.ui.unit.Density
 import androidx.test.core.app.ActivityScenario
 import androidx.test.core.app.ApplicationProvider
@@ -542,25 +542,14 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         override val mainClock: MainTestClock
             get() = mainClockImpl
 
-        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
+        @OptIn(ExperimentalTextApi::class)
+        override fun performTextInput(node: SemanticsNode, action: TextInputForTests.() -> Unit) {
             val owner = node.root as ViewRootForTest
 
             test.runOnIdle {
-                val textInputService = owner.getTextInputServiceOrDie()
-                val onEditCommand = textInputService.onEditCommand
-                    ?: throw IllegalStateException("No input session started. Missing a focus?")
-                onEditCommand(command)
-            }
-        }
-
-        override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-            val owner = node.root as ViewRootForTest
-
-            test.runOnIdle {
-                val textInputService = owner.getTextInputServiceOrDie()
-                val onImeActionPerformed = textInputService.onImeActionPerformed
-                    ?: throw IllegalStateException("No input session started. Missing a focus?")
-                onImeActionPerformed.invoke(actionSpecified)
+                val textInput = owner.textInputForTests
+                    ?: error("No input session started. Missing a focus?")
+                action(textInput)
             }
         }
 
@@ -571,13 +560,6 @@ abstract class AndroidComposeUiTestEnvironment<A : ComponentActivity>(
         override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
             waitForIdle(atLeastOneRootExpected)
             return composeRootRegistry.getRegisteredComposeRoots()
-        }
-
-        private fun ViewRootForTest.getTextInputServiceOrDie(): TextInputServiceForTests {
-            return textInputService as? TextInputServiceForTests
-                ?: throw IllegalStateException(
-                    "Text input service wrapper not set up! Did you use ComposeTestRule?"
-                )
         }
     }
 }

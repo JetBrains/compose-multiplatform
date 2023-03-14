@@ -23,6 +23,9 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.gestures.draggable
+import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Box
@@ -31,9 +34,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.overscroll
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -153,5 +158,81 @@ fun OverscrollSample() {
                 // show the overscroll only on the text, not the containers (just for fun)
                 .overscroll(overscroll)
         )
+    }
+}
+
+@Sampled
+@Composable
+fun OverscrollWithDraggable_Before() {
+    var dragPosition by remember { mutableStateOf(0f) }
+    val minPosition = -1000f
+    val maxPosition = 1000f
+
+    val draggableState = rememberDraggableState { delta ->
+        val newPosition = (dragPosition + delta).coerceIn(minPosition, maxPosition)
+        dragPosition = newPosition
+    }
+
+    Box(
+        Modifier
+            .size(100.dp)
+            .draggable(draggableState, orientation = Orientation.Horizontal),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Drag position $dragPosition")
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Sampled
+@Composable
+fun OverscrollWithDraggable_After() {
+    var dragPosition by remember { mutableStateOf(0f) }
+    val minPosition = -1000f
+    val maxPosition = 1000f
+
+    val overscrollEffect = ScrollableDefaults.overscrollEffect()
+
+    val draggableState = rememberDraggableState { delta ->
+        // Horizontal, so convert the delta to a horizontal offset
+        val deltaAsOffset = Offset(delta, 0f)
+        // Wrap the original logic inside applyToScroll
+        overscrollEffect.applyToScroll(deltaAsOffset, NestedScrollSource.Drag) { remainingOffset ->
+            val remainingDelta = remainingOffset.x
+            val newPosition = (dragPosition + remainingDelta).coerceIn(minPosition, maxPosition)
+            // Calculate how much delta we have consumed
+            val consumed = newPosition - dragPosition
+            dragPosition = newPosition
+            // Return how much offset we consumed, so that we can show overscroll for what is left
+            Offset(consumed, 0f)
+        }
+    }
+
+    Box(
+        Modifier
+            // Draw overscroll on the box
+            .overscroll(overscrollEffect)
+            .size(100.dp)
+            .draggable(
+                draggableState,
+                orientation = Orientation.Horizontal,
+                onDragStopped = {
+                    overscrollEffect.applyToFling(Velocity(it, 0f)) { velocity ->
+                        if (dragPosition == minPosition || dragPosition == maxPosition) {
+                            // If we are at the min / max bound, give overscroll all of the velocity
+                            Velocity.Zero
+                        } else {
+                            // If we aren't at the min / max bound, consume all of the velocity so
+                            // overscroll won't show. Normally in this case something like
+                            // Modifier.scrollable would use the velocity to update the scroll state
+                            // with a fling animation, but just do nothing to keep this simpler.
+                            velocity
+                        }
+                    }
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text("Drag position $dragPosition")
     }
 }

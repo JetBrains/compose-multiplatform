@@ -16,4 +16,4 @@
 
 package androidx.compose.ui.platform
 
-internal expect class PlatformClipboardManager : ClipboardManager
+internal expect class PlatformClipboardManager() : ClipboardManager

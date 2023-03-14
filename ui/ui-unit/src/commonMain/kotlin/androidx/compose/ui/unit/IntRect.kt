@@ -326,7 +326,7 @@ fun IntRect.toRect(): Rect = Rect(
  * Rounds a [Rect] to an [IntRect]
  */
 @Stable
-fun Rect.round(): IntRect = IntRect(
+fun Rect.roundToIntRect(): IntRect = IntRect(
     left = left.roundToInt(),
     top = top.roundToInt(),
     right = right.roundToInt(),

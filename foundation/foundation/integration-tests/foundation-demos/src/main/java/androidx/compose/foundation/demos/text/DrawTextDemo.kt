@@ -23,12 +23,17 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Button
 import androidx.compose.material.Checkbox
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -41,8 +46,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
@@ -55,7 +62,9 @@ import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.withStyle
@@ -63,6 +72,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 import kotlin.system.measureNanoTime
 import kotlinx.coroutines.flow.filterNotNull
@@ -73,6 +83,10 @@ import kotlinx.coroutines.flow.withIndex
 @Composable
 fun DrawTextDemo() {
     LazyColumn {
+        item {
+            TagLine(tag = "Draw text blendMode")
+            DrawTextBlendMode()
+        }
         item {
             TagLine(tag = "Draw text string")
             DrawTextString()
@@ -270,6 +284,97 @@ fun DrawTextMeasure() {
 
         textLayoutResult?.let { drawText(it, topLeft = Offset(padding, padding)) }
     }
+}
+
+private val blendModes = listOf(
+    BlendMode.Clear,
+    BlendMode.Src,
+    BlendMode.Dst,
+    BlendMode.SrcOver,
+    BlendMode.DstOver,
+    BlendMode.SrcIn,
+    BlendMode.DstIn,
+    BlendMode.SrcOut,
+    BlendMode.DstOut,
+    BlendMode.SrcAtop,
+    BlendMode.DstAtop,
+    BlendMode.Xor,
+    BlendMode.Plus,
+    BlendMode.Modulate,
+    BlendMode.Screen,
+    BlendMode.Overlay,
+    BlendMode.Darken,
+    BlendMode.Lighten,
+    BlendMode.ColorDodge,
+    BlendMode.ColorBurn,
+    BlendMode.Hardlight,
+    BlendMode.Softlight,
+    BlendMode.Difference,
+    BlendMode.Exclusion,
+    BlendMode.Multiply,
+    BlendMode.Hue,
+    BlendMode.Saturation,
+    BlendMode.Color,
+    BlendMode.Luminosity,
+)
+
+@Composable
+fun DrawTextBlendMode() {
+    val textMeasurer = rememberTextMeasurer()
+    var isExpanded by remember { mutableStateOf(false) }
+    var blendModeState by remember { mutableStateOf(BlendMode.SrcOver) }
+    Button(onClick = { isExpanded = true }) {
+        Text("BlendMode: $blendModeState")
+    }
+    DropdownMenu(expanded = isExpanded, onDismissRequest = { isExpanded = false }) {
+        blendModes.forEach { blendMode ->
+            DropdownMenuItem(onClick = { blendModeState = blendMode }) {
+                val weight = if (blendModeState == blendMode) FontWeight.Bold else FontWeight.Normal
+                Text(
+                    text = blendMode.toString(),
+                    fontWeight = weight
+                )
+            }
+        }
+    }
+    Box(
+        modifier = Modifier
+            .size(400.dp)
+            .drawBehind {
+                drawRect(color = Color.Red, size = Size(size.width / 2, size.height))
+                drawRect(
+                    color = Color.Green,
+                    size = Size(size.width / 2, size.height),
+                    topLeft = Offset(size.width / 2, 0f)
+                )
+                // Clear the circular clock background
+                drawCircle(
+                    color = Color.Black,
+                    radius = size.width / 3f,
+                    blendMode = BlendMode.Clear
+                )
+
+                val textLayout = textMeasurer.measure(
+                    text = AnnotatedString("12 34"),
+                    style = TextStyle(
+                        brush = Brush.horizontalGradient(RainbowColors),
+                        fontSize = 220.sp,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 180.sp,
+                        lineHeightStyle = LineHeightStyle(
+                            trim = LineHeightStyle.Trim.Both,
+                            alignment = LineHeightStyle.Alignment.Center
+                        )
+                    ),
+                    constraints = Constraints(maxWidth = size.width.roundToInt())
+                )
+                drawText(textLayout, blendMode = blendModeState, topLeft = Offset(0f, -50f))
+
+                drawCircle(color = Color.White, radius = size.width / 6f, blendMode = BlendMode.Xor)
+
+                drawCircle(color = Color.Blue, radius = size.width / 3f, blendMode = BlendMode.Hue)
+            }
+    )
 }
 
 @Composable

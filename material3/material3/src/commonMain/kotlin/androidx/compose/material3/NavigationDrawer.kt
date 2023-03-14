@@ -61,10 +61,12 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.dismiss
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
@@ -645,7 +647,6 @@ object DrawerDefaults {
  * for this item. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this item in different states.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NavigationDrawerItem(
     label: @Composable () -> Unit,
@@ -661,7 +662,7 @@ fun NavigationDrawerItem(
     Surface(
         selected = selected,
         onClick = onClick,
-        modifier = modifier
+        modifier = modifier.semantics { role = Role.Tab }
             .height(NavigationDrawerTokens.ActiveIndicatorHeight)
             .fillMaxWidth(),
         shape = shape,

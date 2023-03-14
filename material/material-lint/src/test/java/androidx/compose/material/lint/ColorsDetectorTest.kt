@@ -19,7 +19,7 @@
 package androidx.compose.material.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.kotlinAndCompiledStub
+import androidx.compose.lint.test.kotlinAndBytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -44,7 +44,7 @@ class ColorsDetectorTest : LintDetectorTest() {
     override fun getIssues(): MutableList<Issue> = mutableListOf(ColorsDetector.ConflictingOnColor)
 
     // Simplified Colors.kt stubs
-    private val ColorsStub = kotlinAndCompiledStub(
+    private val ColorsStub = kotlinAndBytecodeStub(
         filename = "Colors.kt",
         filepath = "androidx/compose/material",
         checksum = 0x2f84988c,
@@ -583,7 +583,7 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             """
             ),
             Stubs.Color,
-            ColorsStub.compiled
+            ColorsStub.bytecode
         )
             .run()
             // TODO: b/184856104 currently the constructor call to Colors cannot be resolved when
@@ -614,7 +614,7 @@ src/androidx/compose/material/foo/test.kt:22: Error: Conflicting 'on' color for 
             """
             ),
             Stubs.Color,
-            ColorsStub.compiled
+            ColorsStub.bytecode
         )
             .run()
             .expect(
@@ -653,7 +653,7 @@ src/androidx/compose/material/foo/test.kt:15: Error: Conflicting 'on' color for 
             """
             ),
             Stubs.Color,
-            ColorsStub.compiled
+            ColorsStub.bytecode
         )
             .run()
             .expect(
@@ -711,7 +711,7 @@ src/androidx/compose/material/foo/test.kt:15: Error: Conflicting 'on' color for 
             """
             ),
             Stubs.Color,
-            ColorsStub.compiled
+            ColorsStub.bytecode
         )
             .run()
             .expectClean()
@@ -784,7 +784,7 @@ src/androidx/compose/material/foo/test.kt:15: Error: Conflicting 'on' color for 
             """
             ),
             Stubs.Color,
-            ColorsStub.compiled
+            ColorsStub.bytecode
         )
             .run()
             .expectClean()

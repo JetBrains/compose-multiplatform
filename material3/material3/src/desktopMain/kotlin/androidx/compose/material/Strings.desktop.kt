@@ -17,8 +17,12 @@
 package androidx.compose.material3
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReadOnlyComposable
+
+import java.util.Locale
 
 @Composable
+@ReadOnlyComposable
 internal actual fun getString(string: Strings): String {
     return when (string) {
         Strings.NavigationMenu -> "Navigation menu"
@@ -44,6 +48,44 @@ internal actual fun getString(string: Strings): String {
         Strings.DatePickerNavigateToYearDescription -> "Navigate to year %1$"
         Strings.DatePickerHeadlineDescription -> "Current selection: %1$"
         Strings.DatePickerNoSelectionDescription -> "None"
+        Strings.DatePickerTodayDescription -> "Today"
+        Strings.DatePickerScrollToShowLaterYears -> "Scroll to show later years"
+        Strings.DatePickerScrollToShowEarlierYears -> "Scroll to show earlier years"
+        Strings.DateInputTitle -> "Select date"
+        Strings.DateInputHeadline -> "Entered date"
+        Strings.DateInputLabel -> "Date"
+        Strings.DateInputHeadlineDescription -> "Entered date: %1$"
+        Strings.DateInputNoInputDescription -> "None"
+        Strings.DateInputInvalidNotAllowed -> "Date not allowed: %1$"
+        Strings.DateInputInvalidForPattern -> "Date does not match expected pattern: %1$"
+        Strings.DateInputInvalidYearRange -> "Date out of expected year range %1$ - %2$"
+        Strings.DatePickerSwitchToCalendarMode -> "Switch to calendar input mode"
+        Strings.DatePickerSwitchToInputMode -> "Switch to text input mode"
+        Strings.DateRangePickerTitle -> "Select dates"
+        Strings.DateRangePickerStartHeadline -> "Start date"
+        Strings.DateRangePickerEndHeadline -> "End date"
+        Strings.DateRangePickerScrollToShowNextMonth -> "Scroll to show the next month"
+        Strings.DateRangePickerScrollToShowPreviousMonth -> "Scroll to show the previous month"
+        Strings.DateRangePickerDayInRange -> "In range"
+        Strings.DateRangeInputTitle -> "Enter dates"
+        Strings.DateRangeInputInvalidRangeInput -> "Invalid date range input"
+        Strings.BottomSheetDragHandleDescription -> "Drag Handle"
+        Strings.TooltipLongPressLabel -> "Show tooltip"
+        Strings.TimePickerAM -> "AM"
+        Strings.TimePickerPM -> "PM"
+        Strings.TimePickerPeriodToggle -> "Select AM or PM"
+        Strings.TimePickerMinuteSelection -> "Select minutes"
+        Strings.TimePickerHourSelection -> "Select hour"
+        Strings.TimePickerHourSuffix -> "%1$ o\\'clock"
+        Strings.TimePickerMinuteSuffix -> "%1$ minutes"
+        Strings.TimePicker24HourSuffix -> "%1$ hours"
+        Strings.TimePickerMinute -> "Minute"
+        Strings.TimePickerHour -> "Hour"
+        Strings.TooltipPaneDescription -> "Tooltip"
         else -> ""
     }
 }
+@Composable
+@ReadOnlyComposable
+internal actual fun getString(string: Strings, vararg formatArgs: Any): String =
+    String.format(getString(string), Locale.getDefault(), *formatArgs)

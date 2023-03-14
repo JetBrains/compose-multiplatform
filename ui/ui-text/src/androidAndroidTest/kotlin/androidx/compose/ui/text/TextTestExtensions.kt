@@ -19,9 +19,11 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.font.AndroidFontLoader
 import androidx.compose.ui.text.font.AndroidFontResolveInterceptor
 import androidx.compose.ui.text.font.AsyncTypefaceCache
@@ -32,31 +34,63 @@ import androidx.compose.ui.text.font.PlatformFontFamilyTypefaceAdapter
 import androidx.compose.ui.text.font.PlatformFontLoader
 import androidx.compose.ui.text.font.PlatformResolveInterceptor
 import androidx.compose.ui.text.font.TypefaceRequestCache
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.text.style.TextDecoration
 import kotlin.math.ceil
 import kotlin.math.roundToInt
 
-@OptIn(ExperimentalTextApi::class)
-fun Paragraph.bitmap(
-    color: Color = Color.Unspecified,
-    shadow: Shadow? = null,
-    textDecoration: TextDecoration? = null,
-    drawStyle: DrawStyle? = null
+/**
+ * Creates a special canvas using this paragraph's size. Draw operations can be called through
+ * [block] lambda. Returns the final bitmap representation of the canvas after drawing is completed.
+ */
+fun Paragraph.onCanvas(
+    block: Paragraph.(androidx.compose.ui.graphics.Canvas) -> Unit = {}
 ): Bitmap {
     val bitmap = Bitmap.createBitmap(
         width.toIntPx(),
         height.toIntPx(),
         Bitmap.Config.ARGB_8888
     )
-    this.paint(
-        canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
-        color = color,
-        shadow = shadow,
-        textDecoration = textDecoration,
-        drawStyle = drawStyle
-    )
+    val canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap))
+    block(canvas)
     return bitmap
+}
+
+/**
+ * Creates a special canvas using this MultiParagraph's size. Draw operations can be called through
+ * [block] lambda. Returns the final bitmap representation of the canvas after drawing is completed.
+ */
+fun MultiParagraph.onCanvas(
+    block: MultiParagraph.(androidx.compose.ui.graphics.Canvas) -> Unit = {}
+): Bitmap {
+    val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
+    val bitmap = Bitmap.createBitmap(
+        width.toIntPx(),
+        height.toIntPx(),
+        Bitmap.Config.ARGB_8888
+    )
+    val canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap))
+    block(canvas)
+    return bitmap
+}
+
+@OptIn(ExperimentalTextApi::class)
+fun Paragraph.bitmap(
+    color: Color = Color.Unspecified,
+    shadow: Shadow? = null,
+    textDecoration: TextDecoration? = null,
+    drawStyle: DrawStyle? = null,
+    blendMode: BlendMode = BlendMode.SrcOver
+): Bitmap {
+    return onCanvas { canvas ->
+        this.paint(
+            canvas = canvas,
+            color = color,
+            shadow = shadow,
+            textDecoration = textDecoration,
+            drawStyle = drawStyle,
+            blendMode = blendMode
+        )
+    }
 }
 
 @OptIn(ExperimentalTextApi::class)
@@ -65,22 +99,20 @@ fun Paragraph.bitmap(
     alpha: Float,
     shadow: Shadow? = null,
     textDecoration: TextDecoration? = null,
-    drawStyle: DrawStyle? = null
+    drawStyle: DrawStyle? = null,
+    blendMode: BlendMode = BlendMode.SrcOver
 ): Bitmap {
-    val bitmap = Bitmap.createBitmap(
-        width.toIntPx(),
-        height.toIntPx(),
-        Bitmap.Config.ARGB_8888
-    )
-    this.paint(
-        canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
-        brush = brush,
-        alpha = alpha,
-        shadow = shadow,
-        textDecoration = textDecoration,
-        drawStyle = drawStyle
-    )
-    return bitmap
+    return onCanvas { canvas ->
+        this.paint(
+            canvas = canvas,
+            brush = brush,
+            alpha = alpha,
+            shadow = shadow,
+            textDecoration = textDecoration,
+            drawStyle = drawStyle,
+            blendMode = blendMode
+        )
+    }
 }
 
 /**
@@ -96,30 +128,28 @@ fun MultiParagraph.bitmap(
     brush: Brush? = null,
     alpha: Float = Float.NaN,
     textDecoration: TextDecoration? = null,
-    drawStyle: DrawStyle? = null
+    drawStyle: DrawStyle? = null,
+    blendMode: BlendMode = BlendMode.SrcOver
 ): Bitmap {
-    val width = paragraphInfoList.maxByOrNull { it.paragraph.width }?.paragraph?.width ?: 0f
-    val bitmap = Bitmap.createBitmap(
-        width.toIntPx(),
-        height.toIntPx(),
-        Bitmap.Config.ARGB_8888
-    )
-    if (brush != null) {
-        this.paint(
-            androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
-            brush,
-            alpha,
-            decoration = textDecoration,
-            drawStyle = drawStyle
-        )
-    } else {
-        this.paint(
-            canvas = androidx.compose.ui.graphics.Canvas(Canvas(bitmap)),
-            decoration = textDecoration,
-            drawStyle = drawStyle
-        )
+    return onCanvas { canvas ->
+        if (brush != null) {
+            this.paint(
+                canvas,
+                brush,
+                alpha,
+                decoration = textDecoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        } else {
+            this.paint(
+                canvas = canvas,
+                decoration = textDecoration,
+                drawStyle = drawStyle,
+                blendMode = blendMode
+            )
+        }
     }
-    return bitmap
 }
 
 @OptIn(ExperimentalTextApi::class)

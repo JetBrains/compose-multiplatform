@@ -20,7 +20,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.DelegatingLazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.IntervalList
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
-import androidx.compose.foundation.lazy.layout.LazyPinnableContainerProvider
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnableItem
 import androidx.compose.foundation.lazy.layout.rememberLazyNearestItemsRangeState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
@@ -88,8 +88,13 @@ private class LazyGridItemProviderImpl(
     intervals = intervals,
     nearestItemsRange = nearestItemsRange,
     itemContent = { interval, index ->
-        LazyPinnableContainerProvider(state.pinnedItems, index) {
-            interval.value.item.invoke(LazyGridItemScopeImpl, index - interval.startIndex)
+        val localIndex = index - interval.startIndex
+        LazyLayoutPinnableItem(
+            key = interval.value.key?.invoke(localIndex),
+            index = index,
+            pinnedItemList = state.pinnedItems
+        ) {
+            interval.value.item.invoke(LazyGridItemScopeImpl, localIndex)
         }
     }
 ) {

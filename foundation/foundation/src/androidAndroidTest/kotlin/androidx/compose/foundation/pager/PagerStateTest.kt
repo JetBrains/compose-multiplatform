@@ -22,6 +22,7 @@ import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -30,6 +31,7 @@ import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performTouchInput
 import androidx.test.filters.LargeTest
+import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.test.assertFalse
 import kotlinx.coroutines.Dispatchers
@@ -44,6 +46,29 @@ import org.junit.runners.Parameterized
 @LargeTest
 @RunWith(Parameterized::class)
 internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
+
+    @Test
+    fun pagerStateNotAttached_shouldReturnDefaultValues_andChangeAfterAttached() = runBlocking {
+        // Arrange
+        val state = PagerState(initialPage = 5, initialPageOffsetFraction = 0.2f)
+
+        assertThat(state.currentPage).isEqualTo(5)
+        assertThat(state.currentPageOffsetFraction).isEqualTo(0.2f)
+
+        val currentPage = derivedStateOf { state.currentPage }
+        val currentPageOffsetFraction = derivedStateOf { state.currentPageOffsetFraction }
+
+        createPager(state = state, modifier = Modifier.fillMaxSize())
+
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToPage(state.currentPage + 1)
+        }
+
+        rule.runOnIdle {
+            assertThat(currentPage.value).isEqualTo(6)
+            assertThat(currentPageOffsetFraction.value).isEqualTo(0.0f)
+        }
+    }
 
     @Test
     fun scrollToPage_shouldPlacePagesCorrectly() = runBlocking {
@@ -61,6 +86,7 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
         }
     }
 
+    @SdkSuppress(maxSdkVersion = 32) // b/269176638
     @Test
     fun scrollToPage_usedOffset_shouldPlacePagesCorrectly() = runBlocking {
         // Arrange
@@ -404,6 +430,55 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
     }
 
     @Test
+    fun targetPage_performScrollBelowThreshold_shouldNotShowNextPage() {
+        // Arrange
+        val state = PagerState()
+        createPager(
+            state = state,
+            modifier = Modifier.fillMaxSize(),
+            snappingPage = PagerSnapDistance.atMost(3)
+        )
+        rule.runOnIdle { assertThat(state.targetPage).isEqualTo(state.currentPage) }
+
+        rule.mainClock.autoAdvance = false
+        // Act
+        // Moving less than threshold
+        val forwardDelta =
+            scrollForwardSign.toFloat() * with(rule.density) { DefaultPositionThreshold.toPx() / 2 }
+
+        var previousTargetPage = state.targetPage
+
+        onPager().performTouchInput {
+            down(layoutStart)
+            moveBy(Offset(forwardDelta, forwardDelta))
+        }
+
+        // Assert
+        assertThat(state.targetPage).isEqualTo(previousTargetPage)
+
+        // Reset
+        rule.mainClock.autoAdvance = true
+        onPager().performTouchInput { up() }
+        rule.runOnIdle { assertThat(state.targetPage).isEqualTo(state.currentPage) }
+
+        // Act
+        // Moving more than threshold
+        val backwardDelta = scrollForwardSign.toFloat() * with(rule.density) {
+                -DefaultPositionThreshold.toPx() / 2
+        }
+
+        previousTargetPage = state.targetPage
+
+        onPager().performTouchInput {
+            down(layoutStart)
+            moveBy(Offset(backwardDelta, backwardDelta))
+        }
+
+        // Assert
+        assertThat(state.targetPage).isEqualTo(previousTargetPage)
+    }
+
+    @Test
     fun targetPage_performScroll_shouldShowNextPage() {
         // Arrange
         val state = PagerState()
@@ -473,9 +548,9 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
             swipeWithVelocityAcrossMainAxis(20000f, forwardDelta)
         }
         rule.mainClock.advanceTimeUntil { state.targetPage != previousTarget }
-
+        var flingOriginIndex = state.firstVisiblePage?.index ?: 0
         // Assert
-        assertThat(state.targetPage).isEqualTo(state.currentPage + 3)
+        assertThat(state.targetPage).isEqualTo(flingOriginIndex + 3)
         assertThat(state.targetPage).isNotEqualTo(state.currentPage)
 
         rule.mainClock.autoAdvance = true
@@ -491,7 +566,8 @@ internal class PagerStateTest(val config: ParamConfig) : BasePagerTest(config) {
         rule.mainClock.advanceTimeUntil { state.targetPage != previousTarget }
 
         // Assert
-        assertThat(state.targetPage).isEqualTo(state.currentPage - 3)
+        flingOriginIndex = (state.firstVisiblePage?.index ?: 0) + 1
+        assertThat(state.targetPage).isEqualTo(flingOriginIndex - 3)
         assertThat(state.targetPage).isNotEqualTo(state.currentPage)
 
         rule.mainClock.autoAdvance = true

@@ -26,7 +26,7 @@ import androidx.compose.foundation.lazy.layout.LazyAnimateScrollScope
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState
 import androidx.compose.foundation.lazy.layout.LazyLayoutPrefetchState.PrefetchHandle
-import androidx.compose.foundation.lazy.layout.LazyPinnedItemContainer
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnedItemList
 import androidx.compose.foundation.lazy.layout.animateScrollToItem
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridLaneInfo.Companion.Unset
 import androidx.compose.runtime.Composable
@@ -207,9 +207,9 @@ class LazyStaggeredGridState private constructor(
     internal val mutableInteractionSource = MutableInteractionSource()
 
     /**
-     * List of extra items to compose during the measure pass.
+     * Stores currently pinned items which are always composed.
      */
-    internal val pinnedItems = LazyPinnedItemContainer()
+    internal val pinnedItems = LazyLayoutPinnedItemList()
 
     /**
      * Call this function to take control of scrolling and gain the ability to send scroll events

@@ -21,7 +21,6 @@ package androidx.compose.ui.text.googlefonts
 
 import android.content.Context
 import android.graphics.Typeface
-import android.net.Uri
 import android.os.Handler
 import android.os.Looper
 import androidx.annotation.ArrayRes
@@ -80,6 +79,9 @@ fun Font(
  *
  * To learn more about the features supported by Google Fonts, see
  * [Get Started with the Google Fonts for Android](https://developers.google.com/fonts/docs/android)
+ *
+ * For a full list of fonts available on Android, see the
+ * [Google Fonts Directory For Android XML](https://fonts.gstatic.com/s/a/directory.xml).
  *
  * @param name Name of a font on Google fonts, such as "Roboto" or "Open Sans"
  * @param bestEffort If besteffort is true and your query specifies a valid family name but the
@@ -166,6 +168,7 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
             if (providerAuthority != other.providerAuthority) return false
             if (providerPackage != other.providerPackage) return false
             if (certificates != other.certificates) return false
+            if (certificatesRes != other.certificatesRes) return false
 
             return true
         }
@@ -173,16 +176,9 @@ class GoogleFont(val name: String, val bestEffort: Boolean = true) {
         override fun hashCode(): Int {
             var result = providerAuthority.hashCode()
             result = 31 * result + providerPackage.hashCode()
-            result = 31 * result + certificates.hashCode()
+            result = 31 * result + (certificates?.hashCode() ?: 0)
+            result = 31 * result + certificatesRes
             return result
-        }
-
-        companion object {
-            /**
-             * Url with a canonical list of all Google Fonts that are currently supported on
-             * Android.
-             */
-            val AllFontsListUri: Uri = Uri.parse("https://fonts.gstatic.com/s/a/directory.xml")
         }
     }
 }
@@ -368,7 +364,7 @@ private fun reasonToString(@FontRequestFailReason reasonCode: Int): String {
         FAIL_REASON_FONT_LOAD_ERROR -> "Generic error loading font, for example variation " +
             "settings were not parsable"
         FAIL_REASON_FONT_NOT_FOUND -> "Font not found, please check availability on " +
-            "GoogleFont.Provider.AllFontsList: ${GoogleFont.Provider.AllFontsListUri}"
+            "GoogleFont.Provider.AllFontsList: https://fonts.gstatic.com/s/a/directory.xml"
         FAIL_REASON_FONT_UNAVAILABLE -> "The provider found the queried font, but it is " +
             "currently unavailable."
         FAIL_REASON_MALFORMED_QUERY -> "The given query was not supported by this provider."

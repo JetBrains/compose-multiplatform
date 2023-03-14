@@ -19,7 +19,7 @@
 package androidx.compose.runtime.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.checks.infrastructure.TestMode
@@ -44,7 +44,7 @@ class ComposableFlowOperatorDetectorTest : LintDetectorTest() {
     /**
      * Combined stub of some Flow APIs
      */
-    private val flowStub: TestFile = compiledStub(
+    private val flowStub: TestFile = bytecodeStub(
         filename = "Flow.kt",
         filepath = "kotlinx/coroutines/flow",
         checksum = 0x8d13620c,

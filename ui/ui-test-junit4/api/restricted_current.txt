@@ -1,14 +1,4 @@
 // Signature format: 4.0
-package androidx.compose.ui.test {
-
-  public final class ComposeUiTestKt {
-  }
-
-  public final class ComposeUiTest_androidKt {
-  }
-
-}
-
 package androidx.compose.ui.test.junit4 {
 
   public final class AndroidComposeTestRule<R extends org.junit.rules.TestRule, A extends androidx.activity.ComponentActivity> implements androidx.compose.ui.test.junit4.ComposeContentTestRule {
@@ -46,17 +36,8 @@ package androidx.compose.ui.test.junit4 {
     method public static androidx.compose.ui.test.junit4.ComposeTestRule createEmptyComposeRule();
   }
 
-  public final class AndroidSynchronization_androidKt {
-  }
-
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeContentTestRule extends androidx.compose.ui.test.junit4.ComposeTestRule {
     method public void setContent(kotlin.jvm.functions.Function0<kotlin.Unit> composable);
-  }
-
-  public final class ComposeIdlingResource_androidKt {
-  }
-
-  public final class ComposeRootRegistry_androidKt {
   }
 
   @kotlin.jvm.JvmDefaultWithCompatibility public interface ComposeTestRule extends org.junit.rules.TestRule androidx.compose.ui.test.SemanticsNodeInteractionsProvider {
@@ -71,9 +52,6 @@ package androidx.compose.ui.test.junit4 {
     method public void waitUntil(optional long timeoutMillis, kotlin.jvm.functions.Function0<java.lang.Boolean> condition);
     property public abstract androidx.compose.ui.unit.Density density;
     property public abstract androidx.compose.ui.test.MainTestClock mainClock;
-  }
-
-  public final class EspressoLink_androidKt {
   }
 
   public final class StateRestorationTester {

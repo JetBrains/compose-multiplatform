@@ -1305,7 +1305,10 @@ class MeasureAndLayoutDelegateTest {
 
         assertThat(activeLayers).isEqualTo(1)
 
-        root.removeAll()
+        val node = root.children[0]
+        root.removeAt(0, 1)
+        // in the real composition after removing the node onRelease() will be called as well
+        node.onRelease()
         delegate.measureAndLayout()
 
         assertThat(activeLayers).isEqualTo(0)

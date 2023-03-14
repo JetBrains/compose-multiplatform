@@ -71,6 +71,8 @@ import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.input.PlatformTextInputPluginRegistry
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.font.createFontFamilyResolver
 import androidx.compose.ui.text.platform.FontLoader
@@ -81,11 +83,14 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.text.InternalTextApi
+import androidx.compose.ui.text.input.PlatformTextInputPluginRegistryImpl
 
 private typealias Command = () -> Unit
 
 @OptIn(
     ExperimentalComposeUiApi::class,
+    ExperimentalTextApi::class,
     InternalCoreApi::class,
     InternalComposeUiApi::class
 )
@@ -206,6 +211,13 @@ internal class SkiaBasedOwner(
     }
 
     override val textInputService = TextInputService(platformInputService)
+
+    @Suppress("UNUSED_ANONYMOUS_PARAMETER")
+    @OptIn(InternalTextApi::class)
+    override val platformTextInputPluginRegistry: PlatformTextInputPluginRegistry
+        get() = PlatformTextInputPluginRegistryImpl { factory, platformTextInput ->
+            TODO("See https://issuetracker.google.com/267235947")
+        }
 
     @Deprecated(
         "fontLoader is deprecated, use fontFamilyResolver",

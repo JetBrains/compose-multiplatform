@@ -623,6 +623,14 @@ fun <S> Transition<S>.AnimatedContent(
     val currentlyVisible = remember(this) { mutableStateListOf(currentState) }
     val contentMap = remember(this) { mutableMapOf<S, @Composable() () -> Unit>() }
 
+    // This is needed for tooling because it could change currentState directly,
+    // as opposed to changing target only. When that happens we need to clear all the
+    // visible content and only display the content for the new current state and target state.
+    if (!currentlyVisible.contains(currentState)) {
+        currentlyVisible.clear()
+        currentlyVisible.add(currentState)
+    }
+
     if (currentState == targetState) {
         if (currentlyVisible.size != 1 || currentlyVisible[0] != currentState) {
             currentlyVisible.clear()
@@ -650,7 +658,7 @@ fun <S> Transition<S>.AnimatedContent(
         }
     }
 
-    if (!contentMap.containsKey(targetState)) {
+    if (!contentMap.containsKey(targetState) || !contentMap.containsKey(currentState)) {
         contentMap.clear()
         currentlyVisible.fastForEach { stateForContent ->
             contentMap[stateForContent] = {

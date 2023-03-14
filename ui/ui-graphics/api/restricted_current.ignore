@@ -1,5 +1,0 @@
-// Baseline format: 1.0
-AddedAbstractMethod: androidx.compose.ui.graphics.PathMeasure#getPosition(float):
-    Added method androidx.compose.ui.graphics.PathMeasure.getPosition(float)
-AddedAbstractMethod: androidx.compose.ui.graphics.PathMeasure#getTangent(float):
-    Added method androidx.compose.ui.graphics.PathMeasure.getTangent(float)

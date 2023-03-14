@@ -20,6 +20,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -27,13 +28,9 @@ import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.gestures.awaitEachGesture
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -47,11 +44,9 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.onConsumedWindowInsetsChanged
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CornerSize
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -64,20 +59,27 @@ import androidx.compose.material3.tokens.SearchBarTokens
 import androidx.compose.material3.tokens.SearchViewTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.structuralEqualityPolicy
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.RoundRect
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.node.Ref
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
@@ -88,24 +90,28 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.Constraints
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.lerp
+import androidx.compose.ui.unit.offset
 import androidx.compose.ui.util.lerp
 import androidx.compose.ui.zIndex
 import kotlin.math.max
 import kotlin.math.min
 
-// TODO(260864875): Add material.io link and image when available
 /**
- * Material Design search bar
+ * <a href="https://m3.material.io/components/search/overview" class="external" target="_blank">Material Design search</a>.
  *
  * A search bar represents a floating search field that allows users to enter a keyword or phrase
  * and get relevant information. It can be used as a way to navigate through an app via search
  * queries.
  *
  * An active search bar expands into a search "view" and can be used to display dynamic suggestions.
+ *
+ * ![Search bar image](https://developer.android.com/images/reference/androidx/compose/material3/search-bar.png)
  *
  * A [SearchBar] expands to occupy the entirety of its allowed size when active. For full-screen
  * behavior as specified by Material guidelines, parent layouts of the [SearchBar] must not pass
@@ -166,102 +172,105 @@ fun SearchBar(
     interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    val animationProgress: Float by animateFloatAsState(
+    val animationProgress: State<Float> = animateFloatAsState(
         targetValue = if (active) 1f else 0f,
-        animationSpec = tween(
-            durationMillis = AnimationDurationMillis,
-            easing = MotionTokens.EasingLegacyCubicBezier,
-        )
+        animationSpec = if (active) AnimationEnterFloatSpec else AnimationExitFloatSpec
     )
+
+    val density = LocalDensity.current
 
     val defaultInputFieldShape = SearchBarDefaults.inputFieldShape
     val defaultFullScreenShape = SearchBarDefaults.fullScreenShape
-    val animatedShape by remember {
-        derivedStateOf {
-            when {
-                shape == defaultInputFieldShape -> {
-                    // The shape can only be animated if it's the default spec value
-                    val animatedRadius = SearchBarCornerRadius * (1 - animationProgress)
-                    RoundedCornerShape(CornerSize(animatedRadius))
+    val useFullScreenShape by remember {
+        derivedStateOf(structuralEqualityPolicy()) { animationProgress.value == 1f }
+    }
+    val animatedShape = remember(useFullScreenShape, shape) {
+        when {
+            shape == defaultInputFieldShape ->
+                // The shape can only be animated if it's the default spec value
+                GenericShape { size, _ ->
+                    val radius = with(density) {
+                        (SearchBarCornerRadius * (1 - animationProgress.value)).toPx()
+                    }
+                    addRoundRect(RoundRect(size.toRect(), CornerRadius(radius)))
                 }
-                animationProgress == 1f -> defaultFullScreenShape
-                else -> shape
-            }
+            useFullScreenShape -> defaultFullScreenShape
+            else -> shape
         }
     }
 
-    // The main animation trickery is allowing the component to smoothly expand while keeping the
-    // input field at the same relative location on screen. For this, Modifier.windowInsetsPadding
-    // is not suitable. Instead, we convert the insets to a padding applied to the Surface, which
-    // gradually becomes padding applied to the input field as the animation proceeds.
-    val unconsumedInsets = remember { Ref<WindowInsets>() }
-    val topPadding = SearchBarVerticalPadding +
-        (unconsumedInsets.value ?: ZeroWindowInsets).asPaddingValues().calculateTopPadding()
-    val animatedSurfaceTopPadding = lerp(topPadding, 0.dp, animationProgress)
-    val animatedInputFieldPadding by remember {
+    // The main animation complexity is allowing the component to smoothly expand while keeping the
+    // input field at the same relative location on screen. `Modifier.windowInsetsPadding` does not
+    // support animation and thus is not suitable. Instead, we convert the insets to a padding
+    // applied to the Surface, which gradually becomes padding applied to the input field as the
+    // animation proceeds.
+    val unconsumedInsets = remember { MutableWindowInsets() }
+    val topPadding = remember(density) {
         derivedStateOf {
-            PaddingValues(
-                top = topPadding * animationProgress,
-                bottom = SearchBarVerticalPadding * animationProgress,
-            )
+            SearchBarVerticalPadding +
+                unconsumedInsets.asPaddingValues(density).calculateTopPadding()
         }
     }
 
-    BoxWithConstraints(
+    Surface(
+        shape = animatedShape,
+        color = colors.containerColor,
+        contentColor = contentColorFor(colors.containerColor),
+        tonalElevation = tonalElevation,
         modifier = modifier
             .zIndex(1f)
             .onConsumedWindowInsetsChanged { consumedInsets ->
-                unconsumedInsets.value = windowInsets.exclude(consumedInsets)
+                unconsumedInsets.insets = windowInsets.exclude(consumedInsets)
             }
-            .consumeWindowInsets(unconsumedInsets.value ?: ZeroWindowInsets),
-        propagateMinConstraints = true
-    ) {
-        val height: Dp
-        val width: Dp
-        with(LocalDensity.current) {
-            val startWidth = max(constraints.minWidth, SearchBarMinWidth.roundToPx())
-                .coerceAtMost(min(constraints.maxWidth, SearchBarMaxWidth.roundToPx()))
-                .toFloat()
-            val startHeight = max(constraints.minHeight, InputFieldHeight.roundToPx())
-                .coerceAtMost(constraints.maxHeight)
-                .toFloat()
-            val endWidth = constraints.maxWidth.toFloat()
-            val endHeight = constraints.maxHeight.toFloat()
+            .consumeWindowInsets(unconsumedInsets)
+            .layout { measurable, constraints ->
+                val animatedTopPadding =
+                    lerp(topPadding.value, 0.dp, animationProgress.value).roundToPx()
 
-            height = lerp(startHeight, endHeight, animationProgress).toDp()
-            width = lerp(startWidth, endWidth, animationProgress).toDp()
+                val startWidth = max(constraints.minWidth, SearchBarMinWidth.roundToPx())
+                    .coerceAtMost(min(constraints.maxWidth, SearchBarMaxWidth.roundToPx()))
+                val startHeight = max(constraints.minHeight, InputFieldHeight.roundToPx())
+                    .coerceAtMost(constraints.maxHeight)
+                val endWidth = constraints.maxWidth
+                val endHeight = constraints.maxHeight
+
+                val width = lerp(startWidth, endWidth, animationProgress.value)
+                val height =
+                    lerp(startHeight, endHeight, animationProgress.value) + animatedTopPadding
+
+                val placeable = measurable.measure(Constraints.fixed(width, height)
+                    .offset(vertical = -animatedTopPadding))
+                layout(width, height) {
+                    placeable.placeRelative(0, animatedTopPadding)
+            }
         }
+    ) {
+        Column {
+            val animatedInputFieldPadding = remember {
+                AnimatedPaddingValues(animationProgress, topPadding)
+            }
+            SearchBarInputField(
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
+                active = active,
+                onActiveChange = onActiveChange,
+                modifier = Modifier.padding(paddingValues = animatedInputFieldPadding),
+                enabled = enabled,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                colors = colors.inputFieldColors,
+                interactionSource = interactionSource,
+            )
 
-        Surface(
-            shape = animatedShape,
-            color = colors.containerColor,
-            contentColor = contentColorFor(colors.containerColor),
-            tonalElevation = tonalElevation,
-            modifier = Modifier
-                .padding(top = animatedSurfaceTopPadding)
-                .size(width = width, height = height)
-        ) {
-            Column {
-                SearchBarInputField(
-                    query = query,
-                    onQueryChange = onQueryChange,
-                    onSearch = onSearch,
-                    active = active,
-                    onActiveChange = onActiveChange,
-                    modifier = Modifier.padding(animatedInputFieldPadding),
-                    enabled = enabled,
-                    placeholder = placeholder,
-                    leadingIcon = leadingIcon,
-                    trailingIcon = trailingIcon,
-                    colors = colors.inputFieldColors,
-                    interactionSource = interactionSource,
-                )
-
-                if (animationProgress > 0) {
-                    Column(Modifier.alpha(animationProgress)) {
-                        Divider(color = colors.dividerColor)
-                        content()
-                    }
+            val showResults by remember {
+                derivedStateOf(structuralEqualityPolicy()) { animationProgress.value > 0 }
+            }
+            if (showResults) {
+                Column(Modifier.graphicsLayer { alpha = animationProgress.value }) {
+                    Divider(color = colors.dividerColor)
+                    content()
                 }
             }
         }
@@ -272,15 +281,16 @@ fun SearchBar(
     }
 }
 
-// TODO(260864875): Add material.io link and image when available
 /**
- * Material Design search bar
+ * <a href="https://m3.material.io/components/search/overview" class="external" target="_blank">Material Design search</a>.
  *
  * A search bar represents a floating search field that allows users to enter a keyword or phrase
  * and get relevant information. It can be used as a way to navigate through an app via search
  * queries.
  *
  * An active search bar expands into a search "view" and can be used to display dynamic suggestions.
+ *
+ * ![Search bar image](https://developer.android.com/images/reference/androidx/compose/material3/docked-search-bar.png)
  *
  * A [DockedSearchBar] displays search results in a bounded table below the input field. It is meant
  * to be an alternative to [SearchBar] when expanding to full-screen size is undesirable on large
@@ -404,7 +414,7 @@ private fun SearchBarInputField(
     val searchSemantics = getString(Strings.SearchBarSearch)
     val suggestionsAvailableSemantics = getString(Strings.SuggestionsAvailable)
     val textColor = LocalTextStyle.current.color.takeOrElse {
-        colors.textColor(enabled).value
+        colors.textColor(enabled, isError = false, interactionSource = interactionSource).value
     }
 
     BasicTextField(
@@ -414,24 +424,13 @@ private fun SearchBarInputField(
             .height(InputFieldHeight)
             .fillMaxWidth()
             .focusRequester(focusRequester)
-            .pointerInput(Unit) {
-                awaitEachGesture {
-                    // Must be PointerEventPass.Initial to observe events before the text field
-                    // consumes them in the Main pass
-                    awaitFirstDown(pass = PointerEventPass.Initial)
-                    val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
-                    if (upEvent != null) {
-                        onActiveChange(true)
-                    }
-                }
-            }
+            .onFocusChanged { if (it.isFocused) onActiveChange(true) }
             .semantics {
                 contentDescription = searchSemantics
                 if (active) {
                     stateDescription = suggestionsAvailableSemantics
                 }
                 onClick {
-                    onActiveChange(true)
                     focusRequester.requestFocus()
                     true
                 }
@@ -517,7 +516,9 @@ object SearchBarDefaults {
      * Only a subset of the full list of [TextFieldColors] parameters are used in the input field.
      * All other parameters have no effect.
      *
-     * @param textColor the color used for the input text of this input field
+     * @param focusedTextColor the color used for the input text of this input field when focused
+     * @param unfocusedTextColor the color used for the input text of this input field when not
+     * focused
      * @param disabledTextColor the color used for the input text of this input field when disabled
      * @param cursorColor the cursor color for this input field
      * @param selectionColors the colors used when the input text of this input field is selected
@@ -528,9 +529,50 @@ object SearchBarDefaults {
      * @param unfocusedTrailingIconColor the trailing icon color for this input field when not
      * focused
      * @param disabledTrailingIconColor the trailing icon color for this input field when disabled
-     * @param placeholderColor the placeholder color for this input field
+     * @param focusedPlaceholderColor the placeholder color for this input field when focused
+     * @param unfocusedPlaceholderColor the placeholder color for this input field when not focused
      * @param disabledPlaceholderColor the placeholder color for this input field when disabled
      */
+    @ExperimentalMaterial3Api
+    @Composable
+    fun inputFieldColors(
+        focusedTextColor: Color = SearchBarTokens.InputTextColor.toColor(),
+        unfocusedTextColor: Color = SearchBarTokens.InputTextColor.toColor(),
+        disabledTextColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+        cursorColor: Color = FilledTextFieldTokens.CaretColor.toColor(),
+        selectionColors: TextSelectionColors = LocalTextSelectionColors.current,
+        focusedLeadingIconColor: Color = SearchBarTokens.LeadingIconColor.toColor(),
+        unfocusedLeadingIconColor: Color = SearchBarTokens.LeadingIconColor.toColor(),
+        disabledLeadingIconColor: Color = FilledTextFieldTokens.DisabledLeadingIconColor
+            .toColor().copy(alpha = FilledTextFieldTokens.DisabledLeadingIconOpacity),
+        focusedTrailingIconColor: Color = SearchBarTokens.TrailingIconColor.toColor(),
+        unfocusedTrailingIconColor: Color = SearchBarTokens.TrailingIconColor.toColor(),
+        disabledTrailingIconColor: Color = FilledTextFieldTokens.DisabledTrailingIconColor
+            .toColor().copy(alpha = FilledTextFieldTokens.DisabledTrailingIconOpacity),
+        focusedPlaceholderColor: Color = SearchBarTokens.SupportingTextColor.toColor(),
+        unfocusedPlaceholderColor: Color = SearchBarTokens.SupportingTextColor.toColor(),
+        disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
+            .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
+    ): TextFieldColors =
+        TextFieldDefaults.textFieldColors(
+            focusedTextColor = focusedTextColor,
+            unfocusedTextColor = unfocusedTextColor,
+            disabledTextColor = disabledTextColor,
+            cursorColor = cursorColor,
+            selectionColors = selectionColors,
+            focusedLeadingIconColor = focusedLeadingIconColor,
+            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
+            disabledLeadingIconColor = disabledLeadingIconColor,
+            focusedTrailingIconColor = focusedTrailingIconColor,
+            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
+            disabledTrailingIconColor = disabledTrailingIconColor,
+            focusedPlaceholderColor = focusedPlaceholderColor,
+            unfocusedPlaceholderColor = unfocusedPlaceholderColor,
+            disabledPlaceholderColor = disabledPlaceholderColor,
+        )
+
+    @Deprecated("Maintained for binary compatibility", level = DeprecationLevel.HIDDEN)
     @ExperimentalMaterial3Api
     @Composable
     fun inputFieldColors(
@@ -550,21 +592,22 @@ object SearchBarDefaults {
         placeholderColor: Color = SearchBarTokens.SupportingTextColor.toColor(),
         disabledPlaceholderColor: Color = FilledTextFieldTokens.DisabledInputColor.toColor()
             .copy(alpha = FilledTextFieldTokens.DisabledInputOpacity),
-    ): TextFieldColors =
-        TextFieldDefaults.textFieldColors(
-            textColor = textColor,
-            disabledTextColor = disabledTextColor,
-            cursorColor = cursorColor,
-            selectionColors = selectionColors,
-            focusedLeadingIconColor = focusedLeadingIconColor,
-            unfocusedLeadingIconColor = unfocusedLeadingIconColor,
-            disabledLeadingIconColor = disabledLeadingIconColor,
-            focusedTrailingIconColor = focusedTrailingIconColor,
-            unfocusedTrailingIconColor = unfocusedTrailingIconColor,
-            disabledTrailingIconColor = disabledTrailingIconColor,
-            placeholderColor = placeholderColor,
-            disabledPlaceholderColor = disabledPlaceholderColor,
-        )
+    ) = inputFieldColors(
+        focusedTextColor = textColor,
+        unfocusedTextColor = textColor,
+        disabledTextColor = disabledTextColor,
+        cursorColor = cursorColor,
+        selectionColors = selectionColors,
+        focusedLeadingIconColor = focusedLeadingIconColor,
+        unfocusedLeadingIconColor = unfocusedLeadingIconColor,
+        disabledLeadingIconColor = disabledLeadingIconColor,
+        focusedTrailingIconColor = focusedTrailingIconColor,
+        unfocusedTrailingIconColor = unfocusedTrailingIconColor,
+        disabledTrailingIconColor = disabledTrailingIconColor,
+        focusedPlaceholderColor = placeholderColor,
+        unfocusedPlaceholderColor = placeholderColor,
+        disabledPlaceholderColor = disabledPlaceholderColor,
+    )
 }
 
 /**
@@ -601,7 +644,41 @@ class SearchBarColors internal constructor(
     }
 }
 
-private val ZeroWindowInsets: WindowInsets = WindowInsets(0, 0, 0, 0)
+@Stable
+private class AnimatedPaddingValues(
+    val animationProgress: State<Float>,
+    val topPadding: State<Dp>,
+) : PaddingValues {
+    override fun calculateTopPadding(): Dp = topPadding.value * animationProgress.value
+    override fun calculateBottomPadding(): Dp = SearchBarVerticalPadding * animationProgress.value
+
+    override fun calculateLeftPadding(layoutDirection: LayoutDirection): Dp = 0.dp
+    override fun calculateRightPadding(layoutDirection: LayoutDirection): Dp = 0.dp
+}
+
+/**
+ * A [WindowInsets] whose values can change without changing the instance. This is useful
+ * to avoid recomposition when [WindowInsets] can change.
+ *
+ * Copied from [androidx.compose.foundation.layout.MutableWindowInsets], which is marked as
+ * experimental and thus cannot be used cross-module.
+ */
+private class MutableWindowInsets(
+    initialInsets: WindowInsets = WindowInsets(0, 0, 0, 0)
+) : WindowInsets {
+    /**
+     * The [WindowInsets] that are used for [left][getLeft], [top][getTop], [right][getRight],
+     * and [bottom][getBottom] values.
+     */
+    var insets by mutableStateOf(initialInsets)
+
+    override fun getLeft(density: Density, layoutDirection: LayoutDirection): Int =
+        insets.getLeft(density, layoutDirection)
+    override fun getTop(density: Density): Int = insets.getTop(density)
+    override fun getRight(density: Density, layoutDirection: LayoutDirection): Int =
+        insets.getRight(density, layoutDirection)
+    override fun getBottom(density: Density): Int = insets.getBottom(density)
+}
 
 // Measurement specs
 private val SearchBarCornerRadius: Dp = InputFieldHeight / 2
@@ -614,12 +691,32 @@ internal val SearchBarVerticalPadding: Dp = 8.dp
 private val SearchBarIconOffsetX: Dp = 4.dp
 
 // Animation specs
-private const val AnimationDurationMillis: Int = MotionTokens.DurationMedium2.toInt()
-private val SizeAnimationSpec: FiniteAnimationSpec<IntSize> =
-    tween(durationMillis = AnimationDurationMillis, easing = MotionTokens.EasingLegacyCubicBezier)
-private val OpacityAnimationSpec: FiniteAnimationSpec<Float> =
-    tween(durationMillis = AnimationDurationMillis, easing = MotionTokens.EasingLegacyCubicBezier)
+private const val AnimationEnterDurationMillis: Int = MotionTokens.DurationLong4.toInt()
+private const val AnimationExitDurationMillis: Int = MotionTokens.DurationMedium3.toInt()
+private const val AnimationDelayMillis: Int = MotionTokens.DurationShort2.toInt()
+private val AnimationEnterEasing = MotionTokens.EasingEmphasizedDecelerateCubicBezier
+private val AnimationExitEasing = CubicBezierEasing(0.0f, 1.0f, 0.0f, 1.0f)
+private val AnimationEnterFloatSpec: FiniteAnimationSpec<Float> = tween(
+    durationMillis = AnimationEnterDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationEnterEasing,
+)
+private val AnimationExitFloatSpec: FiniteAnimationSpec<Float> = tween(
+    durationMillis = AnimationExitDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationExitEasing,
+)
+private val AnimationEnterSizeSpec: FiniteAnimationSpec<IntSize> = tween(
+    durationMillis = AnimationEnterDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationEnterEasing,
+)
+private val AnimationExitSizeSpec: FiniteAnimationSpec<IntSize> = tween(
+    durationMillis = AnimationExitDurationMillis,
+    delayMillis = AnimationDelayMillis,
+    easing = AnimationExitEasing,
+)
 private val DockedEnterTransition: EnterTransition =
-    fadeIn(OpacityAnimationSpec) + expandVertically(SizeAnimationSpec)
+    fadeIn(AnimationEnterFloatSpec) + expandVertically(AnimationEnterSizeSpec)
 private val DockedExitTransition: ExitTransition =
-    fadeOut(OpacityAnimationSpec) + shrinkVertically(SizeAnimationSpec)
+    fadeOut(AnimationExitFloatSpec) + shrinkVertically(AnimationExitSizeSpec)

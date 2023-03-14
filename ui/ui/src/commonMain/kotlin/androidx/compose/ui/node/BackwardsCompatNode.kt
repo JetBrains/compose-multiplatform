@@ -153,7 +153,9 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
             if (element is DrawCacheModifier) {
                 invalidateCache = true
             }
-            invalidateLayer()
+            if (!duringAttach) {
+                invalidateLayer()
+            }
         }
         if (isKind(Nodes.Layout)) {
             val isChainUpdate = requireLayoutNode().nodes.tail.isAttached
@@ -163,8 +165,10 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
                 coordinator.layoutModifierNode = this
                 coordinator.onLayoutModifierNodeChanged()
             }
-            invalidateLayer()
-            requireLayoutNode().invalidateMeasurements()
+            if (!duringAttach) {
+                invalidateLayer()
+                requireLayoutNode().invalidateMeasurements()
+            }
         }
         if (element is RemeasurementModifier) {
             element.onRemeasurementAvailable(this)
@@ -304,7 +308,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
         }
     }
 
-    override val isValid: Boolean get() = isAttached
+    override val isValidOwnerScope: Boolean get() = isAttached
     override var targetSize: IntSize
         get() = (element as IntermediateLayoutModifier).targetSize
         set(value) {

@@ -41,9 +41,9 @@ class PathMeasureTest {
 
         val tangent = pathMeasure.getTangent(distance * 0.5f)
 
-        Assert.assertEquals(50f, position.x)
-        Assert.assertEquals(50f, position.y)
-        Assert.assertEquals(0.707106f, tangent.x, 0.00001f)
-        Assert.assertEquals(0.707106f, tangent.y, 0.00001f)
+        Assert.assertEquals(50f, position.x, 0.0001f)
+        Assert.assertEquals(50f, position.y, 0.0001f)
+        Assert.assertEquals(0.707106f, tangent.x, 0.0001f)
+        Assert.assertEquals(0.707106f, tangent.y, 0.0001f)
     }
 }

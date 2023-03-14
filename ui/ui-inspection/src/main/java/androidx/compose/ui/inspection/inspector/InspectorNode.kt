@@ -96,6 +96,11 @@ class InspectorNode internal constructor(
     val bounds: QuadBounds? = null,
 
     /**
+     * True if the code for the Composable was inlined
+     */
+    val inlined: Boolean = false,
+
+    /**
      * The parameters of this Composable.
      */
     val parameters: List<RawParameter>,
@@ -191,6 +196,7 @@ internal class MutableInspectorNode {
     var length = 0
     var box: IntRect = emptyBox
     var bounds: QuadBounds? = null
+    var inlined = false
     val parameters = mutableListOf<RawParameter>()
     var viewId = UNDEFINED_ID
     val children = mutableListOf<InspectorNode>()
@@ -207,6 +213,7 @@ internal class MutableInspectorNode {
         unmergedSemantics.clear()
         box = emptyBox
         bounds = null
+        inlined = false
         outerBox = outsideBox
         children.clear()
     }
@@ -232,6 +239,7 @@ internal class MutableInspectorNode {
         length = node.length
         box = node.box
         bounds = node.bounds
+        inlined = node.inlined
         mergedSemantics.addAll(node.mergedSemantics)
         unmergedSemantics.addAll(node.unmergedSemantics)
         parameters.addAll(node.parameters)
@@ -241,7 +249,7 @@ internal class MutableInspectorNode {
     fun build(withSemantics: Boolean = true): InspectorNode =
         InspectorNode(
             id, key, anchorId, name, fileName, packageHash, lineNumber, offset, length,
-            box, bounds, parameters.toList(), viewId,
+            box, bounds, inlined, parameters.toList(), viewId,
             if (withSemantics) mergedSemantics.toList() else emptyList(),
             if (withSemantics) unmergedSemantics.toList() else emptyList(),
             children.toList()

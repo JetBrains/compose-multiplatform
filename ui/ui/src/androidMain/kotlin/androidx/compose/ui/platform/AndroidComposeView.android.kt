@@ -128,12 +128,16 @@ import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.semantics.outerSemantics
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.createFontFamilyResolver
+import androidx.compose.ui.text.input.AndroidTextInputServicePlugin
+import androidx.compose.ui.text.input.PlatformTextInputPluginRegistryImpl
 import androidx.compose.ui.text.input.PlatformTextInputService
+import androidx.compose.ui.text.input.TextInputForTests
 import androidx.compose.ui.text.input.TextInputService
-import androidx.compose.ui.text.input.TextInputServiceAndroid
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
@@ -158,7 +162,7 @@ import java.lang.reflect.Method
 import kotlin.math.roundToInt
 
 @SuppressLint("ViewConstructor", "VisibleForTests")
-@OptIn(ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalComposeUiApi::class, InternalTextApi::class, ExperimentalTextApi::class)
 internal class AndroidComposeView(context: Context) :
     ViewGroup(context), Owner, ViewRootForTest, PositionCalculator, DefaultLifecycleObserver {
 
@@ -365,10 +369,29 @@ internal class AndroidComposeView(context: Context) :
         _inputModeManager.inputMode = if (touchMode) Touch else Keyboard
     }
 
-    private val textInputServiceAndroid = TextInputServiceAndroid(this)
+    /**
+     * This is the root of the text input system's state. It currently holds the default
+     * [textInputService], but may be used to provide alternative text input systems. All text input
+     * methods this class implements from [View] should delegate to the active service.
+     */
+    override val platformTextInputPluginRegistry =
+        PlatformTextInputPluginRegistryImpl { factory, platformTextInput ->
+            factory.createAdapter(platformTextInput, view = this)
+        }
 
-    @OptIn(InternalComposeUiApi::class)
-    override val textInputService = textInputServiceFactory(textInputServiceAndroid)
+    /**
+     * The default text input service. The service is wired up through
+     * [platformTextInputPluginRegistry], this class only knows about it to support
+     * [LocalTextInputService].
+     */
+    // We never call dispose() on the returned AdapterHandle because the adapter will live as long
+    // as this view, and this view also owns the registry, so they'll all be gc'd together.
+    override val textInputService = platformTextInputPluginRegistry.getOrCreateAdapter(
+        AndroidTextInputServicePlugin
+    ).adapter.service
+
+    override val textInputForTests: TextInputForTests?
+        get() = platformTextInputPluginRegistry.focusedAdapter?.inputForTests
 
     @Deprecated(
         "fontLoader is deprecated, use fontFamilyResolver",
@@ -1081,18 +1104,6 @@ internal class AndroidComposeView(context: Context) :
     }
 
     /**
-     * Android has an issue where calling showSoftwareKeyboard after calling
-     * hideSoftwareKeyboard, it results in keyboard flickering and sometimes the keyboard ends up
-     * being hidden even though the most recent call was to showKeyboard.
-     *
-     * This function starts a suspended function that listens for show/hide commands and only
-     * runs the latest command.
-     */
-    suspend fun keyboardVisibilityEventLoop() {
-        textInputServiceAndroid.textInputCommandEventLoop()
-    }
-
-    /**
      * Walks the entire LayoutNode sub-hierarchy and marks all nodes as needing measurement.
      */
     private fun invalidateLayoutNodeMeasurement(node: LayoutNode) {
@@ -1159,6 +1170,9 @@ internal class AndroidComposeView(context: Context) :
             onViewTreeOwnersAvailable?.invoke(viewTreeOwners)
             onViewTreeOwnersAvailable = null
         }
+
+        _inputModeManager.inputMode = if (isInTouchMode) Touch else Keyboard
+
         viewTreeOwners!!.lifecycleOwner.lifecycle.addObserver(this)
         viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
         viewTreeObserver.addOnScrollChangedListener(scrollChangedListener)
@@ -1510,10 +1524,11 @@ internal class AndroidComposeView(context: Context) :
         viewToWindowMatrix.invertTo(windowToViewMatrix)
     }
 
-    override fun onCheckIsTextEditor(): Boolean = textInputServiceAndroid.isEditorFocused()
+    override fun onCheckIsTextEditor(): Boolean =
+        platformTextInputPluginRegistry.focusedAdapter != null
 
     override fun onCreateInputConnection(outAttrs: EditorInfo): InputConnection? =
-        textInputServiceAndroid.createInputConnection(outAttrs)
+        platformTextInputPluginRegistry.focusedAdapter?.createInputConnection(outAttrs)
 
     override fun calculateLocalPosition(positionInWindow: Offset): Offset {
         recalculateWindowPosition()

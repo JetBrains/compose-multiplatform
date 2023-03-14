@@ -72,7 +72,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@OptIn(ExperimentalMaterial3Api::class)
 @MediumTest
 @RunWith(AndroidJUnit4::class)
 class SurfaceTest {
@@ -296,7 +295,7 @@ class SurfaceTest {
         }
         rule.onNodeWithTag("surface")
             .assertHasClickAction()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Button))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsEnabled()
             // since we merge descendants we should have text on the same node
             .assertTextEquals("0")
@@ -500,7 +499,7 @@ class SurfaceTest {
         }
         rule.onNodeWithTag("surface")
             .assertHasClickAction()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Tab))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsEnabled()
             // since we merge descendants we should have text on the same node
             .assertTextEquals("false")
@@ -604,7 +603,7 @@ class SurfaceTest {
         }
         rule.onNodeWithTag("surface")
             .assertHasClickAction()
-            .assert(SemanticsMatcher.expectValue(SemanticsProperties.Role, Role.Switch))
+            .assert(SemanticsMatcher.keyNotDefined(SemanticsProperties.Role))
             .assertIsEnabled()
             // since we merge descendants we should have text on the same node
             .assertTextEquals("false")

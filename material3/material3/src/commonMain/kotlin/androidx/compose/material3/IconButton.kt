@@ -193,7 +193,6 @@ fun IconToggleButton(
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledIconButton(
     onClick: () -> Unit,
@@ -205,7 +204,7 @@ fun FilledIconButton(
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
-    modifier = modifier,
+    modifier = modifier.semantics { role = Role.Button },
     enabled = enabled,
     shape = shape,
     color = colors.containerColor(enabled).value,
@@ -254,7 +253,6 @@ fun FilledIconButton(
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilledTonalIconButton(
     onClick: () -> Unit,
@@ -266,7 +264,7 @@ fun FilledTonalIconButton(
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
-    modifier = modifier,
+    modifier = modifier.semantics { role = Role.Button },
     enabled = enabled,
     shape = shape,
     color = colors.containerColor(enabled).value,
@@ -441,7 +439,6 @@ fun FilledTonalIconToggleButton(
  * [Interaction]s and customize the appearance / behavior of this icon button in different states.
  * @param content the content of this icon button, typically an [Icon]
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OutlinedIconButton(
     onClick: () -> Unit,
@@ -454,7 +451,7 @@ fun OutlinedIconButton(
     content: @Composable () -> Unit
 ) = Surface(
     onClick = onClick,
-    modifier = modifier,
+    modifier = modifier.semantics { role = Role.Button },
     enabled = enabled,
     shape = shape,
     color = colors.containerColor(enabled).value,

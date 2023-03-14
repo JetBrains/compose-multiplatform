@@ -16,6 +16,8 @@
 
 package androidx.compose.foundation.text.selection
 
+import androidx.compose.foundation.text.findFollowingBreak
+import androidx.compose.foundation.text.findPrecedingBreak
 import androidx.compose.foundation.text.getParagraphBoundary
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextRange
@@ -87,6 +89,7 @@ internal interface SelectionAdjustment {
                     // If there isn't any selection before, we assume handles are not crossed.
                     val previousHandlesCrossed = previousSelectionRange?.reversed ?: false
                     ensureAtLeastOneChar(
+                        text = textLayoutResult.layoutInput.text.text,
                         offset = newRawSelectionRange.start,
                         lastOffset = textLayoutResult.layoutInput.text.lastIndex,
                         isStartHandle = isStartHandle,
@@ -205,6 +208,7 @@ internal interface SelectionAdjustment {
                 // The new selection is collapsed, ensure at least one char is selected.
                 if (newRawSelectionRange.collapsed) {
                     return ensureAtLeastOneChar(
+                        text = textLayoutResult.layoutInput.text.text,
                         offset = newRawSelectionRange.start,
                         lastOffset = textLayoutResult.layoutInput.text.lastIndex,
                         isStartHandle = isStartHandle,
@@ -402,10 +406,12 @@ internal interface SelectionAdjustment {
 }
 
 /**
- * This method adjusts the raw start and end offset and bounds the selection to one character. The
- * logic of bounding evaluates the last selection result, which handle is being dragged, and if
- * selection reaches the boundary.
+ * This method adjusts the raw start and end offset and bounds the selection to one character
+ * respecting [String.findPrecedingBreak] and [String.findFollowingBreak]. The logic of bounding
+ * evaluates the last selection result, which handle is being dragged, and if selection reaches the
+ * boundary.
  *
+ * @param text the complete string
  * @param offset unprocessed start and end offset calculated directly from input position, in
  * this case start and offset equals to each other.
  * @param lastOffset last offset of the text. It's actually the length of the text.
@@ -417,6 +423,7 @@ internal interface SelectionAdjustment {
  * @return the adjusted [TextRange].
  */
 internal fun ensureAtLeastOneChar(
+    text: String,
     offset: Int,
     lastOffset: Int,
     isStartHandle: Boolean,
@@ -430,17 +437,17 @@ internal fun ensureAtLeastOneChar(
     // the other handle's position is computed accordingly.
     if (offset == 0) {
         return if (isStartHandle) {
-            TextRange(1, 0)
+            TextRange(text.findFollowingBreak(0), 0)
         } else {
-            TextRange(0, 1)
+            TextRange(0, text.findFollowingBreak(0))
         }
     }
 
     if (offset == lastOffset) {
         return if (isStartHandle) {
-            TextRange(lastOffset - 1, lastOffset)
+            TextRange(text.findPrecedingBreak(lastOffset), lastOffset)
         } else {
-            TextRange(lastOffset, lastOffset - 1)
+            TextRange(lastOffset, text.findPrecedingBreak(lastOffset))
         }
     }
 
@@ -449,18 +456,18 @@ internal fun ensureAtLeastOneChar(
     return if (isStartHandle) {
         if (!previousHandlesCrossed) {
             // Handle is NOT crossed, and the start handle is dragged.
-            TextRange(offset - 1, offset)
+            TextRange(text.findPrecedingBreak(offset), offset)
         } else {
             // Handle is crossed, and the start handle is dragged.
-            TextRange(offset + 1, offset)
+            TextRange(text.findFollowingBreak(offset), offset)
         }
     } else {
         if (!previousHandlesCrossed) {
             // Handle is NOT crossed, and the end handle is dragged.
-            TextRange(offset, offset + 1)
+            TextRange(offset, text.findFollowingBreak(offset))
         } else {
             // Handle is crossed, and the end handle is dragged.
-            TextRange(offset, offset - 1)
+            TextRange(offset, text.findPrecedingBreak(offset))
         }
     }
 }

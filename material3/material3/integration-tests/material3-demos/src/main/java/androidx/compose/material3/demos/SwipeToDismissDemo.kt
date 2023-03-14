@@ -139,7 +139,7 @@ fun SwipeToDismissDemo() {
                     dismissContent = {
                         Card {
                             ListItem(
-                                headlineText = {
+                                headlineContent = {
                                     Text(item, fontWeight = if (unread) FontWeight.Bold else null)
                                 },
                                 modifier = Modifier.semantics {
@@ -155,7 +155,7 @@ fun SwipeToDismissDemo() {
                                         }
                                     )
                                 },
-                                supportingText = { Text("Swipe me left or right!") },
+                                supportingContent = { Text("Swipe me left or right!") },
                             )
                         }
                     }

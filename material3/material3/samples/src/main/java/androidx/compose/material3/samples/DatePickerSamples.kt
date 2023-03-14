@@ -19,23 +19,35 @@ import android.os.Build
 import androidx.annotation.Sampled
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Icon
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DateRangePicker
+import androidx.compose.material3.DisplayMode
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.rememberDateRangePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import java.time.DayOfWeek
 import java.time.Instant
 import java.time.ZoneId
@@ -49,9 +61,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun DatePickerSample() {
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-        // Pre-select a date with January 4, 2020
+        // Pre-select a date for January 4, 2020
         val datePickerState = rememberDatePickerState(initialSelectedDateMillis = 1578096000000)
-        DatePicker(datePickerState = datePickerState, modifier = Modifier.padding(16.dp))
+        DatePicker(state = datePickerState, modifier = Modifier.padding(16.dp))
+
         Text("Selected date timestamp: ${datePickerState.selectedDateMillis ?: "no selection"}")
     }
 }
@@ -102,7 +115,7 @@ fun DatePickerDialogSample() {
                 }
             }
         ) {
-            DatePicker(datePickerState = datePickerState)
+            DatePicker(state = datePickerState)
         }
     }
 }
@@ -116,7 +129,7 @@ fun DatePickerWithDateValidatorSample() {
     val datePickerState = rememberDatePickerState()
     Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
         DatePicker(
-            datePickerState = datePickerState,
+            state = datePickerState,
             // Blocks Sunday and Saturday from being selected.
             dateValidator = { utcDateInMills ->
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -132,5 +145,60 @@ fun DatePickerWithDateValidatorSample() {
             }
         )
         Text("Selected date timestamp: ${datePickerState.selectedDateMillis ?: "no selection"}")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Sampled
+@Composable
+fun DateInputSample() {
+    Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+        val state = rememberDatePickerState(initialDisplayMode = DisplayMode.Input)
+        DatePicker(state = state, modifier = Modifier.padding(16.dp))
+
+        Text("Entered date timestamp: ${state.selectedDateMillis ?: "no input"}")
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview
+@Sampled
+@Composable
+fun DateRangePickerSample() {
+    // Decoupled snackbar host state from scaffold state for demo purposes.
+    val snackState = remember { SnackbarHostState() }
+    val snackScope = rememberCoroutineScope()
+    SnackbarHost(hostState = snackState, Modifier.zIndex(1f))
+
+    val state = rememberDateRangePickerState()
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Top) {
+        // Add a row with "Save" and dismiss actions.
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 12.dp, end = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            IconButton(onClick = { /* dismiss the UI */ }) {
+                Icon(Icons.Filled.Close, contentDescription = "Localized description")
+            }
+            TextButton(
+                onClick = {
+                    snackScope.launch {
+                        snackState.showSnackbar(
+                            "Saved range (timestamps): " +
+                                "${state.selectedStartDateMillis!!..state.selectedEndDateMillis!!}"
+                        )
+                    }
+                },
+                enabled = state.selectedEndDateMillis != null
+            ) {
+                Text(text = "Save")
+            }
+        }
+
+        DateRangePicker(state = state, modifier = Modifier.weight(1f))
     }
 }

@@ -50,6 +50,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -98,7 +101,6 @@ import androidx.compose.ui.unit.dp
  * for this button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -118,7 +120,7 @@ fun Button(
     val tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp
     Surface(
         onClick = onClick,
-        modifier = modifier,
+        modifier = modifier.semantics { role = Role.Button },
         enabled = enabled,
         shape = shape,
         color = containerColor,

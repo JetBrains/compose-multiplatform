@@ -60,8 +60,10 @@ class AndroidPaint(private var internalPaint: android.graphics.Paint) : Paint {
     override var blendMode: BlendMode
         get() = _blendMode
         set(value) {
-            _blendMode = value
-            internalPaint.setNativeBlendMode(value)
+            if (_blendMode != value) {
+                _blendMode = value
+                internalPaint.setNativeBlendMode(value)
+            }
         }
 
     override var style: PaintingStyle

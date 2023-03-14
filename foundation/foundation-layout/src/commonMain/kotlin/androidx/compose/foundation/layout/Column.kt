@@ -130,6 +130,9 @@ interface ColumnScope {
      * Otherwise, the element is allowed to be smaller - this will result in [Column] being smaller,
      * as the unused allocated height will not be redistributed to other siblings.
      *
+     * In a [FlowColumn], when a weight is applied to an item, the item is scaled based on
+     * the number of weighted items that fall on the column it was placed in.
+     *
      * @param weight The proportional height to give to this element, as related to the total of
      * all weighted siblings. Must be positive.
      * @param fill When `true`, the element will occupy the whole height allocated.

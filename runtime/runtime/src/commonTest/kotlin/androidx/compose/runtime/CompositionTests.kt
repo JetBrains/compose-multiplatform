@@ -3313,7 +3313,56 @@ class CompositionTests {
 
         revalidate()
     }
+
+    @Test // regression test for 267586102
+    fun test_remember_in_a_loop() = compositionTest {
+        var i1 = 0
+        var i2 = 0
+        var i3 = 0
+        var recomposeCounter = 0
+        var scope: RecomposeScope? = null
+
+        val content: @Composable SomeUnstableClass.() -> Unit = {
+            for (index in 0 until recomposeCounter) {
+                remember(this) { index }
+            }
+            scope = currentRecomposeScope
+            // these remembered values are not expected to change, BUT they change on recompositions
+            i1 = remember(this) { 1 }
+            i2 = remember(this) { 2 }
+            i3 = remember(this) { 3 }
+            recomposeCounter++
+        }
+
+        compose {
+            content(SomeUnstableClass())
+        }
+        advance()
+
+        assertEquals(1, i1)
+        assertEquals(2, i2)
+        assertEquals(3, i3)
+        assertEquals(1, recomposeCounter)
+
+        scope!!.invalidate()
+        advance()
+
+        assertEquals(2, recomposeCounter)
+        assertEquals(1, i1)
+        assertEquals(2, i2)
+        assertEquals(3, i3)
+
+        scope!!.invalidate()
+        advance()
+
+        assertEquals(3, recomposeCounter)
+        assertEquals(1, i1)
+        assertEquals(2, i2)
+        assertEquals(3, i3)
+    }
 }
+
+class SomeUnstableClass(val a: Any = "abc")
 
 @Composable
 fun test_CM1_RetFun(condition: Boolean) {

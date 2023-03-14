@@ -18,7 +18,8 @@ package androidx.compose.ui.focus
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.node.modifierElementOf
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * Add this modifier to a component to observe focus state events. [onFocusChanged] is invoked
@@ -30,19 +31,25 @@ import androidx.compose.ui.node.modifierElementOf
  * Note: If you want to be notified every time the internal focus state is written to (even if it
  * hasn't changed), use [onFocusEvent] instead.
  */
-@Suppress("ModifierInspectorInfo")
-fun Modifier.onFocusChanged(onFocusChanged: (FocusState) -> Unit): Modifier = this.then(
-    @OptIn(ExperimentalComposeUiApi::class)
-    modifierElementOf(
-        key = onFocusChanged,
-        create = { FocusChangedModifierNode(onFocusChanged) },
-        update = { it.onFocusChanged = onFocusChanged },
-        definitions = {
-            name = "onFocusChanged"
-            properties["onFocusChanged"] = onFocusChanged
-        }
-    )
-)
+fun Modifier.onFocusChanged(
+    onFocusChanged: (FocusState) -> Unit
+): Modifier = this then FocusChangedElement(onFocusChanged)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private data class FocusChangedElement(
+    val onFocusChanged: (FocusState) -> Unit
+) : ModifierNodeElement<FocusChangedModifierNode>() {
+    override fun create() = FocusChangedModifierNode(onFocusChanged)
+
+    override fun update(node: FocusChangedModifierNode) = node.apply {
+        onFocusChanged = this@FocusChangedElement.onFocusChanged
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "onFocusChanged"
+        properties["onFocusChanged"] = onFocusChanged
+    }
+}
 
 @ExperimentalComposeUiApi
 private class FocusChangedModifierNode(

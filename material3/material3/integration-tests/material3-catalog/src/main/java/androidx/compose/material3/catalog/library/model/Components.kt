@@ -69,6 +69,18 @@ private val BottomAppBars = Component(
     examples = BottomAppBarsExamples
 )
 
+private val BottomSheets = Component(
+    id = nextId(),
+    name = "Bottom Sheet",
+    description = "Bottom sheets are surfaces containing supplementary content, anchored to the " +
+        "bottom of the screen.",
+    // No bottom sheet icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/bottom-sheets",
+    docsUrl = "$DocsUrl#bottomsheet",
+    sourceUrl = "$Material3SourceUrl/ModalBottomSheet.kt",
+    examples = BottomSheetExamples
+)
+
 private val Buttons = Component(
     id = nextId(),
     name = "Buttons",
@@ -335,6 +347,17 @@ private val Tooltips = Component(
     examples = TooltipsExamples
 )
 
+private val TimePickers = Component(
+    id = nextId(),
+    name = "Time Picker",
+    description = "Time picker allows the user to choose time of day.",
+    // No time picker icon
+    guidelinesUrl = "$ComponentGuidelinesUrl/time-picker",
+    docsUrl = "$DocsUrl#time-pickers",
+    sourceUrl = "$Material3SourceUrl/TimePicker.kt",
+    examples = TimePickerExamples
+)
+
 private val TopAppBar = Component(
     id = nextId(),
     name = "Top app bar",
@@ -350,6 +373,7 @@ private val TopAppBar = Component(
 val Components = listOf(
     Badge,
     BottomAppBars,
+    BottomSheets,
     Buttons,
     Card,
     Checkboxes,
@@ -373,5 +397,6 @@ val Components = listOf(
     Tabs,
     TextFields,
     Tooltips,
+    TimePickers,
     TopAppBar
 )

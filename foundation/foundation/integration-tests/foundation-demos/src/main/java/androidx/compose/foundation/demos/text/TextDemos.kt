@@ -44,6 +44,9 @@ val TextDemos = DemoCategory(
                         ComposableDemo("Ellipsize and letterspacing") {
                             EllipsizeWithLetterSpacing()
                         },
+                        ComposableDemo("Letterspacing") {
+                            LetterSpacingDemo()
+                        }
                     )
                 ),
                 DemoCategory(
@@ -107,6 +110,7 @@ val TextDemos = DemoCategory(
                 ComposableDemo("TextFieldValue") { TextFieldValueDemo() },
                 ComposableDemo("Tail Following Text Field") { TailFollowingTextFieldDemo() },
                 ComposableDemo("Focus immediately") { FocusTextFieldImmediatelyDemo() },
+                ComposableDemo("Secondary input system") { PlatformTextInputAdapterDemo() },
             )
         ),
         DemoCategory(
@@ -114,6 +118,7 @@ val TextDemos = DemoCategory(
             listOf(
                 ComposableDemo("Text selection") { TextSelectionDemo() },
                 ComposableDemo("Text selection sample") { TextSelectionSample() },
+                ComposableDemo("Overflowed Selection") { TextOverflowedSelectionDemo() },
             )
         ),
         DemoCategory(

@@ -24,6 +24,7 @@ import android.os.Looper
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewParent
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
 import androidx.compose.runtime.CompositionContext
 import androidx.compose.runtime.snapshots.SnapshotStateObserver
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -47,6 +48,7 @@ import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.platform.AndroidComposeView
 import androidx.compose.ui.platform.composeToViewOffset
 import androidx.compose.ui.platform.compositionContext
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Velocity
@@ -66,11 +68,11 @@ import kotlinx.coroutines.launch
  * `AndroidViewBinding` APIs, which are built on top of [AndroidViewHolder].
  */
 @OptIn(ExperimentalComposeUiApi::class)
-internal abstract class AndroidViewHolder(
+internal open class AndroidViewHolder(
     context: Context,
     parentContext: CompositionContext?,
     private val dispatcher: NestedScrollDispatcher
-) : ViewGroup(context), NestedScrollingParent3 {
+) : ViewGroup(context), NestedScrollingParent3, ComposeNodeLifecycleCallback {
 
     init {
         // Any [Abstract]ComposeViews that are descendants of this view will host
@@ -98,6 +100,8 @@ internal abstract class AndroidViewHolder(
             }
         }
 
+    fun getInteropView(): InteropView? = view
+
     /**
      * The update logic of the [View].
      */
@@ -108,6 +112,12 @@ internal abstract class AndroidViewHolder(
             runUpdate()
         }
     private var hasUpdateBlock = false
+
+    var reset: () -> Unit = {}
+        protected set
+
+    var release: () -> Unit = {}
+        protected set
 
     /**
      * The modifier of the `LayoutNode` corresponding to this [View].
@@ -180,6 +190,26 @@ internal abstract class AndroidViewHolder(
 
     private val nestedScrollingParentHelper: NestedScrollingParentHelper =
         NestedScrollingParentHelper(this)
+
+    override fun onReuse() {
+        // We reset at the same time we remove the view. So if the view was removed, we can just
+        // re-add it and it's ready to go. If it's already attached, we didn't reset it and need
+        // to do so for it to be reused correctly.
+        if (view!!.parent !== this) {
+            addView(view)
+        } else {
+            reset()
+        }
+    }
+
+    override fun onDeactivate() {
+        reset()
+        removeView(view)
+    }
+
+    override fun onRelease() {
+        release()
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         view?.measure(widthMeasureSpec, heightMeasureSpec)
@@ -272,8 +302,10 @@ internal abstract class AndroidViewHolder(
     val layoutNode: LayoutNode = run {
         // Prepare layout node that proxies measure and layout passes to the View.
         val layoutNode = LayoutNode()
+        layoutNode.interopViewFactoryHolder = this@AndroidViewHolder
 
         val coreModifier = Modifier
+            .semantics(true) {}
             .pointerInteropFilter(this)
             .drawBehind {
                 drawIntoCanvas { canvas ->

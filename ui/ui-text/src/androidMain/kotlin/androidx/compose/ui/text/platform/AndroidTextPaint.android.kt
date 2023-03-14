@@ -20,6 +20,7 @@ import android.text.TextPaint
 import androidx.annotation.VisibleForTesting
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Paint
@@ -79,7 +80,6 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
     }
 
     fun setColor(color: Color) {
-        color.toArgb()
         if (color.isSpecified) {
             composePaint.color = color
             composePaint.shader = null
@@ -125,6 +125,10 @@ internal class AndroidTextPaint(flags: Int, density: Float) : TextPaint(flags) {
             }
         }
     }
+
+    // BlendMode is only available to DrawScope.drawText.
+    // not intended to be used by TextStyle/SpanStyle.
+    var blendMode: BlendMode by composePaint::blendMode
 }
 
 /**

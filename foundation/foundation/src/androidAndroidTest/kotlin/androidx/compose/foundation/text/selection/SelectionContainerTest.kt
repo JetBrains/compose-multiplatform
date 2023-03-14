@@ -26,12 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -40,10 +42,13 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
 import androidx.compose.ui.test.TouchInjectionScope
@@ -57,6 +62,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
@@ -79,12 +85,10 @@ import com.nhaarman.mockitokotlin2.verify
 import java.util.concurrent.CountDownLatch
 import kotlin.math.max
 import kotlin.math.sign
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-@Suppress("DEPRECATION")
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SelectionContainerTest {
@@ -176,15 +180,14 @@ class SelectionContainerTest {
                     )
                 }
 
+            rule.mainClock.advanceTimeByFrame()
             // Assert. Should select "Demo".
-            rule.runOnIdle {
-                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
-                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
-                verify(
-                    hapticFeedback,
-                    times(1)
-                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
+            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
+            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
+            verify(
+                hapticFeedback,
+                times(1)
+            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
             // Check the position of the anchors of the selection handles. We don't need to compare
             // to the absolute position since the semantics report selection relative to the
@@ -196,7 +199,6 @@ class SelectionContainerTest {
         }
     }
 
-    //    @Ignore("b/230622412")
     @Test
     fun long_press_select_a_word_rtl_layout() {
         with(rule.density) {
@@ -221,15 +223,15 @@ class SelectionContainerTest {
                     )
                 }
 
+            rule.mainClock.advanceTimeByFrame()
+
             // Assert. Should select "Demo".
-            rule.runOnIdle {
-                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
-                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
-                verify(
-                    hapticFeedback,
-                    times(1)
-                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
+            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
+            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
+            verify(
+                hapticFeedback,
+                times(1)
+            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
             // Check the position of the anchors of the selection handles. We don't need to compare
             // to the absolute position since the semantics report selection relative to the
@@ -328,7 +330,7 @@ class SelectionContainerTest {
     }
 
     @Test
-    fun selectionHandle_remainsInComposition_whenTextIsOverflown_clipped_softwrapDisabled() {
+    fun selectionHandle_remainsInComposition_whenTextIsOverflowed_clipped_softwrapDisabled() {
         createSelectionContainer {
             Column {
                 BasicText(
@@ -365,35 +367,85 @@ class SelectionContainerTest {
         assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
     }
 
-    @Ignore("b/262428141")
     @Test
-    fun selectionHandle_remainsInComposition_whenTextIsOverflown_clipped_maxLines1() {
+    fun allTextIsSelected_whenTextIsOverflowed_clipped_maxLines1() = with(rule.density) {
+        val longText = "$textContent ".repeat(100)
         createSelectionContainer {
             Column {
                 BasicText(
-                    AnnotatedString("$textContent ".repeat(100)),
-                    Modifier
-                        .fillMaxWidth()
-                        .testTag(tag1),
+                    AnnotatedString(longText),
+                    Modifier.fillMaxWidth().testTag(tag1),
                     style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
                     maxLines = 1
                 )
-                DisableSelection {
-                    BasicText(
-                        textContent,
-                        Modifier.fillMaxWidth().testTag(tag2),
-                        style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
-                        maxLines = 1
-                    )
-                }
             }
         }
 
         startSelection(tag1)
-        dragHandleTo(Handle.SelectionEnd, offset = characterBox(tag2, 4).center)
+        dragHandleTo(
+            handle = Handle.SelectionEnd,
+            offset = characterBox(tag1, 4).bottomRight + Offset(x = 0f, y = fontSize.toPx())
+        )
 
         assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
-        assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
+        assertAnchorInfo(selection.value?.end, offset = longText.length, selectableId = 1)
+    }
+
+    @Test
+    fun allTextIsSelected_whenTextIsOverflowed_ellipsized_maxLines1() = with(rule.density) {
+        val longText = "$textContent ".repeat(100)
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(longText),
+                    Modifier.fillMaxWidth().testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(
+            handle = Handle.SelectionEnd,
+            offset = characterBox(tag1, 4).bottomRight + Offset(x = 0f, y = fontSize.toPx())
+        )
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = longText.length, selectableId = 1)
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun selection_doesCopy_whenCopyKeyEventSent() {
+        lateinit var clipboardManager: ClipboardManager
+        createSelectionContainer {
+            clipboardManager = LocalClipboardManager.current
+            clipboardManager.setText(AnnotatedString("Clipboard content at start of test."))
+            Column {
+                BasicText(
+                    text = "ExpectedText",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                )
+            }
+        }
+
+        startSelection(tag1)
+
+        rule.onNodeWithTag(tag1)
+            .performKeyInput {
+                keyDown(Key.CtrlLeft)
+                keyDown(Key.C)
+                keyUp(Key.C)
+                keyUp(Key.CtrlLeft)
+            }
+
+        rule.runOnIdle {
+            assertThat(clipboardManager.getText()?.text).isEqualTo("ExpectedText")
+        }
     }
 
     private fun startSelection(

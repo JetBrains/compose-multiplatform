@@ -17,8 +17,8 @@
 package androidx.compose.foundation.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
-import androidx.compose.lint.test.kotlinAndCompiledStub
+import androidx.compose.lint.test.bytecodeStub
+import androidx.compose.lint.test.kotlinAndBytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.checks.infrastructure.TestFile
 import com.android.tools.lint.detector.api.Detector
@@ -34,7 +34,7 @@ class NonLambdaOffsetModifierDetectorTest : LintDetectorTest() {
         "Warning: ${NonLambdaOffsetModifierDetector.ReportMainMessage} " +
             "[${NonLambdaOffsetModifierDetector.IssueId}]"
 
-    private val OffsetStub: TestFile = compiledStub(
+    private val OffsetStub: TestFile = bytecodeStub(
         filename = "Offset.kt",
         filepath = "androidx/compose/foundation/layout",
         checksum = 0xd449361a,
@@ -92,7 +92,7 @@ class NonLambdaOffsetModifierDetectorTest : LintDetectorTest() {
     )
 
     // common_typos_disable
-    private val AnotherOffsetDefinitionStub = kotlinAndCompiledStub(
+    private val AnotherOffsetDefinitionStub = kotlinAndBytecodeStub(
         filename = "InitialTestPackage.kt",
         filepath = "initial/test/pack",
         checksum = 0xd4dfae47,
@@ -186,7 +186,7 @@ class NonLambdaOffsetModifierDetectorTest : LintDetectorTest() {
     )
     // common_typos_enabled
 
-    private val DensityStub: TestFile = compiledStub(
+    private val DensityStub: TestFile = bytecodeStub(
         filename = "Density.kt",
         filepath = "androidx/compose/ui/unit",
         checksum = 0xaa534a7a,
@@ -1383,7 +1383,7 @@ src/test/test.kt:19: $WarningMessage
 
         """
             ),
-            AnotherOffsetDefinitionStub.compiled
+            AnotherOffsetDefinitionStub.bytecode
         )
             .run()
             .expectClean()

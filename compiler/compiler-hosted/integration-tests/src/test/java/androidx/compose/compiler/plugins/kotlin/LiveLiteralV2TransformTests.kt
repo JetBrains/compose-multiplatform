@@ -16,12 +16,15 @@
 
 package androidx.compose.compiler.plugins.kotlin
 
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.junit.Test
 
 class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
-    override val liveLiteralsV2Enabled: Boolean
-        get() = true
+    override fun CompilerConfiguration.updateConfiguration() {
+        put(ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY, true)
+    }
 
+    @Test
     fun testSiblingCallArgs() = assertNoDuplicateKeys(
         """
         fun Test() {
@@ -31,6 +34,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     )
 
+    @Test
     fun testFunctionCallWithConstArg() = assertKeys(
         "Int%arg-0%call-print%fun-Test",
         "Int%arg-0%call-print-1%fun-Test"
@@ -43,6 +47,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testDispatchReceiver() = assertKeys(
         "Int%%this%call-toString%arg-0%call-print%fun-Test",
         "Int%arg-0%call-print-1%fun-Test"
@@ -55,6 +60,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testInsidePropertyGetter() = assertKeys(
         "Int%fun-%get-foo%%get%val-foo"
     ) {
@@ -64,12 +70,14 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
     }
 
     // NOTE(lmr): For static initializer expressions we can/should do more.
+    @Test
     fun testInsidePropertyInitializer() = assertKeys {
         """
         val foo: Int = 1
         """
     }
 
+    @Test
     fun testValueParameter() = assertKeys(
         "Int%param-x%fun-Foo"
     ) {
@@ -78,6 +86,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testAnnotation() = assertKeys {
         """
         annotation class Foo(val value: Int = 1)
@@ -87,6 +96,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
     }
 
     // NOTE(lmr): In the future we should try and get this to work
+    @Test
     fun testForLoop() = assertKeys {
         """
         fun Foo() {
@@ -97,6 +107,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testWhileTrue() = assertKeys(
         "Double%arg-1%call-greater%cond%if%body%loop%fun-Foo",
         "Int%arg-0%call-print%body%loop%fun-Foo"
@@ -111,6 +122,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testWhileCondition() = assertKeys(
         "Int%arg-0%call-print%body%loop%fun-Foo"
     ) {
@@ -123,6 +135,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testForInCollection() = assertKeys(
         "Int%arg-0%call-print-1%body%loop%fun-Foo"
     ) {
@@ -137,12 +150,14 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
     }
 
     // NOTE(lmr): we should deal with this in some cases, but leaving untouched for now
+    @Test
     fun testConstantProperty() = assertKeys {
         """
         const val foo = 1
         """
     }
 
+    @Test
     fun testSafeCall() = assertKeys(
         "Boolean%arg-1%call-EQEQ%fun-Foo",
         "String%arg-0%call-contains%else%when%arg-0%call-EQEQ%fun-Foo"
@@ -154,6 +169,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testElvis() = assertKeys(
         "String%branch%when%fun-Foo"
     ) {
@@ -164,6 +180,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testTryCatch() = assertKeys(
         "Int%arg-0%call-invoke%catch%fun-Foo",
         "Int%arg-0%call-invoke%finally%fun-Foo",
@@ -182,6 +199,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testWhen() = assertKeys(
         "Double%arg-1%call-greater%cond%when%fun-Foo",
         "Double%arg-1%call-greater%cond-1%when%fun-Foo",
@@ -200,6 +218,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testWhenWithSubject() = assertKeys(
         "Double%%%this%call-rangeTo%%this%call-contains%cond%when%fun-Foo",
         "Double%%%this%call-rangeTo%%this%call-contains%cond-1%when%fun-Foo",
@@ -220,6 +239,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testWhenWithSubject2() = assertKeys(
         "Int%arg-0%call-print%branch-1%when%fun-Foo",
         "Int%arg-0%call-print%else%when%fun-Foo",
@@ -236,6 +256,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testDelegatingCtor() = assertKeys(
         "Int%arg-0%call-%init%%class-Bar"
     ) {
@@ -245,6 +266,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testLocalVal() = assertKeys(
         "Int%arg-0%call-plus%set-y%fun-Foo",
         "Int%val-x%fun-Foo",
@@ -259,6 +281,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testCapturedVar() = assertKeys(
         "Int%val-a%fun-Example",
         "String%0%str%fun-Example",
@@ -304,6 +327,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """
     }
 
+    @Test
     fun testCommentsAbove() = assertDurableChange(
         """
             fun Test() {
@@ -318,6 +342,7 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
         """.trimIndent()
     )
 
+    @Test
     fun testValsAndStructureAbove() = assertDurableChange(
         """
             fun Test() {
@@ -542,6 +567,179 @@ class LiveLiteralV2TransformTests : AbstractLiveLiteralTransformTests() {
                 return if (tmp0 == null) {
                   val tmp1 = liveLiteral("Int%arg-0%call-print-2%fun-A", Int%arg-0%call-print-2%fun-A)
                   State%Int%arg-0%call-print-2%fun-A = tmp1
+                  tmp1
+                } else {
+                  tmp0
+                }
+                .value
+              }
+            }
+        """
+    )
+
+    @Test
+    fun testComposeIrSkippingWithDefaultsRelease() = verifyComposeIrTransform(
+        """
+            import androidx.compose.ui.text.input.TextFieldValue
+            import androidx.compose.runtime.*
+            import androidx.compose.foundation.layout.*
+            import androidx.compose.foundation.text.KeyboardActions
+            import androidx.compose.material.*
+
+            object Ui {}
+
+            @Composable
+            fun Ui.UiTextField(
+                isError: Boolean = false,
+                keyboardActions2: Boolean = false,
+            ) {
+                println("t41 insideFunction ${'$'}isError")
+                println("t41 insideFunction ${'$'}keyboardActions2")
+                Column {
+                    Text("${'$'}isError")
+                    Text("${'$'}keyboardActions2")
+                }
+            }
+        """.trimIndent(),
+        """
+            @StabilityInferred(parameters = 0)
+            object Ui {
+              static val %stable: Int = LiveLiterals%TestKt.Int%class-Ui()
+            }
+            @Composable
+            @ComposableTarget(applier = "androidx.compose.ui.UiComposable")
+            fun Ui.UiTextField(isError: Boolean, keyboardActions2: Boolean, %composer: Composer?, %changed: Int, %default: Int) {
+              %composer = %composer.startRestartGroup(<>)
+              sourceInformation(%composer, "C(UiTextField)")
+              val %dirty = %changed
+              if (%changed and 0b01110000 === 0) {
+                %dirty = %dirty or if (%default and 0b0001 === 0 && %composer.changed(isError)) 0b00100000 else 0b00010000
+              }
+              if (%changed and 0b001110000000 === 0) {
+                %dirty = %dirty or if (%default and 0b0010 === 0 && %composer.changed(keyboardActions2)) 0b000100000000 else 0b10000000
+              }
+              if (%dirty and 0b001011010001 !== 0b10010000 || !%composer.skipping) {
+                %composer.startDefaults()
+                if (%changed and 0b0001 === 0 || %composer.defaultsInvalid) {
+                  if (%default and 0b0001 !== 0) {
+                    isError = LiveLiterals%TestKt.Boolean%param-isError%fun-UiTextField()
+                    %dirty = %dirty and 0b01110000.inv()
+                  }
+                  if (%default and 0b0010 !== 0) {
+                    keyboardActions2 = LiveLiterals%TestKt.Boolean%param-keyboardActions2%fun-UiTextField()
+                    %dirty = %dirty and 0b001110000000.inv()
+                  }
+                } else {
+                  %composer.skipToGroupEnd()
+                  if (%default and 0b0001 !== 0) {
+                    %dirty = %dirty and 0b01110000.inv()
+                  }
+                  if (%default and 0b0010 !== 0) {
+                    %dirty = %dirty and 0b001110000000.inv()
+                  }
+                }
+                %composer.endDefaults()
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %changed, -1, <>)
+                }
+                println("%{LiveLiterals%TestKt.String%0%str%arg-0%call-println%fun-UiTextField()}%isError")
+                println("%{LiveLiterals%TestKt.String%0%str%arg-0%call-println-1%fun-UiTextField()}%keyboardActions2")
+                Column(null, null, null, { %composer: Composer?, %changed: Int ->
+                  Text("%isError", null, <unsafe-coerce>(0L), <unsafe-coerce>(0L), null, null, null, <unsafe-coerce>(0L), null, null, <unsafe-coerce>(0L), <unsafe-coerce>(0), false, 0, 0, null, null, %composer, 0, 0, 0b00011111111111111110)
+                  Text("%keyboardActions2", null, <unsafe-coerce>(0L), <unsafe-coerce>(0L), null, null, null, <unsafe-coerce>(0L), null, null, <unsafe-coerce>(0L), <unsafe-coerce>(0), false, 0, 0, null, null, %composer, 0, 0, 0b00011111111111111110)
+                }, %composer, 0, 0b0111)
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
+              } else {
+                %composer.skipToGroupEnd()
+              }
+              %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+                UiTextField(isError, keyboardActions2, %composer, updateChangedFlags(%changed or 0b0001), %default)
+              }
+            }
+            @LiveLiteralFileInfo(file = "/Test.kt")
+            internal object LiveLiterals%TestKt {
+              val enabled: Boolean = false
+              val Int%class-Ui: Int = 0
+              var State%Int%class-Ui: State<Int>?
+              @LiveLiteralInfo(key = "Int%class-Ui", offset = -1)
+              fun Int%class-Ui(): Int {
+                if (!enabled) {
+                  return Int%class-Ui
+                }
+                val tmp0 = State%Int%class-Ui
+                return if (tmp0 == null) {
+                  val tmp1 = liveLiteral("Int%class-Ui", Int%class-Ui)
+                  State%Int%class-Ui = tmp1
+                  tmp1
+                } else {
+                  tmp0
+                }
+                .value
+              }
+              val Boolean%param-isError%fun-UiTextField: Boolean = false
+              var State%Boolean%param-isError%fun-UiTextField: State<Boolean>?
+              @LiveLiteralInfo(key = "Boolean%param-isError%fun-UiTextField", offset = 292)
+              fun Boolean%param-isError%fun-UiTextField(): Boolean {
+                if (!enabled) {
+                  return Boolean%param-isError%fun-UiTextField
+                }
+                val tmp0 = State%Boolean%param-isError%fun-UiTextField
+                return if (tmp0 == null) {
+                  val tmp1 = liveLiteral("Boolean%param-isError%fun-UiTextField", Boolean%param-isError%fun-UiTextField)
+                  State%Boolean%param-isError%fun-UiTextField = tmp1
+                  tmp1
+                } else {
+                  tmp0
+                }
+                .value
+              }
+              val Boolean%param-keyboardActions2%fun-UiTextField: Boolean = false
+              var State%Boolean%param-keyboardActions2%fun-UiTextField: State<Boolean>?
+              @LiveLiteralInfo(key = "Boolean%param-keyboardActions2%fun-UiTextField", offset = 331)
+              fun Boolean%param-keyboardActions2%fun-UiTextField(): Boolean {
+                if (!enabled) {
+                  return Boolean%param-keyboardActions2%fun-UiTextField
+                }
+                val tmp0 = State%Boolean%param-keyboardActions2%fun-UiTextField
+                return if (tmp0 == null) {
+                  val tmp1 = liveLiteral("Boolean%param-keyboardActions2%fun-UiTextField", Boolean%param-keyboardActions2%fun-UiTextField)
+                  State%Boolean%param-keyboardActions2%fun-UiTextField = tmp1
+                  tmp1
+                } else {
+                  tmp0
+                }
+                .value
+              }
+              val String%0%str%arg-0%call-println%fun-UiTextField: String = "t41 insideFunction "
+              var State%String%0%str%arg-0%call-println%fun-UiTextField: State<String>?
+              @LiveLiteralInfo(key = "String%0%str%arg-0%call-println%fun-UiTextField", offset = 355)
+              fun String%0%str%arg-0%call-println%fun-UiTextField(): String {
+                if (!enabled) {
+                  return String%0%str%arg-0%call-println%fun-UiTextField
+                }
+                val tmp0 = State%String%0%str%arg-0%call-println%fun-UiTextField
+                return if (tmp0 == null) {
+                  val tmp1 = liveLiteral("String%0%str%arg-0%call-println%fun-UiTextField", String%0%str%arg-0%call-println%fun-UiTextField)
+                  State%String%0%str%arg-0%call-println%fun-UiTextField = tmp1
+                  tmp1
+                } else {
+                  tmp0
+                }
+                .value
+              }
+              val String%0%str%arg-0%call-println-1%fun-UiTextField: String = "t41 insideFunction "
+              var State%String%0%str%arg-0%call-println-1%fun-UiTextField: State<String>?
+              @LiveLiteralInfo(key = "String%0%str%arg-0%call-println-1%fun-UiTextField", offset = 398)
+              fun String%0%str%arg-0%call-println-1%fun-UiTextField(): String {
+                if (!enabled) {
+                  return String%0%str%arg-0%call-println-1%fun-UiTextField
+                }
+                val tmp0 = State%String%0%str%arg-0%call-println-1%fun-UiTextField
+                return if (tmp0 == null) {
+                  val tmp1 = liveLiteral("String%0%str%arg-0%call-println-1%fun-UiTextField", String%0%str%arg-0%call-println-1%fun-UiTextField)
+                  State%String%0%str%arg-0%call-println-1%fun-UiTextField = tmp1
                   tmp1
                 } else {
                   tmp0

@@ -55,6 +55,7 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
+import androidx.test.filters.RequiresDevice
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -94,6 +95,7 @@ class CoreTextFieldKeyboardScrollableInteractionTest(
     private val ListTag = "list"
     private val keyboardHelper = KeyboardHelper(rule)
 
+    @RequiresDevice // b/266736632
     @Test
     fun test() {
         rule.setContent {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,13 +23,17 @@ import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.PlainTooltipBox
+import androidx.compose.material3.PlainTooltipState
+import androidx.compose.material3.RichTooltipBox
+import androidx.compose.material3.RichTooltipState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipState
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -48,11 +52,12 @@ fun PlainTooltipSample() {
         tooltip = { Text("Add to favorites") }
     ) {
         IconButton(
-            onClick = { /* Icon button's click event */ }
+            onClick = { /* Icon button's click event */ },
+            modifier = Modifier.tooltipAnchor()
         ) {
             Icon(
                 imageVector = Icons.Filled.Favorite,
-                contentDescription = null
+                contentDescription = "Localized Description"
             )
         }
     }
@@ -63,9 +68,8 @@ fun PlainTooltipSample() {
 @Sampled
 @Composable
 fun PlainTooltipWithManualInvocationSample() {
-    val tooltipState = remember { TooltipState() }
+    val tooltipState = remember { PlainTooltipState() }
     val scope = rememberCoroutineScope()
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -75,7 +79,7 @@ fun PlainTooltipWithManualInvocationSample() {
         ) {
             Icon(
                 imageVector = Icons.Filled.AddCircle,
-                contentDescription = null
+                contentDescription = "Localized Description"
             )
         }
         Spacer(Modifier.requiredHeight(30.dp))
@@ -86,3 +90,74 @@ fun PlainTooltipWithManualInvocationSample() {
         }
     }
 }
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun RichTooltipSample() {
+    val tooltipState = remember { RichTooltipState() }
+    val scope = rememberCoroutineScope()
+    RichTooltipBox(
+        title = { Text(richTooltipSubheadText) },
+        action = {
+            TextButton(
+                onClick = { scope.launch { tooltipState.dismiss() } }
+            ) { Text(richTooltipActionText) }
+        },
+        text = { Text(richTooltipText) },
+        tooltipState = tooltipState
+    ) {
+        IconButton(
+            onClick = { /* Icon button's click event */ },
+            modifier = Modifier.tooltipAnchor()
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Info,
+                contentDescription = "Localized Description"
+            )
+        }
+    }
+}
+@OptIn(ExperimentalMaterial3Api::class)
+@Sampled
+@Composable
+fun RichTooltipWithManualInvocationSample() {
+    val tooltipState = remember { RichTooltipState() }
+    val scope = rememberCoroutineScope()
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        RichTooltipBox(
+            title = { Text(richTooltipSubheadText) },
+            action = {
+                TextButton(
+                    onClick = {
+                        scope.launch {
+                            tooltipState.dismiss()
+                        }
+                    }
+                ) { Text(richTooltipActionText) }
+            },
+            text = { Text(richTooltipText) },
+            tooltipState = tooltipState
+        ) {
+            Icon(
+                imageVector = Icons.Filled.Info,
+                contentDescription = "Localized Description"
+            )
+        }
+        Spacer(Modifier.requiredHeight(30.dp))
+        OutlinedButton(
+            onClick = { scope.launch { tooltipState.show() } }
+        ) {
+            Text("Display tooltip")
+        }
+    }
+}
+
+const val richTooltipSubheadText = "Permissions"
+const val richTooltipText =
+    "Configure permissions for selected service accounts. " +
+        "You can add and remove service account members and assign roles to them. " +
+        "Visit go/permissions for details"
+const val richTooltipActionText = "Request Access"

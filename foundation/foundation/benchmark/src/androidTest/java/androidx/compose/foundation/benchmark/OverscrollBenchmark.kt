@@ -54,7 +54,6 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -87,19 +86,16 @@ class OverscrollBenchmark {
         benchmarkRule.benchmarkFirstDraw(overscrollTestCase)
     }
 
-    @Ignore // b/265351382
     @Test
     fun overscroll_measure() {
         benchmarkRule.toggleStateBenchmarkMeasure(overscrollTestCase, false)
     }
 
-    @Ignore // b/265351382
     @Test
     fun overscroll_layout() {
         benchmarkRule.toggleStateBenchmarkLayout(overscrollTestCase, false)
     }
 
-    @Ignore // b/265351382
     @Test
     fun overscroll_draw() {
         benchmarkRule.toggleStateBenchmarkDraw(overscrollTestCase, false)
@@ -165,7 +161,7 @@ private class OverscrollTestCase : LayeredComposeTestCase(), ToggleableTestCase 
             motionEventHelper.sendEvent(MotionEvent.ACTION_MOVE, Offset(x = 0f, y = height / 8f))
             showingOverscroll = true
         } else {
-            motionEventHelper.sendEvent(MotionEvent.ACTION_UP, Offset.Zero)
+            motionEventHelper.sendEvent(MotionEvent.ACTION_UP, Offset.Zero, 1000L)
             showingOverscroll = false
         }
     }

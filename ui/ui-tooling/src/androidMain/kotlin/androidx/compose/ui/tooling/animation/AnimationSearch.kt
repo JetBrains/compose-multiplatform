@@ -38,6 +38,7 @@ private const val ANIMATED_CONTENT = "AnimatedContent"
 private const val ANIMATED_VISIBILITY = "AnimatedVisibility"
 private const val ANIMATE_VALUE_AS_STATE = "animateValueAsState"
 private const val REMEMBER = "remember"
+private const val REMEMBER_INFINITE_TRANSITION = "rememberInfiniteTransition"
 private const val REMEMBER_UPDATED_STATE = "rememberUpdatedState"
 private const val SIZE_ANIMATION_MODIFIER = "androidx.compose.animation.SizeAnimationModifier"
 
@@ -58,9 +59,12 @@ private inline fun <reified T> Collection<Group>.findRememberedData(): List<T> {
 }
 
 @OptIn(UiToolingDataApi::class)
-private inline fun <reified T> Group.findData(): T? {
+private inline fun <reified T> Group.findData(includeGrandchildren: Boolean = false): T? {
     // Search in self data and children data
-    return (data + children.flatMap { it.data }).firstOrNull { data ->
+    val dataToSearch = data + children.let {
+        if (includeGrandchildren) (it + it.flatMap { child -> child.children }) else it
+    }.flatMap { it.data }
+    return dataToSearch.firstOrNull { data ->
         data is T
     } as? T
 }
@@ -201,11 +205,13 @@ internal class AnimationSearch(
 
         private fun findAnimations(groupsWithLocation: Collection<Group>):
             List<InfiniteTransitionSearchInfo> {
-            val groups = groupsWithLocation.filter { group -> group.name == "run" }
-                .filterIsInstance<CallGroup>()
+            val groups =
+                groupsWithLocation.filter { group -> group.name == REMEMBER_INFINITE_TRANSITION }
+                    .filterIsInstance<CallGroup>()
+
             return groups.mapNotNull {
                 val infiniteTransition = it.findData<InfiniteTransition>()
-                val toolingOverride = it.findData<MutableState<State<Long>?>>()
+                val toolingOverride = it.findData<MutableState<State<Long>?>>(true)
                 if (infiniteTransition != null && toolingOverride != null) {
                     if (toolingOverride.value == null) {
                         toolingOverride.value = ToolingState(0L)

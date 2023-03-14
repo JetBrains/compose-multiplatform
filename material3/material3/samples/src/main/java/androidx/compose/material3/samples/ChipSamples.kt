@@ -51,7 +51,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled
 @Composable
@@ -69,7 +68,6 @@ fun AssistChipSample() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled
 @Composable
@@ -198,7 +196,6 @@ fun InputChipWithAvatarSample() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled
 @Composable
@@ -209,7 +206,6 @@ fun SuggestionChipSample() {
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Sampled
 @Composable
@@ -222,7 +218,6 @@ fun ElevatedSuggestionChipSample() {
 
 @Preview
 @Sampled
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChipGroupSingleLineSample() {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {

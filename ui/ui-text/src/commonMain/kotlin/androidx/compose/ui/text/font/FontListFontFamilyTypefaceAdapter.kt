@@ -102,7 +102,7 @@ internal class FontListFontFamilyTypefaceAdapter(
                     async {
                         asyncTypefaceCache.runCached(font, resourceLoader, true) {
                             try {
-                                withTimeout(Font.MaximumAsyncTimeout) {
+                                withTimeout(Font.MaximumAsyncTimeoutMillis) {
                                     resourceLoader.awaitLoad(font)
                                 }
                             } catch (cause: Exception) {
@@ -297,7 +297,7 @@ internal class AsyncFontListLoader constructor(
         return try {
             // case 0: load completes - success (non-null)
             // case 1: we timeout - permanent failure (null)
-            withTimeoutOrNull(Font.MaximumAsyncTimeout) {
+            withTimeoutOrNull(Font.MaximumAsyncTimeoutMillis) {
                 platformFontLoader.awaitLoad(this@loadWithTimeoutOrNull)
             }
         } catch (cancel: CancellationException) {

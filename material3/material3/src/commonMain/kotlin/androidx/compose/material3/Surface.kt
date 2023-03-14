@@ -169,9 +169,8 @@ fun Surface(
  * a `Modifier.semantics { onClick(label = "YOUR_LABEL", action = null) }` to the Surface.
  *
  * 6) Semantics for clicks. Just like with [Modifier.clickable], clickable version of Surface will
- * produce semantics to indicate that it is clicked. Also, by default, accessibility services will
- * describe the element as [Role.Button]. You may change this by passing a desired [Role] with a
- * [Modifier.semantics].
+ * produce semantics to indicate that it is clicked. No semantic role is set by default, you
+ * may specify one by passing a desired [Role] with a [Modifier.semantics].
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].
  *
@@ -198,7 +197,6 @@ fun Surface(
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
  * different [Interaction]s.
  */
-@ExperimentalMaterial3Api
 @Composable
 @NonRestartableComposable
 fun Surface(
@@ -235,7 +233,6 @@ fun Surface(
                     interactionSource = interactionSource,
                     indication = rememberRipple(),
                     enabled = enabled,
-                    role = Role.Button,
                     onClick = onClick
                 ),
             propagateMinConstraints = true
@@ -279,9 +276,8 @@ fun Surface(
  * that doesn't require [onClick] param.
  *
  * 6) Semantics for selection. Just like with [Modifier.selectable], selectable version of Surface
- * will produce semantics to indicate that it is selected. Also, by default, accessibility services
- * will describe the element as [Role.Tab]. You may change this by passing a desired [Role] with a
- * [Modifier.semantics].
+ * will produce semantics to indicate that it is selected. No semantic role is set by default, you
+ * may specify one by passing a desired [Role] with a [Modifier.semantics].
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].
  *
@@ -309,7 +305,6 @@ fun Surface(
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
  * different [Interaction]s.
  */
-@ExperimentalMaterial3Api
 @Composable
 @NonRestartableComposable
 fun Surface(
@@ -348,7 +343,6 @@ fun Surface(
                     interactionSource = interactionSource,
                     indication = rememberRipple(),
                     enabled = enabled,
-                    role = Role.Tab,
                     onClick = onClick
                 ),
             propagateMinConstraints = true
@@ -392,9 +386,8 @@ fun Surface(
  * handling, consider using a Surface function that doesn't require [onCheckedChange] param.
  *
  * 6) Semantics for toggle. Just like with [Modifier.toggleable], toggleable version of Surface
- * will produce semantics to indicate that it is checked.  Also, by default, accessibility services
- * will describe the element as [Role.Switch]. You may change this by passing a desired [Role] with
- * a [Modifier.semantics].
+ * will produce semantics to indicate that it is checked.  No semantic role is set by default, you
+ * may specify one by passing a desired [Role] with a [Modifier.semantics].
  *
  * To manually retrieve the content color inside a surface, use [LocalContentColor].
  *
@@ -422,7 +415,6 @@ fun Surface(
  * you want to observe [Interaction]s and customize the appearance / behavior of this Surface in
  * different [Interaction]s.
  */
-@ExperimentalMaterial3Api
 @Composable
 @NonRestartableComposable
 fun Surface(
@@ -461,7 +453,6 @@ fun Surface(
                     interactionSource = interactionSource,
                     indication = rememberRipple(),
                     enabled = enabled,
-                    role = Role.Switch,
                     onValueChange = onCheckedChange
                 ),
             propagateMinConstraints = true

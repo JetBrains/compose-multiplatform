@@ -20,35 +20,47 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.compositionLocalOf
 
 /**
- * Parent layouts with pinning support for the children content will provide the current
- * [PinnableContainer] via this composition local.
+ * Use this composition local to get the [PinnableContainer] handling the current subhierarchy.
+ *
+ * It will be not null, for example, when the current content is composed as an item of lazy list.
  */
 val LocalPinnableContainer = compositionLocalOf<PinnableContainer?> { null }
 
 /**
- * Represents a container which can be pinned by some of its parents.
+ * Represents a container which can be pinned when the content of this container is important.
  *
- * For example in lists which only compose visible items it means this item will be kept
- * composed even when it will be scrolled out of the view.
+ * For example, each item of lazy list represents one [PinnableContainer], and if this
+ * container is pinned, this item will not be disposed when scrolled out of the viewport.
+ *
+ * Pinning a currently focused item so the focus is not lost is one of the examples when this
+ * functionality can be useful.
+ *
+ * @see LocalPinnableContainer
  */
 @Stable
 interface PinnableContainer {
 
     /**
-     * Pin the current container when its content needs to be kept alive, for example when it has
-     * focus or user is interacting with it in some other way.
+     * Allows to pin this container when the associated content is considered important.
      *
-     * Don't forget to call [PinnedHandle.unpin] when this content is not needed anymore.
+     * For example, if this [PinnableContainer] is an item of lazy list pinning will mean
+     * this item will not be disposed when scrolled out of the viewport.
+     *
+     * Don't forget to call [PinnedHandle.release] when this content is not important anymore.
      */
     fun pin(): PinnedHandle
 
     /**
-     * This is an object returned by [pin] which allows to unpin the content.
+     * This is an object returned by [pin] which allows to release the pinning.
      */
+    @Suppress("NotCloseable")
     fun interface PinnedHandle {
         /**
-         *  Unpin the container associated with this handle.
+         * Releases the pin.
+         *
+         * For example, if this [PinnableContainer] is an item of lazy list releasing the
+         * pinning will allow lazy list to stop composing the item when it is not visible.
          */
-        fun unpin()
+        fun release()
     }
 }

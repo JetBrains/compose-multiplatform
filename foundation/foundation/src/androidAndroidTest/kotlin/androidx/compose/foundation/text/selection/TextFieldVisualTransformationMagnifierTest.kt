@@ -43,6 +43,7 @@ import androidx.test.filters.RequiresDevice
 import androidx.test.filters.SdkSuppress
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.sign
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -96,6 +97,7 @@ internal class TextFieldVisualTransformationMagnifierTest(
         assertThat(getMagnifierCenterOffset()).isNotEqualTo(Offset.Zero)
     }
 
+    @Ignore("b/266233836")
     @RequiresDevice // b/264701475
     @Test
     fun checkMagnifierFollowsHandleHorizontally() {

@@ -49,7 +49,7 @@ fun Modifier.pullRefresh(
     properties["state"] = state
     properties["enabled"] = enabled
 }) {
-    Modifier.pullRefresh(state::onPull, { state.onRelease() }, enabled)
+    Modifier.pullRefresh(state::onPull, state::onRelease, enabled)
 }
 
 /**
@@ -64,16 +64,20 @@ fun Modifier.pullRefresh(
  * @param onPull Callback for dispatching vertical scroll delta, takes float pullDelta as argument.
  * Positive delta (pulling down) is dispatched only if the child does not consume it (i.e. pulling
  * down despite being at the top of a scrollable component), whereas negative delta (swiping up) is
- * dispatched first (in case it is needed to push the indicator back up), and then whatever is not
- * consumed is passed on to the child.
+ * dispatched first (in case it is needed to push the indicator back up), and then the unconsumed
+ * delta is passed on to the child. The callback returns how much delta was consumed.
  * @param onRelease Callback for when drag is released, takes float flingVelocity as argument.
+ * The callback returns how much velocity was consumed - in most cases this should only consume
+ * velocity if pull refresh has been dragged already and the velocity is positive (the fling is
+ * downwards), as an upwards fling should typically still scroll a scrollable component beneath the
+ * pullRefresh. This is invoked before any remaining velocity is passed to the child.
  * @param enabled If not enabled, all scroll delta and fling velocity will be ignored and neither
  * [onPull] nor [onRelease] will be invoked.
  */
 @ExperimentalMaterialApi
 fun Modifier.pullRefresh(
     onPull: (pullDelta: Float) -> Float,
-    onRelease: suspend (flingVelocity: Float) -> Unit,
+    onRelease: suspend (flingVelocity: Float) -> Float,
     enabled: Boolean = true
 ) = inspectable(inspectorInfo = debugInspectorInfo {
     name = "pullRefresh"
@@ -86,7 +90,7 @@ fun Modifier.pullRefresh(
 
 private class PullRefreshNestedScrollConnection(
     private val onPull: (pullDelta: Float) -> Float,
-    private val onRelease: suspend (flingVelocity: Float) -> Unit,
+    private val onRelease: suspend (flingVelocity: Float) -> Float,
     private val enabled: Boolean
 ) : NestedScrollConnection {
 
@@ -110,7 +114,6 @@ private class PullRefreshNestedScrollConnection(
     }
 
     override suspend fun onPreFling(available: Velocity): Velocity {
-        onRelease(available.y)
-        return Velocity.Zero
+        return Velocity(0f, onRelease(available.y))
     }
 }

@@ -2591,8 +2591,8 @@ internal fun composeViewSwipeUp() {
     onView(allOf(instanceOf(AbstractComposeView::class.java)))
         .perform(
             espressoSwipe(
-                GeneralLocation.BOTTOM_CENTER,
-                GeneralLocation.CENTER
+                GeneralLocation.CENTER,
+                GeneralLocation.TOP_CENTER
             )
         )
 }

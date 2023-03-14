@@ -18,6 +18,7 @@ package androidx.compose.ui.text.platform
 
 import android.graphics.Matrix
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.ShaderBrush
@@ -36,15 +37,18 @@ internal actual fun MultiParagraph.drawMultiParagraph(
     alpha: Float,
     shadow: Shadow?,
     decoration: TextDecoration?,
-    drawStyle: DrawStyle?
+    drawStyle: DrawStyle?,
+    blendMode: BlendMode
 ) {
     canvas.save()
 
     if (paragraphInfoList.size <= 1) {
-        drawParagraphs(canvas, brush, alpha, shadow, decoration, drawStyle)
+        drawParagraphs(canvas, brush, alpha, shadow, decoration, drawStyle, blendMode)
     } else {
         when (brush) {
-            is SolidColor -> drawParagraphs(canvas, brush, alpha, shadow, decoration, drawStyle)
+            is SolidColor -> {
+                drawParagraphs(canvas, brush, alpha, shadow, decoration, drawStyle, blendMode)
+            }
             is ShaderBrush -> {
                 var height = 0f
                 var width = 0f
@@ -62,7 +66,8 @@ internal actual fun MultiParagraph.drawMultiParagraph(
                         alpha = alpha,
                         shadow = shadow,
                         textDecoration = decoration,
-                        drawStyle = drawStyle
+                        drawStyle = drawStyle,
+                        blendMode = blendMode
                     )
                     canvas.translate(0f, it.paragraph.height)
                     matrix.setTranslate(0f, -it.paragraph.height)
@@ -82,10 +87,11 @@ private fun MultiParagraph.drawParagraphs(
     alpha: Float,
     shadow: Shadow?,
     decoration: TextDecoration?,
-    drawStyle: DrawStyle?
+    drawStyle: DrawStyle?,
+    blendMode: BlendMode
 ) {
     paragraphInfoList.fastForEach {
-        it.paragraph.paint(canvas, brush, alpha, shadow, decoration, drawStyle)
+        it.paragraph.paint(canvas, brush, alpha, shadow, decoration, drawStyle, blendMode)
         canvas.translate(0f, it.paragraph.height)
     }
 }

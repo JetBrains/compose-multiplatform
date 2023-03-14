@@ -17,11 +17,14 @@ package androidx.compose.ui.text
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.ImageBitmapConfig
+import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.Shadow
@@ -4442,6 +4445,78 @@ class ParagraphIntegrationTest {
             val secondBitmap = baseParagraph.bitmap(drawStyle = null)
 
             assertThat(firstBitmap).isEqualToBitmap(secondBitmap)
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun paint_withBlendMode_changesVisual() {
+        with(defaultDensity) {
+            val text = "aaa"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val baseParagraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize, color = Color.Green),
+                width = paragraphWidth
+            )
+
+            val bitmapDefault = baseParagraph.onCanvas { canvas ->
+                // first draw a Red background
+                val paint = Paint().apply { color = Color.Red }
+                canvas.drawRect(Rect(Offset.Zero, Size(width, height)), paint)
+                // draw the paragraph as usual
+                baseParagraph.paint(canvas)
+            }
+
+            val bitmapPlus = baseParagraph.onCanvas { canvas ->
+                // first draw a Red background
+                val paint = Paint().apply { color = Color.Red }
+                canvas.drawRect(Rect(Offset.Zero, Size(width, height)), paint)
+                // draw the paragraph as usual
+                this.paint(canvas, blendMode = BlendMode.Plus)
+            }
+
+            assertThat(bitmapDefault).isNotEqualToBitmap(bitmapPlus)
+        }
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    @Test
+    fun paint_withBlendMode_sameResult() {
+        with(defaultDensity) {
+            val text = "aaa"
+            // FontSize doesn't matter here, but it should be big enough for bitmap comparison.
+            val fontSize = 100.sp
+            val fontSizeInPx = fontSize.toPx()
+            val paragraphWidth = fontSizeInPx * text.length
+
+            val baseParagraph = simpleParagraph(
+                text = text,
+                style = TextStyle(fontSize = fontSize),
+                width = paragraphWidth
+            )
+
+            val bitmapSrc = baseParagraph.onCanvas { canvas ->
+                // first draw a Red background
+                val paint = Paint().apply { color = Color.Red }
+                canvas.drawRect(Rect(Offset.Zero, Size(width, height)), paint)
+                // draw the paragraph as usual
+                baseParagraph.paint(canvas, blendMode = BlendMode.Src)
+            }
+
+            val bitmapSrcOver = baseParagraph.onCanvas { canvas ->
+                // first draw a Red background
+                val paint = Paint().apply { color = Color.Red }
+                canvas.drawRect(Rect(Offset.Zero, Size(width, height)), paint)
+                // draw the paragraph as usual
+                this.paint(canvas, blendMode = BlendMode.SrcOver)
+            }
+
+            assertThat(bitmapSrc).isEqualToBitmap(bitmapSrcOver)
         }
     }
 

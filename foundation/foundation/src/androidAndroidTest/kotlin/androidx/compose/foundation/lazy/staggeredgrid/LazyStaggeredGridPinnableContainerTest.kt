@@ -257,7 +257,7 @@ class LazyStaggeredGridPinnableContainerTest {
         }
 
         rule.runOnIdle {
-            handle.unpin()
+            handle.release()
         }
 
         rule.waitUntil {
@@ -576,7 +576,7 @@ class LazyStaggeredGridPinnableContainerTest {
         while (handles.isNotEmpty()) {
             rule.runOnIdle {
                 assertThat(composed).contains(1)
-                handles.removeFirst().unpin()
+                handles.removeFirst().release()
             }
         }
 
@@ -613,7 +613,7 @@ class LazyStaggeredGridPinnableContainerTest {
 
         rule.runOnIdle {
             assertThat(parentPinned).isTrue()
-            handle.unpin()
+            handle.release()
         }
 
         rule.runOnIdle {

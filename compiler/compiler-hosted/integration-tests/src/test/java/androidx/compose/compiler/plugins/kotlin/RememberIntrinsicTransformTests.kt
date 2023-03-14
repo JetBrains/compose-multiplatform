@@ -17,11 +17,14 @@
 package androidx.compose.compiler.plugins.kotlin
 
 import org.intellij.lang.annotations.Language
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.junit.Test
 
 class RememberIntrinsicTransformTests : AbstractIrTransformTest() {
-    override val intrinsicRememberEnabled: Boolean
-        get() = true
+    override fun CompilerConfiguration.updateConfiguration() {
+        put(ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY, true)
+        put(ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY, true)
+    }
 
     private fun comparisonPropagation(
         @Language("kotlin")
@@ -1689,6 +1692,154 @@ class RememberIntrinsicTransformTests : AbstractIrTransformTest() {
 
             @Composable
             fun Text(value: String) { }
+        """
+    )
+
+    @Test
+    fun testVarargsIntrinsicRemember() = verifyComposeIrTransform(
+        source = """
+            import androidx.compose.runtime.*
+
+            @Composable
+            fun Test(vararg strings: String) {
+                val show = remember { mutableStateOf(false) }
+                if (show.value) {
+                    Text("Showing")
+                }
+            }
+        """,
+        extra = """
+            import androidx.compose.runtime.*
+
+            @Composable
+            fun Text(value: String) { }
+        """,
+        expectedTransformed = """
+            @Composable
+            fun Test(strings: Array<out String>, %composer: Composer?, %changed: Int) {
+              %composer = %composer.startRestartGroup(<>)
+              sourceInformation(%composer, "C(Test)<rememb...>,<Text("...>:Test.kt")
+              val %dirty = %changed
+              %composer.startMovableGroup(<>, strings.size)
+              val tmp0_iterator = strings.iterator()
+              while (tmp0_iterator.hasNext()) {
+                val value = tmp0_iterator.next()
+                %dirty = %dirty or if (%composer.changed(value)) 0b0100 else 0
+              }
+              %composer.endMovableGroup()
+              if (%dirty and 0b1110 === 0) {
+                %dirty = %dirty or 0b0010
+              }
+              if (%dirty and 0b0001 !== 0 || !%composer.skipping) {
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %changed, -1, <>)
+                }
+                val show = remember({
+                  mutableStateOf(
+                    value = false
+                  )
+                }, %composer, 0)
+                if (show.value) {
+                  Text("Showing", %composer, 0b0110)
+                }
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
+              } else {
+                %composer.skipToGroupEnd()
+              }
+              %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+                Test(*strings, %composer, updateChangedFlags(%changed or 0b0001))
+              }
+            }
+        """
+    )
+
+    @Test // regression test for b/267586102
+    fun testRememberInALoop() = verifyComposeIrTransform(
+        source = """
+            import androidx.compose.runtime.*
+
+            val content: @Composable (a: SomeUnstableClass) -> Unit = {
+                for (index in 0 until count) {
+                    val i = remember { index }
+                }
+                val a = remember { 1 }
+            }
+        """,
+        extra = """
+            import androidx.compose.runtime.*
+
+            val count = 0
+            class SomeUnstableClass(val a: Any = "abc")
+        """,
+        expectedTransformed = """
+            val content: Function3<@[ParameterName(name = 'a')] SomeUnstableClass, Composer, Int, Unit> = ComposableSingletons%TestKt.lambda-1
+            internal object ComposableSingletons%TestKt {
+              val lambda-1: Function3<SomeUnstableClass, Composer, Int, Unit> = composableLambdaInstance(<>, false) { it: SomeUnstableClass, %composer: Composer?, %changed: Int ->
+                sourceInformation(%composer, "C<rememb...>:Test.kt")
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %changed, -1, <>)
+                }
+                %composer.startReplaceableGroup(<>)
+                sourceInformation(%composer, "*<rememb...>")
+                val tmp0_iterator = 0 until count.iterator()
+                while (tmp0_iterator.hasNext()) {
+                  val index = tmp0_iterator.next()
+                  val i = remember({
+                    index
+                  }, %composer, 0)
+                }
+                %composer.endReplaceableGroup()
+                val a = remember({
+                  1
+                }, %composer, 0)
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
+              }
+            }
+
+        """
+    )
+
+    @Test // Regression test for b/267586102 to ensure the fix doesn't insert unnecessary groups
+    fun testRememberInALoop_NoTrailingRemember() = verifyComposeIrTransform(
+        source = """
+            import androidx.compose.runtime.*
+
+            val content: @Composable (a: SomeUnstableClass) -> Unit = {
+                for (index in 0 until count) {
+                    val i = remember { index }
+                }
+            }
+        """,
+        extra = """
+                import androidx.compose.runtime.*
+
+                val count = 0
+                class SomeUnstableClass(val a: Any = "abc")
+            """,
+        expectedTransformed = """
+            val content: Function3<@[ParameterName(name = 'a')] SomeUnstableClass, Composer, Int, Unit> = ComposableSingletons%TestKt.lambda-1
+            internal object ComposableSingletons%TestKt {
+              val lambda-1: Function3<SomeUnstableClass, Composer, Int, Unit> = composableLambdaInstance(<>, false) { it: SomeUnstableClass, %composer: Composer?, %changed: Int ->
+                sourceInformation(%composer, "C*<rememb...>:Test.kt")
+                if (isTraceInProgress()) {
+                  traceEventStart(<>, %changed, -1, <>)
+                }
+                val tmp0_iterator = 0 until count.iterator()
+                while (tmp0_iterator.hasNext()) {
+                  val index = tmp0_iterator.next()
+                  val i = remember({
+                    index
+                  }, %composer, 0)
+                }
+                if (isTraceInProgress()) {
+                  traceEventEnd()
+                }
+              }
+            }
         """
     )
 }

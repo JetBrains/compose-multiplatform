@@ -80,16 +80,21 @@ abstract class DelegatingNode : Modifier.Node() {
         }
     }
 
-    override fun onAttach() {
-        super.onAttach()
+    override fun attach() {
+        super.attach()
         forEachDelegate {
             it.updateCoordinator(coordinator)
             it.attach()
         }
     }
 
-    override fun onDetach() {
+    override fun detach() {
         forEachDelegate { it.detach() }
-        super.onDetach()
+        super.detach()
+    }
+
+    override fun reset() {
+        super.reset()
+        forEachDelegate { it.reset() }
     }
 }

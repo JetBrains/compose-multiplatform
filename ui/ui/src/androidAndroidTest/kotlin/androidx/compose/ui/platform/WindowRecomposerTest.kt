@@ -38,8 +38,7 @@ import androidx.compose.ui.background
 import androidx.compose.ui.graphics.Color
 import androidx.core.view.get
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -226,13 +225,9 @@ class WindowRecomposerTest {
     fun lifecycleAwareWindowRecomposerJoinsAfterDetach(): Unit = runBlocking {
         ActivityScenario.launch(ComponentActivity::class.java).use { scenario ->
             lateinit var recomposer: Recomposer
-            val lifecycleOwner = object : LifecycleOwner {
-                val lifecycle = LifecycleRegistry(this)
-                override fun getLifecycle(): Lifecycle = lifecycle
-            }
+            val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED)
             scenario.onActivity { activity ->
                 val view = View(activity)
-                lifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
                 recomposer = view.createLifecycleAwareWindowRecomposer(
                     lifecycle = lifecycleOwner.lifecycle
                 )
@@ -265,11 +260,7 @@ class WindowRecomposerTest {
             lateinit var recomposer: Recomposer
             scenario.onActivity { activity ->
                 val view = View(activity)
-                val lifecycleOwner = object : LifecycleOwner {
-                    val lifecycle = LifecycleRegistry(this)
-                    override fun getLifecycle(): Lifecycle = lifecycle
-                }
-                lifecycleOwner.lifecycle.currentState = Lifecycle.State.RESUMED
+                val lifecycleOwner = TestLifecycleOwner(Lifecycle.State.RESUMED)
                 recomposer = view.createLifecycleAwareWindowRecomposer(
                     lifecycle = lifecycleOwner.lifecycle
                 )

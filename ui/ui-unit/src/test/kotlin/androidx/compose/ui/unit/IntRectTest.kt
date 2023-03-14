@@ -249,7 +249,7 @@ class IntRectTest {
     fun `round Rect to IntRect`() {
         Assert.assertEquals(
             IntRect(2, 3, 4, 5),
-            Rect(2.4f, 2.5f, 3.9f, 5.3f).round(),
+            Rect(2.4f, 2.5f, 3.9f, 5.3f).roundToIntRect(),
         )
     }
 }

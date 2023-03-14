@@ -80,4 +80,9 @@ sealed interface LazyGridLayoutInfo {
      * For example it is a bottom content padding for LazyVerticalGrid with reverseLayout set to false.
      */
     val afterContentPadding: Int
+
+    /**
+     * The spacing between lines in the direction of scrolling.
+     */
+    val mainAxisItemSpacing: Int
 }

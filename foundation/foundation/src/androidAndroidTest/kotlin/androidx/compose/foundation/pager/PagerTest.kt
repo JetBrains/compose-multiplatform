@@ -135,7 +135,7 @@ internal class PagerTest(val config: ParamConfig) : BasePagerTest(config) {
         createPager(
             state = state,
             modifier = Modifier.fillMaxSize(),
-            pagerCount = { pageCount.value }
+            pageCount = { pageCount.value }
         )
 
         rule.onNodeWithTag("3").assertDoesNotExist()

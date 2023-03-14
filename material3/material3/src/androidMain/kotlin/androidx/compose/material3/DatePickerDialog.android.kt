@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material3.tokens.DatePickerModalTokens
 import androidx.compose.material3.tokens.DialogTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -78,11 +79,9 @@ fun DatePickerDialog(
         properties = properties
     ) {
         Surface(
-            // TODO: Use DatePickerModalTokens values for width and height after b/247694457 is
-            //  resolved.
             modifier = Modifier
-                .requiredWidth(ContainerWidth)
-                .heightIn(max = ContainerHeight),
+                .requiredWidth(DatePickerModalTokens.ContainerWidth)
+                .heightIn(max = DatePickerModalTokens.ContainerHeight),
             shape = shape,
             color = colors.containerColor,
             tonalElevation = tonalElevation,

@@ -244,6 +244,25 @@ class LazyScrollTest { // (private val orientation: Orientation)
     }
 
     @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_forward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(10, -itemSizePx * 3)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(4)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_backward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(10)
+            state.animateScrollToItem(0, itemSizePx * 3)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(6)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
     fun canScrollForward() = runBlocking {
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
         assertThat(state.canScrollForward).isTrue()

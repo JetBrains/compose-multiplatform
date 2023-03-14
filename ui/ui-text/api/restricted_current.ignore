@@ -1,3 +1,0 @@
-// Baseline format: 1.0
-ChangedType: androidx.compose.ui.text.AnnotatedString.Builder#append(char):
-    Method androidx.compose.ui.text.AnnotatedString.Builder.append has changed return type from void to androidx.compose.ui.text.AnnotatedString.Builder

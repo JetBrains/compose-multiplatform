@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,19 +17,22 @@
 package androidx.compose.material3
 
 import android.os.Build
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.remember
 import androidx.compose.testutils.assertAgainstGolden
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performTouchInput
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SdkSuppress
 import androidx.test.screenshot.AndroidXScreenshotTestRule
-import kotlinx.coroutines.launch
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -45,31 +48,72 @@ class TooltipScreenshotTest {
     @get:Rule
     val screenshotRule = AndroidXScreenshotTestRule(GOLDEN_MATERIAL3)
 
-    private val tooltipState = TooltipState()
-
     @Test
     fun plainTooltip_lightTheme() {
-        rule.setMaterialContent(lightColorScheme()) { TestTooltips() }
+        rule.setMaterialContent(lightColorScheme()) { PlainTooltipTest() }
+
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
+        rule.waitForIdle()
         assertAgainstGolden("plainTooltip_lightTheme")
     }
 
     @Test
     fun plainTooltip_darkTheme() {
-        rule.setMaterialContent(darkColorScheme()) { TestTooltips() }
+        rule.setMaterialContent(darkColorScheme()) { PlainTooltipTest() }
+
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
+        rule.waitForIdle()
         assertAgainstGolden("plainTooltip_darkTheme")
     }
 
-    @Composable
-    private fun TestTooltips() {
-        val scope = rememberCoroutineScope()
+    @Test
+    fun richTooltip_lightTheme() {
+        rule.setMaterialContent(lightColorScheme()) { RichTooltipTest() }
 
-        PlainTooltipBox(
-            tooltip = { Text("Tooltip Text") },
-            modifier = Modifier.testTag(TooltipTestTag),
-            tooltipState = tooltipState
-        ) {}
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
 
-        scope.launch { tooltipState.show() }
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
+        rule.waitForIdle()
+        assertAgainstGolden("richTooltip_lightTheme")
+    }
+
+    @Test
+    fun richTooltip_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) { RichTooltipTest() }
+
+        // Stop auto advance for test consistency
+        rule.mainClock.autoAdvance = false
+
+        rule.onNodeWithTag(AnchorTestTag)
+            .performTouchInput { longClick() }
+
+        // Advance by the fade in time
+        rule.mainClock.advanceTimeBy(TooltipFadeInDuration.toLong())
+
+        rule.waitForIdle()
+        assertAgainstGolden("richTooltip_darkTheme")
     }
 
     private fun assertAgainstGolden(goldenName: String) {
@@ -77,6 +121,50 @@ class TooltipScreenshotTest {
             .captureToImage()
             .assertAgainstGolden(screenshotRule, goldenName)
     }
+
+    @Composable
+    private fun PlainTooltipTest() {
+        val tooltipState = remember { PlainTooltipState() }
+        PlainTooltipBox(
+            tooltip = { Text("Tooltip Description") },
+            modifier = Modifier.testTag(TooltipTestTag),
+            tooltipState = tooltipState
+        ) {
+            Icon(
+                Icons.Filled.Favorite,
+                contentDescription = null,
+                modifier = Modifier
+                    .testTag(AnchorTestTag)
+                    .tooltipAnchor()
+            )
+        }
+    }
+
+    @Composable
+    private fun RichTooltipTest() {
+        val tooltipState = remember { RichTooltipState() }
+        RichTooltipBox(
+            title = { Text("Title") },
+            text = {
+                Text(
+                    "Area for supportive text, providing a descriptive " +
+                        "message for the composable that the tooltip is anchored to."
+                )
+            },
+            action = { TextButton(onClick = {}) { Text("Action Text") } },
+            tooltipState = tooltipState,
+            modifier = Modifier.testTag(TooltipTestTag)
+        ) {
+            Icon(
+                Icons.Filled.Favorite,
+                contentDescription = null,
+                modifier = Modifier
+                    .testTag(AnchorTestTag)
+                    .tooltipAnchor()
+            )
+        }
+    }
 }
 
+private const val AnchorTestTag = "Anchor"
 private const val TooltipTestTag = "tooltip"

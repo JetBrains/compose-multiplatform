@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.text.platform
 
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Shadow
@@ -38,5 +39,6 @@ internal expect fun MultiParagraph.drawMultiParagraph(
     alpha: Float = Float.NaN,
     shadow: Shadow? = null,
     decoration: TextDecoration? = null,
-    drawStyle: DrawStyle? = null
+    drawStyle: DrawStyle? = null,
+    blendMode: BlendMode = BlendMode.SrcOver
 )

@@ -19,6 +19,8 @@ package androidx.compose.ui.node
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.input.TextInputForTests
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Density
 
@@ -41,6 +43,15 @@ interface RootForTest {
      * The service handling text input.
      */
     val textInputService: TextInputService
+
+    /**
+     * The [TextInputForTests] for the active text service in this root, or null if no text service
+     * is actively handling an input session.
+     */
+    @Suppress("OPT_IN_MARKER_ON_WRONG_TARGET")
+    @ExperimentalTextApi
+    @get:ExperimentalTextApi
+    val textInputForTests: TextInputForTests? get() = null
 
     /**
      * Send this [KeyEvent] to the focused component in this [Owner].

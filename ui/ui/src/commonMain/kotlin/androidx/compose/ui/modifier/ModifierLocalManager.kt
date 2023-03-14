@@ -63,7 +63,7 @@ internal class ModifierLocalManager(val owner: Owner) {
         val toUpdate = hashSetOf<BackwardsCompatNode>()
         removed.forEachIndexed { i, layout ->
             val key = removedLocal[i]
-            if (layout.isAttached) {
+            if (layout.nodes.head.isAttached) {
                 // if the layout is still attached, that means that this provider got removed and
                 // there's possible some consumers below it that need to be updated
                 invalidateConsumersOfNodeForKey(layout.nodes.head, key, toUpdate)
