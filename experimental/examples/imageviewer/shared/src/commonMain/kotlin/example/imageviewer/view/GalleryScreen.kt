@@ -11,10 +11,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -89,7 +86,11 @@ internal fun GalleryScreen(
                     onFullScreen = { onClickPreviewPicture(it) }
                 )
             }
-            MakeNewMemoryMiniature(onMakeNewMemory)
+            CircularButton(
+                image = painterResource("plus.png"),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(48.dp),
+                onClick = onMakeNewMemory,
+            )
         }
     }
     if (pictures.isEmpty()) {
@@ -120,33 +121,6 @@ private fun SquaresGalleryView(
                 )
             }
         }
-    }
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-private fun BoxScope.MakeNewMemoryMiniature(onClick: () -> Unit) {
-    Column(modifier = Modifier.align(Alignment.BottomCenter)) {
-        Box(
-            Modifier
-                .clip(CircleShape)
-                .width(52.dp)
-                .background(ImageviewerColors.uiLightBlack)
-                .aspectRatio(1.0f)
-                .clickable {
-                    onClick()
-                },
-            contentAlignment = Alignment.Center
-        ) {
-            Image(
-                painter = painterResource("plus.png"),
-                contentDescription = null,
-                modifier = Modifier
-                    .width(18.dp)
-                    .height(18.dp),
-            )
-        }
-        Spacer(Modifier.height(32.dp))
     }
 }
 

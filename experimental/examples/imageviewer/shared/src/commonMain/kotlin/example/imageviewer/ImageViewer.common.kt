@@ -102,9 +102,10 @@ internal fun ImageViewerCommon(
                 }
 
                 is CameraPage -> {
-                    CameraScreen(onBack = {
-                        navigationStack.back()
-                    })
+                    CameraScreen(
+                        localization = dependencies.localization,
+                        onBack = { navigationStack.back() }
+                    )
                 }
             }
         }
