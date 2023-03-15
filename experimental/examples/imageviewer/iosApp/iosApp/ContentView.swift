@@ -322,26 +322,10 @@ extension CameraUIViewController: AVCapturePhotoCaptureDelegate {
     }
 }
 
-extension CameraUIViewController: CLLocationManagerDelegate {
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        switch status {
-        case .authorizedAlways, .authorizedWhenInUse:
-            configureLocationServices()
-        default:
-            print("ImageViewer: location permission wasn't granted, photos will be without location information")
-            return
-        }
-    }
-    
+extension CameraUIViewController {
     private func configureLocationServicesIfAllowed() {
         locationManager.desiredAccuracy = kCLLocationAccuracyBest
         locationManager.requestWhenInUseAuthorization()
-    }
-    
-    private func configureLocationServices() {
-        if CLLocationManager.locationServicesEnabled() {
-            locationManager.startUpdatingLocation()
-        }
     }
 }
 
