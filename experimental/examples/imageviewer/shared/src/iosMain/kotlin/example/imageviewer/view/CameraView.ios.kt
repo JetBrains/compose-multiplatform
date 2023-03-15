@@ -12,18 +12,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
-import kotlinx.cinterop.CValue
+import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
+import platform.CoreFoundation.*
+import platform.CoreGraphics.CGImageRef
 import platform.CoreGraphics.CGRect
-import platform.Foundation.NSError
+import platform.CoreLocation.CLLocationManager
+import platform.CoreLocation.kCLLocationAccuracyBest
+import platform.Foundation.*
+import platform.ImageIO.*
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.UIDevice
 import platform.UIKit.UIDeviceOrientation
 import platform.UIKit.UIImage
 import platform.UIKit.UIView
+import platform.UniformTypeIdentifiers.UTTypeJPEG
 import platform.darwin.NSObject
 
 private sealed interface CameraAccess {
@@ -74,8 +80,63 @@ internal actual fun CameraView(modifier: Modifier) {
     }
 }
 
+data class GeoPos(
+    val latitude: Double,
+    val longitude: Double,
+)
+
+fun fetchCoordinatesFrom(photoData: NSData): GeoPos {
+    val imageSource = CGImageSourceCreateWithData(CFBridgingRetain(photoData) as CFDataRef, null)
+    val imagePropertiesCF = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, null)
+    val gpsDictionary = CFDictionaryGetValue(imagePropertiesCF, kCGImagePropertyGPSDictionary) as CPointer<__CFDictionary>
+    val longitude = CFBridgingRelease(CFDictionaryGetValue(gpsDictionary, kCGImagePropertyGPSLongitude))
+    val latitude = CFBridgingRelease(CFDictionaryGetValue(gpsDictionary, kCGImagePropertyGPSLatitude))
+    return GeoPos(latitude as Double, longitude as Double)
+}
+
+fun NSData.fetchImageFrom() : CGImageRef {
+    return UIImage(data = this).CGImage!!
+    val cfData = this as CFDataRef
+    val imageSource = CGImageSourceCreateWithData(cfData, null)
+    return CGImageSourceCreateImageAtIndex(imageSource, 0, null)!!
+}
+
 @Composable
 private fun BoxScope.AuthorizedCamera() {
+    val locationManager = remember {
+        CLLocationManager().apply {
+            desiredAccuracy = kCLLocationAccuracyBest
+            requestWhenInUseAuthorization()
+        }
+    }
+    fun attachedGPSTo(photoData: NSData): NSData {
+        fun getLocationMetadata(): CFDictionaryRef {
+            val metadata = CFDictionaryCreateMutable(null, 6, null, null)
+            val location = locationManager.location
+            if (location != null) {
+                val latitude = location.coordinate.useContents { latitude }
+                val longitude = location.coordinate.useContents { longitude }
+                CFDictionaryAddValue(metadata, kCGImagePropertyGPSLatitude, CFBridgingRetain(latitude))
+                CFDictionaryAddValue(metadata, kCGImagePropertyGPSLongitude, CFBridgingRetain(longitude))
+                CFDictionaryAddValue(metadata, kCGImagePropertyGPSAltitudeRef, CFBridgingRetain(0))
+                CFDictionaryAddValue(metadata, kCGImagePropertyGPSAltitude, CFBridgingRetain(location.altitude))
+                CFDictionaryAddValue(metadata, kCGImagePropertyGPSTimeStamp, CFBridgingRetain(location.timestamp))
+                CFDictionaryAddValue(metadata, kCGImagePropertyGPSDateStamp, CFBridgingRetain(location.timestamp))
+            }
+            return metadata as CFDictionaryRef
+        }
+        val imageSource = CGImageSourceCreateWithData(CFBridgingRetain(photoData) as CFDataRef, null)
+        val imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, null)
+        val mutableImagePropertiesCF = CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, imageProperties)
+        CFDictionaryAddValue(mutableImagePropertiesCF, kCGImagePropertyGPSDictionary, getLocationMetadata())
+        val mutableImageProperties: NSMutableDictionary = CFBridgingRelease(mutableImagePropertiesCF) as NSMutableDictionary
+        val updatedProperties = CFBridgingRetain(mutableImageProperties) as CFDictionaryRef
+        val destPhotoData = CFDataCreateMutable(null, 0)
+        val imageDestination = CGImageDestinationCreateWithData(destPhotoData, CFBridgingRetain(UTTypeJPEG.identifier) as CFStringRef, 1, null)
+        CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0, updatedProperties)
+        CGImageDestinationFinalize(imageDestination)
+        return CFBridgingRelease(destPhotoData) as NSData
+    }
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
@@ -86,6 +147,10 @@ private fun BoxScope.AuthorizedCamera() {
             ) {
                 val photoData = didFinishProcessingPhoto.fileDataRepresentation()
                     ?: error("fileDataRepresentation is null")
+                val updatedData = attachedGPSTo(photoData = photoData)
+                updatedData.fetchImageFrom()
+                val geo = fetchCoordinatesFrom(updatedData)
+                println("geo: $geo")
                 val uiImage = UIImage(photoData)
                 //todo pass image to gallery page
             }
@@ -99,6 +164,7 @@ private fun BoxScope.AuthorizedCamera() {
         ).devices.firstOrNull() as? AVCaptureDevice
     }
     if (camera != null) {
+        //todo locationManager here?
         val captureSession: AVCaptureSession = remember {
             AVCaptureSession().also { captureSession ->
                 captureSession.sessionPreset = AVCaptureSessionPresetPhoto
