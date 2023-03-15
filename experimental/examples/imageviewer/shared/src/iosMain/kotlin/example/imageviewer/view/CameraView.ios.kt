@@ -25,10 +25,7 @@ import platform.Foundation.*
 import platform.ImageIO.*
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
-import platform.UIKit.UIDevice
-import platform.UIKit.UIDeviceOrientation
-import platform.UIKit.UIImage
-import platform.UIKit.UIView
+import platform.UIKit.*
 import platform.UniformTypeIdentifiers.UTTypeJPEG
 import platform.darwin.NSObject
 
