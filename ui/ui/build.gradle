@@ -83,7 +83,7 @@ dependencies {
         implementation("androidx.savedstate:savedstate-ktx:1.2.1")
         implementation("androidx.lifecycle:lifecycle-runtime:2.6.1")
         implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
-        implementation("androidx.profileinstaller:profileinstaller:1.2.1")
+        implementation("androidx.profileinstaller:profileinstaller:1.3.0")
         implementation("androidx.emoji2:emoji2:1.2.0")
 
         testImplementation(libs.testRules)
