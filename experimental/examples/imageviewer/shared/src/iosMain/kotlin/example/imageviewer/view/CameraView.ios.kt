@@ -12,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
+import example.imageviewer.model.GeoPos
 import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
@@ -76,11 +77,6 @@ internal actual fun CameraView(modifier: Modifier) {
         }
     }
 }
-
-data class GeoPos(
-    val latitude: Double,
-    val longitude: Double,
-)
 
 fun fetchCoordinatesFrom(photoData: NSData): GeoPos {
     val imageSource = CGImageSourceCreateWithData(CFBridgingRetain(photoData) as CFDataRef, null)
@@ -162,6 +158,7 @@ private fun BoxScope.AuthorizedCamera() {
     }
     if (camera != null) {
         //todo locationManager here?
+        //todo location maybe null if user decline location permission
         val captureSession: AVCaptureSession = remember {
             AVCaptureSession().also { captureSession ->
                 captureSession.sessionPreset = AVCaptureSessionPresetPhoto
