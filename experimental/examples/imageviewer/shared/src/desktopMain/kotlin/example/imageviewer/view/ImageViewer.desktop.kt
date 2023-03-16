@@ -3,6 +3,7 @@ package example.imageviewer.view
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -118,12 +119,8 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
         override val httpClient: HttpClient = HttpClient(CIO)
 
         val userHome: String? = System.getProperty("user.home")
-        override val imageRepository: ContentRepository<ImageBitmap> = object:ContentRepository<ImageBitmap> {
-            override suspend fun loadContent(picture: Picture): ImageBitmap {
-                return picture.getImageBitmap()
-            }
-        }
 
+        override val storage: ImageStorage<Picture> = ImageStorageFacade(InMemoryStorage)
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)

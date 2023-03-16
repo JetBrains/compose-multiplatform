@@ -13,18 +13,7 @@ class ResourcePicture(
     override val name: String,
     override val description: String,
     override val geo: GeoPos
-) : Picture {
-    @OptIn(ExperimentalResourceApi::class)
-    override suspend fun getImageBitmap(): ImageBitmap {
-        return resource(resource).readBytes().toImageBitmap()
-    }
-
-    @OptIn(ExperimentalResourceApi::class)
-    @Composable
-    override fun thumbnail(): Painter {
-        return painterResource(resource)
-    }
-}
+) : Picture
 
 val resourcePictures = listOf(
     ResourcePicture(

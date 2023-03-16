@@ -33,8 +33,7 @@ internal fun ImageViewerCommon(
     dependencies: Dependencies,
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
-    val photoGallery = remember { PhotoGallery(dependencies) }
-    val rootGalleryPage = GalleryPage(photoGallery, externalEvents)
+    val rootGalleryPage = GalleryPage(externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -55,7 +54,6 @@ internal fun ImageViewerCommon(
                 is GalleryPage -> {
                     GalleryScreen(
                         page,
-                        photoGallery,
                         dependencies,
                         onClickPreviewPicture = { previewPictureId ->
                             navigationStack.push(MemoryPage(previewPictureId))
@@ -68,8 +66,7 @@ internal fun ImageViewerCommon(
                 is FullScreenPage -> {
                     FullscreenImage(
                         galleryId = page.picture,
-                        gallery = photoGallery,
-                        getImage = { dependencies.imageRepository.loadContent(it) },
+                        getImage = { dependencies.storage.getImage(it) },
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {
@@ -81,8 +78,7 @@ internal fun ImageViewerCommon(
                 is MemoryPage -> {
                     MemoryScreen(
                         memoryPage = page,
-                        photoGallery = photoGallery,
-                        getImage = { dependencies.imageRepository.loadContent(it) },
+                        getImage = { dependencies.storage.getImage(it) },
                         localization = dependencies.localization,
                         onSelectRelatedMemory = { galleryId ->
                             navigationStack.push(MemoryPage(galleryId))
@@ -92,7 +88,9 @@ internal fun ImageViewerCommon(
                         },
                         onHeaderClick = { galleryId ->
                             navigationStack.push(FullScreenPage(galleryId))
-                        })
+                        },
+                        storage = dependencies.storage
+                    )
                 }
 
                 is CameraPage -> {

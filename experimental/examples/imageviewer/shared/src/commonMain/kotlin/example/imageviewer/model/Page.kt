@@ -19,7 +19,6 @@ class CameraPage : Page()
 class FullScreenPage(val picture: Picture) : Page()
 
 class GalleryPage(
-    val photoGallery: PhotoGallery,
     val externalEvents: Flow<ExternalImageViewerEvent>
 ) : Page() {
     var galleryStyle by mutableStateOf(GalleryStyle.SQUARES)
@@ -31,29 +30,28 @@ class GalleryPage(
 
     var currentPictureIndex by mutableStateOf(0)
 
-    val picture get(): Picture? = photoGallery.galleryStateFlow.getOrNull(currentPictureIndex)
+    val picture get(): Picture? = globalPictures.getOrNull(currentPictureIndex)
 
     val galleryEntry: Picture?
-        get() = photoGallery.galleryStateFlow.getOrNull(
-            currentPictureIndex
-        )
+        get() = globalPictures.getOrNull(currentPictureIndex)
 
+    @Deprecated("")
     val pictureId
-        get(): Picture? = photoGallery.galleryStateFlow.getOrNull(
+        get(): Picture? = globalPictures.getOrNull(
             currentPictureIndex
         )
 
     fun nextImage() {
         currentPictureIndex =
-            (currentPictureIndex + 1).mod(photoGallery.galleryStateFlow.lastIndex)
+            (currentPictureIndex + 1).mod(globalPictures.lastIndex)
     }
 
     fun previousImage() {
         currentPictureIndex =
-            (currentPictureIndex - 1).mod(photoGallery.galleryStateFlow.lastIndex)
+            (currentPictureIndex - 1).mod(globalPictures.lastIndex)
     }
 
     fun selectPicture(galleryId: Picture) {
-        currentPictureIndex = photoGallery.galleryStateFlow.indexOfFirst { it == galleryId }
+        currentPictureIndex = globalPictures.indexOfFirst { it == galleryId }
     }
 }

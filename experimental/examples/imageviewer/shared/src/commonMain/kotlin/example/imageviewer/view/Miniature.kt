@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import example.imageviewer.model.ImageStorage
 import example.imageviewer.model.Picture
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -36,6 +37,7 @@ internal fun Miniature(
     onClickSelect: () -> Unit,
     onClickFullScreen: () -> Unit,
     onClickInfo: () -> Unit,
+    storage: ImageStorage<Picture>,
 ) {
     Card(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).height(70.dp)
@@ -53,7 +55,7 @@ internal fun Miniature(
             val modifier = Modifier.height(70.dp)
                 .width(70.dp)
             Image(
-                picture.thumbnail(),
+                storage.getThumbnail(picture),
                 contentDescription = null,
                 modifier = modifier
                     .clip(CircleShape)

@@ -35,12 +35,10 @@ enum class GalleryStyle {
 @Composable
 internal fun GalleryScreen(
     galleryPage: GalleryPage,
-    photoGallery: PhotoGallery,
     dependencies: Dependencies,
     onClickPreviewPicture: (Picture) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
-    val pictures = photoGallery.galleryStateFlow
     LaunchedEffect(Unit) {
         galleryPage.externalEvents.collect {
             when (it) {
@@ -53,7 +51,7 @@ internal fun GalleryScreen(
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box {
             PreviewImage(
-                getImage = { dependencies.imageRepository.loadContent(it) },
+                getImage = { dependencies.storage.getImage(it) },
                 picture = galleryPage.galleryEntry, onClick = {
                     galleryPage.pictureId?.let(onClickPreviewPicture)
                 }
@@ -70,16 +68,17 @@ internal fun GalleryScreen(
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             when (galleryPage.galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
-                    pictures,
-                    galleryPage.pictureId,
+                    images = globalPictures,
+                    selectedImage = galleryPage.pictureId,
                     onSelect = { galleryPage.selectPicture(it) },
+                    storage = dependencies.storage
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
-                    pictures,
-                    dependencies,
+                    pictures = globalPictures,
+                    dependencies = dependencies,
                     onSelect = { galleryPage.selectPicture(it) },
-                    onFullScreen = { onClickPreviewPicture(it) }
+                    onFullScreen = { onClickPreviewPicture(it) },
                 )
             }
             CircularButton(
@@ -89,7 +88,7 @@ internal fun GalleryScreen(
             )
         }
     }
-    if (pictures.isEmpty()) {
+    if (globalPictures.isEmpty()) {
         LoadingScreen(dependencies.localization.loading)
     }
 }
@@ -99,6 +98,7 @@ private fun SquaresGalleryView(
     images: List<Picture>,
     selectedImage: Picture?,
     onSelect: (Picture) -> Unit,
+    storage: ImageStorage<Picture>,
 ) {
     Column {
         Spacer(Modifier.height(4.dp))
@@ -107,11 +107,11 @@ private fun SquaresGalleryView(
             verticalArrangement = Arrangement.spacedBy(1.dp),
             horizontalArrangement = Arrangement.spacedBy(1.dp)
         ) {
-            itemsIndexed(images) { idx, image ->
-                val isSelected = image == selectedImage
+            itemsIndexed(images) { idx, picture ->
+                val isSelected = picture == selectedImage
                 SquareMiniature(
-                    image.thumbnail(),
-                    onClick = { onSelect(image) },
+                    storage.getThumbnail(picture),
+                    onClick = { onSelect(picture) },
                     isHighlighted = isSelected
                 )
             }
@@ -167,7 +167,7 @@ private fun ListGalleryView(
     pictures: List<Picture>,
     dependencies: Dependencies,
     onSelect: (Picture) -> Unit,
-    onFullScreen: (Picture) -> Unit
+    onFullScreen: (Picture) -> Unit,
 ) {
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
@@ -185,6 +185,7 @@ private fun ListGalleryView(
                 onClickInfo = {
                     dependencies.notification.notifyImageData(p.value)
                 },
+                storage = dependencies.storage
             )
             Spacer(modifier = Modifier.height(10.dp))
         }

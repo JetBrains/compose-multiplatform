@@ -25,9 +25,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Localization
+import example.imageviewer.model.ImageStorage
 import example.imageviewer.model.MemoryPage
-import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.Picture
+import example.imageviewer.model.globalPictures
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -36,14 +37,14 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
-    photoGallery: PhotoGallery,
     getImage: suspend (Picture) -> ImageBitmap,
     localization: Localization,
     onSelectRelatedMemory: (Picture) -> Unit,
     onBack: () -> Unit,
-    onHeaderClick: (Picture) -> Unit
+    onHeaderClick: (Picture) -> Unit,
+    storage: ImageStorage<Picture>,
 ) {
-    val pictures = photoGallery.galleryStateFlow
+    val pictures = globalPictures
     val picture = pictures.first()
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
     LaunchedEffect(picture) {
@@ -83,7 +84,7 @@ internal fun MemoryScreen(
                         """.trimIndent()
                     )
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(pictures, storage,  onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -234,6 +235,7 @@ internal fun Headliner(s: String) {
 @Composable
 internal fun RelatedMemoriesVisualizer(
     ps: List<Picture>,
+    storage: ImageStorage<Picture>,
     onSelectRelatedMemory: (Picture) -> Unit
 ) {
     Box(
@@ -244,7 +246,7 @@ internal fun RelatedMemoriesVisualizer(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(ps) { idx, item ->
-                RelatedMemory(idx, item, onSelectRelatedMemory)
+                RelatedMemory(idx, item, storage, onSelectRelatedMemory)
             }
         }
     }
@@ -254,11 +256,12 @@ internal fun RelatedMemoriesVisualizer(
 internal fun RelatedMemory(
     index: Int,
     galleryEntry: Picture,
+    storage: ImageStorage<Picture>,
     onSelectRelatedMemory: (Picture) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
         SquareMiniature(
-            galleryEntry.thumbnail(),
+            storage.getThumbnail(galleryEntry),
             false,
             onClick = { onSelectRelatedMemory(galleryEntry) })
     }
