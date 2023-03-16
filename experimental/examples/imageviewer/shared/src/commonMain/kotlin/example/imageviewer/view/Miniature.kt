@@ -4,11 +4,7 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -52,16 +48,13 @@ internal fun Miniature(
 
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
-            val modifier = Modifier.height(70.dp)
-                .width(70.dp)
-            Image(
-                storage.getThumbnail(picture),
-                contentDescription = null,
-                modifier = modifier
+            MiniatureImage(
+                modifier = Modifier.size(70.dp)
                     .clip(CircleShape)
                     .border(BorderStroke(1.dp, Color.White), CircleShape)
                     .clickable { onClickFullScreen() },
-                contentScale = ContentScale.Crop
+                picture = picture,
+                storage = storage
             )
             Text(
                 text = picture.name,

@@ -15,8 +15,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
@@ -110,7 +108,8 @@ private fun SquaresGalleryView(
             itemsIndexed(images) { idx, picture ->
                 val isSelected = picture == selectedImage
                 SquareMiniature(
-                    storage.getThumbnail(picture),
+                    picture = picture,
+                    storage = storage,
                     onClick = { onSelect(picture) },
                     isHighlighted = isSelected
                 )
@@ -121,20 +120,15 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun SquareMiniature(thumbnail: Painter, isHighlighted: Boolean, onClick: () -> Unit) {
+internal fun SquareMiniature(picture: Picture, storage: ImageStorage<Picture>, isHighlighted: Boolean, onClick: () -> Unit) {
     Box(
-        Modifier.aspectRatio(1.0f).clickable { onClick() },
+        Modifier.aspectRatio(1.0f).clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
     ) {
-        Image(
-            painter = thumbnail,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize().clickable { onClick() }.then(
-                if (isHighlighted) {
-                    Modifier//.border(BorderStroke(5.dp, Color.White))
-                } else Modifier
-            ),
-            contentScale = ContentScale.Crop
+        MiniatureImage(
+            modifier = Modifier.fillMaxSize(),
+            picture = picture,
+            storage = storage,
         )
         if (isHighlighted) {
             Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack))
