@@ -10,6 +10,9 @@ import kotlin.math.roundToInt
 
 private fun Constraints.maxByDirection(isHorizontal: Boolean): Int = if (isHorizontal) maxWidth else maxHeight
 private fun Placeable.valueByDirection(isHorizontal: Boolean): Int = if (isHorizontal) width else height
+private fun Constraints.withUnconstrainedWidth() = copy(minWidth = 0, maxWidth = Constraints.Infinity)
+private fun Constraints.withUnconstrainedHeight() = copy(minHeight = 0, maxHeight = Constraints.Infinity)
+
 
 @OptIn(ExperimentalSplitPaneApi::class)
 @Composable
@@ -58,17 +61,10 @@ internal actual fun SplitPane(
                 // Need the size of the splitter to determine the min/max position
                 // Constrain the splitter only on the "other" axis
                 val splitterConstraints =
-                    if (isHorizontal) {
-                        Constraints(
-                            minHeight = constraints.minHeight,
-                            maxHeight = constraints.maxHeight
-                        )
-                    } else {
-                        Constraints(
-                            minWidth = constraints.minWidth,
-                            maxWidth = constraints.maxWidth
-                        )
-                    }
+                    if (isHorizontal)
+                        constraints.withUnconstrainedWidth()
+                    else
+                        constraints.withUnconstrainedHeight()
                 val splitterPlaceable = splitterMeasurable.measure(splitterConstraints)
                 val splitterSize = splitterPlaceable.valueByDirection(isHorizontal)
 
