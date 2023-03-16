@@ -27,13 +27,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.Picture
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    picture: GalleryEntryWithMetadata?,
+    picture: Picture?,
     onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
 ) {
@@ -59,10 +58,10 @@ internal fun PreviewImage(
                     )
                 }
             ) { currentPicture ->
-                var image by remember(currentPicture) { mutableStateOf(currentPicture?.thumbnail) }
+                var image:ImageBitmap? by remember(currentPicture) { mutableStateOf(null) }
                 LaunchedEffect(currentPicture) {
                     if (currentPicture != null) {
-                        image = getImage(currentPicture.picture)
+                        image = getImage(currentPicture)
                     }
                 }
                 if (image != null) {

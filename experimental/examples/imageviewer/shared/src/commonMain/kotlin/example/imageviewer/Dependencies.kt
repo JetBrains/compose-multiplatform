@@ -5,7 +5,6 @@ import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.ContentRepository
 import example.imageviewer.model.Picture
-import example.imageviewer.model.name
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json

@@ -13,13 +13,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import example.imageviewer.model.CameraPage
-import example.imageviewer.model.FullScreenPage
-import example.imageviewer.model.GalleryPage
-import example.imageviewer.model.MemoryPage
-import example.imageviewer.model.Page
-import example.imageviewer.model.PhotoGallery
-import example.imageviewer.model.bigUrl
+import example.imageviewer.model.*
 import example.imageviewer.view.CameraScreen
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.GalleryScreen
@@ -73,9 +67,9 @@ internal fun ImageViewerCommon(
 
                 is FullScreenPage -> {
                     FullscreenImage(
-                        galleryId = page.galleryId,
+                        galleryId = page.picture,
                         gallery = photoGallery,
-                        getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+                        getImage = { dependencies.imageRepository.loadContent(it) },
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {
@@ -88,7 +82,7 @@ internal fun ImageViewerCommon(
                     MemoryScreen(
                         memoryPage = page,
                         photoGallery = photoGallery,
-                        getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+                        getImage = { dependencies.imageRepository.loadContent(it) },
                         localization = dependencies.localization,
                         onSelectRelatedMemory = { galleryId ->
                             navigationStack.push(MemoryPage(galleryId))

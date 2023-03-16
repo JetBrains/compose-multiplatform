@@ -22,7 +22,6 @@ import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.decorateWithDiskCache
 import example.imageviewer.utils.getPreferredWindowSize
 import example.imageviewer.utils.ioDispatcher
 import io.ktor.client.*
@@ -119,19 +118,11 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
         override val httpClient: HttpClient = HttpClient(CIO)
 
         val userHome: String? = System.getProperty("user.home")
-        override val imageRepository: ContentRepository<ImageBitmap> =
-            createNetworkRepository(httpClient)
-                .run {
-                    if (userHome != null) {
-                        decorateWithDiskCache(
-                            ioScope,
-                            File(userHome).resolve("Pictures").resolve("imageviewer")
-                        )
-                    } else {
-                        this
-                    }
-                }
-                .adapter { it.toImageBitmap() }
+        override val imageRepository: ContentRepository<ImageBitmap> = object:ContentRepository<ImageBitmap> {
+            override suspend fun loadContent(picture: Picture): ImageBitmap {
+                return picture.getImageBitmap()
+            }
+        }
 
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {

@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.model.Picture
-import example.imageviewer.model.name
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -34,7 +33,6 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun Miniature(
     picture: Picture,
-    image: ImageBitmap?,
     onClickSelect: () -> Unit,
     onClickFullScreen: () -> Unit,
     onClickInfo: () -> Unit,
@@ -54,19 +52,15 @@ internal fun Miniature(
         Row(modifier = Modifier.padding(end = 30.dp)) {
             val modifier = Modifier.height(70.dp)
                 .width(70.dp)
-            if (image != null) {
-                Image(
-                    image,
-                    contentDescription = null,
-                    modifier = modifier
-                        .clip(CircleShape)
-                        .border(BorderStroke(1.dp, Color.White), CircleShape)
-                        .clickable { onClickFullScreen() },
-                    contentScale = ContentScale.Crop
-                )
-            } else {
-                CircularProgressIndicator(modifier)
-            }
+            Image(
+                picture.thumbnail(),
+                contentDescription = null,
+                modifier = modifier
+                    .clip(CircleShape)
+                    .border(BorderStroke(1.dp, Color.White), CircleShape)
+                    .clickable { onClickFullScreen() },
+                contentScale = ContentScale.Crop
+            )
             Text(
                 text = picture.name,
                 modifier = Modifier.weight(1f).align(Alignment.CenterVertically)

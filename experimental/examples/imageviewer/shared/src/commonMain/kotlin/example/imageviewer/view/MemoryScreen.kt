@@ -25,8 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Localization
-import example.imageviewer.model.GalleryEntryWithMetadata
-import example.imageviewer.model.GalleryId
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.Picture
@@ -41,15 +39,15 @@ internal fun MemoryScreen(
     photoGallery: PhotoGallery,
     getImage: suspend (Picture) -> ImageBitmap,
     localization: Localization,
-    onSelectRelatedMemory: (GalleryId) -> Unit,
+    onSelectRelatedMemory: (Picture) -> Unit,
     onBack: () -> Unit,
-    onHeaderClick: (GalleryId) -> Unit
+    onHeaderClick: (Picture) -> Unit
 ) {
-    val pictures by photoGallery.galleryStateFlow.collectAsState()
-    val picture = pictures.first { it.id == memoryPage.galleryId }
-    var headerImage by remember(picture) { mutableStateOf(picture.thumbnail) }
+    val pictures = photoGallery.galleryStateFlow
+    val picture = pictures.first()
+    var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
     LaunchedEffect(picture) {
-        headerImage = getImage(picture.picture)
+        headerImage = getImage(picture)
     }
     Box {
         val scrollState = memoryPage.scrollState
@@ -68,7 +66,9 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                MemoryHeader(headerImage, onClick = { onHeaderClick(memoryPage.galleryId) })
+                if(headerImage != null) {
+                    MemoryHeader(headerImage!!, onClick = { onHeaderClick(memoryPage.picture) })
+                }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
@@ -233,8 +233,8 @@ internal fun Headliner(s: String) {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<GalleryEntryWithMetadata>,
-    onSelectRelatedMemory: (GalleryId) -> Unit
+    ps: List<Picture>,
+    onSelectRelatedMemory: (Picture) -> Unit
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
@@ -253,13 +253,13 @@ internal fun RelatedMemoriesVisualizer(
 @Composable
 internal fun RelatedMemory(
     index: Int,
-    galleryEntry: GalleryEntryWithMetadata,
-    onSelectRelatedMemory: (GalleryId) -> Unit
+    galleryEntry: Picture,
+    onSelectRelatedMemory: (Picture) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
         SquareMiniature(
-            galleryEntry.thumbnail,
+            galleryEntry.thumbnail(),
             false,
-            onClick = { onSelectRelatedMemory(galleryEntry.id) })
+            onClick = { onSelectRelatedMemory(galleryEntry) })
     }
 }

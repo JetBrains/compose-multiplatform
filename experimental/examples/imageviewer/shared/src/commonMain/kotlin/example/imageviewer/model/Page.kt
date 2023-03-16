@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 sealed class Page
 
-class MemoryPage(val galleryId: GalleryId) : Page() {
+class MemoryPage(val picture: Picture) : Page() {
     val scrollState = ScrollState(0)
 }
 
 class CameraPage : Page()
 
-class FullScreenPage(val galleryId: GalleryId) : Page()
+class FullScreenPage(val picture: Picture) : Page()
 
 class GalleryPage(
     val photoGallery: PhotoGallery,
@@ -31,29 +31,29 @@ class GalleryPage(
 
     var currentPictureIndex by mutableStateOf(0)
 
-    val picture get(): Picture? = photoGallery.galleryStateFlow.value.getOrNull(currentPictureIndex)?.picture
+    val picture get(): Picture? = photoGallery.galleryStateFlow.getOrNull(currentPictureIndex)
 
-    val galleryEntry: GalleryEntryWithMetadata?
-        get() = photoGallery.galleryStateFlow.value.getOrNull(
+    val galleryEntry: Picture?
+        get() = photoGallery.galleryStateFlow.getOrNull(
             currentPictureIndex
         )
 
     val pictureId
-        get(): GalleryId? = photoGallery.galleryStateFlow.value.getOrNull(
+        get(): Picture? = photoGallery.galleryStateFlow.getOrNull(
             currentPictureIndex
-        )?.id
+        )
 
     fun nextImage() {
         currentPictureIndex =
-            (currentPictureIndex + 1).mod(photoGallery.galleryStateFlow.value.lastIndex)
+            (currentPictureIndex + 1).mod(photoGallery.galleryStateFlow.lastIndex)
     }
 
     fun previousImage() {
         currentPictureIndex =
-            (currentPictureIndex - 1).mod(photoGallery.galleryStateFlow.value.lastIndex)
+            (currentPictureIndex - 1).mod(photoGallery.galleryStateFlow.lastIndex)
     }
 
-    fun selectPicture(galleryId: GalleryId) {
-        currentPictureIndex = photoGallery.galleryStateFlow.value.indexOfFirst { it.id == galleryId }
+    fun selectPicture(galleryId: Picture) {
+        currentPictureIndex = photoGallery.galleryStateFlow.indexOfFirst { it == galleryId }
     }
 }
