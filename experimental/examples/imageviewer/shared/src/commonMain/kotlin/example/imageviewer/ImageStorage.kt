@@ -15,5 +15,3 @@ suspend fun List<BitmapStorage>.getImage(picture: PictureData): ImageBitmap {
     }
     error("ImageBitmap not found for picture $picture")
 }
-
-suspend fun List<BitmapStorage>.getThumbnail(picture: PictureData) = getImage(picture)//todo

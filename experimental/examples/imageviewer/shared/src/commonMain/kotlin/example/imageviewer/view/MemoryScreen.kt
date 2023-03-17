@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import example.imageviewer.BitmapStorage
+import example.imageviewer.ImageProvider
 import example.imageviewer.Localization
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
@@ -40,7 +40,7 @@ internal fun MemoryScreen(
     onSelectRelatedMemory: (PictureData) -> Unit,
     onBack: () -> Unit,
     onHeaderClick: (PictureData) -> Unit,
-    storage: List<BitmapStorage>,
+    storage: ImageProvider,
 ) {
     val pictures = globalPictures
     val picture = pictures.first()
@@ -233,7 +233,7 @@ internal fun Headliner(s: String) {
 @Composable
 internal fun RelatedMemoriesVisualizer(
     ps: List<PictureData>,
-    storage: List<BitmapStorage>,
+    storage: ImageProvider,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
@@ -254,7 +254,7 @@ internal fun RelatedMemoriesVisualizer(
 internal fun RelatedMemory(
     index: Int,
     galleryEntry: PictureData,
-    storage: List<BitmapStorage>,
+    storage: ImageProvider,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {

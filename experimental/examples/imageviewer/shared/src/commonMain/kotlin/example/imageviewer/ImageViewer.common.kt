@@ -66,7 +66,7 @@ internal fun ImageViewerCommon(
                 is FullScreenPage -> {
                     FullscreenImage(
                         galleryId = page.picture,
-                        getImage = { dependencies.storage.getImage(it) },
+                        getImage = { dependencies.imageProvider.getImage(it) },
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {
@@ -78,7 +78,7 @@ internal fun ImageViewerCommon(
                 is MemoryPage -> {
                     MemoryScreen(
                         memoryPage = page,
-                        getImage = { dependencies.storage.getImage(it) },
+                        getImage = { dependencies.imageProvider.getImage(it) },
                         localization = dependencies.localization,
                         onSelectRelatedMemory = { galleryId ->
                             navigationStack.push(MemoryPage(galleryId))
@@ -89,7 +89,7 @@ internal fun ImageViewerCommon(
                         onHeaderClick = { galleryId ->
                             navigationStack.push(FullScreenPage(galleryId))
                         },
-                        storage = dependencies.storage
+                        storage = dependencies.imageProvider
                     )
                 }
 

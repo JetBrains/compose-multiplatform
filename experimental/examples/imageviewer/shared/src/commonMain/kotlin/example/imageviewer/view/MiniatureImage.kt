@@ -5,15 +5,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import example.imageviewer.BitmapStorage
-import example.imageviewer.getThumbnail
+import example.imageviewer.ImageProvider
 import example.imageviewer.model.PictureData
 
 @Composable
 fun MiniatureImage(
     modifier: Modifier,
     picture: PictureData,
-    storage: List<BitmapStorage>,
+    storage: ImageProvider,
 ) {
     var imageBitmap by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(Unit) {

@@ -16,10 +16,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import example.imageviewer.BitmapStorage
 import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
-import example.imageviewer.getImage
+import example.imageviewer.ImageProvider
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -51,7 +50,7 @@ internal fun GalleryScreen(
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box {
             PreviewImage(
-                getImage = { dependencies.storage.getImage(it) },
+                getImage = { dependencies.imageProvider.getImage(it) },
                 picture = galleryPage.galleryEntry, onClick = {
                     galleryPage.pictureId?.let(onClickPreviewPicture)
                 }
@@ -71,7 +70,7 @@ internal fun GalleryScreen(
                     images = globalPictures,
                     selectedImage = galleryPage.pictureId,
                     onSelect = { galleryPage.selectPicture(it) },
-                    storage = dependencies.storage
+                    storage = dependencies.imageProvider
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
@@ -98,7 +97,7 @@ private fun SquaresGalleryView(
     images: List<PictureData>,
     selectedImage: PictureData?,
     onSelect: (PictureData) -> Unit,
-    storage: List<BitmapStorage>,
+    storage: ImageProvider,
 ) {
     Column {
         Spacer(Modifier.height(4.dp))
@@ -122,7 +121,7 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun SquareMiniature(picture: PictureData, storage: List<BitmapStorage>, isHighlighted: Boolean, onClick: () -> Unit) {
+internal fun SquareMiniature(picture: PictureData, storage: ImageProvider, isHighlighted: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.aspectRatio(1.0f).clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
@@ -181,7 +180,7 @@ private fun ListGalleryView(
                 onClickInfo = {
                     dependencies.notification.notifyImageData(p.value)
                 },
-                storage = dependencies.storage
+                storage = dependencies.imageProvider
             )
             Spacer(modifier = Modifier.height(10.dp))
         }
