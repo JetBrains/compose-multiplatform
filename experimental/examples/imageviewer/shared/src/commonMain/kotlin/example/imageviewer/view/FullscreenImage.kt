@@ -1,6 +1,8 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
@@ -11,10 +13,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
@@ -24,6 +29,7 @@ import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.style.*
+import example.imageviewer.utils.onPointerEvent
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -79,30 +85,36 @@ internal fun FullscreenImage(
                     val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
                     val scalableState = remember(imageSize) { ScalableState(imageSize) }
                     val visiblePartOfImage: IntRect = scalableState.visiblePart
-                    Column {
-                        Slider(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = scalableState.scale,
-                            valueRange = MIN_SCALE..MAX_SCALE,
-                            onValueChange = { scalableState.setScale(it) },
-                        )
-                        Box(
-                            modifier = Modifier.fillMaxSize()
-                                .onGloballyPositioned { coordinates ->
-                                    scalableState.changeBoxSize(coordinates.size)
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .onGloballyPositioned { coordinates ->
+                                scalableState.changeBoxSize(coordinates.size)
+                            }
+                            .pointerInput(Unit) {
+                                detectTransformGestures { _, pan, zoom, _ ->
+                                    scalableState.addDragAmount(pan)
+                                    scalableState.addScale(zoom - 1f)
                                 }
-                                .addUserInput(scalableState)
-                        ) {
-                            Image(
-                                modifier = Modifier.fillMaxSize(),
-                                painter = BitmapPainter(
-                                    imageWithFilter,
-                                    srcOffset = visiblePartOfImage.topLeft,
-                                    srcSize = visiblePartOfImage.size
-                                ),
-                                contentDescription = null
-                            )
-                        }
+                            }
+                            .pointerInput(Unit) {
+                                detectTapGestures(
+                                    onDoubleTap = { scalableState.setScale(1f) }
+                                )
+                            }
+                            .onPointerEvent(PointerEventType.Scroll) {
+                                val delta = it.changes.getOrNull(0)?.scrollDelta ?: Offset.Zero
+                                scalableState.addScale(delta.y / 100)
+                            }
+                    ) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(),
+                            painter = BitmapPainter(
+                                imageWithFilter,
+                                srcOffset = visiblePartOfImage.topLeft,
+                                srcSize = visiblePartOfImage.size
+                            ),
+                            contentDescription = null
+                        )
                     }
                     Box(
                         Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
