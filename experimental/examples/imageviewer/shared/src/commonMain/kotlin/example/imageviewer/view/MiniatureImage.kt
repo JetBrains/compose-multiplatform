@@ -9,7 +9,7 @@ import example.imageviewer.ImageProvider
 import example.imageviewer.model.PictureData
 
 @Composable
-fun MiniatureImage(
+internal fun MiniatureImage(
     modifier: Modifier,
     picture: PictureData,
     imageProvider: ImageProvider,

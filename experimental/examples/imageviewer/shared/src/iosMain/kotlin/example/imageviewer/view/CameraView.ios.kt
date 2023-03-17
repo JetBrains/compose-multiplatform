@@ -12,7 +12,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
+import example.imageviewer.ImageStorage
+import example.imageviewer.IosStorableImage
+import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GeoPos
+import example.imageviewer.model.PictureData
 import kotlinx.cinterop.*
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
@@ -37,7 +41,7 @@ private sealed interface CameraAccess {
 }
 
 @Composable
-internal actual fun CameraView(modifier: Modifier) {
+internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
     var cameraAccess: CameraAccess by remember { mutableStateOf(CameraAccess.Undefined) }
     LaunchedEffect(Unit) {
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
@@ -72,63 +76,19 @@ internal actual fun CameraView(modifier: Modifier) {
             }
 
             CameraAccess.Authorized -> {
-                AuthorizedCamera()
+                AuthorizedCamera(storage)
             }
         }
     }
 }
 
-fun fetchCoordinatesFrom(photoData: NSData): GeoPos {
-    val imageSource = CGImageSourceCreateWithData(CFBridgingRetain(photoData) as CFDataRef, null)
-    val imagePropertiesCF = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, null)
-    val gpsDictionary = CFDictionaryGetValue(imagePropertiesCF, kCGImagePropertyGPSDictionary) as CPointer<__CFDictionary>
-    val longitude = CFBridgingRelease(CFDictionaryGetValue(gpsDictionary, kCGImagePropertyGPSLongitude))
-    val latitude = CFBridgingRelease(CFDictionaryGetValue(gpsDictionary, kCGImagePropertyGPSLatitude))
-    return GeoPos(latitude as Double, longitude as Double)
-}
-
-fun NSData.fetchImageFrom() : CGImageRef {
-    return UIImage(data = this).CGImage!!
-    val cfData = this as CFDataRef
-    val imageSource = CGImageSourceCreateWithData(cfData, null)
-    return CGImageSourceCreateImageAtIndex(imageSource, 0, null)!!
-}
-
 @Composable
-private fun BoxScope.AuthorizedCamera() {
+private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
     val locationManager = remember {
         CLLocationManager().apply {
             desiredAccuracy = kCLLocationAccuracyBest
             requestWhenInUseAuthorization()
         }
-    }
-    fun attachedGPSTo(photoData: NSData): NSData {
-        fun getLocationMetadata(): CFDictionaryRef {
-            val metadata = CFDictionaryCreateMutable(null, 6, null, null)
-            val location = locationManager.location
-            if (location != null) {
-                val latitude = location.coordinate.useContents { latitude }
-                val longitude = location.coordinate.useContents { longitude }
-                CFDictionaryAddValue(metadata, kCGImagePropertyGPSLatitude, CFBridgingRetain(latitude))
-                CFDictionaryAddValue(metadata, kCGImagePropertyGPSLongitude, CFBridgingRetain(longitude))
-                CFDictionaryAddValue(metadata, kCGImagePropertyGPSAltitudeRef, CFBridgingRetain(0))
-                CFDictionaryAddValue(metadata, kCGImagePropertyGPSAltitude, CFBridgingRetain(location.altitude))
-                CFDictionaryAddValue(metadata, kCGImagePropertyGPSTimeStamp, CFBridgingRetain(location.timestamp))
-                CFDictionaryAddValue(metadata, kCGImagePropertyGPSDateStamp, CFBridgingRetain(location.timestamp))
-            }
-            return metadata as CFDictionaryRef
-        }
-        val imageSource = CGImageSourceCreateWithData(CFBridgingRetain(photoData) as CFDataRef, null)
-        val imageProperties = CGImageSourceCopyPropertiesAtIndex(imageSource, 0, null)
-        val mutableImagePropertiesCF = CFDictionaryCreateMutableCopy(kCFAllocatorDefault, 0, imageProperties)
-        CFDictionaryAddValue(mutableImagePropertiesCF, kCGImagePropertyGPSDictionary, getLocationMetadata())
-        val mutableImageProperties: NSMutableDictionary = CFBridgingRelease(mutableImagePropertiesCF) as NSMutableDictionary
-        val updatedProperties = CFBridgingRetain(mutableImageProperties) as CFDictionaryRef
-        val destPhotoData = CFDataCreateMutable(null, 0)
-        val imageDestination = CGImageDestinationCreateWithData(destPhotoData, CFBridgingRetain(UTTypeJPEG.identifier) as CFStringRef, 1, null)
-        CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0, updatedProperties)
-        CGImageDestinationFinalize(imageDestination)
-        return CFBridgingRelease(destPhotoData) as NSData
     }
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
     val photoCaptureDelegate = remember {
@@ -140,12 +100,26 @@ private fun BoxScope.AuthorizedCamera() {
             ) {
                 val photoData = didFinishProcessingPhoto.fileDataRepresentation()
                     ?: error("fileDataRepresentation is null")
-                val updatedData = attachedGPSTo(photoData = photoData)
-                updatedData.fetchImageFrom()
-                val geo = fetchCoordinatesFrom(updatedData)
-                println("geo: $geo")
-                val uiImage = UIImage(photoData)
-                //todo pass image to gallery page
+                val location = locationManager.location
+                val geoPos = if (location != null) {
+                    GeoPos(
+                        latitude = location.coordinate.useContents { latitude },
+                        longitude = location.coordinate.useContents { longitude }
+                    )
+                } else {
+                    GeoPos(0.0, 0.0)
+                }
+                val randomFileName =
+                    CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
+                storage.saveImage(
+                    PictureData.Storage(
+                        fileName = randomFileName,
+                        name = "Kotlin Conf",
+                        description = "Kotlin Conf photo description",
+                        geo = geoPos
+                    ),
+                    IosStorableImage(photoData)
+                )
             }
         }
     }

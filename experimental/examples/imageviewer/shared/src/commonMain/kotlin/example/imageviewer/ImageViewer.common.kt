@@ -96,7 +96,8 @@ internal fun ImageViewerCommon(
                 is CameraPage -> {
                     CameraScreen(
                         localization = dependencies.localization,
-                        onBack = { navigationStack.back() }
+                        storage = dependencies.imageStorage,
+                        onBack = { navigationStack.back() },
                     )
                 }
             }

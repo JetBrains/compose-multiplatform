@@ -3,8 +3,8 @@ package example.imageviewer.model
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
-val resourcePictures = listOf<PictureData>(
-    ResourcePicture(
+val resourcePictures = listOf<PictureData.Resource>(
+    PictureData.Resource(
         resource = "1.jpg",
         name = "Taranaki",
         description = """
@@ -14,7 +14,7 @@ val resourcePictures = listOf<PictureData>(
         """.trimIndent(),
         geo = GeoPos(-39.296389, 174.064722)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "2.jpg",
         name = "Auckland SkyCity",
         description = """
@@ -24,7 +24,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(-36.846589, 174.760871)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "3.jpg",
         name = "Empire State Building",
         description = """
@@ -33,7 +33,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(40.7473415, -73.9862414)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "4.jpg",
         name = "Tokyo Skytree",
         description = """
@@ -42,7 +42,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(35.7101, 139.8107)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "5.jpg",
         name = "Nakhal Fort",
         description = """
@@ -52,7 +52,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(23.395, 57.829)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "6.jpg",
         name = "Blue City",
         description = """
@@ -62,7 +62,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(35.171389, -5.269722)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "7.jpg",
         name = "Berliner Fernsehturm",
         description = """
@@ -72,7 +72,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(52.520833, 13.409444)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "8.jpg",
         name = "Hoggar Mountains",
         description = """
@@ -81,7 +81,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(22.133333, 6.166667)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "9.jpg",
         name = "Botanic Garden",
         description = """
@@ -90,7 +90,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(59.992327, 30.341782)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "10.jpg",
         name = "Mountain Ararat",
         description = """
@@ -100,7 +100,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(40.169339, 44.488434)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "11.jpg",
         name = "Cabo da Roca",
         description = """
@@ -109,7 +109,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(38.789283172, 9.4909725957)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "12.jpg",
         name = "Surprised Whiskers 🐱",
         description = """
@@ -119,7 +119,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(52.3560485, 4.9085645)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "13.jpg",
         name = "Software Engineering Donut",
         description = """
@@ -130,7 +130,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(48.1764708, 11.4580367)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "14.jpg",
         name = "Seligman Police Car.",
         description = """
@@ -141,7 +141,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(35.3259364, -112.8553165)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "15.jpg",
         name = "Good Luck Charms",
         description = """
@@ -153,7 +153,7 @@ val resourcePictures = listOf<PictureData>(
             """.trimIndent(),
         geo = GeoPos(48.1458602, 11.5053059)
     ),
-    ResourcePicture(
+    PictureData.Resource(
         resource = "16.jpg",
         name = "Pong Restaurant",
         description = """

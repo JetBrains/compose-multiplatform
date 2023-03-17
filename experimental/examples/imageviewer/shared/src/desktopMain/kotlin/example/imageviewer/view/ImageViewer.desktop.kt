@@ -124,7 +124,14 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
             }
         }
 
-        override fun getDiskImage(picture: DiskPicture): ImageBitmap {
-            TODO("implement getDiskImage")
+        override val imageStorage: ImageStorage = object : ImageStorage {
+            override suspend fun getImage(picture: PictureData.Storage): ImageBitmap {
+                TODO("Not yet implemented")
+            }
+
+            override fun saveImage(picture: PictureData, image: PlatformStorableImage) {
+                TODO("Not yet implemented")
+            }
         }
+
     }

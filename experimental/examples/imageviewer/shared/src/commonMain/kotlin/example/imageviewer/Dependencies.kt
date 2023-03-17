@@ -1,12 +1,12 @@
 package example.imageviewer
 
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.pointer.PointerInputScope
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 
@@ -17,21 +17,14 @@ abstract class Dependencies {
     abstract fun getFilter(type: FilterType): BitmapFilter
     abstract val localization: Localization
     abstract val notification: Notification
-    abstract fun getDiskImage(picture: DiskPicture): ImageBitmap
+    abstract val imageStorage: ImageStorage
     val imageProvider: ImageProvider = object : ImageProvider {
-        override suspend fun getImage(picture: PictureData): ImageBitmap =
-            when(picture) {
-                is ResourcePicture -> resource(picture.resource).readBytes().toImageBitmap()
-                is DiskPicture -> getDiskImage(picture)
+        override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
+                is PictureData.Resource -> resource(picture.resource).readBytes().toImageBitmap()
+                is PictureData.Storage -> imageStorage.getImage(picture)
             }
-        override suspend fun getThumbnail(picture: PictureData): ImageBitmap =
-            getImage(picture)
+        override suspend fun getThumbnail(picture: PictureData): ImageBitmap = getImage(picture)
     }
-}
-
-interface ImageProvider {
-    suspend fun getImage(picture: PictureData): ImageBitmap
-    suspend fun getThumbnail(picture: PictureData): ImageBitmap
 }
 
 interface Notification {
@@ -89,6 +82,12 @@ interface Localization {
     val refreshUnavailable: String
 }
 
-private val jsonReader: Json = Json {
-    ignoreUnknownKeys = true
+interface ImageProvider {
+    suspend fun getImage(picture: PictureData): ImageBitmap
+    suspend fun getThumbnail(picture: PictureData): ImageBitmap
+}
+
+interface ImageStorage {
+    suspend fun getImage(picture: PictureData.Storage): ImageBitmap
+    fun saveImage(picture: PictureData, image: PlatformStorableImage)
 }

@@ -8,9 +8,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import example.imageviewer.ImageStorage
 
 @Composable
-internal actual fun CameraView(modifier: Modifier) {
+internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         Text(
             text = "Camera is not available on Desktop for now.",
