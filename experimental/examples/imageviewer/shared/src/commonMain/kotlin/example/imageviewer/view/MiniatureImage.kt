@@ -5,10 +5,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import example.imageviewer.model.BitmapStorage
-import example.imageviewer.model.ImageStorage
+import example.imageviewer.BitmapStorage
+import example.imageviewer.getThumbnail
 import example.imageviewer.model.PictureData
-import example.imageviewer.model.getThumbnail
 
 @Composable
 fun MiniatureImage(

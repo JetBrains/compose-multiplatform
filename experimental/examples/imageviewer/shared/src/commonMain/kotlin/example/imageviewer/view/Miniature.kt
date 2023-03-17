@@ -19,8 +19,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.model.BitmapStorage
-import example.imageviewer.model.ImageStorage
+import example.imageviewer.BitmapStorage
+import example.imageviewer.ImageStorage
 import example.imageviewer.model.PictureData
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource

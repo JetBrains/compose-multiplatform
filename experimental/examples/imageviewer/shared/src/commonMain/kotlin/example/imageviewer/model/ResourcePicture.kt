@@ -1,11 +1,7 @@
 package example.imageviewer.model
 
-class ResourcePicture(
-    val resource: String,
-    override val name: String,
-    override val description: String,
-    override val geo: GeoPos
-) : PictureData
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 
 val resourcePictures = listOf<PictureData>(
     ResourcePicture(
@@ -169,3 +165,6 @@ val resourcePictures = listOf<PictureData>(
         geo = GeoPos(59.3364318, 18.0587228)
     ),
 )
+
+val globalPictures: SnapshotStateList<PictureData> =//todo not global
+    mutableStateListOf(*resourcePictures.toTypedArray())

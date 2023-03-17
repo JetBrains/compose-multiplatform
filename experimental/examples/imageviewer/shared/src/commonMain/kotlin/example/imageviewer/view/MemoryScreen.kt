@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.BitmapStorage
 import example.imageviewer.Localization
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors

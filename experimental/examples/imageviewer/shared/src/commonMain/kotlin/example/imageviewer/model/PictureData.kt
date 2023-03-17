@@ -3,8 +3,10 @@ package example.imageviewer.model
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 
-val globalPictures: SnapshotStateList<PictureData> =//todo not global
-    mutableStateListOf(*resourcePictures.toTypedArray())
+class GeoPos(
+    val latitude: Double,
+    val longitude: Double,
+)
 
 sealed interface PictureData {
     val name: String
@@ -12,20 +14,16 @@ sealed interface PictureData {
     val geo: GeoPos
 }
 
-class GeoPos(
-    val latitude: Double,
-    val longitude: Double,
-)
-
-class InMemoryPicture(
+class DiskPicture(
+    val fileName: String,
     override val name: String,
     override val description: String,
     override val geo: GeoPos
 ) : PictureData
 
-class DiskPicture(
-    val fileName: String,
-    val name: String,
-    val description: String,
-    val geo: GeoPos
-)
+class ResourcePicture(
+    val resource: String,
+    override val name: String,
+    override val description: String,
+    override val geo: GeoPos
+) : PictureData

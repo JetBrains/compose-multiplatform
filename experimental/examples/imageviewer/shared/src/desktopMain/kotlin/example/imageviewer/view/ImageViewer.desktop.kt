@@ -3,11 +3,9 @@ package example.imageviewer.view
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
-import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -31,7 +29,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.io.File
 
 class ExternalNavigationEventBus {
     private val _events = MutableSharedFlow<ExternalImageViewerEvent>(
@@ -122,7 +119,7 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
 
         override val storage = buildList {
             addStorageAdapter<ResourcePicture> { ResourcesStorage.getImage(it) }
-            addStorageAdapter<InMemoryPicture> { InMemoryStorage.getImage(it) }
+            addStorageAdapter<DiskPicture> { InMemoryStorage.getImage(it) }
         }
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {

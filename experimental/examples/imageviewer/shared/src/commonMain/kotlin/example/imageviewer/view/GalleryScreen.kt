@@ -16,8 +16,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import example.imageviewer.BitmapStorage
 import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.getImage
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi

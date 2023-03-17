@@ -1,7 +1,9 @@
-package example.imageviewer.model
+package example.imageviewer
 
 import androidx.compose.ui.graphics.ImageBitmap
-import example.imageviewer.toImageBitmap
+import example.imageviewer.model.DiskPicture
+import example.imageviewer.model.PictureData
+import example.imageviewer.model.ResourcePicture
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 
@@ -17,9 +19,9 @@ object ResourcesStorage : ImageStorage<ResourcePicture> {
     }
 }
 
-object InMemoryStorage : ImageStorage<InMemoryPicture> {
-    private val map: MutableMap<InMemoryPicture, ImageBitmap> = mutableMapOf()
-    override suspend fun getImage(picture: InMemoryPicture): ImageBitmap {
+object InMemoryStorage : ImageStorage<DiskPicture> {
+    private val map: MutableMap<DiskPicture, ImageBitmap> = mutableMapOf()
+    override suspend fun getImage(picture: DiskPicture): ImageBitmap {
         return map[picture]!!
     }
 }
