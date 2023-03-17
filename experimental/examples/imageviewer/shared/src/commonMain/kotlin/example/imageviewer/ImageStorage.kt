@@ -7,21 +7,16 @@ import example.imageviewer.model.ResourcePicture
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 
-interface ImageStorage<P : PictureData> {
-    suspend fun getImage(picture: P): ImageBitmap
-    suspend fun getThumbnail(picture: P): ImageBitmap = getImage(picture)
-}
-
-object ResourcesStorage : ImageStorage<ResourcePicture> {
+object ResourcesStorage {
     @OptIn(ExperimentalResourceApi::class)
-    override suspend fun getImage(picture: ResourcePicture): ImageBitmap {
+    suspend fun getImage(picture: ResourcePicture): ImageBitmap {
         return resource(picture.resource).readBytes().toImageBitmap()
     }
 }
 
-object InMemoryStorage : ImageStorage<DiskPicture> {
+object InMemoryStorage {
     private val map: MutableMap<DiskPicture, ImageBitmap> = mutableMapOf()
-    override suspend fun getImage(picture: DiskPicture): ImageBitmap {
+    suspend fun getImage(picture: DiskPicture): ImageBitmap {
         return map[picture]!!
     }
 }
