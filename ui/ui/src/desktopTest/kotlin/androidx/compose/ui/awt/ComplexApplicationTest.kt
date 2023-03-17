@@ -115,7 +115,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.platform.Font
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextDecoration.Companion.Underline
@@ -125,10 +124,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.window.ApplicationScope
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.awaitApplication
 import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
@@ -694,7 +691,7 @@ class ComplexApplicationTest {
     fun `no memory leak when wait 3 minutes`() = runApplicationTest(
         timeoutMillis = 10 * 60 * 1000
     ) {
-        launchApplication {
+        launchTestApplication {
             AppWindow()
         }
 
@@ -712,7 +709,5 @@ class ComplexApplicationTest {
             .assertWithMessage("Memory is increased more than 15% after waiting a few minutes")
             .that(newMemory < 1.15 * oldMemory)
             .isTrue()
-
-        exitApplication()
     }
 }

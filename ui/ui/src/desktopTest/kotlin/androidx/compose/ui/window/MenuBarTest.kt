@@ -19,39 +19,34 @@ package androidx.compose.ui.window
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.readFirstPixel
 import androidx.compose.ui.testImage
 import com.google.common.truth.Truth.assertThat
-import org.junit.Test
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JRadioButtonMenuItem
 import javax.swing.JSeparator
+import org.junit.Test
 
-@OptIn(ExperimentalComposeUiApi::class)
 class MenuBarTest {
     @Test(timeout = 20000)
     fun `show and hide menu bar`() = runApplicationTest {
-        var isOpen by mutableStateOf(true)
         var isMenubarShowing by mutableStateOf(true)
         var window: ComposeWindow? = null
 
-        launchApplication {
-            if (isOpen) {
-                Window(onCloseRequest = {}) {
-                    window = this.window
+        launchTestApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
 
-                    if (isMenubarShowing) {
-                        MenuBar {
-                            Menu("Menu0") {
-                                Item("Item0", onClick = {})
-                                Separator()
-                            }
-                            Menu("Menu1") {}
+                if (isMenubarShowing) {
+                    MenuBar {
+                        Menu("Menu0") {
+                            Item("Item0", onClick = {})
+                            Separator()
                         }
+                        Menu("Menu1") {}
                     }
                 }
             }
@@ -78,30 +73,25 @@ class MenuBarTest {
         isMenubarShowing = false
         awaitIdle()
         assertThat(window!!.jMenuBar).isNull()
-
-        isOpen = false
     }
 
     @Test(timeout = 20000)
     fun `show and hide menu`() = runApplicationTest {
-        var isOpen by mutableStateOf(true)
         var isMenuShowing by mutableStateOf(true)
         var window: ComposeWindow? = null
 
-        launchApplication {
-            if (isOpen) {
-                Window(onCloseRequest = {}) {
-                    window = this.window
+        launchTestApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
 
-                    MenuBar {
-                        if (isMenuShowing) {
-                            Menu("Menu0") {
-                                Item("Item0", onClick = {})
-                                Separator()
-                            }
+                MenuBar {
+                    if (isMenuShowing) {
+                        Menu("Menu0") {
+                            Item("Item0", onClick = {})
+                            Separator()
                         }
-                        Menu("Menu1") {}
                     }
+                    Menu("Menu1") {}
                 }
             }
         }
@@ -124,31 +114,26 @@ class MenuBarTest {
             assertThat(getMenu(0).text).isEqualTo("Menu0")
             assertThat(getMenu(1).text).isEqualTo("Menu1")
         }
-
-        isOpen = false
     }
 
     @Test(timeout = 20000)
     fun `show and hide submenu`() = runApplicationTest {
-        var isOpen by mutableStateOf(true)
         var isSubmenuShowing by mutableStateOf(true)
         var window: ComposeWindow? = null
 
-        launchApplication {
-            if (isOpen) {
-                Window(onCloseRequest = {}) {
-                    window = this.window
+        launchTestApplication {
+            Window(onCloseRequest = {}) {
+                window = this.window
 
-                    MenuBar {
-                        Menu("Menu0") {
-                            if (isSubmenuShowing) {
-                                Menu("Submenu0") {}
-                            }
-                            Item("Item0", onClick = {})
-                            Separator()
+                MenuBar {
+                    Menu("Menu0") {
+                        if (isSubmenuShowing) {
+                            Menu("Submenu0") {}
                         }
-                        Menu("Menu1") {}
+                        Item("Item0", onClick = {})
+                        Separator()
                     }
+                    Menu("Menu1") {}
                 }
             }
         }
@@ -173,8 +158,6 @@ class MenuBarTest {
             assertThat(getItem(1).text).isEqualTo("Item0")
             assertThat(getMenuComponent(2)).isInstanceOf(JSeparator::class.java)
         }
-
-        isOpen = false
     }
 
     @Test(timeout = 20000)
@@ -185,7 +168,7 @@ class MenuBarTest {
         var submenuLabel by mutableStateOf("Submenu")
         var itemLabel by mutableStateOf("Item")
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -212,8 +195,6 @@ class MenuBarTest {
             assertThat(getMenu(0).getItem(0).text).isEqualTo("Submenu2")
             assertThat(getMenu(0).getItem(1).text).isEqualTo("Item2")
         }
-
-        exitApplication()
     }
 
     @Test(timeout = 20000)
@@ -224,7 +205,7 @@ class MenuBarTest {
         var submenuEnabled by mutableStateOf(true)
         var itemEnabled by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -251,8 +232,6 @@ class MenuBarTest {
             assertThat(getMenu(0).getItem(0).isEnabled).isFalse()
             assertThat(getMenu(0).getItem(1).isEnabled).isFalse()
         }
-
-        exitApplication()
     }
 
     @Test(timeout = 20000)
@@ -264,7 +243,7 @@ class MenuBarTest {
 
         var icon: Painter? by mutableStateOf(redIcon)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -288,8 +267,6 @@ class MenuBarTest {
         icon = null
         awaitIdle()
         assertThat(item.icon?.readFirstPixel()).isEqualTo(null)
-
-        exitApplication()
     }
 
     // bug https://github.com/JetBrains/compose-jb/issues/1097#issuecomment-921108560
@@ -298,7 +275,7 @@ class MenuBarTest {
         var window: ComposeWindow? = null
         val redIcon = testImage(Color.Red)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -313,8 +290,6 @@ class MenuBarTest {
         awaitIdle()
         window!!.jMenuBar.getMenu(0).doClick()
         window!!.paint(window!!.graphics)
-
-        exitApplication()
     }
 
     @Test(timeout = 20000)
@@ -323,7 +298,7 @@ class MenuBarTest {
 
         var checked by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -348,8 +323,6 @@ class MenuBarTest {
         awaitIdle()
         assertThat(checked).isEqualTo(true)
         assertThat(item.state).isEqualTo(true)
-
-        exitApplication()
     }
 
     @Test(timeout = 20000)
@@ -358,7 +331,7 @@ class MenuBarTest {
 
         var checked by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -381,10 +354,7 @@ class MenuBarTest {
 
         item.doClick()
         awaitIdle()
-        assertThat(checked).isEqualTo(false)
         assertThat(item.state).isEqualTo(false)
-
-        exitApplication()
     }
 
     @Test(timeout = 20000)
@@ -393,7 +363,7 @@ class MenuBarTest {
 
         var selected by mutableStateOf(1)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -427,8 +397,6 @@ class MenuBarTest {
         assertThat(selected).isEqualTo(1)
         assertThat(item0.isSelected).isEqualTo(false)
         assertThat(item1.isSelected).isEqualTo(true)
-
-        exitApplication()
     }
 
     @Test(timeout = 20000)
@@ -437,7 +405,7 @@ class MenuBarTest {
 
         var selected by mutableStateOf(1)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}) {
                 window = this.window
 
@@ -471,7 +439,5 @@ class MenuBarTest {
         assertThat(selected).isEqualTo(0)
         assertThat(item0.isSelected).isEqualTo(true)
         assertThat(item1.isSelected).isEqualTo(false)
-
-        exitApplication()
     }
 }

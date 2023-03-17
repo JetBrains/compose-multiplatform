@@ -39,7 +39,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.density
-import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
@@ -54,7 +53,7 @@ class ExternalDragTest {
 
         val events = mutableListOf<TestDragEvent>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -87,8 +86,6 @@ class ExternalDragTest {
 
         assertThat(events.size).isEqualTo(2)
         assertThat(events.last()).isEqualTo(Drag(Offset(70f, 70f)))
-
-        exitApplication()
     }
 
 
@@ -98,7 +95,7 @@ class ExternalDragTest {
 
         val events = mutableListOf<TestDragEvent>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -134,8 +131,6 @@ class ExternalDragTest {
 
         assertThat(events.size).isEqualTo(1)
         assertThat(events[0]).isEqualTo(DragStarted(Offset(70f, 1f)))
-
-        exitApplication()
     }
 
     @Test
@@ -145,7 +140,7 @@ class ExternalDragTest {
         val eventsComponent1 = mutableListOf<TestDragEvent>()
         val eventsComponent2 = mutableListOf<TestDragEvent>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 400.dp, height = 400.dp)
@@ -202,8 +197,6 @@ class ExternalDragTest {
 
         assertThat(eventsComponent2.size).isEqualTo(2)
         assertThat(eventsComponent2.last()).isEqualTo(TestDragEvent.Drop(Offset(70f, 1f), dragData))
-
-        exitApplication()
     }
 
     @Test
@@ -212,7 +205,7 @@ class ExternalDragTest {
 
         lateinit var componentIsVisible: MutableState<Boolean>
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 400.dp, height = 400.dp)
@@ -244,7 +237,7 @@ class ExternalDragTest {
 
         val events = mutableListOf<TestDragEvent>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)

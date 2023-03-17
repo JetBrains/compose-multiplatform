@@ -32,7 +32,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.LeakDetector
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
@@ -43,7 +42,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
@@ -58,15 +56,13 @@ import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Assume.assumeFalse
 import org.junit.Test
-import kotlinx.coroutines.cancelAndJoin
 
-@OptIn(ExperimentalComposeUiApi::class)
 class WindowTest {
     @Test
     fun `open and close custom window`() = runApplicationTest {
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             var isOpen by remember { mutableStateOf(true) }
 
             fun createWindow() = ComposeWindow().apply {
@@ -103,7 +99,7 @@ class WindowTest {
         var isOpen by mutableStateOf(true)
         var title by mutableStateOf("Title1")
 
-        launchApplication {
+        launchTestApplication {
             fun createWindow() = ComposeWindow().apply {
                 size = Dimension(300, 200)
 
@@ -141,7 +137,7 @@ class WindowTest {
     fun `open and close window`() = runApplicationTest {
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -160,7 +156,7 @@ class WindowTest {
         var isCloseCalled by mutableStateOf(false)
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Window(
                     onCloseRequest = {
@@ -193,7 +189,7 @@ class WindowTest {
         var isOpen by mutableStateOf(true)
         var isLoading by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 if (isLoading) {
                     Window(onCloseRequest = {}) {
@@ -231,7 +227,7 @@ class WindowTest {
 
         var isOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Window(onCloseRequest = {}) {
                     window1 = this.window
@@ -263,7 +259,7 @@ class WindowTest {
         var isOpen by mutableStateOf(true)
         var isNestedOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Window(
                     onCloseRequest = {},
@@ -320,7 +316,7 @@ class WindowTest {
         val local2TestValue = compositionLocalOf { 0 }
         var locals by mutableStateOf(arrayOf(local1TestValue provides 1))
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 CompositionLocalProvider(*locals) {
                     Window(
@@ -386,7 +382,7 @@ class WindowTest {
 
         var isOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Window(onCloseRequest = {}) {
                     DisposableEffect(Unit) {
@@ -445,7 +441,7 @@ class WindowTest {
         var isVisibleOnFirstComposition = false
         var isVisibleOnFirstDraw = false
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication) {
                 if (!isComposed) {
                     isVisibleOnFirstComposition = window.isVisible
@@ -464,8 +460,6 @@ class WindowTest {
         awaitIdle()
         assertThat(isVisibleOnFirstComposition).isFalse()
         assertThat(isVisibleOnFirstDraw).isFalse()
-
-        exitApplication()
     }
 
     @Test(timeout = 30000)
@@ -473,7 +467,7 @@ class WindowTest {
         val customDensity = Density(3.14f)
         var actualDensity: Density? = null
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 CompositionLocalProvider(LocalDensity provides customDensity) {
                     Window(onCloseRequest = ::exitApplication) {
@@ -486,8 +480,6 @@ class WindowTest {
         awaitIdle()
         assertThat(actualDensity).isNotNull()
         assertThat(actualDensity).isNotEqualTo(customDensity)
-
-        exitApplication()
     }
 
     @Test
@@ -495,7 +487,7 @@ class WindowTest {
         var isApplicationEffectEnded = false
         var isWindowEffectEnded = false
 
-        val job = launchApplication {
+        val job = launchTestApplication {
             if (isOpen) {
                 Window(onCloseRequest = ::exitApplication) {
                     LaunchedEffect(Unit) {
@@ -518,7 +510,7 @@ class WindowTest {
         }
 
         awaitIdle()
-        exitApplication()
+        exitTestApplication()
         job.cancelAndJoin()
 
         assertThat(isApplicationEffectEnded).isTrue()
@@ -529,9 +521,9 @@ class WindowTest {
     fun `undecorated resizable window with unspecified size`() = runApplicationTest {
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(
-                onCloseRequest = ::exitApplication,
+                onCloseRequest = { },
                 state = rememberWindowState(width = Dp.Unspecified, height = Dp.Unspecified),
                 undecorated = true,
                 resizable = true,
@@ -544,8 +536,6 @@ class WindowTest {
         awaitIdle()
         assertEquals(32, window?.width)
         assertEquals(32, window?.height)
-
-        window?.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
     }
 
 }

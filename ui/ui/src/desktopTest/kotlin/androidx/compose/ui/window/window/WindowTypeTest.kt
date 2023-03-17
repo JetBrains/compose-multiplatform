@@ -676,7 +676,6 @@ class WindowTypeTest {
 
         awaitIdle()
         body()
-        exitApplication()
     }
 
     private suspend fun WindowTestScope.assert(

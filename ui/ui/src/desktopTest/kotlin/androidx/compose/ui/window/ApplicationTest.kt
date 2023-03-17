@@ -27,7 +27,6 @@ import androidx.compose.runtime.monotonicFrameClock
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
@@ -37,14 +36,13 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CompletableDeferred
 import org.junit.Test
 
-@OptIn(ExperimentalComposeUiApi::class)
 class ApplicationTest {
     @Test
     fun `run application`() = runApplicationTest {
         var isInit = false
         var isDisposed = false
 
-        val appJob = launchApplication {
+        val appJob = launchTestApplication {
             DisposableEffect(Unit) {
                 isInit = true
                 onDispose {
@@ -64,7 +62,7 @@ class ApplicationTest {
         val onEffectLaunch = CompletableDeferred<Unit>()
         val shouldEnd = CompletableDeferred<Unit>()
 
-        launchApplication {
+        launchTestApplication {
             LaunchedEffect(Unit) {
                 onEffectLaunch.complete(Unit)
                 shouldEnd.await()
@@ -83,7 +81,7 @@ class ApplicationTest {
         var isOpen1 by mutableStateOf(true)
         var isOpen2 by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen1) {
                 Window(
                     onCloseRequest = {},
@@ -97,7 +95,7 @@ class ApplicationTest {
             }
         }
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen2) {
                 Window(
                     onCloseRequest = {},
@@ -132,7 +130,7 @@ class ApplicationTest {
         lateinit var appClock: MonotonicFrameClock
         lateinit var windowClock: MonotonicFrameClock
 
-        launchApplication {
+        launchTestApplication {
             LaunchedEffect(Unit) {
                 appClock = coroutineContext.monotonicFrameClock
             }
@@ -148,7 +146,5 @@ class ApplicationTest {
 
         awaitIdle()
         assertThat(windowClock).isNotEqualTo(appClock)
-
-        exitApplication()
     }
 }

@@ -24,7 +24,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.isLinux
@@ -39,7 +38,6 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
@@ -57,21 +55,20 @@ import org.junit.Assume.assumeTrue
 import org.junit.Test
 
 // Note that on Linux some tests are flaky. Swing event listener's on Linux has non-deterministic
-// nature. To avoid flaky'ness we use delays
+// nature. To avoid flakiness we use delays
 // (see description of `delay` parameter in TestUtils.runApplicationTest).
 // It is not a good solution, but it works.
 
 // TODO(demin): figure out how can we fix flaky tests on Linux
 // TODO(demin): fix fullscreen tests on macOs
 
-@OptIn(ExperimentalComposeUiApi::class)
 class WindowStateTest {
     @Test
     fun `manually close window`() = runApplicationTest {
         var window: ComposeWindow? = null
         var isOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Window(onCloseRequest = { isOpen = false }) {
                     window = this.window
@@ -92,7 +89,7 @@ class WindowStateTest {
         var window: ComposeWindow? = null
         var isOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Window(onCloseRequest = { isOpen = false }) {
                     window = this.window
@@ -115,7 +112,7 @@ class WindowStateTest {
         var isParentOpen by mutableStateOf(true)
         var isChildOpen by mutableStateOf(false)
 
-        launchApplication {
+        launchTestApplication {
             if (isParentOpen) {
                 Window(onCloseRequest = {}) {
                     parentWindow = this.window
@@ -156,7 +153,7 @@ class WindowStateTest {
 
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -165,8 +162,6 @@ class WindowStateTest {
         awaitIdle()
         assertThat(window?.size).isEqualTo(Dimension(200, 200))
         assertThat(window?.location).isEqualTo(Point(242, 242))
-
-        exitApplication()
     }
 
     @Test
@@ -177,7 +172,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -188,8 +183,6 @@ class WindowStateTest {
         state.position = WindowPosition(242.dp, (242).dp)
         awaitIdle()
         assertThat(window?.location).isEqualTo(Point(242, 242))
-
-        exitApplication()
     }
 
     @Test
@@ -200,7 +193,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -211,8 +204,6 @@ class WindowStateTest {
         state.size = DpSize(250.dp, 200.dp)
         awaitIdle()
         assertThat(window?.size).isEqualTo(Dimension(250, 200))
-
-        exitApplication()
     }
 
     @Test
@@ -228,7 +219,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -236,8 +227,6 @@ class WindowStateTest {
 
         awaitIdle()
         assertThat(window!!.center() maxDistance window!!.screenCenter() < 250)
-
-        exitApplication()
     }
 
     @Test
@@ -247,7 +236,7 @@ class WindowStateTest {
         var window2: ComposeWindow? = null
         var isWindow1 by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isWindow1) {
                 Window(onCloseRequest = {}, state) {
                     window1 = this.window
@@ -268,8 +257,6 @@ class WindowStateTest {
         isWindow1 = false
         awaitIdle()
         assertThat(window2?.location == Point(242, 242))
-
-        exitApplication()
     }
 
     @Test
@@ -278,7 +265,7 @@ class WindowStateTest {
     ) {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
             }
         }
@@ -287,8 +274,6 @@ class WindowStateTest {
 
         awaitIdle()
         assertThat(state.position.isSpecified).isTrue()
-
-        exitApplication()
     }
 
     @Test
@@ -300,7 +285,7 @@ class WindowStateTest {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -315,8 +300,6 @@ class WindowStateTest {
         state.placement = WindowPlacement.Floating
         awaitIdle()
         assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
-
-        exitApplication()
     }
 
     @Test
@@ -324,7 +307,7 @@ class WindowStateTest {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -339,8 +322,6 @@ class WindowStateTest {
         state.placement = WindowPlacement.Floating
         awaitIdle()
         assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
-
-        exitApplication()
     }
 
     @Test
@@ -348,7 +329,7 @@ class WindowStateTest {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -363,19 +344,17 @@ class WindowStateTest {
         state.isMinimized = false
         awaitIdle()
         assertThat(window?.isMinimized).isFalse()
-
-        exitApplication()
     }
 
     @Test
     fun `maximize and minimize `() = runApplicationTest {
-        // macOs can't be maximized and minimized at the same time
+        // macOS can't be maximized and minimized at the same time
         assumeTrue(isWindows || isLinux)
 
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -388,20 +367,18 @@ class WindowStateTest {
         awaitIdle()
         assertThat(window?.isMinimized).isTrue()
         assertThat(window?.placement).isEqualTo(WindowPlacement.Maximized)
-
-        exitApplication()
     }
 
     @Test
     fun `restore size and position after maximize`() = runApplicationTest {
-        // Swing/macOs can't re-change isMaximized in a deterministic way:
+        // Swing/macOS can't re-change isMaximized in a deterministic way:
 //        fun main() = runBlocking(MainUIDispatcher) {
 //            val window = ComposeWindow()
 //            window.size = Dimension(200, 200)
 //            window.isVisible = true
 //            window.isMaximized = true
 //            delay(100)
-//            window.isMaximized = false  // we cannot do that on macOs (window is still animating)
+//            window.isMaximized = false  // we cannot do that on macOS (window is still animating)
 //            delay(1000)
 //            println(window.isMaximized) // prints true
 //        }
@@ -414,7 +391,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -435,8 +412,6 @@ class WindowStateTest {
         assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
         assertThat(window?.size).isEqualTo(Dimension(201, 203))
         assertThat(window?.location).isEqualTo(Point(196, 257))
-
-        exitApplication()
     }
 
     @Test
@@ -450,7 +425,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -471,8 +446,6 @@ class WindowStateTest {
         assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
         assertThat(window?.size).isEqualTo(Dimension(201, 203))
         assertThat(window?.location).isEqualTo(Point(196, 257))
-
-        exitApplication()
     }
 
     @Test
@@ -484,7 +457,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -492,8 +465,6 @@ class WindowStateTest {
 
         awaitIdle()
         assertThat(window?.placement).isEqualTo(WindowPlacement.Maximized)
-
-        exitApplication()
     }
 
     @Test
@@ -517,7 +488,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -525,8 +496,6 @@ class WindowStateTest {
 
         awaitIdle()
         assertThat(window?.isMinimized).isTrue()
-
-        exitApplication()
     }
 
     @Test
@@ -542,7 +511,7 @@ class WindowStateTest {
         )
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
@@ -550,8 +519,6 @@ class WindowStateTest {
 
         awaitIdle()
         assertThat(window?.placement).isEqualTo(WindowPlacement.Fullscreen)
-
-        exitApplication()
     }
 
     @Test
@@ -564,11 +531,10 @@ class WindowStateTest {
             isMinimized = true,
         )
 
-        var isOpen by mutableStateOf(true)
         var index by mutableStateOf(0)
         val states = mutableListOf<WindowState>()
 
-        launchApplication {
+        launchTestApplication {
             val saveableStateHolder = rememberSaveableStateHolder()
             saveableStateHolder.SaveableStateProvider(index) {
                 val state = rememberWindowState()
@@ -582,9 +548,7 @@ class WindowStateTest {
                 }
             }
 
-            if (isOpen) {
-                Window(onCloseRequest = {}) {}
-            }
+            Window(onCloseRequest = {}) {}
         }
 
         awaitIdle()
@@ -606,8 +570,6 @@ class WindowStateTest {
         assertThat(states[2].isMinimized == newState.isMinimized)
         assertThat(states[2].size == newState.size)
         assertThat(states[2].position == newState.position)
-
-        isOpen = false
     }
 
     @Test
@@ -615,7 +577,7 @@ class WindowStateTest {
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(300.dp, Dp.Unspecified))
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = state
@@ -634,8 +596,6 @@ class WindowStateTest {
         assertThat(window.width).isEqualTo(300)
         assertThat(window.contentSize.height).isEqualTo(200)
         assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
-
-        exitApplication()
     }
 
     @Test
@@ -643,7 +603,7 @@ class WindowStateTest {
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(Dp.Unspecified, 300.dp))
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = state
@@ -662,8 +622,6 @@ class WindowStateTest {
         assertThat(window.height).isEqualTo(300)
         assertThat(window.contentSize.width).isEqualTo(400)
         assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
-
-        exitApplication()
     }
 
     @Test
@@ -671,7 +629,7 @@ class WindowStateTest {
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(Dp.Unspecified, Dp.Unspecified))
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = state
@@ -689,8 +647,6 @@ class WindowStateTest {
         awaitIdle()
         assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
         assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
-
-        exitApplication()
     }
 
     @Test
@@ -700,7 +656,7 @@ class WindowStateTest {
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(100.dp, 100.dp))
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = state
@@ -721,8 +677,6 @@ class WindowStateTest {
         awaitIdle()
         assertThat(window.contentSize).isEqualTo(Dimension(400, 200))
         assertThat(state.size).isEqualTo(DpSize(window.size.width.dp, window.size.height.dp))
-
-        exitApplication()
     }
 
     @Test
@@ -731,7 +685,7 @@ class WindowStateTest {
 
         var visible by mutableStateOf(false)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, visible = visible) {
                 window = this.window
             }
@@ -743,8 +697,6 @@ class WindowStateTest {
         visible = true
         awaitIdle()
         assertThat(window.isVisible).isEqualTo(true)
-
-        exitApplication()
     }
 
     @Test
@@ -753,7 +705,7 @@ class WindowStateTest {
 
         val sendChannel = Channel<Int>(Channel.UNLIMITED)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, visible = false) {
                 LaunchedEffect(Unit) {
                     sendChannel.consumeEach {
@@ -770,8 +722,6 @@ class WindowStateTest {
         sendChannel.send(2)
         awaitIdle()
         assertThat(receivedNumbers).isEqualTo(listOf(1, 2))
-
-        exitApplication()
     }
 
     @Test
@@ -781,7 +731,7 @@ class WindowStateTest {
         lateinit var window1Info: WindowInfo
         lateinit var window2Info: WindowInfo
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication) {
                 window1 = window
                 window1Info = LocalWindowInfo.current
@@ -806,8 +756,6 @@ class WindowStateTest {
         awaitIdle()
         assertThat(window1.isFocused).isEqualTo(window1Info.isWindowFocused)
         assertThat(window2.isFocused).isEqualTo(window2Info.isWindowFocused)
-
-        exitApplication()
     }
 
     @Test
@@ -816,7 +764,7 @@ class WindowStateTest {
 
         val sendChannel = Channel<Int>(Channel.UNLIMITED)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, visible = false, undecorated = true) {
                 LaunchedEffect(Unit) {
                     sendChannel.consumeEach {
@@ -833,8 +781,6 @@ class WindowStateTest {
         sendChannel.send(2)
         awaitIdle()
         assertThat(receivedNumbers).isEqualTo(listOf(1, 2))
-
-        exitApplication()
     }
 
     private val Window.contentSize

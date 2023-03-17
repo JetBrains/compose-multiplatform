@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.graphics.Color
@@ -31,13 +30,11 @@ import androidx.compose.ui.readFirstPixel
 import androidx.compose.ui.testImage
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.awt.event.WindowEvent
 
-@OptIn(ExperimentalComposeUiApi::class)
 class WindowParameterTest {
     @Test
     fun `change title`() = runApplicationTest {
@@ -45,7 +42,7 @@ class WindowParameterTest {
 
         var title by mutableStateOf("Title1")
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, title = title) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -71,7 +68,7 @@ class WindowParameterTest {
 
         var icon: Painter? by mutableStateOf(redIcon)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, icon = icon) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -97,7 +94,7 @@ class WindowParameterTest {
     fun `set undecorated`() = runApplicationTest {
         var window: ComposeWindow? = null
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, undecorated = false) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -116,7 +113,7 @@ class WindowParameterTest {
 
         var resizable by mutableStateOf(false)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, resizable = resizable) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -139,7 +136,7 @@ class WindowParameterTest {
 
         var enabled by mutableStateOf(false)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, enabled = enabled) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -162,7 +159,7 @@ class WindowParameterTest {
 
         var focusable by mutableStateOf(false)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, focusable = focusable) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -185,7 +182,7 @@ class WindowParameterTest {
 
         var alwaysOnTop by mutableStateOf(false)
 
-        launchApplication {
+        launchTestApplication {
             Window(onCloseRequest = ::exitApplication, alwaysOnTop = alwaysOnTop) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))

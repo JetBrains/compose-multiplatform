@@ -25,16 +25,16 @@ import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.ui.awaitEDT
 import java.awt.GraphicsEnvironment
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import kotlinx.coroutines.yield
 import org.jetbrains.skiko.MainUIDispatcher
 import org.junit.Assume.assumeFalse
+import androidx.compose.ui.window.launchApplication as realLaunchApplication
+
 
 internal fun runApplicationTest(
     /**
@@ -63,8 +63,11 @@ internal fun runApplicationTest(
             val exceptionHandler = TestExceptionHandler()
             withExceptionHandler(exceptionHandler) {
                 val scope = WindowTestScope(this, useDelay, hasAnimations, exceptionHandler)
-                scope.body()
-                scope.exitTestApplication()
+                try {
+                    scope.body()
+                } finally {
+                    scope.exitTestApplication()
+                }
             }
             exceptionHandler.throwIfCaught()
         }
@@ -111,19 +114,23 @@ internal class WindowTestScope(
     var isOpen by mutableStateOf(true)
     private val initialRecomposers = Recomposer.runningRecomposers.value
 
-    // TODO(demin) replace launchApplication to launchTestApplication in all tests,
-    //  because we don't close the window with simple launchApplication
     fun launchTestApplication(
         content: @Composable ApplicationScope.() -> Unit
-    ) = launchApplication {
+    ) = realLaunchApplication {
         if (isOpen) {
             content()
         }
     }
 
-    // TODO(demin) remove when we migrate from launchApplication to launchTestApplication (see TODO above)
-    fun exitApplication() {
-        isOpen = false
+    // Overload `launchApplication` to prohibit calling it from tests
+    @Deprecated(
+        "Do not use `launchApplication` from tests; use `launchTestApplication` instead",
+        level = DeprecationLevel.ERROR
+    )
+    fun launchApplication(
+        @Suppress("UNUSED_PARAMETER") content: @Composable ApplicationScope.() -> Unit
+    ): Nothing {
+        error("Do not use `launchApplication` from tests; use `launchTestApplication` instead")
     }
 
     fun exitTestApplication() {

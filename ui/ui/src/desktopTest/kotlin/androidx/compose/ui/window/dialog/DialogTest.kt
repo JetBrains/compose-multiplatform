@@ -44,7 +44,6 @@ import androidx.compose.ui.sendKeyEvent
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberDialogState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
@@ -60,7 +59,7 @@ class DialogTest {
     fun `open and close custom dialog`() = runApplicationTest {
         var window: ComposeDialog? = null
 
-        launchApplication {
+        launchTestApplication {
             var isOpen by remember { mutableStateOf(true) }
 
             fun createWindow() = ComposeDialog().apply {
@@ -98,7 +97,7 @@ class DialogTest {
         var isOpen by mutableStateOf(true)
         var title by mutableStateOf("Title1")
 
-        launchApplication {
+        launchTestApplication {
             fun createWindow() = ComposeDialog().apply {
                 size = Dimension(300, 200)
 
@@ -136,7 +135,7 @@ class DialogTest {
     fun `open and close dialog`() = runApplicationTest {
         var window: ComposeDialog? = null
 
-        launchApplication {
+        launchTestApplication {
             Dialog(onCloseRequest = ::exitApplication) {
                 window = this.window
                 Box(Modifier.size(32.dp).background(Color.Red))
@@ -155,7 +154,7 @@ class DialogTest {
         var isCloseCalled by mutableStateOf(false)
         var window: ComposeDialog? = null
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Dialog(
                     onCloseRequest = {
@@ -188,7 +187,7 @@ class DialogTest {
         var isOpen by mutableStateOf(true)
         var isLoading by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 if (isLoading) {
                     Dialog(onCloseRequest = {}) {
@@ -226,7 +225,7 @@ class DialogTest {
 
         var isOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Dialog(onCloseRequest = {}) {
                     window1 = this.window
@@ -258,7 +257,7 @@ class DialogTest {
         var isOpen by mutableStateOf(true)
         var isNestedOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Dialog(
                     onCloseRequest = {},
@@ -313,7 +312,7 @@ class DialogTest {
         var testValue by mutableStateOf(0)
         val localTestValue = compositionLocalOf { testValue }
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 CompositionLocalProvider(localTestValue provides testValue) {
                     Dialog(
@@ -358,7 +357,7 @@ class DialogTest {
 
         var isOpen by mutableStateOf(true)
 
-        launchApplication {
+        launchTestApplication {
             if (isOpen) {
                 Dialog(onCloseRequest = {}) {
                     DisposableEffect(Unit) {
@@ -392,7 +391,7 @@ class DialogTest {
             onPreviewKeyEventKeys.clear()
         }
 
-        launchApplication {
+        launchTestApplication {
             Dialog(
                 onCloseRequest = ::exitApplication,
                 onPreviewKeyEvent = {
@@ -426,8 +425,6 @@ class DialogTest {
         awaitIdle()
         assertThat(onPreviewKeyEventKeys).isEqualTo(setOf(Key.E))
         assertThat(onKeyEventKeys).isEqualTo(setOf(Key.E))
-
-        exitApplication()
     }
 
     @Test
@@ -445,7 +442,7 @@ class DialogTest {
             onNodePreviewKeyEventKeys.clear()
         }
 
-        launchApplication {
+        launchTestApplication {
             Dialog(
                 onCloseRequest = ::exitApplication,
                 onPreviewKeyEvent = {
@@ -520,8 +517,6 @@ class DialogTest {
         assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.T))
         assertThat(onNodeKeyEventKeys).isEqualTo(setOf(Key.T))
         assertThat(onWindowKeyEventKeys).isEqualTo(setOf(Key.T))
-
-        exitApplication()
     }
 
     @Test(timeout = 30000)
@@ -531,7 +526,7 @@ class DialogTest {
         var isVisibleOnFirstComposition = false
         var isVisibleOnFirstDraw = false
 
-        launchApplication {
+        launchTestApplication {
             Dialog(onCloseRequest = ::exitApplication) {
                 if (!isComposed) {
                     isVisibleOnFirstComposition = window.isVisible
@@ -550,7 +545,5 @@ class DialogTest {
         awaitIdle()
         assertThat(isVisibleOnFirstComposition).isFalse()
         assertThat(isVisibleOnFirstDraw).isFalse()
-
-        exitApplication()
     }
 }

@@ -46,7 +46,6 @@ import androidx.compose.ui.sendMouseWheelEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.density
-import androidx.compose.ui.window.launchApplication
 import androidx.compose.ui.window.rememberWindowState
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
@@ -78,7 +77,7 @@ class WindowInputEventTest {
             onPreviewKeyEventKeys.clear()
         }
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 onPreviewKeyEvent = {
@@ -112,8 +111,6 @@ class WindowInputEventTest {
         awaitIdle()
         assertThat(onPreviewKeyEventKeys).isEqualTo(setOf(Key.E))
         assertThat(onKeyEventKeys).isEqualTo(setOf(Key.E))
-
-        exitApplication()
     }
 
     @Test
@@ -131,7 +128,7 @@ class WindowInputEventTest {
             onNodePreviewKeyEventKeys.clear()
         }
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 onPreviewKeyEvent = {
@@ -206,8 +203,6 @@ class WindowInputEventTest {
         assertThat(onNodePreviewKeyEventKeys).isEqualTo(setOf(Key.T))
         assertThat(onNodeKeyEventKeys).isEqualTo(setOf(Key.T))
         assertThat(onWindowKeyEventKeys).isEqualTo(setOf(Key.T))
-
-        exitApplication()
     }
 
     @Test
@@ -216,7 +211,7 @@ class WindowInputEventTest {
 
         val events = mutableListOf<PointerEvent>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -267,8 +262,6 @@ class WindowInputEventTest {
         assertThat(events[4].type).isEqualTo(PointerEventType.Release)
         assertThat(events[4].pressed).isEqualTo(false)
         assertThat(events[4].position).isEqualTo(Offset(80 * density, 30 * density))
-
-        exitApplication()
     }
 
     @Test
@@ -279,7 +272,7 @@ class WindowInputEventTest {
         var onEnters = 0
         var onExits = 0
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -332,8 +325,6 @@ class WindowInputEventTest {
 //        assertThat(onMoves.size).isEqualTo(2)
 //        assertThat(onEnters).isEqualTo(1)
 //        assertThat(onExits).isEqualTo(1)
-
-        exitApplication()
     }
 
     @Test
@@ -342,7 +333,7 @@ class WindowInputEventTest {
 
         val deltas = mutableListOf<Offset>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -371,8 +362,6 @@ class WindowInputEventTest {
         awaitIdle()
         assertThat(deltas.size).isEqualTo(2)
         assertThat(deltas.last()).isEqualTo(Offset(0f, -1f))
-
-        exitApplication()
     }
 
     @Test
@@ -381,7 +370,7 @@ class WindowInputEventTest {
 
         val deltas = mutableListOf<Offset>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -409,8 +398,6 @@ class WindowInputEventTest {
         awaitIdle()
         assertThat(deltas.size).isEqualTo(eventCount)
         assertThat(deltas.all { it == Offset(0f, 1f) }).isTrue()
-
-        exitApplication()
     }
 
     @Test
@@ -419,7 +406,7 @@ class WindowInputEventTest {
 
         val deltas = mutableListOf<Offset>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -447,8 +434,6 @@ class WindowInputEventTest {
         awaitIdle()
         assertThat(deltas.size).isEqualTo(1)
         assertThat(deltas.first()).isEqualTo(Offset(0f, 1f))
-
-        exitApplication()
     }
 
     @Test(timeout = 5000)
@@ -458,7 +443,7 @@ class WindowInputEventTest {
         val receivedButtons = mutableListOf<PointerButtons>()
         val receivedKeyboardModifiers = mutableListOf<PointerKeyboardModifiers>()
 
-        launchApplication {
+        launchTestApplication {
             Window(
                 onCloseRequest = ::exitApplication,
                 state = rememberWindowState(width = 200.dp, height = 100.dp)
@@ -494,7 +479,7 @@ class WindowInputEventTest {
         assertThat(receivedButtons.size).isEqualTo(1)
         assertThat(receivedButtons.last()).isEqualTo(
             PointerButtons(
-                // on macOs ctrl + primary click is treated as secondary click
+                // on macOS ctrl + primary click is treated as secondary click
                 isPrimaryPressed = !hostOs.isMacOS,
                 isSecondaryPressed = true,
             )
@@ -521,7 +506,7 @@ class WindowInputEventTest {
         assertThat(receivedButtons.size).isEqualTo(2)
         assertThat(receivedButtons.last()).isEqualTo(
             PointerButtons(
-                // on macOs ctrl + primary click is treated as secondary click
+                // on macOS ctrl + primary click is treated as secondary click
                 isPrimaryPressed = !hostOs.isMacOS,
                 isSecondaryPressed = true,
             )
@@ -536,8 +521,6 @@ class WindowInputEventTest {
                 isNumLockOn = getLockingKeyStateSafe(KeyEvent.VK_NUM_LOCK),
             )
         )
-
-        exitApplication()
     }
 
     @Test
@@ -609,8 +592,8 @@ class WindowInputEventTest {
         }
         awaitIdle()
 
-        window.sendMouseEvent(id = MouseEvent.MOUSE_PRESSED, x = 1, y = 1)
-        window.sendMouseEvent(id = MouseEvent.MOUSE_RELEASED, x = 21, y = 1)
+        window.sendMouseEvent(id = MOUSE_PRESSED, x = 1, y = 1)
+        window.sendMouseEvent(id = MOUSE_RELEASED, x = 21, y = 1)
 
         assertThat(box1ReleaseCount).isEqualTo(0)
         assertThat(box2ReleaseCount).isEqualTo(1)
