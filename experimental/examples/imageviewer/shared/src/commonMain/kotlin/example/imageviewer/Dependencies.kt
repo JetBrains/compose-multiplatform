@@ -19,18 +19,13 @@ abstract class Dependencies {
     abstract val notification: Notification
     abstract fun getDiskImage(picture: DiskPicture): ImageBitmap
     val imageProvider: ImageProvider = object : ImageProvider {
-        val providers = buildList {
-            addStorageAdapter<ResourcePicture> { resource(it.resource).readBytes().toImageBitmap() }
-            addStorageAdapter<DiskPicture> { getDiskImage(it) }
-        }
-
-        override suspend fun getImage(picture: PictureData): ImageBitmap {
-            return providers.getImage(picture)
-        }
-
-        override suspend fun getThumbnail(picture: PictureData): ImageBitmap {
-            return providers.getImage(picture)
-        }
+        override suspend fun getImage(picture: PictureData): ImageBitmap =
+            when(picture) {
+                is ResourcePicture -> resource(picture.resource).readBytes().toImageBitmap()
+                is DiskPicture -> getDiskImage(picture)
+            }
+        override suspend fun getThumbnail(picture: PictureData): ImageBitmap =
+            getImage(picture)
     }
 }
 
