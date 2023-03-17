@@ -13,15 +13,11 @@ import javax.swing.SwingUtilities
 @ExperimentalComposeUiApi
 object DefaultWindowExceptionHandlerFactory : WindowExceptionHandlerFactory {
     override fun exceptionHandler(window: Window) = WindowExceptionHandler { throwable ->
-        // invokeLater here to dispatch a blocking operation (showMessageDialog)
+        // invokeLater here to dispatch a blocking operation
         SwingUtilities.invokeLater {
-            JOptionPane.showMessageDialog(
-                // if there was an error during window init, we can't use it as a parent,
-                // otherwise we will have two exceptions in the log
-                window.takeIf { it.isDisplayable },
-                throwable.message ?: "Unknown error", "Error",
-                JOptionPane.ERROR_MESSAGE
-            )
+            // if there was an error during window init, we can't use it as a parent,
+            // otherwise we will have two exceptions in the log
+            showErrorDialog(window.takeIf { it.isDisplayable }, throwable)
             window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
         }
         throw throwable
@@ -45,4 +41,16 @@ fun interface WindowExceptionHandlerFactory {
 @ExperimentalComposeUiApi
 val LocalWindowExceptionHandlerFactory = staticCompositionLocalOf<WindowExceptionHandlerFactory> {
     DefaultWindowExceptionHandlerFactory
+}
+
+private fun showErrorDialog(parentComponent: Window?, throwable: Throwable) {
+    val title = "Error"
+    val message = throwable.message ?: "Unknown error"
+    val pane = object : JOptionPane(message, ERROR_MESSAGE) {
+        // Limit width for long messages
+        override fun getMaxCharactersPerLineCount(): Int = 120
+    }
+    val dialog = pane.createDialog(parentComponent, title)
+    dialog.isVisible = true
+    dialog.dispose()
 }
