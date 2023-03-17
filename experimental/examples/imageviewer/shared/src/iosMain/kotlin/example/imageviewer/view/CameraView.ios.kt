@@ -14,7 +14,6 @@ import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ImageStorage
 import example.imageviewer.IosStorableImage
-import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GeoPos
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.*
@@ -22,16 +21,13 @@ import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
 import platform.CoreFoundation.*
-import platform.CoreGraphics.CGImageRef
 import platform.CoreGraphics.CGRect
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
 import platform.Foundation.*
-import platform.ImageIO.*
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.*
-import platform.UniformTypeIdentifiers.UTTypeJPEG
 import platform.darwin.NSObject
 
 private sealed interface CameraAccess {
@@ -112,7 +108,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 val randomFileName =
                     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
                 storage.saveImage(
-                    PictureData.Storage(
+                    PictureData.Camera(
                         fileName = randomFileName,
                         name = "Kotlin Conf",
                         description = "Kotlin Conf photo description",

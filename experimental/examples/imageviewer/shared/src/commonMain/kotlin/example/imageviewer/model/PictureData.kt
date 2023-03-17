@@ -18,7 +18,7 @@ sealed interface PictureData {
         override val geo: GeoPos
     ) : PictureData
 
-    class Storage(
+    class Camera(
         val fileName: String,
         override val name: String,
         override val description: String,

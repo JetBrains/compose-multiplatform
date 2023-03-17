@@ -1,7 +1,8 @@
 package example.imageviewer
 
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.input.pointer.PointerInputScope
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
@@ -18,11 +19,13 @@ abstract class Dependencies {
     abstract val localization: Localization
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
+    val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
-                is PictureData.Resource -> resource(picture.resource).readBytes().toImageBitmap()
-                is PictureData.Storage -> imageStorage.getImage(picture)
-            }
+            is PictureData.Resource -> resource(picture.resource).readBytes().toImageBitmap()
+            is PictureData.Camera -> imageStorage.getImage(picture)
+        }
+
         override suspend fun getThumbnail(picture: PictureData): ImageBitmap = getImage(picture)
     }
 }
@@ -88,6 +91,6 @@ interface ImageProvider {
 }
 
 interface ImageStorage {
-    suspend fun getImage(picture: PictureData.Storage): ImageBitmap
-    fun saveImage(picture: PictureData, image: PlatformStorableImage)
+    suspend fun getImage(picture: PictureData.Camera): ImageBitmap
+    fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
 }

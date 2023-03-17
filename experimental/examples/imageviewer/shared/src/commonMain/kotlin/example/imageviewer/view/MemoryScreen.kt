@@ -24,6 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.Dependencies
 import example.imageviewer.ImageProvider
 import example.imageviewer.Localization
 import example.imageviewer.model.*
@@ -34,6 +35,7 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun MemoryScreen(
+    dependencies: Dependencies,
     memoryPage: MemoryPage,
     getImage: suspend (PictureData) -> ImageBitmap,
     localization: Localization,
@@ -42,14 +44,12 @@ internal fun MemoryScreen(
     onHeaderClick: (PictureData) -> Unit,
     imageProvider: ImageProvider,
 ) {
-    val pictures = globalPictures
-    val picture = pictures.first()
-    var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
-    LaunchedEffect(picture) {
-        headerImage = getImage(picture)
+    var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
+    LaunchedEffect(memoryPage.picture) {
+        headerImage = getImage(memoryPage.picture)
     }
     Box {
-        val scrollState = memoryPage.scrollState
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -82,7 +82,7 @@ internal fun MemoryScreen(
                         """.trimIndent()
                     )
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, imageProvider,  onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(dependencies.pictures, imageProvider,  onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(

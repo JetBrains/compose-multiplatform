@@ -67,14 +67,14 @@ internal fun GalleryScreen(
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             when (galleryPage.galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
-                    images = globalPictures,
+                    images = dependencies.pictures,
                     selectedImage = galleryPage.pictureId,
                     onSelect = { galleryPage.selectPicture(it) },
                     imageProvider = dependencies.imageProvider
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
-                    pictures = globalPictures,
+                    pictures = dependencies.pictures,
                     dependencies = dependencies,
                     onSelect = { galleryPage.selectPicture(it) },
                     onFullScreen = { onClickPreviewPicture(it) },
@@ -86,9 +86,6 @@ internal fun GalleryScreen(
                 onClick = onMakeNewMemory,
             )
         }
-    }
-    if (globalPictures.isEmpty()) {
-        LoadingScreen(dependencies.localization.loading)
     }
 }
 

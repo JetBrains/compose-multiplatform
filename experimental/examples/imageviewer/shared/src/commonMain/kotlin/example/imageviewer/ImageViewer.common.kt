@@ -33,7 +33,7 @@ internal fun ImageViewerCommon(
     dependencies: Dependencies,
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
-    val rootGalleryPage = GalleryPage(externalEvents)
+    val rootGalleryPage = GalleryPage(dependencies, externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -65,7 +65,7 @@ internal fun ImageViewerCommon(
 
                 is FullScreenPage -> {
                     FullscreenImage(
-                        galleryId = page.picture,
+                        picture = page.picture,
                         getImage = { dependencies.imageProvider.getImage(it) },
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
@@ -77,6 +77,7 @@ internal fun ImageViewerCommon(
 
                 is MemoryPage -> {
                     MemoryScreen(
+                        dependencies = dependencies,
                         memoryPage = page,
                         getImage = { dependencies.imageProvider.getImage(it) },
                         localization = dependencies.localization,

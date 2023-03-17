@@ -26,7 +26,6 @@ import io.ktor.client.engine.darwin.Darwin
 import kotlinx.cinterop.CPointer
 import kotlinx.coroutines.CoroutineScope
 import platform.CoreFoundation.*
-import platform.CoreGraphics.CGImageRef
 import platform.Foundation.CFBridgingRelease
 import platform.Foundation.CFBridgingRetain
 import platform.Foundation.NSData
@@ -86,12 +85,12 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
     }
 
     override val imageStorage: ImageStorage = object : ImageStorage {
-        val map: MutableMap<PictureData.Storage, NSData> = mutableMapOf()
-        override suspend fun getImage(picture: PictureData.Storage): ImageBitmap {
+        val map: MutableMap<PictureData.Camera, NSData> = mutableMapOf()
+        override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
             return map[picture]!!.fetchImageFrom()
         }
 
-        override fun saveImage(picture: PictureData, image: PlatformStorableImage) {
+        override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
             val updatedData: NSData = attachGPSTo(photoData = image.data, picture.geo)
             // todo attach name and description
         }

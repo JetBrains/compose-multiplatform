@@ -4,6 +4,7 @@ import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
 import example.imageviewer.view.GalleryStyle
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +19,8 @@ class CameraPage : Page()
 
 class FullScreenPage(val picture: PictureData) : Page()
 
-class GalleryPage(
+class GalleryPage(//todo delete
+    val dependencies: Dependencies,
     val externalEvents: Flow<ExternalImageViewerEvent>
 ) : Page() {
     var galleryStyle by mutableStateOf(GalleryStyle.SQUARES)
@@ -30,28 +32,28 @@ class GalleryPage(
 
     var currentPictureIndex by mutableStateOf(0)
 
-    val picture get(): PictureData? = globalPictures.getOrNull(currentPictureIndex)
+    val picture get(): PictureData? = dependencies.pictures.getOrNull(currentPictureIndex)
 
     val galleryEntry: PictureData?
-        get() = globalPictures.getOrNull(currentPictureIndex)
+        get() = dependencies.pictures.getOrNull(currentPictureIndex)
 
     @Deprecated("")
     val pictureId
-        get(): PictureData? = globalPictures.getOrNull(
+        get(): PictureData? = dependencies.pictures.getOrNull(
             currentPictureIndex
         )
 
     fun nextImage() {
         currentPictureIndex =
-            (currentPictureIndex + 1).mod(globalPictures.lastIndex)
+            (currentPictureIndex + 1).mod(dependencies.pictures.lastIndex)
     }
 
     fun previousImage() {
         currentPictureIndex =
-            (currentPictureIndex - 1).mod(globalPictures.lastIndex)
+            (currentPictureIndex - 1).mod(dependencies.pictures.lastIndex)
     }
 
     fun selectPicture(galleryId: PictureData) {
-        currentPictureIndex = globalPictures.indexOfFirst { it == galleryId }
+        currentPictureIndex = dependencies.pictures.indexOfFirst { it == galleryId }
     }
 }

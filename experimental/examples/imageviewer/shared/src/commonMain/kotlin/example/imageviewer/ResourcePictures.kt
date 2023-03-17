@@ -1,9 +1,9 @@
-package example.imageviewer.model
+package example.imageviewer
 
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.snapshots.SnapshotStateList
+import example.imageviewer.model.GeoPos
+import example.imageviewer.model.PictureData
 
-val resourcePictures = listOf<PictureData.Resource>(
+val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "1.jpg",
         name = "Taranaki",
@@ -165,6 +165,3 @@ val resourcePictures = listOf<PictureData.Resource>(
         geo = GeoPos(59.3364318, 18.0587228)
     ),
 )
-
-val globalPictures: SnapshotStateList<PictureData> =//todo not global
-    mutableStateListOf(*resourcePictures.toTypedArray())

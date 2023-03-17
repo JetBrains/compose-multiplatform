@@ -29,21 +29,18 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun FullscreenImage(
-    galleryId: PictureData?,
+    picture: PictureData,
     getImage: suspend (PictureData) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
 ) {
-    val picture = globalPictures.first { it == galleryId }
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
-    val originalImageState = remember(galleryId) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(galleryId) {
-        if (galleryId != null) {
-            originalImageState.value = getImage(picture)
-        }
+    val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(picture) {
+        originalImageState.value = getImage(picture)
     }
 
     val originalImage = originalImageState.value
