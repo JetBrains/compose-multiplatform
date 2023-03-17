@@ -40,7 +40,7 @@ internal fun MemoryScreen(
     onSelectRelatedMemory: (PictureData) -> Unit,
     onBack: () -> Unit,
     onHeaderClick: (PictureData) -> Unit,
-    storage: ImageProvider,
+    imageProvider: ImageProvider,
 ) {
     val pictures = globalPictures
     val picture = pictures.first()
@@ -82,7 +82,7 @@ internal fun MemoryScreen(
                         """.trimIndent()
                     )
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, storage,  onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(pictures, imageProvider,  onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -233,7 +233,7 @@ internal fun Headliner(s: String) {
 @Composable
 internal fun RelatedMemoriesVisualizer(
     ps: List<PictureData>,
-    storage: ImageProvider,
+    imageProvider: ImageProvider,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
@@ -244,7 +244,7 @@ internal fun RelatedMemoriesVisualizer(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(ps) { idx, item ->
-                RelatedMemory(idx, item, storage, onSelectRelatedMemory)
+                RelatedMemory(idx, item, imageProvider, onSelectRelatedMemory)
             }
         }
     }
@@ -254,13 +254,13 @@ internal fun RelatedMemoriesVisualizer(
 internal fun RelatedMemory(
     index: Int,
     galleryEntry: PictureData,
-    storage: ImageProvider,
+    imageProvider: ImageProvider,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
         SquareMiniature(
             picture = galleryEntry,
-            storage = storage,
+            imageProvider = imageProvider,
             isHighlighted = false,
             onClick = { onSelectRelatedMemory(galleryEntry) })
     }

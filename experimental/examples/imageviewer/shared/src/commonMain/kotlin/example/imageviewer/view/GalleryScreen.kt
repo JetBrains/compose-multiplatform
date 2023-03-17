@@ -70,7 +70,7 @@ internal fun GalleryScreen(
                     images = globalPictures,
                     selectedImage = galleryPage.pictureId,
                     onSelect = { galleryPage.selectPicture(it) },
-                    storage = dependencies.imageProvider
+                    imageProvider = dependencies.imageProvider
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
@@ -97,7 +97,7 @@ private fun SquaresGalleryView(
     images: List<PictureData>,
     selectedImage: PictureData?,
     onSelect: (PictureData) -> Unit,
-    storage: ImageProvider,
+    imageProvider: ImageProvider,
 ) {
     Column {
         Spacer(Modifier.height(4.dp))
@@ -110,7 +110,7 @@ private fun SquaresGalleryView(
                 val isSelected = picture == selectedImage
                 SquareMiniature(
                     picture = picture,
-                    storage = storage,
+                    imageProvider = imageProvider,
                     onClick = { onSelect(picture) },
                     isHighlighted = isSelected
                 )
@@ -121,7 +121,7 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun SquareMiniature(picture: PictureData, storage: ImageProvider, isHighlighted: Boolean, onClick: () -> Unit) {
+internal fun SquareMiniature(picture: PictureData, imageProvider: ImageProvider, isHighlighted: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.aspectRatio(1.0f).clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
@@ -129,7 +129,7 @@ internal fun SquareMiniature(picture: PictureData, storage: ImageProvider, isHig
         MiniatureImage(
             modifier = Modifier.fillMaxSize(),
             picture = picture,
-            storage = storage,
+            imageProvider = imageProvider,
         )
         if (isHighlighted) {
             Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack))
@@ -180,7 +180,7 @@ private fun ListGalleryView(
                 onClickInfo = {
                     dependencies.notification.notifyImageData(p.value)
                 },
-                storage = dependencies.imageProvider
+                imageProvider = dependencies.imageProvider
             )
             Spacer(modifier = Modifier.height(10.dp))
         }

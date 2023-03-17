@@ -12,11 +12,11 @@ import example.imageviewer.model.PictureData
 fun MiniatureImage(
     modifier: Modifier,
     picture: PictureData,
-    storage: ImageProvider,
+    imageProvider: ImageProvider,
 ) {
     var imageBitmap by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(Unit) {
-        imageBitmap = storage.getThumbnail(picture)
+        imageBitmap = imageProvider.getThumbnail(picture)
     }
     if (imageBitmap != null) {
         Tooltip(picture.name) {

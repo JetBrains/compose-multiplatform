@@ -89,7 +89,7 @@ internal fun ImageViewerCommon(
                         onHeaderClick = { galleryId ->
                             navigationStack.push(FullScreenPage(galleryId))
                         },
-                        storage = dependencies.imageProvider
+                        imageProvider = dependencies.imageProvider
                     )
                 }
 
