@@ -1,19 +1,27 @@
 package example.imageviewer
 
+import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.serialization.json.Json
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.resource
 
-interface Dependencies {
-    val httpClient: HttpClient
-    val ioScope: CoroutineScope
-    fun getFilter(type: FilterType): BitmapFilter
-    val localization: Localization
-    val notification: Notification
-    val storage: List<BitmapStorage>
+@OptIn(ExperimentalResourceApi::class)
+abstract class Dependencies {
+    abstract val httpClient: HttpClient
+    abstract val ioScope: CoroutineScope
+    abstract fun getFilter(type: FilterType): BitmapFilter
+    abstract val localization: Localization
+    abstract val notification: Notification
+    abstract fun getDiskImage(picture: DiskPicture): ImageBitmap
+    val storage: List<BitmapStorage> = buildList {
+        addStorageAdapter<ResourcePicture> { resource(it.resource).readBytes().toImageBitmap() }
+        addStorageAdapter<DiskPicture> { getDiskImage(it) }
+    }
 }
 
 interface Notification {

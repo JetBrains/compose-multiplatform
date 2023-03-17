@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -89,7 +90,7 @@ fun ApplicationScope.ImageViewerDesktop() {
 }
 
 private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
-    object : Dependencies {
+    object : Dependencies() {
         override val ioScope: CoroutineScope = ioScope
         override fun getFilter(type: FilterType): BitmapFilter = when (type) {
             FilterType.GrayScale -> GrayScaleFilter()
@@ -117,13 +118,13 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
 
         val userHome: String? = System.getProperty("user.home")
 
-        override val storage = buildList {
-            addStorageAdapter<ResourcePicture> { ResourcesStorage.getImage(it) }
-            addStorageAdapter<DiskPicture> { InMemoryStorage.getImage(it) }
-        }
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
+        }
+
+        override fun getDiskImage(picture: DiskPicture): ImageBitmap {
+            TODO("implement getDiskImage")
         }
     }
