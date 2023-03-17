@@ -27,14 +27,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.model.Picture
+import example.imageviewer.model.PictureData
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    picture: Picture?,
+    picture: PictureData?,
     onClick: () -> Unit,
-    getImage: suspend (Picture) -> ImageBitmap
+    getImage: suspend (PictureData) -> ImageBitmap
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     Box(

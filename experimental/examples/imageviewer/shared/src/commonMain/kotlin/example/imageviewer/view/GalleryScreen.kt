@@ -34,7 +34,7 @@ enum class GalleryStyle {
 internal fun GalleryScreen(
     galleryPage: GalleryPage,
     dependencies: Dependencies,
-    onClickPreviewPicture: (Picture) -> Unit,
+    onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
     LaunchedEffect(Unit) {
@@ -93,10 +93,10 @@ internal fun GalleryScreen(
 
 @Composable
 private fun SquaresGalleryView(
-    images: List<Picture>,
-    selectedImage: Picture?,
-    onSelect: (Picture) -> Unit,
-    storage: ImageStorage<Picture>,
+    images: List<PictureData>,
+    selectedImage: PictureData?,
+    onSelect: (PictureData) -> Unit,
+    storage: List<BitmapStorage>,
 ) {
     Column {
         Spacer(Modifier.height(4.dp))
@@ -120,7 +120,7 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun SquareMiniature(picture: Picture, storage: ImageStorage<Picture>, isHighlighted: Boolean, onClick: () -> Unit) {
+internal fun SquareMiniature(picture: PictureData, storage: List<BitmapStorage>, isHighlighted: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.aspectRatio(1.0f).clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
@@ -158,10 +158,10 @@ internal fun SquareMiniature(picture: Picture, storage: ImageStorage<Picture>, i
 
 @Composable
 private fun ListGalleryView(
-    pictures: List<Picture>,
+    pictures: List<PictureData>,
     dependencies: Dependencies,
-    onSelect: (Picture) -> Unit,
-    onFullScreen: (Picture) -> Unit,
+    onSelect: (PictureData) -> Unit,
+    onFullScreen: (PictureData) -> Unit,
 ) {
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()

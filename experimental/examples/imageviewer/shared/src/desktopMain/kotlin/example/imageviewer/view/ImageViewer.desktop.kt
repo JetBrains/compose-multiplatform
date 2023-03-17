@@ -120,7 +120,10 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
 
         val userHome: String? = System.getProperty("user.home")
 
-        override val storage: ImageStorage<Picture> = ImageStorageFacade(InMemoryStorage)
+        override val storage = buildList {
+            addStorageAdapter<ResourcePicture> { ResourcesStorage.getImage(it) }
+            addStorageAdapter<InMemoryPicture> { InMemoryStorage.getImage(it) }
+        }
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)

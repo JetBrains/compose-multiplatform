@@ -9,7 +9,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -18,22 +17,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import example.imageviewer.model.BitmapStorage
 import example.imageviewer.model.ImageStorage
-import example.imageviewer.model.Picture
+import example.imageviewer.model.PictureData
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun Miniature(
-    picture: Picture,
+    picture: PictureData,
     onClickSelect: () -> Unit,
     onClickFullScreen: () -> Unit,
     onClickInfo: () -> Unit,
-    storage: ImageStorage<Picture>,
+    storage: List<BitmapStorage>,
 ) {
     Card(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).height(70.dp)

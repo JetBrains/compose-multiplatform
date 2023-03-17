@@ -13,7 +13,7 @@ interface Dependencies {
     fun getFilter(type: FilterType): BitmapFilter
     val localization: Localization
     val notification: Notification
-    val storage: ImageStorage<Picture>
+    val storage: List<BitmapStorage>
 }
 
 interface Notification {
@@ -23,7 +23,7 @@ interface Notification {
     fun notifyLoadImageUnavailable()
     fun notifyLastImage()
     fun notifyFirstImage()
-    fun notifyImageData(picture: Picture)
+    fun notifyImageData(picture: PictureData)
     fun notifyRefreshUnavailable()
 }
 
@@ -43,7 +43,7 @@ abstract class PopupNotification(private val localization: Localization) : Notif
 
     override fun notifyLastImage() = showPopUpMessage(localization.lastImage)
     override fun notifyFirstImage() = showPopUpMessage(localization.firstImage)
-    override fun notifyImageData(picture: Picture) = showPopUpMessage(
+    override fun notifyImageData(picture: PictureData) = showPopUpMessage(
         "${localization.picture} ${picture.name}"
     )
 

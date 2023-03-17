@@ -1,21 +1,13 @@
 package example.imageviewer.model
 
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.painter.Painter
-import example.imageviewer.toImageBitmap
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
-import org.jetbrains.compose.resources.resource
-
 class ResourcePicture(
     val resource: String,
     override val name: String,
     override val description: String,
     override val geo: GeoPos
-) : Picture
+) : PictureData
 
-val resourcePictures = listOf(
+val resourcePictures = listOf<PictureData>(
     ResourcePicture(
         resource = "1.jpg",
         name = "Taranaki",

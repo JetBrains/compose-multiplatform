@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 sealed class Page
 
-class MemoryPage(val picture: Picture) : Page() {
+class MemoryPage(val picture: PictureData) : Page() {
     val scrollState = ScrollState(0)
 }
 
 class CameraPage : Page()
 
-class FullScreenPage(val picture: Picture) : Page()
+class FullScreenPage(val picture: PictureData) : Page()
 
 class GalleryPage(
     val externalEvents: Flow<ExternalImageViewerEvent>
@@ -30,14 +30,14 @@ class GalleryPage(
 
     var currentPictureIndex by mutableStateOf(0)
 
-    val picture get(): Picture? = globalPictures.getOrNull(currentPictureIndex)
+    val picture get(): PictureData? = globalPictures.getOrNull(currentPictureIndex)
 
-    val galleryEntry: Picture?
+    val galleryEntry: PictureData?
         get() = globalPictures.getOrNull(currentPictureIndex)
 
     @Deprecated("")
     val pictureId
-        get(): Picture? = globalPictures.getOrNull(
+        get(): PictureData? = globalPictures.getOrNull(
             currentPictureIndex
         )
 
@@ -51,7 +51,7 @@ class GalleryPage(
             (currentPictureIndex - 1).mod(globalPictures.lastIndex)
     }
 
-    fun selectPicture(galleryId: Picture) {
+    fun selectPicture(galleryId: PictureData) {
         currentPictureIndex = globalPictures.indexOfFirst { it == galleryId }
     }
 }

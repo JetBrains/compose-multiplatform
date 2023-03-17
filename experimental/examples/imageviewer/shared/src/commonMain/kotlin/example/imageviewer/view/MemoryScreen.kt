@@ -25,10 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.Localization
-import example.imageviewer.model.ImageStorage
-import example.imageviewer.model.MemoryPage
-import example.imageviewer.model.Picture
-import example.imageviewer.model.globalPictures
+import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -37,12 +34,12 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
-    getImage: suspend (Picture) -> ImageBitmap,
+    getImage: suspend (PictureData) -> ImageBitmap,
     localization: Localization,
-    onSelectRelatedMemory: (Picture) -> Unit,
+    onSelectRelatedMemory: (PictureData) -> Unit,
     onBack: () -> Unit,
-    onHeaderClick: (Picture) -> Unit,
-    storage: ImageStorage<Picture>,
+    onHeaderClick: (PictureData) -> Unit,
+    storage: List<BitmapStorage>,
 ) {
     val pictures = globalPictures
     val picture = pictures.first()
@@ -234,9 +231,9 @@ internal fun Headliner(s: String) {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<Picture>,
-    storage: ImageStorage<Picture>,
-    onSelectRelatedMemory: (Picture) -> Unit
+    ps: List<PictureData>,
+    storage: List<BitmapStorage>,
+    onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
@@ -255,9 +252,9 @@ internal fun RelatedMemoriesVisualizer(
 @Composable
 internal fun RelatedMemory(
     index: Int,
-    galleryEntry: Picture,
-    storage: ImageStorage<Picture>,
-    onSelectRelatedMemory: (Picture) -> Unit
+    galleryEntry: PictureData,
+    storage: List<BitmapStorage>,
+    onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
         SquareMiniature(

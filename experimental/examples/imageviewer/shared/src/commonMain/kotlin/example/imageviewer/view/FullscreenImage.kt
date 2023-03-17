@@ -29,8 +29,8 @@ import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun FullscreenImage(
-    galleryId: Picture?,
-    getImage: suspend (Picture) -> ImageBitmap,
+    galleryId: PictureData?,
+    getImage: suspend (PictureData) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
