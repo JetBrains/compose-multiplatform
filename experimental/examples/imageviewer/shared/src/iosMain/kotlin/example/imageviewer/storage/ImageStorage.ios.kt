@@ -9,6 +9,7 @@ import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.CPointer
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import platform.CoreFoundation.*
 import platform.Foundation.CFBridgingRelease
@@ -29,7 +30,6 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
     }
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
-        println("getImage")
         return withContext(Dispatchers.Default) {
             map[picture]!!.getImageBitmap()
         }
@@ -40,8 +40,13 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
         saveData = attachTextMetadata(saveData, picture.name, picture.description)
         //todo save picture data to disk (name, description, gps)
         picture.fileName
+        resizeImage(saveData)//todo save to disk as thumbnail ${picture.fileName}-small.jpg
         map[picture] = saveData
         pictures.add(picture)
+    }
+
+    fun resizeImage(original: NSData): NSData {
+        return original//todo
     }
 }
 
