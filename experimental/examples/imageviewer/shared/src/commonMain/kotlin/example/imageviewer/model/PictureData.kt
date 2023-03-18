@@ -1,5 +1,8 @@
 package example.imageviewer.model
 
+import kotlinx.serialization.Serializable
+
+@Serializable
 class GpsPosition(
     val latitude: Double,
     val longitude: Double,
@@ -18,6 +21,7 @@ sealed interface PictureData {
         override val gps: GpsPosition
     ) : PictureData
 
+    @Serializable
     class Camera(
         val fileName: String,
         override val name: String,

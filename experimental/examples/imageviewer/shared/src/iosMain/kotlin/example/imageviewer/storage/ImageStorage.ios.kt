@@ -9,8 +9,10 @@ import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.CPointer
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import platform.CoreFoundation.*
 import platform.Foundation.CFBridgingRelease
 import platform.Foundation.CFBridgingRetain
@@ -43,6 +45,10 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
         resizeImage(saveData)//todo save to disk as thumbnail ${picture.fileName}-small.jpg
         map[picture] = saveData
         pictures.add(picture)
+
+        // how to encode and decode json
+        val jsonStr = Json.Default.encodeToString(picture)
+        val picture2 = Json.Default.decodeFromString<PictureData.Camera>(jsonStr)
     }
 
     fun resizeImage(original: NSData): NSData {
