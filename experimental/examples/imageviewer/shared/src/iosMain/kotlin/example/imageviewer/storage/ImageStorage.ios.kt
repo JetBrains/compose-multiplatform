@@ -44,7 +44,6 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
         picture.fileName
         resizeImage(saveData)//todo save to disk as thumbnail ${picture.fileName}-small.jpg
         map[picture] = saveData
-        pictures.add(picture)
 
         // how to encode and decode json
         val jsonStr = Json.Default.encodeToString(picture)
