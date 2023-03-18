@@ -60,9 +60,18 @@ fun attachGPSTo(photoData: NSData, gps: GpsPosition): NSData {
     val mutableImageProperties: NSMutableDictionary = CFBridgingRelease(mutableImagePropertiesCF) as NSMutableDictionary
     val updatedProperties = CFBridgingRetain(mutableImageProperties) as CFDictionaryRef
     val destPhotoData = CFDataCreateMutable(null, 0)
-    val imageDestination = CGImageDestinationCreateWithData(destPhotoData, CFBridgingRetain(
-        UTTypeJPEG.identifier) as CFStringRef, 1, null)
-    CGImageDestinationAddImageFromSource(imageDestination, imageSource, 0, updatedProperties)
+    val imageDestination = CGImageDestinationCreateWithData(
+        data = destPhotoData,
+        type = CFBridgingRetain(UTTypeJPEG.identifier) as CFStringRef,
+        count = 1,
+        options = null
+    )
+    CGImageDestinationAddImageFromSource(
+        idst = imageDestination,
+        isrc = imageSource,
+        index = 0,
+        properties = updatedProperties
+    )
     CGImageDestinationFinalize(imageDestination)
     return CFBridgingRelease(destPhotoData) as NSData
 }

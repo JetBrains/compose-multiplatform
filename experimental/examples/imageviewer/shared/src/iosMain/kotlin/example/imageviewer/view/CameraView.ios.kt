@@ -181,8 +181,6 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
                     format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
                 )
-                photoSettings.setHighResolutionPhotoEnabled(true)
-                capturePhotoOutput.setHighResolutionCaptureEnabled(true)
                 capturePhotoOutput.capturePhotoWithSettings(
                     settings = photoSettings,
                     delegate = photoCaptureDelegate
