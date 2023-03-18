@@ -1,6 +1,6 @@
 package example.imageviewer.model
 
-class GeoPos(
+class GpsPosition(
     val latitude: Double,
     val longitude: Double,
     val timeStamp: Long = 0,//todo
@@ -9,20 +9,20 @@ class GeoPos(
 sealed interface PictureData {
     val name: String
     val description: String
-    val geo: GeoPos
+    val gps: GpsPosition
 
     class Resource(
         val resource: String,
         override val name: String,
         override val description: String,
-        override val geo: GeoPos
+        override val gps: GpsPosition
     ) : PictureData
 
     class Camera(
         val fileName: String,
         override val name: String,
         override val description: String,
-        override val geo: GeoPos
+        override val gps: GpsPosition
     ) : PictureData
 
 }

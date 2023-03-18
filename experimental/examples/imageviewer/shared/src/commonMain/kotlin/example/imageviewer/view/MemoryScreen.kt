@@ -90,7 +90,8 @@ internal fun MemoryScreen(
                             .clip(locationShape)
                             .border(1.dp, Color.Gray, locationShape)
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .height(200.dp),
+                        gps = memoryPage.picture.gps
                     )
                     Spacer(Modifier.height(50.dp))
                     Row(

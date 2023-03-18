@@ -14,7 +14,7 @@ import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ImageStorage
 import example.imageviewer.IosStorableImage
-import example.imageviewer.model.GeoPos
+import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.*
 import platform.AVFoundation.*
@@ -98,12 +98,12 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                     ?: error("fileDataRepresentation is null")
                 val location = locationManager.location
                 val geoPos = if (location != null) {
-                    GeoPos(
+                    GpsPosition(
                         latitude = location.coordinate.useContents { latitude },
                         longitude = location.coordinate.useContents { longitude }
                     )
                 } else {
-                    GeoPos(0.0, 0.0)
+                    GpsPosition(0.0, 0.0)
                 }
                 val randomFileName =
                     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
@@ -112,7 +112,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                         fileName = randomFileName,
                         name = "Kotlin Conf",
                         description = "Kotlin Conf photo description",
-                        geo = geoPos
+                        gps = geoPos
                     ),
                     IosStorableImage(photoData)
                 )
