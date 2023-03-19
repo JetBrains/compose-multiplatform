@@ -26,7 +26,10 @@ abstract class Dependencies {
             is PictureData.Camera -> imageStorage.getImage(picture)
         }
 
-        override suspend fun getThumbnail(picture: PictureData): ImageBitmap = getImage(picture)
+        override suspend fun getThumbnail(picture: PictureData): ImageBitmap = when (picture) {
+            is PictureData.Resource -> resource(picture.resource).readBytes().toImageBitmap()//todo small
+            is PictureData.Camera -> imageStorage.getThumbnail(picture)
+        }
     }
 }
 
@@ -92,5 +95,6 @@ interface ImageProvider {
 
 interface ImageStorage {
     suspend fun getImage(picture: PictureData.Camera): ImageBitmap
+    suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
     fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
 }

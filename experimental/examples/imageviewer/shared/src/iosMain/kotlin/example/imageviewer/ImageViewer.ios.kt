@@ -84,6 +84,6 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         }
     }
 
-    override val imageStorage: ImageStorage = IosImageStorage(pictures)
+    override val imageStorage: ImageStorage = IosImageStorage(pictures, ioScope)
 
 }
