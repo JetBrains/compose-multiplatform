@@ -18,10 +18,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.skia.Image
 import platform.CoreFoundation.*
-import platform.Foundation.CFBridgingRelease
-import platform.Foundation.CFBridgingRetain
-import platform.Foundation.NSData
-import platform.Foundation.NSMutableDictionary
+import platform.Foundation.*
 import platform.ImageIO.*
 import platform.UIKit.UIImage
 import platform.UIKit.UIImagePNGRepresentation
@@ -31,11 +28,28 @@ import platform.posix.memcpy
 class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage {
 
     //todo remove inmemory storage map
-    val map: MutableMap<PictureData.Camera, ByteArray> = mutableMapOf()
+    private val map: MutableMap<PictureData.Camera, ByteArray> = mutableMapOf()
+    private val fileManager = NSFileManager.defaultManager
+    private val relativePath = "ImageViewer/takenPhotos/"
 
     init {
         // todo read PictureData from disk and add them to pictures
         // pictures.add()
+    }
+
+    fun getRelativePathUrl(): NSURL {
+        val url = fileManager.URLForDirectory(
+            directory = NSDocumentDirectory,
+            inDomain = NSUserDomainMask,
+            create = true,
+            appropriateForURL = null,
+            error = null
+        )!!
+        return url.URLByAppendingPathComponent(relativePath)!!
+    }
+
+    fun makeFileUrl(fileName: String): NSURL {
+        return getRelativePathUrl().URLByAppendingPathComponent(fileName)!!
     }
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
