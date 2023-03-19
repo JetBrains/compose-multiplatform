@@ -125,11 +125,16 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
         }
 
         override val imageStorage: ImageStorage = object : ImageStorage {
-            override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
+
+            override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
                 TODO("Not yet implemented")
             }
 
-            override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+            override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
+                TODO("Not yet implemented")
+            }
+
+            override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
                 TODO("Not yet implemented")
             }
         }
