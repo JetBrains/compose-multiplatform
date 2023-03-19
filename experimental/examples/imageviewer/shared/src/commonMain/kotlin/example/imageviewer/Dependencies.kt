@@ -94,7 +94,7 @@ interface ImageProvider {
 }
 
 interface ImageStorage {
-    suspend fun getImage(picture: PictureData.Camera): ImageBitmap
-    suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
     fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
+    suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
+    suspend fun getImage(picture: PictureData.Camera): ImageBitmap
 }
