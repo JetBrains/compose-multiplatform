@@ -56,12 +56,11 @@ class IosImageStorage(
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
         ioScope.async {
-            //todo wait while image will be saved to disk
-            var pngRepresentation: NSData? =
-                NSData.dataWithContentsOfURL(makeFileUrl(picture.pngFile))
+            fun getFileContent() = NSData.dataWithContentsOfURL(makeFileUrl(picture.pngFile))
+            var pngRepresentation: NSData? = getFileContent()
             while (pngRepresentation == null) {
-                delay(100)
-                pngRepresentation = NSData.dataWithContentsOfURL(makeFileUrl(picture.pngFile))
+                yield()
+                pngRepresentation = getFileContent()
             }
             val byteArray: ByteArray = ByteArray(pngRepresentation.length.toInt()).apply {
                 usePinned {
@@ -89,7 +88,7 @@ class IosImageStorage(
                 ?.writeToURL(makeFileUrl(picture.thumbnailPngFile), true)
             pictures.add(picture)
 
-//            delay(5000) // for hand testing
+            delay(3000) // for hand testing
             UIImagePNGRepresentation(uiImage.resizeToBig())
                 ?.writeToURL(makeFileUrl(picture.pngFile), true)
 
