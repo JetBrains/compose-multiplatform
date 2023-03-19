@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.cinterop.useContents
 import platform.Foundation.NSData
 import platform.UIKit.UIApplication
+import platform.UIKit.UIImage
 import platform.UIKit.safeAreaInsets
 
 private val iosNotchInset = object : WindowInsets {
@@ -30,7 +31,7 @@ actual fun Modifier.notchPadding(): Modifier =
     this.windowInsetsPadding(iosNotchInset)
 
 class IosStorableImage(
-    val data: NSData
+    val rawValue: UIImage
 )
 
 actual typealias PlatformStorableImage = IosStorableImage

@@ -87,6 +87,11 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
         }
     }
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
+    var actualOrientation by remember {
+        mutableStateOf(
+            AVCaptureVideoOrientationPortrait
+        )
+    }
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
             override fun captureOutput(
@@ -107,6 +112,22 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 }
                 val randomFileName =
                     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
+                val uiImage = UIImage(photoData)
+                val rotatedImage = when (actualOrientation) {
+                    AVCaptureVideoOrientationPortraitUpsideDown-> {
+                        uiImage
+                    }
+                    AVCaptureVideoOrientationLandscapeLeft-> {
+                        uiImage
+                    }
+                    AVCaptureVideoOrientationLandscapeRight-> {
+                        uiImage
+                    }
+                    AVCaptureVideoOrientationPortrait-> {
+                        uiImage
+                    }
+                    else -> uiImage
+                }
                 storage.saveImage(
                     PictureData.Camera(
                         id = randomFileName,
@@ -114,7 +135,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                         description = "Kotlin Conf photo description",
                         gps = geoPos
                     ),
-                    IosStorableImage(photoData)
+                    IosStorableImage(rotatedImage)
                 )
             }
         }
@@ -145,8 +166,9 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
             modifier = Modifier.fillMaxSize(),
             background = Color.Black,
             resize = { view: UIView, rect: CValue<CGRect> ->
-                cameraPreviewLayer.connection?.apply {
-                    videoOrientation = when (UIDevice.currentDevice.orientation) {
+                val cameraConnection = cameraPreviewLayer.connection
+                if (cameraConnection != null) {
+                    actualOrientation = when (UIDevice.currentDevice.orientation) {
                         UIDeviceOrientation.UIDeviceOrientationPortrait ->
                             AVCaptureVideoOrientationPortrait
 
@@ -159,8 +181,9 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                         UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown ->
                             AVCaptureVideoOrientationPortraitUpsideDown
 
-                        else -> videoOrientation
+                        else -> cameraConnection.videoOrientation
                     }
+                    cameraConnection.videoOrientation = actualOrientation
                 }
                 CATransaction.begin()
                 CATransaction.setValue(true, kCATransactionDisableActions)

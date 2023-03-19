@@ -73,13 +73,11 @@ class IosImageStorage(
 
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
-            val uiImage = UIImage(image.data)
-            UIImagePNGRepresentation(uiImage.resizeToSmall())?.writeToFile(picture.thumbnailPngFile)
+            UIImagePNGRepresentation(image.rawValue.resizeToThumbnail())
+                ?.writeToFile(picture.thumbnailPngFile)
             pictures.add(picture)
-
-            delay(3000) // for hand testing
-            UIImagePNGRepresentation(uiImage.resizeToBig())?.writeToFile(picture.pngFile)
-
+            UIImagePNGRepresentation(image.rawValue.resizeToBig())
+                ?.writeToFile(picture.pngFile)
             Json.Default.encodeToString(picture).writeToFile(picture.jsonFile)
         }
     }
@@ -113,7 +111,7 @@ class IosImageStorage(
 
 }
 
-private fun UIImage.resizeToSmall(): UIImage {
+private fun UIImage.resizeToThumbnail(): UIImage {
     val newSize = size.useContents { CGSizeMake(width / 8, height / 8) }
     return resize(newSize)
 }
