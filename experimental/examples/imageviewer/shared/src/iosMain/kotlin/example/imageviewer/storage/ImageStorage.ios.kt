@@ -2,29 +2,36 @@ package example.imageviewer.storage
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.toComposeImageBitmap
 import cnames.structs.__CFDictionary
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.CPointer
+import kotlinx.cinterop.addressOf
+import kotlinx.cinterop.usePinned
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.skia.Image
 import platform.CoreFoundation.*
 import platform.Foundation.CFBridgingRelease
 import platform.Foundation.CFBridgingRetain
 import platform.Foundation.NSData
 import platform.Foundation.NSMutableDictionary
 import platform.ImageIO.*
+import platform.UIKit.UIImage
+import platform.UIKit.UIImagePNGRepresentation
 import platform.UniformTypeIdentifiers.UTTypeJPEG
+import platform.posix.memcpy
 
 class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage {
 
     //todo remove inmemory storage map
-    val map: MutableMap<PictureData.Camera, NSData> = mutableMapOf()
+    val map: MutableMap<PictureData.Camera, ByteArray> = mutableMapOf()
 
     init {
         // todo read PictureData from disk and add them to pictures
@@ -33,7 +40,7 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
         return withContext(Dispatchers.Default) {
-            map[picture]!!.getImageBitmap()
+            Image.makeFromEncoded(map[picture]!!).toComposeImageBitmap()
         }
     }
 
@@ -41,13 +48,20 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
         var saveData: NSData = attachGPSTo(photoData = image.data, picture.gps)
         saveData = attachTextMetadata(saveData, picture.name, picture.description)
         //todo save picture data to disk (name, description, gps)
-        picture.fileName
-        resizeImage(saveData)//todo save to disk as thumbnail ${picture.fileName}-small.jpg
-        map[picture] = saveData
+        val pngRepresentation = UIImagePNGRepresentation(UIImage(image.data))!!
+        val byteArray: ByteArray = ByteArray(pngRepresentation.length.toInt()).apply {
+            usePinned {
+                memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
+            }
+        }
+        picture.id
+        resizeImage(saveData)//todo save to disk as thumbnail ${picture.id}-small.jpg
+        map[picture] = byteArray
 
         // how to encode and decode json
         val jsonStr = Json.Default.encodeToString(picture)
         val picture2 = Json.Default.decodeFromString<PictureData.Camera>(jsonStr)
+        pictures.add(picture)
     }
 
     fun resizeImage(original: NSData): NSData {

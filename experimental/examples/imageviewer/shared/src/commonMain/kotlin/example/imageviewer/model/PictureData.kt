@@ -3,7 +3,7 @@ package example.imageviewer.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GpsPosition(
+class GpsPosition(
     val latitude: Double,
     val longitude: Double,
     val timeStamp: Long = 0,//todo
@@ -22,11 +22,14 @@ sealed interface PictureData {
     ) : PictureData
 
     @Serializable
-    data class Camera(
-        val fileName: String,
+    class Camera(
+        val id: String,
         override val name: String,
         override val description: String,
         override val gps: GpsPosition
-    ) : PictureData
+    ) : PictureData {
+        override fun equals(other: Any?): Boolean = (other as? Camera)?.id == id
+        override fun hashCode(): Int = id.hashCode()
+    }
 
 }

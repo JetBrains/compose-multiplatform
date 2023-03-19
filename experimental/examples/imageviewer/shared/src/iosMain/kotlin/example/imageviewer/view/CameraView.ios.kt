@@ -109,7 +109,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
                 storage.saveImage(
                     PictureData.Camera(
-                        fileName = randomFileName,
+                        id = randomFileName,
                         name = "Kotlin Conf",
                         description = "Kotlin Conf photo description",
                         gps = geoPos
