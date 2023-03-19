@@ -28,7 +28,7 @@ import platform.posix.memcpy
 class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage {
 
     //todo remove inmemory storage map
-    private val map: MutableMap<PictureData.Camera, ByteArray> = mutableMapOf()
+    private val pictureDataToPngRepresentation: MutableMap<PictureData.Camera, NSData> = mutableMapOf()
     private val fileManager = NSFileManager.defaultManager
     private val relativePath = "ImageViewer/takenPhotos/"
 
@@ -54,7 +54,13 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
         return withContext(Dispatchers.Default) {
-            Image.makeFromEncoded(map[picture]!!).toComposeImageBitmap()
+            val pngRepresentation = pictureDataToPngRepresentation[picture]!!
+            val byteArray: ByteArray = ByteArray(pngRepresentation.length.toInt()).apply {
+                usePinned {
+                    memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
+                }
+            }
+            Image.makeFromEncoded(byteArray).toComposeImageBitmap()
         }
     }
 
@@ -63,14 +69,8 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
         saveData = attachTextMetadata(saveData, picture.name, picture.description)
         //todo save picture data to disk (name, description, gps)
         val pngRepresentation = UIImagePNGRepresentation(UIImage(image.data))!!
-        val byteArray: ByteArray = ByteArray(pngRepresentation.length.toInt()).apply {
-            usePinned {
-                memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
-            }
-        }
         picture.id
-        resizeImage(saveData)//todo save to disk as thumbnail ${picture.id}-small.jpg
-        map[picture] = byteArray
+        pictureDataToPngRepresentation[picture] = pngRepresentation
 
         // how to encode and decode json
         val jsonStr = Json.Default.encodeToString(picture)
@@ -78,9 +78,6 @@ class IosImageStorage(val pictures: SnapshotStateList<PictureData>):ImageStorage
         pictures.add(picture)
     }
 
-    fun resizeImage(original: NSData): NSData {
-        return original//todo
-    }
 }
 
 fun attachGPSTo(photoData: NSData, gps: GpsPosition): NSData {
