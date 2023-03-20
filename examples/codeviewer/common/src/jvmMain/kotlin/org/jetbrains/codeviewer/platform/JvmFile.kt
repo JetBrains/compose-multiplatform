@@ -89,15 +89,15 @@ private fun java.io.File.readLinePositions(
             val ib = channel.map(
                 FileChannel.MapMode.READ_ONLY, 0, channel.size()
             )
-            var isBeginOfLine = true
             var position = 0L
+            starts.add(0)
             while (ib.hasRemaining()) {
                 val byte = ib.get()
+                position++
+                val isBeginOfLine = byte.toInt().toChar() == '\n'
                 if (isBeginOfLine) {
                     starts.add(position.toInt())
                 }
-                isBeginOfLine = byte.toInt().toChar() == '\n'
-                position++
             }
             channel.close()
         }
