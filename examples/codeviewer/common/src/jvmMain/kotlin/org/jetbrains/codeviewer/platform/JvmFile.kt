@@ -59,12 +59,15 @@ fun java.io.File.toProjectFile(): File = object : File {
 
             override fun get(index: Int): String {
                 val startPosition = lineStartPositions[index]
-                val length = if (index + 1 < size) lineStartPositions[index + 1] - startPosition else
-                    byteBufferSize - startPosition
+                var endPosition = if (index + 1 < size) lineStartPositions[index + 1] else byteBufferSize
+                endPosition-- // Skip \n
+                if (byteBuffer[endPosition].toInt().toChar() == '\r') {
+                    endPosition-- // Skip \r
+                }
                 // Only JDK since 13 has slice() method we need, so do ugly for now.
                 byteBuffer.position(startPosition)
                 val slice = byteBuffer.slice()
-                slice.limit(length)
+                slice.limit(endPosition - startPosition)
                 return StandardCharsets.UTF_8.decode(slice).toString()
             }
         }
