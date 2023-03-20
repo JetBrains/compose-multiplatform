@@ -24,19 +24,55 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.ScreenKey
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import example.imageviewer.Localization
+import example.imageviewer.model.FullScreenPage
 import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.GalleryId
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.Picture
+import example.imageviewer.model.bigUrl
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
+internal class MemoryScreen(
+    val galleryId: GalleryId,
+    val photoGallery: PhotoGallery,
+) : Screen {
+
+    override val key: ScreenKey = uniqueScreenKey
+
+    @Composable
+    override fun Content() {
+        val page = remember { MemoryPage(galleryId) }
+        val dependencies = LocalDependencies.current
+        val navigator = LocalNavigator.currentOrThrow
+        MemoryScreen(
+            memoryPage = page,
+            photoGallery = photoGallery,
+            getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+            localization = dependencies.localization,
+            onSelectRelatedMemory = { galleryId ->
+                navigator.push(MemoryScreen(galleryId, photoGallery))
+            },
+            onBack = navigator::pop,
+            onHeaderClick = { galleryId ->
+                navigator.push(FullScreenImageScreen(galleryId, photoGallery))
+            }
+        )
+    }
+
+}
+
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-internal fun MemoryScreen(
+private fun MemoryScreen(
     memoryPage: MemoryPage,
     photoGallery: PhotoGallery,
     getImage: suspend (Picture) -> ImageBitmap,

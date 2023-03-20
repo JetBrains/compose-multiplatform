@@ -40,6 +40,10 @@ kotlin {
                 implementation(compose.material3)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+
+                val voyagerVersion = "0.0.1-SNAPSHOT" // local version
+                implementation ("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+                implementation ("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
             }
         }
         val androidMain by getting {

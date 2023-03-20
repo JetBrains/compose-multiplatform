@@ -18,11 +18,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
+import example.imageviewer.model.CameraPage
 import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.GalleryId
 import example.imageviewer.model.GalleryPage
+import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
 import example.imageviewer.style.ImageviewerColors
@@ -35,9 +40,32 @@ enum class GalleryStyle {
     LIST
 }
 
+internal class GalleryScreen(
+    val page: GalleryPage,
+    val photoGallery: PhotoGallery,
+) : Screen {
+    @Composable
+    override fun Content() {
+        val navigator = LocalNavigator.currentOrThrow
+        val dependencies = LocalDependencies.current
+        GalleryScreen(
+            page,
+            photoGallery,
+            dependencies,
+            onClickPreviewPicture = { previewPictureId ->
+                navigator.push(MemoryScreen(previewPictureId, photoGallery))
+            },
+            onMakeNewMemory = {
+                navigator.push(CameraScreen)
+            }
+        )
+    }
+
+}
+
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun GalleryScreen(
+private fun GalleryScreen(
     galleryPage: GalleryPage,
     photoGallery: PhotoGallery,
     dependencies: Dependencies,

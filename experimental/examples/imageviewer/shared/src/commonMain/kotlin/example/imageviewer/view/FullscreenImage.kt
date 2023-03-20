@@ -19,6 +19,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import example.imageviewer.Localization
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
@@ -27,8 +30,29 @@ import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
+internal class FullScreenImageScreen(
+    private val galleryId: GalleryId?,
+    private val gallery: PhotoGallery,
+) : Screen {
+
+    @Composable
+    override fun Content() {
+        val dependencies = LocalDependencies.current
+        val navigator = LocalNavigator.currentOrThrow
+        FullscreenImage(
+            galleryId = galleryId,
+            gallery = gallery,
+            getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+            getFilter = { dependencies.getFilter(it) },
+            localization = dependencies.localization,
+            back = navigator::pop
+        )
+    }
+
+}
+
 @Composable
-internal fun FullscreenImage(
+private fun FullscreenImage(
     galleryId: GalleryId?,
     gallery: PhotoGallery,
     getImage: suspend (Picture) -> ImageBitmap,
