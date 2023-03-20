@@ -138,6 +138,7 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
     },
     fontSize = settings.fontSize,
     fontFamily = Fonts.jetbrainsMono(),
+    maxLines = 1,
     modifier = modifier,
     softWrap = false
 )
