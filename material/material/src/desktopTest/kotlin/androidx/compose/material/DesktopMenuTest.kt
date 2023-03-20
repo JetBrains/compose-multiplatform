@@ -16,23 +16,30 @@
 
 package androidx.compose.material
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.internal.keyEvent
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyPress
+import androidx.compose.ui.test.performMouseInput
+import androidx.compose.ui.test.rightClick
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert
 import org.junit.Rule
@@ -46,9 +53,9 @@ class DesktopMenuTest {
     @get:Rule
     val rule = createComposeRule()
 
-    val windowSize = IntSize(100, 100)
-    val anchorPosition = IntOffset(10, 10)
-    val anchorSize = IntSize(80, 20)
+    private val windowSize = IntSize(100, 100)
+    private val anchorPosition = IntOffset(10, 10)
+    private val anchorSize = IntSize(80, 20)
 
     @Test
     fun menu_positioning_vertical_underAnchor() {
@@ -175,5 +182,50 @@ class DesktopMenuTest {
         performKeyDownAndUp(Key.DirectionDown)
         performKeyDownAndUp(Key.Enter)
         assertClicksCount(2, 2, 2)
+    }
+
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
+    @Test
+    fun `right click opens DropdownMenuState`() {
+        val state = DropdownMenuState(DropdownMenuState.Status.Closed)
+        rule.setContent {
+            Box(
+                modifier = Modifier
+                    .testTag("box")
+                    .size(100.dp, 100.dp)
+                    .contextMenuOpenDetector(
+                        state = state
+                    )
+            )
+        }
+
+        rule.onNodeWithTag("box").performMouseInput {
+            rightClick(Offset(10f, 10f))
+        }
+
+        assertThat(state.status == DropdownMenuState.Status.Open(Offset(10f, 10f)))
+    }
+
+    @OptIn(ExperimentalMaterialApi::class, ExperimentalTestApi::class)
+    @Test
+    fun `right doesn't open DropdownMenuState when disabled`() {
+        val state = DropdownMenuState(DropdownMenuState.Status.Closed)
+        rule.setContent {
+            Box(
+                modifier = Modifier
+                    .testTag("box")
+                    .size(100.dp, 100.dp)
+                    .contextMenuOpenDetector(
+                        state = state,
+                        enabled = false
+                    )
+            )
+        }
+
+        rule.onNodeWithTag("box").performMouseInput {
+            rightClick(Offset(10f, 10f))
+        }
+
+        assertThat(state.status == DropdownMenuState.Status.Closed)
     }
 }

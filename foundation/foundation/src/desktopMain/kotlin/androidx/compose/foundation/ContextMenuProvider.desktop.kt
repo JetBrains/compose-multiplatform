@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
 import androidx.compose.ui.input.pointer.PointerEvent
@@ -54,7 +55,7 @@ fun ContextMenuArea(
 ) {
     val data = ContextMenuData(items, LocalContextMenuData.current)
 
-    Box(Modifier.contextMenuDetector(state, enabled), propagateMinConstraints = true) {
+    Box(Modifier.contextMenuOpenDetector(state, enabled), propagateMinConstraints = true) {
         content()
     }
     LocalContextMenuRepresentation.current.Representation(state) { data.allItems }
@@ -97,28 +98,48 @@ private val LocalContextMenuData = staticCompositionLocalOf<ContextMenuData?> {
     null
 }
 
-private fun Modifier.contextMenuDetector(
-    state: ContextMenuState,
-    enabled: Boolean = true
+
+/**
+ * Detects events that open a context menu (mouse right-clicks).
+ *
+ * @param key The pointer input handling coroutine will be cancelled and **re-started** when
+ * [contextMenuOpenDetector] is recomposed with a different [key].
+ * @param enabled Whether to enable the detection.
+ * @param onOpen Invoked when a context menu opening event is detected, with the local offset it
+ * should be opened at.
+ */
+@ExperimentalFoundationApi
+fun Modifier.contextMenuOpenDetector(
+    key: Any? = Unit,
+    enabled: Boolean = true,
+    onOpen: (Offset) -> Unit
 ): Modifier {
-    return if (
-        enabled && state.status == ContextMenuState.Status.Closed
-    ) {
-        this.pointerInput(state) {
+    return if (enabled) {
+        this.pointerInput(key) {
             forEachGesture {
                 awaitPointerEventScope {
                     val event = awaitEventFirstDown()
                     if (event.buttons.isSecondaryPressed) {
                         event.changes.forEach { it.consume() }
-                        state.status =
-                            ContextMenuState.Status.Open(Rect(event.changes[0].position, 0f))
+                        onOpen(event.changes[0].position)
                     }
                 }
             }
         }
     } else {
-        Modifier
+        this
     }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun Modifier.contextMenuOpenDetector(
+    state: ContextMenuState,
+    enabled: Boolean = true
+): Modifier = this.contextMenuOpenDetector(
+    key = state,
+    enabled = enabled && (state.status is ContextMenuState.Status.Closed),
+) { pointerPosition ->
+    state.status = ContextMenuState.Status.Open(Rect(pointerPosition, 0f))
 }
 
 private suspend fun AwaitPointerEventScope.awaitEventFirstDown(): PointerEvent {
