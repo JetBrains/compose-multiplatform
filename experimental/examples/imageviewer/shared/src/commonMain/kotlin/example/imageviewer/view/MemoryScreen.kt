@@ -66,21 +66,17 @@ internal fun MemoryScreen(
                 contentAlignment = Alignment.Center
             ) {
                 if(headerImage != null) {
-                    MemoryHeader(headerImage!!, onClick = { onHeaderClick(memoryPage.picture) })
+                    MemoryHeader(
+                        headerImage!!,
+                        picture = memoryPage.picture,
+                        onClick = { onHeaderClick(memoryPage.picture) }
+                    )
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
                     Headliner("Note")
-                    Collapsible(
-                        """
-                        I took a picture with my iPhone 14 at 17:45. The picture ended up being 3024 x 4032 pixels. ✨
-                        
-                        I took multiple additional photos of the same subject, but they turned out not quite as well, so I decided to keep this specific one as a memory.
-                        
-                        I might upload this picture to Unsplash at some point, since other people might also enjoy this picture. So it would make sense to not keep it to myself! 😄
-                        """.trimIndent()
-                    )
+                    Collapsible(memoryPage.picture.description)
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(dependencies.pictures, imageProvider,  onSelectRelatedMemory)
                     Headliner("Place")
@@ -134,7 +130,7 @@ internal fun MemoryScreen(
 }
 
 @Composable
-private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
+private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
@@ -145,7 +141,7 @@ private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
             modifier = Modifier.fillMaxSize()
         )
         MagicButtonOverlay(onClick)
-        MemoryTextOverlay()
+        MemoryTextOverlay(picture)
     }
 }
 
@@ -160,7 +156,7 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
 }
 
 @Composable
-internal fun BoxScope.MemoryTextOverlay() {
+internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     val shadowTextStyle = LocalTextStyle.current.copy(
         shadow = Shadow(
             color = Color.Black.copy(0.75f),
@@ -172,7 +168,7 @@ internal fun BoxScope.MemoryTextOverlay() {
         modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
     ) {
         Text(
-            "28. Feb",
+            "20. Mar",
             textAlign = TextAlign.Left,
             color = Color.White,
             fontSize = 20.sp,
@@ -183,7 +179,7 @@ internal fun BoxScope.MemoryTextOverlay() {
         )
         Spacer(Modifier.height(1.dp))
         Text(
-            "London",
+            text = picture.name,
             textAlign = TextAlign.Left,
             color = Color.White,
             fontSize = 14.sp,

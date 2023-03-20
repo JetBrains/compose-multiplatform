@@ -73,7 +73,9 @@ internal fun PreviewImage(
                                 .fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
-                        MemoryTextOverlay()
+                        if (picture != null) {
+                            MemoryTextOverlay(picture)
+                        }
                     }
                 } else {
                     Spacer(
