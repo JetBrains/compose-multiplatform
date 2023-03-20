@@ -57,8 +57,8 @@ fun ContextMenuArea(
 
     Box(Modifier.contextMenuOpenDetector(state, enabled), propagateMinConstraints = true) {
         content()
+        LocalContextMenuRepresentation.current.Representation(state) { data.allItems }
     }
-    LocalContextMenuRepresentation.current.Representation(state) { data.allItems }
 }
 
 /**
