@@ -12,6 +12,7 @@ import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.component.CallbackMediaPlayerComponent
 import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
+import java.awt.Component
 import java.util.*
 
 @Composable
@@ -45,16 +46,14 @@ internal actual fun VideoPlayerImpl(url: String, width: Int, height: Int) {
 }
 
 /**
- * To return mediaPlayer from player components.
- * The method names are same, but they don't share the same parent/interface.
- * That's why need this method.
+ * Returns [MediaPlayer] from player components.
+ * The method names are the same, but they don't share the same parent/interface.
+ * That's why we need this method.
  */
-private fun Any.mediaPlayer(): MediaPlayer {
-    return when (this) {
-        is CallbackMediaPlayerComponent -> mediaPlayer()
-        is EmbeddedMediaPlayerComponent -> mediaPlayer()
-        else -> throw IllegalArgumentException("You can only call mediaPlayer() on vlcj player component")
-    }
+private fun Component.mediaPlayer() = when (this) {
+    is CallbackMediaPlayerComponent -> mediaPlayer()
+    is EmbeddedMediaPlayerComponent -> mediaPlayer()
+    else -> error("mediaPlayer() can only be called on vlcj player components")
 }
 
 private fun isMacOS(): Boolean {
