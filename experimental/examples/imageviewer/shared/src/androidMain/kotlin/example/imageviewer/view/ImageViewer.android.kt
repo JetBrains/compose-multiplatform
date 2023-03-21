@@ -7,22 +7,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
-import example.imageviewer.Dependencies
-import example.imageviewer.ImageViewerCommon
-import example.imageviewer.Localization
-import example.imageviewer.Notification
-import example.imageviewer.PopupNotification
+import example.imageviewer.*
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.ContentRepository
-import example.imageviewer.model.adapter
-import example.imageviewer.model.createNetworkRepository
+import example.imageviewer.model.PictureData
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.toImageBitmap
 import example.imageviewer.utils.ioDispatcher
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -39,7 +32,7 @@ fun ImageViewerAndroid() {
     }
 }
 
-private fun getDependencies(context: Context, ioScope: CoroutineScope) = object : Dependencies {
+private fun getDependencies(context: Context, ioScope: CoroutineScope) = object : Dependencies() {
     override val httpClient: HttpClient = HttpClient(OkHttp)
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter =
@@ -65,13 +58,23 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
         override val refreshUnavailable get() = context.getString(R.string.refresh_unavailable)
     }
 
-    override val imageRepository: ContentRepository<ImageBitmap> =
-        createNetworkRepository(httpClient)
-            .adapter { it.toImageBitmap() }
-
     override val notification: Notification = object : PopupNotification(localization) {
         override fun showPopUpMessage(text: String) {
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
+    }
+    override val imageStorage: ImageStorage = object : ImageStorage {
+        override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
+            TODO("Not yet implemented")
+        }
+
+        override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
+            TODO("Not yet implemented")
+        }
+
     }
 }

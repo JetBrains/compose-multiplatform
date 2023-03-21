@@ -83,12 +83,14 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "9.jpg",
-        name = "Botanic Garden",
+        name = "Pong Restaurant",
         description = """
-            Botanic Garden of Saint Petersburg State Forestry University.
-            Forestry research hub with rare plants, flowers & trees amid wooded gardens & academy buildings.
+            Stockholm, Sweden
+            This little restaurant caught my eye because of the color scheme they use! 🦩
+            The neon lights illuminating the dark streets of stockholm was a sight to behold, and the fact that only the first and last letter weren't lit up seems almost intentional.
+            Also, the dumplings served at that place was delightful! 🥟
             """.trimIndent(),
-        gps = GpsPosition(59.992327, 30.341782)
+        gps = GpsPosition(59.3364318, 18.0587228)
     ),
     PictureData.Resource(
         resource = "10.jpg",
@@ -152,16 +154,5 @@ val resourcePictures = arrayOf(
             These figures are still sitting on my desk, and it makes me really happy to look at them! 👀
             """.trimIndent(),
         gps = GpsPosition(48.1458602, 11.5053059)
-    ),
-    PictureData.Resource(
-        resource = "16.jpg",
-        name = "Pong Restaurant",
-        description = """
-            Stockholm, Sweden
-            This little restaurant caught my eye because of the color scheme they use! 🦩
-            The neon lights illuminating the dark streets of stockholm was a sight to behold, and the fact that only the first and last letter weren't lit up seems almost intentional.
-            Also, the dumplings served at that place was delightful! 🥟
-            """.trimIndent(),
-        gps = GpsPosition(59.3364318, 18.0587228)
     ),
 )

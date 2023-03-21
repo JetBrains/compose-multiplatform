@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import example.imageviewer.model.GpsPosition
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
