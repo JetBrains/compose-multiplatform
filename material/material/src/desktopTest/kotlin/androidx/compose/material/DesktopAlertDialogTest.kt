@@ -16,7 +16,7 @@
 
 package androidx.compose.material
 
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.internal.keyEvent
 import androidx.compose.runtime.CompositionLocalProvider
@@ -27,14 +27,25 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.layout.IntrinsicMeasurable
+import androidx.compose.ui.layout.IntrinsicMeasureScope
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.layout.Measurable
+import androidx.compose.ui.layout.MeasurePolicy
+import androidx.compose.ui.layout.MeasureResult
+import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.renderComposeScene
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performKeyPress
+import androidx.compose.ui.test.runDesktopComposeUiTest
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -62,7 +73,7 @@ class DesktopAlertDialogTest {
                 @OptIn(ExperimentalMaterialApi::class)
                 AlertDialog(
                     onDismissRequest = {},
-                    title = { Text("AlerDialog") },
+                    title = { Text("AlertDialog") },
                     text = { Text("Apply?") },
                     confirmButton = { Button(onClick = {}) { Text("Apply") } },
                     modifier = Modifier.size(dialogSize.width.dp, dialogSize.height.dp)
@@ -86,7 +97,7 @@ class DesktopAlertDialogTest {
                 @OptIn(ExperimentalMaterialApi::class)
                 AlertDialog(
                     onDismissRequest = { dismissCount++ },
-                    title = { Text("AlerDialog") },
+                    title = { Text("AlertDialog") },
                     text = { Text("Apply?") },
                     confirmButton = { Button(onClick = {}) { Text("Apply") } },
                     modifier = Modifier.size(dialogSize.width.dp, dialogSize.height.dp)
@@ -119,14 +130,13 @@ class DesktopAlertDialogTest {
         // background.
         val screenshot = renderComposeScene(400, 400){
             AlertDialog(
-                modifier = Modifier
-                    .size(width = 400.dp, height = 100.dp)
-                    .padding(horizontal = 150.dp),
+                modifier = Modifier.size(width = 400.dp, height = 100.dp),
                 onDismissRequest = {},
                 title = {},
                 text = {},
                 dismissButton = {},
                 confirmButton = {},
+                dialogPadding = PaddingValues(horizontal = 150.dp)
             )
         }
 
@@ -139,6 +149,43 @@ class DesktopAlertDialogTest {
 
         // Also check that the shadow is present near the actual edge of the content
         assertNotEquals(nearRealEdgePixel, backgroundPixel)
+    }
+
+    @OptIn(ExperimentalTestApi::class, ExperimentalMaterialApi::class)
+    @Test
+    fun `alert dialog uses available width`() = runDesktopComposeUiTest(
+        width = 800,
+        height = 800
+    ){
+        setContent {
+            AlertDialog(
+                onDismissRequest = {},
+                confirmButton = {},
+                text = {
+                    Layout(
+                        modifier = Modifier.testTag("text_content"),
+                        measurePolicy = object: MeasurePolicy {
+                            override fun MeasureScope.measure(
+                                measurables: List<Measurable>,
+                                constraints: Constraints
+                            ): MeasureResult {
+                                val width = 200.coerceAtMost(constraints.maxWidth)
+                                return layout(width, 200){}
+                            }
+
+                            override fun IntrinsicMeasureScope.minIntrinsicWidth(
+                                measurables: List<IntrinsicMeasurable>,
+                                height: Int
+                            ): Int {
+                                return 100
+                            }
+                        }
+                    )
+                }
+            )
+        }
+
+        onNodeWithTag("text_content").assertWidthIsEqualTo(200.dp)
     }
 
     private fun calculateCenterPosition(rootSize: IntSize, childSize: IntSize): Offset {
