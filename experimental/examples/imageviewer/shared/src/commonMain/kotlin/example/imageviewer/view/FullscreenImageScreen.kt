@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal fun FullscreenImage(
+internal fun FullscreenImageScreen(
     picture: PictureData,
     getImage: suspend (PictureData) -> ImageBitmap,
     getFilter: (FilterType) -> BitmapFilter,
@@ -75,30 +75,23 @@ internal fun FullscreenImage(
                     val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
                     val scalableState = remember(imageSize) { ScalableState(imageSize) }
                     val visiblePartOfImage: IntRect = scalableState.visiblePart
-                    Column {
-                        Slider(
-                            modifier = Modifier.fillMaxWidth(),
-                            value = scalableState.scale,
-                            valueRange = MIN_SCALE..MAX_SCALE,
-                            onValueChange = { scalableState.setScale(it) },
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                            .onGloballyPositioned { coordinates ->
+                                scalableState.changeBoxSize(coordinates.size)
+                            }
+                            .addUserInput(scalableState)
+                    ) {
+                        Image(
+                            modifier = Modifier.fillMaxSize(),
+                            painter = BitmapPainter(
+                                imageWithFilter,
+                                srcOffset = visiblePartOfImage.topLeft,
+                                srcSize = visiblePartOfImage.size
+                            ),
+                            contentDescription = null
                         )
-                        Box(
-                            modifier = Modifier.fillMaxSize()
-                                .onGloballyPositioned { coordinates ->
-                                    scalableState.changeBoxSize(coordinates.size)
-                                }
-                                .addUserInput(scalableState)
-                        ) {
-                            Image(
-                                modifier = Modifier.fillMaxSize(),
-                                painter = BitmapPainter(
-                                    imageWithFilter,
-                                    srcOffset = visiblePartOfImage.topLeft,
-                                    srcSize = visiblePartOfImage.size
-                                ),
-                                contentDescription = null
-                            )
-                        }
+                        ZoomControllerView(scalableState)
                     }
                     Box(
                         Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))

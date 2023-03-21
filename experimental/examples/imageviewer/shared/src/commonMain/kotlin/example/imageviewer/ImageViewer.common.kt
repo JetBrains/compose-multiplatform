@@ -15,7 +15,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
 import example.imageviewer.view.CameraScreen
-import example.imageviewer.view.FullscreenImage
+import example.imageviewer.view.FullscreenImageScreen
 import example.imageviewer.view.GalleryScreen
 import example.imageviewer.view.MemoryScreen
 import example.imageviewer.view.NavigationStack
@@ -64,7 +64,7 @@ internal fun ImageViewerCommon(
                 }
 
                 is FullScreenPage -> {
-                    FullscreenImage(
+                    FullscreenImageScreen(
                         picture = page.picture,
                         getImage = { dependencies.imageProvider.getImage(it) },
                         getFilter = { dependencies.getFilter(it) },
