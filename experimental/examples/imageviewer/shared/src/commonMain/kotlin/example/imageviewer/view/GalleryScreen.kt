@@ -82,7 +82,7 @@ internal fun GalleryScreen(
             }
             CircularButton(
                 image = painterResource("plus.png"),
-                modifier = Modifier.align(Alignment.BottomCenter).padding(48.dp),
+                modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
                 onClick = onMakeNewMemory,
             )
         }
