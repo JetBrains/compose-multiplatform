@@ -38,6 +38,7 @@ kotlin {
                 implementation(compose.material)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
                 implementation(compose.material3)
+                implementation("org.jetbrains.compose.ui:ui:1.55.0")
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
             }

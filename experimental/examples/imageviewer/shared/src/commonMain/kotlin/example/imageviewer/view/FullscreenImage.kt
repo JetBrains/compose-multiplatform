@@ -93,12 +93,14 @@ internal fun FullscreenImage(
                             .pointerInput(Unit) {
                                 detectTransformGestures { _, pan, zoom, _ ->
                                     scalableState.addDragAmount(pan)
-                                    scalableState.addScale(zoom - 1f)
+                                    scalableState.addScale(zoom)
                                 }
                             }
                             .pointerInput(Unit) {
                                 detectTapGestures(
-                                    onDoubleTap = { scalableState.setScale(1f) }
+                                    onDoubleTap = {
+                                        scalableState.setScale(1f)
+                                    }
                                 )
                             }
                             .onPointerEvent(PointerEventType.Scroll) {

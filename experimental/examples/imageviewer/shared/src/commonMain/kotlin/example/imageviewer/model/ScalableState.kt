@@ -40,16 +40,11 @@ fun ScalableState.changeBoxSize(size: IntSize) {
 
 fun ScalableState.setScale(scale: Float) {
     this.scale = scale
+    updateOffsetLimits()
 }
 
-fun ScalableState.addScale(diff: Float) {
-    scale = if (scale + diff > MAX_SCALE) {
-        MAX_SCALE
-    } else if (scale + diff < MIN_SCALE) {
-        MIN_SCALE
-    } else {
-        scale + diff
-    }
+fun ScalableState.addScale(multiplier: Float) {
+    scale = (scale * multiplier).coerceIn(0.2f..5f)
     updateOffsetLimits()
 }
 
