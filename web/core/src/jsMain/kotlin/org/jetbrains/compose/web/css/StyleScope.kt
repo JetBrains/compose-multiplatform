@@ -171,6 +171,11 @@ open class StyleScopeBuilder : StyleScope, StyleHolder {
         properties.addAll(sb.properties)
         variables.addAll(sb.variables)
     }
+
+    internal fun clear() {
+        properties.clear()
+        variables.clear()
+    }
 }
 
 data class StylePropertyDeclaration(

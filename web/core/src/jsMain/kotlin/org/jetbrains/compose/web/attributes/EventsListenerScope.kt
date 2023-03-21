@@ -282,4 +282,8 @@ open class EventsListenerScopeBuilder : EventsListenerScope {
     }
 
     internal fun collectListeners(): List<SyntheticEventListener<*>> = listeners
+
+    internal fun clear() {
+        listeners.clear()
+    }
 }

@@ -101,7 +101,6 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
     }
 }
 
-
 @OptIn(ComposeWebInternalApi::class)
 @Composable
 fun <TElement : Element> TagElement(
@@ -119,20 +118,20 @@ fun <TElement : Element> TagElement(
             DomElementWrapper(node)
         },
         attrsSkippableUpdate = {
-            val attrsScope = AttrsScopeBuilder<TElement>()
+            val attrsScope = scope.attrsScope
+            attrsScope.clear()
             applyAttrs?.invoke(attrsScope)
 
             refEffect = attrsScope.refEffect
 
             update {
-                set(attrsScope.classes, DomElementWrapper::updateClasses)
-                set(attrsScope.styleScope, DomElementWrapper::updateStyleDeclarations)
-                set(attrsScope.collect(), DomElementWrapper::updateAttrs)
-                set(
-                    attrsScope.eventsListenerScopeBuilder.collectListeners(),
-                    DomElementWrapper::updateEventListeners
-                )
-                set(attrsScope.propertyUpdates, DomElementWrapper::updateProperties)
+                reconcile {
+                    updateClasses(attrsScope.classes)
+                    updateStyleDeclarations(attrsScope.styleScope)
+                    updateAttrs(attrsScope.collect())
+                    updateEventListeners(attrsScope.eventsListenerScopeBuilder.collectListeners())
+                    updateProperties(attrsScope.propertyUpdates)
+                }
             }
         },
         elementScope = scope,
