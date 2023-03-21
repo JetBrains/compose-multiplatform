@@ -44,13 +44,13 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "5.jpg",
-        name = "Nakhal Fort",
+        name = "Blue City",
         description = """
-            Nakhal Fort is a large fortification in Al Batinah Region of Oman.
-            It is named after the Wilayah of Nakhal.
-            The fort houses a museum, operated by the Ministry of Tourism, which has exhibits of historic guns, and the fort also hosts a weekly goat market.
+            Is a city in northwest Morocco.
+            It is the chief town of the province of the same name and is noted for its buildings in shades of blue, for which it is nicknamed the "Blue City".
+            Chefchaouen is situated just inland from Tangier and Tétouan.
             """.trimIndent(),
-        gps = GpsPosition(23.395, 57.829)
+        gps = GpsPosition(35.171389, -5.269722)
     ),
     PictureData.Resource(
         resource = "6.jpg",
@@ -83,14 +83,13 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "9.jpg",
-        name = "Pong Restaurant",
+        name = "Nakhal Fort",
         description = """
-            Stockholm, Sweden
-            This little restaurant caught my eye because of the color scheme they use! 🦩
-            The neon lights illuminating the dark streets of stockholm was a sight to behold, and the fact that only the first and last letter weren't lit up seems almost intentional.
-            Also, the dumplings served at that place was delightful! 🥟
+            Nakhal Fort is a large fortification in Al Batinah Region of Oman.
+            It is named after the Wilayah of Nakhal.
+            The fort houses a museum, operated by the Ministry of Tourism, which has exhibits of historic guns, and the fort also hosts a weekly goat market.
             """.trimIndent(),
-        gps = GpsPosition(59.3364318, 18.0587228)
+        gps = GpsPosition(23.395, 57.829)
     ),
     PictureData.Resource(
         resource = "10.jpg",
@@ -154,5 +153,16 @@ val resourcePictures = arrayOf(
             These figures are still sitting on my desk, and it makes me really happy to look at them! 👀
             """.trimIndent(),
         gps = GpsPosition(48.1458602, 11.5053059)
+    ),
+    PictureData.Resource(
+        resource = "16.jpg",
+        name = "Pong Restaurant",
+        description = """
+            Stockholm, Sweden
+            This little restaurant caught my eye because of the color scheme they use! 🦩
+            The neon lights illuminating the dark streets of stockholm was a sight to behold, and the fact that only the first and last letter weren't lit up seems almost intentional.
+            Also, the dumplings served at that place was delightful! 🥟
+            """.trimIndent(),
+        gps = GpsPosition(59.3364318, 18.0587228)
     ),
 )
