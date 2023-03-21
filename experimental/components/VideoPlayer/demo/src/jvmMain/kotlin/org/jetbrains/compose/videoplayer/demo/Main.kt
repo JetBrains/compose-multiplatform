@@ -47,8 +47,9 @@ fun App() {
             modifier = Modifier.fillMaxWidth()
         )
         Row(
-            horizontalArrangement = Arrangement.spacedBy(24.dp),
-            verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(24.dp, Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
         ) {
             Text("Timestamp: ${progress.time}", modifier = Modifier.width(140.dp))
             IconButton(onClick = toggleResume) {
