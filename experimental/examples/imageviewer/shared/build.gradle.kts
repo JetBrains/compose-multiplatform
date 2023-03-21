@@ -41,9 +41,9 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
 
-                val voyagerVersion = "0.0.1-SNAPSHOT" // local version
-                implementation ("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
-                implementation ("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
+                val voyagerVersion = "1.0.0-rc04"
+                implementation("cafe.adriel.voyager:voyager-navigator:$voyagerVersion")
+                implementation("cafe.adriel.voyager:voyager-transitions:$voyagerVersion")
             }
         }
         val androidMain by getting {
