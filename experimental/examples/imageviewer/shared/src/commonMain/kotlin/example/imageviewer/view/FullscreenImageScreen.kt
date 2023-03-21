@@ -27,6 +27,7 @@ import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun FullscreenImageScreen(
     picture: PictureData,
@@ -56,90 +57,65 @@ internal fun FullscreenImageScreen(
         }
     }
     Box(Modifier.fillMaxSize().background(color = ImageviewerColors.fullScreenImageBackground)) {
-        Column {
-            FullscreenImageBar(
-                localization,
-                picture.name,
-                back,
-                availableFilters,
-                selectedFilters,
-                onSelectFilter = {
-                    if (it !in selectedFilters) {
-                        selectedFilters += it
-                    } else {
-                        selectedFilters -= it
-                    }
-                })
-            if (imageWithFilter != null) {
-                Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                    val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
-                    val scalableState = remember(imageSize) { ScalableState(imageSize) }
-                    val visiblePartOfImage: IntRect = scalableState.visiblePart
-                    Box(
-                        modifier = Modifier.fillMaxSize()
-                            .onGloballyPositioned { coordinates ->
-                                scalableState.changeBoxSize(coordinates.size)
-                            }
-                            .addUserInput(scalableState)
-                    ) {
-                        Image(
-                            modifier = Modifier.fillMaxSize(),
-                            painter = BitmapPainter(
-                                imageWithFilter,
-                                srcOffset = visiblePartOfImage.topLeft,
-                                srcSize = visiblePartOfImage.size
-                            ),
-                            contentDescription = null
-                        )
-                        ZoomControllerView(scalableState)
-                    }
-                    Box(
-                        Modifier.clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                            .background(ImageviewerColors.fullScreenImageBackground).padding(16.dp)
-                    ) {
-                        Row(
-                            horizontalArrangement = Arrangement.spacedBy(16.dp),
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        ) {
-                            FilterButtons(availableFilters, selectedFilters, {
-                                if (it !in selectedFilters) {
-                                    selectedFilters += it
-                                } else {
-                                    selectedFilters -= it
-                                }
-                            })
+        if (imageWithFilter != null) {
+            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
+                val scalableState = remember(imageSize) { ScalableState(imageSize) }
+                val visiblePartOfImage: IntRect = scalableState.visiblePart
+                Box(
+                    Modifier.fillMaxSize()
+                        .onGloballyPositioned { coordinates ->
+                            scalableState.changeBoxSize(coordinates.size)
                         }
-                    }
+                        .addUserInput(scalableState)
+                ) {
+                    Image(
+                        modifier = Modifier.fillMaxSize(),
+                        painter = BitmapPainter(
+                            imageWithFilter,
+                            srcOffset = visiblePartOfImage.topLeft,
+                            srcSize = visiblePartOfImage.size
+                        ),
+                        contentDescription = null,
+                    )
                 }
-            } else {
-                LoadingScreen()
+                Column(
+                    Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth(0.5f)
+                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                        .background(ImageviewerColors.filterButtonsBackground).padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    FilterButtons(
+                        filters = availableFilters,
+                        selectedFilters = selectedFilters,
+                        onSelectFilter = {
+                            if (it !in selectedFilters) {
+                                selectedFilters += it
+                            } else {
+                                selectedFilters -= it
+                            }
+                        })
+                    ZoomControllerView(Modifier, scalableState)
+                }
             }
+        } else {
+            LoadingScreen()
         }
+
+        TopLayout(
+            alignLeftContent = {
+                Tooltip(localization.back) {
+                    CircularButton(
+                        painterResource("arrowleft.png"),
+                        onClick = { back() }
+                    )
+                }
+            },
+            alignRightContent = {},
+        )
     }
-
-}
-
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalResourceApi::class)
-@Composable
-private fun FullscreenImageBar(
-    localization: Localization,
-    pictureName: String?,
-    onBack: () -> Unit,
-    filters: List<FilterType>,
-    selectedFilters: Set<FilterType>,
-    onSelectFilter: (FilterType) -> Unit
-) {
-    TopLayout(
-        alignLeftContent = {
-            Tooltip(localization.back) {
-                CircularButton(
-                    painterResource("arrowleft.png"),
-                    onClick = { onBack() }
-                )
-            }
-        },
-        alignRightContent = {},
-    )
 }
 
 @Composable
@@ -148,12 +124,17 @@ private fun FilterButtons(
     selectedFilters: Set<FilterType>,
     onSelectFilter: (FilterType) -> Unit
 ) {
-    for (type in filters) {
-        FilterButton(active = type in selectedFilters,
-            type,
-            onClick = {
-                onSelectFilter(type)
-            })
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        modifier = Modifier.padding(bottom = 16.dp)
+    ) {
+        for (type in filters) {
+            FilterButton(active = type in selectedFilters,
+                type,
+                onClick = {
+                    onSelectFilter(type)
+                })
+        }
     }
 }
 
