@@ -58,6 +58,8 @@ private fun Any.mediaPlayer(): MediaPlayer {
 }
 
 private fun isMacOS(): Boolean {
-    val os = System.getProperty("os.name", "generic").lowercase(Locale.ENGLISH)
-    return os.indexOf("mac") >= 0 || os.indexOf("darwin") >= 0
+    val os = System
+        .getProperty("os.name", "generic")
+        .lowercase(Locale.ENGLISH)
+    return "mac" in os || "darwin" in os
 }
