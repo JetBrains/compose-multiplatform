@@ -3,7 +3,9 @@ package org.jetbrains.compose.videoplayer.demo
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 import org.jetbrains.compose.videoplayer.VideoPlayer
@@ -44,29 +46,44 @@ fun App() {
             onValueChange = { seek = it },
             modifier = Modifier.fillMaxWidth()
         )
-        Text("Timestamp: ${progress.time}")
-        Spacer(Modifier.height(20.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(10.dp)
+            horizontalArrangement = Arrangement.spacedBy(24.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Button(onClick = toggleResume, Modifier.width(150.dp)) {
-                Text(if (isResumed) "Pause" else "Play")
+            Text("Timestamp: ${progress.time}", modifier = Modifier.width(140.dp))
+            IconButton(onClick = toggleResume) {
+                Icon(
+                    painter = painterResource("${if (isResumed) "pause" else "play"}.svg"),
+                    contentDescription = "Play/Pause"
+                )
             }
-            Button(onClick = toggleFullscreen, Modifier.width(150.dp)) {
-                Text("${if (isFullscreen) "Exit" else "Enter"} fullscreen")
+            IconButton(onClick = toggleFullscreen) {
+                Icon(
+                    painter = painterResource("${if (isFullscreen) "exit" else "enter"}-fullscreen.svg"),
+                    contentDescription = "Toggle fullscreen"
+                )
             }
             OutlinedTextField(
                 value = speed.toString(),
                 maxLines = 1,
-                leadingIcon = { Text("Speed: ") },
+                leadingIcon = {
+                    Icon(
+                        painter = painterResource("speed.svg"),
+                        contentDescription = "Speed",
+                        modifier = Modifier.size(36.dp)
+                    )
+                },
                 modifier = Modifier.width(104.dp),
                 onValueChange = { speed = it.toFloat() }
             )
-            Slider(
-                value = volume,
-                onValueChange = { volume = it },
-                modifier = Modifier.width(100.dp)
-            )
+            Row {
+                Icon(painter = painterResource("volume.svg"), contentDescription = "Volume")
+                Slider(
+                    value = volume,
+                    onValueChange = { volume = it },
+                    modifier = Modifier.width(100.dp)
+                )
+            }
         }
     }
 }
