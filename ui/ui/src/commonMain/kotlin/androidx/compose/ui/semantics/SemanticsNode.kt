@@ -418,7 +418,7 @@ private fun LayoutNode.findOneLayerOfSemanticsWrappers(
  * [LayoutNode] to return `true` from [selector] or null if [selector] returns false
  * for all ancestors.
  */
-private fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
+internal fun LayoutNode.findClosestParentNode(selector: (LayoutNode) -> Boolean): LayoutNode? {
     var currentParent = this.parent
     while (currentParent != null) {
         if (selector(currentParent)) {
