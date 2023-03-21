@@ -30,7 +30,14 @@ compose.desktop {
 
             val iconsRoot = project.file("../common/src/desktopMain/resources/images")
             macOS {
-                iconFile.set(iconsRoot.resolve("icon-mac.icns"))
+                //iconFile.set(iconsRoot.resolve("icon-mac.icns")) does not exist
+                runtimeEntitlementsFile.set(project.file("runtime-entitlements.plist"))
+                infoPlist {
+                    extraKeysRawXml = """
+                        <key>NSCameraUsageDescription</key>
+                        <string>This app uses camera for capturing photos</string>
+                    """.trimIndent()
+                }
             }
             windows {
                 iconFile.set(iconsRoot.resolve("icon-windows.ico"))

@@ -65,6 +65,10 @@ kotlin {
                 implementation(compose.desktop.common)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
                 implementation("io.ktor:ktor-client-cio:$ktorVersion")
+
+                implementation("com.github.sarxos:webcam-capture:0.3.12")
+                // for MacOS support
+                implementation("com.github.eduramiba:webcam-capture-driver-native:-SNAPSHOT")
             }
         }
     }
