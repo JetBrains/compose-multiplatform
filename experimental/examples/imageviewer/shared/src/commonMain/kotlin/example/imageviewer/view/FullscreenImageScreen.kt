@@ -56,8 +56,8 @@ internal fun FullscreenImageScreen(
     }
     Box(Modifier.fillMaxSize().background(color = ImageviewerColors.fullScreenImageBackground)) {
         if (imageWithFilter != null) {
-            val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
-            val scalableState = remember(imageSize) { ScalableState(imageSize) }
+            val scalableState = remember { ScalableState() }
+            scalableState.updateImageSize(imageWithFilter.width, imageWithFilter.height)
             val visiblePartOfImage: IntRect = scalableState.visiblePart
             Box(
                 Modifier.fillMaxSize()
