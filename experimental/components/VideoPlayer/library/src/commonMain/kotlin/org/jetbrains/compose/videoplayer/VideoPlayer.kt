@@ -11,20 +11,16 @@ data class Progress(val fraction: Float, val time/* millis */: Long)
 @Composable
 fun VideoPlayer(
     url: String,
-    isResumed: Boolean,
-    volume: Float = 1f,
-    speed: Float = 1f,
-    seek: Float = 0f,
-    isFullscreen: Boolean = false,
+    state: VideoPlayerState,
     modifier: Modifier = Modifier,
     onFinish: (() -> Unit)? = null
 ) = VideoPlayerImpl(
     url = url,
-    isResumed = isResumed,
-    volume = volume,
-    speed = speed,
-    seek = seek,
-    isFullscreen = isFullscreen,
+    isResumed = state.isResumed,
+    volume = state.volume,
+    speed = state.speed,
+    seek = state.seek,
+    isFullscreen = state.isFullscreen,
     modifier = modifier,
     onFinish = onFinish
 )

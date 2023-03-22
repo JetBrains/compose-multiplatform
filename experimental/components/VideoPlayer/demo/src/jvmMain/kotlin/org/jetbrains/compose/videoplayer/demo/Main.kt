@@ -33,11 +33,7 @@ fun App() {
     Column {
         val progress by VideoPlayer(
             url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-            seek = state.seek,
-            speed = state.speed,
-            volume = state.volume,
-            isResumed = state.isResumed,
-            isFullscreen = state.isFullscreen,
+            state = state,
             onFinish = stopPlayback,
             modifier = Modifier
                 .fillMaxWidth()
