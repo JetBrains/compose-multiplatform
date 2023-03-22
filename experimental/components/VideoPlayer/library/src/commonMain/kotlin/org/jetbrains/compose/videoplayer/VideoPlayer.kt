@@ -1,7 +1,9 @@
 package org.jetbrains.compose.videoplayer
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 
 data class Progress(val fraction: Float, val time/* millis */: Long)
@@ -37,3 +39,61 @@ internal expect fun VideoPlayerImpl(
     modifier: Modifier,
     onFinish: (() -> Unit)?
 ): State<Progress>
+
+@Composable
+fun rememberVideoPlayerState(
+    seek: Float = 0f,
+    speed: Float = 1f,
+    volume: Float = 1f,
+    isResumed: Boolean = true,
+    isFullscreen: Boolean = false
+): VideoPlayerState = rememberSaveable(saver = VideoPlayerState.Saver()) {
+    VideoPlayerState(
+        seek,
+        speed,
+        volume,
+        isResumed,
+        isFullscreen
+    )
+}
+
+class VideoPlayerState(
+    seek: Float = 0f,
+    speed: Float = 1f,
+    volume: Float = 1f,
+    isResumed: Boolean = true,
+    isFullscreen: Boolean = false
+) {
+
+    var seek by mutableStateOf(seek)
+    var speed by mutableStateOf(speed)
+    var volume by mutableStateOf(volume)
+    var isResumed by mutableStateOf(isResumed)
+    var isFullscreen by mutableStateOf(isFullscreen)
+
+    companion object {
+        /**
+         * The default [Saver] implementation for [VideoPlayerState].
+         */
+        fun Saver() = listSaver<VideoPlayerState, Any>(
+            save = {
+                listOf(
+                    it.seek,
+                    it.speed,
+                    it.volume,
+                    it.isResumed,
+                    it.isFullscreen
+                )
+            },
+            restore = { state ->
+                VideoPlayerState(
+                    seek = state[0] as Float,
+                    speed = state[1] as Float,
+                    volume = state[2] as Float,
+                    isResumed = state[3] as Boolean,
+                    isFullscreen = state[3] as Boolean,
+                )
+            }
+        )
+    }
+}
