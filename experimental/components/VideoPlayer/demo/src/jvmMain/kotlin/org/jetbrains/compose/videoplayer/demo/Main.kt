@@ -77,7 +77,7 @@ fun App() {
             )
             Row {
                 Icon(painter = painterResource("volume.svg"), contentDescription = "Volume")
-                // TODO: Make the slider logarithmic
+                // TODO: Make the slider change volume in logarithmic manner
                 //  See https://www.dr-lex.be/info-stuff/volumecontrols.html
                 //  and https://ux.stackexchange.com/q/79672/117386
                 //  and https://dcordero.me/posts/logarithmic_volume_control.html

@@ -94,6 +94,10 @@ private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) =
         onDispose { events().removeMediaPlayerEventListener(listener) }
     }
 
+/**
+ * Checks for and emits video progress every 50 milliseconds.
+ * Note that it seems vlcj updates the progress every 250 milliseconds or so.
+ */
 @Composable
 private fun MediaPlayer.produceProgressFor(url: String) =
     produceState(key1 = url, initialValue = Progress(0f, 0L)) {
