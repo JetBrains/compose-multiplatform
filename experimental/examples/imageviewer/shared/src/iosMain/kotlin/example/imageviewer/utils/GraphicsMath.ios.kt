@@ -59,7 +59,7 @@ fun applyPixelFilter(bitmap: Bitmap): Bitmap {
 	val width = bitmap.width
 	val height = bitmap.height
 
-	var result = scaleBitmapAspectRatio(bitmap, width / 4, height / 4)
+	var result = scaleBitmapAspectRatio(bitmap, width / 12, height / 12)
 	result = scaleBitmapAspectRatio(result, width, height)
 
 	return result
@@ -70,7 +70,7 @@ fun applyBlurFilter(bitmap: Bitmap): Bitmap {
 		allocN32Pixels(bitmap.width, bitmap.height)
 	}
 	val blur = Paint().apply {
-		imageFilter = ImageFilter.makeBlur(3f, 3f, FilterTileMode.CLAMP)
+		imageFilter = ImageFilter.makeBlur(12f, 12f, FilterTileMode.CLAMP)
 	}
 
 	val canvas = Canvas(result)

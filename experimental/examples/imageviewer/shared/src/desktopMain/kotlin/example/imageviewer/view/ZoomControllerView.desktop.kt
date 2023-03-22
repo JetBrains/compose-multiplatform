@@ -18,7 +18,7 @@ import example.imageviewer.model.setScale
 @Composable
 internal actual fun ZoomControllerView(modifier: Modifier, scalableState: ScalableState) {
     Slider(
-        modifier = modifier.fillMaxWidth().padding(12.dp),
+        modifier = modifier.fillMaxWidth(0.5f).padding(12.dp),
         value = scalableState.scale,
         valueRange = MIN_SCALE..MAX_SCALE,
         onValueChange = { scalableState.setScale(it) },

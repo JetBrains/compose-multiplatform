@@ -78,7 +78,6 @@ internal fun FullscreenImageScreen(
                 Column(
                     Modifier
                         .align(Alignment.BottomCenter)
-                        .fillMaxWidth(0.5f)
                         .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
                         .background(ImageviewerColors.filterButtonsBackground)
                         .padding(16.dp),

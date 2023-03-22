@@ -53,7 +53,7 @@ fun applyPixelFilter(bitmap: Bitmap): Bitmap {
     var result: Bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
     val w: Int = bitmap.width
     val h: Int = bitmap.height
-    result = scaleBitmapAspectRatio(result, w / 4, h / 4)
+    result = scaleBitmapAspectRatio(result, w / 12, h / 12)
     result = scaleBitmapAspectRatio(result, w, h)
 
     return result
@@ -71,7 +71,7 @@ fun applyBlurFilter(bitmap: Bitmap, context: Context): Bitmap {
     val theIntrinsic: ScriptIntrinsicBlur =
         ScriptIntrinsicBlur.create(renderScript, Element.U8_4(renderScript))
 
-    theIntrinsic.setRadius(3f)
+    theIntrinsic.setRadius(15f)
     theIntrinsic.setInput(tmpIn)
     theIntrinsic.forEach(tmpOut)
 

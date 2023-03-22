@@ -7,13 +7,13 @@ val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "1.jpg",
         thumbnailResource = "1-thumbnail.jpg",
-        name = "Taranaki",
+        name = "Blue City",
         description = """
-            Mount Taranaki is a dormant stratovolcano in the Taranaki region on the west coast of New Zealand's North Island.
-            At 2,518 metres, it is the second highest mountain in the North Island, after Mount Ruapehu.
-            It has a secondary cone, Fanthams Peak, 1,966 metres, on its south side.
-        """.trimIndent(),
-        gps = GpsPosition(-39.296389, 174.064722)
+            Is a city in northwest Morocco.
+            It is the chief town of the province of the same name and is noted for its buildings in shades of blue, for which it is nicknamed the "Blue City".
+            Chefchaouen is situated just inland from Tangier and Tétouan.
+            """.trimIndent(),
+        gps = GpsPosition(35.171389, -5.269722)
     ),
     PictureData.Resource(
         resource = "2.jpg",
@@ -49,13 +49,13 @@ val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "5.jpg",
         thumbnailResource = "5-thumbnail.jpg",
-        name = "Blue City",
+        name = "Taranaki",
         description = """
-            Is a city in northwest Morocco.
-            It is the chief town of the province of the same name and is noted for its buildings in shades of blue, for which it is nicknamed the "Blue City".
-            Chefchaouen is situated just inland from Tangier and Tétouan.
-            """.trimIndent(),
-        gps = GpsPosition(35.171389, -5.269722)
+            Mount Taranaki is a dormant stratovolcano in the Taranaki region on the west coast of New Zealand's North Island.
+            At 2,518 metres, it is the second highest mountain in the North Island, after Mount Ruapehu.
+            It has a secondary cone, Fanthams Peak, 1,966 metres, on its south side.
+        """.trimIndent(),
+        gps = GpsPosition(-39.296389, 174.064722)
     ),
     PictureData.Resource(
         resource = "6.jpg",
