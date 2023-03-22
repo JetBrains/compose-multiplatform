@@ -29,11 +29,13 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
+import androidx.compose.ui.util.componentListenerRef
 import androidx.compose.ui.util.makeDisplayable
 import androidx.compose.ui.util.setIcon
 import androidx.compose.ui.util.setPositionSafely
 import androidx.compose.ui.util.setSizeSafely
 import androidx.compose.ui.util.setUndecoratedSafely
+import androidx.compose.ui.util.windowListenerRef
 import java.awt.Dialog.ModalityType
 import java.awt.Window
 import java.awt.event.ComponentAdapter
@@ -137,6 +139,19 @@ fun Dialog(
         }
     }
 
+    val listeners = remember {
+        object {
+            var windowListenerRef = windowListenerRef()
+            var componentListenerRef = componentListenerRef()
+
+            fun removeFromAndClear(window: ComposeDialog) {
+                windowListenerRef.unregisterFromAndClear(window)
+                componentListenerRef.unregisterFromAndClear(window)
+            }
+        }
+    }
+
+
     Dialog(
         visible = visible,
         onPreviewKeyEvent = onPreviewKeyEvent,
@@ -151,27 +166,35 @@ fun Dialog(
             dialog.apply {
                 // close state is controlled by DialogState.isOpen
                 defaultCloseOperation = JDialog.DO_NOTHING_ON_CLOSE
-                addWindowListener(object : WindowAdapter() {
-                    override fun windowClosing(e: WindowEvent?) {
-                        currentOnCloseRequest()
+                listeners.windowListenerRef.registerWithAndSet(
+                    this,
+                    object : WindowAdapter() {
+                        override fun windowClosing(e: WindowEvent?) {
+                            currentOnCloseRequest()
+                        }
                     }
-                })
-                addComponentListener(object : ComponentAdapter() {
-                    override fun componentResized(e: ComponentEvent) {
-                        currentState.size = DpSize(width.dp, height.dp)
-                        appliedState.size = currentState.size
-                    }
+                )
+                listeners.componentListenerRef.registerWithAndSet(
+                    this,
+                    object : ComponentAdapter() {
+                        override fun componentResized(e: ComponentEvent) {
+                            currentState.size = DpSize(width.dp, height.dp)
+                            appliedState.size = currentState.size
+                        }
 
-                    override fun componentMoved(e: ComponentEvent) {
-                        currentState.position = WindowPosition(x.dp, y.dp)
-                        appliedState.position = currentState.position
+                        override fun componentMoved(e: ComponentEvent) {
+                            currentState.position = WindowPosition(x.dp, y.dp)
+                            appliedState.position = currentState.position
+                        }
                     }
-                })
+                )
                 WindowLocationTracker.onWindowCreated(this)
             }
         },
         dispose = {
             WindowLocationTracker.onWindowDisposed(it)
+            // We need to remove them because AWT can still call them after dispose()
+            listeners.removeFromAndClear(it)
             it.dispose()
         },
         update = { dialog ->

@@ -29,12 +29,16 @@ import androidx.compose.ui.window.WindowPlacement
 import androidx.compose.ui.window.WindowPosition
 import androidx.compose.ui.window.density
 import androidx.compose.ui.window.layoutDirection
+import java.awt.Component
 import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.Frame
 import java.awt.Point
 import java.awt.Toolkit
 import java.awt.Window
+import java.awt.event.ComponentListener
+import java.awt.event.WindowListener
+import java.awt.event.WindowStateListener
 import kotlin.math.roundToInt
 
 /**
@@ -165,3 +169,39 @@ internal fun Window.makeDisplayable() {
         location = oldLocation
     }
 }
+
+internal class ListenerOnWindowRef<T>(
+    private val register: Window.(T) -> Unit,
+    private val unregister: Window.(T) -> Unit
+) {
+    private var value: T? = null
+
+    fun registerWithAndSet(window: Window, listener: T) {
+        window.register(listener)
+        value = listener
+    }
+
+    fun unregisterFromAndClear(window: Window) {
+        value?.let {
+            window.unregister(it)
+            value = null
+        }
+    }
+}
+
+internal fun windowStateListenerRef() = ListenerOnWindowRef<WindowStateListener>(
+    register = Window::addWindowStateListener,
+    unregister = Window::removeWindowStateListener
+)
+
+internal fun windowListenerRef() = ListenerOnWindowRef<WindowListener>(
+    register = Window::addWindowListener,
+    unregister = Window::removeWindowListener
+)
+
+internal fun componentListenerRef() = ListenerOnWindowRef<ComponentListener>(
+    register = Component::addComponentListener,
+    unregister = Component::removeComponentListener
+)
+
+

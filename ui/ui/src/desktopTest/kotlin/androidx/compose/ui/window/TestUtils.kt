@@ -133,8 +133,9 @@ internal class WindowTestScope(
         error("Do not use `launchApplication` from tests; use `launchTestApplication` instead")
     }
 
-    fun exitTestApplication() {
+    suspend fun exitTestApplication() {
         isOpen = false
+        awaitIdle()  // Wait for the windows to actually complete disposing
     }
 
     suspend fun awaitIdle() {
