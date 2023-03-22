@@ -77,7 +77,7 @@ private fun initializeMediaPlayerComponent(): Component = remember {
 
 /**
  * We play the video on finish (so the player is kind of idempotent),
- * unless the [onFinish] block stops the playback.
+ * unless the [onFinish] callback stops the playback.
  * Using `mediaPlayer.controls().repeat = true` did not work as expected.
  */
 @Composable
