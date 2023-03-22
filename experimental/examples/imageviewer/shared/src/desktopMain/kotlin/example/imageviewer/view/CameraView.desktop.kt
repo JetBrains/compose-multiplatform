@@ -65,12 +65,14 @@ internal actual fun CameraView(modifier: Modifier) {
                         }
                         Spacer(Modifier.padding(horizontal = 8.dp))
                     }
-                    EasyDropdown(
-                        selectedItem = webcamState.webcam,
-                        items = webcamListState.webcams,
-                        itemName = { webcam -> webcam.name },
-                        onSelected = { webcam -> webcamState.webcam = webcam }
-                    )
+                    if(webcamListState.webcams.size > 1) {
+                        EasyDropdown(
+                            selectedItem = webcamState.webcam,
+                            items = webcamListState.webcams,
+                            itemName = { webcam -> webcam.name },
+                            onSelected = { webcam -> webcamState.webcam = webcam }
+                        )
+                    }
                 }
             } else {
                 CameraText(text = "Camera not found, connect one.")
