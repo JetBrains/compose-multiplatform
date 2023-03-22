@@ -47,7 +47,13 @@ kotlin {
                 api("androidx.activity:activity-compose:1.6.1")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.9.0")
-                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")
+                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")//todo remove
+                implementation("androidx.camera:camera-camera2:1.2.1")
+                implementation("androidx.camera:camera-lifecycle:1.2.1")
+                implementation("androidx.camera:camera-view:1.2.1")
+                implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
+                implementation("com.google.android.gms:play-services-maps:18.1.0")
+                implementation("com.google.android.gms:play-services-location:21.0.1")
             }
         }
         val iosMain by getting {

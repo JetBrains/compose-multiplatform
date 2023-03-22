@@ -63,18 +63,5 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
     }
-    override val imageStorage: ImageStorage = object : ImageStorage {
-        override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
-            TODO("Not yet implemented")
-        }
-
-        override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
-            TODO("Not yet implemented")
-        }
-
-    }
+    override val imageStorage: ImageStorage = AndroidImageStorage(pictures, ioScope)
 }
