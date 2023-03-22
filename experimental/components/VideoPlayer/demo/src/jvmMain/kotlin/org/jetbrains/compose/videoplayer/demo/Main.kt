@@ -2,7 +2,9 @@ package org.jetbrains.compose.videoplayer.demo
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -10,9 +12,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.singleWindowApplication
 import org.jetbrains.compose.videoplayer.VideoPlayer
 import org.jetbrains.compose.videoplayer.rememberVideoPlayerState
+import java.awt.Dimension
 
 fun main() {
     singleWindowApplication(title = "Video Player") {
+        // See https://github.com/JetBrains/compose-multiplatform/issues/2285
+        window.minimumSize = Dimension(700, 560)
         MaterialTheme {
             App()
         }
