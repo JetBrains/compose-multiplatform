@@ -1,8 +1,6 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.*
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.collectIsHoveredAsState
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,27 +9,27 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import example.imageviewer.ImageProvider
 import example.imageviewer.Localization
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.style.*
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.*
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun FullscreenImageScreen(
     picture: PictureData,
-    getImage: suspend (PictureData) -> ImageBitmap,
+    imageProvider: ImageProvider,
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
@@ -41,7 +39,7 @@ internal fun FullscreenImageScreen(
 
     val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(picture) {
-        originalImageState.value = getImage(picture)
+        originalImageState.value = imageProvider.getImage(picture)
     }
 
     val originalImage = originalImageState.value
@@ -58,36 +56,36 @@ internal fun FullscreenImageScreen(
     }
     Box(Modifier.fillMaxSize().background(color = ImageviewerColors.fullScreenImageBackground)) {
         if (imageWithFilter != null) {
-            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
-                val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
-                val scalableState = remember(imageSize) { ScalableState(imageSize) }
-                val visiblePartOfImage: IntRect = scalableState.visiblePart
-                Box(
-                    Modifier.fillMaxSize()
-                        .onGloballyPositioned { coordinates ->
-                            scalableState.changeBoxSize(coordinates.size)
-                        }
-                        .addUserInput(scalableState)
-                ) {
-                    Image(
-                        modifier = Modifier.fillMaxSize(),
-                        painter = BitmapPainter(
-                            imageWithFilter,
-                            srcOffset = visiblePartOfImage.topLeft,
-                            srcSize = visiblePartOfImage.size
-                        ),
-                        contentDescription = null,
-                    )
-                }
+            val imageSize = IntSize(imageWithFilter.width, imageWithFilter.height)
+            val scalableState = remember(imageSize) { ScalableState(imageSize) }
+            val visiblePartOfImage: IntRect = scalableState.visiblePart
+            Box(
+                Modifier.fillMaxSize()
+                    .onGloballyPositioned { coordinates ->
+                        scalableState.changeBoxSize(coordinates.size)
+                    }
+                    .addUserInput(scalableState)
+            ) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    painter = BitmapPainter(
+                        imageWithFilter,
+                        srcOffset = visiblePartOfImage.topLeft,
+                        srcSize = visiblePartOfImage.size
+                    ),
+                    contentDescription = null,
+                )
                 Column(
                     Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth(0.5f)
                         .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                        .background(ImageviewerColors.filterButtonsBackground).padding(16.dp),
+                        .background(ImageviewerColors.filterButtonsBackground)
+                        .padding(16.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     FilterButtons(
+                        picture = picture,
                         filters = availableFilters,
                         selectedFilters = selectedFilters,
                         onSelectFilter = {
@@ -96,7 +94,10 @@ internal fun FullscreenImageScreen(
                             } else {
                                 selectedFilters -= it
                             }
-                        })
+                        },
+                        getFilter = getFilter,
+                        imageProvider = imageProvider,
+                    )
                     ZoomControllerView(Modifier, scalableState)
                 }
             }
@@ -120,69 +121,36 @@ internal fun FullscreenImageScreen(
 
 @Composable
 private fun FilterButtons(
+    picture: PictureData,
     filters: List<FilterType>,
     selectedFilters: Set<FilterType>,
-    onSelectFilter: (FilterType) -> Unit
+    onSelectFilter: (FilterType) -> Unit,
+    getFilter: (FilterType) -> BitmapFilter,
+    imageProvider: ImageProvider,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.padding(bottom = 16.dp)
     ) {
         for (type in filters) {
-            FilterButton(active = type in selectedFilters,
-                type,
-                onClick = {
-                    onSelectFilter(type)
-                })
-        }
-    }
-}
-
-
-@Composable
-private fun FilterButton(
-    active: Boolean,
-    type: FilterType,
-    onClick: () -> Unit,
-) {
-    val interactionSource = remember { MutableInteractionSource() }
-    val filterButtonHover by interactionSource.collectIsHoveredAsState()
-    Box(
-        modifier = Modifier.background(color = ImageviewerColors.Transparent).clip(CircleShape)
-    ) {
-        Tooltip(type.toString()) {
-            Image(
-                getFilterImage(active, type = type),
-                contentDescription = null,
-                Modifier.size(40.dp)
-                    .hoverable(interactionSource)
-                    .background(color = ImageviewerColors.buttonBackground(filterButtonHover))
-                    .clickable { onClick() }
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-private fun getFilterImage(active: Boolean, type: FilterType): Painter {
-    return when (type) {
-        FilterType.GrayScale -> if (active) {
-            painterResource("grayscale_on.png")
-        } else {
-            painterResource("grayscale_off.png")
-        }
-
-        FilterType.Pixel -> if (active) {
-            painterResource("pixel_on.png")
-        } else {
-            painterResource("pixel_off.png")
-        }
-
-        FilterType.Blur -> if (active) {
-            painterResource("blur_on.png")
-        } else {
-            painterResource("blur_off.png")
+            Tooltip(type.toString()) {
+                ThumbnailImage(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .clip(CircleShape)
+                        .border(
+                            color = if (type in selectedFilters) Color.White else Color.Gray,
+                            width = 3.dp,
+                            shape = CircleShape
+                        )
+                        .clickable {
+                            onSelectFilter(type)
+                        },
+                    picture = picture,
+                    imageProvider = imageProvider,
+                    filter = remember { { getFilter(type).apply(it) } }
+                )
+            }
         }
     }
 }

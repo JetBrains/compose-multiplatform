@@ -9,23 +9,22 @@ import example.imageviewer.ImageProvider
 import example.imageviewer.model.PictureData
 
 @Composable
-internal fun MiniatureImage(
+internal fun ThumbnailImage(
     modifier: Modifier,
     picture: PictureData,
     imageProvider: ImageProvider,
+    filter: (ImageBitmap) -> ImageBitmap = remember { { it } },
 ) {
     var imageBitmap by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(Unit) {
         imageBitmap = imageProvider.getThumbnail(picture)
     }
     if (imageBitmap != null) {
-        Tooltip(picture.name) {
-            Image(
-                bitmap = imageBitmap!!,
-                contentDescription = picture.name,
-                modifier = modifier,
-                contentScale = ContentScale.Crop,
-            )
-        }
+        Image(
+            bitmap = filter(imageBitmap!!),
+            contentDescription = picture.name,
+            modifier = modifier,
+            contentScale = ContentScale.Crop,
+        )
     }
 }

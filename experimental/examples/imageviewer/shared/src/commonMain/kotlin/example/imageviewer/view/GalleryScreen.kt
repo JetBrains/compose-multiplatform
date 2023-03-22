@@ -105,7 +105,7 @@ private fun SquaresGalleryView(
         ) {
             itemsIndexed(images) { idx, picture ->
                 val isSelected = picture == selectedImage
-                SquareMiniature(
+                SquareThumbnail(
                     picture = picture,
                     imageProvider = imageProvider,
                     onClick = { onSelect(picture) },
@@ -118,16 +118,23 @@ private fun SquaresGalleryView(
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun SquareMiniature(picture: PictureData, imageProvider: ImageProvider, isHighlighted: Boolean, onClick: () -> Unit) {
+internal fun SquareThumbnail(
+    picture: PictureData,
+    imageProvider: ImageProvider,
+    isHighlighted: Boolean,
+    onClick: () -> Unit
+) {
     Box(
         Modifier.aspectRatio(1.0f).clickable(onClick = onClick),
         contentAlignment = Alignment.BottomEnd
     ) {
-        MiniatureImage(
-            modifier = Modifier.fillMaxSize(),
-            picture = picture,
-            imageProvider = imageProvider,
-        )
+        Tooltip(picture.name) {
+            ThumbnailImage(
+                modifier = Modifier.fillMaxSize(),
+                picture = picture,
+                imageProvider = imageProvider,
+            )
+        }
         if (isHighlighted) {
             Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack))
             Box(
@@ -166,7 +173,7 @@ private fun ListGalleryView(
     ) {
         Spacer(modifier = Modifier.height(10.dp))
         for (p in pictures.withIndex()) {
-            Miniature(
+            Thumbnail(
                 picture = p.value,
                 onClickSelect = {
                     onSelect(p.value)

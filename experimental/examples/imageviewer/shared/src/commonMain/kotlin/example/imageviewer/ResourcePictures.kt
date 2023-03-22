@@ -6,6 +6,7 @@ import example.imageviewer.model.PictureData
 val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "1.jpg",
+        thumbnailResource = "1-thumbnail.jpg",
         name = "Taranaki",
         description = """
             Mount Taranaki is a dormant stratovolcano in the Taranaki region on the west coast of New Zealand's North Island.
@@ -16,6 +17,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "2.jpg",
+        thumbnailResource = "2-thumbnail.jpg",
         name = "Auckland SkyCity",
         description = """
             SkyCity Casino History
@@ -26,6 +28,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "3.jpg",
+        thumbnailResource = "3-thumbnail.jpg",
         name = "Empire State Building",
         description = """
             The Empire State Building is a 102-story Art Deco skyscraper in Midtown Manhattan, New York City.
@@ -35,6 +38,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "4.jpg",
+        thumbnailResource = "4-thumbnail.jpg",
         name = "Tokyo Skytree",
         description = """
             Tokyo Skytree is a broadcasting and observation tower in Sumida, Tokyo.
@@ -44,6 +48,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "5.jpg",
+        thumbnailResource = "5-thumbnail.jpg",
         name = "Blue City",
         description = """
             Is a city in northwest Morocco.
@@ -54,6 +59,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "6.jpg",
+        thumbnailResource = "6-thumbnail.jpg",
         name = "Blue City",
         description = """
             Is a city in northwest Morocco.
@@ -64,6 +70,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "7.jpg",
+        thumbnailResource = "7-thumbnail.jpg",
         name = "Berliner Fernsehturm",
         description = """
             At 368 meters, the Berlin television tower is the tallest building in Germany and the fifth tallest television tower in Europe.
@@ -74,6 +81,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "8.jpg",
+        thumbnailResource = "8-thumbnail.jpg",
         name = "Hoggar Mountains",
         description = """
             The Hoggar Mountains are a highland region in the central Sahara in southern Algeria, along the Tropic of Cancer.
@@ -83,6 +91,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "9.jpg",
+        thumbnailResource = "9-thumbnail.jpg",
         name = "Nakhal Fort",
         description = """
             Nakhal Fort is a large fortification in Al Batinah Region of Oman.
@@ -93,6 +102,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "10.jpg",
+        thumbnailResource = "10-thumbnail.jpg",
         name = "Mountain Ararat",
         description = """
             Mount Ararat is a snow-capped and dormant compound volcano in the extreme east of Turkey.
@@ -103,6 +113,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "11.jpg",
+        thumbnailResource = "11-thumbnail.jpg",
         name = "Cabo da Roca",
         description = """
             The view on Cabo da Roca.
@@ -112,6 +123,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "12.jpg",
+        thumbnailResource = "12-thumbnail.jpg",
         name = "Surprised Whiskers 🐱",
         description = """
             Surprised Whiskers: A Furry Tale.
@@ -122,6 +134,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "13.jpg",
+        thumbnailResource = "13-thumbnail.jpg",
         name = "Software Engineering Donut",
         description = """
             Munich
@@ -133,6 +146,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "14.jpg",
+        thumbnailResource = "14-thumbnail.jpg",
         name = "Seligman Police Car.",
         description = """
             Seligman, USA
@@ -144,6 +158,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "15.jpg",
+        thumbnailResource = "15-thumbnail.jpg",
         name = "Good Luck Charms",
         description = """
             Munich
@@ -156,6 +171,7 @@ val resourcePictures = arrayOf(
     ),
     PictureData.Resource(
         resource = "16.jpg",
+        thumbnailResource = "16-thumbnail.jpg",
         name = "Pong Restaurant",
         description = """
             Stockholm, Sweden

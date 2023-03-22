@@ -255,7 +255,7 @@ internal fun RelatedMemory(
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-        SquareMiniature(
+        SquareThumbnail(
             picture = galleryEntry,
             imageProvider = imageProvider,
             isHighlighted = false,

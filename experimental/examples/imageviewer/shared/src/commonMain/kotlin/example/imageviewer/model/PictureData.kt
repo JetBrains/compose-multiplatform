@@ -16,6 +16,7 @@ sealed interface PictureData {
 
     class Resource(
         val resource: String,
+        val thumbnailResource: String,
         override val name: String,
         override val description: String,
         override val gps: GpsPosition

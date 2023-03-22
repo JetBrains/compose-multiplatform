@@ -66,7 +66,7 @@ internal fun ImageViewerCommon(
                 is FullScreenPage -> {
                     FullscreenImageScreen(
                         picture = page.picture,
-                        getImage = { dependencies.imageProvider.getImage(it) },
+                        imageProvider = dependencies.imageProvider,
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {

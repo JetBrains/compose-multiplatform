@@ -7,11 +7,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,7 +22,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-internal fun Miniature(
+internal fun Thumbnail(
     picture: PictureData,
     onClickSelect: () -> Unit,
     onClickFullScreen: () -> Unit,
@@ -46,14 +42,16 @@ internal fun Miniature(
 
     ) {
         Row(modifier = Modifier.padding(end = 30.dp)) {
-            MiniatureImage(
-                modifier = Modifier.size(70.dp)
-                    .clip(CircleShape)
-                    .border(BorderStroke(1.dp, Color.White), CircleShape)
-                    .clickable { onClickFullScreen() },
-                picture = picture,
-                imageProvider = imageProvider
-            )
+            Tooltip(picture.name) {
+                ThumbnailImage(
+                    modifier = Modifier.size(70.dp)
+                        .clip(CircleShape)
+                        .border(BorderStroke(1.dp, Color.White), CircleShape)
+                        .clickable { onClickFullScreen() },
+                    picture = picture,
+                    imageProvider = imageProvider
+                )
+            }
             Text(
                 text = picture.name,
                 modifier = Modifier.weight(1f).align(Alignment.CenterVertically)

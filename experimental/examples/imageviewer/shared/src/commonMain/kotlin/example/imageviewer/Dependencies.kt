@@ -22,13 +22,21 @@ abstract class Dependencies {
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
-            is PictureData.Resource -> resource(picture.resource).readBytes().toImageBitmap()
-            is PictureData.Camera -> imageStorage.getImage(picture)
+            is PictureData.Resource -> {
+                resource(picture.resource).readBytes().toImageBitmap()
+            }
+            is PictureData.Camera -> {
+                imageStorage.getImage(picture)
+            }
         }
 
         override suspend fun getThumbnail(picture: PictureData): ImageBitmap = when (picture) {
-            is PictureData.Resource -> resource(picture.resource).readBytes().toImageBitmap()//todo small
-            is PictureData.Camera -> imageStorage.getThumbnail(picture)
+            is PictureData.Resource -> {
+                resource(picture.thumbnailResource).readBytes().toImageBitmap()
+            }
+            is PictureData.Camera -> {
+                imageStorage.getThumbnail(picture)
+            }
         }
     }
 }
