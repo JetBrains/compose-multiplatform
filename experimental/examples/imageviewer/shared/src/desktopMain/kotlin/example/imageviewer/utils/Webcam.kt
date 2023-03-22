@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.graphics.*
 import com.github.eduramiba.webcamcapture.drivers.NativeDriver
 import com.github.sarxos.webcam.*
+import com.github.sarxos.webcam.ds.gstreamer.GStreamerDriver
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -15,6 +16,7 @@ import kotlinx.coroutines.yield
 import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.ColorAlphaType
 import org.jetbrains.skia.ImageInfo
+import java.awt.Dimension
 import java.awt.image.*
 import kotlin.math.max
 import kotlin.time.ExperimentalTime
@@ -48,11 +50,11 @@ internal class WebcamListState {
                 // check if running on ARM/MacOS and apply the native driver.
                 if(driverInitialized.not()) {
                     val os = System.getProperty("os.name")
-                    val driver = if(os.contains("mac") || os.contains("darwin")) {
-                        NativeDriver()
+                    val driver = if(os.contains("linux", ignoreCase = true)) {
+                        GStreamerDriver()
                     } else {
+                        // mac and windows
                         NativeDriver()
-                        // TODO another Driver that already works on Windows and Linux
                     }
 
                     Webcam.setDriver(driver)
@@ -91,7 +93,10 @@ internal class WebcamListState {
 
 @Composable
 internal fun rememberWebcamState(webcam: Webcam): WebcamState {
-    val state = remember { WebcamState(webcam) }
+    val state = remember {
+        webcam.viewSize = Dimension(1280, 720)
+        WebcamState(webcam)
+    }
     state.setup()
 
     return state
