@@ -78,7 +78,7 @@ fun java.io.File.toProjectFile(): File = object : File {
                 } else byteBufferSize
 
                 // Clip windows style line ending from the range too
-                if (byteBuffer[endPosition - 1].isChar('\r')) {
+                if (endPosition > startPosition && byteBuffer[endPosition - 1].isChar('\r')) {
                     endPosition--
                 }
                 return startPosition..endPosition
