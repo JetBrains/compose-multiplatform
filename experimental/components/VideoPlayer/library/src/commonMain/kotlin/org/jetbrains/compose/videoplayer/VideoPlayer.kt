@@ -87,7 +87,7 @@ class VideoPlayerState(
                     speed = it[1] as Float,
                     volume = it[2] as Float,
                     isResumed = it[3] as Boolean,
-                    isFullscreen = it[3] as Boolean,
+                    isFullscreen = it[3] as Boolean
                 )
             }
         )
