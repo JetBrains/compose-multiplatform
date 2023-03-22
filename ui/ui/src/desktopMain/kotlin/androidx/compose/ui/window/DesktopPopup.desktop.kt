@@ -19,7 +19,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.awt.LocalLayerContainer
+import androidx.compose.ui.LocalComposeScene
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
@@ -30,24 +30,15 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.round
-import java.awt.MouseInfo
-import javax.swing.SwingUtilities.convertPointFromScreen
 import kotlin.math.roundToInt
 
 /**
- * Returns a remembered value of the mouse cursor position.
+ * Returns a remembered value of the mouse cursor position or null if cursor is not inside a scene.
  */
 @Composable
-private fun rememberCursorPosition(): Offset {
-    val component = LocalLayerContainer.current
-    return remember {
-        val awtMousePosition = MouseInfo.getPointerInfo().location
-        convertPointFromScreen(awtMousePosition, component)
-        Offset(
-            (awtMousePosition.x * component.density.density),
-            (awtMousePosition.y * component.density.density)
-        )
-    }
+private fun rememberCursorPosition(): Offset? {
+    val scene = LocalComposeScene.current
+    return remember { scene.pointerPositions.values.firstOrNull() }
 }
 
 /**
@@ -68,7 +59,15 @@ fun rememberCursorPositionProvider(
     val windowMarginPx = windowMargin.roundToPx()
     val cursorPosition = rememberCursorPosition()
 
-    return remember(cursorPosition, offsetPx, alignment, windowMarginPx){
+    if (cursorPosition == null) {
+        // if cursor is outside the scene, show popup under the parent component
+        return rememberComponentRectPositionProvider(
+            alignment = alignment,
+            offset = offset
+        )
+    }
+
+    return remember(cursorPosition, offsetPx, alignment, windowMarginPx) {
         PopupPositionProviderAtPosition(
             positionPx = cursorPosition,
             isRelativeToAnchor = false,

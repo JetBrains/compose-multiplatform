@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,7 +61,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toIntRect
 import kotlin.coroutines.CoroutineContext
 import kotlin.jvm.Volatile
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Dispatchers
@@ -232,6 +231,11 @@ class ComposeScene internal constructor(
         }
 
     private var isClosed = false
+
+    /**
+     * Provides mapping pointer id -> current pointer position inside [ComposeScene]
+     */
+    internal val pointerPositions = mutableMapOf<PointerId, Offset>()
 
     init {
         GlobalSnapshotManager.ensureStarted()
@@ -477,6 +481,30 @@ class ComposeScene internal constructor(
         forEachOwner { it.measureAndLayout() }
         pointerPositionUpdater.beforeEvent(event)
         processPointerInput(event)
+        updatePointerPositions(event)
+    }
+
+    private fun updatePointerPositions(event: PointerInputEvent) {
+        // update positions for pointers that are down + mouse (if it is not Exit event)
+        for (pointer in event.pointers) {
+            if ((pointer.type == PointerType.Mouse && event.eventType != PointerEventType.Exit) ||
+                pointer.down
+            ) {
+                pointerPositions[pointer.id] = pointer.position
+            }
+        }
+        // touches/styluses positions should be removed from [pointerPositions] if they are not down anymore
+        // also, mouse exited ComposeScene should be removed
+        val iterator = pointerPositions.iterator()
+        while (iterator.hasNext()) {
+            val pointerId = iterator.next().key
+            val pointer = event.pointers.find { it.id == pointerId } ?: continue
+            if ((pointer.type != PointerType.Mouse && !pointer.down) ||
+                (pointer.type == PointerType.Mouse && event.eventType == PointerEventType.Exit)
+            ) {
+                iterator.remove()
+            }
+        }
     }
 
     @Suppress("DEPRECATION")
