@@ -13,6 +13,7 @@ import uk.co.caprica.vlcj.player.component.EmbeddedMediaPlayerComponent
 import uk.co.caprica.vlcj.player.embedded.EmbeddedMediaPlayer
 import java.awt.Component
 import java.util.*
+import kotlin.math.roundToInt
 
 @Composable
 internal actual fun VideoPlayerImpl(
@@ -59,7 +60,7 @@ internal actual fun VideoPlayerImpl(
     return mediaPlayer.produceProgressFor(url)
 }
 
-private fun Float.toPercentage() = (this * 100).toInt()
+private fun Float.toPercentage() = (this * 100).roundToInt()
 
 /**
  * See https://github.com/caprica/vlcj/issues/887#issuecomment-503288294
