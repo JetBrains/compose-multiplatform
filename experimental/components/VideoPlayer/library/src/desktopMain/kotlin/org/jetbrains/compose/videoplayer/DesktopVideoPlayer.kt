@@ -27,6 +27,7 @@ internal actual fun VideoPlayerImpl(
 ): State<Progress> {
     val mediaPlayerComponent = initializeMediaPlayerComponent()
     val mediaPlayer = remember { mediaPlayerComponent.mediaPlayer() }
+    mediaPlayer.setupVideoFinishHandler(onFinish)
 
     val factory = remember { { mediaPlayerComponent } }
     /* OR the following code and using SwingPanel(factory = { factory }, ...) */
@@ -55,7 +56,6 @@ internal actual fun VideoPlayerImpl(
         background = Color.Transparent,
         modifier = modifier
     )
-    mediaPlayer.setupVideoFinishHandler(onFinish)
     return mediaPlayer.produceProgressFor(url)
 }
 
