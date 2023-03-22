@@ -81,13 +81,13 @@ class VideoPlayerState(
                     it.isFullscreen
                 )
             },
-            restore = { state ->
+            restore = {
                 VideoPlayerState(
-                    seek = state[0] as Float,
-                    speed = state[1] as Float,
-                    volume = state[2] as Float,
-                    isResumed = state[3] as Boolean,
-                    isFullscreen = state[3] as Boolean,
+                    seek = it[0] as Float,
+                    speed = it[1] as Float,
+                    volume = it[2] as Float,
+                    isResumed = it[3] as Boolean,
+                    isFullscreen = it[3] as Boolean,
                 )
             }
         )
