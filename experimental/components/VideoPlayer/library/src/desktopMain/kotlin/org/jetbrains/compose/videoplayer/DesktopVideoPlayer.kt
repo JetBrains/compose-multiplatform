@@ -41,7 +41,9 @@ internal actual fun VideoPlayerImpl(
         if (mediaPlayer is EmbeddedMediaPlayer) {
             /*
              * To be able to access window in the commented code below,
-             * extend the player composable function from WindowScope
+             * extend the player composable function from WindowScope.
+             * See https://github.com/JetBrains/compose-jb/issues/176#issuecomment-812514936
+             * and its subsequent comments.
              */
             // mediaPlayer.fullScreen().strategy(ExclusiveModeFullScreenStrategy(window))
             mediaPlayer.fullScreen().toggle()
