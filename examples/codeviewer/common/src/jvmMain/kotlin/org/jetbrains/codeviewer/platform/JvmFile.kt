@@ -72,14 +72,15 @@ fun java.io.File.toProjectFile(): File = object : File {
             private fun lineRange(index: Int): IntRange {
                 val startPosition = lineStartPositions[index]
                 val nextLineIndex = index + 1
-                var endPosition = if (nextLineIndex < size) {
-                    // Remove \n itself from the range
-                    lineStartPositions[nextLineIndex] - 1
-                } else byteBufferSize
+                var endPosition = if (nextLineIndex < size) lineStartPositions[nextLineIndex] else byteBufferSize
 
-                // Clip windows style line ending from the range too
-                if (endPosition > startPosition && byteBuffer[endPosition - 1].isChar('\r')) {
-                    endPosition--
+                // Remove line endings from the range
+                while (endPosition > startPosition) {
+                    val lastSymbol = byteBuffer[endPosition - 1]
+                    when (lastSymbol.toInt().toChar()) {
+                        '\n', '\r' -> endPosition--
+                        else -> break
+                    }
                 }
                 return startPosition..endPosition
             }
