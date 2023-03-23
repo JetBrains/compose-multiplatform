@@ -54,6 +54,7 @@ kotlin {
                 implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
                 implementation("com.google.android.gms:play-services-maps:18.1.0")
                 implementation("com.google.android.gms:play-services-location:21.0.1")
+                implementation("com.google.maps.android:maps-compose:2.11.2")
             }
         }
         val iosMain by getting {

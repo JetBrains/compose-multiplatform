@@ -13,10 +13,10 @@
         android:roundIcon="@mipmap/ic_imageviewer_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.ImageViewer">
-        <activity
-            android:exported="true"
-            android:name="example.imageviewer.MainActivity"
-        >
+
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="${MAPS_API_KEY}" />
+
+        <activity android:exported="true" android:name="example.imageviewer.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

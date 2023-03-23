@@ -21,6 +21,7 @@ import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
 import example.imageviewer.AndroidStorableImage
@@ -43,6 +44,7 @@ internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
         listOf(
             android.Manifest.permission.CAMERA,
             android.Manifest.permission.ACCESS_COARSE_LOCATION,
+            android.Manifest.permission.ACCESS_FINE_LOCATION,
         )
     )
     if (cameraPermissionState.allPermissionsGranted) {
@@ -93,22 +95,29 @@ private fun CameraWithGrantedPermission(modifier: Modifier, storage: ImageStorag
                     val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
                     val imageBitmap = byteArray.toImageBitmap()
                     image.close()
-                    val lastLocation: Task<Location> =
-                        LocationServices.getFusedLocationProviderClient(context).lastLocation
-                    val gpsPosition = if (lastLocation.isSuccessful) {
-                        GpsPosition(lastLocation.result.latitude, lastLocation.result.longitude)
-                    } else {
-                        GpsPosition(0.0, 0.0)
+                    fun sendToStorage(gpsPosition: GpsPosition) {
+                        storage.saveImage(
+                            PictureData.Camera(
+                                id = UUID.randomUUID().toString(),
+                                name = "Kotlin Conf",
+                                description = "Kotlin Conf photo description",
+                                gps = gpsPosition
+                            ),
+                            AndroidStorableImage(imageBitmap)
+                        )
                     }
-                    storage.saveImage(
-                        PictureData.Camera(
-                            id = UUID.randomUUID().toString(),
-                            name = "Kotlin Conf",
-                            description = "Kotlin Conf photo description",
-                            gps = gpsPosition
-                        ),
-                        AndroidStorableImage(imageBitmap)
-                    )
+
+                    val lastLocation: Task<Location> =
+                        LocationServices.getFusedLocationProviderClient(context).getCurrentLocation(
+                            CurrentLocationRequest.Builder().build(),
+                            null
+                        )
+                    lastLocation.addOnSuccessListener {
+                        sendToStorage(GpsPosition(it.latitude, it.longitude))
+                    }
+                    lastLocation.addOnFailureListener {
+                        sendToStorage(GpsPosition(0.0, 0.0))
+                    }
                 }
             })
         }) {
