@@ -19,11 +19,12 @@ package androidx.compose.foundation.gestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SkikoComposeUiTest
+import androidx.compose.ui.test.runSkikoComposeUiTest
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.test.Test
@@ -36,17 +37,15 @@ import platform.CoreGraphics.CGScrollEventUnit
 import platform.CoreGraphics.kCGScrollEventUnitLine
 import platform.CoreGraphics.kCGScrollEventUnitPixel
 
-@OptIn(ExperimentalComposeUiApi::class)
+@ExperimentalTestApi
 class MacosScrollableTest {
-    private val density = 2f
-    private val scrollLine = density * 10f
+    private val density = Density(2f)
+    private val scrollLine = density.density * 10f
 
     @Test
-    fun `scroll by pixels vertically`() {
-        val scene = ComposeScene(density = Density(density))
+    fun `scroll by pixels vertically`() = runSkikoComposeUiTest(density = density) {
         val context = TestColumn()
-
-        scene.setContent {
+        setContent {
             Box(
                 Modifier
                     .scrollable(
@@ -57,17 +56,17 @@ class MacosScrollableTest {
             )
         }
 
-        scene.sendScrollingEvent(deltaY = 10, unit = kCGScrollEventUnitPixel)
+        sendScrollingEvent(deltaY = 10, unit = kCGScrollEventUnitPixel)
 
+        waitForIdle()
         assertEquals(10F, context.offset, 0.1F)
     }
 
     @Test
-    fun `scroll by lines vertically`() {
-        val scene = ComposeScene(density = Density(density))
+    fun `scroll by lines vertically`() = runSkikoComposeUiTest(density = density) {
         val context = TestColumn()
 
-        scene.setContent {
+        setContent {
             Box(
                 Modifier
                     .scrollable(
@@ -78,17 +77,17 @@ class MacosScrollableTest {
             )
         }
 
-        scene.sendScrollingEvent(deltaY = 3, unit = kCGScrollEventUnitLine)
+        sendScrollingEvent(deltaY = 3, unit = kCGScrollEventUnitLine)
 
+        waitForIdle()
         assertEquals(3F * scrollLine, context.offset, 0.1F)
     }
 
     @Test
-    fun `scroll by pixels horizontally`() {
-        val scene = ComposeScene(density = Density(density))
+    fun `scroll by pixels horizontally`() = runSkikoComposeUiTest(density = density) {
         val context = TestColumn()
 
-        scene.setContent {
+        setContent {
             Box(
                 Modifier
                     .scrollable(
@@ -99,17 +98,17 @@ class MacosScrollableTest {
             )
         }
 
-        scene.sendScrollingEvent(deltaX = 5, unit = kCGScrollEventUnitPixel)
+        sendScrollingEvent(deltaX = 5, unit = kCGScrollEventUnitPixel)
 
+        waitForIdle()
         assertEquals(5F, context.offset, 0.1F)
     }
 
     @Test
-    fun `scroll by lines horizontally`() {
-        val scene = ComposeScene(density = Density(density))
+    fun `scroll by lines horizontally`() = runSkikoComposeUiTest(density = density) {
         val context = TestColumn()
 
-        scene.setContent {
+        setContent {
             Box(
                 Modifier
                     .scrollable(
@@ -120,17 +119,18 @@ class MacosScrollableTest {
             )
         }
 
-        scene.sendScrollingEvent(deltaX = 2, unit = kCGScrollEventUnitLine)
+        sendScrollingEvent(deltaX = 2, unit = kCGScrollEventUnitLine)
 
+        waitForIdle()
         assertEquals(2F * scrollLine, context.offset, 0.1F)
     }
 
-    private fun ComposeScene.sendScrollingEvent(
+    private fun SkikoComposeUiTest.sendScrollingEvent(
         deltaX: Int = 0,
         deltaY: Int = 0,
         unit: CGScrollEventUnit,
     ) {
-        sendPointerEvent(
+        scene.sendPointerEvent(
             eventType = PointerEventType.Scroll,
             position = Offset.Zero,
             scrollDelta = Offset(x = deltaX.toFloat(), y = deltaY.toFloat()),
@@ -142,8 +142,7 @@ class MacosScrollableTest {
         deltaX: Int,
         deltaY: Int,
         unit: CGScrollEventUnit,
-    ): SkikoPointerEvent =
-        SkikoPointerEvent(
+    ) = SkikoPointerEvent(
             x = deltaX.toDouble(),
             y = deltaY.toDouble(),
             deltaX = deltaX.toDouble(),

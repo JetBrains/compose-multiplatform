@@ -22,7 +22,6 @@ import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
@@ -38,16 +37,14 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.cancellation.CancellationException
+import kotlin.math.roundToInt
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.yield
-import kotlin.coroutines.cancellation.CancellationException
-import kotlin.math.roundToInt
-import org.jetbrains.skia.Bitmap
 import org.jetbrains.skia.IRect
-import org.jetbrains.skia.Image
 import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.currentNanoTime
 
@@ -59,11 +56,13 @@ actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
 @ExperimentalTestApi
 fun runSkikoComposeUiTest(
     size: Size = Size(1024.0f, 768.0f),
+    density: Density = Density(1f),
     block: SkikoComposeUiTest.() -> Unit
 ) {
     SkikoComposeUiTest(
         width = size.width.roundToInt(),
-        height = size.height.roundToInt()
+        height = size.height.roundToInt(),
+        density = density
     ).runTest(block)
 }
 
@@ -71,10 +70,9 @@ fun runSkikoComposeUiTest(
 @OptIn(ExperimentalCoroutinesApi::class, InternalTestApi::class)
 class SkikoComposeUiTest(
     width: Int = 1024,
-    height: Int = 768
+    height: Int = 768,
+    override val density: Density = Density(1f)
 ) : ComposeUiTest {
-
-    override val density = Density(1f, 1f)
 
     private val textInputService = object : PlatformTextInputService {
         var onEditCommand: ((List<EditCommand>) -> Unit)? = null
@@ -138,7 +136,7 @@ class SkikoComposeUiTest(
     private fun renderNextFrame() = runOnUiThread {
         scene.render(
             surface.canvas,
-            mainClock.currentTime * 1_000_000
+            mainClock.currentTime * NanoSecondsPerMilliSecond
         )
         if (mainClock.autoAdvance) {
             mainClock.advanceTimeByFrame()
@@ -217,6 +215,8 @@ class SkikoComposeUiTest(
                 )
             }
         }
+
+        // TODO Add a wait function variant without conditions (timeout exceptions)
     }
 
     override fun registerIdlingResource(idlingResource: IdlingResource) {

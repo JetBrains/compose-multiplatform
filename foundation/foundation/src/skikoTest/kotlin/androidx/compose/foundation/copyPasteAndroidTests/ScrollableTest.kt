@@ -82,6 +82,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalViewConfiguration
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.ComposeTimeoutException
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.ScrollWheel
 import androidx.compose.ui.test.SkikoComposeUiTest
@@ -495,6 +496,39 @@ class ScrollableTest {
         }
         runOnIdle {
             assertThat(total).isLessThan(0.01f)
+        }
+    }
+
+    @Test
+    fun scrollable_mouseWheel_scrollWhenAnimated() = runSkikoComposeUiTest {
+        var total = 0f
+        val controller = ScrollableState(
+            consumeScrollDelta = {
+                total += it
+                it
+            }
+        )
+        setScrollableContent {
+            Modifier.scrollable(
+                state = controller,
+                orientation = Orientation.Vertical
+            )
+        }
+        onNodeWithTag(scrollableBoxTag).performMouseInput {
+            this.scroll(100f, ScrollWheel.Vertical)
+        }
+        delay(timeMillis = 20)
+        onNodeWithTag(scrollableBoxTag).performMouseInput {
+            // Send another event during animation
+            this.scroll(20f, ScrollWheel.Vertical)
+        }
+        delay(timeMillis = 20)
+        onNodeWithTag(scrollableBoxTag).performMouseInput {
+            // Send one more event with opposite direction during animation
+            this.scroll(-120f, ScrollWheel.Vertical)
+        }
+        runOnIdle {
+            assertThat(total).isEqualTo(0f, eps = 0.01f)
         }
     }
 
@@ -2412,5 +2446,14 @@ internal suspend fun savePointerInputEvents(
                 }
             }
         }
+    }
+}
+
+// TODO Replace it with public API once available
+@OptIn(ExperimentalTestApi::class)
+fun SkikoComposeUiTest.delay(timeMillis: Long) {
+    try {
+        waitUntil(timeMillis) { false }
+    } catch (ignore: ComposeTimeoutException) {
     }
 }

@@ -175,6 +175,7 @@ class LazyListHeadersTest {
             scroll(105f)
         }
 
+        waitForIdle()
         onNodeWithTag(firstHeaderTag)
             .assertIsNotDisplayed()
 
@@ -313,6 +314,7 @@ class LazyListHeadersTest {
             scroll(102f, ScrollWheel.Horizontal)
         }
 
+        waitForIdle()
         onNodeWithTag(firstHeaderTag)
             .assertIsNotDisplayed()
 

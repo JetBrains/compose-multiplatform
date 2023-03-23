@@ -246,6 +246,7 @@ class LazyArrangementsTest {
             scroll(itemSize.toPx()  * 2)
         }
 
+        waitForIdle()
         onNodeWithTag("1")
             .assertTopPositionInRootIsEqualTo(itemSize * 0.5f)
 
@@ -290,6 +291,7 @@ class LazyArrangementsTest {
             scroll(itemSize.toPx()  * 2, ScrollWheel.Horizontal)
         }
 
+        waitForIdle()
         onNodeWithTag("1")
             .assertLeftPositionInRootIsEqualTo(itemSize * 0.5f)
 
