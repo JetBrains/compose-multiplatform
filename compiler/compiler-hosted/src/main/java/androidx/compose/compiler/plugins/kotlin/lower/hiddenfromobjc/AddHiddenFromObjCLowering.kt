@@ -27,6 +27,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.IrSimpleType
 import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.*
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
@@ -47,6 +48,10 @@ class AddHiddenFromObjCLowering(
 
     private val hiddenFromObjCAnnotation: IrClassSymbol by lazy {
         getTopLevelClass(ClassId.fromString("kotlin/native/HiddenFromObjC"))
+    }
+
+    private val compositionLocalClassSymbol: IrClassSymbol by lazy {
+        getTopLevelClass(ClassId.fromString("androidx/compose/runtime/CompositionLocal"))
     }
 
     override fun lower(module: IrModuleFragment) {
@@ -80,7 +85,9 @@ class AddHiddenFromObjCLowering(
 
         val shouldAdd = p.getter?.hasComposableAnnotation() == true ||
             p.getter?.returnType?.hasComposable() == true ||
-            p.backingField?.type?.hasComposable() == true
+            p.backingField?.type?.hasComposable() == true ||
+            p.getter?.returnType?.isCompositionLocal() == true ||
+            p.backingField?.type?.isCompositionLocal() == true
 
         if (shouldAdd) {
             p.addHiddenFromObjCAnnotation()
@@ -88,6 +95,14 @@ class AddHiddenFromObjCLowering(
         }
 
         return p
+    }
+
+    private fun IrType?.isCompositionLocal(): Boolean {
+        if (this == null) return false
+        if (this.classOrNull == compositionLocalClassSymbol) return true
+        return this.superTypes().any {
+            it.isCompositionLocal()
+        }
     }
 
     private fun IrMutableAnnotationContainer.addHiddenFromObjCAnnotation() {
