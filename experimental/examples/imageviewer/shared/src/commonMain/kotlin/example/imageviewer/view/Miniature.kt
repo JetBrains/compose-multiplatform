@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-internal fun Miniature(
+fun Miniature(
     picture: Picture,
     image: ImageBitmap?,
     onClickSelect: () -> Unit,

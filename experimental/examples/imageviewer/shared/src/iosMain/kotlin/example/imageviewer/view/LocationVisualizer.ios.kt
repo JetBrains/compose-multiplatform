@@ -9,7 +9,7 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
 
 @Composable
-internal actual fun LocationVisualizer(modifier: Modifier) {
+actual fun LocationVisualizer(modifier: Modifier) {
     //todo get real geo coordinates
     UIKitInteropView(
         modifier = modifier,

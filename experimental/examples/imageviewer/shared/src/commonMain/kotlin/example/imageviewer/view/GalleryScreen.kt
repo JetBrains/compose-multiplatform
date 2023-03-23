@@ -43,7 +43,7 @@ enum class GalleryStyle {
 }
 
 @Composable
-internal fun GalleryScreen(
+fun GalleryScreen(
     galleryPage: GalleryPage,
     photoGallery: PhotoGallery,
     dependencies: Dependencies,
@@ -155,7 +155,7 @@ private fun MakeNewMemoryMiniature(onClick: () -> Unit) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick: () -> Unit) {
+fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick: () -> Unit) {
     Box(
         Modifier.aspectRatio(1.0f).clickable { onClick() },
         contentAlignment = Alignment.BottomEnd

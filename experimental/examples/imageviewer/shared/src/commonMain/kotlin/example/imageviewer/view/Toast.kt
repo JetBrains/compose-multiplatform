@@ -22,7 +22,7 @@ sealed interface ToastState {
 }
 
 @Composable
-internal fun Toast(
+fun Toast(
     state: MutableState<ToastState>
 ) {
     val value = state.value

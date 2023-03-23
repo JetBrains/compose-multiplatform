@@ -35,7 +35,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
-internal fun MemoryScreen(
+fun MemoryScreen(
     memoryPage: MemoryPage,
     photoGallery: PhotoGallery,
     localization: Localization,
@@ -170,7 +170,7 @@ private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
 }
 
 @Composable
-internal fun Collapsible(s: String) {
+fun Collapsible(s: String) {
     val interctionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
@@ -195,7 +195,7 @@ internal fun Collapsible(s: String) {
 }
 
 @Composable
-internal fun Headliner(s: String) {
+fun Headliner(s: String) {
     Text(
         text = s,
         fontWeight = FontWeight.SemiBold,
@@ -206,7 +206,7 @@ internal fun Headliner(s: String) {
 }
 
 @Composable
-internal fun RelatedMemoriesVisualizer(
+fun RelatedMemoriesVisualizer(
     ps: List<GalleryEntryWithMetadata>,
     onSelectRelatedMemory: (GalleryId) -> Unit
 ) {
@@ -226,7 +226,7 @@ internal fun RelatedMemoriesVisualizer(
 }
 
 @Composable
-internal fun RelatedMemory(
+fun RelatedMemory(
     index: Int,
     galleryEntry: GalleryEntryWithMetadata,
     onSelectRelatedMemory: (GalleryId) -> Unit

@@ -35,7 +35,7 @@ enum class ExternalImageViewerEvent {
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-internal fun ImageViewerCommon(
+fun ImageViewerCommon(
     dependencies: Dependencies,
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {

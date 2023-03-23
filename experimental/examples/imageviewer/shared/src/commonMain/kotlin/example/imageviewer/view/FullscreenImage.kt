@@ -28,7 +28,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal fun FullscreenImage(
+fun FullscreenImage(
     galleryId: GalleryId?,
     gallery: PhotoGallery,
     getImage: suspend (Picture) -> ImageBitmap,

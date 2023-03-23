@@ -1,3 +1,5 @@
+import org.jetbrains.compose.ComposeExtension
+
 plugins {
     // this is necessary to avoid the plugins to be loaded multiple times
     // in each subproject's classloader
@@ -15,5 +17,11 @@ allprojects {
         mavenCentral()
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         mavenLocal()
+    }
+
+    afterEvaluate {
+        extensions.findByType<ComposeExtension>()?.apply {
+            kotlinCompilerPlugin.set("23.3.23-rc01")
+        }
     }
 }

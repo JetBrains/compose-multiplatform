@@ -48,7 +48,7 @@ object ImageviewerColors {
 }
 
 @Composable
-internal fun ImageViewerTheme(content: @Composable () -> Unit) {
+fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
     MaterialTheme(
         colorScheme = MaterialTheme.colorScheme.copy(

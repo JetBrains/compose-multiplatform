@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal actual fun Tooltip(
+actual fun Tooltip(
     text: String,
     content: @Composable () -> Unit
 ) {

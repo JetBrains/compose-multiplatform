@@ -26,7 +26,7 @@ import io.ktor.client.engine.darwin.Darwin
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-internal fun ImageViewerIos() {
+fun ImageViewerIos() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }

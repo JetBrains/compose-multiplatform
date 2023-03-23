@@ -9,7 +9,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal actual fun LocationVisualizer(modifier: Modifier) {
+actual fun LocationVisualizer(modifier: Modifier) {
     Image(
         painter = painterResource("dummy_map.png"),
         contentDescription = "Map",

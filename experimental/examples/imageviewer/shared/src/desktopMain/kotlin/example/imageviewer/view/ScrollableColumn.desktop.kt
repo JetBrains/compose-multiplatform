@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal actual fun ScrollableColumn(modifier: Modifier, content: @Composable () -> Unit) {
+actual fun ScrollableColumn(modifier: Modifier, content: @Composable () -> Unit) {
     val scrollState = rememberScrollState()
     Modifier.verticalScroll(scrollState)
 

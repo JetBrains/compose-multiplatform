@@ -31,7 +31,7 @@ import example.imageviewer.model.Picture
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-internal fun PreviewImage(
+fun PreviewImage(
     picture: Picture?,
     onClick: () -> Unit,
     getImage: suspend (Picture) -> ImageBitmap
