@@ -488,4 +488,21 @@ class BottomSheetScaffoldTest {
             Truth.assertThat(innerPadding.calculateBottomPadding()).isEqualTo(peekHeight)
         }
     }
+
+    /*
+     * This is a validity check for b/235588730. We can not verify actual placement behavior in this
+     * test as it would require child composables.
+     */
+    @Test
+    fun bottomSheetScaffold_emptySlots_doesNotCrash() {
+        rule.setMaterialContent {
+            BottomSheetScaffold(
+                sheetContent = { },
+                topBar = { },
+                snackbarHost = { },
+                floatingActionButton = { },
+                content = { }
+            )
+        }
+    }
 }
