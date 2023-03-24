@@ -46,6 +46,10 @@ internal actual fun VideoPlayerImpl(
              * extend the player composable function from WindowScope.
              * See https://github.com/JetBrains/compose-jb/issues/176#issuecomment-812514936
              * and its subsequent comments.
+             *
+             * We could also just fullscreen the whole window:
+             * `window.placement = WindowPlacement.Fullscreen`
+             * See https://github.com/JetBrains/compose-multiplatform/issues/1489
              */
             // mediaPlayer.fullScreen().strategy(ExclusiveModeFullScreenStrategy(window))
             mediaPlayer.fullScreen().toggle()
