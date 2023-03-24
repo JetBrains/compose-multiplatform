@@ -132,3 +132,9 @@ tasks.register("publishToMavenLocal") {
         dependsOn(subproject.tasks.named("publishToMavenLocal"))
     }
 }
+
+tasks.register("publishToLocalDir") {
+    for (subproject in subprojects) {
+        dependsOn(subproject.tasks.named("publishAllPublicationsToLocalDirRepository"))
+    }
+}
