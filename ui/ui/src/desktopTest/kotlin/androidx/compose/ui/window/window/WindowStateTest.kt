@@ -65,7 +65,7 @@ import org.junit.Test
 class WindowStateTest {
     @Test
     fun `manually close window`() = runApplicationTest {
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
         var isOpen by mutableStateOf(true)
 
         launchTestApplication {
@@ -77,16 +77,16 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.isShowing).isTrue()
+        assertThat(window.isShowing).isTrue()
 
-        window?.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
+        window.dispatchEvent(WindowEvent(window, WindowEvent.WINDOW_CLOSING))
         awaitIdle()
-        assertThat(window?.isShowing).isFalse()
+        assertThat(window.isShowing).isFalse()
     }
 
     @Test
     fun `programmatically close window`() = runApplicationTest {
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
         var isOpen by mutableStateOf(true)
 
         launchTestApplication {
@@ -98,11 +98,11 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.isShowing).isTrue()
+        assertThat(window.isShowing).isTrue()
 
         isOpen = false
         awaitIdle()
-        assertThat(window?.isShowing).isFalse()
+        assertThat(window.isShowing).isFalse()
     }
 
     @Test
@@ -151,17 +151,18 @@ class WindowStateTest {
             position = WindowPosition(242.dp, 242.dp)
         )
 
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
                 window = this.window
             }
         }
-
+        
         awaitIdle()
-        assertThat(window?.size).isEqualTo(Dimension(200, 200))
-        assertThat(window?.location).isEqualTo(Point(242, 242))
+        assertThat(window)
+        assertThat(window.size).isEqualTo(Dimension(200, 200))
+        assertThat(window.location).isEqualTo(Point(242, 242))
     }
 
     @Test
@@ -170,7 +171,7 @@ class WindowStateTest {
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(200.dp, 200.dp)
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -182,7 +183,7 @@ class WindowStateTest {
 
         state.position = WindowPosition(242.dp, (242).dp)
         awaitIdle()
-        assertThat(window?.location).isEqualTo(Point(242, 242))
+        assertThat(window.location).isEqualTo(Point(242, 242))
     }
 
     @Test
@@ -191,7 +192,7 @@ class WindowStateTest {
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(200.dp, 200.dp)
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -203,7 +204,7 @@ class WindowStateTest {
 
         state.size = DpSize(250.dp, 200.dp)
         awaitIdle()
-        assertThat(window?.size).isEqualTo(Dimension(250, 200))
+        assertThat(window.size).isEqualTo(Dimension(250, 200))
     }
 
     @Test
@@ -217,7 +218,7 @@ class WindowStateTest {
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center)
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -226,7 +227,7 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window!!.center() maxDistance window!!.screenCenter() < 250)
+        assertThat(window.center() maxDistance window.screenCenter() < 250)
     }
 
     @Test
@@ -283,7 +284,7 @@ class WindowStateTest {
         assumeTrue(isWindows || isLinux)
 
         val state = WindowState(size = DpSize(200.dp, 200.dp))
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -295,17 +296,17 @@ class WindowStateTest {
 
         state.placement = WindowPlacement.Fullscreen
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Fullscreen)
+        assertThat(window.placement).isEqualTo(WindowPlacement.Fullscreen)
 
         state.placement = WindowPlacement.Floating
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
+        assertThat(window.placement).isEqualTo(WindowPlacement.Floating)
     }
 
     @Test
     fun maximize() = runApplicationTest(useDelay = isLinux || isMacOs) {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -317,17 +318,17 @@ class WindowStateTest {
 
         state.placement = WindowPlacement.Maximized
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Maximized)
+        assertThat(window.placement).isEqualTo(WindowPlacement.Maximized)
 
         state.placement = WindowPlacement.Floating
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
+        assertThat(window.placement).isEqualTo(WindowPlacement.Floating)
     }
 
     @Test
     fun minimize() = runApplicationTest {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -339,11 +340,11 @@ class WindowStateTest {
 
         state.isMinimized = true
         awaitIdle()
-        assertThat(window?.isMinimized).isTrue()
+        assertThat(window.isMinimized).isTrue()
 
         state.isMinimized = false
         awaitIdle()
-        assertThat(window?.isMinimized).isFalse()
+        assertThat(window.isMinimized).isFalse()
     }
 
     @Test
@@ -352,7 +353,7 @@ class WindowStateTest {
         assumeTrue(isWindows || isLinux)
 
         val state = WindowState(size = DpSize(200.dp, 200.dp))
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -365,8 +366,8 @@ class WindowStateTest {
         state.isMinimized = true
         state.placement = WindowPlacement.Maximized
         awaitIdle()
-        assertThat(window?.isMinimized).isTrue()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Maximized)
+        assertThat(window.isMinimized).isTrue()
+        assertThat(window.placement).isEqualTo(WindowPlacement.Maximized)
     }
 
     @Test
@@ -389,7 +390,7 @@ class WindowStateTest {
             size = DpSize(201.dp, 203.dp),
             position = WindowPosition(196.dp, 257.dp)
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -398,20 +399,20 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.size).isEqualTo(Dimension(201, 203))
-        assertThat(window?.location).isEqualTo(Point(196, 257))
+        assertThat(window.size).isEqualTo(Dimension(201, 203))
+        assertThat(window.location).isEqualTo(Point(196, 257))
 
         state.placement = WindowPlacement.Maximized
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Maximized)
-        assertThat(window?.size).isNotEqualTo(Dimension(201, 203))
-        assertThat(window?.location).isNotEqualTo(Point(196, 257))
+        assertThat(window.placement).isEqualTo(WindowPlacement.Maximized)
+        assertThat(window.size).isNotEqualTo(Dimension(201, 203))
+        assertThat(window.location).isNotEqualTo(Point(196, 257))
 
         state.placement = WindowPlacement.Floating
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
-        assertThat(window?.size).isEqualTo(Dimension(201, 203))
-        assertThat(window?.location).isEqualTo(Point(196, 257))
+        assertThat(window.placement).isEqualTo(WindowPlacement.Floating)
+        assertThat(window.size).isEqualTo(Dimension(201, 203))
+        assertThat(window.location).isEqualTo(Point(196, 257))
     }
 
     @Test
@@ -423,7 +424,7 @@ class WindowStateTest {
             size = DpSize(201.dp, 203.dp),
             position = WindowPosition(196.dp, 257.dp)
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -432,30 +433,67 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.size).isEqualTo(Dimension(201, 203))
-        assertThat(window?.location).isEqualTo(Point(196, 257))
+        assertThat(window.size).isEqualTo(Dimension(201, 203))
+        assertThat(window.location).isEqualTo(Point(196, 257))
 
         state.placement = WindowPlacement.Fullscreen
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Fullscreen)
-        assertThat(window?.size).isNotEqualTo(Dimension(201, 203))
-        assertThat(window?.location).isNotEqualTo(Point(196, 257))
+        assertThat(window.placement).isEqualTo(WindowPlacement.Fullscreen)
+        assertThat(window.size).isNotEqualTo(Dimension(201, 203))
+        assertThat(window.location).isNotEqualTo(Point(196, 257))
 
         state.placement = WindowPlacement.Floating
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Floating)
-        assertThat(window?.size).isEqualTo(Dimension(201, 203))
-        assertThat(window?.location).isEqualTo(Point(196, 257))
+        assertThat(window.placement).isEqualTo(WindowPlacement.Floating)
+        assertThat(window.size).isEqualTo(Dimension(201, 203))
+        assertThat(window.location).isEqualTo(Point(196, 257))
+    }
+
+    @Test
+    fun `window state size and position determine unmaximized state`() = runApplicationTest {
+        // On Linux the behaviour generally works, but this test fails because the size after
+        // un-maximizing it not exactly as expected. Perhaps the window insets are not included
+        // somewhere in AWT.
+        // Specifically on our CI (which is also Linux), however, it fails because the initial
+        // placement fails to be Maximized. The `maximize window before show` test fails the same
+        // way.
+        // Haven't actually tested on Windows; if you run it, and it doesn't pass, replace with
+        // assumeTrue(isMacOs), or investigate/fix.
+        assumeTrue(!isLinux)
+
+        val state = WindowState(
+            size = DpSize(201.dp, 203.dp),
+            position = WindowPosition(196.dp, 257.dp),
+            placement = WindowPlacement.Maximized
+        )
+        lateinit var window: ComposeWindow
+
+        launchTestApplication {
+            Window(onCloseRequest = {}, state) {
+                window = this.window
+            }
+        }
+
+        awaitIdle()
+        assertThat(window.placement).isEqualTo(WindowPlacement.Maximized)
+
+        state.placement = WindowPlacement.Floating
+        awaitIdle()
+        assertThat(window.placement).isEqualTo(WindowPlacement.Floating)
+        assertThat(window.size).isEqualTo(Dimension(201, 203))
+        assertThat(window.location).isEqualTo(Point(196, 257))
     }
 
     @Test
     fun `maximize window before show`() = runApplicationTest(useDelay = isLinux) {
+        // This fails on our Linux CI; the window reports WindowPlacement.Floating.
+        // But testing in an actual Ubuntu 22 system, it succeeds.
         val state = WindowState(
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
             placement = WindowPlacement.Maximized,
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -464,7 +502,7 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Maximized)
+        assertThat(window.placement).isEqualTo(WindowPlacement.Maximized)
     }
 
     @Test
@@ -486,7 +524,7 @@ class WindowStateTest {
             position = WindowPosition(Alignment.Center),
             isMinimized = true
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -495,7 +533,7 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.isMinimized).isTrue()
+        assertThat(window.isMinimized).isTrue()
     }
 
     @Test
@@ -509,7 +547,7 @@ class WindowStateTest {
             position = WindowPosition(Alignment.Center),
             placement = WindowPlacement.Fullscreen,
         )
-        var window: ComposeWindow? = null
+        lateinit var window: ComposeWindow
 
         launchTestApplication {
             Window(onCloseRequest = {}, state) {
@@ -518,7 +556,7 @@ class WindowStateTest {
         }
 
         awaitIdle()
-        assertThat(window?.placement).isEqualTo(WindowPlacement.Fullscreen)
+        assertThat(window.placement).isEqualTo(WindowPlacement.Fullscreen)
     }
 
     @Test

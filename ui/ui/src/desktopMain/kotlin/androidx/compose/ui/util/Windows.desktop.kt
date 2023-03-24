@@ -17,7 +17,6 @@
 package androidx.compose.ui.util
 
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.painter.Painter
@@ -41,34 +40,48 @@ import java.awt.event.WindowListener
 import java.awt.event.WindowStateListener
 import kotlin.math.roundToInt
 
+
 /**
- * Ignore size updating if window is maximized or in fullscreen.
- * Otherwise we will reset maximized / fullscreen state.
+ * Sets the size of the window, given its placement.
+ * If the window is already visible, then change the size only if it's floating, in order to
+ * avoid resetting the maximized / fullscreen state.
+ * If the window is not visible yet, we _do_ set its size so that:
+ * - It will have an "un-maximized" size to go to when the user un-maximizes the window.
+ * - To allow drawing the first frame (at the correct size) before the window is made visible.
  */
-internal fun ComposeWindow.setSizeSafely(size: DpSize) {
-    if (placement == WindowPlacement.Floating) {
-        (this as Window).setSizeSafely(size)
+internal fun Window.setSizeSafely(size: DpSize, placement: WindowPlacement) {
+    if (!isVisible || (placement == WindowPlacement.Floating)) {
+        setSizeImpl(size)
     }
 }
 
 /**
- * Ignore position updating if window is maximized or in fullscreen.
- * Otherwise we will reset maximized / fullscreen state.
+ * Sets the position of the window, given its placement.
+ * If the window is already visible, then change the position only if it's floating, in order to
+ * avoid resetting the maximized / fullscreen state.
+ * If the window is not visible yet, we _do_ set its size so that it will have an "un-maximized"
+ * position to go to when the user un-maximizes the window.
  */
-internal fun ComposeWindow.setPositionSafely(
+internal fun Window.setPositionSafely(
     position: WindowPosition,
-    platformDefaultPosition: () -> Point?
+    placement: WindowPlacement,
+    platformDefaultPosition: () -> Point
 ) {
-    if (placement == WindowPlacement.Floating) {
-        (this as Window).setPositionSafely(position, platformDefaultPosition)
+    if (!isVisible || (placement == WindowPlacement.Floating)) {
+        setPositionImpl(position, platformDefaultPosition)
     }
 }
 
-/**
- * Limit the width and the height to a minimum of 0
- */
-internal fun Window.setSizeSafely(size: DpSize) {
-    val screenBounds by lazy { graphicsConfiguration.bounds }
+private fun Window.setSizeImpl(size: DpSize) {
+    val availableSize by lazy {
+        val screenBounds = graphicsConfiguration.bounds
+        val screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration)
+
+        IntSize(
+            width = screenBounds.width - screenInsets.left - screenInsets.right,
+            height = screenBounds.height - screenInsets.top - screenInsets.bottom
+        )
+    }
 
     val isWidthSpecified = size.isSpecified && size.width.isSpecified
     val isHeightSpecified = size.isSpecified && size.height.isSpecified
@@ -76,32 +89,41 @@ internal fun Window.setSizeSafely(size: DpSize) {
     val width = if (isWidthSpecified) {
         size.width.value.roundToInt().coerceAtLeast(0)
     } else {
-        screenBounds.width
+        availableSize.width
     }
 
     val height = if (isHeightSpecified) {
         size.height.value.roundToInt().coerceAtLeast(0)
     } else {
-        screenBounds.height
+        availableSize.height
     }
 
+    var computedPreferredSize: Dimension? = null
     if (!isWidthSpecified || !isHeightSpecified) {
         preferredSize = Dimension(width, height)
-        pack()
-        // if we set null, getPreferredSize will return the default inner size determined by
-        // the inner components (see the description of setPreferredSize)
+        pack()  // Makes it displayable
+
+        // We set preferred size to null, and then call getPreferredSize, which will compute the
+        // actual preferred size determined by the content (see the description of setPreferredSize)
         preferredSize = null
+        computedPreferredSize = preferredSize
+    }
+
+    if (!isDisplayable) {
+        // Pack to allow drawing the first frame
+        pack()
     }
 
     setSize(
-        if (isWidthSpecified) width else preferredSize.width,
-        if (isHeightSpecified) height else preferredSize.height,
+        if (isWidthSpecified) width else computedPreferredSize!!.width,
+        if (isHeightSpecified) height else computedPreferredSize!!.height,
     )
+    revalidate()  // Calls doLayout on the ComposeLayer, causing it to update its size
 }
 
-internal fun Window.setPositionSafely(
+internal fun Window.setPositionImpl(
     position: WindowPosition,
-    platformDefaultPosition: () -> Point?
+    platformDefaultPosition: () -> Point
 ) = when (position) {
     WindowPosition.PlatformDefault -> location = platformDefaultPosition()
     is WindowPosition.Aligned -> align(position.alignment)
@@ -147,27 +169,13 @@ internal fun Dialog.setUndecoratedSafely(value: Boolean) {
     }
 }
 
-// In fact, this size doesn't affect anything on Windows/Linux, and isn't used by macOs (macOs
+// In fact, this size doesn't affect anything on Windows/Linux, and isn't used by macOS (macOS
 // doesn't have separate Window icons). We specify it to support Painter's with
 // Unspecified intrinsicSize
 private val iconSize = Size(32f, 32f)
 
 internal fun Window.setIcon(painter: Painter?) {
     setIconImage(painter?.toAwtImage(density, layoutDirection, iconSize))
-}
-
-internal fun Window.makeDisplayable() {
-    val oldPreferredSize = preferredSize
-    val oldLocation = location
-    preferredSize = size
-    try {
-        pack()
-    } finally {
-        preferredSize = oldPreferredSize
-        // pack() messes with location in case of multiple displays with different densities,
-        // so we restore it to the value before pack()
-        location = oldLocation
-    }
 }
 
 internal class ListenerOnWindowRef<T>(

@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.ComponentUpdater
 import androidx.compose.ui.util.componentListenerRef
-import androidx.compose.ui.util.makeDisplayable
 import androidx.compose.ui.util.setIcon
 import androidx.compose.ui.util.setPositionSafely
 import androidx.compose.ui.util.setSizeSafely
@@ -233,12 +232,13 @@ fun Window(
                 set(currentAlwaysOnTop, window::setAlwaysOnTop)
             }
             if (state.size != appliedState.size) {
-                window.setSizeSafely(state.size)
+                window.setSizeSafely(state.size, state.placement)
                 appliedState.size = state.size
             }
             if (state.position != appliedState.position) {
                 window.setPositionSafely(
                     state.position,
+                    state.placement,
                     platformDefaultPosition = { WindowLocationTracker.getCascadeLocationFor(window) }
                 )
                 appliedState.position = state.position
@@ -411,11 +411,17 @@ fun Window(
             it.compositionLocalContext = compositionLocalContext
             it.exceptionHandler = windowExceptionHandlerFactory.exceptionHandler(it)
 
+            val wasDisplayable = it.isDisplayable
+
             update(it)
 
-            if (!it.isDisplayable) {
-                it.makeDisplayable()
-                it.contentPane.paint(it.graphics)
+            // If displaying for the first time, make sure we draw the first frame before making
+            // the window visible, to avoid showing the window background
+            // It's the responsibility of setSizeSafely to
+            // - Make the window displayable
+            // - Size the window and the ComposeLayer correctly, so that we can draw it here
+            if (!wasDisplayable && it.isDisplayable) {
+                it.contentPane.paint(it.contentPane.graphics)
             }
         }
     )

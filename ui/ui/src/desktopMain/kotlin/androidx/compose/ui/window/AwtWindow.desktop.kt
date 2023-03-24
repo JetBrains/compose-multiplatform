@@ -24,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.node.Ref
 import androidx.compose.ui.util.UpdateEffect
-import androidx.compose.ui.util.makeDisplayable
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -81,9 +80,6 @@ fun <T : Window> AwtWindow(
     UpdateEffect {
         val window = window()
         update(window)
-        if (!window.isDisplayable) {
-            window.makeDisplayable()
-        }
     }
 
     val showJob = Ref<Job?>()
