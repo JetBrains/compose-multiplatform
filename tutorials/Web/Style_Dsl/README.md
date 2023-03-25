@@ -128,6 +128,32 @@ object AppStylesheet : StyleSheet() {
 }
 ```
 
+### Animation example
+To specify an animation query, you can use the 'animation' function, which takes in the relevant query and a style block.
+You can also move the animation or control its time.
+``` kotlin
+object AppStyleSheet : StyleSheet() {
+    val bounce by keyframes {
+        from {
+            property("transform", "translateX(50%)")
+        }
+
+        to {
+            property("transform", "translateX(-50%)")
+        }
+    }
+
+    val myClass by style {
+        animation(bounce) {
+            duration(2.s)
+            timingFunction(AnimationTimingFunction.EaseIn)
+            direction(AnimationDirection.Alternate)
+        }
+    }
+}
+```
+
+
 ### CSS Variables
 
 The style DSL also provides support for CSS variables.
