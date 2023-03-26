@@ -99,9 +99,12 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 didFinishProcessingPhoto: AVCapturePhoto,
                 error: NSError?
             ) {
+                println("captureOutput")
                 val photoData = didFinishProcessingPhoto.fileDataRepresentation()
                     ?: error("fileDataRepresentation is null")
+                println("photoData: $photoData")
                 val location = locationManager.location
+                println("location: $location")
                 val geoPos = if (location != null) {
                     GpsPosition(
                         latitude = location.coordinate.useContents { latitude },
@@ -110,13 +113,15 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 } else {
                     GpsPosition(0.0, 0.0)
                 }
-                val randomFileName =
+                println("geoPos: $geoPos")
+                val randomUUID =
                     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
+                println("randomUUID: $randomUUID")
                 val uiImage = UIImage(photoData)
-
+                println("uiImage: $uiImage")
                 storage.saveImage(
                     PictureData.Camera(
-                        id = randomFileName,
+                        id = randomUUID,
                         name = "Kotlin Conf",
                         description = "Kotlin Conf photo description",
                         gps = geoPos

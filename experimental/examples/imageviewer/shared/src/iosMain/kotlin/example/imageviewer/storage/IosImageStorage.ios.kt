@@ -148,6 +148,12 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
             height = currentSize.useContents { height } * widthRatio
         )
     }
+    val w = currentSize.useContents { width }
+    val h = currentSize.useContents { height }
+    val w2 = newSize.useContents { width }
+    val h2 = newSize.useContents { height }
+    println("previousSize: $w / $h")
+    println("resize to: $w2 / $h2 ")
 
     val newRect = CGRectMake(
         x = 0.0,
@@ -155,11 +161,15 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
         width = newSize.useContents { width },
         height = newSize.useContents { height }
     )
-
+    println("newRect: $newRect")
     UIGraphicsBeginImageContextWithOptions(size = newSize, opaque = false, scale = 1.0)
+    println("UIGraphicsBeginImageContextWithOptions success")
     this.drawInRect(newRect)
+    println("drawInRect success")
     val newImage = UIGraphicsGetImageFromCurrentImageContext()
+    println("newImage success")
     UIGraphicsEndImageContext()
+    println("UIGraphicsEndImageContext success")
 
     return newImage!!
 }
