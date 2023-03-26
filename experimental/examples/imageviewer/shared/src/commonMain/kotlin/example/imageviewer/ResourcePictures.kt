@@ -7,6 +7,17 @@ val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "1.jpg",
         thumbnailResource = "1-thumbnail.jpg",
+        name = "Mountain K2",
+        description = """
+            K2, at 8,611 meters above sea level, is the second-highest mountain on Earth, after Mount Everest.
+            The name K2 is derived from notation used by the Great Trigonometrical Survey of British India. Thomas Montgomerie made the first survey of the Karakoram from Mount Haramukh, some 210 km to the south, and sketched the two most prominent peaks, labelling them K1 and K2, where the K stands for Karakoram.
+            Also the new Kotlin compiler is code-named "K2".            
+            """.trimIndent(),
+        gps = GpsPosition(35.8825, 76.513333)
+    ),
+    PictureData.Resource(
+        resource = "2.jpg",
+        thumbnailResource = "2-thumbnail.jpg",
         name = "Blue City",
         description = """
             Is a city in northwest Morocco.
@@ -14,17 +25,6 @@ val resourcePictures = arrayOf(
             Chefchaouen is situated just inland from Tangier and Tétouan.
             """.trimIndent(),
         gps = GpsPosition(35.171389, -5.269722)
-    ),
-    PictureData.Resource(
-        resource = "2.jpg",
-        thumbnailResource = "2-thumbnail.jpg",
-        name = "Auckland SkyCity",
-        description = """
-            SkyCity Casino History
-            This kiwi casino is a part of the Sky Tower, a giant resort that was completed in 1997.
-            There were many New Zealand casinos at that time and this was in fact the second one ever built in the whole country
-            """.trimIndent(),
-        gps = GpsPosition(-36.846589, 174.760871)
     ),
     PictureData.Resource(
         resource = "3.jpg",
@@ -60,13 +60,13 @@ val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "6.jpg",
         thumbnailResource = "6-thumbnail.jpg",
-        name = "Blue City",
+        name = "Auckland SkyCity",
         description = """
-            Is a city in northwest Morocco.
-            It is the chief town of the province of the same name and is noted for its buildings in shades of blue, for which it is nicknamed the "Blue City".
-            Chefchaouen is situated just inland from Tangier and Tétouan.
+            SkyCity Casino History
+            This kiwi casino is a part of the Sky Tower, a giant resort that was completed in 1997.
+            There were many New Zealand casinos at that time and this was in fact the second one ever built in the whole country
             """.trimIndent(),
-        gps = GpsPosition(35.171389, -5.269722)
+        gps = GpsPosition(-36.846589, 174.760871)
     ),
     PictureData.Resource(
         resource = "7.jpg",
@@ -180,5 +180,16 @@ val resourcePictures = arrayOf(
             Also, the dumplings served at that place was delightful! 🥟
             """.trimIndent(),
         gps = GpsPosition(59.3364318, 18.0587228)
+    ),
+    PictureData.Resource(
+        resource = "17.jpg",
+        thumbnailResource = "17-thumbnail.jpg",
+        name = "Loki",
+        description = """
+            Meet Loki, my black cat - a furry feline with big, beautiful eyes and an arrogant attitude.
+            Just look at that judging gaze - it's clear that Loki demands more food and is disappointed with my efforts so far!
+            Despite his round belly and chubby cheeks, Loki exudes a regal and confident aura that's hard to resist.
+            """.trimIndent(),
+        gps = GpsPosition(66.476857055, 25.759675853)
     ),
 )

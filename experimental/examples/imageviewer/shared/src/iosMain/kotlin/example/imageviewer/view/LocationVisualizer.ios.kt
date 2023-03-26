@@ -10,7 +10,7 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
 
 @Composable
-internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition) {
+internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
     //todo get real geo coordinates
     UIKitInteropView(
         modifier = modifier,
@@ -20,11 +20,17 @@ internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition) {
             mkMapView.setRegion(
                 MKCoordinateRegionMakeWithDistance(
                     centerCoordinate = cityAmsterdam,
-                    5000.0, 5000.0
+                    10_000.0, 10_000.0
                 ),
                 animated = false
             )
-            mkMapView.addAnnotation(MKPointAnnotation(cityAmsterdam, title = null, subtitle = null))
+            mkMapView.addAnnotation(
+                MKPointAnnotation(
+                    cityAmsterdam,
+                    title = title,
+                    subtitle = null
+                )
+            )
             mkMapView
         },
     )
