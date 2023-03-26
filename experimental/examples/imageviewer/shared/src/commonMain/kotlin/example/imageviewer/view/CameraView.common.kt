@@ -7,4 +7,4 @@ import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
 
 @Composable
-internal expect fun CameraView(modifier: Modifier, storage: ImageStorage)
+internal expect fun CameraView(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit)

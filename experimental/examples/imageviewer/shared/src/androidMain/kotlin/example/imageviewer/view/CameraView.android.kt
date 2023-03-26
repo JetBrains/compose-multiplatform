@@ -35,12 +35,13 @@ import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
 import androidx.compose.ui.graphics.Color
+import example.imageviewer.PlatformStorableImage
 
 private val executor = Executors.newSingleThreadExecutor()
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
+internal actual fun CameraView(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
     val cameraPermissionState = rememberMultiplePermissionsState(
         listOf(
             android.Manifest.permission.CAMERA,
@@ -49,7 +50,7 @@ internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
         )
     )
     if (cameraPermissionState.allPermissionsGranted) {
-        CameraWithGrantedPermission(modifier, storage)
+        CameraWithGrantedPermission(modifier, onCapture)
     } else {
         LaunchedEffect(Unit) {
             cameraPermissionState.launchMultiplePermissionRequest()
@@ -59,7 +60,7 @@ internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
 
 @SuppressLint("MissingPermission")
 @Composable
-private fun CameraWithGrantedPermission(modifier: Modifier, storage: ImageStorage) {
+private fun CameraWithGrantedPermission(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
@@ -97,7 +98,7 @@ private fun CameraWithGrantedPermission(modifier: Modifier, storage: ImageStorag
                     val imageBitmap = byteArray.toImageBitmap()
                     image.close()
                     fun sendToStorage(gpsPosition: GpsPosition) {
-                        storage.saveImage(
+                        onCapture(
                             PictureData.Camera(
                                 id = UUID.randomUUID().toString(),
                                 name = "Kotlin Conf",

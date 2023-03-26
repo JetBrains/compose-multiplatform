@@ -22,7 +22,7 @@ import platform.Foundation.*
 import platform.UIKit.*
 import platform.posix.memcpy
 
-private const val maxStorableImageSize = 2000
+private const val maxStorableImageSize = 1500
 private const val storableThumbnailSize = 200
 
 class IosImageStorage(
@@ -43,7 +43,8 @@ class IosImageStorage(
         val directoryContent = fileManager.contentsOfDirectoryAtPath(savePictureDir.path!!, null)
         if (directoryContent != null) {
             pictures.addAll(
-                directoryContent.map { it.toString() }
+                index = 0,
+                elements = directoryContent.map { it.toString() }
                     .filter { it.endsWith(".json") }
                     .map {
                         val jsonStr = readStringFromFile(it)
@@ -78,7 +79,7 @@ class IosImageStorage(
         ioScope.launch {
             UIImagePNGRepresentation(image.rawValue.resizeToThumbnail())
                 ?.writeToFile(picture.thumbnailPngFile)
-            pictures.add(picture)
+            pictures.add(0, picture)
             UIImagePNGRepresentation(image.rawValue.resizeToBig())
                 ?.writeToFile(picture.pngFile)
             Json.Default.encodeToString(picture).writeToFile(picture.jsonFile)

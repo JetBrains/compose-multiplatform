@@ -14,6 +14,7 @@ import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ImageStorage
 import example.imageviewer.IosStorableImage
+import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.*
@@ -37,7 +38,7 @@ private sealed interface CameraAccess {
 }
 
 @Composable
-internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
+internal actual fun CameraView(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
     var cameraAccess: CameraAccess by remember { mutableStateOf(CameraAccess.Undefined) }
     LaunchedEffect(Unit) {
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
@@ -72,14 +73,14 @@ internal actual fun CameraView(modifier: Modifier, storage: ImageStorage) {
             }
 
             CameraAccess.Authorized -> {
-                AuthorizedCamera(storage)
+                AuthorizedCamera(onCapture)
             }
         }
     }
 }
 
 @Composable
-private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
+private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
     val locationManager = remember {
         CLLocationManager().apply {
             desiredAccuracy = kCLLocationAccuracyBest
@@ -119,7 +120,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 println("randomUUID: $randomUUID")
                 val uiImage = UIImage(photoData)
                 println("uiImage: $uiImage")
-                storage.saveImage(
+                onCapture(
                     PictureData.Camera(
                         id = randomUUID,
                         name = "Kotlin Conf",

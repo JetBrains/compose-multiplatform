@@ -12,7 +12,10 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun CameraScreen(localization: Localization, storage: ImageStorage, onBack: () -> Unit) {
     Box(Modifier.fillMaxSize()) {
-        CameraView(Modifier.fillMaxSize(), storage)
+        CameraView(Modifier.fillMaxSize(), onCapture = { picture, image ->
+            storage.saveImage(picture, image)
+            onBack()
+        })
         TopLayout(
             alignLeftContent = {
                 Tooltip(localization.back) {
