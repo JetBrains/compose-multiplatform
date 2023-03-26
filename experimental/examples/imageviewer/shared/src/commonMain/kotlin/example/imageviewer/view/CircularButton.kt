@@ -21,7 +21,7 @@ internal fun CircularButton(
     onClick: () -> Unit,
 ) {
     Box(
-        modifier.size(50.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
+        modifier.size(54.dp).clip(CircleShape).background(ImageviewerColors.uiLightBlack)
             .clickable { onClick() }, contentAlignment = Alignment.Center
     ) {
         Image(
