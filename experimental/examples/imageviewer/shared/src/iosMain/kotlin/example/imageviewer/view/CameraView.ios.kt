@@ -1,10 +1,7 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -93,6 +90,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
             AVCaptureVideoOrientationPortrait
         )
     }
+    var capturePhotoStarted by remember { mutableStateOf(false) }
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
             override fun captureOutput(
@@ -124,6 +122,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                         IosStorableImage(uiImage)
                     )
                 }
+                capturePhotoStarted = false
             }
         }
     }
@@ -187,8 +186,10 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
             cameraContainer
         }
         Button(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
+            modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
+            enabled = !capturePhotoStarted,
             onClick = {
+                capturePhotoStarted = true
                 val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
                     format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
                 )
@@ -196,8 +197,16 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                     settings = photoSettings,
                     delegate = photoCaptureDelegate
                 )
-            }) {
-            Text("Compose Button - take a photo 📸")
+            }
+        ) {
+            Text("Take a photo 📸")
+        }
+        if (capturePhotoStarted) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(80.dp).align(Alignment.Center),
+                color = Color.White.copy(alpha = 0.7f),
+                strokeWidth = 8.dp,
+            )
         }
     } else {
         SimulatorStub()
