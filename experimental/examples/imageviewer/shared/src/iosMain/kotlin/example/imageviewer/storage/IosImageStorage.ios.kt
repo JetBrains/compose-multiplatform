@@ -22,6 +22,9 @@ import platform.Foundation.*
 import platform.UIKit.*
 import platform.posix.memcpy
 
+private const val maxStorableImageSize = 2000
+private const val storableThumbnailSize = 200
+
 class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
@@ -112,28 +115,46 @@ class IosImageStorage(
 }
 
 private fun UIImage.resizeToThumbnail(): UIImage {
-    val newSize = size.useContents { CGSizeMake(width / 8, height / 8) }
+    val targetScale = maxOf(
+        storableThumbnailSize.toFloat() / size.useContents { width },
+        storableThumbnailSize.toFloat() / size.useContents { height },
+    )
+    val newSize = size.useContents { CGSizeMake(width * targetScale , height * targetScale) }
     return resize(newSize)
 }
 
 private fun UIImage.resizeToBig(): UIImage {
-    val newSize = size.useContents { CGSizeMake(width / 2, height / 2) }
+    val targetScale = maxOf(
+        maxStorableImageSize.toFloat() / size.useContents { width },
+        maxStorableImageSize.toFloat() / size.useContents { height },
+    )
+    val newSize = size.useContents { CGSizeMake(width * targetScale, height * targetScale) }
     return resize(newSize)
 }
 
 private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     val currentSize = this.size
-
-    val widthRatio = targetSize.useContents{ width } / currentSize.useContents{ width }
-    val heightRatio = targetSize.useContents{ height } / currentSize.useContents{ height }
+    val widthRatio = targetSize.useContents { width } / currentSize.useContents { width }
+    val heightRatio = targetSize.useContents { height } / currentSize.useContents { height }
 
     val newSize: CValue<CGSize> = if (widthRatio > heightRatio) {
-        CGSizeMake(width = currentSize.useContents{ width } * heightRatio, height = currentSize.useContents{ height } * heightRatio)
+        CGSizeMake(
+            width = currentSize.useContents { width } * heightRatio,
+            height = currentSize.useContents { height } * heightRatio
+        )
     } else {
-        CGSizeMake(width = currentSize.useContents{ width } * widthRatio, height = currentSize.useContents{ height } * widthRatio)
+        CGSizeMake(
+            width = currentSize.useContents { width } * widthRatio,
+            height = currentSize.useContents { height } * widthRatio
+        )
     }
 
-    val newRect = CGRectMake(x = 0.0, y = 0.0, width = newSize.useContents { width }, height = newSize.useContents { height })
+    val newRect = CGRectMake(
+        x = 0.0,
+        y = 0.0,
+        width = newSize.useContents { width },
+        height = newSize.useContents { height }
+    )
 
     UIGraphicsBeginImageContextWithOptions(size = newSize, opaque = false, scale = 1.0)
     this.drawInRect(newRect)
