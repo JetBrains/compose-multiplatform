@@ -77,21 +77,26 @@ class IosImageStorage(
 
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
-            UIImagePNGRepresentation(image.rawValue.resizeToThumbnail())
+            UIImageJPEGRepresentation(image.rawValue.resizeToThumbnail(), 0.7)
                 ?.writeToFile(picture.thumbnailPngFile)
             pictures.add(0, picture)
-            UIImagePNGRepresentation(image.rawValue.resizeToBig())
+            println("before resizedBig")
+            val resizedBig = image.rawValue.resizeToBig()
+            println("after resizedBig")
+            println("before UIImageJPEGRepresentation")
+            UIImageJPEGRepresentation(resizedBig, 0.7)
                 ?.writeToFile(picture.pngFile)
+            println("after UIImageJPEGRepresentation")
             Json.Default.encodeToString(picture).writeToFile(picture.jsonFile)
         }
     }
 
     override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
         ioScope.async {
-            val pngRepresentation = readPngFromFile(picture.thumbnailPngFile)!!
-            val byteArray: ByteArray = ByteArray(pngRepresentation.length.toInt()).apply {
+            val jpgRepresentation = readPngFromFile(picture.thumbnailPngFile)!!
+            val byteArray: ByteArray = ByteArray(jpgRepresentation.length.toInt()).apply {
                 usePinned {
-                    memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
+                    memcpy(it.addressOf(0), jpgRepresentation.bytes, jpgRepresentation.length)
                 }
             }
             Image.makeFromEncoded(byteArray).toComposeImageBitmap()
@@ -100,14 +105,14 @@ class IosImageStorage(
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
         ioScope.async {
             fun getFileContent() = readPngFromFile(picture.pngFile)
-            var pngRepresentation: NSData? = getFileContent()
-            while (pngRepresentation == null) {
+            var jpgRepresentation: NSData? = getFileContent()
+            while (jpgRepresentation == null) {
                 yield()
-                pngRepresentation = getFileContent()
+                jpgRepresentation = getFileContent()
             }
-            val byteArray: ByteArray = ByteArray(pngRepresentation.length.toInt()).apply {
+            val byteArray: ByteArray = ByteArray(jpgRepresentation.length.toInt()).apply {
                 usePinned {
-                    memcpy(it.addressOf(0), pngRepresentation.bytes, pngRepresentation.length)
+                    memcpy(it.addressOf(0), jpgRepresentation.bytes, jpgRepresentation.length)
                 }
             }
             Image.makeFromEncoded(byteArray).toComposeImageBitmap()
@@ -175,7 +180,7 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     return newImage!!
 }
 
-private val PictureData.Camera.pngFile get():String = id + ".png"
-private val PictureData.Camera.thumbnailPngFile get():String = id + "-thumbnail.png"
+private val PictureData.Camera.pngFile get():String = id + ".jpg"
+private val PictureData.Camera.thumbnailPngFile get():String = id + "-thumbnail.jpg"
 private val PictureData.Camera.jsonFile get():String = id + ".json"
 private fun String.writeToURL(url: NSURL) = (this as NSString).writeToURL(url, true)
