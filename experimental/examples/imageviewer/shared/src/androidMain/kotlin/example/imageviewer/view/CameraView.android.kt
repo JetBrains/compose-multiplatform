@@ -34,6 +34,7 @@ import java.util.UUID
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import androidx.compose.ui.graphics.Color
 
 private val executor = Executors.newSingleThreadExecutor()
 
@@ -121,7 +122,7 @@ private fun CameraWithGrantedPermission(modifier: Modifier, storage: ImageStorag
                 }
             })
         }) {
-            Text("Photo")
+            Text("Compose Button - take a photo 📸", color = Color.White)
         }
     }
 }
