@@ -113,21 +113,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                 val randomFileName =
                     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
                 val uiImage = UIImage(photoData)
-                val rotatedImage = when (actualOrientation) {
-                    AVCaptureVideoOrientationPortraitUpsideDown-> {
-                        uiImage
-                    }
-                    AVCaptureVideoOrientationLandscapeLeft-> {
-                        uiImage
-                    }
-                    AVCaptureVideoOrientationLandscapeRight-> {
-                        uiImage
-                    }
-                    AVCaptureVideoOrientationPortrait-> {
-                        uiImage
-                    }
-                    else -> uiImage
-                }
+
                 storage.saveImage(
                     PictureData.Camera(
                         id = randomFileName,
@@ -135,7 +121,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                         description = "Kotlin Conf photo description",
                         gps = geoPos
                     ),
-                    IosStorableImage(rotatedImage)
+                    IosStorableImage(uiImage)
                 )
             }
         }
@@ -185,6 +171,7 @@ private fun BoxScope.AuthorizedCamera(storage: ImageStorage) {
                     }
                     cameraConnection.videoOrientation = actualOrientation
                 }
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoOrientation = actualOrientation
                 CATransaction.begin()
                 CATransaction.setValue(true, kCATransactionDisableActions)
                 view.layer.setFrame(rect)

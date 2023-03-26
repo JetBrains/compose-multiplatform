@@ -15,11 +15,11 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.jetbrains.skia.Image
+import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
 import platform.CoreGraphics.CGSizeMake
 import platform.Foundation.*
-import platform.UIKit.UIImage
-import platform.UIKit.UIImagePNGRepresentation
+import platform.UIKit.*
 import platform.posix.memcpy
 
 class IosImageStorage(
@@ -121,9 +121,26 @@ private fun UIImage.resizeToBig(): UIImage {
     return resize(newSize)
 }
 
-private fun UIImage.resize(newSize: CValue<CGSize>): UIImage {
-    //todo
-    return this
+private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
+    val currentSize = this.size
+
+    val widthRatio = targetSize.useContents{ width } / currentSize.useContents{ width }
+    val heightRatio = targetSize.useContents{ height } / currentSize.useContents{ height }
+
+    val newSize: CValue<CGSize> = if (widthRatio > heightRatio) {
+        CGSizeMake(width = currentSize.useContents{ width } * heightRatio, height = currentSize.useContents{ height } * heightRatio)
+    } else {
+        CGSizeMake(width = currentSize.useContents{ width } * widthRatio, height = currentSize.useContents{ height } * widthRatio)
+    }
+
+    val newRect = CGRectMake(x = 0.0, y = 0.0, width = newSize.useContents { width }, height = newSize.useContents { height })
+
+    UIGraphicsBeginImageContextWithOptions(size = newSize, opaque = false, scale = 1.0)
+    this.drawInRect(newRect)
+    val newImage = UIGraphicsGetImageFromCurrentImageContext()
+    UIGraphicsEndImageContext()
+
+    return newImage!!
 }
 
 private val PictureData.Camera.pngFile get():String = id + ".png"
