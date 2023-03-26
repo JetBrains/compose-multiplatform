@@ -80,13 +80,8 @@ class IosImageStorage(
             UIImageJPEGRepresentation(image.rawValue.resizeToThumbnail(), 0.7)
                 ?.writeToFile(picture.thumbnailPngFile)
             pictures.add(0, picture)
-            println("before resizedBig")
-            val resizedBig = image.rawValue.resizeToBig()
-            println("after resizedBig")
-            println("before UIImageJPEGRepresentation")
-            UIImageJPEGRepresentation(resizedBig, 0.7)
+            UIImageJPEGRepresentation(image.rawValue.resizeToBig(), 0.7)
                 ?.writeToFile(picture.pngFile)
-            println("after UIImageJPEGRepresentation")
             Json.Default.encodeToString(picture).writeToFile(picture.jsonFile)
         }
     }
@@ -154,28 +149,16 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
             height = currentSize.useContents { height } * widthRatio
         )
     }
-    val w = currentSize.useContents { width }
-    val h = currentSize.useContents { height }
-    val w2 = newSize.useContents { width }
-    val h2 = newSize.useContents { height }
-    println("previousSize: $w / $h")
-    println("resize to: $w2 / $h2 ")
-
     val newRect = CGRectMake(
         x = 0.0,
         y = 0.0,
         width = newSize.useContents { width },
         height = newSize.useContents { height }
     )
-    println("newRect: $newRect")
     UIGraphicsBeginImageContextWithOptions(size = newSize, opaque = false, scale = 1.0)
-    println("UIGraphicsBeginImageContextWithOptions success")
     this.drawInRect(newRect)
-    println("drawInRect success")
     val newImage = UIGraphicsGetImageFromCurrentImageContext()
-    println("newImage success")
     UIGraphicsEndImageContext()
-    println("UIGraphicsEndImageContext success")
 
     return newImage!!
 }

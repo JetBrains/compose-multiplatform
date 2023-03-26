@@ -48,7 +48,7 @@ class AndroidImageStorage(
                 height = (androidBitmap.height * targetThumbnailScale).toInt()
             ).asImageBitmap()
 
-            pictures.add(picture)
+            pictures.add(0, picture)
         }
     }
 

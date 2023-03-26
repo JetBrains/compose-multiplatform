@@ -100,35 +100,30 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                 didFinishProcessingPhoto: AVCapturePhoto,
                 error: NSError?
             ) {
-                println("captureOutput")
                 val photoData = didFinishProcessingPhoto.fileDataRepresentation()
-                    ?: error("fileDataRepresentation is null")
-                println("photoData: $photoData")
-                val location = locationManager.location
-                println("location: $location")
-                val geoPos = if (location != null) {
-                    GpsPosition(
-                        latitude = location.coordinate.useContents { latitude },
-                        longitude = location.coordinate.useContents { longitude }
+                if (photoData != null) {
+                    val location = locationManager.location
+                    val geoPos = if (location != null) {
+                        GpsPosition(
+                            latitude = location.coordinate.useContents { latitude },
+                            longitude = location.coordinate.useContents { longitude }
+                        )
+                    } else {
+                        GpsPosition(0.0, 0.0)
+                    }
+                    val randomUUID =
+                        CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
+                    val uiImage = UIImage(photoData)
+                    onCapture(
+                        PictureData.Camera(
+                            id = randomUUID,
+                            name = "Kotlin Conf",
+                            description = "Kotlin Conf photo description",
+                            gps = geoPos
+                        ),
+                        IosStorableImage(uiImage)
                     )
-                } else {
-                    GpsPosition(0.0, 0.0)
                 }
-                println("geoPos: $geoPos")
-                val randomUUID =
-                    CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
-                println("randomUUID: $randomUUID")
-                val uiImage = UIImage(photoData)
-                println("uiImage: $uiImage")
-                onCapture(
-                    PictureData.Camera(
-                        id = randomUUID,
-                        name = "Kotlin Conf",
-                        description = "Kotlin Conf photo description",
-                        gps = geoPos
-                    ),
-                    IosStorableImage(uiImage)
-                )
             }
         }
     }
