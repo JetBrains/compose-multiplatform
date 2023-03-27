@@ -2,30 +2,37 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
-import example.imageviewer.ImageStorage
 import example.imageviewer.IosStorableImage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
-import kotlinx.cinterop.*
+import kotlinx.cinterop.CValue
+import kotlinx.cinterop.useContents
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
-import platform.CoreFoundation.*
+import platform.CoreFoundation.CFUUIDCreate
+import platform.CoreFoundation.CFUUIDCreateString
 import platform.CoreGraphics.CGRect
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
-import platform.Foundation.*
+import platform.Foundation.CFBridgingRelease
+import platform.Foundation.NSError
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
-import platform.UIKit.*
+import platform.UIKit.UIDevice
+import platform.UIKit.UIDeviceOrientation
+import platform.UIKit.UIImage
+import platform.UIKit.UIView
 import platform.darwin.NSObject
 
 private sealed interface CameraAccess {
@@ -35,7 +42,10 @@ private sealed interface CameraAccess {
 }
 
 @Composable
-internal actual fun CameraView(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
+internal actual fun CameraView(
+    modifier: Modifier,
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
     var cameraAccess: CameraAccess by remember { mutableStateOf(CameraAccess.Undefined) }
     LaunchedEffect(Unit) {
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
@@ -77,7 +87,7 @@ internal actual fun CameraView(modifier: Modifier, onCapture: (picture: PictureD
 }
 
 @Composable
-private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
+private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit) {
     val locationManager = remember {
         CLLocationManager().apply {
             desiredAccuracy = kCLLocationAccuracyBest
@@ -171,7 +181,8 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                     }
                     cameraConnection.videoOrientation = actualOrientation
                 }
-                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoOrientation = actualOrientation
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoOrientation =
+                    actualOrientation
                 CATransaction.begin()
                 CATransaction.setValue(true, kCATransactionDisableActions)
                 view.layer.setFrame(rect)

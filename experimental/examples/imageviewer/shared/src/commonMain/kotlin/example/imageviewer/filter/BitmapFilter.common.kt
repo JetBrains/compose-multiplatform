@@ -18,4 +18,4 @@ expect fun blurFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitma
 expect class PlatformContext
 
 @Composable
-internal expect fun getPlatformContext():PlatformContext
+internal expect fun getPlatformContext(): PlatformContext

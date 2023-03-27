@@ -5,7 +5,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import example.imageviewer.Dependencies
 import example.imageviewer.ExternalImageViewerEvent
 import example.imageviewer.view.GalleryStyle
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +12,7 @@ import kotlinx.coroutines.flow.Flow
 sealed class Page
 
 class MemoryPage(val picture: PictureData) : Page() {
-    val scrollState = ScrollState(0)
+
 }
 
 class CameraPage : Page()

@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.viewinterop.AndroidView
@@ -25,23 +26,24 @@ import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
 import example.imageviewer.AndroidStorableImage
-import example.imageviewer.ImageStorage
+import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.toImageBitmap
 import java.nio.ByteBuffer
-import java.util.UUID
+import java.util.*
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import androidx.compose.ui.graphics.Color
-import example.imageviewer.PlatformStorableImage
 
 private val executor = Executors.newSingleThreadExecutor()
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-internal actual fun CameraView(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
+internal actual fun CameraView(
+    modifier: Modifier,
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
     val cameraPermissionState = rememberMultiplePermissionsState(
         listOf(
             android.Manifest.permission.CAMERA,
@@ -60,7 +62,10 @@ internal actual fun CameraView(modifier: Modifier, onCapture: (picture: PictureD
 
 @SuppressLint("MissingPermission")
 @Composable
-private fun CameraWithGrantedPermission(modifier: Modifier, onCapture: (picture: PictureData.Camera, image: PlatformStorableImage)->Unit) {
+private fun CameraWithGrantedPermission(
+    modifier: Modifier,
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
 
