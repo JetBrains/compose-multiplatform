@@ -1,4 +1,4 @@
-import androidx.build.layoutlib.AndroidXLayoutlibImplPlugin
+import androidx.build.paparazzi.AndroidXPaparazziImplPlugin
 
 buildscript {
     dependencies {
@@ -6,4 +6,4 @@ buildscript {
     }
 }
 
-apply plugin: AndroidXLayoutlibImplPlugin
+apply plugin: AndroidXPaparazziImplPlugin

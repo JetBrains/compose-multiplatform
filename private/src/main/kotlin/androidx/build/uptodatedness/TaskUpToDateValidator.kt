@@ -118,7 +118,16 @@ val ALLOW_RERUNNING_TASKS = setOf(
     ":lint-checks:integration-tests:copyDebugAndroidLintReports",
 
     // https://youtrack.jetbrains.com/issue/KT-49933
-    "generateProjectStructureMetadata"
+    "generateProjectStructureMetadata",
+
+    // https://github.com/google/protobuf-gradle-plugin/issues/667
+    ":datastore:datastore-preferences-proto:extractIncludeTestProto",
+    ":glance:glance-appwidget-proto:extractIncludeTestProto",
+    ":health:connect:connect-client-proto:extractIncludeTestProto",
+    ":privacysandbox:tools:tools-core:extractIncludeTestProto",
+    ":test:screenshot:screenshot-proto:extractIncludeTestProto",
+    ":wear:protolayout:protolayout-proto:extractIncludeTestProto",
+    ":wear:tiles:tiles-proto:extractIncludeTestProto"
 )
 
 // Additional tasks that are expected to be temporarily out-of-date after running once
@@ -128,10 +137,8 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
     "listTaskOutputs",
     "tasks",
 
-    // More information about the fact that these dokka tasks rerun can be found at b/167569304
-    "dokkaKotlinDocs",
-    "zipDokkaDocs",
-    "dackkaDocs",
+    // More information about the fact that these dackka tasks rerun can be found at b/167569304
+    "docs",
 
     // We know that these tasks are never up to date due to maven-metadata.xml changing
     // https://github.com/gradle/gradle/issues/11203
@@ -141,6 +148,8 @@ val DONT_TRY_RERUNNING_TASKS = setOf(
 )
 
 val DONT_TRY_RERUNNING_TASK_TYPES = setOf(
+    // TODO(aurimas): add back when upgrading to AGP 8.0.0-beta01
+    "com.android.build.gradle.internal.tasks.BundleLibraryJavaRes_Decorated",
     "com.android.build.gradle.internal.lint.AndroidLintTextOutputTask_Decorated",
     // lint report tasks
     "com.android.build.gradle.internal.lint.AndroidLintTask_Decorated",

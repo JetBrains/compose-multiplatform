@@ -27,6 +27,7 @@ import javax.inject.Inject
 import org.gradle.api.Project
 import org.gradle.api.file.FileCollection
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 import org.gradle.process.ExecOperations
 import org.gradle.workers.WorkAction
@@ -38,6 +39,7 @@ import org.gradle.workers.WorkerExecutor
 fun runMetalavaWithArgs(
     metalavaClasspath: FileCollection,
     args: List<String>,
+    k2UastEnabled: Boolean,
     workerExecutor: WorkerExecutor
 ) {
     val allArgs = listOf(
@@ -54,12 +56,14 @@ fun runMetalavaWithArgs(
     workQueue.submit(MetalavaWorkAction::class.java) { parameters ->
         parameters.args.set(allArgs)
         parameters.metalavaClasspath.set(metalavaClasspath.files)
+        parameters.k2UastEnabled.set(k2UastEnabled)
     }
 }
 
 interface MetalavaParams : WorkParameters {
     val args: ListProperty<String>
     val metalavaClasspath: SetProperty<File>
+    val k2UastEnabled: Property<Boolean>
 }
 
 abstract class MetalavaWorkAction @Inject constructor(
@@ -75,6 +79,11 @@ abstract class MetalavaWorkAction @Inject constructor(
                     "--add-opens",
                     "java.base/java.util=ALL-UNNAMED"
                 )
+                if (parameters.k2UastEnabled.get()) {
+                    // Enable Android Lint infrastructure used by Metalava to use K2 UAST
+                    // (also historically known as FIR) when running Metalava for this module.
+                    it.systemProperty("lint.use.fir.uast", true)
+                }
                 it.classpath(parameters.metalavaClasspath.get())
                 it.mainClass.set("com.android.tools.metalava.Driver")
                 it.args = parameters.args.get()
@@ -195,6 +204,7 @@ fun generateApi(
     apiLocation: ApiLocation,
     apiLintMode: ApiLintMode,
     includeRestrictToLibraryGroupApis: Boolean,
+    k2UastEnabled: Boolean,
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
@@ -202,11 +212,13 @@ fun generateApi(
     // can safely be skipped on the public pass.
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.PublicApi, ApiLintMode.Skip, workerExecutor, pathToManifest
+        apiLocation, GenerateApiMode.PublicApi, ApiLintMode.Skip, k2UastEnabled, workerExecutor,
+        pathToManifest
     )
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, workerExecutor, pathToManifest
+        apiLocation, GenerateApiMode.ExperimentalApi, apiLintMode, k2UastEnabled, workerExecutor,
+        pathToManifest
     )
 
     val restrictedAPIMode = if (includeRestrictToLibraryGroupApis) {
@@ -216,7 +228,7 @@ fun generateApi(
     }
     generateApi(
         metalavaClasspath, files.bootClasspath, files.dependencyClasspath, files.sourcePaths.files,
-        apiLocation, restrictedAPIMode, ApiLintMode.Skip, workerExecutor
+        apiLocation, restrictedAPIMode, ApiLintMode.Skip, k2UastEnabled, workerExecutor
     )
 }
 
@@ -229,6 +241,7 @@ private fun generateApi(
     outputLocation: ApiLocation,
     generateApiMode: GenerateApiMode,
     apiLintMode: ApiLintMode,
+    k2UastEnabled: Boolean,
     workerExecutor: WorkerExecutor,
     pathToManifest: String? = null
 ) {
@@ -236,7 +249,7 @@ private fun generateApi(
         bootClasspath, dependencyClasspath, sourcePaths, outputLocation,
         generateApiMode, apiLintMode, pathToManifest
     )
-    runMetalavaWithArgs(metalavaClasspath, args, workerExecutor)
+    runMetalavaWithArgs(metalavaClasspath, args, k2UastEnabled, workerExecutor)
 }
 
 // Generates the specified api file

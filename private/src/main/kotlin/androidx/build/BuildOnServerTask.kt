@@ -58,7 +58,6 @@ open class BuildOnServerTask : DefaultTask() {
     fun getRequiredFiles(): List<File> {
         return mutableListOf(
             "androidx_aggregate_build_info.txt",
-            "top-of-tree-m2repository-all-$buildId.zip"
         ).map { fileName -> File(distributionDirectory, fileName) }
     }
 

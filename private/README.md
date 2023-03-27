@@ -1,4 +1,4 @@
-This is the :buildSrc:impl project
+This is the :buildSrc:private project
 
 It contains code that is used to configure other projects in this repository but that does not need to be added to the classpaths of the build scripts of those projects.
 
