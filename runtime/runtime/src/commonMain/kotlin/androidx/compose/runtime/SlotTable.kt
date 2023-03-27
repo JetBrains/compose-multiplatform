@@ -1563,12 +1563,14 @@ internal class SlotWriter(
     /**
      * Start a node.
      */
-    fun startNode(key: Any?) = startGroup(NodeKey, key, isNode = true, aux = Composer.Empty)
+    fun startNode(key: Int, objectKey: Any?) =
+        startGroup(key, objectKey, isNode = true, aux = Composer.Empty)
 
     /**
      * Start a node
      */
-    fun startNode(key: Any?, node: Any?) = startGroup(NodeKey, key, isNode = true, aux = node)
+    fun startNode(key: Int, objectKey: Any?, node: Any?) =
+        startGroup(key, objectKey, isNode = true, aux = node)
 
     /**
      * Start a data group.
@@ -3025,6 +3027,16 @@ private class SlotTableGroup(
         )
     }
 
+    override val groupSize: Int get() = table.groups.groupSize(group)
+
+    override val slotsSize: Int
+        get() {
+            val nextGroup = group + groupSize
+            val nextSlot = if (nextGroup < table.groupsSize) table.groups.dataAnchor(nextGroup)
+                else table.slotsSize
+            return nextSlot - table.groups.dataAnchor(group)
+        }
+
     private fun validateRead() {
         if (table.version != version) {
             throw ConcurrentModificationException()
@@ -3138,9 +3150,6 @@ private const val MinGroupGrowthSize = 32
 
 // The minimum number of data slots to allocate in the data slot table
 private const val MinSlotsGrowthSize = 32
-
-// The key to used for nodes
-private const val NodeKey = 125
 
 private fun IntArray.groupInfo(address: Int): Int =
     this[address * Group_Fields_Size + GroupInfo_Offset]

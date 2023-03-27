@@ -554,7 +554,6 @@ fun TextDemoSoftWrap() {
     }
 }
 
-@OptIn(ExperimentalTextApi::class)
 @Composable
 fun TextDemoHyphens() {
     val text = "Transformation"
@@ -562,7 +561,7 @@ fun TextDemoHyphens() {
         hyphens = Hyphens.Auto)
     val textStyleHyphensOff = TextStyle(fontSize = fontSize8, color = Color.Blue,
         hyphens = Hyphens.None)
-    Column() {
+    Column {
         var width by remember { mutableStateOf(30f) }
         Slider(
             value = width,

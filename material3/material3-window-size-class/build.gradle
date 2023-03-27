@@ -35,9 +35,9 @@ dependencies {
          * corresponding block below
          */
         implementation(libs.kotlinStdlibCommon)
-        api("androidx.compose.runtime:runtime:1.2.0")
-        api("androidx.compose.ui:ui:1.2.0")
-        api("androidx.compose.ui:ui-unit:1.2.0")
+        api("androidx.compose.runtime:runtime:1.2.1")
+        api("androidx.compose.ui:ui:1.2.1")
+        api("androidx.compose.ui:ui-unit:1.2.1")
         implementation("androidx.window:window:1.0.0")
 
         testImplementation(libs.kotlinTest)
@@ -105,19 +105,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 androidx {
     name = "Compose Material 3 Window Size Class"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_MATERIAL3
     inceptionYear = "2022"
     description = "Provides window size classes for building responsive UIs"
 }
 
 android {
     namespace "androidx.compose.material3.windowsizeclass"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

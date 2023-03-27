@@ -132,8 +132,6 @@ internal class TextFieldDelegate {
         /**
          * Notify system that focused input area.
          *
-         * System is typically scrolled up not to be covered by keyboard.
-         *
          * @param value The editor model
          * @param textDelegate The text delegate
          * @param layoutCoordinates The layout coordinates
@@ -141,6 +139,7 @@ internal class TextFieldDelegate {
          * @param hasFocus True if focus is gained.
          * @param offsetMapping The mapper from/to editing buffer to/from visible text.
          */
+        // TODO(b/262648050) Try to find a better API.
         @JvmStatic
         internal fun notifyFocusedRect(
             value: TextFieldValue,
@@ -173,8 +172,6 @@ internal class TextFieldDelegate {
             }
             val globalLT = layoutCoordinates.localToRoot(Offset(bbox.left, bbox.top))
 
-            // TODO remove `Deprecated`, if it is removed in AOSP repository
-            @Suppress("DEPRECATION")
             textInputSession.notifyFocusedRect(
                 Rect(Offset(globalLT.x, globalLT.y), Size(bbox.width, bbox.height))
             )
@@ -188,7 +185,7 @@ internal class TextFieldDelegate {
          * @param onValueChange The callback called when the new editor state arrives.
          */
         @JvmStatic
-        private fun onEditCommand(
+        internal fun onEditCommand(
             ops: List<EditCommand>,
             editProcessor: EditProcessor,
             onValueChange: (TextFieldValue) -> Unit,

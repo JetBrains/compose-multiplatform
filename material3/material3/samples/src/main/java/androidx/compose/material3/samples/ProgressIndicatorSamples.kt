@@ -36,8 +36,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Sampled
 @Composable
 fun LinearProgressIndicatorSample() {
@@ -69,6 +71,7 @@ fun LinearProgressIndicatorSample() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun IndeterminateLinearProgressIndicatorSample() {
@@ -79,6 +82,7 @@ fun IndeterminateLinearProgressIndicatorSample() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun CircularProgressIndicatorSample() {
@@ -107,6 +111,7 @@ fun CircularProgressIndicatorSample() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun IndeterminateCircularProgressIndicatorSample() {

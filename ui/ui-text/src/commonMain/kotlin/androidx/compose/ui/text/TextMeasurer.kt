@@ -183,6 +183,73 @@ class TextMeasurer constructor(
         }
     }
 
+    /**
+     * Creates a [TextLayoutResult] according to given parameters.
+     *
+     * This function supports laying out text that consists of multiple paragraphs, includes
+     * placeholders, wraps around soft line breaks, and might overflow outside the specified size.
+     *
+     * Most parameters for text affect the final text layout. One pixel change in [constraints]
+     * boundaries can displace a word to another line which would cause a chain reaction that
+     * completely changes how text is rendered.
+     *
+     * On the other hand, some attributes only play a role when drawing the created text layout.
+     * For example text layout can be created completely in black color but we can apply
+     * [TextStyle.color] later in draw phase. This also means that animating text color shouldn't
+     * invalidate text layout.
+     *
+     * Thus, [textLayoutCache] helps in the process of converting a set of text layout inputs to
+     * a text layout while ignoring non-layout-affecting attributes. Iterative calls that use the
+     * same input parameters should benefit from substantial performance improvements.
+     *
+     * @param text the text to be laid out
+     * @param style the [TextStyle] to be applied to the whole text
+     * @param overflow How visual overflow should be handled.
+     * @param softWrap Whether the text should break at soft line breaks. If false, the glyphs in
+     * the text will be positioned as if there was unlimited horizontal space. If [softWrap] is
+     * false, [overflow] and TextAlign may have unexpected effects.
+     * @param maxLines An optional maximum number of lines for the text to span, wrapping if
+     * necessary. If the text exceeds the given number of lines, it will be truncated according to
+     * [overflow] and [softWrap]. If it is not null, then it must be greater than zero.
+     * @param constraints how wide and tall the text is allowed to be. [Constraints.maxWidth]
+     * will define the width of the MultiParagraph. [Constraints.maxHeight] helps defining the
+     * number of lines that fit with ellipsis is true. [Constraints.minWidth] defines the minimum
+     * width the resulting [TextLayoutResult.size] will report. [Constraints.minHeight] is no-op.
+     * @param layoutDirection layout direction of the measurement environment. If not specified,
+     * defaults to the value that was given during initialization of this [TextMeasurer].
+     * @param density density of the measurement environment. If not specified, defaults to
+     * the value that was given during initialization of this [TextMeasurer].
+     * @param fontFamilyResolver to be used to load the font given in [SpanStyle]s. If not
+     * specified, defaults to the value that was given during initialization of this [TextMeasurer].
+     * @param skipCache Disables cache optimization if it is passed as true.
+     */
+    @Stable
+    fun measure(
+        text: String,
+        style: TextStyle = TextStyle.Default,
+        overflow: TextOverflow = TextOverflow.Clip,
+        softWrap: Boolean = true,
+        maxLines: Int = Int.MAX_VALUE,
+        constraints: Constraints = Constraints(),
+        layoutDirection: LayoutDirection = this.fallbackLayoutDirection,
+        density: Density = this.fallbackDensity,
+        fontFamilyResolver: FontFamily.Resolver = this.fallbackFontFamilyResolver,
+        skipCache: Boolean = false
+    ): TextLayoutResult {
+        return measure(
+            text = AnnotatedString(text),
+            style = style,
+            overflow = overflow,
+            softWrap = softWrap,
+            maxLines = maxLines,
+            constraints = constraints,
+            layoutDirection = layoutDirection,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver,
+            skipCache = skipCache
+        )
+    }
+
     internal companion object {
         /**
          * Computes the visual position of the glyphs for painting the text.
@@ -203,8 +270,7 @@ class TextMeasurer constructor(
             )
 
             val minWidth = constraints.minWidth
-            val widthMatters = softWrap ||
-                overflow == TextOverflow.Ellipsis
+            val widthMatters = softWrap || overflow == TextOverflow.Ellipsis
             val maxWidth = if (widthMatters && constraints.hasBoundedWidth) {
                 constraints.maxWidth
             } else {
@@ -225,8 +291,7 @@ class TextMeasurer constructor(
             //     AA…
             // Here we assume there won't be any '\n' character when softWrap is false. And make
             // maxLines 1 to implement the similar behavior.
-            val overwriteMaxLines = !softWrap &&
-                overflow == TextOverflow.Ellipsis
+            val overwriteMaxLines = !softWrap && overflow == TextOverflow.Ellipsis
             val finalMaxLines = if (overwriteMaxLines) 1 else maxLines
 
             // if minWidth == maxWidth the width is fixed.

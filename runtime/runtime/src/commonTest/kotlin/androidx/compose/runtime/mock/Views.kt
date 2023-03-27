@@ -20,7 +20,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.NonRestartableComposable
+import androidx.compose.runtime.ComposeNodeLifecycleCallback
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.rememberUpdatedState
 
 @Composable
 fun <T : Any> Repeated(
@@ -39,6 +42,45 @@ fun Linear(content: @Composable () -> Unit) {
     ReusableComposeNode<View, ViewApplier>(
         factory = { View().also { it.name = "linear" } },
         update = { }
+    ) {
+        content()
+    }
+}
+
+@Composable
+fun Linear(
+    onReuse: () -> Unit = {},
+    onDeactivate: () -> Unit = {},
+    onRelease: () -> Unit = {},
+    onSet: () -> Unit = {},
+    content: @Composable () -> Unit
+) {
+    val currentOnReuse by rememberUpdatedState(onReuse)
+    val currentOnDeactivate by rememberUpdatedState(onDeactivate)
+    val currentOnRelease by rememberUpdatedState(onRelease)
+    ReusableComposeNode<View, ViewApplier>(
+        factory = {
+            object : View(), ComposeNodeLifecycleCallback {
+                init {
+                    name = "linear"
+                }
+
+                override fun onRelease() {
+                    currentOnRelease()
+                }
+
+                override fun onReuse() {
+                    currentOnReuse()
+                }
+
+                override fun onDeactivate() {
+                    currentOnDeactivate()
+                }
+            }
+        },
+        update = {
+            set(onSet) { onSet() }
+        },
     ) {
         content()
     }

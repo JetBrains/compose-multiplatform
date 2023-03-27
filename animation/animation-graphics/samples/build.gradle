@@ -31,16 +31,15 @@ dependencies {
 
     implementation(project(":compose:animation:animation"))
     implementation(project(":compose:animation:animation-graphics"))
-    implementation("androidx.compose.foundation:foundation:1.0.0")
-    implementation("androidx.compose.material:material:1.0.0")
-    implementation("androidx.compose.runtime:runtime:1.2.0")
-    implementation("androidx.compose.ui:ui-text:1.0.0")
+    implementation("androidx.compose.foundation:foundation:1.2.1")
+    implementation("androidx.compose.material:material:1.2.1")
+    implementation("androidx.compose.runtime:runtime:1.2.1")
+    implementation("androidx.compose.ui:ui-text:1.2.1")
 }
 
 androidx {
     name = "AndroidX Compose UI Animation Graphics Library Samples"
     type = LibraryType.SAMPLES
-    mavenGroup = LibraryGroups.COMPOSE_ANIMATION
     inceptionYear = "2021"
     description = "Contains the sample code for the Androidx Compose UI Animation Graphics Library"
 }

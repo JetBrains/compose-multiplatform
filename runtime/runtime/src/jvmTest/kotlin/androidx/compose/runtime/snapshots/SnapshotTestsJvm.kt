@@ -72,6 +72,7 @@ class SnapshotTestsJvm {
             running.set(false)
         }
 
+        exception.get()?.let { throw it }
         assertNull(exception.get())
     }
 }

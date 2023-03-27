@@ -26,9 +26,8 @@ import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.ui.test.TestActivity
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.LifecycleRegistry
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.testing.TestLifecycleOwner
 import androidx.test.core.app.ActivityScenario
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
@@ -89,13 +88,11 @@ class WrapperTest {
         val composedLatch = CountDownLatch(1)
         val disposeLatch = CountDownLatch(1)
 
-        lateinit var owner: RegistryOwner
+        val owner = TestLifecycleOwner(Lifecycle.State.RESUMED)
         activityScenario.onActivity {
-            owner = RegistryOwner()
-
             val view = ComposeView(it)
             it.setContentView(view)
-            ViewTreeLifecycleOwner.set(view, owner)
+            view.setViewTreeLifecycleOwner(owner)
             view.setContent {
                 DisposableEffect(Unit) {
                     onDispose {
@@ -110,7 +107,7 @@ class WrapperTest {
 
         activityScenario.onActivity {
             assertEquals(1, disposeLatch.count)
-            owner.registry.currentState = Lifecycle.State.DESTROYED
+            owner.currentState = Lifecycle.State.DESTROYED
         }
 
         assertTrue(disposeLatch.await(1, TimeUnit.SECONDS))
@@ -118,11 +115,10 @@ class WrapperTest {
 
     @Test
     fun detachedFromLifecycleWhenDisposed() {
-        lateinit var owner: RegistryOwner
+        val owner = TestLifecycleOwner(Lifecycle.State.RESUMED)
         val composedLatch = CountDownLatch(1)
         lateinit var view: ComposeView
         activityScenario.onActivity {
-            owner = RegistryOwner()
             view = ComposeView(it)
             it.setContentView(
                 // Wrap the ComposeView in a FrameLayout to be the content view;
@@ -133,7 +129,7 @@ class WrapperTest {
                     addView(view)
                 }
             )
-            ViewTreeLifecycleOwner.set(view, owner)
+            view.setViewTreeLifecycleOwner(owner)
             view.setContent {
                 composedLatch.countDown()
             }
@@ -142,9 +138,9 @@ class WrapperTest {
         assertTrue(composedLatch.await(1, TimeUnit.SECONDS))
 
         activityScenario.onActivity {
-            assertEquals(2, owner.registry.observerCount)
+            assertEquals(2, owner.observerCount)
             view.disposeComposition()
-            assertEquals(1, owner.registry.observerCount)
+            assertEquals(1, owner.observerCount)
         }
     }
 
@@ -185,12 +181,5 @@ class WrapperTest {
             }
             assertTrue("setContent didn't compose the content synchronously", composed)
         }
-    }
-
-    private class RegistryOwner : LifecycleOwner {
-        var registry = LifecycleRegistry(this).also {
-            it.currentState = Lifecycle.State.RESUMED
-        }
-        override fun getLifecycle() = registry
     }
 }

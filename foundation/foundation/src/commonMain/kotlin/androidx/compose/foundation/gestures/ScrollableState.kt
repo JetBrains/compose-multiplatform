@@ -78,6 +78,34 @@ interface ScrollableState {
      * not.
      */
     val isScrollInProgress: Boolean
+
+    /**
+     * Whether this [ScrollableState] can scroll forward (consume a positive delta). This is
+     * typically false if the scroll position is equal to its maximum value, and true otherwise.
+     *
+     * Note that `true` here does not imply that delta *will* be consumed - the ScrollableState may
+     * decide not to handle the incoming delta (such as if it is already being scrolled separately).
+     * Additionally, for backwards compatibility with previous versions of ScrollableState this
+     * value defaults to `true`.
+     *
+     * @sample androidx.compose.foundation.samples.CanScrollSample
+     */
+    val canScrollForward: Boolean
+        get() = true
+
+    /**
+     * Whether this [ScrollableState] can scroll backward (consume a negative delta). This is
+     * typically false if the scroll position is equal to its minimum value, and true otherwise.
+     *
+     * Note that `true` here does not imply that delta *will* be consumed - the ScrollableState may
+     * decide not to handle the incoming delta (such as if it is already being scrolled separately).
+     * Additionally, for backwards compatibility with previous versions of ScrollableState this
+     * value defaults to `true`.
+     *
+     * @sample androidx.compose.foundation.samples.CanScrollSample
+     */
+    val canScrollBackward: Boolean
+        get() = true
 }
 
 /**

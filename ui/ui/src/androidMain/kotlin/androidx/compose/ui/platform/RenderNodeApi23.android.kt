@@ -21,9 +21,11 @@ import android.graphics.Outline
 import android.view.RenderNode
 import android.view.DisplayListCanvas
 import android.os.Build
+import android.view.View
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RenderEffect
 
@@ -36,6 +38,8 @@ import androidx.compose.ui.graphics.RenderEffect
 @RequiresApi(Build.VERSION_CODES.M)
 internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRenderNode {
     private val renderNode = RenderNode.create("Compose", ownerView)
+
+    private var internalCompositingStrategy = CompositingStrategy.Auto
 
     init {
         if (needToValidateAccess) {
@@ -68,6 +72,8 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.offsetTopAndBottom(0)
             verifyShadowColorProperties(renderNode)
             discardDisplayListInternal()
+            renderNode.setLayerType(View.LAYER_TYPE_NONE)
+            renderNode.setHasOverlappingRendering(renderNode.hasOverlappingRendering())
             needToValidateAccess = false // only need to do this once
         }
         if (testFailCreateRenderNode) {
@@ -206,6 +212,33 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             renderNode.alpha = value
         }
 
+    override var compositingStrategy: CompositingStrategy
+        get() = internalCompositingStrategy
+        set(value) {
+            when (value) {
+                CompositingStrategy.Offscreen -> {
+                    renderNode.setLayerType(View.LAYER_TYPE_HARDWARE)
+                    renderNode.setHasOverlappingRendering(true)
+                }
+                CompositingStrategy.ModulateAlpha -> {
+                    renderNode.setLayerType(View.LAYER_TYPE_NONE)
+                    renderNode.setHasOverlappingRendering(false)
+                }
+                else -> { // CompositingStrategy.Auto
+                    renderNode.setLayerType(View.LAYER_TYPE_NONE)
+                    renderNode.setHasOverlappingRendering(true)
+                }
+            }
+            internalCompositingStrategy = value
+        }
+
+    internal fun getLayerType(): Int = when (internalCompositingStrategy) {
+        CompositingStrategy.Offscreen -> View.LAYER_TYPE_HARDWARE
+        else -> View.LAYER_TYPE_NONE
+    }
+
+    internal fun hasOverlappingRendering(): Boolean = renderNode.hasOverlappingRendering()
+
     override val hasDisplayList: Boolean
         get() = renderNode.isValid
 
@@ -295,7 +328,8 @@ internal class RenderNodeApi23(val ownerView: AndroidComposeView) : DeviceRender
             // on it since this is a write only field
             clipToBounds = clipToBounds,
             alpha = renderNode.alpha,
-            renderEffect = renderEffect
+            renderEffect = renderEffect,
+            compositingStrategy = internalCompositingStrategy
         )
 
     override fun discardDisplayList() {

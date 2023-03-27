@@ -107,7 +107,7 @@ class LazyStaggeredGridArrangementsTest(
                     .testTag(LazyStaggeredGrid)
                     .axisSize(itemSizeDp * 3, itemSizeDp * 5),
                 state = state,
-                mainAxisArrangement = Arrangement.spacedBy(itemSizeDp),
+                mainAxisSpacing = itemSizeDp,
                 crossAxisArrangement = Arrangement.spacedBy(itemSizeDp / 2)
             ) {
                 items(100) {
@@ -154,7 +154,7 @@ class LazyStaggeredGridArrangementsTest(
                     .testTag(LazyStaggeredGrid)
                     .axisSize(itemSizeDp * 2, itemSizeDp * 5),
                 state = state,
-                mainAxisArrangement = Arrangement.spacedBy(itemSizeDp)
+                mainAxisSpacing = itemSizeDp
             ) {
                 items(100) {
                     BasicText(
@@ -189,7 +189,7 @@ class LazyStaggeredGridArrangementsTest(
                     .testTag(LazyStaggeredGrid)
                     .axisSize(itemSizeDp * 2, itemSizeDp * 5),
                 state = state,
-                mainAxisArrangement = Arrangement.spacedBy(-itemSizeDp)
+                mainAxisSpacing = -itemSizeDp
             ) {
                 items(100) {
                     BasicText(
@@ -229,7 +229,7 @@ class LazyStaggeredGridArrangementsTest(
             LazyStaggeredGrid(
                 lanes = 2,
                 modifier = Modifier.axisSize(crossAxis = itemSizeDp * 2, mainAxis = itemSizeDp),
-                mainAxisArrangement = Arrangement.spacedBy(-largerThanItemSize),
+                mainAxisSpacing = -largerThanItemSize,
                 state = state
             ) {
                 items(8) { index ->

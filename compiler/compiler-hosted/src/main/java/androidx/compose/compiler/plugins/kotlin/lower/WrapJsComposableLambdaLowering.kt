@@ -16,7 +16,8 @@
 
 package androidx.compose.compiler.plugins.kotlin.lower
 
-import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
+import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.AbstractDecoysLowering
 import androidx.compose.compiler.plugins.kotlin.lower.decoys.CreateDecoysTransformer
@@ -50,7 +51,9 @@ import org.jetbrains.kotlin.ir.util.functions
 import org.jetbrains.kotlin.ir.util.isVararg
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 
 /**
@@ -90,7 +93,7 @@ class WrapJsComposableLambdaLowering(
             context, symbolRemapper, decoysEnabled, metrics
         )
         symbolRemapper.getReferencedSimpleFunction(
-            getTopLevelFunctions(ComposeFqNames.remember).map { it.owner }.first {
+            getTopLevelFunctions(ComposeCallableIds.remember).map { it.owner }.first {
                 it.valueParameters.size == 2 && !it.valueParameters.first().isVararg
             }.symbol
         ).owner.let {
@@ -121,10 +124,10 @@ class WrapJsComposableLambdaLowering(
     override fun visitCall(expression: IrCall): IrExpression {
         val original = super.visitCall(expression) as IrCall
         return when (expression.symbol.owner.fqNameForIrSerialization) {
-            ComposeFqNames.composableLambda -> {
+            ComposeCallableIds.composableLambda.asSingleFqName() -> {
                 transformComposableLambdaCall(original)
             }
-            ComposeFqNames.composableLambdaInstance -> {
+            ComposeCallableIds.composableLambdaInstance.asSingleFqName() -> {
                 transformComposableLambdaInstanceCall(original)
             }
             else -> original
@@ -139,7 +142,7 @@ class WrapJsComposableLambdaLowering(
             if (lambda.function.extensionReceiverParameter != null) 1 else 0
 
         val invokeSymbol = symbolRemapper.getReferencedClass(
-            getTopLevelClass(ComposeFqNames.composableLambdaType)
+            getTopLevelClass(ComposeClassIds.ComposableLambda)
         ).functions.single {
             it.owner.name.asString() == "invoke" &&
                 argumentsCount == it.owner.valueParameters.size
@@ -213,7 +216,9 @@ class WrapJsComposableLambdaLowering(
     }
 
     private fun callRun(returnType: IrType, runBlock: IrFunctionExpressionImpl): IrCall {
-        val runSymbol = getTopLevelFunctions(FqName("kotlin.run")).first()
+        val runSymbol = getTopLevelFunction(
+            CallableId(FqName("kotlin"), Name.identifier("run"))
+        )
         return IrCallImpl(
             startOffset = SYNTHETIC_OFFSET,
             endOffset = SYNTHETIC_OFFSET,

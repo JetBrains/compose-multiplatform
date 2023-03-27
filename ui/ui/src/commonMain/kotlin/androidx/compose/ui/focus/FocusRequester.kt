@@ -16,17 +16,25 @@
 
 package androidx.compose.ui.focus
 
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collection.MutableVector
 import androidx.compose.runtime.collection.mutableVectorOf
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.node.Nodes
+import androidx.compose.ui.node.visitChildren
 
-private const val focusRequesterNotInitialized = """
+private const val FocusRequesterNotInitialized = """
    FocusRequester is not initialized. Here are some possible fixes:
 
    1. Remember the FocusRequester: val focusRequester = remember { FocusRequester() }
    2. Did you forget to add a Modifier.focusRequester() ?
    3. Are you attempting to request focus during composition? Focus requests should be made in
    response to some event. Eg Modifier.clickable { focusRequester.requestFocus() }
+"""
+
+private const val InvalidFocusRequesterInvocation = """
+    Please check whether the focusRequester is FocusRequester.Cancel or FocusRequester.Default
+    before invoking any functions on the focusRequester.
 """
 
 /**
@@ -38,10 +46,11 @@ private const val focusRequesterNotInitialized = """
  *
  * @see androidx.compose.ui.focus.focusRequester
  */
+@Stable
 class FocusRequester {
 
-    internal val focusRequesterModifierLocals: MutableVector<FocusRequesterModifierLocal> =
-        mutableVectorOf()
+    @OptIn(ExperimentalComposeUiApi::class)
+    internal val focusRequesterNodes: MutableVector<FocusRequesterModifierNode> = mutableVectorOf()
 
     /**
      * Use this function to request focus. If the system grants focus to a component associated
@@ -51,12 +60,10 @@ class FocusRequester {
      * @sample androidx.compose.ui.samples.RequestFocusSample
      */
     fun requestFocus() {
-        check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
-        performRequestFocus {
-            it.requestFocus()
-            // TODO(b/245755256): Make focusModifier.requestFocus() return a Boolean.
-            true
-        }
+        // TODO(b/245755256): Add another API that returns a Boolean indicating
+        //  whether requestFocus succeeded or not.
+        @OptIn(ExperimentalComposeUiApi::class)
+        findFocusTarget { it.requestFocus() }
     }
 
     /**
@@ -69,16 +76,20 @@ class FocusRequester {
      * associated with this [FocusRequester].
      */
     @OptIn(ExperimentalComposeUiApi::class)
-    internal fun performRequestFocus(onFound: (FocusModifier) -> Boolean): Boolean? = when (this) {
-        Cancel -> false
-        Default -> null
-        else -> {
-            var success = false
-            focusRequesterModifierLocals.forEach {
-                it.findFocusNode()?.let { success = onFound.invoke(it) || success }
+    internal fun findFocusTarget(onFound: (FocusTargetModifierNode) -> Boolean): Boolean {
+        check(this != Default) { InvalidFocusRequesterInvocation }
+        check(this != Cancel) { InvalidFocusRequesterInvocation }
+        check(focusRequesterNodes.isNotEmpty()) { FocusRequesterNotInitialized }
+        var success = false
+        focusRequesterNodes.forEach { node ->
+            node.visitChildren(Nodes.FocusTarget) {
+                if (onFound(it)) {
+                    success = true
+                    return@forEach
+                }
             }
-            success
         }
+        return success
     }
 
     /**
@@ -96,17 +107,15 @@ class FocusRequester {
      *
      * @sample androidx.compose.ui.samples.CaptureFocusSample
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun captureFocus(): Boolean {
-        check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
-        var success = false
-        focusRequesterModifierLocals.forEach {
-            it.findFocusNode()?.apply {
-                if (captureFocus()) {
-                    success = true
-                }
+        check(focusRequesterNodes.isNotEmpty()) { FocusRequesterNotInitialized }
+        focusRequesterNodes.forEach {
+            if (it.captureFocus()) {
+                return true
             }
         }
-        return success
+        return false
     }
 
     /**
@@ -123,17 +132,15 @@ class FocusRequester {
      *
      * @sample androidx.compose.ui.samples.CaptureFocusSample
      */
+    @OptIn(ExperimentalComposeUiApi::class)
     fun freeFocus(): Boolean {
-        check(focusRequesterModifierLocals.isNotEmpty()) { focusRequesterNotInitialized }
-        var success = false
-        focusRequesterModifierLocals.forEach {
-            it.findFocusNode()?.apply {
-                if (freeFocus()) {
-                    success = true
-                }
+        check(focusRequesterNodes.isNotEmpty()) { FocusRequesterNotInitialized }
+        focusRequesterNodes.forEach {
+            if (it.freeFocus()) {
+                return true
             }
         }
-        return success
+        return false
     }
 
     companion object {

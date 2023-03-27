@@ -21,10 +21,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.testutils.assertPixels
+import androidx.compose.testutils.assertPixelColor
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.compositeOver
+import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.captureToImage
@@ -82,9 +83,12 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.onNodeWithTag(Tag)
             .captureToImage()
-            .assertPixels(SurfaceSize) {
-                expectedSurfaceColor
-            }
+            .toPixelMap()
+            .assertPixelColor(
+                expected = expectedSurfaceColor,
+                x = SurfaceSize.width / 2,
+                y = SurfaceSize.height / 2
+            )
     }
 
     @Test
@@ -104,9 +108,12 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.onNodeWithTag(Tag)
             .captureToImage()
-            .assertPixels(SurfaceSize) {
-                expectedSurfaceColor
-            }
+            .toPixelMap()
+            .assertPixelColor(
+                expected = expectedSurfaceColor,
+                x = SurfaceSize.width / 2,
+                y = SurfaceSize.height / 2
+            )
     }
 
     @Test
@@ -129,9 +136,12 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.onNodeWithTag(Tag)
             .captureToImage()
-            .assertPixels(SurfaceSize) {
-                expectedSurfaceColor
-            }
+            .toPixelMap()
+            .assertPixelColor(
+                expected = expectedSurfaceColor,
+                x = SurfaceSize.width / 2,
+                y = SurfaceSize.height / 2
+            )
     }
 
     @Test
@@ -147,9 +157,12 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.onNodeWithTag(Tag)
             .captureToImage()
-            .assertPixels(SurfaceSize) {
-                expectedSurfaceColor
-            }
+            .toPixelMap()
+            .assertPixelColor(
+                expected = expectedSurfaceColor,
+                x = SurfaceSize.width / 2,
+                y = SurfaceSize.height / 2
+            )
     }
 
     @Test
@@ -168,9 +181,12 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         rule.onNodeWithTag(Tag)
             .captureToImage()
-            .assertPixels(SurfaceSize) {
-                expectedSurfaceColor
-            }
+            .toPixelMap()
+            .assertPixelColor(
+                expected = expectedSurfaceColor,
+                x = SurfaceSize.width / 2,
+                y = SurfaceSize.height / 2
+            )
     }
 
     @Test
@@ -179,7 +195,7 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
 
         val customOverlay = object : ElevationOverlay {
             @Composable
-            override fun apply(color: Color, elevation: Dp): Color = Color.Red
+            override fun apply(color: Color, elevation: Dp): Color = customOverlayColor
         }
 
         rule.setContent {
@@ -188,12 +204,14 @@ class ElevationOverlayTest(private val elevation: Dp?, overlayAlpha: Float?) {
             }
         }
 
-        rule
-            .onNodeWithTag(Tag)
+        rule.onNodeWithTag(Tag)
             .captureToImage()
-            .assertPixels(SurfaceSize) {
-                customOverlayColor
-            }
+            .toPixelMap()
+            .assertPixelColor(
+                expected = customOverlayColor,
+                x = SurfaceSize.width / 2,
+                y = SurfaceSize.height / 2
+            )
     }
 
     /**

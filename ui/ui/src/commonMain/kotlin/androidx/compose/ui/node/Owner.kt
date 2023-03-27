@@ -20,7 +20,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusOwner
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.hapticfeedback.HapticFeedback
@@ -33,8 +33,10 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PlatformTextInputPluginRegistry
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -109,12 +111,15 @@ internal interface Owner {
 
     val textInputService: TextInputService
 
+    @OptIn(ExperimentalTextApi::class)
+    val platformTextInputPluginRegistry: PlatformTextInputPluginRegistry
+
     val pointerIconService: PointerIconService
 
     /**
-     * Provide a focus manager that controls focus within Compose.
+     * Provide a focus owner that controls focus within Compose.
      */
-    val focusManager: FocusManager
+    val focusOwner: FocusOwner
 
     /**
      * Provide information about the window that hosts this [Owner].

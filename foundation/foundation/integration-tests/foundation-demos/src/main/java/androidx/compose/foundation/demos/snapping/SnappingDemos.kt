@@ -42,11 +42,13 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlin.math.absoluteValue
+import kotlin.math.sign
 
 val SnappingDemos = listOf(
     DemoCategory("Lazy List Snapping", LazyListSnappingDemos),
@@ -60,17 +62,22 @@ internal class MultiPageSnappingLayoutInfoProvider(
     private val decayAnimationSpec: DecayAnimationSpec<Float>
 ) : SnapLayoutInfoProvider by baseSnapLayoutInfoProvider {
     override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
-        return decayAnimationSpec.calculateTargetValue(0f, initialVelocity) / 2f
+        val offset = decayAnimationSpec.calculateTargetValue(0f, initialVelocity)
+        val finalDecayedOffset = (offset.absoluteValue - calculateSnapStepSize()).coerceAtLeast(0f)
+        return finalDecayedOffset * initialVelocity.sign
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 internal class ViewPortBasedSnappingLayoutInfoProvider(
     private val baseSnapLayoutInfoProvider: SnapLayoutInfoProvider,
+    private val decayAnimationSpec: DecayAnimationSpec<Float>,
     private val viewPortStep: () -> Float
 ) : SnapLayoutInfoProvider by baseSnapLayoutInfoProvider {
     override fun Density.calculateApproachOffset(initialVelocity: Float): Float {
-        return viewPortStep()
+        val offset = decayAnimationSpec.calculateTargetValue(0f, initialVelocity)
+        val viewPortOffset = viewPortStep()
+        return offset.coerceIn(-viewPortOffset, viewPortOffset)
     }
 }
 

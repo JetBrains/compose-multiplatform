@@ -20,11 +20,10 @@
     <string name="indeterminate" msgid="7933458017204019916">"Bifată parțial"</string>
     <string name="on" msgid="8655164131929253426">"Activat"</string>
     <string name="off" msgid="875452955155264703">"Dezactivat"</string>
+    <string name="switch_role" msgid="2561197295334830845">"Comută"</string>
     <string name="selected" msgid="6043586758067023">"Selectat"</string>
     <string name="not_selected" msgid="6610465462668679431">"Neselectat"</string>
-    <!-- String.format failed for translation -->
-    <!-- no translation found for template_percent (5946805113151406391) -->
-    <skip />
+    <string name="template_percent" msgid="5946805113151406391">"<xliff:g id="PERCENTAGE">%1$d</xliff:g> %%."</string>
     <string name="in_progress" msgid="6827826412747255547">"În curs"</string>
     <string name="tab" msgid="1672349317127674378">"Filă"</string>
     <string name="navigation_menu" msgid="542007171693138492">"Meniu de navigare"</string>

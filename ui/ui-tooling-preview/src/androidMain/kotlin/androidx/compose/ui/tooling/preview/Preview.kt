@@ -51,6 +51,8 @@ import androidx.compose.runtime.Composable
  * @param uiMode Bit mask of the ui mode as per [android.content.res.Configuration.uiMode]
  * @param device Device string indicating the device to use in the preview. See the available
  * devices in [Devices].
+ * @param wallpaper Integer defining which wallpaper from those available in Android Studio
+ * to use for dynamic theming.
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.BINARY)
@@ -73,5 +75,6 @@ annotation class Preview(
     val showBackground: Boolean = false,
     val backgroundColor: Long = 0,
     @UiMode val uiMode: Int = 0,
-    @Device val device: String = Devices.DEFAULT
+    @Device val device: String = Devices.DEFAULT,
+    @Wallpaper val wallpaper: Int = Wallpapers.NONE,
 )

@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.runtime.benchmark.dbmonster.DatabaseList
 import androidx.compose.runtime.benchmark.dbmonster.DatabaseRow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.annotation.UiThreadTest
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -38,7 +39,7 @@ import kotlin.random.Random
  * See: http://mathieuancelin.github.io/js-repaint-perfs/
  */
 @LargeTest
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTestApi::class)
 @RunWith(AndroidJUnit4::class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
 class DbMonsterBenchmark : ComposeBenchmarkBase() {

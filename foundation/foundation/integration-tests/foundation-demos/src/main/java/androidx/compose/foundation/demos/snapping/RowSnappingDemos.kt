@@ -178,13 +178,15 @@ private fun rememberViewPortRowSnapLayoutInfoProvider(
     layoutSize: Density.() -> Float
 ): SnapLayoutInfoProvider {
     val density = LocalDensity.current
+    val decayAnimationSpec: DecayAnimationSpec<Float> = rememberSplineBasedDecay()
     return remember(scrollState, density, layoutSize) {
         ViewPortBasedSnappingLayoutInfoProvider(
             SnapLayoutInfoProvider(
                 scrollState = scrollState,
                 itemSize = { RowItemSize.toPx() },
                 layoutSize = layoutSize
-            )
+            ),
+            decayAnimationSpec
         ) { with(density, layoutSize) }
     }
 }

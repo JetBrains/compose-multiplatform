@@ -33,19 +33,18 @@ import org.jetbrains.kotlin.cli.common.setupLanguageVersionSettings
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.junit.Test
 import java.net.URLClassLoader
+import org.junit.Assert.assertEquals
 
 class RunComposableTests : AbstractCodegenTest() {
-
-    override fun updateConfiguration(configuration: CompilerConfiguration) {
-        super.updateConfiguration(configuration)
-        configuration.setupLanguageVersionSettings(K2JVMCompilerArguments().apply {
+    override fun CompilerConfiguration.updateConfiguration() {
+        setupLanguageVersionSettings(K2JVMCompilerArguments().apply {
             // enabling multiPlatform to use expect/actual declarations
             multiPlatform = true
         })
     }
 
     @Test // Bug report: https://github.com/JetBrains/compose-jb/issues/1407
-    fun testDefaultValuesFromExpectComposableFunctions() = ensureSetup {
+    fun testDefaultValuesFromExpectComposableFunctions() {
         runCompose(
             testFunBody = """
                 ExpectComposable { value ->
@@ -142,7 +141,7 @@ class RunComposableTests : AbstractCodegenTest() {
             instanceClass ?: error("Could not find class $className in loaded classes")
         }
 
-        val instanceOfClass = instanceClass.newInstance()
+        val instanceOfClass = instanceClass.getDeclaredConstructor().newInstance()
         val testMethod = instanceClass.getMethod(
             "test",
             *emptyArray(),

@@ -22,7 +22,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Density
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -43,6 +43,7 @@ class TextDelegateTest {
         )
 
         assertThat(textDelegate.maxLines).isEqualTo(Int.MAX_VALUE)
+        assertThat(textDelegate.minLines).isEqualTo(DefaultMinLines)
         assertThat(textDelegate.overflow).isEqualTo(TextOverflow.Clip)
     }
 
@@ -72,6 +73,21 @@ class TextDelegateTest {
         )
 
         assertThat(textDelegate.maxLines).isEqualTo(maxLines)
+    }
+
+    @Test
+    fun `constructor with customized minLines`() {
+        val minLines = 8
+
+        val textDelegate = TextDelegate(
+            text = AnnotatedString(text = ""),
+            style = TextStyle.Default,
+            minLines = minLines,
+            density = density,
+            fontFamilyResolver = fontFamilyResolver
+        )
+
+        assertThat(textDelegate.minLines).isEqualTo(minLines)
     }
 
     @Test

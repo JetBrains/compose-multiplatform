@@ -16,9 +16,11 @@
 
 package androidx.compose.material
 
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.ui.test.junit4.StateRestorationTester
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.Density
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
@@ -66,7 +68,8 @@ class ModalBottomSheetStateTest {
         try {
             ModalBottomSheetState(
                 initialValue = ModalBottomSheetValue.HalfExpanded,
-                isSkipHalfExpanded = true
+                isSkipHalfExpanded = true,
+                density = rule.density
             )
             fail("ModalBottomSheetState didn't throw an exception")
         } catch (exception: IllegalArgumentException) {
@@ -80,7 +83,8 @@ class ModalBottomSheetStateTest {
     fun test_halfExpandDisabled_initialValueHidden_doesntThrow() {
         ModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Hidden,
-            isSkipHalfExpanded = true
+            isSkipHalfExpanded = true,
+            density = rule.density
         )
     }
 
@@ -88,7 +92,21 @@ class ModalBottomSheetStateTest {
     fun test_halfExpandDisabled_initialValueExpanded_doesntThrow() {
         ModalBottomSheetState(
             initialValue = ModalBottomSheetValue.Expanded,
-            isSkipHalfExpanded = true
+            isSkipHalfExpanded = true,
+            density = rule.density
         )
     }
+
+    private fun ModalBottomSheetState(
+        initialValue: ModalBottomSheetValue,
+        animationSpec: AnimationSpec<Float> = SwipeableDefaults.AnimationSpec,
+        isSkipHalfExpanded: Boolean,
+        confirmValueChange: (ModalBottomSheetValue) -> Boolean = { true },
+        density: Density
+    ) = ModalBottomSheetState(
+        initialValue,
+        animationSpec,
+        confirmValueChange,
+        isSkipHalfExpanded,
+    ).apply { swipeableState.density = density }
 }

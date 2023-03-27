@@ -21,7 +21,9 @@ import android.view.ViewTreeObserver
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.InteractionSource
 import androidx.compose.foundation.interaction.collectIsFocusedAsState
 import androidx.compose.foundation.layout.Box
@@ -47,9 +49,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.boundsInWindow
@@ -62,8 +62,6 @@ import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.onClick
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.util.fastAll
-import kotlinx.coroutines.coroutineScope
 import kotlin.math.max
 
 /**
@@ -192,6 +190,7 @@ private class OnGlobalLayoutListener(
     }
 }
 
+@JvmDefaultWithCompatibility
 /**
  * Scope for [ExposedDropdownMenuBox].
  */
@@ -513,17 +512,13 @@ private fun Modifier.expandable(
     onExpandedChange: () -> Unit,
     menuLabel: String
 ) = pointerInput(Unit) {
-    forEachGesture {
-        coroutineScope {
-            awaitPointerEventScope {
-                var event: PointerEvent
-                do {
-                    event = awaitPointerEvent(PointerEventPass.Initial)
-                } while (
-                    !event.changes.fastAll { it.changedToUp() }
-                )
-                onExpandedChange.invoke()
-            }
+    awaitEachGesture {
+        // Must be PointerEventPass.Initial to observe events before the text field consumes them
+        // in the Main pass
+        awaitFirstDown(pass = PointerEventPass.Initial)
+        val upEvent = waitForUpOrCancellation(pass = PointerEventPass.Initial)
+        if (upEvent != null) {
+            onExpandedChange()
         }
     }
 }.semantics {

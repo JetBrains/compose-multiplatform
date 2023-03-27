@@ -101,7 +101,7 @@ class ColorSpaceTest {
             "Test", FloatArray(6), WhitePoint(0f, 0f),
             op, sIdentity, 0.0f, 1.0f
         )
-        assertEquals(0.5, cs.oetf(0.25), 1e-5)
+        assertEquals(0.5, cs.oetfFunc.invoke(0.25), 1e-5)
     }
 
     @Test
@@ -111,7 +111,7 @@ class ColorSpaceTest {
             "Test", FloatArray(6), WhitePoint(0f, 0f),
             sIdentity, op, 0.0f, 1.0f
         )
-        assertEquals(0.0625, cs.eotf(0.25), 1e-5)
+        assertEquals(0.0625, cs.eotfFunc.invoke(0.25), 1e-5)
     }
 
     @Test
@@ -804,6 +804,38 @@ class ColorSpaceTest {
                 TransferParameters(2.4, 1 / 1.055, 0.055 / 1.055, 1 / 12.92, 0.04045)
             )
         )
+    }
+
+    @Test
+    fun identitySrgbConnector() {
+        val connector1 = ColorSpaces.Srgb.connect()
+        val connector2 = ColorSpaces.Srgb.connect()
+
+        assertSame(connector1, connector2)
+        assertEquals(ColorSpaces.Srgb, connector1.source)
+        assertEquals(ColorSpaces.Srgb, connector1.destination)
+    }
+
+    @Test
+    fun srgbToOklabConnector() {
+        val connector1 = ColorSpaces.Srgb.connect(ColorSpaces.Oklab)
+        val connector2 = ColorSpaces.Srgb.connect(ColorSpaces.Oklab)
+
+        assertSame(connector1, connector2)
+        assertEquals(ColorSpaces.Srgb, connector1.source)
+        assertEquals(ColorSpaces.Oklab, connector1.destination)
+        assertEquals(RenderIntent.Perceptual, connector1.renderIntent)
+    }
+
+    @Test
+    fun oklabToSrgbConnector() {
+        val connector1 = ColorSpaces.Oklab.connect()
+        val connector2 = ColorSpaces.Oklab.connect()
+
+        assertSame(connector1, connector2)
+        assertEquals(ColorSpaces.Oklab, connector1.source)
+        assertEquals(ColorSpaces.Srgb, connector1.destination)
+        assertEquals(RenderIntent.Perceptual, connector1.renderIntent)
     }
 
     companion object {

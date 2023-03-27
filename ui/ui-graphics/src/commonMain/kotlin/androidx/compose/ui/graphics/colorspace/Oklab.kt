@@ -16,6 +16,8 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.packFloats
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.sign
@@ -55,6 +57,65 @@ internal class Oklab(
         mul3x3Float3(InverseM1, v)
 
         return v
+    }
+
+    override fun toXy(v0: Float, v1: Float, v2: Float): Long {
+        val v00 = v0.coerceIn(0f, 1f)
+        val v10 = v1.coerceIn(-0.5f, 0.5f)
+        val v20 = v2.coerceIn(-0.5f, 0.5f)
+
+        val v01 = mul3x3Float3_0(InverseM2, v00, v10, v20)
+        val v11 = mul3x3Float3_1(InverseM2, v00, v10, v20)
+        val v21 = mul3x3Float3_2(InverseM2, v00, v10, v20)
+
+        val v02 = v01 * v01 * v01
+        val v12 = v11 * v11 * v11
+        val v22 = v21 * v21 * v21
+
+        val v03 = mul3x3Float3_0(InverseM1, v02, v12, v22)
+        val v13 = mul3x3Float3_1(InverseM1, v02, v12, v22)
+
+        return packFloats(v03, v13)
+    }
+
+    override fun toZ(v0: Float, v1: Float, v2: Float): Float {
+        val v00 = v0.coerceIn(0f, 1f)
+        val v10 = v1.coerceIn(-0.5f, 0.5f)
+        val v20 = v2.coerceIn(-0.5f, 0.5f)
+
+        val v01 = mul3x3Float3_0(InverseM2, v00, v10, v20)
+        val v11 = mul3x3Float3_1(InverseM2, v00, v10, v20)
+        val v21 = mul3x3Float3_2(InverseM2, v00, v10, v20)
+
+        val v02 = v01 * v01 * v01
+        val v12 = v11 * v11 * v11
+        val v22 = v21 * v21 * v21
+
+        val v23 = mul3x3Float3_2(InverseM1, v02, v12, v22)
+
+        return v23
+    }
+
+    override fun xyzaToColor(
+        x: Float,
+        y: Float,
+        z: Float,
+        a: Float,
+        colorSpace: ColorSpace
+    ): Color {
+        var v0 = mul3x3Float3_0(M1, x, y, z)
+        var v1 = mul3x3Float3_1(M1, x, y, z)
+        var v2 = mul3x3Float3_2(M1, x, y, z)
+
+        v0 = sign(v0) * abs(v0).pow(1.0f / 3.0f)
+        v1 = sign(v1) * abs(v1).pow(1.0f / 3.0f)
+        v2 = sign(v2) * abs(v2).pow(1.0f / 3.0f)
+
+        val v01 = mul3x3Float3_0(M2, v0, v1, v2)
+        val v11 = mul3x3Float3_1(M2, v0, v1, v2)
+        val v21 = mul3x3Float3_2(M2, v0, v1, v2)
+
+        return Color(v01, v11, v21, a, colorSpace)
     }
 
     override fun fromXyz(v: FloatArray): FloatArray {

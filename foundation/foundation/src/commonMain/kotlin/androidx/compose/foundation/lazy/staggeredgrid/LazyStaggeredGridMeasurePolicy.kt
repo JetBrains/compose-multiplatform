@@ -17,14 +17,11 @@
 package androidx.compose.foundation.lazy.staggeredgrid
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.OverscrollEffect
 import androidx.compose.foundation.checkScrollableContainerConstraints
 import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutMeasureScope
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -40,24 +37,22 @@ import androidx.compose.ui.unit.constrainWidth
 @ExperimentalFoundationApi
 internal fun rememberStaggeredGridMeasurePolicy(
     state: LazyStaggeredGridState,
-    itemProvider: LazyLayoutItemProvider,
+    itemProvider: LazyStaggeredGridItemProvider,
     contentPadding: PaddingValues,
     reverseLayout: Boolean,
     orientation: Orientation,
-    verticalArrangement: Arrangement.Vertical,
-    horizontalArrangement: Arrangement.Horizontal,
-    slotSizesSums: Density.(Constraints) -> IntArray,
-    overscrollEffect: OverscrollEffect
+    mainAxisSpacing: Dp,
+    crossAxisSpacing: Dp,
+    slotSizesSums: Density.(Constraints) -> IntArray
 ): LazyLayoutMeasureScope.(Constraints) -> LazyStaggeredGridMeasureResult = remember(
     state,
     itemProvider,
     contentPadding,
     reverseLayout,
     orientation,
-    verticalArrangement,
-    horizontalArrangement,
-    slotSizesSums,
-    overscrollEffect,
+    mainAxisSpacing,
+    crossAxisSpacing,
+    slotSizesSums
 ) {
     { constraints ->
         checkScrollableContainerConstraints(
@@ -70,7 +65,9 @@ internal fun rememberStaggeredGridMeasurePolicy(
         // setup information for prefetch
         state.laneWidthsPrefixSum = resolvedSlotSums
         state.isVertical = isVertical
+        state.spanProvider = itemProvider.spanProvider
 
+        // setup measure
         val beforeContentPadding = contentPadding.beforePadding(
             orientation, reverseLayout, layoutDirection
         ).roundToPx()
@@ -89,18 +86,6 @@ internal fun rememberStaggeredGridMeasurePolicy(
             IntOffset(beforeContentPadding, startContentPadding)
         }
 
-        val mainAxisSpacing = if (isVertical) {
-            verticalArrangement.spacing
-        } else {
-            horizontalArrangement.spacing
-        }.roundToPx()
-
-        val crossAxisSpacing = if (isVertical) {
-            horizontalArrangement.spacing
-        } else {
-            verticalArrangement.spacing
-        }.roundToPx()
-
         val horizontalPadding = contentPadding.run {
             calculateStartPadding(layoutDirection) + calculateEndPadding(layoutDirection)
         }.roundToPx()
@@ -116,16 +101,16 @@ internal fun rememberStaggeredGridMeasurePolicy(
                 minWidth = constraints.constrainWidth(horizontalPadding),
                 minHeight = constraints.constrainHeight(verticalPadding)
             ),
-            mainAxisSpacing = mainAxisSpacing,
-            crossAxisSpacing = crossAxisSpacing,
+            mainAxisSpacing = mainAxisSpacing.roundToPx(),
+            crossAxisSpacing = crossAxisSpacing.roundToPx(),
             contentOffset = contentOffset,
             mainAxisAvailableSize = mainAxisAvailableSize,
             isVertical = isVertical,
+            reverseLayout = reverseLayout,
             beforeContentPadding = beforeContentPadding,
             afterContentPadding = afterContentPadding,
         ).also {
             state.applyMeasureResult(it)
-            overscrollEffect.isEnabled = it.canScrollForward || it.canScrollBackward
         }
     }
 }

@@ -103,6 +103,18 @@ public interface RippleTheme {
 /**
  * RippleAlpha defines the alpha of the ripple / state layer for different [Interaction]s.
  *
+ * On Android, because the press ripple is drawn using the framework's RippleDrawable, there are
+ * constraints / different behaviours for the actual press alpha used on different API versions.
+ * Note that this *only* affects [pressedAlpha] - the other values are guaranteed to be consistent,
+ * as they do not rely on framework code. Specifically:
+ *
+ * API 21-27: The actual ripple is split into two 'layers', with the alpha applied to both layers,
+ * so there is no uniform 'alpha'.
+ * API 28-32: The ripple is just one layer, but the alpha is clamped to a maximum of 0.5f - it is
+ * not possible to have a fully opaque ripple.
+ * API 33: There is a bug where the ripple is clamped to a *minimum* of 0.5, instead of a maximum
+ * like before - this should be resolved in future versions.
+ *
  * @property draggedAlpha the alpha used when the ripple is dragged
  * @property focusedAlpha the alpha used when the ripple is focused
  * @property hoveredAlpha the alpha used when the ripple is hovered

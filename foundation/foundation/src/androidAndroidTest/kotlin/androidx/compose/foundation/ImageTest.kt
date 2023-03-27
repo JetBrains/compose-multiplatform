@@ -80,8 +80,8 @@ class ImageTest {
 
     val contentTag = "ImageTest"
 
-    val imageWidth = 100
-    val imageHeight = 100
+    val imageWidth = 300
+    val imageHeight = 300
     val containerSize = imageWidth
 
     val bgColor = Color.Blue

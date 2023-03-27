@@ -34,5 +34,13 @@ interface DrawModifierNode : DelegatableNode {
     fun onMeasureResultChanged() {}
 }
 
+/**
+ * Invalidates this modifier's draw layer, ensuring that a draw pass will
+ * be run on the next frame.
+ */
 @ExperimentalComposeUiApi
-internal fun DrawModifierNode.requestDraw() = requireLayoutNode().invalidateLayer()
+fun DrawModifierNode.invalidateDraw() {
+    if (node.isAttached) {
+        requireCoordinator(Nodes.Any).invalidateLayer()
+    }
+}

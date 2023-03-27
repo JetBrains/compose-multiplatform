@@ -27,10 +27,10 @@ import androidx.compose.foundation.gestures.awaitVerticalDragOrCancellation
 import androidx.compose.foundation.gestures.awaitVerticalTouchSlopOrCancellation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.gestures.detectDragGesturesAfterLongPress
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.gestures.drag
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.horizontalDrag
 import androidx.compose.foundation.gestures.verticalDrag
 import androidx.compose.foundation.layout.Box
@@ -74,26 +74,24 @@ fun AwaitHorizontalDragOrCancellationSample() {
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown()
-                            var change =
-                                awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
-                                    val originalX = offsetX.value
-                                    val newValue =
-                                        (originalX + over).coerceIn(0f, width - 50.dp.toPx())
-                                    change.consume()
-                                    offsetX.value = newValue
-                                }
-                            while (change != null && change.pressed) {
-                                change = awaitHorizontalDragOrCancellation(change.id)
-                                if (change != null && change.pressed) {
-                                    val originalX = offsetX.value
-                                    val newValue = (originalX + change.positionChange().x)
-                                        .coerceIn(0f, width - 50.dp.toPx())
-                                    change.consume()
-                                    offsetX.value = newValue
-                                }
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        var change =
+                            awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+                                val originalX = offsetX.value
+                                val newValue =
+                                    (originalX + over).coerceIn(0f, width - 50.dp.toPx())
+                                change.consume()
+                                offsetX.value = newValue
+                            }
+                        while (change != null && change.pressed) {
+                            change = awaitHorizontalDragOrCancellation(change.id)
+                            if (change != null && change.pressed) {
+                                val originalX = offsetX.value
+                                val newValue = (originalX + change.positionChange().x)
+                                    .coerceIn(0f, width - 50.dp.toPx())
+                                change.consume()
+                                offsetX.value = newValue
                             }
                         }
                     }
@@ -118,25 +116,23 @@ fun HorizontalDragSample() {
                 .width(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown()
-                            val change =
-                                awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
-                                    val originalX = offsetX.value
-                                    val newValue =
-                                        (originalX + over).coerceIn(0f, width - 50.dp.toPx())
-                                    change.consume()
-                                    offsetX.value = newValue
-                                }
-                            if (change != null) {
-                                horizontalDrag(change.id) {
-                                    val originalX = offsetX.value
-                                    val newValue = (originalX + it.positionChange().x)
-                                        .coerceIn(0f, width - 50.dp.toPx())
-                                    it.consume()
-                                    offsetX.value = newValue
-                                }
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        val change =
+                            awaitHorizontalTouchSlopOrCancellation(down.id) { change, over ->
+                                val originalX = offsetX.value
+                                val newValue =
+                                    (originalX + over).coerceIn(0f, width - 50.dp.toPx())
+                                change.consume()
+                                offsetX.value = newValue
+                            }
+                        if (change != null) {
+                            horizontalDrag(change.id) {
+                                val originalX = offsetX.value
+                                val newValue = (originalX + it.positionChange().x)
+                                    .coerceIn(0f, width - 50.dp.toPx())
+                                it.consume()
+                                offsetX.value = newValue
                             }
                         }
                     }
@@ -187,26 +183,24 @@ fun AwaitVerticalDragOrCancellationSample() {
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown()
-                            var change =
-                                awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
-                                    val originalY = offsetY.value
-                                    val newValue = (originalY + over)
-                                        .coerceIn(0f, height - 50.dp.toPx())
-                                    change.consume()
-                                    offsetY.value = newValue
-                                }
-                            while (change != null && change.pressed) {
-                                change = awaitVerticalDragOrCancellation(change.id)
-                                if (change != null && change.pressed) {
-                                    val originalY = offsetY.value
-                                    val newValue = (originalY + change.positionChange().y)
-                                        .coerceIn(0f, height - 50.dp.toPx())
-                                    change.consume()
-                                    offsetY.value = newValue
-                                }
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        var change =
+                            awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
+                                val originalY = offsetY.value
+                                val newValue = (originalY + over)
+                                    .coerceIn(0f, height - 50.dp.toPx())
+                                change.consume()
+                                offsetY.value = newValue
+                            }
+                        while (change != null && change.pressed) {
+                            change = awaitVerticalDragOrCancellation(change.id)
+                            if (change != null && change.pressed) {
+                                val originalY = offsetY.value
+                                val newValue = (originalY + change.positionChange().y)
+                                    .coerceIn(0f, height - 50.dp.toPx())
+                                change.consume()
+                                offsetY.value = newValue
                             }
                         }
                     }
@@ -231,25 +225,23 @@ fun VerticalDragSample() {
                 .height(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown()
-                            val change =
-                                awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
-                                    val originalY = offsetY.value
-                                    val newValue = (originalY + over)
-                                        .coerceIn(0f, height - 50.dp.toPx())
-                                    change.consume()
-                                    offsetY.value = newValue
-                                }
-                            if (change != null) {
-                                verticalDrag(change.id) {
-                                    val originalY = offsetY.value
-                                    val newValue = (originalY + it.positionChange().y)
-                                        .coerceIn(0f, height - 50.dp.toPx())
-                                    it.consume()
-                                    offsetY.value = newValue
-                                }
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        val change =
+                            awaitVerticalTouchSlopOrCancellation(down.id) { change, over ->
+                                val originalY = offsetY.value
+                                val newValue = (originalY + over)
+                                    .coerceIn(0f, height - 50.dp.toPx())
+                                change.consume()
+                                offsetY.value = newValue
+                            }
+                        if (change != null) {
+                            verticalDrag(change.id) {
+                                val originalY = offsetY.value
+                                val newValue = (originalY + it.positionChange().y)
+                                    .coerceIn(0f, height - 50.dp.toPx())
+                                it.consume()
+                                offsetY.value = newValue
                             }
                         }
                     }
@@ -299,12 +291,24 @@ fun AwaitDragOrCancellationSample() {
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown()
-                            var change = awaitTouchSlopOrCancellation(down.id) { change, over ->
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        var change = awaitTouchSlopOrCancellation(down.id) { change, over ->
+                            val original = Offset(offsetX.value, offsetY.value)
+                            val summed = original + over
+                            val newValue = Offset(
+                                x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
+                                y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
+                            )
+                            change.consume()
+                            offsetX.value = newValue.x
+                            offsetY.value = newValue.y
+                        }
+                        while (change != null && change.pressed) {
+                            change = awaitDragOrCancellation(change.id)
+                            if (change != null && change.pressed) {
                                 val original = Offset(offsetX.value, offsetY.value)
-                                val summed = original + over
+                                val summed = original + change.positionChange()
                                 val newValue = Offset(
                                     x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                                     y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
@@ -312,20 +316,6 @@ fun AwaitDragOrCancellationSample() {
                                 change.consume()
                                 offsetX.value = newValue.x
                                 offsetY.value = newValue.y
-                            }
-                            while (change != null && change.pressed) {
-                                change = awaitDragOrCancellation(change.id)
-                                if (change != null && change.pressed) {
-                                    val original = Offset(offsetX.value, offsetY.value)
-                                    val summed = original + change.positionChange()
-                                    val newValue = Offset(
-                                        x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
-                                        y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
-                                    )
-                                    change.consume()
-                                    offsetX.value = newValue.x
-                                    offsetY.value = newValue.y
-                                }
                             }
                         }
                     }
@@ -349,32 +339,30 @@ fun DragSample() {
                 .size(50.dp)
                 .background(Color.Blue)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown()
-                            val change = awaitTouchSlopOrCancellation(down.id) { change, over ->
+                    awaitEachGesture {
+                        val down = awaitFirstDown()
+                        val change = awaitTouchSlopOrCancellation(down.id) { change, over ->
+                            val original = Offset(offsetX.value, offsetY.value)
+                            val summed = original + over
+                            val newValue = Offset(
+                                x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
+                                y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
+                            )
+                            change.consume()
+                            offsetX.value = newValue.x
+                            offsetY.value = newValue.y
+                        }
+                        if (change != null) {
+                            drag(change.id) {
                                 val original = Offset(offsetX.value, offsetY.value)
-                                val summed = original + over
+                                val summed = original + it.positionChange()
                                 val newValue = Offset(
                                     x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
                                     y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
                                 )
-                                change.consume()
+                                it.consume()
                                 offsetX.value = newValue.x
                                 offsetY.value = newValue.y
-                            }
-                            if (change != null) {
-                                drag(change.id) {
-                                    val original = Offset(offsetX.value, offsetY.value)
-                                    val summed = original + it.positionChange()
-                                    val newValue = Offset(
-                                        x = summed.x.coerceIn(0f, size.width - 50.dp.toPx()),
-                                        y = summed.y.coerceIn(0f, size.height - 50.dp.toPx())
-                                    )
-                                    it.consume()
-                                    offsetX.value = newValue.x
-                                    offsetY.value = newValue.y
-                                }
                             }
                         }
                     }

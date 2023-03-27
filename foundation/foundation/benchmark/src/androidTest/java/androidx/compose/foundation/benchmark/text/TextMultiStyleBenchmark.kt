@@ -17,7 +17,6 @@
 package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.benchmarkDrawPerf
 import androidx.compose.testutils.benchmark.benchmarkFirstCompose
 import androidx.compose.testutils.benchmark.benchmarkFirstDraw
 import androidx.compose.testutils.benchmark.benchmarkFirstLayout
@@ -49,7 +48,7 @@ class TextMultiStyleBenchmark(
         fun initParameters() = cartesian(
             arrayOf(32, 512),
             arrayOf(0, 32)
-        )
+        ).filterForCi { last() }
     }
 
     @get:Rule
@@ -128,13 +127,5 @@ class TextMultiStyleBenchmark(
     @Test
     fun layout() {
         benchmarkRule.benchmarkLayoutPerf(caseFactory)
-    }
-
-    /**
-     * Measure the time taken by re-draw a Text composable with styled text input.
-     */
-    @Test
-    fun draw() {
-        benchmarkRule.benchmarkDrawPerf(caseFactory)
     }
 }

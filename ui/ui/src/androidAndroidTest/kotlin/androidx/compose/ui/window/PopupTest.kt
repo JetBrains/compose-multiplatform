@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.height
 import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.ViewTreeLifecycleOwner
+import androidx.lifecycle.findViewTreeLifecycleOwner
 import androidx.test.espresso.Espresso
 import androidx.test.espresso.Root
 import androidx.test.espresso.assertion.ViewAssertions.matches
@@ -205,11 +205,11 @@ class PopupTest {
             .check(
                 matches(object : TypeSafeMatcher<View>() {
                     override fun describeTo(description: Description?) {
-                        description?.appendText("ViewTreeLifecycleOwner.get(view) != null")
+                        description?.appendText("view.findViewTreeLifecycleOwner() != null")
                     }
 
                     override fun matchesSafely(item: View): Boolean {
-                        return ViewTreeLifecycleOwner.get(item) != null
+                        return item.findViewTreeLifecycleOwner() != null
                     }
                 })
             )

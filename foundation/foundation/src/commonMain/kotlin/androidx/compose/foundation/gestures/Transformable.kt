@@ -17,6 +17,10 @@
 package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.MutatePriority
+import androidx.compose.foundation.gestures.TransformEvent.TransformDelta
+import androidx.compose.foundation.gestures.TransformEvent.TransformStarted
+import androidx.compose.foundation.gestures.TransformEvent.TransformStopped
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -24,22 +28,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.AwaitPointerEventScope
-import androidx.compose.ui.input.pointer.PointerEvent
-import androidx.compose.ui.input.pointer.PointerEventPass
-import androidx.compose.ui.input.pointer.PointerId
 import androidx.compose.ui.input.pointer.PointerInputScope
-import androidx.compose.ui.input.pointer.changedToDown
-import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
-import androidx.compose.ui.input.pointer.changedToUp
-import androidx.compose.ui.input.pointer.changedToUpIgnoreConsumed
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.input.pointer.positionChanged
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
-import kotlinx.coroutines.CancellationException
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.isActive
 
 /**
  * Enable transformation gestures of the modified UI element.
@@ -64,12 +64,40 @@ fun Modifier.transformable(
     enabled: Boolean = true
 ) = composed(
     factory = {
-        val updatedState = rememberUpdatedState(state)
         val updatePanZoomLock = rememberUpdatedState(lockRotationOnZoomPan)
+        val channel = remember { Channel<TransformEvent>(capacity = Channel.UNLIMITED) }
+        if (enabled) {
+            LaunchedEffect(state) {
+                while (isActive) {
+                    var event = channel.receive()
+                    if (event !is TransformStarted) continue
+                    try {
+                        state.transform(MutatePriority.UserInput) {
+                            while (event !is TransformStopped) {
+                                (event as? TransformDelta)?.let {
+                                    transformBy(it.zoomChange, it.panChange, it.rotationChange)
+                                }
+                                event = channel.receive()
+                            }
+                        }
+                    } catch (_: CancellationException) {
+                        // ignore the cancellation and start over again.
+                    }
+                }
+            }
+        }
         val block: suspend PointerInputScope.() -> Unit = remember {
             {
-                forEachGesture {
-                    detectZoom(updatePanZoomLock, updatedState)
+                coroutineScope {
+                    awaitEachGesture {
+                        try {
+                            detectZoom(updatePanZoomLock, channel)
+                        } catch (exception: CancellationException) {
+                            if (!isActive) throw exception
+                        } finally {
+                            channel.trySend(TransformStopped)
+                        }
+                    }
                 }
             }
         }
@@ -83,11 +111,19 @@ fun Modifier.transformable(
     }
 )
 
-// b/242023503 for a planned fix for the MultipleAwaitPointerEventScopes lint violation.
-@Suppress("MultipleAwaitPointerEventScopes")
-private suspend fun PointerInputScope.detectZoom(
+private sealed class TransformEvent {
+    object TransformStarted : TransformEvent()
+    object TransformStopped : TransformEvent()
+    class TransformDelta(
+        val zoomChange: Float,
+        val panChange: Offset,
+        val rotationChange: Float
+    ) : TransformEvent()
+}
+
+private suspend fun AwaitPointerEventScope.detectZoom(
     panZoomLock: State<Boolean>,
-    state: State<TransformableState>
+    channel: Channel<TransformEvent>
 ) {
     var rotation = 0f
     var zoom = 1f
@@ -95,86 +131,49 @@ private suspend fun PointerInputScope.detectZoom(
     var pastTouchSlop = false
     val touchSlop = viewConfiguration.touchSlop
     var lockedToPanZoom = false
-    awaitPointerEventScope {
-        awaitTwoDowns(requireUnconsumed = false)
-    }
-    try {
-        state.value.transform(MutatePriority.UserInput) {
-            awaitPointerEventScope {
-                do {
-                    val event = awaitPointerEvent()
-                    val canceled = event.changes.fastAny { it.isConsumed }
-                    if (!canceled) {
-                        val zoomChange = event.calculateZoom()
-                        val rotationChange = event.calculateRotation()
-                        val panChange = event.calculatePan()
-
-                        if (!pastTouchSlop) {
-                            zoom *= zoomChange
-                            rotation += rotationChange
-                            pan += panChange
-
-                            val centroidSize = event.calculateCentroidSize(useCurrent = false)
-                            val zoomMotion = abs(1 - zoom) * centroidSize
-                            val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
-                            val panMotion = pan.getDistance()
-
-                            if (zoomMotion > touchSlop ||
-                                rotationMotion > touchSlop ||
-                                panMotion > touchSlop
-                            ) {
-                                pastTouchSlop = true
-                                lockedToPanZoom = panZoomLock.value && rotationMotion < touchSlop
-                            }
-                        }
-
-                        if (pastTouchSlop) {
-                            val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
-                            if (effectiveRotation != 0f ||
-                                zoomChange != 1f ||
-                                panChange != Offset.Zero
-                            ) {
-                                transformBy(zoomChange, panChange, effectiveRotation)
-                            }
-                            event.changes.fastForEach {
-                                if (it.positionChanged()) {
-                                    it.consume()
-                                }
-                            }
-                        }
-                    }
-                } while (!canceled && event.changes.fastAny { it.pressed })
-            }
-        }
-    } catch (c: CancellationException) {
-        // cancelled by higher priority, start listening over
-    }
-}
-
-/**
- * Reads events until the first down is received. If [requireUnconsumed] is `true` and the first
- * down is consumed in the [PointerEventPass.Main] pass, that gesture is ignored.
- */
-private suspend fun AwaitPointerEventScope.awaitTwoDowns(requireUnconsumed: Boolean = true) {
-    var event: PointerEvent
-    var firstDown: PointerId? = null
+    awaitFirstDown(requireUnconsumed = false)
     do {
-        event = awaitPointerEvent()
-        var downPointers = if (firstDown != null) 1 else 0
-        event.changes.fastForEach {
-            val isDown =
-                if (requireUnconsumed) it.changedToDown() else it.changedToDownIgnoreConsumed()
-            val isUp =
-                if (requireUnconsumed) it.changedToUp() else it.changedToUpIgnoreConsumed()
-            if (isUp && firstDown == it.id) {
-                firstDown = null
-                downPointers -= 1
+        val event = awaitPointerEvent()
+        val canceled = event.changes.fastAny { it.isConsumed }
+        if (!canceled) {
+            val zoomChange = event.calculateZoom()
+            val rotationChange = event.calculateRotation()
+            val panChange = event.calculatePan()
+
+            if (!pastTouchSlop) {
+                zoom *= zoomChange
+                rotation += rotationChange
+                pan += panChange
+
+                val centroidSize = event.calculateCentroidSize(useCurrent = false)
+                val zoomMotion = abs(1 - zoom) * centroidSize
+                val rotationMotion = abs(rotation * PI.toFloat() * centroidSize / 180f)
+                val panMotion = pan.getDistance()
+
+                if (zoomMotion > touchSlop ||
+                    rotationMotion > touchSlop ||
+                    panMotion > touchSlop
+                ) {
+                    pastTouchSlop = true
+                    lockedToPanZoom = panZoomLock.value && rotationMotion < touchSlop
+                    channel.trySend(TransformStarted)
+                }
             }
-            if (isDown) {
-                firstDown = it.id
-                downPointers += 1
+
+            if (pastTouchSlop) {
+                val effectiveRotation = if (lockedToPanZoom) 0f else rotationChange
+                if (effectiveRotation != 0f ||
+                    zoomChange != 1f ||
+                    panChange != Offset.Zero
+                ) {
+                    channel.trySend(TransformDelta(zoomChange, panChange, effectiveRotation))
+                }
+                event.changes.fastForEach {
+                    if (it.positionChanged()) {
+                        it.consume()
+                    }
+                }
             }
         }
-        val satisfied = downPointers > 1
-    } while (!satisfied)
+    } while (!canceled && event.changes.fastAny { it.pressed })
 }

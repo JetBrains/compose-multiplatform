@@ -66,10 +66,10 @@ class TextSpanParagraphStyleTest {
     @Test
     fun paragraphStyle_is_covered_by_TextStyle() {
         val paragraphStyleProperties = memberProperties(ParagraphStyle::class).filter {
-            it.name != "platformStyle"
+            !it.isKnownUnmatchedProperty()
         }
         val textStyleProperties = memberProperties(TextStyle::class).filter {
-            it.name != "platformStyle"
+            !it.isKnownUnmatchedProperty()
         }
         assertThat(textStyleProperties).containsAtLeastElementsIn(paragraphStyleProperties)
     }
@@ -77,12 +77,25 @@ class TextSpanParagraphStyleTest {
     @Test
     fun paragraphStyle_properties_is_covered_by_TextStyle() {
         val paragraphStyleProperties = memberProperties(ParagraphStyle::class).filter {
-            it.name != "platformStyle"
+            !it.isKnownUnmatchedProperty()
         }
         val textStyleProperties = memberProperties(TextStyle::class).filter {
-            it.name != "platformStyle"
+            !it.isKnownUnmatchedProperty()
         }
         assertThat(textStyleProperties).containsAtLeastElementsIn(paragraphStyleProperties)
+    }
+
+    /**
+     * These properties are known to not have an exact mach
+     */
+    private fun Property.isKnownUnmatchedProperty(): Boolean {
+        return name in listOf(
+            "platformStyle",
+            // these are for boxing optimizations
+            "hyphensOrDefault",
+            "lineBreakOrDefault",
+            "textAlignOrDefault"
+        )
     }
 
     @Test

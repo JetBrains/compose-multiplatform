@@ -20,7 +20,6 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.caches.LruCache
 import androidx.compose.ui.text.caches.SimpleArrayMap
 import androidx.compose.ui.text.fastDistinctBy
@@ -47,7 +46,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.coroutineContext
 
-@ExperimentalTextApi
 internal class FontListFontFamilyTypefaceAdapter(
     private val asyncTypefaceCache: AsyncTypefaceCache = AsyncTypefaceCache(),
     injectedContext: CoroutineContext = EmptyCoroutineContext
@@ -104,7 +102,7 @@ internal class FontListFontFamilyTypefaceAdapter(
                     async {
                         asyncTypefaceCache.runCached(font, resourceLoader, true) {
                             try {
-                                withTimeout(Font.MaximumAsyncTimeout) {
+                                withTimeout(Font.MaximumAsyncTimeoutMillis) {
                                     resourceLoader.awaitLoad(font)
                                 }
                             } catch (cause: Exception) {
@@ -173,7 +171,6 @@ internal class FontListFontFamilyTypefaceAdapter(
  * @param platformFontLoader loader for resolving types from fonts
  * @return (async fonts to resolve for fallback) to (a typeface that can display this frame)
  */
-@ExperimentalTextApi
 private fun List<Font>.firstImmediatelyAvailable(
     typefaceRequest: TypefaceRequest,
     asyncTypefaceCache: AsyncTypefaceCache,
@@ -244,7 +241,6 @@ private fun List<Font>.firstImmediatelyAvailable(
     return asyncFontsToLoad to fallbackTypeface
 }
 
-@OptIn(ExperimentalTextApi::class)
 internal class AsyncFontListLoader constructor(
     private val fontList: List<Font>,
     initialType: Any,
@@ -301,7 +297,7 @@ internal class AsyncFontListLoader constructor(
         return try {
             // case 0: load completes - success (non-null)
             // case 1: we timeout - permanent failure (null)
-            withTimeoutOrNull(Font.MaximumAsyncTimeout) {
+            withTimeoutOrNull(Font.MaximumAsyncTimeoutMillis) {
                 platformFontLoader.awaitLoad(this@loadWithTimeoutOrNull)
             }
         } catch (cancel: CancellationException) {
@@ -337,7 +333,6 @@ internal class AsyncFontListLoader constructor(
  * All async failures are cached permanently, while successful typefaces may be evicted from the
  * cache at a fixed size.
  */
-@ExperimentalTextApi
 internal class AsyncTypefaceCache {
     @kotlin.jvm.JvmInline
     internal value class AsyncTypefaceResult(val result: Any?) {

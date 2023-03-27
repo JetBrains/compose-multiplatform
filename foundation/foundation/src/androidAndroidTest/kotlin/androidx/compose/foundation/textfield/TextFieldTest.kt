@@ -21,16 +21,21 @@ package androidx.compose.foundation.textfield
 
 import android.os.Build
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -51,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixelColor
 import androidx.compose.testutils.assertShape
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
@@ -91,11 +97,11 @@ import androidx.compose.ui.test.longClick
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performKeyPress
-import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTextClearance
 import androidx.compose.ui.test.performTextInput
 import androidx.compose.ui.test.performTextInputSelection
+import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.ParagraphStyle
@@ -133,6 +139,7 @@ import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.text.withAnnotation
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
@@ -1030,6 +1037,39 @@ class TextFieldTest {
     }
 
     @Test
+    fun textField_stringOverload_doesNotCallOnValueChange_whenCompositionUpdatesOnly_semantics() {
+        var callbackCounter = 0
+
+        rule.setContent {
+            val focusManager = LocalFocusManager.current
+            val text = remember { mutableStateOf("A") }
+
+            BasicTextField(
+                value = text.value,
+                onValueChange = {
+                    callbackCounter += 1
+                    text.value = it
+
+                    // causes TextFieldValue's composition clearing
+                    focusManager.clearFocus(true)
+                },
+                modifier = Modifier.testTag("tag")
+            )
+        }
+
+        rule.onNodeWithTag("tag")
+            .performClick()
+        rule.waitForIdle()
+
+        rule.onNodeWithTag("tag")
+            .performSemanticsAction(SemanticsActions.SetText) { it(AnnotatedString("")) }
+
+        rule.runOnIdle {
+            assertThat(callbackCounter).isEqualTo(1)
+        }
+    }
+
+    @Test
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
     fun textField_textAlignCenter_defaultWidth() {
         val fontSize = 50
@@ -1140,7 +1180,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1165,7 +1207,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1191,7 +1235,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1223,7 +1269,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1258,7 +1306,9 @@ class TextFieldTest {
                 onValueChange = {
                     textFieldValue.value = it
                 },
-                modifier = Modifier.testTag(Tag).wrapContentSize()
+                modifier = Modifier
+                    .testTag(Tag)
+                    .wrapContentSize()
             )
         }
         val textNode = rule.onNodeWithTag(Tag)
@@ -1272,12 +1322,14 @@ class TextFieldTest {
                 )
             )
         )
-        textNode.performKeyPress(KeyEvent(
-            NativeKeyEvent(
-                NativeKeyEvent.ACTION_UP,
-                NativeKeyEvent.KEYCODE_DEL
+        textNode.performKeyPress(
+            KeyEvent(
+                NativeKeyEvent(
+                    NativeKeyEvent.ACTION_UP,
+                    NativeKeyEvent.KEYCODE_DEL
+                )
             )
-        ))
+        )
 
         textFieldValue.value = "Hello"
 
@@ -1287,6 +1339,45 @@ class TextFieldTest {
         val actual = textNode.fetchSemanticsNode().config
             .getOrNull(SemanticsProperties.TextSelectionRange)
         assertThat(actual).isEqualTo(expected)
+    }
+
+    @Test
+    fun decorationBoxIntrinsics() {
+        var size: IntSize? = null
+        var dividerSize: IntSize? = null
+        rule.setContent {
+            Box(Modifier.onGloballyPositioned { size = it.size }) {
+                Row(Modifier.height(IntrinsicSize.Min)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .width(10.dp)
+                            .onGloballyPositioned { dividerSize = it.size }
+                            .drawBehind { drawRect(Color.Gray) }
+                    )
+                    BasicTextField(
+                        value = "",
+                        onValueChange = {},
+                        decorationBox = { content ->
+                            Box(
+                                modifier = Modifier
+                                    .border(1.dp, Color.Magenta)
+                                    .padding(4.dp),
+                                propagateMinConstraints = true
+                            ) {
+                                content()
+                            }
+                        }
+                    )
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            assertThat(dividerSize).isNotNull()
+            assertThat(size).isNotNull()
+            assertThat(dividerSize!!.height).isEqualTo(size!!.height)
+        }
     }
 }
 

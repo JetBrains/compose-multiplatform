@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.selection
 
+import android.os.Build.VERSION.SDK_INT
 import androidx.compose.foundation.TapIndicationDelay
 import androidx.compose.foundation.interaction.FocusInteraction
 import androidx.compose.foundation.interaction.HoverInteraction
@@ -42,11 +43,15 @@ import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.InputMode.Companion.Keyboard
+import androidx.compose.ui.input.InputMode.Companion.Touch
+import androidx.compose.ui.input.InputModeManager
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.geometry.isSpecified
 import androidx.compose.ui.platform.InspectableValue
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalInputModeManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.SemanticsProperties
@@ -103,7 +108,12 @@ class ToggleableTest {
     @After
     fun after() {
         isDebugInspectorInfoEnabled = false
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
+    }
+
+    // TODO(b/267253920): Add a compose test API to set/reset InputMode.
+    @After
+    fun resetTouchMode() = with(InstrumentationRegistry.getInstrumentation()) {
+        if (SDK_INT < 33) setInTouchMode(true) else resetInTouchMode()
     }
 
     @Test
@@ -639,13 +649,14 @@ class ToggleableTest {
 
     @Test
     fun toggleableTest_interactionSource_focus_inTouchMode() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(true)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
         val focusRequester = FocusRequester()
+        lateinit var inputModeManager: InputModeManager
 
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box {
                 Box(
                     Modifier
@@ -673,6 +684,8 @@ class ToggleableTest {
         }
 
         rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Touch)
             focusRequester.requestFocus()
         }
 
@@ -684,15 +697,16 @@ class ToggleableTest {
 
     @Test
     fun toggleableTest_interactionSource_focus_inKeyboardMode() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         lateinit var scope: CoroutineScope
         val focusRequester = FocusRequester()
         lateinit var focusManager: FocusManager
+        lateinit var inputModeManager: InputModeManager
 
         rule.setContent {
             scope = rememberCoroutineScope()
             focusManager = LocalFocusManager.current
+            inputModeManager = LocalInputModeManager.current
             Box {
                     Box(
                         Modifier
@@ -720,6 +734,8 @@ class ToggleableTest {
         }
 
         rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
             focusRequester.requestFocus()
         }
 
@@ -884,10 +900,11 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun toggleableTest_clickWithEnterKey() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
+        lateinit var inputModeManager: InputModeManager
         var toggled by mutableStateOf(false)
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "ToggleableText",
                 modifier = Modifier
@@ -897,7 +914,11 @@ class ToggleableTest {
             )
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val toggleableNode = rule.onNodeWithTag("toggleable")
         rule.runOnIdle { assertThat(toggled).isFalse() }
@@ -912,10 +933,11 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun toggleableTest_clickWithNumPadEnterKey() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "ToggleableText",
                 modifier = Modifier
@@ -925,7 +947,11 @@ class ToggleableTest {
             )
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val toggleableNode = rule.onNodeWithTag("toggleable")
         rule.runOnIdle { assertThat(toggled).isFalse() }
@@ -940,10 +966,11 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun toggleableTest_clickWithDpadCenter() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "ToggleableText",
                 modifier = Modifier
@@ -953,7 +980,11 @@ class ToggleableTest {
             )
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val toggleableNode = rule.onNodeWithTag("toggleable")
         rule.runOnIdle { assertThat(toggled).isFalse() }
@@ -968,10 +999,11 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
     fun toggleableTest_clickWithEnterKey_triStateToggleable() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val focusRequester = FocusRequester()
         var toggled by mutableStateOf(false)
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             BasicText(
                 "ToggleableText",
                 modifier = Modifier
@@ -981,7 +1013,11 @@ class ToggleableTest {
             )
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val toggleableNode = rule.onNodeWithTag("toggleable")
         rule.runOnIdle { assertThat(toggled).isFalse() }
@@ -996,11 +1032,12 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_enterKey_emitsIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
+            inputModeManager = LocalInputModeManager.current
             scope = rememberCoroutineScope()
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
@@ -1016,7 +1053,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1042,12 +1083,14 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_numPadEnterKey_emitsIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
+
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
                     modifier = Modifier
@@ -1062,7 +1105,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1088,12 +1135,13 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_dpadCenter_emitsIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
                     modifier = Modifier
@@ -1108,7 +1156,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
         rule.waitForIdle()
 
         val interactions = mutableListOf<Interaction>()
@@ -1135,12 +1187,13 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_otherKey_doesNotEmitIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
+        lateinit var inputModeManager: InputModeManager
         lateinit var scope: CoroutineScope
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
                     modifier = Modifier
@@ -1155,7 +1208,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1171,12 +1228,13 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_doubleEnterKey_emitsFurtherInteractions() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
                     modifier = Modifier
@@ -1191,7 +1249,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1231,13 +1293,14 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_repeatKeyEvents_doNotEmitFurtherInteractions() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
         var repeatCounter = 0
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
                     modifier = Modifier
@@ -1257,7 +1320,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {
@@ -1290,14 +1357,15 @@ class ToggleableTest {
     @Test
     @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
     fun toggleableTest_interruptedClick_emitsCancelIndication() {
-        InstrumentationRegistry.getInstrumentation().setInTouchMode(false)
         val interactionSource = MutableInteractionSource()
         val focusRequester = FocusRequester()
         val enabled = mutableStateOf(true)
         lateinit var scope: CoroutineScope
+        lateinit var inputModeManager: InputModeManager
 
         rule.setContent {
             scope = rememberCoroutineScope()
+            inputModeManager = LocalInputModeManager.current
             Box(Modifier.padding(10.dp)) {
                 BasicText("ToggleableText",
                     modifier = Modifier
@@ -1313,7 +1381,11 @@ class ToggleableTest {
             }
         }
 
-        rule.runOnIdle { focusRequester.requestFocus() }
+        rule.runOnIdle {
+            @OptIn(ExperimentalComposeUiApi::class)
+            inputModeManager.requestInputMode(Keyboard)
+            focusRequester.requestFocus()
+        }
 
         val interactions = mutableListOf<Interaction>()
         scope.launch {

@@ -43,6 +43,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.test.filters.RequiresDevice
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.sign
 import org.junit.Rule
@@ -66,7 +67,8 @@ internal abstract class AbstractSelectionMagnifierTests {
         text: String,
         modifier: Modifier,
         style: TextStyle,
-        onTextLayout: (TextLayoutResult) -> Unit
+        onTextLayout: (TextLayoutResult) -> Unit,
+        maxLines: Int
     )
 
     @Test
@@ -139,46 +141,55 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_appears_whileStartHandleTouched() {
         checkMagnifierAppears_whileHandleTouched(Handle.SelectionStart)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_appears_whileEndHandleTouched() {
         checkMagnifierAppears_whileHandleTouched(Handle.SelectionEnd)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_followsStartHandleHorizontally_whenDragged() {
         checkMagnifierFollowsHandleHorizontally(Handle.SelectionStart)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_followsEndHandleHorizontally_whenDragged() {
         checkMagnifierFollowsHandleHorizontally(Handle.SelectionEnd)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_staysAtLineStart_whenDraggedPastStart() {
         checkMagnifierConstrainedToLineHorizontalBounds(Handle.SelectionStart)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_staysAtLineEnd_whenDraggedPastEnd() {
         checkMagnifierConstrainedToLineHorizontalBounds(Handle.SelectionEnd)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_hidden_whenDraggedFarPastStartOfLine() {
         checkMagnifierHiddenWhenDraggedTooFar(Handle.SelectionStart)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_hidden_whenDraggedFarPastEndOfLine() {
         checkMagnifierHiddenWhenDraggedTooFar(Handle.SelectionEnd)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_followsStartHandleHorizontally_whenDragged_rtl() {
         checkMagnifierFollowsHandleHorizontally(
@@ -187,6 +198,7 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_followsEndHandleHorizontally_whenDragged_rtl() {
         checkMagnifierFollowsHandleHorizontally(
@@ -195,6 +207,7 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_staysAtLineStart_whenDraggedPastStart_rtl() {
         checkMagnifierConstrainedToLineHorizontalBounds(
@@ -203,6 +216,7 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_staysAtLineEnd_whenDraggedPastEnd_rtl() {
         checkMagnifierConstrainedToLineHorizontalBounds(
@@ -211,6 +225,7 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_hidden_whenDraggedFarPastStartOfLine_rtl() {
         checkMagnifierHiddenWhenDraggedTooFar(
@@ -219,6 +234,7 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_hidden_whenDraggedFarPastEndOfLine_rtl() {
         checkMagnifierHiddenWhenDraggedTooFar(
@@ -227,21 +243,25 @@ internal abstract class AbstractSelectionMagnifierTests {
         )
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_doesNotFollowStartHandleVertically_whenDraggedWithinLine() {
         checkMagnifierDoesNotFollowHandleVerticallyWithinLine(Handle.SelectionStart)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_doesNotFollowEndHandleVertically_whenDraggedWithinLine() {
         checkMagnifierDoesNotFollowHandleVerticallyWithinLine(Handle.SelectionEnd)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_followsStartHandle_whenDraggedToNextLine() {
         checkMagnifierFollowsHandleVerticallyBetweenLines(Handle.SelectionStart)
     }
 
+    @RequiresDevice // b/264702195
     @Test
     fun magnifier_followsEndHandle_whenDraggedToNextLine() {
         checkMagnifierFollowsHandleVerticallyBetweenLines(Handle.SelectionEnd)
@@ -253,8 +273,9 @@ internal abstract class AbstractSelectionMagnifierTests {
         text: String,
         modifier: Modifier,
         style: TextStyle = TextStyle.Default,
-        onTextLayout: (TextLayoutResult) -> Unit = {}
-    ) = TestContent(text, modifier, style, onTextLayout)
+        onTextLayout: (TextLayoutResult) -> Unit = {},
+        maxLines: Int = Int.MAX_VALUE
+    ) = TestContent(text, modifier, style, onTextLayout, maxLines)
 
     protected fun checkMagnifierAppears_whileHandleTouched(handle: Handle) {
         rule.setContent {
@@ -465,6 +486,35 @@ internal abstract class AbstractSelectionMagnifierTests {
         assertThat(y)
             .isWithin(1f)
             .of(magnifierInitialPosition.y + lineHeight)
+    }
+
+    protected fun checkMagnifierAsHandleGoesOutOfBoundsUsingMaxLines(handle: Handle) {
+        var lineHeight = 0f
+        rule.setContent {
+            Content(
+                "aaaa aaaa aaaa\naaaa aaaa aaaa",
+                Modifier
+                    // Center the text to give the magnifier lots of room to move.
+                    .fillMaxSize()
+                    .wrapContentSize()
+                    .testTag(tag),
+                onTextLayout = { lineHeight = it.getLineBottom(0) - it.getLineTop(0) },
+                maxLines = 1
+            )
+        }
+
+        showHandle(handle)
+
+        // Touch the handle to show the magnifier.
+        rule.onNode(isSelectionHandle(handle))
+            .performTouchInput { down(center) }
+
+        // Drag the handle down - the magnifier should follow.
+        val dragDistance = Offset(0f, lineHeight)
+        rule.onNode(isSelectionHandle(handle))
+            .performTouchInput { movePastSlopBy(dragDistance) }
+
+        assertNoMagnifierExists()
     }
 
     protected fun checkMagnifierDoesNotFollowHandleVerticallyWithinLine(handle: Handle) {

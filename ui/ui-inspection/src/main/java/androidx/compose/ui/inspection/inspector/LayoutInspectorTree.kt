@@ -20,6 +20,7 @@ import android.view.View
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.CompositionGroup
+import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.R
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.inspection.util.AnchorMap
@@ -43,36 +44,13 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.node.InteroperableComposeUiNode
 import java.util.ArrayDeque
 import java.util.Collections
 import java.util.IdentityHashMap
-import kotlin.math.absoluteValue
 import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
-
-val systemPackages = setOf(
-    -1,
-    packageNameHash("androidx.compose.animation"),
-    packageNameHash("androidx.compose.animation.core"),
-    packageNameHash("androidx.compose.desktop"),
-    packageNameHash("androidx.compose.foundation"),
-    packageNameHash("androidx.compose.foundation.layout"),
-    packageNameHash("androidx.compose.foundation.text"),
-    packageNameHash("androidx.compose.material"),
-    packageNameHash("androidx.compose.material.ripple"),
-    packageNameHash("androidx.compose.runtime"),
-    packageNameHash("androidx.compose.runtime.saveable"),
-    packageNameHash("androidx.compose.ui"),
-    packageNameHash("androidx.compose.ui.graphics.vector"),
-    packageNameHash("androidx.compose.ui.layout"),
-    packageNameHash("androidx.compose.ui.platform"),
-    packageNameHash("androidx.compose.ui.tooling"),
-    packageNameHash("androidx.compose.ui.selection"),
-    packageNameHash("androidx.compose.ui.semantics"),
-    packageNameHash("androidx.compose.ui.viewinterop"),
-    packageNameHash("androidx.compose.ui.window"),
-)
 
 /**
  * The [InspectorNode.id] will be populated with:
@@ -95,10 +73,6 @@ private val unwantedCalls = setOf(
     "ProvideAndroidCompositionLocals",
     "ProvideCommonCompositionLocals",
 )
-
-@VisibleForTesting
-fun packageNameHash(packageName: String) =
-    packageName.fold(0) { hash, char -> hash * 31 + char.code }.absoluteValue
 
 /**
  * Generator of a tree for the Layout Inspector.
@@ -403,12 +377,21 @@ class LayoutInspectorTree {
         input: List<MutableInspectorNode>,
         buildFakeChildNodes: Boolean = false
     ) {
-        if (parentNode.name == "AndroidView") {
-            // Special case:
-            // We may have captured the View id from an AndroidView Composable.
-            // Add the viewId to the child ComposeNode that should be present.
-            input.singleOrNull { it.name == "ComposeNode" }?.viewId = subCompositions.latestViewId()
-        }
+        // If we're adding an unwanted node from the `input` to the parent node and it has a
+        // View ID, then assign it to the parent view so that we don't lose the context that we
+        // found a View as a descendant of the parent node. Most likely, there were one or more
+        // unwanted intermediate nodes between the node that actually owns the Android View
+        // and the desired node that the View should be associated with in the inspector. If
+        // there's more than one input node with a View ID, we skip this step since it's
+        // unclear how these views would be related.
+        input.singleOrNull { it.viewId != UNDEFINED_ID }
+            ?.takeIf { node ->
+                // Take if the node has been marked as unwanted
+                node.id == UNDEFINED_ID
+            }
+            ?.let { nodeWithView ->
+                parentNode.viewId = nodeWithView.viewId
+            }
 
         var id: Long? = null
         input.forEach { node ->
@@ -444,6 +427,7 @@ class LayoutInspectorTree {
             if (parentNode.id <= UNDEFINED_ID && nodeId != null) nodeId else parentNode.id
     }
 
+    @OptIn(InternalComposeUiApi::class)
     private fun parse(
         group: CompositionGroup,
         context: SourceContext,
@@ -452,6 +436,18 @@ class LayoutInspectorTree {
         val node = newNode()
         node.name = context.name ?: ""
         node.key = group.key as? Int ?: 0
+        node.inlined = context.isInline
+
+        // If this node is associated with an android View, set the node's viewId to point to
+        // the hosted view. We use the parent's uniqueDrawingId since the interopView returned here
+        // will be the view itself, but we want to use the `AndroidViewHolder` that hosts the view
+        // instead of the view directly.
+        (group.node as? InteroperableComposeUiNode?)?.getInteropView()?.let { interopView ->
+            (interopView.parent as? View)?.uniqueDrawingId?.let { viewId ->
+                node.viewId = viewId
+            }
+        }
+
         val layoutInfo = group.node as? LayoutInfo
         if (layoutInfo != null) {
             return parseLayoutInfo(layoutInfo, context, node)

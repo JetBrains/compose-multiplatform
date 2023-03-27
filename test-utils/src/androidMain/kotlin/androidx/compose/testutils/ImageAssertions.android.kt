@@ -102,6 +102,15 @@ fun ImageBitmap.assertContainsColor(
     return this
 }
 
+fun ImageBitmap.assertDoesNotContainColor(
+    unexpectedColor: Color
+): ImageBitmap {
+    if (containsColor(unexpectedColor)) {
+        throw AssertionError("The given color $unexpectedColor was found in the bitmap.")
+    }
+    return this
+}
+
 private fun ImageBitmap.containsColor(expectedColor: Color): Boolean {
     val pixels = this.toPixelMap()
     for (x in 0 until width) {

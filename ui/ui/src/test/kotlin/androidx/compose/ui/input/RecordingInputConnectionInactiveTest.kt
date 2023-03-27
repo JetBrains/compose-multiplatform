@@ -21,7 +21,7 @@ import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.RecordingInputConnection
 import androidx.compose.ui.text.input.TextFieldValue
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

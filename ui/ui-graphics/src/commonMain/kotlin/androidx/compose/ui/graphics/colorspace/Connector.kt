@@ -16,6 +16,10 @@
 
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.unpackFloat1
+import androidx.compose.ui.util.unpackFloat2
+
 /**
  * A connector transforms colors from a source color space to a destination
  * color space.
@@ -153,6 +157,19 @@ internal constructor(
         return transformDestination.fromXyz(xyz)
     }
 
+    internal open fun transformToColor(r: Float, g: Float, b: Float, a: Float): Color {
+        val packed = transformSource.toXy(r, g, b)
+        var x = unpackFloat1(packed)
+        var y = unpackFloat2(packed)
+        var z = transformSource.toZ(r, g, b)
+        if (transform != null) {
+            x *= transform[0]
+            y *= transform[1]
+            z *= transform[2]
+        }
+        return transformDestination.xyzaToColor(x, y, z, a, destination)
+    }
+
     /**
      * Optimized connector for RGB->RGB conversions.
      */
@@ -168,14 +185,27 @@ internal constructor(
         }
 
         override fun transform(v: FloatArray): FloatArray {
-            v[0] = mSource.eotf(v[0].toDouble()).toFloat()
-            v[1] = mSource.eotf(v[1].toDouble()).toFloat()
-            v[2] = mSource.eotf(v[2].toDouble()).toFloat()
+            v[0] = mSource.eotfFunc(v[0].toDouble()).toFloat()
+            v[1] = mSource.eotfFunc(v[1].toDouble()).toFloat()
+            v[2] = mSource.eotfFunc(v[2].toDouble()).toFloat()
             mul3x3Float3(mTransform, v)
-            v[0] = mDestination.oetf(v[0].toDouble()).toFloat()
-            v[1] = mDestination.oetf(v[1].toDouble()).toFloat()
-            v[2] = mDestination.oetf(v[2].toDouble()).toFloat()
+            v[0] = mDestination.oetfFunc(v[0].toDouble()).toFloat()
+            v[1] = mDestination.oetfFunc(v[1].toDouble()).toFloat()
+            v[2] = mDestination.oetfFunc(v[2].toDouble()).toFloat()
             return v
+        }
+
+        override fun transformToColor(r: Float, g: Float, b: Float, a: Float): Color {
+            val v0 = mSource.eotfFunc(r.toDouble()).toFloat()
+            val v1 = mSource.eotfFunc(g.toDouble()).toFloat()
+            val v2 = mSource.eotfFunc(b.toDouble()).toFloat()
+            val v01 = mul3x3Float3_0(mTransform, v0, v1, v2)
+            val v11 = mul3x3Float3_1(mTransform, v0, v1, v2)
+            val v21 = mul3x3Float3_2(mTransform, v0, v1, v2)
+            val v02 = mDestination.oetfFunc(v01.toDouble()).toFloat()
+            val v12 = mDestination.oetfFunc(v11.toDouble()).toFloat()
+            val v22 = mDestination.oetfFunc(v21.toDouble()).toFloat()
+            return Color(v02, v12, v22, a, mDestination)
         }
 
         /**
@@ -293,7 +323,17 @@ internal constructor(
                 override fun transform(v: FloatArray): FloatArray {
                     return v
                 }
+
+                override fun transformToColor(r: Float, g: Float, b: Float, a: Float): Color {
+                    return Color(r, g, b, a, destination)
+                }
             }
         }
+
+        internal val SrgbIdentity = identity(ColorSpaces.Srgb)
+        internal val SrgbToOklabPerceptual =
+            Connector(ColorSpaces.Srgb, ColorSpaces.Oklab, RenderIntent.Perceptual)
+        internal val OklabToSrgbPerceptual =
+            Connector(ColorSpaces.Oklab, ColorSpaces.Srgb, RenderIntent.Perceptual)
     }
 }

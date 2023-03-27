@@ -19,6 +19,8 @@ package androidx.compose.runtime.collection
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertNull
 import kotlin.test.assertTrue
 
 private class Key(val value: Int)
@@ -114,9 +116,9 @@ class IdentityArrayMapTests {
         repeat(100) {
             assertEquals(100 - it, map.size)
             val removed = map.remove(keys[it])
-            assertTrue(removed, "Expected to remove key $it")
+            assertEquals(removed, it.toString(), "Expected to remove $it for ${keys[it]}")
             if (it > 0) {
-                assertFalse(
+                assertNull(
                     map.remove(keys[it - 1]),
                     "Expected item ${it - 1} to already be removed"
                 )
@@ -133,7 +135,7 @@ class IdentityArrayMapTests {
         repeat(16) {
             val key = keys[it]
             val removed = map.remove(key)
-            assertTrue(removed)
+            assertNotNull(removed)
             assertFalse(map.contains(key))
         }
         assertTrue(map.isEmpty())

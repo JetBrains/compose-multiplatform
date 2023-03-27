@@ -16,11 +16,14 @@
 
 package androidx.compose.ui.test.junit4
 
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.input.CommitTextCommand
 import androidx.compose.ui.text.input.EditCommand
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.ImeOptions
 import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.TextInputForTests
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.text.input.TextInputSession
 
@@ -31,12 +34,18 @@ import androidx.compose.ui.text.input.TextInputSession
  * accept input from the IME. Here we grab that callback so we can fetch it commands the same
  * way IME would do.
  */
+@OptIn(ExperimentalTextApi::class)
 internal class TextInputServiceForTests(
     platformTextInputService: PlatformTextInputService
-) : TextInputService(platformTextInputService) {
+) : TextInputService(platformTextInputService), TextInputForTests {
 
-    var onEditCommand: ((List<EditCommand>) -> Unit)? = null
-    var onImeActionPerformed: ((ImeAction) -> Unit)? = null
+    private class Session(
+        var imeOptions: ImeOptions,
+        var onEditCommand: (List<EditCommand>) -> Unit,
+        var onImeActionPerformed: (ImeAction) -> Unit,
+    )
+
+    private var session: Session? = null
 
     override fun startInput(
         value: TextFieldValue,
@@ -44,8 +53,11 @@ internal class TextInputServiceForTests(
         onEditCommand: (List<EditCommand>) -> Unit,
         onImeActionPerformed: (ImeAction) -> Unit
     ): TextInputSession {
-        this.onEditCommand = onEditCommand
-        this.onImeActionPerformed = onImeActionPerformed
+        session = Session(
+            imeOptions = imeOptions,
+            onEditCommand = onEditCommand,
+            onImeActionPerformed = onImeActionPerformed
+        )
         return super.startInput(
             value,
             imeOptions,
@@ -55,8 +67,29 @@ internal class TextInputServiceForTests(
     }
 
     override fun stopInput(session: TextInputSession) {
-        this.onEditCommand = null
-        this.onImeActionPerformed = null
+        this.session = null
         super.stopInput(session)
     }
+
+    override fun inputTextForTest(text: String) {
+        performEditCommand(listOf(CommitTextCommand(text, 1)))
+    }
+
+    override fun submitTextForTest() {
+        with(requireSession()) {
+            if (imeOptions.imeAction == ImeAction.Default) {
+                throw AssertionError(
+                    "Failed to perform IME action as current node does not specify any."
+                )
+            }
+            onImeActionPerformed(imeOptions.imeAction)
+        }
+    }
+
+    private fun performEditCommand(commands: List<EditCommand>) {
+        requireSession().onEditCommand(commands)
+    }
+
+    private fun requireSession(): Session =
+        session ?: error("No input session started. Missing a focus?")
 }

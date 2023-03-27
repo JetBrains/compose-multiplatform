@@ -19,7 +19,7 @@
 package androidx.compose.animation.core.lint
 
 import androidx.compose.lint.test.Stubs
-import androidx.compose.lint.test.compiledStub
+import androidx.compose.lint.test.bytecodeStub
 import com.android.tools.lint.checks.infrastructure.LintDetectorTest
 import com.android.tools.lint.detector.api.Detector
 import com.android.tools.lint.detector.api.Issue
@@ -40,7 +40,7 @@ class TransitionDetectorTest : LintDetectorTest() {
         mutableListOf(TransitionDetector.UnusedTransitionTargetStateParameter)
 
     // Simplified Transition.kt stubs
-    private val TransitionStub = compiledStub(
+    private val TransitionStub = bytecodeStub(
         filename = "Transition.kt",
         filepath = "androidx/compose/animation/core",
         checksum = 0x313a900e,

@@ -165,6 +165,9 @@ class FloatingActionButtonScreenshotTest {
         rule.runOnIdle {
             @OptIn(ExperimentalComposeUiApi::class)
             localInputModeManager!!.requestInputMode(InputMode.Keyboard)
+        }
+
+        rule.runOnIdle {
             focusRequester.requestFocus()
         }
 

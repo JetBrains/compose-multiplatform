@@ -53,12 +53,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.R
 import androidx.compose.ui.test.assertTextEquals
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performScrollTo
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.tests.R
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
@@ -70,6 +70,7 @@ import androidx.test.espresso.Espresso
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.isDisplayed
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.FlakyTest
 import androidx.test.filters.MediumTest
 import androidx.test.filters.SmallTest
 import org.hamcrest.CoreMatchers.instanceOf
@@ -92,6 +93,7 @@ class ComposeViewTest {
     @get:Rule
     val rule = createAndroidComposeRule<ComponentActivity>()
 
+    @FlakyTest(bugId = 256017578)
     @Test
     fun composeViewComposedContent() {
         rule.activityRule.scenario.onActivity { activity ->
@@ -556,6 +558,7 @@ class ComposeViewTest {
         assertNotNull("test did not run", result?.getOrThrow())
     }
 
+    @Ignore // b/260006789
     @Test
     fun canScrollVerticallyDown_returnsTrue_onlyAfterDownEventInScrollable() {
         lateinit var composeView: View
@@ -581,6 +584,7 @@ class ComposeViewTest {
         }
     }
 
+    @Ignore // b/260006789
     @Test
     fun canScrollVerticallyUp_returnsTrue_onlyAfterDownEventInScrollable() {
         lateinit var composeView: View
@@ -608,6 +612,7 @@ class ComposeViewTest {
         }
     }
 
+    @Ignore // b/260006789
     @Test
     fun canScrollVertically_returnsFalse_afterDownEventOutsideScrollable() {
         lateinit var composeView: View
@@ -631,6 +636,7 @@ class ComposeViewTest {
         }
     }
 
+    @Ignore // b/260006789
     @Test
     fun canScrollHorizontallyRight_returnsTrue_onlyAfterDownEventInScrollable() {
         lateinit var composeView: View

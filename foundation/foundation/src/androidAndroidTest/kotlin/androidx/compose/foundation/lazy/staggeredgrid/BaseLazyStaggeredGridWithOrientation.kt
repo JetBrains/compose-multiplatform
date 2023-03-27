@@ -20,15 +20,15 @@ import androidx.compose.animation.core.snap
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.BaseLazyLayoutTestWithOrientation
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
@@ -50,36 +50,72 @@ open class BaseLazyStaggeredGridWithOrientation(
         }
     }
 
-    internal fun Modifier.debugBorder(color: Color = Color.Black) = border(1.dp, color)
-
     @Composable
     internal fun LazyStaggeredGrid(
         lanes: Int,
         modifier: Modifier = Modifier,
         state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
         contentPadding: PaddingValues = PaddingValues(0.dp),
-        mainAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        reverseLayout: Boolean = false,
+        mainAxisSpacing: Dp = 0.dp,
         crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        content: LazyStaggeredGridScope.() -> Unit,
+    ) {
+        LazyStaggeredGrid(
+            StaggeredGridCells.Fixed(lanes),
+            modifier,
+            state,
+            contentPadding,
+            mainAxisSpacing,
+            crossAxisArrangement,
+            reverseLayout,
+            content
+        )
+    }
+
+    internal fun axisSize(crossAxis: Int, mainAxis: Int): IntSize =
+        IntSize(
+            if (orientation == Orientation.Vertical) crossAxis else mainAxis,
+            if (orientation == Orientation.Vertical) mainAxis else crossAxis,
+        )
+
+    internal fun axisOffset(crossAxis: Int, mainAxis: Int): IntOffset =
+        IntOffset(
+            if (orientation == Orientation.Vertical) crossAxis else mainAxis,
+            if (orientation == Orientation.Vertical) mainAxis else crossAxis,
+        )
+
+    @Composable
+    internal fun LazyStaggeredGrid(
+        cells: StaggeredGridCells,
+        modifier: Modifier = Modifier,
+        state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
+        contentPadding: PaddingValues = PaddingValues(0.dp),
+        mainAxisSpacing: Dp = 0.dp,
+        crossAxisArrangement: Arrangement.HorizontalOrVertical = Arrangement.spacedBy(0.dp),
+        reverseLayout: Boolean = false,
         content: LazyStaggeredGridScope.() -> Unit,
     ) {
         if (orientation == Orientation.Vertical) {
             LazyVerticalStaggeredGrid(
-                columns = StaggeredGridCells.Fixed(lanes),
+                columns = cells,
                 modifier = modifier,
                 contentPadding = contentPadding,
-                verticalArrangement = mainAxisArrangement,
+                verticalItemSpacing = mainAxisSpacing,
                 horizontalArrangement = crossAxisArrangement,
                 state = state,
+                reverseLayout = reverseLayout,
                 content = content
             )
         } else {
             LazyHorizontalStaggeredGrid(
-                rows = StaggeredGridCells.Fixed(lanes),
+                rows = cells,
                 modifier = modifier,
                 contentPadding = contentPadding,
                 verticalArrangement = crossAxisArrangement,
-                horizontalArrangement = mainAxisArrangement,
+                horizontalItemSpacing = mainAxisSpacing,
                 state = state,
+                reverseLayout = reverseLayout,
                 content = content
             )
         }

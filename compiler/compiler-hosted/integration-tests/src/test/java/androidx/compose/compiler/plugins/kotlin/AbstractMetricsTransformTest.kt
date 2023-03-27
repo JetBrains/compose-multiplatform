@@ -16,31 +16,28 @@
 
 package androidx.compose.compiler.plugins.kotlin
 
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import androidx.compose.compiler.plugins.kotlin.facade.KotlinCompilerFacade
+import androidx.compose.compiler.plugins.kotlin.facade.SourceFile
+import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.junit.Assert.assertEquals
 
-abstract class AbstractMetricsTransformTest : ComposeIrTransformTest() {
-    override val metricsDestination: String?
-        get() = null
-
-    override fun postProcessingStep(
-        module: IrModuleFragment,
-        context: IrPluginContext
-    ) {
-        extension!!.metrics = ModuleMetricsImpl(module.name.asString(), context)
-        super.postProcessingStep(module, context)
-    }
-
-    fun verifyMetrics(
+abstract class AbstractMetricsTransformTest : AbstractIrTransformTest() {
+    private fun verifyMetrics(
         source: String,
-        compilation: Compilation = JvmCompilation(),
         verify: ModuleMetrics.() -> Unit
     ) {
-        val files = listOf(
-            sourceFile("Test.kt", source.replace('%', '$')),
+        val files = listOf(SourceFile("Test.kt", source))
+        val metrics = ModuleMetricsImpl(KotlinCompilerFacade.TEST_MODULE_NAME)
+        compileToIr(
+            files,
+            registerExtensions = { configuration ->
+                ComposeComponentRegistrar.registerCommonExtensions(this)
+                val extension = ComposeComponentRegistrar.createComposeIrExtension(configuration)
+                extension.metrics = metrics
+                IrGenerationExtension.registerExtension(this, extension)
+            }
         )
-        compilation.compile(files)
-        extension!!.metrics.verify()
+        metrics.verify()
     }
 
     fun assertClasses(
@@ -101,10 +98,5 @@ abstract class AbstractMetricsTransformTest : ComposeIrTransformTest() {
                 .trimIndent()
                 .trimTrailingWhitespacesAndAddNewlineAtEOF(),
         )
-    }
-
-    override fun tearDown() {
-        extension!!.metrics = EmptyModuleMetrics
-        super.tearDown()
     }
 }

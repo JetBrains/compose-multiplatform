@@ -17,7 +17,6 @@
 package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.benchmarkDrawPerf
 import androidx.compose.testutils.benchmark.benchmarkFirstCompose
 import androidx.compose.testutils.benchmark.benchmarkFirstDraw
 import androidx.compose.testutils.benchmark.benchmarkFirstLayout
@@ -47,7 +46,7 @@ class TextBasicBenchmark(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "length={0}")
-        fun initParameters(): Array<Any> = arrayOf(32, 512)
+        fun initParameters(): Array<Any> = arrayOf(32, 512).filterForCi()
     }
 
     @get:Rule
@@ -120,14 +119,6 @@ class TextBasicBenchmark(
     @Test
     fun layout() {
         benchmarkRule.benchmarkLayoutPerf(caseFactory)
-    }
-
-    /**
-     * Measure the time taken by redrawing the [Text] composable.
-     */
-    @Test
-    fun draw() {
-        benchmarkRule.benchmarkDrawPerf(caseFactory)
     }
 
     /**

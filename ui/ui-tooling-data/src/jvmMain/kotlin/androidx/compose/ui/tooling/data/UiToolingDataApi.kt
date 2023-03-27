@@ -17,4 +17,5 @@
 package androidx.compose.ui.tooling.data
 
 @RequiresOptIn("This API is for tooling only and is likely to change in the future.")
+@Retention(AnnotationRetention.BINARY)
 annotation class UiToolingDataApi

@@ -177,7 +177,8 @@ class OutlinedTextFieldScreenshotTest {
                 value = TextFieldValue(text = text, selection = TextRange(text.length)),
                 onValueChange = {},
                 modifier = Modifier.testTag(TextFieldTag).requiredWidth(280.dp),
-                colors = TextFieldDefaults.outlinedTextFieldColors(textColor = Color.Magenta)
+                colors =
+                    TextFieldDefaults.outlinedTextFieldColors(unfocusedTextColor = Color.Magenta),
             )
         }
 
@@ -595,6 +596,90 @@ class OutlinedTextFieldScreenshotTest {
         }
 
         assertAgainstGolden("outlinedTextField_leadingTrailingIcons_error")
+    }
+
+    @Test
+    fun outlinedTextField_prefixSuffix_withLabelAndInput() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_prefixSuffix_withLabelAndInput")
+    }
+
+    @Test
+    fun outlinedTextField_prefixSuffix_withLabelAndInput_darkTheme() {
+        rule.setMaterialContent(darkColorScheme()) {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_prefixSuffix_withLabelAndInput_darkTheme")
+    }
+
+    @Test
+    fun outlinedTextField_prefixSuffix_withLabelAndInput_focused() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        rule.onNodeWithTag(TextFieldTag).focus()
+
+        assertAgainstGolden("outlinedTextField_prefixSuffix_withLabelAndInput_focused")
+    }
+
+    @Test
+    fun outlinedTextField_prefixSuffix_withPlaceholder() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "",
+                onValueChange = {},
+                placeholder = { Text("Placeholder") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_prefixSuffix_withPlaceholder")
+    }
+
+    @Test
+    fun outlinedTextField_prefixSuffix_withLeadingTrailingIcons() {
+        rule.setMaterialContent(lightColorScheme()) {
+            OutlinedTextField(
+                value = "Text",
+                onValueChange = {},
+                label = { Text("Label") },
+                modifier = Modifier.width(300.dp).testTag(TextFieldTag),
+                prefix = { Text("P:") },
+                suffix = { Text(":S") },
+                leadingIcon = { Icon(Icons.Default.Call, null) },
+                trailingIcon = { Icon(Icons.Default.Clear, null) },
+            )
+        }
+
+        assertAgainstGolden("outlinedTextField_prefixSuffix_withLeadingTrailingIcons")
     }
 
     @Test
