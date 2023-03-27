@@ -30,6 +30,7 @@ import example.imageviewer.model.GalleryId
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.Picture
+import example.imageviewer.painterResourceCached
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -103,7 +104,7 @@ internal fun MemoryScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Image(
-                            painterResource("trash.png"),
+                            painterResourceCached("trash.png"),
                             contentDescription = null,
                             modifier = Modifier.size(14.dp)
                         )
@@ -123,7 +124,7 @@ internal fun MemoryScreen(
             alignLeftContent = {
                 Tooltip(localization.back) {
                     CircularButton(
-                        painterResource("arrowleft.png"),
+                        painterResourceCached("arrowleft.png"),
                         onClick = { onBack() }
                     )
                 }
@@ -155,7 +156,7 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
         modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 16.dp)
     ) {
-        CircularButton(painterResource("magic.png"), onClick)
+        CircularButton(painterResourceCached("magic.png"), onClick)
     }
 }
 

@@ -24,9 +24,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.Resource
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
-import org.khronos.webgl.Uint8Array
-import org.w3c.xhr.ARRAYBUFFER
-import org.khronos.webgl.get
 import org.w3c.xhr.XMLHttpRequest
 import org.w3c.xhr.XMLHttpRequestResponseType
 import kotlin.coroutines.resume
@@ -88,13 +85,26 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
     override val httpClient: WrappedHttpClient = object : WrappedHttpClient {
 
         override suspend fun getAsBytes(urlString: String): ByteArray {
-            return resource(urlString).readBytes()
+            return urlResource(urlString).readBytes()
+        }
+    }
+
+    private fun ContentRepository<ImageBitmap>.cacheByUrlAdapter(): ContentRepository<ImageBitmap> {
+        val original = this
+        return object : ContentRepository<ImageBitmap> {
+            val cache = mutableMapOf<String, ImageBitmap>()
+            override suspend fun loadContent(url: String): ImageBitmap {
+                return cache.getOrPut(url) {
+                    original.loadContent(url)
+                }
+            }
         }
     }
 
     override val imageRepository: ContentRepository<ImageBitmap> =
         createNetworkRepository(httpClient)
             .adapter { it.toImageBitmap() }
+            .cacheByUrlAdapter()
 
     override val notification: Notification = object : PopupNotification(localization) {
         override fun showPopUpMessage(text: String) {
@@ -104,7 +114,7 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
 }
 
 @ExperimentalResourceApi
-private fun resource(path: String): Resource = JSResourceImpl(path)
+private fun urlResource(path: String): Resource = JSResourceImpl(path)
 
 @OptIn(ExperimentalResourceApi::class)
 private abstract class AbstractResourceImpl(val path: String) : Resource {
