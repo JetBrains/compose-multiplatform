@@ -17,7 +17,9 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ImageProvider
+import example.imageviewer.ImageProviderLocal
 import example.imageviewer.Localization
+import example.imageviewer.LocalizationLocal
 import example.imageviewer.core.FilterType
 import example.imageviewer.filter.getFilter
 import example.imageviewer.model.*
@@ -28,10 +30,10 @@ import org.jetbrains.compose.resources.*
 @Composable
 internal fun FullscreenImageScreen(
     picture: PictureData,
-    imageProvider: ImageProvider,
-    localization: Localization,
     back: () -> Unit,
 ) {
+    val imageProvider = ImageProviderLocal.current
+    val localization: Localization = LocalizationLocal.current
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
@@ -104,10 +106,7 @@ internal fun FullscreenImageScreen(
         TopLayout(
             alignLeftContent = {
                 Tooltip(localization.back) {
-                    CircularButton(
-                        painterResource("arrowleft.png"),
-                        onClick = { back() }
-                    )
+                    BackButton(back)
                 }
             },
             alignRightContent = {},
@@ -142,7 +141,6 @@ private fun FilterButtons(
                             onSelectFilter(type)
                         },
                     picture = picture,
-                    imageProvider = imageProvider,
                     filter = remember { { getFilter(type).invoke(it) } }
                 )
             }

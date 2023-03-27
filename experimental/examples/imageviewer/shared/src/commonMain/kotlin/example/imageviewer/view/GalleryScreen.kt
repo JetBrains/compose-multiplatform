@@ -12,13 +12,12 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import example.imageviewer.Dependencies
-import example.imageviewer.ExternalImageViewerEvent
-import example.imageviewer.ImageProvider
+import example.imageviewer.*
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -33,11 +32,12 @@ enum class GalleryStyle {
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun GalleryScreen(
+    pictures: SnapshotStateList<PictureData>,
     galleryPage: GalleryPage,
-    dependencies: Dependencies,
     onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
+    val imageProvider = ImageProviderLocal.current
     LaunchedEffect(Unit) {
         galleryPage.externalEvents.collect {
             when (it) {
@@ -50,7 +50,6 @@ internal fun GalleryScreen(
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box {
             PreviewImage(
-                getImage = { dependencies.imageProvider.getImage(it) },
                 picture = galleryPage.galleryEntry, onClick = {
                     galleryPage.pictureId?.let(onClickPreviewPicture)
                 }
@@ -67,15 +66,14 @@ internal fun GalleryScreen(
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             when (galleryPage.galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
-                    images = dependencies.pictures,
+                    images = pictures,
                     selectedImage = galleryPage.pictureId,
                     onSelect = { galleryPage.selectPicture(it) },
-                    imageProvider = dependencies.imageProvider
+                    imageProvider = imageProvider
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
-                    pictures = dependencies.pictures,
-                    dependencies = dependencies,
+                    pictures = pictures,
                     onSelect = { galleryPage.selectPicture(it) },
                     onFullScreen = { onClickPreviewPicture(it) },
                 )
@@ -132,7 +130,6 @@ internal fun SquareThumbnail(
             ThumbnailImage(
                 modifier = Modifier.fillMaxSize(),
                 picture = picture,
-                imageProvider = imageProvider,
             )
         }
         if (isHighlighted) {
@@ -164,10 +161,10 @@ internal fun SquareThumbnail(
 @Composable
 private fun ListGalleryView(
     pictures: List<PictureData>,
-    dependencies: Dependencies,
     onSelect: (PictureData) -> Unit,
     onFullScreen: (PictureData) -> Unit,
 ) {
+    val notification = NotificationLocal.current
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -182,9 +179,8 @@ private fun ListGalleryView(
                     onFullScreen(p.value)
                 },
                 onClickInfo = {
-                    dependencies.notification.notifyImageData(p.value)
+                    notification.notifyImageData(p.value)
                 },
-                imageProvider = dependencies.imageProvider
             )
             Spacer(modifier = Modifier.height(10.dp))
         }

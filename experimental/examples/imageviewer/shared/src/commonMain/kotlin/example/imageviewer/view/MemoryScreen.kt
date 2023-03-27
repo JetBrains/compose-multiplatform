@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,9 +25,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import example.imageviewer.Dependencies
 import example.imageviewer.ImageProvider
-import example.imageviewer.Localization
+import example.imageviewer.ImageProviderLocal
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -35,18 +35,16 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun MemoryScreen(
-    dependencies: Dependencies,
+    pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
-    getImage: suspend (PictureData) -> ImageBitmap,
-    localization: Localization,
     onSelectRelatedMemory: (PictureData) -> Unit,
     onBack: () -> Unit,
     onHeaderClick: (PictureData) -> Unit,
-    imageProvider: ImageProvider,
 ) {
+    val imageProvider = ImageProviderLocal.current
     var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
     LaunchedEffect(memoryPage.picture) {
-        headerImage = getImage(memoryPage.picture)
+        headerImage = imageProvider.getImage(memoryPage.picture)
     }
     Box {
         val scrollState = rememberScrollState()
@@ -78,7 +76,7 @@ internal fun MemoryScreen(
                     Headliner("Note")
                     Collapsible(memoryPage.picture.description)
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(dependencies.pictures, imageProvider,  onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(pictures, imageProvider,  onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -118,12 +116,7 @@ internal fun MemoryScreen(
         }
         TopLayout(
             alignLeftContent = {
-                Tooltip(localization.back) {
-                    CircularButton(
-                        painterResource("arrowleft.png"),
-                        onClick = { onBack() }
-                    )
-                }
+                BackButton(onBack)
             },
             alignRightContent = {},
         )

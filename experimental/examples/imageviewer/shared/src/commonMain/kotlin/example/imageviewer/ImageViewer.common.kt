@@ -1,25 +1,16 @@
 package example.imageviewer
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
-import example.imageviewer.view.CameraScreen
-import example.imageviewer.view.FullscreenImageScreen
-import example.imageviewer.view.GalleryScreen
-import example.imageviewer.view.MemoryScreen
-import example.imageviewer.view.NavigationStack
+import example.imageviewer.view.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 
@@ -40,10 +31,17 @@ internal fun ImageViewerCommon(
         ImageProviderLocal provides dependencies.imageProvider,
         ImageStorageLocal provides dependencies.imageStorage,
     ) {
-        dependencies.pictures
+        ImageViewerWithProvidedDependencies(dependencies.pictures, externalEvents)
     }
+}
 
-    val rootGalleryPage = GalleryPage(dependencies, externalEvents)
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+internal fun ImageViewerWithProvidedDependencies(
+    pictures: SnapshotStateList<PictureData>,
+    externalEvents: Flow<ExternalImageViewerEvent>
+) {
+    val rootGalleryPage = GalleryPage(pictures, externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -63,21 +61,19 @@ internal fun ImageViewerCommon(
             when (page) {
                 is GalleryPage -> {
                     GalleryScreen(
-                        page,
-                        dependencies,
+                        pictures = pictures,
+                        galleryPage = page,
                         onClickPreviewPicture = { previewPictureId ->
                             navigationStack.push(MemoryPage(previewPictureId))
-                        },
-                        onMakeNewMemory = {
-                            navigationStack.push(CameraPage())
-                        })
+                        }
+                    ) {
+                        navigationStack.push(CameraPage())
+                    }
                 }
 
                 is FullScreenPage -> {
                     FullscreenImageScreen(
                         picture = page.picture,
-                        imageProvider = dependencies.imageProvider,
-                        localization = dependencies.localization,
                         back = {
                             navigationStack.back()
                         }
@@ -86,10 +82,8 @@ internal fun ImageViewerCommon(
 
                 is MemoryPage -> {
                     MemoryScreen(
-                        dependencies = dependencies,
+                        pictures = pictures,
                         memoryPage = page,
-                        getImage = { dependencies.imageProvider.getImage(it) },
-                        localization = dependencies.localization,
                         onSelectRelatedMemory = { galleryId ->
                             navigationStack.push(MemoryPage(galleryId))
                         },
@@ -99,14 +93,11 @@ internal fun ImageViewerCommon(
                         onHeaderClick = { galleryId ->
                             navigationStack.push(FullScreenPage(galleryId))
                         },
-                        imageProvider = dependencies.imageProvider
                     )
                 }
 
                 is CameraPage -> {
                     CameraScreen(
-                        localization = dependencies.localization,
-                        storage = dependencies.imageStorage,
                         onBack = { navigationStack.back() },
                     )
                 }

@@ -12,7 +12,6 @@ import org.jetbrains.compose.resources.resource
 
 @OptIn(ExperimentalResourceApi::class)
 abstract class Dependencies {
-    abstract val ioScope: CoroutineScope
     abstract val localization: Localization
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage

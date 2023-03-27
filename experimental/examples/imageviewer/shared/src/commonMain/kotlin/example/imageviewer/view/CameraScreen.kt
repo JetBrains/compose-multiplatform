@@ -1,16 +1,14 @@
 package example.imageviewer.view
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import example.imageviewer.ImageStorage
-import example.imageviewer.Localization
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import example.imageviewer.ImageStorageLocal
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun CameraScreen(localization: Localization, storage: ImageStorage, onBack: () -> Unit) {
+internal fun CameraScreen(onBack: () -> Unit) {
+    val storage = ImageStorageLocal.current
     Box(Modifier.fillMaxSize()) {
         CameraView(Modifier.fillMaxSize(), onCapture = { picture, image ->
             storage.saveImage(picture, image)
@@ -18,12 +16,7 @@ internal fun CameraScreen(localization: Localization, storage: ImageStorage, onB
         })
         TopLayout(
             alignLeftContent = {
-                Tooltip(localization.back) {
-                    CircularButton(
-                        painterResource("arrowleft.png"),
-                        onClick = { onBack() }
-                    )
-                }
+                BackButton(onBack)
             },
             alignRightContent = {},
         )

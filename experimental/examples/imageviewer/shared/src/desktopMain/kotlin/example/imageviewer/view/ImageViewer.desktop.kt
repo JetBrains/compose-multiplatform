@@ -19,8 +19,6 @@ import example.imageviewer.*
 import example.imageviewer.Notification
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.ioDispatcher
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -43,8 +41,7 @@ class ExternalNavigationEventBus {
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
-    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
+    val dependencies = remember { getDependencies(toastState) }
     val externalNavigationEventBus = remember { ExternalNavigationEventBus() }
 
     Window(
@@ -85,9 +82,8 @@ fun ApplicationScope.ImageViewerDesktop() {
     }
 }
 
-private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
+private fun getDependencies(toastState: MutableState<ToastState>) =
     object : Dependencies() {
-        override val ioScope: CoroutineScope = ioScope
         override val localization: Localization = object : Localization {
             override val back: String get() = ResString.back
             override val appName: String get() = ResString.appName

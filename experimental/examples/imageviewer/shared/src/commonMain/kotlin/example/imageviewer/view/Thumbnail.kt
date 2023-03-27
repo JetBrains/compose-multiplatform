@@ -15,7 +15,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.ImageProvider
 import example.imageviewer.model.PictureData
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -26,8 +25,7 @@ internal fun Thumbnail(
     picture: PictureData,
     onClickSelect: () -> Unit,
     onClickFullScreen: () -> Unit,
-    onClickInfo: () -> Unit,
-    imageProvider: ImageProvider,
+    onClickInfo: () -> Unit
 ) {
     Card(
         modifier = Modifier.padding(start = 10.dp, end = 10.dp).height(70.dp)
@@ -49,7 +47,6 @@ internal fun Thumbnail(
                         .border(BorderStroke(1.dp, Color.White), CircleShape)
                         .clickable { onClickFullScreen() },
                     picture = picture,
-                    imageProvider = imageProvider
                 )
             }
             Text(

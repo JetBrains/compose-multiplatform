@@ -8,12 +8,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import example.imageviewer.filter.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import example.imageviewer.model.filtration.BlurFilter
-import example.imageviewer.model.filtration.GrayScaleFilter
-import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.storage.IosImageStorage
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.utils.ioDispatcher
@@ -42,13 +38,6 @@ internal fun ImageViewerIos() {
 }
 
 fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies() {
-    override val ioScope: CoroutineScope = ioScope
-    override fun getFilter(type: FilterType): BitmapFilter = when (type) {
-        FilterType.GrayScale -> GrayScaleFilter()
-        FilterType.Pixel -> PixelFilter()
-        FilterType.Blur -> BlurFilter()
-    }
-
     override val localization: Localization = object : Localization {
         override val appName = "ImageViewer"
         override val loading = "Loading images..."
