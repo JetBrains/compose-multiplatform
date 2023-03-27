@@ -9,7 +9,6 @@ plugins {
 }
 
 version = "1.0-SNAPSHOT"
-val ktorVersion = extra["ktor.version"]
 
 kotlin {
     android()
@@ -32,7 +31,6 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
@@ -47,7 +45,6 @@ kotlin {
                 api("androidx.activity:activity-compose:1.6.1")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.9.0")
-                implementation("io.ktor:ktor-client-okhttp:$ktorVersion")//todo remove
                 implementation("androidx.camera:camera-camera2:1.2.1")
                 implementation("androidx.camera:camera-lifecycle:1.2.1")
                 implementation("androidx.camera:camera-view:1.2.1")
@@ -59,7 +56,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+
             }
         }
         val iosSimulatorArm64Main by getting {
@@ -70,8 +67,7 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")
-                implementation("io.ktor:ktor-client-cio:$ktorVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")//todo remove?
             }
         }
     }

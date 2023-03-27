@@ -15,12 +15,11 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
-import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import example.imageviewer.ImageProvider
 import example.imageviewer.Localization
-import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
+import example.imageviewer.filter.getFilter
 import example.imageviewer.model.*
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.*
@@ -30,7 +29,6 @@ import org.jetbrains.compose.resources.*
 internal fun FullscreenImageScreen(
     picture: PictureData,
     imageProvider: ImageProvider,
-    getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
 ) {
@@ -47,7 +45,7 @@ internal fun FullscreenImageScreen(
         if (originalImage != null) {
             var result: ImageBitmap = originalImage
             for (filter in selectedFilters.map { getFilter(it) }) {
-                result = filter.apply(result)
+                result = filter.invoke(result)
             }
             result
         } else {
@@ -94,7 +92,6 @@ internal fun FullscreenImageScreen(
                                 selectedFilters -= it
                             }
                         },
-                        getFilter = getFilter,
                         imageProvider = imageProvider,
                     )
                     ZoomControllerView(Modifier, scalableState)
@@ -124,7 +121,6 @@ private fun FilterButtons(
     filters: List<FilterType>,
     selectedFilters: Set<FilterType>,
     onSelectFilter: (FilterType) -> Unit,
-    getFilter: (FilterType) -> BitmapFilter,
     imageProvider: ImageProvider,
 ) {
     Row(
@@ -147,7 +143,7 @@ private fun FilterButtons(
                         },
                     picture = picture,
                     imageProvider = imageProvider,
-                    filter = remember { { getFilter(type).apply(it) } }
+                    filter = remember { { getFilter(type).invoke(it) } }
                 )
             }
         }

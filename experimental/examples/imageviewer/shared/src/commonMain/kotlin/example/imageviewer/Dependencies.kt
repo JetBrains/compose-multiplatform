@@ -2,20 +2,17 @@ package example.imageviewer
 
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
-import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import io.ktor.client.*
 import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 
 @OptIn(ExperimentalResourceApi::class)
 abstract class Dependencies {
-    abstract val httpClient: HttpClient
     abstract val ioScope: CoroutineScope
-    abstract fun getFilter(type: FilterType): BitmapFilter
     abstract val localization: Localization
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
@@ -25,6 +22,7 @@ abstract class Dependencies {
             is PictureData.Resource -> {
                 resource(picture.resource).readBytes().toImageBitmap()
             }
+
             is PictureData.Camera -> {
                 imageStorage.getImage(picture)
             }
@@ -34,6 +32,7 @@ abstract class Dependencies {
             is PictureData.Resource -> {
                 resource(picture.thumbnailResource).readBytes().toImageBitmap()
             }
+
             is PictureData.Camera -> {
                 imageStorage.getThumbnail(picture)
             }
@@ -105,4 +104,24 @@ interface ImageStorage {
     fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
     suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
     suspend fun getImage(picture: PictureData.Camera): ImageBitmap
+}
+
+val LocalizationLocal = staticCompositionLocalOf<Localization> {
+    noLocalProvidedFor("LocalizationLocal")
+}
+
+val NotificationLocal = staticCompositionLocalOf<Notification> {
+    noLocalProvidedFor("NotificationLocal")
+}
+
+val ImageProviderLocal = staticCompositionLocalOf<ImageProvider> {
+    noLocalProvidedFor("ImageProviderLocal")
+}
+
+val ImageStorageLocal = staticCompositionLocalOf<ImageStorage> {
+    noLocalProvidedFor("ImageStorageLocal")
+}
+
+private fun noLocalProvidedFor(name: String): Nothing {
+    error("CompositionLocal $name not present")
 }

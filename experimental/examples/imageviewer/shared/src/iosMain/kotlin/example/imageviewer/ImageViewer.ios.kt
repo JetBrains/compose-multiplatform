@@ -8,9 +8,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import cnames.structs.__CFDictionary
-import example.imageviewer.core.BitmapFilter
+import example.imageviewer.filter.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import example.imageviewer.model.filtration.BlurFilter
@@ -21,18 +19,9 @@ import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.utils.ioDispatcher
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.darwin.Darwin
-import kotlinx.cinterop.CPointer
 import kotlinx.coroutines.CoroutineScope
 import platform.CoreFoundation.*
-import platform.Foundation.CFBridgingRelease
-import platform.Foundation.CFBridgingRetain
-import platform.Foundation.NSData
-import platform.Foundation.NSMutableDictionary
 import platform.ImageIO.*
-import platform.UIKit.UIImage
-import platform.UniformTypeIdentifiers.UTTypeJPEG
 
 @Composable
 internal fun ImageViewerIos() {
@@ -75,8 +64,6 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         override val pixels = "pixels."
         override val back = "Back"
     }
-
-    override val httpClient: HttpClient = HttpClient(Darwin)
 
     override val notification: Notification = object : PopupNotification(localization) {
         override fun showPopUpMessage(text: String) {

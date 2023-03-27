@@ -11,6 +11,7 @@ import androidx.compose.animation.with
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
@@ -33,6 +34,15 @@ internal fun ImageViewerCommon(
     dependencies: Dependencies,
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
+    CompositionLocalProvider(
+        LocalizationLocal provides dependencies.localization,
+        NotificationLocal provides dependencies.notification,
+        ImageProviderLocal provides dependencies.imageProvider,
+        ImageStorageLocal provides dependencies.imageStorage,
+    ) {
+        dependencies.pictures
+    }
+
     val rootGalleryPage = GalleryPage(dependencies, externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
@@ -67,7 +77,6 @@ internal fun ImageViewerCommon(
                     FullscreenImageScreen(
                         picture = page.picture,
                         imageProvider = dependencies.imageProvider,
-                        getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {
                             navigationStack.back()

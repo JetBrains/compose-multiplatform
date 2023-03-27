@@ -12,24 +12,20 @@ import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import example.imageviewer.*
 import example.imageviewer.Notification
-import example.imageviewer.core.BitmapFilter
-import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import example.imageviewer.model.filtration.BlurFilter
-import example.imageviewer.model.filtration.GrayScaleFilter
-import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.getPreferredWindowSize
 import example.imageviewer.utils.ioDispatcher
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import java.awt.Dimension
+import java.awt.Toolkit
 
 class ExternalNavigationEventBus {
     private val _events = MutableSharedFlow<ExternalImageViewerEvent>(
@@ -92,12 +88,6 @@ fun ApplicationScope.ImageViewerDesktop() {
 private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
     object : Dependencies() {
         override val ioScope: CoroutineScope = ioScope
-        override fun getFilter(type: FilterType): BitmapFilter = when (type) {
-            FilterType.GrayScale -> GrayScaleFilter()
-            FilterType.Pixel -> PixelFilter()
-            FilterType.Blur -> BlurFilter()
-        }
-
         override val localization: Localization = object : Localization {
             override val back: String get() = ResString.back
             override val appName: String get() = ResString.appName
@@ -113,10 +103,6 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
             override val pixels: String get() = ResString.pixels
             override val refreshUnavailable: String get() = ResString.refreshUnavailable
         }
-
-        override val httpClient: HttpClient = HttpClient(CIO)
-
-        val userHome: String? = System.getProperty("user.home")
 
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
@@ -140,3 +126,12 @@ private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<To
         }
 
     }
+
+private fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): DpSize {
+    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
+    val preferredWidth: Int = (screenSize.width * 0.8f).toInt()
+    val preferredHeight: Int = (screenSize.height * 0.8f).toInt()
+    val width: Int = if (desiredWidth < preferredWidth) desiredWidth else preferredWidth
+    val height: Int = if (desiredHeight < preferredHeight) desiredHeight else preferredHeight
+    return DpSize(width.dp, height.dp)
+}

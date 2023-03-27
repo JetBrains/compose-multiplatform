@@ -187,7 +187,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
         }
         Button(
             modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
-            enabled = !capturePhotoStarted,
+//            enabled = !capturePhotoStarted,//todo
             onClick = {
                 capturePhotoStarted = true
                 val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
