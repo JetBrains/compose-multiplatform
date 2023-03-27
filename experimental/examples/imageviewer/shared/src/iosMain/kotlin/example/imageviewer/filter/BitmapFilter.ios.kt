@@ -1,21 +1,27 @@
 package example.imageviewer.filter
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
 import org.jetbrains.skia.*
 
-actual fun grayScaleFilter(bitmap: ImageBitmap): ImageBitmap {
+actual fun grayScaleFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyGrayScaleFilter(bitmap.asSkiaBitmap()).asComposeImageBitmap()
 }
 
-actual fun pixelFilter(bitmap: ImageBitmap): ImageBitmap {
+actual fun pixelFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyPixelFilter(bitmap.asSkiaBitmap()).asComposeImageBitmap()
 }
 
-actual fun blurFilter(bitmap: ImageBitmap): ImageBitmap {
+actual fun blurFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyBlurFilter(bitmap.asSkiaBitmap()).asComposeImageBitmap()
 }
+
+actual class PlatformContext
+
+@Composable
+internal actual fun getPlatformContext():PlatformContext = PlatformContext()
 
 private fun scaleBitmapAspectRatio(
     bitmap: Bitmap,

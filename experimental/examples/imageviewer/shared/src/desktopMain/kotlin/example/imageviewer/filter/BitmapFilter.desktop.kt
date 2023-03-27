@@ -1,5 +1,6 @@
 package example.imageviewer.filter
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toAwtImage
 import androidx.compose.ui.graphics.toComposeImageBitmap
@@ -7,17 +8,23 @@ import java.awt.image.BufferedImage
 import java.awt.image.ConvolveOp
 import java.awt.image.Kernel
 
-actual fun grayScaleFilter(bitmap: ImageBitmap): ImageBitmap {
+
+actual fun grayScaleFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyGrayScaleFilter(bitmap.toAwtImage()).toComposeImageBitmap()
 }
 
-actual fun pixelFilter(bitmap: ImageBitmap): ImageBitmap {
+actual fun pixelFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyPixelFilter(bitmap.toAwtImage()).toComposeImageBitmap()
 }
 
-actual fun blurFilter(bitmap: ImageBitmap): ImageBitmap {
+actual fun blurFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyBlurFilter(bitmap.toAwtImage()).toComposeImageBitmap()
 }
+
+actual class PlatformContext
+
+@Composable
+internal actual fun getPlatformContext():PlatformContext = PlatformContext()
 
 private fun scaleBitmapAspectRatio(
     bitmap: BufferedImage,

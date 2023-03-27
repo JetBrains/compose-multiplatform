@@ -21,6 +21,7 @@ import example.imageviewer.Localization
 import example.imageviewer.LocalizationLocal
 import example.imageviewer.core.FilterType
 import example.imageviewer.filter.getFilter
+import example.imageviewer.filter.getPlatformContext
 import example.imageviewer.model.*
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.*
@@ -40,12 +41,13 @@ internal fun FullscreenImageScreen(
         originalImageState.value = imageProvider.getImage(picture)
     }
 
+    val platformContext = getPlatformContext()
     val originalImage = originalImageState.value
     val imageWithFilter = remember(originalImage, selectedFilters) {
         if (originalImage != null) {
             var result: ImageBitmap = originalImage
             for (filter in selectedFilters.map { getFilter(it) }) {
-                result = filter.invoke(result)
+                result = filter.invoke(result, platformContext)
             }
             result
         } else {
@@ -118,6 +120,7 @@ private fun FilterButtons(
     selectedFilters: Set<FilterType>,
     onSelectFilter: (FilterType) -> Unit,
 ) {
+    val platformContext = getPlatformContext()
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.padding(bottom = 16.dp)
@@ -137,7 +140,7 @@ private fun FilterButtons(
                             onSelectFilter(type)
                         },
                     picture = picture,
-                    filter = remember { { getFilter(type).invoke(it) } }
+                    filter = remember { { getFilter(type).invoke(it, platformContext) } }
                 )
             }
         }

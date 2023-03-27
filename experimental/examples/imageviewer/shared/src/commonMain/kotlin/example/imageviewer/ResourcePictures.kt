@@ -18,6 +18,17 @@ val resourcePictures = arrayOf(
     PictureData.Resource(
         resource = "2.jpg",
         thumbnailResource = "2-thumbnail.jpg",
+        name = "Kina The Calico",
+        description = """
+            This cute kitty 🐱 loves one thing above all: soups and sauces!
+            A true connoisseur of all liquid meals, you'll frequently find her lounging by a sunny window and surveying the neighbourhood.
+            But only until it's dinner time again, of course! 🍜
+            """.trimIndent(),
+        gps = GpsPosition(48.138018, 11.5737048)
+    ),
+    PictureData.Resource(
+        resource = "3.jpg",
+        thumbnailResource = "3-thumbnail.jpg",
         name = "Blue City",
         description = """
             Is a city in northwest Morocco.
@@ -25,16 +36,6 @@ val resourcePictures = arrayOf(
             Chefchaouen is situated just inland from Tangier and Tétouan.
             """.trimIndent(),
         gps = GpsPosition(35.171389, -5.269722)
-    ),
-    PictureData.Resource(
-        resource = "3.jpg",
-        thumbnailResource = "3-thumbnail.jpg",
-        name = "Empire State Building",
-        description = """
-            The Empire State Building is a 102-story Art Deco skyscraper in Midtown Manhattan, New York City.
-             The building was designed by Shreve, Lamb & Harmon and built from 1930 to 1931. Its name is derived from "Empire State", the nickname of the state of New York.
-            """.trimIndent(),
-        gps = GpsPosition(40.7473415, -73.9862414)
     ),
     PictureData.Resource(
         resource = "4.jpg",

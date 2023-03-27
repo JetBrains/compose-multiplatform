@@ -5,22 +5,12 @@ import android.widget.Toast
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import example.imageviewer.*
-import example.imageviewer.core.BitmapFilter
-import example.imageviewer.core.FilterType
-import example.imageviewer.model.PictureData
-import example.imageviewer.model.filtration.BlurFilter
-import example.imageviewer.model.filtration.GrayScaleFilter
-import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.shared.R
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.utils.ioDispatcher
-import io.ktor.client.HttpClient
-import io.ktor.client.engine.okhttp.OkHttp
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun ImageViewerAndroid() {
@@ -33,14 +23,6 @@ fun ImageViewerAndroid() {
 }
 
 private fun getDependencies(context: Context, ioScope: CoroutineScope) = object : Dependencies() {
-    override val httpClient: HttpClient = HttpClient(OkHttp)
-    override val ioScope: CoroutineScope = ioScope
-    override fun getFilter(type: FilterType): BitmapFilter =
-        when (type) {
-            FilterType.GrayScale -> GrayScaleFilter()
-            FilterType.Pixel -> PixelFilter()
-            FilterType.Blur -> BlurFilter(context)
-        }
 
     override val localization: Localization = object : Localization {
         override val back get() = context.getString(R.string.back)
