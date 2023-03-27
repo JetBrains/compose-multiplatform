@@ -29,7 +29,6 @@ enum class GalleryStyle {
     LIST
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,

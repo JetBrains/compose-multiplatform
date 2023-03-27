@@ -105,19 +105,19 @@ interface ImageStorage {
     suspend fun getImage(picture: PictureData.Camera): ImageBitmap
 }
 
-val LocalizationLocal = staticCompositionLocalOf<Localization> {
+internal val LocalizationLocal = staticCompositionLocalOf<Localization> {
     noLocalProvidedFor("LocalizationLocal")
 }
 
-val NotificationLocal = staticCompositionLocalOf<Notification> {
+internal val NotificationLocal = staticCompositionLocalOf<Notification> {
     noLocalProvidedFor("NotificationLocal")
 }
 
-val ImageProviderLocal = staticCompositionLocalOf<ImageProvider> {
+internal val ImageProviderLocal = staticCompositionLocalOf<ImageProvider> {
     noLocalProvidedFor("ImageProviderLocal")
 }
 
-val ImageStorageLocal = staticCompositionLocalOf<ImageStorage> {
+internal val ImageStorageLocal = staticCompositionLocalOf<ImageStorage> {
     noLocalProvidedFor("ImageStorageLocal")
 }
 

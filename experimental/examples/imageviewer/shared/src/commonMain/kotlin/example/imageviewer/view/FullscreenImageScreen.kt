@@ -16,7 +16,6 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
-import example.imageviewer.ImageProvider
 import example.imageviewer.ImageProviderLocal
 import example.imageviewer.Localization
 import example.imageviewer.LocalizationLocal
@@ -26,7 +25,6 @@ import example.imageviewer.model.*
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.*
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun FullscreenImageScreen(
     picture: PictureData,
@@ -94,7 +92,6 @@ internal fun FullscreenImageScreen(
                                 selectedFilters -= it
                             }
                         },
-                        imageProvider = imageProvider,
                     )
                     ZoomControllerView(Modifier, scalableState)
                 }
@@ -120,7 +117,6 @@ private fun FilterButtons(
     filters: List<FilterType>,
     selectedFilters: Set<FilterType>,
     onSelectFilter: (FilterType) -> Unit,
-    imageProvider: ImageProvider,
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(16.dp),
