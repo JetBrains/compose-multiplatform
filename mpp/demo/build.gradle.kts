@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ plugins {
     id("AndroidXPlugin")
     id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
-    id("application")
+//    id("application")
     kotlin("plugin.serialization") version "1.8.0"
 }
 
@@ -219,7 +219,7 @@ if (System.getProperty("os.name") == "Mac OS X") {
 
 tasks.create("runDesktop", JavaExec::class.java) {
     dependsOn(":compose:desktop:desktop:jar")
-    main = "androidx.compose.mpp.demo.Main_desktopKt"
+    mainClass.set("androidx.compose.mpp.demo.Main_desktopKt")
     systemProperty("skiko.fps.enabled", "true")
     val compilation = kotlin.jvm("desktop").compilations["main"]
     classpath =

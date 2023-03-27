@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,7 +42,7 @@ import org.jetbrains.skia.Surface
 @OptIn(ExperimentalComposeUiApi::class)
 class PointerIconTest {
     private val iconService = object : PointerIconService {
-        override var current: PointerIcon = PointerIconDefaults.Default
+        override var current: PointerIcon = PointerIcon.Default
     }
 
     @Test
@@ -59,7 +59,7 @@ class PointerIconTest {
                 ) {
                     Box(
                         modifier = Modifier
-                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .pointerHoverIcon(PointerIcon.Text)
                             .size(10.dp, 10.dp)
                     )
                 }
@@ -67,7 +67,7 @@ class PointerIconTest {
         }
 
         scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-        assertThat(iconService.current).isEqualTo(PointerIconDefaults.Text)
+        assertThat(iconService.current).isEqualTo(PointerIcon.Text)
     }
 
     @Test
@@ -85,14 +85,14 @@ class PointerIconTest {
                 ) {
                     Box(
                         modifier = Modifier
-                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .pointerHoverIcon(PointerIcon.Text)
                             .size(10.dp, 10.dp)
                     )
                 }
             }
 
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Text)
+            assertThat(component._pointerIcon).isEqualTo(PointerIcon.Text)
         } finally {
             scene.close()
         }
@@ -113,7 +113,7 @@ class PointerIconTest {
                 ) {
                     Box(
                         modifier = Modifier
-                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .pointerHoverIcon(PointerIcon.Text)
                             .size(10.dp, 10.dp)
                     )
                 }
@@ -121,7 +121,7 @@ class PointerIconTest {
 
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Text)
+            assertThat(component._pointerIcon).isEqualTo(PointerIcon.Text)
         } finally {
             scene.close()
         }
@@ -137,12 +137,12 @@ class PointerIconTest {
             ) {
                 Box(
                     modifier = Modifier
-                        .pointerHoverIcon(PointerIconDefaults.Hand, true)
+                        .pointerHoverIcon(PointerIcon.Hand, true)
                         .size(30.dp, 30.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .pointerHoverIcon(PointerIcon.Text)
                             .size(10.dp, 10.dp)
                     )
                 }
@@ -150,10 +150,10 @@ class PointerIconTest {
         }
 
         scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-        assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
+        assertThat(iconService.current).isEqualTo(PointerIcon.Hand)
 
         scene.sendPointerEvent(PointerEventType.Move, Offset(15f, 15f))
-        assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
+        assertThat(iconService.current).isEqualTo(PointerIcon.Hand)
     }
 
     @Test
@@ -166,12 +166,12 @@ class PointerIconTest {
             ) {
                 Box(
                     modifier = Modifier
-                        .pointerHoverIcon(PointerIconDefaults.Hand)
+                        .pointerHoverIcon(PointerIcon.Hand)
                         .size(30.dp, 30.dp)
                 ) {
                     Box(
                         modifier = Modifier
-                            .pointerHoverIcon(PointerIconDefaults.Text)
+                            .pointerHoverIcon(PointerIcon.Text)
                             .size(10.dp, 10.dp)
                     )
                 }
@@ -179,10 +179,10 @@ class PointerIconTest {
         }
 
         scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
-        assertThat(iconService.current).isEqualTo(PointerIconDefaults.Text)
+        assertThat(iconService.current).isEqualTo(PointerIcon.Text)
 
         scene.sendPointerEvent(PointerEventType.Move, Offset(15f, 15f))
-        assertThat(iconService.current).isEqualTo(PointerIconDefaults.Hand)
+        assertThat(iconService.current).isEqualTo(PointerIcon.Hand)
     }
 
     @Test
@@ -196,7 +196,7 @@ class PointerIconTest {
             scene?.render(surface.canvas, 1)
         }, coroutineContext = coroutineContext)
 
-        val iconState = mutableStateOf(PointerIconDefaults.Text)
+        val iconState = mutableStateOf(PointerIcon.Text)
 
         val recomposeChannel = Channel<Int>(Channel.CONFLATED) // helps with waiting for recomposition
         var count = 0
@@ -210,12 +210,12 @@ class PointerIconTest {
             }
             scene.sendPointerEvent(PointerEventType.Move, Offset(5f, 5f))
             assertThat(recomposeChannel.receive()).isEqualTo(1)
-            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Text)
+            assertThat(component._pointerIcon).isEqualTo(PointerIcon.Text)
 
             // No move, but change should be applied anyway
-            iconState.value = PointerIconDefaults.Crosshair
+            iconState.value = PointerIcon.Crosshair
             assertThat(recomposeChannel.receive()).isEqualTo(2)
-            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Crosshair)
+            assertThat(component._pointerIcon).isEqualTo(PointerIcon.Crosshair)
         } finally {
             scene.close()
         }
@@ -232,7 +232,7 @@ class PointerIconTest {
             scene?.render(surface.canvas, 1)
         }, coroutineContext = coroutineContext)
 
-        val iconState = mutableStateOf(PointerIconDefaults.Text)
+        val iconState = mutableStateOf(PointerIcon.Text)
 
         val recomposeChannel = Channel<Int>(Channel.CONFLATED) // helps with waiting for recomposition
         var count = 0
@@ -250,13 +250,13 @@ class PointerIconTest {
             assertThat(component._pointerIcon).isEqualTo(null)
 
             // No move, not hovered. No pointer icon change expected
-            iconState.value = PointerIconDefaults.Crosshair
+            iconState.value = PointerIcon.Crosshair
             assertThat(recomposeChannel.receive()).isEqualTo(2)
             assertThat(component._pointerIcon).isEqualTo(null)
 
             // Move, but not hovered. Pointer Icon should be Default
             scene.sendPointerEvent(PointerEventType.Move, Offset(90f, 95f))
-            assertThat(component._pointerIcon).isEqualTo(PointerIconDefaults.Default)
+            assertThat(component._pointerIcon).isEqualTo(PointerIcon.Default)
         } finally {
             val toClose = scene
             scene = null // otherwise, invalidate (scene?.render...) crashes

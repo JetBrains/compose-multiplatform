@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,6 @@ import androidx.compose.ui.input.key.type
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.PointerIconDefaults
 import androidx.compose.ui.input.pointer.PointerIconService
 import androidx.compose.ui.input.pointer.PointerInputEvent
 import androidx.compose.ui.input.pointer.PointerInputEventProcessor
@@ -441,11 +440,11 @@ internal class SkiaBasedOwner(
 
     private fun commitPointerIcon() {
         platform.setPointerIcon(pointerIconService.current)
-        pointerIconService.current = PointerIconDefaults.Default
+        pointerIconService.current = PointerIcon.Default
     }
 
     override val pointerIconService = object : PointerIconService {
-        override var current: PointerIcon = PointerIconDefaults.Default
+        override var current: PointerIcon = PointerIcon.Default
 
         override fun requestUpdate() {
             pointerPositionUpdater.needUpdate()
