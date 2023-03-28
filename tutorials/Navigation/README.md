@@ -107,9 +107,7 @@ One of the main goals of the Decompose library is compile time safety. Each chil
 For example, for a simple List-Details navigation we need just two entries:
 
 ``` kotlin
-import com.arkivanov.decompose.statekeeper.Parcelable
-
-sealed class Configuration : Parcelable {
+sealed class Configuration {
     object List : Configuration()
     data class Details(val itemId: Long) : Configuration()
 }
