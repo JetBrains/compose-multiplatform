@@ -25,7 +25,8 @@ kotlin {
             baseName = "shared"
             isStatic = true
         }
-        extraSpecAttributes["resources"] = "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
+        extraSpecAttributes["resources"] =
+            "['src/commonMain/resources/**', 'src/iosMain/resources/**']"
     }
 
     sourceSets {
@@ -57,6 +58,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
+                // TODO: update coroutines (or remove, if 1.8.0 will be presented in Compose)
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-Beta")
             }
         }
@@ -68,7 +70,6 @@ kotlin {
         val desktopMain by getting {
             dependencies {
                 implementation(compose.desktop.common)
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.4")//todo remove?
             }
         }
     }
