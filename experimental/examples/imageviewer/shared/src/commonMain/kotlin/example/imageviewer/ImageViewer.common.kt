@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
@@ -16,7 +17,8 @@ import kotlinx.coroutines.flow.emptyFlow
 
 enum class ExternalImageViewerEvent {
     Foward,
-    Back
+    Back,
+    Escape,
 }
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -43,6 +45,14 @@ internal fun ImageViewerWithProvidedDependencies(
 ) {
     val rootGalleryPage = GalleryPage(pictures, externalEvents)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
+
+    LaunchedEffect(Unit) {
+        externalEvents.collect {
+            if (it == ExternalImageViewerEvent.Escape) {
+                navigationStack.back()
+            }
+        }
+    }
 
     Surface(modifier = Modifier.fillMaxSize()) {
         AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {

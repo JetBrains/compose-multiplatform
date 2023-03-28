@@ -43,6 +43,7 @@ internal fun GalleryScreen(
             when (it) {
                 ExternalImageViewerEvent.Foward -> galleryPage.nextImage()
                 ExternalImageViewerEvent.Back -> galleryPage.previousImage()
+                else -> {}
             }
         }
     }

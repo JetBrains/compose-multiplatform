@@ -65,6 +65,10 @@ fun ApplicationScope.ImageViewerDesktop() {
                     Key.DirectionRight -> externalNavigationEventBus.produceEvent(
                         ExternalImageViewerEvent.Foward
                     )
+
+                    Key.Escape -> externalNavigationEventBus.produceEvent(
+                        ExternalImageViewerEvent.Escape
+                    )
                 }
             }
             false

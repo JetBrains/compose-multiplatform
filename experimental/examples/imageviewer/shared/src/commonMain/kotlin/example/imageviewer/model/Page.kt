@@ -1,6 +1,5 @@
 package example.imageviewer.model
 
-import androidx.compose.foundation.ScrollState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -45,12 +44,12 @@ class GalleryPage(
 
     fun nextImage() {
         currentPictureIndex =
-            (currentPictureIndex + 1).mod(pictures.lastIndex)
+            (currentPictureIndex + 1).mod(pictures.size)
     }
 
     fun previousImage() {
         currentPictureIndex =
-            (currentPictureIndex - 1).mod(pictures.lastIndex)
+            (currentPictureIndex - 1).mod(pictures.size)
     }
 
     fun selectPicture(galleryId: PictureData) {
