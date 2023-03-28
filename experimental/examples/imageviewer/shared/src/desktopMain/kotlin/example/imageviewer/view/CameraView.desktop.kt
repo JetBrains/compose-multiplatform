@@ -19,6 +19,7 @@ import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
+import example.imageviewer.model.createCameraPictureData
 import example.imageviewer.resourcePictures
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -57,8 +58,7 @@ internal actual fun CameraView(
         )
         Button(onClick = {
             onCapture(
-                PictureData.Camera(
-                    id = UUID.randomUUID().toString(),
+                createCameraPictureData(
                     name = randomPicture.name,
                     description = randomPicture.description,
                     gps = randomPicture.gps

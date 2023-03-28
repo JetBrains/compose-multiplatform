@@ -162,7 +162,7 @@ internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
         modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
     ) {
         Text(
-            text = picture.dateString(),
+            text = picture.dateString,
             textAlign = TextAlign.Left,
             color = Color.White,
             fontSize = 20.sp,

@@ -48,7 +48,12 @@ class IosImageStorage(
                     .filter { it.endsWith(".json") }
                     .map {
                         val jsonStr = readStringFromFile(it)
-                        Json.Default.decodeFromString<PictureData.Camera>(jsonStr)
+                        println("jsonStr: $jsonStr")
+                        val obj = Json.Default.decodeFromString<PictureData.Camera>(jsonStr)
+                        println(obj)
+                        obj
+                    }.sortedByDescending {
+                        it.timeStampSeconds
                     }
             )
         } else {

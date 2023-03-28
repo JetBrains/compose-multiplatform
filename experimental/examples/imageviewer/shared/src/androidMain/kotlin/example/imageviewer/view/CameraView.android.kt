@@ -30,6 +30,7 @@ import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
+import example.imageviewer.model.createCameraPictureData
 import example.imageviewer.toImageBitmap
 import java.nio.ByteBuffer
 import java.util.*
@@ -105,8 +106,7 @@ private fun CameraWithGrantedPermission(
                     image.close()
                     fun sendToStorage(gpsPosition: GpsPosition) {
                         onCapture(
-                            PictureData.Camera(
-                                id = UUID.randomUUID().toString(),
+                            createCameraPictureData(
                                 name = "Kotlin Conf",
                                 description = "Kotlin Conf photo description",
                                 gps = gpsPosition

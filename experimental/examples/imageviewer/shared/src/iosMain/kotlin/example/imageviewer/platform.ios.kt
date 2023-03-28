@@ -10,6 +10,9 @@ import platform.Foundation.NSData
 import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
 import platform.UIKit.safeAreaInsets
+import platform.CoreFoundation.CFUUIDCreate
+import platform.CoreFoundation.CFUUIDCreateString
+import platform.Foundation.CFBridgingRelease
 
 private val iosNotchInset = object : WindowInsets {
     override fun getTop(density: Density): Int {
@@ -35,3 +38,6 @@ class IosStorableImage(
 )
 
 actual typealias PlatformStorableImage = IosStorableImage
+
+actual fun createUUID(): String =
+    CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String

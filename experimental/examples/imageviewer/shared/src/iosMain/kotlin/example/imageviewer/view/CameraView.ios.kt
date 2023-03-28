@@ -16,14 +16,14 @@ import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
+import example.imageviewer.model.createCameraPictureData
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
+import kotlinx.datetime.Clock
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
-import platform.CoreFoundation.CFUUIDCreate
-import platform.CoreFoundation.CFUUIDCreateString
 import platform.CoreGraphics.CGRect
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
@@ -128,16 +128,12 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                     } else {
                         GpsPosition(0.0, 0.0)
                     }
-                    val randomUUID =
-                        CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
                     val uiImage = UIImage(photoData)
                     onCapture(
-                        PictureData.Camera(
-                            id = randomUUID,
+                        createCameraPictureData(
                             name = "Kotlin Conf",
                             description = "Kotlin Conf photo description",
-                            gps = geoPos
-                        ),
+                            gps = geoPos),
                         IosStorableImage(uiImage)
                     )
                 }
