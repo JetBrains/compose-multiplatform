@@ -25,8 +25,8 @@ import platform.Foundation.*
 import platform.UIKit.*
 import platform.posix.memcpy
 
-private const val maxStorableImageSize = 1200
-private const val storableThumbnailSize = 180
+private const val maxStorableImageSize = 30
+private const val storableThumbnailSize = 30
 
 class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
