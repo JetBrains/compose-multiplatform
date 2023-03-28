@@ -102,12 +102,6 @@ internal actual fun CameraView(
 private fun BoxScope.AuthorizedCamera(
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
-    val capturePhotoOutput = remember { AVCapturePhotoOutput() }
-    var actualOrientation by remember {
-        mutableStateOf(
-            AVCaptureVideoOrientationPortrait
-        )
-    }
     val camera: AVCaptureDevice? = remember {
         discoverySessionWithDeviceTypes(
             deviceTypes = deviceTypes,
@@ -116,158 +110,167 @@ private fun BoxScope.AuthorizedCamera(
         ).devices.firstOrNull() as? AVCaptureDevice
     }
     if (camera != null) {
-        val locationManager = remember {
-            CLLocationManager().apply {
-                desiredAccuracy = kCLLocationAccuracyBest
-                requestWhenInUseAuthorization()
-            }
-        }
-
-        var capturePhotoStarted by remember { mutableStateOf(false) }
-        val photoCaptureDelegate = remember {
-            object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
-                override fun captureOutput(
-                    output: AVCapturePhotoOutput,
-                    didFinishProcessingPhoto: AVCapturePhoto,
-                    error: NSError?
-                ) {
-                    val photoData = didFinishProcessingPhoto.fileDataRepresentation()
-                    if (photoData != null) {
-                        val gps = locationManager.location?.toGps() ?: GpsPosition(0.0, 0.0)
-                        val uiImage = UIImage(photoData)
-                        onCapture(
-                            createCameraPictureData(
-                                name = "Kotlin Conf",
-                                description = "Kotlin Conf photo description",
-                                gps = gps
-                            ),
-                            IosStorableImage(uiImage)
-                        )
-                    }
-                    capturePhotoStarted = false
-                }
-            }
-        }
-
-        val captureSession: AVCaptureSession = remember {
-            AVCaptureSession().also { captureSession ->
-                captureSession.sessionPreset = AVCaptureSessionPresetPhoto
-                val captureDeviceInput: AVCaptureDeviceInput =
-                    deviceInputWithDevice(device = camera, error = null)!!
-                captureSession.addInput(captureDeviceInput)
-                captureSession.addOutput(capturePhotoOutput)
-            }
-        }
-        val cameraPreviewLayer = remember {
-            AVCaptureVideoPreviewLayer(session = captureSession)
-        }
-
-        DisposableEffect(Unit) {
-            class OrientationListener : NSObject() {
-                @Suppress("UNUSED_PARAMETER")
-                @ObjCAction
-                fun orientationDidChange(arg: NSNotification) {
-                    val cameraConnection = cameraPreviewLayer.connection
-                    if (cameraConnection != null) {
-                        actualOrientation = when (UIDevice.currentDevice.orientation) {
-                            UIDeviceOrientation.UIDeviceOrientationPortrait ->
-                                AVCaptureVideoOrientationPortrait
-
-                            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft ->
-                                AVCaptureVideoOrientationLandscapeRight
-
-                            UIDeviceOrientation.UIDeviceOrientationLandscapeRight ->
-                                AVCaptureVideoOrientationLandscapeLeft
-
-                            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown ->
-                                AVCaptureVideoOrientationPortrait
-
-                            else -> cameraConnection.videoOrientation
-                        }
-                        cameraConnection.videoOrientation = actualOrientation
-                    }
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                        ?.videoOrientation = actualOrientation
-                }
-            }
-
-            val listener = OrientationListener()
-            val notificationName = platform.UIKit.UIDeviceOrientationDidChangeNotification
-            NSNotificationCenter.defaultCenter.addObserver(
-                observer = listener,
-                selector = NSSelectorFromString(
-                    OrientationListener::orientationDidChange.name + ":"
-                ),
-                name = notificationName,
-                `object` = null
-            )
-            onDispose {
-                NSNotificationCenter.defaultCenter.removeObserver(
-                    observer = listener,
-                    name = notificationName,
-                    `object` = null
-                )
-            }
-        }
-        UIKitInteropView(
-            modifier = Modifier.fillMaxSize(),
-            background = Color.Black,
-            resize = { view: UIView, rect: CValue<CGRect> ->
-                CATransaction.begin()
-                CATransaction.setValue(true, kCATransactionDisableActions)
-                view.layer.setFrame(rect)
-                cameraPreviewLayer.setFrame(rect)
-                CATransaction.commit()
-            },
-        ) {
-            val cameraContainer = UIView()
-            cameraContainer.layer.addSublayer(cameraPreviewLayer)
-            cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-            captureSession.startRunning()
-            cameraContainer
-        }
-        Button(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
-            enabled = !capturePhotoStarted,
-            onClick = {
-                capturePhotoStarted = true
-                val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
-                    format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
-                )
-                if (camera.position == AVCaptureDevicePositionFront) {
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                        ?.automaticallyAdjustsVideoMirroring = false
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                        ?.videoMirrored = true
-                }
-                capturePhotoOutput.capturePhotoWithSettings(
-                    settings = photoSettings,
-                    delegate = photoCaptureDelegate
-                )
-            }
-        ) {
-            Text(LocalLocalization.current.takePhoto)
-        }
-        if (capturePhotoStarted) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(80.dp).align(Alignment.Center),
-                color = Color.White.copy(alpha = 0.7f),
-                strokeWidth = 8.dp,
-            )
-        }
+        RealDeviceCamera(camera, onCapture)
     } else {
-        SimulatorStub()
+        Text(
+            """
+            Camera is not available on simulator.
+            Please try to run on a real iOS device.
+        """.trimIndent(), color = Color.White
+        )
     }
 }
 
 @Composable
-private fun SimulatorStub() {
-    Text(
-        """
-            Camera is not available on simulator.
-            Please try to run on a real iOS device.
-        """.trimIndent(), color = Color.White
-    )
+private fun BoxScope.RealDeviceCamera(
+    camera: AVCaptureDevice,
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
+    val capturePhotoOutput = remember { AVCapturePhotoOutput() }
+    var actualOrientation by remember {
+        mutableStateOf(
+            AVCaptureVideoOrientationPortrait
+        )
+    }
+    val locationManager = remember {
+        CLLocationManager().apply {
+            desiredAccuracy = kCLLocationAccuracyBest
+            requestWhenInUseAuthorization()
+        }
+    }
+
+    var capturePhotoStarted by remember { mutableStateOf(false) }
+    val photoCaptureDelegate = remember {
+        object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+            override fun captureOutput(
+                output: AVCapturePhotoOutput,
+                didFinishProcessingPhoto: AVCapturePhoto,
+                error: NSError?
+            ) {
+                val photoData = didFinishProcessingPhoto.fileDataRepresentation()
+                if (photoData != null) {
+                    val gps = locationManager.location?.toGps() ?: GpsPosition(0.0, 0.0)
+                    val uiImage = UIImage(photoData)
+                    onCapture(
+                        createCameraPictureData(
+                            name = "Kotlin Conf",
+                            description = "Kotlin Conf photo description",
+                            gps = gps
+                        ),
+                        IosStorableImage(uiImage)
+                    )
+                }
+                capturePhotoStarted = false
+            }
+        }
+    }
+
+    val captureSession: AVCaptureSession = remember {
+        AVCaptureSession().also { captureSession ->
+            captureSession.sessionPreset = AVCaptureSessionPresetPhoto
+            val captureDeviceInput: AVCaptureDeviceInput =
+                deviceInputWithDevice(device = camera, error = null)!!
+            captureSession.addInput(captureDeviceInput)
+            captureSession.addOutput(capturePhotoOutput)
+        }
+    }
+    val cameraPreviewLayer = remember {
+        AVCaptureVideoPreviewLayer(session = captureSession)
+    }
+
+    DisposableEffect(Unit) {
+        class OrientationListener : NSObject() {
+            @Suppress("UNUSED_PARAMETER")
+            @ObjCAction
+            fun orientationDidChange(arg: NSNotification) {
+                val cameraConnection = cameraPreviewLayer.connection
+                if (cameraConnection != null) {
+                    actualOrientation = when (UIDevice.currentDevice.orientation) {
+                        UIDeviceOrientation.UIDeviceOrientationPortrait ->
+                            AVCaptureVideoOrientationPortrait
+
+                        UIDeviceOrientation.UIDeviceOrientationLandscapeLeft ->
+                            AVCaptureVideoOrientationLandscapeRight
+
+                        UIDeviceOrientation.UIDeviceOrientationLandscapeRight ->
+                            AVCaptureVideoOrientationLandscapeLeft
+
+                        UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown ->
+                            AVCaptureVideoOrientationPortrait
+
+                        else -> cameraConnection.videoOrientation
+                    }
+                    cameraConnection.videoOrientation = actualOrientation
+                }
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.videoOrientation = actualOrientation
+            }
+        }
+
+        val listener = OrientationListener()
+        val notificationName = platform.UIKit.UIDeviceOrientationDidChangeNotification
+        NSNotificationCenter.defaultCenter.addObserver(
+            observer = listener,
+            selector = NSSelectorFromString(
+                OrientationListener::orientationDidChange.name + ":"
+            ),
+            name = notificationName,
+            `object` = null
+        )
+        onDispose {
+            NSNotificationCenter.defaultCenter.removeObserver(
+                observer = listener,
+                name = notificationName,
+                `object` = null
+            )
+        }
+    }
+    UIKitInteropView(
+        modifier = Modifier.fillMaxSize(),
+        background = Color.Black,
+        resize = { view: UIView, rect: CValue<CGRect> ->
+            CATransaction.begin()
+            CATransaction.setValue(true, kCATransactionDisableActions)
+            view.layer.setFrame(rect)
+            cameraPreviewLayer.setFrame(rect)
+            CATransaction.commit()
+        },
+    ) {
+        val cameraContainer = UIView()
+        cameraContainer.layer.addSublayer(cameraPreviewLayer)
+        cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        captureSession.startRunning()
+        cameraContainer
+    }
+    Button(
+        modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
+        enabled = !capturePhotoStarted,
+        onClick = {
+            capturePhotoStarted = true
+            val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
+                format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
+            )
+            if (camera.position == AVCaptureDevicePositionFront) {
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.automaticallyAdjustsVideoMirroring = false
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.videoMirrored = true
+            }
+            capturePhotoOutput.capturePhotoWithSettings(
+                settings = photoSettings,
+                delegate = photoCaptureDelegate
+            )
+        }
+    ) {
+        Text(LocalLocalization.current.takePhoto)
+    }
+    if (capturePhotoStarted) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(80.dp).align(Alignment.Center),
+            color = Color.White.copy(alpha = 0.7f),
+            strokeWidth = 8.dp,
+        )
+    }
 }
 
 fun CLLocation.toGps() =
