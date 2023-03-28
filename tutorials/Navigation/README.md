@@ -177,6 +177,16 @@ The following resources can help with this pattern:
 
 ### A very basic example:
 
+`Child` marker interface to mark all classes representing a navigation child (used to avoid polluting `Any` with extension functions later on):
+
+```kotlin
+interface Child
+
+typealias Content = @Composable () -> Unit
+
+fun <T : Child> T.asContent(content: @Composable (T) -> Unit): Content = { content(this) }
+```
+
 `ItemList` child with UI:
 
 ``` kotlin
@@ -187,7 +197,7 @@ import androidx.compose.runtime.mutableStateOf
 class ItemList(
     database: Database, // Accept the Database as dependency
     val onItemSelected: (itemId: Long) -> Unit // Called on item click
-) {
+) : Child {
     // No concurrency involved just for simplicity. The state can be updated if needed.
     private val _state = mutableStateOf(database.getAll())
     val state: State<List<Item>> = _state
@@ -213,7 +223,7 @@ class ItemDetails(
     itemId: Long, // An item id to be loaded and displayed
     database: Database, // Accept the Database as dependency
     val onFinished: () -> Unit // Called on TopAppBar back button click
-) {
+) : Child {
     // No concurrency involved just for simplicity. The state can be updated if needed.
     private val _state = mutableStateOf(database.getById(id = itemId))
     val state: State<Item> = _state
@@ -236,10 +246,6 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
 import com.arkivanov.decompose.router.stack.*
 import com.arkivanov.decompose.value.Value
-
-typealias Content = @Composable () -> Unit
-
-fun <T : Any> T.asContent(content: @Composable (T) -> Unit): Content = { content(this) }
 
 class Root(
     componentContext: ComponentContext, // In Decompose each component has its own ComponentContext
