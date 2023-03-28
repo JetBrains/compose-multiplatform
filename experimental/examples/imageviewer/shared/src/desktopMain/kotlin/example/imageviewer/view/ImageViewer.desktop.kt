@@ -86,30 +86,12 @@ fun ApplicationScope.ImageViewerDesktop() {
 
 private fun getDependencies(toastState: MutableState<ToastState>, ioScope: CoroutineScope) =
     object : Dependencies() {
-        override val localization: Localization = object : Localization {
-            override val back: String get() = ResString.back
-            override val appName: String get() = ResString.appName
-            override val loading: String get() = ResString.loading
-            override val repoInvalid: String get() = ResString.repoInvalid
-            override val repoEmpty: String get() = ResString.repoEmpty
-            override val noInternet: String get() = ResString.noInternet
-            override val loadImageUnavailable: String get() = ResString.loadImageUnavailable
-            override val lastImage: String get() = ResString.lastImage
-            override val firstImage: String get() = ResString.firstImage
-            override val picture: String get() = ResString.picture
-            override val size: String get() = ResString.size
-            override val pixels: String get() = ResString.pixels
-            override val refreshUnavailable: String get() = ResString.refreshUnavailable
-        }
-
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
         }
-
         override val imageStorage: ImageStorage = DesktopImageStorage(pictures, ioScope)
-
     }
 
 private fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): DpSize {

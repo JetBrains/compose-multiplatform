@@ -26,6 +26,7 @@ import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
 import example.imageviewer.AndroidStorableImage
+import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
@@ -128,7 +129,7 @@ private fun CameraWithGrantedPermission(
                 }
             })
         }) {
-            Text("Compose Button - take a photo 📸", color = Color.White)
+            Text(LocalLocalization.current.takePhoto, color = Color.White)
         }
     }
 }

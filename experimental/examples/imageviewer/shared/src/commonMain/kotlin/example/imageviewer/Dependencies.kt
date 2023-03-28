@@ -12,10 +12,13 @@ import org.jetbrains.compose.resources.resource
 
 @OptIn(ExperimentalResourceApi::class)
 abstract class Dependencies {
-    abstract val localization: Localization
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
+    val localization: Localization = when (getCurrentLanguage()) {
+        AvailableLanguages.EN -> EnglishLocalization
+        AvailableLanguages.DE -> DeutschhLocalization
+    }
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
             is PictureData.Resource -> {
@@ -92,6 +95,8 @@ interface Localization {
     val size: String
     val pixels: String
     val refreshUnavailable: String
+    val takePhoto: String
+    val addPhoto: String
 }
 
 interface ImageProvider {

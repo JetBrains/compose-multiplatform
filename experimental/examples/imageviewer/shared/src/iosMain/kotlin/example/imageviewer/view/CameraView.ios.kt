@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
 import example.imageviewer.IosStorableImage
+import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
@@ -214,7 +215,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                 )
             }
         ) {
-            Text("Take a photo 📸")
+            Text(LocalLocalization.current.takePhoto)
         }
         if (capturePhotoStarted) {
             CircularProgressIndicator(
