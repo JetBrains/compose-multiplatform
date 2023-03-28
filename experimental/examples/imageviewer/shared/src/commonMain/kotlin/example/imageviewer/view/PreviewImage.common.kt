@@ -33,7 +33,7 @@ import example.imageviewer.model.PictureData
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    picture: PictureData?,
+    picture: PictureData,
     onClick: () -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
@@ -59,11 +59,9 @@ internal fun PreviewImage(
                     )
                 }
             ) { currentPicture ->
-                var image:ImageBitmap? by remember(currentPicture) { mutableStateOf(null) }
+                var image: ImageBitmap? by remember(currentPicture) { mutableStateOf(null) }
                 LaunchedEffect(currentPicture) {
-                    if (currentPicture != null) {
-                        image = imageProvider.getImage(currentPicture)
-                    }
+                    image = imageProvider.getImage(currentPicture)
                 }
                 if (image != null) {
                     Box(Modifier.fillMaxSize()) {
@@ -74,9 +72,7 @@ internal fun PreviewImage(
                                 .fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
-                        if (picture != null) {
-                            MemoryTextOverlay(picture)
-                        }
+                        MemoryTextOverlay(currentPicture)
                     }
                 } else {
                     Spacer(

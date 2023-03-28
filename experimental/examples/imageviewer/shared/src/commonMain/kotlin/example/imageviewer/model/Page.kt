@@ -28,10 +28,11 @@ class GalleryPage(
 
     var currentPictureIndex by mutableStateOf(0)
 
-    val picture get(): PictureData? = pictures.getOrNull(currentPictureIndex)
+    val picture get(): PictureData = pictures[currentPictureIndex]
 
-    val galleryEntry: PictureData?
-        get() = pictures.getOrNull(currentPictureIndex)
+    @Deprecated("")
+    val galleryEntry: PictureData
+        get() = pictures[currentPictureIndex]
 
     @Deprecated("")
     val pictureId

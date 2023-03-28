@@ -34,3 +34,5 @@ sealed interface PictureData {
     }
 
 }
+
+fun PictureData.dateString() = "20. Mar"
