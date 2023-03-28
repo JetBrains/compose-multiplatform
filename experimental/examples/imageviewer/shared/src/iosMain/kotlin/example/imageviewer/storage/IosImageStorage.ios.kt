@@ -82,10 +82,10 @@ class IosImageStorage(
 
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
-            UIImageJPEGRepresentation(image.rawValue.resizeToThumbnail(), 0.7)
+            UIImageJPEGRepresentation(image.rawValue.resizeToThumbnail(), 0.6)
                 ?.writeToFile(picture.thumbnailPngFile)
             pictures.add(0, picture)
-            UIImageJPEGRepresentation(image.rawValue.resizeToBig(), 0.7)
+            UIImageJPEGRepresentation(image.rawValue.resizeToBig(), 0.6)
                 ?.writeToFile(picture.pngFile)
             Json.Default.encodeToString(picture).writeToFile(picture.jsonFile)
         }
