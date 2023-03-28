@@ -24,28 +24,28 @@ enum class ExternalImageViewerEvent {
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun ImageViewerCommon(
-    dependencies: Dependencies,
-    externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
+    dependencies: Dependencies
 ) {
     CompositionLocalProvider(
         LocalLocalization provides dependencies.localization,
         LocalNotification provides dependencies.notification,
         LocalImageProvider provides dependencies.imageProvider,
         LocalImageStorage provides dependencies.imageStorage,
+        LocalInternalEvents provides dependencies.externalEvents
     ) {
-        ImageViewerWithProvidedDependencies(dependencies.pictures, externalEvents)
+        ImageViewerWithProvidedDependencies(dependencies.pictures)
     }
 }
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun ImageViewerWithProvidedDependencies(
-    pictures: SnapshotStateList<PictureData>,
-    externalEvents: Flow<ExternalImageViewerEvent>
+    pictures: SnapshotStateList<PictureData>
 ) {
-    val rootGalleryPage = GalleryPage(pictures, externalEvents)
+    val rootGalleryPage = GalleryPage(pictures)
     val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
 
+    val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
         externalEvents.collect {
             if (it == ExternalImageViewerEvent.Escape) {

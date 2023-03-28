@@ -22,6 +22,7 @@ import example.imageviewer.utils.ioDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import java.awt.Dimension
 import java.awt.Toolkit
@@ -43,8 +44,10 @@ class ExternalNavigationEventBus {
 fun ApplicationScope.ImageViewerDesktop() {
     val ioScope = rememberCoroutineScope { ioDispatcher }
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val dependencies = remember { getDependencies(toastState, ioScope) }
     val externalNavigationEventBus = remember { ExternalNavigationEventBus() }
+    val dependencies = remember {
+        getDependencies(toastState, ioScope, externalNavigationEventBus.events)
+    }
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -79,8 +82,7 @@ fun ApplicationScope.ImageViewerDesktop() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 ImageViewerCommon(
-                    dependencies = dependencies,
-                    externalEvents = externalNavigationEventBus.events
+                    dependencies = dependencies
                 )
                 Toast(toastState)
             }
@@ -88,7 +90,11 @@ fun ApplicationScope.ImageViewerDesktop() {
     }
 }
 
-private fun getDependencies(toastState: MutableState<ToastState>, ioScope: CoroutineScope) =
+private fun getDependencies(
+    toastState: MutableState<ToastState>,
+    ioScope: CoroutineScope,
+    events: SharedFlow<ExternalImageViewerEvent>
+) =
     object : Dependencies() {
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
@@ -96,6 +102,7 @@ private fun getDependencies(toastState: MutableState<ToastState>, ioScope: Corou
             }
         }
         override val imageStorage: ImageStorage = DesktopImageStorage(pictures, ioScope)
+        override val externalEvents = events
     }
 
 private fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): DpSize {

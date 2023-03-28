@@ -4,9 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import example.imageviewer.ExternalImageViewerEvent
 import example.imageviewer.view.GalleryStyle
-import kotlinx.coroutines.flow.Flow
 
 sealed class Page
 
@@ -19,8 +17,7 @@ class CameraPage : Page()
 class FullScreenPage(val picture: PictureData) : Page()
 
 class GalleryPage(
-    val pictures: SnapshotStateList<PictureData>,
-    val externalEvents: Flow<ExternalImageViewerEvent>
+    val pictures: SnapshotStateList<PictureData>
 ) : Page() {
     var galleryStyle by mutableStateOf(GalleryStyle.SQUARES)
 

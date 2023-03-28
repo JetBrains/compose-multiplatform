@@ -7,6 +7,8 @@ import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 
@@ -15,6 +17,7 @@ abstract class Dependencies {
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
+    open val externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
     val localization: Localization = when (getCurrentLanguage()) {
         AvailableLanguages.EN -> EnglishLocalization
         AvailableLanguages.DE -> DeutschhLocalization
@@ -124,6 +127,10 @@ internal val LocalImageProvider = staticCompositionLocalOf<ImageProvider> {
 
 internal val LocalImageStorage = staticCompositionLocalOf<ImageStorage> {
     noLocalProvidedFor("LocalImageStorage")
+}
+
+internal val LocalInternalEvents = staticCompositionLocalOf<Flow<ExternalImageViewerEvent>> {
+    noLocalProvidedFor("LocalInternalEvents")
 }
 
 private fun noLocalProvidedFor(name: String): Nothing {

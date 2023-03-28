@@ -38,8 +38,9 @@ internal fun GalleryScreen(
     onMakeNewMemory: () -> Unit
 ) {
     val imageProvider = LocalImageProvider.current
+    val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
-        galleryPage.externalEvents.collect {
+        externalEvents.collect {
             when (it) {
                 ExternalImageViewerEvent.Foward -> galleryPage.nextImage()
                 ExternalImageViewerEvent.Back -> galleryPage.previousImage()
