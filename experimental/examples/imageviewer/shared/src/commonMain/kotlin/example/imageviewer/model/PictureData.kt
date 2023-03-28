@@ -29,7 +29,7 @@ sealed interface PictureData {
     ) : PictureData
 
     @Serializable
-    data class Camera(
+    class Camera(
         val id: String,
         val timeStampSeconds: Long,
         override val name: String,
