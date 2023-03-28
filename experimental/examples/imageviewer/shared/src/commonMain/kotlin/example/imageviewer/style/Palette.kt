@@ -31,9 +31,18 @@ object ImageviewerColors {
     val textOnImage = Color.White
     val noteBlockBackground = Color(0xFFF3F3F4)
 
+
     val KotlinGradient0 = Color(0xFF7F52FF)
     val KotlinGradient50 = Color(0xFFC811E2)
     val KotlinGradient100 = Color(0xFFE54857)
+
+    val kotlinHorizontalGradientBrush = Brush.horizontalGradient(
+        colors = listOf(
+            KotlinGradient0,
+            KotlinGradient50,
+            KotlinGradient100
+        )
+    )
 
     fun buttonBackground(isHover: Boolean) = if (isHover) TranslucentBlack else Transparent
 }
