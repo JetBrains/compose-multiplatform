@@ -18,7 +18,7 @@ This tutorial uses a very simple example of a List-Details application with just
 
 ### Setup
 
-First let's add the Decompose library to the project. Please refer to the [Getting started](https://arkivanov.github.io/Decompose/getting-started/) section of the documentation.
+First let's add the Decompose library to the project. Please refer to the [Getting started](https://arkivanov.github.io/Decompose/) section of the documentation.
 
 ### Item model and Database
 
@@ -132,8 +132,8 @@ To make this possible, all child Configurations must be [Parcelable](https://dev
 If you need Android support, please make sure you have `kotlin-parcelize` plugin enabled. All Configurations should look like this:
 
 ``` kotlin
-import com.arkivanov.decompose.statekeeper.Parcelable
-import com.arkivanov.decompose.statekeeper.Parcelize
+import com.arkivanov.essenty.parcelable.Parcelable
+import com.arkivanov.essenty.parcelable.Parcelize
 
 sealed class Configuration : Parcelable {
     @Parcelize
@@ -148,12 +148,12 @@ sealed class Configuration : Parcelable {
 
 This pattern should be chosen if any of the following apply:
 
-1. You support Multipaltform targets with different UI frameworks, and you want to share the navigation logic between them. For example if you support Desktop with Compose UI, iOS with SwiftUI and/or JavaScript with React UI.
+1. You support Multiplatform targets with different UI frameworks, and you want to share the navigation logic between them. For example if you support Desktop with Compose UI, iOS with SwiftUI and/or JavaScript with React UI.
 2. You want to keep children running while in the back stack (stopped, but not destroyed).
 3. You are targeting Android and need instance retaining functionality in children (aka AndroidX [ViewModels](https://developer.android.com/topic/libraries/architecture/viewmodel)) and you want to hide this logic as implementation details.
 4. You want to keep the navigation logic (and probably the business logic) separate from UI.
 
-The first point is quite obvious. If Compose is not the only UI you are using and you want to share the navigation logic, then it can not be managed by Compose.
+The first point is quite obvious. If Compose is not the only UI you are using, and you want to share the navigation logic, then it can not be managed by Compose.
 
 The second point may be especially useful in Desktop. When a child is pushed to the back stack, it is stopped but not destroyed. So it keeps running in "background" without UI. This makes it possible to keep children's state in memory while navigating.
 
@@ -168,7 +168,7 @@ You can find some integration tests in the TodoApp example:
 
 This pattern is encouraged by the Decompose library. If this is your choice, then you can just use its recommended approach. 
 
-The main idea is to split (decompose) your project by multiple components. Components can be organized in a tree structure, and each level can (but not must) have multiple [Routers](https://arkivanov.github.io/Decompose/router/overview/). Each component is just a normal interface/class, an entry point to the underlying logic.
+The main idea is to split (decompose) your project by multiple components. Components can be organized in a tree structure, and each level can (but not must) have multiple [ChildStack](https://arkivanov.github.io/Decompose/navigation/stack/overview/). Each component is just a normal interface/class, an entry point to the underlying logic.
 
 The only responsibility of the user interface is to listen for components' state changes and trigger their events.
 
@@ -235,10 +235,9 @@ Root with navigation (assuming only Compose UI is used):
 ``` kotlin
 import androidx.compose.runtime.Composable
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.pop
-import com.arkivanov.decompose.push
-import com.arkivanov.decompose.router
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.router.stack.*
+import com.arkivanov.decompose.value.Value
 
 typealias Content = @Composable () -> Unit
 
@@ -249,15 +248,17 @@ class Root(
     private val database: Database // Accept the Database as dependency
 ) : ComponentContext by componentContext {
 
-    private val router =
-        router<Configuration, Content>(
-            initialConfiguration = Configuration.List, // Starting with List
-            childFactory = ::createChild // The Router calls this function, providing the child Configuration and ComponentContext 
-        )
+    private val navigation = StackNavigation<Configuration>()
+    private val stack = childStack(
+        source = navigation,
+        initialConfiguration = Configuration.List,
+        handleBackButton = true,
+        childFactory = ::createChild,
+    )
 
-    val routerState = router.state
+    val childStack: Value<ChildStack<*, Child>> = stack
 
-    private fun createChild(configuration: Configuration, context: ComponentContext): Content =
+    private fun createChild(configuration: Configuration, context: ComponentContext): Child =
         when (configuration) {
             is Configuration.List -> list()
             is Configuration.Details -> details(configuration)
@@ -266,20 +267,20 @@ class Root(
     private fun list(): Content =
         ItemList(
             database = database, // Supply dependencies
-            onItemSelected = { router.push(Configuration.Details(itemId = it)) } // Push Details on item click
+            onItemSelected = { navigation.push(Configuration.Details(itemId = it)) }, // Push Details on item click
         ).asContent { ItemListUi(it) }
 
     private fun details(configuration: Configuration.Details): Content =
         ItemDetails(
             itemId = configuration.itemId, // Safely pass arguments
             database = database, // Supply dependencies
-            onFinished = router::pop // Go back to List
+            onFinished = navigation::pop // Go back to List
         ).asContent { ItemDetailsUi(it) }
 }
 
 @Composable
 fun RootUi(root: Root) {
-    Children(root.routerState) { child ->
+    Children(stack = root.childStack) { child ->
         child.instance()
     }
 }
@@ -288,36 +289,53 @@ fun RootUi(root: Root) {
 Application and Root initialization:
 
 ``` kotlin
-import androidx.compose.desktop.DesktopTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.window.singleWindowApplication
-import com.arkivanov.decompose.extensions.compose.jetbrains.rememberRootComponent
+import androidx.compose.ui.window.Window
+import androidx.compose.ui.window.application
+import androidx.compose.ui.window.rememberWindowState
+import com.arkivanov.decompose.DefaultComponentContext
+import com.arkivanov.decompose.ExperimentalDecomposeApi
+import com.arkivanov.decompose.extensions.compose.jetbrains.lifecycle.LifecycleController
+import com.arkivanov.essenty.lifecycle.LifecycleRegistry
 
-fun main() = singleWindowApplication(
-    title = "Navigation tutorial"
-) {
-    Surface(modifier = Modifier.fillMaxSize()) {
-        MaterialTheme {
-            DesktopTheme {
-                RootUi(root()) // Render the Root and its children
+@OptIn(ExperimentalDecomposeApi::class)
+fun main() {
+
+    // Create a lifecycle
+    val lifecycle = LifecycleRegistry()
+
+    // Create an instance of the root component with a default component context
+    val root = Root(
+        componentContext = DefaultComponentContext(lifecycle = lifecycle),
+        database = DatabaseImpl() // Supply dependencies
+    )
+
+    // Alternative: manually start the lifecycle (no reaction to window state)
+    // lifecycle.resume()
+
+    application {
+        val windowState = rememberWindowState()
+
+        // Bind the registry to the life cycle of the window
+        LifecycleController(lifecycle, windowState)
+
+        Window(
+            onCloseRequest = ::exitApplication,
+            state = windowState,
+            title = "Navigation tutorial"
+        ) {
+
+            MaterialTheme {
+                Surface(modifier = Modifier.fillMaxSize()) {
+                    RootUi(root) // Render the Root and its children
+                }
             }
         }
     }
 }
-
-@Composable
-private fun root(): Root =
-    // The rememberRootComponent function provides the root ComponentContext and remembers the instance or Root
-    rememberRootComponent { componentContext ->
-        Root(
-            componentContext = componentContext,
-            database = DatabaseImpl() // Supply dependencies
-        )
-    }
 ```
 
 ## Managing navigation inside @Composable world
@@ -328,35 +346,89 @@ This pattern should be chosen if you prefer to use Compose for more than just UI
 
 Decompose does not provide any out-of-the-box `@Composable` navigation API. But it is pretty easy to write your own with it. You can experiment and come up with your own API.
 
-Please refer to the following article for implementation details: "[A comprehensive hundred-line navigation for Jetpack/Desktop Compose](https://proandroiddev.com/a-comprehensive-hundred-line-navigation-for-jetpack-desktop-compose-5b723c4f256e)". It also explains some additional features, like back button handling, transition animations, etc.
+Please refer to the following article for implementation details: "[A comprehensive thirty-line navigation for Jetpack/Multiplatform Compose](https://proandroiddev.com/a-comprehensive-hundred-line-navigation-for-jetpack-desktop-compose-5b723c4f256e)". It also explains some additional features, like back button handling, transition animations, etc.
 
-### A very basic example:
+### A very basic example using `ChildStack`
+
+Basic child screen representation in form of sealed class used for navigation (`@Parcelize` required for state preservation on Android):
 
 ``` kotlin
-import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.Router
-import com.arkivanov.decompose.statekeeper.Parcelable
+sealed class Screen : Parcelable {
+    @Parcelize
+    object List : Screen()
 
-@Composable
-inline fun <reified C : Parcelable> rememberRouter(
-    noinline initialConfiguration: () -> C
-): Router<C, Any> =
-    TODO("See the article mentioned above for the implementation")
+    @Parcelize
+    data class Details(val itemId: Long) : Screen()
+}
 ```
 
-First of all we need the `Router` from the Decompose library. Once we have it, all we need to do is to use the `Children` function. The `Children` function listens for the `Router` state changes, and renders the currently active child using the provided callback. The article mentioned above explains the implementation details.
+To start with the integration of the navigation we need the `ChildStack` from the Decompose library. The `ChildStack` needs a `ComponentContext` that exposes things like lifecycle management, state preservation, instance retaining and back button handling. Once we have a `ComponentContext` and a `ChildStack`, all we need to do is to use the `Children` function. The `Children` function listens for the `ChildStack` state changes, and renders the currently active child using the provided callback. The article mentioned above explains the implementation details.
 
-Using the `Router`:
+```kotlin
+val LocalComponentContext: ProvidableCompositionLocal<ComponentContext> =
+    staticCompositionLocalOf { error("Root component context was not provided") }
+
+@Composable
+fun ProvideComponentContext(componentContext: ComponentContext, content: @Composable () -> Unit) {
+    CompositionLocalProvider(LocalComponentContext provides componentContext, content = content)
+}
+```
+
+Getting the `ChildStack`:
+
+```kotlin
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.Children
+import com.arkivanov.decompose.extensions.compose.jetbrains.stack.animation.StackAnimation
+import com.arkivanov.decompose.router.stack.StackNavigationSource
+import com.arkivanov.decompose.router.stack.childStack
+import com.arkivanov.essenty.parcelable.Parcelable
+
+@Composable
+inline fun <reified C : Parcelable> ChildStack(
+    source: StackNavigationSource<C>,
+    noinline initialStack: () -> List<C>,
+    modifier: Modifier = Modifier,
+    handleBackButton: Boolean = false,
+    animation: StackAnimation<C, ComponentContext>? = null,
+    noinline content: @Composable (C) -> Unit,
+) {
+    val componentContext = LocalComponentContext.current
+
+    Children(
+        stack = remember {
+            componentContext.childStack(
+                source = source,
+                initialStack = initialStack,
+                handleBackButton = handleBackButton,
+                childFactory = { _, childComponentContext -> childComponentContext },
+            )
+        },
+        modifier = modifier,
+        animation = animation,
+    ) { child ->
+        ProvideComponentContext(child.instance) {
+            content(child.configuration)
+        }
+    }
+}
+```
+
+And using it:
 
 ``` kotlin
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import com.arkivanov.composenavigatorexample.navigator.rememberRouter
-import com.arkivanov.decompose.extensions.compose.jetbrains.Children
-import com.arkivanov.decompose.pop
-import com.arkivanov.decompose.push
-
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.window.singleWindowApplication
+import com.arkivanov.decompose.router.stack.StackNavigation
+import com.arkivanov.decompose.router.stack.pop
+import com.arkivanov.decompose.router.stack.push
 
 @Composable
 fun ItemList(
@@ -389,29 +461,36 @@ fun ItemDetails(
 
 @Composable
 fun Root(database: Database) {
-    // Create and remember the Router
-    val router =
-        rememberRouter<Configuration>(
-            initialConfiguration = { Configuration.List } // Start with the List screen
-        )
-
-    // Render children
-    Children(routerState = router.state) { screen ->
-        when (val configuration = screen.configuration) {
-            is Configuration.List ->
+    val navigation = remember { StackNavigation<Screen>() }
+    
+    ChildStack(
+        source = navigation,
+        initialStack = { listOf(Screen.List) },
+        handleBackButton = true,
+    ) { screen ->
+        when (screen) {
+            is Screen.List ->
                 ItemList(
                     database = database, // Supply dependencies
-                    onItemClick = { router.push(Configuration.Details(itemId = it)) } // Push Details on item click
+                    onItemClick = { navigation.push(Screen.Details(it)) } // Push Details on item click
                 )
-
-            is Configuration.Details ->
+            is Screen.Details ->
                 ItemDetails(
-                    itemId = configuration.itemId, // Safely pass arguments
+                    itemId = screen.itemId, // Safely pass arguments
                     database = database, // Supply dependencies
-                    onBackClick = router::pop // Go back to List
+                    onBackClick = navigation::pop // Go back to List
                 )
-        }.let {} // Ensure exhaustiveness
+        }
+    }
+}
+
+fun main() {
+    singleWindowApplication(title = "Navigation tutorial") {
+        MaterialTheme {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                Root(database = DatabaseImpl())
+            }
+        }
     }
 }
 ```
-
