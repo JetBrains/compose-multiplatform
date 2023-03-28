@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
@@ -19,6 +18,8 @@ import example.imageviewer.*
 import example.imageviewer.Notification
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageViewerTheme
+import example.imageviewer.utils.ioDispatcher
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -40,8 +41,9 @@ class ExternalNavigationEventBus {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
+    val ioScope = rememberCoroutineScope { ioDispatcher }
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val dependencies = remember { getDependencies(toastState) }
+    val dependencies = remember { getDependencies(toastState, ioScope) }
     val externalNavigationEventBus = remember { ExternalNavigationEventBus() }
 
     Window(
@@ -82,7 +84,7 @@ fun ApplicationScope.ImageViewerDesktop() {
     }
 }
 
-private fun getDependencies(toastState: MutableState<ToastState>) =
+private fun getDependencies(toastState: MutableState<ToastState>, ioScope: CoroutineScope) =
     object : Dependencies() {
         override val localization: Localization = object : Localization {
             override val back: String get() = ResString.back
@@ -106,20 +108,7 @@ private fun getDependencies(toastState: MutableState<ToastState>) =
             }
         }
 
-        override val imageStorage: ImageStorage = object : ImageStorage {
-
-            override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
-                TODO("Not yet implemented")
-            }
-
-            override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
-                TODO("Not yet implemented")
-            }
-        }
+        override val imageStorage: ImageStorage = DesktopImageStorage(pictures, ioScope)
 
     }
 

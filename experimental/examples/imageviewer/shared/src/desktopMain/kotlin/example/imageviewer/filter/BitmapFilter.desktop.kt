@@ -26,7 +26,7 @@ actual class PlatformContext
 @Composable
 internal actual fun getPlatformContext():PlatformContext = PlatformContext()
 
-private fun scaleBitmapAspectRatio(
+internal fun scaleBitmapAspectRatio(
     bitmap: BufferedImage,
     width: Int,
     height: Int
