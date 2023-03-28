@@ -19,26 +19,9 @@ class FullScreenPage(val picture: PictureData) : Page()
 class GalleryPage(
     val pictures: SnapshotStateList<PictureData>
 ) : Page() {
-    var galleryStyle by mutableStateOf(GalleryStyle.SQUARES)
 
-    fun toggleGalleryStyle() {
-        galleryStyle =
-            if (galleryStyle == GalleryStyle.SQUARES) GalleryStyle.LIST else GalleryStyle.SQUARES
-    }
-
-    var currentPictureIndex by mutableStateOf(0)
-
+    private var currentPictureIndex by mutableStateOf(0)
     val picture get(): PictureData = pictures[currentPictureIndex]
-
-    @Deprecated("")
-    val galleryEntry: PictureData
-        get() = pictures[currentPictureIndex]
-
-    @Deprecated("")
-    val pictureId
-        get(): PictureData? = pictures.getOrNull(
-            currentPictureIndex
-        )
 
     fun nextImage() {
         currentPictureIndex =
@@ -52,5 +35,9 @@ class GalleryPage(
 
     fun selectPicture(picture: PictureData) {
         currentPictureIndex = pictures.indexOfFirst { it == picture }
+    }
+
+    fun resetSelectedPicture() {
+        currentPictureIndex = 0
     }
 }

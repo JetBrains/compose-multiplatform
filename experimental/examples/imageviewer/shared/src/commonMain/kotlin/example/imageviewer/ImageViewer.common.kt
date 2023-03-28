@@ -108,7 +108,7 @@ internal fun ImageViewerWithProvidedDependencies(
                     CameraScreen(
                         onBack = { resetSelectedPhoto ->
                             if (resetSelectedPhoto) {
-                                rootGalleryPage.currentPictureIndex = 0
+                                rootGalleryPage.resetSelectedPicture()
                             }
                             navigationStack.back()
                         },

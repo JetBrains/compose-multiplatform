@@ -47,6 +47,7 @@ internal fun GalleryScreen(
     onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
+    var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
     val imageProvider = LocalImageProvider.current
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
@@ -70,16 +71,19 @@ internal fun GalleryScreen(
                 alignLeftContent = {},
                 alignRightContent = {
                     CircularButton(painterResource("list_view.png")) {
-                        galleryPage.toggleGalleryStyle()
+                        galleryStyle = when (galleryStyle) {
+                            GalleryStyle.SQUARES -> GalleryStyle.LIST
+                            GalleryStyle.LIST -> GalleryStyle.SQUARES
+                        }
                     }
                 },
             )
         }
         Box(Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
-            when (galleryPage.galleryStyle) {
+            when (galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
                     images = pictures,
-                    selectedImage = galleryPage.pictureId,
+                    selectedImage = galleryPage.picture,
                     onSelect = { galleryPage.selectPicture(it) },
                     imageProvider = imageProvider
                 )
