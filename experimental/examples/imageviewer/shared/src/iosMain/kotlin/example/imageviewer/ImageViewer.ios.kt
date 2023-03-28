@@ -6,7 +6,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import example.imageviewer.storage.IosImageStorage
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.ioDispatcher
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
 import kotlinx.coroutines.CoroutineScope

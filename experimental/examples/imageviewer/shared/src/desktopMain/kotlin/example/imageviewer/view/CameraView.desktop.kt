@@ -17,12 +17,9 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.DesktopStorableImage
 import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
-import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
 import example.imageviewer.resourcePictures
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.orEmpty
 import org.jetbrains.compose.resources.rememberImageBitmap

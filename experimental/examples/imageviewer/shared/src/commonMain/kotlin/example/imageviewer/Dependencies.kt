@@ -4,9 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
-import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -46,58 +44,20 @@ abstract class Dependencies {
 }
 
 interface Notification {
-    fun notifyInvalidRepo()
-    fun notifyRepoIsEmpty()
-    fun notifyNoInternet()
-    fun notifyLoadImageUnavailable()
-    fun notifyLastImage()
-    fun notifyFirstImage()
     fun notifyImageData(picture: PictureData)
-    fun notifyRefreshUnavailable()
 }
 
 abstract class PopupNotification(private val localization: Localization) : Notification {
     abstract fun showPopUpMessage(text: String)
-
-    override fun notifyInvalidRepo() = showPopUpMessage(localization.repoInvalid)
-    override fun notifyRepoIsEmpty() = showPopUpMessage(localization.repoEmpty)
-    override fun notifyNoInternet() = showPopUpMessage(localization.noInternet)
-    override fun notifyLoadImageUnavailable() =
-        showPopUpMessage(
-            """
-                ${localization.noInternet}
-                ${localization.loadImageUnavailable}
-            """.trimIndent()
-        )
-
-    override fun notifyLastImage() = showPopUpMessage(localization.lastImage)
-    override fun notifyFirstImage() = showPopUpMessage(localization.firstImage)
     override fun notifyImageData(picture: PictureData) = showPopUpMessage(
         "${localization.picture} ${picture.name}"
-    )
-
-    override fun notifyRefreshUnavailable() = showPopUpMessage(
-        """
-            ${localization.noInternet}
-            ${localization.refreshUnavailable}
-        """.trimIndent()
     )
 }
 
 interface Localization {
-    val back: String
     val appName: String
-    val loading: String
-    val repoInvalid: String
-    val repoEmpty: String
-    val noInternet: String
-    val loadImageUnavailable: String
-    val lastImage: String
-    val firstImage: String
+    val back: String
     val picture: String
-    val size: String
-    val pixels: String
-    val refreshUnavailable: String
     val takePhoto: String
     val addPhoto: String
 }

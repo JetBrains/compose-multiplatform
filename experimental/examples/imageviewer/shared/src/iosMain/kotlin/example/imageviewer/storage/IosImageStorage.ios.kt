@@ -10,7 +10,10 @@ import kotlinx.cinterop.CValue
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.yield
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -122,7 +125,7 @@ private fun UIImage.resizeToThumbnail(): UIImage {
         storableThumbnailSize.toFloat() / size.useContents { width },
         storableThumbnailSize.toFloat() / size.useContents { height },
     )
-    val newSize = size.useContents { CGSizeMake(width * targetScale , height * targetScale) }
+    val newSize = size.useContents { CGSizeMake(width * targetScale, height * targetScale) }
     return resize(newSize)
 }
 

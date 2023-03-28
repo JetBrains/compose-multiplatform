@@ -24,7 +24,7 @@ actual fun blurFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitma
 actual class PlatformContext
 
 @Composable
-internal actual fun getPlatformContext():PlatformContext = PlatformContext()
+internal actual fun getPlatformContext(): PlatformContext = PlatformContext()
 
 internal fun scaleBitmapAspectRatio(
     bitmap: BufferedImage,

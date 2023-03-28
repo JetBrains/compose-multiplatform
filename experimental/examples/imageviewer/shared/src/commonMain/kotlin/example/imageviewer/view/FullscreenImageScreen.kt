@@ -4,7 +4,6 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -12,19 +11,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.painter.BitmapPainter
-import androidx.compose.ui.input.key.*
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.Localization
 import example.imageviewer.LocalLocalization
-import example.imageviewer.core.FilterType
+import example.imageviewer.filter.FilterType
 import example.imageviewer.filter.getFilter
 import example.imageviewer.filter.getPlatformContext
 import example.imageviewer.model.*
 import example.imageviewer.style.*
-import org.jetbrains.compose.resources.*
 
 @Composable
 internal fun FullscreenImageScreen(

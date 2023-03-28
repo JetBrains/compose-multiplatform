@@ -20,14 +20,16 @@ import example.imageviewer.model.createCameraPictureData
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
-import kotlinx.datetime.Clock
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
 import platform.CoreGraphics.CGRect
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
-import platform.Foundation.*
+import platform.Foundation.NSError
+import platform.Foundation.NSNotification
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSSelectorFromString
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.UIDevice
@@ -133,7 +135,8 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                         createCameraPictureData(
                             name = "Kotlin Conf",
                             description = "Kotlin Conf photo description",
-                            gps = geoPos),
+                            gps = geoPos
+                        ),
                         IosStorableImage(uiImage)
                     )
                 }
@@ -191,6 +194,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                         actualOrientation
                 }
             }
+
             val listener = OrientationListener()
             val notificationName = platform.UIKit.UIDeviceOrientationDidChangeNotification
             NSNotificationCenter.defaultCenter.addObserver(
@@ -226,15 +230,17 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
         }
         Button(
             modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
-//            enabled = !capturePhotoStarted,//todo
+            enabled = !capturePhotoStarted,
             onClick = {
                 capturePhotoStarted = true
                 val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
                     format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
                 )
                 if (camera.position == AVCaptureDevicePositionFront) {
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.automaticallyAdjustsVideoMirroring = false
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoMirrored = true
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.automaticallyAdjustsVideoMirroring =
+                        false
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoMirrored =
+                        true
                 }
                 capturePhotoOutput.capturePhotoWithSettings(
                     settings = photoSettings,

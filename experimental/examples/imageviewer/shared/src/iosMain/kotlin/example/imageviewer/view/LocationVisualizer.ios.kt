@@ -11,7 +11,6 @@ import platform.MapKit.MKPointAnnotation
 
 @Composable
 internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
-    //todo get real geo coordinates
     UIKitInteropView(
         modifier = modifier,
         factory = {

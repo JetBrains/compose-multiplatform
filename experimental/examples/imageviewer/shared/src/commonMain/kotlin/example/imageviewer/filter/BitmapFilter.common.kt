@@ -2,7 +2,6 @@ package example.imageviewer.filter
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
-import example.imageviewer.core.FilterType
 
 fun getFilter(type: FilterType): (ImageBitmap, PlatformContext) -> ImageBitmap =
     when (type) {

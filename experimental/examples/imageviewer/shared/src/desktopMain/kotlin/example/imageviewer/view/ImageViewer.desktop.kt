@@ -18,7 +18,6 @@ import example.imageviewer.*
 import example.imageviewer.Notification
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.ioDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

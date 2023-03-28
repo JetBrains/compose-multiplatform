@@ -7,7 +7,7 @@ based on Compose Multiplatform UI library (desktop, android and iOS).
 
 Choose a run configuration for an appropriate target in IDE and run it.
 
-![run-configurations.png](run-configurations.png)
+![run-configurations.png](screenshots/run-configurations.png)
 
 To run on iOS device, please correct `TEAM_ID` value in `iosApp/Configuration/Config.xcconfig` with your Apple Team ID.
 Alternatively, you may setup signing within XCode opening `iosApp/iosApp.xcworkspace` and then
@@ -33,5 +33,3 @@ Then choose **iosApp** configuration in IDE and run it.
  - Create a file in the root directory named `local.properties` with a single line that looks like
    this, replacing YOUR_KEY with the key from step 1: `MAPS_API_KEY=YOUR_KEY`
  - Open project in IntelliJ IDEA or Android Studio and run "android" configuration.
-
-![Desktop](screenshots/imageviewer.png)
