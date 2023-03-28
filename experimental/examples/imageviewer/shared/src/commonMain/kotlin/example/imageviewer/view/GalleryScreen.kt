@@ -61,14 +61,9 @@ internal fun GalleryScreen(
         selectedPictureIndex.value = pictures.indexOfFirst { it == picture }
     }
 
-    val picture by remember {
-        derivedStateOf {
-            pictures.getOrNull(selectedPictureIndex.value)
-        }
-    }
+    val picture = pictures.getOrNull(selectedPictureIndex.value)
 
     var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
-    val imageProvider = LocalImageProvider.current
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
         externalEvents.collect {
@@ -107,7 +102,6 @@ internal fun GalleryScreen(
                     images = pictures,
                     selectedImage = picture,
                     onSelect = { selectPicture(it) },
-                    imageProvider = imageProvider
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
@@ -130,7 +124,6 @@ private fun SquaresGalleryView(
     images: List<PictureData>,
     selectedImage: PictureData?,
     onSelect: (PictureData) -> Unit,
-    imageProvider: ImageProvider,
 ) {
     Column {
         Spacer(Modifier.height(4.dp))
@@ -143,7 +136,6 @@ private fun SquaresGalleryView(
                 val isSelected = picture == selectedImage
                 SquareThumbnail(
                     picture = picture,
-                    imageProvider = imageProvider,
                     onClick = { onSelect(picture) },
                     isHighlighted = isSelected
                 )
@@ -156,7 +148,6 @@ private fun SquaresGalleryView(
 @Composable
 internal fun SquareThumbnail(
     picture: PictureData,
-    imageProvider: ImageProvider,
     isHighlighted: Boolean,
     onClick: () -> Unit
 ) {
