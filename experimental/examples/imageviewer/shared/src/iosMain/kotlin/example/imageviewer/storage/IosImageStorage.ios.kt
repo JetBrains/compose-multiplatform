@@ -87,7 +87,8 @@ class IosImageStorage(
             pictures.add(0, picture)
             UIImageJPEGRepresentation(image.rawValue.resizeToBig(), 0.6)
                 ?.writeToFile(picture.pngFile)
-            Json.Default.encodeToString(picture).writeToFile(picture.jsonFile)
+            val jsonStr = Json.Default.encodeToString(picture)
+            jsonStr.writeToFile(picture.jsonFile)
         }
     }
 
@@ -171,4 +172,9 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
 private val PictureData.Camera.pngFile get():String = id + ".jpg"
 private val PictureData.Camera.thumbnailPngFile get():String = id + "-thumbnail.jpg"
 private val PictureData.Camera.jsonFile get():String = id + ".json"
-private fun String.writeToURL(url: NSURL) = (this as NSString).writeToURL(url, true)
+private fun String.writeToURL(url: NSURL) = (this as NSString).writeToURL(
+    url = url,
+    atomically = true,
+    encoding = NSUTF8StringEncoding,
+    error = null
+)
