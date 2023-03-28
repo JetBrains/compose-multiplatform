@@ -12,8 +12,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
 import example.imageviewer.view.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.emptyFlow
 
 enum class ExternalImageViewerEvent {
     Foward,
@@ -108,7 +106,12 @@ internal fun ImageViewerWithProvidedDependencies(
 
                 is CameraPage -> {
                     CameraScreen(
-                        onBack = { navigationStack.back() },
+                        onBack = { resetSelectedPhoto ->
+                            if (resetSelectedPhoto) {
+                                rootGalleryPage.currentPictureIndex = 0
+                            }
+                            navigationStack.back()
+                        },
                     )
                 }
             }

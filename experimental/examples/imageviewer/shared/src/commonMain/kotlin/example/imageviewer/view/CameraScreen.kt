@@ -7,16 +7,18 @@ import androidx.compose.ui.Modifier
 import example.imageviewer.LocalImageStorage
 
 @Composable
-internal fun CameraScreen(onBack: () -> Unit) {
+internal fun CameraScreen(onBack: (resetSelectedPhoto: Boolean) -> Unit) {
     val storage = LocalImageStorage.current
     Box(Modifier.fillMaxSize()) {
         CameraView(Modifier.fillMaxSize(), onCapture = { picture, image ->
             storage.saveImage(picture, image)
-            onBack()
+            onBack(true)
         })
         TopLayout(
             alignLeftContent = {
-                BackButton(onBack)
+                BackButton {
+                    onBack(false)
+                }
             },
             alignRightContent = {},
         )

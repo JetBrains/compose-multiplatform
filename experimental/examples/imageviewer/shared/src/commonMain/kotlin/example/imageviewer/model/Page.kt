@@ -49,7 +49,7 @@ class GalleryPage(
             (currentPictureIndex - 1).mod(pictures.size)
     }
 
-    fun selectPicture(galleryId: PictureData) {
-        currentPictureIndex = pictures.indexOfFirst { it == galleryId }
+    fun selectPicture(picture: PictureData) {
+        currentPictureIndex = pictures.indexOfFirst { it == picture }
     }
 }
