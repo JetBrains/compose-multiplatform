@@ -67,6 +67,18 @@ class VideoPlayerState(
     var isResumed by mutableStateOf(isResumed)
     var isFullscreen by mutableStateOf(isFullscreen)
 
+    fun toggleResume() {
+        isResumed = !isResumed
+    }
+
+    fun toggleFullscreen() {
+        isFullscreen = !isFullscreen
+    }
+
+    fun stopPlayback() {
+        isResumed = false
+    }
+
     companion object {
         /**
          * The default [Saver] implementation for [VideoPlayerState].

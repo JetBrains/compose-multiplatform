@@ -27,14 +27,11 @@ fun main() {
 @Composable
 fun App() {
     val state = rememberVideoPlayerState()
-    val stopPlayback = remember { { state.isResumed = false } }
-    val toggleResume = remember { { state.isResumed = !state.isResumed } }
-    val toggleFullscreen = remember { { state.isFullscreen = !state.isFullscreen } }
     Column {
         val progress by VideoPlayer(
             url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
             state = state,
-            onFinish = stopPlayback,
+            onFinish = state::stopPlayback,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(400.dp)
@@ -50,13 +47,13 @@ fun App() {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Timestamp: ${progress.time}", modifier = Modifier.width(140.dp))
-            IconButton(onClick = toggleResume) {
+            IconButton(onClick = state::toggleResume) {
                 Icon(
                     painter = painterResource("${if (state.isResumed) "pause" else "play"}.svg"),
                     contentDescription = "Play/Pause"
                 )
             }
-            IconButton(onClick = toggleFullscreen) {
+            IconButton(onClick = state::toggleFullscreen) {
                 Icon(
                     painter = painterResource("${if (state.isFullscreen) "exit" else "enter"}-fullscreen.svg"),
                     contentDescription = "Toggle fullscreen"
