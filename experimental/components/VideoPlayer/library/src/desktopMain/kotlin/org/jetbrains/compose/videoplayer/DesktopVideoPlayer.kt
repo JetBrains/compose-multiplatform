@@ -61,7 +61,7 @@ internal actual fun VideoPlayerImpl(
         background = Color.Transparent,
         modifier = modifier
     )
-    return mediaPlayer.produceProgressFor(url)
+    return mediaPlayer.produceProgress()
 }
 
 private fun Float.toPercentage() = (this * 100).roundToInt()
@@ -100,11 +100,16 @@ private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) =
 
 /**
  * Checks for and emits video progress every 50 milliseconds.
- * Note that it seems vlcj updates the progress every 250 milliseconds or so.
+ * Note that it seems vlcj updates the progress just every 250 milliseconds or so.
+ *
+ * Instead of using `Unit` as the `key1` for [produceState],
+ * we could use `media().info()?.mrl()` if it's needed to re-launch
+ * the producer (for whatever reason) when the url (aka video) changes.
+ *
  */
 @Composable
-private fun MediaPlayer.produceProgressFor(url: String) =
-    produceState(key1 = url, initialValue = Progress(0f, 0L)) {
+private fun MediaPlayer.produceProgress() =
+    produceState(key1 = Unit, initialValue = Progress(0f, 0L)) {
         while (true) {
             val fraction = status().position()
             val time = status().time()
