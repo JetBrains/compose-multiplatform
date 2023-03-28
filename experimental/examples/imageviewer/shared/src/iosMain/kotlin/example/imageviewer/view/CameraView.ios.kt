@@ -17,6 +17,7 @@ import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import kotlinx.cinterop.CValue
+import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
@@ -26,8 +27,7 @@ import platform.CoreFoundation.CFUUIDCreateString
 import platform.CoreGraphics.CGRect
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
-import platform.Foundation.CFBridgingRelease
-import platform.Foundation.NSError
+import platform.Foundation.*
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.UIDevice
@@ -41,6 +41,14 @@ private sealed interface CameraAccess {
     object Denied : CameraAccess
     object Authorized : CameraAccess
 }
+
+private val deviceTypes = listOf(
+    AVCaptureDeviceTypeBuiltInWideAngleCamera,
+    AVCaptureDeviceTypeBuiltInDualWideCamera,
+    AVCaptureDeviceTypeBuiltInDualCamera,
+    AVCaptureDeviceTypeBuiltInUltraWideCamera,
+    AVCaptureDeviceTypeBuiltInDuoCamera
+)
 
 @Composable
 internal actual fun CameraView(
@@ -139,7 +147,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
     }
     val camera: AVCaptureDevice? = remember {
         discoverySessionWithDeviceTypes(
-            deviceTypes = listOf(AVCaptureDeviceTypeBuiltInWideAngleCamera),
+            deviceTypes = deviceTypes,
             mediaType = AVMediaTypeVideo,
             position = AVCaptureDevicePositionFront,
         ).devices.firstOrNull() as? AVCaptureDevice
@@ -159,31 +167,54 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
         val cameraPreviewLayer = remember {
             AVCaptureVideoPreviewLayer(session = captureSession)
         }
+
+        DisposableEffect(Unit) {
+            class OrientationListener : NSObject() {
+                @ObjCAction
+                fun orientationDidChange(arg: NSNotification) {
+                    val cameraConnection = cameraPreviewLayer.connection
+                    if (cameraConnection != null) {
+                        actualOrientation = when (UIDevice.currentDevice.orientation) {
+                            UIDeviceOrientation.UIDeviceOrientationPortrait ->
+                                AVCaptureVideoOrientationPortrait
+
+                            UIDeviceOrientation.UIDeviceOrientationLandscapeLeft ->
+                                AVCaptureVideoOrientationLandscapeRight
+
+                            UIDeviceOrientation.UIDeviceOrientationLandscapeRight ->
+                                AVCaptureVideoOrientationLandscapeLeft
+
+                            UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown ->
+                                AVCaptureVideoOrientationPortrait
+
+                            else -> cameraConnection.videoOrientation
+                        }
+                        cameraConnection.videoOrientation = actualOrientation
+                    }
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoOrientation =
+                        actualOrientation
+                }
+            }
+            val listener = OrientationListener()
+            val notificationName = platform.UIKit.UIDeviceOrientationDidChangeNotification
+            NSNotificationCenter.defaultCenter.addObserver(
+                observer = listener,
+                selector = NSSelectorFromString(OrientationListener::orientationDidChange.name + ":"),
+                name = notificationName,
+                `object` = null
+            )
+            onDispose {
+                NSNotificationCenter.defaultCenter.removeObserver(
+                    observer = listener,
+                    name = notificationName,
+                    `object` = null
+                )
+            }
+        }
         UIKitInteropView(
             modifier = Modifier.fillMaxSize(),
             background = Color.Black,
             resize = { view: UIView, rect: CValue<CGRect> ->
-                val cameraConnection = cameraPreviewLayer.connection
-                if (cameraConnection != null) {
-                    actualOrientation = when (UIDevice.currentDevice.orientation) {
-                        UIDeviceOrientation.UIDeviceOrientationPortrait ->
-                            AVCaptureVideoOrientationPortrait
-
-                        UIDeviceOrientation.UIDeviceOrientationLandscapeLeft ->
-                            AVCaptureVideoOrientationLandscapeRight
-
-                        UIDeviceOrientation.UIDeviceOrientationLandscapeRight ->
-                            AVCaptureVideoOrientationLandscapeLeft
-
-                        UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown ->
-                            AVCaptureVideoOrientationPortraitUpsideDown
-
-                        else -> cameraConnection.videoOrientation
-                    }
-                    cameraConnection.videoOrientation = actualOrientation
-                }
-                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoOrientation =
-                    actualOrientation
                 CATransaction.begin()
                 CATransaction.setValue(true, kCATransactionDisableActions)
                 view.layer.setFrame(rect)

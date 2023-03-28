@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 @Composable
 internal actual fun Tooltip(
     text: String,
-    modifier: Modifier,
     content: @Composable () -> Unit
 ) {
     TooltipArea(
@@ -31,8 +30,7 @@ internal actual fun Tooltip(
                     style = MaterialTheme.typography.caption
                 )
             }
-        },
-        modifier = modifier
+        }
     ) {
         content()
     }

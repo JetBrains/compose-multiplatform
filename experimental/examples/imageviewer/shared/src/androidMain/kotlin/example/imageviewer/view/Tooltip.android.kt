@@ -6,7 +6,6 @@ import androidx.compose.ui.Modifier
 @Composable
 internal actual fun Tooltip(
     text: String,
-    modifier: Modifier,
     content: @Composable () -> Unit
 ) {
     // No Tooltip for Android
