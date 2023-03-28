@@ -24,6 +24,7 @@ import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
 import platform.CoreGraphics.CGRect
+import platform.CoreLocation.CLLocation
 import platform.CoreLocation.CLLocationManager
 import platform.CoreLocation.kCLLocationAccuracyBest
 import platform.Foundation.NSError
@@ -101,50 +102,11 @@ internal actual fun CameraView(
 private fun BoxScope.AuthorizedCamera(
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {
-    val locationManager = remember {
-        CLLocationManager().apply {
-            desiredAccuracy = kCLLocationAccuracyBest
-            requestWhenInUseAuthorization()
-        }
-    }
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
     var actualOrientation by remember {
         mutableStateOf(
             AVCaptureVideoOrientationPortrait
         )
-    }
-    var capturePhotoStarted by remember { mutableStateOf(false) }
-    val photoCaptureDelegate = remember {
-        object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
-            override fun captureOutput(
-                output: AVCapturePhotoOutput,
-                didFinishProcessingPhoto: AVCapturePhoto,
-                error: NSError?
-            ) {
-                val photoData = didFinishProcessingPhoto.fileDataRepresentation()
-                if (photoData != null) {
-                    val location = locationManager.location
-                    val geoPos = if (location != null) {
-                        GpsPosition(
-                            latitude = location.coordinate.useContents { latitude },
-                            longitude = location.coordinate.useContents { longitude }
-                        )
-                    } else {
-                        GpsPosition(0.0, 0.0)
-                    }
-                    val uiImage = UIImage(photoData)
-                    onCapture(
-                        createCameraPictureData(
-                            name = "Kotlin Conf",
-                            description = "Kotlin Conf photo description",
-                            gps = geoPos
-                        ),
-                        IosStorableImage(uiImage)
-                    )
-                }
-                capturePhotoStarted = false
-            }
-        }
     }
     val camera: AVCaptureDevice? = remember {
         discoverySessionWithDeviceTypes(
@@ -154,8 +116,39 @@ private fun BoxScope.AuthorizedCamera(
         ).devices.firstOrNull() as? AVCaptureDevice
     }
     if (camera != null) {
-        //todo locationManager here?
-        //todo location maybe null if user decline location permission
+        val locationManager = remember {
+            CLLocationManager().apply {
+                desiredAccuracy = kCLLocationAccuracyBest
+                requestWhenInUseAuthorization()
+            }
+        }
+
+        var capturePhotoStarted by remember { mutableStateOf(false) }
+        val photoCaptureDelegate = remember {
+            object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
+                override fun captureOutput(
+                    output: AVCapturePhotoOutput,
+                    didFinishProcessingPhoto: AVCapturePhoto,
+                    error: NSError?
+                ) {
+                    val photoData = didFinishProcessingPhoto.fileDataRepresentation()
+                    if (photoData != null) {
+                        val gps = locationManager.location?.toGps() ?: GpsPosition(0.0, 0.0)
+                        val uiImage = UIImage(photoData)
+                        onCapture(
+                            createCameraPictureData(
+                                name = "Kotlin Conf",
+                                description = "Kotlin Conf photo description",
+                                gps = gps
+                            ),
+                            IosStorableImage(uiImage)
+                        )
+                    }
+                    capturePhotoStarted = false
+                }
+            }
+        }
+
         val captureSession: AVCaptureSession = remember {
             AVCaptureSession().also { captureSession ->
                 captureSession.sessionPreset = AVCaptureSessionPresetPhoto
@@ -276,3 +269,9 @@ private fun SimulatorStub() {
         """.trimIndent(), color = Color.White
     )
 }
+
+fun CLLocation.toGps() =
+    GpsPosition(
+        latitude = coordinate.useContents { latitude },
+        longitude = coordinate.useContents { longitude }
+    )
