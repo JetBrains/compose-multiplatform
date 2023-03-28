@@ -7,7 +7,7 @@ import androidx.compose.ui.Modifier
 import example.imageviewer.LocalImageStorage
 
 @Composable
-internal fun CameraScreen(onBack: (resetSelectedPhoto: Boolean) -> Unit) {
+internal fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
     val storage = LocalImageStorage.current
     Box(Modifier.fillMaxSize()) {
         CameraView(Modifier.fillMaxSize(), onCapture = { picture, image ->

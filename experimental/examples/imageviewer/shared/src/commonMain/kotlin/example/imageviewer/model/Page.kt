@@ -4,23 +4,21 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import example.imageviewer.view.GalleryStyle
 
-sealed class Page
+sealed interface Page
 
-class MemoryPage(val picture: PictureData) : Page() {
+class MemoryPage(val picture: PictureData) : Page
 
-}
+class CameraPage : Page
 
-class CameraPage : Page()
-
-class FullScreenPage(val picture: PictureData) : Page()
+class FullScreenPage(val picture: PictureData) : Page
 
 class GalleryPage(
     val pictures: SnapshotStateList<PictureData>
-) : Page() {
+) : Page {
 
     private var currentPictureIndex by mutableStateOf(0)
+
     val picture get(): PictureData = pictures[currentPictureIndex]
 
     fun nextImage() {
