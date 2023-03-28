@@ -11,7 +11,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -19,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
@@ -26,7 +29,6 @@ import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
 import example.imageviewer.*
-import example.imageviewer.LocalLocalization
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
@@ -94,40 +96,53 @@ private fun CameraWithGrantedPermission(
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
     val nameAndDescription = createNewPhotoNameAndDescription()
+    var capturePhotoStarted by remember { mutableStateOf(false) }
     Box(contentAlignment = Alignment.BottomCenter, modifier = modifier) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
-        Button(onClick = {
-            imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
-                override fun onCaptureSuccess(image: ImageProxy) {
-                    val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
-                    val imageBitmap = byteArray.toImageBitmap()
-                    image.close()
-                    fun sendToStorage(gpsPosition: GpsPosition) {
-                        onCapture(
-                            createCameraPictureData(
-                                name = nameAndDescription.name,
-                                description = nameAndDescription.description,
-                                gps = gpsPosition
-                            ),
-                            AndroidStorableImage(imageBitmap)
-                        )
-                    }
+        Button(
+            enabled = !capturePhotoStarted,
+            onClick = {
+                capturePhotoStarted = true
+                imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
+                    override fun onCaptureSuccess(image: ImageProxy) {
+                        val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
+                        val imageBitmap = byteArray.toImageBitmap()
+                        image.close()
+                        fun sendToStorage(gpsPosition: GpsPosition) {
+                            onCapture(
+                                createCameraPictureData(
+                                    name = nameAndDescription.name,
+                                    description = nameAndDescription.description,
+                                    gps = gpsPosition
+                                ),
+                                AndroidStorableImage(imageBitmap)
+                            )
+                            capturePhotoStarted = false
+                        }
 
-                    val lastLocation: Task<Location> =
-                        LocationServices.getFusedLocationProviderClient(context).getCurrentLocation(
-                            CurrentLocationRequest.Builder().build(),
-                            null
-                        )
-                    lastLocation.addOnSuccessListener {
-                        sendToStorage(GpsPosition(it.latitude, it.longitude))
+                        val lastLocation: Task<Location> =
+                            LocationServices.getFusedLocationProviderClient(context)
+                                .getCurrentLocation(
+                                    CurrentLocationRequest.Builder().build(),
+                                    null
+                                )
+                        lastLocation.addOnSuccessListener {
+                            sendToStorage(GpsPosition(it.latitude, it.longitude))
+                        }
+                        lastLocation.addOnFailureListener {
+                            sendToStorage(GpsPosition(0.0, 0.0))
+                        }
                     }
-                    lastLocation.addOnFailureListener {
-                        sendToStorage(GpsPosition(0.0, 0.0))
-                    }
-                }
-            })
-        }) {
+                })
+            }) {
             Text(LocalLocalization.current.takePhoto, color = Color.White)
+        }
+        if (capturePhotoStarted) {
+            CircularProgressIndicator(
+                modifier = Modifier.size(80.dp).align(Alignment.Center),
+                color = Color.White.copy(alpha = 0.7f),
+                strokeWidth = 8.dp,
+            )
         }
     }
 }

@@ -8,7 +8,6 @@ import androidx.compose.ui.layout.ContentScale
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.model.PictureData
 
-
 @Composable
 internal fun ThumbnailImage(
     modifier: Modifier,
