@@ -36,7 +36,7 @@ internal fun GalleryScreen(
     onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
-    val imageProvider = ImageProviderLocal.current
+    val imageProvider = LocalImageProvider.current
     LaunchedEffect(Unit) {
         galleryPage.externalEvents.collect {
             when (it) {
@@ -163,7 +163,7 @@ private fun ListGalleryView(
     onSelect: (PictureData) -> Unit,
     onFullScreen: (PictureData) -> Unit,
 ) {
-    val notification = NotificationLocal.current
+    val notification = LocalNotification.current
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {

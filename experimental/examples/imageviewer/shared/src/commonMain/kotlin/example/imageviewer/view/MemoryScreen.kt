@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.ImageProvider
-import example.imageviewer.ImageProviderLocal
+import example.imageviewer.LocalImageProvider
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -41,7 +41,7 @@ internal fun MemoryScreen(
     onBack: () -> Unit,
     onHeaderClick: (PictureData) -> Unit,
 ) {
-    val imageProvider = ImageProviderLocal.current
+    val imageProvider = LocalImageProvider.current
     var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
     LaunchedEffect(memoryPage.picture) {
         headerImage = imageProvider.getImage(memoryPage.picture)

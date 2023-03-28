@@ -26,10 +26,10 @@ internal fun ImageViewerCommon(
     externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
 ) {
     CompositionLocalProvider(
-        LocalizationLocal provides dependencies.localization,
-        NotificationLocal provides dependencies.notification,
-        ImageProviderLocal provides dependencies.imageProvider,
-        ImageStorageLocal provides dependencies.imageStorage,
+        LocalLocalization provides dependencies.localization,
+        LocalNotification provides dependencies.notification,
+        LocalImageProvider provides dependencies.imageProvider,
+        LocalImageStorage provides dependencies.imageStorage,
     ) {
         ImageViewerWithProvidedDependencies(dependencies.pictures, externalEvents)
     }

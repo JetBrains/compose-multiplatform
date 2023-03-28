@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.ImageProviderLocal
+import example.imageviewer.LocalImageProvider
 import example.imageviewer.model.PictureData
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -36,7 +36,7 @@ internal fun PreviewImage(
     picture: PictureData?,
     onClick: () -> Unit,
 ) {
-    val imageProvider = ImageProviderLocal.current
+    val imageProvider = LocalImageProvider.current
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         Modifier.fillMaxWidth().height(393.dp).background(Color.Black),
