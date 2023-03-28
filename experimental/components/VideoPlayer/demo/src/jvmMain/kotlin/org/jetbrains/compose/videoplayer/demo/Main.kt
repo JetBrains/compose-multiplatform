@@ -13,6 +13,24 @@ import org.jetbrains.compose.videoplayer.VideoPlayer
 import org.jetbrains.compose.videoplayer.rememberVideoPlayerState
 import java.awt.Dimension
 
+/**
+ * To play a local file, use a URL notation like this:
+ * ```kotlin
+ * const val VIDEO_URL = "file:///C:/Users/John/Desktop/example.mp4"
+ * ```
+ * Relative paths like this may also work (relative to subproject directory aka `demo/`):
+ * ```kotlin
+ * val VIDEO_URL = """file:///${Path("videos/example.mp4")}"""
+ * ```
+ * To package a video with the app distributable,
+ * see [this tutorial](https://github.com/JetBrains/compose-jb/tree/master/tutorials/Native_distributions_and_local_execution#adding-files-to-packaged-application)
+ * and then use a URL syntax like this:
+ * ```kotlin
+ * val VIDEO_URL = """file:///${Path(System.getProperty("compose.application.resources.dir")) / "example.mp4"}"""
+ * ```
+ */
+const val VIDEO_URL = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+
 fun main() {
     singleWindowApplication(title = "Video Player") {
         // See https://github.com/JetBrains/compose-multiplatform/issues/2285
@@ -28,7 +46,7 @@ fun App() {
     val state = rememberVideoPlayerState()
     Column {
         val progress by VideoPlayer(
-            url = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+            url = VIDEO_URL,
             state = state,
             onFinish = state::stopPlayback,
             modifier = Modifier
