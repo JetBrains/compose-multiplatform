@@ -20,9 +20,9 @@ internal fun ThumbnailImage(
     LaunchedEffect(picture) {
         imageBitmap = imageProvider.getThumbnail(picture)
     }
-    if (imageBitmap != null) {
+    imageBitmap?.let {
         Image(
-            bitmap = filter(imageBitmap!!),
+            bitmap = filter(it),
             contentDescription = picture.name,
             modifier = modifier,
             contentScale = ContentScale.Crop,

@@ -63,9 +63,9 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                if(headerImage != null) {
+                headerImage?.let {
                     MemoryHeader(
-                        headerImage!!,
+                        it,
                         picture = memoryPage.picture,
                         onClick = { onHeaderClick(memoryPage.picture) }
                     )

@@ -43,18 +43,38 @@ enum class GalleryStyle {
 @Composable
 internal fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
-    galleryPage: GalleryPage,
+    selectedPictureIndex: MutableState<Int>,
     onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
+    fun nextImage() {
+        selectedPictureIndex.value =
+            (selectedPictureIndex.value + 1).mod(pictures.size)
+    }
+
+    fun previousImage() {
+        selectedPictureIndex.value =
+            (selectedPictureIndex.value - 1).mod(pictures.size)
+    }
+
+    fun selectPicture(picture: PictureData) {
+        selectedPictureIndex.value = pictures.indexOfFirst { it == picture }
+    }
+
+    val picture by remember {
+        derivedStateOf {
+            pictures.getOrNull(selectedPictureIndex.value)
+        }
+    }
+
     var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
     val imageProvider = LocalImageProvider.current
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
         externalEvents.collect {
             when (it) {
-                ExternalImageViewerEvent.Foward -> galleryPage.nextImage()
-                ExternalImageViewerEvent.Back -> galleryPage.previousImage()
+                ExternalImageViewerEvent.Foward -> nextImage()
+                ExternalImageViewerEvent.Back -> previousImage()
                 else -> {}
             }
         }
@@ -62,11 +82,13 @@ internal fun GalleryScreen(
 
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box {
-            PreviewImage(
-                picture = galleryPage.picture, onClick = {
-                    onClickPreviewPicture(galleryPage.picture)
-                }
-            )
+            picture?.let {
+                PreviewImage(
+                    picture = it, onClick = {
+                        onClickPreviewPicture(it)
+                    }
+                )
+            }
             TopLayout(
                 alignLeftContent = {},
                 alignRightContent = {
@@ -83,14 +105,14 @@ internal fun GalleryScreen(
             when (galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
                     images = pictures,
-                    selectedImage = galleryPage.picture,
-                    onSelect = { galleryPage.selectPicture(it) },
+                    selectedImage = picture,
+                    onSelect = { selectPicture(it) },
                     imageProvider = imageProvider
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
                     pictures = pictures,
-                    onSelect = { galleryPage.selectPicture(it) },
+                    onSelect = { selectPicture(it) },
                     onFullScreen = { onClickPreviewPicture(it) },
                 )
             }

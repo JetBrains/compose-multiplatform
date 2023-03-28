@@ -4,10 +4,7 @@ import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
@@ -40,9 +37,8 @@ internal fun ImageViewerCommon(
 internal fun ImageViewerWithProvidedDependencies(
     pictures: SnapshotStateList<PictureData>
 ) {
-    val rootGalleryPage = GalleryPage(pictures)
-    val navigationStack = remember { NavigationStack<Page>(rootGalleryPage) }
-
+    val selectedPictureIndex: MutableState<Int> = mutableStateOf(0)
+    val navigationStack = remember { NavigationStack<Page>(GalleryPage()) }
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
         externalEvents.collect {
@@ -70,7 +66,7 @@ internal fun ImageViewerWithProvidedDependencies(
                 is GalleryPage -> {
                     GalleryScreen(
                         pictures = pictures,
-                        galleryPage = page,
+                        selectedPictureIndex = selectedPictureIndex,
                         onClickPreviewPicture = { previewPictureId ->
                             navigationStack.push(MemoryPage(previewPictureId))
                         }
@@ -108,7 +104,7 @@ internal fun ImageViewerWithProvidedDependencies(
                     CameraScreen(
                         onBack = { resetSelectedPicture ->
                             if (resetSelectedPicture) {
-                                rootGalleryPage.resetSelectedPicture()
+                                selectedPictureIndex.value = 0
                             }
                             navigationStack.back()
                         },
