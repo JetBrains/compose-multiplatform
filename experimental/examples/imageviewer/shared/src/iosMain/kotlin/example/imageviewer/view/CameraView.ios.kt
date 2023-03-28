@@ -204,6 +204,10 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                 val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
                     format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
                 )
+                if (camera.position == AVCaptureDevicePositionFront) {
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.automaticallyAdjustsVideoMirroring = false
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoMirrored = true
+                }
                 capturePhotoOutput.capturePhotoWithSettings(
                     settings = photoSettings,
                     delegate = photoCaptureDelegate
