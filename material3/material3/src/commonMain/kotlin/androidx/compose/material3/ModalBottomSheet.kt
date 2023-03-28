@@ -113,7 +113,7 @@ fun ModalBottomSheet(
             snapTo = { target -> scope.launch { sheetState.snapTo(target) } }
         )
     }
-    val systemBarHeight = WindowInsets.systemBarsForVisualComponents.getBottom(LocalDensity.current)
+    val systemBarHeight = WindowInsets.systemBarsForVisualComponents().getBottom(LocalDensity.current)
 
     ModalBottomSheetPopup(
         onDismissRequest = {

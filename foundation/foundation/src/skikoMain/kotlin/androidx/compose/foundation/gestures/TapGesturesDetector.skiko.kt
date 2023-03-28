@@ -1,3 +1,19 @@
+/*
+ * Copyright 2023 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package androidx.compose.foundation.gestures
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -21,10 +37,7 @@ import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.util.fastAll
 import androidx.compose.ui.util.fastAny
 import androidx.compose.ui.util.fastForEach
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 
 /**
  * Detects tap, double-tap, and long press gestures and calls [onTap], [onDoubleTap], and
@@ -81,7 +94,9 @@ suspend fun PointerInputScope.detectTapGestures(
 
     while (currentCoroutineContext().isActive) {
         awaitPointerEventScope {
-            pressScope.reset()
+            // TODO: [1.4 Update] seems that launch may introduce races?
+            //  TapGestureDetectorKt.detectTapGestures also use it
+            launch { pressScope.reset() }
 
             val down = awaitPress(filter = filter, requireUnconsumed = true).apply { changes[0].consume() }
 
@@ -131,7 +146,9 @@ suspend fun PointerInputScope.detectTapGestures(
                 if (secondPress == null) {
                     onTap?.invoke(firstRelease.changes[0].position)
                 } else {
-                    pressScope.reset()
+                    // TODO: [1.4 Update] seems that launch may introduce races?
+                    //  TapGestureDetectorKt.detectTapGestures also use it
+                    launch { pressScope.reset() }
                     launch { pressScope.onPress(secondPress.changes[0].position) }
 
                     cancelled = false

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,6 @@ package androidx.compose.material3
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
-
-import java.util.Locale
 
 @Composable
 @ReadOnlyComposable
@@ -87,5 +85,10 @@ internal actual fun getString(string: Strings): String {
 }
 @Composable
 @ReadOnlyComposable
-internal actual fun getString(string: Strings, vararg formatArgs: Any): String =
-    String.format(getString(string), Locale.getDefault(), *formatArgs)
+internal actual fun getString(string: Strings, vararg formatArgs: Any): String {
+    // TODO: [1.4 Update] implement properly see commented code below (it uses jdk now)
+    return getString(string)
+}
+
+//internal actual fun getString(string: Strings, vararg formatArgs: Any): String =
+//    String.format(getString(string), Locale.getDefault(), *formatArgs)

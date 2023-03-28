@@ -23,8 +23,6 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.grid.LazyGridItemInfo
 import androidx.compose.foundation.lazy.grid.LazyGridState
-import androidx.compose.foundation.lazy.grid.mainAxisItemSpacing
-import androidx.compose.foundation.lazy.mainAxisItemSpacing
 import androidx.compose.foundation.text.TextFieldScrollState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue

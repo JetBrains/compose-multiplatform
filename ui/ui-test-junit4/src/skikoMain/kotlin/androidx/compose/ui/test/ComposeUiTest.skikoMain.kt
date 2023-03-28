@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,13 +30,12 @@ import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.junit4.MainTestClockImpl
 import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
 import androidx.compose.ui.test.junit4.isOnUiThread
-import androidx.compose.ui.text.input.EditCommand
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.ImeOptions
-import androidx.compose.ui.text.input.PlatformTextInputService
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.roundToInt
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -49,7 +48,8 @@ import org.jetbrains.skia.Surface
 import org.jetbrains.skiko.currentNanoTime
 
 @ExperimentalTestApi
-actual fun runComposeUiTest(block: ComposeUiTest.() -> Unit) {
+actual fun runComposeUiTest(effectContext: CoroutineContext, block: ComposeUiTest.() -> Unit) {
+    // TODO: [1.4 Update] take effectContext into account
     SkikoComposeUiTest().runTest(block)
 }
 
@@ -66,9 +66,15 @@ fun runSkikoComposeUiTest(
     ).runTest(block)
 }
 
+/**
+ * @param effectContext The [CoroutineContext] used to run the composition. The context for
+ * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
+ */
 @ExperimentalTestApi
 @OptIn(ExperimentalCoroutinesApi::class, InternalTestApi::class)
 class SkikoComposeUiTest(
+    // TODO: [1.4 Update] take effectContext into account
+    effectContext: CoroutineContext = EmptyCoroutineContext,
     width: Int = 1024,
     height: Int = 768,
     override val density: Density = Density(1f)
@@ -270,7 +276,14 @@ class SkikoComposeUiTest(
     }
 
     private inner class DesktopTestOwner : TestOwner {
-        override fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
+        @OptIn(ExperimentalTextApi::class)
+        override fun performTextInput(node: SemanticsNode, action: TextInputForTests.() -> Unit) {
+            // TODO: [1.4 Update] implement new API
+            TODO()
+        }
+
+        // TODO: use it in performTextInput
+        private fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             runOnIdle {
                 val onEditCommand = textInputService.onEditCommand
                     ?: throw IllegalStateException("No input session started. Missing a focus?")
@@ -278,7 +291,8 @@ class SkikoComposeUiTest(
             }
         }
 
-        override fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
+        // TODO: use it in performTextInput
+        private fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
             runOnIdle {
                 val onImeActionPerformed = textInputService.onImeActionPerformed
                     ?: throw IllegalStateException("No input session started. Missing a focus?")

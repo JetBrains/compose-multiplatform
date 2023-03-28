@@ -140,7 +140,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.dp
-import java.text.NumberFormat
+import kotlin.jvm.JvmInline
 import kotlin.math.PI
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -445,7 +445,7 @@ class TimePickerColors internal constructor(
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
-        if (javaClass != other?.javaClass) return false
+        if (other == null || this::class != other::class) return false
 
         other as TimePickerColors
 
@@ -1401,10 +1401,13 @@ private class VisibleModifier(
     }
 }
 
-private fun Int.toLocalString(minDigits: Int): String {
-    val formatter = NumberFormat.getIntegerInstance()
-    // Eliminate any use of delimiters when formatting the integer.
-    formatter.isGroupingUsed = false
-    formatter.minimumIntegerDigits = minDigits
-    return formatter.format(this)
-}
+internal expect fun Int.toLocalString(minDigits: Int): String
+
+// TODO: [1.4 Update] properly implement it without jdk
+//private fun Int.toLocalString(minDigits: Int): String {
+//    val formatter = NumberFormat.getIntegerInstance()
+//    // Eliminate any use of delimiters when formatting the integer.
+//    formatter.isGroupingUsed = false
+//    formatter.minimumIntegerDigits = minDigits
+//    return formatter.format(this)
+//}

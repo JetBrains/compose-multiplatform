@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,15 +20,9 @@ import org.jetbrains.skia.Rect as SkRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.asSkiaPath
 import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toComposeRect
 import androidx.compose.ui.text.platform.SkiaParagraphIntrinsics
 import androidx.compose.ui.text.platform.cursorHorizontalPosition
 import androidx.compose.ui.text.platform.isNeutralDirectionality
@@ -36,11 +30,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.floor
-import org.jetbrains.skia.paragraph.Direction
-import org.jetbrains.skia.paragraph.LineMetrics
-import org.jetbrains.skia.paragraph.RectHeightMode
-import org.jetbrains.skia.paragraph.RectWidthMode
-import org.jetbrains.skia.paragraph.TextBox
+import org.jetbrains.skia.paragraph.*
 
 internal class SkiaParagraph(
     intrinsics: ParagraphIntrinsics,
@@ -453,8 +443,10 @@ internal class SkiaParagraph(
         color: Color,
         shadow: Shadow?,
         textDecoration: TextDecoration?,
-        drawStyle: DrawStyle?
+        drawStyle: DrawStyle?,
+        blendMode: BlendMode
     ) {
+        // TODO: [1.4 Update] take blendMode into account
         paragraph = with(layouter) {
             setTextStyle(
                 color = color,
@@ -476,8 +468,10 @@ internal class SkiaParagraph(
         alpha: Float,
         shadow: Shadow?,
         textDecoration: TextDecoration?,
-        drawStyle: DrawStyle?
+        drawStyle: DrawStyle?,
+        blendMode: BlendMode
     ) {
+        // TODO: [1.4 Update] take blendMode into account
         paragraph = with(layouter) {
             setTextStyle(
                 brush = brush,

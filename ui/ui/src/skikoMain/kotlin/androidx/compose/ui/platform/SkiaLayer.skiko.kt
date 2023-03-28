@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,43 +16,15 @@
 
 package androidx.compose.ui.platform
 
-import androidx.compose.ui.geometry.MutableRect
-import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.*
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.RoundRect
-import androidx.compose.ui.geometry.toRect
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.Canvas
-import androidx.compose.ui.graphics.ClipOp
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultCameraDistance
-import androidx.compose.ui.graphics.DefaultShadowColor
-import androidx.compose.ui.graphics.Matrix
-import androidx.compose.ui.graphics.Outline
-import androidx.compose.ui.graphics.Paint
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.RenderEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.graphics.asSkiaPath
-import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.toSkiaRRect
-import androidx.compose.ui.graphics.toSkiaRect
 import androidx.compose.ui.node.OwnedLayer
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
+import androidx.compose.ui.unit.*
 import kotlin.math.max
-import org.jetbrains.skia.ClipMode
-import org.jetbrains.skia.Picture
-import org.jetbrains.skia.PictureRecorder
-import org.jetbrains.skia.Point3
-import org.jetbrains.skia.ShadowUtils
+import org.jetbrains.skia.*
 
 internal class SkiaLayer(
     private var density: Density,
@@ -91,6 +63,9 @@ internal class SkiaLayer(
     private var shadowElevation: Float = 0f
     private var ambientShadowColor: Color = DefaultShadowColor
     private var spotShadowColor: Color = DefaultShadowColor
+
+    // TODO: [1.4 Update] check that compositingStrategy is properly used after merge
+    private var compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
 
     override fun destroy() {
         picture?.close()
@@ -166,6 +141,7 @@ internal class SkiaLayer(
         renderEffect: RenderEffect?,
         ambientShadowColor: Color,
         spotShadowColor: Color,
+        compositingStrategy: CompositingStrategy,
         layoutDirection: LayoutDirection,
         density: Density
     ) {
@@ -185,6 +161,7 @@ internal class SkiaLayer(
         this.renderEffect = renderEffect
         this.ambientShadowColor = ambientShadowColor
         this.spotShadowColor = spotShadowColor
+        this.compositingStrategy = compositingStrategy
         outlineCache.shape = shape
         outlineCache.layoutDirection = layoutDirection
         outlineCache.density = density
@@ -262,7 +239,11 @@ internal class SkiaLayer(
             }
 
             val currentRenderEffect = renderEffect
-            if (alpha < 1 || currentRenderEffect != null) {
+            val requiresLayer =
+                (alpha < 1 && compositingStrategy != CompositingStrategy.ModulateAlpha) ||
+                    currentRenderEffect != null ||
+                    compositingStrategy == CompositingStrategy.Offscreen
+            if (requiresLayer) {
                 canvas.saveLayer(
                     bounds,
                     Paint().apply {
@@ -272,6 +253,12 @@ internal class SkiaLayer(
                 )
             } else {
                 canvas.save()
+            }
+            val skiaCanvas = canvas as SkiaBackedCanvas
+            if (compositingStrategy == CompositingStrategy.ModulateAlpha) {
+                skiaCanvas.alphaMultiplier = alpha
+            } else {
+                skiaCanvas.alphaMultiplier = 1.0f
             }
 
             drawBlock(canvas)

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,13 +18,7 @@ package androidx.compose.ui.platform
 
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.DefaultCameraDistance
-import androidx.compose.ui.graphics.DefaultShadowColor
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.RenderEffect
-import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
@@ -394,12 +388,14 @@ class SkiaLayerTest {
         transformOrigin: TransformOrigin = TransformOrigin.Center,
         shape: Shape = RectangleShape,
         clip: Boolean = false,
-        renderEffect: RenderEffect? = null
+        renderEffect: RenderEffect? = null,
+        compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
     ) {
         updateLayerProperties(
             scaleX, scaleY, alpha, translationX, translationY, shadowElevation, rotationX,
             rotationY, rotationZ, cameraDistance, transformOrigin, shape, clip, renderEffect,
-            ambientShadowColor, spotShadowColor, LayoutDirection.Ltr, Density(1f, 1f)
+            ambientShadowColor, spotShadowColor, compositingStrategy, LayoutDirection.Ltr,
+            Density(1f, 1f)
         )
     }
 }
