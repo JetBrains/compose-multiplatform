@@ -98,7 +98,9 @@ internal actual fun CameraView(
 }
 
 @Composable
-private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit) {
+private fun BoxScope.AuthorizedCamera(
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
     val locationManager = remember {
         CLLocationManager().apply {
             desiredAccuracy = kCLLocationAccuracyBest
@@ -169,6 +171,7 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
 
         DisposableEffect(Unit) {
             class OrientationListener : NSObject() {
+                @Suppress("UNUSED_PARAMETER")
                 @ObjCAction
                 fun orientationDidChange(arg: NSNotification) {
                     val cameraConnection = cameraPreviewLayer.connection
@@ -190,8 +193,8 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                         }
                         cameraConnection.videoOrientation = actualOrientation
                     }
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoOrientation =
-                        actualOrientation
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                        ?.videoOrientation = actualOrientation
                 }
             }
 
@@ -199,7 +202,9 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
             val notificationName = platform.UIKit.UIDeviceOrientationDidChangeNotification
             NSNotificationCenter.defaultCenter.addObserver(
                 observer = listener,
-                selector = NSSelectorFromString(OrientationListener::orientationDidChange.name + ":"),
+                selector = NSSelectorFromString(
+                    OrientationListener::orientationDidChange.name + ":"
+                ),
                 name = notificationName,
                 `object` = null
             )
@@ -237,10 +242,10 @@ private fun BoxScope.AuthorizedCamera(onCapture: (picture: PictureData.Camera, i
                     format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
                 )
                 if (camera.position == AVCaptureDevicePositionFront) {
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.automaticallyAdjustsVideoMirroring =
-                        false
-                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)?.videoMirrored =
-                        true
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                        ?.automaticallyAdjustsVideoMirroring = false
+                    capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                        ?.videoMirrored = true
                 }
                 capturePhotoOutput.capturePhotoWithSettings(
                     settings = photoSettings,
