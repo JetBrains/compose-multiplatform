@@ -39,6 +39,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
@@ -1351,6 +1353,27 @@ class AndroidViewTest {
         onView(instanceOf(EditText::class.java))
             .check(matches(isDisplayed()))
             .check(matches(withText("User Input")))
+    }
+
+    @Test
+    fun androidView_withParentDataModifier() {
+        val columnHeight = 100
+        val columnHeightDp = with(rule.density) { columnHeight.toDp() }
+        var viewSize = IntSize.Zero
+        rule.setContent {
+            Column(Modifier.height(columnHeightDp).fillMaxWidth()) {
+                AndroidView(
+                    factory = { View(it) },
+                    modifier = Modifier.weight(1f).onGloballyPositioned { viewSize = it.size }
+                )
+
+                Box(Modifier.height(columnHeightDp / 4))
+            }
+        }
+
+        rule.runOnIdle {
+            assertEquals(columnHeight * 3 / 4, viewSize.height)
+        }
     }
 
     @ExperimentalComposeUiApi

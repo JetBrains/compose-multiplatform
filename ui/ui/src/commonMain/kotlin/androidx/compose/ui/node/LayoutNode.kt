@@ -422,6 +422,7 @@ internal class LayoutNode(
         forEachCoordinatorIncludingInner { it.onLayoutNodeAttach() }
         onAttach?.invoke(owner)
 
+        layoutDelegate.updateParentData()
         invalidateFocusOnAttach()
     }
 
