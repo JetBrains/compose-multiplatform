@@ -2124,9 +2124,14 @@ class ComposableFunctionBodyTransformer(
         // boxing in a different way.
         val type = value.type.unboxInlineClass()
         val expr = value.unboxValueIfInline()
+        val isOriginallyPrimitive = value.type.toPrimitiveType() != null
+        val isUnboxedPrimitive = type.toPrimitiveType() != null &&
+            value.type.isInlineClassType() &&
+            expr != value // k/js and k/native can't unbox external value classes with private val
         val descriptor = type
             .toPrimitiveType()
             .let { changedPrimitiveFunctions[it] }
+            .takeIf { isOriginallyPrimitive || isUnboxedPrimitive }
             ?: if (type.isFunction()) changedInstanceFunction else changedFunction
         return irMethodCall(irCurrentComposer(), descriptor).also {
             it.putValueArgument(0, expr)

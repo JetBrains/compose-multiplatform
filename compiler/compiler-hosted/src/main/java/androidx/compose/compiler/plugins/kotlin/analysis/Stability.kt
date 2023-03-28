@@ -17,8 +17,8 @@
 package androidx.compose.compiler.plugins.kotlin.analysis
 
 import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
+import androidx.compose.compiler.plugins.kotlin.lower.AbstractComposeLowering
 import androidx.compose.compiler.plugins.kotlin.lower.annotationClass
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.ir.declarations.IrAnnotationContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
@@ -64,7 +64,6 @@ import org.jetbrains.kotlin.ir.util.isFinalClass
 import org.jetbrains.kotlin.ir.util.isFunctionOrKFunction
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.util.isTypeParameter
-import org.jetbrains.kotlin.platform.jvm.isJvm
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 
 sealed class Stability {
@@ -308,7 +307,7 @@ private fun canInferStability(declaration: IrClass): Boolean {
     return KnownStableConstructs.stableTypes.contains(fqName) ||
         // On JS and Native we can't access StabilityInferred annotation for IR_EXTERNAL_DECLARATION_STUB,
         // therefore skip it for now and calculate the stability on the fly
-        context.platform.isJvm() &&
+        AbstractComposeLowering.isJvmTarget &&
         declaration.origin == IrDeclarationOrigin.IR_EXTERNAL_DECLARATION_STUB
 }
 

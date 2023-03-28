@@ -136,6 +136,15 @@ abstract class AbstractComposeLowering(
     val symbolRemapper: DeepCopySymbolRemapper,
     val metrics: ModuleMetrics
 ) : IrElementTransformerVoid(), ModuleLoweringPass {
+
+    companion object {
+        var isJvmTarget: Boolean = false
+    }
+
+    init {
+        isJvmTarget = context.platform?.isJvm() ?: false
+    }
+
     protected val builtIns = context.irBuiltIns
 
     private val _composerIrClass =
@@ -257,15 +266,15 @@ abstract class AbstractComposeLowering(
                 ).unboxValueIfInline()
             } else {
                 val primaryValueParameter = klass.primaryConstructor?.valueParameters?.get(0)
-                    ?: error("Expected a value parameter")
-                if (klass.properties.filter {
-                        it.name == primaryValueParameter.name && it.getter != null
-                }.count() == 0) {
-                    // K/JS and K/Native don't show a getter of an internal/private property,
+                val cantUnbox = primaryValueParameter == null || klass.properties.none {
+                    it.name == primaryValueParameter.name && it.getter != null
+                }
+                if (cantUnbox) {
+                    // LazyIr (external module) doesn't show a getter of a private property.
                     // So we can't unbox the value
                     return this
                 }
-                val fieldGetter = klass.getPropertyGetter(primaryValueParameter.name.identifier)
+                val fieldGetter = klass.getPropertyGetter(primaryValueParameter!!.name.identifier)
                     ?: error("Expected a getter")
                 return irCall(
                     symbol = fieldGetter,

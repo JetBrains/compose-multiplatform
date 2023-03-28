@@ -46,6 +46,8 @@ import org.jetbrains.kotlin.ir.util.isEnumEntry
 import org.jetbrains.kotlin.ir.util.isFileClass
 import org.jetbrains.kotlin.ir.util.isInterface
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
+import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.platform.jvm.isJvm
 
 enum class StabilityBits(val bits: Int) {
@@ -181,9 +183,21 @@ class ClassStabilityTransformer(
             declarations += stabilityField
         } else {
             // This ensures proper mangles in k/js and k/native (since kotlin 1.6.0-rc2)
-            val stabilityProp = makeStabilityProp().apply {
-                parent = this@addStabilityMarkerField
-                backingField = stabilityField
+            val stabilityProp = makeStabilityProp(stabilityField, stabilityExpression, this).also {
+                val clsRef = context.referenceClass(
+                    ClassId.topLevel(FqName("kotlinx.serialization.Transient"))
+                )
+                if (clsRef != null) {
+                    it.annotations = it.annotations + IrConstructorCallImpl(
+                        type = this.defaultType,
+                        symbol = clsRef.constructors.first(),
+                        constructorTypeArgumentsCount = 0,
+                        valueArgumentsCount = 0,
+                        startOffset = UNDEFINED_OFFSET,
+                        endOffset = UNDEFINED_OFFSET,
+                        typeArgumentsCount = 0
+                    )
+                }
             }
             stabilityField.correspondingPropertySymbol = stabilityProp.symbol
             declarations += stabilityProp
