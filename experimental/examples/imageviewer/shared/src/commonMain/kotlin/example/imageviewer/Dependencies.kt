@@ -18,7 +18,7 @@ abstract class Dependencies {
     open val externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
     val localization: Localization = when (getCurrentLanguage()) {
         AvailableLanguages.EN -> EnglishLocalization
-        AvailableLanguages.DE -> DeutschhLocalization
+        AvailableLanguages.DE -> DeutschLocalization
     }
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
@@ -60,6 +60,10 @@ interface Localization {
     val picture: String
     val takePhoto: String
     val addPhoto: String
+    val kotlinConfName: String
+    val kotlinConfDescription: String
+    val newPhotoName: String
+    val newPhotoDescription: String
 }
 
 interface ImageProvider {

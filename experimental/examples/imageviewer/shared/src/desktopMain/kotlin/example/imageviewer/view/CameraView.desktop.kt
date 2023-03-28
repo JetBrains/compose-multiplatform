@@ -14,12 +14,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import example.imageviewer.DesktopStorableImage
+import example.imageviewer.*
 import example.imageviewer.LocalLocalization
-import example.imageviewer.PlatformStorableImage
+import example.imageviewer.createNewPhotoNameAndDescription
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
-import example.imageviewer.resourcePictures
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.orEmpty
 import org.jetbrains.compose.resources.rememberImageBitmap
@@ -53,11 +52,12 @@ internal actual fun CameraView(
                 )
                 .padding(20.dp)
         )
+        val nameAndDescription = createNewPhotoNameAndDescription()
         Button(onClick = {
             onCapture(
                 createCameraPictureData(
-                    name = randomPicture.name,
-                    description = randomPicture.description,
+                    name = nameAndDescription.name,
+                    description = nameAndDescription.description,
                     gps = randomPicture.gps
                 ),
                 DesktopStorableImage(imageBitmap)

@@ -7,9 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import example.imageviewer.*
-import example.imageviewer.shared.R
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.ioDispatcher
 import kotlinx.coroutines.CoroutineScope
 
 @Composable

@@ -25,13 +25,11 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.tasks.Task
-import example.imageviewer.AndroidStorableImage
+import example.imageviewer.*
 import example.imageviewer.LocalLocalization
-import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
-import example.imageviewer.toImageBitmap
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Executors
@@ -95,7 +93,7 @@ private fun CameraWithGrantedPermission(
         )
         preview.setSurfaceProvider(previewView.surfaceProvider)
     }
-
+    val nameAndDescription = createNewPhotoNameAndDescription()
     Box(contentAlignment = Alignment.BottomCenter, modifier = modifier) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         Button(onClick = {
@@ -107,8 +105,8 @@ private fun CameraWithGrantedPermission(
                     fun sendToStorage(gpsPosition: GpsPosition) {
                         onCapture(
                             createCameraPictureData(
-                                name = "Kotlin Conf",
-                                description = "Kotlin Conf photo description",
+                                name = nameAndDescription.name,
+                                description = nameAndDescription.description,
                                 gps = gpsPosition
                             ),
                             AndroidStorableImage(imageBitmap)

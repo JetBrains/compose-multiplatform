@@ -14,6 +14,7 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.IosStorableImage
 import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
+import example.imageviewer.createNewPhotoNameAndDescription
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
@@ -138,7 +139,7 @@ private fun BoxScope.RealDeviceCamera(
             requestWhenInUseAuthorization()
         }
     }
-
+    val nameAndDescription = createNewPhotoNameAndDescription()
     var capturePhotoStarted by remember { mutableStateOf(false) }
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
@@ -153,8 +154,8 @@ private fun BoxScope.RealDeviceCamera(
                     val uiImage = UIImage(photoData)
                     onCapture(
                         createCameraPictureData(
-                            name = "Kotlin Conf",
-                            description = "Kotlin Conf photo description",
+                            name = nameAndDescription.name,
+                            description = nameAndDescription.description,
                             gps = gps
                         ),
                         IosStorableImage(uiImage)
