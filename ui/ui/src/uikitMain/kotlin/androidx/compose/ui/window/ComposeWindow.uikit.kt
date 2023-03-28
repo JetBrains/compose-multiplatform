@@ -22,6 +22,7 @@ import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.interop.LocalLayerContainer
+import androidx.compose.ui.interop.LocalMemoryWarning
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.platform.TextToolbar
@@ -39,6 +40,10 @@ import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.launch
 import org.jetbrains.skiko.SkikoUIView
 import org.jetbrains.skiko.TextActions
 import platform.CoreGraphics.CGPointMake
@@ -96,6 +101,9 @@ internal actual class ComposeWindow : UIViewController {
 
     private lateinit var layer: ComposeLayer
     private lateinit var content: @Composable () -> Unit
+    private val memoryWarningFlow: MutableSharedFlow<Unit> =
+        MutableSharedFlow(extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+
     private val keyboardVisibilityListener = object : NSObject() {
         @Suppress("unused")
         @ObjCAction
@@ -234,6 +242,7 @@ internal actual class ComposeWindow : UIViewController {
         layer.setContent(content = {
             CompositionLocalProvider(
                 LocalLayerContainer provides rootView,
+                LocalMemoryWarning provides memoryWarningFlow,
             ) {
                 content()
             }
@@ -311,8 +320,26 @@ internal actual class ComposeWindow : UIViewController {
     }
 
     override fun didReceiveMemoryWarning() {
+        fun printMemoryLog(str: String) {
+            println("MEMORY LOG: $str")
+        }
+        fun callGC(str:String) {
+            printMemoryLog("before GC.collect() $str")
+            kotlin.native.internal.GC.collect()
+            printMemoryLog("after  GC.collect() $str")
+        }
+
+        printMemoryLog("didReceiveMemoryWarning, maybe memory leak")
+        callGC("1")
+        GlobalScope.launch {
+            printMemoryLog("before memoryWarningFlow.emit(Unit)")
+            memoryWarningFlow.emit(Unit)
+            printMemoryLog("after  memoryWarningFlow.emit(Unit)")
+            callGC("2")
+        }
+        printMemoryLog("before super.didReceiveMemoryWarning()")
         super.didReceiveMemoryWarning()
-        error("didReceiveMemoryWarning, maybe memory leak")
+        printMemoryLog("after  super.didReceiveMemoryWarning()")
     }
 
     actual fun setContent(
