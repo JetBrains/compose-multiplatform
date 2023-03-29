@@ -12,7 +12,7 @@ import androidx.compose.ui.geometry.isSpecified
  * scaled and shifted in some area (a window, relative to its center)
  */
 class ScalableState {
-    val scaleLimits = 0.5f..10f
+    val scaleLimits = 0.2f..10f
 
     /**
      * Offset of the camera before scaling (an offset in pixels in the area coordinate system)

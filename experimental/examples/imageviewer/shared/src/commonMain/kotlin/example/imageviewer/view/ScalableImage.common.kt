@@ -40,7 +40,6 @@ internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, mod
 
         Box(
             modifier
-                .fillMaxSize()
                 .drawWithContent {
                     drawIntoCanvas {
                         it.withSave {
