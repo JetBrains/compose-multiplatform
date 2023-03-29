@@ -25,8 +25,8 @@ import platform.Foundation.*
 import platform.UIKit.*
 import platform.posix.memcpy
 
-private const val maxStorableImageSize = 1200
-private const val storableThumbnailSize = 180
+private const val maxStorableImageSizePx = 1200
+private const val storableThumbnailSizePx = 180
 
 class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
@@ -123,8 +123,8 @@ class IosImageStorage(
 
 private fun UIImage.resizeToThumbnail(): UIImage {
     val targetScale = maxOf(
-        storableThumbnailSize.toFloat() / size.useContents { width },
-        storableThumbnailSize.toFloat() / size.useContents { height },
+        storableThumbnailSizePx.toFloat() / size.useContents { width },
+        storableThumbnailSizePx.toFloat() / size.useContents { height },
     )
     val newSize = size.useContents { CGSizeMake(width * targetScale, height * targetScale) }
     return resize(newSize)
@@ -132,8 +132,8 @@ private fun UIImage.resizeToThumbnail(): UIImage {
 
 private fun UIImage.resizeToBig(): UIImage {
     val targetScale = maxOf(
-        maxStorableImageSize.toFloat() / size.useContents { width },
-        maxStorableImageSize.toFloat() / size.useContents { height },
+        maxStorableImageSizePx.toFloat() / size.useContents { width },
+        maxStorableImageSizePx.toFloat() / size.useContents { height },
     )
     val newSize = size.useContents { CGSizeMake(width * targetScale, height * targetScale) }
     return resize(newSize)

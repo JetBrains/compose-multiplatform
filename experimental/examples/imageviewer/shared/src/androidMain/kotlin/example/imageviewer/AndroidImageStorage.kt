@@ -9,8 +9,8 @@ import example.imageviewer.model.PictureData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private const val maxStorableImageSize = 2000
-private const val storableThumbnailSize = 200
+private const val maxStorableImageSizePx = 2000
+private const val storableThumbnailSizePx = 200
 
 class AndroidImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
@@ -26,8 +26,8 @@ class AndroidImageStorage(
             val androidBitmap = image.imageBitmap.asAndroidBitmap()
 
             val targetScale = maxOf(
-                maxStorableImageSize.toFloat() / androidBitmap.width,
-                maxStorableImageSize.toFloat() / androidBitmap.height
+                maxStorableImageSizePx.toFloat() / androidBitmap.width,
+                maxStorableImageSizePx.toFloat() / androidBitmap.height
             )
             mapWithBigImages[picture] =
                 if (targetScale < 1.0) {
@@ -40,8 +40,8 @@ class AndroidImageStorage(
                 }
 
             val targetThumbnailScale = maxOf(
-                storableThumbnailSize.toFloat() / androidBitmap.width,
-                storableThumbnailSize.toFloat() / androidBitmap.height
+                storableThumbnailSizePx.toFloat() / androidBitmap.width,
+                storableThumbnailSizePx.toFloat() / androidBitmap.height
             )
             mapWithThumbnails[picture] = androidBitmap.scale(
                 width = (androidBitmap.width * targetThumbnailScale).toInt(),

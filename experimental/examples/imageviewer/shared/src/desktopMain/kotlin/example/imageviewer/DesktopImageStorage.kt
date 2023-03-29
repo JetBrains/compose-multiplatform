@@ -9,8 +9,8 @@ import example.imageviewer.model.PictureData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-private const val maxStorableImageSize = 2000
-private const val storableThumbnailSize = 200
+private const val maxStorableImageSizePx = 2000
+private const val storableThumbnailSizePx = 200
 
 class DesktopImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
@@ -26,8 +26,8 @@ class DesktopImageStorage(
             val awtImage = image.imageBitmap.toAwtImage()
 
             val targetScale = maxOf(
-                maxStorableImageSize.toFloat() / awtImage.width,
-                maxStorableImageSize.toFloat() / awtImage.height
+                maxStorableImageSizePx.toFloat() / awtImage.width,
+                maxStorableImageSizePx.toFloat() / awtImage.height
             )
             mapWithBigImages[picture] =
                 if (targetScale < 1.0) {
@@ -41,8 +41,8 @@ class DesktopImageStorage(
                 }
 
             val targetThumbnailScale = maxOf(
-                storableThumbnailSize.toFloat() / awtImage.width,
-                storableThumbnailSize.toFloat() / awtImage.height
+                storableThumbnailSizePx.toFloat() / awtImage.width,
+                storableThumbnailSizePx.toFloat() / awtImage.height
             )
             mapWithThumbnails[picture] = scaleBitmapAspectRatio(
                 awtImage,
