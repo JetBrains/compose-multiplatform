@@ -54,46 +54,34 @@ internal fun FullscreenImageScreen(
     Box(Modifier.fillMaxSize().background(color = ImageviewerColors.fullScreenImageBackground)) {
         if (imageWithFilter != null) {
             val scalableState = remember { ScalableState() }
-            scalableState.updateImageSize(imageWithFilter.width, imageWithFilter.height)
-            val visiblePartOfImage: IntRect = scalableState.visiblePart
-            Box(
-                Modifier.fillMaxSize()
-                    .onGloballyPositioned { coordinates ->
-                        scalableState.changeBoxSize(coordinates.size)
-                    }
-                    .addUserInput(scalableState)
+
+            ScalableImage(
+                scalableState,
+                imageWithFilter,
+                modifier = Modifier.fillMaxSize(),
+            )
+
+            Column(
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
+                    .background(ImageviewerColors.filterButtonsBackground)
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    modifier = Modifier.fillMaxSize(),
-                    painter = BitmapPainter(
-                        imageWithFilter,
-                        srcOffset = visiblePartOfImage.topLeft,
-                        srcSize = visiblePartOfImage.size
-                    ),
-                    contentDescription = null,
+                FilterButtons(
+                    picture = picture,
+                    filters = availableFilters,
+                    selectedFilters = selectedFilters,
+                    onSelectFilter = {
+                        if (it !in selectedFilters) {
+                            selectedFilters += it
+                        } else {
+                            selectedFilters -= it
+                        }
+                    },
                 )
-                Column(
-                    Modifier
-                        .align(Alignment.BottomCenter)
-                        .clip(RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp))
-                        .background(ImageviewerColors.filterButtonsBackground)
-                        .padding(16.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    FilterButtons(
-                        picture = picture,
-                        filters = availableFilters,
-                        selectedFilters = selectedFilters,
-                        onSelectFilter = {
-                            if (it !in selectedFilters) {
-                                selectedFilters += it
-                            } else {
-                                selectedFilters -= it
-                            }
-                        },
-                    )
-                    ZoomControllerView(Modifier, scalableState)
-                }
+                ZoomControllerView(Modifier, scalableState)
             }
         } else {
             LoadingScreen()

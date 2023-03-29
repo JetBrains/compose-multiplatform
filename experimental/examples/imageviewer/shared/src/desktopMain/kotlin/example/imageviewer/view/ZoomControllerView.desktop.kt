@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.model.MAX_SCALE
 import example.imageviewer.model.MIN_SCALE
 import example.imageviewer.model.ScalableState
-import example.imageviewer.model.setScale
 
 @Composable
 internal actual fun ZoomControllerView(modifier: Modifier, scalableState: ScalableState) {
