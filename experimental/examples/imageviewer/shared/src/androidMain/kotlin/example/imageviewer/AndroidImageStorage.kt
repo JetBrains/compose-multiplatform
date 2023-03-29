@@ -16,38 +16,16 @@ class AndroidImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
-    val largeImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
-    val thumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    private val largeImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    private val thumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
+
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
         }
         ioScope.launch {
-            val androidBitmap = image.imageBitmap.asAndroidBitmap()
-
-            val targetScale = maxOf(
-                maxStorableImageSizePx.toFloat() / androidBitmap.width,
-                maxStorableImageSizePx.toFloat() / androidBitmap.height
-            )
-            largeImages[picture] =
-                if (targetScale < 1.0) {
-                    androidBitmap.scale(
-                        width = (androidBitmap.width * targetScale).toInt(),
-                        height = (androidBitmap.height * targetScale).toInt()
-                    ).asImageBitmap()
-                } else {
-                    image.imageBitmap
-                }
-
-            val targetThumbnailScale = maxOf(
-                storableThumbnailSizePx.toFloat() / androidBitmap.width,
-                storableThumbnailSizePx.toFloat() / androidBitmap.height
-            )
-            thumbnails[picture] = androidBitmap.scale(
-                width = (androidBitmap.width * targetThumbnailScale).toInt(),
-                height = (androidBitmap.height * targetThumbnailScale).toInt()
-            ).asImageBitmap()
-
+            largeImages[picture] = image.imageBitmap.fitInto(maxStorableImageSizePx)
+            thumbnails[picture] = image.imageBitmap.fitInto(storableThumbnailSizePx)
             pictures.add(0, picture)
         }
     }
@@ -59,5 +37,19 @@ class AndroidImageStorage(
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
         return largeImages[picture]!!
     }
+}
 
+private fun ImageBitmap.fitInto(px: Int): ImageBitmap {
+    val targetScale = maxOf(
+        px.toFloat() / width,
+        px.toFloat() / height
+    )
+    return if (targetScale < 1.0) {
+        asAndroidBitmap().scale(
+            width = (width * targetScale).toInt(),
+            height = (height * targetScale).toInt()
+        ).asImageBitmap()
+    } else {
+        this
+    }
 }

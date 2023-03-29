@@ -82,10 +82,10 @@ class IosImageStorage(
 
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
-            UIImageJPEGRepresentation(image.rawValue.resizeToThumbnail(), 0.6)
+            UIImageJPEGRepresentation(image.rawValue.fitInto(storableThumbnailSizePx), 0.6)
                 ?.writeToFile(picture.thumbnailJpgFile)
             pictures.add(0, picture)
-            UIImageJPEGRepresentation(image.rawValue.resizeToBig(), 0.6)
+            UIImageJPEGRepresentation(image.rawValue.fitInto(maxStorableImageSizePx), 0.6)
                 ?.writeToFile(picture.jpgFile)
             val jsonStr = Json.Default.encodeToString(picture)
             jsonStr.writeToFile(picture.jsonFile)
@@ -121,19 +121,10 @@ class IosImageStorage(
 
 }
 
-private fun UIImage.resizeToThumbnail(): UIImage {
+private fun UIImage.fitInto(px: Int): UIImage {
     val targetScale = maxOf(
-        storableThumbnailSizePx.toFloat() / size.useContents { width },
-        storableThumbnailSizePx.toFloat() / size.useContents { height },
-    )
-    val newSize = size.useContents { CGSizeMake(width * targetScale, height * targetScale) }
-    return resize(newSize)
-}
-
-private fun UIImage.resizeToBig(): UIImage {
-    val targetScale = maxOf(
-        maxStorableImageSizePx.toFloat() / size.useContents { width },
-        maxStorableImageSizePx.toFloat() / size.useContents { height },
+        px.toFloat() / size.useContents { width },
+        px.toFloat() / size.useContents { height },
     )
     val newSize = size.useContents { CGSizeMake(width * targetScale, height * targetScale) }
     return resize(newSize)
