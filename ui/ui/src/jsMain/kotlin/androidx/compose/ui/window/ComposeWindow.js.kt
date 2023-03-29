@@ -72,7 +72,6 @@ internal actual class ComposeWindow actual constructor() {
     actual fun setContent(
         content: @Composable () -> Unit
     ) {
-        println("ComposeWindow.setContent")
         layer.setDensity(density)
         layer.setContent(
             content = content

@@ -1,5 +1,6 @@
 package androidx.compose.mpp.demo
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.window.Window
 import kotlinx.browser.document
 import org.jetbrains.skiko.GenericSkikoView
@@ -10,7 +11,8 @@ import org.w3c.dom.HTMLCanvasElement
 fun main() {
     onWasmReady {
         Window("Compose/JS sample") {
-            myContent()
+            val app = remember { App() }
+            app.Content()
         }
     }
 }

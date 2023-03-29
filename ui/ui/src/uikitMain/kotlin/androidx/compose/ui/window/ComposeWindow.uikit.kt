@@ -324,7 +324,6 @@ internal actual class ComposeWindow : UIViewController {
     actual fun setContent(
         content: @Composable () -> Unit
     ) {
-        println("ComposeWindow.setContent")
         this.content = content
     }
 

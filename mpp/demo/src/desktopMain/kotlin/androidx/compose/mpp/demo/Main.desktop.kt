@@ -16,13 +16,17 @@
 
 package androidx.compose.mpp.demo
 
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.singleWindowApplication
 
-fun main() = singleWindowApplication(
+fun main(args: Array<String>) = singleWindowApplication(
     title = "Compose MPP demo",
     state = WindowState(width = 1024.dp, height = 850.dp),
 ) {
-    myContent()
+    val app = remember {
+        App(initialScreenName = args.getOrNull(0))
+    }
+    app.Content()
 }

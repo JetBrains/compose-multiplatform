@@ -16,49 +16,12 @@
 
 package androidx.compose.mpp.demo
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.window.ComposeUIViewController
 
+// TODO This module is just a proxy to run the demo from mpp:demo. Figure out how to get rid of it.
+//  If it is removed, there is no available configuration in IDE
 fun getViewControllerWithCompose() = ComposeUIViewController {
-    val textState1 = remember { mutableStateOf("text field 1") }
-    val textState2 = remember { mutableStateOf("text field 2") }
-    Column {
-        Text(".")
-        Text(".")
-        Text(".")
-        Text(".")
-        Text(".")
-        Text(".")
-        Text(".")
-        Text(".")
-        Text("Hello, UIKit")
-        TextField(modifier = Modifier.fillMaxWidth(), value = textState1.value, onValueChange = {
-            textState1.value = it
-        })
-        TextField(modifier = Modifier.fillMaxWidth(), value = textState2.value, onValueChange = {
-            textState2.value = it
-        })
-        Image(
-            painter = object : Painter() {
-                override val intrinsicSize: Size = Size(16f, 16f)
-                override fun DrawScope.onDraw() {
-                    drawRect(color = Color.Blue)
-                }
-            },
-            contentDescription = "image sample"
-        )
-    }
+    val app = remember() { App() }
+    app.Content()
 }

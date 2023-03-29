@@ -69,6 +69,7 @@ kotlin {
                 implementation(project(":compose:foundation:foundation-layout"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:mpp"))
+                implementation(project(":compose:mpp:demo"))
                 implementation(project(":compose:runtime:runtime"))
                 implementation(project(":compose:ui:ui"))
                 implementation(project(":compose:ui:ui-graphics"))
