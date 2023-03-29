@@ -23,7 +23,7 @@ import kotlin.math.min
 import kotlin.math.pow
 
 @Composable
-fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
+internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
     BoxWithConstraints {
         val areaSize = areaSize
         val imageSize = image.size
