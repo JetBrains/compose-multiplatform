@@ -28,8 +28,8 @@ Then choose **iosApp** configuration in IDE and run it.
 
 ### Running Android application
 
- - Get a [Google Maps API key](https://developers.google.com/maps/documentation/android-sdk/get-api-key)
- - Add to local.properties: `sdk.dir=YOUR_SDK_PATH`
- - Create a file in the root directory named `local.properties` with a single line that looks like
-   this, replacing YOUR_KEY with the key from step 1: `MAPS_API_KEY=YOUR_KEY`
- - Open project in IntelliJ IDEA or Android Studio and run "android" configuration.
+- Get a [Google Maps API key](https://developers.google.com/maps/documentation/android-sdk/get-api-key)
+- Add to `local.properties` file located in the root directory (create if it doesn't exist):
+  - `MAPS_API_KEY=YOUR_KEY` where `YOUR_KEY` is your key from previous step;
+  - `sdk.dir=YOUR_SDK_PATH` where `YOUR_SDK_PATH` is a path to Android SDK in your system.
+- Open project in IntelliJ IDEA or Android Studio and run `androidApp` configuration.
