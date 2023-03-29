@@ -28,7 +28,6 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalImageProvider
-import example.imageviewer.memoryWarningFlow
 import example.imageviewer.model.PictureData
 
 @OptIn(ExperimentalAnimationApi::class)
@@ -63,13 +62,6 @@ internal fun PreviewImage(
                 var image: ImageBitmap? by remember(currentPicture) { mutableStateOf(null) }
                 LaunchedEffect(currentPicture) {
                     image = imageProvider.getImage(currentPicture)
-                }
-                val memoryWarningFlow = memoryWarningFlow()
-                LaunchedEffect(Unit) {
-                    memoryWarningFlow.collect {
-                        image = null
-                        image = imageProvider.getThumbnail(currentPicture)
-                    }
                 }
                 if (image != null) {
                     Box(Modifier.fillMaxSize()) {

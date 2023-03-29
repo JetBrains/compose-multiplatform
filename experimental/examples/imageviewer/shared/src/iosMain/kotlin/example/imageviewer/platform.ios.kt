@@ -2,15 +2,12 @@ package example.imageviewer
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.interop.LocalMemoryWarning
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
 import platform.CoreFoundation.CFUUIDCreate
 import platform.CoreFoundation.CFUUIDCreateString
 import platform.Foundation.CFBridgingRelease
@@ -47,6 +44,3 @@ actual fun createUUID(): String =
     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
 
 actual val ioDispatcher = Dispatchers.IO
-
-@Composable
-internal actual fun memoryWarningFlow(): Flow<Unit> = LocalMemoryWarning.current

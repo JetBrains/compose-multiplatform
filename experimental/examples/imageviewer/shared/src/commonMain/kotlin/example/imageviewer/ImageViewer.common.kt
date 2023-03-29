@@ -40,20 +40,10 @@ internal fun ImageViewerWithProvidedDependencies(
     val selectedPictureIndex: MutableState<Int> = mutableStateOf(0)
     val navigationStack = remember { NavigationStack<Page>(GalleryPage()) }
     val externalEvents = LocalInternalEvents.current
-    var showCameraScreen by remember { mutableStateOf(false) }//todo temp for checking memory warnings
     LaunchedEffect(Unit) {
         externalEvents.collect {
             if (it == ExternalImageViewerEvent.Escape) {
                 navigationStack.back()
-            }
-        }
-    }
-    val memoryWarningFlow = memoryWarningFlow()
-    LaunchedEffect(Unit) {
-        memoryWarningFlow.collect {
-            showCameraScreen = false
-            while (navigationStack.stack.size > 1) {
-                navigationStack.stack.removeLast()
             }
         }
     }
@@ -81,8 +71,7 @@ internal fun ImageViewerWithProvidedDependencies(
                             navigationStack.push(MemoryPage(previewPictureId))
                         }
                     ) {
-                        showCameraScreen = true
-//                        navigationStack.push(CameraPage())
+                        navigationStack.push(CameraPage())
                     }
                 }
 
@@ -110,18 +99,18 @@ internal fun ImageViewerWithProvidedDependencies(
                         },
                     )
                 }
+
+                is CameraPage -> {
+                    CameraScreen(
+                        onBack = { resetSelectedPicture ->
+                            if (resetSelectedPicture) {
+                                selectedPictureIndex.value = 0
+                            }
+                            navigationStack.back()
+                        },
+                    )
+                }
             }
-        }
-        if (showCameraScreen) {
-            CameraScreen(
-                onBack = { resetSelectedPicture ->
-                    if (resetSelectedPicture) {
-                        selectedPictureIndex.value = 0
-                    }
-                    showCameraScreen = false
-//                    navigationStack.back()
-                },
-            )
         }
     }
 }
