@@ -1,5 +1,7 @@
 package example.imageviewer.storage
 
+import android.content.Context
+import android.graphics.Bitmap
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -8,37 +10,73 @@ import androidx.core.graphics.scale
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
+import example.imageviewer.toAndroidBitmap
+import example.imageviewer.toImageBitmap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
 
 private const val maxStorableImageSizePx = 2000
 private const val storableThumbnailSizePx = 200
+private const val jpegCompressionQuality = 60
 
 class AndroidImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
-    private val ioScope: CoroutineScope
+    private val ioScope: CoroutineScope,
+    context: Context
 ) : ImageStorage {
-    private val largeImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
-    private val thumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    private val savePictureDir = File(context.filesDir, "takenPhotos")
 
-    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+    private val PictureData.Camera.jpgFile get() = File(savePictureDir, "$id.jpg")
+    private val PictureData.Camera.thumbnailJpgFile get() = File(savePictureDir, "$id-thumbnail.jpg")
+    private val PictureData.Camera.jsonFile get() = File(savePictureDir, "$id.json")
+
+    init {
+        if (savePictureDir.isDirectory) {
+            val files = savePictureDir.listFiles { _, name: String ->
+                name.endsWith(".json")
+            } ?: emptyArray()
+            pictures.addAll(
+                index = 0,
+                elements = files.map {
+                    it.readText().toCameraMetadata()
+                }.sortedByDescending {
+                    it.timeStampSeconds
+                }
+            )
+        } else {
+            savePictureDir.mkdirs()
+        }
+    }
+
+    override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
         }
         ioScope.launch {
-            largeImages[picture] = image.imageBitmap.fitInto(maxStorableImageSizePx)
-            thumbnails[picture] = image.imageBitmap.fitInto(storableThumbnailSizePx)
-            pictures.add(0, picture)
+            with(image.imageBitmap) {
+                pictureData.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
+                pictureData.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
+
+            }
+            pictures.add(0, pictureData)
+            pictureData.jsonFile.writeText(pictureData.toJson())
         }
     }
 
-    override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
-        return thumbnails[picture]!!
-    }
+    override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap =
+        withContext(ioScope.coroutineContext) {
+            pictureData.thumbnailJpgFile.readBytes().toImageBitmap()
+        }
 
-    override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
-        return largeImages[picture]!!
-    }
+    override suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap =
+        withContext(ioScope.coroutineContext) {
+            pictureData.jpgFile.readBytes().toImageBitmap()
+        }
 }
 
 private fun ImageBitmap.fitInto(px: Int): ImageBitmap {
@@ -53,5 +91,17 @@ private fun ImageBitmap.fitInto(px: Int): ImageBitmap {
         ).asImageBitmap()
     } else {
         this
+    }
+}
+
+private fun PictureData.Camera.toJson(): String =
+    Json.Default.encodeToString(this)
+
+private fun String.toCameraMetadata(): PictureData.Camera =
+    Json.Default.decodeFromString(this)
+
+private fun File.writeJpeg(image: ImageBitmap, compressionQuality: Int = jpegCompressionQuality) {
+    outputStream().use {
+        image.asAndroidBitmap().compress(Bitmap.CompressFormat.JPEG, compressionQuality, it)
     }
 }

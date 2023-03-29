@@ -27,5 +27,5 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
     }
-    override val imageStorage: ImageStorage = AndroidImageStorage(pictures, ioScope)
+    override val imageStorage: ImageStorage = AndroidImageStorage(pictures, ioScope, context)
 }

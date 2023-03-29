@@ -6,14 +6,12 @@ import androidx.compose.ui.graphics.toComposeImageBitmap
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
+import example.imageviewer.toImageBitmap
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.addressOf
 import kotlinx.cinterop.useContents
 import kotlinx.cinterop.usePinned
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -27,6 +25,7 @@ import platform.posix.memcpy
 
 private const val maxStorableImageSizePx = 1200
 private const val storableThumbnailSizePx = 180
+private const val jpegCompressionQuality = 60
 
 class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
@@ -42,6 +41,10 @@ class IosImageStorage(
         error = null
     )!!.URLByAppendingPathComponent("ImageViewer/takenPhotos/")!!
 
+    private val PictureData.Camera.jpgFile get() = makeFileUrl("$id.jpg")
+    private val PictureData.Camera.thumbnailJpgFile get() = makeFileUrl("$id-thumbnail.jpg")
+    private val PictureData.Camera.jsonFile get() = makeFileUrl("$id.json")
+
     init {
         val directoryContent = fileManager.contentsOfDirectoryAtPath(savePictureDir.path!!, null)
         if (directoryContent != null) {
@@ -50,8 +53,7 @@ class IosImageStorage(
                 elements = directoryContent.map { it.toString() }
                     .filter { it.endsWith(".json") }
                     .map {
-                        val jsonStr = readStringFromFile(it)
-                        Json.Default.decodeFromString<PictureData.Camera>(jsonStr)
+                        makeFileUrl(it).readText().toCameraMetadata()
                     }.sortedByDescending {
                         it.timeStampSeconds
                     }
@@ -64,61 +66,26 @@ class IosImageStorage(
     private fun makeFileUrl(fileName: String) =
         savePictureDir.URLByAppendingPathComponent(fileName)!!
 
-    private fun readStringFromFile(fileName: String): String =
-        NSString.stringWithContentsOfURL(
-            url = makeFileUrl(fileName),
-            encoding = NSUTF8StringEncoding,
-            error = null,
-        ) as String
-
-    private fun String.writeToFile(fileName: String) =
-        writeToURL(makeFileUrl(fileName))
-
-    private fun readPngFromFile(fileName: String) =
-        NSData.dataWithContentsOfURL(makeFileUrl(fileName))
-
-    private fun NSData.writeToFile(fileName: String) =
-        writeToURL(makeFileUrl(fileName), true)
-
-    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+    override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
-            UIImageJPEGRepresentation(image.rawValue.fitInto(storableThumbnailSizePx), 0.6)
-                ?.writeToFile(picture.thumbnailJpgFile)
-            pictures.add(0, picture)
-            UIImageJPEGRepresentation(image.rawValue.fitInto(maxStorableImageSizePx), 0.6)
-                ?.writeToFile(picture.jpgFile)
-            val jsonStr = Json.Default.encodeToString(picture)
-            jsonStr.writeToFile(picture.jsonFile)
+            with(image.rawValue) {
+                pictureData.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
+                pictureData.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
+            }
+            pictures.add(0, pictureData)
+            pictureData.jsonFile.writeText(pictureData.toJson())
         }
     }
 
-    override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
-        ioScope.async {
-            val jpgRepresentation = readPngFromFile(picture.thumbnailJpgFile)!!
-            val byteArray: ByteArray = ByteArray(jpgRepresentation.length.toInt()).apply {
-                usePinned {
-                    memcpy(it.addressOf(0), jpgRepresentation.bytes, jpgRepresentation.length)
-                }
-            }
-            Image.makeFromEncoded(byteArray).toComposeImageBitmap()
-        }.await()
+    override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap =
+        withContext(ioScope.coroutineContext) {
+            pictureData.thumbnailJpgFile.readBytes().toImageBitmap()
+        }
 
-    override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
-        ioScope.async {
-            fun getFileContent() = readPngFromFile(picture.jpgFile)
-            var jpgRepresentation: NSData? = getFileContent()
-            while (jpgRepresentation == null) {
-                yield()
-                jpgRepresentation = getFileContent()
-            }
-            val byteArray: ByteArray = ByteArray(jpgRepresentation.length.toInt()).apply {
-                usePinned {
-                    memcpy(it.addressOf(0), jpgRepresentation.bytes, jpgRepresentation.length)
-                }
-            }
-            Image.makeFromEncoded(byteArray).toComposeImageBitmap()
-        }.await()
-
+    override suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap =
+        withContext(ioScope.coroutineContext) {
+            pictureData.jpgFile.readBytes().toImageBitmap()
+        }
 }
 
 private fun UIImage.fitInto(px: Int): UIImage {
@@ -160,12 +127,47 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     return newImage!!
 }
 
-private val PictureData.Camera.jpgFile get(): String = id + ".jpg"
-private val PictureData.Camera.thumbnailJpgFile get(): String = id + "-thumbnail.jpg"
-private val PictureData.Camera.jsonFile get(): String = id + ".json"
-private fun String.writeToURL(url: NSURL) = (this as NSString).writeToURL(
-    url = url,
-    atomically = true,
-    encoding = NSUTF8StringEncoding,
-    error = null
-)
+private fun PictureData.Camera.toJson(): String =
+    Json.Default.encodeToString(this)
+
+private fun String.toCameraMetadata(): PictureData.Camera =
+    Json.Default.decodeFromString(this)
+
+private suspend fun NSURL.readData(): NSData {
+    while (true) {
+        val data = NSData.dataWithContentsOfURL(this)
+        if (data != null)
+            return data
+        yield()
+    }
+}
+
+private suspend fun NSURL.readBytes(): ByteArray =
+    with(readData()) {
+        ByteArray(length.toInt()).apply {
+            usePinned {
+                memcpy(it.addressOf(0), bytes, length)
+            }
+        }
+    }
+
+private fun NSURL.writeJpeg(image: UIImage, compressionQuality: Int = jpegCompressionQuality) {
+    UIImageJPEGRepresentation(image, compressionQuality / 100.0)
+        ?.writeToURL(this, true)
+}
+
+private fun NSURL.readText(): String =
+    NSString.stringWithContentsOfURL(
+        url = this,
+        encoding = NSUTF8StringEncoding,
+        error = null,
+    ) as String
+
+private fun NSURL.writeText(text: String) {
+    (text as NSString).writeToURL(
+        url = this,
+        atomically = true,
+        encoding = NSUTF8StringEncoding,
+        error = null
+    )
+}

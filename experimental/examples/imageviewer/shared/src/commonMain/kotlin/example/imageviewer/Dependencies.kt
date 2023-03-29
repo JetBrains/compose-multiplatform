@@ -69,9 +69,9 @@ interface ImageProvider {
 }
 
 interface ImageStorage {
-    fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
-    suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
-    suspend fun getImage(picture: PictureData.Camera): ImageBitmap
+    fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage)
+    suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap
+    suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap
 }
 
 internal val LocalLocalization = staticCompositionLocalOf<Localization> {
