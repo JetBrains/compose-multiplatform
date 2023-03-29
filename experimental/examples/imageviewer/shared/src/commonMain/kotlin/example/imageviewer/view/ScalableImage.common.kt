@@ -5,7 +5,6 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
@@ -30,12 +29,14 @@ internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, mod
         val imageCenter = Offset(image.width / 2f, image.height / 2f)
         val areaCenter = Offset(areaSize.width / 2f, areaSize.height / 2f)
 
-        DisposableEffect(Unit) {
-            scalableState.setScale(
-                min(areaSize.width / imageSize.width, areaSize.height / imageSize.height),
-                areaCenter
-            )
-            onDispose { }
+        if (areaSize.width > 0 && areaSize.height > 0) {
+            DisposableEffect(Unit) {
+                scalableState.setScale(
+                    min(areaSize.width / imageSize.width, areaSize.height / imageSize.height),
+                    Offset.Zero,
+                )
+                onDispose { }
+            }
         }
 
         Box(
@@ -54,14 +55,14 @@ internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, mod
                 .pointerInput(Unit) {
                     detectTransformGestures { centroid, pan, zoom, _ ->
                         scalableState.addPan(pan)
-                        scalableState.addScale(zoom, centroid)
+                        scalableState.addScale(zoom, centroid - areaCenter)
                     }
                 }
                 .onPointerEvent(PointerEventType.Scroll) {
-                    val gestureCentroid = it.changes[0].position
+                    val centroid = it.changes[0].position
                     val delta = it.changes[0].scrollDelta
-                    val gestureZoom = 1.2f.pow(-delta.y)
-                    scalableState.addScale(gestureZoom, gestureCentroid - areaCenter)
+                    val zoom = 1.2f.pow(-delta.y)
+                    scalableState.addScale(zoom, centroid - areaCenter)
                 }
                 .pointerInput(Unit) {
                     detectTapGestures(onDoubleTap = { position ->
@@ -71,7 +72,7 @@ internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, mod
                             } else {
                                 scalableState.scaleLimits.endInclusive
                             },
-                            position
+                            position - areaCenter
                         )
                     }) { }
                 },
