@@ -197,6 +197,8 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(project(":internal-testutils-fonts"))
                     implementation(libs.mockitoCore)
                     implementation(libs.mockitoKotlin)
+                    implementation(libs.mockitoCore4)
+                    implementation(libs.mockitoKotlin4)
                     implementation(libs.kotlinReflect)
                 }
             }

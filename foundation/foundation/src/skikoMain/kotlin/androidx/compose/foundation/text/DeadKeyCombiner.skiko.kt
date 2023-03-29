@@ -17,18 +17,10 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.ui.input.key.KeyEvent
+import androidx.compose.ui.input.key.utf16CodePoint
 
-/**
- * Key combiner which buffers dead keys and combines them with subsequent keys as necessary.
- *
- * It is NOT thread safe.
- */
-internal expect class DeadKeyCombiner() {
-
-    /**
-     * @param event the key event received by the combiner
-     * @return a unicode code point to emit in response to the event,
-     * or null if no code point should be emitted
-     */
-    fun consume(event: KeyEvent): Int?
+internal actual class DeadKeyCombiner {
+    // TODO needs actual impl
+    // TODO: [1.4 Update] provide proper implementation
+    actual fun consume(event: KeyEvent): Int? = event.utf16CodePoint
 }

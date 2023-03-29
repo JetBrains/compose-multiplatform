@@ -506,7 +506,7 @@ class TimePickerColors internal constructor(
 fun rememberTimePickerState(
     initialHour: Int = 0,
     initialMinute: Int = 0,
-    is24Hour: Boolean = is24HourFormat,
+    is24Hour: Boolean = is24HourFormat(),
 ): TimePickerState = rememberSaveable(
     saver = TimePickerState.Saver()
 ) {

@@ -42,7 +42,7 @@ import androidx.compose.ui.semantics.collapse
 import androidx.compose.ui.semantics.expand
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
-import java.lang.Float.max
+import kotlin.math.max
 import kotlin.math.roundToInt
 import kotlinx.coroutines.launch
 
@@ -309,7 +309,8 @@ private fun BottomSheetScaffoldLayout(
             bottomSheet(layoutHeight)
         }[0].measure(looseConstraints)
         val sheetOffsetY = sheetOffset().roundToInt()
-        val sheetOffsetX = Integer.max(0, (layoutWidth - sheetPlaceable.width) / 2)
+        // TODO: [1.4 Update]
+        val sheetOffsetX = max(0, (layoutWidth - sheetPlaceable.width) / 2)
 
         val topBarPlaceable = topBar?.let {
             subcompose(BottomSheetScaffoldLayoutSlot.TopBar) { topBar() }[0]

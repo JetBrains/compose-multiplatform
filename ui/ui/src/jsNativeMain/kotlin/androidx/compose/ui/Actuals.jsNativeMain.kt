@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package androidx.compose.ui
 
 import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 import org.jetbrains.skiko.SkikoInputModifiers
 
 internal actual fun NativeKeyEvent.toPointerKeyboardModifiers(): PointerKeyboardModifiers {
@@ -28,4 +30,13 @@ internal actual fun NativeKeyEvent.toPointerKeyboardModifiers(): PointerKeyboard
         isMetaPressed = modifiers.has(SkikoInputModifiers.META),
         // TODO: add other modifiers when they are available in SkikoInputModifiers
     )
+}
+
+// TODO: For non-JVM platforms, you can revive the kotlin-reflect implementation from
+//  https://android-review.googlesource.com/c/platform/frameworks/support/+/2441379
+@OptIn(ExperimentalComposeUiApi::class)
+internal actual fun InspectorInfo.tryPopulateReflectively(
+    element: ModifierNodeElement<*>
+) {
+    // TODO: [1.4 Update] implement it (see todo from Google)
 }

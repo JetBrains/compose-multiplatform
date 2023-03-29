@@ -19,7 +19,7 @@ package androidx.compose.runtime.collection
 /**
  * Map of (int) -> Element that attempts to avoid boxing.
  */
-internal expect class IntMap<E> {
+internal expect class IntMap<E>() {
     /**
      * True if this map contains key
      */

@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -437,7 +437,7 @@ internal class BackwardsCompatNode(element: Modifier.Element) :
     override fun modifyFocusProperties(focusProperties: FocusProperties) {
         val focusOrderModifier = element
         check(focusOrderModifier is FocusOrderModifier)
-        focusProperties.apply(FocusOrderModifierToProperties(focusOrderModifier))
+        focusProperties.apply(createFocusOrderModifierToProperties(focusOrderModifier))
     }
 
     override fun toString(): String = element.toString()
@@ -461,10 +461,10 @@ private val updateModifierLocalConsumer = { it: BackwardsCompatNode ->
  * the ModifierLocalConsumerEntity and ModifierLocalProviderEntity.
  */
 @Suppress("DEPRECATION")
-private class FocusOrderModifierToProperties(
-    val modifier: FocusOrderModifier
+private fun createFocusOrderModifierToProperties(
+    modifier: FocusOrderModifier
 ) : (FocusProperties) -> Unit {
-    override fun invoke(focusProperties: FocusProperties) {
+    return { focusProperties ->
         modifier.populateFocusOrder(FocusOrder(focusProperties))
     }
 }

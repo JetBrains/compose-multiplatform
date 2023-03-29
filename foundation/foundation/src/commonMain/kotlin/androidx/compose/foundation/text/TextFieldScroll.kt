@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -81,12 +81,7 @@ internal fun Modifier.textFieldScrollable(
     // TODO: b/255557085 remove when / if rememberScrollableState exposes lambda parameters for
     //  setting these
     val wrappedScrollableState = remember(scrollableState, scrollerPosition) {
-        object : ScrollableState by scrollableState {
-            override val canScrollForward by derivedStateOf {
-                scrollerPosition.offset < scrollerPosition.maximum
-            }
-            override val canScrollBackward by derivedStateOf { scrollerPosition.offset > 0f }
-        }
+        createScrollableState(scrollableState, scrollerPosition)
     }
     val scroll = Modifier.scrollable(
         orientation = scrollerPosition.orientation,
@@ -96,6 +91,19 @@ internal fun Modifier.textFieldScrollable(
         enabled = enabled && scrollerPosition.maximum != 0f
     )
     scroll
+}
+
+// Workaround for K/JS
+private inline fun createScrollableState(
+    scrollableState: ScrollableState,
+    scrollerPosition: TextFieldScrollerPosition
+): ScrollableState {
+    return object : ScrollableState by scrollableState {
+        override val canScrollForward by derivedStateOf {
+            scrollerPosition.offset < scrollerPosition.maximum
+        }
+        override val canScrollBackward by derivedStateOf { scrollerPosition.offset > 0f }
+    }
 }
 
 // Layout

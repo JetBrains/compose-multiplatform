@@ -14,21 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.text
+package androidx.compose.material.internal
 
-import androidx.compose.ui.input.key.KeyEvent
-
-/**
- * Key combiner which buffers dead keys and combines them with subsequent keys as necessary.
- *
- * It is NOT thread safe.
- */
-internal expect class DeadKeyCombiner() {
-
-    /**
-     * @param event the key event received by the combiner
-     * @return a unicode code point to emit in response to the event,
-     * or null if no code point should be emitted
-     */
-    fun consume(event: KeyEvent): Int?
-}
+// TODO: [1.4 Update] upstream it
+// TODO: this actual is not needed after https://youtrack.jetbrains.com/issue/KT-53149 is implemented
+internal annotation class NoOp
+internal actual typealias JvmDefaultWithCompatibility = NoOp

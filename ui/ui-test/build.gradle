@@ -94,6 +94,8 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 api(project(":compose:ui:ui"))
                 api(project(":compose:ui:ui-text"))
                 api(project(":compose:ui:ui-unit"))
+                api(libs.kotlinCoroutinesCore)
+                api(libs.kotlinCoroutinesTest)
                 api(libs.kotlinStdlib)
 
                 implementation(project(":compose:ui:ui-util"))

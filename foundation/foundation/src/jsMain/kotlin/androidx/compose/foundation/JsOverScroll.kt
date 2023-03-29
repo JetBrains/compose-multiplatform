@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.unit.Velocity
 
@@ -35,22 +33,40 @@ internal actual fun rememberOverscrollEffect(): OverscrollEffect {
 
 @OptIn(ExperimentalFoundationApi::class)
 private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset = Offset.Zero
+    // TODO: [1.4 Update] Implement new API properly and remove commented old code
 
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {}
+    override fun applyToScroll(
+        delta: Offset,
+        source: NestedScrollSource,
+        performScroll: (Offset) -> Offset
+    ): Offset {
+        return Offset.Zero
+    }
 
-    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+    override suspend fun applyToFling(
+        velocity: Velocity,
+        performFling: suspend (Velocity) -> Velocity
+    ) {
 
-    override suspend fun consumePostFling(velocity: Velocity) {}
+    }
 
-    override var isEnabled = false
+
+    //    override fun consumePreScroll(
+//        scrollDelta: Offset,
+//        source: NestedScrollSource
+//    ): Offset = Offset.Zero
+//
+//    override fun consumePostScroll(
+//        initialDragDelta: Offset,
+//        overscrollDelta: Offset,
+//        source: NestedScrollSource
+//    ) {}
+//
+//    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+//
+//    override suspend fun consumePostFling(velocity: Velocity) {}
+//
+//    override var isEnabled = false
     override val isInProgress = false
     override val effectModifier = Modifier
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -2390,23 +2390,40 @@ class ScrollableTest {
 @OptIn(ExperimentalFoundationApi::class)
 private val NoOpOverscrollEffect = object : OverscrollEffect {
 
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset = Offset.Zero
+    // TODO: [1.4 Update] implement it after OverscrollEffect API changes
 
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {
+    override fun applyToScroll(
+        delta: Offset,
+        source: NestedScrollSource,
+        performScroll: (Offset) -> Offset
+    ): Offset {
+        TODO("Not yet implemented")
     }
 
-    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+    override suspend fun applyToFling(
+        velocity: Velocity,
+        performFling: suspend (Velocity) -> Velocity
+    ) {
+        TODO("Not yet implemented")
+    }
 
-    override suspend fun consumePostFling(velocity: Velocity) {}
-
-    override var isEnabled: Boolean = false
+//    override fun consumePreScroll(
+//        scrollDelta: Offset,
+//        source: NestedScrollSource
+//    ): Offset = Offset.Zero
+//
+//    override fun consumePostScroll(
+//        initialDragDelta: Offset,
+//        overscrollDelta: Offset,
+//        source: NestedScrollSource
+//    ) {
+//    }
+//
+//    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+//
+//    override suspend fun consumePostFling(velocity: Velocity) {}
+//
+//    override var isEnabled: Boolean = false
 
     override val isInProgress: Boolean
         get() = false

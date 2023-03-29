@@ -21,6 +21,7 @@ import androidx.compose.ui.text.ExperimentalTextApi
 
 // TODO(b/267235947) Flesh this out, document it, and wire it up when ready to integrate new text
 //  field with desktop.
+// TODO: [1.4 Update] implement it properly
 @ExperimentalTextApi
 @Immutable
 actual interface PlatformTextInputPlugin<T : PlatformTextInputAdapter>

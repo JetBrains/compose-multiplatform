@@ -19,8 +19,7 @@ package androidx.compose.material3
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
 
-internal actual val is24HourFormat: Boolean
-    @Composable
-    @ReadOnlyComposable
-    // TODO: [1.4 Update] implement properly
-    get() = true
+// TODO: [1.4 Update] implement properly and change to val back when JS compiler is fixed
+@Composable
+@ReadOnlyComposable
+internal actual fun is24HourFormat(): Boolean = true

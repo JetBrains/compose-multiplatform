@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,22 +33,40 @@ internal actual fun rememberOverscrollEffect(): OverscrollEffect {
 
 @OptIn(ExperimentalFoundationApi::class)
 private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
-    override fun consumePreScroll(
-        scrollDelta: Offset,
-        source: NestedScrollSource
-    ): Offset = Offset.Zero
+    // TODO: [1.4 Update] implement it properly after API changes and remove commented old code
 
-    override fun consumePostScroll(
-        initialDragDelta: Offset,
-        overscrollDelta: Offset,
-        source: NestedScrollSource
-    ) {}
+    override fun applyToScroll(
+        delta: Offset,
+        source: NestedScrollSource,
+        performScroll: (Offset) -> Offset
+    ): Offset {
+        return Offset.Zero
+    }
 
-    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+    override suspend fun applyToFling(
+        velocity: Velocity,
+        performFling: suspend (Velocity) -> Velocity
+    ) {
+    }
 
-    override suspend fun consumePostFling(velocity: Velocity) {}
 
-    override var isEnabled = false
+//    override fun consumePreScroll(
+//        scrollDelta: Offset,
+//        source: NestedScrollSource
+//    ): Offset = Offset.Zero
+//
+//    override fun consumePostScroll(
+//        initialDragDelta: Offset,
+//        overscrollDelta: Offset,
+//        source: NestedScrollSource
+//    ) {}
+//
+//    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
+//
+//    override suspend fun consumePostFling(velocity: Velocity) {}
+//
+//    override var isEnabled = false
+
     override val isInProgress = false
     override val effectModifier = Modifier
 }

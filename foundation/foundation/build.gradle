@@ -195,6 +195,8 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                     implementation(libs.junit)
                     implementation(libs.skikoCurrentOs)
                     implementation(libs.kotlinCoroutinesSwing)
+                    implementation(libs.mockitoCore4)
+                    implementation(libs.mockitoKotlin4)
                     implementation(libs.mockitoCore)
                     implementation(libs.mockitoKotlin)
                 }

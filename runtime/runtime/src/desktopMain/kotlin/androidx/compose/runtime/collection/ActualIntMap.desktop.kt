@@ -16,7 +16,7 @@
 
 package androidx.compose.runtime.collection
 
-internal actual class IntMap<T> {
+internal actual class IntMap<E> actual constructor() {
     private val DELETED = Any()
     private var keys = IntArray(10)
     private var _size = 0
@@ -32,11 +32,11 @@ internal actual class IntMap<T> {
     /**
      * Get [key] or null
      */
-    actual operator fun get(key: Int): T? {
+    actual operator fun get(key: Int): E? {
         val index = keys.binarySearch(_size, key)
         return if (index >= 0 && values[index] !== DELETED) {
             @Suppress("UNCHECKED_CAST")
-            values[index] as T
+            values[index] as E
         } else {
             null
         }
@@ -45,11 +45,11 @@ internal actual class IntMap<T> {
     /**
      * Get [key] or [valueIfNotFound]
      */
-    actual fun get(key: Int, valueIfAbsent: T): T {
+    actual fun get(key: Int, valueIfAbsent: E): E {
         val index = keys.binarySearch(_size, key)
         return if (index >= 0 && values[index] !== DELETED) {
             @Suppress("UNCHECKED_CAST")
-            values[index] as T
+            values[index] as E
         } else {
             valueIfAbsent
         }
@@ -58,7 +58,7 @@ internal actual class IntMap<T> {
     /**
      * Set [key] to [value]
      */
-    actual operator fun set(key: Int, value: T) {
+    actual operator fun set(key: Int, value: E) {
         var index = keys.binarySearch(_size, key)
         if (index >= 0) {
             values[index] = value

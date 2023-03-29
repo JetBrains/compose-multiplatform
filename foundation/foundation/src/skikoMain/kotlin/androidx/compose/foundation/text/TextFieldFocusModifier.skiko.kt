@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,8 @@ package androidx.compose.foundation.text
 
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusManager
+
+// TODO: [1.4 Update] implement it properly for platforms
 
 /**
  * TextField consumes the D-pad keys, due to which we can't move focus once a TextField is focused.
