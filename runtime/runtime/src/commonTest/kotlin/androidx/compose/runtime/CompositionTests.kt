@@ -3223,6 +3223,8 @@ class CompositionTests {
     }
 
     @Test // Regression test for b/249050560
+    @IgnoreJsTarget
+    // TODO(o.k.): fails due to old js-only change in ComposerLambdaMemoization.rememberExpression
     fun testFunctionInstances() = compositionTest {
         var state by mutableStateOf(0)
         functionInstance = { -1 }

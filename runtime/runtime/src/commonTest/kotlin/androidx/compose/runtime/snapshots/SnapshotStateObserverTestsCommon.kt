@@ -615,20 +615,20 @@ class SnapshotStateObserverTestsCommon {
             stateObserver.start()
             Snapshot.notifyObjectsInitialized()
 
-            val onChange: (String) -> Unit = { scope ->
-                if (scope == "scope" && state1.value < 2) {
+            val onChange: (ValueWrapper) -> Unit = { scope ->
+                if (scope.s == "scope" && state1.value < 2) {
                     state1.value++
                     Snapshot.sendApplyNotifications()
                 }
             }
 
-            stateObserver.observeReads("scope", onChange) {
+            stateObserver.observeReads(ValueWrapper("scope"), onChange) {
                 state1.value
                 state2.value
             }
 
             repeat(10) {
-                stateObserver.observeReads("scope $it", onChange) {
+                stateObserver.observeReads(ValueWrapper("scope $it"), onChange) {
                     state1.value
                     state2.value
                 }
@@ -654,8 +654,8 @@ class SnapshotStateObserverTestsCommon {
             stateObserver.start()
             Snapshot.notifyObjectsInitialized()
 
-            val onChange: (String) -> Unit = { scope ->
-                if (scope == "scope" && state1.value < 2) {
+            val onChange: (ValueWrapper) -> Unit = { scope ->
+                if (scope.s == "scope" && state1.value < 2) {
                     state1.value++
                     Snapshot.sendApplyNotifications()
                     state2.value++
@@ -667,7 +667,7 @@ class SnapshotStateObserverTestsCommon {
                 }
             }
 
-            stateObserver.observeReads("scope", onChange) {
+            stateObserver.observeReads(ValueWrapper("scope"), onChange) {
                 state1.value
                 state2.value
                 state3.value
@@ -675,7 +675,7 @@ class SnapshotStateObserverTestsCommon {
             }
 
             repeat(10) {
-                stateObserver.observeReads("scope $it", onChange) {
+                stateObserver.observeReads(ValueWrapper("scope $it"), onChange) {
                     state1.value
                     state2.value
                     state3.value
@@ -701,16 +701,17 @@ class SnapshotStateObserverTestsCommon {
         runSimpleTest { stateObserver, state ->
             val changeBlock: (Any) -> Unit = { changes++ }
             // record observation
-            stateObserver.observeReads("scope", changeBlock) {
+            val s = ValueWrapper("scope")
+            stateObserver.observeReads(s, changeBlock) {
                 // read state
                 state.value
             }
 
             // clear scope
-            stateObserver.clear("scope")
+            stateObserver.clear(s)
 
             // record again
-            stateObserver.observeReads("scope", changeBlock) {
+            stateObserver.observeReads(s, changeBlock) {
                 // read state
                 state.value
             }

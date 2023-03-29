@@ -33,6 +33,7 @@ import androidx.compose.runtime.snapshots.fastToSet
 import androidx.compose.runtime.tooling.CompositionData
 import androidx.compose.runtime.tooling.LocalInspectionTables
 import kotlin.coroutines.CoroutineContext
+import kotlin.jvm.JvmInline
 
 internal typealias Change = (
     applier: Applier<*>,

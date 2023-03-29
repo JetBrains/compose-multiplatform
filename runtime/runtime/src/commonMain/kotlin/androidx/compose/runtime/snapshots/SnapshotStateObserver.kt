@@ -58,7 +58,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     private fun drainChanges(): Boolean {
         // Don't modify the scope maps while notifications are being sent either by the caller or
         // on another thread
-        if (synchronized(observedScopeMaps) { sendingNotifications }) return false
+        if (synchronized(applyMapsLock) { sendingNotifications }) return false
 
         // Remove all pending changes and return true if any of the objects are observed
         var hasValues = false
@@ -79,7 +79,7 @@ class SnapshotStateObserver(private val onChangedExecutor: (callback: () -> Unit
     private fun sendNotifications() {
         onChangedExecutor {
             while (true) {
-                synchronized(observedScopeMaps) {
+                synchronized(applyMapsLock) {
                     if (!sendingNotifications) {
                         sendingNotifications = true
                         try {
