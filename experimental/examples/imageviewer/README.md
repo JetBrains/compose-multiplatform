@@ -32,4 +32,4 @@ Then choose **iosApp** configuration in IDE and run it.
 - Add to `local.properties` file located in the root directory (create if it doesn't exist):
   - `MAPS_API_KEY=YOUR_KEY` where `YOUR_KEY` is your key from previous step;
   - `sdk.dir=YOUR_SDK_PATH` where `YOUR_SDK_PATH` is a path to Android SDK in your system.
-- Open project in IntelliJ IDEA or Android Studio and run Android configuration.
+- Open project in IntelliJ IDEA or Android Studio and run `androidApp` configuration.
