@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.ImageProvider
 import example.imageviewer.LocalImageProvider
+import example.imageviewer.memoryWarningFlow
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -45,6 +46,13 @@ internal fun MemoryScreen(
     var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
     LaunchedEffect(memoryPage.picture) {
         headerImage = imageProvider.getImage(memoryPage.picture)
+    }
+    val memoryWarningFlow = memoryWarningFlow()
+    LaunchedEffect(Unit) {
+        memoryWarningFlow.collect {
+            headerImage = null
+            headerImage = imageProvider.getThumbnail(memoryPage.picture)
+        }
     }
     Box {
         val scrollState = rememberScrollState()

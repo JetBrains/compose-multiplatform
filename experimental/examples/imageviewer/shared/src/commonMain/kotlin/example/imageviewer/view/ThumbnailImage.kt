@@ -6,7 +6,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import example.imageviewer.LocalImageProvider
+import example.imageviewer.memoryWarningFlow
 import example.imageviewer.model.PictureData
+import kotlinx.coroutines.delay
 
 @Composable
 internal fun ThumbnailImage(
@@ -18,6 +20,14 @@ internal fun ThumbnailImage(
     var imageBitmap by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(picture) {
         imageBitmap = imageProvider.getThumbnail(picture)
+    }
+    val memoryWarningFlow = memoryWarningFlow()
+    LaunchedEffect(Unit) {
+        memoryWarningFlow.collect {
+            imageBitmap = null
+            delay(500)
+            imageBitmap = imageProvider.getThumbnail(picture)
+        }
     }
     imageBitmap?.let {
         Image(
