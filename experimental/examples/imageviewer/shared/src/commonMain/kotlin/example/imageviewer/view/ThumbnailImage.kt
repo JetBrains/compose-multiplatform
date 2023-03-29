@@ -24,7 +24,6 @@ internal fun ThumbnailImage(
     val memoryWarningFlow = memoryWarningFlow()
     LaunchedEffect(Unit) {
         memoryWarningFlow.collect {
-            println("temporary remove thumbnail")
             imageBitmap = null
             delay(500)
             imageBitmap = imageProvider.getThumbnail(picture)

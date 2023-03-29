@@ -50,7 +50,6 @@ internal fun MemoryScreen(
     val memoryWarningFlow = memoryWarningFlow()
     LaunchedEffect(Unit) {
         memoryWarningFlow.collect {
-            println("downgrade image")
             headerImage = null
             headerImage = imageProvider.getThumbnail(memoryPage.picture)
         }
