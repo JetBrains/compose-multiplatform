@@ -31,40 +31,30 @@ class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
+    private val savePictureDir = File(NSFileManager.defaultManager.DocumentDirectory, "ImageViewer/takenPhotos/")
 
-    private val fileManager = NSFileManager.defaultManager
-    private val savePictureDir = fileManager.URLForDirectory(
-        directory = NSDocumentDirectory,
-        inDomain = NSUserDomainMask,
-        create = true,
-        appropriateForURL = null,
-        error = null
-    )!!.URLByAppendingPathComponent("ImageViewer/takenPhotos/")!!
-
-    private val PictureData.Camera.jpgFile get() = makeFileUrl("$id.jpg")
-    private val PictureData.Camera.thumbnailJpgFile get() = makeFileUrl("$id-thumbnail.jpg")
-    private val PictureData.Camera.jsonFile get() = makeFileUrl("$id.json")
+    private val PictureData.Camera.jpgFile get() = File(savePictureDir, "$id.jpg")
+    private val PictureData.Camera.thumbnailJpgFile get() = File(savePictureDir, "$id-thumbnail.jpg")
+    private val PictureData.Camera.jsonFile get() = File(savePictureDir, "$id.json")
 
     init {
-        val directoryContent = fileManager.contentsOfDirectoryAtPath(savePictureDir.path!!, null)
-        if (directoryContent != null) {
+        if (savePictureDir.isDirectory) {
+            val files = savePictureDir.listFiles { _, name: String ->
+                name.endsWith(".json")
+            } ?: emptyArray()
             pictures.addAll(
                 index = 0,
-                elements = directoryContent.map { it.toString() }
-                    .filter { it.endsWith(".json") }
+                elements = files
                     .map {
-                        makeFileUrl(it).readText().toCameraMetadata()
+                        it.readText().toCameraMetadata()
                     }.sortedByDescending {
                         it.timeStampSeconds
                     }
             )
         } else {
-            fileManager.createDirectoryAtURL(savePictureDir, true, null, null)
+            savePictureDir.mkdirs()
         }
     }
-
-    private fun makeFileUrl(fileName: String) =
-        savePictureDir.URLByAppendingPathComponent(fileName)!!
 
     override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
@@ -133,41 +123,7 @@ private fun PictureData.Camera.toJson(): String =
 private fun String.toCameraMetadata(): PictureData.Camera =
     Json.Default.decodeFromString(this)
 
-private suspend fun NSURL.readData(): NSData {
-    while (true) {
-        val data = NSData.dataWithContentsOfURL(this)
-        if (data != null)
-            return data
-        yield()
-    }
-}
-
-private suspend fun NSURL.readBytes(): ByteArray =
-    with(readData()) {
-        ByteArray(length.toInt()).apply {
-            usePinned {
-                memcpy(it.addressOf(0), bytes, length)
-            }
-        }
-    }
-
 private fun NSURL.writeJpeg(image: UIImage, compressionQuality: Int = jpegCompressionQuality) {
     UIImageJPEGRepresentation(image, compressionQuality / 100.0)
         ?.writeToURL(this, true)
-}
-
-private fun NSURL.readText(): String =
-    NSString.stringWithContentsOfURL(
-        url = this,
-        encoding = NSUTF8StringEncoding,
-        error = null,
-    ) as String
-
-private fun NSURL.writeText(text: String) {
-    (text as NSString).writeToURL(
-        url = this,
-        atomically = true,
-        encoding = NSUTF8StringEncoding,
-        error = null
-    )
 }
