@@ -83,10 +83,10 @@ class IosImageStorage(
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
             UIImageJPEGRepresentation(image.rawValue.resizeToThumbnail(), 0.6)
-                ?.writeToFile(picture.thumbnailPngFile)
+                ?.writeToFile(picture.thumbnailJpgFile)
             pictures.add(0, picture)
             UIImageJPEGRepresentation(image.rawValue.resizeToBig(), 0.6)
-                ?.writeToFile(picture.pngFile)
+                ?.writeToFile(picture.jpgFile)
             val jsonStr = Json.Default.encodeToString(picture)
             jsonStr.writeToFile(picture.jsonFile)
         }
@@ -94,7 +94,7 @@ class IosImageStorage(
 
     override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
         ioScope.async {
-            val jpgRepresentation = readPngFromFile(picture.thumbnailPngFile)!!
+            val jpgRepresentation = readPngFromFile(picture.thumbnailJpgFile)!!
             val byteArray: ByteArray = ByteArray(jpgRepresentation.length.toInt()).apply {
                 usePinned {
                     memcpy(it.addressOf(0), jpgRepresentation.bytes, jpgRepresentation.length)
@@ -105,7 +105,7 @@ class IosImageStorage(
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
         ioScope.async {
-            fun getFileContent() = readPngFromFile(picture.pngFile)
+            fun getFileContent() = readPngFromFile(picture.jpgFile)
             var jpgRepresentation: NSData? = getFileContent()
             while (jpgRepresentation == null) {
                 yield()
@@ -169,8 +169,8 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     return newImage!!
 }
 
-private val PictureData.Camera.pngFile get():String = id + ".jpg"
-private val PictureData.Camera.thumbnailPngFile get():String = id + "-thumbnail.jpg"
+private val PictureData.Camera.jpgFile get():String = id + ".jpg"
+private val PictureData.Camera.thumbnailJpgFile get():String = id + "-thumbnail.jpg"
 private val PictureData.Camera.jsonFile get():String = id + ".json"
 private fun String.writeToURL(url: NSURL) = (this as NSString).writeToURL(
     url = url,
