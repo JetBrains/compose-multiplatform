@@ -66,7 +66,7 @@ private fun applyGrayScaleFilter(bitmap: BufferedImage): BufferedImage {
 private fun applyPixelFilter(bitmap: BufferedImage): BufferedImage {
     val w: Int = bitmap.width
     val h: Int = bitmap.height
-    var result = scaleBitmapAspectRatio(bitmap, w / 10, h / 10)
+    var result = scaleBitmapAspectRatio(bitmap, w / 12, h / 12)
     result = scaleBitmapAspectRatio(result, w, h)
     return result
 }
