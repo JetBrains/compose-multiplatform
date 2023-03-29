@@ -27,16 +27,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.model.GalleryEntryWithMetadata
-import example.imageviewer.model.Picture
+import example.imageviewer.LocalImageProvider
+import example.imageviewer.model.PictureData
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    picture: GalleryEntryWithMetadata?,
+    picture: PictureData,
     onClick: () -> Unit,
-    getImage: suspend (Picture) -> ImageBitmap
 ) {
+    val imageProvider = LocalImageProvider.current
     val interactionSource = remember { MutableInteractionSource() }
     Box(
         Modifier.fillMaxWidth().height(393.dp).background(Color.Black),
@@ -59,11 +59,9 @@ internal fun PreviewImage(
                     )
                 }
             ) { currentPicture ->
-                var image by remember(currentPicture) { mutableStateOf(currentPicture?.thumbnail) }
+                var image: ImageBitmap? by remember(currentPicture) { mutableStateOf(null) }
                 LaunchedEffect(currentPicture) {
-                    if (currentPicture != null) {
-                        image = getImage(currentPicture.picture)
-                    }
+                    image = imageProvider.getImage(currentPicture)
                 }
                 if (image != null) {
                     Box(Modifier.fillMaxSize()) {
@@ -74,7 +72,7 @@ internal fun PreviewImage(
                                 .fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
-                        MemoryTextOverlay()
+                        MemoryTextOverlay(currentPicture)
                     }
                 } else {
                     Spacer(

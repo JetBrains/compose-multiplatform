@@ -1,23 +1,37 @@
 package example.imageviewer.view
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.*
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitInteropView
 import androidx.compose.ui.unit.dp
+import example.imageviewer.IosStorableImage
+import example.imageviewer.LocalLocalization
+import example.imageviewer.PlatformStorableImage
+import example.imageviewer.createNewPhotoNameAndDescription
+import example.imageviewer.model.GpsPosition
+import example.imageviewer.model.PictureData
+import example.imageviewer.model.createCameraPictureData
 import kotlinx.cinterop.CValue
+import kotlinx.cinterop.ObjCAction
+import kotlinx.cinterop.useContents
 import platform.AVFoundation.*
 import platform.AVFoundation.AVCaptureDeviceDiscoverySession.Companion.discoverySessionWithDeviceTypes
 import platform.AVFoundation.AVCaptureDeviceInput.Companion.deviceInputWithDevice
 import platform.CoreGraphics.CGRect
+import platform.CoreLocation.CLLocation
+import platform.CoreLocation.CLLocationManager
+import platform.CoreLocation.kCLLocationAccuracyBest
 import platform.Foundation.NSError
+import platform.Foundation.NSNotification
+import platform.Foundation.NSNotificationCenter
+import platform.Foundation.NSSelectorFromString
 import platform.QuartzCore.CATransaction
 import platform.QuartzCore.kCATransactionDisableActions
 import platform.UIKit.UIDevice
@@ -32,8 +46,19 @@ private sealed interface CameraAccess {
     object Authorized : CameraAccess
 }
 
+private val deviceTypes = listOf(
+    AVCaptureDeviceTypeBuiltInWideAngleCamera,
+    AVCaptureDeviceTypeBuiltInDualWideCamera,
+    AVCaptureDeviceTypeBuiltInDualCamera,
+    AVCaptureDeviceTypeBuiltInUltraWideCamera,
+    AVCaptureDeviceTypeBuiltInDuoCamera
+)
+
 @Composable
-internal actual fun CameraView(modifier: Modifier) {
+internal actual fun CameraView(
+    modifier: Modifier,
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
     var cameraAccess: CameraAccess by remember { mutableStateOf(CameraAccess.Undefined) }
     LaunchedEffect(Unit) {
         when (AVCaptureDevice.authorizationStatusForMediaType(AVMediaTypeVideo)) {
@@ -68,15 +93,54 @@ internal actual fun CameraView(modifier: Modifier) {
             }
 
             CameraAccess.Authorized -> {
-                AuthorizedCamera()
+                AuthorizedCamera(onCapture)
             }
         }
     }
 }
 
 @Composable
-private fun BoxScope.AuthorizedCamera() {
+private fun BoxScope.AuthorizedCamera(
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
+    val camera: AVCaptureDevice? = remember {
+        discoverySessionWithDeviceTypes(
+            deviceTypes = deviceTypes,
+            mediaType = AVMediaTypeVideo,
+            position = AVCaptureDevicePositionFront,
+        ).devices.firstOrNull() as? AVCaptureDevice
+    }
+    if (camera != null) {
+        RealDeviceCamera(camera, onCapture)
+    } else {
+        Text(
+            """
+            Camera is not available on simulator.
+            Please try to run on a real iOS device.
+        """.trimIndent(), color = Color.White
+        )
+    }
+}
+
+@Composable
+private fun BoxScope.RealDeviceCamera(
+    camera: AVCaptureDevice,
+    onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
+) {
     val capturePhotoOutput = remember { AVCapturePhotoOutput() }
+    var actualOrientation by remember {
+        mutableStateOf(
+            AVCaptureVideoOrientationPortrait
+        )
+    }
+    val locationManager = remember {
+        CLLocationManager().apply {
+            desiredAccuracy = kCLLocationAccuracyBest
+            requestWhenInUseAuthorization()
+        }
+    }
+    val nameAndDescription = createNewPhotoNameAndDescription()
+    var capturePhotoStarted by remember { mutableStateOf(false) }
     val photoCaptureDelegate = remember {
         object : NSObject(), AVCapturePhotoCaptureDelegateProtocol {
             override fun captureOutput(
@@ -85,38 +149,44 @@ private fun BoxScope.AuthorizedCamera() {
                 error: NSError?
             ) {
                 val photoData = didFinishProcessingPhoto.fileDataRepresentation()
-                    ?: error("fileDataRepresentation is null")
-                val uiImage = UIImage(photoData)
-                //todo pass image to gallery page
+                if (photoData != null) {
+                    val gps = locationManager.location?.toGps() ?: GpsPosition(0.0, 0.0)
+                    val uiImage = UIImage(photoData)
+                    onCapture(
+                        createCameraPictureData(
+                            name = nameAndDescription.name,
+                            description = nameAndDescription.description,
+                            gps = gps
+                        ),
+                        IosStorableImage(uiImage)
+                    )
+                }
+                capturePhotoStarted = false
             }
         }
     }
-    val camera: AVCaptureDevice? = remember {
-        discoverySessionWithDeviceTypes(
-            deviceTypes = listOf(AVCaptureDeviceTypeBuiltInWideAngleCamera),
-            mediaType = AVMediaTypeVideo,
-            position = AVCaptureDevicePositionFront,
-        ).devices.firstOrNull() as? AVCaptureDevice
+
+    val captureSession: AVCaptureSession = remember {
+        AVCaptureSession().also { captureSession ->
+            captureSession.sessionPreset = AVCaptureSessionPresetPhoto
+            val captureDeviceInput: AVCaptureDeviceInput =
+                deviceInputWithDevice(device = camera, error = null)!!
+            captureSession.addInput(captureDeviceInput)
+            captureSession.addOutput(capturePhotoOutput)
+        }
     }
-    if (camera != null) {
-        val captureSession: AVCaptureSession = remember {
-            AVCaptureSession().also { captureSession ->
-                captureSession.sessionPreset = AVCaptureSessionPresetPhoto
-                val captureDeviceInput: AVCaptureDeviceInput =
-                    deviceInputWithDevice(device = camera, error = null)!!
-                captureSession.addInput(captureDeviceInput)
-                captureSession.addOutput(capturePhotoOutput)
-            }
-        }
-        val cameraPreviewLayer = remember {
-            AVCaptureVideoPreviewLayer(session = captureSession)
-        }
-        UIKitInteropView(
-            modifier = Modifier.fillMaxSize(),
-            background = Color.Black,
-            resize = { view: UIView, rect: CValue<CGRect> ->
-                cameraPreviewLayer.connection?.apply {
-                    videoOrientation = when (UIDevice.currentDevice.orientation) {
+    val cameraPreviewLayer = remember {
+        AVCaptureVideoPreviewLayer(session = captureSession)
+    }
+
+    DisposableEffect(Unit) {
+        class OrientationListener : NSObject() {
+            @Suppress("UNUSED_PARAMETER")
+            @ObjCAction
+            fun orientationDidChange(arg: NSNotification) {
+                val cameraConnection = cameraPreviewLayer.connection
+                if (cameraConnection != null) {
+                    actualOrientation = when (UIDevice.currentDevice.orientation) {
                         UIDeviceOrientation.UIDeviceOrientationPortrait ->
                             AVCaptureVideoOrientationPortrait
 
@@ -127,50 +197,85 @@ private fun BoxScope.AuthorizedCamera() {
                             AVCaptureVideoOrientationLandscapeLeft
 
                         UIDeviceOrientation.UIDeviceOrientationPortraitUpsideDown ->
-                            AVCaptureVideoOrientationPortraitUpsideDown
+                            AVCaptureVideoOrientationPortrait
 
-                        else -> videoOrientation
+                        else -> cameraConnection.videoOrientation
                     }
+                    cameraConnection.videoOrientation = actualOrientation
                 }
-                CATransaction.begin()
-                CATransaction.setValue(true, kCATransactionDisableActions)
-                view.layer.setFrame(rect)
-                cameraPreviewLayer.setFrame(rect)
-                CATransaction.commit()
-            },
-        ) {
-            val cameraContainer = UIView()
-            cameraContainer.layer.addSublayer(cameraPreviewLayer)
-            cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-            captureSession.startRunning()
-            cameraContainer
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.videoOrientation = actualOrientation
+            }
         }
-        Button(
-            modifier = Modifier.align(Alignment.BottomCenter).padding(20.dp),
-            onClick = {
-                val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
-                    format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
-                )
-                photoSettings.setHighResolutionPhotoEnabled(true)
-                capturePhotoOutput.setHighResolutionCaptureEnabled(true)
-                capturePhotoOutput.capturePhotoWithSettings(
-                    settings = photoSettings,
-                    delegate = photoCaptureDelegate
-                )
-            }) {
-            Text("Compose Button - take a photo 📸")
+
+        val listener = OrientationListener()
+        val notificationName = platform.UIKit.UIDeviceOrientationDidChangeNotification
+        NSNotificationCenter.defaultCenter.addObserver(
+            observer = listener,
+            selector = NSSelectorFromString(
+                OrientationListener::orientationDidChange.name + ":"
+            ),
+            name = notificationName,
+            `object` = null
+        )
+        onDispose {
+            NSNotificationCenter.defaultCenter.removeObserver(
+                observer = listener,
+                name = notificationName,
+                `object` = null
+            )
         }
-    } else {
-        SimulatorStub()
+    }
+    UIKitInteropView(
+        modifier = Modifier.fillMaxSize(),
+        background = Color.Black,
+        resize = { view: UIView, rect: CValue<CGRect> ->
+            CATransaction.begin()
+            CATransaction.setValue(true, kCATransactionDisableActions)
+            view.layer.setFrame(rect)
+            cameraPreviewLayer.setFrame(rect)
+            CATransaction.commit()
+        },
+    ) {
+        val cameraContainer = UIView()
+        cameraContainer.layer.addSublayer(cameraPreviewLayer)
+        cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+        captureSession.startRunning()
+        cameraContainer
+    }
+    Button(
+        modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
+        enabled = !capturePhotoStarted,
+        onClick = {
+            capturePhotoStarted = true
+            val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
+                format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
+            )
+            if (camera.position == AVCaptureDevicePositionFront) {
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.automaticallyAdjustsVideoMirroring = false
+                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                    ?.videoMirrored = true
+            }
+            capturePhotoOutput.capturePhotoWithSettings(
+                settings = photoSettings,
+                delegate = photoCaptureDelegate
+            )
+        }
+    ) {
+        Text(LocalLocalization.current.takePhoto)
+    }
+    if (capturePhotoStarted) {
+        CircularProgressIndicator(
+            modifier = Modifier.size(80.dp).align(Alignment.Center),
+            color = Color.White.copy(alpha = 0.7f),
+            strokeWidth = 8.dp,
+        )
     }
 }
 
-@Composable
-private fun SimulatorStub() {
-    Text(
-        """
-            Camera is not available on simulator.
-            Please try to run on a real iOS device.
-        """.trimIndent(), color = Color.White
+fun CLLocation.toGps() =
+    GpsPosition(
+        latitude = coordinate.useContents { latitude },
+        longitude = coordinate.useContents { longitude }
     )
-}

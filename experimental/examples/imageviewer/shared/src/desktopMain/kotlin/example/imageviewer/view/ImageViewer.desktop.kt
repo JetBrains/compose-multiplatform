@@ -6,32 +6,25 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.KeyEventType
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import example.imageviewer.*
 import example.imageviewer.Notification
-import example.imageviewer.core.BitmapFilter
-import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
-import example.imageviewer.model.filtration.BlurFilter
-import example.imageviewer.model.filtration.GrayScaleFilter
-import example.imageviewer.model.filtration.PixelFilter
 import example.imageviewer.style.ImageViewerTheme
-import example.imageviewer.utils.decorateWithDiskCache
-import example.imageviewer.utils.getPreferredWindowSize
-import example.imageviewer.utils.ioDispatcher
-import io.ktor.client.*
-import io.ktor.client.engine.cio.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.io.File
+import java.awt.Dimension
+import java.awt.Toolkit
 
 class ExternalNavigationEventBus {
     private val _events = MutableSharedFlow<ExternalImageViewerEvent>(
@@ -48,10 +41,12 @@ class ExternalNavigationEventBus {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ApplicationScope.ImageViewerDesktop() {
+    val ioScope = rememberCoroutineScope { ioDispatcher }
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
-    val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
-    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
     val externalNavigationEventBus = remember { ExternalNavigationEventBus() }
+    val dependencies = remember {
+        getDependencies(toastState, ioScope, externalNavigationEventBus.events)
+    }
 
     Window(
         onCloseRequest = ::exitApplication,
@@ -72,6 +67,10 @@ fun ApplicationScope.ImageViewerDesktop() {
                     Key.DirectionRight -> externalNavigationEventBus.produceEvent(
                         ExternalImageViewerEvent.Foward
                     )
+
+                    Key.Escape -> externalNavigationEventBus.produceEvent(
+                        ExternalImageViewerEvent.Escape
+                    )
                 }
             }
             false
@@ -82,8 +81,7 @@ fun ApplicationScope.ImageViewerDesktop() {
                 modifier = Modifier.fillMaxSize()
             ) {
                 ImageViewerCommon(
-                    dependencies = dependencies,
-                    externalEvents = externalNavigationEventBus.events
+                    dependencies = dependencies
                 )
                 Toast(toastState)
             }
@@ -91,51 +89,26 @@ fun ApplicationScope.ImageViewerDesktop() {
     }
 }
 
-private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
-    object : Dependencies {
-        override val ioScope: CoroutineScope = ioScope
-        override fun getFilter(type: FilterType): BitmapFilter = when (type) {
-            FilterType.GrayScale -> GrayScaleFilter()
-            FilterType.Pixel -> PixelFilter()
-            FilterType.Blur -> BlurFilter()
-        }
-
-        override val localization: Localization = object : Localization {
-            override val back: String get() = ResString.back
-            override val appName: String get() = ResString.appName
-            override val loading: String get() = ResString.loading
-            override val repoInvalid: String get() = ResString.repoInvalid
-            override val repoEmpty: String get() = ResString.repoEmpty
-            override val noInternet: String get() = ResString.noInternet
-            override val loadImageUnavailable: String get() = ResString.loadImageUnavailable
-            override val lastImage: String get() = ResString.lastImage
-            override val firstImage: String get() = ResString.firstImage
-            override val picture: String get() = ResString.picture
-            override val size: String get() = ResString.size
-            override val pixels: String get() = ResString.pixels
-            override val refreshUnavailable: String get() = ResString.refreshUnavailable
-        }
-
-        override val httpClient: HttpClient = HttpClient(CIO)
-
-        val userHome: String? = System.getProperty("user.home")
-        override val imageRepository: ContentRepository<ImageBitmap> =
-            createNetworkRepository(httpClient)
-                .run {
-                    if (userHome != null) {
-                        decorateWithDiskCache(
-                            ioScope,
-                            File(userHome).resolve("Pictures").resolve("imageviewer")
-                        )
-                    } else {
-                        this
-                    }
-                }
-                .adapter { it.toImageBitmap() }
-
+private fun getDependencies(
+    toastState: MutableState<ToastState>,
+    ioScope: CoroutineScope,
+    events: SharedFlow<ExternalImageViewerEvent>
+) =
+    object : Dependencies() {
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
         }
+        override val imageStorage: ImageStorage = DesktopImageStorage(pictures, ioScope)
+        override val externalEvents = events
     }
+
+private fun getPreferredWindowSize(desiredWidth: Int, desiredHeight: Int): DpSize {
+    val screenSize: Dimension = Toolkit.getDefaultToolkit().screenSize
+    val preferredWidth: Int = (screenSize.width * 0.8f).toInt()
+    val preferredHeight: Int = (screenSize.height * 0.8f).toInt()
+    val width: Int = if (desiredWidth < preferredWidth) desiredWidth else preferredWidth
+    val height: Int = if (desiredHeight < preferredHeight) desiredHeight else preferredHeight
+    return DpSize(width.dp, height.dp)
+}

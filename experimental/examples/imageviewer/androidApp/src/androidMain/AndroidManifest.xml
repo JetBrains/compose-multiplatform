@@ -12,11 +12,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_imageviewer_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity
-            android:exported="true"
-            android:name="example.imageviewer.MainActivity"
-        >
+        android:theme="@style/Theme.ImageViewer">
+
+        <!-- Add value `MAPS_API_KEY=***` to local.properties file (More detailed in README.md) -->
+        <meta-data android:name="com.google.android.geo.API_KEY" android:value="${MAPS_API_KEY}" />
+
+        <activity android:exported="true" android:name="example.imageviewer.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />

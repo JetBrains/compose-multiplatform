@@ -8,7 +8,8 @@ import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 
-class ScalableState(val imageSize: IntSize) {
+class ScalableState() {
+    var imageSize by mutableStateOf(IntSize(0, 0))
     var boxSize by mutableStateOf(IntSize(1, 1))
     var offset by mutableStateOf(IntOffset.Zero)
     var scale by mutableStateOf(1f)
@@ -55,6 +56,11 @@ fun ScalableState.addScale(diff: Float) {
 
 fun ScalableState.addDragAmount(diff: Offset) {
     offset -= IntOffset((diff.x + 1).toInt(), (diff.y + 1).toInt())
+    updateOffsetLimits()
+}
+
+fun ScalableState.updateImageSize(width: Int, height: Int) {
+    imageSize = IntSize(width, height)
     updateOffsetLimits()
 }
 

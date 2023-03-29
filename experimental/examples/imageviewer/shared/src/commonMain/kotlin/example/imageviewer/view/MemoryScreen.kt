@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,12 +25,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import example.imageviewer.Localization
-import example.imageviewer.model.GalleryEntryWithMetadata
-import example.imageviewer.model.GalleryId
-import example.imageviewer.model.MemoryPage
-import example.imageviewer.model.PhotoGallery
-import example.imageviewer.model.Picture
+import example.imageviewer.ImageProvider
+import example.imageviewer.LocalImageProvider
+import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -37,22 +35,19 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun MemoryScreen(
+    pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
-    photoGallery: PhotoGallery,
-    getImage: suspend (Picture) -> ImageBitmap,
-    localization: Localization,
-    onSelectRelatedMemory: (GalleryId) -> Unit,
+    onSelectRelatedMemory: (PictureData) -> Unit,
     onBack: () -> Unit,
-    onHeaderClick: (GalleryId) -> Unit
+    onHeaderClick: (PictureData) -> Unit,
 ) {
-    val pictures by photoGallery.galleryStateFlow.collectAsState()
-    val picture = pictures.first { it.id == memoryPage.galleryId }
-    var headerImage by remember(picture) { mutableStateOf(picture.thumbnail) }
-    LaunchedEffect(picture) {
-        headerImage = getImage(picture.picture)
+    val imageProvider = LocalImageProvider.current
+    var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
+    LaunchedEffect(memoryPage.picture) {
+        headerImage = imageProvider.getImage(memoryPage.picture)
     }
     Box {
-        val scrollState = memoryPage.scrollState
+        val scrollState = rememberScrollState()
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -68,22 +63,20 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                MemoryHeader(headerImage, onClick = { onHeaderClick(memoryPage.galleryId) })
+                headerImage?.let {
+                    MemoryHeader(
+                        it,
+                        picture = memoryPage.picture,
+                        onClick = { onHeaderClick(memoryPage.picture) }
+                    )
+                }
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
                     Headliner("Note")
-                    Collapsible(
-                        """
-                        I took a picture with my iPhone 14 at 17:45. The picture ended up being 3024 x 4032 pixels. ✨
-                        
-                        I took multiple additional photos of the same subject, but they turned out not quite as well, so I decided to keep this specific one as a memory.
-                        
-                        I might upload this picture to Unsplash at some point, since other people might also enjoy this picture. So it would make sense to not keep it to myself! 😄
-                        """.trimIndent()
-                    )
+                    Collapsible(memoryPage.picture.description)
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(pictures, imageProvider,  onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -91,7 +84,9 @@ internal fun MemoryScreen(
                             .clip(locationShape)
                             .border(1.dp, Color.Gray, locationShape)
                             .fillMaxWidth()
-                            .height(200.dp)
+                            .height(200.dp),
+                        gps = memoryPage.picture.gps,
+                        title = memoryPage.picture.name,
                     )
                     Spacer(Modifier.height(50.dp))
                     Row(
@@ -121,12 +116,7 @@ internal fun MemoryScreen(
         }
         TopLayout(
             alignLeftContent = {
-                Tooltip(localization.back) {
-                    CircularButton(
-                        painterResource("arrowleft.png"),
-                        onClick = { onBack() }
-                    )
-                }
+                BackButton(onBack)
             },
             alignRightContent = {},
         )
@@ -134,7 +124,7 @@ internal fun MemoryScreen(
 }
 
 @Composable
-private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
+private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
@@ -145,7 +135,7 @@ private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
             modifier = Modifier.fillMaxSize()
         )
         MagicButtonOverlay(onClick)
-        MemoryTextOverlay()
+        MemoryTextOverlay(picture)
     }
 }
 
@@ -160,7 +150,7 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
 }
 
 @Composable
-internal fun BoxScope.MemoryTextOverlay() {
+internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     val shadowTextStyle = LocalTextStyle.current.copy(
         shadow = Shadow(
             color = Color.Black.copy(0.75f),
@@ -172,7 +162,7 @@ internal fun BoxScope.MemoryTextOverlay() {
         modifier = Modifier.align(Alignment.BottomStart).padding(start = 12.dp, bottom = 16.dp)
     ) {
         Text(
-            "28. Feb",
+            text = picture.dateString,
             textAlign = TextAlign.Left,
             color = Color.White,
             fontSize = 20.sp,
@@ -183,7 +173,7 @@ internal fun BoxScope.MemoryTextOverlay() {
         )
         Spacer(Modifier.height(1.dp))
         Text(
-            "London",
+            text = picture.name,
             textAlign = TextAlign.Left,
             color = Color.White,
             fontSize = 14.sp,
@@ -233,8 +223,9 @@ internal fun Headliner(s: String) {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<GalleryEntryWithMetadata>,
-    onSelectRelatedMemory: (GalleryId) -> Unit
+    ps: List<PictureData>,
+    imageProvider: ImageProvider,
+    onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
@@ -244,7 +235,7 @@ internal fun RelatedMemoriesVisualizer(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(ps) { idx, item ->
-                RelatedMemory(idx, item, onSelectRelatedMemory)
+                RelatedMemory(idx, item, imageProvider, onSelectRelatedMemory)
             }
         }
     }
@@ -253,13 +244,14 @@ internal fun RelatedMemoriesVisualizer(
 @Composable
 internal fun RelatedMemory(
     index: Int,
-    galleryEntry: GalleryEntryWithMetadata,
-    onSelectRelatedMemory: (GalleryId) -> Unit
+    galleryEntry: PictureData,
+    imageProvider: ImageProvider,
+    onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-        SquareMiniature(
-            galleryEntry.thumbnail,
-            false,
-            onClick = { onSelectRelatedMemory(galleryEntry.id) })
+        SquareThumbnail(
+            picture = galleryEntry,
+            isHighlighted = false,
+            onClick = { onSelectRelatedMemory(galleryEntry) })
     }
 }

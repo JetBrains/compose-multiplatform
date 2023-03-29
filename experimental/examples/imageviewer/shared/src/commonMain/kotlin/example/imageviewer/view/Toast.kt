@@ -11,6 +11,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import example.imageviewer.model.TOAST_DURATION
 import example.imageviewer.style.ImageviewerColors
@@ -37,7 +38,7 @@ internal fun Toast(
                 shape = RoundedCornerShape(4.dp)
             ) {
                 Box(contentAlignment = Alignment.Center) {
-                    Text(value.message)
+                    Text(value.message, color = Color.White)
                 }
                 LaunchedEffect(value.message) {
                     delay(TOAST_DURATION)

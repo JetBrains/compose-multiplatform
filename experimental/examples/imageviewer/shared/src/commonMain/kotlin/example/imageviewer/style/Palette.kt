@@ -26,8 +26,8 @@ object ImageviewerColors {
     val onBackground = Color(0xFF19191C)
 
     val fullScreenImageBackground = Color(0xFF19191C)
-
-    val uiLightBlack = Color(25, 25, 28, 180)
+    val filterButtonsBackground = fullScreenImageBackground.copy(alpha = 0.7f)
+    val uiLightBlack = Color(25, 25, 28).copy(alpha = 0.7f)
     val textOnImage = Color.White
     val noteBlockBackground = Color(0xFFF3F3F4)
 

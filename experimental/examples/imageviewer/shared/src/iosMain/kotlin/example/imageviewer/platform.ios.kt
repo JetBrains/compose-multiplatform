@@ -6,7 +6,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.cinterop.useContents
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import platform.CoreFoundation.CFUUIDCreate
+import platform.CoreFoundation.CFUUIDCreateString
+import platform.Foundation.CFBridgingRelease
 import platform.UIKit.UIApplication
+import platform.UIKit.UIImage
 import platform.UIKit.safeAreaInsets
 
 private val iosNotchInset = object : WindowInsets {
@@ -27,3 +33,14 @@ private val iosNotchInset = object : WindowInsets {
 
 actual fun Modifier.notchPadding(): Modifier =
     this.windowInsetsPadding(iosNotchInset)
+
+class IosStorableImage(
+    val rawValue: UIImage
+)
+
+actual typealias PlatformStorableImage = IosStorableImage
+
+actual fun createUUID(): String =
+    CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
+
+actual val ioDispatcher = Dispatchers.IO
