@@ -16,10 +16,7 @@ abstract class Dependencies {
     abstract val imageStorage: ImageStorage
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     open val externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
-    val localization: Localization = when (getCurrentLanguage()) {
-        AvailableLanguages.EN -> EnglishLocalization
-        AvailableLanguages.DE -> DeutschLocalization
-    }
+    val localization: Localization = getCurrentLocalization()
     val imageProvider: ImageProvider = object : ImageProvider {
         override suspend fun getImage(picture: PictureData): ImageBitmap = when (picture) {
             is PictureData.Resource -> {

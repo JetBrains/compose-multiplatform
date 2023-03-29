@@ -7,7 +7,7 @@ enum class AvailableLanguages {
 
 expect fun getCurrentLanguage(): AvailableLanguages
 
-object EnglishLocalization : Localization {
+private object EnglishLocalization : Localization {
     override val appName = "My Memories"
     override val picture = "Picture:"
     override val back = "Back"
@@ -22,7 +22,7 @@ object EnglishLocalization : Localization {
     override val newPhotoDescription = "May amazing things happen to you! 🙂"
 }
 
-object DeutschLocalization : Localization {
+private object DeutschLocalization : Localization {
     override val appName = "Meine Erinnerungen"
     override val picture = "Bild:"
     override val back = "Zurück"
@@ -35,4 +35,9 @@ object DeutschLocalization : Localization {
     """.trimIndent()
     override val newPhotoName = "New Memory"
     override val newPhotoDescription = "May amazing things happen to you! 🙂"
+}
+
+fun getCurrentLocalization() = when (getCurrentLanguage()) {
+    AvailableLanguages.EN -> EnglishLocalization
+    AvailableLanguages.DE -> DeutschLocalization
 }
