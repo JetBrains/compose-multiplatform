@@ -70,147 +70,118 @@ class SelectionTest {
 
     @Test
     fun selection_merge_handles_not_cross() {
-        val startOffset1 = 9
-        val endOffset1 = 20
-        val selectableKey1 = 1L
-        val startAnchor1 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = startOffset1,
-            selectableId = selectableKey1
-        )
-        val endAnchor1 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = endOffset1,
-            selectableId = selectableKey1
-        )
-        val selection1 = Selection(
-            start = startAnchor1,
-            end = endAnchor1,
-            handlesCrossed = false
-        )
-        val startOffset2 = 0
-        val endOffset2 = 30
-        val selectableKey2 = 2L
-        val startAnchor2 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = startOffset2,
-            selectableId = selectableKey2
-        )
-        val endAnchor2 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = endOffset2,
-            selectableId = selectableKey2
-        )
-        val selection2 = Selection(
-            start = startAnchor2,
-            end = endAnchor2,
-            handlesCrossed = false
-        )
-
+        val selection1 = makeSelection(9, 20, 1L, false)
+        val selection2 = makeSelection(0, 30, 2L, false)
         val selection = selection1.merge(selection2)
 
-        assertThat(selection.start.offset).isEqualTo(startOffset1)
-        assertThat(selection.end.offset).isEqualTo(endOffset2)
-        assertThat(selection.start.selectableId).isEqualTo(selectableKey1)
-        assertThat(selection.end.selectableId).isEqualTo(selectableKey2)
+        assertThat(selection.start.offset).isEqualTo(9)
+        assertThat(selection.end.offset).isEqualTo(30)
+        assertThat(selection.start.selectableId).isEqualTo(1L)
+        assertThat(selection.end.selectableId).isEqualTo(2L)
         assertThat(selection.handlesCrossed).isFalse()
     }
 
     @Test
     fun selection_merge_handles_cross() {
-        val startOffset1 = 20
-        val endOffset1 = 9
-        val selectableKey1 = 1L
-        val startAnchor1 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = startOffset1,
-            selectableId = selectableKey1
-        )
-        val endAnchor1 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = endOffset1,
-            selectableId = selectableKey1
-        )
-        val selection1 = Selection(
-            start = startAnchor1,
-            end = endAnchor1,
-            handlesCrossed = true
-        )
-        val startOffset2 = 30
-        val endOffset2 = 0
-        val selectableKey2 = 2L
-        val startAnchor2 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = startOffset2,
-            selectableId = selectableKey2
-        )
-        val endAnchor2 = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = endOffset2,
-            selectableId = selectableKey2
-        )
-        val selection2 = Selection(
-            start = startAnchor2,
-            end = endAnchor2,
-            handlesCrossed = true
-        )
-
+        val selection1 = makeSelection(20, 9, 1L, true)
+        val selection2 = makeSelection(30, 0, 2L, true)
         val selection = selection1.merge(selection2)
 
-        assertThat(selection.start.offset).isEqualTo(startOffset2)
-        assertThat(selection.end.offset).isEqualTo(endOffset1)
-        assertThat(selection.start.selectableId).isEqualTo(selectableKey2)
-        assertThat(selection.end.selectableId).isEqualTo(selectableKey1)
+        assertThat(selection.start.offset).isEqualTo(30)
+        assertThat(selection.end.offset).isEqualTo(9)
+        assertThat(selection.start.selectableId).isEqualTo(2L)
+        assertThat(selection.end.selectableId).isEqualTo(1L)
+        assertThat(selection.handlesCrossed).isTrue()
+    }
+
+    @Test
+    fun selection_merge_both_empty() {
+        val selection1 = makeSelection(10, 10, 1L, false)
+        val selection2 = makeSelection(0, 0, 2L, false)
+        val selection = selection1.merge(selection2)
+
+        assertThat(selection.start.offset).isEqualTo(10)
+        assertThat(selection.end.offset).isEqualTo(0)
+        assertThat(selection.start.selectableId).isEqualTo(1L)
+        assertThat(selection.end.selectableId).isEqualTo(2L)
+        assertThat(selection.handlesCrossed).isFalse()
+    }
+
+    @Test
+    fun selection_merge_empty_with_not_cross() {
+        val selection1 = makeSelection(10, 10, 1L)
+        val selection2 = makeSelection(0, 20, 2L, false)
+        val selection = selection1.merge(selection2)
+
+        assertThat(selection.start.offset).isEqualTo(10)
+        assertThat(selection.end.offset).isEqualTo(20)
+        assertThat(selection.start.selectableId).isEqualTo(1L)
+        assertThat(selection.end.selectableId).isEqualTo(2L)
+        assertThat(selection.handlesCrossed).isFalse()
+    }
+
+    @Test
+    fun selection_merge_empty_with_cross() {
+        val selection1 = makeSelection(10, 10, 1L)
+        val selection2 = makeSelection(20, 0, 2L, true)
+        val selection = selection1.merge(selection2)
+
+        assertThat(selection.start.offset).isEqualTo(20)
+        assertThat(selection.end.offset).isEqualTo(10)
+        assertThat(selection.start.selectableId).isEqualTo(2L)
+        assertThat(selection.end.selectableId).isEqualTo(1L)
+        assertThat(selection.handlesCrossed).isTrue()
+    }
+
+    @Test
+    fun selection_merge_not_cross_with_cross() {
+        val selection1 = makeSelection(0, 10, 1L, false)
+        val selection2 = makeSelection(20, 0, 2L, true)
+        val selection = selection1.merge(selection2)
+
+        assertThat(selection.start.offset).isEqualTo(20)
+        assertThat(selection.end.offset).isEqualTo(0)
+        assertThat(selection.start.selectableId).isEqualTo(2L)
+        assertThat(selection.end.selectableId).isEqualTo(1L)
         assertThat(selection.handlesCrossed).isTrue()
     }
 
     @Test
     fun selection_toTextRange_handles_not_cross() {
-        val startOffset = 0
-        val endOffset = 6
-        val startAnchor = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = startOffset,
-            selectableId = 1L
-        )
-        val endAnchor = Selection.AnchorInfo(
-            direction = ResolvedTextDirection.Ltr,
-            offset = endOffset,
-            selectableId = 1L
-        )
-        val selection = Selection(
-            start = startAnchor,
-            end = endAnchor,
-            handlesCrossed = false
-        )
-
+        val selection = makeSelection(0, 6)
         val textRange = selection.toTextRange()
 
-        assertThat(textRange).isEqualTo(TextRange(startOffset, endOffset))
+        assertThat(textRange).isEqualTo(TextRange(0, 6))
     }
 
     @Test
     fun selection_toTextRange_handles_cross() {
-        val startOffset = 6
-        val endOffset = 0
+        val selection = makeSelection(6, 0)
+        val textRange = selection.toTextRange()
+
+        assertThat(textRange).isEqualTo(TextRange(6, 0))
+    }
+
+    private fun makeSelection(
+        startOffset: Int,
+        endOffset: Int,
+        selectableId: Long = 1L,
+        handlesCrossed: Boolean = false
+    ): Selection {
         val startAnchor = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = startOffset,
-            selectableId = 1L
+            selectableId = selectableId
         )
         val endAnchor = Selection.AnchorInfo(
             direction = ResolvedTextDirection.Ltr,
             offset = endOffset,
-            selectableId = 1L
+            selectableId = selectableId
         )
-        val selection = Selection(
+        return Selection(
             start = startAnchor,
             end = endAnchor,
-            handlesCrossed = false
+            handlesCrossed = handlesCrossed
         )
-
-        val textRange = selection.toTextRange()
-
-        assertThat(textRange).isEqualTo(TextRange(startOffset, endOffset))
     }
 }

@@ -381,7 +381,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 val selection = if (selectable.selectableId == selectableId)
                     selectable.getSelectAllSelection() else null
                 selection?.let { subselections[selectable.selectableId] = it }
-                merge(mergedSelection, selection)
+                mergedSelection?.merge(selection) ?: selection
             }
         if (newSelection != previousSelection) {
             hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -780,7 +780,7 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
 
                 moveConsumed = moveConsumed || consumed
                 selection?.let { newSubselections[selectable.selectableId] = it }
-                merge(mergedSelection, selection)
+                mergedSelection?.merge(selection) ?: selection
             }
         if (newSelection != selection) {
             hapticFeedBack?.performHapticFeedback(HapticFeedbackType.TextHandleMove)
@@ -801,15 +801,6 @@ internal class SelectionManager(private val selectionRegistrar: SelectionRegistr
                 adjustment = SelectionAdjustment.Word
             )
         }
-    }
-}
-
-internal fun merge(lhs: Selection?, rhs: Selection?): Selection? {
-    return when {
-        lhs == null -> rhs
-        rhs == null || rhs.start == rhs.end -> lhs
-        lhs.start == lhs.end -> lhs.copy(handlesCrossed = rhs.handlesCrossed).merge(rhs)
-        else -> lhs.merge(rhs)
     }
 }
 

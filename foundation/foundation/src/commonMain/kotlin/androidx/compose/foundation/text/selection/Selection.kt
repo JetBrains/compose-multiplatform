@@ -69,6 +69,8 @@ internal data class Selection(
 
     fun merge(other: Selection?): Selection {
         if (other == null) return this
+        if (!this.handlesCrossed && other.handlesCrossed) return other.copy(end = this.start)
+        val handlesCrossed = if (start == end) other.handlesCrossed else this.handlesCrossed
 
         var selection = this
         selection = if (handlesCrossed) {
