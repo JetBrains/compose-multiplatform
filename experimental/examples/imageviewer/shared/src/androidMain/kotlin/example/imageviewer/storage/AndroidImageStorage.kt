@@ -1,10 +1,12 @@
-package example.imageviewer
+package example.imageviewer.storage
 
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.graphics.scale
+import example.imageviewer.ImageStorage
+import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
