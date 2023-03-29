@@ -67,6 +67,7 @@ internal fun PreviewImage(
                 val memoryWarningFlow = memoryWarningFlow()
                 LaunchedEffect(Unit) {
                     memoryWarningFlow.collect {
+                        println("downgrade image")
                         image = null
                         image = imageProvider.getThumbnail(currentPicture)
                     }

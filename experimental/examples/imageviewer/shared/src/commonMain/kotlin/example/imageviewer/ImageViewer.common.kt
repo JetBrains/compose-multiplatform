@@ -51,7 +51,9 @@ internal fun ImageViewerWithProvidedDependencies(
     val memoryWarningFlow = memoryWarningFlow()
     LaunchedEffect(Unit) {
         memoryWarningFlow.collect {
+            println("turn off camera")
             showCameraScreen = false
+            println("clear stack")
             while (navigationStack.stack.size > 1) {
                 navigationStack.stack.removeLast()
             }
