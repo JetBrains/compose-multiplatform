@@ -10,9 +10,9 @@ import example.imageviewer.model.GpsPosition
 
 @Composable
 internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
-    val singapore = LatLng(gps.latitude, gps.longitude)
+    val currentLocation = LatLng(gps.latitude, gps.longitude)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(singapore, 10f)
+        position = CameraPosition.fromLatLngZoom(currentLocation, 10f)
     }
     GoogleMap(
         modifier = modifier,
