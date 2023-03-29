@@ -16,8 +16,8 @@ class AndroidImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
-    val mapWithBigImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
-    val mapWithThumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    val largeImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    val thumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
@@ -29,7 +29,7 @@ class AndroidImageStorage(
                 maxStorableImageSizePx.toFloat() / androidBitmap.width,
                 maxStorableImageSizePx.toFloat() / androidBitmap.height
             )
-            mapWithBigImages[picture] =
+            largeImages[picture] =
                 if (targetScale < 1.0) {
                     androidBitmap.scale(
                         width = (androidBitmap.width * targetScale).toInt(),
@@ -43,7 +43,7 @@ class AndroidImageStorage(
                 storableThumbnailSizePx.toFloat() / androidBitmap.width,
                 storableThumbnailSizePx.toFloat() / androidBitmap.height
             )
-            mapWithThumbnails[picture] = androidBitmap.scale(
+            thumbnails[picture] = androidBitmap.scale(
                 width = (androidBitmap.width * targetThumbnailScale).toInt(),
                 height = (androidBitmap.height * targetThumbnailScale).toInt()
             ).asImageBitmap()
@@ -53,11 +53,11 @@ class AndroidImageStorage(
     }
 
     override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
-        return mapWithThumbnails[picture]!!
+        return thumbnails[picture]!!
     }
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
-        return mapWithBigImages[picture]!!
+        return largeImages[picture]!!
     }
 
 }

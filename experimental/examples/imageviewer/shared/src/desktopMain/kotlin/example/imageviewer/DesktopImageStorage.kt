@@ -16,8 +16,8 @@ class DesktopImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
-    val mapWithBigImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
-    val mapWithThumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    val largeImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
+    val thumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
     override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
@@ -29,7 +29,7 @@ class DesktopImageStorage(
                 maxStorableImageSizePx.toFloat() / awtImage.width,
                 maxStorableImageSizePx.toFloat() / awtImage.height
             )
-            mapWithBigImages[picture] =
+            largeImages[picture] =
                 if (targetScale < 1.0) {
                     scaleBitmapAspectRatio(
                         awtImage,
@@ -44,7 +44,7 @@ class DesktopImageStorage(
                 storableThumbnailSizePx.toFloat() / awtImage.width,
                 storableThumbnailSizePx.toFloat() / awtImage.height
             )
-            mapWithThumbnails[picture] = scaleBitmapAspectRatio(
+            thumbnails[picture] = scaleBitmapAspectRatio(
                 awtImage,
                 width = (awtImage.width * targetThumbnailScale).toInt(),
                 height = (awtImage.height * targetThumbnailScale).toInt(),
@@ -55,11 +55,11 @@ class DesktopImageStorage(
     }
 
     override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
-        return mapWithThumbnails[picture]!!
+        return thumbnails[picture]!!
     }
 
     override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
-        return mapWithBigImages[picture]!!
+        return largeImages[picture]!!
     }
 
 }
