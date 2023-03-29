@@ -169,9 +169,9 @@ private fun UIImage.resize(targetSize: CValue<CGSize>): UIImage {
     return newImage!!
 }
 
-private val PictureData.Camera.jpgFile get():String = id + ".jpg"
-private val PictureData.Camera.thumbnailJpgFile get():String = id + "-thumbnail.jpg"
-private val PictureData.Camera.jsonFile get():String = id + ".json"
+private val PictureData.Camera.jpgFile get(): String = id + ".jpg"
+private val PictureData.Camera.thumbnailJpgFile get(): String = id + "-thumbnail.jpg"
+private val PictureData.Camera.jsonFile get(): String = id + ".json"
 private fun String.writeToURL(url: NSURL) = (this as NSString).writeToURL(
     url = url,
     atomically = true,

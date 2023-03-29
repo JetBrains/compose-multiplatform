@@ -39,7 +39,7 @@ sealed interface PictureData {
         override fun equals(other: Any?): Boolean = (other as? Camera)?.id == id
         override fun hashCode(): Int = id.hashCode()
         override val dateString: String
-            get():String {
+            get(): String {
                 val instantTime = Instant.fromEpochSeconds(timeStampSeconds, 0)
                 val utcTime = instantTime.toLocalDateTime(TimeZone.UTC)
                 val date = utcTime.date

@@ -7,6 +7,6 @@ expect fun Modifier.notchPadding(): Modifier
 
 expect class PlatformStorableImage
 
-expect fun createUUID():String
+expect fun createUUID(): String
 
 expect val ioDispatcher: CoroutineDispatcher

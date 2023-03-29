@@ -15,6 +15,6 @@ class AndroidStorableImage(
 
 actual typealias PlatformStorableImage = AndroidStorableImage
 
-actual fun createUUID():String = UUID.randomUUID().toString()
+actual fun createUUID(): String = UUID.randomUUID().toString()
 
 actual val ioDispatcher = Dispatchers.IO
