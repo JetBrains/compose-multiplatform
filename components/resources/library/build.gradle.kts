@@ -126,6 +126,16 @@ android {
     }
 }
 
+project.configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.module.name.startsWith("ui-graphics")) {
+            useVersion("23.3.24-rc01")
+        } else if (requested.module.group.startsWith("org.jetbrains.compose")) {
+            useVersion("1.4.0-dev-wasm02")
+        }
+    }
+}
+
 dependencies {
     //Android integration tests
     testImplementation("androidx.test:core:1.5.0")

@@ -5,10 +5,20 @@
 
 package org.jetbrains.compose.resources
 
+import androidx.compose.ui.graphics.ImageBitmap
 import java.io.IOException
 
 @ExperimentalResourceApi
 actual fun resource(path: String): Resource = DesktopResourceImpl(path)
+
+actual typealias ResourcesRawResult = ByteArray
+actual typealias ResourcesRawImageResult = ByteArray
+
+internal actual fun ResourcesRawImageResult.rawToImageBitmap(): ImageBitmap = this.toImageBitmap()
+
+actual suspend fun ResourcesRawResult.asResourcesRawImageResult(): ResourcesRawImageResult {
+    return this
+}
 
 @ExperimentalResourceApi
 private class DesktopResourceImpl(path: String) : AbstractResourceImpl(path) {

@@ -34,7 +34,20 @@ compose.experimental {
 project.configurations.forEach { conf ->
     conf.resolutionStrategy.eachDependency {
         if (requested.module.name.contains("kotlin-stdlib")) {
-            useVersion("1.8.20-Beta")
+            useVersion("1.8.20-RC2")
+        }
+    }
+}
+
+project.configurations.all {
+    resolutionStrategy.eachDependency {
+        if (requested.module.name.startsWith("ui-graphics")) {
+            useVersion("23.3.24-rc01")
+        } else if (requested.module.group.startsWith("org.jetbrains.compose")) {
+            useVersion("1.4.0-dev-wasm02")
+        } else if (requested.module.group.startsWith("org.jetbrains.skiko")) {
+            //useVersion("23.3.28.3-wasm03-SNAPSHOT+debug")
+            useVersion("23.3.28.5-wasm03-SNAPSHOT")
         }
     }
 }

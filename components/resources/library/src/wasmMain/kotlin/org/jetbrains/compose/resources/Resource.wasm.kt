@@ -5,10 +5,15 @@
 
 package org.jetbrains.compose.resources
 
+import androidx.compose.ui.graphics.ImageBitmap
 import org.jetbrains.compose.resources.vector.xmldom.Element
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ImageInfo
 import org.khronos.webgl.ArrayBuffer
 import org.khronos.webgl.Int8Array
 import org.khronos.webgl.Uint8Array
+import org.khronos.webgl.Uint8ClampedArray
 import org.w3c.xhr.ARRAYBUFFER
 import org.khronos.webgl.get
 import org.w3c.xhr.XMLHttpRequest
@@ -17,25 +22,86 @@ import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.wasm.unsafe.*
+import org.w3c.files.Blob
 import kotlin.wasm.unsafe.withScopedMemoryAllocator
 import kotlin.wasm.unsafe.UnsafeWasmMemoryApi
 
 @ExperimentalResourceApi
 actual fun resource(path: String): Resource = JSResourceImpl(path)
 
+actual typealias ResourcesRawResult = Blob
+
+external interface WebImageBitmap {
+    val height: Int
+    val width: Int
+}
+
+external interface WebImageData {
+    val data: Uint8ClampedArray
+    val colorSpace: String
+    val height: Int
+    val width: Int
+}
+
+actual typealias ResourcesRawImageResult = WebImageBitmap
+
+actual suspend fun ResourcesRawResult.asResourcesRawImageResult(): ResourcesRawImageResult {
+    return suspendCoroutine { continuation ->
+        getWebImageBitmap(this) { webImageBitmap ->
+            continuation.resume(webImageBitmap)
+        }
+    }
+}
+
+@Suppress(
+    "INVISIBLE_MEMBER",
+    "INVISIBLE_REFERENCE",
+    "EXPOSED_PARAMETER_TYPE"
+)
+internal actual fun ResourcesRawImageResult.rawToImageBitmap(): ImageBitmap {
+    val webImageData = getWebImageData(this)
+    val int8Array = Int8Array(webImageData.data.buffer)
+//    val int8Array = Int8Array(webImageData.data.length)
+    //int8Array.set(webImageData.data)
+    val pixelsByteArray = jsInt8ArrayToKotlinByteArray(int8Array)
+    val bitmap = Bitmap()
+    bitmap.setImageInfo(ImageInfo.makeN32(webImageData.width, webImageData.height, ColorAlphaType.OPAQUE))
+    bitmap.allocPixels()
+    bitmap.installPixels(pixelsByteArray)
+    return androidx.compose.ui.graphics.SkiaBackedImageBitmap(bitmap)
+}
+
+
+@JsFun("""
+    (blob, resultCallback) => {
+       createImageBitmap(blob).then((res) => resultCallback(res));
+    }
+""")
+internal external fun getWebImageBitmap(blob: Blob, resultCallback: (WebImageBitmap) -> Unit)
+
+@JsFun("""
+    (bitmap) => {
+        const offscreenCanvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const context = offscreenCanvas.getContext('2d');
+        context.drawImage(bitmap, 0, 0);
+        return context.getImageData(0, 0, bitmap.width, bitmap.height);
+    }
+""")
+internal external fun getWebImageData(bitmap: WebImageBitmap): WebImageData
+
 @ExperimentalResourceApi
 private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
-    override suspend fun readBytes(): ByteArray {
+    override suspend fun readBytes(): ResourcesRawResult {
         return suspendCoroutine { continuation ->
             val req = XMLHttpRequest()
-            req.open("GET", "/$path", true)
-            req.responseType = "arraybuffer".asDynamic().unsafeCast<XMLHttpRequestResponseType>()
+            req.open("GET", "$path", true)
+            req.responseType = "blob".asDynamic().unsafeCast<XMLHttpRequestResponseType>()
 
             req.onload = { _ ->
-                val arrayBuffer = req.response
-                if (arrayBuffer is ArrayBuffer) {
-                    val size = arrayBuffer.byteLength
-                    continuation.resume(arrayBuffer.toByteArray())
+                val blob = req.response
+                if (blob is Blob) {
+                    //val size = arrayBuffer.byteLength
+                    continuation.resume(blob)
                 } else {
                     continuation.resumeWithException(MissingResourceException(path))
                 }

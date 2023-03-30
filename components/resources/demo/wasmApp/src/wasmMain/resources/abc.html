@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<canvas id=foo width=1000 height=1000></canvas>
+
+<script type="text/javascript"
+        src="https://unpkg.com/canvaskit-wasm@0.38.0/bin/canvaskit.js"></script>
+<!--<script type="text/javascript"-->
+<!--        src="ck.js"></script>-->
+<script type="text/javascript">
+    var cdn = 'https://storage.googleapis.com/skia-cdn/misc/';
+  const ckLoaded = CanvasKitInit({
+    locateFile: (file) => 'https://unpkg.com/canvaskit-wasm@0.38.0/bin/'+file});
+  const loadTestImage = fetch(cdn + 'test.png').then((response) => response.arrayBuffer());
+  Promise.all([ckLoaded, loadTestImage]).then((results) => {
+      const CanvasKit = results[0];
+      const imgData = results[1];
+      console.log(imgData);
+      const start = Date.now();
+      const img = CanvasKit.MakeImageFromEncoded(imgData);
+      const end = Date.now();
+      console.log("Time = " + (end - start));
+      var d = {
+          width: 512,
+          height: 512,
+          colorType: CanvasKit.ColorType.RGBA_8888,
+          alphaType: CanvasKit.AlphaType.Unpremul,
+          colorSpace: CanvasKit.ColorSpace.SRGB
+      }
+      // const start2 = Date.now();
+      // img.readPixels(0, 0, d);
+      // const end2 = Date.now();
+      // console.log("Time2 = " + (end2 - start2));
+
+    const surface = CanvasKit.MakeCanvasSurface('foo');
+
+    const paint = new CanvasKit.Paint();
+    paint.setColor(CanvasKit.Color4f(0.9, 0, 0, 1.0));
+    paint.setStyle(CanvasKit.PaintStyle.Stroke);
+    paint.setAntiAlias(true);
+    const rr = CanvasKit.RRectXY(CanvasKit.LTRBRect(10, 60, 210, 260), 25, 15);
+
+    function draw(canvas) {
+      canvas.clear(CanvasKit.WHITE);
+      canvas.drawImage(img, 0, 0);
+      // canvas.drawRRect(rr, paint);
+    }
+    surface.drawOnce(draw);
+  });
+</script>
+
+</body>
+</html>

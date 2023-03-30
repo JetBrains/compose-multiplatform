@@ -10,8 +10,13 @@ package org.jetbrains.compose.resources
  */
 @ExperimentalResourceApi
 interface Resource {
-    suspend fun readBytes(): ByteArray //todo in future use streaming
+    suspend fun readBytes(): ResourcesRawResult //todo in future use streaming
 }
+
+expect class ResourcesRawResult
+expect interface ResourcesRawImageResult
+
+expect suspend fun ResourcesRawResult.asResourcesRawImageResult(): ResourcesRawImageResult
 
 /**
  * Get a resource from <sourceSet>/resources (for example, from commonMain/resources).

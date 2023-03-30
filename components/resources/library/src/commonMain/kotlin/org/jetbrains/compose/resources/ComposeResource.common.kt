@@ -32,7 +32,7 @@ fun Resource.rememberImageBitmap(): LoadState<ImageBitmap> {
     val state: MutableState<LoadState<ImageBitmap>> = remember(this) { mutableStateOf(LoadState.Loading()) }
     LaunchedEffect(this) {
         state.value = try {
-            LoadState.Success(readBytes().toImageBitmap())
+            LoadState.Success(readBytes().asResourcesRawImageResult().rawToImageBitmap())
         } catch (e: Exception) {
             LoadState.Error(e)
         }
@@ -49,7 +49,7 @@ fun Resource.rememberImageVector(density: Density): LoadState<ImageVector> {
     val state: MutableState<LoadState<ImageVector>> = remember(this, density) { mutableStateOf(LoadState.Loading()) }
     LaunchedEffect(this, density) {
         state.value = try {
-            LoadState.Success(readBytes().toImageVector(density))
+            LoadState.Success((readBytes() as ByteArray).toImageVector(density))
         } catch (e: Exception) {
             LoadState.Error(e)
         }
@@ -129,6 +129,8 @@ internal expect fun isSyncResourceLoadingSupported(): Boolean
 internal expect fun Resource.readBytesSync(): ByteArray
 
 internal expect fun ByteArray.toImageBitmap(): ImageBitmap
+
+internal expect fun ResourcesRawImageResult.rawToImageBitmap(): ImageBitmap
 
 internal expect fun parseXML(byteArray: ByteArray): Element
 

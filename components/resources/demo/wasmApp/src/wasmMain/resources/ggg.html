@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<canvas id="canvas" width=1000 height=1000></canvas>
+<!--<div style="display:none;">-->
+<!--  <img id="source" src="https://storage.googleapis.com/skia-cdn/misc/test.png" width="512" height="512" />-->
+<!--</div>-->
+
+<script type="text/javascript">
+  const canvas = document.getElementById("canvas");
+  const ctx = canvas.getContext("2d");
+  // const image = document.getElementById("source");
+
+  function drawImg(imgBitmap) {
+      ctx.drawImage(imgBitmap, 0, 0);
+  }
+
+  var cdn = 'https://storage.googleapis.com/skia-cdn/misc/';
+  // const loadTestImage = fetch(cdn + 'test.png').then((response) => response.blob());
+  const loadTestImage = fetch('https://raw.githubusercontent.com/JetBrains/compose-jb/master/artwork/imageviewerrepo/1.jpg').then((response) => response.blob());
+
+  var _imgBitmap;
+
+  function render() {
+      if (_imgBitmap != null) {
+          drawImg(_imgBitmap)
+      }
+      requestAnimationFrame(render);
+  }
+
+  loadTestImage.then((img) => createImageBitmap(img)).then((imgBitmap) => {
+      // let s = Date.now();
+      _imgBitmap = imgBitmap;
+      let e = Date.now();
+      // console.log("Time = " + (e - s));
+  });
+
+  requestAnimationFrame(render);
+
+  // image.addEventListener("load", (e) => {
+  //
+  // });
+</script>
+
+</body>
+</html>

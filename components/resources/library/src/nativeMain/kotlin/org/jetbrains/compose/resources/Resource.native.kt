@@ -5,7 +5,16 @@
 
 package org.jetbrains.compose.resources
 
+import androidx.compose.ui.graphics.ImageBitmap
 import org.jetbrains.compose.resources.vector.xmldom.Element
 import org.jetbrains.compose.resources.vector.xmldom.parse
 
 internal actual fun parseXML(byteArray: ByteArray): Element = parse(byteArray.decodeToString())
+
+actual typealias ResourcesRawResult = ByteArray
+actual typealias ResourcesRawImageResult = ByteArray
+internal actual fun ResourcesRawImageResult.rawToImageBitmap(): ImageBitmap = this.toImageBitmap()
+
+actual suspend fun ResourcesRawResult.asResourcesRawImageResult(): ResourcesRawImageResult {
+    return this
+}
