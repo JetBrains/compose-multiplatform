@@ -56,7 +56,7 @@ import kotlin.math.floor
 import kotlin.math.max
 
 /**
- * <a href="https://m3.material.io/components/checkbox/overview" class="external" target="_blank">Material Design checkbox</a>.
+ * Material Design checkbox.
  *
  * Checkboxes allow users to select one or more items from a set. Checkboxes can turn an option on
  * or off.
@@ -97,9 +97,7 @@ fun Checkbox(
         state = ToggleableState(checked),
         onClick = if (onCheckedChange != null) {
             { onCheckedChange(!checked) }
-        } else {
-            null
-        },
+        } else null,
         modifier = modifier,
         enabled = enabled,
         colors = colors,
@@ -108,7 +106,7 @@ fun Checkbox(
 }
 
 /**
- * <a href="https://m3.material.io/components/checkbox/guidelines" class="external" target="_blank">Material Design checkbox</a> parent.
+ * Material Design checkbox parent.
  *
  * Checkboxes can have a parent-child relationship with other checkboxes. When the parent checkbox
  * is checked, all child checkboxes are checked. If a parent checkbox is unchecked, all child
@@ -165,7 +163,7 @@ fun TriStateCheckbox(
         modifier = modifier
             .then(
                 if (onClick != null) {
-                    Modifier.minimumInteractiveComponentSize()
+                    Modifier.minimumTouchTargetSize()
                 } else {
                     Modifier
                 }

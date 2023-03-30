@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-// VERSION: v0_126
+// VERSION: v0_103
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
 package androidx.compose.material3.tokens
@@ -63,29 +63,17 @@ internal object FilterChipTokens {
     val UnselectedHoverLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val UnselectedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
     val UnselectedPressedLabelTextColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val DisabledIconColor = ColorSchemeKeyTokens.OnSurface
+    const val DisabledIconOpacity = 0.38f
     val IconSize = 18.0.dp
-    val DisabledLeadingIconColor = ColorSchemeKeyTokens.OnSurface
-    const val DisabledLeadingIconOpacity = 0.38f
-    val LeadingIconUnselectedColor = ColorSchemeKeyTokens.Primary
-    val SelectedDraggedLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedFocusLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedHoverLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedPressedLeadingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val UnselectedDraggedLeadingIconColor = ColorSchemeKeyTokens.Primary
-    val UnselectedFocusLeadingIconColor = ColorSchemeKeyTokens.Primary
-    val UnselectedHoverLeadingIconColor = ColorSchemeKeyTokens.Primary
-    val UnselectedPressedLeadingIconColor = ColorSchemeKeyTokens.Primary
-    val DisabledTrailingIconColor = ColorSchemeKeyTokens.OnSurface
-    const val DisabledTrailingIconOpacity = 0.38f
-    val SelectedDraggedTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedFocusTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedHoverTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedPressedTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val SelectedTrailingIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
-    val TrailingIconUnselectedColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val UnselectedDraggedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val UnselectedFocusTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val UnselectedHoverTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
-    val UnselectedPressedTrailingIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val SelectedDraggedIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedFocusIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedHoverIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val SelectedPressedIconColor = ColorSchemeKeyTokens.OnSecondaryContainer
+    val UnselectedDraggedIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedFocusIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedHoverIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
+    val UnselectedPressedIconColor = ColorSchemeKeyTokens.OnSurfaceVariant
 }

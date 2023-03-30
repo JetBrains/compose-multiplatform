@@ -56,10 +56,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.clearAndSetSemantics
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -92,6 +89,7 @@ import androidx.compose.ui.unit.dp
  * and customize the appearance / behavior of this FAB in different states.
  * @param content the content of this FAB, typically an [Icon]
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FloatingActionButton(
     onClick: () -> Unit,
@@ -105,7 +103,7 @@ fun FloatingActionButton(
 ) {
     Surface(
         onClick = onClick,
-        modifier = modifier.semantics { role = Role.Button },
+        modifier = modifier,
         shape = shape,
         color = containerColor,
         contentColor = contentColor,

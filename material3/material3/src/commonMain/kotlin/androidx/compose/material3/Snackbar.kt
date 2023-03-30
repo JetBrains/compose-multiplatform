@@ -43,7 +43,7 @@ import kotlin.math.max
 import kotlin.math.min
 
 /**
- * <a href="https://m3.material.io/components/snackbar/overview" class="external" target="_blank">Material Design snackbar</a>.
+ * Material Design snackbar.
  *
  * Snackbars provide brief messages about app processes at the bottom of the screen.
  *
@@ -142,7 +142,7 @@ fun Snackbar(
 }
 
 /**
- * <a href="https://m3.material.io/components/snackbar/overview" class="external" target="_blank">Material Design snackbar</a>.
+ * Material Design snackbar.
  *
  * Snackbars provide brief messages about app processes at the bottom of the screen.
  *
@@ -223,7 +223,7 @@ fun Snackbar(
                     content = {
                         Icon(
                             Icons.Filled.Close,
-                            contentDescription = getString(Strings.SnackbarDismiss),
+                            contentDescription = null, // TODO add "Dismiss Snackbar" to Strings.
                         )
                     }
                 )

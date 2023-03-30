@@ -157,8 +157,7 @@ fun TabRow(
                     constraints.copy(
                         minWidth = tabWidth,
                         maxWidth = tabWidth,
-                        minHeight = tabRowHeight,
-                        maxHeight = tabRowHeight,
+                        minHeight = tabRowHeight
                     )
                 )
             }
@@ -266,11 +265,7 @@ fun ScrollableTabRow(
                 maxOf(curr, measurable.maxIntrinsicHeight(Constraints.Infinity))
             }
 
-            val tabConstraints = constraints.copy(
-                minWidth = minTabWidth,
-                minHeight = layoutHeight,
-                maxHeight = layoutHeight,
-            )
+            val tabConstraints = constraints.copy(minWidth = minTabWidth, minHeight = layoutHeight)
             val tabPlaceables = tabMeasurables
                 .map { it.measure(tabConstraints) }
 

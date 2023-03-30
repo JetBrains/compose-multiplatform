@@ -103,7 +103,7 @@ fun RadioButton(
         modifier
             .then(
                 if (onClick != null) {
-                    Modifier.minimumInteractiveComponentSize()
+                    Modifier.minimumTouchTargetSize()
                 } else {
                     Modifier
                 }

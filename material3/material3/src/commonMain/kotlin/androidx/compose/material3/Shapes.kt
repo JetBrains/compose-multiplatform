@@ -23,7 +23,6 @@ import androidx.compose.material3.tokens.ShapeKeyTokens
 import androidx.compose.material3.tokens.ShapeTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.ReadOnlyComposable
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.RectangleShape
@@ -145,11 +144,6 @@ internal fun CornerBasedShape.top(): CornerBasedShape {
     return copy(bottomStart = CornerSize(0.0.dp), bottomEnd = CornerSize(0.0.dp))
 }
 
-/** Helper function for component shape tokens. Used to grab the top values of a shape parameter. */
-internal fun CornerBasedShape.bottom(): CornerBasedShape {
-    return copy(topStart = CornerSize(0.0.dp), topEnd = CornerSize(0.0.dp))
-}
-
 /** Helper function for component shape tokens. Used to grab the end values of a shape parameter. */
 internal fun CornerBasedShape.end(): CornerBasedShape {
     return copy(topStart = CornerSize(0.0.dp), bottomStart = CornerSize(0.0.dp))
@@ -178,7 +172,6 @@ internal fun Shapes.fromToken(value: ShapeKeyTokens): Shape {
 
 /** Converts a shape token key to the local shape provided by the theme */
 @Composable
-@ReadOnlyComposable
 internal fun ShapeKeyTokens.toShape(): Shape {
     return MaterialTheme.shapes.fromToken(this)
 }

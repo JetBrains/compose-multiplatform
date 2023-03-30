@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material3.tokens.DialogTokens
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -56,7 +57,9 @@ internal fun AlertDialogContent(
         tonalElevation = tonalElevation,
     ) {
         Column(
-            modifier = Modifier.padding(DialogPadding)
+            modifier = Modifier
+                .sizeIn(minWidth = MinWidth, maxWidth = MaxWidth)
+                .padding(DialogPadding)
         ) {
             icon?.let {
                 CompositionLocalProvider(LocalContentColor provides iconContentColor) {
@@ -211,11 +214,11 @@ internal fun AlertDialogFlowRow(
     }
 }
 
-internal val DialogMinWidth = 280.dp
-internal val DialogMaxWidth = 560.dp
-
 // Paddings for each of the dialog's parts.
 private val DialogPadding = PaddingValues(all = 24.dp)
 private val IconPadding = PaddingValues(bottom = 16.dp)
 private val TitlePadding = PaddingValues(bottom = 16.dp)
 private val TextPadding = PaddingValues(bottom = 24.dp)
+
+private val MinWidth = 280.dp
+private val MaxWidth = 560.dp

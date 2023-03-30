@@ -31,6 +31,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.ButtonDefaults.ContentPadding
+import androidx.compose.material3.ButtonDefaults.IconSize
+import androidx.compose.material3.ButtonDefaults.IconSpacing
+import androidx.compose.material3.ButtonDefaults.MinHeight
+import androidx.compose.material3.ButtonDefaults.MinWidth
+import androidx.compose.material3.ButtonDefaults.TextButtonContentPadding
+import androidx.compose.material3.ButtonDefaults.buttonColors
+import androidx.compose.material3.ButtonDefaults.buttonElevation
+import androidx.compose.material3.ButtonDefaults.elevatedButtonColors
+import androidx.compose.material3.ButtonDefaults.elevatedButtonElevation
+import androidx.compose.material3.ButtonDefaults.filledTonalButtonColors
+import androidx.compose.material3.ButtonDefaults.filledTonalButtonElevation
+import androidx.compose.material3.ButtonDefaults.outlinedButtonColors
+import androidx.compose.material3.ButtonDefaults.textButtonColors
 import androidx.compose.material3.tokens.ElevatedButtonTokens
 import androidx.compose.material3.tokens.FilledButtonTokens
 import androidx.compose.material3.tokens.FilledTonalButtonTokens
@@ -50,9 +64,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.semantics.role
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -101,6 +112,7 @@ import androidx.compose.ui.unit.dp
  * for this button. You can create and pass in your own `remember`ed instance to observe
  * [Interaction]s and customize the appearance / behavior of this button in different states.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Button(
     onClick: () -> Unit,
@@ -120,7 +132,7 @@ fun Button(
     val tonalElevation = elevation?.tonalElevation(enabled, interactionSource)?.value ?: 0.dp
     Surface(
         onClick = onClick,
-        modifier = modifier.semantics { role = Role.Button },
+        modifier = modifier,
         enabled = enabled,
         shape = shape,
         color = containerColor,
@@ -455,10 +467,8 @@ object ButtonDefaults {
      * The default content padding used by [Button], [ElevatedButton], [FilledTonalButton], and
      * [OutlinedButton] buttons.
      *
-     * - See [TextButtonContentPadding] or [TextButtonWithIconContentPadding] for content padding
-     *  used by [TextButton].
-     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains
-     * [Icon].
+     * - See [TextButtonContentPadding] for content padding used by [TextButton].
+     * - See [ButtonWithIconContentPadding] for content padding used by [Button] that contains [Icon].
      */
     val ContentPadding =
         PaddingValues(
@@ -481,27 +491,12 @@ object ButtonDefaults {
 
     private val TextButtonHorizontalPadding = 12.dp
 
-    /** The default content padding used by [TextButton].
-     *
-     * - See [TextButtonWithIconContentPadding] for content padding used by [TextButton] that
-     * contains [Icon].
-     */
+    /** The default content padding used by [TextButton] */
     val TextButtonContentPadding =
         PaddingValues(
             start = TextButtonHorizontalPadding,
             top = ContentPadding.calculateTopPadding(),
             end = TextButtonHorizontalPadding,
-            bottom = ContentPadding.calculateBottomPadding()
-        )
-
-    private val TextButtonWithIconHorizontalEndPadding = 16.dp
-
-    /** The default content padding used by [TextButton] that contains an [Icon]. */
-    val TextButtonWithIconContentPadding =
-        PaddingValues(
-            start = TextButtonHorizontalPadding,
-            top = ContentPadding.calculateTopPadding(),
-            end = TextButtonWithIconHorizontalEndPadding,
             bottom = ContentPadding.calculateBottomPadding()
         )
 

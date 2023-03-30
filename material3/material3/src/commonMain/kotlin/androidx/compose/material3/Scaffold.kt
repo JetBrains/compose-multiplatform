@@ -70,6 +70,7 @@ import androidx.compose.ui.unit.offset
  * properly offset top and bottom bars. If using [Modifier.verticalScroll], apply this modifier to
  * the child of the scroll, and not on the scroll itself.
  */
+@ExperimentalMaterial3Api
 @Composable
 fun Scaffold(
     modifier: Modifier = Modifier,
@@ -108,6 +109,7 @@ fun Scaffold(
  * @param bottomBar the content to place at the bottom of the [Scaffold], on top of the
  * [content], typically a [NavigationBar].
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ScaffoldLayout(
     fabPosition: FabPosition,
@@ -271,6 +273,7 @@ private fun ScaffoldLayout(
 /**
  * Object containing various default values for [Scaffold] component.
  */
+@ExperimentalMaterial3Api
 object ScaffoldDefaults {
     /**
      * Default insets to be used and consumed by the scaffold content slot
@@ -283,6 +286,7 @@ object ScaffoldDefaults {
 /**
  * The possible positions for a [FloatingActionButton] attached to a [Scaffold].
  */
+@ExperimentalMaterial3Api
 @kotlin.jvm.JvmInline
 value class FabPosition internal constructor(@Suppress("unused") private val value: Int) {
     companion object {
