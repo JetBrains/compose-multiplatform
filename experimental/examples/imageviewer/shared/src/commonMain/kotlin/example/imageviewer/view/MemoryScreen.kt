@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.*
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -25,14 +25,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import example.imageviewer.ImageProvider
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -71,12 +70,12 @@ internal fun MemoryScreen(
                     )
                 }
             }
-            Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+            Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
                 Column {
                     Headliner("Note")
                     Collapsible(memoryPage.picture.description)
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, imageProvider,  onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -224,7 +223,6 @@ internal fun Headliner(s: String) {
 @Composable
 internal fun RelatedMemoriesVisualizer(
     ps: List<PictureData>,
-    imageProvider: ImageProvider,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
@@ -235,7 +233,7 @@ internal fun RelatedMemoriesVisualizer(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             itemsIndexed(ps) { idx, item ->
-                RelatedMemory(idx, item, imageProvider, onSelectRelatedMemory)
+                RelatedMemory(item, onSelectRelatedMemory)
             }
         }
     }
@@ -243,9 +241,7 @@ internal fun RelatedMemoriesVisualizer(
 
 @Composable
 internal fun RelatedMemory(
-    index: Int,
     galleryEntry: PictureData,
-    imageProvider: ImageProvider,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
