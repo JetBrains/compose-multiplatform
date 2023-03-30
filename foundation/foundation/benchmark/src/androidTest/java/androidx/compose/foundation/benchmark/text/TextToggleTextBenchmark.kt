@@ -18,8 +18,7 @@ package androidx.compose.foundation.benchmark.text
 
 import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkDraw
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkLayout
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasure
+import androidx.compose.testutils.benchmark.toggleStateBenchmarkMeasureLayout
 import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.text.benchmark.TextBenchmarkTestRule
 import androidx.compose.ui.unit.dp
@@ -38,7 +37,7 @@ class TextToggleTextBenchmark(
     companion object {
         @JvmStatic
         @Parameterized.Parameters(name = "length={0}")
-        fun initParameters(): Array<Any> = arrayOf(32, 512)
+        fun initParameters(): Array<Any> = arrayOf(32, 512).filterForCi()
     }
 
     @get:Rule
@@ -74,16 +73,8 @@ class TextToggleTextBenchmark(
      * Measure the time taken to measure the [Text] composable when text gets toggled.
      */
     @Test
-    fun toggleText_measure() {
-        benchmarkRule.toggleStateBenchmarkMeasure(caseFactory)
-    }
-
-    /**
-     * Measure the time taken to layout the [Text] composable when text gets toggled.
-     */
-    @Test
-    fun toggleText_layout() {
-        benchmarkRule.toggleStateBenchmarkLayout(caseFactory)
+    fun toggleText_measureLayout() {
+        benchmarkRule.toggleStateBenchmarkMeasureLayout(caseFactory, assertOneRecomposition = false)
     }
 
     /**

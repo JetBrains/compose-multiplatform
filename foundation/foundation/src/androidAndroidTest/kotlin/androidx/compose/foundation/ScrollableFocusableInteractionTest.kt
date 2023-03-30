@@ -28,21 +28,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusDirection.Companion.Next
 import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsFocused
@@ -53,6 +54,7 @@ import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -66,6 +68,10 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
+/**
+ * Copy of [LazyListFocusableInteractionTest], modified for non-lazy scrollables. Any new tests
+ * added here should probably be added there too.
+ */
 @MediumTest
 @RunWith(Parameterized::class)
 class ScrollableFocusableInteractionTest(
@@ -88,7 +94,6 @@ class ScrollableFocusableInteractionTest(
 
     private val scrollableAreaTag = "scrollableArea"
     private val focusableTag = "focusable"
-    private val focusRequester = FocusRequester()
     private val scrollState = ScrollState(initial = 0)
     private lateinit var focusManager: FocusManager
 
@@ -110,7 +115,7 @@ class ScrollableFocusableInteractionTest(
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 Spacer(Modifier.size(90.toDp()))
-                TestFocusable(size = 10.toDp(), focusRequester)
+                TestFocusable(size = 10.toDp())
             }
         }
         requestFocusAndScrollToTop()
@@ -135,7 +140,7 @@ class ScrollableFocusableInteractionTest(
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 Spacer(Modifier.size(90.toDp()))
-                TestFocusable(size = 10.toDp(), focusRequester)
+                TestFocusable(size = 10.toDp())
             }
         }
         requestFocusAndScrollToTop()
@@ -153,14 +158,14 @@ class ScrollableFocusableInteractionTest(
     }
 
     @Test
-    fun scrollsFocusedFocusableIntoView_whenPartiallyInViewAndBecomesMoreHidden() {
+    fun doesNotScrollFocusedFocusableIntoView_whenPartiallyInViewAndBecomesMoreHidden() {
         var viewportSize by mutableStateOf(95.toDp())
 
         rule.setContent {
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 WithSpacerBefore(size = 90.toDp()) {
-                    TestFocusable(size = 10.toDp(), focusRequester)
+                    TestFocusable(size = 10.toDp())
                 }
             }
         }
@@ -177,19 +182,19 @@ class ScrollableFocusableInteractionTest(
 
         rule.onNodeWithTag(focusableTag)
             .assertScrollAxisPositionInRootIsEqualTo(
-                if (reverseScrolling) (-5).toDp() else 81.toDp()
+                if (reverseScrolling) (-5 - 4).toDp() else 90.toDp()
             )
             .assertIsDisplayed()
     }
 
     @Test
-    fun scrollsFocusedFocusableIntoView_whenPartiallyInViewAndBecomesFullyHidden() {
+    fun doesNotScrollFocusedFocusableIntoView_whenPartiallyInViewAndBecomesFullyHidden() {
         var viewportSize by mutableStateOf(95.toDp())
 
         rule.setContent {
             ScrollableRowOrColumn(size = viewportSize) {
                 WithSpacerBefore(90.toDp()) {
-                    TestFocusable(size = 10.toDp(), focusRequester)
+                    TestFocusable(size = 10.toDp())
                 }
             }
         }
@@ -206,20 +211,40 @@ class ScrollableFocusableInteractionTest(
 
         rule.onNodeWithTag(focusableTag)
             .assertScrollAxisPositionInRootIsEqualTo(
-                if (reverseScrolling) (-5).toDp() else 80.toDp()
+                // When reversing scrolling, shrinking the viewport will move the child as well by
+                // the amount it shrunk – 5px.
+                if (reverseScrolling) (-5 - 5).toDp() else 90.toDp()
             )
-            .assertIsDisplayed()
+            .assertIsNotDisplayed()
     }
 
     @Test
     fun scrollsFocusedFocusableIntoView_whenViewportAnimatedQuickly() {
         var viewportSize by mutableStateOf(100.toDp())
+        var animate by mutableStateOf(false)
 
         rule.setContent {
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 Spacer(Modifier.size(90.toDp()))
-                TestFocusable(size = 10.toDp(), focusRequester)
+                TestFocusable(size = 10.toDp())
+            }
+
+            if (animate) {
+                LaunchedEffect(Unit) {
+                    // Manually execute an "animation" that shrinks the viewport by twice the
+                    // focusable's size on every frame, for a few frames. The underlying bug in
+                    // b/230756508 would lose track of the focusable after the second frame.
+                    withFrameNanos {
+                        viewportSize = 80.toDp()
+                    }
+                    withFrameNanos {
+                        viewportSize = 60.toDp()
+                    }
+                    withFrameNanos {
+                        viewportSize = 40.toDp()
+                    }
+                }
             }
         }
         requestFocusAndScrollToTop()
@@ -228,24 +253,10 @@ class ScrollableFocusableInteractionTest(
             .assertIsDisplayed()
             .assertIsFocused()
 
-        // Manually execute an "animation" that shrinks the viewport by twice the focusable's size
-        // on every frame, for a few frames. The underlying bug in b/230756508 would lose track
-        // of the focusable after the second frame.
-        rule.mainClock.autoAdvance = false
-        viewportSize = 80.toDp()
-        rule.mainClock.advanceTimeByFrame()
-        rule.waitForIdle()
-        viewportSize = 60.toDp()
-        rule.mainClock.advanceTimeByFrame()
-        rule.waitForIdle()
-        viewportSize = 40.toDp()
-        rule.mainClock.advanceTimeByFrame()
-        rule.waitForIdle()
-
-        // Resume the clock. The scroll animation should finish.
-        rule.mainClock.autoAdvance = true
+        animate = true
 
         rule.onNodeWithTag(focusableTag)
+            .assertScrollAxisPositionInRootIsEqualTo(30.toDp())
             .assertIsDisplayed()
     }
 
@@ -257,7 +268,7 @@ class ScrollableFocusableInteractionTest(
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 Spacer(Modifier.size(90.toDp()))
-                TestFocusable(size = 10.toDp(), focusRequester)
+                TestFocusable(size = 10.toDp())
             }
         }
         requestFocusAndScrollToTop()
@@ -304,7 +315,7 @@ class ScrollableFocusableInteractionTest(
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 Spacer(Modifier.size(90.toDp()))
-                TestFocusable(size = 10.toDp(), focusRequester)
+                TestFocusable(size = 10.toDp())
             }
         }
         requestFocusAndScrollToTop()
@@ -340,7 +351,6 @@ class ScrollableFocusableInteractionTest(
         // Expand the viewport back to its original size to bring the focusable back into view.
         viewportSize = 100.toDp()
         rule.waitForIdle()
-        Thread.sleep(2000)
 
         // Shrink the viewport again, this should trigger another scroll animation to keep the
         // scrollable in view.
@@ -359,12 +369,8 @@ class ScrollableFocusableInteractionTest(
         rule.setContent {
             ScrollableRowOrColumn(viewportSize) {
                 // Put a focusable just out of view.
-                if (!reverseScrolling) {
-                    Spacer(Modifier.size(gapSize))
-                }
-                TestFocusable(10.toDp(), focusRequester)
-                if (reverseScrolling) {
-                    Spacer(Modifier.size(gapSize))
+                WithSpacerBefore(size = gapSize) {
+                    TestFocusable(10.toDp())
                 }
             }
         }
@@ -397,7 +403,7 @@ class ScrollableFocusableInteractionTest(
             ScrollableRowOrColumn(size = viewportSize) {
                 // Put a focusable in the bottom of the viewport.
                 WithSpacerBefore(size = 90.toDp()) {
-                    TestFocusable(size = 10.toDp(), focusRequester)
+                    TestFocusable(size = 10.toDp())
                 }
             }
         }
@@ -429,14 +435,12 @@ class ScrollableFocusableInteractionTest(
                 // Put a focusable in the middle of the viewport, but ensure we're a lot bigger
                 // than the viewport so it can grow without requiring a scroll.
                 Spacer(Modifier.size(initialViewPortSize * 2))
-                TestFocusable(size = itemSize, focusRequester)
+                TestFocusable(size = itemSize)
                 Spacer(Modifier.size(initialViewPortSize * 2))
             }
         }
         scrollToTop()
-        rule.runOnIdle {
-            focusRequester.requestFocus()
-        }
+        requestFocus()
 
         // Requesting focus will bring the entire focused item into view (at the bottom of the
         // viewport), then scroll up by half the focusable height so it's partially in view.
@@ -464,8 +468,8 @@ class ScrollableFocusableInteractionTest(
     @Test
     fun scrollsToNewFocusable_whenFocusedChildChangesDuringAnimation() {
         var viewportSize by mutableStateOf(100.toDp())
-        val focusRequester1 = FocusRequester()
-        val focusRequester2 = FocusRequester()
+        val focusable1 = "focusable1"
+        val focusable2 = "focusable2"
 
         @Composable
         fun Focusable1() {
@@ -473,8 +477,7 @@ class ScrollableFocusableInteractionTest(
                 Modifier
                     .size(10.toDp())
                     .background(Color.Blue)
-                    .testTag("focusable1")
-                    .focusRequester(focusRequester1)
+                    .testTag(focusable1)
                     .focusable()
             )
         }
@@ -485,8 +488,7 @@ class ScrollableFocusableInteractionTest(
                 Modifier
                     .size(10.toDp())
                     .background(Color.Blue)
-                    .testTag("focusable2")
-                    .focusRequester(focusRequester2)
+                    .testTag(focusable2)
                     .focusable()
             )
         }
@@ -499,11 +501,9 @@ class ScrollableFocusableInteractionTest(
             }
         }
         // When focusable2 gets focus, focusable1 should be scrolled out of view.
-        rule.runOnIdle {
-            focusRequester2.requestFocus()
-        }
-        rule.onNodeWithTag("focusable1").assertIsNotDisplayed()
-        rule.onNodeWithTag("focusable2").assertIsDisplayed()
+        requestFocus(focusable2)
+        rule.onNodeWithTag(focusable1).assertIsNotDisplayed()
+        rule.onNodeWithTag(focusable2).assertIsDisplayed()
         // Pause the clock because we need to do some work in the middle of an animation.
         rule.mainClock.autoAdvance = false
 
@@ -514,17 +514,15 @@ class ScrollableFocusableInteractionTest(
 
         // Tick the clock forward to let the animation start and run a bit.
         repeat(3) { rule.mainClock.advanceTimeByFrame() }
-        rule.onNodeWithTag("focusable1").assertIsNotDisplayed()
-        rule.onNodeWithTag("focusable2").assertIsNotDisplayed()
+        rule.onNodeWithTag(focusable1).assertIsNotDisplayed()
+        rule.onNodeWithTag(focusable2).assertIsNotDisplayed()
 
-        rule.runOnIdle {
-            focusRequester1.requestFocus()
-        }
+        requestFocus(focusable1)
         // Resume the clock, allow animation to finish.
         rule.mainClock.autoAdvance = true
 
-        rule.onNodeWithTag("focusable1").assertIsDisplayed()
-        rule.onNodeWithTag("focusable2").assertIsNotDisplayed()
+        rule.onNodeWithTag(focusable1).assertIsDisplayed()
+        rule.onNodeWithTag(focusable2).assertIsNotDisplayed()
     }
 
     @Test
@@ -533,16 +531,16 @@ class ScrollableFocusableInteractionTest(
         val itemSize = with(rule.density) { 100.toDp() }
         rule.setContentForTest {
             ScrollableRowOrColumn(size = itemSize * 3) {
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, focusRequester)
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, null)
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = focusableTag)
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = "")
             }
         }
 
         // Act.
-        rule.runOnIdle { focusRequester.requestFocus() }
+        requestFocus()
 
         // Assert.
         rule.runOnIdle { assertThat(scrollState.value).isEqualTo(0) }
@@ -554,16 +552,16 @@ class ScrollableFocusableInteractionTest(
         val itemSize = with(rule.density) { 100.toDp() }
         rule.setContentForTest {
             ScrollableRowOrColumn(size = itemSize * 2) {
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, focusRequester)
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, null)
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = focusableTag)
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = "")
             }
         }
 
         // Act.
-        rule.runOnIdle { focusRequester.requestFocus() }
+        requestFocus()
 
         // Assert.
         rule.runOnIdle { assertThat(scrollState.value).isEqualTo(100) }
@@ -575,12 +573,12 @@ class ScrollableFocusableInteractionTest(
         val itemSize = with(rule.density) { 100.toDp() }
         rule.setContentForTest {
             ScrollableRowOrColumn(size = itemSize * 2) {
-                TestFocusable(itemSize, null)
-                TestFocusable(itemSize, focusRequester)
-                TestFocusable(itemSize, null)
+                TestFocusable(itemSize, tag = "")
+                TestFocusable(itemSize, tag = focusableTag)
+                TestFocusable(itemSize, tag = "")
             }
         }
-        rule.runOnIdle { focusRequester.requestFocus() }
+        requestFocus()
 
         // Act.
         rule.runOnIdle { focusManager.moveFocus(if (reverseScrolling) Previous else Next) }
@@ -618,6 +616,7 @@ class ScrollableFocusableInteractionTest(
                     )
                 ) { content() }
             }
+
             Horizontal -> {
                 Row(
                     // Uses scrollable under the hood.
@@ -645,17 +644,16 @@ class ScrollableFocusableInteractionTest(
     }
 
     @Composable
-    private fun TestFocusable(size: Dp, focusRequester: FocusRequester?) {
+    private fun TestFocusable(size: Dp, tag: String = focusableTag) {
         val interactionSource = remember { MutableInteractionSource() }
         val isFocused by interactionSource.collectIsFocusedAsState()
 
         Box(
             Modifier
-                .testTag(focusableTag)
+                .testTag(tag)
                 .size(size)
                 .border(1.dp, Color.White)
                 .background(if (isFocused) Color.Blue else Color.Black)
-                .then(focusRequester?.let { Modifier.focusRequester(it) } ?: Modifier)
                 .focusable(interactionSource = interactionSource)
         )
     }
@@ -668,10 +666,12 @@ class ScrollableFocusableInteractionTest(
     private fun Int.toDp(): Dp = with(rule.density) { this@toDp.toDp() }
 
     private fun requestFocusAndScrollToTop() {
-        rule.runOnIdle {
-            focusRequester.requestFocus()
-        }
+        requestFocus()
         scrollToTop()
+    }
+
+    private fun requestFocus(tag: String = focusableTag) {
+        rule.onNodeWithTag(tag).performSemanticsAction(SemanticsActions.RequestFocus)
     }
 
     private fun scrollToTop() {

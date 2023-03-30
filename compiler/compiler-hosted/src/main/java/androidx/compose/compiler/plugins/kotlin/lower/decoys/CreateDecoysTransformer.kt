@@ -41,14 +41,14 @@ import org.jetbrains.kotlin.ir.expressions.IrExpressionBody
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.util.DeepCopySymbolRemapper
-import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.addChild
+import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.copyTo
-import org.jetbrains.kotlin.ir.util.remapTypeParameters
 import org.jetbrains.kotlin.ir.util.copyTypeParametersFrom
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.hasDefaultValue
 import org.jetbrains.kotlin.ir.util.patchDeclarationParents
+import org.jetbrains.kotlin.ir.util.remapTypeParameters
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
@@ -92,18 +92,18 @@ class CreateDecoysTransformer(
     private val originalFunctions: MutableMap<IrFunction, IrDeclarationParent> = mutableMapOf()
 
     private val decoyAnnotation by lazy {
-        getTopLevelClass(DecoyFqNames.Decoy).owner
+        getTopLevelClass(DecoyClassIds.Decoy).owner
     }
 
     private val decoyImplementationAnnotation by lazy {
-        getTopLevelClass(DecoyFqNames.DecoyImplementation).owner
+        getTopLevelClass(DecoyClassIds.DecoyImplementation).owner
     }
 
     private val decoyImplementationDefaultsBitmaskAnnotation =
-        getTopLevelClass(DecoyFqNames.DecoyImplementationDefaultsBitMask).owner
+        getTopLevelClass(DecoyClassIds.DecoyImplementationDefaultsBitMask).owner
 
     private val decoyStub by lazy {
-        getInternalFunction("illegalDecoyCallException").owner
+        getTopLevelFunction(DecoyCallableIds.illegalDecoyCallException).owner
     }
 
     override fun lower(module: IrModuleFragment) {

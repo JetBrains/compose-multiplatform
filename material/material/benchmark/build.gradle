@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import androidx.build.LibraryType
+
 plugins {
     id("AndroidXPlugin")
     id("com.android.library")
@@ -41,4 +43,8 @@ dependencies {
 
 android {
     namespace "androidx.compose.material.benchmark"
+}
+
+androidx {
+    type = LibraryType.INTERNAL_TEST_LIBRARY
 }

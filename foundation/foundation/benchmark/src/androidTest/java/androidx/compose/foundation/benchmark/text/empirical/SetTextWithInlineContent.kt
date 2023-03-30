@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical
 
+import androidx.compose.foundation.benchmark.text.DoFullBenchmark
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.InlineTextContent
@@ -24,9 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.testutils.LayeredComposeTestCase
 import androidx.compose.testutils.ToggleableTestCase
-import androidx.compose.testutils.benchmark.ComposeBenchmarkRule
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkComposeMeasureLayout
-import androidx.compose.testutils.benchmark.toggleStateBenchmarkRecompose
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.Placeholder
@@ -35,8 +33,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.test.filters.LargeTest
-import org.junit.Rule
-import org.junit.Test
+import org.junit.Assume
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 
@@ -77,12 +74,11 @@ class SetTextWithInlineContent(
 
 @LargeTest
 @RunWith(Parameterized::class)
-open class SetTextWithInlineContentParent(private val size: Int) {
+open class SetTextWithInlineContentParent(
+    private val size: Int
+) : EmpiricalBench<SetTextWithInlineContent>() {
 
-    @get:Rule
-    val benchmarkRule = ComposeBenchmarkRule()
-
-    private val caseFactory = {
+    override val caseFactory = {
         val text = generateCacheableStringOf(size)
         SetTextWithInlineContent(text.annotateWithInlineContent())
     }
@@ -91,16 +87,6 @@ open class SetTextWithInlineContentParent(private val size: Int) {
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters(): List<Array<Any>> = listOf()
-    }
-
-    @Test
-    fun recomposeOnly() {
-        benchmarkRule.toggleStateBenchmarkRecompose(caseFactory)
-    }
-
-    @Test
-    fun recomposeMeasureLayout() {
-        benchmarkRule.toggleStateBenchmarkComposeMeasureLayout(caseFactory)
     }
 }
 
@@ -122,6 +108,11 @@ class SocialAppWithInlineContent(size: Int) : SetTextWithInlineContentParent(siz
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters() = SocialApps.TextLengths
     }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
+    }
 }
 
 @LargeTest
@@ -132,6 +123,11 @@ class ChatAppWithInlineContent(size: Int) : SetTextWithInlineContentParent(size)
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters() = ChatApps.TextLengths
     }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
+    }
 }
 
 @LargeTest
@@ -141,5 +137,10 @@ class ShoppingAppWithInlineContent(size: Int) : SetTextWithInlineContentParent(s
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters() = ShoppingApps.TextLengths
+    }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
     }
 }

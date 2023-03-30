@@ -17,6 +17,8 @@
 package androidx.compose.ui.text.font
 
 import android.content.Context
+import android.graphics.Typeface
+import androidx.compose.runtime.State
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
 import kotlin.coroutines.CoroutineContext
@@ -33,7 +35,6 @@ import kotlin.coroutines.CoroutineContext
  * All instances of FontFamily.Resolver created by [createFontFamilyResolver] share the same
  * typeface caches.
  */
-@OptIn(ExperimentalTextApi::class)
 fun createFontFamilyResolver(
     context: Context
 ): FontFamily.Resolver {
@@ -66,7 +67,6 @@ fun createFontFamilyResolver(
  * @param context Android context for resolving fonts
  * @param coroutineContext context to launch async requests in during resolution.
  */
-@ExperimentalTextApi
 fun createFontFamilyResolver(
     context: Context,
     coroutineContext: CoroutineContext
@@ -99,4 +99,29 @@ fun emptyCacheFontFamilyResolver(context: Context): FontFamily.Resolver {
             AsyncTypefaceCache()
         )
     )
+}
+
+/**
+ * Resolve a font to an Android Typeface
+ *
+ * On Android, font resolution always produces an [android.graphics.Typeface].
+ *
+ * This convenience method converts State<Any> to State<Typeface> to avoid casting the result.
+ *
+ * @param fontFamily fontFamily to resolve from
+ * @param fontWeight font weight to resolve in [fontFamily], will use closest match if not exact
+ * @param fontStyle italic or upright text, to resolve in [fontFamily]
+ * @param fontSynthesis allow font synthesis if [fontFamily] or [fontStyle] don't have an exact
+ * match. This will allow "fake bold" (drawing with too wide a brush) and "fake italic" (drawing
+ * then skewing) to be applied when no exact match is present for the weight and style.
+ */
+fun FontFamily.Resolver.resolveAsTypeface(
+    fontFamily: FontFamily? = null,
+    fontWeight: FontWeight = FontWeight.Normal,
+    fontStyle: FontStyle = FontStyle.Normal,
+    fontSynthesis: FontSynthesis = FontSynthesis.All
+): State<Typeface> {
+    // this unchecked cast is done here to avoid callers having to do it at every call site
+    @Suppress("UNCHECKED_CAST")
+    return resolve(fontFamily, fontWeight, fontStyle, fontSynthesis) as State<Typeface>
 }

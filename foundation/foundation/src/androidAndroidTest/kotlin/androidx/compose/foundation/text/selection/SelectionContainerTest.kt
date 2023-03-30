@@ -16,10 +16,9 @@
 
 package androidx.compose.foundation.text.selection
 
-import android.view.View
-import android.view.ViewGroup
-import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TEST_FONT_FAMILY
@@ -27,11 +26,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventPass
 import androidx.compose.ui.input.pointer.PointerInputChange
@@ -40,30 +42,39 @@ import androidx.compose.ui.input.pointer.PointerInputModifier
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.ClipboardManager
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.SemanticsActions
+import androidx.compose.ui.test.ExperimentalTestApi
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.SemanticsNodeInteractionsProvider
+import androidx.compose.ui.test.TouchInjectionScope
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.hasAnyChild
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.isRoot
 import androidx.compose.ui.test.junit4.ComposeTestRule
-import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.longClick
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onRoot
+import androidx.compose.ui.test.performKeyInput
+import androidx.compose.ui.test.performSemanticsAction
 import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.width
-import androidx.test.espresso.matcher.BoundedMatcher
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
 import androidx.test.filters.SdkSuppress
@@ -71,30 +82,29 @@ import com.google.common.truth.Truth.assertThat
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
-import org.hamcrest.Description
+import java.util.concurrent.CountDownLatch
+import kotlin.math.max
+import kotlin.math.sign
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import java.util.concurrent.CountDownLatch
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.roundToInt
-import org.junit.Ignore
 
-@Suppress("DEPRECATION")
 @LargeTest
 @RunWith(AndroidJUnit4::class)
 class SelectionContainerTest {
     @get:Rule
-    val rule = createAndroidComposeRule<ComponentActivity>()
-
-    private lateinit var view: View
+    val rule = createComposeRule().also {
+        it.mainClock.autoAdvance = false
+    }
 
     private val textContent = "Text Demo Text"
     private val fontFamily = TEST_FONT_FAMILY
     private val selection = mutableStateOf<Selection?>(null)
     private val fontSize = 20.sp
     private val log = PointerInputChangeLog()
+
+    private val tag1 = "tag1"
+    private val tag2 = "tag2"
 
     private val hapticFeedback = mock<HapticFeedback>()
 
@@ -170,15 +180,14 @@ class SelectionContainerTest {
                     )
                 }
 
+            rule.mainClock.advanceTimeByFrame()
             // Assert. Should select "Demo".
-            rule.runOnIdle {
-                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
-                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
-                verify(
-                    hapticFeedback,
-                    times(1)
-                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
+            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('D'))
+            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('o') + 1)
+            verify(
+                hapticFeedback,
+                times(1)
+            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
             // Check the position of the anchors of the selection handles. We don't need to compare
             // to the absolute position since the semantics report selection relative to the
@@ -190,7 +199,6 @@ class SelectionContainerTest {
         }
     }
 
-    @Ignore("b/230622412")
     @Test
     fun long_press_select_a_word_rtl_layout() {
         with(rule.density) {
@@ -215,15 +223,15 @@ class SelectionContainerTest {
                     )
                 }
 
+            rule.mainClock.advanceTimeByFrame()
+
             // Assert. Should select "Demo".
-            rule.runOnIdle {
-                assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
-                assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
-                verify(
-                    hapticFeedback,
-                    times(1)
-                ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
-            }
+            assertThat(selection.value!!.start.offset).isEqualTo(textContent.indexOf('T'))
+            assertThat(selection.value!!.end.offset).isEqualTo(textContent.indexOf('t') + 1)
+            verify(
+                hapticFeedback,
+                times(1)
+            ).performHapticFeedback(HapticFeedbackType.TextHandleMove)
 
             // Check the position of the anchors of the selection handles. We don't need to compare
             // to the absolute position since the semantics report selection relative to the
@@ -235,7 +243,280 @@ class SelectionContainerTest {
         }
     }
 
-    private fun createSelectionContainer(isRtl: Boolean = false) {
+    @Test
+    fun selectionContinues_toBelowText() = with(rule.density) {
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(textContent),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize)
+                )
+                BasicText(
+                    AnnotatedString(textContent),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag2),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize)
+                )
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(Handle.SelectionEnd, offset = characterBox(tag2, 3).bottomRight)
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
+    }
+
+    @Test
+    fun selectionContinues_toAboveText() = with(rule.density) {
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(textContent),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize)
+                )
+                BasicText(
+                    AnnotatedString(textContent),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag2),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize)
+                )
+            }
+        }
+
+        startSelection(tag2, offset = 6) // second word should be selected
+        dragHandleTo(Handle.SelectionStart, offset = characterBox(tag1, 5).bottomLeft)
+
+        assertAnchorInfo(selection.value?.start, offset = 5, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = 9, selectableId = 2)
+    }
+
+    @Test
+    fun selectionContinues_toNextText_skipsDisableSelection() = with(rule.density) {
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(textContent),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize)
+                )
+                DisableSelection {
+                    BasicText(
+                        AnnotatedString(textContent),
+                        Modifier
+                            .fillMaxWidth()
+                            .testTag(tag2),
+                        style = TextStyle(fontFamily = fontFamily, fontSize = fontSize)
+                    )
+                }
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(Handle.SelectionEnd, offset = characterBox(tag2, 3).bottomRight)
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = textContent.length, selectableId = 1)
+    }
+
+    @Test
+    fun selectionHandle_remainsInComposition_whenTextIsOverflowed_clipped_softwrapDisabled() {
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString("$textContent ".repeat(100)),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                    softWrap = false
+                )
+                DisableSelection {
+                    BasicText(
+                        textContent,
+                        Modifier.fillMaxWidth(),
+                        style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                        softWrap = false
+                    )
+                }
+                BasicText(
+                    AnnotatedString("$textContent ".repeat(100)),
+                    Modifier
+                        .fillMaxWidth()
+                        .testTag(tag2),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                    softWrap = false
+                )
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(Handle.SelectionEnd, offset = characterBox(tag2, 3).bottomRight)
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = 4, selectableId = 2)
+    }
+
+    @Test
+    fun allTextIsSelected_whenTextIsOverflowed_clipped_maxLines1() = with(rule.density) {
+        val longText = "$textContent ".repeat(100)
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(longText),
+                    Modifier.fillMaxWidth().testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                    maxLines = 1
+                )
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(
+            handle = Handle.SelectionEnd,
+            offset = characterBox(tag1, 4).bottomRight + Offset(x = 0f, y = fontSize.toPx())
+        )
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = longText.length, selectableId = 1)
+    }
+
+    @Test
+    fun allTextIsSelected_whenTextIsOverflowed_ellipsized_maxLines1() = with(rule.density) {
+        val longText = "$textContent ".repeat(100)
+        createSelectionContainer {
+            Column {
+                BasicText(
+                    AnnotatedString(longText),
+                    Modifier.fillMaxWidth().testTag(tag1),
+                    style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        startSelection(tag1)
+        dragHandleTo(
+            handle = Handle.SelectionEnd,
+            offset = characterBox(tag1, 4).bottomRight + Offset(x = 0f, y = fontSize.toPx())
+        )
+
+        assertAnchorInfo(selection.value?.start, offset = 0, selectableId = 1)
+        assertAnchorInfo(selection.value?.end, offset = longText.length, selectableId = 1)
+    }
+
+    @Test
+    @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
+    fun selection_doesCopy_whenCopyKeyEventSent() {
+        lateinit var clipboardManager: ClipboardManager
+        createSelectionContainer {
+            clipboardManager = LocalClipboardManager.current
+            clipboardManager.setText(AnnotatedString("Clipboard content at start of test."))
+            Column {
+                BasicText(
+                    text = "ExpectedText",
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .testTag(tag1),
+                )
+            }
+        }
+
+        startSelection(tag1)
+
+        rule.onNodeWithTag(tag1)
+            .performKeyInput {
+                keyDown(Key.CtrlLeft)
+                keyDown(Key.C)
+                keyUp(Key.C)
+                keyUp(Key.CtrlLeft)
+            }
+
+        rule.runOnIdle {
+            assertThat(clipboardManager.getText()?.text).isEqualTo("ExpectedText")
+        }
+    }
+
+    private fun startSelection(
+        tag: String,
+        offset: Int = 0
+    ) {
+        val textLayoutResult = rule.onNodeWithTag(tag).fetchTextLayoutResult()
+        val boundingBox = textLayoutResult.getBoundingBox(offset)
+        rule.onNodeWithTag(tag).performTouchInput {
+            longClick(boundingBox.center)
+        }
+    }
+
+    private fun characterBox(
+        tag: String,
+        offset: Int
+    ): Rect {
+        val nodePosition = rule.onNodeWithTag(tag).fetchSemanticsNode().positionInRoot
+        val textLayoutResult = rule.onNodeWithTag(tag).fetchTextLayoutResult()
+        return textLayoutResult.getBoundingBox(offset).translate(nodePosition)
+    }
+
+    private fun dragHandleTo(
+        handle: Handle,
+        offset: Offset
+    ) {
+        val position = rule.onNode(isSelectionHandle(handle))
+            .fetchSemanticsNode()
+            .config[SelectionHandleInfoKey]
+            .position
+        // selection handles are anchored at the bottom of a line.
+
+        rule.onNode(isSelectionHandle(handle)).performTouchInput {
+            val delta = offset - position
+            down(center)
+            movePastSlopBy(delta)
+            up()
+        }
+    }
+
+    /**
+     * Moves the first pointer by [delta] past the touch slop threshold on each axis.
+     * If [delta] is 0 on either axis it will stay 0.
+     */
+    private fun TouchInjectionScope.movePastSlopBy(delta: Offset) {
+        val slop = Offset(
+            x = viewConfiguration.touchSlop * delta.x.sign,
+            y = viewConfiguration.touchSlop * delta.y.sign
+        )
+        moveBy(delta + slop)
+    }
+
+    private fun assertAnchorInfo(
+        anchorInfo: Selection.AnchorInfo?,
+        resolvedTextDirection: ResolvedTextDirection = ResolvedTextDirection.Ltr,
+        offset: Int = 0,
+        selectableId: Long = 0
+    ) {
+        assertThat(anchorInfo).isEqualTo(
+            Selection.AnchorInfo(
+                resolvedTextDirection,
+                offset,
+                selectableId
+            )
+        )
+    }
+
+    private fun createSelectionContainer(
+        isRtl: Boolean = false,
+        content: (@Composable () -> Unit)? = null
+    ) {
         val measureLatch = CountDownLatch(1)
 
         val layoutDirection = if (isRtl) LayoutDirection.Rtl else LayoutDirection.Ltr
@@ -244,7 +525,11 @@ class SelectionContainerTest {
                 LocalHapticFeedback provides hapticFeedback,
                 LocalLayoutDirection provides layoutDirection
             ) {
-                TestParent(Modifier.testTag("selectionContainer").gestureSpy(log)) {
+                TestParent(
+                    Modifier
+                        .testTag("selectionContainer")
+                        .gestureSpy(log)
+                ) {
                     SelectionContainer(
                         modifier = Modifier.onGloballyPositioned {
                             measureLatch.countDown()
@@ -254,7 +539,7 @@ class SelectionContainerTest {
                             selection.value = it
                         }
                     ) {
-                        BasicText(
+                        content?.invoke() ?: BasicText(
                             AnnotatedString(textContent),
                             Modifier.fillMaxSize(),
                             style = TextStyle(fontFamily = fontFamily, fontSize = fontSize),
@@ -265,42 +550,6 @@ class SelectionContainerTest {
                             onTextLayout = {}
                         )
                     }
-                }
-            }
-        }
-        rule.activityRule.scenario.onActivity {
-            view = it.findViewById<ViewGroup>(android.R.id.content)
-        }
-    }
-
-    private fun matchesPosition(expectedX: Dp, expectedY: Dp): BoundedMatcher<View, View> {
-        return object : BoundedMatcher<View, View>(View::class.java) {
-            // (-1, -1) no position found
-            var positionFound = IntOffset(-1, -1)
-
-            override fun matchesSafely(item: View?): Boolean {
-                with(rule.density) {
-                    val position = IntArray(2)
-                    item?.getLocationOnScreen(position)
-                    positionFound = IntOffset(position[0], position[1])
-
-                    val expectedPositionXInt = expectedX.value.roundToInt()
-                    val expectedPositionYInt = expectedY.value.roundToInt()
-                    val positionFoundXInt = positionFound.x.toDp().value.roundToInt()
-                    val positionFoundYInt = positionFound.y.toDp().value.roundToInt()
-                    return abs(expectedPositionXInt - positionFoundXInt) < 5 &&
-                        abs(expectedPositionYInt - positionFoundYInt) < 5
-                }
-            }
-
-            override fun describeTo(description: Description?) {
-                with(rule.density) {
-                    description?.appendText(
-                        "with expected position: " +
-                            "${expectedX.value}, ${expectedY.value} " +
-                            "but position found:" +
-                            "${positionFound.x.toDp().value}, ${positionFound.y.toDp().value}"
-                    )
                 }
             }
         }
@@ -351,6 +600,19 @@ private class GestureSpy : PointerInputModifier {
             // Nothing to implement
         }
     }
+}
+
+/**
+ * Returns the text layout result caught by [SemanticsActions.GetTextLayoutResult]
+ * under this node. Throws an AssertionError if the node has not defined GetTextLayoutResult
+ * semantics action.
+ */
+fun SemanticsNodeInteraction.fetchTextLayoutResult(): TextLayoutResult {
+    val textLayoutResults = mutableListOf<TextLayoutResult>()
+    performSemanticsAction(SemanticsActions.GetTextLayoutResult) {
+        it(textLayoutResults)
+    }
+    return textLayoutResults.first()
 }
 
 @Composable

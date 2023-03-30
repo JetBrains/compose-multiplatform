@@ -30,6 +30,7 @@ import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assert
 import androidx.compose.ui.test.assertHasClickAction
 import androidx.compose.ui.test.assertHeightIsAtLeast
+import androidx.compose.ui.test.assertIsEqualTo
 import androidx.compose.ui.test.assertIsNotSelected
 import androidx.compose.ui.test.assertIsSelected
 import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
@@ -115,7 +116,9 @@ class NavigationDrawerItemTest {
             rule.onRoot().getBoundsInRoot().right -
                 rule.onNodeWithText("Badge", useUnmergedTree = true).getBoundsInRoot().right
         // 24 at the end
-        assertThat(badgePadding).isEqualTo(24.dp)
+        badgePadding.assertIsEqualTo(
+            expected = 24.dp,
+            subject = "badge padding ")
     }
 
     @Test

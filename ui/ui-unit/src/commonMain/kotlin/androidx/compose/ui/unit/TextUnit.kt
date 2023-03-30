@@ -60,7 +60,12 @@ value class TextUnitType(internal val type: Long) {
     }
 }
 
-@ExperimentalUnitApi
+/**
+ * Construct a new TextUnit.
+ *
+ * @param value of the dimension
+ * @param type dimension
+ */
 fun TextUnit(value: Float, type: TextUnitType): TextUnit = pack(type.type, value)
 
 /**

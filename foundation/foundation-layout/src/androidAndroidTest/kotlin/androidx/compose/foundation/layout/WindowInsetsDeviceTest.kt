@@ -326,6 +326,11 @@ class WindowInsetsDeviceTest {
      */
     @Test
     fun insetsSetAtStart() {
+        rule.runOnUiThread {
+            @Suppress("UNNECESSARY_NOT_NULL_ASSERTION")
+            WindowCompat.getInsetsController(rule.activity.window, rule.activity.window.decorView)!!
+                .show(WindowInsetsCompat.Type.ime() or WindowInsetsCompat.Type.systemBars())
+        }
         var leftInset = 0
         var topInset = 0
         var rightInset = 0

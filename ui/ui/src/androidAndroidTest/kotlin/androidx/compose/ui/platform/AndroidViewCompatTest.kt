@@ -103,6 +103,7 @@ import org.hamcrest.CoreMatchers.not
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -778,6 +779,7 @@ class AndroidViewCompatTest {
         rule.runOnIdle { assertEquals(invalidatesDuringScroll + 1, view!!.draws) }
     }
 
+    @Ignore // b/254573760
     @SdkSuppress(minSdkVersion = Build.VERSION_CODES.M)
     @Test
     fun testWebViewIsRelaidOut_afterPageLoad() {
@@ -917,10 +919,10 @@ class AndroidViewCompatTest {
             setMeasuredDimension(size, size)
         }
 
-        override fun draw(canvas: Canvas?) {
+        override fun draw(canvas: Canvas) {
             super.draw(canvas)
             drawnAfterLastColorChange = true
-            canvas!!.drawRect(
+            canvas.drawRect(
                 Rect(0, 0, size, size),
                 Paint().apply { color = this@ColoredSquareView.color.toArgb() }
             )
@@ -954,7 +956,7 @@ class AndroidViewCompatTest {
             }
         }
 
-        override fun onDraw(canvas: Canvas?) {
+        override fun onDraw(canvas: Canvas) {
             super.onDraw(canvas)
             ++draws
         }

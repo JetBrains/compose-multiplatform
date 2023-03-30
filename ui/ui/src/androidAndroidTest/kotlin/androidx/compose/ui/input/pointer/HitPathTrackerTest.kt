@@ -23,12 +23,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.autofill.Autofill
 import androidx.compose.ui.autofill.AutofillTree
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusOwner
 import androidx.compose.ui.geometry.MutableRect
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.RenderEffect
 import androidx.compose.ui.graphics.Shape
@@ -56,8 +57,10 @@ import androidx.compose.ui.platform.ClipboardManager
 import androidx.compose.ui.platform.TextToolbar
 import androidx.compose.ui.platform.ViewConfiguration
 import androidx.compose.ui.platform.WindowInfo
+import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.input.PlatformTextInputPluginRegistry
 import androidx.compose.ui.text.input.TextInputService
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.Density
@@ -3645,9 +3648,12 @@ private class MockOwner(
         get() = Density(1f)
     override val textInputService: TextInputService
         get() = TODO("Not yet implemented")
+    @OptIn(ExperimentalTextApi::class)
+    override val platformTextInputPluginRegistry: PlatformTextInputPluginRegistry
+        get() = TODO("Not yet implemented")
     override val pointerIconService: PointerIconService
         get() = TODO("Not yet implemented")
-    override val focusManager: FocusManager
+    override val focusOwner: FocusOwner
         get() = TODO("Not yet implemented")
     override val windowInfo: WindowInfo
         get() = TODO("Not yet implemented")
@@ -3751,6 +3757,7 @@ private class MockOwner(
                 renderEffect: RenderEffect?,
                 ambientShadowColor: Color,
                 spotShadowColor: Color,
+                compositingStrategy: CompositingStrategy,
                 layoutDirection: LayoutDirection,
                 density: Density
             ) {

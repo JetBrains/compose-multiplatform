@@ -23,7 +23,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.consumedWindowInsets
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -69,7 +69,7 @@ fun Component(
         onBackClick = onBackClick
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier.consumedWindowInsets(paddingValues),
+            modifier = Modifier.consumeWindowInsets(paddingValues),
             contentPadding = PaddingValues(
                 start = paddingValues.calculateStartPadding(ltr) + ComponentPadding,
                 top = paddingValues.calculateTopPadding() + ComponentPadding,

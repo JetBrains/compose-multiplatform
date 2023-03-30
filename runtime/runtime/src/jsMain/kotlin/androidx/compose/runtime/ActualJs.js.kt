@@ -135,3 +135,8 @@ internal actual class SnapshotContextElementImpl actual constructor(
     override val key: CoroutineContext.Key<*>
         get() = SnapshotContextElement
 }
+
+internal actual fun logError(message: String, e: Throwable) {
+    println(message)
+    e.printStackTrace()
+}

@@ -29,8 +29,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.util.packInts
 //import androidx.test.filters.SmallTest
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -108,6 +108,82 @@ class SelectionAdjustmentTest {
         )
 
         assertThat(adjustedTextRange).isEqualTo(TextRange(2, 1))
+    }
+
+    @Test
+    fun adjustment_Character_collapsedNotReversed_returnOneUnicodeSelectionNotReversed() {
+        val textLayoutResult = mockTextLayoutResult(text = "hi\uD83D\uDE00")
+        // After the adjustment, the complete unicode should be selected instead of a single
+        // character that is only part of the unicode.
+        val rawSelection = TextRange(2, 2)
+        val previousSelection = TextRange(2, 4)
+        val isStartHandle = false
+
+        val adjustedSelection = SelectionAdjustment.Character.adjust(
+            textLayoutResult = textLayoutResult,
+            newRawSelectionRange = rawSelection,
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
+        )
+
+        assertThat(adjustedSelection).isEqualTo(TextRange(2, 4))
+    }
+
+    @Test
+    fun adjustment_Character_collapsedReversed_returnOneUnicodeSelectionReversed() {
+        val textLayoutResult = mockTextLayoutResult(text = "hi\uD83D\uDE00")
+        val rawSelection = TextRange(4, 4)
+        val previousTextRange = TextRange(4, 2)
+        val isStartHandle = false
+
+        val adjustedTextRange = SelectionAdjustment.Character.adjust(
+            textLayoutResult = textLayoutResult,
+            newRawSelectionRange = rawSelection,
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousTextRange
+        )
+
+        assertThat(adjustedTextRange).isEqualTo(TextRange(4, 2))
+    }
+
+    @Test
+    fun adjustment_Character_collapsedNotReversed_returnOneEmojiSelectionNotReversed() {
+        val textLayoutResult = mockTextLayoutResult(text = "#️⃣sharp")
+        // After the adjustment, the unicode sequence representing the keycap # emoji should be
+        // selected instead of a single character/unicode that is only part of the emoji.
+        val rawSelection = TextRange(0, 0)
+        val previousSelection = TextRange(0, 3)
+        val isStartHandle = false
+
+        val adjustedSelection = SelectionAdjustment.Character.adjust(
+            textLayoutResult = textLayoutResult,
+            newRawSelectionRange = rawSelection,
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousSelection
+        )
+
+        assertThat(adjustedSelection).isEqualTo(TextRange(0, 3))
+    }
+
+    @Test
+    fun adjustment_Character_collapsedReversed_returnOneEmojiSelectionReversed() {
+        val textLayoutResult = mockTextLayoutResult(text = "#️⃣sharp")
+        val rawSelection = TextRange(3, 3)
+        val previousTextRange = TextRange(3, 0)
+        val isStartHandle = false
+
+        val adjustedTextRange = SelectionAdjustment.Character.adjust(
+            textLayoutResult = textLayoutResult,
+            newRawSelectionRange = rawSelection,
+            previousHandleOffset = -1,
+            isStartHandle = isStartHandle,
+            previousSelectionRange = previousTextRange
+        )
+
+        assertThat(adjustedTextRange).isEqualTo(TextRange(3, 0))
     }
 
     @Test

@@ -26,14 +26,16 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.tooling.preview.Preview
 
+@Preview
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun OneLineListItem() {
     Column {
         ListItem(
-            headlineText = { Text("One line list item with 24x24 icon") },
+            headlineContent = { Text("One line list item with 24x24 icon") },
             leadingContent = {
                 Icon(
                     Icons.Filled.Favorite,
@@ -45,14 +47,15 @@ fun OneLineListItem() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun TwoLineListItem() {
     Column {
         ListItem(
-            headlineText = { Text("Two line list item with trailing") },
-            supportingText = { Text("Secondary text") },
+            headlineContent = { Text("Two line list item with trailing") },
+            supportingContent = { Text("Secondary text") },
             trailingContent = { Text("meta") },
             leadingContent = {
                 Icon(
@@ -65,15 +68,16 @@ fun TwoLineListItem() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun ThreeLineListItem() {
     Column {
         ListItem(
-            headlineText = { Text("Three line list item") },
-            overlineText = { Text("OVERLINE") },
-            supportingText = { Text("Secondary text") },
+            headlineContent = { Text("Three line list item") },
+            overlineContent = { Text("OVERLINE") },
+            supportingContent = { Text("Secondary text") },
             leadingContent = {
                 Icon(
                     Icons.Filled.Favorite,

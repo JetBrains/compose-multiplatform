@@ -75,7 +75,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
             if (modifierParameter.name != ModifierParameterName) {
                 context.report(
                     ModifierParameter,
-                    node,
+                    modifierParameterElement,
                     context.getNameLocation(modifierParameterElement),
                     "$modifierName parameter should be named $ModifierParameterName",
                     LintFix.create()
@@ -91,7 +91,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
             if (modifierParameter.type.canonicalText != Names.Ui.Modifier.javaFqn) {
                 context.report(
                     ModifierParameter,
-                    node,
+                    modifierParameterElement,
                     context.getNameLocation(modifierParameterElement),
                     "$modifierName parameter should have a type of $modifierName",
                     LintFix.create()
@@ -113,7 +113,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
                 if (referenceExpression?.getReferencedName() != modifierName) {
                     context.report(
                         ModifierParameter,
-                        node,
+                        modifierParameterElement,
                         context.getNameLocation(modifierParameterElement),
                         "Optional $modifierName parameter should have a default value " +
                             "of `$modifierName`",
@@ -134,7 +134,7 @@ class ModifierParameterDetector : Detector(), SourceCodeScanner {
                 if (index != optionalParameterIndex) {
                     context.report(
                         ModifierParameter,
-                        node,
+                        modifierParameterElement,
                         context.getNameLocation(modifierParameterElement),
                         "$modifierName parameter should be the first optional parameter",
                         // Hard to make a lint fix for this and keep parameter formatting, so

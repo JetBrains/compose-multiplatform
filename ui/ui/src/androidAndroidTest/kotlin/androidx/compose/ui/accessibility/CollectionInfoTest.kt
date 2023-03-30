@@ -47,7 +47,6 @@ import androidx.compose.ui.zIndex
 import androidx.core.view.accessibility.AccessibilityNodeInfoCompat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
-import org.junit.After
 import org.junit.Assert
 import org.junit.Before
 import org.junit.Rule
@@ -83,11 +82,6 @@ class CollectionInfoTest {
             accessibilityForceEnabledForTesting = true
         }
         info = AccessibilityNodeInfoCompat.obtain()
-    }
-
-    @After
-    fun cleanup() {
-        info.recycle()
     }
 
     // Collection Info tests

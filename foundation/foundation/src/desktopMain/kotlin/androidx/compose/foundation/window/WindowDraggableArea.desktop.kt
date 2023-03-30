@@ -17,7 +17,7 @@
 package androidx.compose.foundation.window
 
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -46,11 +46,9 @@ fun WindowScope.WindowDraggableArea(
 
     Box(
         modifier = modifier.pointerInput(Unit) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    awaitFirstDown()
-                    handler.register()
-                }
+            awaitEachGesture {
+                awaitFirstDown()
+                handler.register()
             }
         }
     ) {

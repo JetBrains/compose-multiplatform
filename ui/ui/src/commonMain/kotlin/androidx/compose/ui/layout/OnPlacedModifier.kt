@@ -17,11 +17,12 @@
 package androidx.compose.ui.layout
 
 import androidx.compose.runtime.Stable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
-import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.node.LayoutAwareModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * Invoke [onPlaced] after the parent [LayoutModifier] and parent layout has been placed and before
@@ -33,34 +34,31 @@ import androidx.compose.ui.internal.JvmDefaultWithCompatibility
 @Stable
 fun Modifier.onPlaced(
     onPlaced: (LayoutCoordinates) -> Unit
-) = this.then(
-    OnPlacedModifierImpl(
-        callback = onPlaced,
-        inspectorInfo = debugInspectorInfo {
-            name = "onPlaced"
-            properties["onPlaced"] = onPlaced
-        }
-    )
-)
+) = this then OnPlacedElement(onPlaced)
 
+@OptIn(ExperimentalComposeUiApi::class)
+private data class OnPlacedElement(
+    val onPlaced: (LayoutCoordinates) -> Unit
+) : ModifierNodeElement<OnPlacedModifierImpl>() {
+    override fun create() = OnPlacedModifierImpl(callback = onPlaced)
+
+    override fun update(node: OnPlacedModifierImpl) = node.apply {
+        callback = onPlaced
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "onPlaced"
+        properties["onPlaced"] = onPlaced
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
 private class OnPlacedModifierImpl(
-    val callback: (LayoutCoordinates) -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : OnPlacedModifier, InspectorValueInfo(inspectorInfo) {
+    var callback: (LayoutCoordinates) -> Unit
+) : LayoutAwareModifierNode, Modifier.Node() {
 
     override fun onPlaced(coordinates: LayoutCoordinates) {
         callback(coordinates)
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is OnPlacedModifierImpl) return false
-
-        return callback == other.callback
-    }
-
-    override fun hashCode(): Int {
-        return callback.hashCode()
     }
 }
 

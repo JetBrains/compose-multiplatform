@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.KeyEvent as ComposeKeyEvent
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.focusRect
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.toCompose
 import androidx.compose.ui.input.pointer.PointerType
@@ -140,11 +139,9 @@ internal class ComposeLayer(
     }
 
     fun getActiveFocusRect(): DpRect? {
-        val activeFocusModifier = scene.mainOwner?.focusManager?.getActiveFocusModifier()
-        if (activeFocusModifier?.parent == null) {
-            return null // Ignore root FocusModifier
-        }
-        return activeFocusModifier.focusRect().toDpRect(density)
+        // TODO: [1.4 Update] Check that new solution is valid
+        val focusRect = scene.mainOwner?.focusOwner?.getFocusRect() ?: return null
+        return focusRect.toDpRect(density)
     }
 
     fun setContent(

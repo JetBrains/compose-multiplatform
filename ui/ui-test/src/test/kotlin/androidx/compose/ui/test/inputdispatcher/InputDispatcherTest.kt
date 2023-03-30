@@ -31,9 +31,9 @@ import androidx.compose.ui.test.createTestContext
 import androidx.compose.ui.test.util.InputEventRecorder
 import androidx.compose.ui.test.util.assertNoTouchGestureInProgress
 import com.google.common.truth.Truth.assertThat
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.doReturn
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.any
+import org.mockito.kotlin.doReturn
+import org.mockito.kotlin.mock
 import org.junit.After
 
 @OptIn(InternalTestApi::class)

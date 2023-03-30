@@ -622,6 +622,7 @@ internal class CompositionImpl(
                         }
                         applier.clear()
                         manager.dispatchRememberObservers()
+                        manager.dispatchNodeCallbacks()
                     }
                     manager.dispatchAbandons()
                 }
@@ -792,6 +793,7 @@ internal class CompositionImpl(
             writer.removeCurrentGroup(manager)
         }
         manager.dispatchRememberObservers()
+        manager.dispatchNodeCallbacks()
     }
 
     private fun applyChangesInLocked(changes: MutableList<Change>) {
@@ -816,6 +818,7 @@ internal class CompositionImpl(
             // that implement RememberObserver receive onRemembered before a side effect
             // that captured it and operates on it can run.
             manager.dispatchRememberObservers()
+            manager.dispatchNodeCallbacks()
             manager.dispatchSideEffects()
 
             if (pendingInvalidScopes) {
@@ -1033,9 +1036,6 @@ internal class CompositionImpl(
 
     /**
      * Helper for collecting remember observers for later strictly ordered dispatch.
-     *
-     * This includes support for the deprecated [RememberObserver] which should be
-     * removed with it.
      */
     private class RememberEventDispatcher(
         private val abandoning: MutableSet<RememberObserver>
@@ -1043,6 +1043,8 @@ internal class CompositionImpl(
         private val remembering = mutableListOf<RememberObserver>()
         private val forgetting = mutableListOf<RememberObserver>()
         private val sideEffects = mutableListOf<() -> Unit>()
+        private var deactivating: MutableList<ComposeNodeLifecycleCallback>? = null
+        private var releasing: MutableList<ComposeNodeLifecycleCallback>? = null
 
         override fun remembering(instance: RememberObserver) {
             forgetting.lastIndexOf(instance).let { index ->
@@ -1068,6 +1070,18 @@ internal class CompositionImpl(
 
         override fun sideEffect(effect: () -> Unit) {
             sideEffects += effect
+        }
+
+        override fun deactivating(instance: ComposeNodeLifecycleCallback) {
+            (deactivating ?: mutableListOf<ComposeNodeLifecycleCallback>().also {
+                deactivating = it
+            }) += instance
+        }
+
+        override fun releasing(instance: ComposeNodeLifecycleCallback) {
+            (releasing ?: mutableListOf<ComposeNodeLifecycleCallback>().also {
+                releasing = it
+            }) += instance
         }
 
         fun dispatchRememberObservers() {
@@ -1115,6 +1129,32 @@ internal class CompositionImpl(
                         instance.onAbandoned()
                     }
                 }
+            }
+        }
+
+        fun dispatchNodeCallbacks() {
+            val deactivating = deactivating
+            if (!deactivating.isNullOrEmpty()) {
+                trace("Compose:deactivations") {
+                    for (i in deactivating.size - 1 downTo 0) {
+                        val instance = deactivating[i]
+                        instance.onDeactivate()
+                    }
+                }
+                deactivating.clear()
+            }
+
+            val releasing = releasing
+            if (!releasing.isNullOrEmpty()) {
+                // note that in contrast with objects from `forgetting` we will invoke the callback
+                // even for objects being abandoned.
+                trace("Compose:releases") {
+                    for (i in releasing.size - 1 downTo 0) {
+                        val instance = releasing[i]
+                        instance.onRelease()
+                    }
+                }
+                releasing.clear()
             }
         }
     }

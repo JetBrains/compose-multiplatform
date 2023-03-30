@@ -21,6 +21,7 @@ import androidx.compose.foundation.gestures.ScrollScope
 import androidx.compose.foundation.lazy.layout.LazyAnimateScrollScope
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.util.fastSumBy
+import kotlin.math.abs
 
 @ExperimentalFoundationApi
 internal class LazyStaggeredGridAnimateScrollScope(
@@ -55,8 +56,10 @@ internal class LazyStaggeredGridAnimateScrollScope(
         val averageMainAxisItemSize = itemSizeSum / (visibleItems.size * state.laneCount)
 
         val indexesDiff = index - firstVisibleItemIndex
+        var coercedOffset = minOf(abs(targetScrollOffset), averageMainAxisItemSize)
+        if (targetScrollOffset < 0) coercedOffset *= -1
         return (averageMainAxisItemSize * indexesDiff).toFloat() +
-            targetScrollOffset - firstVisibleItemScrollOffset
+            coercedOffset - firstVisibleItemScrollOffset
     }
 
     override val numOfItemsForTeleport: Int get() = 100 * state.laneCount

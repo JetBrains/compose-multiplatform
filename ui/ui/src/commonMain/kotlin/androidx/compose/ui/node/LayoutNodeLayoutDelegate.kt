@@ -223,6 +223,7 @@ internal class LayoutNodeLayoutDelegate(
         private var lastLayerBlock: (GraphicsLayerScope.() -> Unit)? = null
         private var lastZIndex: Float = 0f
 
+        private var parentDataDirty: Boolean = true
         override var parentData: Any? = null
             private set
         override val isPlaced: Boolean
@@ -510,7 +511,12 @@ internal class LayoutNodeLayoutDelegate(
             }
         }
 
+        fun invalidateParentData() {
+            parentDataDirty = true
+        }
         fun updateParentData(): Boolean {
+            if (!parentDataDirty) return false
+            parentDataDirty = false
             val changed = parentData != outerCoordinator.parentData
             parentData = outerCoordinator.parentData
             return changed
@@ -847,6 +853,7 @@ internal class LayoutNodeLayoutDelegate(
             }
         }
 
+        private var parentDataDirty: Boolean = true
         override var parentData: Any? = measurePassDelegate.parentData
             private set
 
@@ -988,7 +995,13 @@ internal class LayoutNodeLayoutDelegate(
             }
         }
 
+        fun invalidateParentData() {
+            parentDataDirty = true
+        }
+
         fun updateParentData(): Boolean {
+            if (!parentDataDirty) return false
+            parentDataDirty = false
             val changed = parentData != outerCoordinator.lookaheadDelegate!!.parentData
             parentData = outerCoordinator.lookaheadDelegate!!.parentData
             return changed
@@ -1123,6 +1136,11 @@ internal class LayoutNodeLayoutDelegate(
                 layoutNode.parent?.requestLookaheadRemeasure()
             }
         }
+    }
+
+    fun invalidateParentData() {
+        measurePassDelegate.invalidateParentData()
+        lookaheadPassDelegate?.invalidateParentData()
     }
 
     fun resetAlignmentLines() {

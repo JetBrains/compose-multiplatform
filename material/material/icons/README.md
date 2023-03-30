@@ -20,7 +20,8 @@ Generation is split into a few distinct steps:
 To add new icons, simply use the icon downloading script at `generator/download_material_icons.py`, run any Gradle command that will trigger compilation of the icon modules (such as `./gradlew buildOnServer`), and follow the message in the build failure asking to confirm API changes by updating the API tracking file.
 
 ## Icon Testing
-Similar to how we generate Kotlin source for each icon, we also generate a 'testing manifest' that contains a list of all the source drawables, matched to their generated code representations. This allows us to run screenshot comparison tests (`IconComparisonTest`) that compare each pixel of the generated and source drawables, to ensure we generated the correct code, and that any changes in parsing logic that causes inconsistencies with our generation logic is caught in CI.
+1. Similar to how we generate Kotlin source for each icon, we also generate a 'testing manifest' that contains a list of all the source drawables, matched to their generated code representations. This allows us to run screenshot comparison tests (`CoreIconComparisonTest`, and `ExtendedIconComparisonTest`) that compare each pixel of the generated and source drawables, to ensure we generated the correct code, and that any changes in parsing logic that causes inconsistencies with our generation logic is caught in CI.
+2. Note that, for performance reasons, the `ExtendedIconComparisonTest` is marked with `@Ignore` and will not run on a regular test execution. **It's important to run this test locally after every icons update**.
 
 ## Useful files
 

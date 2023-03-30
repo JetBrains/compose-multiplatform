@@ -20,6 +20,7 @@
     <string name="indeterminate" msgid="7933458017204019916">"Отмечено частично"</string>
     <string name="on" msgid="8655164131929253426">"Включено"</string>
     <string name="off" msgid="875452955155264703">"Отключено"</string>
+    <string name="switch_role" msgid="2561197295334830845">"Переключатель"</string>
     <string name="selected" msgid="6043586758067023">"Выбрано"</string>
     <string name="not_selected" msgid="6610465462668679431">"Не выбрано"</string>
     <string name="template_percent" msgid="5946805113151406391">"Процентов: <xliff:g id="PERCENTAGE">%1$d</xliff:g>."</string>

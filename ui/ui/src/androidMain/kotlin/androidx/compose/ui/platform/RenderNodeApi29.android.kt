@@ -22,6 +22,7 @@ import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.CanvasHolder
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.RenderEffect
 
@@ -33,6 +34,12 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
     private val renderNode = RenderNode("Compose")
 
     private var internalRenderEffect: RenderEffect? = null
+
+    private var internalCompositingStrategy: CompositingStrategy = CompositingStrategy.Auto
+
+    internal fun isUsingCompositingLayer(): Boolean = renderNode.useCompositingLayer
+
+    internal fun hasOverlappingRendering(): Boolean = renderNode.hasOverlappingRendering()
 
     override val uniqueId: Long get() = renderNode.uniqueId
 
@@ -148,6 +155,28 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             }
         }
 
+    override var compositingStrategy: CompositingStrategy
+        get() = internalCompositingStrategy
+        set(value) {
+            with(renderNode) {
+                when (value) {
+                    CompositingStrategy.Offscreen -> {
+                        setUseCompositingLayer(true, null)
+                        setHasOverlappingRendering(true)
+                    }
+                    CompositingStrategy.ModulateAlpha -> {
+                        setUseCompositingLayer(false, null)
+                        setHasOverlappingRendering(false)
+                    }
+                    else -> { // CompositingStrategy.Auto
+                        setUseCompositingLayer(false, null)
+                        setHasOverlappingRendering(true)
+                    }
+                }
+            }
+            internalCompositingStrategy = value
+        }
+
     override val hasDisplayList: Boolean
         get() = renderNode.hasDisplayList()
 
@@ -225,7 +254,8 @@ internal class RenderNodeApi29(val ownerView: AndroidComposeView) : DeviceRender
             clipToOutline = renderNode.clipToOutline,
             clipToBounds = renderNode.clipToBounds,
             alpha = renderNode.alpha,
-            renderEffect = internalRenderEffect
+            renderEffect = internalRenderEffect,
+            compositingStrategy = internalCompositingStrategy
         )
 
     override fun discardDisplayList() {

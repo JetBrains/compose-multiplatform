@@ -201,18 +201,14 @@ class SemanticsNode internal constructor(
         get() = mergingEnabled && unmergedConfig.isMergingSemanticsOfDescendants
 
     internal fun unmergedChildren(
-        sortByBounds: Boolean = false,
         includeFakeNodes: Boolean = false
     ): List<SemanticsNode> {
         // TODO(lmr): we should be able to do this more efficiently using visitSubtree
         if (this.isFake) return listOf()
         val unmergedChildren: MutableList<SemanticsNode> = mutableListOf()
 
-        val semanticsChildren = if (sortByBounds) {
-            this.layoutNode.findOneLayerOfSemanticsWrappersSortedByBounds()
-        } else {
-            this.layoutNode.findOneLayerOfSemanticsWrappers()
-        }
+        val semanticsChildren = this.layoutNode.findOneLayerOfSemanticsWrappers()
+
         semanticsChildren.fastForEach { semanticsChild ->
             unmergedChildren.add(SemanticsNode(semanticsChild, mergingEnabled))
         }
@@ -234,7 +230,6 @@ class SemanticsNode internal constructor(
     //               optimize this when the merging algorithm is improved.
     val children: List<SemanticsNode>
         get() = getChildren(
-            sortByBounds = false,
             includeReplacedSemantics = !mergingEnabled,
             includeFakeNodes = false
         )
@@ -248,27 +243,11 @@ class SemanticsNode internal constructor(
      */
     internal val replacedChildren: List<SemanticsNode>
         get() = getChildren(
-            sortByBounds = false,
             includeReplacedSemantics = false,
             includeFakeNodes = true
         )
 
     /**
-     * Similar to [replacedChildren] but children are sorted by bounds: top to down, left to
-     * right(right to left in RTL mode).
-     */
-    // TODO(b/184376083): This is too expensive for a val (full subtree recreation every call);
-    //               optimize this when the merging algorithm is improved.
-    internal val replacedChildrenSortedByBounds: List<SemanticsNode>
-        get() = getChildren(
-            sortByBounds = true,
-            includeReplacedSemantics = false,
-            includeFakeNodes = true
-        )
-
-    /**
-     * @param sortByBounds if true, nodes in the result list will be sorted with respect to their
-     * bounds. Otherwise children will be in the order they are added to the composition
      * @param includeReplacedSemantics if true, the result will contain children of nodes marked
      * as [clearAndSetSemantics]. For accessibility we always use false, but in testing and
      * debugging we should be able to investigate both
@@ -278,7 +257,6 @@ class SemanticsNode internal constructor(
      * and so will be this parameter.
      */
     private fun getChildren(
-        sortByBounds: Boolean,
         includeReplacedSemantics: Boolean,
         includeFakeNodes: Boolean
     ): List<SemanticsNode> {
@@ -290,10 +268,10 @@ class SemanticsNode internal constructor(
             // In most common merging scenarios like Buttons, this will return nothing.
             // In cases like a clickable Row itself containing a Button, this will
             // return the Button as a child.
-            return findOneLayerOfMergingSemanticsNodes(sortByBounds = sortByBounds)
+            return findOneLayerOfMergingSemanticsNodes()
         }
 
-        return unmergedChildren(sortByBounds, includeFakeNodes)
+        return unmergedChildren(includeFakeNodes)
     }
 
     /**
@@ -327,10 +305,9 @@ class SemanticsNode internal constructor(
         }
 
     private fun findOneLayerOfMergingSemanticsNodes(
-        list: MutableList<SemanticsNode> = mutableListOf(),
-        sortByBounds: Boolean = false
+        list: MutableList<SemanticsNode> = mutableListOf()
     ): List<SemanticsNode> {
-        unmergedChildren(sortByBounds).fastForEach { child ->
+        unmergedChildren().fastForEach { child ->
             if (child.isMergingSemanticsOfDescendants) {
                 list.add(child)
             } else {

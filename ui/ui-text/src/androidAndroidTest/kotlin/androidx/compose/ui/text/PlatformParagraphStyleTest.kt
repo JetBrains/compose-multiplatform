@@ -42,6 +42,15 @@ class PlatformParagraphStyleTest {
     }
 
     @Test
+    fun merge_returns_correct_supportEmoji() {
+        val style = PlatformParagraphStyle(emojiSupportMatch = EmojiSupportMatch.None)
+        val otherStyle = PlatformParagraphStyle(emojiSupportMatch = EmojiSupportMatch.Default)
+
+        assertThat(style.merge(other = otherStyle).emojiSupportMatch)
+            .isEqualTo(EmojiSupportMatch.Default)
+    }
+
+    @Test
     fun paragraphStyle_merge_with_null_platformStyle() {
         val style = ParagraphStyle(
             platformStyle = PlatformParagraphStyle(includeFontPadding = true)
@@ -63,52 +72,74 @@ class PlatformParagraphStyleTest {
         )
 
         val otherStyle = ParagraphStyle(
-            platformStyle = PlatformParagraphStyle(includeFontPadding = false)
+            platformStyle = PlatformParagraphStyle(
+                emojiSupportMatch = EmojiSupportMatch.None,
+                includeFontPadding = false
+            )
         )
 
         val mergedStyle = style.merge(otherStyle)
 
         assertThat(mergedStyle.platformStyle).isNotNull()
+
         assertThat(
             mergedStyle.platformStyle?.includeFontPadding
         ).isFalse()
+        assertThat(mergedStyle.platformStyle?.emojiSupportMatch).isEqualTo(EmojiSupportMatch.None)
 
         val mergedStyle2 = otherStyle.merge(style)
 
         assertThat(mergedStyle2.platformStyle).isNotNull()
         assertThat(mergedStyle2.platformStyle?.includeFontPadding).isTrue()
+        assertThat(mergedStyle2.platformStyle?.emojiSupportMatch)
+            .isEqualTo(EmojiSupportMatch.Default)
     }
 
     @Test
     fun paragraphStyle_lerp_platformStyles_fraction_start() {
         val style = ParagraphStyle(
-            platformStyle = PlatformParagraphStyle(includeFontPadding = true)
+            platformStyle = PlatformParagraphStyle(
+                emojiSupportMatch = EmojiSupportMatch.None,
+                includeFontPadding = true
+            )
         )
 
         val otherStyle = ParagraphStyle(
-            platformStyle = PlatformParagraphStyle(includeFontPadding = false)
+            platformStyle = PlatformParagraphStyle(
+                emojiSupportMatch = EmojiSupportMatch.Default,
+                includeFontPadding = false
+            )
         )
 
         val lerpedStyle = lerp(style, otherStyle, 0f)
 
         assertThat(lerpedStyle.platformStyle).isNotNull()
         assertThat(lerpedStyle.platformStyle?.includeFontPadding).isTrue()
+        assertThat(lerpedStyle.platformStyle?.emojiSupportMatch).isEqualTo(EmojiSupportMatch.None)
     }
 
     @Test
     fun paragraphStyle_lerp_platformStyles_fraction_end() {
         val style = ParagraphStyle(
-            platformStyle = PlatformParagraphStyle(includeFontPadding = true)
+            platformStyle = PlatformParagraphStyle(
+                emojiSupportMatch = EmojiSupportMatch.None,
+                includeFontPadding = true
+            )
         )
 
         val otherStyle = ParagraphStyle(
-            platformStyle = PlatformParagraphStyle(includeFontPadding = false)
+            platformStyle = PlatformParagraphStyle(
+                emojiSupportMatch = EmojiSupportMatch.Default,
+                includeFontPadding = false
+            )
         )
-
         val lerpedStyle = lerp(style, otherStyle, 1f)
 
         assertThat(lerpedStyle.platformStyle).isNotNull()
         assertThat(lerpedStyle.platformStyle?.includeFontPadding).isFalse()
+        assertThat(lerpedStyle.platformStyle?.emojiSupportMatch).isEqualTo(
+            EmojiSupportMatch.Default
+        )
     }
 
     @Test
@@ -128,6 +159,9 @@ class PlatformParagraphStyleTest {
         assertThat(lerpedStyle.platformStyle).isNotNull()
         assertThat(lerpedStyle.platformStyle?.includeFontPadding).isEqualTo(
             defaultParagraphStyle.includeFontPadding
+        )
+        assertThat(lerpedStyle.platformStyle?.emojiSupportMatch).isEqualTo(
+            EmojiSupportMatch.Default
         )
     }
 }

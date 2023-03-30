@@ -56,6 +56,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
+import androidx.compose.material.TriStateCheckbox
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.Composable
@@ -69,23 +70,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 enum class CheckBoxState { Unselected, Selected }
 
-@Preview("Single CheckBox")
-@Composable
-fun CheckBoxPreview() {
-    CheckBox()
-}
-
 @Preview(name = "CheckBox + Scaffold")
 @Composable
-fun CheckBoxScaffoldPreview() {
+fun TransitionWithScaffoldPreview() {
     Scaffold {
-        CheckBox()
+        TransitionPreview()
     }
 }
 
@@ -93,7 +89,7 @@ fun CheckBoxScaffoldPreview() {
 @Composable
 fun AllAnimations() {
     AnimatedContentPreview()
-    CheckBox()
+    TransitionPreview()
     AnimateAsStatePreview()
     CrossFadePreview()
     AnimateContentSizePreview()
@@ -121,7 +117,7 @@ fun AnimationOrder() {
 }
 
 @OptIn(ExperimentalAnimationApi::class)
-@Preview(name = "AnimatedContent")
+@Preview
 @Composable
 fun AnimatedContentPreview() {
     Row {
@@ -136,8 +132,25 @@ fun AnimatedContentPreview() {
     }
 }
 
+@Preview
+@Composable
+fun AnimatedContentAndTransitionPreview() {
+    AnimatedContentPreview()
+    TransitionPreview()
+}
+
 @OptIn(ExperimentalAnimationApi::class)
-@Preview(name = "AnimatedVisibility")
+@Preview
+@Composable
+fun AnimatedContentExtensionPreview() {
+    val editable by remember { mutableStateOf(CheckBoxState.Unselected) }
+    val transition = updateTransition(targetState = editable, label = "transition.AV")
+    transition.AnimatedContent {
+        Text(text = "State: $it")
+    }
+}
+
+@Preview
 @Composable
 fun AnimatedVisibilityPreview() {
     val editable by remember { mutableStateOf(true) }
@@ -157,8 +170,9 @@ fun TransitionAnimatedVisibilityPreview() {
     }
 }
 
+@Preview
 @Composable
-private fun CheckBox() {
+fun TransitionPreview() {
     val (selected, onSelected) = remember { mutableStateOf(false) }
     val transition = updateTransition(
         if (selected) CheckBoxState.Selected else CheckBoxState.Unselected,
@@ -185,7 +199,7 @@ private fun CheckBox() {
     }
 }
 
-@Preview(name = "AnimateAsStatePreview")
+@Preview
 @Composable
 fun AnimateAsStatePreview() {
     var showMenu by remember { mutableStateOf(true) }
@@ -213,7 +227,37 @@ fun AnimateAsStatePreview() {
     }
 }
 
-@Preview(name = "CrossFadePreview")
+@Preview
+@Composable
+fun AnimateAsStateWithLabelsPreview() {
+    var showMenu by remember { mutableStateOf(true) }
+    var message by remember { mutableStateOf("Hello") }
+
+    val size: Dp by animateDpAsState(
+        targetValue = if (showMenu) 0.dp else 10.dp,
+        animationSpec = spring(Spring.DampingRatioHighBouncy, Spring.StiffnessHigh),
+        label = "CustomDpLabel"
+    )
+    val offset by animateIntAsState(
+        targetValue = if (showMenu) 2 else 1,
+        label = "CustomIntLabel"
+    )
+
+    Box(
+        Modifier
+            .padding(size)
+            .offset(offset.dp)
+            .pointerInput(Unit) {
+                detectTapGestures {
+                    showMenu = !showMenu
+                    message += "!"
+                }
+            }) {
+        Text(text = message)
+    }
+}
+
+@Preview
 @Composable
 fun CrossFadePreview() {
     var currentPage by remember { mutableStateOf("A") }
@@ -236,7 +280,30 @@ fun CrossFadePreview() {
     }
 }
 
-@Preview(name = "AnimateContentSizePreview")
+@Preview
+@Composable
+fun CrossFadeWithLabelPreview() {
+    var currentPage by remember { mutableStateOf("A") }
+    Row {
+        Button(onClick = {
+            currentPage = when (currentPage) {
+                "A" -> "B"
+                "B" -> "A"
+                else -> "A"
+            }
+        }) {
+            Text("Switch Page")
+        }
+        Crossfade(targetState = currentPage, label = "CrossfadeWithLabel") { screen ->
+            when (screen) {
+                "A" -> Text("Page A")
+                "B" -> Text("Page B")
+            }
+        }
+    }
+}
+
+@Preview
 @Composable
 fun AnimateContentSizePreview() {
     var message by remember { mutableStateOf("Hello") }
@@ -257,7 +324,14 @@ fun AnimateContentSizePreview() {
     }
 }
 
-@Preview(name = "TargetBasedAnimationPreview")
+@Preview
+@Composable
+fun AnimateContentSizeAndTransitionPreview() {
+    AnimateContentSizePreview()
+    TransitionPreview()
+}
+
+@Preview
 @Composable
 fun TargetBasedAnimationPreview() {
     val anim = remember {
@@ -280,7 +354,14 @@ fun TargetBasedAnimationPreview() {
     Box { Text(text = "Play time $playTime") }
 }
 
-@Preview(name = "DecayAnimationPreview")
+@Preview
+@Composable
+fun TargetBasedAndTransitionPreview() {
+    TargetBasedAnimationPreview()
+    TransitionPreview()
+}
+
+@Preview
 @Composable
 fun DecayAnimationPreview() {
     val anim = remember {
@@ -303,6 +384,13 @@ fun DecayAnimationPreview() {
 
 @Preview
 @Composable
+fun DecayAndTransitionPreview() {
+    DecayAnimationPreview()
+    TransitionPreview()
+}
+
+@Preview
+@Composable
 fun InfiniteTransitionPreview() {
     val infiniteTransition = rememberInfiniteTransition()
     Row {
@@ -310,6 +398,13 @@ fun InfiniteTransitionPreview() {
         infiniteTransition.PulsingDot(StartOffset(150, StartOffsetType.FastForward))
         infiniteTransition.PulsingDot(StartOffset(300, StartOffsetType.FastForward))
     }
+}
+
+@Preview
+@Composable
+fun InfiniteAndTransitionPreview() {
+    InfiniteTransitionPreview()
+    TransitionPreview()
 }
 
 @Composable
@@ -329,4 +424,11 @@ fun InfiniteTransition.PulsingDot(startOffset: StartOffset) {
             }
             .background(Color.Gray, shape = CircleShape)
     )
+}
+
+@Preview
+@Composable
+fun MaterialPreview() {
+    val state = remember { mutableStateOf(ToggleableState.On) }.value
+    TriStateCheckbox(state, {})
 }

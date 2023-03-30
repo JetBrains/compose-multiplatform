@@ -24,8 +24,8 @@ import androidx.compose.foundation.gestures.calculatePan
 import androidx.compose.foundation.gestures.calculateRotation
 import androidx.compose.foundation.gestures.calculateZoom
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
@@ -113,15 +113,13 @@ fun CalculateRotation() {
             .graphicsLayer(rotationZ = angle)
             .background(Color.Blue)
             .pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown()
-                        do {
-                            val event = awaitPointerEvent()
-                            val rotation = event.calculateRotation()
-                            angle += rotation
-                        } while (event.changes.any { it.pressed })
-                    }
+                awaitEachGesture {
+                    awaitFirstDown()
+                    do {
+                        val event = awaitPointerEvent()
+                        val rotation = event.calculateRotation()
+                        angle += rotation
+                    } while (event.changes.any { it.pressed })
                 }
             }
             .fillMaxSize()
@@ -137,14 +135,12 @@ fun CalculateZoom() {
             .graphicsLayer(scaleX = zoom, scaleY = zoom)
             .background(Color.Blue)
             .pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown()
-                        do {
-                            val event = awaitPointerEvent()
-                            zoom *= event.calculateZoom()
-                        } while (event.changes.any { it.pressed })
-                    }
+                awaitEachGesture {
+                    awaitFirstDown()
+                    do {
+                        val event = awaitPointerEvent()
+                        zoom *= event.calculateZoom()
+                    } while (event.changes.any { it.pressed })
                 }
             }
             .fillMaxSize()
@@ -162,16 +158,14 @@ fun CalculatePan() {
             .graphicsLayer()
             .background(Color.Blue)
             .pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown()
-                        do {
-                            val event = awaitPointerEvent()
-                            val offset = event.calculatePan()
-                            offsetX.value += offset.x
-                            offsetY.value += offset.y
-                        } while (event.changes.any { it.pressed })
-                    }
+                awaitEachGesture {
+                    awaitFirstDown()
+                    do {
+                        val event = awaitPointerEvent()
+                        val offset = event.calculatePan()
+                        offsetX.value += offset.x
+                        offsetY.value += offset.y
+                    } while (event.changes.any { it.pressed })
                 }
             }
             .fillMaxSize()
@@ -190,23 +184,21 @@ fun CalculateCentroidSize() {
                 drawCircle(Color.Blue, centroidSize, center = position)
             }
             .pointerInput(Unit) {
-                forEachGesture {
-                    awaitPointerEventScope {
-                        awaitFirstDown().also {
-                            position = it.position
-                        }
-                        do {
-                            val event = awaitPointerEvent()
-                            val size = event.calculateCentroidSize()
-                            if (size != 0f) {
-                                centroidSize = event.calculateCentroidSize()
-                            }
-                            val centroid = event.calculateCentroid()
-                            if (centroid != Offset.Unspecified) {
-                                position = centroid
-                            }
-                        } while (event.changes.any { it.pressed })
+                awaitEachGesture {
+                    awaitFirstDown().also {
+                        position = it.position
                     }
+                    do {
+                        val event = awaitPointerEvent()
+                        val size = event.calculateCentroidSize()
+                        if (size != 0f) {
+                            centroidSize = event.calculateCentroidSize()
+                        }
+                        val centroid = event.calculateCentroid()
+                        if (centroid != Offset.Unspecified) {
+                            position = centroid
+                        }
+                    } while (event.changes.any { it.pressed })
                 }
             }
             .fillMaxSize()

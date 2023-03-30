@@ -60,7 +60,7 @@ class TextDelegateBenchmark(
             cartesian(
                 arrayOf(32, 512),
                 arrayOf(0, 32)
-            )
+            ).filterForCi { last() }
     }
 
     @get:Rule

@@ -17,18 +17,20 @@
 package androidx.compose.ui.draw
 
 import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.platform.InspectorInfo
-import androidx.compose.ui.platform.InspectorValueInfo
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.internal.JvmDefaultWithCompatibility
+import androidx.compose.ui.node.DrawModifierNode
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * A [Modifier.Element] that draws into the space of the layout.
@@ -85,35 +87,32 @@ interface BuildDrawCacheParams {
  */
 fun Modifier.drawBehind(
     onDraw: DrawScope.() -> Unit
-) = this.then(
-    DrawBackgroundModifier(
-        onDraw = onDraw,
-        inspectorInfo = debugInspectorInfo {
-            name = "drawBehind"
-            properties["onDraw"] = onDraw
-        }
-    )
-)
+) = this then DrawBehindElement(onDraw)
 
+@OptIn(ExperimentalComposeUiApi::class)
+private data class DrawBehindElement(
+    val onDraw: DrawScope.() -> Unit
+) : ModifierNodeElement<DrawBackgroundModifier>() {
+    override fun create() = DrawBackgroundModifier(onDraw)
+
+    override fun update(node: DrawBackgroundModifier) = node.apply {
+        onDraw = this@DrawBehindElement.onDraw
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "drawBehind"
+        properties["onDraw"] = onDraw
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
 private class DrawBackgroundModifier(
-    val onDraw: DrawScope.() -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : DrawModifier, InspectorValueInfo(inspectorInfo) {
+    var onDraw: DrawScope.() -> Unit
+) : Modifier.Node(), DrawModifierNode {
 
     override fun ContentDrawScope.draw() {
         onDraw()
         drawContent()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DrawBackgroundModifier) return false
-
-        return onDraw == other.onDraw
-    }
-
-    override fun hashCode(): Int {
-        return onDraw.hashCode()
     }
 }
 
@@ -247,33 +246,30 @@ class DrawResult internal constructor(internal var block: ContentDrawScope.() ->
  */
 fun Modifier.drawWithContent(
     onDraw: ContentDrawScope.() -> Unit
-): Modifier = this.then(
-    DrawWithContentModifier(
-        onDraw = onDraw,
-        inspectorInfo = debugInspectorInfo {
-            name = "drawWithContent"
-            properties["onDraw"] = onDraw
-        }
-    )
-)
+): Modifier = this then DrawWithContentElement(onDraw)
 
+@OptIn(ExperimentalComposeUiApi::class)
+private data class DrawWithContentElement(
+    val onDraw: ContentDrawScope.() -> Unit
+) : ModifierNodeElement<DrawWithContentModifier>() {
+    override fun create() = DrawWithContentModifier(onDraw)
+
+    override fun update(node: DrawWithContentModifier) = node.apply {
+        onDraw = this@DrawWithContentElement.onDraw
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "drawWithContent"
+        properties["onDraw"] = onDraw
+    }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
 private class DrawWithContentModifier(
-    val onDraw: ContentDrawScope.() -> Unit,
-    inspectorInfo: InspectorInfo.() -> Unit
-) : DrawModifier, InspectorValueInfo(inspectorInfo) {
+    var onDraw: ContentDrawScope.() -> Unit
+) : Modifier.Node(), DrawModifierNode {
 
     override fun ContentDrawScope.draw() {
         onDraw()
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is DrawWithContentModifier) return false
-
-        return onDraw == other.onDraw
-    }
-
-    override fun hashCode(): Int {
-        return onDraw.hashCode()
     }
 }

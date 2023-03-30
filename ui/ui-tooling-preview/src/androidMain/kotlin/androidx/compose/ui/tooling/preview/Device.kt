@@ -56,6 +56,10 @@ object Devices {
     const val FOLDABLE = "spec:shape=Normal,width=673,height=841,unit=dp,dpi=480"
     const val TABLET = "spec:shape=Normal,width=1280,height=800,unit=dp,dpi=420"
     const val DESKTOP = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=420"
+
+    // TV devices (not adding 4K since it will be very heavy for preview)
+    const val TV_720p = "spec:shape=Normal,width=1280,height=720,unit=dp,dpi=420"
+    const val TV_1080p = "spec:shape=Normal,width=1920,height=1080,unit=dp,dpi=420"
 }
 
 /**
@@ -99,6 +103,9 @@ object Devices {
         Devices.FOLDABLE,
         Devices.TABLET,
         Devices.DESKTOP,
+
+        Devices.TV_720p,
+        Devices.TV_1080p,
     ]
 )
 annotation class Device

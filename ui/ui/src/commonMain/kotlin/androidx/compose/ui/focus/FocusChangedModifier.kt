@@ -16,12 +16,10 @@
 
 package androidx.compose.ui.focus
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
-import androidx.compose.ui.platform.debugInspectorInfo
+import androidx.compose.ui.node.ModifierNodeElement
+import androidx.compose.ui.platform.InspectorInfo
 
 /**
  * Add this modifier to a component to observe focus state events. [onFocusChanged] is invoked
@@ -33,18 +31,35 @@ import androidx.compose.ui.platform.debugInspectorInfo
  * Note: If you want to be notified every time the internal focus state is written to (even if it
  * hasn't changed), use [onFocusEvent] instead.
  */
-fun Modifier.onFocusChanged(onFocusChanged: (FocusState) -> Unit): Modifier =
-    composed(
-        inspectorInfo = debugInspectorInfo {
-            name = "onFocusChanged"
-            properties["onFocusChanged"] = onFocusChanged
-        }
-    ) {
-        val focusState: MutableState<FocusState?> = remember { mutableStateOf(null) }
-        Modifier.onFocusEvent {
-            if (focusState.value != it) {
-                focusState.value = it
-                onFocusChanged(it)
-            }
+fun Modifier.onFocusChanged(
+    onFocusChanged: (FocusState) -> Unit
+): Modifier = this then FocusChangedElement(onFocusChanged)
+
+@OptIn(ExperimentalComposeUiApi::class)
+private data class FocusChangedElement(
+    val onFocusChanged: (FocusState) -> Unit
+) : ModifierNodeElement<FocusChangedModifierNode>() {
+    override fun create() = FocusChangedModifierNode(onFocusChanged)
+
+    override fun update(node: FocusChangedModifierNode) = node.apply {
+        onFocusChanged = this@FocusChangedElement.onFocusChanged
+    }
+
+    override fun InspectorInfo.inspectableProperties() {
+        name = "onFocusChanged"
+        properties["onFocusChanged"] = onFocusChanged
+    }
+}
+
+@ExperimentalComposeUiApi
+private class FocusChangedModifierNode(
+    var onFocusChanged: (FocusState) -> Unit
+) : FocusEventModifierNode, Modifier.Node() {
+    private var focusState: FocusState? = null
+    override fun onFocusEvent(focusState: FocusState) {
+        if (this.focusState != focusState) {
+            this.focusState = focusState
+            this.onFocusChanged.invoke(focusState)
         }
     }
+}

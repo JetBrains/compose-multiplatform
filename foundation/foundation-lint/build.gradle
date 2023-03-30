@@ -41,7 +41,6 @@ dependencies {
 androidx {
     name = "Compose Foundation Lint Checks"
     type = LibraryType.LINT
-    mavenGroup = LibraryGroups.COMPOSE_FOUNDATION
     inceptionYear = "2022"
     description = "Compose Foundation Lint Checks"
 }

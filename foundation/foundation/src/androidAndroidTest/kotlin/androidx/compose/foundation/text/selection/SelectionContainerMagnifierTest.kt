@@ -17,13 +17,16 @@
 package androidx.compose.foundation.text.selection
 
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.foundation.text.Handle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextLayoutResult
 import androidx.compose.ui.text.TextStyle
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
+import androidx.test.filters.RequiresDevice
 import androidx.test.filters.SdkSuppress
+import org.junit.Test
 import org.junit.runner.RunWith
 
 @MediumTest
@@ -36,10 +39,23 @@ internal class SelectionContainerMagnifierTest : AbstractSelectionMagnifierTests
         text: String,
         modifier: Modifier,
         style: TextStyle,
-        onTextLayout: (TextLayoutResult) -> Unit
+        onTextLayout: (TextLayoutResult) -> Unit,
+        maxLines: Int
     ) {
         SelectionContainer(modifier) {
-            BasicText(text, style = style, onTextLayout = onTextLayout)
+            BasicText(text, style = style, onTextLayout = onTextLayout, maxLines = maxLines)
         }
+    }
+
+    @RequiresDevice // b/264702195
+    @Test
+    fun magnifier_goesToLastLine_whenSelectionEndDraggedBelowTextBounds_whenTextOverflowed() {
+        checkMagnifierAsHandleGoesOutOfBoundsUsingMaxLines(Handle.SelectionEnd)
+    }
+
+    @RequiresDevice // b/264702195
+    @Test
+    fun magnifier_hidden_whenSelectionStartDraggedBelowTextBounds_whenTextOverflowed() {
+        checkMagnifierAsHandleGoesOutOfBoundsUsingMaxLines(Handle.SelectionStart)
     }
 }

@@ -20,7 +20,7 @@ import androidx.activity.ComponentActivity
 import androidx.core.view.WindowCompat
 import java.util.concurrent.CountDownLatch
 
-class WindowInsetsActivity : ComponentActivity() {
+open class WindowInsetsActivity : ComponentActivity() {
     val createdLatch = CountDownLatch(1)
     val attachedToWindowLatch = CountDownLatch(1)
 
@@ -35,3 +35,5 @@ class WindowInsetsActivity : ComponentActivity() {
         super.onAttachedToWindow()
     }
 }
+
+class WindowInsetsActionBarActivity : WindowInsetsActivity()

@@ -17,6 +17,8 @@
 package androidx.compose.material.pullrefresh
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
@@ -45,7 +47,6 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.rotate
-import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import kotlin.math.abs
@@ -125,8 +126,18 @@ private fun CircularArrowIndicator(
 ) {
     val path = remember { Path().apply { fillType = PathFillType.EvenOdd } }
 
-    Canvas(modifier.semantics { contentDescription = "Refreshing" }) {
+    val targetAlpha by remember(state) {
+        derivedStateOf {
+            if (state.progress >= 1f) MaxAlpha else MinAlpha
+        }
+    }
+
+    val alphaState = animateFloatAsState(targetValue = targetAlpha, animationSpec = AlphaTween)
+
+    // Empty semantics for tests
+    Canvas(modifier.semantics {}) {
         val values = ArrowValues(state.progress)
+        val alpha = alphaState.value
 
         rotate(degrees = values.rotation) {
             val arcRadius = ArcRadius.toPx() + StrokeWidth.toPx() / 2f
@@ -138,7 +149,7 @@ private fun CircularArrowIndicator(
             )
             drawArc(
                 color = color,
-                alpha = values.alpha,
+                alpha = alpha,
                 startAngle = values.startAngle,
                 sweepAngle = values.endAngle - values.startAngle,
                 useCenter = false,
@@ -149,14 +160,13 @@ private fun CircularArrowIndicator(
                     cap = StrokeCap.Square
                 )
             )
-            drawArrow(path, arcBounds, color, values)
+            drawArrow(path, arcBounds, color, alpha, values)
         }
     }
 }
 
 @Immutable
 private class ArrowValues(
-    val alpha: Float,
     val rotation: Float,
     val startAngle: Float,
     val endAngle: Float,
@@ -174,17 +184,22 @@ private fun ArrowValues(progress: Float): ArrowValues {
     val tensionPercent = linearTension - linearTension.pow(2) / 4
 
     // Calculations based on SwipeRefreshLayout specification.
-    val alpha = progress.coerceIn(0f, 1f)
     val endTrim = adjustedPercent * MaxProgressArc
     val rotation = (-0.25f + 0.4f * adjustedPercent + tensionPercent) * 0.5f
     val startAngle = rotation * 360
     val endAngle = (rotation + endTrim) * 360
     val scale = min(1f, adjustedPercent)
 
-    return ArrowValues(alpha, rotation, startAngle, endAngle, scale)
+    return ArrowValues(rotation, startAngle, endAngle, scale)
 }
 
-private fun DrawScope.drawArrow(arrow: Path, bounds: Rect, color: Color, values: ArrowValues) {
+private fun DrawScope.drawArrow(
+    arrow: Path,
+    bounds: Rect,
+    color: Color,
+    alpha: Float,
+    values: ArrowValues
+) {
     arrow.reset()
     arrow.moveTo(0f, 0f) // Move to left corner
     arrow.lineTo(x = ArrowWidth.toPx() * values.scale, y = 0f) // Line to right corner
@@ -205,7 +220,7 @@ private fun DrawScope.drawArrow(arrow: Path, bounds: Rect, color: Color, values:
     )
     arrow.close()
     rotate(degrees = values.endAngle) {
-        drawPath(path = arrow, color = color, alpha = values.alpha)
+        drawPath(path = arrow, color = color, alpha = alpha)
     }
 }
 
@@ -219,3 +234,8 @@ private val StrokeWidth = 2.5.dp
 private val ArrowWidth = 10.dp
 private val ArrowHeight = 5.dp
 private val Elevation = 6.dp
+
+// Values taken from SwipeRefreshLayout
+private const val MinAlpha = 0.3f
+private const val MaxAlpha = 1f
+private val AlphaTween = tween<Float>(300, easing = LinearEasing)

@@ -16,17 +16,18 @@
 
 package androidx.compose.compiler.plugins.kotlin.lower
 
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import androidx.compose.compiler.plugins.kotlin.ModuleMetrics
-import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
-import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.analysis.forEach
+import androidx.compose.compiler.plugins.kotlin.analysis.hasStableMarker
+import androidx.compose.compiler.plugins.kotlin.analysis.normalize
+import androidx.compose.compiler.plugins.kotlin.analysis.stabilityOf
 import org.jetbrains.kotlin.backend.common.ClassLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.isInlineClassType
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
@@ -67,7 +68,7 @@ class ClassStabilityTransformer(
     ClassLoweringPass,
     ModuleLoweringPass {
 
-    private val StabilityInferredClass = getTopLevelClass(ComposeFqNames.StabilityInferred)
+    private val StabilityInferredClass = getTopLevelClass(ComposeClassIds.StabilityInferred)
     private val UNSTABLE = StabilityBits.UNSTABLE.bitsForSlot(0)
     private val STABLE = StabilityBits.STABLE.bitsForSlot(0)
 
@@ -82,7 +83,6 @@ class ClassStabilityTransformer(
         irFile.transformChildrenVoid(this)
     }
 
-    @OptIn(ObsoleteDescriptorBasedAPI::class)
     override fun visitClass(declaration: IrClass): IrStatement {
         val result = super.visitClass(declaration)
         val cls = result as? IrClass ?: return result
@@ -107,6 +107,7 @@ class ClassStabilityTransformer(
                 marked = true,
                 stability = Stability.Stable,
             )
+            cls.addStabilityMarkerField(irConst(STABLE))
             return cls
         }
 
@@ -164,24 +165,31 @@ class ClassStabilityTransformer(
             it.putValueArgument(0, irConst(parameterMask))
         }
 
-        val stabilityField = makeStabilityField().also { f ->
-            f.parent = cls
-            f.initializer = IrExpressionBodyImpl(
+        cls.addStabilityMarkerField(stableExpr)
+        return result
+    }
+
+    private fun IrClass.addStabilityMarkerField(stabilityExpression: IrExpression) {
+        val stabilityField = makeStabilityField().apply {
+            parent = this@addStabilityMarkerField
+            initializer = IrExpressionBodyImpl(
                 UNDEFINED_OFFSET,
                 UNDEFINED_OFFSET,
-                stableExpr
+                stabilityExpression
             )
         }
 
         if (context.platform.isJvm()) {
-            cls.declarations += stabilityField
+            declarations += stabilityField
         } else {
             // This ensures proper mangles in k/js and k/native (since kotlin 1.6.0-rc2)
-            val stabilityProp = makeStabilityProp(stabilityField, stableExpr, cls).also {
-                val clsRef = context.referenceClass(ClassId.topLevel(FqName("kotlinx.serialization.Transient")))
+            val stabilityProp = makeStabilityProp(stabilityField, stabilityExpression, this).also {
+                val clsRef = context.referenceClass(
+                    ClassId.topLevel(FqName("kotlinx.serialization.Transient"))
+                )
                 if (clsRef != null) {
                     it.annotations = it.annotations + IrConstructorCallImpl(
-                        type = cls.defaultType,
+                        type = this.defaultType,
                         symbol = clsRef.constructors.first(),
                         constructorTypeArgumentsCount = 0,
                         valueArgumentsCount = 0,
@@ -191,9 +199,8 @@ class ClassStabilityTransformer(
                     )
                 }
             }
-            cls.declarations += stabilityProp
+            stabilityField.correspondingPropertySymbol = stabilityProp.symbol
+            declarations += stabilityProp
         }
-
-        return result
     }
 }

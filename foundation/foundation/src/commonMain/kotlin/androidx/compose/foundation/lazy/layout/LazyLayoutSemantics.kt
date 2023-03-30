@@ -41,7 +41,8 @@ internal fun Modifier.lazyLayoutSemantics(
     itemProvider: LazyLayoutItemProvider,
     state: LazyLayoutSemanticState,
     orientation: Orientation,
-    userScrollEnabled: Boolean
+    userScrollEnabled: Boolean,
+    reverseScrolling: Boolean
 ): Modifier {
     val coroutineScope = rememberCoroutineScope()
     return this.then(
@@ -63,7 +64,26 @@ internal fun Modifier.lazyLayoutSemantics(
                 result
             }
 
-            val accessibilityScrollState = state.scrollAxisRange()
+            val accessibilityScrollState = ScrollAxisRange(
+                value = {
+                    // This is a simple way of representing the current position without
+                    // needing any lazy items to be measured. It's good enough so far, because
+                    // screen-readers care mostly about whether scroll position changed or not
+                    // rather than the actual offset in pixels.
+                    state.currentPosition
+                },
+                maxValue = {
+                    if (state.canScrollForward) {
+                        // If we can scroll further, we don't know the end yet,
+                        // but it's upper bounded by #items + 1
+                        itemProvider.itemCount + 1f
+                    } else {
+                        // If we can't scroll further, the current value is the max
+                        state.currentPosition
+                    }
+                },
+                reverseScrolling = reverseScrolling
+            )
 
             val scrollByAction: ((x: Float, y: Float) -> Boolean)? = if (userScrollEnabled) {
                 { x, y ->
@@ -123,7 +143,8 @@ internal fun Modifier.lazyLayoutSemantics(
 }
 
 internal interface LazyLayoutSemanticState {
-    fun scrollAxisRange(): ScrollAxisRange
+    val currentPosition: Float
+    val canScrollForward: Boolean
     fun collectionInfo(): CollectionInfo
     suspend fun animateScrollBy(delta: Float)
     suspend fun scrollToItem(index: Int)

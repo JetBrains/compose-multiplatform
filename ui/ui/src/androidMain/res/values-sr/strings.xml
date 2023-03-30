@@ -20,6 +20,7 @@
     <string name="indeterminate" msgid="7933458017204019916">"Делимично означено"</string>
     <string name="on" msgid="8655164131929253426">"Укључено"</string>
     <string name="off" msgid="875452955155264703">"Искључено"</string>
+    <string name="switch_role" msgid="2561197295334830845">"Прекидач"</string>
     <string name="selected" msgid="6043586758067023">"Изабрано"</string>
     <string name="not_selected" msgid="6610465462668679431">"Није изабрано"</string>
     <string name="template_percent" msgid="5946805113151406391">"<xliff:g id="PERCENTAGE">%1$d</xliff:g> посто."</string>

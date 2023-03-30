@@ -28,6 +28,7 @@ import kotlin.test.assertFalse
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
+import kotlinx.test.IgnoreJsTarget
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class SnapshotStateListTests {
@@ -551,6 +552,7 @@ class SnapshotStateListTests {
     }
 
     @Test
+    @IgnoreJsTarget // TODO(karpovich): Fix? timeout on node.js
     fun concurrentGlobalModification_add() = runTest(UnconfinedTestDispatcher()) {
         repeat(100) {
             val list = mutableStateListOf<Int>()
@@ -598,6 +600,25 @@ class SnapshotStateListTests {
         }
         repeat(100) {
             assertEquals(it, list[it])
+        }
+    }
+
+    @Test
+    fun currentValueOfTheList() {
+        val list = mutableStateListOf<Int>()
+        val lists = mutableListOf<List<Int>>()
+        repeat(100) {
+            Snapshot.withMutableSnapshot {
+                list.add(it)
+                lists.add(list.toList())
+            }
+        }
+        repeat(100) { index ->
+            val current = lists[index]
+            assertEquals(index + 1, current.size)
+            current.forEachIndexed { i, value ->
+                assertEquals(i, value)
+            }
         }
     }
 

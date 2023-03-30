@@ -22,6 +22,7 @@ import androidx.compose.runtime.benchmark.siblings.ReorderType
 import androidx.compose.runtime.benchmark.siblings.SiblingManagement
 import androidx.compose.runtime.benchmark.siblings.update
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.test.annotation.UiThreadTest
 import androidx.test.filters.LargeTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -52,7 +53,7 @@ import kotlin.random.Random
  */
 @LargeTest
 @RunWith(Parameterized::class)
-@OptIn(ExperimentalCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class, ExperimentalTestApi::class)
 class SiblingBenchmark(
     val count: Int,
     val reorder: ReorderType,

@@ -65,7 +65,12 @@ sealed class Group(
     /**
      * The child groups of this group
      */
-    val children: Collection<Group>
+    val children: Collection<Group>,
+
+    /**
+     * True if the group is for an inline function call
+     */
+    val isInline: Boolean,
 ) {
     /**
      * Modifier information for the Group, or empty list if there isn't any.
@@ -142,8 +147,9 @@ class CallGroup(
     identity: Any?,
     override val parameters: List<ParameterInformation>,
     data: Collection<Any?>,
-    children: Collection<Group>
-) : Group(key, name, location, identity, box, data, children)
+    children: Collection<Group>,
+    isInline: Boolean
+) : Group(key, name, location, identity, box, data, children, isInline)
 
 /**
  * A group that represents an emitted node
@@ -160,7 +166,7 @@ class NodeGroup(
     data: Collection<Any?>,
     override val modifierInfo: List<ModifierInfo>,
     children: Collection<Group>
-) : Group(key, null, null, null, box, data, children)
+) : Group(key, null, null, null, box, data, children, false)
 
 @UiToolingDataApi
 private object EmptyGroup : Group(
@@ -170,7 +176,8 @@ private object EmptyGroup : Group(
     identity = null,
     box = emptyBox,
     data = emptyList(),
-    children = emptyList()
+    children = emptyList(),
+    isInline = false
 )
 
 /**
@@ -202,7 +209,8 @@ private class SourceInformationContext(
     val locations: List<SourceLocationInfo>,
     val repeatOffset: Int,
     val parameters: List<Parameter>?,
-    val isCall: Boolean
+    val isCall: Boolean,
+    val isInline: Boolean
 ) {
     private var nextLocation = 0
 
@@ -424,6 +432,7 @@ private fun sourceInformationContextOf(
     val sourceLocations = mutableListOf<SourceLocationInfo>()
     var repeatOffset = -1
     var isCall = false
+    var isInline = false
     var name: String? = null
     var parameters: List<Parameter>? = null
     var sourceFile: String? = null
@@ -435,10 +444,14 @@ private fun sourceInformationContextOf(
                 parseLocation()?.let { sourceLocations.add(it) }
             }
             mr.isChar("C") -> {
+                // A redundant call marker is placed in inline functions
+                if (isCall) isInline = true
                 isCall = true
                 next()
             }
             mr.isCallWithName() -> {
+                // A redundant call marker is placed in inline functions
+                if (isCall) isInline = true
                 isCall = true
                 name = mr.callName()
                 next()
@@ -480,7 +493,8 @@ private fun sourceInformationContextOf(
         locations = sourceLocations,
         repeatOffset = repeatOffset,
         parameters = parameters,
-        isCall = isCall
+        isCall = isCall,
+        isInline = isInline
     )
 }
 
@@ -535,7 +549,8 @@ private fun CompositionGroup.getGroup(parentContext: SourceInformationContext?):
             },
             extractParameterInfo(data, context),
             data,
-            children
+            children,
+            context?.isInline == true
         )
 }
 
@@ -587,12 +602,17 @@ private class CompositionCallStack<T>(
     override val name: String?
         get() {
             val info = current.sourceInfo ?: return null
-            if (!info.startsWith("C(")) {
-                return null
+            val startIndex = when {
+                info.startsWith("CC(") -> 3
+                info.startsWith("C(") -> 2
+                else -> return null
             }
             val endIndex = info.indexOf(')')
-            return if (endIndex > 2) info.substring(2, endIndex) else null
+            return if (endIndex > 2) info.substring(startIndex, endIndex) else null
         }
+
+    override val isInline: Boolean
+        get() = current.sourceInfo?.startsWith("CC") == true
 
     override var bounds: IntRect = emptyBox
         private set
@@ -686,6 +706,11 @@ interface SourceContext {
      * The current depth into the [CompositionGroup] tree.
      */
     val depth: Int
+
+    /**
+     * The source context is for a call to an inline composable function
+     */
+    val isInline: Boolean get() = false
 }
 
 /**

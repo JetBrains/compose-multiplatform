@@ -60,7 +60,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.flow.collect
 import kotlin.math.roundToInt
 
 /**
@@ -116,7 +115,11 @@ fun Switch(
     Box(
         modifier
             .then(
-                if (onCheckedChange != null) Modifier.minimumTouchTargetSize() else Modifier
+                if (onCheckedChange != null) {
+                    Modifier.minimumInteractiveComponentSize()
+                } else {
+                    Modifier
+                }
             )
             .then(toggleableModifier)
             .swipeable(
@@ -201,7 +204,8 @@ private fun BoxScope.SwitchImpl(
         ThumbDefaultElevation
     }
     val trackColor by colors.trackColor(enabled, checked)
-    Canvas(Modifier.align(Alignment.Center).fillMaxSize()) {
+    Canvas(
+        Modifier.align(Alignment.Center).fillMaxSize()) {
         drawTrack(trackColor, TrackWidth.toPx(), TrackStrokeWidth.toPx())
     }
     val thumbColor by colors.thumbColor(enabled, checked)

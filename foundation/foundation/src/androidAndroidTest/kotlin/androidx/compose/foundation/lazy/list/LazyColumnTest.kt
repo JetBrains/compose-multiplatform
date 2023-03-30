@@ -49,13 +49,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertPositionInRootIsEqualTo
 import androidx.compose.ui.test.captureToImage
 import androidx.compose.ui.test.getUnclippedBoundsInRoot
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onChildren
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performTouchInput
@@ -172,39 +170,28 @@ class LazyColumnTest {
 
     @Test
     fun removeItemsTest() {
-        val startingNumItems = 3
-        var numItems = startingNumItems
-        var numItemsModel by mutableStateOf(numItems)
+        var itemCount by mutableStateOf(3)
         val tag = "List"
         rule.setContentWithTestViewConfiguration {
             LazyColumn(Modifier.testTag(tag)) {
-                items((1..numItemsModel).toList()) {
+                items((0 until itemCount).toList()) {
                     BasicText("$it")
                 }
             }
         }
 
-        while (numItems >= 0) {
-            // Confirm the number of children to ensure there are no extra items
-            rule.onNodeWithTag(tag)
-                .onChildren()
-                .assertCountEquals(numItems)
-
+        while (itemCount >= 0) {
             // Confirm the children's content
-            for (i in 1..3) {
+            for (i in 0 until 3) {
                 rule.onNodeWithText("$i").apply {
-                    if (i <= numItems) {
-                        assertExists()
+                    if (i < itemCount) {
+                        assertIsPlaced()
                     } else {
-                        assertDoesNotExist()
+                        assertIsNotPlaced()
                     }
                 }
             }
-            numItems--
-            if (numItems >= 0) {
-                // Don't set the model to -1
-                rule.runOnIdle { numItemsModel = numItems }
-            }
+            itemCount--
         }
     }
 
@@ -256,15 +243,13 @@ class LazyColumnTest {
         for (data in dataLists) {
             rule.runOnIdle { dataModel = data }
 
-            // Confirm the number of children to ensure there are no extra items
-            val numItems = data.size
-            rule.onNodeWithTag(tag)
-                .onChildren()
-                .assertCountEquals(numItems)
-
             // Confirm the children's content
-            for (item in data) {
-                rule.onNodeWithText("$item").assertExists()
+            for (index in 1..8) {
+                if (index in data) {
+                    rule.onNodeWithText("$index").assertIsDisplayed()
+                } else {
+                    rule.onNodeWithText("$index").assertIsNotPlaced()
+                }
             }
         }
     }
@@ -401,7 +386,7 @@ class LazyColumnTest {
             .assertIsDisplayed()
 
         rule.onNodeWithTag("3")
-            .assertDoesNotExist()
+            .assertIsNotPlaced()
     }
 
     @Test

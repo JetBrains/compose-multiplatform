@@ -287,9 +287,9 @@ class ComposeScene internal constructor(
             focusedOwner = owner
         }
         if (isFocused) {
-            owner.focusManager.takeFocus()
+            owner.focusOwner.takeFocus()
         } else {
-            owner.focusManager.releaseFocus()
+            owner.focusOwner.releaseFocus()
         }
     }
 
@@ -606,14 +606,14 @@ class ComposeScene internal constructor(
     @ExperimentalComposeUiApi
     fun releaseFocus() {
         list.forEach {
-            it.focusManager.releaseFocus()
+            it.focusOwner.releaseFocus()
         }
         isFocused = false
     }
 
     @ExperimentalComposeUiApi
     fun requestFocus() {
-        list.findLast { it.isFocusable }?.focusManager?.takeFocus()
+        list.findLast { it.isFocusable }?.focusOwner?.takeFocus()
         isFocused = true
     }
 
@@ -627,7 +627,7 @@ class ComposeScene internal constructor(
      */
     @ExperimentalComposeUiApi
     fun moveFocus(focusDirection: FocusDirection): Boolean =
-        list.lastOrNull()?.focusManager?.moveFocus(focusDirection) ?: false
+        list.lastOrNull()?.focusOwner?.moveFocus(focusDirection) ?: false
 }
 
 private class DefaultPointerStateTracker {

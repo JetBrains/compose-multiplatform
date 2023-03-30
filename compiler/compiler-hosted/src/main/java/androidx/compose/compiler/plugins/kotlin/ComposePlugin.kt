@@ -20,18 +20,18 @@ import androidx.compose.compiler.plugins.kotlin.lower.ClassStabilityFieldSeriali
 import com.intellij.mock.MockProject
 import com.intellij.openapi.project.Project
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
+import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOptionProcessingException
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
-import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
-import org.jetbrains.kotlin.config.CompilerConfiguration
-import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
-import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
+import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.KotlinCompilerVersion
+import org.jetbrains.kotlin.extensions.StorageComponentContainerContributor
 import org.jetbrains.kotlin.extensions.internal.TypeResolutionInterceptor
 import org.jetbrains.kotlin.serialization.DescriptorSerializerPlugin
 
@@ -190,116 +190,100 @@ class ComposeCommandLineProcessor : CommandLineProcessor {
 }
 
 @OptIn(ExperimentalCompilerApi::class)
-class ComposeComponentRegistrar : ComponentRegistrar {
+class ComposeComponentRegistrar :
+    @Suppress("DEPRECATION") org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar {
     override fun registerProjectComponents(
         project: MockProject,
         configuration: CompilerConfiguration
     ) {
-        registerProjectExtensions(
-            project as Project,
-            configuration
-        )
+        if (checkCompilerVersion(configuration)) {
+            registerCommonExtensions(project)
+            IrGenerationExtension.registerExtension(
+                project,
+                createComposeIrExtension(configuration)
+            )
+        }
     }
 
     companion object {
-
-        @Suppress("UNUSED_PARAMETER")
-        fun registerProjectExtensions(
-            project: Project,
-            configuration: CompilerConfiguration
-        ) {
-            val KOTLIN_VERSION_EXPECTATION = "1.8.0"
-            KotlinCompilerVersion.getVersion()?.let { version ->
-                val msgCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
-                val suppressKotlinVersionCheck = configuration.get(
-                    ComposeConfiguration.SUPPRESS_KOTLIN_VERSION_COMPATIBILITY_CHECK
-                )
-                if (suppressKotlinVersionCheck != null && suppressKotlinVersionCheck != version) {
-                    if (suppressKotlinVersionCheck == "true") {
+        fun checkCompilerVersion(configuration: CompilerConfiguration): Boolean {
+            try {
+                val KOTLIN_VERSION_EXPECTATION = "1.8.10"
+                KotlinCompilerVersion.getVersion()?.let { version ->
+                    val msgCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY)
+                    val suppressKotlinVersionCheck = configuration.get(
+                        ComposeConfiguration.SUPPRESS_KOTLIN_VERSION_COMPATIBILITY_CHECK
+                    )
+                    if (
+                        suppressKotlinVersionCheck != null &&
+                        suppressKotlinVersionCheck != version
+                    ) {
+                        if (suppressKotlinVersionCheck == "true") {
+                            msgCollector?.report(
+                                CompilerMessageSeverity.STRONG_WARNING,
+                                " `suppressKotlinVersionCompatibilityCheck` should" +
+                                    " specify the version of Kotlin for which you want the" +
+                                    " compatibility check to be disabled. For example," +
+                                    " `suppressKotlinVersionCompatibilityCheck=$version`"
+                            )
+                        } else {
+                            msgCollector?.report(
+                                CompilerMessageSeverity.STRONG_WARNING,
+                                " `suppressKotlinVersionCompatibilityCheck` is set to a" +
+                                    " version of Kotlin ($suppressKotlinVersionCheck) that you" +
+                                    " are not using and should be set properly. (you are using" +
+                                    " Kotlin $version)"
+                            )
+                        }
+                    }
+                    if (suppressKotlinVersionCheck == KOTLIN_VERSION_EXPECTATION) {
                         msgCollector?.report(
                             CompilerMessageSeverity.STRONG_WARNING,
-                            " `suppressKotlinVersionCompatibilityCheck` should" +
-                                " specify the version of Kotlin for which you want the" +
-                                " compatibility check to be disabled. For example," +
-                                " `suppressKotlinVersionCompatibilityCheck=$version`"
-                        )
-                    } else {
-                        msgCollector?.report(
-                            CompilerMessageSeverity.STRONG_WARNING,
-                            " `suppressKotlinVersionCompatibilityCheck` is set to a" +
-                                " version of Kotlin ($suppressKotlinVersionCheck) that you" +
-                                " are not using and should be set properly. (you are using" +
-                                " Kotlin $version)"
+                            " `suppressKotlinVersionCompatibilityCheck` is set to the" +
+                                " same version of Kotlin that the Compose Compiler was already" +
+                                " expecting (Kotlin $suppressKotlinVersionCheck), and thus has" +
+                                " no effect and should be removed."
                         )
                     }
-                }
-                if (suppressKotlinVersionCheck == KOTLIN_VERSION_EXPECTATION) {
-                    msgCollector?.report(
-                        CompilerMessageSeverity.STRONG_WARNING,
-                        " `suppressKotlinVersionCompatibilityCheck` is set to the same" +
-                            " version of Kotlin that the Compose Compiler was already expecting" +
-                            " (Kotlin $suppressKotlinVersionCheck), and thus has no effect and" +
-                            " should be removed."
-                    )
-                }
-                if (suppressKotlinVersionCheck != "true" &&
-                    version != KOTLIN_VERSION_EXPECTATION &&
-                    version != suppressKotlinVersionCheck) {
-                    msgCollector?.report(
-                        CompilerMessageSeverity.ERROR,
-                        "This version (${VersionChecker.compilerVersion}) of the" +
-                            " Compose Compiler requires Kotlin version" +
-                            " $KOTLIN_VERSION_EXPECTATION but you appear to be using Kotlin" +
-                            " version $version which is not known to be compatible.  Please" +
-                            " fix your configuration (or" +
-                            " `suppressKotlinVersionCompatibilityCheck` but don't say I" +
-                            " didn't warn you!)."
-                    )
+                    if (suppressKotlinVersionCheck != "true" &&
+                        version != KOTLIN_VERSION_EXPECTATION &&
+                        version != suppressKotlinVersionCheck
+                    ) {
+                        msgCollector?.report(
+                            CompilerMessageSeverity.ERROR,
+                            "This version (${VersionChecker.compilerVersion}) of the" +
+                                " Compose Compiler requires Kotlin version" +
+                                " $KOTLIN_VERSION_EXPECTATION but you appear to be using Kotlin" +
+                                " version $version which is not known to be compatible.  Please" +
+                                " consult the Compose-Kotlin compatibility map located at" +
+                                " https://developer.android.com" +
+                                "/jetpack/androidx/releases/compose-kotlin" +
+                                " to choose a compatible version pair (or" +
+                                " `suppressKotlinVersionCompatibilityCheck` but don't say I" +
+                                " didn't warn you!)."
+                        )
 
-                    // Return without registering the Compose plugin because the registration
-                    // APIs may have changed and thus throw an exception during registration,
-                    // preventing the diagnostic from being emitted.
-                    return
+                        // Return without registering the Compose plugin because the registration
+                        // APIs may have changed and thus throw an exception during registration,
+                        // preventing the diagnostic from being emitted.
+                        return false
+                    }
                 }
+                return true
+            } catch (t: Throwable) {
+                throw Error(
+                    "Something went wrong while checking for version compatibility" +
+                        " between the Compose Compiler and the Kotlin Compiler.  It is possible" +
+                        " that the versions are incompatible.  Please verify your kotlin version " +
+                        " and consult the Compose-Kotlin compatibility map located at" +
+                        " https://developer.android.com" +
+                        "/jetpack/androidx/releases/compose-kotlin",
+                    t
+                )
             }
+        }
 
-            val liveLiteralsEnabled = configuration.get(
-                ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY,
-                false
-            )
-            val liveLiteralsV2Enabled = configuration.get(
-                ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY,
-                false
-            )
-            val generateFunctionKeyMetaClasses = configuration.get(
-                ComposeConfiguration.GENERATE_FUNCTION_KEY_META_CLASSES_KEY,
-                false
-            )
-            val sourceInformationEnabled = configuration.get(
-                ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
-                false
-            )
-            val intrinsicRememberEnabled = configuration.get(
-                ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
-                false
-            )
-            val decoysEnabled = configuration.get(
-                ComposeConfiguration.DECOYS_ENABLED_KEY,
-                false
-            )
-            val metricsDestination = configuration.get(
-                ComposeConfiguration.METRICS_DESTINATION_KEY,
-                ""
-            ).let {
-                if (it.isBlank()) null else it
-            }
-            val reportsDestination = configuration.get(
-                ComposeConfiguration.REPORTS_DESTINATION_KEY,
-                ""
-            ).let {
-                if (it.isBlank()) null else it
-            }
-
+        fun registerCommonExtensions(project: Project) {
             StorageComponentContainerContributor.registerExtension(
                 project,
                 ComposableCallChecker()
@@ -322,23 +306,56 @@ class ComposeComponentRegistrar : ComponentRegistrar {
                 @Suppress("IllegalExperimentalApiUsage")
                 ComposeTypeResolutionInterceptorExtension()
             )
-            IrGenerationExtension.registerExtension(
-                project,
-                ComposeIrGenerationExtension(
-                    configuration = configuration,
-                    liveLiteralsEnabled = liveLiteralsEnabled,
-                    liveLiteralsV2Enabled = liveLiteralsV2Enabled,
-                    generateFunctionKeyMetaClasses = generateFunctionKeyMetaClasses,
-                    sourceInformationEnabled = sourceInformationEnabled,
-                    intrinsicRememberEnabled = intrinsicRememberEnabled,
-                    decoysEnabled = decoysEnabled,
-                    metricsDestination = metricsDestination,
-                    reportsDestination = reportsDestination,
-                )
-            )
             DescriptorSerializerPlugin.registerExtension(
                 project,
                 ClassStabilityFieldSerializationPlugin()
+            )
+        }
+
+        fun createComposeIrExtension(
+            configuration: CompilerConfiguration
+        ): ComposeIrGenerationExtension {
+            val liveLiteralsEnabled = configuration.getBoolean(
+                ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY,
+            )
+            val liveLiteralsV2Enabled = configuration.getBoolean(
+                ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY,
+            )
+            val generateFunctionKeyMetaClasses = configuration.getBoolean(
+                ComposeConfiguration.GENERATE_FUNCTION_KEY_META_CLASSES_KEY,
+            )
+            val sourceInformationEnabled = configuration.getBoolean(
+                ComposeConfiguration.SOURCE_INFORMATION_ENABLED_KEY,
+            )
+            val intrinsicRememberEnabled = configuration.get(
+                ComposeConfiguration.INTRINSIC_REMEMBER_OPTIMIZATION_ENABLED_KEY,
+                false
+            )
+            val decoysEnabled = configuration.getBoolean(
+                ComposeConfiguration.DECOYS_ENABLED_KEY,
+            )
+            val metricsDestination = configuration.get(
+                ComposeConfiguration.METRICS_DESTINATION_KEY,
+                ""
+            ).ifBlank { null }
+            val reportsDestination = configuration.get(
+                ComposeConfiguration.REPORTS_DESTINATION_KEY,
+                ""
+            ).ifBlank { null }
+            val validateIr = configuration.getBoolean(
+                JVMConfigurationKeys.VALIDATE_IR
+            )
+
+            return ComposeIrGenerationExtension(
+                liveLiteralsEnabled = liveLiteralsEnabled,
+                liveLiteralsV2Enabled = liveLiteralsV2Enabled,
+                generateFunctionKeyMetaClasses = generateFunctionKeyMetaClasses,
+                sourceInformationEnabled = sourceInformationEnabled,
+                intrinsicRememberEnabled = intrinsicRememberEnabled,
+                decoysEnabled = decoysEnabled,
+                metricsDestination = metricsDestination,
+                reportsDestination = reportsDestination,
+                validateIr = validateIr,
             )
         }
     }

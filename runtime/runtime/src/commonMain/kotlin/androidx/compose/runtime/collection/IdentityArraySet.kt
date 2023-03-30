@@ -40,6 +40,8 @@ internal class IdentityArraySet<T : Any> : Set<T> {
      * Return the item at the given [index].
      */
     operator fun get(index: Int): T {
+        checkIndexBounds(index)
+
         @Suppress("UNCHECKED_CAST")
         return values[index] as T
     }
@@ -213,6 +215,15 @@ internal class IdentityArraySet<T : Any> : Set<T> {
 
         // We should insert at the end
         return -(size + 1)
+    }
+
+    /**
+     * Verifies if index is in bounds
+     */
+    private fun checkIndexBounds(index: Int) {
+        if (index !in 0 until size) {
+            throw IndexOutOfBoundsException("Index $index, size $size")
+        }
     }
 
     /**

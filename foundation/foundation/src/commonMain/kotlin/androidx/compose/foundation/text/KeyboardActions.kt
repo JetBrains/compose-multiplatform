@@ -16,12 +16,14 @@
 
 package androidx.compose.foundation.text
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.text.input.ImeAction
 
 /**
  * The [KeyboardActions] class allows developers to specify actions that will be triggered in
  * response to users triggering IME action on the software keyboard.
  */
+@Stable
 class KeyboardActions(
     /**
      * This is run when the user triggers the [Done][ImeAction.Done] action. A null value
@@ -67,11 +69,35 @@ class KeyboardActions(
      */
     val onSend: (KeyboardActionScope.() -> Unit)? = null
 ) {
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is KeyboardActions) return false
+
+        return onDone == other.onDone &&
+            onGo == other.onGo &&
+            onNext == other.onNext &&
+            onPrevious == other.onPrevious &&
+            onSearch == other.onSearch &&
+            onSend == other.onSend
+    }
+
+    override fun hashCode(): Int {
+        var result = onDone?.hashCode() ?: 0
+        result = 31 * result + (onGo?.hashCode() ?: 0)
+        result = 31 * result + (onNext?.hashCode() ?: 0)
+        result = 31 * result + (onPrevious?.hashCode() ?: 0)
+        result = 31 * result + (onSearch?.hashCode() ?: 0)
+        result = 31 * result + (onSend?.hashCode() ?: 0)
+        return result
+    }
+
     companion object {
         /**
          * Use this default value if you don't want to specify any action but want to use use the
          * default action implementations.
          */
+        @Stable
         val Default: KeyboardActions = KeyboardActions()
     }
 }

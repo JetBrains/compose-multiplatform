@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,8 +39,9 @@ internal class NativeLocale(val locale: NSLocale) : PlatformLocale {
 
 internal actual fun createPlatformLocaleDelegate(): PlatformLocaleDelegate =
     object : PlatformLocaleDelegate {
-        override val current: List<PlatformLocale>
-            get() = listOf(NativeLocale(NSLocale.currentLocale))
+        // TODO: [1.4 Update] Check that new solution is correct
+        override val current: LocaleList
+            get() = LocaleList(Locale(NativeLocale(NSLocale.currentLocale)))
 
 
         override fun parseLanguageTag(languageTag: String): PlatformLocale {

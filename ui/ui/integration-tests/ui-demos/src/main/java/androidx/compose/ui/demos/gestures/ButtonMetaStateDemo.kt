@@ -17,7 +17,7 @@
 package androidx.compose.ui.demos.gestures
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -71,45 +71,43 @@ fun ButtonMetaStateDemo() {
 
     Column(
         Modifier.pointerInput(Unit) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    do {
-                        val event = awaitPointerEvent()
-                        val metaState = event.keyboardModifiers
-                        control = metaState.isCtrlPressed
-                        alt = metaState.isAltPressed
-                        shift = metaState.isShiftPressed
-                        meta = metaState.isMetaPressed
-                        sym = metaState.isSymPressed
-                        function = metaState.isFunctionPressed
-                        numLock = metaState.isNumLockOn
-                        scrollLock = metaState.isScrollLockOn
-                        capsLock = metaState.isCapsLockOn
+            awaitEachGesture {
+                do {
+                    val event = awaitPointerEvent()
+                    val metaState = event.keyboardModifiers
+                    control = metaState.isCtrlPressed
+                    alt = metaState.isAltPressed
+                    shift = metaState.isShiftPressed
+                    meta = metaState.isMetaPressed
+                    sym = metaState.isSymPressed
+                    function = metaState.isFunctionPressed
+                    numLock = metaState.isNumLockOn
+                    scrollLock = metaState.isScrollLockOn
+                    capsLock = metaState.isCapsLockOn
 
-                        val buttons = event.buttons
-                        primary = buttons.isPrimaryPressed
-                        secondary = buttons.isSecondaryPressed
-                        tertiary = buttons.isTertiaryPressed
-                        back = buttons.isBackPressed
-                        forward = buttons.isForwardPressed
-                    } while (event.changes.any { it.pressed })
-                    // In the future, hover events should work also, but it isn't
-                    // implemented yet.
-                    control = false
-                    alt = false
-                    shift = false
-                    meta = false
-                    sym = false
-                    function = false
-                    numLock = false
-                    scrollLock = false
-                    capsLock = false
-                    primary = false
-                    secondary = false
-                    tertiary = false
-                    back = false
-                    forward = false
-                }
+                    val buttons = event.buttons
+                    primary = buttons.isPrimaryPressed
+                    secondary = buttons.isSecondaryPressed
+                    tertiary = buttons.isTertiaryPressed
+                    back = buttons.isBackPressed
+                    forward = buttons.isForwardPressed
+                } while (event.changes.any { it.pressed })
+                // In the future, hover events should work also, but it isn't
+                // implemented yet.
+                control = false
+                alt = false
+                shift = false
+                meta = false
+                sym = false
+                function = false
+                numLock = false
+                scrollLock = false
+                capsLock = false
+                primary = false
+                secondary = false
+                tertiary = false
+                back = false
+                forward = false
             }
         }
     ) {

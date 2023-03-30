@@ -58,8 +58,10 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
+@Preview
 @Sampled
 @Composable
 fun SimpleTextFieldSample() {
@@ -73,6 +75,7 @@ fun SimpleTextFieldSample() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun SimpleOutlinedTextFieldSample() {
@@ -85,6 +88,7 @@ fun SimpleOutlinedTextFieldSample() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun TextFieldWithIcons() {
@@ -99,6 +103,7 @@ fun TextFieldWithIcons() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun TextFieldWithPlaceholder() {
@@ -112,6 +117,24 @@ fun TextFieldWithPlaceholder() {
     )
 }
 
+@Preview
+@Sampled
+@Composable
+fun TextFieldWithPrefixAndSuffix() {
+    var text by rememberSaveable { mutableStateOf("") }
+
+    TextField(
+        value = text,
+        onValueChange = { text = it },
+        singleLine = true,
+        label = { Text("Label") },
+        prefix = { Text("www.") },
+        suffix = { Text(".com") },
+        placeholder = { Text("google") },
+    )
+}
+
+@Preview
 @Sampled
 @Composable
 fun TextFieldWithErrorState() {
@@ -148,6 +171,7 @@ fun TextFieldWithErrorState() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun TextFieldWithSupportingText() {
@@ -163,6 +187,7 @@ fun TextFieldWithSupportingText() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun PasswordTextField() {
@@ -274,6 +299,7 @@ private val Icons.Filled.VisibilityOff: ImageVector
     }
 private var _visibilityOff: ImageVector? = null
 
+@Preview
 @Sampled
 @Composable
 fun TextFieldSample() {
@@ -288,6 +314,7 @@ fun TextFieldSample() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun OutlinedTextFieldSample() {
@@ -303,6 +330,7 @@ fun OutlinedTextFieldSample() {
 }
 
 @OptIn(ExperimentalComposeUiApi::class)
+@Preview
 @Sampled
 @Composable
 fun TextFieldWithHideKeyboardOnImeAction() {
@@ -338,6 +366,7 @@ fun TextArea() {
     )
 }
 
+@Preview
 @Sampled
 @Composable
 fun CustomTextFieldBasedOnDecorationBox() {
@@ -384,6 +413,7 @@ fun CustomTextFieldBasedOnDecorationBox() {
     }
 }
 
+@Preview
 @Sampled
 @Composable
 fun CustomOutlinedTextFieldBasedOnDecorationBox() {

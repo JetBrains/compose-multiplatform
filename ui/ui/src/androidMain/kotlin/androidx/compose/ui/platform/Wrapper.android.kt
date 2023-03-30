@@ -150,7 +150,6 @@ private class WrappedComposition(
                             currentComposer.collectParameterInformation()
                         }
 
-                        LaunchedEffect(owner) { owner.keyboardVisibilityEventLoop() }
                         LaunchedEffect(owner) { owner.boundsUpdatesEventLoop() }
 
                         CompositionLocalProvider(LocalInspectionTables provides inspectionTable) {

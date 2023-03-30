@@ -15,6 +15,8 @@
  */
 package androidx.compose.ui.graphics.colorspace
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.util.packFloats
 import kotlin.math.abs
 import kotlin.math.pow
 import kotlin.math.withSign
@@ -279,6 +281,38 @@ abstract class ColorSpace internal constructor(
     abstract fun toXyz(/*@Size(min = 3)*/ v: FloatArray): FloatArray
 
     /**
+     * Same as [toXyz], but returns only the x and y components packed into a long.
+     */
+    internal open fun toXy(v0: Float, v1: Float, v2: Float): Long {
+        val xyz = toXyz(v0, v1, v2)
+        return packFloats(xyz[0], xyz[1])
+    }
+
+    /**
+     * Same as [toXyz], but returns only the z component.
+     */
+    internal open fun toZ(v0: Float, v1: Float, v2: Float): Float {
+        val xyz = toXyz(v0, v1, v2)
+        return xyz[2]
+    }
+
+    /**
+     * Converts [x], [y], [z] components to this ColorSpace and returns a color
+     * with the resulting values, using [a] for alpha, and [colorSpace] for the
+     * color space.
+     */
+    internal open fun xyzaToColor(
+        x: Float,
+        y: Float,
+        z: Float,
+        a: Float,
+        colorSpace: ColorSpace
+    ): Color {
+        val colors = fromXyz(x, y, z)
+        return Color(colors[0], colors[1], colors[2], a, colorSpace)
+    }
+
+    /**
      * Converts tristimulus values from the CIE XYZ space to this
      * color space's color model.
      *
@@ -398,6 +432,19 @@ fun ColorSpace.connect(
     destination: ColorSpace = ColorSpaces.Srgb,
     intent: RenderIntent = RenderIntent.Perceptual
 ): Connector {
+    if (this === ColorSpaces.Srgb) {
+        if (destination === ColorSpaces.Srgb) {
+            return Connector.SrgbIdentity
+        }
+        if (destination === ColorSpaces.Oklab && intent == RenderIntent.Perceptual) {
+            return Connector.SrgbToOklabPerceptual
+        }
+    } else if (this === ColorSpaces.Oklab &&
+        destination === ColorSpaces.Srgb &&
+        intent == RenderIntent.Perceptual
+    ) {
+        return Connector.OklabToSrgbPerceptual
+    }
     if (this === destination) {
         return Connector.identity(this)
     }
@@ -645,6 +692,60 @@ internal fun mul3x3Float3(
     rhs[1] = lhs[1] * r0 + lhs[4] * r1 + lhs[7] * r2
     rhs[2] = lhs[2] * r0 + lhs[5] * r1 + lhs[8] * r2
     return rhs
+}
+
+/**
+ * Multiplies a vector of 3 components by a 3x3 matrix and returns the first element.
+ *
+ * @param lhs 3x3 matrix, as a non-null array of 9 floats
+ * @param r0: The first element of the vector
+ * @param r1: The second element of the vector
+ * @param r2: The third element of the vector
+ * @return The first element of the resulting multiplication.
+ */
+internal fun mul3x3Float3_0(
+    lhs: FloatArray,
+    r0: Float,
+    r1: Float,
+    r2: Float
+): Float {
+    return lhs[0] * r0 + lhs[3] * r1 + lhs[6] * r2
+}
+
+/**
+ * Multiplies a vector of 3 components by a 3x3 matrix and returns the second element.
+ *
+ * @param lhs 3x3 matrix, as a non-null array of 9 floats
+ * @param r0: The first element of the vector
+ * @param r1: The second element of the vector
+ * @param r2: The third element of the vector
+ * @return The second element of the resulting multiplication.
+ */
+internal fun mul3x3Float3_1(
+    lhs: FloatArray,
+    r0: Float,
+    r1: Float,
+    r2: Float
+): Float {
+    return lhs[1] * r0 + lhs[4] * r1 + lhs[7] * r2
+}
+
+/**
+ * Multiplies a vector of 3 components by a 3x3 matrix and returns the third element.
+ *
+ * @param lhs 3x3 matrix, as a non-null array of 9 floats
+ * @param r0: The first element of the vector
+ * @param r1: The second element of the vector
+ * @param r2: The third element of the vector
+ * @return The third element of the resulting multiplication.
+ */
+internal fun mul3x3Float3_2(
+    lhs: FloatArray,
+    r0: Float,
+    r1: Float,
+    r2: Float
+): Float {
+    return lhs[2] * r0 + lhs[5] * r1 + lhs[8] * r2
 }
 
 /**

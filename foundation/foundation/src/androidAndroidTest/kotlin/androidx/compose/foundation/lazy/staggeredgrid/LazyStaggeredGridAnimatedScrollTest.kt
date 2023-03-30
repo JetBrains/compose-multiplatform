@@ -19,20 +19,15 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.animation.core.FloatSpringSpec
 import androidx.compose.foundation.AutoTestFrameClock
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.lazy.grid.isEqualTo
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
 import com.google.common.truth.Truth.assertWithMessage
@@ -139,7 +134,32 @@ class LazyStaggeredGridAnimatedScrollTest(
             state.animateScrollToItem(100)
         }
         rule.waitForIdle()
-        assertThat(state.firstVisibleItemIndex).isEqualTo(90)
+        assertThat(state.firstVisibleItemIndex).isEqualTo(91)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun animateScrollToItem_toFullSpan() {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(50, 10)
+        }
+        rule.waitForIdle()
+        assertThat(state.firstVisibleItemIndex).isEqualTo(50)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(10)
+    }
+
+    @Test
+    fun animateScrollToItem_toFullSpan_andBack() {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(50, 10)
+        }
+        rule.waitForIdle()
+
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(45, 0)
+        }
+
+        assertThat(state.firstVisibleItemIndex).isEqualTo(44)
         assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
     }
 
@@ -166,6 +186,26 @@ class LazyStaggeredGridAnimatedScrollTest(
     @Test
     fun animateScrollToItem_firstItem_toOffset() {
         assertSpringAnimation(fromIndex = 10, fromOffset = 10, toIndex = 0, toOffset = 10)
+    }
+
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_forward() {
+        runBlocking(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(20, -itemSizePx * 3)
+        }
+        rule.waitForIdle()
+        assertThat(state.firstVisibleItemIndex).isEqualTo(14)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_backward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(20)
+            state.animateScrollToItem(0, itemSizePx * 3)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(6)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
     }
 
     private fun assertSpringAnimation(
@@ -232,13 +272,22 @@ class LazyStaggeredGridAnimatedScrollTest(
             state = state,
             modifier = Modifier.axisSize(itemSizeDp * 2, itemSizeDp * 5)
         ) {
-            items(100) {
+            items(
+                count = 100,
+                span = {
+                    // mark a span to check scroll through
+                    if (it == 50)
+                        StaggeredGridItemSpan.FullLine
+                    else
+                        StaggeredGridItemSpan.SingleLane
+                }
+            ) {
                 BasicText(
                     "$it",
                     Modifier
                         .mainAxisSize(itemSizeDp)
                         .testTag("$it")
-                        .border(1.dp, Color.Black)
+                        .debugBorder()
                 )
             }
         }

@@ -45,6 +45,10 @@ fun <T> LiveData<T>.observeAsState(): State<T?> = observeAsState(value)
  * be new value posted into the [LiveData] the returned [State] will be updated causing
  * recomposition of every [State.value] usage.
  *
+ * The [initial] value will be used only if this LiveData is not already
+ * [initialized][isInitialized]. Note that if [T] is a non-null type, it is your
+ * responsibility to ensure that any value you set on this LiveData is also non-null.
+ *
  * The inner observer will automatically be removed when this composable disposes or the current
  * [LifecycleOwner] moves to the [Lifecycle.State.DESTROYED] state.
  *
@@ -53,7 +57,10 @@ fun <T> LiveData<T>.observeAsState(): State<T?> = observeAsState(value)
 @Composable
 fun <R, T : R> LiveData<T>.observeAsState(initial: R): State<R> {
     val lifecycleOwner = LocalLifecycleOwner.current
-    val state = remember { mutableStateOf(initial) }
+    val state = remember {
+        @Suppress("UNCHECKED_CAST") /* Initialized values of a LiveData<T> must be a T */
+        mutableStateOf(if (isInitialized) value as T else initial)
+    }
     DisposableEffect(this, lifecycleOwner) {
         val observer = Observer<T> { state.value = it }
         observe(lifecycleOwner, observer)

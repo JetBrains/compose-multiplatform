@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,16 +17,18 @@
 package androidx.compose.ui.text.style
 
 import androidx.compose.runtime.Immutable
-import androidx.compose.ui.text.ExperimentalTextApi
+import kotlin.jvm.JvmInline
 
 @Immutable
-@ExperimentalTextApi
-actual class LineBreak private constructor() {
+@JvmInline
+actual value class LineBreak private constructor(
+    internal val mask: Int
+) {
     actual companion object {
-        actual val Simple: LineBreak = LineBreak()
+        actual val Simple: LineBreak = LineBreak(1)
 
-        actual val Heading: LineBreak = LineBreak()
+        actual val Heading: LineBreak = LineBreak(2)
 
-        actual val Paragraph: LineBreak = LineBreak()
+        actual val Paragraph: LineBreak = LineBreak(3)
     }
 }

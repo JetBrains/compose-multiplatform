@@ -88,6 +88,7 @@ message ComposableNode {
       SYSTEM_CREATED = 0x1;
       HAS_MERGED_SEMANTICS = 0x2;
       HAS_UNMERGED_SEMANTICS = 0x4;
+      INLINED = 0x8;
     }
     int32 flags = 9;
 

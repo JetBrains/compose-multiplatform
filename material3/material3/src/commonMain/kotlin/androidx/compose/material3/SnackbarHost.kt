@@ -95,7 +95,6 @@ class SnackbarHostState {
      * @return [SnackbarResult.ActionPerformed] if option action has been clicked or
      * [SnackbarResult.Dismissed] if snackbar has been dismissed via timeout or by the user
      */
-    @OptIn(ExperimentalMaterial3Api::class)
     suspend fun showSnackbar(
         message: String,
         actionLabel: String? = null,
@@ -123,7 +122,6 @@ class SnackbarHostState {
      * @return [SnackbarResult.ActionPerformed] if option action has been clicked or
      * [SnackbarResult.Dismissed] if snackbar has been dismissed via timeout or by the user
      */
-    @ExperimentalMaterial3Api
     suspend fun showSnackbar(visuals: SnackbarVisuals): SnackbarResult = mutex.withLock {
         try {
             return suspendCancellableCoroutine { continuation ->

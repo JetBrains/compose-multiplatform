@@ -19,18 +19,24 @@ package androidx.compose.foundation.lazy.staggeredgrid
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.layout.DelegatingLazyLayoutItemProvider
 import androidx.compose.foundation.lazy.layout.LazyLayoutItemProvider
+import androidx.compose.foundation.lazy.layout.LazyLayoutPinnableItem
 import androidx.compose.foundation.lazy.layout.rememberLazyNearestItemsRangeState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 
+@OptIn(ExperimentalFoundationApi::class)
+internal interface LazyStaggeredGridItemProvider : LazyLayoutItemProvider {
+    val spanProvider: LazyStaggeredGridSpanProvider
+}
+
 @Composable
 @ExperimentalFoundationApi
 internal fun rememberStaggeredGridItemProvider(
     state: LazyStaggeredGridState,
     content: LazyStaggeredGridScope.() -> Unit,
-): LazyLayoutItemProvider {
+): LazyStaggeredGridItemProvider {
     val latestContent = rememberUpdatedState(content)
     val nearestItemsRangeState = rememberLazyNearestItemsRangeState(
         firstVisibleItemIndex = { state.firstVisibleItemIndex },
@@ -40,13 +46,28 @@ internal fun rememberStaggeredGridItemProvider(
     return remember(state) {
         val itemProviderState = derivedStateOf {
             val scope = LazyStaggeredGridScopeImpl().apply(latestContent.value)
-            LazyLayoutItemProvider(
+            object : LazyLayoutItemProvider by LazyLayoutItemProvider(
                 scope.intervals,
                 nearestItemsRangeState.value,
-            ) { interval, index ->
-                interval.item.invoke(LazyStaggeredGridItemScopeImpl, index)
+                itemContent = { interval, index ->
+                    val localIndex = index - interval.startIndex
+                    LazyLayoutPinnableItem(
+                        key = interval.value.key?.invoke(localIndex),
+                        index = index,
+                        pinnedItemList = state.pinnedItems
+                    ) {
+                        interval.value.item.invoke(LazyStaggeredGridItemScopeImpl, localIndex)
+                    }
+                }
+            ), LazyStaggeredGridItemProvider {
+                override val spanProvider = LazyStaggeredGridSpanProvider(scope.intervals)
             }
         }
-        object : LazyLayoutItemProvider by DelegatingLazyLayoutItemProvider(itemProviderState) { }
+
+        object : LazyLayoutItemProvider by DelegatingLazyLayoutItemProvider(itemProviderState),
+            LazyStaggeredGridItemProvider {
+
+            override val spanProvider get() = itemProviderState.value.spanProvider
+        }
     }
 }

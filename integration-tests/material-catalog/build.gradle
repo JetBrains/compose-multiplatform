@@ -29,8 +29,8 @@ plugins {
 android {
     defaultConfig {
         applicationId "androidx.compose.material.catalog"
-        versionCode 2001
-        versionName "2.0.1"
+        versionCode 2100
+        versionName "2.1.0"
     }
     buildTypes {
         release {
@@ -58,7 +58,7 @@ dependencies {
     // Outside of androidx this is resolved via constraint added to lifecycle-common,
     // but it doesn't work in androidx.
     // See aosp/1804059
-    implementation projectOrArtifact(":lifecycle:lifecycle-common-java8")
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.5.1"
 }
 
 // We want to publish a release APK of this project for the Compose Material Catalog

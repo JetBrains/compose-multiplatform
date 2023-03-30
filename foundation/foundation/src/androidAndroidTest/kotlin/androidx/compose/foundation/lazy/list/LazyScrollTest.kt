@@ -243,6 +243,52 @@ class LazyScrollTest(private val orientation: Orientation) {
         assertSpringAnimation(toIndex = 0, toOffset = 20, fromIndex = 8)
     }
 
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_forward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.animateScrollToItem(10, -itemSizePx * 3)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(7)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun animateScrollToItemWithOffsetLargerThanItemSize_backward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(10)
+            state.animateScrollToItem(0, itemSizePx * 3)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(3)
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+    }
+
+    @Test
+    fun canScrollForward() = runBlocking {
+        assertThat(state.firstVisibleItemScrollOffset).isEqualTo(0)
+        assertThat(state.canScrollForward).isTrue()
+        assertThat(state.canScrollBackward).isFalse()
+    }
+
+    @Test
+    fun canScrollBackward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(itemsCount)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(itemsCount - 3)
+        assertThat(state.canScrollForward).isFalse()
+        assertThat(state.canScrollBackward).isTrue()
+    }
+
+    @Test
+    fun canScrollForwardAndBackward() = runBlocking {
+        withContext(Dispatchers.Main + AutoTestFrameClock()) {
+            state.scrollToItem(1)
+        }
+        assertThat(state.firstVisibleItemIndex).isEqualTo(1)
+        assertThat(state.canScrollForward).isTrue()
+        assertThat(state.canScrollBackward).isTrue()
+    }
+
     private fun assertSpringAnimation(
         toIndex: Int,
         toOffset: Int = 0,

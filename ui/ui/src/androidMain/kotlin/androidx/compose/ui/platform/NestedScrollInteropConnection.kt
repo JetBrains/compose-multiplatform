@@ -19,7 +19,6 @@ package androidx.compose.ui.platform
 import android.view.View
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -223,15 +222,15 @@ private val Offset.scrollAxes: Int
  * is one that implements NestedScrollingParent3, a key layout that does that is
  * [androidx.coordinatorlayout.widget.CoordinatorLayout].
  *
+ * @param hostView The View that hosts the compose scrollable, this is usually a ComposeView.
+ *
  * Learn how to enable nested scroll interop:
  * @sample androidx.compose.ui.samples.ComposeInCooperatingViewNestedScrollInteropSample
  *
  */
-@ExperimentalComposeUiApi
 @Composable
-fun rememberNestedScrollInteropConnection(): NestedScrollConnection {
-    val composeView = LocalView.current
-    return remember(composeView) {
-        NestedScrollInteropConnection(composeView)
-    }
+fun rememberNestedScrollInteropConnection(
+    hostView: View = LocalView.current
+): NestedScrollConnection = remember(hostView) {
+    NestedScrollInteropConnection(hostView)
 }

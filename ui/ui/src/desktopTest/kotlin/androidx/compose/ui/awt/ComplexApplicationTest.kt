@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -100,7 +100,7 @@ import androidx.compose.ui.input.key.isShiftPressed
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
 import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIconDefaults
+import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.isBackPressed
 import androidx.compose.ui.input.pointer.isForwardPressed
 import androidx.compose.ui.input.pointer.onPointerEvent
@@ -373,7 +373,7 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
 
         Row(verticalAlignment = Alignment.CenterVertically) {
             Button(
-                modifier = Modifier.padding(4.dp).pointerHoverIcon(PointerIconDefaults.Hand),
+                modifier = Modifier.padding(4.dp).pointerHoverIcon(PointerIcon.Hand),
                 onClick = {
                     amount.value++
                 }
@@ -565,12 +565,12 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
 
         Box(
             modifier = Modifier.size(150.dp).background(Color.Gray).pointerHoverIcon(
-                if (isCtrlPressed.value) PointerIconDefaults.Hand else PointerIconDefaults.Default
+                if (isCtrlPressed.value) PointerIcon.Hand else PointerIcon.Default
             )
         ) {
             Box(
                 modifier = Modifier.offset(20.dp, 20.dp).size(100.dp).background(Color.Blue).pointerHoverIcon(
-                    if (isCtrlPressed.value) PointerIconDefaults.Crosshair else PointerIconDefaults.Text,
+                    if (isCtrlPressed.value) PointerIcon.Crosshair else PointerIcon.Text,
                 )
             ) {
                 Text("pointerHoverIcon test with Ctrl")

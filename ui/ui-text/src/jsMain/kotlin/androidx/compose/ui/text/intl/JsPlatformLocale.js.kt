@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,8 +31,9 @@ internal class JsLocale(val locale: dynamic) : PlatformLocale {
 
 internal actual fun createPlatformLocaleDelegate(): PlatformLocaleDelegate =
     object : PlatformLocaleDelegate {
-        override val current: List<PlatformLocale>
-            get() = listOf(JsLocale(Any()))
+        override val current: LocaleList
+            // TODO: [1.4 Update] Check that it is implemented properly
+            get() = LocaleList(Locale(JsLocale(Any())))
 
 
         override fun parseLanguageTag(languageTag: String): PlatformLocale {

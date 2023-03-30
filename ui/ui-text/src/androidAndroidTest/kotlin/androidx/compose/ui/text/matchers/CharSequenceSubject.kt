@@ -68,6 +68,12 @@ internal class CharSequenceSubject private constructor(
         spans(spanClazz).has(start, end, predicate)
     }
 
+    fun <T : Any> doesNotHaveSpan(
+        spanClazz: KClass<out T>,
+    ) {
+        spans(spanClazz).isEmpty()
+    }
+
     /**
      * Similar to [hasSpan], and the returned matcher will also check that the span is not covered
      * by other spans.

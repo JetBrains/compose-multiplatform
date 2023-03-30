@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ internal actual object MappedKeys {
     actual val H: Key = Key(Key.H.keyCode)
     actual val V: Key = Key(Key.V.keyCode)
     actual val X: Key = Key(Key.X.keyCode)
+    actual val Y: Key = Key(Key.Y.keyCode)
     actual val Z: Key = Key(Key.Z.keyCode)
     actual val Backslash: Key = Key(Key.Backslash.keyCode)
     actual val DirectionLeft: Key = Key(Key.DirectionLeft.keyCode)
@@ -45,7 +46,7 @@ internal actual object MappedKeys {
     actual val Paste: Key = Key(Key.Paste.keyCode)
     actual val Cut: Key = Key(Key.Cut.keyCode)
     actual val Tab: Key = Key(Key.Tab.keyCode)
-    val Copy: Key = Key(Key.Copy.keyCode)
+    actual val Copy: Key = Key(Key.Copy.keyCode)
 }
 
 internal actual val MappedKeys.Space: Key

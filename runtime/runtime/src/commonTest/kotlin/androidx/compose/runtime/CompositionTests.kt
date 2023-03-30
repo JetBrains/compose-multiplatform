@@ -38,10 +38,12 @@ import androidx.compose.runtime.mock.compositionTest
 import androidx.compose.runtime.mock.contact
 import androidx.compose.runtime.mock.expectChanges
 import androidx.compose.runtime.mock.expectNoChanges
+import androidx.compose.runtime.mock.frameDelayMillis
 import androidx.compose.runtime.mock.revalidate
 import androidx.compose.runtime.mock.skip
 import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
+import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
@@ -53,8 +55,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.runTest
 import kotlinx.test.IgnoreJsTarget
+import kotlinx.coroutines.withContext
 
 @Composable
 fun Container(content: @Composable () -> Unit) = content()
@@ -3011,7 +3015,8 @@ class CompositionTests {
                 assertEquals(1, applier.insertCount, "expected setup node not inserted")
                 shouldEmitNode = false
                 Snapshot.sendApplyNotifications()
-                testScheduler.advanceUntilIdle()
+                // Only advance one frame since the next frame will be automatically scheduled.
+                testScheduler.advanceTimeByFrame(coroutineContext)
                 assertEquals(1, stateMutatedOnRemove.value, "observable removals performed")
                 // Only two composition passes should have been performed by this point; a state
                 // invalidation in the applier should not be picked up or acted upon until after
@@ -3216,6 +3221,206 @@ class CompositionTests {
             Text("Hello!")
         }
     }
+
+    @Test // Regression test for b/249050560
+    @IgnoreJsTarget
+    // TODO(o.k.): fails due to old js-only change in ComposerLambdaMemoization.rememberExpression
+    fun testFunctionInstances() = compositionTest {
+        var state by mutableStateOf(0)
+        functionInstance = { -1 }
+
+        compose {
+            val localStateCopy = state
+            fun localStateReader() = localStateCopy
+            updateInstance(::localStateReader)
+        }
+
+        assertEquals(state, functionInstance())
+
+        state = 10
+        advance()
+        assertEquals(state, functionInstance())
+    }
+
+    @Test
+    fun testNonLocalReturn_CM1_RetFunc_FalseTrue() = compositionTest {
+        var condition by mutableStateOf(false)
+
+        compose {
+            test_CM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_RetFun(condition)
+        }
+
+        condition = true
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun testNonLocalReturn_CM1_RetFunc_TrueFalse() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            test_CM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_RetFun(condition)
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun test_CM1_CCM1_RetFun_FalseTrue() = compositionTest {
+        var condition by mutableStateOf(false)
+
+        compose {
+            test_CM1_CCM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_CCM1_RetFun(condition)
+        }
+
+        condition = true
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun test_CM1_CCM1_RetFun_TrueFalse() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            test_CM1_CCM1_RetFun(condition)
+        }
+
+        validate {
+            this.test_CM1_CCM1_RetFun(condition)
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test // regression test for 267586102
+    fun test_remember_in_a_loop() = compositionTest {
+        var i1 = 0
+        var i2 = 0
+        var i3 = 0
+        var recomposeCounter = 0
+        var scope: RecomposeScope? = null
+
+        val content: @Composable SomeUnstableClass.() -> Unit = {
+            for (index in 0 until recomposeCounter) {
+                remember(this) { index }
+            }
+            scope = currentRecomposeScope
+            // these remembered values are not expected to change, BUT they change on recompositions
+            i1 = remember(this) { 1 }
+            i2 = remember(this) { 2 }
+            i3 = remember(this) { 3 }
+            recomposeCounter++
+        }
+
+        compose {
+            content(SomeUnstableClass())
+        }
+        advance()
+
+        assertEquals(1, i1)
+        assertEquals(2, i2)
+        assertEquals(3, i3)
+        assertEquals(1, recomposeCounter)
+
+        scope!!.invalidate()
+        advance()
+
+        assertEquals(2, recomposeCounter)
+        assertEquals(1, i1)
+        assertEquals(2, i2)
+        assertEquals(3, i3)
+
+        scope!!.invalidate()
+        advance()
+
+        assertEquals(3, recomposeCounter)
+        assertEquals(1, i1)
+        assertEquals(2, i2)
+        assertEquals(3, i3)
+    }
+}
+
+class SomeUnstableClass(val a: Any = "abc")
+
+@Composable
+fun test_CM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    M1 {
+        Text("M1 - before")
+        if (condition) return
+        Text("M1 - after")
+    }
+    Text("Root - after")
+}
+
+fun MockViewValidator.test_CM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    Text("M1 - before")
+    if (condition) return
+    Text("M1 - after")
+    Text("Root - after")
+}
+
+@Composable
+fun test_CM1_CCM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    M1 {
+        Text("M1 - begin")
+        if (condition) {
+            Text("if - begin")
+            M1 {
+                Text("In CCM1")
+                return@test_CM1_CCM1_RetFun
+            }
+        }
+        Text("M1 - end")
+    }
+    Text("Root - end")
+}
+
+fun MockViewValidator.test_CM1_CCM1_RetFun(condition: Boolean) {
+    Text("Root - before")
+    Text("M1 - begin")
+    if (condition) {
+        Text("if - begin")
+        Text("In CCM1")
+        return
+    }
+    Text("M1 - end")
+    Text("Root - end")
+}
+
+var functionInstance: () -> Int = { 0 }
+
+@Composable
+fun updateInstance(newInstance: () -> Int) {
+    functionInstance = newInstance
 }
 
 var stateA by mutableStateOf(1000)
@@ -3289,18 +3494,32 @@ fun testDeferredSubcomposition(block: @Composable () -> Unit): () -> Unit {
 internal suspend fun <R> localRecomposerTest(
     block: CoroutineScope.(Recomposer) -> R
 ) = coroutineScope {
-    val contextWithClock = coroutineContext + TestMonotonicFrameClock(this)
-    val recomposer = Recomposer(contextWithClock)
-    launch(contextWithClock) {
-        recomposer.runRecomposeAndApplyChanges()
+    withContext(TestMonotonicFrameClock(this)) {
+        val recomposer = Recomposer(coroutineContext)
+        launch {
+            recomposer.runRecomposeAndApplyChanges()
+        }
+        block(recomposer)
+        // This call doesn't need to be in a finally; everything it does will be torn down
+        // in exceptional cases by the coroutineScope failure
+        recomposer.cancel()
     }
-    block(recomposer)
-    // This call doesn't need to be in a finally; everything it does will be torn down
-    // in exceptional cases by the coroutineScope failure
-    recomposer.cancel()
 }
 
-@Composable fun Wrap(content: @Composable () -> Unit) {
+/**
+ * Advances this scheduler by exactly one frame, as defined by the [TestMonotonicFrameClock] in
+ * [context].
+ */
+@OptIn(ExperimentalCoroutinesApi::class)
+private fun TestCoroutineScheduler.advanceTimeByFrame(context: CoroutineContext) {
+    val testClock = context[MonotonicFrameClock] as TestMonotonicFrameClock
+    advanceTimeBy(testClock.frameDelayMillis)
+    // advanceTimeBy doesn't run tasks at exactly frameDelayMillis.
+    runCurrent()
+}
+
+@Composable
+fun Wrap(content: @Composable () -> Unit) {
     content()
 }
 
@@ -3369,3 +3588,15 @@ fun <T> MutableList<T>.swap(a: T, b: T) {
     set(aIndex, b)
     set(bIndex, a)
 }
+
+@Composable
+private inline fun InlineWrapper(content: @Composable () -> Unit) = content()
+
+@Composable
+private inline fun M1(content: @Composable () -> Unit) = InlineWrapper { content() }
+
+@Composable
+private inline fun M2(content: @Composable () -> Unit) = M1 { content() }
+
+@Composable
+private inline fun M3(content: @Composable () -> Unit) = M2 { content() }

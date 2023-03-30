@@ -20,9 +20,11 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerInputChange
 import androidx.compose.ui.input.pointer.changedToDownIgnoreConsumed
+import androidx.compose.ui.input.pointer.util.VelocityTracker1D.Strategy
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
+import kotlin.math.sign
 import kotlin.math.sqrt
 
 private const val AssumePointerMoveStoppedMilliseconds: Int = 40
@@ -30,31 +32,29 @@ private const val HistorySize: Int = 20
 
 // TODO(b/204895043): Keep value in sync with VelocityPathFinder.HorizonMilliSeconds
 private const val HorizonMilliseconds: Int = 100
-private const val MinSampleSize: Int = 3
 
 /**
  * Computes a pointer's velocity.
  *
  * The input data is provided by calling [addPosition]. Adding data is cheap.
  *
- * To obtain a velocity, call [calculateVelocity] or [getVelocityEstimate]. This will
- * compute the velocity based on the data added so far. Only call these when
- * you need to use the velocity, as they are comparatively expensive.
+ * To obtain a velocity, call [calculateVelocity]. This will compute the velocity
+ * based on the data added so far. Only call this when you need to use the velocity,
+ * as it is comparatively expensive.
  *
  * The quality of the velocity estimation will be better if more data points
  * have been received.
  */
 class VelocityTracker {
+    private val xVelocityTracker = VelocityTracker1D() // non-differential, Lsq2 1D velocity tracker
+    private val yVelocityTracker = VelocityTracker1D() // non-differential, Lsq2 1D velocity tracker
 
-    // Circular buffer; current sample at index.
-    private val samples: Array<PointAtTime?> = Array(HistorySize) { null }
-    private var index: Int = 0
     internal var currentPointerPositionAccumulator = Offset.Zero
 
     /**
-     * Adds a position as the given time to the tracker.
+     * Adds a position at the given time to the tracker.
      *
-     * Call resetTracking to remove added Offsets.
+     * Call [resetTracking] to remove added [Offset]s.
      *
      * @see resetTracking
      */
@@ -62,8 +62,8 @@ class VelocityTracker {
     //   positions. For velocity tracking, the only thing that is important is the change in
     //   position over time.
     fun addPosition(timeMillis: Long, position: Offset) {
-        index = (index + 1) % HistorySize
-        samples[index] = PointAtTime(position, timeMillis)
+        xVelocityTracker.addDataPoint(timeMillis, position.x)
+        yVelocityTracker.addDataPoint(timeMillis, position.y)
     }
 
     /**
@@ -72,42 +72,129 @@ class VelocityTracker {
      * This can be expensive. Only call this when you need the velocity.
      */
     fun calculateVelocity(): Velocity {
-        val estimate = getVelocityEstimate().pixelsPerSecond
-        return Velocity(estimate.x, estimate.y)
+        return Velocity(xVelocityTracker.calculateVelocity(), yVelocityTracker.calculateVelocity())
     }
 
     /**
      * Clears the tracked positions added by [addPosition].
      */
     fun resetTracking() {
-        samples.fill(element = null)
+        xVelocityTracker.resetTracking()
+        yVelocityTracker.resetTracking()
+    }
+}
+
+/**
+ * A velocity tracker calculating velocity in 1 dimension.
+ *
+ * Add displacement data points using [addDataPoint], and obtain velocity using [calculateVelocity].
+ *
+ * Note: for calculating touch-related or other 2 dimensional/planar velocities, please use
+ * [VelocityTracker], which handles velocity tracking across both X and Y dimensions at once.
+ */
+class VelocityTracker1D internal constructor(
+    // whether the data points added to the tracker represent differential values
+    // (i.e. change in the  tracked object's displacement since the previous data point).
+    // If false, it means that the data points added to the tracker will be considered as absolute
+    // values (e.g. positional values).
+    val isDataDifferential: Boolean = false,
+    // The velocity tracking strategy that this instance uses for all velocity calculations.
+    private val strategy: Strategy = Strategy.Lsq2,
+) {
+
+    init {
+        if (isDataDifferential && strategy.equals(Strategy.Lsq2)) {
+            throw IllegalStateException("Lsq2 not (yet) supported for differential axes")
+        }
     }
 
     /**
-     * Returns an estimate of the velocity of the object being tracked by the
-     * tracker given the current information available to the tracker.
+     * Constructor to create a new velocity tracker. It allows to specify whether or not the tracker
+     * should consider the data ponits provided via [addDataPoint] as differential or
+     * non-differential.
      *
-     * Information is added using [addPosition].
+     * Differential data ponits represent change in displacement. For instance, differential data
+     * points of [2, -1, 5] represent: the object moved by "2" units, then by "-1" units, then by
+     * "5" units. An example use case for differential data points is when tracking velocity for an
+     * object whose displacements (or change in positions) over time are known.
      *
-     * Returns null if there is no data on which to base an estimate.
+     * Non-differential data ponits represent position of the object whose velocity is tracked. For
+     * instance, non-differential data points of [2, -1, 5] represent: the object was at position
+     * "2", then at position "-1", then at position "5". An example use case for non-differential
+     * data points is when tracking velocity for an object whose positions on a geometrical axis
+     * over different instances of time are known.
+     *
+     * @param isDataDifferential [true] if the data ponits provided to the constructed tracker
+     * are differential. [false] otherwise.
      */
-    private fun getVelocityEstimate(): VelocityEstimate {
-        val x: MutableList<Float> = mutableListOf()
-        val y: MutableList<Float> = mutableListOf()
+    constructor(isDataDifferential: Boolean) : this(isDataDifferential, Strategy.Impulse)
+
+    private val minSampleSize: Int = when (strategy) {
+        Strategy.Impulse -> 2
+        Strategy.Lsq2 -> 3
+    }
+
+    /**
+     * A strategy used for velocity calculation. Each strategy has a different philosophy that could
+     * result in notably different velocities than the others, so make careful choice or change of
+     * strategy whenever you want to make one.
+     */
+    internal enum class Strategy {
+        /**
+         * Least squares strategy. Polynomial fit at degree 2.
+         * Note that the implementation of this strategy currently supports only non-differential
+         * data points.
+         */
+        Lsq2,
+
+        /**
+         * Impulse velocity tracking strategy, that calculates velocity using the mathematical
+         * relationship between kinetic energy and velocity.
+         */
+        Impulse,
+    }
+    // Circular buffer; current sample at index.
+    private val samples: Array<DataPointAtTime?> = Array(HistorySize) { null }
+    private var index: Int = 0
+
+    /**
+     * Adds a data point for velocity calculation at a given time, [timeMillis]. The data ponit
+     * represents an amount of a change in position (for differential data points), or an absolute
+     * position (for non-differential data points). Whether or not the tracker handles differential
+     * data points is decided by [isDataDifferential], which is set once and finally during
+     * the construction of the tracker.
+     *
+     * Use the same units for the data points provided. For example, having some data points in `cm`
+     * and some in `m` will result in incorrect velocity calculations, as this method (and the
+     * tracker) has no knowledge of the units used.
+     */
+    fun addDataPoint(timeMillis: Long, dataPoint: Float) {
+        index = (index + 1) % HistorySize
+        samples.set(index, timeMillis, dataPoint)
+    }
+
+    /**
+     * Computes the estimated velocity at the time of the last provided data point. The units of
+     * velocity will be `units/second`, where `units` is the units of the data points provided via
+     * [addDataPoint].
+     *
+     * This can be expensive. Only call this when you need the velocity.
+     */
+    fun calculateVelocity(): Float {
+        val dataPoints: MutableList<Float> = mutableListOf()
         val time: MutableList<Float> = mutableListOf()
         var sampleCount = 0
         var index: Int = index
 
         // The sample at index is our newest sample.  If it is null, we have no samples so return.
-        val newestSample: PointAtTime = samples[index] ?: return VelocityEstimate.None
+        val newestSample: DataPointAtTime = samples[index] ?: return 0f
 
-        var previousSample: PointAtTime = newestSample
-        var oldestSample: PointAtTime = newestSample
+        var previousSample: DataPointAtTime = newestSample
 
         // Starting with the most recent PointAtTime sample, iterate backwards while
         // the samples represent continuous motion.
         do {
-            val sample: PointAtTime = samples[index] ?: break
+            val sample: DataPointAtTime = samples[index] ?: break
 
             val age: Float = (newestSample.time - sample.time).toFloat()
             val delta: Float =
@@ -117,50 +204,66 @@ class VelocityTracker {
                 break
             }
 
-            oldestSample = sample
-            val position: Offset = sample.point
-            x.add(position.x)
-            y.add(position.y)
+            dataPoints.add(sample.dataPoint)
             time.add(-age)
             index = (if (index == 0) HistorySize else index) - 1
 
             sampleCount += 1
         } while (sampleCount < HistorySize)
 
-        if (sampleCount >= MinSampleSize) {
-            try {
-                val xFit: PolynomialFit = polyFitLeastSquares(time, x, 2)
-                val yFit: PolynomialFit = polyFitLeastSquares(time, y, 2)
-
-                // The 2nd coefficient is the derivative of the quadratic polynomial at
-                // x = 0, and that happens to be the last timestamp that we end up
-                // passing to polyFitLeastSquares for both x and y.
-                val xSlope = xFit.coefficients[1]
-                val ySlope = yFit.coefficients[1]
-                return VelocityEstimate(
-                    pixelsPerSecond = Offset(
-                        // Convert from pixels/ms to pixels/s
-                        (xSlope * 1000),
-                        (ySlope * 1000)
-                    ),
-                    confidence = xFit.confidence * yFit.confidence,
-                    durationMillis = newestSample.time - oldestSample.time,
-                    offset = newestSample.point - oldestSample.point
-                )
-            } catch (exception: IllegalArgumentException) {
-                // TODO(b/129494918): Is catching an exception here something we really want to do?
-                return VelocityEstimate.None
+        if (sampleCount >= minSampleSize) {
+            // Choose computation logic based on strategy.
+            // Multiply by "1000" to convert from units/ms to units/s
+            return when (strategy) {
+                Strategy.Impulse ->
+                    calculateImpulseVelocity(dataPoints, time, isDataDifferential) * 1000
+                Strategy.Lsq2 -> calculateLeastSquaresVelocity(dataPoints, time) * 1000
             }
         }
 
         // We're unable to make a velocity estimate but we did have at least one
         // valid pointer position.
-        return VelocityEstimate(
-            pixelsPerSecond = Offset.Zero,
-            confidence = 1.0f,
-            durationMillis = newestSample.time - oldestSample.time,
-            offset = newestSample.point - oldestSample.point
-        )
+        return 0f
+    }
+
+    /**
+     * Clears data points added by [addDataPoint].
+     */
+    fun resetTracking() {
+        samples.fill(element = null)
+        index = 0
+    }
+
+    /**
+     * Calculates velocity based on [Strategy.Lsq2]. The provided [time] entries are in "ms", and
+     * should be provided in reverse chronological order. The returned velocity is in "units/ms",
+     * where "units" is unit of the [dataPoints].
+     */
+    private fun calculateLeastSquaresVelocity(dataPoints: List<Float>, time: List<Float>): Float {
+        // The 2nd coefficient is the derivative of the quadratic polynomial at
+        // x = 0, and that happens to be the last timestamp that we end up
+        // passing to polyFitLeastSquares.
+        try {
+            return polyFitLeastSquares(time, dataPoints, 2)[1]
+        } catch (exception: IllegalArgumentException) {
+            return 0f
+        }
+    }
+}
+
+/**
+ * Extension to simplify either creating a new [DataPointAtTime] at an array index (if the index
+ * was never populated), or to update an existing [DataPointAtTime] (if the index had an existing
+ * element). This helps to have zero allocations on average, and avoid performance hit that can be
+ * caused by creating lots of objects.
+ */
+private fun Array<DataPointAtTime?>.set(index: Int, time: Long, dataPoint: Float) {
+    val currentEntry = this[index]
+    if (currentEntry == null) {
+        this[index] = DataPointAtTime(time, dataPoint)
+    } else {
+        currentEntry.time = time
+        currentEntry.dataPoint = dataPoint
     }
 }
 
@@ -214,48 +317,7 @@ fun VelocityTracker.addPointerInputChange(event: PointerInputChange) {
     addPosition(event.uptimeMillis, currentPointerPositionAccumulator)
 }
 
-private data class PointAtTime(val point: Offset, val time: Long)
-
-/**
- * A two dimensional velocity estimate.
- *
- * VelocityEstimates are computed by [VelocityTracker.getImpulseVelocity]. An
- * estimate's [confidence] measures how well the velocity tracker's position
- * data fit a straight line, [durationMillis] is the time that elapsed between the
- * first and last position sample used to compute the velocity, and [offset]
- * is similarly the difference between the first and last positions.
- *
- * See also:
- *
- *  * VelocityTracker, which computes [VelocityEstimate]s.
- *  * Velocity, which encapsulates (just) a velocity vector and provides some
- *    useful velocity operations.
- */
-private data class VelocityEstimate(
-    /** The number of pixels per second of velocity in the x and y directions. */
-    val pixelsPerSecond: Offset,
-    /**
-     * A value between 0.0 and 1.0 that indicates how well [VelocityTracker]
-     * was able to fit a straight line to its position data.
-     *
-     * The value of this property is 1.0 for a perfect fit, 0.0 for a poor fit.
-     */
-    val confidence: Float,
-    /**
-     * The time that elapsed between the first and last position sample used
-     * to compute [pixelsPerSecond].
-     */
-    val durationMillis: Long,
-    /**
-     * The difference between the first and last position sample used
-     * to compute [pixelsPerSecond].
-     */
-    val offset: Offset
-) {
-    companion object {
-        val None = VelocityEstimate(Offset.Zero, 1f, 0, Offset.Zero)
-    }
-}
+internal data class DataPointAtTime(var time: Long, var dataPoint: Float)
 
 /**
  *  TODO (shepshapard): If we want to support varying weights for each position, we could accept a
@@ -286,7 +348,7 @@ internal fun polyFitLeastSquares(
     /** The y-coordinates of each data point. */
     y: List<Float>,
     degree: Int
-): PolynomialFit {
+): List<Float> {
     if (degree < 1) {
         throw IllegalArgumentException("The degree must be at positive integer")
     }
@@ -371,41 +433,132 @@ internal fun polyFitLeastSquares(
         coefficients[i] /= r.get(i, i)
     }
 
-    // Calculate the coefficient of determination (confidence) as:
-    //   1 - (sumSquaredError / sumSquaredTotal)
-    // ...where sumSquaredError is the residual sum of squares (variance of the
-    // error), and sumSquaredTotal is the total sum of squares (variance of the
-    // data) where each has been weighted.
-    var yMean = 0.0f
-    for (h in 0 until m) {
-        yMean += y[h]
-    }
-    yMean /= m
-
-    var sumSquaredError = 0.0f
-    var sumSquaredTotal = 0.0f
-    for (h in 0 until m) {
-        var term = 1.0f
-        var err: Float = y[h] - coefficients[0]
-        for (i in 1 until n) {
-            term *= x[h]
-            err -= term * coefficients[i]
-        }
-        sumSquaredError += DefaultWeight * DefaultWeight * err * err
-        val v = y[h] - yMean
-        sumSquaredTotal += DefaultWeight * DefaultWeight * v * v
-    }
-
-    val confidence =
-        if (sumSquaredTotal <= 0.000001f) 1f else 1f - (sumSquaredError / sumSquaredTotal)
-
-    return PolynomialFit(coefficients, confidence)
+    return coefficients
 }
 
-internal data class PolynomialFit(
-    val coefficients: List<Float>,
-    val confidence: Float
-)
+/**
+ * Calculates velocity based on the Impulse strategy. The provided [time] entries are in "ms", and
+ * should be provided in reverse chronological order. The returned velocity is in "units/ms",
+ * where "units" is unit of the [dataPoints].
+ *
+ * Calculates the resulting velocity based on the total immpulse provided by the data ponits.
+ *
+ * The moving object in these calculations is the touchscreen (if we are calculating touch
+ * velocity), or any input device from which the data points are generated. We refer to this
+ * object as the "subject" below.
+ *
+ * Initial condition is discussed below, but for now suppose that v(t=0) = 0
+ *
+ * The kinetic energy of the object at the release is E=0.5*m*v^2
+ * Then vfinal = sqrt(2E/m). The goal is to calculate E.
+ *
+ * The kinetic energy at the release is equal to the total work done on the object by the finger.
+ * The total work W is the sum of all dW along the path.
+ *
+ * dW = F*dx, where dx is the piece of path traveled.
+ * Force is change of momentum over time, F = dp/dt = m dv/dt.
+ * Then substituting:
+ * dW = m (dv/dt) * dx = m * v * dv
+ *
+ * Summing along the path, we get:
+ * W = sum(dW) = sum(m * v * dv) = m * sum(v * dv)
+ * Since the mass stays constant, the equation for final velocity is:
+ * vfinal = sqrt(2*sum(v * dv))
+ *
+ * Here,
+ * dv : change of velocity = (v[i+1]-v[i])
+ * dx : change of distance = (x[i+1]-x[i])
+ * dt : change of time = (t[i+1]-t[i])
+ * v : instantaneous velocity = dx/dt
+ *
+ * The final formula is:
+ * vfinal = sqrt(2) * sqrt(sum((v[i]-v[i-1])*|v[i]|)) for all i
+ * The absolute value is needed to properly account for the sign. If the velocity over a
+ * particular segment descreases, then this indicates braking, which means that negative
+ * work was done. So for two positive, but decreasing, velocities, this contribution would be
+ * negative and will cause a smaller final velocity.
+ *
+ * Initial condition
+ * There are two ways to deal with initial condition:
+ * 1) Assume that v(0) = 0, which would mean that the subject is initially at rest.
+ * This is not entirely accurate. We are only taking the past X ms of touch data, where X is
+ * currently equal to 100. However, a touch event that created a fling probably lasted for longer
+ * than that, which would mean that the user has already been interacting with the subject, and
+ * it has probably already been moving.
+ * 2) Assume that the subject has already been moving at a certain velocity, calculate this
+ * initial velocity and the equivalent energy, and start with this initial energy.
+ * Consider an example where we have the following data, consisting of 3 points:
+ *                 time: t0, t1, t2
+ *                 x   : x0, x1, x2
+ *                 v   :  0, v1, v2
+ * Here is what will happen in each of these scenarios:
+ * 1) By directly applying the formula above with the v(0) = 0 boundary condition, we will get
+ * vfinal = sqrt(2*(|v1|*(v1-v0) + |v2|*(v2-v1))). This can be simplified since v0=0
+ * vfinal = sqrt(2*(|v1|*v1 + |v2|*(v2-v1))) = sqrt(2*(v1^2 + |v2|*(v2 - v1)))
+ * since velocity is a real number
+ * 2) If we treat the subject as already moving, then it must already have an energy (per mass)
+ * equal to 1/2*v1^2. Then the initial energy should be 1/2*v1*2, and only the second segment
+ * will contribute to the total kinetic energy (since we can effectively consider that v0=v1).
+ * This will give the following expression for the final velocity:
+ * vfinal = sqrt(2*(1/2*v1^2 + |v2|*(v2-v1)))
+ * This analysis can be generalized to an arbitrary number of samples.
+ *
+ *
+ * Comparing the two equations above, we see that the only mathematical difference
+ * is the factor of 1/2 in front of the first velocity term.
+ * This boundary condition would allow for the "proper" calculation of the case when all of the
+ * samples are equally spaced in time and distance, which should suggest a constant velocity.
+ *
+ * Note that approach 2) is sensitive to the proper ordering of the data in time, since
+ * the boundary condition must be applied to the oldest sample to be accurate.
+ */
+private fun calculateImpulseVelocity(
+    dataPoints: List<Float>,
+    time: List<Float>,
+    isDataDifferential: Boolean
+): Float {
+    val numDataPoints = dataPoints.size
+    if (numDataPoints < 2) {
+        return 0f
+    }
+    if (numDataPoints == 2) {
+        if (time[0] == time[1]) {
+            return 0f
+        }
+        val dataPointsDelta =
+            // For differential data ponits, each measurement reflects the amount of change in the
+            // subject's position. However, the first sample is discarded in computation because we
+            // don't know the time duration over which this change has occurred.
+            if (isDataDifferential) dataPoints[0]
+            else dataPoints[0] - dataPoints[1]
+        return dataPointsDelta / (time[0] - time[1])
+    }
+    var work = 0f
+    for (i in (numDataPoints - 1) downTo 1) {
+        if (time[i] == time[i - 1]) {
+            continue
+        }
+        val vPrev = kineticEnergyToVelocity(work)
+        val dataPointsDelta =
+            if (isDataDifferential) -dataPoints[i - 1]
+            else dataPoints[i] - dataPoints[i - 1]
+        val vCurr = dataPointsDelta / (time[i] - time[i - 1])
+        work += (vCurr - vPrev) * abs(vCurr)
+        if (i == (numDataPoints - 1)) {
+            work = (work * 0.5f)
+        }
+    }
+    return kineticEnergyToVelocity(work)
+}
+
+/**
+ * Calculates the velocity for a given [kineticEnergy], using the formula:
+ *          Kinetic Energy = 0.5 * mass * (velocity)^2
+ * where a mass of "1" is used.
+ */
+private fun kineticEnergyToVelocity(kineticEnergy: Float): Float {
+    return sign(kineticEnergy) * sqrt(2 * abs(kineticEnergy))
+}
 
 private class Vector(
     val length: Int

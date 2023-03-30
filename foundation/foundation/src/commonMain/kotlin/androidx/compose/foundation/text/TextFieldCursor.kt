@@ -23,6 +23,7 @@ import androidx.compose.animation.core.keyframes
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.MotionDurationScale
 import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -39,6 +40,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlin.math.floor
+import kotlinx.coroutines.withContext
 
 @Suppress("ModifierInspectorInfo")
 internal fun Modifier.cursor(
@@ -53,10 +55,13 @@ internal fun Modifier.cursor(
     val isWindowFocused = LocalWindowInfo.current.isWindowFocused
     if (state.hasFocus && value.selection.collapsed && isBrushSpecified && isWindowFocused) {
         LaunchedEffect(value.annotatedString, value.selection) {
-            // ensure that the value is always 1f _this_ frame by calling snapTo
-            cursorAlpha.snapTo(1f)
-            // then start the cursor blinking on animation clock (500ms on to start)
-            cursorAlpha.animateTo(0f, cursorAnimationSpec)
+            // Animate the cursor even when animations are disabled by the system.
+            withContext(FixedMotionDurationScale) {
+                // ensure that the value is always 1f _this_ frame by calling snapTo
+                cursorAlpha.snapTo(1f)
+                // then start the cursor blinking on animation clock (500ms on to start)
+                cursorAlpha.animateTo(0f, cursorAnimationSpec)
+            }
         }
         drawWithContent {
             this.drawContent()
@@ -100,3 +105,8 @@ private val cursorAnimationSpec: AnimationSpec<Float> = infiniteRepeatable(
 )
 
 internal expect val DefaultCursorThickness: Dp
+
+private object FixedMotionDurationScale : MotionDurationScale {
+    override val scaleFactor: Float
+        get() = 1f
+}

@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,12 +32,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.foundation.text.*
 import androidx.compose.foundation.text.Handle
 import androidx.compose.foundation.text.TextFieldScrollerPosition
 import androidx.compose.foundation.text.TextLayoutResultProxy
-import androidx.compose.foundation.text.maxLinesHeight
 import androidx.compose.foundation.text.textFieldScroll
 import androidx.compose.foundation.text.textFieldScrollable
 import androidx.compose.runtime.Composable
@@ -688,7 +686,7 @@ class TextFieldScrollTest {
             softWrap = isVertical,
             modifier = modifier
                 .testTag(TextfieldTag)
-                .maxLinesHeight(resolvedMaxLines, TextStyle.Default)
+                .heightInLines(textStyle = TextStyle.Default, maxLines = resolvedMaxLines)
                 .textFieldScrollable(scrollerPosition)
                 .textFieldScroll(
                     remember { scrollerPosition },

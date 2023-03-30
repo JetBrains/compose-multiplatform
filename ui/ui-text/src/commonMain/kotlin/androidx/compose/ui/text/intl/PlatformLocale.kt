@@ -52,7 +52,7 @@ internal interface PlatformLocaleDelegate {
      *
      * The implementation must return at least one locale.
      */
-    val current: List<PlatformLocale>
+    val current: LocaleList
 
     /**
      * Parse the IETF BCP47 compliant language tag.

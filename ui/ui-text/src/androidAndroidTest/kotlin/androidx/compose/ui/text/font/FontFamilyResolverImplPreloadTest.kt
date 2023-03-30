@@ -197,7 +197,7 @@ class FontFamilyResolverImplPreloadTest {
             fallbackFont
         )
         val deferred = testScope.async { subject.preload(fontFamily) }
-        testScope.advanceTimeBy(Font.MaximumAsyncTimeout)
+        testScope.advanceTimeBy(Font.MaximumAsyncTimeoutMillis)
         assertThat(deferred.isCompleted).isTrue()
         testScope.runBlockingTest {
             deferred.await() // actually throw here

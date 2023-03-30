@@ -18,7 +18,7 @@ package androidx.compose.foundation.gesture
 
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
 import androidx.compose.ui.Modifier
@@ -73,12 +73,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -111,12 +109,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -149,12 +145,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -197,12 +191,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -245,12 +237,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -301,12 +291,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -358,12 +346,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }
@@ -406,13 +392,11 @@ class AwaitTouchEventTest {
                 modifier = Modifier
                     .testTag("MyLongPressParent")
                     .pointerInput(Unit) {
-                        forEachGesture() {
-                            awaitPointerEventScope {
-                                while (true) {
-                                    val event = awaitPointerEvent(PointerEventPass.Final)
-                                    if (event.type == PointerEventType.Move) {
-                                        event.changes[0].consume()
-                                    }
+                        awaitEachGesture {
+                            while (true) {
+                                val event = awaitPointerEvent(PointerEventPass.Final)
+                                if (event.type == PointerEventType.Move) {
+                                    event.changes[0].consume()
                                 }
                             }
                         }
@@ -423,12 +407,10 @@ class AwaitTouchEventTest {
                     modifier = Modifier
                         .testTag("myLongPress")
                         .pointerInput(Unit) {
-                            forEachGesture {
-                                awaitPointerEventScope {
-                                    val down = awaitFirstDown(requireUnconsumed = false)
-                                    awaitLongPressOrCancellation(down.id)?.let {
-                                        counter++
-                                    }
+                            awaitEachGesture {
+                                val down = awaitFirstDown(requireUnconsumed = false)
+                                awaitLongPressOrCancellation(down.id)?.let {
+                                    counter++
                                 }
                             }
                         }

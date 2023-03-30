@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,13 +82,9 @@ interface LazyListLayoutInfo {
      * For example it is a bottom content padding for LazyColumn with reverseLayout set to false.
      */
     val afterContentPadding: Int get() = 0
-}
 
-/**
- * The spacing between lines in the direction of scrolling.
- */
-// This is part of the LazyListLayoutInfo interface upstream with commit
-// 2fb3084cd9d48755c92c6b4876b6d5bb77d7a8f2
-// Once we rebase over that commit, this should be removed
-internal val LazyListLayoutInfo.mainAxisItemSpacing: Int
-    get() = if (this is LazyListMeasureResult) mainAxisItemSpacingInternal else 0
+    /**
+     * The spacing between items in the direction of scrolling.
+     */
+    val mainAxisItemSpacing: Int get() = 0
+}

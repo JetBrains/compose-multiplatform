@@ -159,6 +159,35 @@ class TransformableTest {
     }
 
     @Test
+    fun transformable_panWithOneFinger() {
+        var cumulativePan = Offset.Zero
+        var touchSlop = 0f
+
+        setTransformableContent {
+            touchSlop = LocalViewConfiguration.current.touchSlop
+            Modifier.transformable(
+                state = rememberTransformableState { _, pan, _ ->
+                    cumulativePan += pan
+                }
+            )
+        }
+
+        val expected = Offset(50f + touchSlop, 0f)
+
+        rule.onNodeWithTag(TEST_TAG).performTouchInput {
+            down(1, center)
+            moveBy(1, expected)
+            up(1)
+        }
+
+        rule.mainClock.advanceTimeBy(milliseconds = 1000)
+
+        rule.runOnIdle {
+            assertWithMessage("Should have panned 20/10").that(cumulativePan).isEqualTo(expected)
+        }
+    }
+
+    @Test
     fun transformable_rotate() {
         var cumulativeRotation = 0f
 
@@ -290,8 +319,10 @@ class TransformableTest {
         val state = TransformableState { zoom, _, _ ->
             cumulativeScale *= zoom
         }
+        var slop: Float = 0f
 
         setTransformableContent {
+            slop = LocalViewConfiguration.current.touchSlop
             Modifier.transformable(state = state)
         }
 
@@ -302,7 +333,7 @@ class TransformableTest {
         rule.onNodeWithTag(TEST_TAG).performTouchInput {
             down(pointerId = 1, center)
             down(pointerId = 2, center + Offset(10f, 10f))
-            moveBy(2, Offset(20f, 20f))
+            moveBy(2, Offset(slop * 2, slop * 2))
         }
 
         assertThat(state.isTransformInProgress).isEqualTo(true)

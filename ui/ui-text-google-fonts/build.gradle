@@ -28,7 +28,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
 
-    implementation("androidx.compose.runtime:runtime:1.2.0")
+    implementation("androidx.compose.runtime:runtime:1.2.1")
     implementation(project(":compose:ui:ui-text"))
     implementation("androidx.core:core:1.8.0")
 
@@ -44,19 +44,10 @@ dependencies {
 androidx {
     name = "AndroidX Compose Google Fonts integration"
     type = LibraryType.PUBLISHED_LIBRARY
-    mavenGroup = LibraryGroups.COMPOSE_UI
     inceptionYear = "2022"
     description = "Compose Downloadable Fonts integration for Google Fonts"
 }
 
 android {
     namespace "androidx.compose.ui.text.googlefonts"
-}
-
-tasks.withType(KotlinCompile).configureEach {
-    kotlinOptions {
-        freeCompilerArgs += [
-                "-Xjvm-default=all",
-        ]
-    }
 }

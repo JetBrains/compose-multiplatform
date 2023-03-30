@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,16 @@
 package androidx.compose.foundation.text
 
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.ScrollableState
 import androidx.compose.foundation.gestures.rememberScrollableState
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.structuralEqualityPolicy
@@ -64,7 +67,7 @@ internal fun Modifier.textFieldScrollable(
     // do not reverse direction only in case of RTL in horizontal orientation
     val rtl = LocalLayoutDirection.current == LayoutDirection.Rtl
     val reverseDirection = scrollerPosition.orientation == Orientation.Vertical || !rtl
-    val controller = rememberScrollableState { delta ->
+    val scrollableState = rememberScrollableState { delta ->
         val newOffset = scrollerPosition.offset + delta
         val consumedDelta = when {
             newOffset > scrollerPosition.maximum ->
@@ -75,14 +78,32 @@ internal fun Modifier.textFieldScrollable(
         scrollerPosition.offset += consumedDelta
         consumedDelta
     }
+    // TODO: b/255557085 remove when / if rememberScrollableState exposes lambda parameters for
+    //  setting these
+    val wrappedScrollableState = remember(scrollableState, scrollerPosition) {
+        createScrollableState(scrollableState, scrollerPosition)
+    }
     val scroll = Modifier.scrollable(
         orientation = scrollerPosition.orientation,
         reverseDirection = reverseDirection,
-        state = controller,
+        state = wrappedScrollableState,
         interactionSource = interactionSource,
         enabled = enabled && scrollerPosition.maximum != 0f
     )
     scroll
+}
+
+// Workaround for K/JS
+private inline fun createScrollableState(
+    scrollableState: ScrollableState,
+    scrollerPosition: TextFieldScrollerPosition
+): ScrollableState {
+    return object : ScrollableState by scrollableState {
+        override val canScrollForward by derivedStateOf {
+            scrollerPosition.offset < scrollerPosition.maximum
+        }
+        override val canScrollBackward by derivedStateOf { scrollerPosition.offset > 0f }
+    }
 }
 
 // Layout

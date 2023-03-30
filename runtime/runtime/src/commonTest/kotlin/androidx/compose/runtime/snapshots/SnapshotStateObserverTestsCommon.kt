@@ -606,6 +606,119 @@ class SnapshotStateObserverTestsCommon {
         assertEquals(1, changes)
     }
 
+    @Test
+    fun testRecursiveApplyChanges_SingleRecursive() {
+        val stateObserver = SnapshotStateObserver { it() }
+        val state1 = mutableStateOf(0)
+        val state2 = mutableStateOf(0)
+        try {
+            stateObserver.start()
+            Snapshot.notifyObjectsInitialized()
+
+            val onChange: (ValueWrapper) -> Unit = { scope ->
+                if (scope.s == "scope" && state1.value < 2) {
+                    state1.value++
+                    Snapshot.sendApplyNotifications()
+                }
+            }
+
+            stateObserver.observeReads(ValueWrapper("scope"), onChange) {
+                state1.value
+                state2.value
+            }
+
+            repeat(10) {
+                stateObserver.observeReads(ValueWrapper("scope $it"), onChange) {
+                    state1.value
+                    state2.value
+                }
+            }
+
+            state1.value++
+            state2.value++
+
+            Snapshot.sendApplyNotifications()
+        } finally {
+            stateObserver.stop()
+        }
+    }
+
+    @Test
+    fun testRecursiveApplyChanges_MultiRecursive() {
+        val stateObserver = SnapshotStateObserver { it() }
+        val state1 = mutableStateOf(0)
+        val state2 = mutableStateOf(0)
+        val state3 = mutableStateOf(0)
+        val state4 = mutableStateOf(0)
+        try {
+            stateObserver.start()
+            Snapshot.notifyObjectsInitialized()
+
+            val onChange: (ValueWrapper) -> Unit = { scope ->
+                if (scope.s == "scope" && state1.value < 2) {
+                    state1.value++
+                    Snapshot.sendApplyNotifications()
+                    state2.value++
+                    Snapshot.sendApplyNotifications()
+                    state3.value++
+                    Snapshot.sendApplyNotifications()
+                    state4.value++
+                    Snapshot.sendApplyNotifications()
+                }
+            }
+
+            stateObserver.observeReads(ValueWrapper("scope"), onChange) {
+                state1.value
+                state2.value
+                state3.value
+                state4.value
+            }
+
+            repeat(10) {
+                stateObserver.observeReads(ValueWrapper("scope $it"), onChange) {
+                    state1.value
+                    state2.value
+                    state3.value
+                    state4.value
+                }
+            }
+
+            state1.value++
+            state2.value++
+            state3.value++
+            state4.value++
+
+            Snapshot.sendApplyNotifications()
+        } finally {
+            stateObserver.stop()
+        }
+    }
+
+    @Test
+    fun readingValueAfterClearInvalidates() {
+        var changes = 0
+
+        runSimpleTest { stateObserver, state ->
+            val changeBlock: (Any) -> Unit = { changes++ }
+            // record observation
+            val s = ValueWrapper("scope")
+            stateObserver.observeReads(s, changeBlock) {
+                // read state
+                state.value
+            }
+
+            // clear scope
+            stateObserver.clear(s)
+
+            // record again
+            stateObserver.observeReads(s, changeBlock) {
+                // read state
+                state.value
+            }
+        }
+        assertEquals(1, changes)
+    }
+
     private fun runSimpleTest(
         block: (modelObserver: SnapshotStateObserver, data: MutableState<Int>) -> Unit
     ) {

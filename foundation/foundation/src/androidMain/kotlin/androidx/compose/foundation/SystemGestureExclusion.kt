@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.toAndroidRect
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.OnGloballyPositionedModifier
 import androidx.compose.ui.layout.boundsInRoot
@@ -97,7 +96,13 @@ private class ExcludeFromSystemGestureModifier(
 
     override fun onGloballyPositioned(coordinates: LayoutCoordinates) {
         val newRect = if (exclusion == null) {
-            coordinates.boundsInRoot().toAndroidRect()
+            val boundsInRoot = coordinates.boundsInRoot()
+            android.graphics.Rect(
+                boundsInRoot.left.roundToInt(),
+                boundsInRoot.top.roundToInt(),
+                boundsInRoot.right.roundToInt(),
+                boundsInRoot.bottom.roundToInt()
+            )
         } else {
             calcBounds(coordinates, exclusion.invoke(coordinates))
         }

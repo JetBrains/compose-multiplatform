@@ -22,7 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.awaitLongPressOrCancellation
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -56,12 +56,10 @@ fun AwaitLongPressOrCancellationSample() {
                 .wrapContentSize(Alignment.Center)
                 .size(192.dp)
                 .pointerInput(Unit) {
-                    forEachGesture {
-                        awaitPointerEventScope {
-                            val down = awaitFirstDown(requireUnconsumed = false)
-                            awaitLongPressOrCancellation(down.id)?.let {
-                                count++
-                            }
+                    awaitEachGesture {
+                        val down = awaitFirstDown(requireUnconsumed = false)
+                        awaitLongPressOrCancellation(down.id)?.let {
+                            count++
                         }
                     }
                 }

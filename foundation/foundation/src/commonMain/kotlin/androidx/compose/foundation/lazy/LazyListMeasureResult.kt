@@ -51,7 +51,7 @@ internal class LazyListMeasureResult(
     /** see [LazyListLayoutInfo.afterContentPadding] */
     override val afterContentPadding: Int,
     /** see [LazyListLayoutInfo.mainAxisItemSpacing] */
-    val mainAxisItemSpacingInternal: Int
+    override val mainAxisItemSpacing: Int
 ) : LazyListLayoutInfo, MeasureResult by measureResult {
     override val viewportSize: IntSize
         get() = IntSize(width, height)

@@ -196,7 +196,7 @@ class FontListFontFamily internal constructor(
 }
 
 /**
- * Defines a font family with an generic font family name.
+ * Defines a font family with a generic font family name.
  *
  * If the platform cannot find the passed generic font family, use the platform default one.
  *

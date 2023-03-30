@@ -18,7 +18,6 @@ package androidx.compose.ui.text.font
 
 import android.content.Context
 import android.graphics.Typeface
-import androidx.compose.ui.text.ExperimentalTextApi
 
 /**
  * Describes a system-installed font that may be present on some Android devices.
@@ -53,7 +52,6 @@ import androidx.compose.ui.text.ExperimentalTextApi
  *
  * @throws IllegalArgumentException if familyName is empty
  */
-@ExperimentalTextApi
 fun Font(
     familyName: DeviceFontFamilyName,
     weight: FontWeight = FontWeight.Normal,
@@ -72,7 +70,6 @@ fun Font(
  * @param name System fontFamilyName as passed to [Typeface.create]
  * @throws IllegalArgumentException if name is empty
  */
-@ExperimentalTextApi
 @JvmInline
 value class DeviceFontFamilyName(val name: String) {
     init {
@@ -80,7 +77,6 @@ value class DeviceFontFamilyName(val name: String) {
     }
 }
 
-@ExperimentalTextApi
 private class DeviceFontFamilyNameFont constructor(
     private val familyName: DeviceFontFamilyName,
     override val weight: FontWeight,
@@ -126,7 +122,6 @@ private class DeviceFontFamilyNameFont constructor(
     }
 }
 
-@ExperimentalTextApi
 private object NamedFontLoader : AndroidFont.TypefaceLoader {
     override fun loadBlocking(context: Context, font: AndroidFont): Typeface? {
         return (font as? DeviceFontFamilyNameFont)?.loadCached(context)

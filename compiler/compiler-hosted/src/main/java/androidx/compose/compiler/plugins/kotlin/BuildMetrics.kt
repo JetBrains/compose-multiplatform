@@ -17,13 +17,13 @@
 package androidx.compose.compiler.plugins.kotlin
 
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
-import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.knownStable
 import androidx.compose.compiler.plugins.kotlin.analysis.knownUnstable
+import androidx.compose.compiler.plugins.kotlin.analysis.stabilityOf
 import androidx.compose.compiler.plugins.kotlin.lower.ComposableFunctionBodyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.IrSourcePrinterVisitor
 import androidx.compose.compiler.plugins.kotlin.lower.isUnitOrNullableUnit
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import java.io.File
 import org.jetbrains.kotlin.ir.ObsoleteDescriptorBasedAPI
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrField
@@ -37,8 +37,8 @@ import org.jetbrains.kotlin.ir.util.fqNameForIrSerialization
 import org.jetbrains.kotlin.js.resolve.diagnostics.findPsi
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.psi.KtParameter
-import java.io.File
 
+@JvmDefaultWithCompatibility
 interface FunctionMetrics {
     val isEmpty: Boolean get() = false
     val packageName: FqName
@@ -82,6 +82,7 @@ interface FunctionMetrics {
     fun print(out: Appendable, src: IrSourcePrinterVisitor)
 }
 
+@JvmDefaultWithCompatibility
 interface ModuleMetrics {
     val isEmpty get() = false
 
@@ -190,9 +191,7 @@ object EmptyFunctionMetrics : FunctionMetrics {
 
 class ModuleMetricsImpl(
     var name: String,
-    context: IrPluginContext
 ) : ModuleMetrics {
-    val stabilityInferencer = StabilityInferencer(context)
     private var skippableComposables = 0
     private var restartableComposables = 0
     private var readonlyComposables = 0
@@ -250,7 +249,7 @@ class ModuleMetricsImpl(
                 }
                 if (field.name == KtxNameConventions.STABILITY_FLAG) continue
                 append("  ")
-                val fieldStability = stabilityInferencer.stabilityOf(field.type)
+                val fieldStability = stabilityOf(field.type)
                 append("${fieldStability.simpleHumanReadable()} ")
                 append(if (isVar) "var " else "val ")
                 append(field.name.asString())

@@ -46,6 +46,8 @@ class ModifierInfoTest : ToolingTest() {
     @Test
     fun testBounds() {
         val slotTableRecord = CompositionDataRecord.create()
+        val graphicsLayer = Modifier.graphicsLayer()
+
         show {
             Inspectable(slotTableRecord) {
                 with(LocalDensity.current) {
@@ -53,7 +55,10 @@ class ModifierInfoTest : ToolingTest() {
                     val px5 = 5f.toDp()
                     Box {
                         Column(
-                            Modifier.padding(px10).graphicsLayer().background(color = Color.Blue)
+                            Modifier
+                                .padding(px10)
+                                .then(graphicsLayer)
+                                .background(color = Color.Blue)
                         ) {
                             Box(Modifier.padding(px5).size(px5))
                         }
@@ -101,10 +106,10 @@ class ModifierInfoTest : ToolingTest() {
                 columnModifierInfo[0].modifier is LayoutModifier
             )
             assertEquals(0f, columnModifierInfo[0].coordinates.positionInRoot().x)
-            assertTrue(
-                "The second modifier in the column should be a LayoutModifier" +
+            assertEquals(
+                "The second modifier in the column should be the graphicsLayer" +
                     "but was ${columnModifierInfo[1].modifier}",
-                columnModifierInfo[1].modifier is LayoutModifier
+                graphicsLayer, columnModifierInfo[1].modifier
             )
             assertTrue(columnModifierInfo[2].extra is GraphicLayerInfo)
             assertEquals(10f, columnModifierInfo[1].coordinates.positionInRoot().x)

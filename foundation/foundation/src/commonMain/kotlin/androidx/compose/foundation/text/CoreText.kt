@@ -38,6 +38,7 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerHoverIcon
@@ -313,6 +314,16 @@ internal class TextController(val state: TextState) : RememberObserver {
             measurables: List<Measurable>,
             constraints: Constraints
         ): MeasureResult {
+            // Reading this state here ensures that we invalidate measure every time we update the
+            // text delegate. That is effectively what was happening before, by accident of how
+            // setting the modifier always invalidated measure, but this CL changes that so we have
+            // to do it manually.
+            // In the future, we shouldn't always invalidate measure just because the delegate
+            // changes – we should only do so when specific things change that actually require
+            // re-measuring. But that's part of the text effort to rewrite all this code with
+            // Modifier.Node. Since the old code was already "over-invalidating", this change keeps
+            // that behavior and is no worse (except for the additional state write/read).
+            state.layoutInvalidation
             // NOTE(text-perf-review): current implementation of layout means that layoutResult
             // will _never_ be the same instance. We should try and fast path case where
             // everything is the same and return same instance in that case.
@@ -433,22 +444,32 @@ internal class TextController(val state: TextState) : RememberObserver {
             state.layoutResult?.let {
                 state.drawScopeInvalidation
                 val selection = selectionRegistrar?.subselections?.get(state.selectableId)
+                val lastVisibleOffset = state.selectable?.getLastVisibleOffset() ?: 0
 
                 if (selection != null) {
                     val start = if (!selection.handlesCrossed) {
                         selection.start.offset
                     } else {
                         selection.end.offset
-                    }
+                    }.coerceIn(0, lastVisibleOffset)
+                    // selection path should end at the last visible character.
                     val end = if (!selection.handlesCrossed) {
                         selection.end.offset
                     } else {
                         selection.start.offset
-                    }
+                    }.coerceIn(0, lastVisibleOffset)
 
                     if (start != end) {
                         val selectionPath = it.multiParagraph.getPathForRange(start, end)
-                        drawPath(selectionPath, state.selectionBackgroundColor)
+                        // clip selection path drawing so that it doesn't overflow, unless
+                        // overflow is also TextOverflow.Visible
+                        if (it.layoutInput.overflow == TextOverflow.Visible) {
+                            drawPath(selectionPath, state.selectionBackgroundColor)
+                        } else {
+                            clipRect {
+                                drawPath(selectionPath, state.selectionBackgroundColor)
+                            }
+                        }
                     }
                 }
                 drawIntoCanvas { canvas ->
@@ -493,6 +514,13 @@ internal class TextController(val state: TextState) : RememberObserver {
 
     val modifiers: Modifier
         get() = coreModifiers
+            // This is more correct here since before this modifier was created once, with the
+            // initial style and minLines, and then never got updates to those values. Here it gets
+            // created every time it's read, i.e. every recomposition, so it will always have the
+            // latest values.
+            // Also, there is no need to pass state.textDelegate.maxLines here as it is passed to
+            // MultiParagraph computation anyway.
+            .heightInLines(state.textDelegate.style, state.textDelegate.minLines)
             .then(semanticsModifier)
             .then(selectionModifiers)
 
@@ -521,8 +549,7 @@ internal class TextController(val state: TextState) : RememberObserver {
 @OptIn(InternalFoundationTextApi::class)
 /*@VisibleForTesting*/
 internal class TextState(
-    /** Should *NEVER* be set directly, only through [TextController.setTextDelegate] */
-    var textDelegate: TextDelegate,
+    textDelegate: TextDelegate,
     /** The selectable Id assigned to the [selectable] */
     val selectableId: Long
 ) {
@@ -533,6 +560,13 @@ internal class TextState(
 
     /** The last layout coordinates for the Text's layout, used by selection */
     var layoutCoordinates: LayoutCoordinates? = null
+
+    /** Should *NEVER* be set directly, only through [TextController.setTextDelegate] */
+    var textDelegate: TextDelegate = textDelegate
+        set(value) {
+            layoutInvalidation = Unit
+            field = value
+        }
 
     /** The latest TextLayoutResult calculated in the measure block.*/
     var layoutResult: TextLayoutResult? = null
@@ -550,6 +584,8 @@ internal class TextState(
     /** Read in draw scopes to invalidate when layoutResult  */
     var drawScopeInvalidation by mutableStateOf(Unit, neverEqualPolicy())
         private set
+    var layoutInvalidation by mutableStateOf(Unit, neverEqualPolicy())
+        private set
 }
 
 /**
@@ -566,6 +602,7 @@ internal fun updateTextDelegate(
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = DefaultMinLines,
     placeholders: List<AnnotatedString.Range<Placeholder>>
 ): TextDelegate {
     // NOTE(text-perf-review): whenever we have remember intrinsic implemented, this might be a
@@ -575,6 +612,7 @@ internal fun updateTextDelegate(
         current.softWrap != softWrap ||
         current.overflow != overflow ||
         current.maxLines != maxLines ||
+        current.minLines != minLines ||
         current.density != density ||
         current.placeholders != placeholders ||
         current.fontFamilyResolver !== fontFamilyResolver
@@ -585,6 +623,7 @@ internal fun updateTextDelegate(
             softWrap = softWrap,
             overflow = overflow,
             maxLines = maxLines,
+            minLines = minLines,
             density = density,
             fontFamilyResolver = fontFamilyResolver,
             placeholders = placeholders,
@@ -604,6 +643,7 @@ internal fun updateTextDelegate(
     softWrap: Boolean = true,
     overflow: TextOverflow = TextOverflow.Clip,
     maxLines: Int = Int.MAX_VALUE,
+    minLines: Int = DefaultMinLines,
 ): TextDelegate {
     // NOTE(text-perf-review): whenever we have remember intrinsic implemented, this might be a
     // lot slower than the equivalent `remember(a, b, c, ...) { ... }` call.
@@ -612,6 +652,7 @@ internal fun updateTextDelegate(
         current.softWrap != softWrap ||
         current.overflow != overflow ||
         current.maxLines != maxLines ||
+        current.minLines != minLines ||
         current.density != density ||
         current.fontFamilyResolver !== fontFamilyResolver
     ) {
@@ -621,6 +662,7 @@ internal fun updateTextDelegate(
             softWrap = softWrap,
             overflow = overflow,
             maxLines = maxLines,
+            minLines = minLines,
             density = density,
             fontFamilyResolver = fontFamilyResolver,
         )

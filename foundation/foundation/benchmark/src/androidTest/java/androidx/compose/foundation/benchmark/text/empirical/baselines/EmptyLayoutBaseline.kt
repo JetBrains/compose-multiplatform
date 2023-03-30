@@ -16,6 +16,7 @@
 
 package androidx.compose.foundation.benchmark.text.empirical.baselines
 
+import androidx.compose.foundation.benchmark.text.DoFullBenchmark
 import androidx.compose.foundation.benchmark.text.empirical.AllApps
 import androidx.compose.foundation.benchmark.text.empirical.ChatApps
 import androidx.compose.foundation.benchmark.text.empirical.generateCacheableStringOf
@@ -31,6 +32,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.test.filters.LargeTest
+import org.junit.Assume
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -124,5 +126,10 @@ class ChatAppEmptyLayoutBaselineBaseline(size: Int) : EmptyLayoutBaselineParent(
         @JvmStatic
         @Parameterized.Parameters(name = "size={0}")
         fun initParameters(): Array<Any> = ChatApps.TextLengths
+    }
+
+    init {
+        // we only need this for full reporting
+        Assume.assumeTrue(DoFullBenchmark)
     }
 }

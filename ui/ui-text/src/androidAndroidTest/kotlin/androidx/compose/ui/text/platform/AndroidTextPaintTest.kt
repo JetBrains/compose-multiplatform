@@ -19,6 +19,7 @@ package androidx.compose.ui.text.platform
 import android.graphics.Paint
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
@@ -495,6 +496,19 @@ class AndroidTextPaintTest {
 
         textPaint.setDrawStyle(null)
         assertThat(textPaint.style).isEqualTo(Paint.Style.STROKE)
+    }
+
+    @Test
+    fun blendMode_defaultValue() {
+        val textPaint = defaultTextPaint
+        assertThat(textPaint.blendMode).isEqualTo(BlendMode.SrcOver)
+    }
+
+    @Test
+    fun setBlendMode_toDstOver() {
+        val textPaint = defaultTextPaint
+        textPaint.blendMode = BlendMode.DstOver
+        assertThat(textPaint.blendMode).isEqualTo(BlendMode.DstOver)
     }
 
     private val defaultTextPaint get() = AndroidTextPaint(flags = 0, density = 1.0f)

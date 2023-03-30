@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -80,13 +80,9 @@ sealed interface LazyGridLayoutInfo {
      * For example it is a bottom content padding for LazyVerticalGrid with reverseLayout set to false.
      */
     val afterContentPadding: Int
-}
 
-/**
- * The spacing between lines in the direction of scrolling.
- */
-// This is part of the LazyGridLayoutInfo interface upstream with commit
-// 2fb3084cd9d48755c92c6b4876b6d5bb77d7a8f2
-// Once we rebase over that commit, this should be removed
-internal val LazyGridLayoutInfo.mainAxisItemSpacing: Int
-    get() = if (this is LazyGridMeasureResult) mainAxisItemSpacingInternal else 0
+    /**
+     * The spacing between lines in the direction of scrolling.
+     */
+    val mainAxisItemSpacing: Int
+}

@@ -568,6 +568,6 @@ class OneDimensionalFocusSearchNextTest {
             focusManager = LocalFocusManager.current
             composable()
         }
-        rule.runOnIdle { (focusManager as FocusManagerImpl).takeFocus() }
+        rule.runOnIdle { (focusManager as FocusOwnerImpl).takeFocus() }
     }
 }

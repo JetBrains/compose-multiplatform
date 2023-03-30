@@ -47,7 +47,9 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.focus.onFocusEvent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.drawscope.ContentDrawScope
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.semantics
@@ -132,6 +134,12 @@ class ModifiersBenchmark(
                     CircleShape
                 )
             },
+            *modifier("graphicsLayer") {
+                Modifier.graphicsLayer(
+                    translationX = if (it) 1f else 2f,
+                    shape = if (it) RectangleShape else CircleShape
+                )
+            }
         )
 
         private val focusRequester = FocusRequester()

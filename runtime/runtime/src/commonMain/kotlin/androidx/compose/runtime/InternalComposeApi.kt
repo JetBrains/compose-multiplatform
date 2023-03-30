@@ -26,4 +26,5 @@ package androidx.compose.runtime
     AnnotationTarget.FUNCTION,
     AnnotationTarget.PROPERTY
 )
+@Retention(AnnotationRetention.BINARY)
 annotation class InternalComposeApi

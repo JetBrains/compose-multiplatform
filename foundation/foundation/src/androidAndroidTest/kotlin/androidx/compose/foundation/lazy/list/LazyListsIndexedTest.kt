@@ -16,15 +16,25 @@
 
 package androidx.compose.foundation.lazy.list
 
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.ScrollableDefaults
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyList
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.assertIsDisplayed
@@ -43,11 +53,10 @@ class LazyListsIndexedTest {
     val rule = createComposeRule()
 
     @Test
-    fun lazyColumnShowsIndexedItems() {
+    fun lazyColumnShowsIndexedItems_zeroBeyondBoundsItemCount() {
         val items = (1..4).map { it.toString() }
-
         rule.setContent {
-            LazyColumn(Modifier.height(200.dp)) {
+            LazyColumn(Modifier.height(200.dp), beyondBoundsItemCount = 0) {
                 itemsIndexed(items) { index, item ->
                     Spacer(
                         Modifier.height(101.dp).fillParentMaxWidth()
@@ -71,9 +80,35 @@ class LazyListsIndexedTest {
     }
 
     @Test
+    fun lazyColumnShowsIndexedItems_withBeyondBoundsItemCount() {
+        val items = (1..4).map { it.toString() }
+        rule.setContent {
+            LazyColumn(Modifier.height(200.dp), beyondBoundsItemCount = 1) {
+                itemsIndexed(items) { index, item ->
+                    Spacer(
+                        Modifier.height(101.dp).fillParentMaxWidth()
+                            .testTag("$index-$item")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0-1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1-2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2-3")
+            .assertExists()
+
+        rule.onNodeWithTag("3-4")
+            .assertDoesNotExist()
+    }
+
+    @Test
     fun columnWithIndexesComposedWithCorrectIndexAndItem() {
         val items = (0..1).map { it.toString() }
-
         rule.setContent {
             LazyColumn(Modifier.height(200.dp)) {
                 itemsIndexed(items) { index, item ->
@@ -92,11 +127,10 @@ class LazyListsIndexedTest {
     }
 
     @Test
-    fun lazyRowShowsIndexedItems() {
+    fun lazyRowShowsIndexedItems_zeroBeyondBoundsItemCount() {
         val items = (1..4).map { it.toString() }
-
         rule.setContent {
-            LazyRow(Modifier.width(200.dp)) {
+            LazyRow(Modifier.width(200.dp), beyondBoundsItemCount = 0) {
                 itemsIndexed(items) { index, item ->
                     Spacer(
                         Modifier.width(101.dp).fillParentMaxHeight()
@@ -114,6 +148,33 @@ class LazyListsIndexedTest {
 
         rule.onNodeWithTag("2-3")
             .assertDoesNotExist()
+
+        rule.onNodeWithTag("3-4")
+            .assertDoesNotExist()
+    }
+
+    @Test
+    fun lazyRowShowsIndexedItems_withBeyondBoundsItemCount() {
+        val items = (1..4).map { it.toString() }
+        rule.setContent {
+            LazyRow(Modifier.width(200.dp), beyondBoundsItemCount = 1) {
+                itemsIndexed(items) { index, item ->
+                    Spacer(
+                        Modifier.width(101.dp).fillParentMaxHeight()
+                            .testTag("$index-$item")
+                    )
+                }
+            }
+        }
+
+        rule.onNodeWithTag("0-1")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("1-2")
+            .assertIsDisplayed()
+
+        rule.onNodeWithTag("2-3")
+            .assertExists()
 
         rule.onNodeWithTag("3-4")
             .assertDoesNotExist()
@@ -139,4 +200,62 @@ class LazyListsIndexedTest {
         rule.onNodeWithText("1x1")
             .assertLeftPositionInRootIsEqualTo(100.dp)
     }
+}
+
+@Composable
+private fun LazyColumn(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    verticalArrangement: Arrangement.Vertical =
+        if (!reverseLayout) Arrangement.Top else Arrangement.Bottom,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    beyondBoundsItemCount: Int,
+    content: LazyListScope.() -> Unit
+) {
+    LazyList(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        flingBehavior = flingBehavior,
+        horizontalAlignment = horizontalAlignment,
+        verticalArrangement = verticalArrangement,
+        isVertical = true,
+        reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        beyondBoundsItemCount = beyondBoundsItemCount,
+        content = content
+    )
+}
+
+@Composable
+private fun LazyRow(
+    modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
+    contentPadding: PaddingValues = PaddingValues(0.dp),
+    reverseLayout: Boolean = false,
+    horizontalArrangement: Arrangement.Horizontal =
+        if (!reverseLayout) Arrangement.Start else Arrangement.End,
+    verticalAlignment: Alignment.Vertical = Alignment.Top,
+    flingBehavior: FlingBehavior = ScrollableDefaults.flingBehavior(),
+    userScrollEnabled: Boolean = true,
+    beyondBoundsItemCount: Int,
+    content: LazyListScope.() -> Unit
+) {
+    LazyList(
+        modifier = modifier,
+        state = state,
+        contentPadding = contentPadding,
+        verticalAlignment = verticalAlignment,
+        horizontalArrangement = horizontalArrangement,
+        isVertical = false,
+        flingBehavior = flingBehavior,
+        reverseLayout = reverseLayout,
+        userScrollEnabled = userScrollEnabled,
+        beyondBoundsItemCount = beyondBoundsItemCount,
+        content = content
+    )
 }
