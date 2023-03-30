@@ -2,23 +2,91 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.BoxWithConstraintsScope
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
+import androidx.compose.ui.graphics.withSave
+import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import example.imageviewer.model.ScalableState
-import example.imageviewer.model.addDragAmount
-import example.imageviewer.model.addScale
-import example.imageviewer.model.setScale
+import example.imageviewer.utils.onPointerEvent
+import kotlin.math.min
+import kotlin.math.pow
 
-expect fun Modifier.addUserInput(state: ScalableState): Modifier
+@Composable
+internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
+    BoxWithConstraints {
+        val areaSize = areaSize
+        val imageSize = image.size
+        val imageCenter = Offset(image.width / 2f, image.height / 2f)
+        val areaCenter = Offset(areaSize.width / 2f, areaSize.height / 2f)
 
-fun Modifier.addTouchUserInput(state: ScalableState): Modifier =
-    pointerInput(Unit) {
-        detectTransformGestures { _, pan, zoom, _ ->
-            state.addDragAmount(pan)
-            state.addScale(zoom - 1f)
+        if (areaSize.width > 0 && areaSize.height > 0) {
+            DisposableEffect(Unit) {
+                scalableState.setScale(
+                    min(areaSize.width / imageSize.width, areaSize.height / imageSize.height),
+                    Offset.Zero,
+                )
+                onDispose { }
+            }
         }
-    }.pointerInput(Unit) {
-        detectTapGestures(
-            onDoubleTap = { state.setScale(1f) }
+
+        Box(
+            modifier
+                .drawWithContent {
+                    drawIntoCanvas {
+                        it.withSave {
+                            it.translate(areaCenter.x, areaCenter.y)
+                            it.translate(scalableState.offset.x, scalableState.offset.y)
+                            it.scale(scalableState.scale, scalableState.scale)
+                            it.translate(-imageCenter.x, -imageCenter.y)
+                            drawImage(image)
+                        }
+                    }
+                }
+                .pointerInput(Unit) {
+                    detectTransformGestures { centroid, pan, zoom, _ ->
+                        scalableState.addPan(pan)
+                        scalableState.addScale(zoom, centroid - areaCenter)
+                    }
+                }
+                .onPointerEvent(PointerEventType.Scroll) {
+                    val centroid = it.changes[0].position
+                    val delta = it.changes[0].scrollDelta
+                    val zoom = 1.2f.pow(-delta.y)
+                    scalableState.addScale(zoom, centroid - areaCenter)
+                }
+                .pointerInput(Unit) {
+                    detectTapGestures(onDoubleTap = { position ->
+                        scalableState.setScale(
+                            if (scalableState.scale > 2.0) {
+                                scalableState.scaleLimits.start
+                            } else {
+                                scalableState.scaleLimits.endInclusive
+                            },
+                            position - areaCenter
+                        )
+                    }) { }
+                },
         )
+
+        SideEffect {
+            scalableState.limitTargetInsideArea(areaSize, imageSize)
+        }
+    }
+}
+
+private val ImageBitmap.size get() = Size(width.toFloat(), height.toFloat())
+
+private val BoxWithConstraintsScope.areaSize
+    @Composable get() = with(LocalDensity.current) {
+        Size(maxWidth.toPx(), maxHeight.toPx())
     }
