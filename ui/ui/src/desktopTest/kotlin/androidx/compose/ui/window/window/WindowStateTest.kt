@@ -450,7 +450,9 @@ class WindowStateTest {
     }
 
     @Test
-    fun `window state size and position determine unmaximized state`() = runApplicationTest {
+    fun `window state size and position determine unmaximized state`() = runApplicationTest(
+        useDelay = true
+    ) {
         // On Linux the behaviour generally works, but this test fails because the size after
         // un-maximizing it not exactly as expected. Perhaps the window insets are not included
         // somewhere in AWT.
@@ -665,7 +667,7 @@ class WindowStateTest {
     @Test
     fun `set window size by its content`() = runApplicationTest(useDelay = isLinux) {
         lateinit var window: ComposeWindow
-        val state = WindowState(size = DpSize(Dp.Unspecified, Dp.Unspecified))
+        val state = WindowState(size = DpSize.Unspecified)
 
         launchTestApplication {
             Window(
