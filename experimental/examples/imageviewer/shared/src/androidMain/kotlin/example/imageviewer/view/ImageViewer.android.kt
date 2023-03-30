@@ -7,6 +7,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import example.imageviewer.*
+import example.imageviewer.storage.AndroidImageStorage
 import example.imageviewer.style.ImageViewerTheme
 import kotlinx.coroutines.CoroutineScope
 
@@ -26,5 +27,5 @@ private fun getDependencies(context: Context, ioScope: CoroutineScope) = object 
             Toast.makeText(context, text, Toast.LENGTH_SHORT).show()
         }
     }
-    override val imageStorage: ImageStorage = AndroidImageStorage(pictures, ioScope)
+    override val imageStorage: ImageStorage = AndroidImageStorage(pictures, ioScope, context)
 }
