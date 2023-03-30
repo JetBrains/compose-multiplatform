@@ -320,15 +320,16 @@ private fun Project.isMultiplatformPublicationEnabled(): Boolean {
 }
 
 private fun Project.configureMultiplatformPublication(componentFactory: SoftwareComponentFactory) {
-    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>()!!
+//    TODO: [1.4 Update] workaround for mpp publication -- disable android
 
-    multiplatformExtension.targets.all { target ->
-        if (target is KotlinAndroidTarget) {
-            target.publishLibraryVariants(
-                Release.DEFAULT_PUBLISH_CONFIG
-            )
-        }
-    }
+//    val multiplatformExtension = extensions.findByType<KotlinMultiplatformExtension>()!!
+//    multiplatformExtension.targets.all { target ->
+//        if (target is KotlinAndroidTarget) {
+//            target.publishLibraryVariants(
+//                Release.DEFAULT_PUBLISH_CONFIG
+//            )
+//        }
+//    }
 
     replaceBaseMultiplatformPublication(componentFactory)
 }
