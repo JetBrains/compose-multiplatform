@@ -38,5 +38,4 @@ internal actual fun NativeKeyEvent.toPointerKeyboardModifiers(): PointerKeyboard
 internal actual fun InspectorInfo.tryPopulateReflectively(
     element: ModifierNodeElement<*>
 ) {
-    // TODO: [1.4 Update] implement it (see todo from Google)
 }
