@@ -144,7 +144,9 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         project.configureMavenArtifactUpload(extension, componentFactory)
         project.configureExternalDependencyLicenseCheck()
         project.configureProjectStructureValidation(extension)
-        project.configureProjectVersionValidation(extension)
+        // TODO: [1.4 Update] check that it is not needed
+        //   This validation is not needed for JetBrains Fork, since they usually set in a force way
+//        project.configureProjectVersionValidation(extension)
         project.registerProjectOrArtifact()
         project.addCreateLibraryBuildInfoFileTasks(extension)
 

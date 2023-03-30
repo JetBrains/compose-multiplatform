@@ -286,11 +286,13 @@ open class AndroidXExtension(val project: Project) {
     }
 
     private fun isGroupVersionOverrideAllowed(): Boolean {
+        // TODO: [1.4 Update] seems that for JetBrains fork version override is always allowed to build publications
+        return true
         // Grant an exception to the same-version-group policy for artifacts that haven't shipped a
         // stable API surface, e.g. 1.0.0-alphaXX, to allow for rapid early-stage development.
-        val version = mavenVersion
-        return version != null && version.major == 1 && version.minor == 0 && version.patch == 0 &&
-            version.isAlpha()
+//        val version = mavenVersion
+//        return version != null && version.major == 1 && version.minor == 0 && version.patch == 0 &&
+//            version.isAlpha()
     }
 
     private var versionIsSet = false
