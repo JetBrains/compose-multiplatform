@@ -84,8 +84,6 @@ internal fun FullscreenImageScreen(
                 )
                 ZoomControllerView(Modifier, scalableState)
             }
-        } else {
-            LoadingScreen()
         }
 
         TopLayout(

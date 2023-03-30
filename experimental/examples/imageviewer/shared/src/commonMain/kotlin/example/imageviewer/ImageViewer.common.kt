@@ -13,7 +13,6 @@ enum class ExternalImageViewerEvent {
     Escape,
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun ImageViewerCommon(
     dependencies: Dependencies

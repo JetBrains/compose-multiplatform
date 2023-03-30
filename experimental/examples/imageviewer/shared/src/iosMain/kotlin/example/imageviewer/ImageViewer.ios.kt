@@ -17,14 +17,14 @@ internal fun ImageViewerIos() {
     val dependencies = remember(ioScope) { getDependencies(ioScope, toastState) }
 
     ImageViewerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize()
-        ) {
+//        Surface( // TODO: add Surface after fixing a crash in newer version of Compose
+//            modifier = Modifier.fillMaxSize()
+//        ) {
             ImageViewerCommon(
                 dependencies = dependencies
             )
             Toast(toastState)
-        }
+//        }
     }
 }
 
