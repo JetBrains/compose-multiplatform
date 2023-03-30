@@ -7,12 +7,15 @@ RUN dpkg-reconfigure -f noninteractive dash
 
 RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     gnupg2 \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     python3 \
     python-is-python3 \
     unzip \
     wget
 
+ENV JAVA_HOME=/usr/lib/jvm/java-17-amazon-corretto
+COPY --from=amazoncorretto:17 $JAVA_HOME $JAVA_HOME
+ENV PATH=$JAVA_HOME/bin:$PATH
 
 ARG CHROME_VERSION="google-chrome-stable"
 RUN wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | apt-key add -
