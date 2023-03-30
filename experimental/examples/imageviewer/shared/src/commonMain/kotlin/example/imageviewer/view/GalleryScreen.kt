@@ -125,21 +125,19 @@ private fun SquaresGalleryView(
     selectedImage: PictureData?,
     onSelect: (PictureData) -> Unit,
 ) {
-    Column {
-        Spacer(Modifier.height(4.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 130.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            itemsIndexed(images) { idx, picture ->
-                val isSelected = picture == selectedImage
-                SquareThumbnail(
-                    picture = picture,
-                    onClick = { onSelect(picture) },
-                    isHighlighted = isSelected
-                )
-            }
+    LazyVerticalGrid(
+        modifier = Modifier.padding(top = 4.dp),
+        columns = GridCells.Adaptive(minSize = 130.dp),
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+        horizontalArrangement = Arrangement.spacedBy(1.dp)
+    ) {
+        itemsIndexed(images) { idx, picture ->
+            val isSelected = picture == selectedImage
+            SquareThumbnail(
+                picture = picture,
+                onClick = { onSelect(picture) },
+                isHighlighted = isSelected
+            )
         }
     }
 }
