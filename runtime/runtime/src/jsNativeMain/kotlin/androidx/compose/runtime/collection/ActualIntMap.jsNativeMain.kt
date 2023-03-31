@@ -17,57 +17,41 @@
 package androidx.compose.runtime.collection
 
 internal actual class IntMap<E> actual constructor() {
-    private val DELETED = Any()
-    private var keys = IntArray(10)
-    private var _size = 0
-    private var values = Array<Any?>(10) { null }
+
+    // TODO(o.k.): IntMap is supposed to avoid Integer boxing!
+    // but after merging 1.4 changes we faced a crash in some iOS samples.
+    // For reproducer, see dima.avdeev/reproduce-lazy-column-crash
+    // The initial implementation (supplied from upstream) was not tested
+    // and `binarySearch` and `set` functions require more attention.
+    // For now, we rely on kotlin's MutableMap (with Integer boxing).
+    private val backingMap = mutableMapOf<Int, E>()
 
     /**
      * True if this map contains key
      */
     actual operator fun contains(key: Int): Boolean {
-        return keys.binarySearch(_size, key) >= 0
+        return backingMap.containsKey(key)
     }
 
     /**
      * Get [key] or null
      */
     actual operator fun get(key: Int): E? {
-        val index = keys.binarySearch(_size, key)
-        return if (index >= 0 && values[index] !== DELETED) {
-            @Suppress("UNCHECKED_CAST")
-            values[index] as E
-        } else {
-            null
-        }
+        return backingMap[key]
     }
 
     /**
      * Get [key] or [valueIfNotFound]
      */
     actual fun get(key: Int, valueIfAbsent: E): E {
-        val index = keys.binarySearch(_size, key)
-        return if (index >= 0 && values[index] !== DELETED) {
-            @Suppress("UNCHECKED_CAST")
-            values[index] as E
-        } else {
-            valueIfAbsent
-        }
+        return backingMap.getOrElse(key) { valueIfAbsent }
     }
 
     /**
      * Set [key] to [value]
      */
     actual operator fun set(key: Int, value: E) {
-        var index = keys.binarySearch(_size, key)
-        if (index >= 0) {
-            values[index] = value
-        } else {
-            index = -index
-            keys = keys.insert(_size, index, key)
-            values = values.insert(_size, index, value)
-            _size++
-        }
+        backingMap[key] = value
     }
 
     /**
@@ -76,74 +60,64 @@ internal actual class IntMap<E> actual constructor() {
      * Otherwise no op
      */
     actual fun remove(key: Int) {
-        // note this never GCs
-        val index = keys.binarySearch(_size, key)
-        if (index >= 0) {
-            values[index] = DELETED
-        }
+        backingMap.remove(key)
     }
 
     /**
      * Clear this map
      */
     actual fun clear() {
-        _size = 0
-        for (i in keys.indices) {
-            keys[i] = 0
-        }
-        for (i in values.indices) {
-            values[i] = null
-        }
+        backingMap.clear()
     }
 
     /**
      * Current count of (key, value) pairs
      */
     actual val size: Int
-        get() = _size
+        get() = backingMap.size
 }
 
 private fun IntArray.binarySearch(size: Int, value: Int): Int {
-    var max = 0
-    var min = size - 1
-    while (max <= min) {
-        val mid = max + min / 2
+    var min = 0
+    var max = size - 1
+    while (min <= max) {
+        val mid = (min + max) / 2
         val midValue = this[mid]
         if (midValue < value) {
-            max = mid + 1
+            min = mid + 1
         } else if (midValue > value) {
-            min = mid - 1
+            max = mid - 1
         } else {
             return mid
         }
     }
-    return -(max + 1)
+    return -(min + 1)
 }
 
 private fun IntArray.insert(currentSize: Int, index: Int, value: Int): IntArray {
     if (currentSize + 1 <= size) {
         if (index < currentSize) {
-            intArrayCopy(src = this, srcPos = 0, dest = this, destPos = index + 1, length = currentSize - index)
-//            System.arraycopy(this, index, this, index + 1, currentSize - index)
+            intArrayCopy(src = this, srcPos = index, dest = this, destPos = index + 1, length = currentSize - index)
+            // System.arraycopy(this, index, this, index + 1, currentSize - index)
         }
         this[index] = value
         return this
     }
 
     val result = IntArray(size * 2)
-//    System.arraycopy(this, 0, result, 0, index)
+    // System.arraycopy(this, 0, result, 0, index)
     intArrayCopy(src = this, srcPos = 0, dest = result, destPos = 0, length = index)
     result[index] = value
     intArrayCopy(src = this, srcPos = index, dest = result, destPos = index + 1, length = size - index)
-//    System.arraycopy(this, index, result, index + 1, size - index)
+    // System.arraycopy(this, index, result, index + 1, size - index)
     return result
 }
 
 private fun Array<Any?>.insert(currentSize: Int, index: Int, value: Any?): Array<Any?> {
     if (currentSize + 1 <= size) {
         if (index < currentSize) {
-            arrayCopy(src = this, srcPos = 0, dest = this, destPos = index + 1, length = currentSize - index)
-//            System.arraycopy(this, index, this, index + 1, currentSize - index)
+            arrayCopy(src = this, srcPos = index, dest = this, destPos = index + 1, length = currentSize - index)
+            // System.arraycopy(this, index, this, index + 1, currentSize - index)
         }
         this[index] = value
         return this
@@ -164,25 +138,7 @@ private fun intArrayCopy(
     dest: IntArray, destPos: Int,
     length: Int
 ) {
-    if (length < 0 ||
-        srcPos < 0 ||
-        destPos < 0 ||
-        srcPos + length > src.size
-        || destPos + length > dest.size
-    ) {
-        error("Invalid arguments")
-    }
-
-    if (src === dest && srcPos < destPos) {
-        // handle overlapping regions within the same array
-        for (i in (srcPos + length - 1) downTo srcPos) {
-            dest[i + destPos - srcPos] = src[i]
-        }
-    } else {
-        for (i in srcPos until srcPos + length) {
-            dest[i + destPos - srcPos] = src[i]
-        }
-    }
+    src.copyInto(dest, destinationOffset = destPos, startIndex = srcPos, endIndex = srcPos + length)
 }
 
 private fun arrayCopy(
@@ -190,23 +146,5 @@ private fun arrayCopy(
     dest: Array<Any?>, destPos: Int,
     length: Int
 ) {
-    if (length < 0 ||
-        srcPos < 0 ||
-        destPos < 0 ||
-        srcPos + length > src.size
-        || destPos + length > dest.size
-    ) {
-        error("Invalid arguments")
-    }
-
-    if (src === dest && srcPos < destPos) {
-        // handle overlapping regions within the same array
-        for (i in (srcPos + length - 1) downTo srcPos) {
-            dest[i + destPos - srcPos] = src[i]
-        }
-    } else {
-        for (i in srcPos until srcPos + length) {
-            dest[i + destPos - srcPos] = src[i]
-        }
-    }
+    src.copyInto(dest, destinationOffset = destPos, startIndex = srcPos, endIndex = srcPos + length)
 }
