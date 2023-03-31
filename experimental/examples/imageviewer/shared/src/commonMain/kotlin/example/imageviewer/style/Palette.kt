@@ -1,9 +1,9 @@
 package example.imageviewer.style
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.material3.LocalTextStyle
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ProvideTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -51,7 +51,7 @@ object ImageviewerColors {
 internal fun ImageViewerTheme(content: @Composable () -> Unit) {
     isSystemInDarkTheme() // todo check and change colors
     MaterialTheme(
-        colorScheme = MaterialTheme.colorScheme.copy(
+        colors = MaterialTheme.colors.copy(
             background = ImageviewerColors.background,
             onBackground = ImageviewerColors.onBackground
         )

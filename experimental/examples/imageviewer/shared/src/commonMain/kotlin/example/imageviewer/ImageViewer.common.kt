@@ -2,11 +2,8 @@ package example.imageviewer
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
-import androidx.compose.ui.Modifier
 import example.imageviewer.model.*
 import example.imageviewer.view.*
 
@@ -16,7 +13,6 @@ enum class ExternalImageViewerEvent {
     Escape,
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun ImageViewerCommon(
     dependencies: Dependencies
@@ -48,68 +44,66 @@ internal fun ImageViewerWithProvidedDependencies(
         }
     }
 
-    Surface(modifier = Modifier.fillMaxSize()) {
-        AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {
-            val previousIdx = initialState.index
-            val currentIdx = targetState.index
-            val multiplier = if (previousIdx < currentIdx) 1 else -1
-            if (initialState.value is GalleryPage && targetState.value is MemoryPage) {
-                fadeIn() with fadeOut(tween(durationMillis = 500, 500))
-            } else if (initialState.value is MemoryPage && targetState.value is GalleryPage) {
-                fadeIn() with fadeOut(tween(delayMillis = 150))
-            } else {
-                slideInHorizontally { w -> multiplier * w } with
-                        slideOutHorizontally { w -> multiplier * -1 * w }
-            }
-        }) { (index, page) ->
-            when (page) {
-                is GalleryPage -> {
-                    GalleryScreen(
-                        pictures = pictures,
-                        selectedPictureIndex = selectedPictureIndex,
-                        onClickPreviewPicture = { previewPictureId ->
-                            navigationStack.push(MemoryPage(previewPictureId))
-                        }
-                    ) {
-                        navigationStack.push(CameraPage())
+    AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {
+        val previousIdx = initialState.index
+        val currentIdx = targetState.index
+        val multiplier = if (previousIdx < currentIdx) 1 else -1
+        if (initialState.value is GalleryPage && targetState.value is MemoryPage) {
+            fadeIn() with fadeOut(tween(durationMillis = 500, 500))
+        } else if (initialState.value is MemoryPage && targetState.value is GalleryPage) {
+            fadeIn() with fadeOut(tween(delayMillis = 150))
+        } else {
+            slideInHorizontally { w -> multiplier * w } with
+                    slideOutHorizontally { w -> multiplier * -1 * w }
+        }
+    }) { (index, page) ->
+        when (page) {
+            is GalleryPage -> {
+                GalleryScreen(
+                    pictures = pictures,
+                    selectedPictureIndex = selectedPictureIndex,
+                    onClickPreviewPicture = { previewPictureId ->
+                        navigationStack.push(MemoryPage(previewPictureId))
                     }
+                ) {
+                    navigationStack.push(CameraPage())
                 }
+            }
 
-                is FullScreenPage -> {
-                    FullscreenImageScreen(
-                        picture = page.picture,
-                        back = {
-                            navigationStack.back()
+            is FullScreenPage -> {
+                FullscreenImageScreen(
+                    picture = page.picture,
+                    back = {
+                        navigationStack.back()
+                    }
+                )
+            }
+
+            is MemoryPage -> {
+                MemoryScreen(
+                    pictures = pictures,
+                    memoryPage = page,
+                    onSelectRelatedMemory = { galleryId ->
+                        navigationStack.push(MemoryPage(galleryId))
+                    },
+                    onBack = {
+                        navigationStack.back()
+                    },
+                    onHeaderClick = { galleryId ->
+                        navigationStack.push(FullScreenPage(galleryId))
+                    },
+                )
+            }
+
+            is CameraPage -> {
+                CameraScreen(
+                    onBack = { resetSelectedPicture ->
+                        if (resetSelectedPicture) {
+                            selectedPictureIndex.value = 0
                         }
-                    )
-                }
-
-                is MemoryPage -> {
-                    MemoryScreen(
-                        pictures = pictures,
-                        memoryPage = page,
-                        onSelectRelatedMemory = { galleryId ->
-                            navigationStack.push(MemoryPage(galleryId))
-                        },
-                        onBack = {
-                            navigationStack.back()
-                        },
-                        onHeaderClick = { galleryId ->
-                            navigationStack.push(FullScreenPage(galleryId))
-                        },
-                    )
-                }
-
-                is CameraPage -> {
-                    CameraScreen(
-                        onBack = { resetSelectedPicture ->
-                            if (resetSelectedPicture) {
-                                selectedPictureIndex.value = 0
-                            }
-                            navigationStack.back()
-                        },
-                    )
-                }
+                        navigationStack.back()
+                    },
+                )
             }
         }
     }
