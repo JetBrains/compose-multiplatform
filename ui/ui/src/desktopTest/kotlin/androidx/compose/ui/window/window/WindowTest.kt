@@ -37,16 +37,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.FrameWindowScope
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowPlacement
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.rememberWindowState
+import androidx.compose.ui.unit.*
+import androidx.compose.ui.window.*
 import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import java.awt.Dimension
@@ -604,4 +598,40 @@ class WindowTest {
         assertEquals(32, window?.height)
     }
 
+    @Test
+    fun `showing a window should measure content specified size`() = runApplicationTest{
+        val constraintsList = mutableListOf<Constraints>()
+        val windowSize = DpSize(400.dp, 300.dp)
+        lateinit var window: ComposeWindow
+
+        launchTestApplication {
+            Window(
+                onCloseRequest = { },
+                state = rememberWindowState(size = windowSize),
+            ) {
+                window = this.window
+                Layout(
+                    measurePolicy = { _, constraints ->
+                        constraintsList.add(constraints)
+                        layout(0, 0){ }
+                    }
+                )
+            }
+        }
+
+        awaitIdle()
+
+        with(window.density) {
+            val expectedSize = (windowSize - window.insets.toSize()).toSize()
+            assertEquals(
+                listOf(
+                    Constraints(
+                        maxWidth = expectedSize.width.toInt(),
+                        maxHeight = expectedSize.height.toInt()
+                    )
+                ),
+                constraintsList
+            )
+        }
+    }
 }

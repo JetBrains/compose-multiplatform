@@ -111,6 +111,7 @@ private fun Window.setSizeImpl(size: DpSize) {
 
     if (!isDisplayable) {
         // Pack to allow drawing the first frame
+        preferredSize = Dimension(width, height)
         pack()
     }
 
