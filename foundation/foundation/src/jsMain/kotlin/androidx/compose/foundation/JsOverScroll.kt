@@ -27,27 +27,30 @@ import androidx.compose.ui.unit.Velocity
 @Composable
 internal actual fun rememberOverscrollEffect(): OverscrollEffect {
     return remember {
-        DesktopEdgeEffectOverscrollEffect()
+        JSOverscrollEffect()
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private class DesktopEdgeEffectOverscrollEffect() : OverscrollEffect {
-    // TODO: [1.4 Update] Implement new API properly and remove commented old code
+private class JSOverscrollEffect() : OverscrollEffect {
 
     override fun applyToScroll(
         delta: Offset,
         source: NestedScrollSource,
         performScroll: (Offset) -> Offset
     ): Offset {
-        return Offset.Zero
+        // JS doesn't yet use drag touches to apply scrolling. But it might be for mobile browsers.
+        val overscrollDelta = Offset.Zero // TODO: implement similar to Android
+        return overscrollDelta + performScroll(delta)
     }
 
     override suspend fun applyToFling(
         velocity: Velocity,
         performFling: suspend (Velocity) -> Velocity
     ) {
-
+        // JS doesn't yet use drag touches to apply scrolling. But it might be for mobile browsers.
+        // TODO: implement similar to Android
+        performFling(velocity)
     }
 
 

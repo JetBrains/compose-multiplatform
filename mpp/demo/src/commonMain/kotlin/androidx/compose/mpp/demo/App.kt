@@ -30,6 +30,7 @@ class App(
 
     private val screens = listOf(
         Screen("Example1") { Example1() },
+        Screen("ExampleLazyColumn") { ExampleLazyColumn() },
     )
 
     private class Screen(val title: String, val content: @Composable () -> Unit)
