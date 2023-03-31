@@ -122,7 +122,12 @@ internal class SkiaBasedOwner(
         properties = {}
     )
 
-    override val focusOwner: FocusOwner = FocusOwnerImpl {
+    // TODO(https://github.com/JetBrains/compose-multiplatform/issues/2944)
+    //  Check if ComposePanel/SwingPanel focus interop work correctly with new features of
+    //  the focus system (it works with the old features like moveFocus/clearFocus)
+    override val focusOwner: FocusOwner = FocusOwnerImpl(
+        parent = parentFocusManager
+    ) {
         registerOnEndApplyChangesListener(it)
     }.apply {
         layoutDirection = platform.layoutDirection
