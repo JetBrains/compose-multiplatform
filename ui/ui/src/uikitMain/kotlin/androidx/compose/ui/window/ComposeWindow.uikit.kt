@@ -54,6 +54,7 @@ import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.Foundation.NSValue
 import platform.UIKit.CGRectValue
+import platform.UIKit.UIColor
 import platform.UIKit.UIScreen
 import platform.UIKit.UIView
 import platform.UIKit.UIViewAutoresizingFlexibleHeight
@@ -61,6 +62,7 @@ import platform.UIKit.UIViewAutoresizingFlexibleWidth
 import platform.UIKit.UIViewController
 import platform.UIKit.UIViewControllerTransitionCoordinatorProtocol
 import platform.UIKit.addSubview
+import platform.UIKit.backgroundColor
 import platform.UIKit.reloadInputViews
 import platform.UIKit.setAutoresizesSubviews
 import platform.UIKit.setAutoresizingMask
@@ -157,8 +159,14 @@ internal actual class ComposeWindow : UIViewController {
 
     override fun loadView() {
         val skiaLayer = createSkiaLayer()
-        val skikoUIView = SkikoUIView(skiaLayer).load()
+        val skikoUIView = SkikoUIView(
+            skiaLayer = skiaLayer,
+            pointInside = { point, _ ->
+                !layer.hitInteropView(point, isTouchEvent = true)
+            },
+        ).load()
         val rootView = UIView() // rootView needs to interop with UIKit
+        rootView.backgroundColor = UIColor.whiteColor
         rootView.addSubview(skikoUIView)
         rootView.setAutoresizesSubviews(true)
         skikoUIView.setAutoresizingMask(

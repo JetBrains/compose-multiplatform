@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.InteropViewCatchPointerModifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
@@ -73,10 +74,11 @@ private val DefaultResize: UIView.(CValue<CGRect>) -> Unit = { rect -> this.setF
 @Composable
 fun <T : UIView> UIKitInteropView(
     modifier: Modifier,
-    background: Color = Color.White,
+    background: Color = Color.Unspecified,
     update: (T) -> Unit = NoOpUpdate,
     dispose: (T) -> Unit = NoOpDispose,
     resize: (view: T, rect: CValue<CGRect>) -> Unit = DefaultResize,
+    interactive: Boolean = true,
     factory: () -> T,
 ) {
     val componentInfo = remember { ComponentInfo<T>() }
@@ -102,6 +104,12 @@ fun <T : UIView> UIKitInteropView(
             }
         }.drawBehind {
             drawRect(Color.Transparent, blendMode = BlendMode.DstAtop) // draw transparent hole
+        }.let {
+            if (interactive) {
+                it.then(InteropViewCatchPointerModifier())
+            } else {
+                it
+            }
         }
     )
 
@@ -119,7 +127,11 @@ fun <T : UIView> UIKitInteropView(
         }
     }
     LaunchedEffect(background) {
-        componentInfo.container.backgroundColor = parseColor(background)
+        if (background == Color.Unspecified) {
+            componentInfo.container.backgroundColor = root.backgroundColor
+        } else {
+            componentInfo.container.backgroundColor = parseColor(background)
+        }
     }
     SideEffect {
         componentInfo.updater.update = update

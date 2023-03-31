@@ -55,14 +55,19 @@ import androidx.compose.ui.input.pointer.PointerInputEventProcessor
 import androidx.compose.ui.input.pointer.PositionCalculator
 import androidx.compose.ui.input.pointer.ProcessResult
 import androidx.compose.ui.input.pointer.TestPointerInputEventData
+import androidx.compose.ui.input.pointer.InteropViewCatchPointerModifier
 import androidx.compose.ui.layout.RootMeasurePolicy
 import androidx.compose.ui.modifier.ModifierLocalManager
+import androidx.compose.ui.node.BackwardsCompatNode
+import androidx.compose.ui.node.HitTestResult
 import androidx.compose.ui.node.InternalCoreApi
+import androidx.compose.ui.node.LayoutModifierNode
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.LayoutNodeDrawScope
 import androidx.compose.ui.node.MeasureAndLayoutDelegate
 import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
+import androidx.compose.ui.node.PointerInputModifierNode
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -394,6 +399,16 @@ internal class SkiaBasedOwner(
                 commitPointerIcon()
             }
         }
+    }
+
+    /**
+     * If pointerPosition is UIKitInterop, then Compose skip touches. And touches goes to UIKit view
+     */
+    fun hitInteropView(pointerPosition: Offset, isTouchEvent: Boolean): Boolean {
+        val result = HitTestResult<PointerInputModifierNode>()
+        pointerInputEventProcessor.root.hitTest(pointerPosition, result, isTouchEvent)
+        val last: PointerInputModifierNode? = result.lastOrNull()
+        return (last as? BackwardsCompatNode)?.element is InteropViewCatchPointerModifier
     }
 
     @Suppress("OVERRIDE_DEPRECATION")

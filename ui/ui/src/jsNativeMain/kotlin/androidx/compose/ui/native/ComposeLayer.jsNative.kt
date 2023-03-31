@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.DpRect
 import androidx.compose.ui.unit.ExperimentalUnitApi
 import androidx.compose.ui.unit.toDpRect
+import org.jetbrains.skia.Point
 import org.jetbrains.skiko.SkikoInput
 import org.jetbrains.skiko.currentNanoTime
 
@@ -143,6 +144,12 @@ internal class ComposeLayer(
         val focusRect = scene.mainOwner?.focusOwner?.getFocusRect() ?: return null
         return focusRect.toDpRect(density)
     }
+
+    fun hitInteropView(point: Point, isTouchEvent: Boolean): Boolean =
+        scene.mainOwner?.hitInteropView(
+            pointerPosition = Offset(point.x * density.density, point.y * density.density),
+            isTouchEvent = isTouchEvent,
+        ) ?: false
 
     fun setContent(
         onPreviewKeyEvent: (ComposeKeyEvent) -> Boolean = { false },

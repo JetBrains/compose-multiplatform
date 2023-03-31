@@ -20,7 +20,6 @@ import platform.UIKit.UITextField
 @Composable
 fun ComposeUITextField(modifier: Modifier, value: String, onValueChange: (String) -> Unit) {
     UIKitInteropView(
-        background = Color.Green,
         modifier = modifier,
         factory = {
             val textField = object : UITextField(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
