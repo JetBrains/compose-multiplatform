@@ -32,8 +32,7 @@ internal class JsLocale(val locale: dynamic) : PlatformLocale {
 internal actual fun createPlatformLocaleDelegate(): PlatformLocaleDelegate =
     object : PlatformLocaleDelegate {
         override val current: LocaleList
-            // TODO: [1.4 Update] Check that it is implemented properly
-            get() = LocaleList(Locale(JsLocale(Any())))
+            get() = LocaleList(listOf(Locale(JsLocale(Any()))))
 
 
         override fun parseLanguageTag(languageTag: String): PlatformLocale {
