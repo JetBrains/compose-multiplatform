@@ -446,7 +446,6 @@ internal class SkiaParagraph(
         drawStyle: DrawStyle?,
         blendMode: BlendMode
     ) {
-        // TODO: [1.4 Update] take blendMode into account
         paragraph = with(layouter) {
             setTextStyle(
                 color = color,
@@ -454,6 +453,7 @@ internal class SkiaParagraph(
                 textDecoration = textDecoration
             )
             setDrawStyle(drawStyle)
+            setBlendMode(blendMode)
             layoutParagraph(
                 width = width
             )
@@ -471,7 +471,6 @@ internal class SkiaParagraph(
         drawStyle: DrawStyle?,
         blendMode: BlendMode
     ) {
-        // TODO: [1.4 Update] take blendMode into account
         paragraph = with(layouter) {
             setTextStyle(
                 brush = brush,
@@ -481,6 +480,7 @@ internal class SkiaParagraph(
                 textDecoration = textDecoration
             )
             setDrawStyle(drawStyle)
+            setBlendMode(blendMode)
             layoutParagraph(
                 width = width
             )

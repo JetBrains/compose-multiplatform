@@ -17,12 +17,9 @@
 package androidx.compose.ui.text.platform
 
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shadow
-import androidx.compose.ui.graphics.asComposePaint
+import androidx.compose.ui.geometry.isUnspecified
+import androidx.compose.ui.graphics.*
 import androidx.compose.ui.graphics.drawscope.DrawStyle
-import androidx.compose.ui.graphics.takeOrElse
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.Placeholder
@@ -68,7 +65,6 @@ internal class ParagraphLayouter(
         fontFamilyResolver = fontFamilyResolver,
         text = text,
         textStyle = style,
-        brushSize = null,
         spanStyles = spanStyles,
         placeholders = placeholders,
         density = density,
@@ -122,7 +118,7 @@ internal class ParagraphLayouter(
     ) {
         val actualSize = builder.brushSize
         if (builder.textStyle.brush != brush ||
-            actualSize == null ||
+            actualSize.isUnspecified ||
             !actualSize.width.sameValueAs(brushSize.width) ||
             !actualSize.height.sameValueAs(brushSize.height) ||
             !builder.textStyle.alpha.sameValueAs(alpha) ||
@@ -141,7 +137,17 @@ internal class ParagraphLayouter(
     }
 
     fun setDrawStyle(drawStyle: DrawStyle?) {
-        // TODO Implement applying DrawStyle
+        if (builder.drawStyle != drawStyle) {
+            builder.drawStyle = drawStyle
+            paragraphCache = null
+        }
+    }
+
+    fun setBlendMode(blendMode: BlendMode) {
+        if (builder.blendMode != blendMode) {
+            builder.blendMode = blendMode
+            paragraphCache = null
+        }
     }
 
     fun layoutParagraph(width: Float): Paragraph {
