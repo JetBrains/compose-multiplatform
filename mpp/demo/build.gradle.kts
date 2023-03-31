@@ -92,6 +92,20 @@ kotlin {
             }
         }
     }
+    iosArm64("uikitArm64") {
+        binaries {
+            executable() {
+                entryPoint = "androidx.compose.mpp.demo.main"
+                freeCompilerArgs += listOf(
+                    "-linker-option", "-framework", "-linker-option", "Metal",
+                    "-linker-option", "-framework", "-linker-option", "CoreText",
+                    "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+                )
+                // TODO: the current compose binary surprises LLVM, so disable checks for now.
+                freeCompilerArgs += "-Xdisable-phases=VerifyBitcode"
+            }
+        }
+    }
     iosSimulatorArm64("uikitSimArm64") {
         binaries {
             executable() {
@@ -150,7 +164,7 @@ kotlin {
         val macosArm64Main by getting { dependsOn(macosMain) }
         val uikitMain by creating { dependsOn(darwinMain) }
         val uikitX64Main by getting { dependsOn(uikitMain) }
-        val uikitArm64Main by creating { dependsOn(uikitMain) }
+        val uikitArm64Main by getting { dependsOn(uikitMain) }
         val uikitSimArm64Main by getting { dependsOn(uikitMain) }
     }
 }
