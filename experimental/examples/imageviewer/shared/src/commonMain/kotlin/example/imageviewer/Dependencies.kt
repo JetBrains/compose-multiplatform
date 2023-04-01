@@ -38,14 +38,34 @@ abstract class Dependencies {
             }
         }
 
-        override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
-            imageStorage.saveImage(pictureData, image)
+        override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
+            imageStorage.saveImage(picture, image)
         }
 
         override fun delete(picture: PictureData) {
             pictures.remove(picture)
             if (picture is PictureData.Camera) {
                 imageStorage.delete(picture)
+            }
+        }
+
+        override fun edit(picture: PictureData, name: String, description: String) {
+            when (picture) {
+                is PictureData.Resource -> {
+                    pictures[pictures.indexOf(picture)] =
+                        picture.copy(
+                            name = name,
+                            description = description,
+                        )
+                }
+                is PictureData.Camera -> {
+                    val edited = picture.copy(
+                        name = name,
+                        description = description,
+                    )
+                    pictures[pictures.indexOf(picture)] = edited
+                    imageStorage.rewrite(edited)
+                }
             }
         }
     }
@@ -77,15 +97,17 @@ interface Localization {
 interface ImageProvider {
     suspend fun getImage(picture: PictureData): ImageBitmap
     suspend fun getThumbnail(picture: PictureData): ImageBitmap
-    fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage)
+    fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
     fun delete(picture: PictureData)
+    fun edit(picture: PictureData, name: String, description: String)
 }
 
 interface ImageStorage {
-    fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage)
+    fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
     fun delete(picture: PictureData.Camera)
-    suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap
-    suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap
+    fun rewrite(picture: PictureData.Camera)
+    suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap
+    suspend fun getImage(picture: PictureData.Camera): ImageBitmap
 }
 
 internal val LocalLocalization = staticCompositionLocalOf<Localization> {

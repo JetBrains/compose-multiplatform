@@ -19,6 +19,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -27,6 +28,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -36,7 +38,6 @@ import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -45,6 +46,7 @@ internal fun MemoryScreen(
     onBack: () -> Unit,
     onHeaderClick: (PictureData) -> Unit,
 ) {
+    var edit: Boolean by remember { mutableStateOf(false) }
     val imageProvider = LocalImageProvider.current
     var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
     LaunchedEffect(memoryPage.picture) {
@@ -99,7 +101,7 @@ internal fun MemoryScreen(
                             onBack()
                         }
                         IconWithText(Icons.Default.Edit, "Edit") {
-
+                            edit = true
                         }
                         IconWithText(Icons.Default.Share, "Share") {
 
@@ -115,6 +117,50 @@ internal fun MemoryScreen(
             },
             alignRightContent = {},
         )
+        if (edit) {
+            var name by remember { mutableStateOf(memoryPage.picture.name) }
+            var description by remember { mutableStateOf(memoryPage.picture.description) }
+            Box(Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f))
+                .clickable {
+                    imageProvider.edit(memoryPage.picture, name, description)
+                    edit = false
+                }
+            ) {
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(30.dp)
+                        .clip(RoundedCornerShape(20.dp))
+                        .background(Color.White),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                ) {
+                    TextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.White,
+                        ),
+                        textStyle = LocalTextStyle.current.copy(
+                            textAlign = TextAlign.Center,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold,
+                        ),
+                    )
+                    TextField(
+                        value = description,
+                        onValueChange = { description = it },
+                        colors = TextFieldDefaults.textFieldColors(
+                            backgroundColor = Color.White,
+                            unfocusedIndicatorColor = Color.Transparent,
+                            focusedIndicatorColor = Color.Transparent,
+                        )
+                    )
+                }
+            }
+        }
     }
 }
 

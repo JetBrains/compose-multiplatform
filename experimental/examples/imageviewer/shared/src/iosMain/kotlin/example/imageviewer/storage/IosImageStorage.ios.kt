@@ -56,14 +56,14 @@ class IosImageStorage(
         }
     }
 
-    override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
+    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
             with(image.rawValue) {
-                pictureData.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
-                pictureData.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
+                picture.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
+                picture.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
             }
-            pictures.add(0, pictureData)
-            pictureData.jsonFile.writeText(pictureData.toJson())
+            pictures.add(0, picture)
+            picture.jsonFile.writeText(picture.toJson())
         }
     }
 
@@ -75,14 +75,21 @@ class IosImageStorage(
         }
     }
 
-    override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap =
+    override fun rewrite(picture: PictureData.Camera) {
+        ioScope.launch {
+            picture.jsonFile.delete()
+            picture.jsonFile.writeText(picture.toJson())
+        }
+    }
+
+    override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
-            pictureData.thumbnailJpgFile.readBytes().toImageBitmap()
+            picture.thumbnailJpgFile.readBytes().toImageBitmap()
         }
 
-    override suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap =
+    override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
-            pictureData.jpgFile.readBytes().toImageBitmap()
+            picture.jpgFile.readBytes().toImageBitmap()
         }
 }
 
