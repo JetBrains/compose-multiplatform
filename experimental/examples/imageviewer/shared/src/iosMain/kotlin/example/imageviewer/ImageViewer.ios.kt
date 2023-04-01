@@ -11,10 +11,12 @@ import example.imageviewer.view.ToastState
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
-internal fun ImageViewerIos(openShareController:(Any) -> Unit) {
+internal fun ImageViewerIos(openShareController: (SharedPhoto) -> Unit) {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
-    val dependencies = remember(ioScope) { getDependencies(ioScope, toastState, openShareController) }
+    val dependencies = remember(ioScope) {
+        getDependencies(ioScope, toastState, openShareController)
+    }
 
     ImageViewerTheme {
         Surface(
@@ -28,7 +30,11 @@ internal fun ImageViewerIos(openShareController:(Any) -> Unit) {
     }
 }
 
-fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>, openShareController: (Any) -> Unit) =
+fun getDependencies(
+    ioScope: CoroutineScope,
+    toastState: MutableState<ToastState>,
+    openShareController: (SharedPhoto) -> Unit
+) =
     object : Dependencies() {
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
@@ -37,5 +43,7 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         }
         override val imageStorage: ImageStorage = IosImageStorage(pictures, ioScope)
 
-        override val openShareController: (Any) -> Unit = openShareController
+        override val openShareController: (SharedPhoto) -> Unit = { sharedPhoto ->
+            openShareController(sharedPhoto)
+        }
     }

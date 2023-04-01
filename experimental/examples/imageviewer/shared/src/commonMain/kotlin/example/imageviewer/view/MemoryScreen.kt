@@ -31,6 +31,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.LocalImageProvider
+import example.imageviewer.LocalSharePicture
+import example.imageviewer.SharedPhoto
+import example.imageviewer.createSharedPhoto
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -44,8 +47,9 @@ internal fun MemoryScreen(
     onBack: () -> Unit,
     onHeaderClick: (PictureData) -> Unit,
 ) {
-    var edit: Boolean by remember { mutableStateOf(false) }
     val imageProvider = LocalImageProvider.current
+    val sharePicture = LocalSharePicture.current
+    var edit: Boolean by remember { mutableStateOf(false) }
     val picture = memoryPage.pictureState.value
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
     LaunchedEffect(picture) {
@@ -103,7 +107,7 @@ internal fun MemoryScreen(
                             edit = true
                         }
                         IconWithText(Icons.Default.Share, "Share") {
-
+                            sharePicture(createSharedPhoto(picture))
                         }
                     }
                     Spacer(Modifier.height(50.dp))

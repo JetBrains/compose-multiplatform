@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import example.imageviewer.model.PictureData
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -44,3 +45,7 @@ actual fun createUUID(): String =
     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
 
 actual val ioDispatcher = Dispatchers.IO
+
+actual class SharedPhoto(val rawValue: Any)
+
+actual fun createSharedPhoto(pictureData: PictureData): SharedPhoto = SharedPhoto(pictureData)

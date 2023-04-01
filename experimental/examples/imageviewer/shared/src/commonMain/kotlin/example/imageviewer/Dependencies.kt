@@ -14,7 +14,7 @@ import org.jetbrains.compose.resources.resource
 abstract class Dependencies {
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
-    abstract val openShareController: (Any) -> Unit
+    open val openShareController: (SharedPhoto) -> Unit = {}
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     open val externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
     val localization: Localization = getCurrentLocalization()
@@ -127,6 +127,10 @@ internal val LocalImageProvider = staticCompositionLocalOf<ImageProvider> {
 
 internal val LocalInternalEvents = staticCompositionLocalOf<Flow<ExternalImageViewerEvent>> {
     noLocalProvidedFor("LocalInternalEvents")
+}
+
+internal val LocalSharePicture = staticCompositionLocalOf<(SharedPhoto) -> Unit> {
+    noLocalProvidedFor("LocalSharePicture")
 }
 
 private fun noLocalProvidedFor(name: String): Nothing {
