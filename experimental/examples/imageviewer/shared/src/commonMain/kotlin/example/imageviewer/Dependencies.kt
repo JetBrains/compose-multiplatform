@@ -14,6 +14,7 @@ import org.jetbrains.compose.resources.resource
 abstract class Dependencies {
     abstract val notification: Notification
     abstract val imageStorage: ImageStorage
+    abstract val openShareController: (Any) -> Unit
     val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     open val externalEvents: Flow<ExternalImageViewerEvent> = emptyFlow()
     val localization: Localization = getCurrentLocalization()
