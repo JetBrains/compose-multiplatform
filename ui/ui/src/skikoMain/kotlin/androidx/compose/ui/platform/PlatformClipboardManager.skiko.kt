@@ -28,4 +28,6 @@ internal class PlatformClipboardManager : ClipboardManager {
     override fun setText(annotatedString: AnnotatedString) {
         skikoClipboardManager.setText(annotatedString.text)
     }
+
+    override fun hasText(): Boolean = skikoClipboardManager.hasText()
 }
