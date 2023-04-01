@@ -11,7 +11,3 @@ expect class PlatformStorableImage
 expect fun createUUID(): String
 
 expect val ioDispatcher: CoroutineDispatcher
-
-expect class SharedPhoto
-
-expect fun createSharedPhoto(pictureData: PictureData): SharedPhoto

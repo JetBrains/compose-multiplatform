@@ -22,7 +22,7 @@ internal fun ImageViewerCommon(
         LocalNotification provides dependencies.notification,
         LocalImageProvider provides dependencies.imageProvider,
         LocalInternalEvents provides dependencies.externalEvents,
-        LocalSharePicture provides dependencies.openShareController,
+        LocalSharePicture provides dependencies.sharePicture,
     ) {
         ImageViewerWithProvidedDependencies(dependencies.pictures)
     }

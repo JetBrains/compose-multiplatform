@@ -19,7 +19,3 @@ actual typealias PlatformStorableImage = AndroidStorableImage
 actual fun createUUID(): String = UUID.randomUUID().toString()
 
 actual val ioDispatcher = Dispatchers.IO
-
-actual class SharedPhoto
-
-actual fun createSharedPhoto(pictureData: PictureData): SharedPhoto = SharedPhoto()

@@ -91,6 +91,21 @@ class IosImageStorage(
         withContext(ioScope.coroutineContext) {
             picture.jpgFile.readBytes().toImageBitmap()
         }
+
+    suspend fun getNSDataToShare(picture: PictureData): NSData = withContext(Dispatchers.IO) {
+        when (picture) {
+            is PictureData.Camera -> {
+                picture.jpgFile
+            }
+
+            is PictureData.Resource -> {
+                NSURL(
+                    fileURLWithPath = NSBundle.mainBundle.resourcePath + "/" + picture.resource,
+                    isDirectory = false
+                )
+            }
+        }.readData()
+    }
 }
 
 private fun UIImage.fitInto(px: Int): UIImage {

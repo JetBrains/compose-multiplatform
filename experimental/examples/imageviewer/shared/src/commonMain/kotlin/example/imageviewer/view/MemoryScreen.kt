@@ -32,8 +32,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.LocalSharePicture
-import example.imageviewer.SharedPhoto
-import example.imageviewer.createSharedPhoto
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -85,7 +83,10 @@ internal fun MemoryScreen(
                     Headliner("Note")
                     Collapsible(picture.description)
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(
+                        pictures = (pictures - picture).shuffled().take(5),
+                        onSelectRelatedMemory = onSelectRelatedMemory
+                    )
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -107,7 +108,7 @@ internal fun MemoryScreen(
                             edit = true
                         }
                         IconWithText(Icons.Default.Share, "Share") {
-                            sharePicture(createSharedPhoto(picture))
+                            sharePicture.share(picture)
                         }
                     }
                     Spacer(Modifier.height(50.dp))
@@ -294,7 +295,7 @@ internal fun Headliner(s: String) {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<PictureData>,
+    pictures: List<PictureData>,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
@@ -304,7 +305,7 @@ internal fun RelatedMemoriesVisualizer(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(ps) { idx, item ->
+            itemsIndexed(pictures) { idx, item ->
                 RelatedMemory(item, onSelectRelatedMemory)
             }
         }

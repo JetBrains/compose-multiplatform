@@ -4,18 +4,26 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import example.imageviewer.model.PictureData
 import example.imageviewer.storage.IosImageStorage
 import example.imageviewer.style.ImageViewerTheme
 import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import platform.UIKit.UIActivityViewController
+import platform.UIKit.UIApplication
+import platform.UIKit.UIImage
+import platform.UIKit.UIWindow
 
 @Composable
-internal fun ImageViewerIos(openShareController: (SharedPhoto) -> Unit) {
+internal fun ImageViewerIos() {
     val toastState = remember { mutableStateOf<ToastState>(ToastState.Hidden) }
     val ioScope: CoroutineScope = rememberCoroutineScope { ioDispatcher }
     val dependencies = remember(ioScope) {
-        getDependencies(ioScope, toastState, openShareController)
+        getDependencies(ioScope, toastState)
     }
 
     ImageViewerTheme {
@@ -30,20 +38,34 @@ internal fun ImageViewerIos(openShareController: (SharedPhoto) -> Unit) {
     }
 }
 
-fun getDependencies(
-    ioScope: CoroutineScope,
-    toastState: MutableState<ToastState>,
-    openShareController: (SharedPhoto) -> Unit
-) =
+fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
     object : Dependencies() {
         override val notification: Notification = object : PopupNotification(localization) {
             override fun showPopUpMessage(text: String) {
                 toastState.value = ToastState.Shown(text)
             }
         }
-        override val imageStorage: ImageStorage = IosImageStorage(pictures, ioScope)
 
-        override val openShareController: (SharedPhoto) -> Unit = { sharedPhoto ->
-            openShareController(sharedPhoto)
+        override val imageStorage: IosImageStorage = IosImageStorage(pictures, ioScope)
+
+        override val sharePicture: SharePicture = object : SharePicture {
+            override fun share(picture: PictureData) {
+                ioScope.launch {
+                    val data = imageStorage.getNSDataToShare(picture)
+                    withContext(Dispatchers.Main) {
+                        val window = UIApplication.sharedApplication.windows.last() as? UIWindow
+                        val currentViewController = window?.rootViewController
+                        val activityViewController = UIActivityViewController(
+                            activityItems = listOf(UIImage(data = data)),
+                            applicationActivities = null
+                        )
+                        currentViewController?.presentViewController(
+                            viewControllerToPresent = activityViewController,
+                            animated = true,
+                            completion = null,
+                        )
+                    }
+                }
+            }
         }
     }
