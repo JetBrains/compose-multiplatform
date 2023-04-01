@@ -62,7 +62,7 @@ internal fun ImageViewerWithProvidedDependencies(
                     pictures = pictures,
                     selectedPictureIndex = selectedPictureIndex,
                     onClickPreviewPicture = { previewPictureId ->
-                        navigationStack.push(MemoryPage(previewPictureId))
+                        navigationStack.push(MemoryPage(mutableStateOf(previewPictureId)))
                     }
                 ) {
                     navigationStack.push(CameraPage())
@@ -83,7 +83,7 @@ internal fun ImageViewerWithProvidedDependencies(
                     pictures = pictures,
                     memoryPage = page,
                     onSelectRelatedMemory = { galleryId ->
-                        navigationStack.push(MemoryPage(galleryId))
+                        navigationStack.push(MemoryPage(mutableStateOf(galleryId)))
                     },
                     onBack = {
                         navigationStack.back()

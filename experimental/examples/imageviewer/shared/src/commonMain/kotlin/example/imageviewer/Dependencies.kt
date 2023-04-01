@@ -49,14 +49,15 @@ abstract class Dependencies {
             }
         }
 
-        override fun edit(picture: PictureData, name: String, description: String) {
+        override fun edit(picture: PictureData, name: String, description: String): PictureData {
             when (picture) {
                 is PictureData.Resource -> {
-                    pictures[pictures.indexOf(picture)] =
-                        picture.copy(
-                            name = name,
-                            description = description,
-                        )
+                    val edited = picture.copy(
+                        name = name,
+                        description = description,
+                    )
+                    pictures[pictures.indexOf(picture)] = edited
+                    return edited
                 }
                 is PictureData.Camera -> {
                     val edited = picture.copy(
@@ -65,6 +66,7 @@ abstract class Dependencies {
                     )
                     pictures[pictures.indexOf(picture)] = edited
                     imageStorage.rewrite(edited)
+                    return edited
                 }
             }
         }
@@ -99,7 +101,7 @@ interface ImageProvider {
     suspend fun getThumbnail(picture: PictureData): ImageBitmap
     fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage)
     fun delete(picture: PictureData)
-    fun edit(picture: PictureData, name: String, description: String)
+    fun edit(picture: PictureData, name: String, description: String): PictureData
 }
 
 interface ImageStorage {

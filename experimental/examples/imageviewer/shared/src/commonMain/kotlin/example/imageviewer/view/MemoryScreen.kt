@@ -19,7 +19,6 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -28,7 +27,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -48,9 +46,10 @@ internal fun MemoryScreen(
 ) {
     var edit: Boolean by remember { mutableStateOf(false) }
     val imageProvider = LocalImageProvider.current
-    var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
-    LaunchedEffect(memoryPage.picture) {
-        headerImage = imageProvider.getImage(memoryPage.picture)
+    val picture = memoryPage.pictureState.value
+    var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
+    LaunchedEffect(picture) {
+        headerImage = imageProvider.getImage(picture)
     }
     Box {
         val scrollState = rememberScrollState()
@@ -72,15 +71,15 @@ internal fun MemoryScreen(
                 headerImage?.let {
                     MemoryHeader(
                         it,
-                        picture = memoryPage.picture,
-                        onClick = { onHeaderClick(memoryPage.picture) }
+                        picture = picture,
+                        onClick = { onHeaderClick(picture) }
                     )
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Headliner("Note")
-                    Collapsible(memoryPage.picture.description)
+                    Collapsible(picture.description)
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
                     Headliner("Place")
@@ -91,13 +90,13 @@ internal fun MemoryScreen(
                             .border(1.dp, Color.Gray, locationShape)
                             .fillMaxWidth()
                             .height(200.dp),
-                        gps = memoryPage.picture.gps,
-                        title = memoryPage.picture.name,
+                        gps = picture.gps,
+                        title = picture.name,
                     )
                     Spacer(Modifier.height(50.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         IconWithText(Icons.Default.Delete, "Delete") {
-                            imageProvider.delete(memoryPage.picture)
+                            imageProvider.delete(picture)
                             onBack()
                         }
                         IconWithText(Icons.Default.Edit, "Edit") {
@@ -118,13 +117,14 @@ internal fun MemoryScreen(
             alignRightContent = {},
         )
         if (edit) {
-            var name by remember { mutableStateOf(memoryPage.picture.name) }
-            var description by remember { mutableStateOf(memoryPage.picture.description) }
+            var name by remember { mutableStateOf(picture.name) }
+            var description by remember { mutableStateOf(picture.description) }
             Box(Modifier
                 .fillMaxSize()
                 .background(Color.Black.copy(alpha = 0.4f))
                 .clickable {
-                    imageProvider.edit(memoryPage.picture, name, description)
+                    val edited = imageProvider.edit(picture, name, description)
+                    memoryPage.pictureState.value = edited
                     edit = false
                 }
             ) {
