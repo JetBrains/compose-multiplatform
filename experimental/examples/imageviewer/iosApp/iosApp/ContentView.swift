@@ -14,8 +14,14 @@ let gradient = LinearGradient(
 )
 
 struct ComposeView: UIViewControllerRepresentable {
+    private let openShareController: (Any) -> ()
+
+    init(openShareController: @escaping (Any) -> ()) {
+        self.openShareController = openShareController
+    }
+
     func makeUIViewController(context: Context) -> UIViewController {
-        let controller = Main_iosKt.MainViewController()
+        let controller = Main_iosKt.MainViewController(openShareController: openShareController)
         controller.overrideUserInterfaceStyle = .light
         return controller
     }
@@ -26,7 +32,7 @@ struct ComposeView: UIViewControllerRepresentable {
 struct ContentView: View {
     var body: some View {
         ZStack {
-            ComposeView()
+            ComposeView(openShareController: )
                     .ignoresSafeArea(.all) // Compose has own keyboard handler
             VStack {
                 gradient.ignoresSafeArea(edges: .top).frame(height: 0)
