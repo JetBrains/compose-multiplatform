@@ -21,7 +21,6 @@ internal fun ImageViewerCommon(
         LocalLocalization provides dependencies.localization,
         LocalNotification provides dependencies.notification,
         LocalImageProvider provides dependencies.imageProvider,
-        LocalImageStorage provides dependencies.imageStorage,
         LocalInternalEvents provides dependencies.externalEvents
     ) {
         ImageViewerWithProvidedDependencies(dependencies.pictures)

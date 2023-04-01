@@ -41,6 +41,10 @@ fun NSURL.listFiles(filter: (NSURL, String) -> Boolean) =
         ?.map { File(this, it) }
         ?.toTypedArray()
 
+fun NSURL.delete() {
+    NSFileManager.defaultManager.removeItemAtURL(this, null)
+}
+
 suspend fun NSURL.readData(): NSData {
     while (true) {
         val data = NSData.dataWithContentsOfURL(this)

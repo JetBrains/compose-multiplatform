@@ -37,6 +37,17 @@ abstract class Dependencies {
                 imageStorage.getThumbnail(picture)
             }
         }
+
+        override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
+            imageStorage.saveImage(pictureData, image)
+        }
+
+        override fun delete(picture: PictureData) {
+            pictures.remove(picture)
+            if (picture is PictureData.Camera) {
+                imageStorage.delete(picture)
+            }
+        }
     }
 }
 
@@ -66,10 +77,13 @@ interface Localization {
 interface ImageProvider {
     suspend fun getImage(picture: PictureData): ImageBitmap
     suspend fun getThumbnail(picture: PictureData): ImageBitmap
+    fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage)
+    fun delete(picture: PictureData)
 }
 
 interface ImageStorage {
     fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage)
+    fun delete(picture: PictureData.Camera)
     suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap
     suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap
 }
@@ -84,10 +98,6 @@ internal val LocalNotification = staticCompositionLocalOf<Notification> {
 
 internal val LocalImageProvider = staticCompositionLocalOf<ImageProvider> {
     noLocalProvidedFor("LocalImageProvider")
-}
-
-internal val LocalImageStorage = staticCompositionLocalOf<ImageStorage> {
-    noLocalProvidedFor("LocalImageStorage")
 }
 
 internal val LocalInternalEvents = staticCompositionLocalOf<Flow<ExternalImageViewerEvent>> {

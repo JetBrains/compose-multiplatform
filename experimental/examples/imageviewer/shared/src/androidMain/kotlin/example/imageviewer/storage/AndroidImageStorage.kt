@@ -68,6 +68,12 @@ class AndroidImageStorage(
         }
     }
 
+    override fun delete(picture: PictureData.Camera) {
+        picture.jsonFile.delete()
+        picture.jpgFile.delete()
+        picture.thumbnailJpgFile.delete()
+    }
+
     override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
             pictureData.thumbnailJpgFile.readBytes().toImageBitmap()

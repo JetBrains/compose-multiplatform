@@ -10,6 +10,10 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -20,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -71,7 +76,7 @@ internal fun MemoryScreen(
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
-                Column {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Headliner("Note")
                     Collapsible(memoryPage.picture.description)
                     Headliner("Related memories")
@@ -88,26 +93,17 @@ internal fun MemoryScreen(
                         title = memoryPage.picture.name,
                     )
                     Spacer(Modifier.height(50.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            8.dp,
-                            Alignment.CenterHorizontally
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painterResource("trash.png"),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Text(
-                            text = "Delete Memory",
-                            textAlign = TextAlign.Left,
-                            color = ImageviewerColors.onBackground,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal
-                        )
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        IconWithText(Icons.Default.Delete, "Delete") {
+                            imageProvider.delete(memoryPage.picture)
+                            onBack()
+                        }
+                        IconWithText(Icons.Default.Edit, "Edit") {
+
+                        }
+                        IconWithText(Icons.Default.Share, "Share") {
+
+                        }
                     }
                     Spacer(Modifier.height(50.dp))
                 }
@@ -118,6 +114,32 @@ internal fun MemoryScreen(
                 BackButton(onBack)
             },
             alignRightContent = {},
+        )
+    }
+}
+
+@Composable
+private fun IconWithText(icon: ImageVector, text: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.clickable {
+            onClick()
+        },
+        horizontalArrangement = Arrangement.spacedBy(
+            8.dp,
+            Alignment.CenterHorizontally
+        ),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+        )
+        Text(
+            text = text,
+            textAlign = TextAlign.Left,
+            color = ImageviewerColors.onBackground,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal
         )
     }
 }

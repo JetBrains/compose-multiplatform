@@ -31,6 +31,10 @@ class DesktopImageStorage(
         }
     }
 
+    override fun delete(picture: PictureData.Camera) {
+        // For now, on Desktop pictures saving in memory. We don't need additional delete logic.
+    }
+
     override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap {
         return thumbnails[pictureData]!!
     }
