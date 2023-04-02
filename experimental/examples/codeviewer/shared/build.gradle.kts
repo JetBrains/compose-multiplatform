@@ -37,7 +37,8 @@ kotlin {
                 implementation(compose.material)
                 implementation(compose.materialIconsExtended)
                  @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)           }
+                implementation(compose.components.resources)
+            }
         }
         val androidMain by getting {
             kotlin.srcDirs("src/jvmMain/kotlin")
