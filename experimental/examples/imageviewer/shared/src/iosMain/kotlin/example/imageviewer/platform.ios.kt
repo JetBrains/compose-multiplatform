@@ -2,8 +2,6 @@ package example.imageviewer
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Density
@@ -50,4 +48,4 @@ actual val ioDispatcher = Dispatchers.IO
 
 actual val isShareFeatureSupported: Boolean = true
 
-actual val shareIcon: ImageVector = Icons.Filled.Share
+actual val shareIcon: ImageVector = IosShareIcon

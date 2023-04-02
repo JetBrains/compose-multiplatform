@@ -185,7 +185,7 @@ private fun IconWithText(icon: ImageVector, text: String, onClick: () -> Unit) {
             8.dp,
             Alignment.CenterHorizontally
         ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.Bottom
     ) {
         Icon(
             imageVector = icon,
