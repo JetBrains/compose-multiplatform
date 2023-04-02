@@ -41,7 +41,7 @@ data class MapState(
  * return false to disable zoom on click
  */
 @Composable
-public fun MapView(
+fun MapView(
     modifier: Modifier,
     userAgent: String,
     latitude: Double? = null,
@@ -61,7 +61,7 @@ public fun MapView(
 
     var width: Int by remember { mutableStateOf(100) }
     var height: Int by remember { mutableStateOf(100) }
-    var cache: Map<Tile, TileImage> by remember { mutableStateOf(mapOf()) }
+    var inMemoryCache: Map<Tile, TileImage> by remember { mutableStateOf(mapOf()) }
     val internalState: InternalMapState by derivedStateOf {
         val center = createGeoPt(state.value.latitude, state.value.longitude)
         InternalMapState(width, height, state.value.scale)
@@ -72,12 +72,12 @@ public fun MapView(
         val tilesToDisplay: MutableList<DisplayTileWithImage<TileImage>> = mutableListOf()
         val tilesToLoad: MutableSet<Tile> = mutableSetOf()
         calcTiles.forEach {
-            val cachedImage = cache[it.tile]
+            val cachedImage = inMemoryCache[it.tile]
             if (cachedImage != null) {
                 tilesToDisplay.add(DisplayTileWithImage(it.display, cachedImage, it.tile))
             } else {
                 tilesToLoad.add(it.tile)
-                val croppedImage = cache.searchOrCrop(it.tile)
+                val croppedImage = inMemoryCache.searchOrCrop(it.tile)
                 tilesToDisplay.add(DisplayTileWithImage(it.display, croppedImage, it.tile))
             }
         }
@@ -85,7 +85,7 @@ public fun MapView(
             tilesToLoad.forEach { tile ->
                 try {
                     val image: TileImage = imageRepository.loadContent(tile)
-                    cache = cache + (tile to image) //todo потенциально дорогая операция
+                    inMemoryCache = inMemoryCache + (tile to image)
                 } catch (t: Throwable) {
                     println("exception in tiles loading, throwable: $t")
                     // ignore errors. Tile image loaded with retries
