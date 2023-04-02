@@ -8,7 +8,7 @@ import example.imageviewer.model.GpsPosition
 
 @Composable
 internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
-    com.map.MapView(
+    com.map.MapViewWithButtons(
         modifier.height(300.dp),
         userAgent = "ComposerMapViewExample",
         latitude = gps.latitude,

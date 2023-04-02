@@ -61,7 +61,6 @@ fun MapView(
 
     var width: Int by remember { mutableStateOf(100) }
     var height: Int by remember { mutableStateOf(100) }
-    var inMemoryCache: Map<Tile, TileImage> by remember { mutableStateOf(mapOf()) }
     val internalState: InternalMapState by derivedStateOf {
         val center = createGeoPt(state.value.latitude, state.value.longitude)
         InternalMapState(width, height, state.value.scale)
@@ -95,13 +94,14 @@ fun MapView(
         tilesToDisplay
     }
 
-    PlatformMapView(
+    MapViewDesktop(
         modifier = modifier,
+        isInTouchMode = false,
         tiles = displayTiles,
-        onZoom = { pt: Pt?, change ->
+        onZoom = { pt: Pt?, change: Double ->
             onStateChange(internalState.zoom(pt, change).toExternalState())
         },
-        onClick = {
+        onClick = { it: Pt ->
             if (onMapViewClick(
                     internalState.displayToGeo(it).latitude,
                     internalState.displayToGeo(it).longitude
@@ -110,11 +110,11 @@ fun MapView(
                 onStateChange(internalState.zoom(it, Config.ZOOM_ON_CLICK).toExternalState())
             }
         },
-        onMove = { dx, dy ->
+        onMove = { dx: Int, dy: Int ->
             val topLeft = internalState.topLeft + internalState.displayLengthToGeo(Pt(-dx, -dy))
             onStateChange(internalState.copy(topLeft = topLeft).correctGeoXY().toExternalState())
         },
-        updateSize = { w, h ->
+        updateSize = { w: Int, h: Int ->
             width = w
             height = h
             onStateChange(internalState.copy(width = w, height = h).toExternalState())
@@ -128,3 +128,5 @@ fun InternalMapState.toExternalState() =
         centerGeo.longitude,
         scale
     )
+
+private var inMemoryCache: Map<Tile, TileImage> by mutableStateOf(mapOf())

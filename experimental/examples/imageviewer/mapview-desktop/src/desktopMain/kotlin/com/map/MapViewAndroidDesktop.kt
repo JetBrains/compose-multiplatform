@@ -36,7 +36,7 @@ import java.net.URL
 import kotlin.math.roundToInt
 
 @Composable
-fun MapViewAndroidDesktop(
+fun MapViewDesktop(
     modifier: Modifier,
     isInTouchMode: Boolean,
     tiles: List<DisplayTileWithImage<TileImage>>,
@@ -127,88 +127,35 @@ fun MapViewAndroidDesktop(
         }
     }
 
-    Box(modifier) {
-        Canvas(
-            Modifier.fillMaxSize().applyPointerInput()
-                .run {
-                    if (isInTouchMode) {
-                        applyTouchScreenHandlers()
-                    } else {
-                        this
-                    }
+    Canvas(
+        Modifier.fillMaxSize().applyPointerInput()
+            .run {
+                if (isInTouchMode) {
+                    applyTouchScreenHandlers()
+                } else {
+                    this
                 }
-        ) {
-            updateSize(size.width.toInt(), size.height.toInt())
-            clipRect() {
-                tiles.forEach { (t, img) ->
-                    if (img != null) {
-                        val size = IntSize(t.size, t.size)
-                        val position = IntOffset(t.x, t.y)
-                        drawImage(
-                            img.extract(),
-                            srcOffset = IntOffset(img.offsetX, img.offsetY),
-                            srcSize = IntSize(img.cropSize, img.cropSize),
-                            dstOffset = position,
-                            dstSize = size
-                        )
-                    }
-                }
-            }
-            drawPath(path = Path().apply {
-                addRect(Rect(0f, 0f, size.width, size.height))
-            }, color = Color.Red, style = Stroke(4f))
-        }
-        Column(
-            Modifier
-                .align(Alignment.CenterEnd)
-                .fillMaxHeight()
-                .padding(10.dp),
-            verticalArrangement = Arrangement.SpaceEvenly
-        ) {
-            ZoomBtn(Icons.Filled.ZoomIn, "ZoomIn") {
-                onZoom(null, 2.0)
-            }
-            ZoomBtn(Icons.Filled.ZoomOut, "ZoomOut") {
-                onZoom(null, -2.0)
-            }
-        }
-        Row(Modifier.align(Alignment.BottomCenter)) {
-            LinkText("OpenStreetMap license", Config.OPENSTREET_MAP_LICENSE)
-            LinkText("Usage policy", Config.OPENSTREET_MAP_POLICY)
-        }
-    }
-}
-
-@Composable
-private fun ZoomBtn(icon: ImageVector, contentDescription: String, onClick: () -> Unit) {
-    Box(
-        Modifier.size(40.dp)
-            .clip(RoundedCornerShape(5.dp))
-            .background(Color.White.copy(alpha = 0.8f))
-            .clickable {
-                onClick()
             }
     ) {
-        Icon(icon, contentDescription, Modifier.fillMaxSize().padding(2.dp), Color.Blue)
-    }
-}
-
-@Composable
-private fun LinkText(text:String, link:String) {
-    Text(
-        text = text,
-        color = Color.Blue,
-        fontWeight = FontWeight.Bold,
-        modifier = Modifier.clickable {
-            navigateToUrl(link)
+        updateSize(size.width.toInt(), size.height.toInt())
+        clipRect() {
+            tiles.forEach { (t, img) ->
+                if (img != null) {
+                    val size = IntSize(t.size, t.size)
+                    val position = IntOffset(t.x, t.y)
+                    drawImage(
+                        img.extract(),
+                        srcOffset = IntOffset(img.offsetX, img.offsetY),
+                        srcSize = IntSize(img.cropSize, img.cropSize),
+                        dstOffset = position,
+                        dstSize = size
+                    )
+                }
+            }
         }
-            .padding(4.dp)
-            .background(Color.White.copy(alpha = 0.8f), shape = RoundedCornerShape(5.dp))
-            .padding(10.dp)
-            .clip(RoundedCornerShape(5.dp))
-    )
-}
+        drawPath(path = Path().apply {
+            addRect(Rect(0f, 0f, size.width, size.height))
+        }, color = Color.Red, style = Stroke(4f))
+    }
 
-private fun navigateToUrl(url: String) {
-    Desktop.getDesktop().browse(URL(url).toURI())
 }
