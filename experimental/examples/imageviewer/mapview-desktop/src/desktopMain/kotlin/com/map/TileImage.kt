@@ -1,16 +1,25 @@
 package com.map
 
+import androidx.compose.ui.graphics.ImageBitmap
 import kotlin.math.roundToInt
 
 /**
  * Картинка в удобном представлении для рисования на конкретной платформе.
  * Требуется чтобы отрисовка на Canvas происходила быстро.
  */
-expect class TileImage {
-    val cropSize: Int
-    val offsetX: Int
-    val offsetY: Int
-    fun lightweightDuplicate(offsetX: Int, offsetY: Int, cropSize: Int): TileImage
+class TileImage(
+    val platformSpecificData: ImageBitmap,
+    val offsetX: Int = 0,
+    val offsetY: Int = 0,
+    val cropSize: Int = TILE_SIZE,
+) {
+    fun lightweightDuplicate(offsetX: Int, offsetY: Int, cropSize: Int): TileImage =
+        TileImage(
+            platformSpecificData,
+            offsetX = offsetX,
+            offsetY = offsetY,
+            cropSize = cropSize
+        )
 }
 
 /**
