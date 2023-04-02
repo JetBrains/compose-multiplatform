@@ -2,7 +2,10 @@ package example.imageviewer
 
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import kotlinx.cinterop.useContents
@@ -44,3 +47,7 @@ actual fun createUUID(): String =
     CFBridgingRelease(CFUUIDCreateString(null, CFUUIDCreate(null))) as String
 
 actual val ioDispatcher = Dispatchers.IO
+
+actual val isShareFeatureSupported: Boolean = true
+
+actual val shareIcon: ImageVector = Icons.Filled.Share

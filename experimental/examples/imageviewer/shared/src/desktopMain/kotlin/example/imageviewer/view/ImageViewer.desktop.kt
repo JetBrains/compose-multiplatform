@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
 import example.imageviewer.*
 import example.imageviewer.Notification
+import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageViewerTheme
 import kotlinx.coroutines.CoroutineScope
@@ -23,6 +24,7 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Toolkit
 
@@ -100,7 +102,12 @@ private fun getDependencies(
                 toastState.value = ToastState.Shown(text)
             }
         }
-        override val imageStorage: ImageStorage = DesktopImageStorage(pictures, ioScope)
+        override val imageStorage: DesktopImageStorage = DesktopImageStorage(pictures, ioScope)
+        override val sharePicture: SharePicture = object : SharePicture {
+            override fun share(context: PlatformContext, picture: PictureData) {
+                // On Desktop share feature not supported
+            }
+        }
         override val externalEvents = events
     }
 

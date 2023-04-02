@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.graphics.ImageBitmap
+import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emptyFlow
@@ -60,6 +61,7 @@ abstract class Dependencies {
                     pictures[pictures.indexOf(picture)] = edited
                     return edited
                 }
+
                 is PictureData.Camera -> {
                     val edited = picture.copy(
                         name = name,
@@ -114,7 +116,7 @@ interface ImageStorage {
 }
 
 interface SharePicture {
-    fun share(picture: PictureData)
+    fun share(context: PlatformContext, picture: PictureData)
 }
 
 internal val LocalLocalization = staticCompositionLocalOf<Localization> {

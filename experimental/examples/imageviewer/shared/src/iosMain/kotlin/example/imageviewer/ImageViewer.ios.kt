@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import example.imageviewer.filter.PlatformContext
 import example.imageviewer.model.PictureData
 import example.imageviewer.storage.IosImageStorage
 import example.imageviewer.style.ImageViewerTheme
@@ -49,7 +50,7 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         override val imageStorage: IosImageStorage = IosImageStorage(pictures, ioScope)
 
         override val sharePicture: SharePicture = object : SharePicture {
-            override fun share(picture: PictureData) {
+            override fun share(context: PlatformContext, picture: PictureData) {
                 ioScope.launch {
                     val data = imageStorage.getNSDataToShare(picture)
                     withContext(Dispatchers.Main) {

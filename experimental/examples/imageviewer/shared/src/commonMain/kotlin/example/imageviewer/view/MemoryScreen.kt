@@ -32,7 +32,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.LocalSharePicture
+import example.imageviewer.filter.getPlatformContext
+import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
+import example.imageviewer.shareIcon
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -50,6 +53,7 @@ internal fun MemoryScreen(
     var edit: Boolean by remember { mutableStateOf(false) }
     val picture = memoryPage.pictureState.value
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
+    val platformContext = getPlatformContext()
     LaunchedEffect(picture) {
         headerImage = imageProvider.getImage(picture)
     }
@@ -84,7 +88,7 @@ internal fun MemoryScreen(
                     Collapsible(picture.description)
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(
-                        pictures = (pictures - picture).shuffled().take(5),
+                        pictures = remember { (pictures - picture).shuffled().take(8) },
                         onSelectRelatedMemory = onSelectRelatedMemory
                     )
                     Headliner("Place")
@@ -107,8 +111,10 @@ internal fun MemoryScreen(
                         IconWithText(Icons.Default.Edit, "Edit") {
                             edit = true
                         }
-                        IconWithText(Icons.Default.Share, "Share") {
-                            sharePicture.share(picture)
+                        if (isShareFeatureSupported) {
+                            IconWithText(shareIcon, "Share") {
+                                sharePicture.share(platformContext, picture)
+                            }
                         }
                     }
                     Spacer(Modifier.height(50.dp))
