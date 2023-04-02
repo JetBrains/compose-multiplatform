@@ -39,6 +39,7 @@ data class MapState(
 @Composable
 public fun MapView(
     modifier: DisplayModifier,
+    userAgent: String,
     latitude: Double? = null,
     longitude: Double? = null,
     startScale: Double? = null,
@@ -50,7 +51,7 @@ public fun MapView(
 ) {
     val viewScope = rememberCoroutineScope()
     val ioScope = remember { CoroutineScope(SupervisorJob(viewScope.coroutineContext.job) + getDispatcherIO()) }
-    val imageRepository = rememberTilesRepository(ioScope)
+    val imageRepository = rememberTilesRepository(userAgent, ioScope)
 
     var width: Int by remember { mutableStateOf(100) }
     var height: Int by remember { mutableStateOf(100) }

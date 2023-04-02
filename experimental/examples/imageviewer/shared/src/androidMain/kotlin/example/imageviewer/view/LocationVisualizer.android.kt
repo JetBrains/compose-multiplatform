@@ -1,6 +1,8 @@
 package example.imageviewer.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.foundation.layout.height
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.Modifier
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -15,7 +17,7 @@ internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, tit
         position = CameraPosition.fromLatLngZoom(currentLocation, 10f)
     }
     GoogleMap(
-        modifier = modifier,
+        modifier = modifier.height(250.dp),
         cameraPositionState = cameraPositionState
     )
 }

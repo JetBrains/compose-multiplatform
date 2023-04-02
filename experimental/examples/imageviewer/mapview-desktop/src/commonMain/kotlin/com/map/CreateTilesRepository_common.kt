@@ -1,6 +1,7 @@
 package com.map
 
 import androidx.compose.runtime.Composable
+import io.ktor.client.features.*
 import kotlinx.coroutines.CoroutineScope
 import kotlin.coroutines.CoroutineContext
 
@@ -11,6 +12,7 @@ import kotlin.coroutines.CoroutineContext
  */
 @Composable
 internal expect fun rememberTilesRepository(
+    userAgent: String,
     ioScope: CoroutineScope
 ): ContentRepository<Tile, TileImage>
 

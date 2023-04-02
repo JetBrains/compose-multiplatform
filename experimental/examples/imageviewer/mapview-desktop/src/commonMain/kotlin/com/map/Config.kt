@@ -3,7 +3,9 @@ package com.map
 val TILE_SIZE = 256
 
 object Config {
-    val DISPLAY_TELEMETRY: Boolean = true
+    val OPENSTREET_MAP_LICENSE: String = "https://wiki.openstreetmap.org/wiki/OpenStreetMap_License"
+    val OPENSTREET_MAP_POLICY: String = "https://operations.osmfoundation.org/policies/"
+    val DISPLAY_TELEMETRY: Boolean = false
     val SIMULATE_NETWORK_PROBLEMS = false
     val CLICK_DURATION_MS: Long = 300
     val CLICK_AREA_RADIUS_PX: Int = 7
@@ -21,10 +23,6 @@ object Config {
     }
 }
 
-/**
- * MapTiler tile,
- * doc here https://cloud.maptiler.com/maps/streets/
- */
 data class Tile(
     val zoom: Int,
     val x: Int,

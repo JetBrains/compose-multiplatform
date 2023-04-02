@@ -82,8 +82,7 @@ internal fun MemoryScreen(
                         Modifier.padding(horizontal = 12.dp)
                             .clip(locationShape)
                             .border(1.dp, Color.Gray, locationShape)
-                            .fillMaxWidth()
-                            .height(200.dp),
+                            .fillMaxWidth(),
                         gps = memoryPage.picture.gps,
                         title = memoryPage.picture.name,
                     )
