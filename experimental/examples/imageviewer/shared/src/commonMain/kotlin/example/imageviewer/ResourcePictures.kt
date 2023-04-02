@@ -131,7 +131,7 @@ val resourcePictures = arrayOf(
             Cabo da Roca or Cape Roca is a cape which forms the westernmost point of the Sintra Mountain Range, of mainland Portugal, of continental Europe, and of the Eurasian landmass.
             """.trimIndent(),
         dateString = "3 Jun.",
-        gps = GpsPosition(38.789283172, 9.4909725957)
+        gps = GpsPosition(38.789283172, -9.4909725957)
     ),
     PictureData.Resource(
         resource = "12.jpg",
