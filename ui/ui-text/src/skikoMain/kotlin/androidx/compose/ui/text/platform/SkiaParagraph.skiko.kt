@@ -243,7 +243,7 @@ internal data class ComputedStyle(
 
     fun merge(density: Density, other: SpanStyle) {
         val fontSize = fontSizeInHierarchy(density, fontSize, other.fontSize)
-        textForegroundStyle.merge(other.textForegroundStyle)
+        textForegroundStyle = textForegroundStyle.merge(other.textForegroundStyle)
         other.fontFamily?.let { fontFamily = it }
         this.fontSize = fontSize
         other.fontWeight?.let { fontWeight = it }
