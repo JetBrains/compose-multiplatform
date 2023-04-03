@@ -193,18 +193,18 @@ class ImageComposeScene(
      *
      * @param eventType Indicates the primary reason that the event was sent.
      * @param position The [Offset] of the current pointer event, relative to the content.
+     * @param scrollDelta scroll delta for the PointerEventType.Scroll event
      * @param timeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
      * is platform-dependent.
      * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
      * or [touch][PointerType.Touch].
-     * @param buttons Contains the state of pointer buttons (e.g. mouse and stylus buttons).
-     * @param keyboardModifiers Contains the state of modifier keys, such as Shift, Control, and Alt,
-     * as well as the state of the lock keys, such as Caps Lock and Num Lock.
+     * @param buttons Contains the state of pointer buttons (e.g. mouse and stylus buttons) after the event.
+     * @param keyboardModifiers Contains the state of modifier keys, such as Shift, Control,
+     * and Alt, as well as the state of the lock keys, such as Caps Lock and Num Lock.
      * @param nativeEvent The original native event.
      * @param button Represents the index of a button which state changed in this event. It's null
      * when there was no change of the buttons state or when button is not applicable (e.g. touch event).
      */
-    @OptIn(ExperimentalComposeUiApi::class)
     fun sendPointerEvent(
         eventType: PointerEventType,
         position: Offset,
@@ -218,6 +218,42 @@ class ImageComposeScene(
     ): Unit = scene.sendPointerEvent(
         eventType, position, scrollDelta, timeMillis, type, buttons, keyboardModifiers, nativeEvent, button
     )
+
+    /**
+     * Send pointer event to the content. The more detailed version of [sendPointerEvent] that can accept
+     * multiple pointers.
+     *
+     * @param eventType Indicates the primary reason that the event was sent.
+     * @param pointers The current pointers with position relative to the content.
+     * There can be multiple pointers, for example, if we use Touch and touch screen with multiple fingers.
+     * Contains only the state of the active pointers.
+     * Touch that is released still considered as active on PointerEventType.Release event (but with pressed=false). It
+     * is no longer active after that, and shouldn't be passed to the scene.
+     * @param buttons Contains the state of pointer buttons (e.g. mouse and stylus buttons) after the event.
+     * @param keyboardModifiers Contains the state of modifier keys, such as Shift, Control,
+     * and Alt, as well as the state of the lock keys, such as Caps Lock and Num Lock.
+     * @param scrollDelta scroll delta for the PointerEventType.Scroll event
+     * @param timeMillis The time of the current pointer event, in milliseconds. The start (`0`) time
+     * is platform-dependent.
+     * @param nativeEvent The original native event.
+     * @param button Represents the index of a button which state changed in this event. It's null
+     * when there was no change of the buttons state or when button is not applicable (e.g. touch event).
+     */
+    @ExperimentalComposeUiApi
+    fun sendPointerEvent(
+        eventType: PointerEventType,
+        pointers: List<ComposeScene.Pointer>,
+        buttons: PointerButtons = PointerButtons(),
+        keyboardModifiers: PointerKeyboardModifiers = PointerKeyboardModifiers(),
+        scrollDelta: Offset = Offset(0f, 0f),
+        timeMillis: Long = (currentNanoTime() / 1E6).toLong(),
+        nativeEvent: Any? = null,
+        button: PointerButton? = null,
+    ): Unit = scene.sendPointerEvent(
+        eventType, pointers, buttons, keyboardModifiers, scrollDelta, timeMillis, nativeEvent, button
+    )
+
+
     /**
      * Send [KeyEvent] to the content.
      * @return true if the event was consumed by the content

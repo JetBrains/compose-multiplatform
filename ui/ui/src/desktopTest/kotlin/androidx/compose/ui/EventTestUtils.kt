@@ -44,13 +44,44 @@ fun Events.assertReceivedNoEvents() = assertThat(list).isEmpty()
 fun Events.assertReceived(type: PointerEventType, offset: Offset) =
     received().assertHas(type, offset)
 
+@OptIn(ExperimentalComposeUiApi::class)
+fun Events.assertReceived(type: PointerEventType, vararg pointers: ComposeScene.Pointer) =
+    received().assertHas(type, *pointers)
+
 fun Events.assertReceivedLast(type: PointerEventType, offset: Offset) =
     receivedLast().assertHas(type, offset)
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun Events.assertReceivedLast(type: PointerEventType, vararg pointers: ComposeScene.Pointer) =
+    receivedLast().assertHas(type, *pointers)
 
 fun PointerEvent.assertHas(type: PointerEventType, offset: Offset) {
     assertThat(this.type).isEqualTo(type)
     assertThat(changes.first().position).isEqualTo(offset)
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun PointerEvent.assertHas(type: PointerEventType, vararg pointers: ComposeScene.Pointer) {
+    assertThat(this.type).isEqualTo(type)
+    val actualPointers = changes.map {
+        ComposeScene.Pointer(
+            it.id,
+            it.position,
+            it.pressed,
+            it.type,
+            it.pressure
+        )
+    }
+    assertThat(actualPointers).containsExactly(*pointers)
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun touch(x: Float, y: Float, pressed: Boolean, id: Int = 0) = ComposeScene.Pointer(
+    id = PointerId(id.toLong()),
+    position = Offset(x, y),
+    pressed = pressed,
+    type = PointerType.Touch
+)
 
 class Events {
     val list = mutableListOf<PointerEvent>()
@@ -127,6 +158,35 @@ fun Modifier.collectEvents(events: Events) = pointerInput(Unit) {
         }
     }
 }
+
+@OptIn(ExperimentalComposeUiApi::class)
+fun ImageComposeScene.sendPointerEvent(
+    type: PointerEventType,
+    vararg pointers: ComposeScene.Pointer
+) = sendPointerEvent(type, pointers = pointers.toList())
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun event(
+    type: PointerEventType,
+    vararg pointers: Pair<Int, ComposeScene.Pointer>
+) = PointerInputEvent(
+    type,
+    0,
+    pointers.map {
+        val id = it.first
+        val pointer = it.second
+        PointerInputEventData(
+            PointerId(id.toLong()),
+            uptime = 0,
+            pointer.position,
+            pointer.position,
+            pointer.pressed,
+            pointer.pressure,
+            pointer.type,
+            scrollDelta = Offset.Zero
+        )
+    },
+)
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal fun mouseEvent(
