@@ -70,7 +70,7 @@ fun App() {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Timestamp: ${progress.time} ms", modifier = Modifier.width(140.dp))
+            Text("Timestamp: ${progress.timeMillis} ms", modifier = Modifier.width(180.dp))
             IconButton(onClick = state::toggleResume) {
                 Icon(
                     painter = painterResource("${if (state.isResumed) "pause" else "play"}.svg"),

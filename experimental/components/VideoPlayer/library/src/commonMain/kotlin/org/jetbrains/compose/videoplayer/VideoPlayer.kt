@@ -6,7 +6,7 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 
-data class Progress(val fraction: Float, val time/* millis */: Long)
+data class Progress(val fraction: Float, val timeMillis: Long)
 
 @Composable
 fun VideoPlayer(
