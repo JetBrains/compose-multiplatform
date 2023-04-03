@@ -18,52 +18,19 @@ package androidx.compose.foundation.copyPasteAndroidTests
 
 import androidx.compose.animation.core.keyframes
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.OverscrollEffect
-import androidx.compose.foundation.assertThat
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.containsExactly
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.ModifierLocalScrollableContainer
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.ScrollScope
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.scrollable
-import androidx.compose.foundation.hasSize
+import androidx.compose.foundation.*
+import androidx.compose.foundation.gestures.*
 import androidx.compose.foundation.interaction.DragInteraction
 import androidx.compose.foundation.interaction.Interaction
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.isEmpty
-import androidx.compose.foundation.isEqualTo
-import androidx.compose.foundation.isFalse
-import androidx.compose.foundation.isGreaterThan
-import androidx.compose.foundation.isLessThan
-import androidx.compose.foundation.isNull
-import androidx.compose.foundation.isTrue
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.focus.*
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -77,35 +44,13 @@ import androidx.compose.ui.input.pointer.util.VelocityTracker
 import androidx.compose.ui.materialize
 import androidx.compose.ui.modifier.ModifierLocalConsumer
 import androidx.compose.ui.modifier.ModifierLocalReadScope
-import androidx.compose.ui.platform.InspectableValue
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalViewConfiguration
-import androidx.compose.ui.platform.isDebugInspectorInfoEnabled
-import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ComposeTimeoutException
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.ScrollWheel
-import androidx.compose.ui.test.SkikoComposeUiTest
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.onRoot
-import androidx.compose.ui.test.performMouseInput
-import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.test.runSkikoComposeUiTest
-import androidx.compose.ui.test.swipe
-import androidx.compose.ui.test.swipeDown
-import androidx.compose.ui.test.swipeLeft
-import androidx.compose.ui.test.swipeRight
-import androidx.compose.ui.test.swipeUp
-import androidx.compose.ui.test.swipeWithVelocity
+import androidx.compose.ui.platform.*
+import androidx.compose.ui.test.*
 import androidx.compose.ui.unit.Velocity
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEach
 import kotlin.math.abs
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertTrue
+import kotlin.test.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.coroutineScope
@@ -2385,50 +2330,6 @@ class ScrollableTest {
             }
         }
     }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
-private val NoOpOverscrollEffect = object : OverscrollEffect {
-
-    // TODO: [1.4 Update] implement it after OverscrollEffect API changes
-
-    override fun applyToScroll(
-        delta: Offset,
-        source: NestedScrollSource,
-        performScroll: (Offset) -> Offset
-    ): Offset {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun applyToFling(
-        velocity: Velocity,
-        performFling: suspend (Velocity) -> Velocity
-    ) {
-        TODO("Not yet implemented")
-    }
-
-//    override fun consumePreScroll(
-//        scrollDelta: Offset,
-//        source: NestedScrollSource
-//    ): Offset = Offset.Zero
-//
-//    override fun consumePostScroll(
-//        initialDragDelta: Offset,
-//        overscrollDelta: Offset,
-//        source: NestedScrollSource
-//    ) {
-//    }
-//
-//    override suspend fun consumePreFling(velocity: Velocity): Velocity = Velocity.Zero
-//
-//    override suspend fun consumePostFling(velocity: Velocity) {}
-//
-//    override var isEnabled: Boolean = false
-
-    override val isInProgress: Boolean
-        get() = false
-
-    override val effectModifier: Modifier get() = Modifier
 }
 
 // Very low tolerance on the difference
