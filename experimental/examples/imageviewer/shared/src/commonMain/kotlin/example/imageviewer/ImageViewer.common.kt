@@ -83,8 +83,8 @@ internal fun ImageViewerWithProvidedDependencies(
                 MemoryScreen(
                     pictures = pictures,
                     memoryPage = page,
-                    onSelectRelatedMemory = { galleryId ->
-                        navigationStack.push(MemoryPage(mutableStateOf(galleryId)))
+                    onSelectRelatedMemory = { picture ->
+                        navigationStack.push(MemoryPage(mutableStateOf(picture)))
                     },
                     onBack = {
                         navigationStack.back()
