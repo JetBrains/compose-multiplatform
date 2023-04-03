@@ -13,7 +13,6 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -128,48 +127,10 @@ internal fun MemoryScreen(
             alignRightContent = {},
         )
         if (edit) {
-            var name by remember { mutableStateOf(picture.name) }
-            var description by remember { mutableStateOf(picture.description) }
-            Box(Modifier
-                .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.4f))
-                .clickable {
-                    val edited = imageProvider.edit(picture, name, description)
-                    memoryPage.pictureState.value = edited
-                    edit = false
-                }
-            ) {
-                Column(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(30.dp)
-                        .clip(RoundedCornerShape(20.dp))
-                        .background(Color.White),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    TextField(
-                        value = name,
-                        onValueChange = { name = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.White,
-                        ),
-                        textStyle = LocalTextStyle.current.copy(
-                            textAlign = TextAlign.Center,
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                        ),
-                    )
-                    TextField(
-                        value = description,
-                        onValueChange = { description = it },
-                        colors = TextFieldDefaults.textFieldColors(
-                            backgroundColor = Color.White,
-                            unfocusedIndicatorColor = Color.Transparent,
-                            focusedIndicatorColor = Color.Transparent,
-                        )
-                    )
-                }
+            EditMemoryDialog(picture.name, picture.description) { name, description ->
+                val edited = imageProvider.edit(picture, name, description)
+                memoryPage.pictureState.value = edited
+                edit = false
             }
         }
     }
