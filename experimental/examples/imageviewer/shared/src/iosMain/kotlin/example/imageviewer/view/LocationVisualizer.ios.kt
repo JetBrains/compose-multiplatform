@@ -1,6 +1,7 @@
 package example.imageviewer.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitInteropView
 import example.imageviewer.model.GpsPosition
@@ -11,26 +12,29 @@ import platform.MapKit.MKPointAnnotation
 
 @Composable
 internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
+    val location = CLLocationCoordinate2DMake(gps.latitude, gps.longitude)
+    val annotation = remember {
+        MKPointAnnotation(
+            location,
+            title = null,
+            subtitle = null
+        )
+    }
+    val mkMapView = remember { MKMapView().apply { addAnnotation(annotation) } }
+    annotation.setTitle(title)
     UIKitInteropView(
         modifier = modifier,
         factory = {
-            val mkMapView = MKMapView()
-            val cityAmsterdam = CLLocationCoordinate2DMake(gps.latitude, gps.longitude)
+            mkMapView
+        },
+        update = {
             mkMapView.setRegion(
                 MKCoordinateRegionMakeWithDistance(
-                    centerCoordinate = cityAmsterdam,
+                    centerCoordinate = location,
                     10_000.0, 10_000.0
                 ),
                 animated = false
             )
-            mkMapView.addAnnotation(
-                MKPointAnnotation(
-                    cityAmsterdam,
-                    title = title,
-                    subtitle = null
-                )
-            )
-            mkMapView
-        },
+        }
     )
 }

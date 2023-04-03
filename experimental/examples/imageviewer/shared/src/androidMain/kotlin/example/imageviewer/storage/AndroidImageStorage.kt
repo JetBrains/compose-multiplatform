@@ -2,23 +2,29 @@ package example.imageviewer.storage
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.content.FileProvider
 import androidx.core.graphics.scale
 import example.imageviewer.ImageStorage
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.model.PictureData
-import example.imageviewer.toAndroidBitmap
 import example.imageviewer.toImageBitmap
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.resource
 import java.io.File
+import java.util.UUID
+
 
 private const val maxStorableImageSizePx = 2000
 private const val storableThumbnailSizePx = 200
@@ -29,10 +35,15 @@ class AndroidImageStorage(
     private val ioScope: CoroutineScope,
     context: Context
 ) : ImageStorage {
-    private val savePictureDir = File(context.filesDir, "takenPhotos")
+    private val savePictureDir = File(context.filesDir, "taken_photos")
+    private val sharedImagesDir = File(context.filesDir, "share_images")
 
     private val PictureData.Camera.jpgFile get() = File(savePictureDir, "$id.jpg")
-    private val PictureData.Camera.thumbnailJpgFile get() = File(savePictureDir, "$id-thumbnail.jpg")
+    private val PictureData.Camera.thumbnailJpgFile
+        get() = File(
+            savePictureDir,
+            "$id-thumbnail.jpg"
+        )
     private val PictureData.Camera.jsonFile get() = File(savePictureDir, "$id.json")
 
     init {
@@ -53,30 +64,64 @@ class AndroidImageStorage(
         }
     }
 
-    override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
+    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
         }
         ioScope.launch {
             with(image.imageBitmap) {
-                pictureData.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
-                pictureData.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
+                picture.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
+                picture.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
 
             }
-            pictures.add(0, pictureData)
-            pictureData.jsonFile.writeText(pictureData.toJson())
+            pictures.add(0, picture)
+            picture.jsonFile.writeText(picture.toJson())
         }
     }
 
-    override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap =
+    override fun delete(picture: PictureData.Camera) {
+        ioScope.launch {
+            picture.jsonFile.delete()
+            picture.jpgFile.delete()
+            picture.thumbnailJpgFile.delete()
+        }
+    }
+
+    override fun rewrite(picture: PictureData.Camera) {
+        ioScope.launch {
+            picture.jsonFile.delete()
+            picture.jsonFile.writeText(picture.toJson())
+        }
+    }
+
+    override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
-            pictureData.thumbnailJpgFile.readBytes().toImageBitmap()
+            picture.thumbnailJpgFile.readBytes().toImageBitmap()
         }
 
-    override suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap =
+    override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
-            pictureData.jpgFile.readBytes().toImageBitmap()
+            picture.jpgFile.readBytes().toImageBitmap()
         }
+
+    @OptIn(ExperimentalResourceApi::class)
+    suspend fun getUri(context: Context, picture: PictureData): Uri = withContext(Dispatchers.IO) {
+        val tempFileToShare: File = sharedImagesDir.resolve("share_picture.jpg")
+        when (picture) {
+            is PictureData.Camera -> {
+                picture.jpgFile.copyTo(tempFileToShare, overwrite = true)
+            }
+
+            is PictureData.Resource -> {
+                tempFileToShare.writeBytes(resource(picture.resource).readBytes())
+            }
+        }
+        FileProvider.getUriForFile(
+            context,
+            "example.imageviewer.fileprovider",
+            tempFileToShare
+        )
+    }
 }
 
 private fun ImageBitmap.fitInto(px: Int): ImageBitmap {

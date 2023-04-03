@@ -10,6 +10,9 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
@@ -20,18 +23,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import example.imageviewer.LocalImageProvider
+import example.imageviewer.LocalSharePicture
+import example.imageviewer.filter.getPlatformContext
+import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
+import example.imageviewer.shareIcon
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -41,9 +48,13 @@ internal fun MemoryScreen(
     onHeaderClick: (PictureData) -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
-    var headerImage: ImageBitmap? by remember(memoryPage.picture) { mutableStateOf(null) }
-    LaunchedEffect(memoryPage.picture) {
-        headerImage = imageProvider.getImage(memoryPage.picture)
+    val sharePicture = LocalSharePicture.current
+    var edit: Boolean by remember { mutableStateOf(false) }
+    val picture = memoryPage.pictureState.value
+    var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
+    val platformContext = getPlatformContext()
+    LaunchedEffect(picture) {
+        headerImage = imageProvider.getImage(picture)
     }
     Box {
         val scrollState = rememberScrollState()
@@ -65,17 +76,20 @@ internal fun MemoryScreen(
                 headerImage?.let {
                     MemoryHeader(
                         it,
-                        picture = memoryPage.picture,
-                        onClick = { onHeaderClick(memoryPage.picture) }
+                        picture = picture,
+                        onClick = { onHeaderClick(picture) }
                     )
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
-                Column {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Headliner("Note")
-                    Collapsible(memoryPage.picture.description)
+                    Collapsible(picture.description)
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(
+                        pictures = remember { (pictures - picture).shuffled().take(8) },
+                        onSelectRelatedMemory = onSelectRelatedMemory
+                    )
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -84,30 +98,23 @@ internal fun MemoryScreen(
                             .border(1.dp, Color.Gray, locationShape)
                             .fillMaxWidth()
                             .height(200.dp),
-                        gps = memoryPage.picture.gps,
-                        title = memoryPage.picture.name,
+                        gps = picture.gps,
+                        title = picture.name,
                     )
                     Spacer(Modifier.height(50.dp))
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            8.dp,
-                            Alignment.CenterHorizontally
-                        ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Image(
-                            painterResource("trash.png"),
-                            contentDescription = null,
-                            modifier = Modifier.size(14.dp)
-                        )
-                        Text(
-                            text = "Delete Memory",
-                            textAlign = TextAlign.Left,
-                            color = ImageviewerColors.onBackground,
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Normal
-                        )
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                        IconWithText(Icons.Default.Delete, "Delete") {
+                            imageProvider.delete(picture)
+                            onBack()
+                        }
+                        IconWithText(Icons.Default.Edit, "Edit") {
+                            edit = true
+                        }
+                        if (isShareFeatureSupported) {
+                            IconWithText(shareIcon, "Share") {
+                                sharePicture.share(platformContext, picture)
+                            }
+                        }
                     }
                     Spacer(Modifier.height(50.dp))
                 }
@@ -118,6 +125,39 @@ internal fun MemoryScreen(
                 BackButton(onBack)
             },
             alignRightContent = {},
+        )
+        if (edit) {
+            EditMemoryDialog(picture.name, picture.description) { name, description ->
+                val edited = imageProvider.edit(picture, name, description)
+                memoryPage.pictureState.value = edited
+                edit = false
+            }
+        }
+    }
+}
+
+@Composable
+private fun IconWithText(icon: ImageVector, text: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.clickable {
+            onClick()
+        },
+        horizontalArrangement = Arrangement.spacedBy(
+            8.dp,
+            Alignment.CenterHorizontally
+        ),
+        verticalAlignment = Alignment.Bottom
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+        )
+        Text(
+            text = text,
+            textAlign = TextAlign.Left,
+            color = ImageviewerColors.onBackground,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal
         )
     }
 }
@@ -222,7 +262,7 @@ internal fun Headliner(s: String) {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<PictureData>,
+    pictures: List<PictureData>,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(
@@ -232,7 +272,7 @@ internal fun RelatedMemoriesVisualizer(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(ps) { idx, item ->
+            itemsIndexed(pictures) { idx, item ->
                 RelatedMemory(item, onSelectRelatedMemory)
             }
         }

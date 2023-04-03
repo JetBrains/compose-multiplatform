@@ -56,26 +56,56 @@ class IosImageStorage(
         }
     }
 
-    override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
+    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         ioScope.launch {
             with(image.rawValue) {
-                pictureData.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
-                pictureData.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
+                picture.jpgFile.writeJpeg(fitInto(maxStorableImageSizePx))
+                picture.thumbnailJpgFile.writeJpeg(fitInto(storableThumbnailSizePx))
             }
-            pictures.add(0, pictureData)
-            pictureData.jsonFile.writeText(pictureData.toJson())
+            pictures.add(0, picture)
+            picture.jsonFile.writeText(picture.toJson())
         }
     }
 
-    override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap =
+    override fun delete(picture: PictureData.Camera) {
+        ioScope.launch {
+            picture.jsonFile.delete()
+            picture.jpgFile.delete()
+            picture.thumbnailJpgFile.delete()
+        }
+    }
+
+    override fun rewrite(picture: PictureData.Camera) {
+        ioScope.launch {
+            picture.jsonFile.delete()
+            picture.jsonFile.writeText(picture.toJson())
+        }
+    }
+
+    override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
-            pictureData.thumbnailJpgFile.readBytes().toImageBitmap()
+            picture.thumbnailJpgFile.readBytes().toImageBitmap()
         }
 
-    override suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap =
+    override suspend fun getImage(picture: PictureData.Camera): ImageBitmap =
         withContext(ioScope.coroutineContext) {
-            pictureData.jpgFile.readBytes().toImageBitmap()
+            picture.jpgFile.readBytes().toImageBitmap()
         }
+
+    suspend fun getNSDataToShare(picture: PictureData): NSData = withContext(Dispatchers.IO) {
+        when (picture) {
+            is PictureData.Camera -> {
+                picture.jpgFile
+            }
+
+            is PictureData.Resource -> {
+                NSURL(
+                    fileURLWithPath = NSBundle.mainBundle.resourcePath + "/" + picture.resource,
+                    isDirectory = false
+                )
+            }
+        }.readData()
+    }
 }
 
 private fun UIImage.fitInto(px: Int): UIImage {

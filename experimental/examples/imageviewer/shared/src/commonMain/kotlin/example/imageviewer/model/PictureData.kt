@@ -19,7 +19,7 @@ sealed interface PictureData {
     val gps: GpsPosition
     val dateString: String
 
-    class Resource(
+    data class Resource(
         val resource: String,
         val thumbnailResource: String,
         override val name: String,
@@ -29,15 +29,13 @@ sealed interface PictureData {
     ) : PictureData
 
     @Serializable
-    class Camera(
+    data class Camera(
         val id: String,
         val timeStampSeconds: Long,
         override val name: String,
         override val description: String,
         override val gps: GpsPosition,
     ) : PictureData {
-        override fun equals(other: Any?): Boolean = (other as? Camera)?.id == id
-        override fun hashCode(): Int = id.hashCode()
         override val dateString: String
             get(): String {
                 val instantTime = Instant.fromEpochSeconds(timeStampSeconds, 0)

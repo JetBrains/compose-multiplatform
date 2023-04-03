@@ -6,12 +6,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import example.imageviewer.LocalImageStorage
+import example.imageviewer.LocalImageProvider
 import kotlinx.coroutines.delay
 
 @Composable
 internal fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
-    val storage = LocalImageStorage.current
+    val imageProvider = LocalImageProvider.current
     var showCamera by remember { mutableStateOf(false) }
     LaunchedEffect(onBack) {
         if (!showCamera) {
@@ -22,7 +22,7 @@ internal fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
     Box(Modifier.fillMaxSize().background(Color.Black)) {
         if (showCamera) {
             CameraView(Modifier.fillMaxSize(), onCapture = { picture, image ->
-                storage.saveImage(picture, image)
+                imageProvider.saveImage(picture, image)
                 onBack(true)
             })
         }

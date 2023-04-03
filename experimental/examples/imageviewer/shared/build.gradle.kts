@@ -35,6 +35,7 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
+                //implementation(compose.materialIconsExtended) // TODO not working on iOS
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")

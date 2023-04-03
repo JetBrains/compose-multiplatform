@@ -21,8 +21,8 @@ internal fun ImageViewerCommon(
         LocalLocalization provides dependencies.localization,
         LocalNotification provides dependencies.notification,
         LocalImageProvider provides dependencies.imageProvider,
-        LocalImageStorage provides dependencies.imageStorage,
-        LocalInternalEvents provides dependencies.externalEvents
+        LocalInternalEvents provides dependencies.externalEvents,
+        LocalSharePicture provides dependencies.sharePicture,
     ) {
         ImageViewerWithProvidedDependencies(dependencies.pictures)
     }
@@ -63,7 +63,7 @@ internal fun ImageViewerWithProvidedDependencies(
                     pictures = pictures,
                     selectedPictureIndex = selectedPictureIndex,
                     onClickPreviewPicture = { previewPictureId ->
-                        navigationStack.push(MemoryPage(previewPictureId))
+                        navigationStack.push(MemoryPage(mutableStateOf(previewPictureId)))
                     }
                 ) {
                     navigationStack.push(CameraPage())
@@ -83,8 +83,8 @@ internal fun ImageViewerWithProvidedDependencies(
                 MemoryScreen(
                     pictures = pictures,
                     memoryPage = page,
-                    onSelectRelatedMemory = { galleryId ->
-                        navigationStack.push(MemoryPage(galleryId))
+                    onSelectRelatedMemory = { picture ->
+                        navigationStack.push(MemoryPage(mutableStateOf(picture)))
                     },
                     onBack = {
                         navigationStack.back()

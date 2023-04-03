@@ -20,23 +20,31 @@ class DesktopImageStorage(
     private val largeImages = mutableMapOf<PictureData.Camera, ImageBitmap>()
     private val thumbnails = mutableMapOf<PictureData.Camera, ImageBitmap>()
 
-    override fun saveImage(pictureData: PictureData.Camera, image: PlatformStorableImage) {
+    override fun saveImage(picture: PictureData.Camera, image: PlatformStorableImage) {
         if (image.imageBitmap.width == 0 || image.imageBitmap.height == 0) {
             return
         }
         ioScope.launch {
-            largeImages[pictureData] = image.imageBitmap.fitInto(maxStorableImageSizePx)
-            thumbnails[pictureData] = image.imageBitmap.fitInto(storableThumbnailSizePx)
-            pictures.add(0, pictureData)
+            largeImages[picture] = image.imageBitmap.fitInto(maxStorableImageSizePx)
+            thumbnails[picture] = image.imageBitmap.fitInto(storableThumbnailSizePx)
+            pictures.add(0, picture)
         }
     }
 
-    override suspend fun getThumbnail(pictureData: PictureData.Camera): ImageBitmap {
-        return thumbnails[pictureData]!!
+    override fun delete(picture: PictureData.Camera) {
+        // For now, on Desktop pictures saving in memory. We don't need additional delete logic.
     }
 
-    override suspend fun getImage(pictureData: PictureData.Camera): ImageBitmap {
-        return largeImages[pictureData]!!
+    override fun rewrite(picture: PictureData.Camera) {
+        // For now, on Desktop pictures saving in memory. We don't need additional rewrite logic.
+    }
+
+    override suspend fun getThumbnail(picture: PictureData.Camera): ImageBitmap {
+        return thumbnails[picture]!!
+    }
+
+    override suspend fun getImage(picture: PictureData.Camera): ImageBitmap {
+        return largeImages[picture]!!
     }
 }
 
