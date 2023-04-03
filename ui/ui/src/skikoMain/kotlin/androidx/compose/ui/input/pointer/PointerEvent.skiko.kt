@@ -17,6 +17,8 @@
 package androidx.compose.ui.input.pointer
 
 import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.ui.util.fastForEach
+import kotlin.jvm.JvmStatic
 import org.jetbrains.skiko.SkikoPointerDevice
 import org.jetbrains.skiko.SkikoPointerEventKind
 
@@ -144,7 +146,7 @@ actual class PointerEvent internal constructor(
         changes = changes,
         buttons = PointerButtons(0),
         keyboardModifiers = PointerKeyboardModifiers(0),
-        type = PointerEventType.Unknown,
+        type = calculatePointerEventType(changes),
         nativeEvent = null,
         button = null
     )
@@ -232,6 +234,27 @@ actual class PointerEvent internal constructor(
             ")"
     }
 
+    companion object {
+        @JvmStatic
+        private fun calculatePointerEventType(changes: List<PointerInputChange>): PointerEventType {
+            if (changes.isEmpty()) {
+                return PointerEventType.Unknown
+            }
+
+            // Taken from android implementation.
+            // Used for testing when internal event is not provided.
+            // (see SuspendingGestureTestUtil)
+            changes.fastForEach {
+                if (it.changedToUpIgnoreConsumed()) {
+                    return PointerEventType.Release
+                }
+                if (it.changedToDownIgnoreConsumed()) {
+                    return PointerEventType.Press
+                }
+            }
+            return PointerEventType.Move
+        }
+    }
 }
 
 private object ButtonMasks {
