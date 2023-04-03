@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.AlertDialog
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.LocalTextStyle
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
@@ -26,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 internal actual fun BoxScope.EditMemoryDialog(
     previousName: String,
@@ -34,44 +37,51 @@ internal actual fun BoxScope.EditMemoryDialog(
 ) {
     var name by remember { mutableStateOf(previousName) }
     var description by remember { mutableStateOf(previousDescription) }
+    AlertDialog(
+        onDismissRequest = {
+            save(name, description)
+        },
+        buttons = {
+            Column(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .padding(30.dp)
+                    .clip(RoundedCornerShape(20.dp))
+                    .background(Color.White),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                TextField(
+                    value = name,
+                    onValueChange = { name = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.White,
+                    ),
+                    textStyle = LocalTextStyle.current.copy(
+                        textAlign = TextAlign.Center,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.Bold,
+                    ),
+                )
+                TextField(
+                    value = description,
+                    onValueChange = { description = it },
+                    colors = TextFieldDefaults.textFieldColors(
+                        backgroundColor = Color.White,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                    )
+                )
+            }
+        },
+    )
     Box(
         Modifier
             .fillMaxSize()
             .background(Color.Black.copy(alpha = 0.4f))
             .clickable {
-                save(name, description)
+
             }
     ) {
-        Column(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(30.dp)
-                .clip(RoundedCornerShape(20.dp))
-                .background(Color.White),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            TextField(
-                value = name,
-                onValueChange = { name = it },
-                modifier = Modifier.fillMaxWidth(),
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                ),
-                textStyle = LocalTextStyle.current.copy(
-                    textAlign = TextAlign.Center,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                ),
-            )
-            TextField(
-                value = description,
-                onValueChange = { description = it },
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = Color.White,
-                    unfocusedIndicatorColor = Color.Transparent,
-                    focusedIndicatorColor = Color.Transparent,
-                )
-            )
-        }
     }
 }
