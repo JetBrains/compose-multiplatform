@@ -37,14 +37,4 @@ interface SkiaRootForTest : RootForTest {
      * Whether the Owner has pending layout work.
      */
     val hasPendingMeasureOrLayout: Boolean
-
-    /**
-     * Process pointer event
-     *
-     * [timeMillis] time when the pointer event occurred
-     * [pointers] state of all pointers
-     */
-    @Suppress("DEPRECATION")
-    @Deprecated("Don't send events directly to root. Send events to [scene]. Will be removed in Compose 1.3")
-    fun processPointerInput(timeMillis: Long, pointers: List<TestPointerInputEventData>)
 }

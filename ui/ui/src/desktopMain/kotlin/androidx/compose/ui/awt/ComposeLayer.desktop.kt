@@ -172,8 +172,7 @@ internal class ComposeLayer(
         MainUIDispatcher + coroutineExceptionHandler,
         platform,
         Density(1f),
-        _component::needRedraw,
-        createSyntheticNativeMoveEvent = _component::createSyntheticMouseEvent,
+        _component::needRedraw
     )
 
     private val density get() = _component.density.density
@@ -287,21 +286,6 @@ internal class ComposeLayer(
                 this@ComposeLayer.scene.density = density
                 updateSceneSize()
             }
-        }
-
-        @Suppress("DEPRECATION")
-        fun createSyntheticMouseEvent(sourceEvent: Any?, positionSourceEvent: Any?): Any {
-            sourceEvent as MouseEvent
-            positionSourceEvent as MouseEvent
-
-            return SyntheticMouseEvent(
-                sourceEvent.source as Component,
-                MouseEvent.MOUSE_MOVED,
-                sourceEvent.`when`,
-                sourceEvent.modifiersEx,
-                positionSourceEvent.x,
-                positionSourceEvent.y
-            )
         }
 
         private fun refreshWindowFocus() {
@@ -557,14 +541,3 @@ private val MouseEvent.isMacOsCtrlClick
                     ((modifiersEx and InputEvent.BUTTON1_DOWN_MASK) != 0) &&
                     ((modifiersEx and InputEvent.CTRL_DOWN_MASK) != 0)
             )
-
-@Deprecated("Will be removed in Compose 1.3")
-internal class SyntheticMouseEvent(
-    source: Component,
-    id: Int,
-    `when`: Long,
-    modifiers: Int,
-    x: Int,
-    y: Int
-) : MouseEvent(source, id, `when`, modifiers, x, y, 0, false)
-

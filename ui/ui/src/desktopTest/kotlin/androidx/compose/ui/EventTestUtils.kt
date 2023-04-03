@@ -21,8 +21,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerInputEvent
+import androidx.compose.ui.input.pointer.PointerInputEventData
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntRect
@@ -32,6 +37,7 @@ import androidx.compose.ui.unit.toOffset
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupPositionProvider
 import com.google.common.truth.Truth.assertThat
+import kotlin.test.assertContentEquals
 
 fun Events.assertReceivedNoEvents() = assertThat(list).isEmpty()
 
@@ -120,4 +126,57 @@ fun Modifier.collectEvents(events: Events) = pointerInput(Unit) {
             events.add(awaitPointerEvent())
         }
     }
+}
+
+@OptIn(ExperimentalComposeUiApi::class)
+internal fun mouseEvent(
+    type: PointerEventType,
+    x: Float,
+    y: Float,
+    pressed: Boolean
+) = PointerInputEvent(
+    type,
+    0,
+    listOf(
+        PointerInputEventData(
+            id = PointerId(0),
+            uptime = 0,
+            Offset(x, y),
+            Offset(x, y),
+            down = pressed,
+            pressure = 1f,
+            type = PointerType.Mouse,
+            scrollDelta = Offset.Zero
+        )
+    ),
+    buttons = PointerButtons(isPrimaryPressed = pressed)
+)
+
+internal infix fun List<PointerInputEvent>.positionAndDownShouldEqual(
+    expected: List<PointerInputEvent>
+) {
+    assertContentEquals(
+        expected.map { it.formatPositionAndDown() },
+        map { it.formatPositionAndDown() }
+    )
+}
+
+internal fun PointerInputEvent.formatPositionAndDown(): String {
+    val pointers = if (pointers.size == 1) {
+        pointers.first().formatPositionAndDown()
+    } else {
+        pointers.joinToString(" ") {
+            val id = it.id.value
+            val data = it.formatPositionAndDown()
+            "$id-$data"
+        }
+    }
+    return "$eventType $pointers"
+}
+
+internal fun PointerInputEventData.formatPositionAndDown(): String {
+    val x = position.x.toInt()
+    val y = position.y.toInt()
+    val down = if (down) "down" else "up"
+    return "$x:$y:$down"
 }

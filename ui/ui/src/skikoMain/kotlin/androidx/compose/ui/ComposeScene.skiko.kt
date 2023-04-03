@@ -93,10 +93,7 @@ class ComposeScene internal constructor(
     coroutineContext: CoroutineContext = Dispatchers.Unconfined,
     internal val platform: Platform,
     density: Density = Density(1f),
-    private val invalidate: () -> Unit = {},
-    @Deprecated("Will be removed in Compose 1.3")
-    internal val createSyntheticNativeMoveEvent:
-        (sourceEvent: Any?, positionSourceEvent: Any?) -> Any? = { _, _ -> null }
+    private val invalidate: () -> Unit = {}
 ) {
     /**
      * Constructs [ComposeScene]
@@ -215,7 +212,10 @@ class ComposeScene internal constructor(
 
     private val recomposer = Recomposer(coroutineContext + job + effectDispatcher)
 
-    internal val pointerPositionUpdater = PointerPositionUpdater(::invalidateIfNeeded, ::sendAsMove)
+    private val syntheticEventSender = SyntheticEventSender(::processPointerInput)
+    internal val pointerPositionUpdater = PointerPositionUpdater(
+        ::invalidateIfNeeded, syntheticEventSender
+    )
 
     internal var mainOwner: SkiaBasedOwner? = null
     private var composition: Composition? = null
@@ -354,6 +354,7 @@ class ComposeScene internal constructor(
         content: @Composable () -> Unit
     ) {
         check(!isClosed) { "ComposeScene is closed" }
+        syntheticEventSender.reset()
         pointerPositionUpdater.reset()
         composition?.dispose()
         mainOwner?.dispose()
@@ -442,7 +443,7 @@ class ComposeScene internal constructor(
      * is platform-dependent.
      * @param type The device type that produced the event, such as [mouse][PointerType.Mouse],
      * or [touch][PointerType.Touch].
-     * @param buttons Contains the state of pointer buttons (e.g. mouse and stylus buttons).
+     * @param buttons Contains the state of pointer buttons (e.g. mouse and stylus buttons) after the event.
      * @param keyboardModifiers Contains the state of modifier keys, such as Shift, Control,
      * and Alt, as well as the state of the lock keys, such as Caps Lock and Num Lock.
      * @param nativeEvent The original native event.
@@ -479,8 +480,8 @@ class ComposeScene internal constructor(
         )
         needLayout = false
         forEachOwner { it.measureAndLayout() }
-        pointerPositionUpdater.beforeEvent(event)
-        processPointerInput(event)
+        pointerPositionUpdater.update()
+        syntheticEventSender.send(event)
         updatePointerPositions(event)
     }
 
@@ -507,16 +508,6 @@ class ComposeScene internal constructor(
         }
     }
 
-    @Suppress("DEPRECATION")
-    private fun sendAsMove(sourceEvent: PointerInputEvent, positionSourceEvent: PointerInputEvent) {
-        val nativeEvent = createSyntheticNativeMoveEvent(
-            sourceEvent.nativeEvent,
-            positionSourceEvent.nativeEvent
-        )
-        processPointerInput(createMoveEvent(nativeEvent, sourceEvent, positionSourceEvent))
-    }
-
-    @OptIn(ExperimentalComposeUiApi::class)
     private fun processPointerInput(event: PointerInputEvent) {
         when (event.eventType) {
             PointerEventType.Press -> processPress(event)
