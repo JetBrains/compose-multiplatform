@@ -269,7 +269,7 @@ fun AlertDialog(
         AlertDialog(
             onDismissRequest = onDismissRequest,
             shape = shape,
-            modifier = modifier.padding(dialogPadding),
+            modifier = Modifier.padding(dialogPadding).then(modifier),
         ) { modifier ->
             AlertDialogContent(
                 buttons = buttons,
