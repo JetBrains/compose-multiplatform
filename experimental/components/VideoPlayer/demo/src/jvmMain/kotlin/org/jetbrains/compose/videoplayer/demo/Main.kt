@@ -44,6 +44,13 @@ fun main() {
 @Composable
 fun App() {
     val state = rememberVideoPlayerState()
+    /*
+     * Could not use a [Box] to overlay the controls on top of the video.
+     * See https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Swing_Integration
+     * Related issues:
+     * https://github.com/JetBrains/compose-multiplatform/issues/1521
+     * https://github.com/JetBrains/compose-multiplatform/issues/2926
+     */
     Column {
         val progress by VideoPlayer(
             url = VIDEO_URL,
