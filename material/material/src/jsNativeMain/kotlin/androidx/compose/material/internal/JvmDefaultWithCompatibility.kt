@@ -16,7 +16,6 @@
 
 package androidx.compose.material.internal
 
-// TODO: [1.4 Update] upstream it
 // TODO: this actual is not needed after https://youtrack.jetbrains.com/issue/KT-53149 is implemented
 internal annotation class NoOp
 internal actual typealias JvmDefaultWithCompatibility = NoOp
