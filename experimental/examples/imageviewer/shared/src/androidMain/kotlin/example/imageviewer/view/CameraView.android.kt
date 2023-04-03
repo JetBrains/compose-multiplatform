@@ -19,6 +19,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -32,6 +33,10 @@ import example.imageviewer.*
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.resource
 import java.nio.ByteBuffer
 import java.util.*
 import java.util.concurrent.Executors
@@ -62,6 +67,7 @@ internal actual fun CameraView(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @SuppressLint("MissingPermission")
 @Composable
 private fun CameraWithGrantedPermission(
@@ -77,6 +83,7 @@ private fun CameraWithGrantedPermission(
     val cameraSelector = CameraSelector.Builder()
         .requireLensFacing(CameraSelector.LENS_FACING_BACK)
         .build()
+    val viewScope = rememberCoroutineScope()
 
     LaunchedEffect(Unit) {
         val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
@@ -102,38 +109,50 @@ private fun CameraWithGrantedPermission(
         Button(
             enabled = !capturePhotoStarted,
             onClick = {
+                fun addLocationInfoAndReturnResult(imageBitmap: ImageBitmap) {
+                    fun sendToStorage(gpsPosition: GpsPosition) {
+                        onCapture(
+                            createCameraPictureData(
+                                name = nameAndDescription.name,
+                                description = nameAndDescription.description,
+                                gps = gpsPosition
+                            ),
+                            AndroidStorableImage(imageBitmap)
+                        )
+                        capturePhotoStarted = false
+                    }
+                    LocationServices.getFusedLocationProviderClient(context)
+                        .getCurrentLocation(CurrentLocationRequest.Builder().build(), null)
+                        .apply {
+                            addOnSuccessListener {
+                                sendToStorage(GpsPosition(it.latitude, it.longitude))
+                            }
+                            addOnFailureListener {
+                                sendToStorage(GpsPosition(0.0, 0.0))
+                            }
+                        }
+                }
+
                 capturePhotoStarted = true
                 imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
                     override fun onCaptureSuccess(image: ImageProxy) {
                         val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
                         val imageBitmap = byteArray.toImageBitmap()
                         image.close()
-                        fun sendToStorage(gpsPosition: GpsPosition) {
-                            onCapture(
-                                createCameraPictureData(
-                                    name = nameAndDescription.name,
-                                    description = nameAndDescription.description,
-                                    gps = gpsPosition
-                                ),
-                                AndroidStorableImage(imageBitmap)
-                            )
-                            capturePhotoStarted = false
-                        }
-
-                        val lastLocation: Task<Location> =
-                            LocationServices.getFusedLocationProviderClient(context)
-                                .getCurrentLocation(
-                                    CurrentLocationRequest.Builder().build(),
-                                    null
-                                )
-                        lastLocation.addOnSuccessListener {
-                            sendToStorage(GpsPosition(it.latitude, it.longitude))
-                        }
-                        lastLocation.addOnFailureListener {
-                            sendToStorage(GpsPosition(0.0, 0.0))
-                        }
+                        addLocationInfoAndReturnResult(imageBitmap)
                     }
                 })
+                viewScope.launch {
+                    // TODO: There is a known issue with Android emulator
+                    //  https://partnerissuetracker.corp.google.com/issues/161034252
+                    //  After 5 seconds delay, let's assume that the bug appears and publish a prepared photo
+                    delay(5000)
+                    if (capturePhotoStarted) {
+                        addLocationInfoAndReturnResult(
+                            resource("android-emulator-photo.jpg").readBytes().toImageBitmap()
+                        )
+                    }
+                }
             }) {
             Text(LocalLocalization.current.takePhoto, color = Color.White)
         }

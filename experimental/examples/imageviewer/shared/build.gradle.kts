@@ -43,12 +43,12 @@ kotlin {
         }
         val androidMain by getting {
             dependencies {
-                api("androidx.activity:activity-compose:1.6.1")
+                api("androidx.activity:activity-compose:1.7.0")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.9.0")
-                implementation("androidx.camera:camera-camera2:1.2.1")
-                implementation("androidx.camera:camera-lifecycle:1.2.1")
-                implementation("androidx.camera:camera-view:1.2.1")
+                implementation("androidx.camera:camera-camera2:1.2.2")
+                implementation("androidx.camera:camera-lifecycle:1.2.2")
+                implementation("androidx.camera:camera-view:1.2.2")
                 implementation("com.google.accompanist:accompanist-permissions:0.29.2-rc")
                 implementation("com.google.android.gms:play-services-maps:18.1.0")
                 implementation("com.google.android.gms:play-services-location:21.0.1")
@@ -57,7 +57,7 @@ kotlin {
         }
         val iosMain by getting {
             dependencies {
-                // TODO: update coroutines (or remove, if 1.8.0 will be presented in Compose)
+                // Kotlin Coroutines 1.7.0 contains Dispatchers.IO
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-Beta")
             }
         }
