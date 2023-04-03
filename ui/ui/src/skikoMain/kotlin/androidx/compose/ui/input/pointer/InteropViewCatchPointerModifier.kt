@@ -19,7 +19,7 @@ package androidx.compose.ui.input.pointer
 import androidx.compose.ui.unit.IntSize
 
 /**
- * Modifier to catch pointer above platform interop view, like UIKitInteropView.
+ * Modifier to catch pointer above platform interop view, like UIKitView.
  */
 internal class InteropViewCatchPointerModifier : PointerInputFilter(), PointerInputModifier {
     override fun onPointerEvent(

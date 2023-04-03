@@ -61,26 +61,29 @@ private val NoOpDispose: UIView.() -> Unit = STUB_CALLBACK_WITH_RECEIVER
 private val DefaultResize: UIView.(CValue<CGRect>) -> Unit = { rect -> this.setFrame(rect) }
 
 /**
+ * @param factory The block creating the [UIView] to be composed.
  * @param modifier The modifier to be applied to the layout. Size should be specified in modifier.
  * Modifier may contains crop() modifier with different shapes.
- * @param background A color of UIView background.
  * @param update A callback to be invoked after the layout is inflated.
- * @param dispose A callback that will be called when the view leaves the composition.
- * @param resize May be used to custom resize logic.
- * @param factory The block creating the [UIView] to be composed.
- * TODO adapt UIKitInteropView to reuse inside LazyColumn like in Android:
- * https://developer.android.com/reference/kotlin/androidx/compose/ui/viewinterop/package-summary#AndroidView(kotlin.Function1,kotlin.Function1,androidx.compose.ui.Modifier,kotlin.Function1,kotlin.Function1)
+ * @param background A color of UIView background.
+ * @param onRelease A callback invoked as a signal that this view instance has exited the
+ * composition hierarchy entirely and will not be reused again. Any additional resources used by the
+ * View should be freed at this time.
+ * @param onResize May be used to custom resize logic.
+ * @param interactive If true, then user touches will be passed to this UIView
  */
 @Composable
-fun <T : UIView> UIKitInteropView(
-    modifier: Modifier,
-    background: Color = Color.Unspecified,
-    update: (T) -> Unit = NoOpUpdate,
-    dispose: (T) -> Unit = NoOpDispose,
-    resize: (view: T, rect: CValue<CGRect>) -> Unit = DefaultResize,
-    interactive: Boolean = true,
+fun <T : UIView> UIKitView(
     factory: () -> T,
+    modifier: Modifier,
+    update: (T) -> Unit = NoOpUpdate,
+    background: Color = Color.Unspecified,
+    onRelease: (T) -> Unit = NoOpDispose,
+    onResize: (view: T, rect: CValue<CGRect>) -> Unit = DefaultResize,
+    interactive: Boolean = true,
 ) {
+    // TODO: adapt UIKitView to reuse inside LazyColumn like in AndroidView:
+    //  https://developer.android.com/reference/kotlin/androidx/compose/ui/viewinterop/package-summary#AndroidView(kotlin.Function1,kotlin.Function1,androidx.compose.ui.Modifier,kotlin.Function1,kotlin.Function1)
     val componentInfo = remember { ComponentInfo<T>() }
     val root = LocalLayerContainer.current
     val density = LocalDensity.current.density
@@ -95,7 +98,7 @@ fun <T : UIView> UIKitInteropView(
                 val rect = newRectInPixels / density
                 componentInfo.container.setFrame(rect.toCGRect())
                 if (rectInPixels.width != newRectInPixels.width || rectInPixels.height != newRectInPixels.height) {
-                    resize(
+                    onResize(
                         componentInfo.component,
                         CGRectMake(0.0, 0.0, rect.width.toDouble(), rect.height.toDouble()),
                     )
@@ -113,7 +116,7 @@ fun <T : UIView> UIKitInteropView(
         }
     )
 
-    DisposableEffect(factory, dispose) {
+    DisposableEffect(factory, onRelease) {
         componentInfo.component = factory()
         componentInfo.container = UIView().apply {
             addSubview(componentInfo.component)
@@ -123,7 +126,7 @@ fun <T : UIView> UIKitInteropView(
         onDispose {
             componentInfo.container.removeFromSuperview()
             componentInfo.updater.dispose()
-            dispose(componentInfo.component)
+            onRelease(componentInfo.component)
         }
     }
     LaunchedEffect(background) {

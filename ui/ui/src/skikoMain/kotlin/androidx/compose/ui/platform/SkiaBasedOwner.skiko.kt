@@ -402,7 +402,7 @@ internal class SkiaBasedOwner(
     }
 
     /**
-     * If pointerPosition is UIKitInterop, then Compose skip touches. And touches goes to UIKit view
+     * If pointerPosition is inside UIKitView, then Compose skip touches. And touches goes to UIKit.
      */
     fun hitInteropView(pointerPosition: Offset, isTouchEvent: Boolean): Boolean {
         val result = HitTestResult<PointerInputModifierNode>()
