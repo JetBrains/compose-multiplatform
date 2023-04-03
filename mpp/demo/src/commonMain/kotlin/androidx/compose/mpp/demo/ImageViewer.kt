@@ -18,10 +18,7 @@ package androidx.compose.mpp.demo
 
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.detectTransformGestures
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
@@ -89,6 +86,7 @@ fun ImageViewer(image: ImageBitmap) {
 
         Box(
             Modifier
+                .fillMaxSize()
                 .drawWithContent {
                     drawIntoCanvas {
                         it.withSave {
