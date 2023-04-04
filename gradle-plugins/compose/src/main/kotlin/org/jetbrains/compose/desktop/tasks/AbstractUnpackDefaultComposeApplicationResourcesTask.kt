@@ -17,6 +17,7 @@ import org.jetbrains.compose.internal.utils.clearDirs
 import org.jetbrains.compose.internal.utils.ioFile
 
 private const val DEFAULT_COMPOSE_PROGUARD_RULES_FILE_NAME = "default-compose-desktop-rules.pro"
+private const val DEFAULT_ENTITLEMENTS_FILE_NAME = "default-entitlements.plist"
 
 abstract class AbstractUnpackDefaultComposeApplicationResourcesTask : AbstractComposeDesktopTask() {
     internal class DefaultResourcesProvider(resourcesRootDir: Provider<Directory>) {
@@ -24,6 +25,7 @@ abstract class AbstractUnpackDefaultComposeApplicationResourcesTask : AbstractCo
         val windowsIcon: Provider<RegularFile> = resourcesRootDir.map { it.file("default-icon-windows.ico") }
         val linuxIcon: Provider<RegularFile> = resourcesRootDir.map { it.file("default-icon-linux.png") }
         val defaultComposeProguardRules: Provider<RegularFile> = resourcesRootDir.map { it.file(DEFAULT_COMPOSE_PROGUARD_RULES_FILE_NAME) }
+        val defaultEntitlements: Provider<RegularFile> = resourcesRootDir.map { it.file(DEFAULT_ENTITLEMENTS_FILE_NAME) }
     }
 
     @OutputDirectory
@@ -42,6 +44,7 @@ abstract class AbstractUnpackDefaultComposeApplicationResourcesTask : AbstractCo
         unpack(iconSourcePath("windows", "ico"), resources.windowsIcon)
         unpack(iconSourcePath("linux", "png"), resources.linuxIcon)
         unpack(DEFAULT_COMPOSE_PROGUARD_RULES_FILE_NAME, resources.defaultComposeProguardRules)
+        unpack(DEFAULT_ENTITLEMENTS_FILE_NAME, resources.defaultEntitlements)
     }
 
     private fun iconSourcePath(platformName: String, iconExt: String): String =

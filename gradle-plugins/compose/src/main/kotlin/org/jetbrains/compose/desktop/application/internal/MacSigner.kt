@@ -38,7 +38,13 @@ internal class NoCertificateSigner(runTool: ExternalToolRunner) : MacSigner(runT
             // Apple Silicon requires binaries to be signed
             // For local builds, ad hoc signatures are OK
             // https://wiki.lazarus.freepascal.org/Code_Signing_for_macOS
-            runTool.codesign("--sign", "-", "-vvvv", file.absolutePath)
+            val args = arrayListOf("-vvvv", "--sign", "-", "--options", "runtime", "--force")
+            entitlements?.let {
+                args.add("--entitlements")
+                args.add(entitlements.absolutePath)
+            }
+            args.add(file.absolutePath)
+            runTool.codesign(*args.toTypedArray())
         }
     }
 
