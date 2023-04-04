@@ -254,11 +254,10 @@ internal class SkiaLayer(
             } else {
                 canvas.save()
             }
-            val skiaCanvas = canvas as SkiaBackedCanvas
-            if (compositingStrategy == CompositingStrategy.ModulateAlpha) {
-                skiaCanvas.alphaMultiplier = alpha
+            canvas.alphaMultiplier = if (compositingStrategy == CompositingStrategy.ModulateAlpha) {
+                alpha
             } else {
-                skiaCanvas.alphaMultiplier = 1.0f
+                1.0f
             }
 
             drawBlock(canvas)

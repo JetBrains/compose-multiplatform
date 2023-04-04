@@ -35,7 +35,6 @@ internal class SkiaBackedPaint(
     override fun asFrameworkPaint(): NativePaint = skia
 
     private var mAlphaMultiplier = 1.0f
-    private var mColor: Color = Color.Black
 
     var alphaMultiplier: Float
         get() = mAlphaMultiplier
@@ -46,13 +45,12 @@ internal class SkiaBackedPaint(
         }
 
     private fun updateAlpha(alpha: Float = this.alpha, multiplier: Float = this.mAlphaMultiplier) {
-        skia.color = mColor.copy(alpha = alpha * multiplier).toArgb()
+        skia.color = Color(skia.color).copy(alpha = alpha * multiplier).toArgb()
     }
 
     override var alpha: Float
-        get() = mColor.alpha
+        get() = Color(skia.color).alpha
         set(value) {
-            mColor = mColor.copy(alpha = value)
             updateAlpha(alpha = value)
         }
 
@@ -63,9 +61,8 @@ internal class SkiaBackedPaint(
         }
 
     override var color: Color
-        get() = mColor
+        get() = Color(skia.color)
         set(color) {
-            mColor = color
             skia.color = color.toArgb()
         }
 
