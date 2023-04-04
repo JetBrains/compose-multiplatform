@@ -88,10 +88,11 @@ internal class SkiaParagraph(
 
     override val lineCount: Int
         // workaround for https://bugs.chromium.org/p/skia/issues/detail?id=11321
-        get() = if (text == "") {
+        // workaround for invalid paragraph layout result
+        get() = if (text == "" || paragraph.lineNumber < 1) {
             1
         } else {
-            paragraph.lineNumber.toInt()
+            paragraph.lineNumber
         }
 
     override val placeholderRects: List<Rect?>
@@ -177,30 +178,34 @@ internal class SkiaParagraph(
         return metrics.last()
     }
 
-    override fun getLineHeight(lineIndex: Int) = lineMetrics[lineIndex].height.toFloat()
+    override fun getLineHeight(lineIndex: Int) =
+        lineMetrics.getOrNull(lineIndex)?.height?.toFloat() ?: 0f
 
-    override fun getLineWidth(lineIndex: Int) = lineMetrics[lineIndex].width.toFloat()
+    override fun getLineWidth(lineIndex: Int) =
+        lineMetrics.getOrNull(lineIndex)?.width?.toFloat() ?: 0f
 
-    override fun getLineStart(lineIndex: Int) = lineMetrics[lineIndex].startIndex.toInt()
+    override fun getLineStart(lineIndex: Int) =
+        lineMetrics.getOrNull(lineIndex)?.startIndex ?: 0
 
-    override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean) =
-        if (visibleEnd) {
-            val metrics = lineMetrics[lineIndex]
+    override fun getLineEnd(lineIndex: Int, visibleEnd: Boolean): Int {
+        val metrics = lineMetrics.getOrNull(lineIndex) ?: return 0
+        return if (visibleEnd) {
             // workarounds for https://bugs.chromium.org/p/skia/issues/detail?id=11321 :(
             // we are waiting for fixes
             if (lineIndex > 0 && metrics.startIndex < lineMetrics[lineIndex - 1].endIndex) {
-                metrics.endIndex.toInt()
+                metrics.endIndex
             } else if (
                 metrics.startIndex < text.length &&
-                text[metrics.startIndex.toInt()] == '\n'
+                text[metrics.startIndex] == '\n'
             ) {
-                metrics.startIndex.toInt()
+                metrics.startIndex
             } else {
-                metrics.endExcludingWhitespaces.toInt()
+                metrics.endExcludingWhitespaces
             }
         } else {
-            lineMetrics[lineIndex].endIndex.toInt()
+            metrics.endIndex
         }
+    }
 
     override fun isLineEllipsized(lineIndex: Int) = false
 
