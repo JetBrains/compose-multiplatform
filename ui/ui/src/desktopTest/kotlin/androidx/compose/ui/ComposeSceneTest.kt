@@ -308,6 +308,9 @@ class ComposeSceneTest {
         scene.sendPointerEvent(PointerEventType.Move, Offset(-1f, -1f))
         scene.sendPointerEvent(PointerEventType.Exit, Offset(-1f, -1f))
         awaitNextRender()
+        // TODO(https://github.com/JetBrains/compose-multiplatform/issues/2970)
+        //  fix one-frame lag after a Release
+        awaitNextRender()
         screenshotRule.snap(surface, "frame3_onMouseReleased")
 
         scene.sendPointerEvent(PointerEventType.Enter, Offset(1f, 1f))
