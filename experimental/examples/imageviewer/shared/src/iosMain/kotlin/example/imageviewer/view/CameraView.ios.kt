@@ -9,7 +9,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.interop.UIKitInteropView
+import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
 import example.imageviewer.IosStorableImage
 import example.imageviewer.LocalLocalization
@@ -226,23 +226,24 @@ private fun BoxScope.RealDeviceCamera(
             )
         }
     }
-    UIKitInteropView(
+    UIKitView(
         modifier = Modifier.fillMaxSize(),
         background = Color.Black,
-        resize = { view: UIView, rect: CValue<CGRect> ->
+        factory = {
+            val cameraContainer = UIView()
+            cameraContainer.layer.addSublayer(cameraPreviewLayer)
+            cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
+            captureSession.startRunning()
+            cameraContainer
+        },
+        onResize = { view: UIView, rect: CValue<CGRect> ->
             CATransaction.begin()
             CATransaction.setValue(true, kCATransactionDisableActions)
             view.layer.setFrame(rect)
             cameraPreviewLayer.setFrame(rect)
             CATransaction.commit()
         },
-    ) {
-        val cameraContainer = UIView()
-        cameraContainer.layer.addSublayer(cameraPreviewLayer)
-        cameraPreviewLayer.videoGravity = AVLayerVideoGravityResizeAspectFill
-        captureSession.startRunning()
-        cameraContainer
-    }
+    )
     Button(
         modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
         enabled = !capturePhotoStarted,
