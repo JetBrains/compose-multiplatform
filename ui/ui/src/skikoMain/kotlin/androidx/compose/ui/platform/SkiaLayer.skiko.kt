@@ -63,8 +63,6 @@ internal class SkiaLayer(
     private var shadowElevation: Float = 0f
     private var ambientShadowColor: Color = DefaultShadowColor
     private var spotShadowColor: Color = DefaultShadowColor
-
-    // TODO: [1.4 Update] check that compositingStrategy is properly used after merge
     private var compositingStrategy: CompositingStrategy = CompositingStrategy.Auto
 
     override fun destroy() {
