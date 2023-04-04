@@ -19,10 +19,12 @@ runGradle() {
     popd
 }
 
+runGradle chat-mpp packageDistributionForCurrentOS
 runGradle codeviewer packageDistributionForCurrentOS
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
 runGradle notepad packageDistributionForCurrentOS
-# runGradle todoapp-lite packageDistributionForCurrentOS  # Disabled due to scrollbars until upgrade to compose 1.4.0
+runGradle todoapp-lite packageDistributionForCurrentOS  # Disabled due to scrollbars until upgrade to compose 1.4.0
+runGradle minesweeper packageDistributionForCurrentOS
 runGradle visual-effects packageDistributionForCurrentOS
 runGradle widgets-gallery packageDistributionForCurrentOS

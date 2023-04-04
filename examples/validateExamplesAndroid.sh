@@ -20,9 +20,11 @@ runGradle() {
 }
 
 # requires an emulator running or an Android device to be connected
+runGradle chat installDebug
 runGradle codeviewer installDebug
 runGradle imageviewer installDebug
 runGradle issues installDebug
+runGradle minesweeper installDebug
 runGradle todoapp-lite installDebug
 runGradle widgets-gallery installDebug
 runGradle todoapp installDebug

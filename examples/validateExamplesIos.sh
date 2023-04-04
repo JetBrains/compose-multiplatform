@@ -31,9 +31,9 @@ runGradle() {
     popd
 }
 
-runGradle chat-mpp
+runGradle chat
 runGradle codeviewer
-runGradle falling-balls-mpp
+runGradle falling-balls
 runGradle imageviewer
 runGradle todoapp-lite
 runGradle visual-effects
