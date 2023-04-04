@@ -12,6 +12,7 @@ internal object ComposeCompilerCompatibility {
         "1.8.20-Beta" to "1.3.0-dev-wasm-02",
         "1.8.20-RC" to "1.4.0-dev-wasm01",
         "1.8.20-RC2" to "1.4.0-dev-wasm02",
+        "1.8.20" to "1.4.0-dev-wasm03",
         "1.9.0-dev-1" to "1.3.0-dev-wasm-01"
     )
 

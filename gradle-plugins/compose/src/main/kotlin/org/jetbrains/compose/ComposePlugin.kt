@@ -90,9 +90,9 @@ class ComposePlugin : Plugin<Project> {
             // TODO: remove these HACKS for version substitution when possible
             val conf = it
             conf.resolutionStrategy.eachDependency {
-                if (project.getKotlinPluginVersion() == "1.8.20-RC2") {
+                if (project.getKotlinPluginVersion() == "1.8.20") {
                     if (it.requested.module.name.contains("kotlin-stdlib")) {
-                        it.useVersion("1.8.20-RC2")
+                        it.useVersion("1.8.20")
                     }
                 }
                 val isWasm = conf.name.contains("wasm", true)
