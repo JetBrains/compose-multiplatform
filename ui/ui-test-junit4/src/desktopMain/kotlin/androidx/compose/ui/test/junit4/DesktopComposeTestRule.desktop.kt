@@ -55,7 +55,7 @@ class DesktopComposeTestRule private constructor(
     @ExperimentalTestApi
     constructor(
         effectContext: CoroutineContext = EmptyCoroutineContext
-    ) : this(DesktopComposeUiTest(effectContext))
+    ) : this(DesktopComposeUiTest(effectContext = effectContext))
 
     var scene: ComposeScene
         get() = composeTest.scene

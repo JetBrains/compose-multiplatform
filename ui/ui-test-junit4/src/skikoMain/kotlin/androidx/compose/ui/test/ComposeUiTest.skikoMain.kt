@@ -49,19 +49,21 @@ import org.jetbrains.skiko.currentNanoTime
 
 @ExperimentalTestApi
 actual fun runComposeUiTest(effectContext: CoroutineContext, block: ComposeUiTest.() -> Unit) {
-    // TODO: [1.4 Update] take effectContext into account
-    SkikoComposeUiTest().runTest(block)
+    SkikoComposeUiTest(effectContext = effectContext).runTest(block)
 }
 
 @ExperimentalTestApi
 fun runSkikoComposeUiTest(
     size: Size = Size(1024.0f, 768.0f),
     density: Density = Density(1f),
+    // TODO(https://github.com/JetBrains/compose-multiplatform/issues/2960) Support effectContext
+    effectContext: CoroutineContext = EmptyCoroutineContext,
     block: SkikoComposeUiTest.() -> Unit
 ) {
     SkikoComposeUiTest(
         width = size.width.roundToInt(),
         height = size.height.roundToInt(),
+        effectContext = effectContext,
         density = density
     ).runTest(block)
 }
@@ -73,12 +75,18 @@ fun runSkikoComposeUiTest(
 @ExperimentalTestApi
 @OptIn(ExperimentalCoroutinesApi::class, InternalTestApi::class)
 class SkikoComposeUiTest(
-    // TODO: [1.4 Update] take effectContext into account
-    effectContext: CoroutineContext = EmptyCoroutineContext,
     width: Int = 1024,
     height: Int = 768,
+    // TODO(https://github.com/JetBrains/compose-multiplatform/issues/2960) Support effectContext
+    effectContext: CoroutineContext = EmptyCoroutineContext,
     override val density: Density = Density(1f)
 ) : ComposeUiTest {
+    init {
+        require(effectContext == EmptyCoroutineContext) {
+            "The argument effectContext isn't supported yet. " +
+                "Follow https://github.com/JetBrains/compose-multiplatform/issues/2960"
+        }
+    }
 
     private val textInputService = object : PlatformTextInputService {
         var onEditCommand: ((List<EditCommand>) -> Unit)? = null

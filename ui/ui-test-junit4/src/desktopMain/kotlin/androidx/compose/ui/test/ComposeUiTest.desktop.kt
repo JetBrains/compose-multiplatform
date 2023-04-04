@@ -25,18 +25,18 @@ typealias DesktopComposeUiTest = SkikoComposeUiTest
 /**
  * Variant of [runComposeUiTest] that allows you to specify the size of the surface.
  *
- * @param effectContext The [CoroutineContext] used to run the composition. The context for
- * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
  * @param width the desired width of the surface
  * @param height the desired height of the surface
+ * @param effectContext The [CoroutineContext] used to run the composition. The context for
+ * `LaunchedEffect`s and `rememberCoroutineScope` will be derived from this context.
  */
 @ExperimentalTestApi
 fun runDesktopComposeUiTest(
-    // TODO: [1.4 Update] take effectContext into account
-    effectContext: CoroutineContext = EmptyCoroutineContext,
     width: Int = 1024,
     height: Int = 768,
+    // TODO(https://github.com/JetBrains/compose-multiplatform/issues/2960) Support effectContext
+    effectContext: CoroutineContext = EmptyCoroutineContext,
     block: DesktopComposeUiTest.() -> Unit
 ) {
-    DesktopComposeUiTest(effectContext, width, height).runTest(block)
+    DesktopComposeUiTest(width, height, effectContext).runTest(block)
 }
