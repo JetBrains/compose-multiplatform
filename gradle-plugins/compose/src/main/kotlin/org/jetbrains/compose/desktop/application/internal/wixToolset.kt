@@ -11,6 +11,7 @@ import org.gradle.api.tasks.Copy
 import org.jetbrains.compose.desktop.application.tasks.AbstractJPackageTask
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
+import org.jetbrains.compose.internal.utils.ioFile
 import java.io.File
 
 internal const val DOWNLOAD_WIX_TOOLSET_TASK_NAME = "downloadWix"
@@ -37,7 +38,7 @@ internal fun JvmApplicationContext.configureWix() {
     val wixDir = project.gradle.gradleUserHomeDir.resolve("compose-jb")
     val fileName = "wix311"
     val zipFile = wixDir.resolve("$fileName.zip")
-    val unzipDir = root.projectDir.resolve(fileName)
+    val unzipDir = root.layout.buildDirectory.dir(fileName)
     val download = root.tasks.maybeCreate(DOWNLOAD_WIX_TOOLSET_TASK_NAME, Download::class.java).apply {
         onlyIf { !zipFile.isFile }
         src("https://github.com/wixtoolset/wix3/releases/download/wix3112rtm/wix311-binaries.zip")
@@ -46,7 +47,7 @@ internal fun JvmApplicationContext.configureWix() {
     val unzip = root.tasks.maybeCreate(UNZIP_WIX_TOOLSET_TASK_NAME, Copy::class.java).apply {
         dependsOn(download)
         from(project.zipTree(zipFile))
-        destinationDir = unzipDir
+        destinationDir = unzipDir.ioFile
     }
     project.eachWindowsPackageTask {
         dependsOn(unzip)
