@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.unit.dp
 import java.nio.file.Files
 import kotlin.io.path.readBytes
@@ -31,25 +32,24 @@ import org.junit.Test
 
 @OptIn(ExperimentalTestApi::class)
 class UseComposeUiTest {
-    // TODO: [1.4 Update] fix tests (seems captureToImage was broken before)
-//    @Test
-//    fun testDrawSquare() = runDesktopComposeUiTest(10, 10) {
-//        setContent {
-//            Canvas(Modifier.size(10.dp)) {
-//                drawRect(Color.Blue, size = Size(10f, 10f))
-//            }
-//        }
-//        val img: Image = captureToImage()
-//        val actualPng = Files.createTempFile("test-draw-square", ".png")
-//        val actualImage =
-//            img.encodeToData(EncodedImageFormat.PNG) ?: error("Could not encode image as png")
-//        actualPng.writeBytes(actualImage.bytes)
-//
-//        val expectedPng =
-//            ClassLoader.getSystemResource("androidx/compose/ui/test/draw-square.png")
-//
-//        assert(actualPng.readBytes().contentEquals(expectedPng.readBytes())) {
-//            "The actual image '$actualPng' does not match the expected image '$expectedPng'"
-//        }
-//    }
+    @Test
+    fun testDrawSquare() = runDesktopComposeUiTest(10, 10) {
+        setContent {
+            Canvas(Modifier.size(10.dp)) {
+                drawRect(Color.Blue, size = Size(10f, 10f))
+            }
+        }
+        val img: Image = Image.makeFromBitmap(captureToImage().asSkiaBitmap())
+        val actualPng = Files.createTempFile("test-draw-square", ".png")
+        val actualImage =
+            img.encodeToData(EncodedImageFormat.PNG) ?: error("Could not encode image as png")
+        actualPng.writeBytes(actualImage.bytes)
+
+        val expectedPng =
+            ClassLoader.getSystemResource("androidx/compose/ui/test/draw-square.png")
+
+        assert(actualPng.readBytes().contentEquals(expectedPng.readBytes())) {
+            "The actual image '$actualPng' does not match the expected image '$expectedPng'"
+        }
+    }
 }
