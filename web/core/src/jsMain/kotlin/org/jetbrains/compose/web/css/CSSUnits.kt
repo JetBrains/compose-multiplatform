@@ -56,6 +56,18 @@ interface CSSUnit {
     interface vw: CSSUnitRel
 
     interface vh: CSSUnitRel
+    
+    interface lvh: CSSUnitRel
+    
+    interface dvh: CSSUnitRel
+    
+    interface svh: CSSUnitRel
+    
+    interface lvw: CSSUnitRel
+    
+    interface dvw: CSSUnitRel
+    
+    interface svw: CSSUnitRel
 
     interface vi: CSSUnitRel
 
@@ -123,6 +135,18 @@ interface CSSUnit {
         inline val vw get() = "vw".unsafeCast<vw>()
 
         inline val vh get() = "vh".unsafeCast<vh>()
+        
+        inline val lvh get() = "lvh".unsafeCast<vh>()
+        
+        inline val dvh get() = "dvh".unsafeCast<vh>()
+        
+        inline val svh get() = "svh".unsafeCast<vh>()
+        
+        inline val lvw get() = "lvw".unsafeCast<vw>()
+        
+        inline val dvw get() = "dvw".unsafeCast<vw>()
+        
+        inline val svw get() = "svw".unsafeCast<vw>()
 
         inline val vi get() = "vi".unsafeCast<vi>()
 
@@ -196,6 +220,24 @@ val Number.vw
 
 val Number.vh
     get(): CSSSizeValue<CSSUnit.vh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vh)
+    
+val Number.lvw
+    get(): CSSSizeValue<CSSUnit.lvw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.lvw)
+    
+val Number.dvw
+    get(): CSSSizeValue<CSSUnit.dvw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dvw)
+    
+val Number.svw
+    get(): CSSSizeValue<CSSUnit.svw> = CSSUnitValueTyped(this.toFloat(), CSSUnit.svw)
+    
+val Number.lvh
+    get(): CSSSizeValue<CSSUnit.lvh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.lvh)
+    
+val Number.dvh
+    get(): CSSSizeValue<CSSUnit.dvh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.dvh)
+    
+val Number.svh
+    get(): CSSSizeValue<CSSUnit.svh> = CSSUnitValueTyped(this.toFloat(), CSSUnit.svh)
 
 val Number.vmin
     get(): CSSSizeValue<CSSUnit.vmin> = CSSUnitValueTyped(this.toFloat(), CSSUnit.vmin)
