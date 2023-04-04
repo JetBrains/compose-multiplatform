@@ -28,6 +28,7 @@ import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.platform.SkiaRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.junit4.MainTestClockImpl
+import androidx.compose.ui.test.junit4.TextInputServiceForTests
 import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
 import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -88,9 +89,14 @@ class SkikoComposeUiTest(
         }
     }
 
+    private class Session(
+        var imeOptions: ImeOptions,
+        var onEditCommand: (List<EditCommand>) -> Unit,
+        var onImeActionPerformed: (ImeAction) -> Unit,
+    )
+
     private val textInputService = object : PlatformTextInputService {
-        var onEditCommand: ((List<EditCommand>) -> Unit)? = null
-        var onImeActionPerformed: ((ImeAction) -> Unit)? = null
+        var session: Session? = null
 
         override fun startInput(
             value: TextFieldValue,
@@ -98,18 +104,45 @@ class SkikoComposeUiTest(
             onEditCommand: (List<EditCommand>) -> Unit,
             onImeActionPerformed: (ImeAction) -> Unit
         ) {
-            this.onEditCommand = onEditCommand
-            this.onImeActionPerformed = onImeActionPerformed
+            session = Session(
+                imeOptions = imeOptions,
+                onEditCommand = onEditCommand,
+                onImeActionPerformed = onImeActionPerformed
+            )
         }
 
         override fun stopInput() {
-            this.onEditCommand = null
-            this.onImeActionPerformed = null
+            session = null
         }
 
         override fun showSoftwareKeyboard() = Unit
         override fun hideSoftwareKeyboard() = Unit
         override fun updateState(oldValue: TextFieldValue?, newValue: TextFieldValue) = Unit
+    }
+
+    @OptIn(ExperimentalTextApi::class)
+    private val textInputServiceForTests = object : TextInputForTests {
+        override fun inputTextForTest(text: String) {
+            performEditCommand(listOf(CommitTextCommand(text, 1)))
+        }
+
+        override fun submitTextForTest() {
+            with(requireSession()) {
+                if (imeOptions.imeAction == ImeAction.Default) {
+                    throw AssertionError(
+                        "Failed to perform IME action as current node does not specify any."
+                    )
+                }
+                onImeActionPerformed(imeOptions.imeAction)
+            }
+        }
+
+        private fun performEditCommand(commands: List<EditCommand>) {
+            requireSession().onEditCommand(commands)
+        }
+
+        private fun requireSession(): Session =
+            textInputService.session ?: error("No input session started. Missing a focus?")
     }
 
     private val coroutineDispatcher = UnconfinedTestDispatcher()
@@ -286,25 +319,8 @@ class SkikoComposeUiTest(
     private inner class DesktopTestOwner : TestOwner {
         @OptIn(ExperimentalTextApi::class)
         override fun performTextInput(node: SemanticsNode, action: TextInputForTests.() -> Unit) {
-            // TODO: [1.4 Update] implement new API
-            TODO()
-        }
-
-        // TODO: use it in performTextInput
-        private fun sendTextInputCommand(node: SemanticsNode, command: List<EditCommand>) {
             runOnIdle {
-                val onEditCommand = textInputService.onEditCommand
-                    ?: throw IllegalStateException("No input session started. Missing a focus?")
-                onEditCommand(command)
-            }
-        }
-
-        // TODO: use it in performTextInput
-        private fun sendImeAction(node: SemanticsNode, actionSpecified: ImeAction) {
-            runOnIdle {
-                val onImeActionPerformed = textInputService.onImeActionPerformed
-                    ?: throw IllegalStateException("No input session started. Missing a focus?")
-                onImeActionPerformed.invoke(actionSpecified)
+                textInputServiceForTests.action()
             }
         }
 

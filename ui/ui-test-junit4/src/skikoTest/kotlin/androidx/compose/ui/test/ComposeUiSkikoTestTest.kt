@@ -299,7 +299,7 @@ class ComposeUiSkikoTestTest {
             assertThat(changes[0].type).isEqualTo(PointerType.Touch)
         }
         events[1].apply {
-            assertThat(type).isEqualTo(Enter)
+            assertThat(type).isEqualTo(Move)
             assertThat(changes[0].position).isEqualTo(Offset(10f, 20f))
             assertThat(changes[0].type).isEqualTo(PointerType.Touch)
         }
@@ -360,7 +360,7 @@ class ComposeUiSkikoTestTest {
             assertThat(changes[0].type).isEqualTo(PointerType.Touch)
         }
         events[1].apply {
-            assertThat(type).isEqualTo(Enter)
+            assertThat(type).isEqualTo(Move)
             assertThat(changes[0].position).isEqualTo(Offset(10f, 20f))
             assertThat(changes[0].type).isEqualTo(PointerType.Touch)
         }
@@ -410,10 +410,9 @@ class ComposeUiSkikoTestTest {
     @Test
     fun text_input() = runComposeUiTest {
         var text by mutableStateOf(TextFieldValue(""))
-        val focusRequester = FocusRequester()
 
         setContent {
-            BasicTextField(text, { text = it }, modifier = Modifier.testTag("test").focusRequester(focusRequester))
+            BasicTextField(text, { text = it }, modifier = Modifier.testTag("test"))
         }
 
         onNodeWithTag("test").performClick()
