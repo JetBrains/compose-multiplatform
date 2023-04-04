@@ -9,13 +9,16 @@ import java.io.FileInputStream
 import java.io.FilenameFilter
 import java.io.IOException
 import java.io.RandomAccessFile
+import java.nio.ByteBuffer
 import java.nio.channels.FileChannel
 import java.nio.charset.StandardCharsets
 
 fun java.io.File.toProjectFile(): File = object : File {
-    override val name: String get() = this@toProjectFile.name
+    override val name: String
+        get() = this@toProjectFile.name
 
-    override val isDirectory: Boolean get() = this@toProjectFile.isDirectory
+    override val isDirectory: Boolean
+        get() = this@toProjectFile.isDirectory
 
     override val children: List<File>
         get() = this@toProjectFile
@@ -23,31 +26,34 @@ fun java.io.File.toProjectFile(): File = object : File {
             .orEmpty()
             .map { it.toProjectFile() }
 
+    private val numberOfFiles
+        get() = listFiles()?.size ?: 0
+
     override val hasChildren: Boolean
-        get() = isDirectory && listFiles()?.size ?: 0 > 0
+        get() = isDirectory && numberOfFiles > 0
 
 
     override fun readLines(scope: CoroutineScope): TextLines {
         var byteBufferSize: Int
         val byteBuffer = RandomAccessFile(this@toProjectFile, "r").use { file ->
             byteBufferSize = file.length().toInt()
-            file.channel
-                .map(FileChannel.MapMode.READ_ONLY, 0, file.length())
+            file.channel.map(FileChannel.MapMode.READ_ONLY, 0, file.length())
         }
 
         val lineStartPositions = IntList()
-
         var size by mutableStateOf(0)
 
+        // In case of big files, update number of lines periodically
         val refreshJob = scope.launch {
             delay(100)
             size = lineStartPositions.size
-            while (true) {
+            while (isActive) {
                 delay(1000)
                 size = lineStartPositions.size
             }
         }
 
+        // Find indexes where lines starts in background
         scope.launch(Dispatchers.IO) {
             readLinePositions(lineStartPositions)
             refreshJob.cancel()
@@ -58,22 +64,37 @@ fun java.io.File.toProjectFile(): File = object : File {
             override val size get() = size
 
             override fun get(index: Int): String {
-                val startPosition = lineStartPositions[index]
-                val length = if (index + 1 < size) lineStartPositions[index + 1] - startPosition else
-                    byteBufferSize - startPosition
-                // Only JDK since 13 has slice() method we need, so do ugly for now.
-                byteBuffer.position(startPosition)
-                val slice = byteBuffer.slice()
-                slice.limit(length)
+                val position = lineRange(index)
+                val slice = byteBuffer.slice(position.first, position.last - position.first)
                 return StandardCharsets.UTF_8.decode(slice).toString()
+            }
+
+            private fun lineRange(index: Int): IntRange {
+                val startPosition = lineStartPositions[index]
+                val nextLineIndex = index + 1
+                var endPosition = if (nextLineIndex < size) lineStartPositions[nextLineIndex] else byteBufferSize
+
+                // Remove line endings from the range
+                while (endPosition > startPosition) {
+                    val lastSymbol = byteBuffer[endPosition - 1]
+                    when (lastSymbol.toInt().toChar()) {
+                        '\n', '\r' -> endPosition--
+                        else -> break
+                    }
+                }
+                return startPosition..endPosition
             }
         }
     }
 }
 
-private fun java.io.File.readLinePositions(
-    starts: IntList
-) {
+// Backport slice from JDK 13
+private fun ByteBuffer.slice(index: Int, length: Int): ByteBuffer {
+    position(index)
+    return slice().limit(length) as ByteBuffer
+}
+
+private fun java.io.File.readLinePositions(starts: IntList) {
     require(length() <= Int.MAX_VALUE) {
         "Files with size over ${Int.MAX_VALUE} aren't supported"
     }
@@ -82,22 +103,8 @@ private fun java.io.File.readLinePositions(
     starts.clear(length().toInt() / averageLineLength)
 
     try {
-        FileInputStream(this@readLinePositions).use {
-            val channel = it.channel
-            val ib = channel.map(
-                FileChannel.MapMode.READ_ONLY, 0, channel.size()
-            )
-            var isBeginOfLine = true
-            var position = 0L
-            while (ib.hasRemaining()) {
-                val byte = ib.get()
-                if (isBeginOfLine) {
-                    starts.add(position.toInt())
-                }
-                isBeginOfLine = byte.toInt().toChar() == '\n'
-                position++
-            }
-            channel.close()
+        for (i in readLinePositions()) {
+            starts.add(i)
         }
     } catch (e: IOException) {
         e.printStackTrace()
@@ -107,6 +114,31 @@ private fun java.io.File.readLinePositions(
 
     starts.compact()
 }
+
+private fun java.io.File.readLinePositions() = sequence {
+    require(length() <= Int.MAX_VALUE) {
+        "Files with size over ${Int.MAX_VALUE} aren't supported"
+    }
+    readBuffer {
+        yield(position())
+        while (hasRemaining()) {
+            val byte = get()
+            if (byte.isChar('\n')) {
+                yield(position())
+            }
+        }
+    }
+}
+
+private inline fun java.io.File.readBuffer(block: ByteBuffer.() -> Unit) {
+    FileInputStream(this).use { stream ->
+        stream.channel.use { channel ->
+            channel.map(FileChannel.MapMode.READ_ONLY, 0, channel.size()).block()
+        }
+    }
+}
+
+private fun Byte.isChar(char: Char) = toInt().toChar() == char
 
 /**
  * Compact version of List<Int> (without unboxing Int and using IntArray under the hood)

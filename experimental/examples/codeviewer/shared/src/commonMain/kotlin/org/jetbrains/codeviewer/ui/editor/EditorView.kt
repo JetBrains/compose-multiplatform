@@ -138,6 +138,7 @@ private fun LineContent(content: Editor.Content, modifier: Modifier, settings: S
     },
     fontSize = settings.fontSize,
     fontFamily = Fonts.jetbrainsMono(),
+    maxLines = 1,
     modifier = modifier,
     softWrap = false
 )
@@ -168,7 +169,7 @@ private fun codeString(str: String) = buildAnnotatedString {
         addStyle(AppTheme.code.keyword, strFormatted, "package ")
         addStyle(AppTheme.code.value, strFormatted, "true")
         addStyle(AppTheme.code.value, strFormatted, "false")
-        addStyle(AppTheme.code.value, strFormatted, Regex("[0-9]*"))
+        addStyle(AppTheme.code.value, strFormatted, Regex("[0-9]+"))
         addStyle(AppTheme.code.annotation, strFormatted, Regex("^@[a-zA-Z_]*"))
         addStyle(AppTheme.code.comment, strFormatted, Regex("^\\s*//.*"))
     }
