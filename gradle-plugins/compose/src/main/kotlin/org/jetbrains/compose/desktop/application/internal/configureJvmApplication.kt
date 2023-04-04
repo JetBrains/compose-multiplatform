@@ -349,11 +349,16 @@ internal fun JvmApplicationContext.configureCommonNotarizationSettings(
     notarizationTask.nonValidatedNotarizationSettings = app.nativeDistributions.macOS.notarization
 }
 
+private fun <T> TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>.get(
+    fn: AbstractUnpackDefaultComposeApplicationResourcesTask.DefaultResourcesProvider.() -> Provider<T>
+) = flatMap { fn(it.resources) }
+
 internal fun JvmApplicationContext.configurePlatformSettings(
     packageTask: AbstractJPackageTask,
-    unpackDefaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
+    defaultResources: TaskProvider<AbstractUnpackDefaultComposeApplicationResourcesTask>
 ) {
-    packageTask.dependsOn(unpackDefaultResources)
+    packageTask.dependsOn(defaultResources)
+
     when (currentOS) {
         OS.Linux -> {
             app.nativeDistributions.linux.also { linux ->
@@ -364,7 +369,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.linuxMenuGroup.set(provider { linux.menuGroup })
                 packageTask.linuxPackageName.set(provider { linux.packageName })
                 packageTask.linuxRpmLicenseType.set(provider { linux.rpmLicenseType })
-                packageTask.iconFile.set(linux.iconFile.orElse(unpackDefaultResources.flatMap { it.resources.linuxIcon }))
+                packageTask.iconFile.set(linux.iconFile.orElse(defaultResources.get { linuxIcon }))
                 packageTask.installationPath.set(linux.installationPath)
             }
         }
@@ -377,7 +382,7 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 packageTask.winMenu.set(provider { win.menu })
                 packageTask.winMenuGroup.set(provider { win.menuGroup })
                 packageTask.winUpgradeUuid.set(provider { win.upgradeUuid })
-                packageTask.iconFile.set(win.iconFile.orElse(unpackDefaultResources.flatMap { it.resources.windowsIcon }))
+                packageTask.iconFile.set(win.iconFile.orElse(defaultResources.get { windowsIcon }))
                 packageTask.installationPath.set(win.installationPath)
             }
         }
@@ -393,15 +398,16 @@ internal fun JvmApplicationContext.configurePlatformSettings(
                 )
                 packageTask.macAppStore.set(mac.appStore)
                 packageTask.macAppCategory.set(mac.appCategory)
-                packageTask.macEntitlementsFile.set(mac.entitlementsFile)
-                packageTask.macRuntimeEntitlementsFile.set(mac.runtimeEntitlementsFile)
+                val defaultEntitlements = defaultResources.get { defaultEntitlements }
+                packageTask.macEntitlementsFile.set(mac.entitlementsFile.orElse(defaultEntitlements))
+                packageTask.macRuntimeEntitlementsFile.set(mac.runtimeEntitlementsFile.orElse(defaultEntitlements))
                 packageTask.packageBuildVersion.set(packageBuildVersionFor(packageTask.targetFormat))
                 packageTask.nonValidatedMacBundleID.set(provider { mac.bundleID })
                 packageTask.macProvisioningProfile.set(mac.provisioningProfile)
                 packageTask.macRuntimeProvisioningProfile.set(mac.runtimeProvisioningProfile)
                 packageTask.macExtraPlistKeysRawXml.set(provider { mac.infoPlistSettings.extraKeysRawXml })
                 packageTask.nonValidatedMacSigningSettings = app.nativeDistributions.macOS.signing
-                packageTask.iconFile.set(mac.iconFile.orElse(unpackDefaultResources.flatMap { it.resources.macIcon }))
+                packageTask.iconFile.set(mac.iconFile.orElse(defaultResources.get { macIcon }))
                 packageTask.installationPath.set(mac.installationPath)
             }
         }
