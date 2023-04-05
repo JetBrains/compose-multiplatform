@@ -5,7 +5,7 @@ import androidx.compose.material.icons.materialPath
 
 val IconCustomArrowBack = materialIcon("Filled.CustomArrowBack") {
     val startY = 12f
-    val startX = 3f
+    val startX = 1f
     val arrowWidth = 8f
     val arrowHeight = 14f
     val lineWidth = 14f
