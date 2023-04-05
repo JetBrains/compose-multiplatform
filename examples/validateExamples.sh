@@ -19,7 +19,7 @@ runGradle() {
     popd
 }
 
-runGradle chat-mpp packageDistributionForCurrentOS
+runGradle chat packageDistributionForCurrentOS
 runGradle codeviewer packageDistributionForCurrentOS
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
