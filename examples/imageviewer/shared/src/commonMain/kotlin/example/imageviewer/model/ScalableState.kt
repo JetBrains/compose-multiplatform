@@ -40,7 +40,7 @@ class ScalableState {
     }
 
     /**
-     * The calculated base scale for 100% zoom. Calculated in a way the target size fits the area size.
+     * The calculated base scale for 100% zoom. Calculated so that the target fits the area.
      */
     private val scaleFor100PercentZoom by derivedStateOf {
         if (targetSize.isSpecified && areaSize.isSpecified) {
