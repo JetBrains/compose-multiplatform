@@ -42,6 +42,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import org.junit.Assert
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.runners.JUnit4
 import org.junit.runner.RunWith
@@ -120,6 +121,7 @@ class DesktopMenuTest {
         }
     }
 
+    @Ignore // TODO: remove ignore when changes from http://r.android.com/2520700 will be merged
     @OptIn(ExperimentalComposeUiApi::class)
     @Test
     fun `navigate DropDownMenu using arrows`() {
