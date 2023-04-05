@@ -9,8 +9,6 @@
 **Compose Multiplatform** is a declarative framework for sharing UIs across multiple platforms with Kotlin. 
 It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) and developed by [JetBrains](https://www.jetbrains.com/) and open-source contributors.
 
-![](apps.png)
-
 You can choose the platforms across which to share your UIs using Compose Multiplatform:
 
 * [iOS](https://github.com/JetBrains/compose-multiplatform-ios-android-template/#readme) (Alpha)
@@ -20,11 +18,13 @@ You can choose the platforms across which to share your UIs using Compose Multip
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
+![Shared UIs of the iOS, Android, desktop, and web apps](artwork/readme/apps.jpg)
+
 ## iOS
 
 > iOS support is in Alpha. It may change incompatibly and require manual migration in the future. 
-> We would appreciate your feedback on it in the public Slack channel [#compose-ios](link). 
-> If you face any issues, please report them on [GitHub](link).
+> We would appreciate your feedback on it in the public Slack channel [#compose-ios](https://kotlinlang.slack.com/archives/C0346LWVBJ4/p1678888063176359). 
+> If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
 Compose Multiplatform shares most of its API with Jetpack Compose, the Android UI framework developed by Google. 
 You can use the same APIs to build user interfaces for both Android and iOS.
@@ -53,7 +53,9 @@ It has desktop extensions for menus, keyboard shortcuts, window manipulation, an
 
 ## Web
 
-> Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. We would appreciate your feedback on it in the public Slack channel [#compose-web](link). If you face any issues, please report them on [GitHub](link).
+> Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. 
+> We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
+> If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
 You can experiment with sharing your mobile or desktop UIs with the web. Compose for Web is based on [Kotlin/Wasm](kotl.in/wasm), 
 the newest target for Kotlin Multiplatform projects. It allows Kotlin developers to run their code in the browser with 
@@ -66,12 +68,13 @@ all the benefits that WebAssembly has to offer, such as good and predictable per
 If you want to share UIs across all supported platforms at once, you can start with [this template](https://github.com/JetBrains/compose-multiplatform-template#readme).
 
 > Note that this template currently doesn’t support the web. It will be added later.
+> 
+> We would appreciate your feedback on Compose Multiplatform in the public Slack channel [#compose](https://kotlinlang.slack.com/archives/CJLTWPH7S/p1678882768039969).
 
 ## Learn more
 
-* [FAQ](link)
-* [Samples](/examples/)
-* [Tutorials](/tutorials/)
+* [Samples](examples/README.md)
+* [Tutorials](tutorials/README.md)
 * [Changelog](CHANGELOG.md)
 * [Compatibility and versioning](VERSIONING.md)
 
