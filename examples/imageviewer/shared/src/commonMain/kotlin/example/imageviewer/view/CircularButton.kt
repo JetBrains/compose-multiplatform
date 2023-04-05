@@ -17,6 +17,7 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import example.imageviewer.LocalLocalization
+import example.imageviewer.icon.IconCustomArrowBack
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -87,7 +88,7 @@ internal fun CircularButton(
 internal fun BackButton(onClick: () -> Unit) {
     Tooltip(LocalLocalization.current.back) {
         CircularButton(
-            painterResource("arrowleft.png"),
+            imageVector = IconCustomArrowBack,
             onClick = onClick
         )
     }

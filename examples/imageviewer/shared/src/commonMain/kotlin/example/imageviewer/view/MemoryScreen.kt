@@ -32,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import example.imageviewer.LocalImageProvider
 import example.imageviewer.LocalSharePicture
 import example.imageviewer.filter.getPlatformContext
+import example.imageviewer.icon.IconAutoFixHigh
 import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
 import example.imageviewer.shareIcon
@@ -184,7 +185,10 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
         modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp)
     ) {
-        CircularButton(painterResource("magic.png"), onClick = onClick)
+        CircularButton(
+            imageVector = IconAutoFixHigh,
+            onClick = onClick,
+        )
     }
 }
 
