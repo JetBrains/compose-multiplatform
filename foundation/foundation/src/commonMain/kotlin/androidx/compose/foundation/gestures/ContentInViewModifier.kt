@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,15 +33,7 @@ import androidx.compose.ui.layout.OnRemeasuredModifier
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 import kotlin.math.abs
-import kotlinx.coroutines.CancellableContinuation
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.job
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.*
 
 /**
  * Static field to turn on a bunch of verbose logging to debug animations. Since this is a constant,
@@ -210,7 +202,9 @@ internal class ContentInViewModifier(
                             )
                             val consumedScroll = scrollMultiplier * scrollBy(adjustedDelta)
                             if (DEBUG) println("[$TAG] Consumed $consumedScroll of scroll")
-                            if (consumedScroll < delta) {
+                            // consumedScroll check changed in JetBrains Fork
+                            // keep it during merge if it is not upstreamed
+                            if (abs(consumedScroll) < abs(delta)) {
                                 // If the scroll state didn't consume all the scroll on this frame,
                                 // it probably won't consume any more later either (we might have
                                 // hit the scroll bounds). This is a terminal condition for the
@@ -220,7 +214,7 @@ internal class ContentInViewModifier(
                                 // TODO(b/239671493) Should this trigger nested scrolling?
                                 animationJob.cancel(
                                     "Scroll animation cancelled because scroll was not consumed " +
-                                        "($consumedScroll < $delta)"
+                                        "(${abs(consumedScroll)} < ${abs(delta)})"
                                 )
                             }
                         },

@@ -828,8 +828,6 @@ class ScrollbarTest {
         }
     }
 
-    // TODO: [1.4 Update] test hangs on waitForIdle after 1.4 merge
-    @Ignore
     @Test
     @OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
     fun `basic text field with vertical scrolling test`() {
