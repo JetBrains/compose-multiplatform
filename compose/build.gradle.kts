@@ -112,7 +112,6 @@ tasks.register("testComposeJbDesktop") {
 
 tasks.register("testComposeJbWeb") {
     dependsOnComposeTask(":compose:runtime:runtime:jsTest")
-    dependsOnComposeTask(":compose:runtime:runtime:test")
 }
 
 tasks.register("testUIKit") {
