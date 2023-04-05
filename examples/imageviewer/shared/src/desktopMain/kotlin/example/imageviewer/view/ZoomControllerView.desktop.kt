@@ -14,9 +14,9 @@ import example.imageviewer.model.ScalableState
 internal actual fun ZoomControllerView(modifier: Modifier, scalableState: ScalableState) {
     Slider(
         modifier = modifier.fillMaxWidth(0.5f).padding(12.dp),
-        value = scalableState.scale,
-        valueRange = scalableState.scaleLimits.start..scalableState.scaleLimits.endInclusive,
-        onValueChange = { scalableState.setScale(it) },
+        value = scalableState.zoom,
+        valueRange = scalableState.zoomLimits.start..scalableState.zoomLimits.endInclusive,
+        onValueChange = { scalableState.setZoom(it) },
         colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White)
     )
 }

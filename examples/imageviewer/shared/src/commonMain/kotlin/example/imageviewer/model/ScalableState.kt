@@ -1,32 +1,56 @@
 package example.imageviewer.model
 
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
+import kotlin.math.max
 
 /**
  * Encapsulate all transformations about showing some target (an image, relative to its center)
  * scaled and shifted in some area (a window, relative to its center)
  */
 class ScalableState {
-    val scaleLimits = 0.2f..10f
+    var zoomLimits = 1.0f..5f
+
+    private var offset by mutableStateOf(Offset.Zero)
 
     /**
-     * Offset of the camera before scaling (an offset in pixels in the area coordinate system)
+     * Zoom of the target relative to the area size. 1.0 - the target completely fits the area.
      */
-    var offset by mutableStateOf(Offset.Zero)
-        private set
-    var scale by mutableStateOf(1f)
+    var zoom by mutableStateOf(1f)
         private set
 
-    private var areaSize: Size = Size.Unspecified
-    private var targetSize: Size = Size.Zero
+    private var areaSize: Size by mutableStateOf(Size.Unspecified)
+    private var targetSize: Size by mutableStateOf(Size.Zero)
 
-    private var offsetXLimits = Float.NEGATIVE_INFINITY..Float.POSITIVE_INFINITY
-    private var offsetYLimits = Float.NEGATIVE_INFINITY..Float.POSITIVE_INFINITY
+    /**
+     * A transformation that should be applied to render the target in the area.
+     *   offset - in pixels in the area coordinate system, should be applied before scaling
+     *   scale - scale of the target in the area
+     */
+    val transformation: Transformation by derivedStateOf {
+        Transformation(
+            offset = offset,
+            scale = zoomToScale(zoom)
+        )
+    }
+
+    /**
+     * The calculated base scale for 100% zoom. Calculated in a way the target size fits the area size.
+     */
+    private val scaleFor100PercentZoom by derivedStateOf {
+        if (targetSize.isSpecified && areaSize.isSpecified) {
+            max(areaSize.width / targetSize.width, areaSize.height / targetSize.height)
+        } else {
+            1.0f
+        }
+    }
+
+    private fun zoomToScale(zoom: Float) = zoom * scaleFor100PercentZoom
 
     /**
      * Limit the target center position, so:
@@ -46,22 +70,20 @@ class ScalableState {
 
     private fun applyLimits() {
         if (targetSize.isSpecified && areaSize.isSpecified) {
-            offsetXLimits = centerLimits(targetSize.width * scale, areaSize.width)
-            offsetYLimits = centerLimits(targetSize.height * scale, areaSize.height)
+            val offsetXLimits = centerLimits(targetSize.width * transformation.scale, areaSize.width)
+            val offsetYLimits = centerLimits(targetSize.height * transformation.scale, areaSize.height)
+
             offset = Offset(
                 offset.x.coerceIn(offsetXLimits),
                 offset.y.coerceIn(offsetYLimits),
             )
-        } else {
-            offsetXLimits = Float.NEGATIVE_INFINITY..Float.POSITIVE_INFINITY
-            offsetYLimits = Float.NEGATIVE_INFINITY..Float.POSITIVE_INFINITY
         }
     }
 
-    private fun centerLimits(imageSize: Float, areaSize: Float): ClosedFloatingPointRange<Float> {
+    private fun centerLimits(targetSize: Float, areaSize: Float): ClosedFloatingPointRange<Float> {
         val areaCenter = areaSize / 2
-        val imageCenter = imageSize / 2
-        val extra = (imageCenter - areaCenter).coerceAtLeast(0f)
+        val targetCenter = targetSize / 2
+        val extra = (targetCenter - areaCenter).coerceAtLeast(0f)
         return -extra / 2..extra / 2
     }
 
@@ -75,17 +97,37 @@ class ScalableState {
      * After we apply the new scale, the camera should be focused on the same point in
      * the target coordinate system.
      */
-    fun addScale(scaleMultiplier: Float, focus: Offset = Offset.Zero) {
-        setScale(scale * scaleMultiplier, focus)
+    fun addZoom(zoomMultiplier: Float, focus: Offset = Offset.Zero) {
+        setZoom(zoom * zoomMultiplier, focus)
     }
 
-    fun setScale(scale: Float, focus: Offset = Offset.Zero) {
-        val newScale = scale.coerceIn(scaleLimits)
-        val focusInTargetSystem = (focus - offset) / this.scale
-        // calculate newOffset from this equation:
-        // focusInTargetSystem = (focus - newOffset) / newScale
-        offset = focus - focusInTargetSystem * newScale
-        this.scale = newScale
+    /**
+     * @param focus on which point the camera is focused in the area coordinate system.
+     * After we apply the new scale, the camera should be focused on the same point in
+     * the target coordinate system.
+     */
+    fun setZoom(zoom: Float, focus: Offset = Offset.Zero) {
+        val newZoom = zoom.coerceIn(zoomLimits)
+        val newOffset = Transformation.offsetOf(
+            point = transformation.pointOf(focus),
+            transformedPoint = focus,
+            scale = zoomToScale(newZoom)
+        )
+        this.offset = newOffset
+        this.zoom = newZoom
         applyLimits()
+    }
+
+    data class Transformation(
+        val offset: Offset,
+        val scale: Float,
+    ) {
+        fun pointOf(transformedPoint: Offset) = (transformedPoint - offset) / scale
+
+        companion object {
+            // is derived from the equation `point = (transformedPoint - offset) / scale`
+            fun offsetOf(point: Offset, transformedPoint: Offset, scale: Float) =
+                transformedPoint - point * scale
+        }
     }
 }
