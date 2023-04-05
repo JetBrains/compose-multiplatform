@@ -1,19 +1,17 @@
 # Code Viewer
-MPP Code Viewer example for desktop/android/iOS written in Multiplatform Compose library.
+Code Viewer example for Desktop, Android and iOS written in Compose Multiplatform.
+
+## Setting up your development environment
+
+To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
 
 ## How to run
 
-Choose a run configuration for an appropriate target in IDE and run it.
+Choose a run configuration for an appropriate target in Android Studio and run it.
 
 ![run-configurations.png](run-configurations.png)
 
-To run on iOS device, please correct `TEAM_ID` value in `iosApp/Configuration/Config.xcconfig` with your Apple Team ID.
-Alternatively, you may setup signing within XCode opening `iosApp/iosApp.xcworkspace` and then
-using "Signing & Capabilities" tab of `Codeviewer` target.
-
-Then choose **iosApp** configuration in IDE and run it.
-
-## Run on desktop via Gradle
+## Run desktop via Gradle
 
 `./gradlew desktopApp:run`
 
