@@ -1,19 +1,17 @@
 # Imageviewer
 
-An example of image gallery for remote server image viewing,
-based on Compose Multiplatform UI library (desktop, android and iOS).
+An example of an image gallery with camera and map support
+based on Compose Multiplatform (desktop, Android and iOS).
+
+## Setting up your development environment
+
+To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
 
 ## How to run
 
 Choose a run configuration for an appropriate target in IDE and run it.
 
 ![run-configurations.png](screenshots/run-configurations.png)
-
-To run on iOS device, please correct `TEAM_ID` value in `iosApp/Configuration/Config.xcconfig` with your Apple Team ID.
-Alternatively, you may setup signing within XCode opening `iosApp/iosApp.xcworkspace` and then
-using "Signing & Capabilities" tab of `iosApp` target.
-
-Then choose **iosApp** configuration in IDE and run it.
 
 ## Run on desktop via Gradle
 

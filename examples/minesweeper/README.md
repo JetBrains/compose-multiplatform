@@ -4,21 +4,15 @@ A simple game powered by Compose Multiplatform.
 
 Game can run on Android, iOS, desktop or in a browser.
 
-*Prerequisites*: to run on iOS and Android, you should have "Kotlin Multiplatform Mobile" plugin installed either 
-                 in Android Studio or in AppCode with [installed CocoaPods](https://kotlinlang.org/docs/native-cocoapods.html).
+## Setting up your development environment
 
+To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
 
 ## How to run 
 
-Choose a run configuration for an appropriate target in IDE and run it.
+Choose a run configuration for an appropriate target in Android Studio and run it.
 
 ![run-configurations.png](run-configurations.png)
-
-To run on iOS device, please correct `TEAM_ID` value in `iosApp/Configuration/Config.xcconfig` with your Apple Team ID. 
-Alternatively, you may setup signing within XCode opening `iosApp/iosApp.xcworkspace` and then 
-using "Signing & Capabilities" tab of `iosApp` target.
-
-Then choose **iosApp** configuration in IDE and run it. 
 
 ## Run on desktop via Gradle
 
