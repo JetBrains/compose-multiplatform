@@ -106,6 +106,7 @@ class ComposePlugin : Plugin<Project> {
         }
     }
 
+    @Suppress("DEPRECATION")
     class Dependencies(project: Project) {
         val desktop = DesktopDependencies
         val compiler = CompilerDependencies(project)
@@ -122,7 +123,9 @@ class ComposePlugin : Plugin<Project> {
         val preview get() = composeDependency("org.jetbrains.compose.ui:ui-tooling-preview")
         val materialIconsExtended get() = composeDependency("org.jetbrains.compose.material:material-icons-extended")
         val components get() = CommonComponentsDependencies
+        @Deprecated("Use compose.html", replaceWith = ReplaceWith("html"))
         val web: WebDependencies get() = WebDependencies
+        val html: HtmlDependencies get() = HtmlDependencies
     }
 
     object DesktopDependencies {
@@ -163,17 +166,32 @@ class ComposePlugin : Plugin<Project> {
         val animatedImage = composeDependency("org.jetbrains.compose.components:components-animatedimage")
     }
 
+    @Deprecated("Use compose.html")
     object WebDependencies {
         val core by lazy {
-            composeDependency("org.jetbrains.compose.web:web-core")
+            composeDependency("org.jetbrains.compose.html:html-core")
         }
 
         val svg by lazy {
-            composeDependency("org.jetbrains.compose.web:web-svg")
+            composeDependency("org.jetbrains.compose.html:html-svg")
         }
 
         val testUtils by lazy {
-            composeDependency("org.jetbrains.compose.web:test-utils")
+            composeDependency("org.jetbrains.compose.html:html-test-utils")
+        }
+    }
+
+    object HtmlDependencies {
+        val core by lazy {
+            composeDependency("org.jetbrains.compose.html:html-core")
+        }
+
+        val svg by lazy {
+            composeDependency("org.jetbrains.compose.html:html-svg")
+        }
+
+        val testUtils by lazy {
+            composeDependency("org.jetbrains.compose.html:html-test-utils")
         }
     }
 }

@@ -33,10 +33,11 @@ rootProject.plugins.withType<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJ
 subprojects {
     apply(plugin = "maven-publish")
 
-    group = "org.jetbrains.compose.web"
+    val projectName = name
+    group = "org.jetbrains.compose.html"
     version = COMPOSE_WEB_VERSION
 
-    if ((project.name != "web-widgets") && (project.name != "web-integration-widgets")) {
+    if ((project.name != "html-widgets") && (project.name != "html-integration-widgets")) {
         afterEvaluate {
             if (plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
                 project.kotlinExtension.targets.forEach { target ->
@@ -73,8 +74,8 @@ subprojects {
             publications.all {
                 this as MavenPublication
                 pom {
-                    name.set("JetBrains Compose Multiplatform")
-                    description.set("JetBrains Compose Multiplatform for Web")
+                    name.set("JetBrains Compose Multiplatform HTML library")
+                    description.set("JetBrains Compose Multiplatform HTML library")
                     url.set("https://www.jetbrains.com/lp/compose-mpp/")
                     licenses {
                         license {
@@ -91,9 +92,38 @@ subprojects {
                         }
                     }
                     scm {
-                        connection.set("scm:git://github.com/JetBrains/compose-jb.git")
-                        developerConnection.set("scm:git://github.com/JetBrains/compose-jb.git")
-                        url.set("https://github.com/jetbrains/compose-jb")
+                        connection.set("scm:git://github.com/JetBrains/compose-multiplatform.git")
+                        developerConnection.set("scm:git://github.com/JetBrains/compose-multiplatform.git")
+                        url.set("https://github.com/jetbrains/compose-multiplatform")
+                    }
+                }
+            }
+            publications {
+                val oldArtifactId = when (projectName) {
+                    "html-core" -> "web-core"
+                    "html-svg" -> "web-svg"
+                    "html-test-utils" -> "test-utils"
+                    "html-benchmark-core" -> "web-benchmark-core"
+                    "internal-html-core-runtime" -> "internal-web-core-runtime"
+                    "html-integration-core" -> "web-integration-core"
+                    "compose-compiler-integration" -> "compose-compiler-integration"
+                    "compose-compiler-integration-lib" -> "compose-compiler-integration-lib"
+                    else -> null
+                }
+                if (oldArtifactId != null) {
+                    create<MavenPublication>("relocation") {
+                        pom {
+                            // Old artifact coordinates
+                            groupId = "org.jetbrains.compose.web"
+                            artifactId = oldArtifactId
+                            distributionManagement {
+                                relocation {
+                                    // New artifact coordinates
+                                    groupId.set("org.jetbrains.compose.html")
+                                    artifactId.set(projectName)
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -139,8 +169,8 @@ subprojects {
         println("substituting published artifacts with projects ones in project $name")
         configurations.all {
             resolutionStrategy.dependencySubstitution {
-                substitute(module("org.jetbrains.compose.web:web-core")).apply {
-                    with(project(":web-core"))
+                substitute(module("org.jetbrains.compose.html:html-core")).apply {
+                    with(project(":html-core"))
                 }
             }
         }

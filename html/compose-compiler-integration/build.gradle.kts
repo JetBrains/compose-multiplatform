@@ -24,7 +24,7 @@ kotlin {
                 implementation(project(":compose-compiler-integration-lib"))
                 implementation(kotlin("stdlib-js"))
                 implementation(compose.runtime)
-                implementation(project(":web-core"))
+                implementation(project(":html-core"))
             }
         }
 

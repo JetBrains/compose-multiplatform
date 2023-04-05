@@ -21,7 +21,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(project(":web-core"))
+                implementation(project(":html-core"))
                 implementation(kotlin("stdlib-common"))
             }
         }
@@ -34,7 +34,7 @@ kotlin {
 
         val jsTest by getting {
             dependencies {
-                implementation(project(":test-utils"))
+                implementation(project(":html-test-utils"))
                 implementation(kotlin("test-js"))
             }
         }

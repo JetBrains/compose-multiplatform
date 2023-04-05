@@ -20,7 +20,7 @@ kotlin {
             dependencies {
                 implementation(kotlin("stdlib-common"))
                 implementation(compose.runtime)
-                implementation(project(":web-core"))
+                implementation(project(":html-core"))
             }
         }
     }
