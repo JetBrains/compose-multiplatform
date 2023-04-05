@@ -1,10 +1,10 @@
 {
   "images" : [
     {
-      "filename" : "ic_imageviewer.png",
+      "filename" : "image.png",
       "idiom" : "universal",
       "platform" : "ios",
-      "size" : "192x192"
+      "size" : "1024x1024"
     }
   ],
   "info" : {
