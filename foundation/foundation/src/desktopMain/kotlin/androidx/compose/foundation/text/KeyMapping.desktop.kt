@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,17 +16,18 @@
 
 package androidx.compose.foundation.text
 
+import java.awt.event.KeyEvent as AwtKeyEvent
 import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.ui.input.key.Key
-import androidx.compose.ui.input.key.KeyEvent
-import androidx.compose.ui.input.key.isAltPressed
-import androidx.compose.ui.input.key.isCtrlPressed
-import androidx.compose.ui.input.key.isMetaPressed
-import androidx.compose.ui.input.key.isShiftPressed
-import androidx.compose.ui.input.key.key
-import java.awt.event.KeyEvent as AwtKeyEvent
 
-internal actual val platformDefaultKeyMapping: KeyMapping =
+internal actual val platformDefaultKeyMapping: KeyMapping
+    get() = overriddenDefaultKeyMapping ?: _platformDefaultKeyMapping
+
+/**
+ * Used for testing purposes only
+ */
+internal var overriddenDefaultKeyMapping: KeyMapping? = null
+private val _platformDefaultKeyMapping: KeyMapping =
     createPlatformDefaultKeyMapping(DesktopPlatform.Current)
 
 internal fun createPlatformDefaultKeyMapping(platform: DesktopPlatform): KeyMapping {

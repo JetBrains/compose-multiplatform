@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,21 +20,15 @@ import androidx.compose.foundation.DesktopPlatform
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyMapping
 import androidx.compose.foundation.text.createPlatformDefaultKeyMapping
-import androidx.compose.foundation.text.platformDefaultKeyMapping
+import androidx.compose.foundation.text.overriddenDefaultKeyMapping
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.test.ExperimentalTestApi
-import androidx.compose.ui.test.assertIsFocused
-import androidx.compose.ui.test.click
+import androidx.compose.ui.test.*
 import androidx.compose.ui.test.junit4.createComposeRule
-import androidx.compose.ui.test.onNodeWithTag
-import androidx.compose.ui.test.performKeyInput
-import androidx.compose.ui.test.performMouseInput
-import androidx.compose.ui.test.pressKey
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import com.google.common.truth.Truth
@@ -48,21 +42,13 @@ class SelectionTests {
     @get:Rule
     val rule = createComposeRule()
 
-    private val originalPlatformKeyMapping = platformDefaultKeyMapping
-
     @After
     fun restoreRealDesktopPlatform() {
-        setPlatformDefaultKeyMapping(originalPlatformKeyMapping)
+        overriddenDefaultKeyMapping = null
     }
 
     private fun setPlatformDefaultKeyMapping(value: KeyMapping) {
-        val field = Class.forName("androidx.compose.foundation.text.KeyMapping_desktopKt")
-            .getDeclaredField("platformDefaultKeyMapping")
-        field.isAccessible = true
-        val modifiersField = java.lang.reflect.Field::class.java.getDeclaredField("modifiers")
-        modifiersField.isAccessible = true
-        modifiersField.setInt(field, field.modifiers and java.lang.reflect.Modifier.FINAL.inv())
-        field.set(null, value)
+        overriddenDefaultKeyMapping = value
     }
 
     @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
