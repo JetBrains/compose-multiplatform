@@ -3,6 +3,7 @@ package example.imageviewer.icon
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
 
+// TODO Copied from "material:material-icons-extended", because this artifact is not working on iOS for now
 val IconAutoFixHigh = materialIcon(name = "Filled.AutoFixHigh") {
     materialPath {
         moveTo(7.5f, 5.6f)
