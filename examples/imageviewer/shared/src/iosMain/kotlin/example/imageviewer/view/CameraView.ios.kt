@@ -2,7 +2,6 @@ package example.imageviewer.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
@@ -12,9 +11,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.interop.UIKitView
 import androidx.compose.ui.unit.dp
 import example.imageviewer.IosStorableImage
-import example.imageviewer.LocalLocalization
 import example.imageviewer.PlatformStorableImage
 import example.imageviewer.createNewPhotoNameAndDescription
+import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
@@ -244,27 +243,25 @@ private fun BoxScope.RealDeviceCamera(
             CATransaction.commit()
         },
     )
-    Button(
-        modifier = Modifier.align(Alignment.BottomCenter).padding(44.dp),
+    CircularButton(
+        imageVector = IconPhotoCamera,
+        modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
         enabled = !capturePhotoStarted,
-        onClick = {
-            capturePhotoStarted = true
-            val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
-                format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
-            )
-            if (camera.position == AVCaptureDevicePositionFront) {
-                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                    ?.automaticallyAdjustsVideoMirroring = false
-                capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
-                    ?.videoMirrored = true
-            }
-            capturePhotoOutput.capturePhotoWithSettings(
-                settings = photoSettings,
-                delegate = photoCaptureDelegate
-            )
-        }
     ) {
-        Text(LocalLocalization.current.takePhoto)
+        capturePhotoStarted = true
+        val photoSettings = AVCapturePhotoSettings.photoSettingsWithFormat(
+            format = mapOf(AVVideoCodecKey to AVVideoCodecTypeJPEG)
+        )
+        if (camera.position == AVCaptureDevicePositionFront) {
+            capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                ?.automaticallyAdjustsVideoMirroring = false
+            capturePhotoOutput.connectionWithMediaType(AVMediaTypeVideo)
+                ?.videoMirrored = true
+        }
+        capturePhotoOutput.capturePhotoWithSettings(
+            settings = photoSettings,
+            delegate = photoCaptureDelegate
+        )
     }
     if (capturePhotoStarted) {
         CircularProgressIndicator(

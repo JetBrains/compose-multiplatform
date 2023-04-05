@@ -6,6 +6,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
+import example.imageviewer.icon.IconIosShare
 import kotlinx.cinterop.useContents
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -48,4 +49,4 @@ actual val ioDispatcher = Dispatchers.IO
 
 actual val isShareFeatureSupported: Boolean = true
 
-actual val shareIcon: ImageVector = IosShareIcon
+actual val shareIcon: ImageVector = IconIosShare

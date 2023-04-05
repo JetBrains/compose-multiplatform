@@ -182,7 +182,7 @@ private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () 
 @Composable
 internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
-        modifier = Modifier.align(Alignment.BottomEnd).padding(end = 12.dp, bottom = 16.dp)
+        modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp)
     ) {
         CircularButton(painterResource("magic.png"), onClick = onClick)
     }
