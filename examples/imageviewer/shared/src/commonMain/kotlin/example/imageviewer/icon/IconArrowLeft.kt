@@ -1,7 +1,5 @@
 package example.imageviewer.icon
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AutoFixHigh
 import androidx.compose.material.icons.materialIcon
 import androidx.compose.material.icons.materialPath
 
