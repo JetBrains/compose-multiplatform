@@ -24,14 +24,14 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Toolkit
 
 class ExternalNavigationEventBus {
     private val _events = MutableSharedFlow<ExternalImageViewerEvent>(
-        replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_LATEST
+        replay = 0,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
+        extraBufferCapacity = 1,
     )
     val events = _events.asSharedFlow()
 
