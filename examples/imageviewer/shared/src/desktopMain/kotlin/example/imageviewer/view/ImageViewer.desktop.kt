@@ -24,7 +24,6 @@ import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import java.awt.Desktop
 import java.awt.Dimension
 import java.awt.Toolkit
 
@@ -63,15 +62,15 @@ fun ApplicationScope.ImageViewerDesktop() {
             if (it.type == KeyEventType.KeyUp) {
                 when (it.key) {
                     Key.DirectionLeft -> externalNavigationEventBus.produceEvent(
-                        ExternalImageViewerEvent.Back
+                        ExternalImageViewerEvent.Previous
                     )
 
                     Key.DirectionRight -> externalNavigationEventBus.produceEvent(
-                        ExternalImageViewerEvent.Foward
+                        ExternalImageViewerEvent.Next
                     )
 
                     Key.Escape -> externalNavigationEventBus.produceEvent(
-                        ExternalImageViewerEvent.Escape
+                        ExternalImageViewerEvent.ReturnBack
                     )
                 }
             }

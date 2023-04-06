@@ -8,9 +8,9 @@ import example.imageviewer.model.*
 import example.imageviewer.view.*
 
 enum class ExternalImageViewerEvent {
-    Foward,
-    Back,
-    Escape,
+    Next,
+    Previous,
+    ReturnBack,
 }
 
 @Composable
@@ -38,7 +38,7 @@ internal fun ImageViewerWithProvidedDependencies(
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
         externalEvents.collect {
-            if (it == ExternalImageViewerEvent.Escape) {
+            if (it == ExternalImageViewerEvent.ReturnBack) {
                 navigationStack.back()
             }
         }
