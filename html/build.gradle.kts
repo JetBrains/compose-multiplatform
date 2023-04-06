@@ -111,7 +111,7 @@ subprojects {
                     else -> null
                 }
 
-                // TODO Remove this publishing in Compose 1.7
+                // TODO Remove this publishing in Compose 1.7. The package was migrated in 1.4.
                 if (oldArtifactId != null) {
                     create<MavenPublication>("relocation") {
                         pom {
