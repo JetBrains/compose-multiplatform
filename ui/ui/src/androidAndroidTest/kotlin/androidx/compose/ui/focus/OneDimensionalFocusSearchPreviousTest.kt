@@ -275,6 +275,72 @@ class OneDimensionalFocusSearchPreviousTest {
     }
 
     @Test
+    fun focusMovesToParent() {
+        // Arrange.
+        val (parent, child1, child2, child3) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(parent, 0, 0, 10, 10) {
+                FocusableBox(child1, 10, 0, 10, 10, initialFocus)
+                FocusableBox(child2, 20, 0, 10, 10)
+                FocusableBox(child3, 20, 0, 10, 10)
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Previous) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(parent.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusMovesToParent_ignoresDeactivated() {
+        // Arrange.
+        val (item, parent, child1, child2) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(item, 0, 0, 10, 10)
+            FocusableBox(parent, 0, 0, 10, 10, deactivated = true) {
+                FocusableBox(child1, 10, 0, 10, 10, initialFocus)
+                FocusableBox(child2, 20, 0, 10, 10)
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Previous) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(item.value).isTrue()
+        }
+    }
+
+    @Test
+    fun focusMovesToParent_ignoresDeactivated_andWrapsAround() {
+        // Arrange.
+        val (parent, child1, child2, child3) = List(4) { mutableStateOf(false) }
+        rule.setContentForTest {
+            FocusableBox(parent, 0, 0, 10, 10, deactivated = true) {
+                FocusableBox(child1, 10, 0, 10, 10, initialFocus)
+                FocusableBox(child2, 20, 0, 10, 10)
+                FocusableBox(child3, 0, 0, 10, 10)
+            }
+        }
+
+        // Act.
+        val movedFocusSuccessfully = rule.runOnIdle { focusManager.moveFocus(Previous) }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(movedFocusSuccessfully).isTrue()
+            assertThat(child3.value).isTrue()
+        }
+    }
+
+    @Test
     fun focusWrapsAroundToLastItem() {
         // Arrange.
         val (item1, item2, item3) = List(3) { mutableStateOf(false) }
