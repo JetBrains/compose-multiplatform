@@ -20,6 +20,16 @@ import example.imageviewer.model.ScalableState
 import example.imageviewer.utils.onPointerEvent
 import kotlin.math.pow
 
+/**
+ * Initial zoom of the image. 1.0f means the image fully fits the window.
+ */
+private const val INITIAL_ZOOM = 1.0f
+
+/**
+ * This zoom means that the image isn't significantly zoomed for the user yet.
+ */
+private const val SLIGHTLY_INCREASED_ZOOM = 1.5f
+
 @Composable
 internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
     BoxWithConstraints {
@@ -55,9 +65,11 @@ internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, mod
                 }
                 .pointerInput(Unit) {
                     detectTapGestures(onDoubleTap = { position ->
+                        // If a user zoomed significantly, the zoom should be the restored on double tap,
+                        // otherwise the zoom should be increased
                         scalableState.setZoom(
-                            if (scalableState.zoom > 1.5f) {
-                                1.0f
+                            if (scalableState.zoom > SLIGHTLY_INCREASED_ZOOM) {
+                                INITIAL_ZOOM
                             } else {
                                 scalableState.zoomLimits.endInclusive
                             },
