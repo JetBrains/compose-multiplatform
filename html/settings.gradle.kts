@@ -58,16 +58,16 @@ fun module(name: String, path: String) {
 }
 
 
-module(":web-core", "core")
-module(":web-svg", "svg")
-module(":web-integration-core", "integration-core")
+module(":html-core", "core")
+module(":html-svg", "svg")
+module(":html-integration-core", "integration-core")
 module(":compose-compiler-integration", "compose-compiler-integration")
 module(":compose-compiler-integration-lib", "compose-compiler-integration/lib")
-module(":internal-web-core-runtime", "internal-web-core-runtime")
-module(":test-utils", "test-utils")
+module(":internal-html-core-runtime", "internal-html-core-runtime")
+module(":html-test-utils", "test-utils")
 
 if (extra["compose.web.tests.skip.benchmarks"]!!.toString().toBoolean() != true) {
-    module(":web-benchmark-core", "benchmark-core")
+    module(":html-benchmark-core", "benchmark-core")
 } else {
     println("skipping benchmarks")
 }

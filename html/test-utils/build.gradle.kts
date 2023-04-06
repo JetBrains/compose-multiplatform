@@ -6,6 +6,10 @@ plugins {
 }
 
 
+repositories {
+    mavenCentral()
+}
+
 kotlin {
     js(IR) {
         browser() {
@@ -15,31 +19,17 @@ kotlin {
                 }
             }
         }
-        binaries.executable()
     }
 
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
+                implementation(project(":internal-html-core-runtime"))
             }
         }
-
-        val jsMain by getting {
-            dependencies {
-                implementation(project(":internal-web-core-runtime"))
-                implementation(kotlin("stdlib-js"))
-                implementation(project(":web-core"))
-            }
-        }
-
         val jsTest by getting {
-            languageSettings {
-                optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
-            }
             dependencies {
-                implementation(project(":test-utils"))
                 implementation(kotlin("test-js"))
             }
         }

@@ -33,7 +33,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
-                implementation(project(":web-core"))
+                implementation(project(":html-core"))
                 implementation(kotlin("stdlib-common"))
             }
         }
