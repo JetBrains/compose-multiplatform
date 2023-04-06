@@ -57,8 +57,8 @@ internal fun GalleryScreen(
     LaunchedEffect(Unit) {
         externalEvents.collect {
             when (it) {
-                ExternalImageViewerEvent.Foward -> nextImage()
-                ExternalImageViewerEvent.Back -> previousImage()
+                ExternalImageViewerEvent.Next -> nextImage()
+                ExternalImageViewerEvent.Previous -> previousImage()
                 else -> {}
             }
         }
