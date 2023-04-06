@@ -24,6 +24,7 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.focusRect
 import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.input.pointer.PointerId
+import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.toCompose
 import androidx.compose.ui.platform.Platform
 import androidx.compose.ui.unit.Density
@@ -65,6 +66,16 @@ internal class ComposeLayer(
 
         @OptIn(ExperimentalComposeUiApi::class)
         override fun onPointerEvent(event: SkikoPointerEvent) {
+            if (supportsMultitouch) {
+                onPointerEventWithMultitouch(event)
+            } else {
+                // macos and web don't work properly when using onPointerEventWithMultitouch
+                onPointerEventNoMultitouch(event)
+            }
+        }
+
+        @OptIn(ExperimentalComposeUiApi::class)
+        private fun onPointerEventWithMultitouch(event: SkikoPointerEvent) {
             val scale = density.density
             val topLeftOffset = getTopLeftOffset()
             scene.sendPointerEvent(
@@ -82,6 +93,20 @@ internal class ComposeLayer(
                     )
                 },
                 timeMillis = event.timestamp,
+                nativeEvent = event
+            )
+        }
+
+        private fun onPointerEventNoMultitouch(event: SkikoPointerEvent) {
+            val scale = density.density
+            scene.sendPointerEvent(
+                eventType = event.kind.toCompose(),
+                position = Offset(
+                    x = event.x.toFloat() * scale,
+                    y = event.y.toFloat() * scale
+                ) - getTopLeftOffset(),
+                timeMillis = currentMillis(),
+                type = PointerType.Mouse,
                 nativeEvent = event
             )
         }
@@ -161,3 +186,6 @@ internal class ComposeLayer(
 internal expect fun getMainDispatcher(): CoroutineDispatcher
 
 private fun currentMillis() = (currentNanoTime() / 1E6).toLong()
+
+
+internal expect val supportsMultitouch: Boolean

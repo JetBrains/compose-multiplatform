@@ -20,3 +20,4 @@ import kotlinx.coroutines.CoroutineDispatcher
 
 internal actual fun getMainDispatcher(): CoroutineDispatcher = Dispatchers.Main
 
+internal actual val supportsMultitouch: Boolean get() = false
