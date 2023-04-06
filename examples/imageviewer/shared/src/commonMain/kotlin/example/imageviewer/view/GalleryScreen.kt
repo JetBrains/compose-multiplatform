@@ -123,7 +123,7 @@ internal fun GalleryScreen(
                             image = imageProvider.getImage(picture)
                         }
                         if (image != null) {
-                            Box(Modifier.fillMaxSize().slidePages(pagerState, idx)) {
+                            Box(Modifier.fillMaxSize().animatePageChanges(pagerState, idx)) {
                                 Image(
                                     bitmap = image!!,
                                     contentDescription = null,
@@ -271,7 +271,7 @@ private fun ListGalleryView(
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-private fun Modifier.slidePages(pagerState: PagerState, index: Int) =
+private fun Modifier.animatePageChanges(pagerState: PagerState, index: Int) =
     graphicsLayer {
         val x = (pagerState.currentPage - index + pagerState.currentPageOffsetFraction) * 2
         alpha = 1f - (x.absoluteValue * 0.7f).coerceIn(0f, 0.7f)
