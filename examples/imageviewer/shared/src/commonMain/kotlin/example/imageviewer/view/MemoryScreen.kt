@@ -38,20 +38,19 @@ import example.imageviewer.model.*
 import example.imageviewer.shareIcon
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
-    onSelectRelatedMemory: (PictureData) -> Unit,
-    onBack: () -> Unit,
-    onHeaderClick: (PictureData) -> Unit,
+    onSelectRelatedMemory: (index: Int) -> Unit,
+    onBack: (resetNavigation: Boolean) -> Unit,
+    onHeaderClick: (index: Int) -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
     val sharePicture = LocalSharePicture.current
     var edit: Boolean by remember { mutableStateOf(false) }
-    val picture = memoryPage.pictureState.value
+    val picture = pictures.getOrNull(memoryPage.pictureIndex) ?: return
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
     val platformContext = getPlatformContext()
     LaunchedEffect(picture) {
@@ -78,7 +77,7 @@ internal fun MemoryScreen(
                     MemoryHeader(
                         it,
                         picture = picture,
-                        onClick = { onHeaderClick(picture) }
+                        onClick = { onHeaderClick(memoryPage.pictureIndex) }
                     )
                 }
             }
@@ -106,7 +105,7 @@ internal fun MemoryScreen(
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         IconWithText(Icons.Default.Delete, "Delete") {
                             imageProvider.delete(picture)
-                            onBack()
+                            onBack(true)
                         }
                         IconWithText(Icons.Default.Edit, "Edit") {
                             edit = true
@@ -123,14 +122,15 @@ internal fun MemoryScreen(
         }
         TopLayout(
             alignLeftContent = {
-                BackButton(onBack)
+                BackButton {
+                    onBack(false)
+                }
             },
             alignRightContent = {},
         )
         if (edit) {
             EditMemoryDialog(picture.name, picture.description) { name, description ->
-                val edited = imageProvider.edit(picture, name, description)
-                memoryPage.pictureState.value = edited
+                imageProvider.edit(picture, name, description)
                 edit = false
             }
         }
@@ -267,7 +267,7 @@ internal fun Headliner(s: String) {
 @Composable
 internal fun RelatedMemoriesVisualizer(
     pictures: List<PictureData>,
-    onSelectRelatedMemory: (PictureData) -> Unit
+    onSelectRelatedMemory: (index: Int) -> Unit
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
@@ -276,8 +276,13 @@ internal fun RelatedMemoriesVisualizer(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(pictures) { idx, item ->
-                RelatedMemory(item, onSelectRelatedMemory)
+            itemsIndexed(pictures) { index, item ->
+                Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
+                    SquareThumbnail(
+                        picture = item,
+                        isHighlighted = false,
+                        onClick = { onSelectRelatedMemory(index) })
+                }
             }
         }
     }
@@ -288,6 +293,7 @@ internal fun RelatedMemory(
     galleryEntry: PictureData,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {
+//todo delete this function
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
         SquareThumbnail(
             picture = galleryEntry,

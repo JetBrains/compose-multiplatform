@@ -3,6 +3,8 @@ package example.imageviewer
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import example.imageviewer.model.*
 import example.imageviewer.view.*
@@ -33,8 +35,17 @@ internal fun ImageViewerCommon(
 internal fun ImageViewerWithProvidedDependencies(
     pictures: SnapshotStateList<PictureData>
 ) {
-    val selectedPictureIndex = remember { mutableStateOf(0) }
-    val navigationStack = remember { NavigationStack<Page>(GalleryPage()) }
+    // rememberSaveable is required to properly handle Android configuration changes (such as device rotation)
+    val selectedPictureIndex = rememberSaveable { mutableStateOf(0) }
+    val navigationStack = rememberSaveable(
+        saver = listSaver<NavigationStack<Page>, Page>(
+            restore = { NavigationStack(*it.toTypedArray()) },
+            save = { it.stack },
+        )
+    ) {
+        NavigationStack(GalleryPage())
+    }
+
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
         externalEvents.collect {
@@ -62,8 +73,8 @@ internal fun ImageViewerWithProvidedDependencies(
                 GalleryScreen(
                     pictures = pictures,
                     selectedPictureIndex = selectedPictureIndex,
-                    onClickPreviewPicture = { previewPictureId ->
-                        navigationStack.push(MemoryPage(mutableStateOf(previewPictureId)))
+                    onClickPreviewPicture = { previewPictureIndex ->
+                        navigationStack.push(MemoryPage(previewPictureIndex))
                     }
                 ) {
                     navigationStack.push(CameraPage())
@@ -72,7 +83,7 @@ internal fun ImageViewerWithProvidedDependencies(
 
             is FullScreenPage -> {
                 FullscreenImageScreen(
-                    picture = page.picture,
+                    picture = pictures[page.pictureIndex],
                     back = {
                         navigationStack.back()
                     }
@@ -83,14 +94,19 @@ internal fun ImageViewerWithProvidedDependencies(
                 MemoryScreen(
                     pictures = pictures,
                     memoryPage = page,
-                    onSelectRelatedMemory = { picture ->
-                        navigationStack.push(MemoryPage(mutableStateOf(picture)))
+                    onSelectRelatedMemory = { pictureIndex ->
+                        navigationStack.push(MemoryPage(pictureIndex))
                     },
-                    onBack = {
-                        navigationStack.back()
+                    onBack = { resetNavigation ->
+                        if (resetNavigation) {
+                            selectedPictureIndex.value = 0
+                            navigationStack.reset()
+                        } else {
+                            navigationStack.back()
+                        }
                     },
-                    onHeaderClick = { galleryId ->
-                        navigationStack.push(FullScreenPage(galleryId))
+                    onHeaderClick = { pictureIndex ->
+                        navigationStack.push(FullScreenPage(pictureIndex))
                     },
                 )
             }
