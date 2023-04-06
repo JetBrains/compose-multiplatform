@@ -8,6 +8,7 @@ import androidx.camera.core.ImageProxy
 import androidx.camera.core.Preview
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
@@ -40,6 +42,7 @@ import java.util.*
 import java.util.concurrent.Executors
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.absoluteValue
 
 private val executor = Executors.newSingleThreadExecutor()
 
@@ -74,16 +77,25 @@ private fun CameraWithGrantedPermission(
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
+    val viewScope = rememberCoroutineScope()
 
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
     val imageCapture: ImageCapture = remember { ImageCapture.Builder().build() }
-    val cameraSelector = CameraSelector.Builder()
-        .requireLensFacing(CameraSelector.LENS_FACING_BACK)
-        .build()
-    val viewScope = rememberCoroutineScope()
+    var isFrontCamera by remember { mutableStateOf(false) }
+    val cameraSelector = remember(isFrontCamera) {
+        val lensFacing =
+            if (isFrontCamera) {
+                CameraSelector.LENS_FACING_FRONT
+            } else {
+                CameraSelector.LENS_FACING_BACK
+            }
+        CameraSelector.Builder()
+            .requireLensFacing(lensFacing)
+            .build()
+    }
 
-    LaunchedEffect(Unit) {
+    LaunchedEffect(isFrontCamera) {
         val cameraProvider = suspendCoroutine<ProcessCameraProvider> { continuation ->
             ProcessCameraProvider.getInstance(context).also { cameraProvider ->
                 cameraProvider.addListener({
@@ -102,7 +114,14 @@ private fun CameraWithGrantedPermission(
     }
     val nameAndDescription = createNewPhotoNameAndDescription()
     var capturePhotoStarted by remember { mutableStateOf(false) }
-    Box(modifier = modifier) {
+
+    Box(modifier = modifier.pointerInput(isFrontCamera) {
+        detectHorizontalDragGestures { change, dragAmount ->
+            if (dragAmount.absoluteValue > 50.0) {
+                isFrontCamera = !isFrontCamera
+            }
+        }
+    }) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
         CircularButton(
             imageVector = IconPhotoCamera,
