@@ -110,6 +110,8 @@ subprojects {
                     "compose-compiler-integration-lib" -> "compose-compiler-integration-lib"
                     else -> null
                 }
+
+                // TODO Remove this publishing in Compose 1.7
                 if (oldArtifactId != null) {
                     create<MavenPublication>("relocation") {
                         pom {
