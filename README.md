@@ -18,7 +18,7 @@ You can choose the platforms across which to share your UIs using Compose Multip
 
 For example, you can share UIs between iOS and Android or Windows and MacOS.
 
-![Shared UIs of the iOS, Android, desktop, and web apps](artwork/readme/apps.jpg)
+![Shared UIs of the iOS, Android, desktop, and web apps](artwork/readme/apps.png)
 
 ## iOS
 
