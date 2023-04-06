@@ -110,25 +110,8 @@ internal class SkiaBasedOwner(
         layoutDirection = platform.layoutDirection
     }
 
-    // TODO: Set the input mode. For now we don't support touch mode, (always in Key mode).
-    private val _inputModeManager = InputModeManagerImpl(
-        initialInputMode = Keyboard,
-        onRequestInputModeChange = {
-            if (it == Touch || it == Keyboard) {
-                setInputMode(it)
-                true
-            } else {
-                false
-            }
-        }
-    )
-
-    private fun setInputMode(inputMode: InputMode) {
-        _inputModeManager.inputMode = inputMode
-    }
-
     override val inputModeManager: InputModeManager
-        get() = _inputModeManager
+        get() = platform.inputModeManager
 
     override val modifierLocalManager: ModifierLocalManager = ModifierLocalManager(this)
 

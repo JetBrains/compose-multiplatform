@@ -19,6 +19,9 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.input.InputMode
+import androidx.compose.ui.input.InputModeManager
+import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.semantics.SemanticsOwner
@@ -33,6 +36,7 @@ import androidx.compose.ui.unit.LayoutDirection
 internal interface Platform {
     val windowInfo: WindowInfo
     val focusManager: FocusManager
+    val inputModeManager: InputModeManager
     val layoutDirection: LayoutDirection
         get() = LayoutDirection.Ltr
 
@@ -53,6 +57,7 @@ internal interface Platform {
                 isWindowFocused = true
             }
 
+            override val inputModeManager = DefaultInputModeManager()
             override val focusManager = EmptyFocusManager
 
             override fun requestFocusForOwner() = false
@@ -97,6 +102,26 @@ internal interface Platform {
             }
         }
     }
+}
+
+internal fun DefaultInputModeManager(
+    initialInputMode: InputMode = InputMode.Keyboard
+) : InputModeManager {
+    lateinit var inputModeManager: InputModeManagerImpl
+
+    inputModeManager = InputModeManagerImpl(
+        initialInputMode = initialInputMode,
+        onRequestInputModeChange = {
+            if (it == InputMode.Touch || it == InputMode.Keyboard) {
+                inputModeManager.inputMode = it
+                true
+            } else {
+                false
+            }
+        }
+    )
+
+    return inputModeManager
 }
 
 internal object EmptyFocusManager : FocusManager {
