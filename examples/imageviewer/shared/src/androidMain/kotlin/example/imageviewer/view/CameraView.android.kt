@@ -1,7 +1,6 @@
 package example.imageviewer.view
 
 import android.annotation.SuppressLint
-import android.location.Location
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCapture.OnImageCapturedCallback
@@ -11,10 +10,9 @@ import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,8 +26,8 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.google.android.gms.location.CurrentLocationRequest
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.tasks.Task
 import example.imageviewer.*
+import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.GpsPosition
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
@@ -104,57 +102,57 @@ private fun CameraWithGrantedPermission(
     }
     val nameAndDescription = createNewPhotoNameAndDescription()
     var capturePhotoStarted by remember { mutableStateOf(false) }
-    Box(contentAlignment = Alignment.BottomCenter, modifier = modifier) {
+    Box(modifier = modifier) {
         AndroidView({ previewView }, modifier = Modifier.fillMaxSize())
-        Button(
+        CircularButton(
+            imageVector = IconPhotoCamera,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
             enabled = !capturePhotoStarted,
-            onClick = {
-                fun addLocationInfoAndReturnResult(imageBitmap: ImageBitmap) {
-                    fun sendToStorage(gpsPosition: GpsPosition) {
-                        onCapture(
-                            createCameraPictureData(
-                                name = nameAndDescription.name,
-                                description = nameAndDescription.description,
-                                gps = gpsPosition
-                            ),
-                            AndroidStorableImage(imageBitmap)
-                        )
-                        capturePhotoStarted = false
-                    }
-                    LocationServices.getFusedLocationProviderClient(context)
-                        .getCurrentLocation(CurrentLocationRequest.Builder().build(), null)
-                        .apply {
-                            addOnSuccessListener {
-                                sendToStorage(GpsPosition(it.latitude, it.longitude))
-                            }
-                            addOnFailureListener {
-                                sendToStorage(GpsPosition(0.0, 0.0))
-                            }
+        ) {
+            fun addLocationInfoAndReturnResult(imageBitmap: ImageBitmap) {
+                fun sendToStorage(gpsPosition: GpsPosition) {
+                    onCapture(
+                        createCameraPictureData(
+                            name = nameAndDescription.name,
+                            description = nameAndDescription.description,
+                            gps = gpsPosition
+                        ),
+                        AndroidStorableImage(imageBitmap)
+                    )
+                    capturePhotoStarted = false
+                }
+                LocationServices.getFusedLocationProviderClient(context)
+                    .getCurrentLocation(CurrentLocationRequest.Builder().build(), null)
+                    .apply {
+                        addOnSuccessListener {
+                            sendToStorage(GpsPosition(it.latitude, it.longitude))
                         }
-                }
+                        addOnFailureListener {
+                            sendToStorage(GpsPosition(0.0, 0.0))
+                        }
+                    }
+            }
 
-                capturePhotoStarted = true
-                imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
-                    override fun onCaptureSuccess(image: ImageProxy) {
-                        val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
-                        val imageBitmap = byteArray.toImageBitmap()
-                        image.close()
-                        addLocationInfoAndReturnResult(imageBitmap)
-                    }
-                })
-                viewScope.launch {
-                    // TODO: There is a known issue with Android emulator
-                    //  https://partnerissuetracker.corp.google.com/issues/161034252
-                    //  After 5 seconds delay, let's assume that the bug appears and publish a prepared photo
-                    delay(5000)
-                    if (capturePhotoStarted) {
-                        addLocationInfoAndReturnResult(
-                            resource("android-emulator-photo.jpg").readBytes().toImageBitmap()
-                        )
-                    }
+            capturePhotoStarted = true
+            imageCapture.takePicture(executor, object : OnImageCapturedCallback() {
+                override fun onCaptureSuccess(image: ImageProxy) {
+                    val byteArray: ByteArray = image.planes[0].buffer.toByteArray()
+                    val imageBitmap = byteArray.toImageBitmap()
+                    image.close()
+                    addLocationInfoAndReturnResult(imageBitmap)
                 }
-            }) {
-            Text(LocalLocalization.current.takePhoto, color = Color.White)
+            })
+            viewScope.launch {
+                // TODO: There is a known issue with Android emulator
+                //  https://partnerissuetracker.corp.google.com/issues/161034252
+                //  After 5 seconds delay, let's assume that the bug appears and publish a prepared photo
+                delay(5000)
+                if (capturePhotoStarted) {
+                    addLocationInfoAndReturnResult(
+                        resource("android-emulator-photo.jpg").readBytes().toImageBitmap()
+                    )
+                }
+            }
         }
         if (capturePhotoStarted) {
             CircularProgressIndicator(

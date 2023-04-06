@@ -33,7 +33,7 @@ internal fun ImageViewerCommon(
 internal fun ImageViewerWithProvidedDependencies(
     pictures: SnapshotStateList<PictureData>
 ) {
-    val selectedPictureIndex: MutableState<Int> = mutableStateOf(0)
+    val selectedPictureIndex = remember { mutableStateOf(0) }
     val navigationStack = remember { NavigationStack<Page>(GalleryPage()) }
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {

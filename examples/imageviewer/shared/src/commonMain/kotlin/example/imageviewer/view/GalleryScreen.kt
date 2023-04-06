@@ -1,7 +1,12 @@
-@file:OptIn(ExperimentalResourceApi::class)
-
 package example.imageviewer.view
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.AnimationConstants
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,26 +14,38 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.*
+import example.imageviewer.icon.IconMenu
+import example.imageviewer.icon.IconVisibility
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
+import kotlinx.coroutines.launch
+import kotlin.math.absoluteValue
 
 enum class GalleryStyle {
     SQUARES,
     LIST
 }
 
-@OptIn(ExperimentalResourceApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
@@ -36,21 +53,44 @@ internal fun GalleryScreen(
     onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
+    val imageProvider = LocalImageProvider.current
+    val viewScope = rememberCoroutineScope()
+
+    val pagerState = rememberPagerState(initialPage = selectedPictureIndex.value)
+    LaunchedEffect(pagerState) {
+        // Subscribe to page changes
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            selectedPictureIndex.value = page
+        }
+    }
+
     fun nextImage() {
-        selectedPictureIndex.value =
-            (selectedPictureIndex.value + 1).mod(pictures.size)
+        viewScope.launch {
+            pagerState.animateScrollToPage(
+                (pagerState.currentPage + 1).mod(pictures.size)
+            )
+        }
     }
 
     fun previousImage() {
-        selectedPictureIndex.value =
-            (selectedPictureIndex.value - 1).mod(pictures.size)
+        viewScope.launch {
+            pagerState.animateScrollToPage(
+                (pagerState.currentPage - 1).mod(pictures.size)
+            )
+        }
     }
 
-    fun selectPicture(picture: PictureData) {
-        selectedPictureIndex.value = pictures.indexOfFirst { it == picture }
+    fun selectPicture(index: Int) {
+        viewScope.launch {
+            pagerState.animateScrollToPage(
+                index,
+                animationSpec = tween(
+                    easing = LinearOutSlowInEasing,
+                    durationMillis = AnimationConstants.DefaultDurationMillis * 2
+                )
+            )
+        }
     }
-
-    val picture = pictures.getOrNull(selectedPictureIndex.value)
 
     var galleryStyle by remember { mutableStateOf(GalleryStyle.SQUARES) }
     val externalEvents = LocalInternalEvents.current
@@ -63,20 +103,43 @@ internal fun GalleryScreen(
             }
         }
     }
-
     Column(modifier = Modifier.background(MaterialTheme.colors.background)) {
         Box {
-            picture?.let {
-                PreviewImage(
-                    picture = it, onClick = {
-                        onClickPreviewPicture(it)
+            Box(
+                Modifier.fillMaxWidth().height(393.dp)
+                    .background(Color.Black),
+                contentAlignment = Alignment.Center
+            ) {
+                Box(
+                    Modifier.fillMaxSize()
+                        .clickable {
+                            onClickPreviewPicture(pictures[pagerState.currentPage])
+                        }
+                ) {
+                    HorizontalPager(pictures.size, state = pagerState) { idx ->
+                        val picture = pictures[idx]
+                        var image: ImageBitmap? by remember(picture) { mutableStateOf(null) }
+                        LaunchedEffect(picture) {
+                            image = imageProvider.getImage(picture)
+                        }
+                        if (image != null) {
+                            Box(Modifier.fillMaxSize().animatePageChanges(pagerState, idx)) {
+                                Image(
+                                    bitmap = image!!,
+                                    contentDescription = null,
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                                MemoryTextOverlay(picture)
+                            }
+                        }
                     }
-                )
+                }
             }
             TopLayout(
                 alignLeftContent = {},
                 alignRightContent = {
-                    CircularButton(painterResource("list_view.png")) {
+                    CircularButton(imageVector = IconMenu) {
                         galleryStyle = when (galleryStyle) {
                             GalleryStyle.SQUARES -> GalleryStyle.LIST
                             GalleryStyle.LIST -> GalleryStyle.SQUARES
@@ -89,7 +152,7 @@ internal fun GalleryScreen(
             when (galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
                     images = pictures,
-                    selectedImage = picture,
+                    pagerState = pagerState,
                     onSelect = { selectPicture(it) },
                 )
 
@@ -100,7 +163,7 @@ internal fun GalleryScreen(
                 )
             }
             CircularButton(
-                image = painterResource("plus.png"),
+                Icons.Filled.Add,
                 modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
                 onClick = onMakeNewMemory,
             )
@@ -108,11 +171,12 @@ internal fun GalleryScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
     images: List<PictureData>,
-    selectedImage: PictureData?,
-    onSelect: (PictureData) -> Unit,
+    pagerState: PagerState,
+    onSelect: (Int) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.padding(top = 4.dp),
@@ -121,17 +185,15 @@ private fun SquaresGalleryView(
         horizontalArrangement = Arrangement.spacedBy(1.dp)
     ) {
         itemsIndexed(images) { idx, picture ->
-            val isSelected = picture == selectedImage
             SquareThumbnail(
                 picture = picture,
-                onClick = { onSelect(picture) },
-                isHighlighted = isSelected
+                onClick = { onSelect(idx) },
+                isHighlighted = pagerState.targetPage == idx
             )
         }
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun SquareThumbnail(
     picture: PictureData,
@@ -139,8 +201,7 @@ internal fun SquareThumbnail(
     onClick: () -> Unit
 ) {
     Box(
-        Modifier.aspectRatio(1.0f).clickable(onClick = onClick),
-        contentAlignment = Alignment.BottomEnd
+        Modifier.aspectRatio(1.0f).clickable(onClick = onClick)
     ) {
         Tooltip(picture.name) {
             ThumbnailImage(
@@ -148,27 +209,33 @@ internal fun SquareThumbnail(
                 picture = picture,
             )
         }
-        if (isHighlighted) {
-            Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack))
-            Box(
-                Modifier
-                    .padding(end = 4.dp, bottom = 4.dp)
-                    .clip(CircleShape)
-                    .width(32.dp)
-                    .background(ImageviewerColors.uiLightBlack)
-                    .aspectRatio(1.0f)
-                    .clickable {
-                        onClick()
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                Image(
-                    painter = painterResource("eye.png"),
-                    contentDescription = null,
-                    modifier = Modifier
-                        .width(17.dp)
-                        .height(17.dp),
-                )
+        val tween = tween<Float>(
+            durationMillis = AnimationConstants.DefaultDurationMillis * 3,
+            delayMillis = 100,
+            easing = LinearOutSlowInEasing,
+        )
+        AnimatedVisibility(isHighlighted, enter = fadeIn(tween), exit = fadeOut(tween)) {
+            Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack)) {
+                Box(
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 4.dp, bottom = 4.dp)
+                        .clip(CircleShape)
+                        .width(32.dp)
+                        .background(ImageviewerColors.uiLightBlack)
+                        .aspectRatio(1.0f)
+                        .clickable {
+                            onClick()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = IconVisibility,
+                        contentDescription = null,
+                        modifier = Modifier.size(17.dp),
+                        tint = Color.White,
+                    )
+                }
             }
         }
     }
@@ -177,7 +244,7 @@ internal fun SquareThumbnail(
 @Composable
 private fun ListGalleryView(
     pictures: List<PictureData>,
-    onSelect: (PictureData) -> Unit,
+    onSelect: (Int) -> Unit,
     onFullScreen: (PictureData) -> Unit,
 ) {
     val notification = LocalNotification.current
@@ -189,7 +256,7 @@ private fun ListGalleryView(
             Thumbnail(
                 picture = p.value,
                 onClickSelect = {
-                    onSelect(p.value)
+                    onSelect(p.index)
                 },
                 onClickFullScreen = {
                     onFullScreen(p.value)
@@ -202,3 +269,14 @@ private fun ListGalleryView(
         }
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun Modifier.animatePageChanges(pagerState: PagerState, index: Int) =
+    graphicsLayer {
+        val x = (pagerState.currentPage - index + pagerState.currentPageOffsetFraction) * 2
+        alpha = 1f - (x.absoluteValue * 0.7f).coerceIn(0f, 0.7f)
+        val scale = 1f - (x.absoluteValue * 0.4f).coerceIn(0f, 0.4f)
+        scaleX = scale
+        scaleY = scale
+        rotationY = x * 15f
+    }

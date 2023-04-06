@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import example.imageviewer.*
+import example.imageviewer.icon.IconPhotoCamera
 import example.imageviewer.model.PictureData
 import example.imageviewer.model.createCameraPictureData
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -51,7 +52,10 @@ internal actual fun CameraView(
                 .padding(20.dp)
         )
         val nameAndDescription = createNewPhotoNameAndDescription()
-        Button(onClick = {
+        CircularButton(
+            imageVector = IconPhotoCamera,
+            modifier = Modifier.align(Alignment.BottomCenter).padding(36.dp),
+        ) {
             onCapture(
                 createCameraPictureData(
                     name = nameAndDescription.name,
@@ -60,8 +64,6 @@ internal actual fun CameraView(
                 ),
                 DesktopStorableImage(imageBitmap)
             )
-        }, Modifier.align(Alignment.BottomCenter)) {
-            Text(LocalLocalization.current.takePhoto)
         }
     }
 }
