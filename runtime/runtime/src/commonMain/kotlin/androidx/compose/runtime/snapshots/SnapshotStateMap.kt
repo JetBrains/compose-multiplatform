@@ -137,8 +137,8 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
             val builder = oldMap!!.builder()
             result = block(builder)
             val newMap = builder.build()
-            if (newMap == oldMap || synchronized(sync) {
-                writable {
+            if (newMap == oldMap || writable {
+                synchronized(sync) {
                     if (modification == currentModification) {
                         map = newMap
                         modification++
@@ -153,8 +153,8 @@ class SnapshotStateMap<K, V> : MutableMap<K, V>, StateObject {
 
     private inline fun update(block: (PersistentMap<K, V>) -> PersistentMap<K, V>) = withCurrent {
         val newMap = block(map)
-        if (newMap !== map) synchronized(sync) {
-            writable {
+        if (newMap !== map) writable {
+            synchronized(sync) {
                 map = newMap
                 modification++
             }

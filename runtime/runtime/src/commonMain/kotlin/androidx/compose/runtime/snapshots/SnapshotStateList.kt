@@ -106,8 +106,8 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
 
     override fun addAll(elements: Collection<T>) = conditionalUpdate { it.addAll(elements) }
     override fun clear() {
-        synchronized(sync) {
-            writable {
+        writable {
+            synchronized(sync) {
                 list = persistentListOf()
                 modification++
             }
@@ -167,8 +167,8 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
             val builder = oldList!!.builder()
             result = block(builder)
             val newList = builder.build()
-            if (newList == oldList || synchronized(sync) {
-                writable {
+            if (newList == oldList || writable {
+                 synchronized(sync) {
                     if (modification == currentModification) {
                         list = newList
                         modification++
@@ -201,8 +201,8 @@ class SnapshotStateList<T> : MutableList<T>, StateObject {
                     result = false
                     break
                 }
-                if (synchronized(sync) {
-                    writable {
+                if (writable {
+                    synchronized(sync) {
                         if (modification == currentModification) {
                             list = newList
                             modification++
