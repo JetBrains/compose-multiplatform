@@ -1,16 +1,11 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package example.imageviewer
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import example.imageviewer.model.*
 import example.imageviewer.view.*
-import kotlinx.coroutines.launch
 
 enum class ExternalImageViewerEvent {
     Foward,
@@ -38,7 +33,7 @@ internal fun ImageViewerCommon(
 internal fun ImageViewerWithProvidedDependencies(
     pictures: SnapshotStateList<PictureData>
 ) {
-    val pagerState = rememberPagerState()
+    val selectedPictureIndex = remember { mutableStateOf(0) }
     val navigationStack = remember { NavigationStack<Page>(GalleryPage()) }
     val externalEvents = LocalInternalEvents.current
     LaunchedEffect(Unit) {
@@ -48,7 +43,6 @@ internal fun ImageViewerWithProvidedDependencies(
             }
         }
     }
-    val viewScope = rememberCoroutineScope()
 
     AnimatedContent(targetState = navigationStack.lastWithIndex(), transitionSpec = {
         val previousIdx = initialState.index
@@ -67,7 +61,7 @@ internal fun ImageViewerWithProvidedDependencies(
             is GalleryPage -> {
                 GalleryScreen(
                     pictures = pictures,
-                    pagerState = pagerState,
+                    selectedPictureIndex = selectedPictureIndex,
                     onClickPreviewPicture = { previewPictureId ->
                         navigationStack.push(MemoryPage(mutableStateOf(previewPictureId)))
                     }
@@ -105,9 +99,7 @@ internal fun ImageViewerWithProvidedDependencies(
                 CameraScreen(
                     onBack = { resetSelectedPicture ->
                         if (resetSelectedPicture) {
-                            viewScope.launch {
-                                pagerState.scrollToPage(0)
-                            }
+                            selectedPictureIndex.value = 0
                         }
                         navigationStack.back()
                     },

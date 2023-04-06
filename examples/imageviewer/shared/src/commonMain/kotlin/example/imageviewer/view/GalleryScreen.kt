@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
-
 package example.imageviewer.view
 
 import androidx.compose.animation.AnimatedVisibility
@@ -18,6 +16,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -39,7 +38,6 @@ import example.imageviewer.icon.IconVisibility
 import example.imageviewer.model.*
 import example.imageviewer.style.ImageviewerColors
 import kotlinx.coroutines.launch
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import kotlin.math.absoluteValue
 
 enum class GalleryStyle {
@@ -47,16 +45,25 @@ enum class GalleryStyle {
     LIST
 }
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
-    pagerState: PagerState,
+    selectedPictureIndex: MutableState<Int>,
     onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
     val imageProvider = LocalImageProvider.current
     val viewScope = rememberCoroutineScope()
+
+    val pagerState = rememberPagerState(initialPage = selectedPictureIndex.value)
+    LaunchedEffect(pagerState) {
+        // Subscribe to page changes
+        snapshotFlow { pagerState.currentPage }.collect { page ->
+            selectedPictureIndex.value = page
+        }
+    }
+
     fun nextImage() {
         viewScope.launch {
             pagerState.animateScrollToPage(
@@ -110,7 +117,7 @@ internal fun GalleryScreen(
                         }
                 ) {
                     HorizontalPager(pictures.size, state = pagerState) { idx ->
-                        val picture = pictures.get(idx)
+                        val picture = pictures[idx]
                         var image: ImageBitmap? by remember(picture) { mutableStateOf(null) }
                         LaunchedEffect(picture) {
                             image = imageProvider.getImage(picture)
@@ -164,6 +171,7 @@ internal fun GalleryScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
     images: List<PictureData>,
@@ -186,7 +194,6 @@ private fun SquaresGalleryView(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 internal fun SquareThumbnail(
     picture: PictureData,
@@ -263,6 +270,7 @@ private fun ListGalleryView(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 private fun Modifier.slidePages(pagerState: PagerState, index: Int) =
     graphicsLayer {
         val x = (pagerState.currentPage - index + pagerState.currentPageOffsetFraction) * 2
