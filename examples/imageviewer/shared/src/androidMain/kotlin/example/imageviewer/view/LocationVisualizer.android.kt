@@ -9,7 +9,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import example.imageviewer.model.GpsPosition
 
 @Composable
-internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
+actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
     val currentLocation = LatLng(gps.latitude, gps.longitude)
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(currentLocation, 10f)

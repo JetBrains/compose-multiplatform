@@ -31,7 +31,7 @@ kotlin {
                 optIn("org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi")
             }
             dependencies {
-                implementation(project(":internal-web-core-runtime"))
+                implementation(project(":internal-html-core-runtime"))
             }
         }
 
@@ -41,7 +41,7 @@ kotlin {
                 optIn("org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi")
             }
             dependencies {
-                implementation(project(":test-utils"))
+                implementation(project(":html-test-utils"))
                 implementation(kotlin("test-js"))
             }
         }

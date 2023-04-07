@@ -6,6 +6,6 @@ import example.imageviewer.model.ScalableState
 import androidx.compose.ui.Modifier
 
 @Composable
-internal actual fun ZoomControllerView(modifier: Modifier, scalableState: ScalableState) {
+actual fun ZoomControllerView(modifier: Modifier, scalableState: ScalableState) {
     // No need for additional ZoomControllerView for Android
 }

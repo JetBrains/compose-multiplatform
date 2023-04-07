@@ -24,14 +24,14 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.codeviewer.ui.common.AppTheme
 
 @Composable
-internal fun EditorTabsView(model: Editors) = Row(Modifier.horizontalScroll(rememberScrollState())) {
+fun EditorTabsView(model: Editors) = Row(Modifier.horizontalScroll(rememberScrollState())) {
     for (editor in model.editors) {
         EditorTabView(editor)
     }
 }
 
 @Composable
-internal fun EditorTabView(model: Editor) = Surface(
+fun EditorTabView(model: Editor) = Surface(
     color = if (model.isActive) {
         AppTheme.colors.backgroundDark
     } else {

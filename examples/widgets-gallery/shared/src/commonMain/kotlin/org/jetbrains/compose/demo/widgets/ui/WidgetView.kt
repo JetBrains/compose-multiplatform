@@ -9,7 +9,7 @@ import androidx.compose.ui.Modifier
 import org.jetbrains.compose.demo.widgets.ui.screens.*
 
 @Composable
-internal fun WidgetsView(
+fun WidgetsView(
     widgetsTypeState: MutableState<WidgetsType>,
     modifier: Modifier
 ) {

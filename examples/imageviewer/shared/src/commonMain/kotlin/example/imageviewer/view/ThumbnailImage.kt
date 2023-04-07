@@ -9,7 +9,7 @@ import example.imageviewer.LocalImageProvider
 import example.imageviewer.model.PictureData
 
 @Composable
-internal fun ThumbnailImage(
+fun ThumbnailImage(
     modifier: Modifier,
     picture: PictureData,
     filter: (ImageBitmap) -> ImageBitmap = remember { { it } },

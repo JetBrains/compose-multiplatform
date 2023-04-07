@@ -12,7 +12,7 @@ import org.jetbrains.codeviewer.ui.editor.Editors
 import org.jetbrains.codeviewer.ui.filetree.FileTree
 
 @Composable
-internal fun MainView() {
+fun MainView() {
     val codeViewer = remember {
         val editors = Editors()
 

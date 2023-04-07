@@ -32,7 +32,7 @@ import org.jetbrains.codeviewer.util.withoutWidthConstraints
 import kotlin.text.Regex.Companion.fromLiteral
 
 @Composable
-internal fun EditorView(model: Editor, settings: Settings) = key(model) {
+fun EditorView(model: Editor, settings: Settings) = key(model) {
     with (LocalDensity.current) {
         SelectionContainer {
             Surface(

@@ -40,7 +40,7 @@ import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
-internal fun MemoryScreen(
+fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
     onSelectRelatedMemory: (index: Int) -> Unit,
@@ -181,7 +181,7 @@ private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () 
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
+fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
         modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp)
     ) {
@@ -193,7 +193,7 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
 }
 
 @Composable
-internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
+fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     val shadowTextStyle = LocalTextStyle.current.copy(
         shadow = Shadow(
             color = Color.Black.copy(0.75f),
@@ -228,7 +228,7 @@ internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
 }
 
 @Composable
-internal fun Collapsible(s: String) {
+fun Collapsible(s: String) {
     val interctionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
@@ -254,7 +254,7 @@ internal fun Collapsible(s: String) {
 }
 
 @Composable
-internal fun Headliner(s: String) {
+fun Headliner(s: String) {
     Text(
         text = s,
         fontWeight = FontWeight.SemiBold,
@@ -265,7 +265,7 @@ internal fun Headliner(s: String) {
 }
 
 @Composable
-internal fun RelatedMemoriesVisualizer(
+fun RelatedMemoriesVisualizer(
     pictures: List<PictureData>,
     onSelectRelatedMemory: (index: Int) -> Unit
 ) {
@@ -289,7 +289,7 @@ internal fun RelatedMemoriesVisualizer(
 }
 
 @Composable
-internal fun RelatedMemory(
+fun RelatedMemory(
     galleryEntry: PictureData,
     onSelectRelatedMemory: (PictureData) -> Unit
 ) {

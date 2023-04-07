@@ -28,7 +28,7 @@ compose.desktop {
             packageName = "ImageViewer"
             packageVersion = "1.0.0"
 
-            val iconsRoot = project.file("../common/src/desktopMain/resources/images")
+            val iconsRoot = project.file("../shared/src/commonMain/resources")
             macOS {
                 iconFile.set(iconsRoot.resolve("icon-mac.icns"))
             }

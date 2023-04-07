@@ -8,7 +8,7 @@ import org.jetbrains.codeviewer.platform.font
 
 object Fonts {
     @Composable
-    internal fun jetbrainsMono() = FontFamily(
+    fun jetbrainsMono() = FontFamily(
         font(
             "JetBrains Mono",
             "jetbrainsmono_regular",

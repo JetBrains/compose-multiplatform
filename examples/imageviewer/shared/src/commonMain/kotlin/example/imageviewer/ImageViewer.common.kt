@@ -16,7 +16,7 @@ enum class ExternalImageViewerEvent {
 }
 
 @Composable
-internal fun ImageViewerCommon(
+fun ImageViewerCommon(
     dependencies: Dependencies
 ) {
     CompositionLocalProvider(
@@ -32,7 +32,7 @@ internal fun ImageViewerCommon(
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-internal fun ImageViewerWithProvidedDependencies(
+fun ImageViewerWithProvidedDependencies(
     pictures: SnapshotStateList<PictureData>
 ) {
     // rememberSaveable is required to properly handle Android configuration changes (such as device rotation)

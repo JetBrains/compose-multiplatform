@@ -31,7 +31,7 @@ import org.jetbrains.codeviewer.platform.VerticalScrollbar
 import org.jetbrains.codeviewer.util.withoutWidthConstraints
 
 @Composable
-internal fun FileTreeViewTabView() = Surface {
+fun FileTreeViewTabView() = Surface {
     Row(
         Modifier.padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -46,7 +46,7 @@ internal fun FileTreeViewTabView() = Surface {
 }
 
 @Composable
-internal fun FileTreeView(model: FileTree) = Surface(
+fun FileTreeView(model: FileTree) = Surface(
     modifier = Modifier.fillMaxSize()
 ) {
     with(LocalDensity.current) {

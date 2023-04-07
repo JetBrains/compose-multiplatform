@@ -9,12 +9,12 @@ import androidx.compose.ui.unit.sp
 import org.jetbrains.compose.demo.widgets.theme.typography
 
 @Composable
-internal fun SubtitleText(subtitle: String, modifier: Modifier = Modifier) {
+fun SubtitleText(subtitle: String, modifier: Modifier = Modifier) {
     Text(text = subtitle, style = typography.subtitle2, modifier = modifier.padding(8.dp))
 }
 
 @Composable
-internal fun TitleText(title: String) {
+fun TitleText(title: String) {
     Text(
         text = title,
         style = typography.h6.copy(fontSize = 14.sp),

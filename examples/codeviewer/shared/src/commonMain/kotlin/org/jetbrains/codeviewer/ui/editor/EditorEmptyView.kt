@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-internal fun EditorEmptyView() = Box(Modifier.fillMaxSize()) {
+fun EditorEmptyView() = Box(Modifier.fillMaxSize()) {
     Column(Modifier.align(Alignment.Center)) {
         Icon(
             Icons.Default.Code,

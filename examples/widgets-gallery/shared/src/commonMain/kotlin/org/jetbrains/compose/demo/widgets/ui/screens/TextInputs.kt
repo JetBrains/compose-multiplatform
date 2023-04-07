@@ -19,7 +19,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun TextInputs() {
+fun TextInputs() {
     var text by remember { mutableStateOf(TextFieldValue("")) }
 
     // TODO Explore CoreTextField
