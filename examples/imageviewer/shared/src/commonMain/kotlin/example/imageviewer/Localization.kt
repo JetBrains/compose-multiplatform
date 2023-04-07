@@ -7,6 +7,8 @@ enum class AvailableLanguages {
 
 expect fun getCurrentLanguage(): AvailableLanguages
 
+expect fun getCurrentPlatform(): String
+
 private object EnglishLocalization : Localization {
     override val appName = "My Memories"
     override val picture = "Picture:"
@@ -15,7 +17,7 @@ private object EnglishLocalization : Localization {
     override val addPhoto = "Add a photo"
     override val kotlinConfName = "KotlinConf 2023 🎉"
     override val kotlinConfDescription = """
-        This photo was taken during KotlinConf 2023! 🎊
+        This photo was taken during KotlinConf 2023 with My Memories Compose Multiplatform for ${getCurrentPlatform()} app! 🎊
         Have a fun with Kotlin and Compose Multiplatform 🥳
     """.trimIndent()
     override val newPhotoName = "New Memory"
