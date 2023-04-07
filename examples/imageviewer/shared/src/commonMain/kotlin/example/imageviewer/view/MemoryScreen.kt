@@ -287,17 +287,3 @@ fun RelatedMemoriesVisualizer(
         }
     }
 }
-
-@Composable
-fun RelatedMemory(
-    galleryEntry: PictureData,
-    onSelectRelatedMemory: (PictureData) -> Unit
-) {
-//todo delete this function
-    Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-        SquareThumbnail(
-            picture = galleryEntry,
-            isHighlighted = false,
-            onClick = { onSelectRelatedMemory(galleryEntry) })
-    }
-}
