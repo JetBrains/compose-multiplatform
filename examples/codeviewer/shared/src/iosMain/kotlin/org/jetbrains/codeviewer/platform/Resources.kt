@@ -13,7 +13,7 @@ private val cache: MutableMap<String, Font> = mutableMapOf()
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal actual fun font(name: String, res: String, weight: FontWeight, style: FontStyle): Font {
+actual fun font(name: String, res: String, weight: FontWeight, style: FontStyle): Font {
     return cache.getOrPut(res) {
         val byteArray = runBlocking {
             resource("font/$res.ttf").readBytes()

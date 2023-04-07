@@ -36,7 +36,7 @@ import org.jetbrains.compose.demo.widgets.ui.utils.VerticalSplittable
 import org.jetbrains.compose.demo.widgets.ui.utils.withoutWidthConstraints
 
 @Composable
-internal fun MainView() {
+fun MainView() {
     WidgetGalleryTheme {
         Surface {
             WidgetsPanel()
@@ -45,7 +45,7 @@ internal fun MainView() {
 }
 
 @Composable
-internal fun WidgetsPanel() {
+fun WidgetsPanel() {
     val widgetsTypeState = rememberSaveable { mutableStateOf(WidgetsType.sortedValues.first()) }
     val panelState = remember { PanelState() }
 

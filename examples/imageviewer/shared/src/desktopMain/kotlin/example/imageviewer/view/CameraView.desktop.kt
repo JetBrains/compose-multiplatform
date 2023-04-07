@@ -26,7 +26,7 @@ import java.util.*
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal actual fun CameraView(
+actual fun CameraView(
     modifier: Modifier,
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {

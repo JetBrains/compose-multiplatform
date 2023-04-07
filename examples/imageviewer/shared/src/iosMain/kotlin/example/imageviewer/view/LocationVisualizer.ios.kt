@@ -11,7 +11,7 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
 
 @Composable
-internal actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
+actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
     val location = CLLocationCoordinate2DMake(gps.latitude, gps.longitude)
     val annotation = remember {
         MKPointAnnotation(

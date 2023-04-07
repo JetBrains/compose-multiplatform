@@ -23,7 +23,7 @@ import org.jetbrains.compose.demo.widgets.ui.utils.TitleText
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
-internal fun AppBars() {
+fun AppBars() {
     TopAppBarsDemo()
     BottomAppBarDemo()
     NavigationBarDemo()

@@ -18,7 +18,7 @@ val friendMessages = listOf(
 val store = CoroutineScope(SupervisorJob()).createStore()
 
 @Composable
-internal fun ChatAppWithScaffold(displayTextField: Boolean = true) {
+fun ChatAppWithScaffold(displayTextField: Boolean = true) {
     Theme {
         Scaffold(
             topBar = {
@@ -33,7 +33,7 @@ internal fun ChatAppWithScaffold(displayTextField: Boolean = true) {
 }
 
 @Composable
-internal fun ChatApp(displayTextField: Boolean = true) {
+fun ChatApp(displayTextField: Boolean = true) {
     val state by store.stateFlow.collectAsState()
     Theme {
         Surface {
@@ -74,7 +74,7 @@ internal fun ChatApp(displayTextField: Boolean = true) {
 }
 
 @Composable
-internal fun Theme(content: @Composable () -> Unit) {
+fun Theme(content: @Composable () -> Unit) {
     MaterialTheme(
         colors = darkColors(
             surface = Color(ChatColors.SURFACE),

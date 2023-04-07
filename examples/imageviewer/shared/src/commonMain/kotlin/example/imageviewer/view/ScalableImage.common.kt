@@ -31,7 +31,7 @@ private const val INITIAL_ZOOM = 1.0f
 private const val SLIGHTLY_INCREASED_ZOOM = 1.5f
 
 @Composable
-internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
+fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
     BoxWithConstraints {
         val areaSize = areaSize
         val imageSize = image.size

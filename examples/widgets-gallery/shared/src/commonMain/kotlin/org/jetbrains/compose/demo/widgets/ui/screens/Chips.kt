@@ -21,7 +21,7 @@ import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
-internal fun Chips() {
+fun Chips() {
     // There is no in-built chips but you can make yours like below
     SubtitleText(subtitle = "Custom chips with surface")
     Column(modifier = Modifier.padding(8.dp)) {

@@ -16,7 +16,7 @@ private val MinFontSize = 6.sp
 private val MaxFontSize = 40.sp
 
 @Composable
-internal fun StatusBar(settings: Settings) = Box(
+fun StatusBar(settings: Settings) = Box(
     Modifier
         .height(32.dp)
         .fillMaxWidth()

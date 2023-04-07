@@ -17,7 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun SendMessage(sendMessage: (String) -> Unit) {
+fun SendMessage(sendMessage: (String) -> Unit) {
     var inputText by remember { mutableStateOf("") }
     TextField(
         modifier = Modifier.fillMaxWidth()

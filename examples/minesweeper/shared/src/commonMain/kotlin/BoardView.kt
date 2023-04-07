@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-internal fun BoardView(game: GameController) = with(GameStyles) {
+fun BoardView(game: GameController) = with(GameStyles) {
     Column {
         for (row in 0 until game.rows) {
             Row(verticalAlignment = Alignment.CenterVertically) {

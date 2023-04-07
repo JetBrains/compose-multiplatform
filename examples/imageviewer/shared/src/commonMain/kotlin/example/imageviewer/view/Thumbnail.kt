@@ -26,7 +26,7 @@ import example.imageviewer.icon.IconMoreVert
 import example.imageviewer.model.PictureData
 
 @Composable
-internal fun Thumbnail(
+fun Thumbnail(
     picture: PictureData,
     onClickSelect: () -> Unit,
     onClickFullScreen: () -> Unit,
