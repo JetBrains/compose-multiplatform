@@ -17,8 +17,9 @@ private object EnglishLocalization : Localization {
     override val addPhoto = "Add a photo"
     override val kotlinConfName = "KotlinConf 2023 🎉"
     override val kotlinConfDescription = """
-        This photo was taken during KotlinConf 2023 with My Memories Compose Multiplatform for ${getCurrentPlatform()} app! 🎊
-        Have a fun with Kotlin and Compose Multiplatform 🥳
+        This photo was taken during KotlinConf 2023 using #ComposeMultiplatform running on ${getCurrentPlatform()}! 🎊
+        Let's build some stunning UIs! 🥳
+        https://jb.gg/compose
     """.trimIndent()
     override val newPhotoName = "New Memory"
     override val newPhotoDescription = "May amazing things happen to you! 🙂"
