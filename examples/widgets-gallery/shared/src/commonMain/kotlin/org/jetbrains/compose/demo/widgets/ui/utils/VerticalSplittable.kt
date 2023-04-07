@@ -26,7 +26,7 @@ class SplitterState {
 }
 
 @Composable
-internal fun VerticalSplittable(
+fun VerticalSplittable(
     modifier: Modifier,
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
@@ -58,7 +58,7 @@ internal fun VerticalSplittable(
 
 
 @Composable
-internal fun VerticalSplitter(
+fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
     color: Color = Color.DarkGray

@@ -115,7 +115,7 @@ enum class ColorPallet {
 }
 
 @Composable
-internal fun WidgetGalleryTheme(
+fun WidgetGalleryTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     colorPallet: ColorPallet = GREEN,
     content: @Composable() () -> Unit,

@@ -11,7 +11,7 @@ import androidx.compose.ui.unit.dp
 import example.imageviewer.notchPadding
 
 @Composable
-internal fun TopLayout(
+fun TopLayout(
     alignLeftContent: @Composable () -> Unit = {},
     alignRightContent: @Composable () -> Unit = {},
 ) {

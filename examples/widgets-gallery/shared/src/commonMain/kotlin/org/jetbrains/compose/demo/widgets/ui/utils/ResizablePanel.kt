@@ -34,7 +34,7 @@ class PanelState {
 }
 
 @Composable
-internal fun ResizablePanel(
+fun ResizablePanel(
     modifier: Modifier,
     state: PanelState,
     title: String,

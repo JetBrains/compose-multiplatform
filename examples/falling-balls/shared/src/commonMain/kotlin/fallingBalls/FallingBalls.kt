@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-internal fun FallingBalls(game: Game) {
+fun FallingBalls(game: Game) {
     val density = LocalDensity.current
     Column {
         Text(

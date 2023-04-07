@@ -27,7 +27,7 @@ actual fun blurFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitma
 actual class PlatformContext(val androidContext: Context)
 
 @Composable
-internal actual fun getPlatformContext(): PlatformContext = PlatformContext(LocalContext.current)
+actual fun getPlatformContext(): PlatformContext = PlatformContext(LocalContext.current)
 
 
 private fun applyBlurFilter(bitmap: Bitmap, context: Context): Bitmap {

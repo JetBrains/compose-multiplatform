@@ -47,7 +47,7 @@ enum class GalleryStyle {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun GalleryScreen(
+fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
     selectedPictureIndex: MutableState<Int>,
     onClickPreviewPicture: (PictureData) -> Unit,
@@ -195,7 +195,7 @@ private fun SquaresGalleryView(
 }
 
 @Composable
-internal fun SquareThumbnail(
+fun SquareThumbnail(
     picture: PictureData,
     isHighlighted: Boolean,
     onClick: () -> Unit

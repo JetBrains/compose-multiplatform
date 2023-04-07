@@ -7,13 +7,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
 @Composable
-internal expect fun VerticalScrollbar(
+expect fun VerticalScrollbar(
     modifier: Modifier,
     scrollState: ScrollState
 )
 
 @Composable
-internal expect fun VerticalScrollbar(
+expect fun VerticalScrollbar(
     modifier: Modifier,
     scrollState: LazyListState
 )

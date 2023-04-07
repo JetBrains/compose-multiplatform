@@ -10,7 +10,7 @@ class NameAndDescription(
 )
 
 @Composable
-internal fun createNewPhotoNameAndDescription(): NameAndDescription {
+fun createNewPhotoNameAndDescription(): NameAndDescription {
     val localization = LocalLocalization.current
     return remember {
 

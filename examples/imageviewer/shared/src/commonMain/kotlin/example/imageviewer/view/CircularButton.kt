@@ -18,7 +18,7 @@ import example.imageviewer.icon.IconCustomArrowBack
 import example.imageviewer.style.ImageviewerColors
 
 @Composable
-internal fun CircularButton(
+fun CircularButton(
     content: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean,
@@ -41,7 +41,7 @@ internal fun CircularButton(
 }
 
 @Composable
-internal fun CircularButton(
+fun CircularButton(
     imageVector: ImageVector,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
@@ -58,7 +58,7 @@ internal fun CircularButton(
 }
 
 @Composable
-internal fun BackButton(onClick: () -> Unit) {
+fun BackButton(onClick: () -> Unit) {
     Tooltip(LocalLocalization.current.back) {
         CircularButton(
             imageVector = IconCustomArrowBack,

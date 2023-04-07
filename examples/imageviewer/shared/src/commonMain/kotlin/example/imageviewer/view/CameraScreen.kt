@@ -10,7 +10,7 @@ import example.imageviewer.LocalImageProvider
 import kotlinx.coroutines.delay
 
 @Composable
-internal fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
+fun CameraScreen(onBack: (resetSelectedPicture: Boolean) -> Unit) {
     val imageProvider = LocalImageProvider.current
     var showCamera by remember { mutableStateOf(false) }
     LaunchedEffect(onBack) {

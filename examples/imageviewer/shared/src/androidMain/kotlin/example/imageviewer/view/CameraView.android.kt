@@ -48,7 +48,7 @@ private val executor = Executors.newSingleThreadExecutor()
 
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
-internal actual fun CameraView(
+actual fun CameraView(
     modifier: Modifier,
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {

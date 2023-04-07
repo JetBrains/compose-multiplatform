@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import example.todoapp.lite.common.RootStore.RootState
 
 @Composable
-internal fun RootContent(modifier: Modifier = Modifier) {
+fun RootContent(modifier: Modifier = Modifier) {
     val model = remember { RootStore() }
     val state = model.state
 

@@ -14,7 +14,7 @@ import org.jetbrains.compose.demo.widgets.theme.typography
 import org.jetbrains.compose.demo.widgets.ui.utils.SubtitleText
 
 @Composable
-internal fun TextViews() {
+fun TextViews() {
     Column {
         val textModifier = Modifier.padding(horizontal = 8.dp)
 

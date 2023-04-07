@@ -43,7 +43,7 @@ private var areaWidth = 0
 private var areaHeight = 0
 
 @Composable
-internal fun BouncingBallsApp(initialBallsCount: Int = 5) {
+fun BouncingBallsApp(initialBallsCount: Int = 5) {
     val items = remember {
         val list = mutableStateListOf<BouncingBall>()
         list.addAll(generateSequence {

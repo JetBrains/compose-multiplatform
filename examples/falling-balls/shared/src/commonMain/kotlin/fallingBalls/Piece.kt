@@ -20,7 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun Piece(index: Int, piece: PieceData) {
+fun Piece(index: Int, piece: PieceData) {
     val boxSize = 40.dp
     Box(
         Modifier
