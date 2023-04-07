@@ -74,13 +74,15 @@ fun App() {
             IconButton(onClick = state::toggleResume) {
                 Icon(
                     painter = painterResource("${if (state.isResumed) "pause" else "play"}.svg"),
-                    contentDescription = "Play/Pause"
+                    contentDescription = "Play/Pause",
+                    modifier = Modifier.size(32.dp)
                 )
             }
             IconButton(onClick = state::toggleFullscreen) {
                 Icon(
                     painter = painterResource("${if (state.isFullscreen) "exit" else "enter"}-fullscreen.svg"),
-                    contentDescription = "Toggle fullscreen"
+                    contentDescription = "Toggle fullscreen",
+                    modifier = Modifier.size(32.dp)
                 )
             }
             OutlinedTextField(
@@ -90,14 +92,18 @@ fun App() {
                     Icon(
                         painter = painterResource("speed.svg"),
                         contentDescription = "Speed",
-                        modifier = Modifier.size(36.dp)
+                        modifier = Modifier.size(28.dp)
                     )
                 },
                 modifier = Modifier.width(104.dp),
                 onValueChange = { state.speed = it.toFloat() }
             )
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(painter = painterResource("volume.svg"), contentDescription = "Volume")
+                Icon(
+                    painter = painterResource("volume.svg"),
+                    contentDescription = "Volume",
+                    modifier = Modifier.size(32.dp)
+                )
                 // TODO: Make the slider change volume in logarithmic manner
                 //  See https://www.dr-lex.be/info-stuff/volumecontrols.html
                 //  and https://ux.stackexchange.com/q/79672/117386
