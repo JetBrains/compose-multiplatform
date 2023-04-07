@@ -39,8 +39,7 @@ and embed complex native UI views, such as [MKMapView](https://developer.apple.c
 ## Android
 
 When Android is one of your targets, you can get the same experience for Android as if you were developing an Android app 
-using [Jetpack Compose](https://developer.android.com/jetpack/compose). All tooling features, such as profilers and 
-the Layout Inspector in Android Studio, work in the same way with Compose Multiplatform.
+using [Jetpack Compose](https://developer.android.com/jetpack/compose).
 
 ## Desktop
 
