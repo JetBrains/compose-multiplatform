@@ -229,10 +229,10 @@ fun BoxScope.MemoryTextOverlay(picture: PictureData) {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Collapsible(longText: String, onEdit: () -> Unit) {
+fun Collapsible(s: String, onEdit: () -> Unit) {
     val interctionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
-    val text = if (isCollapsed) longText.lines().first() + "... (see more)" else longText
+    val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
     Text(
         text,
         fontSize = 16.sp,
