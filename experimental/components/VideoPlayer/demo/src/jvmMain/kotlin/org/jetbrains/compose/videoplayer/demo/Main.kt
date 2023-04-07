@@ -96,7 +96,7 @@ fun App() {
                 modifier = Modifier.width(104.dp),
                 onValueChange = { state.speed = it.toFloat() }
             )
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(painter = painterResource("volume.svg"), contentDescription = "Volume")
                 // TODO: Make the slider change volume in logarithmic manner
                 //  See https://www.dr-lex.be/info-stuff/volumecontrols.html
