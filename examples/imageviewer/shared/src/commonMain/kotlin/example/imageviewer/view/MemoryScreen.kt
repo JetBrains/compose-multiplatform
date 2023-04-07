@@ -84,7 +84,7 @@ fun MemoryScreen(
             Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Headliner("Note")
-                    Collapsible(picture.description)
+                    Collapsible(picture.description, onEdit = { edit = true })
                     Headliner("Related memories")
                     RelatedMemoriesVisualizer(
                         pictures = remember { (pictures - picture).shuffled().take(8) },
@@ -227,8 +227,9 @@ fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Collapsible(s: String) {
+fun Collapsible(s: String, onEdit: () -> Unit) {
     val interctionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
@@ -245,10 +246,15 @@ fun Collapsible(s: String) {
                     dampingRatio = Spring.DampingRatioLowBouncy,
                     stiffness = Spring.StiffnessLow
                 )
+            ).combinedClickable(
+                interactionSource = interctionSource, indication = null,
+                onClick = {
+                    isCollapsed = !isCollapsed
+                },
+                onLongClick = {
+                    onEdit()
+                }
             )
-            .clickable(interactionSource = interctionSource, indication = null) {
-                isCollapsed = !isCollapsed
-            }
             .fillMaxWidth(),
     )
 }
