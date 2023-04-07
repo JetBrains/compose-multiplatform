@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -82,7 +83,7 @@ private fun CameraWithGrantedPermission(
     val preview = Preview.Builder().build()
     val previewView = remember { PreviewView(context) }
     val imageCapture: ImageCapture = remember { ImageCapture.Builder().build() }
-    var isFrontCamera by remember { mutableStateOf(false) }
+    var isFrontCamera by rememberSaveable { mutableStateOf(false) }
     val cameraSelector = remember(isFrontCamera) {
         val lensFacing =
             if (isFrontCamera) {

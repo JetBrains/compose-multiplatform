@@ -50,7 +50,7 @@ enum class GalleryStyle {
 fun GalleryScreen(
     pictures: SnapshotStateList<PictureData>,
     selectedPictureIndex: MutableState<Int>,
-    onClickPreviewPicture: (PictureData) -> Unit,
+    onClickPreviewPicture: (index: Int) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
     val imageProvider = LocalImageProvider.current
@@ -113,17 +113,17 @@ fun GalleryScreen(
                 Box(
                     Modifier.fillMaxSize()
                         .clickable {
-                            onClickPreviewPicture(pictures[pagerState.currentPage])
+                            onClickPreviewPicture(pagerState.currentPage)
                         }
                 ) {
-                    HorizontalPager(pictures.size, state = pagerState) { idx ->
-                        val picture = pictures[idx]
+                    HorizontalPager(pictures.size, state = pagerState) { index ->
+                        val picture = pictures[index]
                         var image: ImageBitmap? by remember(picture) { mutableStateOf(null) }
                         LaunchedEffect(picture) {
                             image = imageProvider.getImage(picture)
                         }
                         if (image != null) {
-                            Box(Modifier.fillMaxSize().animatePageChanges(pagerState, idx)) {
+                            Box(Modifier.fillMaxSize().animatePageChanges(pagerState, index)) {
                                 Image(
                                     bitmap = image!!,
                                     contentDescription = null,
@@ -176,7 +176,7 @@ fun GalleryScreen(
 private fun SquaresGalleryView(
     images: List<PictureData>,
     pagerState: PagerState,
-    onSelect: (Int) -> Unit,
+    onSelect: (index: Int) -> Unit,
 ) {
     LazyVerticalGrid(
         modifier = Modifier.padding(top = 4.dp),
@@ -184,11 +184,11 @@ private fun SquaresGalleryView(
         verticalArrangement = Arrangement.spacedBy(1.dp),
         horizontalArrangement = Arrangement.spacedBy(1.dp)
     ) {
-        itemsIndexed(images) { idx, picture ->
+        itemsIndexed(images) { index, picture ->
             SquareThumbnail(
                 picture = picture,
-                onClick = { onSelect(idx) },
-                isHighlighted = pagerState.targetPage == idx
+                onClick = { onSelect(index) },
+                isHighlighted = pagerState.targetPage == index
             )
         }
     }
@@ -244,8 +244,8 @@ fun SquareThumbnail(
 @Composable
 private fun ListGalleryView(
     pictures: List<PictureData>,
-    onSelect: (Int) -> Unit,
-    onFullScreen: (PictureData) -> Unit,
+    onSelect: (index: Int) -> Unit,
+    onFullScreen: (index: Int) -> Unit,
 ) {
     val notification = LocalNotification.current
     ScrollableColumn(
@@ -259,7 +259,7 @@ private fun ListGalleryView(
                     onSelect(p.index)
                 },
                 onClickFullScreen = {
-                    onFullScreen(p.value)
+                    onFullScreen(p.index)
                 },
                 onClickInfo = {
                     notification.notifyImageData(p.value)
