@@ -57,7 +57,10 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
                         val window = UIApplication.sharedApplication.windows.last() as? UIWindow
                         val currentViewController = window?.rootViewController
                         val activityViewController = UIActivityViewController(
-                            activityItems = listOf(UIImage(data = data)),
+                            activityItems = listOf(
+                                UIImage(data = data),
+                                picture.name + "\n"  + picture.description
+                            ),
                             applicationActivities = null
                         )
                         currentViewController?.presentViewController(
