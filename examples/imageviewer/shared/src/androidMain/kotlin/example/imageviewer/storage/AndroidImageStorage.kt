@@ -106,6 +106,9 @@ class AndroidImageStorage(
 
     @OptIn(ExperimentalResourceApi::class)
     suspend fun getUri(context: Context, picture: PictureData): Uri = withContext(Dispatchers.IO) {
+        if (!sharedImagesDir.exists()) {
+            sharedImagesDir.mkdirs()
+        }
         val tempFileToShare: File = sharedImagesDir.resolve("share_picture.jpg")
         when (picture) {
             is PictureData.Camera -> {
@@ -113,6 +116,9 @@ class AndroidImageStorage(
             }
 
             is PictureData.Resource -> {
+                if (!tempFileToShare.exists()) {
+                    tempFileToShare.createNewFile()
+                }
                 tempFileToShare.writeBytes(resource(picture.resource).readBytes())
             }
         }

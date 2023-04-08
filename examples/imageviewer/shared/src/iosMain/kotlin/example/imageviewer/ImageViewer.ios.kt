@@ -59,7 +59,7 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
                         val activityViewController = UIActivityViewController(
                             activityItems = listOf(
                                 UIImage(data = data),
-                                picture.name + "\n"  + picture.description
+                                picture.description
                             ),
                             applicationActivities = null
                         )
