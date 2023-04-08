@@ -32,7 +32,6 @@ actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: Strin
             modifier = Modifier.fillMaxSize()
         )
         Box(Modifier.fillMaxSize().clickable {
-            println("bigMap = true")
             bigMap = true
         })
     }
