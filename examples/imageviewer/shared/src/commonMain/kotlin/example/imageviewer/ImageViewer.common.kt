@@ -94,8 +94,8 @@ fun ImageViewerWithProvidedDependencies(
                 MemoryScreen(
                     pictures = pictures,
                     memoryPage = page,
-                    onSelectRelatedMemory = { pictureIndex ->
-                        navigationStack.push(MemoryPage(pictureIndex))
+                    onSelectRelatedMemory = { picture: PictureData ->
+                        navigationStack.push(MemoryPage(pictures.indexOf(picture)))
                     },
                     onBack = { resetNavigation ->
                         if (resetNavigation) {
