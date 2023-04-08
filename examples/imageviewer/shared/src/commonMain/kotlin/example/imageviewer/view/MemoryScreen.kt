@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
-    onSelectRelatedMemory: (index: Int) -> Unit,
+    onSelectRelatedMemory: (picture: PictureData) -> Unit,
     onBack: (resetNavigation: Boolean) -> Unit,
     onHeaderClick: (index: Int) -> Unit,
 ) {
@@ -273,7 +273,7 @@ fun Headliner(s: String) {
 @Composable
 fun RelatedMemoriesVisualizer(
     pictures: List<PictureData>,
-    onSelectRelatedMemory: (index: Int) -> Unit
+    onSelectRelatedMemory: (picture: PictureData) -> Unit
 ) {
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
@@ -287,7 +287,7 @@ fun RelatedMemoriesVisualizer(
                     SquareThumbnail(
                         picture = item,
                         isHighlighted = false,
-                        onClick = { onSelectRelatedMemory(index) })
+                        onClick = { onSelectRelatedMemory(item) })
                 }
             }
         }
