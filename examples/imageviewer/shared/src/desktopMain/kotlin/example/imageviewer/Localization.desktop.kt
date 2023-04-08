@@ -5,3 +5,5 @@ actual fun getCurrentLanguage(): AvailableLanguages =
         "de" -> AvailableLanguages.DE
         else -> AvailableLanguages.EN
     }
+
+actual fun getCurrentPlatform(): String = "Desktop"
