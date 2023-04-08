@@ -53,6 +53,7 @@ fun MemoryScreen(
     val picture = pictures.getOrNull(memoryPage.pictureIndex) ?: return
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
     val platformContext = getPlatformContext()
+    val verticalScrollEnableState = remember { mutableStateOf(true) }
     LaunchedEffect(picture) {
         headerImage = imageProvider.getImage(picture)
     }
@@ -61,7 +62,7 @@ fun MemoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState, enabled = verticalScrollEnableState.value)
         ) {
             Box(
                 modifier = Modifier
@@ -100,6 +101,7 @@ fun MemoryScreen(
                             .height(200.dp),
                         gps = picture.gps,
                         title = picture.name,
+                        parentScrollEnableState = verticalScrollEnableState,
                     )
                     Spacer(Modifier.height(50.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {

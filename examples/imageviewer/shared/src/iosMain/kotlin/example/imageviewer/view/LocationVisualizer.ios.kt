@@ -1,6 +1,7 @@
 package example.imageviewer.view
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.interop.UIKitView
@@ -11,7 +12,12 @@ import platform.MapKit.MKMapView
 import platform.MapKit.MKPointAnnotation
 
 @Composable
-actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
+actual fun LocationVisualizer(
+    modifier: Modifier,
+    gps: GpsPosition,
+    title: String,
+    parentScrollEnableState: MutableState<Boolean>
+) {
     val location = CLLocationCoordinate2DMake(gps.latitude, gps.longitude)
     val annotation = remember {
         MKPointAnnotation(
