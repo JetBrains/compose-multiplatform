@@ -14,10 +14,7 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
-                implementation(compose.material)
                 implementation(compose.materialIconsExtended)
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
             }
         }
         val desktopMain by getting {

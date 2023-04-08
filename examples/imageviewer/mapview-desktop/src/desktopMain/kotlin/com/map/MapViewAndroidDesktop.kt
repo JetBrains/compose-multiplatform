@@ -1,38 +1,23 @@
 package com.map
 
 import androidx.compose.foundation.Canvas
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.gestures.rememberTransformableState
 import androidx.compose.foundation.gestures.transformable
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ZoomIn
-import androidx.compose.material.icons.filled.ZoomOut
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipRect
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.isPrimaryPressed
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
-import java.awt.Desktop
-import java.net.URL
 import kotlin.math.roundToInt
 
 @Composable
@@ -102,11 +87,12 @@ fun MapViewDesktop(
         }
     }
 
-    val transformableState = rememberTransformableState { zoomChange, offsetChange, rotationChange ->
-        previousMoveDownPos = null
-        onMove(offsetChange.x.roundToInt(), offsetChange.y.roundToInt())
-        onZoom(null, zoomChange.toDouble() - 1)
-    }
+    val transformableState =
+        rememberTransformableState { zoomChange, offsetChange, rotationChange ->
+            previousMoveDownPos = null
+            onMove(offsetChange.x.roundToInt(), offsetChange.y.roundToInt())
+            onZoom(null, zoomChange.toDouble() - 1)
+        }
 
     fun Modifier.applyTouchScreenHandlers(): Modifier {
         return transformable(

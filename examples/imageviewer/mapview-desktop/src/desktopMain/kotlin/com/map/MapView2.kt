@@ -68,12 +68,12 @@ fun MapViewWithButtons(
                 .padding(10.dp),
             verticalArrangement = Arrangement.SpaceEvenly
         ) {
-            ZoomBtn(Icons.Filled.ZoomIn, "ZoomIn") {
+            ZoomBtn(Icons.Filled.ZoomIn, "zoom in") {
                 if (targetScale < maxScale) {
                     targetScale *= scaleCoefficient
                 }
             }
-            ZoomBtn(Icons.Filled.ZoomOut, "ZoomOut") {
+            ZoomBtn(Icons.Filled.ZoomOut, "zoom out") {
                 if (targetScale > minScale) {
                     targetScale /= scaleCoefficient
                 }
