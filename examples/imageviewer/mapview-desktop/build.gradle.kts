@@ -22,7 +22,7 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-cio:1.6.8")
+                implementation("io.ktor:ktor-client-cio:2.2.1")
                 implementation(compose.desktop.common)
             }
         }
