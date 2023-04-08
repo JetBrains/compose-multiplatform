@@ -9,7 +9,6 @@ import example.imageviewer.model.GpsPosition
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 actual fun LocationVisualizer(
     modifier: Modifier,
@@ -17,10 +16,11 @@ actual fun LocationVisualizer(
     title: String,
     parentScrollEnableState: MutableState<Boolean>
 ) {
-    Image(
-        painter = painterResource("dummy_map.png"),
-        contentDescription = "Map",
-        contentScale = ContentScale.Crop,
-        modifier = modifier
+    com.map.MapViewWithButtons(
+        modifier,
+        userAgent = "ComposerMapViewExample",
+        latitude = gps.latitude,
+        longitude = gps.longitude,
+        startScale = 8_000.0
     )
 }
