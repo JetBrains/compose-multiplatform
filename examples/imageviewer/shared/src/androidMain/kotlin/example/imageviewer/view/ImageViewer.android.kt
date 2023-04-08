@@ -57,6 +57,10 @@ private fun getDependencies(
                         Intent.EXTRA_STREAM,
                         imageStorage.getUri(context.androidContext, picture)
                     )
+                    putExtra(
+                        Intent.EXTRA_TEXT,
+                        picture.description
+                    )
                     type = "image/jpeg"
                     flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
                 }
