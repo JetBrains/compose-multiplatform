@@ -11,10 +11,11 @@ import org.jetbrains.compose.resources.painterResource
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 actual fun LocationVisualizer(modifier: Modifier, gps: GpsPosition, title: String) {
-    Image(
-        painter = painterResource("dummy_map.png"),
-        contentDescription = "Map",
-        contentScale = ContentScale.Crop,
-        modifier = modifier
+    example.map.MapView(
+        modifier,
+        userAgent = "ComposerMapViewExample",
+        latitude = gps.latitude,
+        longitude = gps.longitude,
+        startScale = 8_000.0
     )
 }
