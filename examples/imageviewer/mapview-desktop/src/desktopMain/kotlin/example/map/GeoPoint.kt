@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import kotlin.math.*
 
@@ -10,7 +10,7 @@ import kotlin.math.*
 data class GeoPoint(val x: Double, val y: Double)
 
 /**
- * DisplayPoint screen coordinates (Also it may be used as distance between 2 screnn point)
+ * DisplayPoint screen coordinates (Also it may be used as distance between 2 screen point)
  */
 data class DisplayPoint(val x: Int, val y: Int)
 
@@ -32,6 +32,7 @@ fun Double.toRad() = this * PI / 180
 operator fun DisplayPoint.minus(other: DisplayPoint): DisplayPoint =
     DisplayPoint(this.x - other.x, this.y - other.y)
 
+@Suppress("unused")
 fun DisplayPoint.distanceTo(other: DisplayPoint): Double {
     val dx = other.x - x
     val dy = other.y - y

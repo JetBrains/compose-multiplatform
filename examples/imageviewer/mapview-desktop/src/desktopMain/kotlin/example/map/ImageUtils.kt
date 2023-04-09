@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.toComposeImageBitmap

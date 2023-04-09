@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch

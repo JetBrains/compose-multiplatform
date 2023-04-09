@@ -1,7 +1,7 @@
-package com.map
+package example.map
 
-import com.map.collection.CollectionAddRemove
-import com.map.collection.createStack
+import example.map.collection.CollectionAddRemove
+import example.map.collection.createStack
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
@@ -14,6 +14,7 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
     delayBeforeRequestMs: Long = 50
 ): ContentRepository<K, T> {
     val origin = this
+
     data class State(
         val stack: CollectionAddRemove<ElementWait<K, T>> = createStack(waitBufferCapacity),
         val currentRequests: Int = 0
@@ -30,7 +31,8 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
                                 val result = origin.loadContent(element.key)
                                 element.deferred.complete(result)
                             } catch (t: Throwable) {
-                                val message = "caught exception in decorateWithLimitRequestsInParallel"
+                                val message =
+                                    "caught exception in decorateWithLimitRequestsInParallel"
                                 element.deferred.completeExceptionally(Exception(message, t))
                             } finally {
                                 store.send(Intent.ElementComplete())

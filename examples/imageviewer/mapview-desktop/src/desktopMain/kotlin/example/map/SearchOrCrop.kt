@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import kotlin.math.max
 
@@ -21,8 +21,7 @@ fun Map<Tile, TileImage>.searchOrCrop(tile: Tile): TileImage? {
             val i = tile.x - (x shl deltaZoom)
             val j = tile.y - (y shl deltaZoom)
             val size = max(TILE_SIZE ushr deltaZoom, 1)
-            val cropImg = img2.cropAndRestoreSize(i * size, j * size, size)
-            return cropImg
+            return img2.cropAndRestoreSize(i * size, j * size, size)
         }
     }
     return null

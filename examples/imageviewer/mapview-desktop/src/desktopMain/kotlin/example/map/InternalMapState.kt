@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 data class InternalMapState(
     val width: Int = 100,
@@ -45,5 +45,6 @@ fun InternalMapState.correctGeoY(): InternalMapState {
     }
 }
 
-fun InternalMapState.correctGeoX(): InternalMapState = copy(topLeft = topLeft.copy(x = topLeft.x.mod(1.0)))
+fun InternalMapState.correctGeoX(): InternalMapState =
+    copy(topLeft = topLeft.copy(x = topLeft.x.mod(1.0)))
 

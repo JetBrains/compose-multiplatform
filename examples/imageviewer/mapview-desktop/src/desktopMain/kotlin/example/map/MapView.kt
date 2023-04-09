@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -133,7 +133,8 @@ fun MapView(
         }
     }
     val onMove = { dx: Int, dy: Int ->
-        val topLeft = internalState.topLeft + internalState.displayLengthToGeo(DisplayPoint(-dx, -dy))
+        val topLeft =
+            internalState.topLeft + internalState.displayLengthToGeo(DisplayPoint(-dx, -dy))
         onStateChange(internalState.copy(topLeft = topLeft).correctGeoXY().toExternalState())
     }
     var previousMoveDownPos by remember<MutableState<Offset?>> { mutableStateOf(null) }

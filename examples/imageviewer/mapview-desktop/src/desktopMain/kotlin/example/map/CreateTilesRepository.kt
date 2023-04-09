@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember

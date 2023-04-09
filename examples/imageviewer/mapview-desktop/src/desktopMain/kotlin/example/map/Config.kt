@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 val TILE_SIZE = 256
 

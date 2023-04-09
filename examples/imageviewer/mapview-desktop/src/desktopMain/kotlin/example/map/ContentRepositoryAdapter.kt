@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 fun <K, A, B> ContentRepository<K, A>.adapter(transform: (A) -> B): ContentRepository<K, B> {
     val origin = this

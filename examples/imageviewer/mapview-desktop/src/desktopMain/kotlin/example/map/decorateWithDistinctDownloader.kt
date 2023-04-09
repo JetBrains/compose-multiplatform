@@ -1,10 +1,10 @@
-package com.map
+package example.map
 
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ObsoleteCoroutinesApi
 import kotlinx.coroutines.channels.actor
 import kotlinx.coroutines.launch
-
 
 private sealed interface Message<K, T> {
     class StartDownload<K, T>(val key: K, val deferred: CompletableDeferred<T>) : Message<K, T>
@@ -12,6 +12,7 @@ private sealed interface Message<K, T> {
     class DownloadFail<K, T>(val key: K, val exception: Throwable) : Message<K, T>
 }
 
+@OptIn(ObsoleteCoroutinesApi::class)
 fun <K, T> ContentRepository<K, T>.decorateWithDistinctDownloader(
     scope: CoroutineScope
 ): ContentRepository<K, T> {
@@ -43,7 +44,8 @@ fun <K, T> ContentRepository<K, T>.decorateWithDistinctDownloader(
                     }
                 }
                 is Message.DownloadFail<K, T> -> {
-                    val exceptionInfo = "decorateWithDistinctDownloader, fail to load tile ${message.key}"
+                    val exceptionInfo =
+                        "decorateWithDistinctDownloader, fail to load tile ${message.key}"
                     val exception = Exception(exceptionInfo, message.exception)
                     mapKeyToRequests.remove(message.key)?.forEach {
                         it.completeExceptionally(exception)

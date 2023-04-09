@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 fun InternalMapState.geoLengthToDisplay(geoLength: Double): Int {
     return (height * geoLength * scale).toInt()
@@ -6,6 +6,7 @@ fun InternalMapState.geoLengthToDisplay(geoLength: Double): Int {
 
 fun InternalMapState.geoXToDisplay(x: Double): Int = geoLengthToDisplay(x - topLeft.x)
 fun InternalMapState.geoYToDisplay(y: Double): Int = geoLengthToDisplay(y - topLeft.y)
+@Suppress("unused")
 fun InternalMapState.geoToDisplay(geoPt: GeoPoint): DisplayPoint =
     DisplayPoint(geoXToDisplay(geoPt.x), geoYToDisplay(geoPt.y))
 

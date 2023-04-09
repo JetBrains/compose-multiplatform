@@ -12,7 +12,7 @@ actual fun LocationVisualizer(
     title: String,
     parentScrollEnableState: MutableState<Boolean>
 ) {
-    com.map.MapView(
+    example.map.MapView(
         modifier,
         userAgent = "ComposerMapViewExample",
         latitude = gps.latitude,

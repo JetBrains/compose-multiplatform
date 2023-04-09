@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import androidx.compose.ui.geometry.Offset
 import kotlin.math.ceil

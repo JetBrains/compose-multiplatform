@@ -1,4 +1,4 @@
-package com.map.collection
+package example.map.collection
 
 /**
  * A stack that works like LRU cache.

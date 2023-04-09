@@ -1,4 +1,4 @@
-package com.map.collection
+package example.map.collection
 
 /**
  * Interface for thread-safe immutable collections

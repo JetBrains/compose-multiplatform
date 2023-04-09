@@ -1,4 +1,4 @@
-package com.map
+package example.map
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.channels.Channel
@@ -15,7 +15,10 @@ interface Store<STATE, INTENT> {
     val state get() = stateFlow.value
 }
 
-fun <STATE, INTENT> CoroutineScope.createStore(init: STATE, reducer: Reducer<STATE, INTENT>): Store<STATE, INTENT> {
+fun <STATE, INTENT> CoroutineScope.createStore(
+    init: STATE,
+    reducer: Reducer<STATE, INTENT>
+): Store<STATE, INTENT> {
     val mutableStateFlow = MutableStateFlow(init)
     val channel: Channel<INTENT> = Channel(Channel.UNLIMITED)
 
@@ -40,7 +43,10 @@ fun <STATE, INTENT> CoroutineScope.createStore(init: STATE, reducer: Reducer<STA
 
 typealias ReducerSE<STATE, INTENT, EFFECT> = suspend (STATE, INTENT) -> ReducerResult<STATE, EFFECT>
 
-data class ReducerResult<STATE, EFFECT>(val state: STATE, val sideEffects: List<EFFECT> = emptyList())
+data class ReducerResult<STATE, EFFECT>(
+    val state: STATE,
+    val sideEffects: List<EFFECT> = emptyList()
+)
 
 fun <STATE, INTENT, EFFECT> CoroutineScope.createStoreWithSideEffect(
     init: STATE,
@@ -61,10 +67,16 @@ fun <STATE, INTENT, EFFECT> CoroutineScope.createStoreWithSideEffect(
 }
 
 fun <STATE : Any, EFFECT> STATE.noSideEffects() = ReducerResult(this, emptyList<EFFECT>())
-fun <STATE : Any, EFFECT> STATE.addSideEffects(sideEffects: List<EFFECT>) = ReducerResult(this, sideEffects)
+fun <STATE : Any, EFFECT> STATE.addSideEffects(sideEffects: List<EFFECT>) =
+    ReducerResult(this, sideEffects)
+
 fun <STATE : Any, EFFECT> STATE.addSideEffect(effect: EFFECT) = addSideEffects(listOf(effect))
 
-fun <T, R> StateFlow<T>.mapStateFlow(scope: CoroutineScope, init: R, transform: suspend (T) -> R): StateFlow<R> {
+fun <T, R> StateFlow<T>.mapStateFlow(
+    scope: CoroutineScope,
+    init: R,
+    transform: suspend (T) -> R
+): StateFlow<R> {
     val result = MutableStateFlow(init)
     scope.launch {
         collect {
