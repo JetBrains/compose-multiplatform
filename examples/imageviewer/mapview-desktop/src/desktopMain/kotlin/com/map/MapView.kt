@@ -1,11 +1,41 @@
 package com.map
 
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.isPrimaryPressed
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
+import java.awt.Desktop
+import java.net.URL
+import kotlin.math.roundToInt
 
 data class MapState(
     val latitude: Double,
@@ -39,6 +69,8 @@ data class MapState(
  * @param onMapViewClick handle click event with point coordinates (latitude, longitude)
  * return true to enable zoom on click
  * return false to disable zoom on click
+ *
+ * @param consumeScroll consume scroll events for disable parent scrolling
  */
 @Composable
 fun MapView(
@@ -51,7 +83,8 @@ fun MapView(
         mutableStateOf(MapState(latitude ?: 0.0, longitude ?: 0.0, startScale ?: 1.0))
     },
     onStateChange: (MapState) -> Unit = { (state as? MutableState<MapState>)?.value = it },
-    onMapViewClick: (latitude: Double, longitude: Double) -> Boolean = { lat, lon -> true },
+    onMapViewClick: (latitude: Double, longitude: Double) -> Boolean = { _, _ -> true },
+    consumeScroll: Boolean = true,
 ) {
     val viewScope = rememberCoroutineScope()
     val ioScope = remember {
@@ -94,32 +127,109 @@ fun MapView(
         tilesToDisplay
     }
 
-    MapViewDesktop(
-        modifier = modifier,
-        isInTouchMode = false,
-        tiles = displayTiles,
-        onZoom = { pt: Pt?, change: Double ->
-            onStateChange(internalState.zoom(pt, change).toExternalState())
-        },
-        onClick = { it: Pt ->
-            if (onMapViewClick(
-                    internalState.displayToGeo(it).latitude,
-                    internalState.displayToGeo(it).longitude
-                )
-            ) {
-                onStateChange(internalState.zoom(it, Config.ZOOM_ON_CLICK).toExternalState())
-            }
-        },
-        onMove = { dx: Int, dy: Int ->
-            val topLeft = internalState.topLeft + internalState.displayLengthToGeo(Pt(-dx, -dy))
-            onStateChange(internalState.copy(topLeft = topLeft).correctGeoXY().toExternalState())
-        },
-        updateSize = { w: Int, h: Int ->
-            width = w
-            height = h
-            onStateChange(internalState.copy(width = w, height = h).toExternalState())
+    val onZoom = { pt: Pt?, change: Double ->
+        onStateChange(internalState.zoom(pt, change).toExternalState())
+    }
+    val onClick = { pt: Pt ->
+        val geoPoint = internalState.displayToGeo(pt)
+        if (onMapViewClick(geoPoint.latitude, geoPoint.longitude)) {
+            onStateChange(internalState.zoom(pt, Config.ZOOM_ON_CLICK).toExternalState())
         }
-    )
+    }
+    val onMove = { dx: Int, dy: Int ->
+        val topLeft = internalState.topLeft + internalState.displayLengthToGeo(Pt(-dx, -dy))
+        onStateChange(internalState.copy(topLeft = topLeft).correctGeoXY().toExternalState())
+    }
+    var previousMoveDownPos by remember<MutableState<Offset?>> { mutableStateOf(null) }
+    var previousPressTime by remember { mutableStateOf(0L) }
+    var previousPressPos by remember<MutableState<Offset?>> { mutableStateOf(null) }
+    fun Modifier.applyPointerInput() = pointerInput(Unit) {
+        while (true) {
+            val event = awaitPointerEventScope {
+                awaitPointerEvent()
+            }
+            val current = event.changes.firstOrNull()?.position
+            if (event.type == PointerEventType.Scroll) {
+                val scrollY: Float? = event.changes.firstOrNull()?.scrollDelta?.y
+                if (scrollY != null && scrollY != 0f) {
+                    onZoom(current?.toPt(), -scrollY * Config.SCROLL_SENSITIVITY_DESKTOP)
+                }
+                if (consumeScroll) {
+                    event.changes.forEach {
+                        it.consume()
+                    }
+                }
+            }
+            when (event.type) {
+                PointerEventType.Move -> {
+                    if (event.buttons.isPrimaryPressed) {
+                        val previous = previousMoveDownPos
+                        if (previous != null && current != null) {
+                            val dx = (current.x - previous.x).toInt()
+                            val dy = (current.y - previous.y).toInt()
+                            if (dx != 0 || dy != 0) {
+                                onMove(dx, dy)
+                            }
+                        }
+                        previousMoveDownPos = current
+                    } else {
+                        previousMoveDownPos = null
+                    }
+                }
+
+                PointerEventType.Press -> {
+                    previousPressTime = timeMs()
+                    previousPressPos = current
+                    previousMoveDownPos = current
+                }
+
+                PointerEventType.Release -> {
+                    if (timeMs() - previousPressTime < Config.CLICK_DURATION_MS) {
+                        val previous = previousPressPos
+                        if (current != null && previous != null) {
+                            if (current.distanceTo(previous) < Config.CLICK_AREA_RADIUS_PX) {
+                                onClick(current.toPt())
+                            }
+                        }
+                    }
+                    previousPressTime = timeMs()
+                    previousMoveDownPos = null
+                }
+            }
+        }
+    }
+
+    Box(modifier) {
+        Canvas(Modifier.fillMaxSize().applyPointerInput()) {
+            val p1 = size.width.toInt()
+            val p2 = size.height.toInt()
+            width = p1
+            height = p2
+            onStateChange(internalState.copy(width = p1, height = p2).toExternalState())
+            clipRect() {
+                displayTiles.forEach { (t, img) ->
+                    if (img != null) {
+                        val size = IntSize(t.size, t.size)
+                        val position = IntOffset(t.x, t.y)
+                        drawImage(
+                            img.extract(),
+                            srcOffset = IntOffset(img.offsetX, img.offsetY),
+                            srcSize = IntSize(img.cropSize, img.cropSize),
+                            dstOffset = position,
+                            dstSize = size
+                        )
+                    }
+                }
+            }
+            drawPath(path = Path().apply<Path> {
+                addRect(Rect(0f, 0f, size.width, size.height))
+            }, color = Color.Red, style = Stroke(4f))
+        }
+        Row(Modifier.align(Alignment.BottomCenter)) {
+            LinkText("OpenStreetMap license", Config.OPENSTREET_MAP_LICENSE)
+            LinkText("Usage policy", Config.OPENSTREET_MAP_POLICY)
+        }
+    }
 }
 
 fun InternalMapState.toExternalState() =
@@ -128,5 +238,25 @@ fun InternalMapState.toExternalState() =
         centerGeo.longitude,
         scale
     )
+
+@Composable
+private fun LinkText(text: String, link: String) {
+    Text(
+        text = text,
+        color = Color.Blue,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.clickable {
+            navigateToUrl(link)
+        }
+            .padding(4.dp)
+            .background(Color.White.copy(alpha = 0.8f), shape = RoundedCornerShape(5.dp))
+            .padding(10.dp)
+            .clip(RoundedCornerShape(5.dp))
+    )
+}
+
+private fun navigateToUrl(url: String) {
+    Desktop.getDesktop().browse(URL(url).toURI())
+}
 
 private var inMemoryCache: Map<Tile, TileImage> by mutableStateOf(mapOf())

@@ -62,7 +62,7 @@ fun MemoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState, enabled = verticalScrollEnableState.value)
+                .verticalScroll(scrollState, enabled = false)
         ) {
             Box(
                 modifier = Modifier

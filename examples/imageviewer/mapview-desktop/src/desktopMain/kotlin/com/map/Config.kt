@@ -10,6 +10,7 @@ object Config {
     val ZOOM_ON_CLICK = 0.8
     val MAX_SCALE_ON_SINGLE_ZOOM_EVENT = 2.0
     val CACHE_DIR_NAME = "map-view-cache"
+    val SCROLL_SENSITIVITY_DESKTOP = 0.05
     val MIN_ZOOM = 0
     val MAX_ZOOM = 22
     val FONT_LEVEL = 2

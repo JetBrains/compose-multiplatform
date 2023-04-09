@@ -14,7 +14,6 @@ kotlin {
             dependencies {
                 implementation(compose.runtime)
                 implementation(compose.foundation)
-                implementation(compose.materialIconsExtended)
             }
         }
         val desktopMain by getting {
