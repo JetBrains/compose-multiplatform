@@ -12,16 +12,11 @@ private sealed interface Message<K, T> {
     class DownloadFail<K, T>(val key: K, val exception: Throwable) : Message<K, T>
 }
 
-/**
- * Если идёт несколько запросов по одному и тому же ключу, то ставить их в ожидание, и делать только один сетевой вызов.
- */
 fun <K, T> ContentRepository<K, T>.decorateWithDistinctDownloader(
     scope: CoroutineScope
 ): ContentRepository<K, T> {
     val origin = this
     val actor = scope.actor<Message<K, T>> {
-        // Вся модификация происходит только с одного потока (корутины)
-        // Можно работать с mutable переменными без синхронизации
         val mapKeyToRequests: MutableMap<K, MutableList<CompletableDeferred<T>>> = mutableMapOf()
         while (true) {
             when (val message = receive()) {
@@ -29,8 +24,6 @@ fun <K, T> ContentRepository<K, T>.decorateWithDistinctDownloader(
                     val requestsWithSameKey = mapKeyToRequests.getOrPut(message.key) {
                         val newHandlers = mutableListOf<CompletableDeferred<T>>()
                         scope.launch {
-                            // Этот код запускается вне actor-а и тут нельзя напрямую менять mutable state
-                            // Но можно пробрасывать сообщения обратно в actor
                             try {
                                 val result = origin.loadContent(message.key)
                                 channel.send(

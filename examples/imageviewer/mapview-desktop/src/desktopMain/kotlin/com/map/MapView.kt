@@ -3,9 +3,6 @@ package com.map
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.foundation.gestures.rememberTransformableState
-import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -35,7 +32,6 @@ import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import java.awt.Desktop
 import java.net.URL
-import kotlin.math.roundToInt
 
 data class MapState(
     val latitude: Double,
@@ -127,17 +123,17 @@ fun MapView(
         tilesToDisplay
     }
 
-    val onZoom = { pt: Pt?, change: Double ->
+    val onZoom = { pt: DisplayPoint?, change: Double ->
         onStateChange(internalState.zoom(pt, change).toExternalState())
     }
-    val onClick = { pt: Pt ->
+    val onClick = { pt: DisplayPoint ->
         val geoPoint = internalState.displayToGeo(pt)
         if (onMapViewClick(geoPoint.latitude, geoPoint.longitude)) {
             onStateChange(internalState.zoom(pt, Config.ZOOM_ON_CLICK).toExternalState())
         }
     }
     val onMove = { dx: Int, dy: Int ->
-        val topLeft = internalState.topLeft + internalState.displayLengthToGeo(Pt(-dx, -dy))
+        val topLeft = internalState.topLeft + internalState.displayLengthToGeo(DisplayPoint(-dx, -dy))
         onStateChange(internalState.copy(topLeft = topLeft).correctGeoXY().toExternalState())
     }
     var previousMoveDownPos by remember<MutableState<Offset?>> { mutableStateOf(null) }

@@ -10,19 +10,11 @@ import kotlinx.coroutines.Dispatchers
 import java.io.File
 import kotlin.coroutines.CoroutineContext
 
-
-/**
- * Создать репозиторий для получения tile картинок.
- * В зависимости от платформы будет обёрнут в Декоратор для кэша на диск и (или) in-memory кэш.
- * Эта функция с аннотацией Composable, чтобы можно было получить android Context
- */
 @Composable
 internal fun rememberTilesRepository(
     userAgent: String,
     ioScope: CoroutineScope
 ): ContentRepository<Tile, TileImage> = remember {
-    // Для HOME директории MacOS требует разрешения.
-    // Чтобы не просить разрешений созданим кэш во временной директории.
     val cacheDir = File(System.getProperty("java.io.tmpdir")).resolve(Config.CACHE_DIR_NAME)
     createRealRepository(HttpClient(CIO) {
         install(UserAgent) {

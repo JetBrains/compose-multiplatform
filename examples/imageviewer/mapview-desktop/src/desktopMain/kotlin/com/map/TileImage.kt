@@ -3,10 +3,6 @@ package com.map
 import androidx.compose.ui.graphics.ImageBitmap
 import kotlin.math.roundToInt
 
-/**
- * Картинка в удобном представлении для рисования на конкретной платформе.
- * Требуется чтобы отрисовка на Canvas происходила быстро.
- */
 class TileImage(
     val platformSpecificData: ImageBitmap,
     val offsetX: Int = 0,
@@ -22,9 +18,6 @@ class TileImage(
         )
 }
 
-/**
- * Вырезать нужный кусочек и сделать scale до исходного размера
- */
 fun TileImage.cropAndRestoreSize(x: Int, y: Int, targetSize: Int): TileImage {
     val scale: Float = targetSize.toFloat() / TILE_SIZE
     val newSize = maxOf(1, (cropSize * scale).roundToInt())

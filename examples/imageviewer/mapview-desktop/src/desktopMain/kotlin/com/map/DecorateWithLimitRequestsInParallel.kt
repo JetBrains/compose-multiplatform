@@ -7,10 +7,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-/**
- * Декоратор для ограничения количества параллельных запросов в сеть.
- * Запросы которые пришли недавно - обрабатываются в первую очередь (внутри для этого используется Stack)
- */
 fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
     scope: CoroutineScope,
     maxParallelRequests: Int = 2, // Policy: https://operations.osmfoundation.org/policies/tiles/
@@ -18,8 +14,6 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
     delayBeforeRequestMs: Long = 50
 ): ContentRepository<K, T> {
     val origin = this
-
-    // Потокобезопасное immutable состояние
     data class State(
         val stack: CollectionAddRemove<ElementWait<K, T>> = createStack(waitBufferCapacity),
         val currentRequests: Int = 0
@@ -53,7 +47,6 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
             }
         }
     ) { state, intent: Intent<K, T> ->
-        // Модификация состояния происходит только в этой функции и исполняется в одном потоке
         when (intent) {
             is Intent.NewElement -> {
                 val (fifo, removed) = state.stack.add(intent.wait)

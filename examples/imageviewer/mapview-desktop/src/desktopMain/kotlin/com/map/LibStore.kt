@@ -15,12 +15,6 @@ interface Store<STATE, INTENT> {
     val state get() = stateFlow.value
 }
 
-/**
- * Реализация Store из MVI архитектуры для слоя представления.
- * STATE - immutable состояние
- * INTENT - Действия, которые влияют на состояние
- * reducer - генерирует новое состояние
- */
 fun <STATE, INTENT> CoroutineScope.createStore(init: STATE, reducer: Reducer<STATE, INTENT>): Store<STATE, INTENT> {
     val mutableStateFlow = MutableStateFlow(init)
     val channel: Channel<INTENT> = Channel(Channel.UNLIMITED)
@@ -48,9 +42,6 @@ typealias ReducerSE<STATE, INTENT, EFFECT> = suspend (STATE, INTENT) -> ReducerR
 
 data class ReducerResult<STATE, EFFECT>(val state: STATE, val sideEffects: List<EFFECT> = emptyList())
 
-/**
- * MVI по типу ELM с обработкой SideEffect-ов
- */
 fun <STATE, INTENT, EFFECT> CoroutineScope.createStoreWithSideEffect(
     init: STATE,
     effectHandler: (store: Store<STATE, INTENT>, sideEffect: EFFECT) -> Unit,

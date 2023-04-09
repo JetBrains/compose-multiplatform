@@ -1,10 +1,10 @@
 package com.map
 
 data class InternalMapState(
-    val width: Int = 100, // display width in dp (pixels)
-    val height: Int = 100,//display height in dp (pixels)
+    val width: Int = 100,
+    val height: Int = 100,
     val scale: Double = 1.0,
-    val topLeft: GeoPt = GeoPt(0.0, 0.0),
+    val topLeft: GeoPoint = GeoPoint(0.0, 0.0),
 )
 
 data class DisplayTileWithImage<T>(
@@ -14,8 +14,8 @@ data class DisplayTileWithImage<T>(
 )
 
 data class DisplayTile(
-    val size: Int,//Размер на экране
-    val x: Int,//координаты на экране
+    val size: Int,
+    val x: Int,
     val y: Int
 )
 
@@ -24,15 +24,12 @@ data class DisplayTileAndTile(
     val tile: Tile
 )
 
-val InternalMapState.centerGeo get():GeoPt = displayToGeo(Pt(width / 2, height / 2))
-fun InternalMapState.copyAndChangeCenter(targetCenter: GeoPt): InternalMapState =
+val InternalMapState.centerGeo get():GeoPoint = displayToGeo(DisplayPoint(width / 2, height / 2))
+fun InternalMapState.copyAndChangeCenter(targetCenter: GeoPoint): InternalMapState =
     copy(
         topLeft = topLeft + targetCenter - centerGeo
     ).correctGeoXY()
 
-/**
- * Корректируем координаты, чтобы они не выходили за край карты.
- */
 fun InternalMapState.correctGeoXY(): InternalMapState =
     correctGeoX().correctGeoY()
 
