@@ -38,12 +38,16 @@ class IosImageStorage(
     private val pictures: SnapshotStateList<PictureData>,
     private val ioScope: CoroutineScope
 ) : ImageStorage {
+
     private val savePictureDir =
         File(NSFileManager.defaultManager.DocumentDirectory, "ImageViewer/takenPhotos/")
 
-    private val PictureData.Camera.jpgFile get() = File(savePictureDir, "$id.jpg")
+    private val PictureData.Camera.jpgFile
+        get() = File(savePictureDir, "$id.jpg")
+
     private val PictureData.Camera.thumbnailJpgFile
         get() = File(savePictureDir, "$id-thumbnail.jpg")
+
     private val PictureData.Camera.jsonFile get() = File(savePictureDir, "$id.json")
 
     init {
