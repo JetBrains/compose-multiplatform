@@ -23,8 +23,6 @@ import kotlinx.serialization.json.Json
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.resource
 import java.io.File
-import java.util.UUID
-
 
 private const val maxStorableImageSizePx = 2000
 private const val storableThumbnailSizePx = 200

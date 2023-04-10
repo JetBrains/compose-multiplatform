@@ -2,7 +2,12 @@ package example.imageviewer
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import kotlinx.datetime.*
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.Month
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.toLocalDateTime
 
 class NameAndDescription(
     val name: String,
