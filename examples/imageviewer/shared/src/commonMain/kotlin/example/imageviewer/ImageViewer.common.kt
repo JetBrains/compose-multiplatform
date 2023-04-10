@@ -67,7 +67,7 @@ fun ImageViewerWithProvidedDependencies(
             slideInHorizontally { w -> multiplier * w } with
                     slideOutHorizontally { w -> multiplier * -1 * w }
         }
-    }) { (index, page) ->
+    }) { (_, page) ->
         when (page) {
             is GalleryPage -> {
                 GalleryScreen(
@@ -94,8 +94,8 @@ fun ImageViewerWithProvidedDependencies(
                 MemoryScreen(
                     pictures = pictures,
                     memoryPage = page,
-                    onSelectRelatedMemory = { picture: PictureData ->
-                        navigationStack.push(MemoryPage(pictures.indexOf(picture)))
+                    onSelectRelatedMemory = { pictureIndex ->
+                        navigationStack.push(MemoryPage(pictureIndex))
                     },
                     onBack = { resetNavigation ->
                         if (resetNavigation) {

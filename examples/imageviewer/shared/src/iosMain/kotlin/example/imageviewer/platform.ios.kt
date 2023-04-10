@@ -15,7 +15,6 @@ import platform.CoreFoundation.CFUUIDCreateString
 import platform.Foundation.CFBridgingRelease
 import platform.UIKit.UIApplication
 import platform.UIKit.UIImage
-import platform.UIKit.safeAreaInsets
 
 private val iosNotchInset = object : WindowInsets {
     override fun getTop(density: Density): Int {

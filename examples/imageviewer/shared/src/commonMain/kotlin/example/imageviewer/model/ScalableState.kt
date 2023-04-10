@@ -8,6 +8,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.isSpecified
 import kotlin.math.max
+import kotlin.math.min
 
 /**
  * Encapsulate all transformations about showing some target (an image, relative to its center)
@@ -50,6 +51,17 @@ class ScalableState {
         }
     }
 
+    /**
+     * The calculated scale for full visibility of the target.
+     */
+    private val scaleForFullVisibility by derivedStateOf {
+        if (targetSize.isSpecified && areaSize.isSpecified) {
+            min(areaSize.width / targetSize.width, areaSize.height / targetSize.height)
+        } else {
+            1.0f
+        }
+    }
+
     private fun zoomToScale(zoom: Float) = zoom * scaleFor100PercentZoom
 
     /**
@@ -65,6 +77,7 @@ class ScalableState {
     ) {
         this.areaSize = areaSize
         this.targetSize = targetSize
+        zoomLimits = (scaleForFullVisibility / scaleFor100PercentZoom)..zoomLimits.endInclusive
         applyLimits()
     }
 
@@ -73,6 +86,7 @@ class ScalableState {
             val offsetXLimits = centerLimits(targetSize.width * transformation.scale, areaSize.width)
             val offsetYLimits = centerLimits(targetSize.height * transformation.scale, areaSize.height)
 
+            zoom = zoom.coerceIn(zoomLimits)
             offset = Offset(
                 offset.x.coerceIn(offsetXLimits),
                 offset.y.coerceIn(offsetYLimits),

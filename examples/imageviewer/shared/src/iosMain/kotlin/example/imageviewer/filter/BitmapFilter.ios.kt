@@ -4,7 +4,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asComposeImageBitmap
 import androidx.compose.ui.graphics.asSkiaBitmap
-import org.jetbrains.skia.*
+import org.jetbrains.skia.Bitmap
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skia.ColorAlphaType
+import org.jetbrains.skia.ColorInfo
+import org.jetbrains.skia.ColorType
+import org.jetbrains.skia.FilterTileMode
+import org.jetbrains.skia.Image
+import org.jetbrains.skia.ImageFilter
+import org.jetbrains.skia.ImageInfo
+import org.jetbrains.skia.Paint
 
 actual fun grayScaleFilter(bitmap: ImageBitmap, context: PlatformContext): ImageBitmap {
     return applyGrayScaleFilter(bitmap.asSkiaBitmap()).asComposeImageBitmap()
