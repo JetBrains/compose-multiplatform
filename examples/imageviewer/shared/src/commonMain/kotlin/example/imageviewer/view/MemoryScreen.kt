@@ -88,7 +88,7 @@ fun MemoryScreen(
                     Collapsible(picture.description, onEdit = { edit = true })
                     Headliner("Related memories")
                     val shuffledIndices = remember {
-                        (pictures.indices.toList() - memoryPage.pictureIndex).shuffled()
+                        (pictures.indices.toList() - memoryPage.pictureIndex).shuffled().take(8)
                     }
                     LazyRow(
                         modifier = Modifier
