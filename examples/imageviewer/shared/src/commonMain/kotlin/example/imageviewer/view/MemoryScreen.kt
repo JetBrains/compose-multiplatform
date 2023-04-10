@@ -102,7 +102,8 @@ fun MemoryScreen(
                                 SquareThumbnail(
                                     picture = pictures[index],
                                     isHighlighted = false,
-                                    onClick = { onSelectRelatedMemory(index) })
+                                    onClick = { onSelectRelatedMemory(index) }
+                                )
                             }
                         }
                     }
