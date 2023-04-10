@@ -23,6 +23,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.interop.LocalLayerContainer
+import androidx.compose.ui.interop.LocalUIViewController
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.platform.DefaultInputModeManager
@@ -249,6 +250,7 @@ internal actual class ComposeWindow : UIViewController {
         layer.setContent(content = {
             CompositionLocalProvider(
                 LocalLayerContainer provides rootView,
+                LocalUIViewController provides this,
             ) {
                 content()
             }
