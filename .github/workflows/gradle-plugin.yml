@@ -16,7 +16,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
-          java-version: '16'
+          java-version: '17'
       - name: Test Gradle plugin
         shell: bash
         run: |
