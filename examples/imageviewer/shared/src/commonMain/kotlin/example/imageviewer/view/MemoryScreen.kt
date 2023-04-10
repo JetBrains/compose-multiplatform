@@ -37,7 +37,6 @@ import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
 import example.imageviewer.shareIcon
 import example.imageviewer.style.ImageviewerColors
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @Composable
 fun MemoryScreen(
@@ -197,7 +196,6 @@ private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () 
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
@@ -248,7 +246,7 @@ fun BoxScope.MemoryTextOverlay(picture: PictureData) {
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun Collapsible(s: String, onEdit: () -> Unit) {
-    val interctionSource = remember { MutableInteractionSource() }
+    val interactionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
     Text(
@@ -265,7 +263,7 @@ fun Collapsible(s: String, onEdit: () -> Unit) {
                     stiffness = Spring.StiffnessLow
                 )
             ).combinedClickable(
-                interactionSource = interctionSource, indication = null,
+                interactionSource = interactionSource, indication = null,
                 onClick = {
                     isCollapsed = !isCollapsed
                 },
