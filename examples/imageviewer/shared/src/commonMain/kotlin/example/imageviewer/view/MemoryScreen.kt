@@ -7,7 +7,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -43,7 +43,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
-    onSelectRelatedMemory: (picture: PictureData) -> Unit,
+    onSelectRelatedMemory: (pictureIndex: Int) -> Unit,
     onBack: (resetNavigation: Boolean) -> Unit,
     onHeaderClick: (index: Int) -> Unit,
 ) {
@@ -87,10 +87,26 @@ fun MemoryScreen(
                     Headliner("Note")
                     Collapsible(picture.description, onEdit = { edit = true })
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(
-                        pictures = remember { (pictures - picture).shuffled().take(8) },
-                        onSelectRelatedMemory = onSelectRelatedMemory
-                    )
+                    val shuffledIndices = remember {
+                        (pictures.indices.toList() - memoryPage.pictureIndex).shuffled().take(8)
+                    }
+                    LazyRow(
+                        modifier = Modifier
+                            .padding(10.dp, 0.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(items = shuffledIndices) { index ->
+                            Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
+                                SquareThumbnail(
+                                    picture = pictures[index],
+                                    isHighlighted = false,
+                                    onClick = { onSelectRelatedMemory(index) }
+                                )
+                            }
+                        }
+                    }
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -270,28 +286,4 @@ fun Headliner(s: String) {
         color = Color.Black,
         modifier = Modifier.padding(start = 12.dp, top = 32.dp, end = 12.dp, bottom = 16.dp)
     )
-}
-
-@Composable
-fun RelatedMemoriesVisualizer(
-    pictures: List<PictureData>,
-    onSelectRelatedMemory: (picture: PictureData) -> Unit
-) {
-    Box(
-        modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
-    ) {
-        LazyRow(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(pictures) { index, item ->
-                Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-                    SquareThumbnail(
-                        picture = item,
-                        isHighlighted = false,
-                        onClick = { onSelectRelatedMemory(item) })
-                }
-            }
-        }
-    }
 }
