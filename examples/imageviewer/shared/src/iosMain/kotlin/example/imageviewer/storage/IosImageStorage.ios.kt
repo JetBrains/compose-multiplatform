@@ -48,7 +48,8 @@ class IosImageStorage(
     private val PictureData.Camera.thumbnailJpgFile
         get() = File(savePictureDir, "$id-thumbnail.jpg")
 
-    private val PictureData.Camera.jsonFile get() = File(savePictureDir, "$id.json")
+    private val PictureData.Camera.jsonFile
+        get() = File(savePictureDir, "$id.json")
 
     init {
         if (savePictureDir.isDirectory) {
