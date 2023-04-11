@@ -42,7 +42,7 @@ fun cloneTemplate(template: String, index: Int, content: String): File {
   val tempDir = file("${project.buildDir.absolutePath}/temp/cloned-$index")
   tempDir.deleteRecursively()
   tempDir.mkdirs()
-  file("${projectDir.parentFile.parentFile.absolutePath}/templates/$template").copyRecursively(tempDir)
+  file("${projectDir.parentFile.parentFile.absolutePath}/ci/templates/$template").copyRecursively(tempDir)
   // tempDir.deleteOnExit()
   File("$tempDir/src/main/kotlin/main.kt").printWriter().use { out ->
     out.println(content)
@@ -143,14 +143,14 @@ fun createCheckSpecs(checkTargets: String = "all"): List<CheckSpec> {
     kotlinVersion = project.findProperty("kotlin.version")?.toString()
   )
   fun web() = CheckSpec(
-    gradleCmd = "compileKotlinJs", dir = "Web", template = "web-template",
+    gradleCmd = "compileKotlinJs", dir = "HTML", template = "html-library-template",
     kotlinVersion = project.findProperty("kotlin.js.version")?.toString() ?:
       project.findProperty("kotlin.version")?.toString()
   )
   fun all() = listOf(desktop(), web())
 
   return when (checkTargets) {
-    "web" -> listOf(web())
+    "html" -> listOf(web())
     "desktop" -> listOf(desktop())
     else -> all()
   }
