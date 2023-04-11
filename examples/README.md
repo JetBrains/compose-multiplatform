@@ -10,4 +10,4 @@
 * [Todoapp Lite](todoapp-lite) - A simplified version of [Todoapp](todoapp), fully based on Compose (Android, iOS, Desktop)
 * [Notepad](notepad) - Notepad, using the Composable Window API (Desktop)
 * [IDEA plugin](intellij-plugin) - Plugin for IDEA using Compose for Desktop
-* [HTML based examples](html) - Examples written with Compose HTML Library
+* [HTML based examples](html/README.md) - Examples written with Compose HTML Library
