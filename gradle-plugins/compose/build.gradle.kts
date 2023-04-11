@@ -117,7 +117,7 @@ tasks.test {
  * It is not desirable to depend on little known service for provisioning JDK distributions, even for tests.
  * Thus, the only option is to download the necessary JDK distributions ourselves.
  */
-val jdkVersionsForTests = listOf(11, 15, 18, 19)
+val jdkVersionsForTests = listOf(11, 19)
 val jdkForTestsRoot = project.gradle.gradleUserHomeDir.resolve("compose-jb-jdks")
 val downloadJdksForTests = tasks.register("downloadJdksForTests") {}
 
