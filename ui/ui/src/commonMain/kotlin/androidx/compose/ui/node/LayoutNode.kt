@@ -1379,7 +1379,7 @@ internal class LayoutNode(
             resetModifierState()
         }
         // resetModifierState detaches all nodes, so we need to re-attach them upon reuse.
-        nodes.attach()
+        nodes.attach(true)
     }
 
     override fun onDeactivate() {
