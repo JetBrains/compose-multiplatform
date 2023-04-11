@@ -8,9 +8,8 @@ fun createRealRepository(ktorClient: HttpClient) =
     object : ContentRepository<Tile, ByteArray> {
         @Suppress("PARAMETER_NAME_CHANGED_ON_OVERRIDE")
         override suspend fun loadContent(tile: Tile): ByteArray {
-            Config.createTileUrl(tile.zoom, tile.x, tile.y)
             return ktorClient.get(
-                urlString = Config.createTileUrl(tile.zoom, tile.x, tile.y)
+                urlString = Config.createTileUrl(tile)
             ).readBytes()
         }
     }

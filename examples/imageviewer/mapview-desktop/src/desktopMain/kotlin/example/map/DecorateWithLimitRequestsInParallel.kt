@@ -40,6 +40,7 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
                         }
                     }
                 }
+
                 is NetworkSideEffect.Delay<K, T> -> {
                     scope.launch {
                         delay(delayBeforeRequestMs)
@@ -60,6 +61,7 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
                 }
                 state.copy(stack = fifo).addSideEffect(NetworkSideEffect.Delay())
             }
+
             is Intent.AfterDelay -> {
                 if (state.stack.isNotEmpty()) {
                     var fifo = state.stack
@@ -79,6 +81,7 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
                     state.noSideEffects()
                 }
             }
+
             is Intent.ElementComplete -> {
                 state.copy(
                     currentRequests = state.currentRequests - 1

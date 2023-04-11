@@ -58,9 +58,10 @@ object Config {
      */
     val FONT_LEVEL = 1
 
-    fun createTileUrl(zoom: Int, x: Int, y: Int): String {
-        return "https://tile.openstreetmap.org/$zoom/$x/$y.png"
-    }
+    fun createTileUrl(tile: Tile): String =
+        with(tile) {
+            "https://tile.openstreetmap.org/$zoom/$x/$y.png"
+        }
 }
 
 data class Tile(
