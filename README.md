@@ -2,85 +2,79 @@
 [![Latest release](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=brightgreen&label=latest%20release)](https://github.com/JetBrains/compose-multiplatform/releases/latest)
 [![Latest build](https://img.shields.io/github/v/release/JetBrains/compose-multiplatform?color=orange&include_prereleases&label=latest%20build)](https://github.com/JetBrains/compose-multiplatform/releases)
 
-# Compose Multiplatform, by JetBrains
-![](artwork/readme/apps.png)
-Compose Kotlin UI framework port for desktop platforms (macOS, Linux, Windows) and Web, components outside of the core [Compose repository](https://android.googlesource.com/platform/frameworks/support).
 
-Preview functionality (check your application UI without building/running it) for desktop platforms is available via [IDEA plugin](https://plugins.jetbrains.com/plugin/16541-compose-multiplatform-ide-support).
 
-## Tutorials
-### Compose for Desktop
-* [Getting started](tutorials/Getting_Started)
-* [Image and icon manipulations](tutorials/Image_And_Icons_Manipulations)
-* [Mouse events and hover](tutorials/Mouse_Events)
-* [Scrolling and scrollbars](tutorials/Desktop_Components#scrollbars)
-* [Tooltips](tutorials/Desktop_Components#tooltips)
-* [Context Menu](tutorials/Context_Menu/README.md)
-* [Top level windows management](tutorials/Window_API_new)
-* [Menu, tray, notifications](tutorials/Tray_Notifications_MenuBar_new)
-* [Keyboard support](tutorials/Keyboard)
-* [Tab focus navigation](tutorials/Tab_Navigation)
-* [Swing interoperability](tutorials/Swing_Integration)
-* [Navigation](tutorials/Navigation)
-* [Accessibility](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Accessibility)
-* [Building a native distribution](tutorials/Native_distributions_and_local_execution)
+# Compose Multiplatform
 
-Also, see [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) docs from Google. They were originally written for Android, but most of information applies to Compose for Desktop as well.
+**Compose Multiplatform** is a declarative framework for sharing UIs across multiple platforms with Kotlin. 
+It is based on [Jetpack Compose](https://developer.android.com/jetpack/compose) and developed by [JetBrains](https://www.jetbrains.com/) and open-source contributors.
 
-### Compose for Web HTML
-* [Getting started](tutorials/Web/Getting_Started) 
-* [Building web UI](tutorials/Web/Building_UI)
-* [Handling Events](tutorials/Web/Events_Handling)
-* [Controlled and Uncontrolled inputs](tutorials/Web/Controlled_Uncontrolled_Inputs)
-* [Style DSL](tutorials/Web/Style_Dsl)
-* [Using test-utils](tutorials/Web/Using_Test_Utils)
+You can choose the platforms across which to share your UIs using Compose Multiplatform:
 
-### Jetpack Compose for Android
-Compose Multiplatform uses Jetpack Compose developed by Google when you target Android platform. See more info about it [here](tutorials/Development_for_Android).
+* [iOS](https://github.com/JetBrains/compose-multiplatform-ios-android-template/#readme) (Alpha)
+* [Android](https://developer.android.com/jetpack/compose) (via Jetpack Compose)
+* [Desktop](https://github.com/JetBrains/compose-multiplatform-desktop-template/#readme) (Windows, MacOS, Linux)
+* [Web](https://kotl.in/wasm-compose-example) (Experimental)
 
-[The docs](https://developer.android.com/jetpack/compose/documentation) published by Google are great and describe how to develop on Compose for Android.
+For example, you can share UIs between iOS and Android or Windows and MacOS.
 
-Note that when you use Compose Multiplatform, you setup your project differently. You can create a multiplatform project with Android support via IDEA Project Wizard, or by copying [multiplatform template](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/multiplatform-template). In `androidMain` source set you can use almost all information from the docs, and in `commonMain` source set you can use information from Foundation and Design sections.
+![Shared UIs of the iOS, Android, desktop, and web apps](artwork/readme/apps.png)
 
-### Experimental targets
-The other targets (iOS, Compose for Web Canvas) are experimental and under development. Use them at your own risk.
+## iOS
 
-## Examples
-   * [codeviewer](examples/codeviewer) - File Browser and Code Viewer application for Android and Desktop
-   * [imageviewer](examples/imageviewer) - Image Viewer application for Android and Desktop
-   * [issues](examples/issues) - GitHub issue tracker with an adaptive UI and ktor-client
-   * [Falling Balls](examples/falling-balls) - Simple game
-   * [notepad](examples/notepad) - Notepad, using the new experimental Composable Window API
-   * [todoapp](examples/todoapp) - TODO items tracker with persistence and multiple screens, written with external navigation library
-   * [todoapp-lite](examples/todoapp-lite) - A simplified version of [todoapp](examples/todoapp), fully based on Compose
-   * [widgets gallery](examples/widgets-gallery) - Gallery of standard widgets
-   * [IDEA plugin](examples/intellij-plugin) - Plugin for IDEA using Compose for Desktop
-   * [compose-bird](examples/web-compose-bird) - A flappy bird clone using Compose for Web
-   * [web-landing](examples/web-landing) - A landing page built using Compose for Web (HTML composable api)
-   * [compose-web-with-react](examples/web-with-react) - Using compose-in-react and react-in-compose
-   * [compose-web-in-js](examples/web-compose-in-js) - Using Html based composables in js
+> iOS support is in Alpha. It may change incompatibly and require manual migration in the future. 
+> We would appreciate your feedback on it in the public Slack channel [#compose-ios](https://kotlinlang.slack.com/archives/C0346LWVBJ4/p1678888063176359). 
+> If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
 
-## Other ##
-* [artwork](artwork) - design artifacts
-* [benchmarks](benchmarks) - collection of benchmarks
-* [compose](compose) - composite build of [Compose Multiplatform sources](https://github.com/JetBrains/androidx)
-* [ci](ci) - Continuous Integration helpers
-* [gradle-plugins](gradle-plugins) - a plugin, simplifying usage of Compose Multiplatform with Gradle
-* [templates](templates) - new application templates
-* [components](components) - custom components of Compose Multiplatform
-   * [Split Pane](components/SplitPane)
-* [experimental](experimental) - experimental components and examples
-   * [Compose Multiplatform template project](https://github.com/JetBrains/compose-multiplatform-template) 
-     that includes experimental iOS target 
-   * [examples](experimental/examples) - examples that use new experimental functionality
-   * [cef](experimental/cef) - CEF integration in Jetpack Compose (somewhat outdated)
-   * [Video Player](experimental/components/VideoPlayer)
-   * [LWJGL integration](experimental/lwjgl-integration) - An example showing how to integrate Compose with [LWJGL](https://www.lwjgl.org)
-   * [CLI example](experimental/build_from_cli) - An example showing how to build Compose without Gradle
-       
-## Versions ##
+Compose Multiplatform shares most of its API with Jetpack Compose, the Android UI framework developed by Google. 
+You can use the same APIs to build user interfaces for both Android and iOS.
 
-* [The latest stable release](https://github.com/JetBrains/compose-multiplatform/releases/latest)
-* [The latest dev release](https://github.com/JetBrains/compose-multiplatform/releases)
-* [Compatibility and versioning overview](VERSIONING.md)
+Since Compose is built on top of [Kotlin Multiplatform](https://kotlinlang.org/lp/multiplatform/), 
+you can easily access native APIs, such as the [Camera API](https://developer.apple.com/documentation/avfoundation/capture_setup/avcam_building_a_camera_app), 
+and embed complex native UI views, such as [MKMapView](https://developer.apple.com/documentation/mapkit/mkmapview).
+
+**[Get started with Compose for iOS](https://github.com/JetBrains/compose-multiplatform-ios-android-template#readme)**
+
+
+## Android
+
+When Android is one of your targets, you can get the same experience for Android as if you were developing an Android app 
+using [Jetpack Compose](https://developer.android.com/jetpack/compose).
+
+## Desktop
+
+Compose Multiplatform targets the JVM and supports high-performance hardware-accelerated UI rendering on all major desktop
+platforms – macOS, Windows, and Linux.
+
+It has desktop extensions for menus, keyboard shortcuts, window manipulation, and notification management.
+
+**[Get started with Compose for Desktop](https://github.com/JetBrains/compose-multiplatform-desktop-template#readme)**
+
+## Web
+
+> Web support is Experimental and may be changed at any time. Use it only for evaluation purposes. 
+> We would appreciate your feedback on it in the public Slack channel [#compose-web](https://kotlinlang.slack.com/archives/C01F2HV7868/p1678887590205449). 
+> If you face any issues, please report them on [GitHub](https://github.com/JetBrains/compose-multiplatform/issues).
+
+You can experiment with sharing your mobile or desktop UIs with the web. Compose for Web is based on [Kotlin/Wasm](kotl.in/wasm), 
+the newest target for Kotlin Multiplatform projects. It allows Kotlin developers to run their code in the browser with 
+all the benefits that WebAssembly has to offer, such as good and predictable performance for your applications.
+
+**[Get started with Compose for Web](https://kotl.in/wasm-compose-example)**
+
+## All platforms at once
+
+If you want to share UIs across all supported platforms at once, you can start with [this template](https://github.com/JetBrains/compose-multiplatform-template#readme).
+
+> Note that this template currently doesn’t support the web. It will be added later.
+> 
+> We would appreciate your feedback on Compose Multiplatform in the public Slack channel [#compose](https://kotlinlang.slack.com/archives/CJLTWPH7S/p1678882768039969).
+
+## Learn more
+
+* [Samples](examples/README.md)
+* [Tutorials](tutorials/README.md)
 * [Changelog](CHANGELOG.md)
+* [Compatibility and versioning](VERSIONING.md)
+
+
