@@ -1,3 +1,87 @@
+# 1.4.0 (April 2023)
+
+## Common
+
+- [Added support for Kotlin `1.8.20`](https://github.com/JetBrains/compose-multiplatform/pull/3000)
+- Update skiko from `0.7.54` to `0.7.58`
+- [Migrate skia to `m110`](https://github.com/JetBrains/skiko/pull/667)
+
+### Features
+
+- [Support perspective projection and `cameraDistance` parameter in `graphicsLayer`](https://github.com/JetBrains/compose-multiplatform-core/pull/422)
+- [Support `brush` parameter in `TextStyle` for complex coloring](https://github.com/JetBrains/compose-multiplatform/issues/2814)
+- [Support `drawStyle` parameter in `TextStyle` for drawing outlined text](https://github.com/JetBrains/compose-multiplatform-core/pull/470)
+- [Support `blendMode` parameter when drawing text on Canvas](https://github.com/JetBrains/compose-multiplatform-core/pull/470)
+- [Support compositing strategy on `graphicsLayer`](https://github.com/JetBrains/compose-multiplatform-core/pull/486)
+- [Add `minLines` parameter to `BasicTextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/469)
+- [Support `painterResource` function common source set](https://github.com/JetBrains/compose-multiplatform/pull/2793)
+
+### Fixes
+
+- [Fix performing `ComposeScene.sendKeyEvent` an unintentional non-local return](https://github.com/JetBrains/compose-multiplatform-core/pull/398)
+- [Actually remember provider in `rememberComponentRectPositionProvider`](https://github.com/JetBrains/compose-multiplatform-core/pull/444)
+- [Fix merging multiple selection areas inside `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform/issues/2899)
+- [Fix crash on selecting text if layout result is invalid](https://github.com/JetBrains/compose-multiplatform-core/pull/482)
+- [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
+
+## Desktop
+
+### Features
+
+- [Support external drag and drop](https://github.com/JetBrains/compose-multiplatform-core/pull/391)
+- [Animate scroll initiated by mouse wheel input](https://github.com/JetBrains/compose-multiplatform-core/pull/438)
+- [Remove AWT dependency in `rememberCursorPositionProvider`](https://github.com/JetBrains/compose-multiplatform-core/pull/432)
+
+### Fixes
+
+- [Fix showing a surface behind `AlertDialog` shape](https://github.com/JetBrains/compose-multiplatform/issues/1269)
+- [Fix `AlertDialog` shadow size](https://github.com/JetBrains/compose-multiplatform/issues/2857)
+- [Fix `AlertDialog` width to match the maximum of its content](https://github.com/JetBrains/compose-multiplatform/issues/2836)
+- [Fix `ContextMenuArea` to put the context menu representation in the same box with the content](https://github.com/JetBrains/compose-multiplatform/issues/2729)
+- [Replace using global mouse position with known position for context menus, dropdown menus and tooltips](https://github.com/JetBrains/compose-multiplatform-core/pull/437)
+- [Limit error dialog width in case of long error message](https://github.com/JetBrains/compose-multiplatform-core/pull/441)
+- [Fix window flashing background with unspecified size](https://github.com/JetBrains/compose-multiplatform-core/pull/442)
+- [Unregister window/dialog listeners when disposing](https://github.com/JetBrains/compose-multiplatform-core/pull/446)
+- [Fix applying `ComposePanel` visibility](https://github.com/JetBrains/compose-multiplatform/issues/2656)
+
+## Web
+
+- [`compose.web` is renamed to `compose.html`](https://github.com/JetBrains/compose-multiplatform/pull/2997)
+
+## Tools
+
+- [Packaging native distributions now requires at least JDK 17](https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/Native_distributions_and_local_execution/README.md#customizing-jdk-version)
+
+### Features
+
+- [Provide relative path to jpackage --main-jar](https://github.com/JetBrains/compose-multiplatform/issues/1578)
+- [Provide some entitlements on macOS by default](https://github.com/JetBrains/compose-multiplatform/pull/2974)
+
+
+### Fixes
+
+- [Unzip wix to build directory](https://github.com/JetBrains/compose-multiplatform/issues/2804)
+
+## API Changes
+
+- [Remove deprecated `SkiaRootForTest.processPointerInput`](https://github.com/JetBrains/compose-multiplatform-core/pull/456)
+- [Remove deprecated `PointerEvent.awtEvent`, `KeyEvent.awtEvent`](https://github.com/JetBrains/compose-multiplatform-core/pull/456)
+- [Make accidentally exposed to public `ParagraphLayouter` class `internal` as designed](https://github.com/JetBrains/compose-multiplatform-core/pull/426)
+- [`androidx.compose.foundation.v2.ScrollbarAdapter` is introduced in order to allow scrollbars of a size different from the scrolled widget](https://github.com/JetBrains/compose-multiplatform-core/pull/368)
+
+## Dependencies
+
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+
+- [Compiler 1.4.4](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.4.4)
+- [Runtime 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.4.0)
+- [UI 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.4.0)
+- [Foundation 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.4.0)
+- [Material 1.4.0](https://developer.android.com/jetpack/androidx/releases/compose-material#1.4.0)
+- [Material3 1.0.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.1)
+
+___
+
 # 1.3.1 (March 2023)
 
 ## Common
