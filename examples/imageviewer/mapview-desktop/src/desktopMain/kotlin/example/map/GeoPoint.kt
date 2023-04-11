@@ -14,9 +14,9 @@ data class GeoPoint(val x: Double, val y: Double)
  */
 data class DisplayPoint(val x: Int, val y: Int)
 
-val GeoPoint.longitude get():Double = x * 360.0 - 180.0
+val GeoPoint.longitude get(): Double = x * 360.0 - 180.0
 val GeoPoint.latitude
-    get():Double {
+    get(): Double {
         val latRad = atan(sinh(PI * (1 - 2 * y)))
         return latRad / PI * 180.0
     }

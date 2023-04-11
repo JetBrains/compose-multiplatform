@@ -24,7 +24,7 @@ data class DisplayTileAndTile(
     val tile: Tile
 )
 
-val InternalMapState.centerGeo get():GeoPoint = displayToGeo(DisplayPoint(width / 2, height / 2))
+val InternalMapState.centerGeo get(): GeoPoint = displayToGeo(DisplayPoint(width / 2, height / 2))
 fun InternalMapState.copyAndChangeCenter(targetCenter: GeoPoint): InternalMapState =
     copy(
         topLeft = topLeft + targetCenter - centerGeo

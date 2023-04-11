@@ -6,6 +6,7 @@ fun InternalMapState.geoLengthToDisplay(geoLength: Double): Int {
 
 fun InternalMapState.geoXToDisplay(x: Double): Int = geoLengthToDisplay(x - topLeft.x)
 fun InternalMapState.geoYToDisplay(y: Double): Int = geoLengthToDisplay(y - topLeft.y)
+
 @Suppress("unused")
 fun InternalMapState.geoToDisplay(geoPt: GeoPoint): DisplayPoint =
     DisplayPoint(geoXToDisplay(geoPt.x), geoYToDisplay(geoPt.y))
@@ -23,10 +24,11 @@ fun InternalMapState.displayToGeo(displayPt: DisplayPoint): GeoPoint {
 }
 
 @Suppress("unused")
-val InternalMapState.minScale get():Double = 1.0
+val InternalMapState.minScale get(): Double = 1.0
 
-val InternalMapState.maxScale get():Double =
-    (TILE_SIZE.toDouble() / height) * fastPow2ForPositiveInt(Config.MAX_ZOOM)
+val InternalMapState.maxScale
+    get(): Double =
+        (TILE_SIZE.toDouble() / height) * fastPow2ForPositiveInt(Config.MAX_ZOOM)
 
 internal fun fastPow2ForPositiveInt(x: Int): Int {
     if (x < 0) {

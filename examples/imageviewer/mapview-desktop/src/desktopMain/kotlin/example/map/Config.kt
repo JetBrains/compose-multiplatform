@@ -56,7 +56,7 @@ object Config {
     /**
      * How biggest text should be on map
      */
-    val FONT_LEVEL = 2
+    val FONT_LEVEL = 1
 
     fun createTileUrl(zoom: Int, x: Int, y: Int): String {
         return "https://tile.openstreetmap.org/$zoom/$x/$y.png"

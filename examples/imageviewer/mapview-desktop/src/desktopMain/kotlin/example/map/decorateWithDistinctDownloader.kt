@@ -38,11 +38,13 @@ fun <K, T> ContentRepository<K, T>.decorateWithDistinctDownloader(
                     }
                     requestsWithSameKey.add(message.deferred)
                 }
+
                 is Message.DownloadComplete<K, T> -> {
                     mapKeyToRequests.remove(message.key)?.forEach {
                         it.complete(message.result)
                     }
                 }
+
                 is Message.DownloadFail<K, T> -> {
                     val exceptionInfo =
                         "decorateWithDistinctDownloader, fail to load tile ${message.key}"
