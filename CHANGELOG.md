@@ -31,6 +31,13 @@
 - [Support external drag and drop](https://github.com/JetBrains/compose-multiplatform-core/pull/391)
 - [Animate scroll initiated by mouse wheel input](https://github.com/JetBrains/compose-multiplatform-core/pull/438)
 - [Remove AWT dependency in `rememberCursorPositionProvider`](https://github.com/JetBrains/compose-multiplatform-core/pull/432)
+- Major scrollbar overhaul
+  - [Scrollbar now works correctly in lazy lists when items vary in size](https://github.com/JetBrains/compose-multiplatform/issues/2679)
+  - [Scrollbar now works correctly with lazy list `contentPadding`](https://github.com/JetBrains/compose-multiplatform/issues/2604)
+  - Scrollbar now works correctly in lazy list with spacing between items
+  - Scrollbar now works correctly if the size of the scrollbar doesn't match the size of the widget it scrolls
+  - [Pressing the scrollbar track now works correctly](https://github.com/JetBrains/compose-multiplatform-core/pull/409)
+  - [Added scrollbar support for lazy grids and text fields](https://github.com/JetBrains/compose-multiplatform/issues/1575)
 
 ### Fixes
 
@@ -40,7 +47,6 @@
 - [Use state hoisting instead of global mouse position to determine where context menus, dropdown menus and tooltips should be displayed](https://github.com/JetBrains/compose-multiplatform-core/pull/437)
 - [Limit error dialog width in case of long error message](https://github.com/JetBrains/compose-multiplatform-core/pull/441)
 - [Fix window flashing background with unspecified size](https://github.com/JetBrains/compose-multiplatform-core/pull/442)
-- [Unregister window/dialog listeners when disposing](https://github.com/JetBrains/compose-multiplatform-core/pull/446)
 - [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
 - [Fix applying `ComposePanel` visibility](https://github.com/JetBrains/compose-multiplatform/issues/2656)
 
