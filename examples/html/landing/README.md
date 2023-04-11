@@ -1,4 +1,4 @@
-Landing page of Compose for Web
+Landing page of Compose for Web (a former name of Compose HTML Library)
 
 ### Running Web browser application
  * To run, launch command: `./gradlew :jsBrowserRun`

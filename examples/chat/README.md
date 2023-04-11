@@ -21,7 +21,9 @@ Choose a run configuration for an appropriate target in Android Studio and run i
 
 `./gradlew desktopApp:run`
 
-## Run JS in browser with WebAssembly Skia via Gradle
+## Run JS in browser
+
+> Note that this Web target is written using Kotlin/JS, not Kotlin/Wasm, and isn't officially supported
 
 `./gradlew jsApp:jsBrowserDevelopmentRun`
 
