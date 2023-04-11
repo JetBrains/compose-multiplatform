@@ -19,7 +19,6 @@
 - [Actually remember provider in `rememberComponentRectPositionProvider`](https://github.com/JetBrains/compose-multiplatform-core/pull/444)
 - [Fix merging multiple selection areas inside `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform/issues/2899)
 - [Fix crash on selecting text if layout result is invalid](https://github.com/JetBrains/compose-multiplatform-core/pull/482)
-- [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
 
 ## iOS
 
@@ -35,19 +34,20 @@
 
 ### Fixes
 
-- [Fix showing a surface behind `AlertDialog` shape](https://github.com/JetBrains/compose-multiplatform/issues/1269)
-- [Fix `AlertDialog` shadow size](https://github.com/JetBrains/compose-multiplatform/issues/2857)
+- [Fix using a custom shape for an `AlertDialog`](https://github.com/JetBrains/compose-multiplatform/issues/1269)
 - [Fix `AlertDialog` width to match the maximum of its content](https://github.com/JetBrains/compose-multiplatform/issues/2836)
-- [Fix `ContextMenuArea` to put the context menu representation in the same box with the content](https://github.com/JetBrains/compose-multiplatform/issues/2729)
-- [Replace using global mouse position with known position for context menus, dropdown menus and tooltips](https://github.com/JetBrains/compose-multiplatform-core/pull/437)
+- [Change `ContextMenuArea` to emit a single element, rather than two elements](https://github.com/JetBrains/compose-multiplatform/issues/2729)
+- [Use state hoisting instead of global mouse position to determine where context menus, dropdown menus and tooltips should be displayed](https://github.com/JetBrains/compose-multiplatform-core/pull/437)
 - [Limit error dialog width in case of long error message](https://github.com/JetBrains/compose-multiplatform-core/pull/441)
 - [Fix window flashing background with unspecified size](https://github.com/JetBrains/compose-multiplatform-core/pull/442)
 - [Unregister window/dialog listeners when disposing](https://github.com/JetBrains/compose-multiplatform-core/pull/446)
+- [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
 - [Fix applying `ComposePanel` visibility](https://github.com/JetBrains/compose-multiplatform/issues/2656)
 
 ## Web
 
 - [`Compose for Web` is renamed to `Compose HTML Library`](https://github.com/JetBrains/compose-multiplatform/pull/2997)
+- [The new experimental `Compose for Web` based on Kotlin/Wasm is available](README.md#web)
 
 ## Tools
 
