@@ -6,6 +6,7 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization")
+    id("kotlin-parcelize")
 }
 
 version = "1.0-SNAPSHOT"

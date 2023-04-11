@@ -26,7 +26,7 @@ import org.jetbrains.codeviewer.util.SplitterState
 import org.jetbrains.codeviewer.util.VerticalSplittable
 
 @Composable
-internal fun CodeViewerView(model: CodeViewer) {
+fun CodeViewerView(model: CodeViewer) {
     val panelState = remember { PanelState() }
 
     val animatedSize = if (panelState.splitter.isResizing) {

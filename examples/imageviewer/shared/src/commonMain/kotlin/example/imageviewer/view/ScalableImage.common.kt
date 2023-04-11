@@ -5,7 +5,8 @@ import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.BoxWithConstraintsScope
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.geometry.Offset
@@ -31,7 +32,7 @@ private const val INITIAL_ZOOM = 1.0f
 private const val SLIGHTLY_INCREASED_ZOOM = 1.5f
 
 @Composable
-internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
+fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, modifier: Modifier = Modifier) {
     BoxWithConstraints {
         val areaSize = areaSize
         val imageSize = image.size
@@ -44,8 +45,14 @@ internal fun ScalableImage(scalableState: ScalableState, image: ImageBitmap, mod
                     drawIntoCanvas {
                         it.withSave {
                             it.translate(areaCenter.x, areaCenter.y)
-                            it.translate(scalableState.transformation.offset.x, scalableState.transformation.offset.y)
-                            it.scale(scalableState.transformation.scale, scalableState.transformation.scale)
+                            it.translate(
+                                scalableState.transformation.offset.x,
+                                scalableState.transformation.offset.y
+                            )
+                            it.scale(
+                                scalableState.transformation.scale,
+                                scalableState.transformation.scale
+                            )
                             it.translate(-imageCenter.x, -imageCenter.y)
                             drawImage(image)
                         }

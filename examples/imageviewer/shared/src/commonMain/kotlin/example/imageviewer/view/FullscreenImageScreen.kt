@@ -25,7 +25,7 @@ import example.imageviewer.model.*
 import example.imageviewer.style.*
 
 @Composable
-internal fun FullscreenImageScreen(
+fun FullscreenImageScreen(
     picture: PictureData,
     back: () -> Unit,
 ) {

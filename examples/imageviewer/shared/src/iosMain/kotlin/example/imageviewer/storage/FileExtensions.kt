@@ -3,18 +3,16 @@ package example.imageviewer.storage
 import kotlinx.cinterop.*
 import kotlinx.coroutines.yield
 import platform.Foundation.*
-import platform.UIKit.UIImage
-import platform.UIKit.UIImageJPEGRepresentation
 import platform.posix.memcpy
 
-
-val NSFileManager.DocumentDirectory get() = URLForDirectory(
-    directory = NSDocumentDirectory,
-    inDomain = NSUserDomainMask,
-    create = true,
-    appropriateForURL = null,
-    error = null
-)!!
+val NSFileManager.DocumentDirectory
+    get() = URLForDirectory(
+        directory = NSDocumentDirectory,
+        inDomain = NSUserDomainMask,
+        create = true,
+        appropriateForURL = null,
+        error = null
+    )!!
 
 // Mimic to java's File class
 @Suppress("FunctionName")
@@ -78,5 +76,3 @@ fun NSURL.writeText(text: String) {
         error = null
     )
 }
-
-

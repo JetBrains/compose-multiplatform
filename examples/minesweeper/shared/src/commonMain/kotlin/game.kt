@@ -15,7 +15,7 @@ import kotlin.math.max
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun loadImage(res: String): Painter = painterResource(res)
+fun loadImage(res: String): Painter = painterResource(res)
 
 expect fun hasRightClick(): Boolean
 
@@ -39,7 +39,7 @@ object GameStyles {
 }
 
 @Composable
-internal fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = MainLayout {
+fun Game(requestWindowSize: ((width: Dp, height: Dp) -> Unit)? = null) = MainLayout {
     var message by remember { mutableStateOf<String?>(null) }
 
     val onWin = { message = "You win!" }

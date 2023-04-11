@@ -25,7 +25,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun Words() {
+fun Words() {
     val duration = 5000
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -84,7 +84,7 @@ internal fun Words() {
 }
 
 @Composable
-internal fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
+fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
          color: Color, alpha: Float = 0.8f) {
     Text(
         modifier = Modifier
@@ -99,7 +99,7 @@ internal fun Word(position: DpOffset, angle: Float, scale: Float, text: String,
 }
 
 @Composable
-internal fun FallingSnow() {
+fun FallingSnow() {
     BoxWithConstraints(Modifier.fillMaxSize()) {
         repeat(50) {
             val size = remember { 20.dp + 10.dp * random() }
@@ -134,14 +134,14 @@ internal fun FallingSnow() {
 }
 
 @Composable
-internal fun Background() = Box(
+fun Background() = Box(
     Modifier
         .fillMaxSize()
         .background(Color(0xFF6F97FF))
 )
 
 @Composable
-internal fun RotatingWords() {
+fun RotatingWords() {
     Background()
     FallingSnow()
     Words()

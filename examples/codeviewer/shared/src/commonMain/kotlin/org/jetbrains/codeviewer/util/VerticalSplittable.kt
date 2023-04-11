@@ -22,7 +22,7 @@ import org.jetbrains.codeviewer.platform.cursorForHorizontalResize
 import org.jetbrains.codeviewer.ui.common.AppTheme
 
 @Composable
-internal fun VerticalSplittable(
+fun VerticalSplittable(
     modifier: Modifier,
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
@@ -57,7 +57,7 @@ class SplitterState {
 }
 
 @Composable
-internal fun VerticalSplitter(
+fun VerticalSplitter(
     splitterState: SplitterState,
     onResize: (delta: Dp) -> Unit,
     color: Color = AppTheme.colors.backgroundDark

@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-internal actual fun BoxScope.EditMemoryDialog(
+actual fun BoxScope.EditMemoryDialog(
     previousName: String,
     previousDescription: String,
     save: (name: String, description: String) -> Unit

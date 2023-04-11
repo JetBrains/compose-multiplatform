@@ -214,14 +214,14 @@ Versions must follow the rules:
 
 ## Customizing JDK version
 
-The plugin uses `jpackage`, for which you should be using at least [JDK 15](https://openjdk.java.net/projects/jdk/15/).
+The plugin uses `jpackage`, for which you should be using at least [JDK 17](https://openjdk.java.net/projects/jdk/17/).
 Make sure you meet at least one of the following requirements:
 * `JAVA_HOME` environment variable points to the compatible JDK version.
 * `javaHome` is set via DSL:
 ``` kotlin
 compose.desktop {
     application {
-        javaHome = System.getenv("JDK_15")
+        javaHome = System.getenv("JDK_17")
     }
 }
 ``` 

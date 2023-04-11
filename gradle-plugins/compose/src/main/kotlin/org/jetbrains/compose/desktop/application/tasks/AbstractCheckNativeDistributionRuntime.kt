@@ -20,7 +20,7 @@ import org.jetbrains.compose.internal.utils.clearDirs
 import java.io.File
 
 // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
-internal const val MIN_JAVA_RUNTIME_VERSION = 15
+internal const val MIN_JAVA_RUNTIME_VERSION = 17
 
 @CacheableTask
 abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTask() {

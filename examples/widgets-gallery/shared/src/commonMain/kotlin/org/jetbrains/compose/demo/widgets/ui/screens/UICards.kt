@@ -18,7 +18,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
-internal fun UICards() {
+fun UICards() {
     val item = remember { DemoDataProvider.item }
 
     Text(

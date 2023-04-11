@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import org.jetbrains.compose.demo.widgets.theme.typography
 
 @Composable
-internal fun SnackBars() {
+fun SnackBars() {
     Snackbar(modifier = Modifier.padding(4.dp)) {
         Text(text = "This is a basic snackbar")
     }

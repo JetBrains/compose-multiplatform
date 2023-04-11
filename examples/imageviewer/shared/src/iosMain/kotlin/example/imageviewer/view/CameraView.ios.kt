@@ -54,7 +54,7 @@ private val deviceTypes = listOf(
 )
 
 @Composable
-internal actual fun CameraView(
+actual fun CameraView(
     modifier: Modifier,
     onCapture: (picture: PictureData.Camera, image: PlatformStorableImage) -> Unit
 ) {

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-internal fun OpenedCell(cell: Cell) {
+fun OpenedCell(cell: Cell) {
     Text(
         text = cell.bombsNear.toString(),
         textAlign = TextAlign.Center,
@@ -28,7 +28,7 @@ internal fun OpenedCell(cell: Cell) {
 }
 
 @Composable
-internal fun CellWithIcon(src: String, alt: String) {
+fun CellWithIcon(src: String, alt: String) {
     Image(
         painter = loadImage(src),
         contentDescription = alt,
@@ -37,17 +37,17 @@ internal fun CellWithIcon(src: String, alt: String) {
 }
 
 @Composable
-internal fun Mine() {
+fun Mine() {
     CellWithIcon(src = "assets/mine.png", alt = "Bomb")
 }
 
 @Composable
-internal fun Flag() {
+fun Flag() {
     CellWithIcon(src = "assets/flag.png", alt = "Flag")
 }
 
 @Composable
-internal fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
+fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
     Box(modifier = Modifier.background(Color(0x8e, 0x6e, 0x0e))) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(modifier = Modifier.size(40.dp, 40.dp)) {
@@ -66,7 +66,7 @@ internal fun IndicatorWithIcon(iconPath: String, alt: String, value: Int) {
 }
 
 @Composable
-internal fun NewGameButton(text: String, onClick: () -> Unit) {
+fun NewGameButton(text: String, onClick: () -> Unit) {
     Box(
         Modifier
             .background(color = Color(0x42, 0x8e, 0x04))

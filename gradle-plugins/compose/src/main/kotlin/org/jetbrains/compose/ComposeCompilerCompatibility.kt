@@ -9,7 +9,7 @@ internal object ComposeCompilerCompatibility {
         "1.7.20" to "1.3.2.2",
         "1.8.0" to "1.4.0",
         "1.8.10" to "1.4.2",
-        "1.8.20" to "1.4.5-rc02",
+        "1.8.20" to "1.4.5-rc03",
     )
 
     fun compilerVersionFor(kotlinVersion: String): String {

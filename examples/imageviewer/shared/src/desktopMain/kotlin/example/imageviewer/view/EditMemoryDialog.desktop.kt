@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-internal actual fun BoxScope.EditMemoryDialog(
+actual fun BoxScope.EditMemoryDialog(
     previousName: String,
     previousDescription: String,
     save: (name: String, description: String) -> Unit

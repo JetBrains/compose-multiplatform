@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 @Composable
-internal fun Toggles() {
+fun Toggles() {
     Column {
         var checked by remember { mutableStateOf(true) }
         Checkbox(

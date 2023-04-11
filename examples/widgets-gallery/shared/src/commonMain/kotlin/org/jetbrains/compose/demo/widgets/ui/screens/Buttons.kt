@@ -20,7 +20,7 @@ import org.jetbrains.compose.demo.widgets.theme.purple200
 import org.jetbrains.compose.demo.widgets.theme.typography
 
 @Composable
-internal fun Buttons() {
+fun Buttons() {
     Column {
         Button(onClick = {}, modifier = Modifier.padding(8.dp)) {
             Text(text = "Main Button")

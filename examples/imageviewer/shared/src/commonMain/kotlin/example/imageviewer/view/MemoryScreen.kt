@@ -7,7 +7,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -37,23 +37,22 @@ import example.imageviewer.isShareFeatureSupported
 import example.imageviewer.model.*
 import example.imageviewer.shareIcon
 import example.imageviewer.style.ImageviewerColors
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
-internal fun MemoryScreen(
+fun MemoryScreen(
     pictures: SnapshotStateList<PictureData>,
     memoryPage: MemoryPage,
-    onSelectRelatedMemory: (PictureData) -> Unit,
-    onBack: () -> Unit,
-    onHeaderClick: (PictureData) -> Unit,
+    onSelectRelatedMemory: (pictureIndex: Int) -> Unit,
+    onBack: (resetNavigation: Boolean) -> Unit,
+    onHeaderClick: (index: Int) -> Unit,
 ) {
     val imageProvider = LocalImageProvider.current
     val sharePicture = LocalSharePicture.current
     var edit: Boolean by remember { mutableStateOf(false) }
-    val picture = memoryPage.pictureState.value
+    val picture = pictures.getOrNull(memoryPage.pictureIndex) ?: return
     var headerImage: ImageBitmap? by remember(picture) { mutableStateOf(null) }
     val platformContext = getPlatformContext()
+    val verticalScrollEnableState = remember { mutableStateOf(true) }
     LaunchedEffect(picture) {
         headerImage = imageProvider.getImage(picture)
     }
@@ -62,7 +61,7 @@ internal fun MemoryScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(scrollState)
+                .verticalScroll(scrollState, enabled = verticalScrollEnableState.value)
         ) {
             Box(
                 modifier = Modifier
@@ -78,19 +77,35 @@ internal fun MemoryScreen(
                     MemoryHeader(
                         it,
                         picture = picture,
-                        onClick = { onHeaderClick(picture) }
+                        onClick = { onHeaderClick(memoryPage.pictureIndex) }
                     )
                 }
             }
             Box(modifier = Modifier.background(MaterialTheme.colors.background)) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Headliner("Note")
-                    Collapsible(picture.description)
+                    Collapsible(picture.description, onEdit = { edit = true })
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(
-                        pictures = remember { (pictures - picture).shuffled().take(8) },
-                        onSelectRelatedMemory = onSelectRelatedMemory
-                    )
+                    val shuffledIndices = remember {
+                        (pictures.indices.toList() - memoryPage.pictureIndex).shuffled().take(8)
+                    }
+                    LazyRow(
+                        modifier = Modifier
+                            .padding(10.dp, 0.dp)
+                            .clip(RoundedCornerShape(10.dp))
+                            .fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(items = shuffledIndices) { index ->
+                            Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
+                                SquareThumbnail(
+                                    picture = pictures[index],
+                                    isHighlighted = false,
+                                    onClick = { onSelectRelatedMemory(index) }
+                                )
+                            }
+                        }
+                    }
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -101,12 +116,13 @@ internal fun MemoryScreen(
                             .height(200.dp),
                         gps = picture.gps,
                         title = picture.name,
+                        parentScrollEnableState = verticalScrollEnableState,
                     )
                     Spacer(Modifier.height(50.dp))
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                         IconWithText(Icons.Default.Delete, "Delete") {
                             imageProvider.delete(picture)
-                            onBack()
+                            onBack(true)
                         }
                         IconWithText(Icons.Default.Edit, "Edit") {
                             edit = true
@@ -123,14 +139,15 @@ internal fun MemoryScreen(
         }
         TopLayout(
             alignLeftContent = {
-                BackButton(onBack)
+                BackButton {
+                    onBack(false)
+                }
             },
             alignRightContent = {},
         )
         if (edit) {
             EditMemoryDialog(picture.name, picture.description) { name, description ->
-                val edited = imageProvider.edit(picture, name, description)
-                memoryPage.pictureState.value = edited
+                imageProvider.edit(picture, name, description)
                 edit = false
             }
         }
@@ -179,9 +196,8 @@ private fun MemoryHeader(bitmap: ImageBitmap, picture: PictureData, onClick: () 
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
-internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
+fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
     Column(
         modifier = Modifier.align(Alignment.BottomEnd).padding(12.dp)
     ) {
@@ -193,7 +209,7 @@ internal fun BoxScope.MagicButtonOverlay(onClick: () -> Unit) {
 }
 
 @Composable
-internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
+fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     val shadowTextStyle = LocalTextStyle.current.copy(
         shadow = Shadow(
             color = Color.Black.copy(0.75f),
@@ -227,9 +243,10 @@ internal fun BoxScope.MemoryTextOverlay(picture: PictureData) {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
-internal fun Collapsible(s: String) {
-    val interctionSource = remember { MutableInteractionSource() }
+fun Collapsible(s: String, onEdit: () -> Unit) {
+    val interactionSource = remember { MutableInteractionSource() }
     var isCollapsed by remember { mutableStateOf(true) }
     val text = if (isCollapsed) s.lines().first() + "... (see more)" else s
     Text(
@@ -245,16 +262,21 @@ internal fun Collapsible(s: String) {
                     dampingRatio = Spring.DampingRatioLowBouncy,
                     stiffness = Spring.StiffnessLow
                 )
+            ).combinedClickable(
+                interactionSource = interactionSource, indication = null,
+                onClick = {
+                    isCollapsed = !isCollapsed
+                },
+                onLongClick = {
+                    onEdit()
+                }
             )
-            .clickable(interactionSource = interctionSource, indication = null) {
-                isCollapsed = !isCollapsed
-            }
             .fillMaxWidth(),
     )
 }
 
 @Composable
-internal fun Headliner(s: String) {
+fun Headliner(s: String) {
     Text(
         text = s,
         fontWeight = FontWeight.SemiBold,
@@ -262,36 +284,4 @@ internal fun Headliner(s: String) {
         color = Color.Black,
         modifier = Modifier.padding(start = 12.dp, top = 32.dp, end = 12.dp, bottom = 16.dp)
     )
-}
-
-@Composable
-internal fun RelatedMemoriesVisualizer(
-    pictures: List<PictureData>,
-    onSelectRelatedMemory: (PictureData) -> Unit
-) {
-    Box(
-        modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
-    ) {
-        LazyRow(
-            modifier = Modifier.fillMaxSize(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            itemsIndexed(pictures) { idx, item ->
-                RelatedMemory(item, onSelectRelatedMemory)
-            }
-        }
-    }
-}
-
-@Composable
-internal fun RelatedMemory(
-    galleryEntry: PictureData,
-    onSelectRelatedMemory: (PictureData) -> Unit
-) {
-    Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-        SquareThumbnail(
-            picture = galleryEntry,
-            isHighlighted = false,
-            onClick = { onSelectRelatedMemory(galleryEntry) })
-    }
 }
