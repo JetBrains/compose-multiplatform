@@ -56,7 +56,7 @@ object Config {
     /**
      * How biggest text should be on map
      */
-    val FONT_LEVEL = 1
+    val FONT_LEVEL = 2
 
     fun createTileUrl(tile: Tile): String =
         with(tile) {
