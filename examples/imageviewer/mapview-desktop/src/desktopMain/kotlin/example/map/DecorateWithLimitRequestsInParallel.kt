@@ -1,6 +1,6 @@
 package example.map
 
-import example.map.collection.CollectionAddRemove
+import example.map.collection.ImmutableCollection
 import example.map.collection.createStack
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
@@ -16,7 +16,7 @@ fun <K, T> ContentRepository<K, T>.decorateWithLimitRequestsInParallel(
     val origin = this
 
     data class State(
-        val stack: CollectionAddRemove<ElementWait<K, T>> = createStack(waitBufferCapacity),
+        val stack: ImmutableCollection<ElementWait<K, T>> = createStack(waitBufferCapacity),
         val currentRequests: Int = 0
     )
 

@@ -5,12 +5,12 @@ package example.map.collection
  * When maxSize overflows, elements are removed from the depth of the stack,
  * and a new element is placed on top of the stack.
  */
-fun <T> createStack(maxSize: Int): CollectionAddRemove<T> = Stack(maxSize)
+fun <T> createStack(maxSize: Int): ImmutableCollection<T> = Stack(maxSize)
 
 private data class Stack<T>(
     val maxSize: Int,
     val list: List<T> = emptyList()
-) : CollectionAddRemove<T> {
+) : ImmutableCollection<T> {
     init {
         check(maxSize > 0) { "specify maxSize > 0" }
     }

@@ -23,8 +23,8 @@ fun InternalMapState.displayToGeo(displayPt: DisplayPoint): GeoPoint {
 }
 
 @Suppress("unused")
-val InternalMapState.minScale
-    get():Double = 1.0
+val InternalMapState.minScale get():Double = 1.0
+
 val InternalMapState.maxScale get():Double = (TILE_SIZE.toDouble() / height) * pow2(Config.MAX_ZOOM)
 
 fun pow2(x: Int): Int {
@@ -44,12 +44,7 @@ fun InternalMapState.zoom(zoomCenter: DisplayPoint?, change: Double): InternalMa
         multiply = Config.MAX_SCALE_ON_SINGLE_ZOOM_EVENT
     }
     var scale = state.scale * multiply
-    if (scale < state.minScale) {
-        scale = state.minScale
-    }
-    if (scale > state.maxScale) {
-        scale = state.maxScale
-    }
+    scale = scale.coerceIn(state.minScale..state.maxScale)
     val scaledState = state.copy(scale = scale)
     val geoDelta = state.displayToGeo(pt) - scaledState.displayToGeo(pt)
     return scaledState.copy(topLeft = scaledState.topLeft + geoDelta).correctGeoXY()
