@@ -24,7 +24,7 @@ class SplitPaneState(
         val movableArea = maxPosition - minPosition
         if (movableArea > 0) {
             positionPercentage =
-                ((movableArea * positionPercentage) + delta).coerceIn(minPosition, maxPosition) / movableArea
+                ((movableArea * positionPercentage) + delta).coerceIn(0f, movableArea) / movableArea
         }
     }
 

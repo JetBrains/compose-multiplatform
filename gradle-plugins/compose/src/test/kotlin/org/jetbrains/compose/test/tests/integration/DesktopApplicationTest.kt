@@ -246,15 +246,6 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
-    fun testJdk15() = with(customJdkProject(15)) {
-        testPackageJvmDistributions()
-    }
-    @Test
-    fun testJdk18() = with(customJdkProject(18)) {
-        testPackageJvmDistributions()
-    }
-
-    @Test
     fun testJdk19() = with(customJdkProject(19)) {
         testPackageJvmDistributions()
     }
@@ -501,6 +492,21 @@ class DesktopApplicationTest : GradlePluginTestBase() {
 
         gradle(":runDistributable").checks {
             check.taskSuccessful(":runDistributable")
+        }
+    }
+
+    @Test
+    fun testWixUnzip() {
+        Assumptions.assumeTrue(currentOS == OS.Windows) { "The test is only relevant for Windows" }
+
+        with(testProject(TestProjects.jvm)) {
+            gradle(":unzipWix").checks {
+                check.taskSuccessful(":unzipWix")
+
+                file("build/wix311").checkExists()
+                file("build/wix311/light.exe").checkExists()
+                file("wix311").checkNotExists()
+            }
         }
     }
 }

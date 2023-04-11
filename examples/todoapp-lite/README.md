@@ -1,20 +1,26 @@
+# TodoApp (lite version)
+
 A simplified version of the [TodoApp example](https://github.com/JetBrains/compose-jb/tree/master/examples/todoapp), fully based on Jetpack Compose and without using any third-party libraries.
 
-Supported targets: Android and Desktop.
+Supported targets: Android, Desktop and iOS.
 
-### Running desktop application
- * To run, launch command: `./gradlew :desktop:run`
- * Or choose **desktop** configuration in IDE and run it.  
-  ![desktop-run-configuration.png](screenshots/desktop-run-configuration.png)
+## Setting up your development environment
 
-### Building native desktop distribution
+To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
+
+## How to run
+
+Choose a run configuration for an appropriate target in Android Studio and run it.
+
+![run-configurations.png](run-configurations.png)
+
+## Run on desktop via Gradle
+
+`./gradlew desktopApp:run`
+
+## Building native desktop distribution
 ```
-./gradlew :desktop:packageDistributionForCurrentOS
-# outputs are written to desktop/build/compose/binaries
+./gradlew :desktopApp:packageDistributionForCurrentOS
+# outputs are written to desktopApp/build/compose/binaries
 ```
-
-### Running Android application
-
-Open project in IntelliJ IDEA or Android Studio and run "android" configuration.
-
 ![Desktop](screenshots/todoapplite.png)

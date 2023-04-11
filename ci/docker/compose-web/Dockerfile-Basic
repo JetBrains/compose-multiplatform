@@ -1,4 +1,4 @@
-FROM ubuntu:20.10
+FROM ubuntu:20.04
 
 SHELL ["/bin/bash", "-c"]
 
@@ -7,7 +7,7 @@ RUN dpkg-reconfigure -f noninteractive dash
 
 RUN dpkg --add-architecture i386 && apt-get update -yqq && apt-get install -y \
     gnupg2 \
-    openjdk-11-jdk \
+    openjdk-17-jdk \
     python3 \
     python-is-python3 \
     unzip \

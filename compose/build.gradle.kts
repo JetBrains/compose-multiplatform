@@ -101,6 +101,7 @@ tasks.register("testComposeJbDesktop") {
     dependsOnComposeTask(":compose:ui:ui:desktopTest")
     dependsOnComposeTask(":compose:ui:ui-graphics:desktopTest")
     dependsOnComposeTask(":compose:ui:ui-text:desktopTest")
+    dependsOnComposeTask(":compose:ui:ui-test-junit4:desktopTest")
     dependsOnComposeTask(":compose:foundation:foundation:desktopTest")
     dependsOnComposeTask(":compose:foundation:foundation-layout:desktopTest")
     dependsOnComposeTask(":compose:material:material:desktopTest")
@@ -111,7 +112,6 @@ tasks.register("testComposeJbDesktop") {
 
 tasks.register("testComposeJbWeb") {
     dependsOnComposeTask(":compose:runtime:runtime:jsTest")
-    dependsOnComposeTask(":compose:runtime:runtime:test")
 }
 
 tasks.register("testUIKit") {

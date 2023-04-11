@@ -4,7 +4,6 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.consumeAllChanges
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -86,7 +85,7 @@ internal class HandleScopeImpl(
 ) : HandleScope {
     override fun Modifier.markAsHandle(): Modifier = this.pointerInput(containerScope.splitPaneState) {
         detectDragGestures { change, _ ->
-            change.consumeAllChanges()
+            change.consume()
             containerScope.splitPaneState.dispatchRawMovement(
                 if (containerScope.isHorizontal) change.position.x else change.position.y
             )
@@ -171,7 +170,6 @@ internal class SplitPaneScopeImpl(
  *
  * @param initialPositionPercentage the initial value for [SplitPaneState.positionPercentage]
  * @param moveEnabled the initial value for [SplitPaneState.moveEnabled]
- * @param interactionState the initial value for [SplitPaneState.interactionState]
  * */
 @ExperimentalSplitPaneApi
 @Composable

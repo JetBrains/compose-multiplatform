@@ -19,10 +19,12 @@ runGradle() {
     popd
 }
 
+runGradle chat packageDistributionForCurrentOS
 runGradle codeviewer packageDistributionForCurrentOS
 runGradle imageviewer packageDistributionForCurrentOS
 runGradle issues packageDistributionForCurrentOS
 runGradle notepad packageDistributionForCurrentOS
 runGradle todoapp-lite packageDistributionForCurrentOS
+runGradle minesweeper packageDistributionForCurrentOS
 runGradle visual-effects packageDistributionForCurrentOS
 runGradle widgets-gallery packageDistributionForCurrentOS

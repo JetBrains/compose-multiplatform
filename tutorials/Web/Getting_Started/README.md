@@ -12,7 +12,7 @@ You need to have the following software installed before you begin:
 
 ## Creating a new project
 
-You can create the project by [downloading the template here](https://github.com/JetBrains/compose-jb/tree/master/templates/web-template) or using the Project Wizard in IDEA:
+You can create the project by [downloading the template here](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/web-template) or using the Project Wizard in IDEA:
 
 <img alt="Create new project" src="wizard.png" height="500" />
 
@@ -40,8 +40,8 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.8.0"
-    id("org.jetbrains.compose") version "1.3.0"
+    kotlin("multiplatform") version "1.8.10"
+    id("org.jetbrains.compose") version "1.3.1"
 }
 
 // Add maven repositories

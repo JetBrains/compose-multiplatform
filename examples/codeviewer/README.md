@@ -1,20 +1,24 @@
-MPP Code Viewer example for desktop/android written in Multiplatform Compose library.
+# Code Viewer
+Code Viewer example for Desktop, Android and iOS written in Compose Multiplatform.
 
-### Running desktop application
+## Setting up your development environment
 
-* To run, launch command: `./gradlew :desktop:run`
-* Or choose **desktop** configuration in IDE and run it.  
-  ![desktop-run-configuration.png](screenshots/desktop-run-configuration.png)
+To setup the environment, please consult these [instructions](https://github.com/JetBrains/compose-multiplatform-template#setting-up-your-development-environment).
+
+## How to run
+
+Choose a run configuration for an appropriate target in Android Studio and run it.
+
+![run-configurations.png](run-configurations.png)
+
+## Run desktop via Gradle
+
+`./gradlew desktopApp:run`
 
 ### Building native desktop distribution
 ```
 ./gradlew :desktop:packageDistributionForCurrentOS
 # outputs are written to desktop/build/compose/binaries
-```
-
-### Installing Android application on device/emulator
-```
-./gradlew installDebug
 ```
 
 ![Desktop](screenshots/codeviewer.png)
