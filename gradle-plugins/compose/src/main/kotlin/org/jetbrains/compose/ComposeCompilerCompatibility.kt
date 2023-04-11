@@ -14,7 +14,7 @@ internal object ComposeCompilerCompatibility {
 
     fun compilerVersionFor(kotlinVersion: String): String {
         return kotlinToCompiler[kotlinVersion] ?: throw RuntimeException(
-            "This version of Compose Multiplatform ${ComposeBuildConfig.composeGradlePluginVersion} doesn't support Kotlin " +
+            "Compose Multiplatform ${ComposeBuildConfig.composeGradlePluginVersion} doesn't support Kotlin " +
                     "$kotlinVersion. " +
                     "Please see $KOTLIN_COMPATIBILITY_LINK " +
                     "to know the latest supported version of Kotlin."
