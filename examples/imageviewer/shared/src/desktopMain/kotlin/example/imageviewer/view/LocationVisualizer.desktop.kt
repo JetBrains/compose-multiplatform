@@ -22,6 +22,6 @@ actual fun LocationVisualizer(
         userAgent = "ComposeMapViewExample",
         latitude = gps.latitude,
         longitude = gps.longitude,
-        startScale = 8_000.0
+        startScale = 12_000.0
     )
 }
