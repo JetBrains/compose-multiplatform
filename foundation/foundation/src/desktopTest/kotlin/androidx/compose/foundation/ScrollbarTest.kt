@@ -64,7 +64,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.MouseInjectionScope
-import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.assertTopPositionInRootIsEqualTo
 import androidx.compose.ui.test.click
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
@@ -757,7 +756,7 @@ class ScrollbarTest {
     }
 
     @Test
-    fun `basic lazy grid scrollbar test`() {
+    fun `basic lazy grid test`() {
         rule.setContent {
             LazyGridTestBox(
                 // 3x20 grid, each item is 30x20 dp
@@ -1077,6 +1076,37 @@ class ScrollbarTest {
 
         rule.testLazyContentWithLineSpacing("box0", "box17")
     }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Test
+    fun `basic lazy list with sticky headers test`() {
+        rule.setContent {
+            LazyListTestBox(
+                size = 200.dp,
+                scrollbarWidth = 10.dp
+            ) {
+                stickyHeader {
+                    Box(Modifier.size(50.dp).testTag("header1"))
+                }
+                items(10) {
+                    Box(Modifier.size(20.dp).testTag("box$it"))
+                }
+                stickyHeader {
+                    Box(Modifier.size(50.dp).testTag("header2"))
+                }
+                items(10) {
+                    Box(Modifier.size(20.dp).testTag("box${10+it}"))
+                }
+            }
+        }
+
+        // Drag the scrollbar to the bottom and test the position of the last item
+        rule.onNodeWithTag("scrollbar").performMouseInput {
+            instantDrag(start = Offset(0f, 0f), end = Offset(0f, 120f))
+        }
+        rule.onNodeWithTag("box19").assertTopPositionInRootIsEqualTo(180.dp)
+    }
+
 
     @OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {

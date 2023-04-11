@@ -222,13 +222,47 @@ internal class LazyListScrollbarAdapter(
                 viewportSize.width
         }.toDouble()
 
-    override fun firstVisibleLine(): VisibleLine? {
-        return scrollState.layoutInfo.visibleItemsInfo.firstOrNull()?.let { firstVisibleItem ->
-            VisibleLine(
-                index = firstVisibleItem.index,
-                offset = firstVisibleItem.offset
-            )
+    /**
+     * A heuristic that tries to ignore the "currently stickied" header because it breaks the other
+     * computations in this adapter:
+     * - The currently stickied header always appears in the list of visible items, with its
+     *   regular index. This makes [firstVisibleLine] always return its index, even if the list has
+     *   been scrolled far beyond it.
+     * - [averageVisibleLineSize] calculates the average size in O(1) by assuming that items don't
+     *   overlap, and the stickied item breaks this assumption.
+     *
+     * Attempts to return the index into `visibleItemsInfo` of the first non-currently-stickied (it
+     * could be sticky, but not stickied to the top of the list right now) item, if there is one.
+     *
+     * Note that this heuristic breaks down if the sticky header covers the entire list, so that
+     * it's the only visible item for some portion of the scroll range. But there's currently no
+     * known better way to solve it, and it's a relatively unusual case.
+     */
+    private fun firstFloatingVisibleItemIndex() = with(scrollState.layoutInfo.visibleItemsInfo){
+        when (size) {
+            0 -> null
+            1 -> 0
+            else -> {
+                val first = this[0]
+                val second = this[1]
+                // If either the indices or the offsets aren't continuous, then the first item is
+                // sticky, so we return 1
+                if ((first.index < second.index - 1) ||
+                    (first.offset + first.size + lineSpacing > second.offset))
+                    1
+                else
+                    0
+            }
         }
+    }
+
+    override fun firstVisibleLine(): VisibleLine? {
+        val firstFloatingVisibleIndex = firstFloatingVisibleItemIndex() ?: return null
+        val firstFloatingItem = scrollState.layoutInfo.visibleItemsInfo[firstFloatingVisibleIndex]
+        return VisibleLine(
+            index = firstFloatingItem.index,
+            offset = firstFloatingItem.offset
+        )
     }
 
     override fun totalLineCount() = scrollState.layoutInfo.totalItemsCount
@@ -246,12 +280,11 @@ internal class LazyListScrollbarAdapter(
     }
 
     override fun averageVisibleLineSize() = with(scrollState.layoutInfo.visibleItemsInfo){
-        if (isEmpty())
-            return 0.0
-
-        val first = first()
+        val firstFloatingIndex = firstFloatingVisibleItemIndex() ?: return@with 0.0
+        val first = this[firstFloatingIndex]
         val last = last()
-        (last.offset + last.size - first.offset - (size-1)*lineSpacing).toDouble() / size
+        val count = size - firstFloatingIndex
+        (last.offset + last.size - first.offset - (count-1)*lineSpacing).toDouble() / count
     }
 
     override val lineSpacing get() = scrollState.layoutInfo.mainAxisItemSpacing
