@@ -16,7 +16,7 @@ fun InternalMapState.calcTiles(): List<DisplayTileAndTile> {
             ceil(log2(geoLengthToDisplay(1.0) / TILE_SIZE.toDouble())).roundToInt() - Config.FONT_LEVEL
         )
     )
-    val maxTileIndex: Int = pow2(zoom)
+    val maxTileIndex: Int = fastPow2ForPositiveInt(zoom)
     val tileSize: Int = geoLengthToDisplay(1.0) / maxTileIndex + 1
     val minCol = (topLeft.x * maxTileIndex).toInt()
     val minRow = (topLeft.y * maxTileIndex).toInt()

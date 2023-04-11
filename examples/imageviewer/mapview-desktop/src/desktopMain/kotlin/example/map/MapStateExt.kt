@@ -25,9 +25,10 @@ fun InternalMapState.displayToGeo(displayPt: DisplayPoint): GeoPoint {
 @Suppress("unused")
 val InternalMapState.minScale get():Double = 1.0
 
-val InternalMapState.maxScale get():Double = (TILE_SIZE.toDouble() / height) * pow2(Config.MAX_ZOOM)
+val InternalMapState.maxScale get():Double =
+    (TILE_SIZE.toDouble() / height) * fastPow2ForPositiveInt(Config.MAX_ZOOM)
 
-fun pow2(x: Int): Int {
+internal fun fastPow2ForPositiveInt(x: Int): Int {
     if (x < 0) {
         return 0
     }
