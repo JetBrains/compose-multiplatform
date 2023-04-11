@@ -6,7 +6,12 @@ import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 
-data class Progress(val fraction: Float, val timeMillis: Long)
+data class Progress(
+    val fraction: Float,
+    // TODO: Use kotlin.time.Duration when Kotlin version is updated.
+    //  See https://github.com/Kotlin/api-guidelines/issues/6
+    val timeMillis: Long
+)
 
 @Composable
 fun VideoPlayer(
