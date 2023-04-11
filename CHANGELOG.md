@@ -24,6 +24,10 @@
 - [Fix crash on selecting text if layout result is invalid](https://github.com/JetBrains/compose-multiplatform-core/pull/482)
 - [Fix crash `SplitPane` with a modifier](https://github.com/JetBrains/compose-multiplatform/issues/2214)
 
+## iOS
+
+[iOS support is in Alpha now](README.md#ios)
+
 ## Desktop
 
 ### Features
