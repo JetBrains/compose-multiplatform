@@ -54,9 +54,9 @@ object Config {
     val MAX_ZOOM = 22
 
     /**
-     * How biggest text should be on map
+     * How big text should be on map
      */
-    val FONT_LEVEL = 2
+    val FONT_LEVEL = 1
 
     fun createTileUrl(tile: Tile): String =
         with(tile) {
