@@ -3,8 +3,6 @@
 ## Common
 
 - [Added support for Kotlin `1.8.20`](https://github.com/JetBrains/compose-multiplatform/pull/3000)
-- Update skiko from `0.7.54` to `0.7.58`
-- [Migrate skia to `m110`](https://github.com/JetBrains/skiko/pull/667)
 
 ### Features
 
@@ -14,11 +12,10 @@
 - [Support `blendMode` parameter when drawing text on Canvas](https://github.com/JetBrains/compose-multiplatform-core/pull/470)
 - [Support compositing strategy on `graphicsLayer`](https://github.com/JetBrains/compose-multiplatform-core/pull/486)
 - [Add `minLines` parameter to `BasicTextField`](https://github.com/JetBrains/compose-multiplatform-core/pull/469)
-- [Support `painterResource` function common source set](https://github.com/JetBrains/compose-multiplatform/pull/2793)
+- [Support `painterResource` function in common source set](https://github.com/JetBrains/compose-multiplatform/pull/2793)
 
 ### Fixes
 
-- [Fix performing `ComposeScene.sendKeyEvent` an unintentional non-local return](https://github.com/JetBrains/compose-multiplatform-core/pull/398)
 - [Actually remember provider in `rememberComponentRectPositionProvider`](https://github.com/JetBrains/compose-multiplatform-core/pull/444)
 - [Fix merging multiple selection areas inside `SelectionContainer`](https://github.com/JetBrains/compose-multiplatform/issues/2899)
 - [Fix crash on selecting text if layout result is invalid](https://github.com/JetBrains/compose-multiplatform-core/pull/482)
@@ -50,7 +47,7 @@
 
 ## Web
 
-- [`compose.web` is renamed to `compose.html`](https://github.com/JetBrains/compose-multiplatform/pull/2997)
+- [`Compose for Web` is renamed to `Compose HTML Library`](https://github.com/JetBrains/compose-multiplatform/pull/2997)
 
 ## Tools
 
