@@ -1,9 +1,9 @@
-## Tutorials
+# Tutorials
 
-### iOS + Android
+## iOS + Android
 * [Getting started](https://github.com/JetBrains/compose-multiplatform-ios-android-template)
 
-### Desktop
+## Desktop
 * [Getting started](https://github.com/JetBrains/compose-multiplatform-desktop-template)
 * [Image and icon manipulations](tutorials/Image_And_Icons_Manipulations)
 * [Mouse events and hover](tutorials/Mouse_Events)
@@ -19,16 +19,16 @@
 * [Accessibility](https://github.com/JetBrains/compose-multiplatform/tree/master/tutorials/Accessibility)
 * [Building a native distribution](tutorials/Native_distributions_and_local_execution)
 
-### Web
+## Web
 * [Getting started](https://kotl.in/wasm-compose-example)
 
-### General
+## General
 
 See [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) tutorials from Google. They were originally written for Android, but most of information applies for the other targets as well.
 
-### Libraries
+## Libraries
 
-## HTML
+### HTML
 Compose HTML Library allows you to build reactive user interfaces for the web in Kotlin, using the concepts and APIs of Compose to express the state, behaviour, and logic of your application.
 
 HTML Library provides multiple ways of declaring user interfaces in Kotlin code, allowing you to have full control over your website layout with a declarative HTML/CSS API.
