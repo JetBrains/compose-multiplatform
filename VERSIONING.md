@@ -1,6 +1,8 @@
 ## Compatibility and versioning overview
 
 ### Supported platforms
+   * Android
+   * iOS
    * macOS (x86-64, arm64)
    * Windows (x86-64)
    * Linux (x86-64, arm64)
@@ -12,7 +14,7 @@ Following limitations apply to 1.0 release.
 
   * Only 64-bit x86 Windows is supported
   * Only JDK 11 or later is supported due to the memory management scheme used in Skia bindings
-  * Only JDK 15 or later is supported for packaging native distributions due to jpackage limitations
+  * Only JDK 17 or later is supported for packaging native distributions due to jpackage limitations
 
 Knowing issues on older versions:
 - OpenJDK 11.0.12 has [an issue](https://github.com/JetBrains/compose-jb/issues/940), when we switch keyboard layout on MacOs (isn't reproducible in OpenJDK 11.0.15)
@@ -34,6 +36,7 @@ Kotlin version | Minimal Compose version | Notes
 1.7.20 | 1.2.1
 1.8.0  | 1.3.0 | 1.3.0 is not supported by earlier k/native versions
 1.8.10 | 1.3.1
+1.8.20 | 1.4.0
 
 ### Using the latest Kotlin version 
 

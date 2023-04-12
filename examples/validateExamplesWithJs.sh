@@ -19,6 +19,6 @@ runGradle() {
     popd
 }
 
-runGradle web-compose-bird build
-runGradle web-landing build
-runGradle web-with-react build
+runGradle html/compose-bird build
+runGradle html/landing build
+runGradle html/with-react build
