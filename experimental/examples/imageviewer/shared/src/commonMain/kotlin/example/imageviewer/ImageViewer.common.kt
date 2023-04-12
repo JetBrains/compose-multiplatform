@@ -19,7 +19,6 @@ import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.MemoryPage
 import example.imageviewer.model.Page
 import example.imageviewer.model.PhotoGallery
-import example.imageviewer.model.bigUrl
 import example.imageviewer.view.CameraScreen
 import example.imageviewer.view.FullscreenImage
 import example.imageviewer.view.GalleryScreen
@@ -63,8 +62,8 @@ internal fun ImageViewerCommon(
                         page,
                         photoGallery,
                         dependencies,
-                        onClickPreviewPicture = { previewPictureId ->
-                            navigationStack.push(MemoryPage(previewPictureId))
+                        onClickPreviewPicture = { previewPicture ->
+                            navigationStack.push(MemoryPage(previewPicture))
                         },
                         onMakeNewMemory = {
                             navigationStack.push(CameraPage())
@@ -73,9 +72,7 @@ internal fun ImageViewerCommon(
 
                 is FullScreenPage -> {
                     FullscreenImage(
-                        galleryId = page.galleryId,
-                        gallery = photoGallery,
-                        getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
+                        picture = page.pictureData,
                         getFilter = { dependencies.getFilter(it) },
                         localization = dependencies.localization,
                         back = {
@@ -87,17 +84,17 @@ internal fun ImageViewerCommon(
                 is MemoryPage -> {
                     MemoryScreen(
                         memoryPage = page,
+                        dependencies = dependencies,
                         photoGallery = photoGallery,
-                        getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
                         localization = dependencies.localization,
-                        onSelectRelatedMemory = { galleryId ->
-                            navigationStack.push(MemoryPage(galleryId))
+                        onSelectRelatedMemory = { picture ->
+                             navigationStack.push(MemoryPage(picture))
                         },
                         onBack = {
                             navigationStack.back()
                         },
-                        onHeaderClick = { galleryId ->
-                            navigationStack.push(FullScreenPage(galleryId))
+                        onHeaderClick = { picture ->
+                            navigationStack.push(FullScreenPage(picture))
                         })
                 }
 

@@ -1,17 +1,17 @@
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.window.CanvasBasedWindow
 import androidx.compose.ui.window.Window
 import example.imageviewer.*
 import example.imageviewer.ImageViewerCommon
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.ContentRepository
-import example.imageviewer.model.WrappedHttpClient
-import example.imageviewer.model.adapter
-import example.imageviewer.model.createNetworkRepository
+import example.imageviewer.model.*
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
@@ -27,9 +27,10 @@ import kotlinx.coroutines.CoroutineScope
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.skiko.wasm.onWasmReady
 
+@OptIn(ExperimentalComposeUiApi::class)
 fun main() {
     onWasmReady {
-        Window("ImageViewer") {
+        CanvasBasedWindow("ImageViewer") {
             ImageViewerWeb()
         }
     }
@@ -55,6 +56,7 @@ internal fun ImageViewerWeb() {
 
 @OptIn(ExperimentalResourceApi::class)
 fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
+    override val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
         FilterType.GrayScale -> GrayScaleFilter()

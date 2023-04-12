@@ -2,6 +2,13 @@
 
 package example.imageviewer.view
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.AnimationConstants
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -10,24 +17,20 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import example.imageviewer.Dependencies
-import example.imageviewer.ExternalImageViewerEvent
-import example.imageviewer.model.GalleryEntryWithMetadata
-import example.imageviewer.model.GalleryId
-import example.imageviewer.model.GalleryPage
-import example.imageviewer.model.PhotoGallery
-import example.imageviewer.model.bigUrl
+import example.imageviewer.*
+import example.imageviewer.icon.IconVisibility
+import example.imageviewer.model.*
 import example.imageviewer.painterResourceCached
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -45,10 +48,13 @@ internal fun GalleryScreen(
     galleryPage: GalleryPage,
     photoGallery: PhotoGallery,
     dependencies: Dependencies,
-    onClickPreviewPicture: (GalleryId) -> Unit,
+    onClickPreviewPicture: (PictureData) -> Unit,
     onMakeNewMemory: () -> Unit
 ) {
-    val pictures by photoGallery.galleryStateFlow.collectAsState()
+    val pictures = dependencies.pictures
+
+    var selected: PictureData by remember { mutableStateOf(pictures.first()) }
+
     LaunchedEffect(Unit) {
         galleryPage.externalEvents.collect {
             when (it) {
@@ -61,9 +67,8 @@ internal fun GalleryScreen(
     Column(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
         Box {
             PreviewImage(
-                getImage = { dependencies.imageRepository.loadContent(it.bigUrl) },
-                picture = galleryPage.galleryEntry, onClick = {
-                    galleryPage.pictureId?.let(onClickPreviewPicture)
+                picture = selected, onClick = {
+                    onClickPreviewPicture(selected)
                 }
             )
             TopLayout(
@@ -79,15 +84,17 @@ internal fun GalleryScreen(
             when (galleryPage.galleryStyle) {
                 GalleryStyle.SQUARES -> SquaresGalleryView(
                     pictures,
-                    galleryPage.pictureId,
-                    onSelect = { galleryPage.selectPicture(it) },
+                    selected,
+                    onSelect = { selected = it },
                 )
 
                 GalleryStyle.LIST -> ListGalleryView(
                     pictures,
                     dependencies,
-                    onSelect = { galleryPage.selectPicture(it) },
-                    onFullScreen = { onClickPreviewPicture(it) }
+                    onSelect = { selected = it },
+                    onFullScreen = {
+                        onClickPreviewPicture(it)
+                    }
                 )
             }
             MakeNewMemoryMiniature(onMakeNewMemory)
@@ -98,28 +105,25 @@ internal fun GalleryScreen(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SquaresGalleryView(
-    images: List<GalleryEntryWithMetadata>,
-    selectedImage: GalleryId?,
-    onSelect: (GalleryId) -> Unit,
+    images: List<PictureData>,
+    selectedImage: PictureData,
+    onSelect: (PictureData) -> Unit,
 ) {
-    Column {
-        Spacer(Modifier.height(4.dp))
-        LazyVerticalGrid(
-            columns = GridCells.Adaptive(minSize = 130.dp),
-            verticalArrangement = Arrangement.spacedBy(1.dp),
-            horizontalArrangement = Arrangement.spacedBy(1.dp)
-        ) {
-            itemsIndexed(images) { idx, image ->
-                val isSelected = image.id == selectedImage
-                val (picture, bitmap) = image
-                SquareMiniature(
-                    image.thumbnail,
-                    onClick = { onSelect(picture) },
-                    isHighlighted = isSelected
-                )
-            }
+    LazyVerticalGrid(
+        modifier = Modifier.padding(top = 4.dp),
+        columns = GridCells.Adaptive(minSize = 130.dp),
+        verticalArrangement = Arrangement.spacedBy(1.dp),
+        horizontalArrangement = Arrangement.spacedBy(1.dp)
+    ) {
+        itemsIndexed(images) { _, picture ->
+            SquareThumbnail (
+                picture = picture,
+                onClick = { onSelect(picture) },
+                isHighlighted = selectedImage === picture
+            )
         }
     }
 }
@@ -195,30 +199,73 @@ internal fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick
 }
 
 @Composable
-private fun ListGalleryView(
-    pictures: List<GalleryEntryWithMetadata>,
-    dependencies: Dependencies,
-    onSelect: (GalleryId) -> Unit,
-    onFullScreen: (GalleryId) -> Unit
+fun SquareThumbnail(
+    picture: PictureData,
+    isHighlighted: Boolean,
+    onClick: () -> Unit
 ) {
+    Box(
+        Modifier.aspectRatio(1.0f).clickable(onClick = onClick)
+    ) {
+        Tooltip(picture.name) {
+            ThumbnailImage(
+                modifier = Modifier.fillMaxSize(),
+                picture = picture,
+            )
+        }
+        val tween = tween<Float>(
+            durationMillis = AnimationConstants.DefaultDurationMillis * 3,
+            delayMillis = 100,
+            easing = LinearOutSlowInEasing,
+        )
+        AnimatedVisibility(isHighlighted, enter = fadeIn(tween), exit = fadeOut(tween)) {
+            Box(Modifier.fillMaxSize().background(ImageviewerColors.uiLightBlack)) {
+                Box(
+                    Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(end = 4.dp, bottom = 4.dp)
+                        .clip(CircleShape)
+                        .width(32.dp)
+                        .background(ImageviewerColors.uiLightBlack)
+                        .aspectRatio(1.0f)
+                        .clickable {
+                            onClick()
+                        },
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = IconVisibility,
+                        contentDescription = null,
+                        modifier = Modifier.size(17.dp),
+                        tint = Color.White,
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ListGalleryView(
+    pictures: SnapshotStateList<PictureData>,
+    dependencies: Dependencies,
+    onSelect: (PictureData) -> Unit,
+    onFullScreen: (PictureData) -> Unit
+) {
+//    val notification = LocalNotification.current
+
     ScrollableColumn(
         modifier = Modifier.fillMaxSize()
     ) {
         Spacer(modifier = Modifier.height(10.dp))
         for ((idx, picWithThumb) in pictures.withIndex()) {
-            val (galleryId, picture, miniature) = picWithThumb
-            Miniature(
-                picture = picture,
-                image = miniature,
-                onClickSelect = {
-                    onSelect(galleryId)
-                },
-                onClickFullScreen = {
-                    onFullScreen(galleryId)
-                },
+            Thumbnail(
+                picWithThumb,
+                onClickSelect = { onSelect(picWithThumb) },
+                onClickFullScreen = { onFullScreen(picWithThumb) },
                 onClickInfo = {
-                    dependencies.notification.notifyImageData(picture)
-                },
+                    // dependencies.notification.
+                }
             )
             Spacer(modifier = Modifier.height(10.dp))
         }

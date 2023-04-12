@@ -27,18 +27,20 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import example.imageviewer.LocalImageProvider
 import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.Picture
+import example.imageviewer.model.PictureData
 import kotlinx.coroutines.yield
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 internal fun PreviewImage(
-    picture: GalleryEntryWithMetadata?,
-    onClick: () -> Unit,
-    getImage: suspend (Picture) -> ImageBitmap
+    picture: PictureData,
+    onClick: () -> Unit
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val imageProvider = LocalImageProvider.current
     Box(
         Modifier.fillMaxWidth().height(393.dp).background(Color.Black),
         contentAlignment = Alignment.Center
@@ -60,14 +62,14 @@ internal fun PreviewImage(
                     )
                 }
             ) { currentPicture ->
-                var image by remember(currentPicture) { mutableStateOf(currentPicture?.thumbnail) }
+                var image by remember(currentPicture) { mutableStateOf<ImageBitmap?>(null) }
                 LaunchedEffect(currentPicture) {
                     yield() // To ensure the animation starts first
                     // Wait until the animation is finished, because getImage is quite heavy at the moment,
                     // so the animation can be not smooth (when running in a browser)
                     while (transition.isRunning) { yield() }
                     if (currentPicture != null) {
-                        image = getImage(currentPicture.picture)
+                        image = imageProvider.getImage(picture)
                     }
                 }
                 if (image != null) {

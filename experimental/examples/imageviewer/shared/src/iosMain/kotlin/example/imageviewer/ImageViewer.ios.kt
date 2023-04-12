@@ -2,18 +2,13 @@ package example.imageviewer
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ImageBitmap
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
-import example.imageviewer.model.ContentRepository
-import example.imageviewer.model.adapter
-import example.imageviewer.model.createNetworkRepository
+import example.imageviewer.model.*
 import example.imageviewer.model.filtration.BlurFilter
 import example.imageviewer.model.filtration.GrayScaleFilter
 import example.imageviewer.model.filtration.PixelFilter
@@ -23,6 +18,8 @@ import example.imageviewer.view.Toast
 import example.imageviewer.view.ToastState
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.darwin.Darwin
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import kotlinx.coroutines.CoroutineScope
 
 @Composable
@@ -44,6 +41,7 @@ internal fun ImageViewerIos() {
 }
 
 fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) = object : Dependencies {
+    override val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
     override val ioScope: CoroutineScope = ioScope
     override fun getFilter(type: FilterType): BitmapFilter = when (type) {
         FilterType.GrayScale -> GrayScaleFilter()
@@ -67,7 +65,13 @@ fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState
         override val back = "Back"
     }
 
-    override val httpClient: HttpClient = HttpClient(Darwin)
+    override val httpClient: WrappedHttpClient = object : WrappedHttpClient {
+        val httpClient = HttpClient(Darwin)
+
+        override suspend fun getAsBytes(urlString: String): ByteArray {
+            return httpClient.get(urlString).readBytes()
+        }
+    }
 
     override val imageRepository: ContentRepository<ImageBitmap> =
         createNetworkRepository(httpClient)

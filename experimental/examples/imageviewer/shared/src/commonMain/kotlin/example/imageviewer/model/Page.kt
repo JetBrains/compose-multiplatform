@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 
 sealed class Page
 
-class MemoryPage(val galleryId: GalleryId) : Page() {
+class MemoryPage(val pictureData: PictureData) : Page() {
     val scrollState = ScrollState(0)
 }
 
 class CameraPage : Page()
 
-class FullScreenPage(val galleryId: GalleryId) : Page()
+class FullScreenPage(val pictureData: PictureData) : Page()
 
 class GalleryPage(
     val photoGallery: PhotoGallery,

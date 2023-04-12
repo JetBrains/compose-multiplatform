@@ -5,12 +5,18 @@
     <title>Image Viewer (k/wasm)</title>
   <script src="skiko.js"> </script>
   <script type="module" src="load.mjs"> </script>
+    <style>
+        html, body {
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: gray;
+            overflow: hidden;
+        }
+    </style>
 </head>
 <body>
-<center>
-  <div style="background-color: darkslategrey;">
-    <canvas id="ComposeTarget" width="800" height="1000"></canvas>
-  </div>
-</center>
+<canvas id="ComposeTarget"></canvas>
 </body>
 </html>

@@ -19,6 +19,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import example.imageviewer.LocalImageProvider
 import example.imageviewer.Localization
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
@@ -26,25 +27,22 @@ import example.imageviewer.model.*
 import example.imageviewer.painterResourceCached
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 
 @Composable
 internal fun FullscreenImage(
-    galleryId: GalleryId?,
-    gallery: PhotoGallery,
-    getImage: suspend (Picture) -> ImageBitmap,
+    picture: PictureData,
     getFilter: (FilterType) -> BitmapFilter,
     localization: Localization,
     back: () -> Unit,
 ) {
-    val picture = gallery.galleryStateFlow.value.first { it.id == galleryId }.picture
+    val imageProvider = LocalImageProvider.current
     val availableFilters = FilterType.values().toList()
     var selectedFilters by remember { mutableStateOf(emptySet<FilterType>()) }
 
-    val originalImageState = remember(galleryId) { mutableStateOf<ImageBitmap?>(null) }
-    LaunchedEffect(galleryId) {
-        if (galleryId != null) {
-            originalImageState.value = getImage(picture)
+    val originalImageState = remember(picture) { mutableStateOf<ImageBitmap?>(null) }
+    LaunchedEffect(picture) {
+        if (picture != null) {
+            originalImageState.value = imageProvider.getImage(picture)
         }
     }
 

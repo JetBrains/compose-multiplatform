@@ -3,6 +3,7 @@ package example.imageviewer.view
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -95,6 +96,7 @@ fun ApplicationScope.ImageViewerDesktop() {
 
 private fun getDependencies(ioScope: CoroutineScope, toastState: MutableState<ToastState>) =
     object : Dependencies {
+        override val pictures: SnapshotStateList<PictureData> = mutableStateListOf(*resourcePictures)
         override val ioScope: CoroutineScope = ioScope
         override fun getFilter(type: FilterType): BitmapFilter = when (type) {
             FilterType.GrayScale -> GrayScaleFilter()

@@ -24,12 +24,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import example.imageviewer.Dependencies
+import example.imageviewer.LocalImageProvider
 import example.imageviewer.Localization
-import example.imageviewer.model.GalleryEntryWithMetadata
-import example.imageviewer.model.GalleryId
-import example.imageviewer.model.MemoryPage
-import example.imageviewer.model.PhotoGallery
-import example.imageviewer.model.Picture
+import example.imageviewer.model.*
 import example.imageviewer.painterResourceCached
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -39,18 +37,18 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 internal fun MemoryScreen(
     memoryPage: MemoryPage,
+    dependencies: Dependencies,
     photoGallery: PhotoGallery,
-    getImage: suspend (Picture) -> ImageBitmap,
     localization: Localization,
-    onSelectRelatedMemory: (GalleryId) -> Unit,
+    onSelectRelatedMemory: (PictureData) -> Unit,
     onBack: () -> Unit,
-    onHeaderClick: (GalleryId) -> Unit
+    onHeaderClick: (PictureData) -> Unit
 ) {
-    val pictures by photoGallery.galleryStateFlow.collectAsState()
-    val picture = pictures.first { it.id == memoryPage.galleryId }
-    var headerImage by remember(picture) { mutableStateOf(picture.thumbnail) }
+    val imageProvider = LocalImageProvider.current
+    val picture = memoryPage.pictureData
+    var headerImage by remember(picture) { mutableStateOf<ImageBitmap?>(null) }
     LaunchedEffect(picture) {
-        headerImage = getImage(picture.picture)
+        headerImage = imageProvider.getImage(memoryPage.pictureData)
     }
     Box {
         val scrollState = memoryPage.scrollState
@@ -69,7 +67,9 @@ internal fun MemoryScreen(
                     },
                 contentAlignment = Alignment.Center
             ) {
-                MemoryHeader(headerImage, onClick = { onHeaderClick(memoryPage.galleryId) })
+                MemoryHeader(headerImage, onClick = {
+                    onHeaderClick(picture)
+                })
             }
             Box(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
                 Column {
@@ -84,7 +84,7 @@ internal fun MemoryScreen(
                         """.trimIndent()
                     )
                     Headliner("Related memories")
-                    RelatedMemoriesVisualizer(pictures, onSelectRelatedMemory)
+                    RelatedMemoriesVisualizer(dependencies, onSelectRelatedMemory)
                     Headliner("Place")
                     val locationShape = RoundedCornerShape(10.dp)
                     LocationVisualizer(
@@ -135,16 +135,18 @@ internal fun MemoryScreen(
 }
 
 @Composable
-private fun MemoryHeader(bitmap: ImageBitmap, onClick: () -> Unit) {
+private fun MemoryHeader(bitmap: ImageBitmap?, onClick: () -> Unit) {
     val interactionSource = remember { MutableInteractionSource() }
 
     Box(modifier = Modifier.clickable(interactionSource, null, onClick = { onClick() })) {
-        Image(
-            bitmap,
-            "Memory",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
-        )
+        if (bitmap != null) {
+            Image(
+                bitmap,
+                "Memory",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
         MagicButtonOverlay(onClick)
         MemoryTextOverlay()
     }
@@ -234,9 +236,11 @@ internal fun Headliner(s: String) {
 
 @Composable
 internal fun RelatedMemoriesVisualizer(
-    ps: List<GalleryEntryWithMetadata>,
-    onSelectRelatedMemory: (GalleryId) -> Unit
+    dependencies: Dependencies,
+    onSelectRelatedMemory: (PictureData) -> Unit
 ) {
+    val related = remember { dependencies.pictures.toMutableList().shuffled().take(5) }
+
     Box(
         modifier = Modifier.padding(10.dp, 0.dp).clip(RoundedCornerShape(10.dp)).fillMaxWidth()
     ) {
@@ -244,7 +248,7 @@ internal fun RelatedMemoriesVisualizer(
             modifier = Modifier.fillMaxSize(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            itemsIndexed(ps) { idx, item ->
+            itemsIndexed(related) { idx, item ->
                 RelatedMemory(idx, item, onSelectRelatedMemory)
             }
         }
@@ -254,13 +258,14 @@ internal fun RelatedMemoriesVisualizer(
 @Composable
 internal fun RelatedMemory(
     index: Int,
-    galleryEntry: GalleryEntryWithMetadata,
-    onSelectRelatedMemory: (GalleryId) -> Unit
+    galleryEntry: PictureData,
+    onSelectRelatedMemory: (PictureData) -> Unit
 ) {
     Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-        SquareMiniature(
-            galleryEntry.thumbnail,
+        SquareThumbnail(
+            galleryEntry,
             false,
-            onClick = { onSelectRelatedMemory(galleryEntry.id) })
+            onClick = { onSelectRelatedMemory(galleryEntry) }
+        )
     }
 }
