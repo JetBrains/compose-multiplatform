@@ -1,4 +1,6 @@
-Landing page of Compose for Web (a former name of Compose HTML Library)
+A landing page example
+
+> Note that this page describes Compose HTML which was previously called Compose for Web. When we refer to Compose for Web now, we mean Compose based on WebAssembly.
 
 ### Running Web browser application
  * To run, launch command: `./gradlew :jsBrowserRun`

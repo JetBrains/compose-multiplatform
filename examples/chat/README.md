@@ -21,12 +21,6 @@ Choose a run configuration for an appropriate target in Android Studio and run i
 
 `./gradlew desktopApp:run`
 
-## Run JS in browser
-
-> Note that this Web target is written using Kotlin/JS, not Kotlin/Wasm, and isn't officially supported
-
-`./gradlew jsApp:jsBrowserDevelopmentRun`
-
 ### Run MacOS via Gradle:
 - on Intel CPU: `./gradlew :shared:runDebugExecutableMacosX64`
 - on Apple Silicon: `./gradlew :shared:runDebugExecutableMacosArm64`
