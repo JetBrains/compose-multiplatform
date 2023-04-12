@@ -17,7 +17,7 @@ kotlin {
         named("jsMain") {
             dependencies {
                 implementation(compose.runtime)
-                implementation(compose.web.core)
+                implementation(compose.html.core)
                 implementation(project(":common:utils"))
                 implementation(project(":common:database"))
                 implementation(project(":common:root"))
