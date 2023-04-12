@@ -231,7 +231,7 @@ val reuploadArtifactsToMavenCentral by tasks.registering(UploadToSonatypeTask::c
     user.set(mavenCentral.user)
     password.set(mavenCentral.password)
     autoCommitOnSuccess.set(mavenCentral.autoCommitOnSuccess)
-    stagingProfileName.set("org.jetbrains.compose")
+    stagingProfileName.set("org.jetbrains.skiko")
 }
 
 fun readComposeModules(
