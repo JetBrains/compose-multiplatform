@@ -1,6 +1,6 @@
-# Using Effects in Compose Web
+# Using Effects
 
-Compose for Web introduces a few dom-specific effects on top of [existing effects from Compose](https://developer.android.com/jetpack/compose/side-effects).
+The Compose HTML library introduces a few dom-specific effects on top of [existing effects from Compose](https://developer.android.com/jetpack/compose/side-effects).
 
 
 ### ref in AttrsBuilder
@@ -26,7 +26,7 @@ Div(attrs = {
 
 Only one `ref` can be used per element. Calling it more than once will dismiss earlier calls.
 
-For example, `ref` can be used to add and remove some event listeners not provided by compose-web from the box.
+For example, `ref` can be used to add and remove some event listeners not provided out of the box.
 
 ### DisposableRefEffect (deprecated)
 

@@ -1,21 +1,21 @@
-# Using test-utils for DOM DSL unit testing
+# Using test-utils for unit testing
 
 ### Dependencies
 
-It's necessary to add  `compose.web.testUtils` to jsTest dependencies:
+It's necessary to add  `compose.html.testUtils` to jsTest dependencies:
 
 ``` kotlin
 sourceSets {
     val jsMain by getting {
         dependencies {
-            implementation(compose.web.core)
+            implementation(compose.html.core)
             implementation(compose.runtime)
             //....
         }
     }
     val jsTest by getting {
         implementation(kotlin("test-js"))
-        implementation(compose.web.testUtils)
+        implementation(compose.html.testUtils)
         //...
     }
 }

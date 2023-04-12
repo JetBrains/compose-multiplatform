@@ -1,4 +1,4 @@
-# Style DSL in Compose Web
+# Style DSL
 
 In this tutorial we have a look at how to style the components using the Style DSL. It’s a typesafe DSL for style sheets, which you can use to express CSS rules in your Kotlin code, and even modify styles based on the state of your Compose application.
 

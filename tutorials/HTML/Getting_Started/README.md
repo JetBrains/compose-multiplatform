@@ -1,7 +1,6 @@
-# Getting Started With Compose for Web
+# Getting started with the Compose HTML library
 
-In this tutorial, we will create a simple web UI application using the Compose UI framework.
-
+In this tutorial, we will create a simple web UI application using the Compose HTML Library.
 
 ## Prerequisites
 
@@ -9,12 +8,9 @@ You need to have the following software installed before you begin:
 * JDK 11 or later
 * IntelliJ IDEA Community Edition or Ultimate Edition 2020.2 or later (you can use other editors, but for this tutorial we assume you are using IntelliJ IDEA)
 
-
 ## Creating a new project
 
-You can create the project by [downloading the template here](https://github.com/JetBrains/compose-multiplatform/tree/master/templates/web-template) or using the Project Wizard in IDEA:
-
-<img alt="Create new project" src="wizard.png" height="500" />
+You can create the project by [downloading the template here](https://github.com/JetBrains/compose-multiplatform-html-library-template).
 
 If you want to create the project manually, perform the following steps:
 
@@ -40,8 +36,8 @@ pluginManagement {
 ``` kotlin
 // Add compose gradle plugin
 plugins {
-    kotlin("multiplatform") version "1.8.10"
-    id("org.jetbrains.compose") version "1.3.1"
+    kotlin("multiplatform") version "1.8.20"
+    id("org.jetbrains.compose") version "1.4.0"
 }
 
 // Add maven repositories
@@ -60,7 +56,7 @@ kotlin {
     sourceSets {
         val jsMain by getting {
             dependencies {
-                implementation(compose.web.core)
+                implementation(compose.html.core)
                 implementation(compose.runtime)
             }
         }

@@ -1,11 +1,10 @@
-# Building the UI with Compose Web
+# Building the UI with with the Compose HTML library
 
-
-In this tutorial we will look at several examples that use the Composable DOM DSL to describe the user interface for your web application.
+In this tutorial we will look at several examples that use the Composable HTML/CSS DSL to describe the user interface for your web application.
 
 ### Entry point
 
-Compose for Web needs an HTML node that will be a root of its composition. Inside this root node, Compose then manages its own DOM tree.
+The Compose HTML library needs an HTML node that will be a root of its composition. Inside this root node, Compose then manages its own DOM tree.
 
 ``` kotlin
 renderComposable(rootElementId = "root") {
@@ -13,9 +12,7 @@ renderComposable(rootElementId = "root") {
 }
 ```
 
-### HTML tags in Compose DOM DSL
-
-While the DOM DSL for Compose for Web doesn't provide a Composable for every HTML tag yet, the most used HTML tags can be used directly out of a box.
+### HTML tags
 
 Let's have a look at the Composable for a `Div` tag (most other tags have the same signature):
 
@@ -84,7 +81,7 @@ Div(
 ) { /* content */ }
 ```
 
-However, with this approach, Compose for Web is not able to validate that the attribute exists on the HTML element, or is valid. This is why we also provide a set of helper functions for common attributes.
+However, with this approach, Compose is not able to validate that the attribute exists on the HTML element, or is valid. This is why we also provide a set of helper functions for common attributes.
 
 #### Common attributes
 

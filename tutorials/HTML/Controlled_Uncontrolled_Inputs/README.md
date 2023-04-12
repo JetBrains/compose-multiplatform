@@ -1,6 +1,6 @@
 # Controlled and Uncontrolled inputs
 
-Input components in Compose for Web have two modes: Controlled and Uncontrolled.
+Input components have two modes: Controlled and Uncontrolled.
 
 ### Controlled vs Uncontrolled behaviour
 
