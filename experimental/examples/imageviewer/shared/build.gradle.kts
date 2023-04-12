@@ -51,8 +51,7 @@ kotlin {
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.material3)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-//                implementation(compose.components.resources)
-                implementation("org.jetbrains.compose.components:components-resources:1.4.0-dev-wasm02")
+                implementation(compose.components.resources)
             }
         }
 
