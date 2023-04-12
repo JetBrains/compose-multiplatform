@@ -21,7 +21,7 @@ kotlin {
         val jsMain by getting {
             dependencies {
                 implementation(npm("highlight.js", "10.7.2"))
-                implementation(compose.web.core)
+                implementation(compose.html.core)
                 implementation(compose.runtime)
             }
         }

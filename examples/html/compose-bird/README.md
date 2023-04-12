@@ -7,7 +7,7 @@
 <img alt="Twitter: theapache64" src="https://img.shields.io/twitter/follow/theapache64.svg?style=social" />
 </a>
 
-> A flappy bird clone using Compose Web and radio buttons
+> A game about a bird using Compose HTML Library and radio buttons
 
 ## ▶️ Play
 

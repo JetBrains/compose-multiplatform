@@ -1,11 +1,11 @@
-### Use Compose(web) in React app
+### Use Compose HTML Library in React app
 
 [see ComposeInReactApp.kt](src/jsMain/kotlin/ComposeInReactApp.kt)
 
 `useCompose(...)` is a custom React effect to render a content using Compose.
 It's not a part of any library.
 
-### Use React in Compose(web) app
+### Use React in Compose HTML Library
 
 `UseReactEffect(...)` is a custom Compose effect to render a content using React.
 It's not a part of any library.

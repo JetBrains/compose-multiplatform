@@ -84,8 +84,8 @@ config.output.library = "MyComposables";
 ```
 
 This will produce the output in `build/distributions`.
-Then we can use exported functions from `web-compose-in-js.js` (the filename is defined by the project/module name).
+Then we can use exported functions from `compose-in-js.js` (the filename is defined by the project/module name).
 ```html
-<script src="web-compose-in-js.js"></script>
+<script src="compose-in-js.js"></script>
 <script src="use_compose.js"></script>
 ```
