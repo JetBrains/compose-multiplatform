@@ -23,7 +23,7 @@
 
 ## iOS
 
-[iOS support is in Alpha now](README.md#ios)
+[iOS support is in Alpha now](../d44114d/README.md#ios)
 
 ## Desktop
 
@@ -54,7 +54,7 @@
 ## Web
 
 - [`Compose for Web` is renamed to `Compose HTML Library`](https://github.com/JetBrains/compose-multiplatform/pull/2997)
-- [The new experimental `Compose for Web` based on Kotlin/Wasm is available](README.md#web)
+- [The new experimental `Compose for Web` based on Kotlin/Wasm is available](../d44114d/README.md#web)
 
 ## Tools
 
