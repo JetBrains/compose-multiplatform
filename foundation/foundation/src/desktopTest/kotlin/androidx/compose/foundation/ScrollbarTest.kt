@@ -613,7 +613,6 @@ class ScrollbarTest {
     }
 
     @Theory
-    @Suppress("JUnitMalformedDeclaration")
     fun `dynamically change content then drag slider to the end`(
         scrollbarProvider: ScrollbarProvider
     ) {
@@ -643,7 +642,7 @@ class ScrollbarTest {
     }
 
     @Theory
-    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    @Suppress("SameParameterValue")
     fun `scroll by less than one page in lazy list`(scrollbarProvider: ScrollbarProvider) {
         lateinit var state: LazyListState
 
@@ -667,7 +666,7 @@ class ScrollbarTest {
     }
 
     @Theory
-    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    @Suppress("SameParameterValue")
     fun `scroll in reversed lazy list`(scrollbarProvider: ScrollbarProvider) {
         lateinit var state: LazyListState
 
@@ -691,7 +690,7 @@ class ScrollbarTest {
     }
 
     @Theory
-    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    @Suppress("SameParameterValue")
     fun `scroll by more than one page in lazy list`(scrollbarProvider: ScrollbarProvider) {
         lateinit var state: LazyListState
 
@@ -714,7 +713,7 @@ class ScrollbarTest {
     }
 
     @Theory
-    @Suppress("SameParameterValue", "JUnitMalformedDeclaration")
+    @Suppress("SameParameterValue")
     fun `scroll outside of scrollbar bounds in lazy list`(scrollbarProvider: ScrollbarProvider) {
         lateinit var state: LazyListState
 
@@ -1108,7 +1107,7 @@ class ScrollbarTest {
     }
 
 
-    @OptIn(InternalTestApi::class, ExperimentalComposeUiApi::class)
+    @OptIn(InternalTestApi::class)
     private fun ComposeTestRule.performMouseScroll(x: Int, y: Int, delta: Float) {
         (this as DesktopComposeTestRule).scene.sendPointerEvent(
             PointerEventType.Scroll,
@@ -1558,8 +1557,8 @@ private fun ComposeContentTestRule.setContent(
 }
 
 internal object TestConfig : ScrollConfig {
-    // the formula was determined experimentally based on MacOS Finder behaviour
-    // MacOS driver will send events with accelerating delta
+    // the formula was determined experimentally based on macOS Finder behaviour
+    // macOS driver will send events with accelerating delta
     override fun Density.calculateMouseWheelScroll(event: PointerEvent, bounds: IntSize): Offset {
         return -event.totalScrollDelta * 10.dp.toPx()
     }

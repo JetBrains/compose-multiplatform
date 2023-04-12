@@ -23,7 +23,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 
 class StringHelpersSkikoMainTest {
-    val complexString = "\uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0"
+    private val complexString = "\uD83E\uDDD1\uD83C\uDFFF\u200D\uD83E\uDDB0"
 
     @Test
     fun StringHelpersTest_findFollowingBreak() {

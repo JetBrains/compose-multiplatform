@@ -812,7 +812,6 @@ class ScrollableTest {
         runOnIdle {
             assertThat(innerDrag).isGreaterThan(0f)
             assertThat(outerDrag).isEqualTo(0f)
-            innerDrag
         }
     }
 
@@ -2333,7 +2332,7 @@ class ScrollableTest {
 }
 
 // Very low tolerance on the difference
-internal val VelocityTrackerCalculationThreshold = 1
+internal const val VelocityTrackerCalculationThreshold = 1
 
 @OptIn(ExperimentalComposeUiApi::class)
 internal suspend fun savePointerInputEvents(

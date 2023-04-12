@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.copyPasteAndroidTests.textfield
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.assertThat
 import androidx.compose.foundation.isEqualTo
 import androidx.compose.foundation.layout.defaultMinSize
@@ -31,9 +30,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.runSkikoComposeUiTest
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -178,7 +174,6 @@ class BaseTextFieldDefaultWidthTest {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun DefaultWidthTextField(
     text: String,

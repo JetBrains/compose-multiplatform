@@ -25,7 +25,6 @@ import androidx.compose.foundation.isNotEqualTo
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.text.BasicText
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -59,7 +58,6 @@ import androidx.compose.ui.unit.toOffset
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 
 @OptIn(ExperimentalTestApi::class)
@@ -138,8 +136,8 @@ class TextFieldCursorTest {
                         .then(bgModifier)
                         .then(focusModifier),
                     cursorBrush = Brush.verticalGradient(
-                        // make a brush double/triple color at the beginning and end so we have stable
-                        // colors at the ends.
+                        // make a brush double/triple color at the beginning and end, so we have
+                        // stable colors at the ends.
                         // Without triple bottom, the bottom color never hits to the provided color.
                         listOf(
                             Color.Blue,

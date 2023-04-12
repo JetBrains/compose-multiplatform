@@ -55,7 +55,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SkikoComposeUiTest
@@ -70,7 +69,6 @@ import androidx.compose.ui.test.performTouchInput
 import androidx.compose.ui.test.runSkikoComposeUiTest
 import androidx.compose.ui.test.swipeUp
 import androidx.compose.ui.unit.dp
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -85,7 +83,7 @@ import kotlinx.coroutines.launch
 class LazyColumnTest {
     private val LazyListTag = "LazyListTag"
 
-    internal val NeverEqualObject = object {
+    private val NeverEqualObject = object {
         override fun equals(other: Any?): Boolean {
             return false
         }
@@ -522,6 +520,7 @@ class LazyColumnTest {
     }
 }
 
+@Suppress("unused")
 internal fun Modifier.drawOutsideOfBounds() = drawBehind {
     val inflate = 20.dp.roundToPx().toFloat()
     drawRect(

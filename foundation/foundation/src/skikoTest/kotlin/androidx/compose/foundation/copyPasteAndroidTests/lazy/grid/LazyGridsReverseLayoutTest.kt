@@ -41,8 +41,6 @@ import kotlin.test.Test
 @OptIn(ExperimentalTestApi::class)
 class LazyGridsReverseLayoutTest {
 
-    private val ContainerTag = "ContainerTag"
-
     private var itemSize: Dp = Dp.Infinity
 
     private val density = Density(1f)

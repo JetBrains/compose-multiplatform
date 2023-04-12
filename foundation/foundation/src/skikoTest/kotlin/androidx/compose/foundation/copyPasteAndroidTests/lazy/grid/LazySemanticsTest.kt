@@ -50,7 +50,7 @@ import kotlin.test.Test
  * Create a lazy grid, iterate over all indices, verify key of each of them
  *
  * ScrollToIndex:
- * Create a lazy grid, scroll to a line off screen, verify shown items
+ * Create a lazy grid, scroll to a line off-screen, verify shown items
  *
  * All tests performed in [runTest], scenarios set up in the test methods.
  */
@@ -140,6 +140,7 @@ class LazySemanticsTest {
         Spacer(Modifier.testTag(tag(index)).requiredHeight(30.dp).fillMaxWidth())
     }
 
+    @Suppress("unused")
     @Composable
     private fun SpacerInRow(index: Int) {
         Spacer(Modifier.testTag(tag(index)).requiredWidth(30.dp).fillMaxHeight())

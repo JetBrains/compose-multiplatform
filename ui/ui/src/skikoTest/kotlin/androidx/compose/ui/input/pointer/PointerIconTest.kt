@@ -265,6 +265,7 @@ class PointerIconTest {
     }
 
     private class IconPlatform : Platform by Platform.Empty {
+        @Suppress("PropertyName")
         var _pointerIcon: PointerIcon? = null
 
         override fun setPointerIcon(pointerIcon: PointerIcon) {

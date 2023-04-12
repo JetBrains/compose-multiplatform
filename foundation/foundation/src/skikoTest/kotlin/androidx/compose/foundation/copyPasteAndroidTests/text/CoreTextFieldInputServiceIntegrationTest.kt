@@ -312,6 +312,7 @@ class CoreTextFieldInputServiceIntegrationTest {
         runOnIdle { assertThat(platformTextInputService.keyboardShown).isFalse() }
     }
 
+    @Suppress("unused")
     private fun setContent(content: @Composable () -> Unit) {
         setContent {
             focusManager = LocalFocusManager.current

@@ -50,6 +50,7 @@ fun keyEvent(key: Key, keyEventType: KeyEventType, modifiers: Int = 0): KeyEvent
 /**
  * Creates [KeyEvent] of Unknown type. It wraps KEY_TYPED AWTs KeyEvent
  */
+@Suppress("unused")
 fun keyTypedEvent(key: Key): KeyEvent {
     return KeyEvent(
         KeyEventAwt(

@@ -17,7 +17,6 @@
 package androidx.compose.ui.platform
 
 import androidx.compose.ui.isMacOs
-import androidx.compose.ui.text.InternalTextApi
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.EditProcessor
 import androidx.compose.ui.text.input.ImeOptions
@@ -37,7 +36,6 @@ private object DummyComponent : Component()
 
 @RunWith(JUnit4::class)
 class DesktopInputComponentTest {
-    @OptIn(InternalTextApi::class)
     @Test
     fun replaceInputMethodText_basic() {
         val processor = EditProcessor()
@@ -46,10 +44,10 @@ class DesktopInputComponentTest {
         val inputService = TextInputService(input)
 
         val session = inputService.startInput(
-            TextFieldValue(),
-            ImeOptions.Default,
-            processor::apply,
-            {}
+            value = TextFieldValue(),
+            imeOptions = ImeOptions.Default,
+            onEditCommand = processor::apply,
+            onImeActionPerformed = {}
         )
 
         processor.reset(TextFieldValue("h"), session)
@@ -93,10 +91,10 @@ class DesktopInputComponentTest {
         val inputService = TextInputService(input)
 
         val session = inputService.startInput(
-            TextFieldValue(),
-            ImeOptions.Default,
-            processor::apply,
-            {}
+            value = TextFieldValue(),
+            imeOptions = ImeOptions.Default,
+            onEditCommand = processor::apply,
+            onImeActionPerformed = {}
         )
 
         input.charKeyPressed = true

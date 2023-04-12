@@ -79,7 +79,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalFoundationApi::class, ExperimentalTestApi::class)
 @Ignore // TODO: the tests fail on desktop
-class LazyListAnimateItemPlacementTest() {
+class LazyListAnimateItemPlacementTest {
 
     private val isVertical: Boolean get() = config!!.isVertical
     private val reverseLayout: Boolean get() = config!!.reverseLayout
@@ -733,7 +733,7 @@ class LazyListAnimateItemPlacementTest() {
 
         onAnimationFrame { fraction ->
             onNodeWithTag("2").assertDoesNotExist()
-            // item 2 was between 1 and 3 but we don't compose it and don't know the real size,
+            // item 2 was between 1 and 3, but we don't compose it and don't know the real size,
             // so we use an average size.
             val item2Size = (itemSize + itemSize2 + itemSize3) / 3
             val item1Size = itemSize3 /* the real size of the item 1 */
@@ -793,7 +793,7 @@ class LazyListAnimateItemPlacementTest() {
         onAnimationFrame { fraction ->
             val item2Size = itemSize
             val item4Size = itemSize3
-            // item 3 was between 2 and 4 but we don't compose it and don't know the real size,
+            // item 3 was between 2 and 4, but we don't compose it and don't know the real size,
             // so we use an average size.
             val item3Size = (itemSize + itemSize2 + itemSize3) / 3
             val startItem4Offset = item0Size + item1Size + item2Size + item3Size
@@ -1037,7 +1037,7 @@ class LazyListAnimateItemPlacementTest() {
         }
         mainClock.advanceTimeByFrame()
         // new layoutInfo is produced on every remeasure of Lazy lists.
-        // but we want to avoid remeasuring and only do relayout on each animation frame.
+        // but we want to avoid remeasuring and only do re-layout on each animation frame.
         // two extra measures are possible as we switch inProgress flag.
         assertThat(measurePasses).isAtMost(startMeasurePasses + 2)
     }
@@ -1273,7 +1273,7 @@ class LazyListAnimateItemPlacementTest() {
                         val containerBounds = onNodeWithTag(ContainerTag).getBoundsInRoot()
                         val mainAxisSize =
                             if (isVertical) containerBounds.height else containerBounds.width
-                        val mainAxisSizePx = with(density) { mainAxisSize.roundToPx() }
+                        val mainAxisSizePx = mainAxisSize.roundToPx()
                         list.map {
                             val itemSize = onNodeWithTag(it.first.toString())
                                 .getUnclippedBoundsInRoot().let { bounds ->
@@ -1343,12 +1343,10 @@ class LazyListAnimateItemPlacementTest() {
         if (isVertical) {
             val verticalArrangement =
                 arrangement ?: if (!reverseLayout) Arrangement.Top else Arrangement.Bottom
-            val horizontalAlignment = if (crossAxisAlignment == CrossAxisAlignment.Start) {
-                Alignment.Start
-            } else if (crossAxisAlignment == CrossAxisAlignment.Center) {
-                Alignment.CenterHorizontally
-            } else {
-                Alignment.End
+            val horizontalAlignment = when (crossAxisAlignment) {
+                CrossAxisAlignment.Start -> Alignment.Start
+                CrossAxisAlignment.Center -> Alignment.CenterHorizontally
+                CrossAxisAlignment.End -> Alignment.End
             }
             LazyColumn(
                 state = state,
@@ -1371,12 +1369,10 @@ class LazyListAnimateItemPlacementTest() {
         } else {
             val horizontalArrangement =
                 arrangement ?: if (!reverseLayout) Arrangement.Start else Arrangement.End
-            val verticalAlignment = if (crossAxisAlignment == CrossAxisAlignment.Start) {
-                Alignment.Top
-            } else if (crossAxisAlignment == CrossAxisAlignment.Center) {
-                Alignment.CenterVertically
-            } else {
-                Alignment.Bottom
+            val verticalAlignment = when (crossAxisAlignment) {
+                CrossAxisAlignment.Start -> Alignment.Top
+                CrossAxisAlignment.Center -> Alignment.CenterVertically
+                CrossAxisAlignment.End -> Alignment.Bottom
             }
             LazyRow(
                 state = state,
@@ -1451,10 +1447,10 @@ class LazyListAnimateItemPlacementTest() {
     }
 }
 
-private val FrameDuration = 16L
-private val Duration = 400L
+private const val FrameDuration = 16L
+private const val Duration = 400L
 private val AnimSpec = tween<IntOffset>(Duration.toInt(), easing = LinearEasing)
-private val ContainerTag = "container"
+private const val ContainerTag = "container"
 
 private enum class CrossAxisAlignment {
     Start,

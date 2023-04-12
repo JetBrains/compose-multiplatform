@@ -161,8 +161,8 @@ class ComposeSceneTest {
             Row(Modifier.height(height.dp)) {
                 Layout({
                     Box(Modifier.fillMaxSize().background(Color.Green))
-                }) { measureables, constraints ->
-                    val placeables = measureables.map { it.measure(constraints) }
+                }) { measurables, constraints ->
+                    val placeables = measurables.map { it.measure(constraints) }
                     layout(width, constraints.maxHeight) {
                         placeables.forEach { it.place(x, 0) }
                     }

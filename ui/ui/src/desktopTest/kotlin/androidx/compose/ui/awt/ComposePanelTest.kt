@@ -24,11 +24,9 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.density
-import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.MainUIDispatcher
-import org.junit.Assume
 import org.junit.Test
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment

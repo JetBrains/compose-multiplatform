@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.copyPasteAndroidTests.lazy.list
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.assertThat
 import androidx.compose.foundation.isEqualTo
 import androidx.compose.foundation.layout.Spacer
@@ -47,12 +46,12 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import kotlin.test.Test
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class)
 class LazyCustomKeysTest {
 
-    val density = Density(1f)
+    private val density = Density(1f)
 
-    val itemSize = with(density) {
+    private val itemSize = with(density) {
         100.toDp()
     }
 

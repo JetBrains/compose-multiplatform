@@ -16,7 +16,6 @@
 
 package androidx.compose.ui.platform
 
-import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlinx.coroutines.withContext
 
-@OptIn(ExperimentalCoroutinesApi::class, DelicateCoroutinesApi::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class FlushCoroutineDispatcherTest {
 
     @Test

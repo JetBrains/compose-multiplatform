@@ -16,7 +16,6 @@
 
 package androidx.compose.foundation.copyPasteAndroidTests.textfield
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.assertThat
 import androidx.compose.foundation.isEqualTo
 import androidx.compose.foundation.text.BasicTextField
@@ -41,7 +40,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.input.TextInputService
 import kotlin.test.*
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalTestApi::class)
+@OptIn(ExperimentalTestApi::class)
 class TextFieldUndoTest {
 
     @OptIn(ExperimentalComposeUiApi::class)

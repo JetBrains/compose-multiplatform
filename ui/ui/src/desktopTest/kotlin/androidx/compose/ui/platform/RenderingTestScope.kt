@@ -18,7 +18,6 @@ package androidx.compose.ui.platform
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ComposeScene
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.Constraints
@@ -46,7 +45,6 @@ internal fun renderingTest(
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 internal class RenderingTestScope(
     val width: Int,
     val height: Int,
@@ -59,7 +57,7 @@ internal class RenderingTestScope(
     }
 
     val surface: Surface = Surface.makeRasterN32Premul(width, height)
-    val canvas: Canvas = surface.canvas
+    private val canvas: Canvas = surface.canvas
     val scene = ComposeScene(
         coroutineContext = coroutineContext,
         invalidate = frameDispatcher::scheduleFrame

@@ -20,7 +20,6 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.PointerMatcher
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -44,7 +43,7 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 
 @Suppress("DEPRECATION")
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 class DragGestureTest {
 
     @Test
@@ -128,6 +127,7 @@ class DragGestureTest {
         }
     }
 
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
     @Test
     fun draggable_by_mouse_secondary_button_ignores_primary_button() {
         val density = Density(1f)
@@ -267,6 +267,7 @@ class DragGestureTest {
         }
     }
 
+    @Suppress("ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE")
     @Test
     fun draggable_by_touch_ignores_mouse() {
         val density = Density(1f)

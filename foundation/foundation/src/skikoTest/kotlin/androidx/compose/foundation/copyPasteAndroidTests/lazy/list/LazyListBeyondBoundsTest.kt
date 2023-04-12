@@ -58,7 +58,7 @@ import androidx.compose.ui.unit.LayoutDirection.Rtl
 import kotlin.test.Test
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalTestApi::class)
-class LazyListBeyondBoundsTest() {
+class LazyListBeyondBoundsTest {
 
     // We need to wrap the inline class parameter in another class because Java can't instantiate
     // the inline class.

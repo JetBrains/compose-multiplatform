@@ -31,7 +31,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.runtime.withFrameNanos
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.FillBox
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
@@ -42,19 +41,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntRect
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
-import com.google.common.truth.Truth
 import com.google.common.truth.Truth.assertThat
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
-@OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
 class DesktopPopupTest {
     @get:Rule
     val rule = createComposeRule()
@@ -75,7 +71,7 @@ class DesktopPopupTest {
             }
         }
 
-        Truth.assertThat(actualLocalValue).isEqualTo(3)
+        assertThat(actualLocalValue).isEqualTo(3)
     }
 
     @Test
@@ -98,7 +94,7 @@ class DesktopPopupTest {
         isPopupShowing = false
         rule.waitForIdle()
 
-        Truth.assertThat(isDisposed).isEqualTo(true)
+        assertThat(isDisposed).isEqualTo(true)
     }
 
     @Test
@@ -114,11 +110,11 @@ class DesktopPopupTest {
             }
         }
 
-        Truth.assertThat(densityInsidePopup).isEqualTo(2f)
+        assertThat(densityInsidePopup).isEqualTo(2f)
 
         density = Density(3f, 1f)
         rule.waitForIdle()
-        Truth.assertThat(densityInsidePopup).isEqualTo(3f)
+        assertThat(densityInsidePopup).isEqualTo(3f)
     }
 
     @Test(timeout = 5000) // TODO(demin): why, when an error has occurred, this test never ends?
@@ -210,7 +206,7 @@ class DesktopPopupTest {
 
         rule.waitForIdle()
 
-        Truth.assertThat(lastCompositionState).isEqualTo(1)
+        assertThat(lastCompositionState).isEqualTo(1)
     }
 
     @Test(timeout = 5000)

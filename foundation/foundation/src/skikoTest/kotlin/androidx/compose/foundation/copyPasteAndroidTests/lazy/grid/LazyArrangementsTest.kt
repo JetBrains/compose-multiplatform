@@ -693,7 +693,7 @@ class LazyArrangementsTest {
         }
     }
 
-    fun SkikoComposeUiTest.composeVerticalGridWith(arrangement: Arrangement.Vertical) {
+    private fun SkikoComposeUiTest.composeVerticalGridWith(arrangement: Arrangement.Vertical) {
         setContent {
             LazyVerticalGrid(
                 verticalArrangement = arrangement,
@@ -707,7 +707,7 @@ class LazyArrangementsTest {
         }
     }
 
-    fun SkikoComposeUiTest.composeHorizontalWith(
+    private fun SkikoComposeUiTest.composeHorizontalWith(
         arrangement: Arrangement.Horizontal,
         layoutDirection: LayoutDirection
     ) {
@@ -733,7 +733,7 @@ class LazyArrangementsTest {
         Box(Modifier.requiredSize(size).testTag(index.toString()))
     }
 
-    fun SkikoComposeUiTest.assertArrangementForTwoItems(
+    private fun SkikoComposeUiTest.assertArrangementForTwoItems(
         arrangement: Arrangement.Vertical,
         reverseLayout: Boolean = false
     ) {
@@ -753,7 +753,7 @@ class LazyArrangementsTest {
         }
     }
 
-    fun SkikoComposeUiTest.assertArrangementForTwoItems(
+    private fun SkikoComposeUiTest.assertArrangementForTwoItems(
         arrangement: Arrangement.Horizontal,
         layoutDirection: LayoutDirection,
         reverseLayout: Boolean = false

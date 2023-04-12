@@ -44,8 +44,8 @@ class LazyGridSlotsReuseTest {
 
     val density = Density(1f)
 
-    val itemsSizePx = 30f
-    val itemsSizeDp = with(density) { itemsSizePx.toDp() }
+    private val itemsSizePx = 30f
+    private val itemsSizeDp = with(density) { itemsSizePx.toDp() }
 
     @Test
     fun scroll1ItemScrolledOffItemIsKeptForReuse() = runSkikoComposeUiTest {
@@ -440,4 +440,4 @@ class LazyGridSlotsReuseTest {
     }
 }
 
-private val DefaultMaxItemsToRetain = 7
+private const val DefaultMaxItemsToRetain = 7

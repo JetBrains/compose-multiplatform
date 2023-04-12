@@ -19,7 +19,6 @@ package androidx.compose.foundation
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -40,7 +39,7 @@ import kotlin.test.Test
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 class OnClickTest {
 
     private fun testClick(
@@ -131,7 +130,7 @@ class OnClickTest {
         assertThat(clicksCount).isEqualTo(2)
     }
 
-    @OptIn(ExperimentalStdlibApi::class, ExperimentalTestApi::class)
+    @OptIn(ExperimentalTestApi::class)
     private fun testDoubleClick(
         pointerMatcher: PointerMatcher,
         button: PointerButton
@@ -195,7 +194,7 @@ class OnClickTest {
         pointerMatcher = PointerMatcher.mouse(PointerButton.Tertiary)
     )
 
-    @OptIn(ExperimentalStdlibApi::class, ExperimentalTestApi::class)
+    @OptIn(ExperimentalTestApi::class)
     private fun testLongClick(
         pointerMatcher: PointerMatcher,
         button: PointerButton

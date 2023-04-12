@@ -43,7 +43,6 @@ import androidx.compose.ui.graphics.PathOperation
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.SolidColor
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -193,7 +192,7 @@ class BorderTest {
                 Box(
                     Modifier.size(40.0f.toDp(), 40.0f.toDp())
                         .background(color = Color.Blue)
-                        .border(BorderStroke(-5.0f.toDp(), Color.Red), shape!!)
+                        .border(BorderStroke((-5.0f).toDp(), Color.Red), shape!!)
                 ) {}
             }
         }
@@ -408,7 +407,7 @@ class BorderTest {
         val testTag = "testTag"
         val borderStrokeDp = 5.dp
         var borderStrokePx = 0f
-        var toggle = mutableStateOf(false)
+        val toggle = mutableStateOf(false)
         setContent {
             val testShape = GenericShape { size, _ ->
                 addRect(Rect(0f, 0f, size.width, size.height))

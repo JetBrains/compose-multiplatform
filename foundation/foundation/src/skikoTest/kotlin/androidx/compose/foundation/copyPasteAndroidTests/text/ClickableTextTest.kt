@@ -25,7 +25,6 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.runSkikoComposeUiTest
 import androidx.compose.ui.text.AnnotatedString
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertEquals
 

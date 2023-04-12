@@ -19,11 +19,9 @@ package androidx.compose.foundation
 import androidx.compose.foundation.gestures.detectTransformGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.PointerButton
 import androidx.compose.ui.input.pointer.PointerButtons
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
@@ -34,7 +32,8 @@ import androidx.compose.ui.use
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
+@Suppress("DEPRECATION")
+@OptIn(ExperimentalFoundationApi::class)
 class MouseClickableTest {
     @Test
     fun click() = ImageComposeScene(

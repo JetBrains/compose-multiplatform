@@ -32,7 +32,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asSkiaBitmap
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
@@ -49,10 +48,9 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalTestApi::class)
 class CanvasTest {
 
-    val contentTag = "CanvasTest"
-    val boxWidth = 100
-    val boxHeight = 100
-    val containerSize = boxWidth
+    private val boxWidth = 100
+    private val boxHeight = 100
+    private val containerSize = boxWidth
 
     @Test
     fun testCanvas() = runSkikoComposeUiTest(Size(containerSize * 2f, containerSize * 2f)) {

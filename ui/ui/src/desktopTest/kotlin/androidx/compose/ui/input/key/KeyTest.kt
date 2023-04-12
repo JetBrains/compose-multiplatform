@@ -16,8 +16,6 @@
 
 package androidx.compose.ui.input.key
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.test.junit4.createComposeRule
 import com.google.common.truth.Truth.assertThat

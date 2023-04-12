@@ -137,6 +137,7 @@ import kotlin.random.Random
 import kotlinx.coroutines.delay
 import org.junit.Test
 
+@Suppress("ConstPropertyName")
 private const val title = "Desktop Compose Elements"
 
 private val isCtrlPressed = mutableStateOf(false)
@@ -263,6 +264,7 @@ private fun FrameWindowScope.ScrollableContent(scrollState: ScrollState) {
         )
         var loremColor by remember { mutableStateOf(0) }
 
+        @Suppress("RemoveRedundantQualifierName")
         val loremDecorations = listOf(
             TextDecoration.None,
             TextDecoration.Underline,

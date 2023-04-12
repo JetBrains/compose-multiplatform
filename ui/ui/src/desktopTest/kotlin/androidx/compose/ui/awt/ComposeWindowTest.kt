@@ -36,7 +36,6 @@ import androidx.compose.ui.window.runApplicationTest
 import com.google.common.truth.Truth.assertThat
 import java.awt.Dimension
 import java.awt.GraphicsEnvironment
-import java.awt.event.MouseEvent
 import java.awt.event.MouseEvent.BUTTON1_DOWN_MASK
 import java.awt.event.MouseEvent.MOUSE_ENTERED
 import java.awt.event.MouseEvent.MOUSE_MOVED
@@ -131,7 +130,7 @@ class ComposeWindowTest {
 
             window.isVisible = true
             awaitIdle()
-            window.sendMouseEvent(MouseEvent.MOUSE_PRESSED, x = 100, y = 50)
+            window.sendMouseEvent(MOUSE_PRESSED, x = 100, y = 50)
             awaitIdle()
             assertThat(caughtExceptions.size).isEqualTo(1)
             assertThat(caughtExceptions.last()).isInstanceOf(TestException::class.java)

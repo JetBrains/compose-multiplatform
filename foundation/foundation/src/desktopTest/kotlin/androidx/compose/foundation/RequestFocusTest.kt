@@ -18,8 +18,6 @@ package androidx.compose.foundation
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.ImageComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
@@ -33,11 +31,9 @@ import androidx.compose.ui.use
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalComposeUiApi::class)
 class RequestFocusTest {
 
-    @Test
-    fun `mouseClickable should request focus on click`() =
+    private fun shouldRequestFocusOnClick(clickableModifier: Modifier.(() -> Unit) -> Modifier) =
         ImageComposeScene(
             width = 100,
             height = 100,
@@ -49,7 +45,7 @@ class RequestFocusTest {
                 Box(modifier = Modifier
                     .size(25.dp)
                     .onFocusChanged { focusState = it }
-                    .mouseClickable { clicked = true }
+                    .clickableModifier { clicked = true }
                 )
             }
 
@@ -64,4 +60,17 @@ class RequestFocusTest {
             assertThat(clicked).isEqualTo(true)
             assertThat(focusState?.hasFocus).isEqualTo(true)
         }
+
+    @OptIn(ExperimentalFoundationApi::class)
+    @Suppress("DEPRECATION")
+    @Test
+    fun `mouseClickable should request focus on click`() = shouldRequestFocusOnClick {
+        this.mouseClickable{ it () }
+    }
+
+    @Test
+    fun `clickable should request focus on click`() = shouldRequestFocusOnClick {
+        this.clickable(onClick = it)
+    }
+
 }

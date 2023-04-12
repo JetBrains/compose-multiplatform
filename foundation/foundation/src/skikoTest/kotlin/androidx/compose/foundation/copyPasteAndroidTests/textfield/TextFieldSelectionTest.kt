@@ -204,7 +204,7 @@ class TextFieldSelectionTest {
     private fun extraStarsVisualTransformation(): VisualTransformation {
         return VisualTransformation {
             TransformedText(
-                text = AnnotatedString(it.text.flatMap { listOf(it, '*') }.joinToString("")),
+                text = AnnotatedString(it.text.flatMap { c -> listOf(c, '*') }.joinToString("")),
                 offsetMapping = object : OffsetMapping {
                     override fun originalToTransformed(offset: Int) = offset * 2
                     override fun transformedToOriginal(offset: Int) = offset / 2

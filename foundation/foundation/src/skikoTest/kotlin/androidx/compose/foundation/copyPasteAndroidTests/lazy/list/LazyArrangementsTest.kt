@@ -53,7 +53,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -673,7 +672,7 @@ class LazyArrangementsTest {
         }
     }
 
-    fun SkikoComposeUiTest.composeColumnWith(arrangement: Arrangement.Vertical) {
+    private fun SkikoComposeUiTest.composeColumnWith(arrangement: Arrangement.Vertical) {
         setContent {
             LazyColumn(
                 verticalArrangement = arrangement,
@@ -686,7 +685,7 @@ class LazyArrangementsTest {
         }
     }
 
-    fun SkikoComposeUiTest.composeRowWith(arrangement: Arrangement.Horizontal, layoutDirection: LayoutDirection) {
+    private fun SkikoComposeUiTest.composeRowWith(arrangement: Arrangement.Horizontal, layoutDirection: LayoutDirection) {
         setContent {
             CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
                 LazyRow(
@@ -708,7 +707,7 @@ class LazyArrangementsTest {
         Box(Modifier.requiredSize(size).testTag(index.toString()))
     }
 
-    fun SkikoComposeUiTest.assertArrangementForTwoItems(
+    private fun SkikoComposeUiTest.assertArrangementForTwoItems(
         arrangement: Arrangement.Vertical,
         reverseLayout: Boolean = false
     ) {
@@ -728,7 +727,7 @@ class LazyArrangementsTest {
         }
     }
 
-    fun SkikoComposeUiTest.assertArrangementForTwoItems(
+    private fun SkikoComposeUiTest.assertArrangementForTwoItems(
         arrangement: Arrangement.Horizontal,
         layoutDirection: LayoutDirection,
         reverseLayout: Boolean = false

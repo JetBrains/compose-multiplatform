@@ -42,11 +42,11 @@ import javax.swing.JFrame
 import kotlin.random.Random
 import kotlinx.coroutines.runBlocking
 import org.jetbrains.skiko.MainUIDispatcher
-import org.jetbrains.skiko.hostOs
 import org.junit.Assume
 import org.junit.Test
 
 class ComposeFocusTest {
+
     @Test
     fun `compose window`() = runFocusTest {
         val window = ComposeWindow().disposeOnEnd()
@@ -718,8 +718,6 @@ class ComposeFocusTest {
 
 fun runFocusTest(action: suspend FocusTestScope.() -> Unit) {
     Assume.assumeFalse(GraphicsEnvironment.getLocalGraphicsEnvironment().isHeadlessInstance)
-    // on macOs if we run all tests, the window starts unfocused, so tests fail
-    Assume.assumeFalse(hostOs.isMacOS)
     runBlocking(MainUIDispatcher) {
         val scope = FocusTestScope()
         try {
@@ -746,12 +744,14 @@ class FocusTestScope {
     suspend fun pressNextFocusKey() {
         val focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner
         focusOwner.dispatchEvent(KeyEvent(focusOwner, KeyEvent.KEY_PRESSED, 0, 0, KeyEvent.VK_TAB, '\t'))
+        focusOwner.dispatchEvent(KeyEvent(focusOwner, KeyEvent.KEY_RELEASED, 0, 0, KeyEvent.VK_TAB, '\t'))
         awaitEDT()
     }
 
     suspend fun pressPreviousFocusKey() {
         val focusOwner = KeyboardFocusManager.getCurrentKeyboardFocusManager().focusOwner
         focusOwner.dispatchEvent(KeyEvent(focusOwner, KeyEvent.KEY_PRESSED, 0, KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_TAB, '\t'))
+        focusOwner.dispatchEvent(KeyEvent(focusOwner, KeyEvent.KEY_RELEASED, 0, KeyEvent.SHIFT_DOWN_MASK, KeyEvent.VK_TAB, '\t'))
         awaitEDT()
     }
 }

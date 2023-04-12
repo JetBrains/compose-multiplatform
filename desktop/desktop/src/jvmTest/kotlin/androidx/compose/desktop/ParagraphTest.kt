@@ -70,7 +70,7 @@ class ParagraphTest {
             "   }\n" +
             "}"
 
-    val fontFamily = FontFamily(
+    private val fontFamily = FontFamily(
         Font("NotoSans-Regular.ttf"),
         Font("NotoSans-Italic.ttf", style = FontStyle.Italic)
     )

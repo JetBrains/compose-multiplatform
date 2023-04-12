@@ -40,7 +40,6 @@ import androidx.compose.ui.graphics.drawscope.CanvasDrawScope
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.graphics.toComposeImageBitmap
 import androidx.compose.ui.graphics.toPixelMap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -64,15 +63,15 @@ import kotlin.test.assertEquals
 @OptIn(ExperimentalTestApi::class)
 class ImageTest {
 
-    val contentTag = "ImageTest"
+    private val contentTag = "ImageTest"
 
-    val imageWidth = 100
-    val imageHeight = 100
-    val containerSize = imageWidth
-    val sceneSize = Size(containerSize.toFloat(), containerSize.toFloat())
+    private val imageWidth = 100
+    private val imageHeight = 100
+    private val containerSize = imageWidth
+    private val sceneSize = Size(containerSize.toFloat(), containerSize.toFloat())
 
-    val bgColor = Color.Blue
-    val pathColor = Color.Red
+    private val bgColor = Color.Blue
+    private val pathColor = Color.Red
 
     private fun createImageBitmap(): ImageBitmap {
         val image = ImageBitmap(imageWidth, imageHeight)
@@ -305,11 +304,11 @@ class ImageTest {
         setContent {
             val density = LocalDensity.current
             val size = (containerSize * 2 / density.density).dp
-            val ImageBitmap = ImageBitmap(imageWidth, imageHeight)
+            val imageBitmap = ImageBitmap(imageWidth, imageHeight)
             CanvasDrawScope().draw(
                 density,
                 LayoutDirection.Ltr,
-                Canvas(ImageBitmap),
+                Canvas(imageBitmap),
                 Size(imageWidth.toFloat(), imageHeight.toFloat())
             ) {
                 drawRect(color = Color.Blue)
@@ -320,7 +319,7 @@ class ImageTest {
                     .wrapContentSize(Alignment.Center)
             ) {
                 Image(
-                    bitmap = ImageBitmap,
+                    bitmap = imageBitmap,
                     contentDescription = null,
                     modifier = Modifier
                         .testTag(contentTag)
@@ -487,7 +486,7 @@ class ImageTest {
     @Test
     fun testImageFilterQualityNone() = runSkikoComposeUiTest(Size(20f, 20f)) {
         val sampleBitmap = ImageBitmap(2, 2)
-        val canvas = androidx.compose.ui.graphics.Canvas(sampleBitmap)
+        val canvas = Canvas(sampleBitmap)
         val samplePaint = Paint().apply {
             color = Color.White
         }
