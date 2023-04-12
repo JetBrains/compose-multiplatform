@@ -35,7 +35,6 @@ and embed complex native UI views, such as [MKMapView](https://developer.apple.c
 
 **[Get started with Compose for iOS](https://github.com/JetBrains/compose-multiplatform-ios-android-template#readme)**
 
-
 ## Android
 
 When Android is one of your targets, you can get the same experience for Android as if you were developing an Android app 
@@ -72,6 +71,7 @@ If you want to share UIs across all supported platforms at once, you can start w
 
 ## Learn more
 
+* [FAQ](docs/FAQ.md)
 * [Samples](examples/README.md)
 * [Tutorials](tutorials/README.md)
 * [Changelog](CHANGELOG.md)
