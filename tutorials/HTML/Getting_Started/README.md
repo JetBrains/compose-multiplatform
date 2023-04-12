@@ -1,4 +1,4 @@
-# Getting Started With Compose HTML Library
+# Getting started with the Compose HTML library
 
 In this tutorial, we will create a simple web UI application using the Compose HTML Library.
 

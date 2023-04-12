@@ -24,16 +24,16 @@
 
 ## General
 
-See [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) tutorials from Google. They were originally written for Android, but most of information applies for the other targets as well.
+Google's [Foundation](https://developer.android.com/jetpack/compose/documentation#core) and [Design](https://developer.android.com/jetpack/compose/documentation#design) tutorials were originally written for Android but can be used as a reference for other targets.
 
 ## Libraries
 
 ### HTML
-Compose HTML Library allows you to build reactive user interfaces for the web in Kotlin, using the concepts and APIs of Compose to express the state, behaviour, and logic of your application.
+The Compose HTML library allows you to build reactive user interfaces for the web in Kotlin using the concepts and APIs of Compose to express the state, behavior, and logic of your application.
 
-HTML Library provides multiple ways of declaring user interfaces in Kotlin code, allowing you to have full control over your website layout with a declarative HTML/CSS API.
+The HTML library provides multiple ways of declaring user interfaces in Kotlin with an ability to fully control your website layout with a declarative HTML/CSS API.
 
-> Note that this library currently supports only Kotlin JS, not Kotlin/Wasm
+> Note that this library doesn't support Kotlin/Wasm yet.
 
 * [Getting started](HTML/Getting_Started) 
 * [Building UI](HTML/Building_UI)

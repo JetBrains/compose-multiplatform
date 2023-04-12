@@ -47,7 +47,7 @@ Form(attrs = {
 ```
 
 
-There are more event listeners supported out of the box. We plan to add the documentation for them later on. In the meantime, you can find all supported event listeners in the [source code](https://github.com/JetBrains/compose-multiplatform/blob/master/html/core/src/jsMain/kotlin/org/jetbrains/compose/html/attributes/EventsListenerScope.kt).
+There are more event listeners supported out of the box. You can find all supported event listeners in the [source code](https://github.com/JetBrains/compose-multiplatform/blob/master/html/core/src/jsMain/kotlin/org/jetbrains/compose/html/attributes/EventsListenerScope.kt).
 
 
 ### Runnable example

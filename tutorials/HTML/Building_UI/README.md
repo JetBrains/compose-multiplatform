@@ -1,11 +1,10 @@
-# Building the UI with Compose HTML Library
-
+# Building the UI with with the Compose HTML library
 
 In this tutorial we will look at several examples that use the Composable HTML/CSS DSL to describe the user interface for your web application.
 
 ### Entry point
 
-Compose HTML Library needs an HTML node that will be a root of its composition. Inside this root node, Compose then manages its own DOM tree.
+The Compose HTML library needs an HTML node that will be a root of its composition. Inside this root node, Compose then manages its own DOM tree.
 
 ``` kotlin
 renderComposable(rootElementId = "root") {

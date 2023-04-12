@@ -1,6 +1,6 @@
 # Using Effects
 
-Compose HTML Library introduces a few dom-specific effects on top of [existing effects from Compose](https://developer.android.com/jetpack/compose/side-effects).
+The Compose HTML library introduces a few dom-specific effects on top of [existing effects from Compose](https://developer.android.com/jetpack/compose/side-effects).
 
 
 ### ref in AttrsBuilder
