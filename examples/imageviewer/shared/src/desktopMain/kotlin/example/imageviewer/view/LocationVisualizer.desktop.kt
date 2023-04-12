@@ -17,10 +17,11 @@ actual fun LocationVisualizer(
     title: String,
     parentScrollEnableState: MutableState<Boolean>
 ) {
-    Image(
-        painter = painterResource("dummy_map.png"),
-        contentDescription = "Map",
-        contentScale = ContentScale.Crop,
-        modifier = modifier
+    example.map.MapView(
+        modifier,
+        userAgent = "ComposeMapViewExample",
+        latitude = gps.latitude,
+        longitude = gps.longitude,
+        startScale = 12_000.0
     )
 }

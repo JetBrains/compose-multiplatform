@@ -97,12 +97,15 @@ fun MemoryScreen(
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         items(items = shuffledIndices) { index ->
-                            Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
-                                SquareThumbnail(
-                                    picture = pictures[index],
-                                    isHighlighted = false,
-                                    onClick = { onSelectRelatedMemory(index) }
-                                )
+                            val relatedPicture = pictures.getOrNull(index)
+                            if (relatedPicture != null) {
+                                Box(Modifier.size(130.dp).clip(RoundedCornerShape(8.dp))) {
+                                    SquareThumbnail(
+                                        picture = relatedPicture,
+                                        isHighlighted = false,
+                                        onClick = { onSelectRelatedMemory(index) }
+                                    )
+                                }
                             }
                         }
                     }
