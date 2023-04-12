@@ -74,7 +74,6 @@ If you want to share UIs across all supported platforms at once, you can start w
 
 * [Samples](examples/README.md)
 * [Tutorials](tutorials/README.md)
-* [Examples](examples/README.md)
 * [Changelog](CHANGELOG.md)
 * [Compatibility and versioning](VERSIONING.md)
 
