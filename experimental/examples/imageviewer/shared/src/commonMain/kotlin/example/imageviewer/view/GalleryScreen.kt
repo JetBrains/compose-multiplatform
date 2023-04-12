@@ -28,6 +28,7 @@ import example.imageviewer.model.GalleryId
 import example.imageviewer.model.GalleryPage
 import example.imageviewer.model.PhotoGallery
 import example.imageviewer.model.bigUrl
+import example.imageviewer.painterResourceCached
 import example.imageviewer.style.ImageviewerColors
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -68,7 +69,7 @@ internal fun GalleryScreen(
             TopLayout(
                 alignLeftContent = {},
                 alignRightContent = {
-                    CircularButton(painterResource("list_view.png")) {
+                    CircularButton(painterResourceCached("list_view.png")) {
                         galleryPage.toggleGalleryStyle()
                     }
                 },
@@ -139,7 +140,7 @@ private fun BoxScope.MakeNewMemoryMiniature(onClick: () -> Unit) {
             contentAlignment = Alignment.Center
         ) {
             Image(
-                painter = painterResource("plus.png"),
+                painter = painterResourceCached("plus.png"),
                 contentDescription = null,
                 modifier = Modifier
                     .width(18.dp)
@@ -182,7 +183,7 @@ internal fun SquareMiniature(image: ImageBitmap, isHighlighted: Boolean, onClick
                 contentAlignment = Alignment.Center
             ) {
                 Image(
-                    painter = painterResource("eye.png"),
+                    painter = painterResourceCached("eye.png"),
                     contentDescription = null,
                     modifier = Modifier
                         .width(17.dp)

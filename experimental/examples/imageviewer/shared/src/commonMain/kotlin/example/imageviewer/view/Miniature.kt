@@ -27,6 +27,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.model.Picture
 import example.imageviewer.model.name
+import example.imageviewer.painterResourceCached
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -75,7 +76,7 @@ internal fun Miniature(
             )
 
             Image(
-                painterResource("dots.png"),
+                painterResourceCached("dots.png"),
                 contentDescription = null,
                 modifier = Modifier.height(70.dp)
                     .width(30.dp)

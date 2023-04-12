@@ -1,8 +1,7 @@
 package example.imageviewer.model
 
-import kotlinx.serialization.Serializable
 
-@Serializable
+//@Serializable
 data class Picture(val big: String, val small: String)
 
 fun getNameURL(url: String): String = url.substring(url.lastIndexOf('/') + 1, url.length)

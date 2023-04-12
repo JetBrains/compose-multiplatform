@@ -17,6 +17,18 @@ kotlin {
     ios()
     iosSimulatorArm64()
 
+    js(IR) {
+        moduleName = "imageviewer"
+        browser()
+        binaries.executable()
+    }
+
+    wasm {
+        moduleName = "imageviewer"
+        browser()
+        binaries.executable()
+    }
+
     cocoapods {
         summary = "Shared code for the sample"
         homepage = "https://github.com/JetBrains/compose-jb"
@@ -32,16 +44,33 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation("io.ktor:ktor-client-core:$ktorVersion")
                 implementation(compose.runtime)
                 implementation(compose.foundation)
                 implementation(compose.material)
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+//                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1")
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.material3)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+//                implementation(compose.components.resources)
+                implementation("org.jetbrains.compose.components:components-resources:1.4.0-dev-wasm02")
             }
         }
+
+        val jsWasmMain by creating {
+            dependsOn(commonMain)
+        }
+
+        val jsMain by getting {
+            dependsOn(jsWasmMain)
+            dependencies {
+                implementation("io.ktor:ktor-client-core:$ktorVersion")
+            }
+        }
+
+        val wasmMain by getting {
+            dependsOn(jsWasmMain)
+        }
+
         val androidMain by getting {
             dependencies {
                 api("androidx.activity:activity-compose:1.6.1")
@@ -68,6 +97,10 @@ kotlin {
             }
         }
     }
+}
+
+compose.experimental {
+    web.application {}
 }
 
 android {

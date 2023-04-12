@@ -29,6 +29,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import example.imageviewer.model.GalleryEntryWithMetadata
 import example.imageviewer.model.Picture
+import kotlinx.coroutines.yield
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
@@ -61,6 +62,10 @@ internal fun PreviewImage(
             ) { currentPicture ->
                 var image by remember(currentPicture) { mutableStateOf(currentPicture?.thumbnail) }
                 LaunchedEffect(currentPicture) {
+                    yield() // To ensure the animation starts first
+                    // Wait until the animation is finished, because getImage is quite heavy at the moment,
+                    // so the animation can be not smooth (when running in a browser)
+                    while (transition.isRunning) { yield() }
                     if (currentPicture != null) {
                         image = getImage(currentPicture.picture)
                     }

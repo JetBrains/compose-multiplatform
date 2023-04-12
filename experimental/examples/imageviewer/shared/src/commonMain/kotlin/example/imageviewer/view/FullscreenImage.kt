@@ -23,6 +23,7 @@ import example.imageviewer.Localization
 import example.imageviewer.core.BitmapFilter
 import example.imageviewer.core.FilterType
 import example.imageviewer.model.*
+import example.imageviewer.painterResourceCached
 import example.imageviewer.style.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -144,7 +145,7 @@ private fun FullscreenImageBar(
         alignLeftContent = {
             Tooltip(localization.back) {
                 CircularButton(
-                    painterResource("arrowleft.png"),
+                    painterResourceCached("arrowleft.png"),
                     onClick = { onBack() }
                 )
             }
@@ -198,21 +199,21 @@ private fun FilterButton(
 private fun getFilterImage(active: Boolean, type: FilterType): Painter {
     return when (type) {
         FilterType.GrayScale -> if (active) {
-            painterResource("grayscale_on.png")
+            painterResourceCached("grayscale_on.png")
         } else {
-            painterResource("grayscale_off.png")
+            painterResourceCached("grayscale_off.png")
         }
 
         FilterType.Pixel -> if (active) {
-            painterResource("pixel_on.png")
+            painterResourceCached("pixel_on.png")
         } else {
-            painterResource("pixel_off.png")
+            painterResourceCached("pixel_off.png")
         }
 
         FilterType.Blur -> if (active) {
-            painterResource("blur_on.png")
+            painterResourceCached("blur_on.png")
         } else {
-            painterResource("blur_off.png")
+            painterResourceCached("blur_off.png")
         }
     }
 }
