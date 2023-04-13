@@ -21,10 +21,10 @@ import androidx.compose.ui.text.intl.JsLocale
 import androidx.compose.ui.text.intl.PlatformLocale
 
 /**
- * An Native implementation of StringDelegate
+ * A JS implementation of StringDelegate
  */
 
-internal class NativeStringDelegate() : PlatformStringDelegate {
+internal class JsStringDelegate : PlatformStringDelegate {
     override fun toUpperCase(string: String, locale: PlatformLocale): String =
         string.toUpperCase()
 
@@ -39,5 +39,5 @@ internal class NativeStringDelegate() : PlatformStringDelegate {
 }
 
 internal actual fun ActualStringDelegate(): PlatformStringDelegate =
-    //TODO("implement native StringDelegate")
-    NativeStringDelegate()
+    // TODO("implement JsStringDelegate")
+    JsStringDelegate()

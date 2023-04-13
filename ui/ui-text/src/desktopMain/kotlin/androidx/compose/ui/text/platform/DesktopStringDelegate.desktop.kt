@@ -21,7 +21,7 @@ import androidx.compose.ui.text.intl.DesktopLocale
 import androidx.compose.ui.text.intl.PlatformLocale
 
 /**
- * An Desktop implementation of StringDelegate
+ * A desktop implementation of StringDelegate
  */
 internal class DesktopStringDelegate : PlatformStringDelegate {
     override fun toUpperCase(string: String, locale: PlatformLocale): String =
