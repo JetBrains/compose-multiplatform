@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+import org.gradle.nativeplatform.platform.internal.DefaultNativePlatform
+
 include ":jetpad-integration"
 include ":plugins"
 include ":private"
@@ -22,6 +24,13 @@ include ":public"
 dependencyResolutionManagement {
     versionCatalogs {
         libs {
+            // For JetBrains Fork only. Keep during merge.
+            // Androidx doesn't support windows development, but we should.
+            // `gradle` folder is symlinked for other modules like (:compose:runtime),
+            // and it works fine for Mac and Linux but not for Windows
+            if (DefaultNativePlatform.getCurrentOperatingSystem().isWindows()) {
+                from(files("../gradle/libs.versions.toml"))
+            }
             def agpOverride = System.getenv("GRADLE_PLUGIN_VERSION")
             if (agpOverride != null) {
                 logger.warn("Using custom version ${agpOverride} of AGP due to GRADLE_PLUGIN_VERSION being set.")
