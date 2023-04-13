@@ -94,6 +94,13 @@ class ComposePlugin : Plugin<Project> {
                 ) {
                     if (isWasm) it.useVersion("0.18.5-wasm0")
                 }
+
+                if (it.requested.module.group.startsWith("org.jetbrains.skiko")) {
+                    // skiko 0.0.7.58-wasm01 is broken for k/wasm, but don't want to republish every lib:
+                    if (it.requested.version == "0.0.7.58-wasm01") {
+                        it.useVersion("0.0.7.58-wasm02")
+                    }
+                }
             }
         }
     }
