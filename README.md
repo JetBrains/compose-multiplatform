@@ -77,4 +77,10 @@ If you want to share UIs across all supported platforms at once, you can start w
 * [Changelog](CHANGELOG.md)
 * [Compatibility and versioning](VERSIONING.md)
 
+## Libraries
+
+### Compose HTML
+Compose HTML is a library targeting [kotlin/js](https://kotlinlang.org/docs/js-overview.html) that provides Composable building blocks for building web user interfaces with HTML and CSS.    
+To learn more about Compose HTML go to [tutorials](https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/README.md#html).
+
 
