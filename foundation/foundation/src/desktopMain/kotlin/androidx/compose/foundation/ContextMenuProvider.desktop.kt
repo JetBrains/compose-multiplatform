@@ -16,7 +16,7 @@
 
 package androidx.compose.foundation
 
-import androidx.compose.foundation.gestures.forEachGesture
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -116,13 +116,11 @@ fun Modifier.contextMenuOpenDetector(
 ): Modifier {
     return if (enabled) {
         this.pointerInput(key) {
-            forEachGesture {
-                awaitPointerEventScope {
-                    val event = awaitEventFirstDown()
-                    if (event.buttons.isSecondaryPressed) {
-                        event.changes.forEach { it.consume() }
-                        onOpen(event.changes[0].position)
-                    }
+            awaitEachGesture {
+                val event = awaitEventFirstDown()
+                if (event.buttons.isSecondaryPressed) {
+                    event.changes.forEach { it.consume() }
+                    onOpen(event.changes[0].position)
                 }
             }
         }
