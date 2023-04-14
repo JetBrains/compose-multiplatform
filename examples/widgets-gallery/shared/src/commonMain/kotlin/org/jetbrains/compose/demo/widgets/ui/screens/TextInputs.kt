@@ -33,13 +33,15 @@ fun TextInputs() {
         value = text,
         onValueChange = { newValue -> text = newValue },
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        singleLine = true,
         label = { Text("label") },
-        placeholder = { Text("placeholder") }
+        placeholder = { Text("placeholder") },
     )
 
     OutlinedTextField(
         value = text,
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        singleLine = true,
         label = { Text(text = "Password") },
         placeholder = { Text(text = "12334444") },
         visualTransformation = PasswordVisualTransformation(),
@@ -53,6 +55,7 @@ fun TextInputs() {
         value = text,
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         label = { Text(text = "Email address") },
         placeholder = { Text(text = "Your email") },
@@ -65,6 +68,7 @@ fun TextInputs() {
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = "Email") },
         trailingIcon = { Icon(Icons.Default.Edit, contentDescription = "Edit") },
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
         label = { Text(text = "Email address") },
         placeholder = { Text(text = "Your email") },
@@ -74,8 +78,10 @@ fun TextInputs() {
     )
 
     var numberText by remember { mutableStateOf(TextFieldValue("")) }
-    OutlinedTextField(value = numberText,
+    OutlinedTextField(
+        value = numberText,
         modifier = Modifier.padding(8.dp).fillMaxWidth(),
+        singleLine = true,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
         label = { Text(text = "Phone number") },
         placeholder = { Text(text = "88888888") },
