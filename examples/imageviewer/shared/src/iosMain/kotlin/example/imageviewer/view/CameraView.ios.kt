@@ -79,7 +79,7 @@ actual fun CameraView(
         }
     }
     Box(
-        Modifier.fillMaxSize().background(Color.Black),
+        modifier.fillMaxSize().background(Color.Black),
         contentAlignment = Alignment.Center
     ) {
         when (cameraAccess) {
