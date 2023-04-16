@@ -20,6 +20,9 @@ class CSSRulesHolderState : CSSRulesHolder {
 /**
  * Represents a collection of the css style rules.
  * StyleSheet needs to be mounted.
+ *
+ * @param prefix Will be used as prefix with current style. Pass `null` to use default value (classname of realization)
+ *
  * @see [Style]
  *
  * Example:
@@ -38,17 +41,18 @@ class CSSRulesHolderState : CSSRulesHolder {
  * ```
  */
 open class StyleSheet(
+    prefix: String?,
     private val rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
-    val prefix: String = "",
 ) : StyleSheetBuilder, CSSRulesHolder by rulesHolder {
     private val boundClasses = mutableMapOf<String, CSSRuleDeclarationList>()
+    val prefix = prefix ?: "${this::class.simpleName}-"
 
     constructor(
         rulesHolder: CSSRulesHolder = CSSRulesHolderState(),
         usePrefix: Boolean = true
     ) : this(
-        rules,
-        if (usePrefix) "${this::class.simpleName}-" else "
+        if (usePrefix) null else "",
+        rulesHolder
     )
 
     protected fun style(cssRule: CSSBuilder.() -> Unit) = CSSHolder(prefix, cssRule)
