@@ -20,7 +20,14 @@ import org.junit.jupiter.api.Test
 
 class GradlePluginTest : GradlePluginTestBase() {
     @Test
-    fun skikoWasm() = with(testProject(TestProjects.skikoWasm)) {
+    fun skikoWasm() = with(
+        testProject(
+            TestProjects.skikoWasm,
+            // configuration cache is disabled as a temporary workaround for KT-58057
+            // todo: enable once KT-58057 is fixed
+            testEnvironment = defaultTestEnvironment.copy(useGradleConfigurationCache = false)
+        )
+    ) {
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
             check.taskSuccessful(":compileKotlinJs")

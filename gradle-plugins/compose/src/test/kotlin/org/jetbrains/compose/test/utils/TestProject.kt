@@ -19,6 +19,7 @@ data class TestEnvironment(
     val composeCompilerPlugin: String? = null,
     val composeCompilerArgs: String? = null,
     val composeVerbose: Boolean = true,
+    val useGradleConfigurationCache: Boolean = TestProperties.gradleConfigurationCache,
 ) {
     private val placeholders = linkedMapOf(
         "COMPOSE_GRADLE_PLUGIN_VERSION_PLACEHOLDER" to composeGradlePluginVersion,
@@ -76,7 +77,7 @@ class TestProject(
     }
 
     internal fun gradle(vararg args: String): BuildResult {
-        if (TestProperties.gradleConfigurationCache) {
+        if (testEnvironment.useGradleConfigurationCache) {
             if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
                 // Gradle 7.* does not use the configuration cache in the same build.
                 // In other words, if cache misses, Gradle performs configuration,
@@ -106,7 +107,7 @@ class TestProject(
     private fun gradleRunner(args: Array<out String>): GradleRunner {
         val allArgs = args.toMutableList()
         allArgs.addAll(additionalArgs)
-        if (TestProperties.gradleConfigurationCache) {
+        if (testEnvironment.useGradleConfigurationCache) {
             allArgs.add("--configuration-cache")
         }
 
