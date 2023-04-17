@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,19 +26,8 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.AwtCursor
-import androidx.compose.ui.input.pointer.PointerButton
-import androidx.compose.ui.input.pointer.PointerButtons
-import androidx.compose.ui.input.pointer.PointerEventType
-import androidx.compose.ui.input.pointer.PointerIcon
-import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
-import androidx.compose.ui.input.pointer.PointerType
-import androidx.compose.ui.platform.AccessibilityControllerImpl
-import androidx.compose.ui.platform.Platform
-import androidx.compose.ui.platform.PlatformComponent
-import androidx.compose.ui.platform.PlatformInput
-import androidx.compose.ui.platform.ViewConfiguration
-import androidx.compose.ui.platform.WindowInfoImpl
+import androidx.compose.ui.input.pointer.*
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.semantics.SemanticsOwner
 import androidx.compose.ui.toPointerKeyboardModifiers
 import androidx.compose.ui.unit.Constraints
@@ -48,46 +37,29 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.WindowExceptionHandler
 import androidx.compose.ui.window.density
 import androidx.compose.ui.window.layoutDirection
-import kotlinx.coroutines.CoroutineExceptionHandler
-import org.jetbrains.skia.Canvas
-import org.jetbrains.skiko.MainUIDispatcher
-import org.jetbrains.skiko.SkiaLayer
-import org.jetbrains.skiko.SkikoView
-import java.awt.Component
-import java.awt.ComponentOrientation
-import java.awt.Dimension
-import java.awt.Graphics
-import java.awt.Point
-import java.awt.Toolkit
-import java.awt.Window
-import java.awt.event.FocusEvent
-import java.awt.event.InputEvent
-import java.awt.event.InputMethodEvent
-import java.awt.event.InputMethodListener
-import java.awt.event.KeyAdapter
+import java.awt.*
+import java.awt.Cursor
+import java.awt.event.*
 import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.awt.event.MouseMotionAdapter
-import java.awt.event.MouseWheelEvent
-import java.awt.event.WindowEvent
-import java.awt.event.WindowFocusListener
 import java.awt.im.InputMethodRequests
 import javax.accessibility.Accessible
-import javax.accessibility.AccessibleContext
 import javax.swing.SwingUtilities
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
-import java.awt.Cursor
-import java.awt.event.FocusListener
-import org.jetbrains.skiko.SkiaLayerAnalytics
-import org.jetbrains.skiko.hostOs
-import org.jetbrains.skiko.SkikoInput
+import kotlinx.coroutines.CoroutineExceptionHandler
+import org.jetbrains.skia.Canvas
+import org.jetbrains.skiko.*
+import org.jetbrains.skiko.SkiaLayer
 
 internal class ComposeLayer(
     private val skiaLayerAnalytics: SkiaLayerAnalytics
 ) {
     private var isDisposed = false
+
+    internal val sceneAccessible = ComposeSceneAccessible(
+        ownersProvider = { scene.owners.asReversed() },
+        mainOwnerProvider = { scene.mainOwner }
+    )
 
     private val _component = ComponentImpl()
     val component: SkiaLayer get() = _component
@@ -118,7 +90,9 @@ internal class ComposeLayer(
         }
 
         override fun accessibilityController(owner: SemanticsOwner) =
-            AccessibilityControllerImpl(owner, _component)
+            AccessibilityControllerImpl(owner, _component, onFocusReceived = {
+                _component.requestNativeFocusOnAccessible(it)
+            })
 
         override val windowInfo = WindowInfoImpl()
 
@@ -190,27 +164,12 @@ internal class ComposeLayer(
      */
     private var keyboardModifiersRequireUpdate = false
 
-    private val a11yDisabled by lazy {
-        System.getProperty("compose.accessibility.enable") == "false" ||
-        System.getenv("COMPOSE_DISABLE_ACCESSIBILITY") != null
-    }
-
-    private fun makeAccessible(component: Component) = object : Accessible {
-        override fun getAccessibleContext(): AccessibleContext? {
-            if (a11yDisabled) return null
-            val controller =
-                scene.mainOwner?.accessibilityController as? AccessibilityControllerImpl
-            controller?.onFocusRequested = {
-                _component.requestNativeFocusOnAccessible(it)
-            }
-            val accessible = controller?.rootAccessible
-            accessible?.getAccessibleContext()?.accessibleParent = component.parent as Accessible
-            return accessible?.getAccessibleContext()
-        }
-    }
-
     private inner class ComponentImpl :
-        SkiaLayer(externalAccessibleFactory = ::makeAccessible, analytics = skiaLayerAnalytics), Accessible, PlatformComponent {
+        SkiaLayer(
+            externalAccessibleFactory = { sceneAccessible },
+            analytics = skiaLayerAnalytics
+        ),
+        Accessible, PlatformComponent {
         var currentInputMethodRequests: InputMethodRequests? = null
 
         private var window: Window? = null

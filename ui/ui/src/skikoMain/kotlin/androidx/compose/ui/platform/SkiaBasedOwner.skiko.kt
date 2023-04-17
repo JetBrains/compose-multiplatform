@@ -175,7 +175,7 @@ internal class SkiaBasedOwner(
 
     override val semanticsOwner: SemanticsOwner = SemanticsOwner(root)
 
-    internal var accessibilityController = platform.accessibilityController(semanticsOwner)
+    internal val accessibilityController = platform.accessibilityController(semanticsOwner)
 
     override val autofillTree = AutofillTree()
 

@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,24 @@ import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.TextRange
 import javax.accessibility.Accessible
 import javax.accessibility.AccessibleComponent
-import javax.accessibility.AccessibleContext.ACCESSIBLE_CARET_PROPERTY
-import javax.accessibility.AccessibleContext.ACCESSIBLE_STATE_PROPERTY
-import javax.accessibility.AccessibleContext.ACCESSIBLE_TEXT_PROPERTY
+import javax.accessibility.AccessibleContext.*
 import javax.accessibility.AccessibleState
 import kotlinx.coroutines.delay
 
+/**
+ * This class provides a mapping from compose tree of [owner] to tree of [ComposeAccessible],
+ * so that each [SemanticsNode] has [ComposeAccessible].
+ *
+ * @param onFocusReceived a callback that will be called with [ComposeAccessible]
+ * when a [SemanticsNode] from [owner] received a focus
+ *
+ * @see ComposeSceneAccessible
+ * @see ComposeAccessible
+ */
 internal class AccessibilityControllerImpl(
     private val owner: SemanticsOwner,
-    val desktopComponent: PlatformComponent
+    val desktopComponent: PlatformComponent,
+    private val onFocusReceived: (ComposeAccessible) -> Unit
 ) : AccessibilityController {
     private var currentNodesInvalidated = true
     var _currentNodes: Map<Int, ComposeAccessible> = emptyMap()
@@ -44,8 +53,6 @@ internal class AccessibilityControllerImpl(
             }
             return _currentNodes
         }
-
-    var onFocusRequested: ((ComposeAccessible) -> Unit)? = null
 
     @Suppress("UNUSED_PARAMETER")
     fun fireNewNodeEvent(accessible: ComposeAccessible) {}
@@ -68,31 +75,35 @@ internal class AccessibilityControllerImpl(
                             prev, entry.value
                         )
                     }
+
                     SemanticsProperties.EditableText -> {
                         component.accessibleContext.firePropertyChange(
                             ACCESSIBLE_TEXT_PROPERTY,
                             prev, entry.value
                         )
                     }
+
                     SemanticsProperties.TextSelectionRange -> {
                         component.accessibleContext.firePropertyChange(
                             ACCESSIBLE_CARET_PROPERTY,
                             prev, (entry.value as TextRange).start
                         )
                     }
+
                     SemanticsProperties.Focused ->
                         if (entry.value as Boolean) {
                             component.accessibleContext.firePropertyChange(
                                 ACCESSIBLE_STATE_PROPERTY,
                                 null, AccessibleState.FOCUSED
                             )
-                            onFocusRequested?.invoke(component)
+                            onFocusReceived(component)
                         } else {
                             component.accessibleContext.firePropertyChange(
                                 ACCESSIBLE_STATE_PROPERTY,
                                 AccessibleState.FOCUSED, null
                             )
                         }
+
                     SemanticsProperties.ToggleableState -> {
                         when (entry.value as ToggleableState) {
                             ToggleableState.On ->
@@ -100,6 +111,7 @@ internal class AccessibilityControllerImpl(
                                     ACCESSIBLE_STATE_PROPERTY,
                                     null, AccessibleState.CHECKED
                                 )
+
                             ToggleableState.Off, ToggleableState.Indeterminate ->
                                 component.accessibleContext.firePropertyChange(
                                     ACCESSIBLE_STATE_PROPERTY,
