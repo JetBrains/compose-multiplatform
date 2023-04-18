@@ -1,5 +1,4 @@
 import androidx.build.AndroidXComposePlugin
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("AndroidXPlugin")
@@ -11,6 +10,7 @@ plugins {
 val RUN_ON_DEVICE = false
 
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
+
 
 dependencies {
 
