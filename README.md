@@ -69,6 +69,14 @@ If you want to share UIs across all supported platforms at once, you can start w
 > 
 > We would appreciate your feedback on Compose Multiplatform in the public Slack channel [#compose](https://kotlinlang.slack.com/archives/CJLTWPH7S/p1678882768039969).
 
+## Libraries
+
+### Compose HTML
+
+Compose HTML is a library targeting [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) that provides Composable building blocks for building web user interfaces with HTML and CSS.    
+
+> Note that it is not a multiplatform library. It can be used only with Kotlin/JS.
+
 ## Learn more
 
 * [FAQ](docs/FAQ.md)
@@ -77,12 +85,6 @@ If you want to share UIs across all supported platforms at once, you can start w
 * [Changelog](CHANGELOG.md)
 * [Compatibility and versioning](VERSIONING.md)
 
-## Libraries
 
-### Compose HTML
-Compose HTML is a library targeting [Kotlin/JS](https://kotlinlang.org/docs/js-overview.html) that provides Composable building blocks for building web user interfaces with HTML and CSS.    
-To learn more about Compose HTML go to [tutorials](https://github.com/JetBrains/compose-multiplatform/blob/master/tutorials/README.md#html).   
-
-NOTE: It's not a multiplatform library. It can be used only with Kotlin/JS.
 
 
