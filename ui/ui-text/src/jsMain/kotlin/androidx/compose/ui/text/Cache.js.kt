@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,9 @@
 
 package androidx.compose.ui.text
 
-// expire cache entries after `expireAfter` after last access
-internal class ExpireAfterAccessCache<K, V>() : Cache<K, V> {
-    internal val map = HashMap<K, V>()
+// TODO Use WeakMap once available https://youtrack.jetbrains.com/issue/KT-44309
+internal actual typealias WeakKeysCache<K, V> = NoCache<K, V>
 
-    override fun get(key: K, loader: (K) -> V): V = map.getOrPut(key) {
-        loader(key)
-    }
+internal class NoCache<K : Any, V> : Cache<K, V> {
+    override fun get(key: K, loader: (K) -> V): V = loader(key)
 }

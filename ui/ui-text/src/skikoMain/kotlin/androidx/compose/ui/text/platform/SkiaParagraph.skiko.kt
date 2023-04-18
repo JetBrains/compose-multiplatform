@@ -271,12 +271,10 @@ internal data class ComputedStyle(
     }
 }
 
-internal expect class WeakHashMap<K, V>() : MutableMap<K, V>
-
 // Building of SkTextStyle is a relatively expensive operation. We enable simple caching by
 // mapping SpanStyle to SkTextStyle. To increase the efficiency of this mapping we are making
 // most of the computations before converting Compose paragraph styles to Skia paragraph
-private val skTextStylesCache = WeakHashMap<ComputedStyle, SkTextStyle>()
+private val skTextStylesCache = WeakKeysCache<ComputedStyle, SkTextStyle>()
 
 internal class ParagraphBuilder(
     val fontFamilyResolver: FontFamily.Resolver,
@@ -546,8 +544,8 @@ internal class ParagraphBuilder(
     }
 
     private fun makeSkTextStyle(style: ComputedStyle): SkTextStyle {
-        return skTextStylesCache.getOrPut(style) {
-            style.toSkTextStyle(fontFamilyResolver)
+        return skTextStylesCache.get(style) {
+            it.toSkTextStyle(fontFamilyResolver)
         }
     }
 

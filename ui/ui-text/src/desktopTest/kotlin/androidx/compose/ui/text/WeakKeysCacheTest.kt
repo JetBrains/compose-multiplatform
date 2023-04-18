@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,20 @@
 
 package androidx.compose.ui.text
 
-// TODO: implement proper cache for native.
-internal class ExpireAfterAccessCache<K, V>() : Cache<K, V> {
-    override fun get(key: K, loader: (K) -> V): V = loader(key)
+import kotlin.test.assertEquals
+import org.junit.Test
+
+class WeakKeysCacheTest {
+    data class MyKey(val v: Int)
+
+    @Test
+    fun clearOnGC() {
+        val cache = WeakKeysCache<MyKey, Int>()
+        var created = 0
+        assertEquals(1, cache.get(MyKey(42)) { ++created })
+        assertEquals(1, cache.get(MyKey(42)) { ++created })
+        System.gc()
+        assertEquals(2, cache.get(MyKey(42)) { ++created })
+        assertEquals(2, cache.get(MyKey(42)) { ++created })
+    }
 }

@@ -15,25 +15,18 @@
  */
 package androidx.compose.ui.text.platform
 
+import org.jetbrains.skia.Typeface as SkTypeface
 import androidx.compose.ui.text.Cache
 import androidx.compose.ui.text.ExperimentalTextApi
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontListFontFamily
-import androidx.compose.ui.text.font.FontLoadingStrategy
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.GenericFontFamily
-import androidx.compose.ui.text.font.LoadedFontFamily
+import androidx.compose.ui.text.ExpireAfterAccessCache
+import androidx.compose.ui.text.WeakKeysCache
+import androidx.compose.ui.text.font.*
+import androidx.compose.ui.text.font.Typeface
 import org.jetbrains.skia.FontMgr
-import org.jetbrains.skia.Typeface as SkTypeface
 import org.jetbrains.skia.paragraph.FontCollection
 import org.jetbrains.skia.paragraph.TypefaceFontProvider
-import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.Typeface
-import androidx.compose.ui.text.font.createFontFamilyResolver
 
-expect sealed class PlatformFont : Font {
-    constructor()
+expect sealed class PlatformFont() : Font {
     abstract val identity: String
     internal val cacheKey: String
 }
@@ -64,9 +57,7 @@ class LoadedFont internal constructor(
         if (other !is LoadedFont) return false
         if (identity != other.identity) return false
         if (weight != other.weight) return false
-        if (style != other.style) return false
-
-        return true
+        return style == other.style
     }
 
     override fun hashCode(): Int {
@@ -116,10 +107,6 @@ fun Typeface(typeface: SkTypeface, alias: String? = null): Typeface {
     return SkiaBackedTypeface(alias, typeface)
 }
 
-// TODO: may be have an expect for MessageDigest?
-// It has the static .getInstance() method, how would that work?
-internal expect fun FontListFontFamily.makeAlias(): String
-
 @Suppress("DEPRECATION", "OverridingDeprecatedMember")
 @Deprecated(
     "Replaced with PlatformFontLoader during the introduction of async fonts, all usages" +
@@ -153,6 +140,10 @@ class FontLoadResult(val typeface: SkTypeface?, val aliases: List<String>)
 internal class FontCache {
     internal val fonts = FontCollection()
     private val fontProvider = TypefaceFontProvider()
+    private val registered: MutableSet<String> = HashSet()
+    private val typefacesCache: Cache<String, SkTypeface> = ExpireAfterAccessCache(
+        60_000_000_000 // 1 minute
+    )
 
     init {
         fonts.setDefaultFontManager(FontMgr.default)
@@ -164,10 +155,10 @@ internal class FontCache {
             ?: error("Unknown generic font family ${generic.name}")
     }
 
-    private val registered = HashSet<String>()
-
     internal fun load(font: PlatformFont): FontLoadResult {
-        val typeface = loadFromTypefacesCache(font)
+        val typeface = typefacesCache.get(font.cacheKey) {
+            loadTypeface(font)
+        }
         ensureRegistered(typeface, font.cacheKey)
         return FontLoadResult(typeface, listOf(font.cacheKey))
     }
@@ -200,10 +191,7 @@ internal class FontCache {
             is LoadedFontFamily -> {
                 val typeface = fontFamily.typeface as SkiaBackedTypeface
                 val alias = typeface.alias ?: typeface.nativeTypeface.familyName
-                if (!registered.contains(alias)) {
-                    fontProvider.registerTypeface(typeface.nativeTypeface, alias)
-                    registered.add(alias)
-                }
+                ensureRegistered(typeface.nativeTypeface, alias)
                 listOf(alias)
             }
             is GenericFontFamily -> mapGenericFontFamily(fontFamily)
@@ -213,5 +201,4 @@ internal class FontCache {
 }
 
 internal expect val GenericFontFamiliesMapping: Map<String, List<String>>
-internal expect val typefacesCache: Cache<String, SkTypeface>
-internal expect fun loadFromTypefacesCache(font: Font): SkTypeface
+internal expect fun loadTypeface(font: Font): SkTypeface

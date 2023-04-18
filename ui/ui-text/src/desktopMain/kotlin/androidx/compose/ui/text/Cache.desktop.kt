@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,8 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.text.platform
 
-// Suppressing the diagnostics caused by https://youtrack.jetbrains.com/issue/KT-37316
-@Suppress("ACTUAL_WITHOUT_EXPECT")
-internal actual typealias WeakHashMap<K, V> = java.util.WeakHashMap<K, V>
+package androidx.compose.ui.text
+
+internal actual class WeakKeysCache<K : Any, V> : Cache<K, V> {
+    private val cache =  java.util.WeakHashMap<K, V>()
+
+    override fun get(key: K, loader: (K) -> V): V =
+        cache.getOrPut(key) { loader(key) }
+}

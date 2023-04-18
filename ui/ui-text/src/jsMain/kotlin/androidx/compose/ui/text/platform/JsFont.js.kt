@@ -15,16 +15,11 @@
  */
 package androidx.compose.ui.text.platform
 
-import androidx.compose.ui.text.Cache
-import androidx.compose.ui.text.ExpireAfterAccessCache
+import org.jetbrains.skia.Typeface as SkTypeface
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontListFontFamily
-import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.util.fastForEach
 import org.jetbrains.skia.Data
-import org.jetbrains.skia.Typeface as SkTypeface
 
 internal actual val GenericFontFamiliesMapping by lazy {
     when (Platform.Current) {
@@ -63,25 +58,13 @@ internal actual val GenericFontFamiliesMapping by lazy {
     }
 }
 
-internal actual fun FontListFontFamily.makeAlias(): String {
-    TODO("implement native FontListFontFamily.makeAlias()")
-}
-
-internal actual fun loadFromTypefacesCache(font: Font): SkTypeface {
+internal actual fun loadTypeface(font: Font): SkTypeface {
     if (font !is PlatformFont) {
         throw IllegalArgumentException("Unsupported font type: $font")
     }
     return when (font) {
         is LoadedFont -> SkTypeface.makeFromData(Data.makeFromBytes(font.data))
-        else -> throw IllegalArgumentException("Unsupported font type: $font")
     }
-}
-
-internal actual val typefacesCache = object : Cache<String, SkTypeface> {
-    // TODO: no cache, actually.
-    // override fun get(key: String, loader: (String) -> SkTypeface): SkTypeface = loader(key)
-    override fun get(key: String, loader: (String) -> SkTypeface): SkTypeface =
-        TODO("implement js typefacesCache")
 }
 
 private enum class Platform {
