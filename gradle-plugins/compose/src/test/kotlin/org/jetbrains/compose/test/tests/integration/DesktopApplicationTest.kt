@@ -334,6 +334,15 @@ class DesktopApplicationTest : GradlePluginTestBase() {
     }
 
     @Test
+    fun testMacSignConfiguration() {
+        Assumptions.assumeTrue(currentOS == OS.MacOS)
+
+        with(testProject(TestProjects.macSign)) {
+            gradle("--dry-run", ":createDistributable")
+        }
+    }
+
+    @Test
     @Disabled
     // the test does not work on CI and locally unless test keychain is opened manually
     fun testMacSign() {
