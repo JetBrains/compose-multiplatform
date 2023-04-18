@@ -47,3 +47,10 @@ allprojects {
 dependencies {
     api(project("plugins"))
 }
+
+// use jvmTarger 17 for buildSrc .kts scripts. Keep during merge
+tasks.withType(KotlinCompile).configureEach {
+    kotlinOptions {
+        jvmTarget = "17"
+    }
+}

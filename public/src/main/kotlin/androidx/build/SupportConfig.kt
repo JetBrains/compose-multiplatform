@@ -50,7 +50,7 @@ object SupportConfig {
 }
 
 fun Project.getExternalProjectPath(): File {
-    return File(rootProject.projectDir, "../../external").canonicalFile
+    return File(rootProject.projectDir, "external").canonicalFile
 }
 
 fun Project.getKeystore(): File {

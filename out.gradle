@@ -13,9 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-import groovy.lang.Tuple;
-
 def init = new Properties()
 ext.init = init
 
@@ -28,7 +25,7 @@ def getOutDir(subdir = "") {
     if (outDir == null) {
         def checkoutRoot = System.getProperty("CHECKOUT_ROOT")
         if (checkoutRoot == null) {
-            checkoutRoot = new File("${buildscript.sourceFile.parent}/../../..")
+            checkoutRoot = new File("${buildscript.sourceFile.parent}/..")
         }
         outDir = new File("${checkoutRoot}/out${subdir}")
         buildSrcOut = new File("${checkoutRoot}/out/buildSrc")
