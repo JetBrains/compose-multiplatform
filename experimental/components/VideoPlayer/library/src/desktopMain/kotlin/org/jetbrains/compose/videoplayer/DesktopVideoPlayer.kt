@@ -55,7 +55,7 @@ internal actual fun VideoPlayerImpl(
             mediaPlayer.fullScreen().toggle()
         }
     }
-    DisposableEffect(Unit) { onDispose { mediaPlayer.release() } }
+    DisposableEffect(Unit) { onDispose(mediaPlayer::release) }
     SwingPanel(
         factory = factory,
         background = Color.Transparent,
