@@ -26,7 +26,7 @@ internal actual fun VideoPlayerImpl(
     modifier: Modifier,
     onFinish: (() -> Unit)?
 ): State<Progress> {
-    val mediaPlayerComponent = initializeMediaPlayerComponent()
+    val mediaPlayerComponent = remember { initializeMediaPlayerComponent() }
     val mediaPlayer = remember { mediaPlayerComponent.mediaPlayer() }
     mediaPlayer.setupVideoFinishHandler(onFinish)
 
@@ -70,10 +70,9 @@ private fun Float.toPercentage() = (this * 100).roundToInt()
  * See https://github.com/caprica/vlcj/issues/887#issuecomment-503288294
  * for why we're using CallbackMediaPlayerComponent for macOS.
  */
-@Composable
-private fun initializeMediaPlayerComponent(): Component = remember {
+private fun initializeMediaPlayerComponent(): Component {
     NativeDiscovery().discover()
-    if (isMacOS()) {
+    return if (isMacOS()) {
         CallbackMediaPlayerComponent()
     } else {
         EmbeddedMediaPlayerComponent()
