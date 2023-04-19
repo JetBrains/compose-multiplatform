@@ -24,18 +24,20 @@ internal actual fun VideoPlayerImpl(
     speed: Float,
     seek: Float,
     isFullscreen: Boolean,
+    progressState: MutableState<Progress>,
     modifier: Modifier,
     onFinish: (() -> Unit)?
-): State<Progress> {
+) {
     val mediaPlayerComponent = remember { initializeMediaPlayerComponent() }
     val mediaPlayer = remember { mediaPlayerComponent.mediaPlayer() }
+    mediaPlayer.emitProgressTo(progressState)
     mediaPlayer.setupVideoFinishHandler(onFinish)
 
     val factory = remember { { mediaPlayerComponent } }
     /* OR the following code and using SwingPanel(factory = { factory }, ...) */
     // val factory by rememberUpdatedState(mediaPlayerComponent)
 
-    LaunchedEffect(url) { mediaPlayer.media().play(url) /* OR .start(url) */ }
+    LaunchedEffect(url) { mediaPlayer.media().play/*OR .start*/(url) }
     LaunchedEffect(seek) { mediaPlayer.controls().setPosition(seek) }
     LaunchedEffect(speed) { mediaPlayer.controls().setRate(speed) }
     LaunchedEffect(volume) { mediaPlayer.audio().setVolume(volume.toPercentage()) }
@@ -62,10 +64,9 @@ internal actual fun VideoPlayerImpl(
         background = Color.Transparent,
         modifier = modifier
     )
-    return mediaPlayer.produceProgress()
 }
 
-private fun Float.toPercentage() = (this * 100).roundToInt()
+private fun Float.toPercentage(): Int = (this * 100).roundToInt()
 
 /**
  * See https://github.com/caprica/vlcj/issues/887#issuecomment-503288294
@@ -103,21 +104,21 @@ private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) {
  * Checks for and emits video progress every 50 milliseconds.
  * Note that it seems vlcj updates the progress only every 250 milliseconds or so.
  *
- * Instead of using `Unit` as the `key1` for [produceState],
+ * Instead of using `Unit` as the `key1` for [LaunchedEffect],
  * we could use `media().info()?.mrl()` if it's needed to re-launch
- * the producer (for whatever reason) when the url (aka video) changes.
- *
+ * the effect (for whatever reason) when the url (aka video) changes.
  */
 @Composable
-private fun MediaPlayer.produceProgress(): State<Progress> =
-    produceState(key1 = Unit, initialValue = Progress(0f, 0L)) {
+private fun MediaPlayer.emitProgressTo(state: MutableState<Progress>) {
+    LaunchedEffect(key1 = Unit) {
         while (isActive) {
             val fraction = status().position()
             val time = status().time()
-            value = Progress(fraction, time)
+            state.value = Progress(fraction, time)
             delay(50)
         }
     }
+}
 
 /**
  * Returns [MediaPlayer] from player components.

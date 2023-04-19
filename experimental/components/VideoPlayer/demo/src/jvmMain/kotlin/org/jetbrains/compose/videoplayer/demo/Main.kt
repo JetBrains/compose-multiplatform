@@ -51,7 +51,7 @@ fun App() {
      * https://github.com/JetBrains/compose-multiplatform/issues/2926
      */
     Column {
-        val progress by VideoPlayer(
+        VideoPlayer(
             url = VIDEO_URL,
             state = state,
             onFinish = state::stopPlayback,
@@ -60,7 +60,7 @@ fun App() {
                 .height(400.dp)
         )
         Slider(
-            value = progress.fraction,
+            value = state.progress.value.fraction,
             onValueChange = { state.seek = it },
             modifier = Modifier.fillMaxWidth()
         )
@@ -69,7 +69,7 @@ fun App() {
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.fillMaxWidth()
         ) {
-            Text("Timestamp: ${progress.timeMillis} ms", modifier = Modifier.width(180.dp))
+            Text("Timestamp: ${state.progress.value.timeMillis} ms", modifier = Modifier.width(180.dp))
             IconButton(onClick = state::toggleResume) {
                 Icon(
                     painter = painterResource("${if (state.isResumed) "pause" else "play"}.svg"),

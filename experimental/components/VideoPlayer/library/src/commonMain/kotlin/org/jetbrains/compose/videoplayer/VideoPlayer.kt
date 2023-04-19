@@ -26,6 +26,7 @@ fun VideoPlayer(
     speed = state.speed,
     seek = state.seek,
     isFullscreen = state.isFullscreen,
+    progressState = state._progress,
     modifier = modifier,
     onFinish = onFinish
 )
@@ -37,9 +38,10 @@ internal expect fun VideoPlayerImpl(
     speed: Float,
     seek: Float,
     isFullscreen: Boolean,
+    progressState: MutableState<Progress>,
     modifier: Modifier,
     onFinish: (() -> Unit)?
-): State<Progress>
+)
 
 @Composable
 fun rememberVideoPlayerState(
@@ -54,7 +56,8 @@ fun rememberVideoPlayerState(
         speed,
         volume,
         isResumed,
-        isFullscreen
+        isFullscreen,
+        Progress(0f, 0)
     )
 }
 
@@ -63,7 +66,8 @@ class VideoPlayerState(
     speed: Float = 1f,
     volume: Float = 1f,
     isResumed: Boolean = true,
-    isFullscreen: Boolean = false
+    isFullscreen: Boolean = false,
+    progress: Progress
 ) {
 
     var seek by mutableStateOf(seek)
@@ -71,6 +75,8 @@ class VideoPlayerState(
     var volume by mutableStateOf(volume)
     var isResumed by mutableStateOf(isResumed)
     var isFullscreen by mutableStateOf(isFullscreen)
+    internal val _progress = mutableStateOf(progress)
+    val progress: State<Progress> = _progress
 
     fun toggleResume() {
         isResumed = !isResumed
@@ -95,7 +101,8 @@ class VideoPlayerState(
                     it.speed,
                     it.volume,
                     it.isResumed,
-                    it.isFullscreen
+                    it.isFullscreen,
+                    it.progress.value
                 )
             },
             restore = {
@@ -104,7 +111,8 @@ class VideoPlayerState(
                     speed = it[1] as Float,
                     volume = it[2] as Float,
                     isResumed = it[3] as Boolean,
-                    isFullscreen = it[3] as Boolean
+                    isFullscreen = it[3] as Boolean,
+                    progress = it[4] as Progress,
                 )
             }
         )
