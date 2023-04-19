@@ -60,7 +60,7 @@ kotlin {
         val iosMain by getting {
             dependencies {
                 // Kotlin Coroutines 1.7.0 contains Dispatchers.IO
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-Beta")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-RC")
             }
         }
         val iosSimulatorArm64Main by getting {
