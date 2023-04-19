@@ -5,6 +5,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.SwingPanel
 import androidx.compose.ui.graphics.Color
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import uk.co.caprica.vlcj.factory.discovery.NativeDiscovery
 import uk.co.caprica.vlcj.player.base.MediaPlayer
 import uk.co.caprica.vlcj.player.base.MediaPlayerEventAdapter
@@ -80,12 +81,12 @@ private fun initializeMediaPlayerComponent(): Component {
 }
 
 /**
- * We play the video on finish (so the player is kind of idempotent),
+ * We play the video again on finish (so the player is kind of idempotent),
  * unless the [onFinish] callback stops the playback.
  * Using `mediaPlayer.controls().repeat = true` did not work as expected.
  */
 @Composable
-private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) =
+private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) {
     DisposableEffect(onFinish) {
         val listener = object : MediaPlayerEventAdapter() {
             override fun stopped(mediaPlayer: MediaPlayer) {
@@ -96,6 +97,7 @@ private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) =
         events().addMediaPlayerEventListener(listener)
         onDispose { events().removeMediaPlayerEventListener(listener) }
     }
+}
 
 /**
  * Checks for and emits video progress every 50 milliseconds.
@@ -107,9 +109,9 @@ private fun MediaPlayer.setupVideoFinishHandler(onFinish: (() -> Unit)?) =
  *
  */
 @Composable
-private fun MediaPlayer.produceProgress() =
+private fun MediaPlayer.produceProgress(): State<Progress> =
     produceState(key1 = Unit, initialValue = Progress(0f, 0L)) {
-        while (true) {
+        while (isActive) {
             val fraction = status().position()
             val time = status().time()
             value = Progress(fraction, time)
