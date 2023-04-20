@@ -64,8 +64,11 @@ internal actual fun loadTypeface(font: Font): SkTypeface {
     if (font !is PlatformFont) {
         throw IllegalArgumentException("Unsupported font type: $font")
     }
+    @Suppress("REDUNDANT_ELSE_IN_WHEN")
     return when (font) {
         is LoadedFont -> SkTypeface.makeFromData(Data.makeFromBytes(font.data))
+        // TODO: compilation fails without `else` see https://youtrack.jetbrains.com/issue/KT-43875
+        else -> throw IllegalArgumentException("Unsupported font type: $font")
     }
 }
 
