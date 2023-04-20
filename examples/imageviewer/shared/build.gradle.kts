@@ -41,6 +41,9 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.0")
+
+                // Kotlin Coroutines 1.7.0 contains Dispatchers.IO for iOS
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-RC")
             }
         }
         val androidMain by getting {
@@ -58,10 +61,7 @@ kotlin {
             }
         }
         val iosMain by getting {
-            dependencies {
-                // Kotlin Coroutines 1.7.0 contains Dispatchers.IO
-                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-RC")
-            }
+
         }
         val iosSimulatorArm64Main by getting {
             dependsOn(iosMain)
