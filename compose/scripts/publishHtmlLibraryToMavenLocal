@@ -7,7 +7,7 @@ if [[ -z "$COMPOSE_CUSTOM_VERSION" ]]; then
     exit 1
 fi
 
-pushd ../../web
+pushd ../../html
 ./gradlew publishToMavenLocal -Pcompose.version="$COMPOSE_CUSTOM_VERSION"  || exit 1
 popd
 
