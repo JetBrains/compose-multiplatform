@@ -1,7 +1,0 @@
-#!/bin/bash
-
-cd "$(dirname "$0")"
-
-pushd ..
-./gradlew publishComposeJbToMavenLocal $COMPOSE_DEFAULT_GRADLE_ARGS "$@" || exit 1
-popd
