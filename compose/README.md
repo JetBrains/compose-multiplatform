@@ -43,7 +43,7 @@ export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version
 ./scripts/publishComponentsToMavenLocal
 ```
 
-5. Publish additional Web components
+5. Publish Compose HTML library
 ```bash
-./scripts/publishWebComponentsToMavenLocal
+./scripts/publishHtmlLibraryToMavenLocal
 ```
