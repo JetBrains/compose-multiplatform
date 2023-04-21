@@ -31,7 +31,7 @@ export COMPOSE_CUSTOM_VERSION=0.0.0-custom-version
 ```
 
 2. Publish core libraries
-   using [instructions](https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/MULTIPLATFORM.md)
+   using [instructions](https://github.com/JetBrains/compose-multiplatform-core/blob/jb-main/MULTIPLATFORM.md#publishing)
 3. Publish Gradle plugin
 
 ```bash
