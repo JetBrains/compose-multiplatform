@@ -13,12 +13,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package androidx.compose.ui.text.platform
+package androidx.compose.ui.text
 
-import androidx.compose.ui.text.style.ResolvedTextDirection
+import org.jetbrains.skia.icu.CharDirection
 
-internal actual fun String.contentBasedTextDirection(): ResolvedTextDirection? {
-    // TODO: implement native contentBasedTextDirection
-    return null
+
+internal actual fun strongDirectionType(codePoint: Int): StrongDirectionType =
+    CharDirection.of(codePoint).toStrongDirectionType()
+
+/**
+ * Get strong (R, L or AL) direction type.
+ * See https://www.unicode.org/reports/tr9/
+ */
+private fun Int.toStrongDirectionType() = when (this) {
+    CharDirection.LEFT_TO_RIGHT -> StrongDirectionType.Ltr
+
+    CharDirection.RIGHT_TO_LEFT,
+    CharDirection.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
+
+    else -> StrongDirectionType.None
 }
-

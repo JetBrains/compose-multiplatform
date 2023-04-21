@@ -16,12 +16,7 @@
 
 package androidx.compose.ui.text.intl
 
-import platform.Foundation.countryCode
-import platform.Foundation.currentLocale
-import platform.Foundation.languageCode
-import platform.Foundation.NSLocale
-import platform.Foundation.localeIdentifier
-import platform.Foundation.scriptCode
+import platform.Foundation.*
 
 internal class NativeLocale(val locale: NSLocale) : PlatformLocale {
     override val language: String
@@ -48,4 +43,5 @@ internal actual fun createPlatformLocaleDelegate(): PlatformLocaleDelegate =
         }
     }
 
-
+internal actual fun PlatformLocale.isRtl(): Boolean =
+    NSLocale.characterDirectionForLanguage(language) == NSLocaleLanguageDirectionRightToLeft

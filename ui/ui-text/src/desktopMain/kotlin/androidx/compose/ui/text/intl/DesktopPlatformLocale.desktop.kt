@@ -16,29 +16,34 @@
 
 package androidx.compose.ui.text.intl
 
-import java.util.Locale
+import java.awt.ComponentOrientation
+import java.util.Locale as JavaLocale
 
-internal class DesktopLocale(val locale: Locale) : PlatformLocale {
+internal class DesktopLocale(val javaLocale: JavaLocale) : PlatformLocale {
     override val language: String
-        get() = locale.language
+        get() = javaLocale.language
 
     override val script: String
-        get() = locale.script
+        get() = javaLocale.script
 
     override val region: String
-        get() = locale.country
+        get() = javaLocale.country
 
-    override fun toLanguageTag(): String = locale.toLanguageTag()
+    override fun toLanguageTag(): String = javaLocale.toLanguageTag()
 }
 
 internal actual fun createPlatformLocaleDelegate() = object : PlatformLocaleDelegate {
     override val current: LocaleList
-        get() = LocaleList(listOf(Locale(DesktopLocale(Locale.getDefault()))))
+        get() = LocaleList(listOf(Locale(DesktopLocale(JavaLocale.getDefault()))))
 
     override fun parseLanguageTag(languageTag: String): PlatformLocale =
         DesktopLocale(
-            Locale.forLanguageTag(
+            JavaLocale.forLanguageTag(
                 languageTag
             )
         )
 }
+
+internal actual fun PlatformLocale.isRtl(): Boolean =
+    // TODO Get rid of AWT reference here
+    !ComponentOrientation.getOrientation((this as DesktopLocale).javaLocale).isLeftToRight

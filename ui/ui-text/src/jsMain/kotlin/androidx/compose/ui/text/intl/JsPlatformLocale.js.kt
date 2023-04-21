@@ -40,4 +40,4 @@ internal actual fun createPlatformLocaleDelegate(): PlatformLocaleDelegate =
         }
     }
 
-
+internal actual fun PlatformLocale.isRtl(): Boolean = false // TODO

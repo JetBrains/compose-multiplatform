@@ -32,6 +32,7 @@ class App(
         Screen("Example1") { Example1() },
         Screen("ImageViewer") { ImageViewer() },
         Screen("RoundedCornerCrashOnJS") { RoundedCornerCrashOnJS() },
+        Screen("TextDirection") { TextDirection() },
     )
 
     private class Screen(val title: String, val content: @Composable () -> Unit)

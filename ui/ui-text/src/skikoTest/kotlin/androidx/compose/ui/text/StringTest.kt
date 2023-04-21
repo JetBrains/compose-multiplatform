@@ -55,4 +55,12 @@ class StringTest {
         assertEquals(uppercase.capitalize(serbianLocale), uppercase)
         assertEquals(uppercase.decapitalize(serbianLocale), lowercase)
     }
+
+    @Test
+    fun directionality() {
+        assertEquals(StrongDirectionType.None, strongDirectionType('0'.code)) // Number
+        assertEquals(StrongDirectionType.Ltr, strongDirectionType('A'.code)) // Latin
+        assertEquals(StrongDirectionType.Rtl, strongDirectionType('א'.code)) // Hebrew
+        assertEquals(StrongDirectionType.Rtl, strongDirectionType('؈'.code)) // Arabic
+    }
 }

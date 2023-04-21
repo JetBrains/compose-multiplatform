@@ -336,8 +336,8 @@ internal class SkiaParagraph(
 
     override fun getBidiRunDirection(offset: Int): ResolvedTextDirection =
         when (getBoxForwardByOffset(offset)?.direction) {
-            org.jetbrains.skia.paragraph.Direction.RTL -> ResolvedTextDirection.Rtl
-            org.jetbrains.skia.paragraph.Direction.LTR -> ResolvedTextDirection.Ltr
+            Direction.RTL -> ResolvedTextDirection.Rtl
+            Direction.LTR -> ResolvedTextDirection.Ltr
             null -> ResolvedTextDirection.Ltr
         }
 
