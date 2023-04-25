@@ -45,7 +45,9 @@ internal actual class MissingResourceException actual constructor(path: String) 
     Exception("Missing resource with path: $path")
 
 internal actual fun parseXML(byteArray: ByteArray): Element {
-    throw UnsupportedOperationException("XML Vector Drawables are not supported for Web target")
+    val xmlString = byteArray.decodeToString()
+    val xmlDom = DOMParser().parseFromString(xmlString, "application/xml")
+    val rootXmlElement = xmlDom.documentElement!!
 }
 
 internal actual fun isSyncResourceLoadingSupported() = false

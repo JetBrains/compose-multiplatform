@@ -237,7 +237,7 @@ private fun Element.parseColorStop(defaultOffset: Float): Pair<Float, Color>? {
 }
 
 private fun Element.attributeOrNull(namespace: String, name: String): String? {
-    val value = getAttributeNS(namespace, name)
+    val value = getAttributeNS(namespace, name) ?: return null
     return if (value.isNotBlank()) value else null
 }
 
@@ -260,7 +260,7 @@ private fun Element.apptAttr(
     namespace: String,
     name: String
 ): Element? {
-    val prefix = lookupPrefix(namespace)
+    val prefix = lookupPrefix(namespace) ?: return null
     return childrenSequence
         .filterIsInstance<Element>()
         .find {
@@ -271,6 +271,6 @@ private fun Element.apptAttr(
 
 private val Element.childrenSequence get() = sequence<Node> {
     for (i in 0 until childNodes.length) {
-        yield(childNodes.item(i))
+        yield(childNodes.item(i)!!)
     }
 }
