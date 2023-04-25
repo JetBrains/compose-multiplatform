@@ -4,6 +4,7 @@
  */
 package org.jetbrains.compose.resources.vector.xmldom
 
+import org.jetbrains.compose.resources.vector.xmldom.MalformedXMLException
 import platform.Foundation.*
 import platform.darwin.NSObject
 
@@ -16,8 +17,6 @@ internal fun parse(xml: String): Element {
     }.parse()
     return parser.root!!
 }
-
-class MalformedXMLException(message: String?) : Exception(message)
 
 private class ElementImpl(override val localName: String,
                           override val nodeName: String,
