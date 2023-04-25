@@ -1,10 +1,8 @@
 package androidx.compose.mpp.demo
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -15,66 +13,84 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
+val MainScreen = Screen.List(
+    "Demo",
+    Screen.Example("Example1") { Example1() },
+    Screen.Example("ImageViewer") { ImageViewer() },
+    Screen.Example("RoundedCornerCrashOnJS") { RoundedCornerCrashOnJS() },
+    Screen.Example("TextDirection") { TextDirection() },
+    LazyLayouts,
+)
+
+sealed interface Screen {
+    val title: String
+
+    class Example(override val title: String, val content: @Composable () -> Unit) : Screen
+    class List(override val title: String, vararg val screens: Screen) : Screen
+}
+
 class App(
-    private val initialScreenName: String? = null
+    initialScreenName: String? = null
 ) {
-    private val MainScreen = Screen("Demo") { Main() }
+    private val navigationStack: SnapshotStateList<Screen> = mutableStateListOf(MainScreen)
 
-    private val screens = listOf(
-        Screen("Example1") { Example1() },
-        Screen("ImageViewer") { ImageViewer() },
-        Screen("RoundedCornerCrashOnJS") { RoundedCornerCrashOnJS() },
-        Screen("TextDirection") { TextDirection() },
-    )
-
-    private class Screen(val title: String, val content: @Composable () -> Unit)
-
-    private var screen: Screen by mutableStateOf(
+    init {
         if (initialScreenName != null) {
-            screens.find { it.title == initialScreenName }!!
-        } else {
-            MainScreen
+            var currentScreen = navigationStack.first()
+            initialScreenName.split("/").forEach { target ->
+                val listScreen = currentScreen as Screen.List
+                currentScreen = listScreen.screens.find { it.title == target }!!
+                navigationStack.add(currentScreen)
+            }
         }
-    )
+    }
 
     @Composable
     fun Content() {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text(screen.title) },
-                    navigationIcon = if (screen != MainScreen) {
-                        {
+                    title = {
+                        val title: String = if (navigationStack.size > 1) {
+                            navigationStack.drop(1).joinToString("/") { it.title }
+                        } else {
+                            navigationStack.first().title
+                        }
+                        Text(title)
+                    },
+                    navigationIcon = {
+                        if (navigationStack.size > 1) {
                             Icon(
                                 Icons.Filled.ArrowBack,
                                 contentDescription = "Back",
-                                modifier = Modifier.clickable { screen = MainScreen }
+                                modifier = Modifier.clickable { navigationStack.removeLast() }
                             )
                         }
-                    } else {
-                        null
                     }
                 )
             }
         ) {
-            screen.content()
-        }
-    }
+            when (val screen = navigationStack.last()) {
+                is Screen.Example -> {
+                    screen.content()
+                }
 
-    @Composable
-    fun Main() {
-        LazyColumn(Modifier.fillMaxSize()) {
-            items(screens) {
-                Text(it.title, Modifier.clickable { screen = it }.padding(16.dp).fillMaxWidth())
+                is Screen.List -> {
+                    LazyColumn(Modifier.fillMaxSize()) {
+                        items(screen.screens) {
+                            Text(it.title, Modifier.clickable {
+                                navigationStack.add(it)
+                            }.padding(16.dp).fillMaxWidth())
+                        }
+                    }
+                }
             }
         }
     }
+
 }
