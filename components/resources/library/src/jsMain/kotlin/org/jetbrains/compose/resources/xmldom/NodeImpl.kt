@@ -9,7 +9,7 @@ internal open class NodeImpl(val n: DomNode): Node {
 
     override val localName = "" /* localName is not a Node property, only applies to Elements and Attrs */
 
-    override val namespaceURI = "" /* localName is not a Node property, only applies to Elements and Attrs */
+    override val namespaceURI = "" /* namespaceURI is not a Node property, only applies to Elements and Attrs */
 
     override val childNodes: NodeList
         get() =
