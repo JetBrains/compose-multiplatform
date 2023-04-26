@@ -5,10 +5,10 @@ import org.w3c.dom.Element as DomElement
 internal class ElementImpl(val element: DomElement): NodeImpl(element), Element {
 
     override val localName: String
-        get() = element.localName ?: ""
+        get() = element.localName
 
     override val namespaceURI: String
-        get() = element.localName ?: ""
+        get() = element.namespaceURI ?: ""
 
     override fun getAttributeNS(nameSpaceURI: String, localName: String): String =
         element.getAttributeNS(nameSpaceURI, localName) ?: ""
