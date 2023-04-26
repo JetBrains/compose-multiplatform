@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
@@ -33,6 +34,8 @@ import androidx.compose.ui.unit.dp
 import com.google.common.truth.Truth.assertThat
 import kotlin.math.sqrt
 import kotlin.test.assertTrue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.launch
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
@@ -231,6 +234,52 @@ class DesktopScrollableTest {
 
         waitForIdle()
         assertThat(column.offset).isEqualTo(0f)
+    }
+
+    @Test
+    fun multipleScrollingModifiers() = runSkikoComposeUiTest(
+        size = size,
+        density = density
+    ) {
+        val verticalContext = TestColumn()
+        val horizontalContext = TestColumn()
+        lateinit var scope: CoroutineScope
+        setContent {
+            scope = rememberCoroutineScope()
+            CompositionLocalProvider(
+                LocalScrollConfig provides LinuxGnomeConfig
+            ) {
+                Box(
+                    Modifier
+                        .scrollable(
+                            orientation = Orientation.Vertical,
+                            state = verticalContext.controller()
+                        )
+                        .scrollable(
+                            orientation = Orientation.Horizontal,
+                            state = horizontalContext.controller()
+                        )
+                        .size(10.dp, 20.dp)
+                )
+            }
+        }
+        scope.launch {
+            scene.sendPointerEvent(
+                eventType = PointerEventType.Scroll,
+                position = Offset.Zero,
+                scrollDelta = Offset(0f, -5f),
+                nativeEvent = awtWheelEvent(),
+            )
+            scene.sendPointerEvent(
+                eventType = PointerEventType.Scroll,
+                position = Offset.Zero,
+                scrollDelta = Offset(-5f, 0f),
+                nativeEvent = awtWheelEvent(),
+            )
+        }
+        waitForIdle()
+        assertThat(verticalContext.offset).isWithin(0.1f).of(5f * scrollLineLinux(20.dp))
+        assertThat(horizontalContext.offset).isWithin(0.1f).of(5f * scrollLineLinux(10.dp))
     }
 
     @Test

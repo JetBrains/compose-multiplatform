@@ -386,24 +386,20 @@ private fun <E> untilNull(builderAction: () -> E?) = sequence<E> {
     } while (element != null)
 }
 
-private suspend fun ScrollingLogic.tryToScrollBySmallDelta(
+private fun ScrollingLogic.tryToScrollBySmallDelta(
     delta: Float,
     threshold: Float = 4f,
     fallback: (Float) -> Boolean
 ): Boolean {
-    var isConsumed = false
-    scrollableState.scroll {
-        isConsumed = if (abs(delta) > threshold) {
-            // Gather possibility to scroll by applying a piece of required delta.
-            val testDelta = if (delta > 0f) threshold else -threshold
-            val consumedDelta = scrollBy(testDelta)
-            consumedDelta != 0f && fallback(delta - testDelta)
-        } else {
-            val consumedDelta = scrollBy(delta)
-            consumedDelta != 0f
-        }
+    return if (abs(delta) > threshold) {
+        // Gather possibility to scroll by applying a piece of required delta.
+        val testDelta = if (delta > 0f) threshold else -threshold
+        val consumedDelta = scrollableState.dispatchRawDelta(testDelta)
+        consumedDelta != 0f && fallback(delta - testDelta)
+    } else {
+        val consumedDelta = scrollableState.dispatchRawDelta(delta)
+        consumedDelta != 0f
     }
-    return isConsumed
 }
 
 private suspend fun ScrollingLogic.animatedDispatchScroll(
@@ -458,13 +454,11 @@ private suspend fun ScrollingLogic.animatedDispatchScroll(
 private fun Modifier.mouseWheelInput(
     key1: Any?,
     key2: Any?,
-    onMouseWheel: suspend PointerInputScope.(PointerEvent) -> Boolean
+    onMouseWheel: PointerInputScope.(PointerEvent) -> Boolean
 ) = pointerInput(key1, key2) {
-    coroutineScope {
-        while (isActive) {
-            val event = awaitPointerEventScope {
-                awaitScrollEvent()
-            }
+    awaitPointerEventScope {
+        while (true) {
+            val event = awaitScrollEvent()
             if (!event.isConsumed) {
                 val consumed = onMouseWheel(event)
                 if (consumed) {
