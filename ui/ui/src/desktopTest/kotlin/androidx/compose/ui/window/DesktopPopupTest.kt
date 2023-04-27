@@ -231,9 +231,7 @@ class DesktopPopupTest {
         rule.waitForIdle()
     }
 
-    // TODO(https://github.com/JetBrains/compose-jb/issues/1866) enable when deadlock is fixed
     @Test
-    @Ignore("Enable when deadlock https://github.com/JetBrains/compose-jb/issues/1866 is fixed")
     fun `call dismiss if clicked outside of focusable popup`() = ImageComposeScene(
         100,
         100
@@ -258,9 +256,7 @@ class DesktopPopupTest {
         assertThat(onDismissRequestCallCount).isEqualTo(1)
     }
 
-    // TODO(https://github.com/JetBrains/compose-jb/issues/1866) enable when deadlock is fixed
     @Test
-    @Ignore("Enable when deadlock https://github.com/JetBrains/compose-jb/issues/1866 is fixed")
     fun `pass event if clicked outside of non-focusable popup`() = ImageComposeScene(
         100,
         100
@@ -285,9 +281,7 @@ class DesktopPopupTest {
         assertThat(onDismissRequestCallCount).isEqualTo(0)
     }
 
-    // TODO(https://github.com/JetBrains/compose-jb/issues/1866) enable when deadlock is fixed
     @Test
-    @Ignore("Enable when deadlock https://github.com/JetBrains/compose-jb/issues/1866 is fixed")
     fun `can scroll outside of non-focusable popup`() = ImageComposeScene(100, 100).use { scene ->
         val background = FillBox()
         val popup = PopupState(IntRect(20, 20, 60, 60), focusable = false)
@@ -301,9 +295,7 @@ class DesktopPopupTest {
         background.events.assertReceivedLast(PointerEventType.Scroll, Offset(10f, 10f))
     }
 
-    // TODO(https://github.com/JetBrains/compose-jb/issues/1866) enable when deadlock is fixed
     @Test
-    @Ignore("Enable when deadlock https://github.com/JetBrains/compose-jb/issues/1866 is fixed")
     fun `can't scroll outside of focusable popup`() = ImageComposeScene(100, 100).use { scene ->
         val background = FillBox()
         val popup = PopupState(IntRect(20, 20, 60, 60), focusable = true)

@@ -94,7 +94,6 @@ class ImageComposeSceneTest {
         }
     }
 
-    @Ignore("See https://github.com/JetBrains/compose-jb/issues/1866")
     @Test
     fun `run multiple ImageComposeScene`() {
         for (i in 1..300) {
