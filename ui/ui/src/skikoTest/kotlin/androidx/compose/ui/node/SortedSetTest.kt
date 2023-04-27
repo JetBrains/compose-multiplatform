@@ -35,7 +35,7 @@ class SortedSetTest {
         return set
     }
 
-    private fun <E> assertEquals(expect: Iterable<E>, actual: SortedSet<E>) {
+    private fun <E> assertOrderEquals(expect: Iterable<E>, actual: SortedSet<E>) {
         for (e in expect) {
             assertEquals(e, actual.first())
             assertTrue(actual.contains(e))
@@ -47,16 +47,16 @@ class SortedSetTest {
 
     @Test
     fun correctOrder() {
-        assertEquals(listOf(1, 2, 5, 6), sortedSetOf(1, 2, 5, 6))
-        assertEquals(listOf(1, 2, 5, 6), sortedSetOf(2, 6, 1, 5))
-        val numbers = (1..1000).map { Random.nextInt(10_000_000) }
+        assertOrderEquals(listOf(1, 2, 5, 6), sortedSetOf(1, 2, 5, 6))
+        assertOrderEquals(listOf(1, 2, 5, 6), sortedSetOf(2, 6, 1, 5))
+        val numbers = (1..1000).map { Random.nextInt(10_000_000) }.distinct()
         val set = sortedSetOf(*numbers.toTypedArray())
-        assertEquals(numbers.sorted(), set)
+        assertOrderEquals(numbers.sorted(), set)
     }
 
     @Test
     fun customComparator() {
         val set = sortedSetOf(compareBy { it.length }, "B", "AAA", "DD")
-        assertEquals(listOf("B", "DD", "AAA"), set)
+        assertOrderEquals(listOf("B", "DD", "AAA"), set)
     }
 }
