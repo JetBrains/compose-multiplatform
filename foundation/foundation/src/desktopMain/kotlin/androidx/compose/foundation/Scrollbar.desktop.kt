@@ -779,13 +779,14 @@ interface ScrollbarAdapter {
 
 }
 
-private fun computeSliderPositionAndSize(sliderAdapter: SliderAdapter): Pair<Int, Int> {
-    val adapterPosition = sliderAdapter.position
-    val position = adapterPosition.roundToInt()
-    val size = (sliderAdapter.thumbSize + adapterPosition - position).roundToInt()
+private fun thumbPixelRange(sliderAdapter: SliderAdapter): IntRange {
+    val start = sliderAdapter.position.roundToInt()
+    val endExclusive = start + sliderAdapter.thumbSize.roundToInt()
 
-    return Pair(position, size)
+    return start until endExclusive
 }
+
+private val IntRange.size get() = last + 1 - first
 
 private fun verticalMeasurePolicy(
     sliderAdapter: SliderAdapter,
@@ -793,16 +794,16 @@ private fun verticalMeasurePolicy(
     scrollThickness: Int
 ) = MeasurePolicy { measurables, constraints ->
     setContainerSize(constraints.maxHeight)
-    val (position, height) = computeSliderPositionAndSize(sliderAdapter)
+    val pixelRange = thumbPixelRange(sliderAdapter)
 
     val placeable = measurables.first().measure(
         Constraints.fixed(
             constraints.constrainWidth(scrollThickness),
-            height
+            pixelRange.size
         )
     )
     layout(placeable.width, constraints.maxHeight) {
-        placeable.place(0, position)
+        placeable.place(0, pixelRange.first)
     }
 }
 
@@ -812,16 +813,16 @@ private fun horizontalMeasurePolicy(
     scrollThickness: Int
 ) = MeasurePolicy { measurables, constraints ->
     setContainerSize(constraints.maxWidth)
-    val (position, width) = computeSliderPositionAndSize(sliderAdapter)
+    val pixelRange = thumbPixelRange(sliderAdapter)
 
     val placeable = measurables.first().measure(
         Constraints.fixed(
-            width,
+            pixelRange.size,
             constraints.constrainHeight(scrollThickness)
         )
     )
     layout(constraints.maxWidth, placeable.height) {
-        placeable.place(position, 0)
+        placeable.place(pixelRange.first, 0)
     }
 }
 
@@ -899,10 +900,10 @@ private class TrackPressScroller(
      * Calculates the direction of scrolling towards the given offset (in pixels).
      */
     private fun directionOfScrollTowards(offset: Float): Int {
-        val thumbRange = sliderAdapter.bounds
+        val pixelRange = thumbPixelRange(sliderAdapter)
         return when {
-            offset < thumbRange.start -> -1
-            offset > thumbRange.endInclusive -> 1
+            offset < pixelRange.first -> -1
+            offset > pixelRange.last -> 1
             else -> 0
         }
     }
