@@ -32,11 +32,7 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
 import kotlin.math.ceil
-import kotlin.test.Ignore
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertTrue
+import kotlin.test.*
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -178,6 +174,69 @@ class DragGestureTest {
             )
             assertEquals(Offset(5f, 5f), dragStartResult)
         }
+    }
+
+    private fun assertDragSucceeds(
+        density: Density,
+        startOffset: Offset,
+        endOffset: Offset
+    ){
+        ImageComposeScene(
+            width = 100,
+            height = 100,
+            density = density
+        ).use { scene ->
+
+            var dragStarted = false
+            var dragged = false
+            var dragEnded = false
+
+            scene.setContent {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp, 40.dp)
+                        .onDrag(
+                            enabled = true,
+                            onDragStart = { dragStarted = true },
+                            onDragEnd = { dragEnded = true },
+                            onDrag = { dragged = true }
+                        )
+                )
+            }
+
+            scene.sendPointerEvent(PointerEventType.Move, startOffset)
+            scene.sendPointerEvent(PointerEventType.Press, startOffset, button = PointerButton.Primary)
+            scene.sendPointerEvent(PointerEventType.Move, endOffset)
+            scene.sendPointerEvent(PointerEventType.Release,endOffset, button = PointerButton.Primary)
+
+            assertTrue(dragStarted)
+            assertTrue(dragged)
+            assertTrue(dragEnded)
+        }
+    }
+
+    @Test
+    fun vertical_drag_passes_slop() {
+        val density = Density(1f)
+        val viewConfiguration = DefaultViewConfiguration(density)
+        val startOffset = Offset(5f, 5f)
+        assertDragSucceeds(
+            density = density,
+            startOffset = startOffset,
+            endOffset = startOffset + Offset(0f, viewConfiguration.touchSlop + 1f)
+        )
+    }
+
+    @Test
+    fun horizontal_drag_passes_slop() {
+        val density = Density(1f)
+        val viewConfiguration = DefaultViewConfiguration(density)
+        val startOffset = Offset(5f, 5f)
+        assertDragSucceeds(
+            density = density,
+            startOffset = startOffset,
+            endOffset = startOffset + Offset(viewConfiguration.touchSlop + 1f, 0f)
+        )
     }
 
     @Test

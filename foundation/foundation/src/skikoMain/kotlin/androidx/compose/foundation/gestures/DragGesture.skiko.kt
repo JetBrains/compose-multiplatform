@@ -179,7 +179,8 @@ private suspend fun AwaitPointerEventScope.awaitDragStartOnSlop(initialDown: Poi
     do {
         drag = awaitPointerSlopOrCancellation(
             initialDown.changes[0].id,
-            initialDown.changes[0].type
+            initialDown.changes[0].type,
+            triggerOnMainAxisSlop = false
         ) { change, over ->
             change.consume()
             overSlop = over
