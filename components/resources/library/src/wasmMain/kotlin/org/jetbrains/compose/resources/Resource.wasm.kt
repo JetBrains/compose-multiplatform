@@ -29,7 +29,7 @@ private class JSResourceImpl(path: String) : AbstractResourceImpl(path) {
         return suspendCoroutine { continuation ->
             val req = XMLHttpRequest()
             req.open("GET", "/$path", true)
-            req.responseType = "arraybuffer".asDynamic().unsafeCast<XMLHttpRequestResponseType>()
+            req.responseType = "arraybuffer".toJsString().unsafeCast<XMLHttpRequestResponseType>()
 
             req.onload = { _ ->
                 val arrayBuffer = req.response

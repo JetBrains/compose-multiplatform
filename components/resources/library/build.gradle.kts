@@ -145,3 +145,7 @@ configureMavenPublication(
     artifactId = "components-resources",
     name = "Resources for Compose JB"
 )
+
+//compose {
+//    kotlinCompilerPlugin.set("1.4.0-dev-wasm05")
+//}
