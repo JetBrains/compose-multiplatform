@@ -54,7 +54,9 @@ class ComposePlugin : Plugin<Project> {
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
             project.configureExperimental(composeExtension, experimentalExtension)
-            project.checkExperimentalTargetsWithSkikoIsEnabled()
+            // TODO: uncomment when possible. It caused:
+            // Cannot change dependencies of dependency configuration ':resources:library:jsTestCompilationApi' after it has been included in dependency resolution.
+            // project.checkExperimentalTargetsWithSkikoIsEnabled()
 
             if (androidExtension.useAndroidX) {
                 project.logger.warn("useAndroidX is an experimental feature at the moment!")
@@ -84,35 +86,28 @@ class ComposePlugin : Plugin<Project> {
                     freeCompilerArgs += "-Xklib-enable-signature-clash-checks=false"
                 }
             }
-        }
 
-        project.configurations.all {
-            // TODO: remove these HACKS for version substitution when possible
-            val conf = it
-            conf.resolutionStrategy.eachDependency {
-                if (project.getKotlinPluginVersion() == "1.8.20") {
-                    if (it.requested.module.name.contains("kotlin-stdlib")) {
-                        it.useVersion("1.8.20")
+            project.configurations.all {
+                // TODO: remove these HACKS for version substitution when possible
+                val conf = it
+                conf.resolutionStrategy.eachDependency {
+                    if (project.getKotlinPluginVersion() == "1.9.0-dev-6976") {
+                        if (it.requested.module.name.contains("kotlin-stdlib")) {
+                            it.useVersion("1.9.0-dev-6976")
+                        }
                     }
-                }
-                val isWasm = conf.name.contains("wasm", true)
+                    val isWasm = conf.name.contains("wasm", true)
 
-                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
-                    it.requested.module.name.contains("kotlinx-coroutines", true)
-                ) {
-                    if (isWasm) it.useVersion("1.7.0-Beta-wasm0")
-                }
+                    if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                        it.requested.module.name.contains("kotlinx-coroutines", true)
+                    ) {
+                        if (isWasm) it.useVersion("1.7.0-RC-wasm0")
+                    }
 
-                if (it.requested.module.group == "org.jetbrains.kotlinx" &&
-                    it.requested.module.name.contains("atomicfu", true)
-                ) {
-                    if (isWasm) it.useVersion("0.18.5-wasm0")
-                }
-
-                if (it.requested.module.group.startsWith("org.jetbrains.skiko")) {
-                    // skiko 0.0.7.58-wasm01 is broken for k/wasm, but don't want to republish every lib:
-                    if (it.requested.version == "0.0.7.58-wasm01") {
-                        it.useVersion("0.0.7.58-wasm02")
+                    if (it.requested.module.group == "org.jetbrains.kotlinx" &&
+                        it.requested.module.name.contains("atomicfu", true)
+                    ) {
+                        if (isWasm) it.useVersion("0.20.2-wasm0")
                     }
                 }
             }
