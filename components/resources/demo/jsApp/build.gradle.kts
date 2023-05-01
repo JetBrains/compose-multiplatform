@@ -20,6 +20,7 @@ kotlin {
     sourceSets {
         val jsMain by getting  {
             dependencies {
+                implementation(compose.ui)
                 implementation(project(":resources:demo:shared"))
             }
         }
