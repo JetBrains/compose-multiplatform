@@ -21,6 +21,7 @@ kotlin {
     sourceSets {
         val wasmMain by getting  {
             dependencies {
+                implementation(compose.ui)
                 implementation(project(":resources:demo:shared"))
             }
         }

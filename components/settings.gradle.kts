@@ -2,6 +2,8 @@ pluginManagement {
     repositories {
         gradlePluginPortal()
         mavenCentral()
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+        maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
         google()
         mavenLocal()
@@ -17,10 +19,10 @@ pluginManagement {
     }
 }
 
-include(":SplitPane:library")
-include(":SplitPane:demo")
-include(":AnimatedImage:library")
-include("AnimatedImage:demo")
+//include(":SplitPane:library")
+//include(":SplitPane:demo")
+//include(":AnimatedImage:library")
+//include("AnimatedImage:demo")
 include(":resources:library")
 include(":resources:demo:androidApp")
 include(":resources:demo:desktopApp")
