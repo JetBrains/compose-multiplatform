@@ -18,6 +18,9 @@ package androidx.compose.ui.text
 internal actual fun strongDirectionType(codePoint: Int): StrongDirectionType =
     codePoint.getDirectionality().toStrongDirectionType()
 
+internal actual fun Char.isNeutralDirection(): Boolean =
+    directionality.isNeutralDirection()
+
 /**
  * Get the Unicode directionality of a character.
  */
@@ -35,4 +38,12 @@ private fun CharDirectionality.toStrongDirectionType() = when (this) {
     CharDirectionality.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
 
     else -> StrongDirectionType.None
+}
+
+private fun CharDirectionality.isNeutralDirection(): Boolean = when (this) {
+    CharDirectionality.OTHER_NEUTRALS,
+    CharDirectionality.WHITESPACE,
+    CharDirectionality.BOUNDARY_NEUTRAL -> true
+
+    else -> false
 }

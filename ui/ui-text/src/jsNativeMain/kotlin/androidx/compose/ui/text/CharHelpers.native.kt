@@ -21,6 +21,9 @@ import org.jetbrains.skia.icu.CharDirection
 internal actual fun strongDirectionType(codePoint: Int): StrongDirectionType =
     CharDirection.of(codePoint).toStrongDirectionType()
 
+internal actual fun Char.isNeutralDirection(): Boolean =
+    CharDirection.of(code).isNeutralDirection()
+
 /**
  * Get strong (R, L or AL) direction type.
  * See https://www.unicode.org/reports/tr9/
@@ -32,4 +35,12 @@ private fun Int.toStrongDirectionType() = when (this) {
     CharDirection.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
 
     else -> StrongDirectionType.None
+}
+
+private fun Int.isNeutralDirection(): Boolean = when (this) {
+    CharDirection.OTHER_NEUTRAL,
+    CharDirection.WHITE_SPACE_NEUTRAL,
+    CharDirection.BOUNDARY_NEUTRAL -> true
+
+    else -> false
 }

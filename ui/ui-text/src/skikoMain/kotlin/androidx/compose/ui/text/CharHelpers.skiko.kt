@@ -45,6 +45,9 @@ internal value class StrongDirectionType private constructor(val value: Int) {
 
 internal expect fun strongDirectionType(codePoint: Int): StrongDirectionType
 
+// TODO: Use unicode code point instead of Char
+internal expect fun Char.isNeutralDirection(): Boolean
+
 /**
  * Determine direction based on the first strong directional character.
  * Only considers the characters outside isolate pairs.

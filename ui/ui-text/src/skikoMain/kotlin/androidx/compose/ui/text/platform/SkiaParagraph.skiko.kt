@@ -657,5 +657,3 @@ internal fun TextBox.cursorHorizontalPosition(opposite: Boolean = false): Float 
         SkDirection.RTL -> if (opposite) rect.right else rect.left
     }
 }
-
-internal expect fun Char.isNeutralDirectionality(): Boolean
