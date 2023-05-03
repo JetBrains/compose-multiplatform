@@ -54,22 +54,26 @@ import platform.Foundation.NSNotification
 import platform.Foundation.NSNotificationCenter
 import platform.Foundation.NSSelectorFromString
 import platform.Foundation.NSValue
-import platform.UIKit.CGRectValue
-import platform.UIKit.UIColor
-import platform.UIKit.UIScreen
-import platform.UIKit.UIView
-import platform.UIKit.UIViewAutoresizingFlexibleHeight
-import platform.UIKit.UIViewAutoresizingFlexibleWidth
-import platform.UIKit.UIViewController
-import platform.UIKit.UIViewControllerTransitionCoordinatorProtocol
-import platform.UIKit.addSubview
-import platform.UIKit.backgroundColor
-import platform.UIKit.reloadInputViews
-import platform.UIKit.setAutoresizesSubviews
-import platform.UIKit.setAutoresizingMask
-import platform.UIKit.setClipsToBounds
-import platform.UIKit.setNeedsDisplay
+import platform.UIKit.*
 import platform.darwin.NSObject
+
+private val uiContentSizeCategoryToFontScaleMap = mapOf(
+    UIContentSizeCategoryExtraSmall to 0.9f,
+    UIContentSizeCategorySmall to 0.95f,
+    UIContentSizeCategoryMedium to 1.0f,
+    UIContentSizeCategoryLarge to 1.05f,
+    UIContentSizeCategoryExtraLarge to 1.1f,
+    UIContentSizeCategoryExtraExtraLarge to 1.15f,
+    UIContentSizeCategoryExtraExtraExtraLarge to 1.2f,
+
+    UIContentSizeCategoryAccessibilityMedium to 1.3f,
+    UIContentSizeCategoryAccessibilityLarge to 1.4f,
+    UIContentSizeCategoryAccessibilityExtraLarge to 1.5f,
+    UIContentSizeCategoryAccessibilityExtraExtraLarge to 1.6f,
+    UIContentSizeCategoryAccessibilityExtraExtraExtraLarge to 1.7f,
+
+    // UIContentSizeCategoryUnspecified
+)
 
 fun ComposeUIViewController(content: @Composable () -> Unit): UIViewController =
     ComposeWindow().apply {
@@ -98,8 +102,16 @@ internal actual class ComposeWindow : UIViewController {
     @OverrideInit
     constructor(coder: NSCoder) : super(coder)
 
+    private val fontScale: Float
+        get() {
+            val contentSizeCategory =
+                traitCollection.preferredContentSizeCategory ?: UIContentSizeCategoryUnspecified
+
+            return uiContentSizeCategoryToFontScaleMap[contentSizeCategory] ?: 1.0f
+        }
+
     private val density: Density
-        get() = Density(layer.layer.contentScale)
+        get() = Density(layer.layer.contentScale, fontScale)
 
     private lateinit var layer: ComposeLayer
     private lateinit var content: @Composable () -> Unit
@@ -275,6 +287,21 @@ internal actual class ComposeWindow : UIViewController {
             layer.layer.needRedraw()
         }
         super.viewWillTransitionToSize(size, withTransitionCoordinator)
+    }
+
+    override fun traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
+        super.traitCollectionDidChange(previousTraitCollection)
+
+        val newSizeCategory = traitCollection.preferredContentSizeCategory
+
+        if (newSizeCategory != null && previousTraitCollection?.preferredContentSizeCategory != newSizeCategory) {
+            // will force a view to do layout on a next main runloop tick
+            // which will cause viewWillLayoutSubviews
+            // which will assign new density to layer (which takes new fontScale into consideration)
+            // and will force recomposition, because it will change
+
+            view.setNeedsLayout()
+        }
     }
 
     override fun viewWillLayoutSubviews() {
