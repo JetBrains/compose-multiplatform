@@ -28,7 +28,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.isLinux
 import androidx.compose.ui.isMacOs
-import androidx.compose.ui.isWindows
 import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.platform.WindowInfo
 import androidx.compose.ui.unit.Dp
@@ -60,7 +59,6 @@ import org.junit.Test
 // It is not a good solution, but it works.
 
 // TODO(demin): figure out how can we fix flaky tests on Linux
-// TODO(demin): fix fullscreen tests on macOs
 
 class WindowStateTest {
     @Test
@@ -278,11 +276,10 @@ class WindowStateTest {
     }
 
     @Test
-    fun `enter fullscreen`() = runApplicationTest(useDelay = isLinux) {
-        // TODO(demin): fix macOs. We disabled it because it is not deterministic.
-        //  If we set in skiko SkiaLayer.setFullscreen(true) then isFullscreen still returns false
-        assumeTrue(isWindows || isLinux)
-
+    fun `enter fullscreen`() = runApplicationTest(
+        useDelay = isLinux || isMacOs,
+        delayMillis = 1000
+    ) {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         lateinit var window: ComposeWindow
 
@@ -301,6 +298,23 @@ class WindowStateTest {
         state.placement = WindowPlacement.Floating
         awaitIdle()
         assertThat(window.placement).isEqualTo(WindowPlacement.Floating)
+    }
+
+    // https://github.com/JetBrains/compose-multiplatform/issues/3003
+    @Test
+    fun `WindowState placement after showing fullscreen window`() = runApplicationTest(
+        useDelay = isLinux || isMacOs,
+        delayMillis = 1000
+    ) {
+        val state = WindowState(placement = WindowPlacement.Fullscreen)
+
+        launchTestApplication {
+            Window(onCloseRequest = {}, state) { }
+        }
+
+        awaitIdle()
+
+        assertThat(state.placement).isEqualTo(WindowPlacement.Fullscreen)
     }
 
     @Test
@@ -350,7 +364,7 @@ class WindowStateTest {
     @Test
     fun `maximize and minimize `() = runApplicationTest {
         // macOS can't be maximized and minimized at the same time
-        assumeTrue(isWindows || isLinux)
+        assumeTrue(!isMacOs)
 
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         lateinit var window: ComposeWindow
@@ -371,20 +385,12 @@ class WindowStateTest {
     }
 
     @Test
-    fun `restore size and position after maximize`() = runApplicationTest {
-        // Swing/macOS can't re-change isMaximized in a deterministic way:
-//        fun main() = runBlocking(MainUIDispatcher) {
-//            val window = ComposeWindow()
-//            window.size = Dimension(200, 200)
-//            window.isVisible = true
-//            window.isMaximized = true
-//            delay(100)
-//            window.isMaximized = false  // we cannot do that on macOS (window is still animating)
-//            delay(1000)
-//            println(window.isMaximized) // prints true
-//        }
+    fun `restore size and position after maximize`() = runApplicationTest(
+        useDelay = isMacOs,
+        delayMillis = 1000
+    ) {
 //        Swing/Linux has animations and sometimes adds an offset to the size/position
-        assumeTrue(isWindows)
+        assumeTrue(!isLinux)
 
         val state = WindowState(
             size = DpSize(201.dp, 203.dp),
@@ -416,10 +422,10 @@ class WindowStateTest {
     }
 
     @Test
-    fun `restore size and position after fullscreen`() = runApplicationTest {
-//        Swing/Linux has animations and sometimes adds an offset to the size/position
-        assumeTrue(isWindows)
-
+    fun `restore size and position after fullscreen`() = runApplicationTest(
+        useDelay = isMacOs || isLinux,
+        delayMillis = 1000,
+    ) {
         val state = WindowState(
             size = DpSize(201.dp, 203.dp),
             position = WindowPosition(196.dp, 257.dp)
@@ -451,7 +457,8 @@ class WindowStateTest {
 
     @Test
     fun `window state size and position determine unmaximized state`() = runApplicationTest(
-        useDelay = true
+        useDelay = true,
+        delayMillis = 1000
     ) {
         // On Linux the behaviour generally works, but this test fails because the size after
         // un-maximizing it not exactly as expected. Perhaps the window insets are not included
@@ -509,18 +516,6 @@ class WindowStateTest {
 
     @Test
     fun `minimize window before show`() = runApplicationTest {
-        // Linux/macos doesn't support this:
-//        fun main() = runBlocking(MainUIDispatcher) {
-//            val window = ComposeWindow()
-//            window.size = Dimension(200, 200)
-//            window.isMinimized = true
-//            window.isVisible = true
-//            delay(2000)
-//            println(window.isMinimized) // prints false
-//        }
-        // TODO(demin): can we minimize after window.isVisible?
-        assumeTrue(isWindows)
-
         val state = WindowState(
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
@@ -539,11 +534,10 @@ class WindowStateTest {
     }
 
     @Test
-    fun `enter fullscreen before show`() = runApplicationTest {
-        // TODO(demin): probably we have a bug in skiko (we can't change fullscreen on macOs before
-        //  showing the window)
-        assumeTrue(isLinux || isWindows)
-
+    fun `enter fullscreen before show`() = runApplicationTest(
+        useDelay = isMacOs,
+        delayMillis = 1000,
+    ) {
         val state = WindowState(
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
