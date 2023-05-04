@@ -19,6 +19,7 @@ targets:
     info:
       path: plists/Ios/Info.plist
       properties:
+        UILaunchStoryboardName: "LaunchStoryboard" # needs for proper iOS app size and modern features
     sources:
       - "src/"
     settings:
