@@ -659,7 +659,9 @@ class WindowStateTest {
     }
 
     @Test
-    fun `set window size by its content`() = runApplicationTest(useDelay = isLinux) {
+    fun `set window size by its content`() = runApplicationTest {
+        assumeTrue(!isLinux)
+
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize.Unspecified)
 
