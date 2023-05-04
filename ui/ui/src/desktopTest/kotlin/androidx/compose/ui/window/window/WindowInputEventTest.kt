@@ -16,14 +16,12 @@
 
 package androidx.compose.ui.window.window
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
+import androidx.compose.material.Slider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.ExperimentalComposeUiApi
-import androidx.compose.ui.Modifier
+import androidx.compose.ui.*
 import androidx.compose.ui.awt.ComposeWindow
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -40,9 +38,6 @@ import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.PointerKeyboardModifiers
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.sendKeyEvent
-import androidx.compose.ui.sendMouseEvent
-import androidx.compose.ui.sendMouseWheelEvent
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.density
@@ -64,8 +59,102 @@ import java.awt.event.MouseWheelEvent.WHEEL_UNIT_SCROLL
 import org.jetbrains.skiko.hostOs
 import org.junit.Test
 
+sealed class SliderValueEvent {
+    object Change: SliderValueEvent()
+    object ChangeFinished: SliderValueEvent()
+}
+
 @OptIn(ExperimentalComposeUiApi::class)
 class WindowInputEventTest {
+    @Test
+    fun `key strokes call onValueChangeFinished on Slider`()
+        = runApplicationTest {
+        var window: ComposeWindow? = null
+
+
+        val sliderValueEvents = mutableListOf<SliderValueEvent>()
+
+        launchTestApplication {
+            Window(
+                onCloseRequest = ::exitApplication,
+                state = rememberWindowState(width = 200.dp, height = 100.dp)
+            ) {
+                window = this.window
+
+                val float = remember { mutableStateOf(5f) }
+
+                Column {
+                    Slider(
+                        float.value,
+                        onValueChange = {
+                            float.value = it
+                            print(sliderValueEvents)
+                            sliderValueEvents.add(SliderValueEvent.Change)
+                        },
+                        onValueChangeFinished = {
+                            print(sliderValueEvents)
+                            sliderValueEvents.add(SliderValueEvent.ChangeFinished)
+                        },
+                        valueRange = 0f..10f,
+                        steps = 9
+                    )
+
+                    Slider(
+                        float.value,
+                        onValueChange = {},
+                        onValueChangeFinished = {},
+                        valueRange = 0f..10f,
+                        steps = 9
+                    )
+                }
+            }
+        }
+
+        awaitIdle()
+
+        val sendKeyPressEvent = { code: Int ->
+            window!!.sendKeyEvent(code, id = KeyEvent.KEY_PRESSED)
+
+            Unit
+        }
+
+        val sendKeyReleaseEvent = { code: Int ->
+            window!!.sendKeyEvent(code, id = KeyEvent.KEY_RELEASED)
+
+            Unit
+        }
+
+        val sendKeyStrokeEvent = { code: Int ->
+            sendKeyPressEvent(code)
+            sendKeyReleaseEvent(code)
+        }
+
+        // Focus on slider
+        sendKeyStrokeEvent(KeyEvent.VK_TAB)
+
+        sendKeyStrokeEvent(KeyEvent.VK_UP)
+        sendKeyStrokeEvent(KeyEvent.VK_DOWN)
+        sendKeyStrokeEvent(KeyEvent.VK_LEFT)
+        sendKeyStrokeEvent(KeyEvent.VK_RIGHT)
+        sendKeyStrokeEvent(KeyEvent.VK_PAGE_UP)
+        sendKeyStrokeEvent(KeyEvent.VK_PAGE_DOWN)
+        sendKeyStrokeEvent(KeyEvent.VK_HOME)
+        sendKeyStrokeEvent(KeyEvent.VK_END)
+
+        awaitIdle()
+
+        val createExpected = { size: Int ->
+            List(size) {
+                listOf(
+                    SliderValueEvent.Change,
+                    SliderValueEvent.ChangeFinished
+                )
+            }.flatten()
+        }
+
+        assertThat(sliderValueEvents).isEqualTo(createExpected(8))
+    }
+
     @Test
     fun `catch key handlers`() = runApplicationTest {
         var window: ComposeWindow? = null
