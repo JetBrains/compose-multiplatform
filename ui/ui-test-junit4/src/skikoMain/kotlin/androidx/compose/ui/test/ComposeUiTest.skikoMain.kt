@@ -28,7 +28,6 @@ import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.platform.SkiaRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.test.junit4.MainTestClockImpl
-import androidx.compose.ui.test.junit4.TextInputServiceForTests
 import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
 import androidx.compose.ui.test.junit4.isOnUiThread
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -201,7 +200,9 @@ class SkikoComposeUiTest(
 
     private fun shouldPumpTime(): Boolean {
         return mainClock.autoAdvance &&
-            (Snapshot.current.hasPendingChanges() || scene.hasInvalidations())
+            (Snapshot.current.hasPendingChanges()
+                || Snapshot.isApplyObserverNotificationPending
+                || scene.hasInvalidations())
     }
 
     @OptIn(InternalComposeUiApi::class)

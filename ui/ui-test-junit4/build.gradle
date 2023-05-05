@@ -158,6 +158,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:material:material"))
                 implementation(libs.skikoCommon)
                 implementation(libs.kotlinTest)
+                implementation(libs.atomicFu)
             }
 
             desktopTest.dependsOn(skikoTest)
