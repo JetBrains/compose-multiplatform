@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,9 @@
  * limitations under the License.
  */
 
-package androidx.compose.foundation.text
+package androidx.compose.foundation.text.selection
 
-import androidx.compose.ui.input.key.KeyEvent
-import org.jetbrains.skiko.*
+import androidx.compose.ui.Modifier
 
-actual val KeyEvent.isTypedEvent: Boolean
-    get() = nativeKeyEvent.kind == SkikoKeyboardEventKind.DOWN &&
-        nativeKeyEvent.platform?.isPrintable() == true
-
-private fun SkikoPlatformKeyboardEvent.isPrintable(): Boolean =
-    charCode != 0
+internal actual fun Modifier.textFieldMagnifier(manager: TextFieldSelectionManager): Modifier =
+    TODO("implement js textFieldMagnifier")

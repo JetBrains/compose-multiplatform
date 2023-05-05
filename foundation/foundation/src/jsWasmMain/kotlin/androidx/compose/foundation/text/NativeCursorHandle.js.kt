@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,4 +16,17 @@
 
 package androidx.compose.foundation.text
 
-internal actual val platformDefaultKeyMapping: KeyMapping = defaultKeyMapping
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+
+@Composable
+@Suppress("UNUSED_PARAMETER")
+internal actual fun CursorHandle(
+    handlePosition: Offset,
+    modifier: Modifier,
+    content: @Composable (() -> Unit)?
+) {
+    /* Not implemented. */
+}
+

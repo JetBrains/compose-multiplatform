@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 The Android Open Source Project
+ * Copyright 2023 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,9 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package androidx.compose.foundation.text
 
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.input.key.KeyEvent
 
-internal actual val DefaultCursorThickness: Dp = 1.dp
+internal actual fun KeyEvent.cancelsTextSelection(): Boolean = false
+
+internal actual fun showCharacterPalette():Unit = TODO("implement native showCharacterPalette")
