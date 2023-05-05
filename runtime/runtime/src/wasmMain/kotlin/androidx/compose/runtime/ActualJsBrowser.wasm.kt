@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 The Android Open Source Project
+ * Copyright 2019 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,19 +14,16 @@
  * limitations under the License.
  */
 
-package androidx.compose.ui.graphics
+package androidx.compose.runtime
 
-import org.khronos.webgl.ArrayBuffer
-import org.khronos.webgl.ArrayBufferView
-import org.khronos.webgl.Int32Array
-import org.khronos.webgl.Uint8Array
-import org.khronos.webgl.get
+// todo: trace?
+internal actual object Trace {
+    actual fun beginSection(name: String): Any? {
+        return null
+    }
 
-internal actual fun ByteArray.putBytesInto(array: IntArray, offset: Int, length: Int): Unit {
-   val byteBuffer = Uint8Array(this.toTypedArray()).buffer
-   val intArray = Int32Array(byteBuffer, offset, length)
-   for (i in 0 until intArray.length) {
-      array[i] = intArray[i]
-   }
+    actual fun endSection(token: Any?) {
+    }
 }
 
+actual annotation class CheckResult actual constructor(actual val suggest: String)

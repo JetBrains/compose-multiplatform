@@ -66,6 +66,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
         android()
         desktop()
         js()
+        wasm()
         darwin()
 
         configureDarwinFlags()
@@ -99,7 +100,26 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
 
             jsNativeMain.dependsOn(skikoMain)
 
-            jsMain.dependsOn(jsNativeMain)
+            jsWasmMain.dependsOn(jsNativeMain)
+
+            jsMain {
+                dependsOn(jsWasmMain)
+                dependencies {
+                    implementation(kotlin("stdlib-js"))
+                    api(libs.skikoCommon)
+                }
+            }
+
+            if (project.kotlinWasmEnabled.toBoolean()) {
+                wasmMain {
+                    dependsOn(jsWasmMain)
+                    dependencies {
+                        implementation(kotlin("stdlib-wasm"))
+                        implementation(libs.create("skikoWasm"))
+                        implementation(libs.create("skikoWasmWasm"))
+                    }
+                }
+            }
 
             desktopMain {
                 dependsOn skikoMain
