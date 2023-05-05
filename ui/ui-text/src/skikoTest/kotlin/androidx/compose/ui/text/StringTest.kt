@@ -58,9 +58,9 @@ class StringTest {
 
     @Test
     fun directionality() {
-        assertEquals(StrongDirectionType.None, strongDirectionType('0'.code)) // Number
-        assertEquals(StrongDirectionType.Ltr, strongDirectionType('A'.code)) // Latin
-        assertEquals(StrongDirectionType.Rtl, strongDirectionType('א'.code)) // Hebrew
-        assertEquals(StrongDirectionType.Rtl, strongDirectionType('؈'.code)) // Arabic
+        assertEquals(StrongDirectionType.None, '0'.code.strongDirectionType()) // Number
+        assertEquals(StrongDirectionType.Ltr, 'A'.code.strongDirectionType()) // Latin
+        assertEquals(StrongDirectionType.Rtl, 'א'.code.strongDirectionType()) // Hebrew
+        assertEquals(StrongDirectionType.Rtl, '؈'.code.strongDirectionType()) // Arabic
     }
 }

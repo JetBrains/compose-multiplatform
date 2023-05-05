@@ -15,35 +15,31 @@
  */
 package androidx.compose.ui.text
 
-internal actual fun strongDirectionType(codePoint: Int): StrongDirectionType =
-    codePoint.getDirectionality().toStrongDirectionType()
-
-internal actual fun Char.isNeutralDirection(): Boolean =
-    directionality.isNeutralDirection()
-
-/**
- * Get the Unicode directionality of a character.
- */
-private fun Int.getDirectionality(): CharDirectionality =
-    CharDirectionality.valueOf(Character.getDirectionality(this).toInt())
 
 /**
  * Get strong (R, L or AL) direction type.
  * See https://www.unicode.org/reports/tr9/
  */
-private fun CharDirectionality.toStrongDirectionType() = when (this) {
-    CharDirectionality.LEFT_TO_RIGHT -> StrongDirectionType.Ltr
+internal actual fun CodePoint.strongDirectionType(): StrongDirectionType =
+    when (getDirectionality()) {
+        CharDirectionality.LEFT_TO_RIGHT -> StrongDirectionType.Ltr
 
-    CharDirectionality.RIGHT_TO_LEFT,
-    CharDirectionality.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
+        CharDirectionality.RIGHT_TO_LEFT,
+        CharDirectionality.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
 
-    else -> StrongDirectionType.None
-}
+        else -> StrongDirectionType.None
+    }
+internal actual fun CodePoint.isNeutralDirection(): Boolean =
+    when (getDirectionality()) {
+        CharDirectionality.OTHER_NEUTRALS,
+        CharDirectionality.WHITESPACE,
+        CharDirectionality.BOUNDARY_NEUTRAL -> true
 
-private fun CharDirectionality.isNeutralDirection(): Boolean = when (this) {
-    CharDirectionality.OTHER_NEUTRALS,
-    CharDirectionality.WHITESPACE,
-    CharDirectionality.BOUNDARY_NEUTRAL -> true
+        else -> false
+    }
 
-    else -> false
-}
+/**
+ * Get the Unicode directionality of a character.
+ */
+private fun CodePoint.getDirectionality(): CharDirectionality =
+    CharDirectionality.valueOf(Character.getDirectionality(this).toInt())

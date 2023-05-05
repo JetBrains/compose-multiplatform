@@ -43,10 +43,35 @@ internal value class StrongDirectionType private constructor(val value: Int) {
     }
 }
 
-internal expect fun strongDirectionType(codePoint: Int): StrongDirectionType
+// TODO Remove once it's available in common stdlib https://youtrack.jetbrains.com/issue/KT-23251
+internal typealias CodePoint = Int
 
-// TODO: Use unicode code point instead of Char
-internal expect fun Char.isNeutralDirection(): Boolean
+/**
+ * Converts a surrogate pair to a unicode code point.
+ */
+private fun Char.Companion.toCodePoint(high: Char, low: Char): CodePoint =
+    (((high - MIN_HIGH_SURROGATE) shl 10) or (low - MIN_LOW_SURROGATE)) + 0x10000
+
+/**
+ * The minimum value of a supplementary code point, `\u0x10000`.
+ */
+private const val MIN_SUPPLEMENTARY_CODE_POINT: Int = 0x10000
+
+/**
+ * The maximum value of a Unicode code point.
+ */
+private const val MAX_CODE_POINT = 0X10FFFF
+
+internal fun CodePoint.charCount(): Int = if (this >= MIN_SUPPLEMENTARY_CODE_POINT) 2 else 1
+
+/**
+ * Checks if the codepoint specified is a supplementary codepoint or not.
+ */
+internal fun CodePoint.isSupplementaryCodePoint(): Boolean =
+    this in MIN_SUPPLEMENTARY_CODE_POINT..MAX_CODE_POINT
+
+internal expect fun CodePoint.strongDirectionType(): StrongDirectionType
+internal expect fun CodePoint.isNeutralDirection(): Boolean
 
 /**
  * Determine direction based on the first strong directional character.
@@ -54,7 +79,7 @@ internal expect fun Char.isNeutralDirection(): Boolean
  */
 internal fun String.firstStrongDirectionType(): StrongDirectionType {
     for (codePoint in codePointsOutsideDirectionalIsolate) {
-        return when (val strongDirectionType = strongDirectionType(codePoint)) {
+        return when (val strongDirectionType = codePoint.strongDirectionType()) {
             StrongDirectionType.None -> continue
             else -> strongDirectionType
         }
@@ -89,7 +114,7 @@ private val String.codePointsOutsideDirectionalIsolate get() = sequence {
     }
 }
 
-private val String.codePoints get() = sequence {
+internal val String.codePoints get() = sequence {
     var index = 0
     while (index < length) {
         val codePoint = codePointAt(index)
@@ -98,8 +123,10 @@ private val String.codePoints get() = sequence {
     }
 }
 
-// TODO Remove once it's available in common stdlib https://youtrack.jetbrains.com/issue/KT-23251
-private fun String.codePointAt(index: Int): Int {
+/**
+ * Returns the character (Unicode code point) at the specified index.
+ */
+internal fun String.codePointAt(index: Int): CodePoint {
     val high = this[index]
     if (high.isHighSurrogate() && index + 1 < this.length) {
         val low = this[index + 1]
@@ -111,15 +138,15 @@ private fun String.codePointAt(index: Int): Int {
 }
 
 /**
- * Converts a surrogate pair to a unicode code point.
+ * Returns the character (Unicode code point) before the specified index.
  */
-private fun Char.Companion.toCodePoint(high: Char, low: Char): Int =
-    (((high - MIN_HIGH_SURROGATE) shl 10) or (low - MIN_LOW_SURROGATE)) + 0x10000
-
-/**
- * The minimum value of a supplementary code point, `\u0x10000`.
- */
-private const val MIN_SUPPLEMENTARY_CODE_POINT: Int = 0x10000
-
-// TODO Remove once it's available in common stdlib https://youtrack.jetbrains.com/issue/KT-23251
-private fun Int.charCount(): Int = if (this >= MIN_SUPPLEMENTARY_CODE_POINT) 2 else 1
+internal fun String.codePointBefore(index: Int): CodePoint {
+    val low = this[index]
+    if (low.isLowSurrogate() && index - 1 >= 0) {
+        val high = this[index - 1]
+        if (high.isHighSurrogate()) {
+            return Char.toCodePoint(high, low)
+        }
+    }
+    return low.code
+}

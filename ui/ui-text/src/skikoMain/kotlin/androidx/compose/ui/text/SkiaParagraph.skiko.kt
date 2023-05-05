@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.ResolvedTextDirection
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.Constraints
 import kotlin.math.floor
+import org.jetbrains.skia.IRange
 import org.jetbrains.skia.paragraph.*
 
 internal class SkiaParagraph(
@@ -165,6 +166,7 @@ internal class SkiaParagraph(
         } ?: 0f
 
     private fun lineMetricsForOffset(offset: Int): LineMetrics? {
+        checkOffsetIsValid(offset)
         val metrics = lineMetrics
         for (line in metrics) {
             if (offset < line.endIncludingNewline) {
@@ -209,8 +211,7 @@ internal class SkiaParagraph(
     override fun isLineEllipsized(lineIndex: Int) = false
 
     override fun getLineForOffset(offset: Int) =
-        lineMetricsForOffset(offset)?.run { lineNumber.toInt() }
-            ?: 0
+        lineMetricsForOffset(offset)?.lineNumber ?: 0
 
     override fun getLineForVerticalPosition(vertical: Float): Int {
         return getLineMetricsForVerticalPosition(vertical)?.lineNumber ?: 0
@@ -266,7 +267,8 @@ internal class SkiaParagraph(
         }
 
     private fun getBoxForwardByOffset(offset: Int): TextBox? {
-        var to = offset + 1
+        checkOffsetIsValid(offset)
+        var to = offset + 1 // TODO: Use unicode code points (CodePoint.charCount() instead of +1)
         while (to <= text.length) {
             val box = paragraph.getRectsForRange(
                 offset, to,
@@ -275,12 +277,13 @@ internal class SkiaParagraph(
             if (box != null) {
                 return box
             }
-            to += 1
+            to += 1 // TODO: Use unicode code points (CodePoint.charCount() instead of +1)
         }
         return null
     }
 
     private fun getBoxBackwardByOffset(offset: Int, end: Int = offset): TextBox? {
+        checkOffsetIsValid(offset)
         var from = offset - 1
         val isRtl = paragraphIntrinsics.textDirection == ResolvedTextDirection.Rtl
         while (from >= 0) {
@@ -312,6 +315,7 @@ internal class SkiaParagraph(
                             val rect = SkRect(width, box.rect.bottom, width, bottom)
                             TextBox(rect, box.direction)
                         } else {
+                            // TODO: Use unicode code points (CodePoint.charCount() instead of +1)
                             val nextBox =  paragraph.getRectsForRange(
                                 offset, offset + 1,
                                 RectHeightMode.STRUT, RectWidthMode.TIGHT
@@ -331,6 +335,7 @@ internal class SkiaParagraph(
     }
 
     override fun getParagraphDirection(offset: Int): ResolvedTextDirection =
+        // TODO: It should be position based (direction isolate for example)
         paragraphIntrinsics.textDirection
 
     override fun getBidiRunDirection(offset: Int): ResolvedTextDirection =
@@ -394,12 +399,13 @@ internal class SkiaParagraph(
             correctedGlyphPosition = paragraph.getGlyphPositionAtCoordinate(leftX + 1f, position.y).position
         } else if (position.x >= rightX) { // when clicked to the right of a text line
             correctedGlyphPosition = paragraph.getGlyphPositionAtCoordinate(rightX - 1f, position.y).position
+            val isNeutralChar = if (correctedGlyphPosition in text.indices) {
+                text.codePointAt(correctedGlyphPosition).isNeutralDirection()
+            } else false
 
-            // TODO: Use unicode code points
-            val isNeutralChar = text.getOrNull(correctedGlyphPosition)?.isNeutralDirection() ?: false
             // For RTL blocks, the position is still not correct, so we have to subtract 1 from the returned result
             if (!isNeutralChar && getBoxBackwardByOffset(correctedGlyphPosition)?.direction == Direction.RTL) {
-                correctedGlyphPosition -= 1
+                correctedGlyphPosition -= 1 // TODO Check if it should be CodePoint.charCount()
             }
         }
 
@@ -412,16 +418,29 @@ internal class SkiaParagraph(
     }
 
     override fun getWordBoundary(offset: Int): TextRange {
-        return when {
-            (text.getOrNull(offset)?.isLetterOrDigit() ?: false) -> paragraph.getWordBoundary(offset).let {
-                TextRange(it.start, it.end)
-            }
-            (text.getOrNull(offset - 1)?.isLetterOrDigit() ?: false) ->
-                paragraph.getWordBoundary(offset - 1).let {
-                    TextRange(it.start, it.end)
-                }
-            else -> TextRange(offset, offset)
+        checkOffsetIsValid(offset)
+
+        // To match with Android implementation it should return:
+        // - empty range if offset is between spaces
+        // - previous word if offset right after that
+        // - TODO: punctuation doesn't divide words
+        //   NOTE: Android punctuation handling has some issues at the moment, so it doesn't clear
+        //         what expected behavior is.
+
+        // Android uses `isLetterOrDigit` for codepoints, but we have it only for chars.
+        // Using `Char.isWhitespace` instead because whitespaces are not supplementary code units.
+        // TODO: Replace chars to code units to make this code future proof.
+        if (offset < text.length && text[offset].isWhitespace() || offset == text.length) {
+            // If it's whitespace, we're sure that it's not surrogate.
+            return if (offset > 0 && !text[offset - 1].isWhitespace()) {
+                paragraph.getWordBoundary(offset - 1).toTextRange()
+            } else TextRange(offset, offset)
         }
+
+        // Skia paragraph should handle unicode correctly, but it doesn't match Android behavior.
+        // It uses ICU's BreakIterator under the hood, so we can use
+        // `BreakIterator.makeWordInstance()` without calling skia's `getWordBoundary` at all.
+        return paragraph.getWordBoundary(offset).toTextRange()
     }
 
     override fun paint(
@@ -493,4 +512,15 @@ internal class SkiaParagraph(
         }
         paragraph.paint(canvas.nativeCanvas, 0.0f, 0.0f)
     }
+
+    /**
+     * Check if the given offset is in the given range.
+     */
+    private inline fun checkOffsetIsValid(offset: Int) {
+        require(offset in 0..text.length) {
+            ("Invalid offset: $offset. Valid range is [0, ${text.length}]")
+        }
+    }
 }
+
+private fun IRange.toTextRange() = TextRange(start, end)

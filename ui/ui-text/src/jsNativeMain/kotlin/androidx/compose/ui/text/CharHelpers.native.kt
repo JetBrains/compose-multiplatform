@@ -18,29 +18,25 @@ package androidx.compose.ui.text
 import org.jetbrains.skia.icu.CharDirection
 
 
-internal actual fun strongDirectionType(codePoint: Int): StrongDirectionType =
-    CharDirection.of(codePoint).toStrongDirectionType()
-
-internal actual fun Char.isNeutralDirection(): Boolean =
-    CharDirection.of(code).isNeutralDirection()
-
 /**
  * Get strong (R, L or AL) direction type.
  * See https://www.unicode.org/reports/tr9/
  */
-private fun Int.toStrongDirectionType() = when (this) {
-    CharDirection.LEFT_TO_RIGHT -> StrongDirectionType.Ltr
+internal actual fun CodePoint.strongDirectionType(): StrongDirectionType =
+    when (CharDirection.of(this)) {
+        CharDirection.LEFT_TO_RIGHT -> StrongDirectionType.Ltr
 
-    CharDirection.RIGHT_TO_LEFT,
-    CharDirection.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
+        CharDirection.RIGHT_TO_LEFT,
+        CharDirection.RIGHT_TO_LEFT_ARABIC -> StrongDirectionType.Rtl
 
-    else -> StrongDirectionType.None
-}
+        else -> StrongDirectionType.None
+    }
 
-private fun Int.isNeutralDirection(): Boolean = when (this) {
-    CharDirection.OTHER_NEUTRAL,
-    CharDirection.WHITE_SPACE_NEUTRAL,
-    CharDirection.BOUNDARY_NEUTRAL -> true
+internal actual fun CodePoint.isNeutralDirection(): Boolean =
+    when (CharDirection.of(this)) {
+        CharDirection.OTHER_NEUTRAL,
+        CharDirection.WHITE_SPACE_NEUTRAL,
+        CharDirection.BOUNDARY_NEUTRAL -> true
 
-    else -> false
-}
+        else -> false
+    }
