@@ -32,12 +32,16 @@ import org.gradle.api.publish.maven.internal.publication.DefaultMavenPublication
 import org.gradle.api.attributes.Usage
 import org.jetbrains.kotlin.konan.target.KonanTarget
 
+import org.jetbrains.kotlin.gradle.targets.js.dsl.ExperimentalWasmDsl
 
 open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
     val project: Project
 ) : AndroidXComposeMultiplatformExtension() {
     private val multiplatformExtension =
         project.extensions.getByType(KotlinMultiplatformExtension::class.java)
+
+    override val isKotlinWasmTargetEnabled: Boolean
+        get() = project.properties["kotlinWasmEnabled"] == "true"
 
     override fun android(): Unit = multiplatformExtension.run {
         android()
@@ -71,6 +75,18 @@ open class AndroidXComposeMultiplatformExtensionImpl @Inject constructor(
         val commonMain = sourceSets.getByName("commonMain")
         val jsMain = sourceSets.getByName("jsMain")
         jsMain.dependsOn(commonMain)
+    }
+
+    @OptIn(ExperimentalWasmDsl::class)
+    override fun wasm(): Unit = multiplatformExtension.run {
+        if (!isKotlinWasmTargetEnabled) return@run
+        wasm {
+            d8()
+        }
+
+        val commonMain = sourceSets.getByName("commonMain")
+        val wasmMain = sourceSets.getByName("wasmMain")
+        wasmMain.dependsOn(commonMain)
     }
 
     override fun darwin(): Unit = multiplatformExtension.run {

@@ -36,7 +36,8 @@ allprojects {
                     "-Xskip-metadata-version-check",
                     // Issue where sam conversion in gradle's kts file causes task-out-of-date
                     // Details: KT-46445 and https://github.com/gradle/gradle/issues/17052
-                    "-Xsam-conversions=class"
+                    "-Xsam-conversions=class",
+                    "-opt-in=kotlin.RequiresOptIn", // for JB-fork only - don't upstream
             ]
             languageVersion = "1.5"
             apiVersion = "1.5"
