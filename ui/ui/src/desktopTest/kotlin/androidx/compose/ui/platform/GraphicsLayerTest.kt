@@ -167,6 +167,11 @@ class GraphicsLayerTest {
     }
     @Test
     fun rotationZ() {
+
+        // TODO Remove once approximate comparison will be available. The problem: there is a difference
+        //  in antialiasing between platforms. The golden screenshot currently matches CI behaviour.
+        assumeTrue(isLinux)
+
         val snapshot = renderComposeScene(width = 40, height = 40) {
             testRotationBoxes(
                 rotationZ = 45f,
