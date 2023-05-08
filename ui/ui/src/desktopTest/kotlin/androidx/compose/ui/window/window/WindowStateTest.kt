@@ -340,7 +340,7 @@ class WindowStateTest {
     }
 
     @Test
-    fun minimize() = runApplicationTest {
+    fun minimize() = runApplicationTest(useDelay = isMacOs, delayMillis = 1000) {
         val state = WindowState(size = DpSize(200.dp, 200.dp))
         lateinit var window: ComposeWindow
 
@@ -515,7 +515,10 @@ class WindowStateTest {
     }
 
     @Test
-    fun `minimize window before show`() = runApplicationTest {
+    fun `minimize window before show`() = runApplicationTest(
+        useDelay = isMacOs,
+        delayMillis = 1000
+    ) {
         val state = WindowState(
             size = DpSize(200.dp, 200.dp),
             position = WindowPosition(Alignment.Center),
