@@ -30,44 +30,6 @@ actual sealed class PlatformFont : Font {
         get() = "${this::class.qualifiedName}|$identity"
 }
 
-internal actual val GenericFontFamiliesMapping by lazy {
-    when (Platform.Current) {
-        Platform.Windows ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf("Arial"),
-                FontFamily.Serif.name to listOf("Times New Roman"),
-                FontFamily.Monospace.name to listOf("Consolas"),
-                FontFamily.Cursive.name to listOf("Comic Sans MS")
-            )
-        Platform.MacOS ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf(
-                    "System Font",
-                    "Helvetica Neue",
-                    "Helvetica"
-                ),
-                FontFamily.Serif.name to listOf("Times"),
-                FontFamily.Monospace.name to listOf("Courier"),
-                FontFamily.Cursive.name to listOf("Apple Chancery")
-            )
-        Platform.Linux ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf("Noto Sans", "DejaVu Sans"),
-                FontFamily.Serif.name to listOf("Noto Serif", "DejaVu Serif", "Times New Roman"),
-                FontFamily.Monospace.name to listOf("Noto Sans Mono", "DejaVu Sans Mono"),
-                // better alternative?
-                FontFamily.Cursive.name to listOf("Comic Sans MS")
-            )
-        Platform.Unknown ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf("Arial"),
-                FontFamily.Serif.name to listOf("Times New Roman"),
-                FontFamily.Monospace.name to listOf("Consolas"),
-                FontFamily.Cursive.name to listOf("Comic Sans MS")
-            )
-    }
-}
-
 /**
  * Defines a Font using resource name.
  *
@@ -214,21 +176,12 @@ private fun typefaceResource(resourceName: String): SkTypeface {
     return SkTypeface.makeFromData(Data.makeFromBytes(bytes))
 }
 
-private enum class Platform {
-    Linux,
-    Windows,
-    MacOS,
-    Unknown;
-
-    companion object {
-        val Current by lazy {
-            val name = System.getProperty("os.name")
-            when {
-                name.startsWith("Linux") -> Linux
-                name.startsWith("Win") -> Windows
-                name == "Mac OS X" -> MacOS
-                else -> Unknown
-            }
-        }
+internal actual fun currentPlatform(): Platform {
+    val name = System.getProperty("os.name")
+    return when {
+        name.startsWith("Linux") -> Platform.Linux
+        name.startsWith("Win") -> Platform.Windows
+        name == "Mac OS X" -> Platform.MacOS
+        else -> Platform.Unknown
     }
 }

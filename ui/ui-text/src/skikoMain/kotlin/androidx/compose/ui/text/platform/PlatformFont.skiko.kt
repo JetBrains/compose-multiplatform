@@ -200,5 +200,51 @@ internal class FontCache {
         }
 }
 
-internal expect val GenericFontFamiliesMapping: Map<String, List<String>>
+internal enum class Platform {
+    Unknown,
+    Linux,
+    Windows,
+    MacOS,
+    IOS,
+    TvOS,
+    WatchOS,
+}
+
+internal expect fun currentPlatform(): Platform
 internal expect fun loadTypeface(font: Font): SkTypeface
+
+internal val GenericFontFamiliesMapping: Map<String, List<String>> by lazy {
+    when (currentPlatform()) {
+        Platform.Linux ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf("Noto Sans", "DejaVu Sans"),
+                FontFamily.Serif.name to listOf("Noto Serif", "DejaVu Serif", "Times New Roman"),
+                FontFamily.Monospace.name to listOf("Noto Sans Mono", "DejaVu Sans Mono"),
+                // better alternative?
+                FontFamily.Cursive.name to listOf("Comic Sans MS")
+            )
+        Platform.Windows ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf("Arial"),
+                FontFamily.Serif.name to listOf("Times New Roman"),
+                FontFamily.Monospace.name to listOf("Consolas"),
+                FontFamily.Cursive.name to listOf("Comic Sans MS")
+            )
+        Platform.MacOS, Platform.IOS, Platform.TvOS, Platform.WatchOS ->
+            mapOf(
+                // .AppleSystem* aliases is the only legal way to get default SF and NY fonts.
+                FontFamily.SansSerif.name to listOf(".AppleSystemUIFont", "Helvetica Neue", "Helvetica"),
+                FontFamily.Serif.name to listOf(".AppleSystemUIFontSerif", "Times", "Times New Roman"),
+                FontFamily.Monospace.name to listOf(".AppleSystemUIFontMonospaced", "Menlo", "Courier"),
+                // Safari "font-family: cursive" real font names from macOS and iOS.
+                FontFamily.Cursive.name to listOf("Apple Chancery", "Snell Roundhand")
+            )
+        Platform.Unknown ->
+            mapOf(
+                FontFamily.SansSerif.name to listOf("Arial"),
+                FontFamily.Serif.name to listOf("Times New Roman"),
+                FontFamily.Monospace.name to listOf("Consolas"),
+                FontFamily.Cursive.name to listOf("Comic Sans MS")
+            )
+    }
+}

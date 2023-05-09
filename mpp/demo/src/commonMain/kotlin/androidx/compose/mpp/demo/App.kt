@@ -24,6 +24,7 @@ val MainScreen = Screen.List(
     Screen.Example("ImageViewer") { ImageViewer() },
     Screen.Example("RoundedCornerCrashOnJS") { RoundedCornerCrashOnJS() },
     Screen.Example("TextDirection") { TextDirection() },
+    Screen.Example("FontFamilies") { FontFamilies() },
     LazyLayouts,
 )
 

@@ -15,50 +15,10 @@
  */
 package androidx.compose.ui.text.platform
 
-import kotlin.native.OsFamily as NativeOsFamily
 import kotlin.native.Platform as NativePlatform
 import org.jetbrains.skia.Typeface as SkTypeface
 import androidx.compose.ui.text.font.Font
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontListFontFamily
 import org.jetbrains.skia.Data
-
-internal actual val GenericFontFamiliesMapping by lazy {
-    when (Platform.Current) {
-        Platform.Windows ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf("Arial"),
-                FontFamily.Serif.name to listOf("Times New Roman"),
-                FontFamily.Monospace.name to listOf("Consolas"),
-                FontFamily.Cursive.name to listOf("Comic Sans MS")
-            )
-        Platform.MacOS ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf(
-                    "Helvetica Neue",
-                    "Helvetica"
-                ),
-                FontFamily.Serif.name to listOf("Times"),
-                FontFamily.Monospace.name to listOf("Courier"),
-                FontFamily.Cursive.name to listOf("Apple Chancery")
-            )
-        Platform.Linux ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf("Noto Sans", "DejaVu Sans"),
-                FontFamily.Serif.name to listOf("Noto Serif", "DejaVu Serif", "Times New Roman"),
-                FontFamily.Monospace.name to listOf("Noto Sans Mono", "DejaVu Sans Mono"),
-                // better alternative?
-                FontFamily.Cursive.name to listOf("Comic Sans MS")
-            )
-        Platform.Unknown ->
-            mapOf(
-                FontFamily.SansSerif.name to listOf("Arial"),
-                FontFamily.Serif.name to listOf("Times New Roman"),
-                FontFamily.Monospace.name to listOf("Consolas"),
-                FontFamily.Cursive.name to listOf("Comic Sans MS")
-            )
-    }
-}
 
 internal actual fun loadTypeface(font: Font): SkTypeface {
     if (font !is PlatformFont) {
@@ -72,18 +32,12 @@ internal actual fun loadTypeface(font: Font): SkTypeface {
     }
 }
 
-private enum class Platform {
-    Linux,
-    Windows,
-    MacOS,
-    Unknown;
-
-    companion object {
-        val Current: Platform = when(NativePlatform.osFamily) {
-            NativeOsFamily.MACOSX -> MacOS
-            NativeOsFamily.LINUX -> Linux
-            NativeOsFamily.WINDOWS -> Windows
-            else -> Unknown
-        }
-    }
+internal actual fun currentPlatform(): Platform = when (NativePlatform.osFamily) {
+    OsFamily.MACOSX -> Platform.MacOS
+    OsFamily.IOS -> Platform.IOS
+    OsFamily.LINUX -> Platform.Linux
+    OsFamily.WINDOWS -> Platform.Windows
+    OsFamily.TVOS -> Platform.TvOS
+    OsFamily.WATCHOS -> Platform.WatchOS
+    else -> Platform.Unknown
 }
