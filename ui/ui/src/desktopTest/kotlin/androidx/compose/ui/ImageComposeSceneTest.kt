@@ -25,6 +25,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,9 @@ import androidx.compose.ui.test.InternalTestApi
 import androidx.compose.ui.test.junit4.DesktopScreenshotTestRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.dp
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.ExperimentalTime
 import kotlinx.coroutines.runBlocking
@@ -92,6 +96,28 @@ class ImageComposeSceneTest {
             screenshotRule.write(scene.render(50.seconds), "frame3")
             screenshotRule.write(scene.render(100.seconds), "frame4")
         }
+    }
+
+    @OptIn(ExperimentalTime::class)
+    @Test(timeout = 5000)
+    fun `run multiple ImageComposeScenes concurrently`() {
+        val service = Executors.newFixedThreadPool(50)
+
+        for(i in 1..1000) {
+            service.submit {
+                val scene = ImageComposeScene(50, 50) {
+                    Box(Modifier.fillMaxSize().background(Color.White)) {
+                        CircularProgressIndicator()
+                    }
+                }
+                scene.render() // start animation
+                scene.render(50.milliseconds).close()
+                scene.close()
+            }
+        }
+
+        service.shutdown()
+        service.awaitTermination(10000, TimeUnit.MILLISECONDS)
     }
 
     @Test
