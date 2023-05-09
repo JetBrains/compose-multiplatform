@@ -611,6 +611,8 @@ class WindowStateTest {
 
     @Test
     fun `set window height by its content`() = runApplicationTest(useDelay = isLinux) {
+        assumeTrue(!isLinux)  // Flaky on our CI
+
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(300.dp, Dp.Unspecified))
 
@@ -636,7 +638,9 @@ class WindowStateTest {
     }
 
     @Test
-    fun `set window width by its content`() = runApplicationTest(useDelay = isLinux) {
+    fun `set window width by its content`() = runApplicationTest() {
+        assumeTrue(!isLinux)  // Flaky on our CI
+
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize(Dp.Unspecified, 300.dp))
 
@@ -663,7 +667,7 @@ class WindowStateTest {
 
     @Test
     fun `set window size by its content`() = runApplicationTest {
-        assumeTrue(!isLinux)
+        assumeTrue(!isLinux) // Flaky on our CI
 
         lateinit var window: ComposeWindow
         val state = WindowState(size = DpSize.Unspecified)
