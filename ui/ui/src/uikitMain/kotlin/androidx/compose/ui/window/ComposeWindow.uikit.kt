@@ -26,34 +26,19 @@ import androidx.compose.ui.interop.LocalLayerContainer
 import androidx.compose.ui.interop.LocalUIViewController
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.*
-import androidx.compose.ui.platform.DefaultInputModeManager
-import androidx.compose.ui.platform.Platform
-import androidx.compose.ui.platform.UIKitTextInputService
 import androidx.compose.ui.text.input.PlatformTextInputService
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.DpOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toOffset
+import androidx.compose.ui.unit.*
 import kotlin.math.roundToInt
 import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.launch
 import org.jetbrains.skiko.SkikoUIView
 import org.jetbrains.skiko.TextActions
 import platform.CoreGraphics.CGPointMake
 import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
-import platform.Foundation.NSCoder
-import platform.Foundation.NSNotification
-import platform.Foundation.NSNotificationCenter
-import platform.Foundation.NSSelectorFromString
-import platform.Foundation.NSValue
+import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSObject
 
@@ -180,11 +165,17 @@ internal actual class ComposeWindow : UIViewController {
         ).load()
         val rootView = UIView() // rootView needs to interop with UIKit
         rootView.backgroundColor = UIColor.whiteColor
+
+        skikoUIView.translatesAutoresizingMaskIntoConstraints = false
         rootView.addSubview(skikoUIView)
-        rootView.setAutoresizesSubviews(true)
-        skikoUIView.setAutoresizingMask(
-            UIViewAutoresizingFlexibleWidth or UIViewAutoresizingFlexibleHeight
-        )
+
+        NSLayoutConstraint.activateConstraints(listOf(
+            skikoUIView.leadingAnchor.constraintEqualToAnchor(rootView.leadingAnchor),
+            skikoUIView.trailingAnchor.constraintEqualToAnchor(rootView.trailingAnchor),
+            skikoUIView.topAnchor.constraintEqualToAnchor(rootView.topAnchor),
+            skikoUIView.bottomAnchor.constraintEqualToAnchor(rootView.bottomAnchor)
+        ))
+
         view = rootView
         val uiKitTextInputService = UIKitTextInputService(
             showSoftwareKeyboard = {
