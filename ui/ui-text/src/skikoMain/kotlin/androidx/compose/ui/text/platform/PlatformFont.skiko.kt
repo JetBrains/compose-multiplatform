@@ -225,7 +225,9 @@ internal val GenericFontFamiliesMapping: Map<String, List<String>> by lazy {
             )
         Platform.Windows ->
             mapOf(
-                FontFamily.SansSerif.name to listOf("Arial"),
+                // Segoe UI is the Windows system font, so try it first.
+                // See https://learn.microsoft.com/en-us/windows/win32/uxguide/vis-fonts
+                FontFamily.SansSerif.name to listOf("Segoe UI", "Arial"),
                 FontFamily.Serif.name to listOf("Times New Roman"),
                 FontFamily.Monospace.name to listOf("Consolas"),
                 FontFamily.Cursive.name to listOf("Comic Sans MS")
