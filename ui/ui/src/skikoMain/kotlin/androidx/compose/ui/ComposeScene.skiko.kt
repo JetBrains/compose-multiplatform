@@ -150,11 +150,10 @@ class ComposeScene internal constructor(
         check(!isClosed) { "ComposeScene is closed" }
         isInvalidationDisabled = true
         val result = try {
-            // We must see the actual state before we will do [block]
-            // TODO(https://github.com/JetBrains/compose-jb/issues/1854) get rid of synchronized.
-            synchronized(GlobalSnapshotManager.sync) {
-                Snapshot.sendApplyNotifications()
-            }
+            // Try to get see the up-to-date state before running block
+            // Note that this doesn't guarantee it, if sendApplyNotifications is called concurrently
+            // in a different thread than this code.
+            Snapshot.sendApplyNotifications()
             snapshotChanges.perform()
             block()
         } finally {
