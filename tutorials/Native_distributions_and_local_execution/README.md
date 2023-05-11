@@ -12,7 +12,7 @@ There are two tools available for packaging Compose applications:
 1. The Compose Multiplatform Gradle plugin which provides tasks for basic packaging, obfuscation and (macOS only) signing.
 2. [Conveyor](https://www.hydraulic.software), which is a separate tool not made by JetBrains.
 
-This tutorial covers how to use the built-in tasks. Conveyor has [its own tutorial](https://conveyor.hydraulic.dev/latest/tutorial/1-get-started/). The choice of which to use boils down to features/ease of use vs price. Conveyor provides support for online updates, cross-building and [various other features](packaging-tools-comparison.md) but requires [a license](https://hydraulic.software/pricing.html) for non-open source projects. The packaging tasks come with the Compose Desktop Gradle plugin, but the resulting packages don't support online updates and will require a multi-platform CI setup to create packages for each OS.
+This tutorial covers how to use the built-in tasks. Conveyor has [its own tutorial](https://conveyor.hydraulic.dev/latest/tutorial/hare/jvm). The choice of which to use boils down to features/ease of use vs price. Conveyor provides support for online updates, cross-building and [various other features](packaging-tools-comparison.md) but requires [a license](https://hydraulic.software/pricing.html) for non-open source projects. The packaging tasks come with the Compose Desktop Gradle plugin, but the resulting packages don't support online updates and will require a multi-platform CI setup to create packages for each OS.
 
 ## Gradle plugin
 
