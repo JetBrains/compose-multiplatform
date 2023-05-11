@@ -129,8 +129,7 @@ fun DropdownMenu(
 }
 
 /**
- * A variant of a dropdown menu that accepts a [DropdownMenuState] instead of directly using the
- * mouse position.
+ * A variant of a dropdown menu that accepts a [DropdownMenuState] to allow precise positioning.
  *
  * Typically, it should be combined with [Modifier.contextMenuOpenDetector] via state-hoisting.
  *
@@ -362,7 +361,7 @@ fun Modifier.contextMenuOpenDetector(
     return if (enabled) {
         this.contextMenuOpenDetector(
             key = state,
-            enabled = enabled && (state.status is DropdownMenuState.Status.Closed)
+            enabled = state.status is DropdownMenuState.Status.Closed
         ) { pointerPosition ->
             state.status = DropdownMenuState.Status.Open(pointerPosition)
         }
@@ -371,6 +370,9 @@ fun Modifier.contextMenuOpenDetector(
     }
 }
 
+/**
+ * Positions a dropdown relative to another widget (its anchor).
+ */
 @Immutable
 internal data class DesktopDropdownMenuPositionProvider(
     val contentOffset: DpOffset,
@@ -383,6 +385,28 @@ internal data class DesktopDropdownMenuPositionProvider(
         layoutDirection: LayoutDirection,
         popupContentSize: IntSize
     ): IntOffset {
+
+        val isLtr = layoutDirection == LayoutDirection.Ltr
+
+        // Coerce such that this..this+size fits into min..max; if impossible, align with min
+        fun Int.coerceWithSizeIntoRangePreferMin(size: Int, min: Int, max: Int) = when {
+            this < min -> min
+            this + size > max -> max - size
+            else -> this
+        }
+
+        // Coerce such that this..this+size fits into min..max; if impossible, align with max
+        fun Int.coerceWithSizeIntoRangePreferMax(size: Int, min: Int, max: Int) = when {
+            this + size > max -> max - size
+            this < min -> min
+            else -> this
+        }
+
+        fun Int.coerceWithSizeIntoRange(size: Int, min: Int, max: Int) = when {
+            isLtr -> coerceWithSizeIntoRangePreferMin(size, min, max)
+            else -> coerceWithSizeIntoRangePreferMax(size, min, max)
+        }
+
         // The min margin above and below the menu, relative to the screen.
         val verticalMargin = with(density) { MenuVerticalMargin.roundToPx() }
         // The content offset specified using the dropdown offset parameter.
@@ -390,24 +414,24 @@ internal data class DesktopDropdownMenuPositionProvider(
         val contentOffsetY = with(density) { contentOffset.y.roundToPx() }
 
         // Compute horizontal position.
-        val toRight = anchorBounds.left + contentOffsetX
-        val toLeft = anchorBounds.right - contentOffsetX - popupContentSize.width
-        val toDisplayRight = windowSize.width - popupContentSize.width
-        val toDisplayLeft = 0
-        val x = if (layoutDirection == LayoutDirection.Ltr) {
-            sequenceOf(toRight, toLeft, toDisplayRight)
-        } else {
-            sequenceOf(toLeft, toRight, toDisplayLeft)
-        }.firstOrNull {
-            it >= 0 && it + popupContentSize.width <= windowSize.width
-        } ?: toLeft
+        val preferredX = if (isLtr) {
+            anchorBounds.left + contentOffsetX
+        }
+        else {
+            anchorBounds.right - contentOffsetX - popupContentSize.width
+        }
+        val x = preferredX.coerceWithSizeIntoRange(
+            size = popupContentSize.width,
+            min = 0,
+            max = windowSize.width
+        )
 
         // Compute vertical position.
         val toBottom = maxOf(anchorBounds.bottom + contentOffsetY, verticalMargin)
         val toTop = anchorBounds.top - contentOffsetY - popupContentSize.height
         val toCenter = anchorBounds.top - popupContentSize.height / 2
-        val toDisplayBottom = windowSize.height - popupContentSize.height - verticalMargin
-        var y = sequenceOf(toBottom, toTop, toCenter, toDisplayBottom).firstOrNull {
+        val toWindowBottom = windowSize.height - popupContentSize.height - verticalMargin
+        var y = sequenceOf(toBottom, toTop, toCenter, toWindowBottom).firstOrNull {
             it >= verticalMargin &&
                 it + popupContentSize.height <= windowSize.height - verticalMargin
         } ?: toTop

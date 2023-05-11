@@ -55,41 +55,130 @@ class DesktopMenuTest {
     val rule = createComposeRule()
 
     private val windowSize = IntSize(100, 100)
-    private val anchorPosition = IntOffset(10, 10)
-    private val anchorSize = IntSize(80, 20)
 
+    // Standard case: enough room to position below the anchor and align left
     @Test
-    fun menu_positioning_vertical_underAnchor() {
-        val popupSize = IntSize(80, 70)
+    fun menu_positioning_alignLeft_belowAnchor() {
+        val anchorBounds = IntRect(
+            offset = IntOffset(10, 10),
+            size = IntSize(50, 20)
+        )
+        val popupSize = IntSize(70, 70)
 
         val position = DesktopDropdownMenuPositionProvider(
             DpOffset.Zero,
             Density(1f)
         ).calculatePosition(
-            IntRect(anchorPosition, anchorSize),
+            anchorBounds,
             windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
 
-        assertThat(position).isEqualTo(IntOffset(10, 30))
+        assertThat(position).isEqualTo(anchorBounds.bottomLeft)
     }
 
+    // Standard RTL case: enough room to position below the anchor and align right
     @Test
-    fun menu_positioning_vertical_windowTop() {
-        val popupSize = IntSize(80, 100)
+    fun menu_positioning_rtl_alignRight_belowAnchor() {
+        val anchorBounds = IntRect(
+            offset = IntOffset(30, 10),
+            size = IntSize(50, 20)
+        )
+        val popupSize = IntSize(70, 70)
 
         val position = DesktopDropdownMenuPositionProvider(
             DpOffset.Zero,
             Density(1f)
         ).calculatePosition(
-            IntRect(anchorPosition, anchorSize),
+            anchorBounds,
+            windowSize,
+            LayoutDirection.Rtl,
+            popupSize
+        )
+
+        assertThat(position).isEqualTo(
+            IntOffset(
+                x = anchorBounds.right - popupSize.width,
+                y = anchorBounds.bottom
+            )
+        )
+    }
+
+    // Not enough room to position the popup below the anchor, but enough room above
+    @Test
+    fun menu_positioning_alignLeft_aboveAnchor() {
+        val anchorBounds = IntRect(
+            offset = IntOffset(10, 50),
+            size = IntSize(50, 30)
+        )
+        val popupSize = IntSize(70, 30)
+
+        val position = DesktopDropdownMenuPositionProvider(
+            DpOffset.Zero,
+            Density(1f)
+        ).calculatePosition(
+            anchorBounds,
             windowSize,
             LayoutDirection.Ltr,
             popupSize
         )
 
-        assertThat(position).isEqualTo(IntOffset(10, 0))
+        assertThat(position).isEqualTo(
+            IntOffset(
+                x = anchorBounds.left,
+                y = anchorBounds.top - popupSize.height
+            )
+        )
+    }
+
+    // Anchor left is at negative coordinates, so align popup to the left of the window
+    @Test
+    fun menu_positioning_windowLeft_belowAnchor() {
+        val anchorBounds = IntRect(
+            offset = IntOffset(-10, 10),
+            size = IntSize(50, 20)
+        )
+        val popupSize = IntSize(70, 50)
+
+        val position = DesktopDropdownMenuPositionProvider(
+            DpOffset.Zero,
+            Density(1f)
+        ).calculatePosition(
+            anchorBounds = anchorBounds,
+            windowSize,
+            LayoutDirection.Ltr,
+            popupSize
+        )
+
+        assertThat(position).isEqualTo(IntOffset(0, anchorBounds.bottom))
+    }
+
+    // (RTL) Anchor right is beyond the right of the window, so align popup to the window right
+    @Test
+    fun menu_positioning_rtl_windowRight_belowAnchor() {
+        val anchorBounds = IntRect(
+            offset = IntOffset(30, 10),
+            size = IntSize(80, 20)
+        )
+        val popupSize = IntSize(50, 70)
+
+        val position = DesktopDropdownMenuPositionProvider(
+            DpOffset.Zero,
+            Density(1f)
+        ).calculatePosition(
+            anchorBounds,
+            windowSize,
+            LayoutDirection.Rtl,
+            popupSize
+        )
+
+        assertThat(position).isEqualTo(
+            IntOffset(
+                x = windowSize.width - popupSize.width,
+                y = anchorBounds.bottom
+            )
+        )
     }
 
     @OptIn(ExperimentalComposeUiApi::class)
