@@ -59,7 +59,8 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                                     text = message.user.name,
                                     style = MaterialTheme.typography.body1.copy(
                                         fontWeight = FontWeight.SemiBold,
-                                        letterSpacing = 0.sp
+                                        letterSpacing = 0.sp,
+                                        fontSize = 0.9.em
                                     ),
                                     color = message.user.pictureColor //Color(0xFFEA8034)
                                 )
@@ -68,7 +69,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                         Spacer(Modifier.size(3.dp))
                         Text(
                             text = message.text,
-                            style = MaterialTheme.typography.body1.copy(fontSize = 1.2.em, letterSpacing = 0.sp)
+                            style = MaterialTheme.typography.body1.copy(fontSize = 1.1.em, letterSpacing = 0.sp)
                         )
                         Spacer(Modifier.size(4.dp))
                         Row(
@@ -78,7 +79,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                             Text(
                                 text = timeToString(message.timeMs),
                                 textAlign = TextAlign.End,
-                                style = MaterialTheme.typography.subtitle1.copy(fontSize = 0.7.em),
+                                style = MaterialTheme.typography.subtitle1.copy(fontSize = 0.6.em),
                                 color = Color(0xFF979797)
                             )
                         }
