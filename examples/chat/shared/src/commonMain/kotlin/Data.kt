@@ -22,7 +22,7 @@ data class Message private constructor(
 
 data class User(
     val name: String,
-    val pictureColor: Color = ColorProvider.getColor(),
+    val color: Color = ColorProvider.getColor(),
     val picture: String?
 )
 

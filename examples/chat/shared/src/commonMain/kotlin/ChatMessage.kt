@@ -1,31 +1,41 @@
-import androidx.compose.foundation.*
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.*
-import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.runtime.*
-import androidx.compose.ui.*
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
-import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.*
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.em
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun Photo() {
-    Box(Modifier.size(32.dp).background(Color.Red)) {
-
-    }
+fun Triangle(risingToTheRight: Boolean, background: Color) {
+    Box(
+        Modifier
+            .padding(bottom = 10.dp, start = 0.dp)
+            .clip(TriangleEdgeShape(risingToTheRight))
+            .background(background)
+            .size(6.dp)
+    )
 }
 
 @Composable
@@ -42,14 +52,21 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                 }
                 Spacer(Modifier.size(2.dp))
                 Column {
-                    Box(Modifier.padding(bottom = 10.dp, start = 0.dp).clip(TriangleEdgeShape(!isMyMessage)).background(if(!isMyMessage) Color.White else Color(0xFFE5FEFB)).size(6.dp))
+                    Triangle(true, ChatColors.OTHERS_MESSAGE)
                 }
             }
 
             Column {
                 Box(
-                    Modifier.clip(RoundedCornerShape(10.dp, 10.dp, if(!isMyMessage) 10.dp else 0.dp, if(!isMyMessage) 0.dp else 10.dp))
-                        .background(color = if(!isMyMessage) Color.White else Color(0xFFE5FEFB))
+                    Modifier.clip(
+                        RoundedCornerShape(
+                            10.dp,
+                            10.dp,
+                            if (!isMyMessage) 10.dp else 0.dp,
+                            if (!isMyMessage) 0.dp else 10.dp
+                        )
+                    )
+                        .background(color = if (!isMyMessage) ChatColors.OTHERS_MESSAGE else ChatColors.MY_MESSAGE)
                         .padding(start = 10.dp, top = 5.dp, end = 10.dp, bottom = 5.dp),
                 ) {
                     Column {
@@ -62,7 +79,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                                         letterSpacing = 0.sp,
                                         fontSize = 0.9.em
                                     ),
-                                    color = message.user.pictureColor //Color(0xFFEA8034)
+                                    color = message.user.color
                                 )
                             }
                         }
@@ -80,7 +97,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                                 text = timeToString(message.timeMs),
                                 textAlign = TextAlign.End,
                                 style = MaterialTheme.typography.subtitle1.copy(fontSize = 0.6.em),
-                                color = Color(0xFF979797)
+                                color = ChatColors.TIME_TEXT
                             )
                         }
                     }
@@ -89,7 +106,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
             }
             if(isMyMessage) {
                 Column {
-                    Box(Modifier.padding(bottom = 10.dp, start = 0.dp).clip(TriangleEdgeShape(!isMyMessage)).background(if(!isMyMessage) Color.White else Color(0xFFE5FEFB)).size(6.dp))
+                    Triangle(false, ChatColors.MY_MESSAGE)
                 }
             }
         }
