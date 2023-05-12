@@ -5,4 +5,5 @@ object ChatColors {
     val PRIMARY = 0xFFAA77EE
     val SURFACE = 0xFFCC99FF
     val BACKGROUND = 0xFF663388
+    val TOP_GRADIENT = listOf(0xFFEEEFF3, 0xFFE6F0F2)
 }

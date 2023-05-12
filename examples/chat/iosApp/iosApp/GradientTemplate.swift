@@ -22,6 +22,5 @@ struct GradientTemplate<Content: View>: View {
                     .navigationBarTitleDisplayMode(.inline)
                     .statusBar(hidden: false)
         }
-            .toolbar(.visible, for: .tabBar)
     }
 }
