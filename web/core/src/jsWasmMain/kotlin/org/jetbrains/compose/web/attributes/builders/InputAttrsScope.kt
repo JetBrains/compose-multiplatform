@@ -110,8 +110,8 @@ class InputAttrsScope<ValueType>(
 }
 
 internal external interface JsWeakMap {
-    fun delete(key: Any)
-    fun get(key: Any): Any?
-    fun has(key: Any): Boolean
-    fun set(key: Any, value: Any): JsWeakMap
+    fun delete(key: JsAny)
+    fun get(key: JsAny): JsReference<*>
+    fun has(key: JsAny): Boolean
+    fun set(key: JsAny, value: JsReference<*>): JsWeakMap
 }

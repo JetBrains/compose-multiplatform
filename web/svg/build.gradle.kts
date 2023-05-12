@@ -66,11 +66,3 @@ kotlin {
         }
     }
 }
-
-
-project.afterEvaluate {
-    //Disable jsWasmMain intermediate sourceset publication
-    tasks.named("compileJsWasmMainKotlinMetadata") {
-        enabled = false
-    }
-}

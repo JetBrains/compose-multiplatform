@@ -1,4 +1,5 @@
 import org.jetbrains.compose.gradle.standardConf
+import org.jetbrains.kotlin.gradle.targets.js.webpack.KotlinWebpackConfig
 
 plugins {
     kotlin("multiplatform")
@@ -11,8 +12,8 @@ kotlin {
             useJUnitPlatform()
 
             systemProperty(
-                "COMPOSE_WEB_INTEGRATION_TESTS_DISTRIBUTION",
-                File(buildDir, "developmentExecutable")
+                    "COMPOSE_WEB_INTEGRATION_TESTS_DISTRIBUTION",
+                    File(buildDir, "developmentExecutable")
             )
         }
     }
@@ -30,7 +31,17 @@ kotlin {
     }
     wasm {
         moduleName = "myApp"
-        browser()
+        browser {
+            commonWebpackConfig {
+                devServer = (devServer ?: KotlinWebpackConfig.DevServer()).copy(
+                        open = mapOf(
+                                "app" to mapOf(
+                                        "name" to "google-chrome",
+                                )
+                        ),
+                )
+            }
+        }
         binaries.executable()
     }
 
@@ -40,6 +51,8 @@ kotlin {
                 implementation(compose.runtime)
                 implementation(project(":web-core"))
                 implementation(kotlin("stdlib-common"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-RC-wasm0")
+                implementation(project(":internal-web-core-runtime"))
             }
         }
 
@@ -91,8 +104,8 @@ tasks.named<Test>("jvmTest") {
     dependsOn(tasks.named("jsBrowserDevelopmentWebpack"))
 
     listOf(
-        "webdriver.chrome.driver",
-        "webdriver.gecko.driver",
+            "webdriver.chrome.driver",
+            "webdriver.gecko.driver",
     ).forEach {
         if (rootProject.hasProperty(it)) {
             println("${it} => ${rootProject.extensions.getByName(it)}")
@@ -101,7 +114,7 @@ tasks.named<Test>("jvmTest") {
     }
 
     listOf(
-        "compose.web.tests.integration.withFirefox"
+            "compose.web.tests.integration.withFirefox"
     ).forEach { propName ->
         if (project.hasProperty(propName)) {
             systemProperty(propName, "true")
@@ -114,12 +127,5 @@ afterEvaluate {
     rootProject.extensions.configure<org.jetbrains.kotlin.gradle.targets.js.nodejs.NodeJsRootExtension> {
         versions.webpackDevServer.version = "4.0.0"
         versions.webpackCli.version = "4.10.0"
-    }
-}
-
-project.afterEvaluate {
-    //Disable jsWasmMain intermediate sourceset publication
-    tasks.named("compileJsWasmMainKotlinMetadata") {
-        enabled = false
     }
 }

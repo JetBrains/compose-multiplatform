@@ -84,13 +84,14 @@ class TestScope : CoroutineScope by MainScope() {
      * Suspends until [element] observes any change to its html.
      */
     suspend fun waitForChanges(element: HTMLElement = root) {
-        suspendCoroutine<Unit> { continuation ->
-            val observer = MutationObserver { _, observer ->
-                continuation.resume(Unit)
-                observer.disconnect()
-            }
-            observer.observe(element, MutationObserverOptions)
-        }
+        waitForRecompositionComplete()
+//        suspendCoroutine<Unit> { continuation ->
+//            val observer = MutationObserver { _, observer ->
+//                continuation.resume(Unit)
+//                observer.disconnect()
+//            }
+//            observer.observe(element, MutationObserverOptions)
+//        }
     }
 
     /**
@@ -136,18 +137,18 @@ class TestScope : CoroutineScope by MainScope() {
  * ```
  */
 @ComposeWebExperimentalTestsApi
-fun runTest(block: suspend TestScope.() -> Unit): dynamic {
+fun runTest(block: suspend TestScope.() -> Unit): JsAny {
     val scope = TestScope()
     return scope.promise { block(scope) }
 }
 
-private object MutationObserverOptions : MutationObserverInit {
-    override var childList: Boolean? = true
-    override var attributes: Boolean? = true
-    override var characterData: Boolean? = true
-    override var subtree: Boolean? = true
-    override var attributeOldValue: Boolean? = true
-}
+//private object MutationObserverOptions : MutationObserverInit {
+//    override var childList: Boolean? = true
+//    override var attributes: Boolean? = true
+//    override var characterData: Boolean? = true
+//    override var subtree: Boolean? = true
+//    override var attributeOldValue: Boolean? = true
+//}
 
 @OptIn(ExperimentalTime::class)
 private class TestMonotonicClockImpl(

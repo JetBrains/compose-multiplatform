@@ -46,7 +46,7 @@ internal fun restoreControlledTextAreaState(element: HTMLTextAreaElement) {
 }
 
 internal fun <V : Any> saveControlledInputState(element: HTMLElement, value: V) {
-    controlledInputsValuesWeakMap.set(element, value)
+    controlledInputsValuesWeakMap.set(element, value.toJsReference())
 
     if (element is HTMLInputElement) {
         updateRadioGroupIfNeeded(element)

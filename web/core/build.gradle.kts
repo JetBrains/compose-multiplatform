@@ -24,6 +24,7 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation(compose.runtime)
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-RC-wasm0")
             }
         }
 
@@ -79,12 +80,5 @@ kotlin {
                 implementation(compose.desktop.currentOs)
             }
         }
-    }
-}
-
-project.afterEvaluate {
-    //Disable jsWasmMain intermediate sourceset publication
-    tasks.named("compileJsWasmMainKotlinMetadata") {
-        enabled = false
     }
 }

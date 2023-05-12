@@ -120,7 +120,7 @@ fun AttrsScope<HTMLInputElement>.alt(value: String) =
     attr("alt", value) // type: image only
 
 fun AttrsScope<HTMLInputElement>.autoComplete(value: AutoComplete) =
-    attr("autocomplete", value.asDynamic().unsafeCast<String>())
+    attr("autocomplete", value.asString())
 
 fun AttrsScope<HTMLInputElement>.autoFocus() =
     attr("autofocus", "")
@@ -231,7 +231,7 @@ fun AttrsScope<HTMLOptionElement>.label(value: String) =
 /* Select attributes */
 
 fun AttrsScope<HTMLSelectElement>.autoComplete(value: AutoComplete) =
-    attr("autocomplete", value.asDynamic().unsafeCast<String>())
+    attr("autocomplete", value.asString())
 
 fun AttrsScope<HTMLSelectElement>.autofocus() =
     attr("autofocus", "")
@@ -265,7 +265,7 @@ fun AttrsScope<HTMLOptGroupElement>.disabled() =
 /* TextArea attributes */
 
 fun AttrsScope<HTMLTextAreaElement>.autoComplete(value: AutoComplete) =
-    attr("autocomplete", value.asDynamic().unsafeCast<String>())
+    attr("autocomplete", value.asString())
 
 fun AttrsScope<HTMLTextAreaElement>.autoFocus() =
     attr("autofocus", "")

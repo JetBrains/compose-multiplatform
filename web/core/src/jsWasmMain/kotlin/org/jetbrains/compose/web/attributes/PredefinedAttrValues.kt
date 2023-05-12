@@ -4,6 +4,7 @@ package org.jetbrains.compose.web.attributes
 
 import org.w3c.dom.events.Event
 import org.jetbrains.compose.web.EventTargetExtension
+import org.jetbrains.compose.web.JsWasmNumber
 
 sealed class InputType<T>(val typeStr: String) {
 
@@ -42,8 +43,8 @@ sealed class InputType<T>(val typeStr: String) {
         }
     }
 
-    open class InputTypeNumberValue(name: String) : InputType<kotlin.Number?>(name) {
-        override fun inputValue(event: Event): kotlin.Number? {
+    open class InputTypeNumberValue(name: String) : InputType<JsWasmNumber?>(name) {
+        override fun inputValue(event: Event): JsWasmNumber? {
             return (event.target as EventTargetExtension).valueAsNumber
         }
     }
@@ -479,7 +480,9 @@ interface AutoComplete {
          */
         inline val photo get() = AutoComplete("photo")
     }
+
+    fun asString(): String
 }
 
 @Suppress("NOTHING_TO_INLINE")
-inline fun AutoComplete(value: String) = value.unsafeCast<AutoComplete>()
+expect inline fun AutoComplete(value: String): AutoComplete

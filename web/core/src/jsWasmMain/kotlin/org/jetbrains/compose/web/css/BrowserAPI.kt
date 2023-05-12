@@ -21,9 +21,9 @@ internal inline fun CSSKeyframesRule.appendRule(cssRule: String) {
     (this as CSSKeyframesRuleExtension).appendRule(cssRule)
 }
 
-@Suppress("NOTHING_TO_INLINE")
-internal inline fun <T : Any> jsObject(): T =
-    js("({})").unsafeCast<T>()
-
-internal inline fun <T : Any> jsObject(builder: T.() -> Unit): T =
-    jsObject<T>().apply(builder)
+//@Suppress("NOTHING_TO_INLINE")
+//internal inline fun <T : Any> jsObject(): T =
+//    js("({})").unsafeCast<T>()
+//
+//internal inline fun <T : Any> jsObject(builder: T.() -> Unit): T =
+//    jsObject<T>().apply(builder)

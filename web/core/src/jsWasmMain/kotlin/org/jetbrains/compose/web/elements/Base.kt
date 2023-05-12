@@ -69,14 +69,15 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
             is HTMLElement, is SVGElement -> {
                 node.removeAttribute("style")
 
-                val style = node.asDynamic().unsafeCast<ElementCSSInlineStyle>().style
+                val style = getNodeStyle(node)
+                //node.asDynamic().unsafeCast<ElementCSSInlineStyle>().style
 
                 styleApplier.properties.forEach { (name, value) ->
-                    style.setProperty(name, value.toString())
+                    setPropertyInterop(style, name, value.toString())
                 }
 
                 styleApplier.variables.forEach { (name, value) ->
-                    style.setProperty(name, value.toString())
+                    setPropertyInterop(style, name, value.toString())
                 }
             }
         }
@@ -97,6 +98,11 @@ private class DomElementWrapper(override val node: Element): DomNodeWrapper(node
         }
     }
 }
+
+private fun getNodeStyle(node: org.w3c.dom.Element): ElementCSSInlineStyle = js("node.style")
+
+private fun setPropertyInterop(style: ElementCSSInlineStyle, name: String, value: String): Nothing =
+        js("style.setProperty(name, value)")
 
 internal expect fun removeAttributesExceptStyleAndClass(node: Element)
 

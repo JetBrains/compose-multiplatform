@@ -6,9 +6,16 @@
 package org.jetbrains.compose.web.css.keywords
 
 import org.jetbrains.compose.web.css.CSSKeywordValue
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
 
 interface CSSAutoKeyword : CSSKeywordValue
 
+@ComposeWebInternalApi
+object CSSAutoKeywordImpl : CSSAutoKeyword {
+    override fun toString(): String = "auto"
+}
+
+@OptIn(ComposeWebInternalApi::class)
 inline val auto: CSSAutoKeyword
-    get() = CSSKeywordValue("auto").asDynamic().unsafeCast<CSSAutoKeyword>()
+    get() = CSSAutoKeywordImpl
 

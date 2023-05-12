@@ -170,7 +170,7 @@ fun interface ElementBuilder<TElement : Element> {
             val tagLowercase = tagName.lowercase()
             return buildersCache.getOrPut(tagLowercase) {
                 ElementBuilderImplementation<TElement>(tagLowercase)
-            }.asDynamic().unsafeCast<ElementBuilder<TElement>>()
+            } as ElementBuilder<TElement>
         }
     }
 }

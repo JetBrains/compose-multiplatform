@@ -2,6 +2,8 @@
 
 package org.jetbrains.compose.web.css
 
+import org.jetbrains.compose.web.internal.runtime.ComposeWebInternalApi
+
 interface CSSNumericValue<T : CSSUnit> : StylePropertyValue, CSSVariableValueAs<CSSNumericValue<T>>
 
 interface CSSSizeValue<T : CSSUnit> : CSSNumericValue<T> {
@@ -103,75 +105,78 @@ interface CSSUnit {
 
     interface number: CSSUnit
 
+    @OptIn(ComposeWebInternalApi::class)
     companion object {
-        inline val percent get() = "%".unsafeCast<percent>()
+        inline val percent get() = "%".castToCSSUnit<percent>()
 
-        inline val em get() = "em".unsafeCast<em>()
+        inline val em get() = "em".castToCSSUnit<em>()
 
-        inline val ex get() = "ex".unsafeCast<ex>()
+        inline val ex get() = "ex".castToCSSUnit<ex>()
 
-        inline val ch get() = "ch".unsafeCast<ch>()
+        inline val ch get() = "ch".castToCSSUnit<ch>()
 
-        inline val ic get() = "ic".unsafeCast<ic>()
+        inline val ic get() = "ic".castToCSSUnit<ic>()
 
-        inline val rem get() = "rem".unsafeCast<rem>()
+        inline val rem get() = "rem".castToCSSUnit<rem>()
 
-        inline val lh get() = "lh".unsafeCast<lh>()
+        inline val lh get() = "lh".castToCSSUnit<lh>()
 
-        inline val rlh get() = "rlh".unsafeCast<rlh>()
+        inline val rlh get() = "rlh".castToCSSUnit<rlh>()
 
-        inline val vw get() = "vw".unsafeCast<vw>()
+        inline val vw get() = "vw".castToCSSUnit<vw>()
 
-        inline val vh get() = "vh".unsafeCast<vh>()
+        inline val vh get() = "vh".castToCSSUnit<vh>()
 
-        inline val vi get() = "vi".unsafeCast<vi>()
+        inline val vi get() = "vi".castToCSSUnit<vi>()
 
-        inline val vb get() = "vb".unsafeCast<vb>()
+        inline val vb get() = "vb".castToCSSUnit<vb>()
 
-        inline val vmin get() = "vmin".unsafeCast<vmin>()
+        inline val vmin get() = "vmin".castToCSSUnit<vmin>()
 
-        inline val vmax get() = "vmax".unsafeCast<vmax>()
+        inline val vmax get() = "vmax".castToCSSUnit<vmax>()
 
-        inline val cm get() = "cm".unsafeCast<cm>()
+        inline val cm get() = "cm".castToCSSUnit<cm>()
 
-        inline val mm get() = "mm".unsafeCast<mm>()
+        inline val mm get() = "mm".castToCSSUnit<mm>()
 
-        inline val Q get() = "Q".unsafeCast<Q>()
+        inline val Q get() = "Q".castToCSSUnit<Q>()
 
-        inline val pt get() = "pt".unsafeCast<pt>()
+        inline val pt get() = "pt".castToCSSUnit<pt>()
 
-        inline val pc get() = "pc".unsafeCast<pc>()
+        inline val pc get() = "pc".castToCSSUnit<pc>()
 
-        inline val px get() = "px".unsafeCast<px>()
+        inline val px get() = "px".castToCSSUnit<px>()
 
-        inline val deg get() = "deg".unsafeCast<deg>()
+        inline val deg get() = "deg".castToCSSUnit<deg>()
 
-        inline val grad get() = "grad".unsafeCast<grad>()
+        inline val grad get() = "grad".castToCSSUnit<grad>()
 
-        inline val rad get() = "rad".unsafeCast<rad>()
+        inline val rad get() = "rad".castToCSSUnit<rad>()
 
-        inline val turn get() = "turn".unsafeCast<turn>()
+        inline val turn get() = "turn".castToCSSUnit<turn>()
 
-        inline val s get() = "s".unsafeCast<s>()
+        inline val s get() = "s".castToCSSUnit<s>()
 
-        inline val ms get() = "ms".unsafeCast<ms>()
+        inline val ms get() = "ms".castToCSSUnit<ms>()
 
-        inline val Hz get() = "Hz".unsafeCast<Hz>()
+        inline val Hz get() = "Hz".castToCSSUnit<Hz>()
 
-        inline val kHz get() = "kHz".unsafeCast<kHz>()
+        inline val kHz get() = "kHz".castToCSSUnit<kHz>()
 
-        inline val dpi get() = "dpi".unsafeCast<dpi>()
+        inline val dpi get() = "dpi".castToCSSUnit<dpi>()
 
-        inline val dpcm get() = "dpcm".unsafeCast<dpcm>()
+        inline val dpcm get() = "dpcm".castToCSSUnit<dpcm>()
 
-        inline val dppx get() = "dppx".unsafeCast<dppx>()
+        inline val dppx get() = "dppx".castToCSSUnit<dppx>()
 
-        inline val fr get() = "fr".unsafeCast<fr>()
+        inline val fr get() = "fr".castToCSSUnit<fr>()
 
-        inline val number get() = "number".unsafeCast<number>()
+        inline val number get() = "number".castToCSSUnit<number>()
     }
 }
 
+@ComposeWebInternalApi
+expect inline fun <reified T> String.castToCSSUnit(): T
 
 val Number.number
     get(): CSSSizeValue<CSSUnit.number> = CSSUnitValueTyped(this.toFloat(), CSSUnit.number)

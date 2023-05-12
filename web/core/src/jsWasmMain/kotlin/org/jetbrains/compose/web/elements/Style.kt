@@ -53,7 +53,7 @@ private fun fillRule(
 ) {
     when (cssRuleDeclaration) {
         is CSSStyledRuleDeclaration -> {
-            val cssStyleRule = cssRule.asDynamic().unsafeCast<CSSStyleRule>()
+            val cssStyleRule = cssRule as CSSStyleRule
             cssRuleDeclaration.style.properties.forEach { (name, value) ->
                 setProperty(cssStyleRule.style, name, value)
             }
@@ -62,13 +62,13 @@ private fun fillRule(
             }
         }
         is CSSGroupingRuleDeclaration -> {
-            val cssGroupingRule = cssRule.asDynamic().unsafeCast<CSSGroupingRule>()
+            val cssGroupingRule = cssRule as CSSGroupingRule
             cssRuleDeclaration.rules.forEach { childRuleDeclaration ->
                 cssGroupingRule.addRule(childRuleDeclaration)
             }
         }
         is CSSKeyframesRuleDeclaration -> {
-            val cssGroupingRule = cssRule.asDynamic().unsafeCast<CSSKeyframesRule>()
+            val cssGroupingRule = cssRule as CSSKeyframesRule
             cssRuleDeclaration.keys.forEach { childRuleDeclaration ->
                 cssGroupingRule.addRule(childRuleDeclaration)
             }

@@ -1,6 +1,7 @@
 package org.jetbrains.compose.web.events
 
 import androidx.compose.web.events.SyntheticEvent
+import org.jetbrains.compose.web.JsWasmNumber
 import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventTarget
 
@@ -10,12 +11,12 @@ class SyntheticAnimationEvent internal constructor(
 ) : SyntheticEvent<EventTarget>(nativeEvent) {
 
     val animationName: String = animationEventDetails.animationName
-    val elapsedTime: Number = animationEventDetails.elapsedTime
+    val elapsedTime: JsWasmNumber = animationEventDetails.elapsedTime
     val pseudoElement: String = animationEventDetails.pseudoElement
 }
 
 internal external interface AnimationEventDetails {
     val animationName: String
-    val elapsedTime: Number
+    val elapsedTime: JsWasmNumber
     val pseudoElement: String
 }

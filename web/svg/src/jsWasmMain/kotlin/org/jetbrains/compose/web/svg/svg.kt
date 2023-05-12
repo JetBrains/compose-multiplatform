@@ -18,7 +18,7 @@ import org.w3c.dom.svg.*
 private open class ElementBuilderNS<TElement : Element>(private val tagName: String, private val namespace: String) :
     ElementBuilder<TElement> {
     private val el: Element by lazy { document.createElementNS(namespace, tagName) }
-    override fun create(): TElement = el.cloneNode().asDynamic().unsafeCast<TElement>()
+    override fun create(): TElement = el.cloneNode() as TElement
 }
 
 const val SVG_NS = "http://www.w3.org/2000/svg"

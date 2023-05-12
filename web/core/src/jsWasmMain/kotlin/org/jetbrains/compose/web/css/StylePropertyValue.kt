@@ -11,11 +11,11 @@ interface StylePropertyValue
 interface StylePropertyNumber: StylePropertyValue
 interface StylePropertyString: StylePropertyValue
 
-inline fun StylePropertyValue(value: String): StylePropertyString = value.asDynamic().unsafeCast<StylePropertyString>()
-inline fun StylePropertyValue(value: Number): StylePropertyNumber = value.asDynamic().unsafeCast<StylePropertyNumber>()
+inline expect fun StylePropertyValue(value: String): StylePropertyString
+inline expect fun StylePropertyValue(value: Number): StylePropertyNumber
 
 interface CSSStyleValue: StylePropertyValue {
     override fun toString(): String
 }
 
-inline fun CSSStyleValue(value: String): CSSStyleValue = StylePropertyValue(value).asDynamic().unsafeCast<CSSStyleValue>()
+inline expect fun CSSStyleValue(value: String): CSSStyleValue

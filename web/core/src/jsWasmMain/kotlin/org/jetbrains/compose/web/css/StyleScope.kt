@@ -68,8 +68,8 @@ internal inline fun variableValue(variableName: String, fallback: StylePropertyV
 
 interface CSSVariableValueAs<out T : StylePropertyValue>
 
-inline fun <TValue> CSSVariableValue(value: StylePropertyValue) =
-    value.asDynamic().unsafeCast<TValue>()
+inline fun <TValue> CSSVariableValue(value: StylePropertyValue): TValue = TODO("Implement CSSVariableValue")
+    //value.asDynamic().unsafeCast<TValue>()
 
 inline fun <TValue> CSSVariableValue(value: String) =
     CSSVariableValue<TValue>(StylePropertyValue(value))
@@ -145,6 +145,7 @@ interface StyleHolder {
 )
 typealias StyleBuilderImpl = StyleScopeBuilder
 
+@OptIn(ComposeWebInternalApi::class)
 @Suppress("EqualsOrHashCode")
 open class StyleScopeBuilder : StyleScope, StyleHolder {
     override val properties: MutableStylePropertyList = mutableListOf()
@@ -177,8 +178,8 @@ data class StylePropertyDeclaration(
     val name: String,
     val value: StylePropertyValue
 ) {
-    constructor(name: String, value: String) : this(name, value.asDynamic().unsafeCast<StylePropertyValue>())
-    constructor(name: String, value: Number) : this(name, value.asDynamic().unsafeCast<StylePropertyValue>())
+    constructor(name: String, value: String) : this(name, StylePropertyValue(value))
+    constructor(name: String, value: Number) : this(name, StylePropertyValue(value))
 }
 typealias StylePropertyList = List<StylePropertyDeclaration>
 typealias MutableStylePropertyList = MutableList<StylePropertyDeclaration>

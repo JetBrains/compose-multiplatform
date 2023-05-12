@@ -6,10 +6,13 @@ import org.w3c.dom.events.Event
 import org.w3c.dom.events.EventTarget
 internal external interface EventTargetExtension {
     val checked: Boolean
-    val valueAsNumber: Number?
+    val valueAsNumber: JsWasmNumber?
     val value: String?
 }
 
+expect class 
+
+JsWasmNumber
 
 internal external interface CSSKeyframesRuleExtension {
     fun appendRule(cssRule: String)

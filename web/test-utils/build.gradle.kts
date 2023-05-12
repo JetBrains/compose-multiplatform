@@ -28,8 +28,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
+                implementation(compose.runtime)
                 implementation(kotlin("stdlib-common"))
                 implementation(project(":internal-web-core-runtime"))
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.0-RC-wasm0")
             }
         }
         val jsWasmMain by creating {
@@ -46,12 +48,5 @@ kotlin {
                 implementation(kotlin("test-js"))
             }
         }
-    }
-}
-
-project.afterEvaluate {
-    //Disable jsWasmMain intermediate sourceset publication
-    tasks.named("compileJsWasmMainKotlinMetadata") {
-        enabled = false
     }
 }

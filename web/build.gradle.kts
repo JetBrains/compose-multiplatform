@@ -105,21 +105,21 @@ subprojects {
     }
 
     pluginManager.withPlugin("kotlin-multiplatform") {
-        val printTestBundleSize by tasks.registering {
-            dependsOn(tasks.named("jsTest"))
-            doLast {
-                val bundlePath = buildDir.resolve(
-                    "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
-                )
-                if (bundlePath.exists()) {
-                    val size = bundlePath.length()
-                    println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
-                }
-            }
-        }
+//        val printTestBundleSize by tasks.registering {
+//            dependsOn(tasks.named("jsTest"))
+//            doLast {
+//                val bundlePath = buildDir.resolve(
+//                    "compileSync/test/testDevelopmentExecutable/kotlin/${rootProject.name}-${project.name}-test.js"
+//                )
+//                if (bundlePath.exists()) {
+//                    val size = bundlePath.length()
+//                    println("##teamcity[buildStatisticValue key='testBundleSize::${project.name}' value='$size']")
+//                }
+//            }
+//        }
 
         afterEvaluate {
-            tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
+            //tasks.named("jsTest") { finalizedBy(printTestBundleSize) }
         }
     }
 
@@ -165,6 +165,9 @@ subprojects {
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+        }
         google()
     }
 
@@ -174,6 +177,13 @@ subprojects {
             exceptionFormat = TestExceptionFormat.FULL
             showStandardStreams = true
             showStackTraces = true
+        }
+    }
+
+    project.tasks.whenTaskAdded {
+        //Disable jsWasmMain intermediate sourceset publication
+        if (name == "compileJsWasmMainKotlinMetadata") {
+            enabled = false
         }
     }
 }

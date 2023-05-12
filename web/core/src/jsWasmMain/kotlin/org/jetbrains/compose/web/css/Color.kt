@@ -172,7 +172,7 @@ object Color {
     inline val currentColor get() = Color("currentColor")
 }
 
-fun Color(name: String): CSSColorValue = name.unsafeCast<CSSColorValue>()
+expect fun Color(name: String): CSSColorValue
 
 private class RGB(val r: Number, val g: Number, val b: Number): CSSColorValue {
     override fun toString(): String = "rgb($r, $g, $b)"

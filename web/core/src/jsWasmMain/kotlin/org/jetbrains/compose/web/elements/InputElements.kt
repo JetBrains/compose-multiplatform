@@ -2,6 +2,7 @@ package org.jetbrains.compose.web.dom
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.NonRestartableComposable
+import org.jetbrains.compose.web.JsWasmNumber
 import org.jetbrains.compose.web.attributes.builders.InputAttrsScope
 import org.jetbrains.compose.web.attributes.*
 
@@ -123,7 +124,7 @@ fun NumberInput(
     value: Number? = null,
     min: Number? = null,
     max: Number? = null,
-    attrs: InputAttrsScope<Number?>.() -> Unit = {}
+    attrs: InputAttrsScope<JsWasmNumber?>.() -> Unit = {}
 ) {
     Input(
         type = InputType.Number,
@@ -182,7 +183,7 @@ fun RangeInput(
     min: Number? = null,
     max: Number? = null,
     step: Number = 1,
-    attrs: InputAttrsScope<Number?>.() -> Unit = {}
+    attrs: InputAttrsScope<JsWasmNumber?>.() -> Unit = {}
 ) {
     Input(
         type = InputType.Range,

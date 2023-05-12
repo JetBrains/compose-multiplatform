@@ -10,6 +10,9 @@ pluginManagement {
         maven {
             url = uri("https://packages.jetbrains.team/maven/p/ui/dev")
         }
+        maven {
+            url = uri("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/bootstrap")
+        }
     }
 
     resolutionStrategy {

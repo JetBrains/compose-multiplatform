@@ -87,12 +87,12 @@ fun CounterApp(counter: MutableState<Int>) {
 
     Button(
         {
-            style {
-                color(if (counter.value % 2 == 0) Color.green else Color.red)
-                width((counter.value + 200).px)
-                fontSize(if (counter.value % 2 == 0) 25.px else 30.px)
-                margin(15.px)
-            }
+//            style {
+//                color(if (counter.value % 2 == 0) Color.green else Color.red)
+//                width((counter.value + 200).px)
+//                fontSize(if (counter.value % 2 == 0) 25.px else 30.px)
+//                margin(15.px)
+//            }
 
             onClick {
                 println("CounterValue = ${counter.value}")
@@ -114,18 +114,26 @@ fun Counter(value: Int) {
             attr("title", "This is a counter!")
             onDrag { println("DRAGGING NOW!!!!") }
 
-            style {
-                color(Color.red)
-            }
+//            style {
+//                color(Color.red)
+//            }
         }
     ) {
         Text("Counter = $value")
     }
 }
 
-@OptIn(ExperimentalComposeWebStyleApi::class)
 fun main() {
-    val urlParams = URLSearchParams(window.location.search.asDynamic())
+    renderComposableInBody {
+        println("renderComposable")
+        val counter = remember { mutableStateOf(0) }
+        CounterApp(counter)
+    }
+}
+
+@OptIn(ExperimentalComposeWebStyleApi::class)
+fun main2() {
+    val urlParams = URLSearchParams(window.location.search.toJsString())
 
     if (urlParams.has("test")) {
         launchTestCase(urlParams.get("test") ?: "")
@@ -134,6 +142,7 @@ fun main() {
 
     renderComposableInBody {
         println("renderComposable")
+
         val counter = remember { mutableStateOf(0) }
 
         CheckboxInput(checked = false) {
@@ -165,7 +174,7 @@ fun main() {
             onBeforeInput { println(("RangeInput onBeforeInput = ${it.value}")) }
             onInput {
                 println(("RangeInput onInput = ${it.value}"))
-                rangeState = it.value ?: 0
+                rangeState = (it.value ?: 0).toString().toInt()
             }
         }
 
