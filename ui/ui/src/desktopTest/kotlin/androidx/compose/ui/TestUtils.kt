@@ -22,10 +22,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.Paint
 import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.painter.Painter
-import java.awt.Component
-import java.awt.Container
-import java.awt.Image
-import java.awt.Window
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.WindowPosition
+import java.awt.*
 import java.awt.event.InputMethodEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseEvent
@@ -202,3 +202,7 @@ suspend fun awaitEDT() {
         yield()
     }
 }
+
+fun Dimension.toDpSize() = DpSize(width.dp, height.dp)
+
+fun Point.toWindowPosition() = WindowPosition(x.dp, y.dp)
