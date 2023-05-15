@@ -6,8 +6,17 @@
 package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
-import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
+
+internal fun Project.configureExperimentalTargetsFlagsCheck() {
+    plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
+        gradle.taskGraph.whenReady {
+            checkExperimentalTargetsWithSkikoIsEnabled()
+        }
+    }
+}
 
 private const val SKIKO_ARTIFACT_PREFIX = "org.jetbrains.skiko:skiko"
 
@@ -29,8 +38,8 @@ private sealed interface CheckResult {
     class Fail(val target: TargetType) : CheckResult
 }
 
-internal fun Project.checkExperimentalTargetsWithSkikoIsEnabled() = afterEvaluate {
-    val mppExt = project.extensions.findByType(KotlinMultiplatformExtension::class.java) ?: return@afterEvaluate
+private fun Project.checkExperimentalTargetsWithSkikoIsEnabled() {
+    val mppExt = project.mppExt
     val failedResults = mppExt.targets.map { checkTarget(it) }
         .filterIsInstance<CheckResult.Fail>()
         .distinctBy { it.target }
