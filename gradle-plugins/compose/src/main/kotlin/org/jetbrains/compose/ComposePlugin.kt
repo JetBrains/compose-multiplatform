@@ -55,20 +55,6 @@ class ComposePlugin : Plugin<Project> {
             project.configureExperimental(composeExtension, experimentalExtension)
             project.checkExperimentalTargetsWithSkikoIsEnabled()
 
-            if (androidExtension.useAndroidX) {
-                project.logger.warn("useAndroidX is an experimental feature at the moment!")
-                RedirectAndroidVariants.androidxVersion = androidExtension.androidxVersion
-                listOf(
-                    RedirectAndroidVariants::class.java,
-                ).forEach(project.dependencies.components::all)
-            }
-
-            fun ComponentModuleMetadataHandler.replaceAndroidx(original: String, replacement: String) {
-                module(original) {
-                    it.replacedBy(replacement, "org.jetbrains.compose isn't compatible with androidx.compose, because it is the same library published with different maven coordinates")
-                }
-            }
-
             project.tasks.withType(KotlinCompile::class.java).configureEach {
                 it.kotlinOptions.apply {
                     freeCompilerArgs = freeCompilerArgs +
@@ -77,32 +63,6 @@ class ComposePlugin : Plugin<Project> {
                             }
                 }
             }
-        }
-    }
-
-    class RedirectAndroidVariants : ComponentMetadataRule {
-        override fun execute(context: ComponentMetadataContext) = with(context.details) {
-            if (id.group.startsWith("org.jetbrains.compose")) {
-                val group = id.group.replaceFirst("org.jetbrains.compose", "androidx.compose")
-                val newReference = "$group:${id.module.name}:$androidxVersion"
-                listOf(
-                    "debugApiElements-published",
-                    "debugRuntimeElements-published",
-                    "releaseApiElements-published",
-                    "releaseRuntimeElements-published"
-                ).forEach { variantNameToAlter ->
-                    withVariant(variantNameToAlter) { variantMetadata ->
-                        variantMetadata.withDependencies { dependencies ->
-                            dependencies.removeAll { true } //there are references to org.jetbrains artifacts now
-                            dependencies.add(newReference)
-                        }
-                    }
-                }
-            }
-        }
-
-        companion object {
-            var androidxVersion: String? = null
         }
     }
 
