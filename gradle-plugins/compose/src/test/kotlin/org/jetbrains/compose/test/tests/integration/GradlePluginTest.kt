@@ -28,6 +28,17 @@ class GradlePluginTest : GradlePluginTestBase() {
             testEnvironment = defaultTestEnvironment.copy(useGradleConfigurationCache = false)
         )
     ) {
+        fun jsCanvasEnabled(value: Boolean) {
+            modifyGradleProperties { put("org.jetbrains.compose.experimental.jscanvas.enabled", value.toString()) }
+
+        }
+
+        jsCanvasEnabled(false)
+        gradleFailure(":build").checks {
+            check.logContains("ERROR: Compose targets '[jscanvas]' are experimental and may have bugs!")
+        }
+
+        jsCanvasEnabled(true)
         gradle(":build").checks {
             check.taskSuccessful(":unpackSkikoWasmRuntimeJs")
             check.taskSuccessful(":compileKotlinJs")

@@ -76,7 +76,13 @@ class TestProject(
         }
     }
 
-    internal fun gradle(vararg args: String): BuildResult {
+    internal fun gradle(vararg args: String): BuildResult =
+        withGradleRunner(args) { build() }
+
+    internal fun gradleFailure(vararg args: String): BuildResult =
+        withGradleRunner(args) { buildAndFail() }
+
+    private inline fun withGradleRunner(args: Array<out String>, runnerFn: GradleRunner.() -> BuildResult): BuildResult {
         if (testEnvironment.useGradleConfigurationCache) {
             if (GradleVersion.version(TestProperties.gradleVersionForTests).baseVersion < GradleVersion.version("8.0")) {
                 // Gradle 7.* does not use the configuration cache in the same build.
@@ -84,11 +90,11 @@ class TestProject(
                 // but does not, use the serialized task graph.
                 // So in order to test the cache, we need to perform dry-run before the actual run.
                 // This should be fixed in https://github.com/gradle/gradle/issues/21985 (which is planned for 8.0 RC 1)
-                gradleRunner(args.withDryRun()).build()
+                gradleRunner(args.withDryRun()).runnerFn()
             }
         }
 
-        return gradleRunner(args).build()
+        return gradleRunner(args).runnerFn()
     }
 
     private fun Array<out String>.withDryRun(): Array<String> {
