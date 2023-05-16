@@ -18,9 +18,9 @@ private val MaxFontSize = 40.sp
 @Composable
 fun StatusBar(settings: Settings) = Box(
     Modifier
+        .padding(16.dp, 4.dp, 16.dp, 16.dp)
         .height(32.dp)
         .fillMaxWidth()
-        .padding(4.dp)
 ) {
     Row(Modifier.fillMaxHeight().align(Alignment.CenterEnd)) {
         Text(
