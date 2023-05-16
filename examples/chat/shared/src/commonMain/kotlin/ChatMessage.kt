@@ -24,7 +24,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.em
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -77,7 +76,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                                     style = MaterialTheme.typography.body1.copy(
                                         fontWeight = FontWeight.SemiBold,
                                         letterSpacing = 0.sp,
-                                        fontSize = 0.9.em
+                                        fontSize = 14.sp
                                     ),
                                     color = message.user.color
                                 )
@@ -86,7 +85,10 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                         Spacer(Modifier.size(3.dp))
                         Text(
                             text = message.text,
-                            style = MaterialTheme.typography.body1.copy(fontSize = 1.1.em, letterSpacing = 0.sp)
+                            style = MaterialTheme.typography.body1.copy(
+                                fontSize = 18.sp,
+                                letterSpacing = 0.sp
+                            )
                         )
                         Spacer(Modifier.size(4.dp))
                         Row(
@@ -96,7 +98,7 @@ inline fun ChatMessage(isMyMessage: Boolean, message: Message) {
                             Text(
                                 text = timeToString(message.timeMs),
                                 textAlign = TextAlign.End,
-                                style = MaterialTheme.typography.subtitle1.copy(fontSize = 0.6.em),
+                                style = MaterialTheme.typography.subtitle1.copy(fontSize = 10.sp),
                                 color = ChatColors.TIME_TEXT
                             )
                         }
