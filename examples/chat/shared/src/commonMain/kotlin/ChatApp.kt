@@ -66,7 +66,7 @@ fun ChatApp(displayTextField: Boolean = true) {
     Theme {
         Surface {
             Box(modifier = Modifier.fillMaxSize()) {
-                Image(painterResource("background.png"), null, contentScale = ContentScale.Crop)
+                Image(painterResource("background.jpg"), null, contentScale = ContentScale.Crop)
                 Column(
                     modifier = Modifier.fillMaxSize()
                 ) {
