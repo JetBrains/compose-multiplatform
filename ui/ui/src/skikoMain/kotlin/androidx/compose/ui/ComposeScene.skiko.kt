@@ -153,8 +153,7 @@ class ComposeScene internal constructor(
             // Try to get see the up-to-date state before running block
             // Note that this doesn't guarantee it, if sendApplyNotifications is called concurrently
             // in a different thread than this code.
-            Snapshot.sendApplyNotifications()
-            snapshotChanges.perform()
+            sendAndPerformSnapshotChanges()
             block()
         } finally {
             isInvalidationDisabled = false
@@ -413,15 +412,25 @@ class ComposeScene internal constructor(
         }
 
     /**
+     * Sends any pending apply notifications and performs the changes they cause.
+     */
+    private fun sendAndPerformSnapshotChanges() {
+        Snapshot.sendApplyNotifications()
+        snapshotChanges.perform()
+    }
+
+    /**
      * Render the current content on [canvas]. Passed [nanoTime] will be used to drive all
      * animations in the content (or any other code, which uses [withFrameNanos]
      */
     fun render(canvas: Canvas, nanoTime: Long): Unit = postponeInvalidation {
         recomposeDispatcher.flush()
-        frameClock.sendFrame(nanoTime)
+        frameClock.sendFrame(nanoTime) // Recomposition
+        sendAndPerformSnapshotChanges() // Apply changes from recomposition phase to layout phase
         needLayout = false
         forEachOwner { it.measureAndLayout() }
         pointerPositionUpdater.update()
+        sendAndPerformSnapshotChanges()  // Apply changes from layout phase to draw phase
         needDraw = false
         forEachOwner { it.draw(canvas) }
         forEachOwner { it.clearInvalidObservations() }
