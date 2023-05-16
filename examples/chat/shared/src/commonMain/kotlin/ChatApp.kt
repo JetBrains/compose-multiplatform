@@ -26,9 +26,9 @@ import org.jetbrains.compose.resources.painterResource
 
 val myUser = User("Me", picture = null)
 val friends = listOf(
-    User("Alex", picture = "stock1.png"),
-    User("Casey", picture = "stock2.png"),
-    User("Sam", picture = "stock3.png")
+    User("Alex", picture = "stock1.jpg"),
+    User("Casey", picture = "stock2.jpg"),
+    User("Sam", picture = "stock3.jpg")
 )
 val friendMessages = listOf(
     "How's everybody doing today?",
