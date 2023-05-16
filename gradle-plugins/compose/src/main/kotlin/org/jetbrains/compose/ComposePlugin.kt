@@ -22,7 +22,7 @@ import org.jetbrains.compose.desktop.DesktopExtension
 import org.jetbrains.compose.desktop.application.internal.configureDesktop
 import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
-import org.jetbrains.compose.experimental.internal.checkExperimentalTargetsWithSkikoIsEnabled
+import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.web.WebExtension
@@ -53,7 +53,7 @@ class ComposePlugin : Plugin<Project> {
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
             project.configureExperimental(composeExtension, experimentalExtension)
-            project.checkExperimentalTargetsWithSkikoIsEnabled()
+            project.configureExperimentalTargetsFlagsCheck()
 
             if (androidExtension.useAndroidX) {
                 project.logger.warn("useAndroidX is an experimental feature at the moment!")
