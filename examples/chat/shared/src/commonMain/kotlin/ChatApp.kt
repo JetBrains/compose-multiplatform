@@ -50,7 +50,7 @@ fun ChatAppWithScaffold(displayTextField: Boolean = true) {
         Scaffold(
             topBar = {
                 TopAppBar(
-                    title = { Text("Chat sample") },
+                    title = { Text("The Composers Chat") },
                     backgroundColor = MaterialTheme.colors.background,
                 )
             }) {
