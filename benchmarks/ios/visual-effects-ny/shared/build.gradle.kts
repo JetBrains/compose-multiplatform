@@ -15,6 +15,21 @@ kotlin {
     ios()
     iosSimulatorArm64()
 
+    macosX64 {
+        binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
+    }
+    macosArm64 {
+        binaries {
+            executable {
+                entryPoint = "main"
+            }
+        }
+    }
+
     cocoapods {
         summary = "Shared code for the sample"
         homepage = "https://github.com/JetBrains/compose-jb"
@@ -53,6 +68,12 @@ kotlin {
             dependencies {
                 implementation(compose.desktop.common)
             }
+        }
+        val macosMain by creating {
+            dependsOn(commonMain)
+        }
+        val macosArm64Main by getting {
+            dependsOn(macosMain)
         }
     }
 }

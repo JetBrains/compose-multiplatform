@@ -17,8 +17,8 @@ import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
 
-const val width = 400
-const val height = 800
+const val width = 640
+const val height = 480
 const val snowCount = 80
 const val starCount = 60
 const val rocketPartsCount = 30
