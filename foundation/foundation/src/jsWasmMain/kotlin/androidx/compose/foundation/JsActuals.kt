@@ -26,6 +26,10 @@ actual class AtomicLong actual constructor(value: Long) {
         atomic = value
     }
 
-    actual fun getAndIncrement(): Long = TODO("Implement native atomic getAndIncrement")
+    actual fun getAndIncrement(): Long {
+        val original = atomic
+        atomic++
+        return original
+    }
 }
 
