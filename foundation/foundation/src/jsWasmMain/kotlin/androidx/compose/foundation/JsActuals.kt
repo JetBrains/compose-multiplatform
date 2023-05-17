@@ -15,7 +15,14 @@
  */
 
 package androidx.compose.foundation
-
+/**
+ * A simplified, non-thread-safe AtomicLong implementation for usage
+ * in a single-threaded environment (k/js and/or k/wasm - browser apps).
+ * It is not intended for multi-threaded use!
+ *
+ * Its purpose is to provide a corresponding API 
+ * to match AtomicLong implementations for other kotlin platforms.
+ */
 actual class AtomicLong actual constructor(value: Long) {
 
     private var atomic = value
