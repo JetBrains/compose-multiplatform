@@ -33,11 +33,9 @@ import androidx.compose.ui.focus.FocusDirection.Companion.Previous
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.asComposeCanvas
-import androidx.compose.ui.input.InputMode
 import androidx.compose.ui.input.InputMode.Companion.Keyboard
 import androidx.compose.ui.input.InputMode.Companion.Touch
 import androidx.compose.ui.input.InputModeManager
-import androidx.compose.ui.input.InputModeManagerImpl
 import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.key.Key.Companion.Back
 import androidx.compose.ui.input.key.Key.Companion.DirectionCenter
@@ -72,6 +70,7 @@ internal class SkiaBasedOwner(
     parentFocusManager: FocusManager = EmptyFocusManager,
     private val pointerPositionUpdater: PointerPositionUpdater,
     initDensity: Density = Density(1f, 1f),
+    initLayoutDirection: LayoutDirection = platform.layoutDirection,
     bounds: IntRect = IntRect.Zero,
     val isFocusable: Boolean = true,
     val onDismissRequest: (() -> Unit)? = null,
@@ -89,7 +88,15 @@ internal class SkiaBasedOwner(
 
     override var density by mutableStateOf(initDensity)
 
-    override val layoutDirection: LayoutDirection = platform.layoutDirection
+    private var _layoutDirection by mutableStateOf(initLayoutDirection)
+
+    override var layoutDirection: LayoutDirection
+        get() = _layoutDirection
+        set(value) {
+            _layoutDirection = value
+            focusOwner.layoutDirection = value
+            root.layoutDirection = value
+        }
 
     override val sharedDrawScope = LayoutNodeDrawScope()
 
@@ -107,7 +114,7 @@ internal class SkiaBasedOwner(
     ) {
         registerOnEndApplyChangesListener(it)
     }.apply {
-        layoutDirection = platform.layoutDirection
+        layoutDirection = this@SkiaBasedOwner.layoutDirection
     }
 
     override val inputModeManager: InputModeManager
@@ -129,7 +136,7 @@ internal class SkiaBasedOwner(
     var constraints: Constraints = Constraints()
 
     override val root = LayoutNode().also {
-        it.layoutDirection = platform.layoutDirection
+        it.layoutDirection = layoutDirection
         it.measurePolicy = RootMeasurePolicy
         it.modifier = semanticsModifier
             .then(focusOwner.modifier)

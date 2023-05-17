@@ -16,13 +16,7 @@
 
 package androidx.compose.ui.window
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCompositionContext
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.LocalComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -30,6 +24,7 @@ import androidx.compose.ui.input.key.KeyEvent
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.SkiaBasedOwner
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.IntRect
@@ -47,6 +42,7 @@ internal fun PopupLayout(
 ) {
     val scene = LocalComposeScene.current
     val density = LocalDensity.current
+    val layoutDirection = LocalLayoutDirection.current
 
     var parentBounds by remember { mutableStateOf(IntRect.Zero) }
 
@@ -72,6 +68,7 @@ internal fun PopupLayout(
             platform = scene.platform,
             pointerPositionUpdater = scene.pointerPositionUpdater,
             initDensity = density,
+            initLayoutDirection = layoutDirection,
             isFocusable = focusable,
             onDismissRequest = onDismissRequest,
             onPreviewKeyEvent = onPreviewKeyEvent,
@@ -92,7 +89,7 @@ internal fun PopupLayout(
                             val position = popupPositionProvider.calculatePosition(
                                 anchorBounds = parentBounds,
                                 windowSize = IntSize(width, height),
-                                layoutDirection = layoutDirection,
+                                layoutDirection = this@Layout.layoutDirection,
                                 popupContentSize = IntSize(placeable.width, placeable.height)
                             )
                             owner.bounds = IntRect(
@@ -107,12 +104,15 @@ internal fun PopupLayout(
         }
         owner to composition
     }
-    owner.density = density
     DisposableEffect(Unit) {
         onDispose {
             scene.detach(owner)
             composition.dispose()
             owner.dispose()
         }
+    }
+    SideEffect {
+        owner.density = density
+        owner.layoutDirection = layoutDirection
     }
 }

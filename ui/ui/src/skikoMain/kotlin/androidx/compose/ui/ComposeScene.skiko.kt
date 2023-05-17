@@ -367,8 +367,8 @@ class ComposeScene internal constructor(
             platform,
             platform.focusManager,
             pointerPositionUpdater,
-            density,
-            IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
+            initDensity = density,
+            bounds = IntSize(constraints.maxWidth, constraints.maxHeight).toIntRect(),
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent,
         )

@@ -41,13 +41,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntRect
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.use
 import com.google.common.truth.Truth.assertThat
-import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 
@@ -72,6 +73,28 @@ class DesktopPopupTest {
         }
 
         assertThat(actualLocalValue).isEqualTo(3)
+    }
+
+    // https://github.com/JetBrains/compose-multiplatform/issues/3142
+    @Test
+    fun `pass LayoutDirection to popup`() {
+        lateinit var localLayoutDirection: LayoutDirection
+
+        var layoutDirection by mutableStateOf(LayoutDirection.Rtl)
+        rule.setContent {
+            CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
+                Popup {
+                    localLayoutDirection = LocalLayoutDirection.current
+                }
+            }
+        }
+
+        assertThat(localLayoutDirection).isEqualTo(LayoutDirection.Rtl)
+
+        // Test that changing the local propagates it into the popup
+        layoutDirection = LayoutDirection.Ltr
+        rule.waitForIdle()
+        assertThat(localLayoutDirection).isEqualTo(LayoutDirection.Ltr)
     }
 
     @Test
