@@ -17,8 +17,11 @@ import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
 
-const val width = 640
-const val height = 480
+expect fun width(): Int
+expect fun height(): Int
+
+val width = width()
+val height = height()
 const val snowCount = 80
 const val starCount = 60
 const val rocketPartsCount = 30
