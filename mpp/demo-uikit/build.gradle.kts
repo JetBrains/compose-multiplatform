@@ -104,6 +104,8 @@ apple {
         sceneDelegateClass = "SceneDelegate"
         launchStoryboard = "LaunchScreen"
 
+        // TODO: add 'CADisableMinimumFrameDurationOnPhone' set to 'YES'
+
         dependencies {
             // Here we can add additional dependencies to Swift sourceSet
         }
