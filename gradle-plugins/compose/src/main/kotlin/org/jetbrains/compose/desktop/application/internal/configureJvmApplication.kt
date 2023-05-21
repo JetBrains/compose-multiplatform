@@ -65,7 +65,7 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameAction = "check",
         taskNameObject = "runtime"
     ) {
-        javaHome.set(app.javaHomeProvider)
+        jdkHome.set(app.javaHomeProvider)
     }
 
     val suggestRuntimeModules = tasks.register<AbstractSuggestModulesTask>(

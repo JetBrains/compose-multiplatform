@@ -26,7 +26,7 @@ internal const val MIN_JAVA_RUNTIME_VERSION = 17
 abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTask() {
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:InputDirectory
-    val javaHome: Property<String> = objects.notNullProperty()
+    val jdkHome: Property<String> = objects.notNullProperty()
 
     private val taskDir = project.layout.buildDirectory.dir("compose/tmp/$name")
 
@@ -36,41 +36,50 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     @get:LocalState
     val workingDir: Provider<Directory> = taskDir.map { it.dir("localState") }
 
-    private val javaExec: File
-        get() = getTool("java")
+    private val jdkHomeFile: File
+        get() = File(jdkHome.orNull ?: error("Missing jdkHome value"))
 
-    private val javacExec: File
-        get() = getTool("javac")
+    private fun File.getJdkTool(toolName: String): File =
+        resolve("bin/${executableName(toolName)}").apply {
+            check(exists()) {
+                jdkDistributionProbingError("'$toolName' is missing")
+            }
+        }
 
-    private fun getTool(toolName: String): File {
-        val javaHomeBin = File(javaHome.get()).resolve("bin")
-        val tool = javaHomeBin.resolve(executableName(toolName))
-        check(tool.exists()) { "Could not find $tool at: ${tool.absolutePath}}" }
-        return tool
+    private fun jdkDistributionProbingError(errorMessage: String): Nothing {
+        val fullErrorMessage = buildString {
+            appendLine("Failed to check JDK distribution: $errorMessage")
+            appendLine("JDK distribution path: ${jdkHomeFile.absolutePath}")
+        }
+        error(fullErrorMessage)
     }
 
     @TaskAction
     fun run() {
         taskDir.ioFile.mkdirs()
 
-        val javaRuntimeVersion = try {
-            getJavaRuntimeVersionUnsafe()?.toIntOrNull() ?: -1
-        } catch (e: Exception) {
-            throw IllegalStateException(
-                "Could not infer Java runtime version for Java home directory: ${javaHome.get()}", e
-            )
-        }
+        val jdkHome = jdkHomeFile
+        val javaExecutable = jdkHome.getJdkTool("java")
+        val javacExecutable = jdkHome.getJdkTool("javac")
 
-        check(javaRuntimeVersion >= MIN_JAVA_RUNTIME_VERSION) {
-            """|Packaging native distributions requires JDK runtime version >= $MIN_JAVA_RUNTIME_VERSION
-               |Actual version: '${javaRuntimeVersion ?: "<unknown>"}'
-               |Java home: ${javaHome.get()}
-            """.trimMargin()
+        val jvmRuntimeVersionString = getJavaRuntimeVersion(
+            javaExecutable = javaExecutable,
+            javacExecutable = javacExecutable
+        )
+
+        val jvmRuntimeVersion = jvmRuntimeVersionString?.toIntOrNull()
+            ?: jdkDistributionProbingError("JDK version '$jvmRuntimeVersionString' has unexpected format")
+
+        check(jvmRuntimeVersion >= MIN_JAVA_RUNTIME_VERSION) {
+            jdkDistributionProbingError(
+                "minimum required JDK version is '$MIN_JAVA_RUNTIME_VERSION', " +
+                "but actual version is '$jvmRuntimeVersion'"
+            )
         }
 
         val modules = arrayListOf<String>()
         runExternalTool(
-            tool = javaExec,
+            tool = javaExecutable,
             args = listOf("--list-modules"),
             logToConsole = ExternalToolRunner.LogToConsole.Never,
             processStdout = { stdout ->
@@ -83,17 +92,18 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
             }
         )
 
-        val properties = JvmRuntimeProperties(javaRuntimeVersion, modules)
+        val properties = JvmRuntimeProperties(jvmRuntimeVersion, modules)
         JvmRuntimeProperties.writeToFile(properties, javaRuntimePropertiesFile.ioFile)
     }
 
-    private fun getJavaRuntimeVersionUnsafe(): String? {
+    private fun getJavaRuntimeVersion(
+        javaExecutable: File,
+        javacExecutable: File
+    ): String? {
         fileOperations.clearDirs(workingDir)
         val workingDir = workingDir.ioFile
 
         val printJavaRuntimeClassName = "PrintJavaRuntimeVersion"
-        val javaVersionPrefix = "Java runtime version = '"
-        val javaVersionSuffix = "'"
         val printJavaRuntimeJava = workingDir.resolve("java/$printJavaRuntimeClassName.java").apply {
             parentFile.mkdirs()
             writeText("""
@@ -119,7 +129,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
                     }
 
                     private static void printVersionAndHalt(String version) {
-                        System.out.println("$javaVersionPrefix" + version + "$javaVersionSuffix");
+                        System.out.println(version);
                         Runtime.getRuntime().exit(0);
                     }
                 }
@@ -127,7 +137,7 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         }
         val classFilesDir = workingDir.resolve("out-classes")
         runExternalTool(
-            tool = javacExec,
+            tool = javacExecutable,
             args = listOf(
                 "-source", "1.8",
                 "-target", "1.8",
@@ -138,12 +148,9 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
 
         var javaRuntimeVersion: String? = null
         runExternalTool(
-            tool = javaExec,
+            tool = javaExecutable,
             args = listOf("-cp", classFilesDir.absolutePath, printJavaRuntimeClassName),
-            processStdout = { stdout ->
-                val m = "$javaVersionPrefix(.+)$javaVersionSuffix".toRegex().find(stdout)
-                javaRuntimeVersion = m?.groupValues?.get(1)
-            }
+            processStdout = { stdout -> javaRuntimeVersion = stdout.trim() }
         )
         return javaRuntimeVersion
     }
