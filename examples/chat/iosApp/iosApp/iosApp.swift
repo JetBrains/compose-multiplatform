@@ -1,7 +1,10 @@
 import SwiftUI
 
 let gradient = LinearGradient(
-        colors: gradient3Colors(),
+        colors: [
+            Color(red: 0.933, green: 0.937, blue: 0.953),
+            Color(red: 0.902, green: 0.941, blue: 0.949)
+        ],
         startPoint: .topLeading, endPoint: .bottomTrailing
 )
 
@@ -11,12 +14,13 @@ struct iOSApp: App {
 		WindowGroup {
 			TabView {
                 ComposeInsideSwiftUIScreen()
-                    .tabItem { Label("Compose", systemImage: "square.and.pencil") }
+                    .tabItem { Label("Group Chat", systemImage: "rectangle.3.group.bubble.left") }
 
                 YetAnotherSwiftUIScreen()
-                    .tabItem { Label("SwiftUI", systemImage: "list.dash") }
+                    .tabItem { Label("Settings", systemImage: "gear") }
                 
-            }.accentColor(.white).preferredColorScheme(.dark)
+            }
+            .accentColor(Color(red: 0.671, green: 0.365, blue: 0.792)).preferredColorScheme(.light)
 		}
 	}
 }

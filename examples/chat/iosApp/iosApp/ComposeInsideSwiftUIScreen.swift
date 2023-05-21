@@ -14,7 +14,7 @@ struct ComposeInsideSwiftUIScreen: View {
 
 struct ComposeLayer: View {
     var body: some View {
-        GradientTemplate(title: "Compose inside SwiftUI") {
+        GradientTemplate(title: "The Composers Chat") {
             ComposeViewControllerToSwiftUI()
                 .ignoresSafeArea(.keyboard) // Compose have own keyboard handler
         }
@@ -22,7 +22,7 @@ struct ComposeLayer: View {
 }
 
 struct TextInputLayer: View {
-    @State private var textState: String = "text message"
+    @State private var textState: String = ""
     @FocusState private var textFieldFocused: Bool
 
     var body: some View {
@@ -39,12 +39,11 @@ struct TextInputLayer: View {
                         textState = ""
                     }) {
                         HStack {
-                            Image(systemName: "play.fill")
-                            Text("Send")
-                        }.tint(.white)
+                            Image(systemName: "arrow.up.circle.fill")
+                        }.tint(Color(red: 0.671, green: 0.365, blue: 0.792))
                     }
                 }
-            }.padding(10).background(RoundedRectangle(cornerRadius: 10).fill(gradient).opacity(0.8)).padding(6)
+            }.padding(15).background(RoundedRectangle(cornerRadius: 200).fill(.white).opacity(0.95)).padding(15)
         }
     }
 }
