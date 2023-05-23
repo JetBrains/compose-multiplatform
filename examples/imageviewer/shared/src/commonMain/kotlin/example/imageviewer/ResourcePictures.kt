@@ -5,6 +5,18 @@ import example.imageviewer.model.PictureData
 
 val resourcePictures = arrayOf(
     PictureData.Resource(
+        resource = "0.jpg",
+        thumbnailResource = "0-thumbnail.jpg",
+        name = "KotlinConf 2023",
+        description = """
+        This photo was taken during KotlinConf 2023 using #ComposeMultiplatform running on ${getCurrentPlatform()}! 🎊
+        Let's build some stunning UIs! 🥳
+        https://jb.gg/compose            
+            """.trimIndent(),
+        dateString = "13 Apr.",
+        gps = GpsPosition(52.3750666,4.8961794)
+    ),
+    PictureData.Resource(
         resource = "1.jpg",
         thumbnailResource = "1-thumbnail.jpg",
         name = "Mountain K2",
