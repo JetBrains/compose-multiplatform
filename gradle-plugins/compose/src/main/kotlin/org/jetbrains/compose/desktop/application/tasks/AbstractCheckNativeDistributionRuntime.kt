@@ -110,21 +110,25 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
                 import java.lang.reflect.Method;
 
                 public class $printJavaRuntimeClassName {
-                    public static void main(String[] args) {
-                        Class<Runtime> runtimeClass = Runtime.class;
+                    Class<Runtime> runtimeClass = Runtime.class;
+                    try {
+                        Method version = runtimeClass.getMethod("version");
+                        Object runtimeVer = version.invoke(runtimeClass);
+                        Class<? extends Object> runtimeVerClass = runtimeVer.getClass();
                         try {
-                            Method version = runtimeClass.getMethod("version");
-                            Object runtimeVer = version.invoke(runtimeClass);
-                            Class<? extends Object> runtimeVerClass = runtimeVer.getClass();
-                            try {
-                                int feature = (int) runtimeVerClass.getMethod("feature").invoke(runtimeVer);
-                                printVersionAndHalt((Integer.valueOf(feature)).toString());
-                            } catch (NoSuchMethodException e) {
-                                int major = (int) runtimeVerClass.getMethod("major").invoke(runtimeVer);
-                                printVersionAndHalt((Integer.valueOf(major)).toString());
-                            }
-                        } catch (Exception e) {
-                            printVersionAndHalt(System.getProperty("java.version"));
+                            int feature = (int) runtimeVerClass.getMethod("feature").invoke(runtimeVer);
+                            printVersionAndHalt((Integer.valueOf(feature)).toString());
+                        } catch (NoSuchMethodException e) {
+                            int major = (int) runtimeVerClass.getMethod("major").invoke(runtimeVer);
+                            printVersionAndHalt((Integer.valueOf(major)).toString());
+                        }
+                    } catch (Exception e) {
+                        String javaVersion = System.getProperty("java.version");
+                        String[] parts = javaVersion.split("\\.");
+                        if (parts.length > 2 && "1".equalsIgnoreCase(parts[0])) {
+                            printVersionAndHalt(parts[1]);
+                        } else {
+                            throw new IllegalStateException("Could not determine JDK version from string: '" + javaVersion + "'");
                         }
                     }
 
