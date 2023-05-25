@@ -18,7 +18,6 @@ package androidx.compose.ui.layout
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.view.View
 import android.widget.FrameLayout
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -53,7 +52,6 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
-import androidx.compose.ui.layout.RootMeasurePolicy.measure
 import androidx.compose.ui.platform.AndroidOwnerExtraAssertionsRule
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.LocalDensity
@@ -73,7 +71,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
@@ -2352,40 +2349,6 @@ class SubcomposeLayoutTest {
         // removed from the hierarchy.
         rule.onNodeWithTag("tag")
             .assertExists()
-    }
-
-    // Regression test of b/271156218
-    @Test
-    fun deactivatingDeeplyNestedAndroidViewDoesNotCauseRemeasure() {
-        var showContent by mutableStateOf(true)
-        val state = SubcomposeLayoutState(SubcomposeSlotReusePolicy(1))
-        rule.setContent {
-            SubcomposeLayout(
-                state = state,
-                modifier = Modifier.fillMaxSize()
-            ) { constraints ->
-                val content = if (showContent) {
-                    subcompose(0) {
-                        Box {
-                            AndroidView(::View, Modifier.fillMaxSize().testTag("AndroidView"))
-                        }
-                    }
-                } else emptyList()
-
-                val placeables = measure(content, constraints)
-                layout(100, 100) {
-                    placeables.placeChildren()
-                }
-            }
-        }
-
-        rule.onNodeWithTag("AndroidView").assertExists()
-
-        rule.runOnIdle { showContent = false }
-        rule.onNodeWithTag("AndroidView").assertIsNotDisplayed()
-
-        rule.runOnIdle { showContent = true }
-        rule.onNodeWithTag("AndroidView").assertExists()
     }
 
     private fun composeItems(

@@ -35,9 +35,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.compose.testutils.assertPixels
 import androidx.compose.ui.AlignTopLeft
 import androidx.compose.ui.Alignment
@@ -245,13 +242,14 @@ class PainterModifierTest {
         rule.setContent {
             AtLeastSize(
                 size = containerWidth.roundToInt() * 2,
-                modifier = Modifier
-                    .background(Color.White)
-                    .paint(
-                        TestPainter(
-                            containerWidth, containerHeight
-                        ), alignment = Alignment.BottomEnd, contentScale = ContentScale.Inside
-                    )
+                modifier = Modifier.background(Color.White).paint(
+                    TestPainter(
+                        containerWidth,
+                        containerHeight
+                    ),
+                    alignment = Alignment.BottomEnd,
+                    contentScale = ContentScale.Inside
+                )
             ) {
                 // Intentionally empty
             }
@@ -381,9 +379,7 @@ class PainterModifierTest {
         val containerSize = containerWidth.roundToInt() / 2
         rule.setContent {
             NoIntrinsicSizeContainer(
-                Modifier
-                    .background(Color.White)
-                    .then(FixedSizeModifier(containerSize))
+                Modifier.background(Color.White).then(FixedSizeModifier(containerSize))
             ) {
                 NoIntrinsicSizeContainer(
                     FixedSizeModifier(containerSize).paint(
@@ -604,9 +600,9 @@ class PainterModifierTest {
                 }
             }
             Box(
-                modifier = Modifier
-                    .then(modifier)
-                    .paint(painter, contentScale = contentScale)
+                modifier =
+                    Modifier.then(modifier)
+                        .paint(painter, contentScale = contentScale)
             )
         }
 
@@ -806,56 +802,6 @@ class PainterModifierTest {
         }
     }
 
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testUpdatingPainterWithTheSameIntrinsicsSize() {
-        var painter by mutableStateOf(TestPainter(10f, 10f).apply {
-            color = Color.Red
-        })
-        val tag = "testTag"
-
-        rule.setContent {
-            Box(Modifier.testTag(tag).paint(painter))
-        }
-
-        rule.runOnIdle {
-            painter = TestPainter(10f, 10f).apply {
-                color = Color.Blue
-            }
-        }
-
-        rule.onNodeWithTag(tag).captureToImage().apply {
-            assertEquals(10, width)
-            assertEquals(10, height)
-            assertPixels { Color.Blue }
-        }
-    }
-
-    @Test
-    @SdkSuppress(minSdkVersion = Build.VERSION_CODES.O)
-    fun testUpdatingPainterWithTheDifferentIntrinsicsSize() {
-        var painter by mutableStateOf(TestPainter(10f, 10f).apply {
-            color = Color.Red
-        })
-        val tag = "testTag"
-
-        rule.setContent {
-            Box(Modifier.testTag(tag).paint(painter))
-        }
-
-        rule.runOnIdle {
-            painter = TestPainter(5f, 5f).apply {
-                color = Color.Blue
-            }
-        }
-
-        rule.onNodeWithTag(tag).captureToImage().apply {
-            assertEquals(5, width)
-            assertEquals(5, height)
-            assertPixels { Color.Blue }
-        }
-    }
-
     @Composable
     private fun TestPainter(
         alpha: Float = DefaultAlpha,
@@ -866,8 +812,7 @@ class PainterModifierTest {
         val layoutDirection = if (rtl) LayoutDirection.Rtl else LayoutDirection.Ltr
         CompositionLocalProvider(LocalLayoutDirection provides layoutDirection) {
             AtLeastSize(
-                modifier = Modifier
-                    .background(Color.White)
+                modifier = Modifier.background(Color.White)
                     .paint(p, alpha = alpha, colorFilter = colorFilter),
                 size = containerWidth.roundToInt()
             ) {

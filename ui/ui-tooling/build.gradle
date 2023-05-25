@@ -38,10 +38,10 @@ dependencies {
         api(project(":compose:ui:ui"))
         api(project(":compose:ui:ui-tooling-preview"))
         api(project(":compose:ui:ui-tooling-data"))
-        implementation("androidx.savedstate:savedstate-ktx:1.2.1")
+        implementation("androidx.savedstate:savedstate-ktx:1.2.0")
         implementation("androidx.compose.material:material:1.0.0")
-        implementation("androidx.activity:activity-compose:1.7.0")
-        implementation("androidx.lifecycle:lifecycle-common:2.6.1")
+        implementation("androidx.activity:activity-compose:1.7.0-rc01")
+        implementation("androidx.lifecycle:lifecycle-common:2.6.0")
 
         // kotlin-reflect and animation-tooling-internal are provided by Studio at runtime
         compileOnly(project(":compose:animation:animation-tooling-internal"))
@@ -58,7 +58,7 @@ dependencies {
         androidTestImplementation(libs.truth)
         androidTestImplementation(libs.kotlinReflect)
         androidTestImplementation(project(":compose:animation:animation-tooling-internal"))
-        androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+        androidTestImplementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
         androidTestImplementation(project(":compose:runtime:runtime-livedata"))
     }
 }
@@ -85,10 +85,10 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
                 implementation(project(":compose:animation:animation"))
-                implementation("androidx.savedstate:savedstate-ktx:1.2.1")
+                implementation("androidx.savedstate:savedstate-ktx:1.2.0")
                 implementation(project(":compose:material:material"))
-                implementation("androidx.activity:activity-compose:1.7.0")
-                implementation("androidx.lifecycle:lifecycle-common:2.6.1")
+                implementation("androidx.activity:activity-compose:1.7.0-rc01")
+                implementation("androidx.lifecycle:lifecycle-common:2.6.0")
 
                 // kotlin-reflect and tooling-animation-internal are provided by Studio at runtime
                 compileOnly(project(":compose:animation:animation-tooling-internal"))
@@ -113,7 +113,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(libs.truth)
                 implementation(libs.kotlinReflect)
                 implementation(project(":compose:animation:animation-tooling-internal"))
-                implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+                implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.0")
                 implementation(project(":compose:runtime:runtime-livedata"))
             }
         }
