@@ -86,6 +86,28 @@ class AddHiddenFromObjCSerializationPlugin(
             val annotationProto = createAnnotationProto(extension)
             proto.addExtension(KlibMetadataSerializerProtocol.propertyAnnotation, annotationProto)
             proto.flags = proto.flags or hasAnnotationFlag
+
+            // Add the annotation for the getter too if it's Composable
+            val getterDescriptor = descriptor.getter
+            if (getterDescriptor != null && getterDescriptor in hideFromObjCDeclarationsSet) {
+                val annotationForGetter = createAnnotationProto(extension)
+                proto.addExtension(
+                    KlibMetadataSerializerProtocol.propertyGetterAnnotation,
+                    annotationForGetter
+                )
+                proto.getterFlags = proto.getterFlags or hasAnnotationFlag
+            }
+
+            // Add the annotation for the setter too if it's Composable
+            val setterDescriptor = descriptor.getter
+            if (setterDescriptor != null && setterDescriptor in hideFromObjCDeclarationsSet) {
+                val annotationForSetter = createAnnotationProto(extension)
+                proto.addExtension(
+                    KlibMetadataSerializerProtocol.propertySetterAnnotation,
+                    annotationForSetter
+                )
+                proto.setterFlags = proto.setterFlags or hasAnnotationFlag
+            }
         }
     }
 }
