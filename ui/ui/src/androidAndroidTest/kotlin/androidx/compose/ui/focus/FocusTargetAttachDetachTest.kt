@@ -165,6 +165,67 @@ class FocusTargetAttachDetachTest {
     }
 
     @Test
+    fun removedActiveFocusTargetAndFocusChanged_triggersOnFocusEvent() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalModifiers by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .focusRequester(focusRequester)
+                    .then(
+                        if (optionalModifiers) {
+                            Modifier
+                                .onFocusEvent { focusState = it }
+                                .focusTarget()
+                        } else {
+                            Modifier
+                        }
+                    )
+            )
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.isFocused).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalModifiers = false }
+
+        // Assert.
+        rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
+    }
+
+    @Test
+    fun removedActiveComposable_doesNotTriggerOnFocusEvent() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalBox by mutableStateOf(true)
+        rule.setFocusableContent {
+            if (optionalBox) {
+                Box(
+                    modifier = Modifier
+                        .focusRequester(focusRequester)
+                        .onFocusEvent { focusState = it }
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.isFocused).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalBox = false }
+
+        // Assert.
+        rule.runOnIdle { assertThat(focusState.isFocused).isFalse() }
+    }
+
+    @Test
     fun removedCapturedFocusTarget_pointsToNextFocusTarget() {
         // Arrange.
         lateinit var focusState: FocusState
@@ -299,6 +360,45 @@ class FocusTargetAttachDetachTest {
 
         // Act.
         rule.runOnIdle { optionalFocusTargets = false }
+
+        // Assert.
+        rule.runOnIdle {
+            assertThat(focusState.isFocused).isFalse()
+            assertThat(parentFocusState.isFocused).isFalse()
+        }
+    }
+
+    @Test
+    fun removedActiveComposable_clearsFocusFromAllParents() {
+        // Arrange.
+        lateinit var focusState: FocusState
+        lateinit var parentFocusState: FocusState
+        val focusRequester = FocusRequester()
+        var optionalBox by mutableStateOf(true)
+        rule.setFocusableContent {
+            Box(
+                modifier = Modifier
+                    .onFocusChanged { parentFocusState = it }
+                    .focusTarget()
+            ) {
+                if (optionalBox) {
+                    Box(
+                        modifier = Modifier
+                            .onFocusChanged { focusState = it }
+                            .focusRequester(focusRequester)
+                            .focusTarget()
+                    )
+                }
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            assertThat(focusState.hasFocus).isTrue()
+            assertThat(parentFocusState.hasFocus).isTrue()
+        }
+
+        // Act.
+        rule.runOnIdle { optionalBox = false }
 
         // Assert.
         rule.runOnIdle {

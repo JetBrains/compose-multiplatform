@@ -73,7 +73,13 @@ internal class FocusInvalidationManager(
         focusEventNodes.forEach { focusEventNode ->
             // When focus nodes are removed, the corresponding focus events are scheduled for
             // invalidation. If the focus event was also removed, we don't need to invalidate it.
-            if (!focusEventNode.node.isAttached) return@forEach
+            // We call onFocusEvent with the default value, just to make it easier for the user,
+            // so that they don't have to keep track of whether they caused a focused item to be
+            // removed (Which would cause it to lose focus).
+            if (!focusEventNode.node.isAttached) {
+                focusEventNode.onFocusEvent(Inactive)
+                return@forEach
+            }
 
             var requiresUpdate = true
             var aggregatedNode = false

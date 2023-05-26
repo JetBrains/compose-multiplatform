@@ -21,6 +21,7 @@ import androidx.compose.runtime.mock.Contact
 import androidx.compose.runtime.mock.ContactModel
 import androidx.compose.runtime.mock.Edit
 import androidx.compose.runtime.mock.EmptyApplier
+import androidx.compose.runtime.mock.InlineLinear
 import androidx.compose.runtime.mock.Linear
 import androidx.compose.runtime.mock.MockViewValidator
 import androidx.compose.runtime.mock.Point
@@ -45,12 +46,7 @@ import androidx.compose.runtime.mock.validate
 import androidx.compose.runtime.snapshots.Snapshot
 import kotlin.coroutines.CoroutineContext
 import kotlin.random.Random
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
-import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
-import kotlin.test.assertTrue
+import kotlin.test.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.coroutineScope
@@ -3318,6 +3314,342 @@ class CompositionTests {
         revalidate()
     }
 
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test
+    fun test_returnConditionally_fromInlineLambda() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            InlineWrapper {
+                if (condition) return@InlineWrapper
+                Text("Test")
+            }
+        }
+
+        validate {
+            if (!condition) {
+                Text("Test")
+            }
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test
+    fun test_returnConditionally_fromInlineLambda_nonLocal() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            InlineWrapper {
+                M1 {
+                    if (condition) return@InlineWrapper
+                    Text("Test")
+                }
+            }
+        }
+
+        validate {
+            if (!condition) {
+                Text("Test")
+            }
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test
+    fun test_returnConditionally_fromLambda_nonLocal() = compositionTest {
+        var condition by mutableStateOf(true)
+
+        compose {
+            Wrap {
+                M1 {
+                    if (condition) return@Wrap
+                    Text("Test")
+                }
+            }
+        }
+
+        validate {
+            if (!condition) {
+                Text("Test")
+            }
+        }
+
+        condition = false
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test // regression test for 264467571
+    fun test_returnConditionally_fromNodeLambda_local_initial_return() = compositionTest {
+        var condition by mutableStateOf(true)
+        compose {
+            Text("Before outer")
+            InlineLinear {
+                Text("Before inner")
+                InlineLinear inner@{
+                    Text("Before return")
+                    if (condition) return@inner
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        validate {
+            Text("Before outer")
+            InlineLinear {
+                Text("Before inner")
+                InlineLinear inner@{
+                    Text("Before return")
+                    if (condition) return@inner
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        repeat(4) {
+            condition = !condition
+            expectChanges()
+            revalidate()
+        }
+    }
+
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test // regression test for 264467571
+    fun test_returnConditionally_fromNodeLambda_local_initial_no_return() = compositionTest {
+        var condition by mutableStateOf(true)
+        compose {
+            Text("Before outer")
+            InlineLinear {
+                Text("Before inner")
+                InlineLinear inner@{
+                    Text("Before return")
+                    if (condition) return@inner
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        validate {
+            Text("Before outer")
+            InlineLinear {
+                Text("Before inner")
+                InlineLinear inner@{
+                    Text("Before return")
+                    if (condition) return@inner
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        repeat(4) {
+            condition = !condition
+            expectChanges()
+            revalidate()
+        }
+    }
+
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test // regression test for 264467571
+    fun test_returnConditionally_fromNodeLambda_nonLocal_initial_return() = compositionTest {
+        var condition by mutableStateOf(true)
+        compose {
+            Text("Before outer")
+            InlineLinear outer@{
+                Text("Before inner")
+                InlineLinear {
+                    Text("Before return")
+                    if (condition) return@outer
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        validate {
+            Text("Before outer")
+            InlineLinear outer@{
+                Text("Before inner")
+                InlineLinear {
+                    Text("Before return")
+                    if (condition) return@outer
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        repeat(4) {
+            condition = !condition
+            expectChanges()
+            revalidate()
+        }
+    }
+
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test // regression test for 264467571
+    fun test_returnConditionally_fromNodeLambda_nonLocal_initial_no_return() = compositionTest {
+        var condition by mutableStateOf(true)
+        compose {
+            Text("Before outer")
+            InlineLinear outer@{
+                Text("Before inner")
+                InlineLinear {
+                    Text("Before return")
+                    if (condition) return@outer
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        validate {
+            Text("Before outer")
+            InlineLinear outer@{
+                Text("Before inner")
+                InlineLinear {
+                    Text("Before return")
+                    if (condition) return@outer
+                    Text("After return")
+                }
+                Text("After inner")
+            }
+            Text("Before outer")
+        }
+
+        repeat(4) {
+            condition = !condition
+            expectChanges()
+            revalidate()
+        }
+    }
+
+    @Ignore // Failing, will pass in 1.5 https://github.com/JetBrains/compose-multiplatform/issues/3211
+    @Test
+    fun test_returnConditionally_fromConditionalNodeLambda_nonLocal_initial_no_return() =
+        compositionTest {
+            var condition by mutableStateOf(true)
+            compose {
+                Text("Before outer")
+                InlineLinear outer@{
+                    Text("Before inner")
+                    if (condition) {
+                        InlineLinear {
+                            Text("Before return")
+                            return@outer
+                        }
+                    }
+                    Text("After inner")
+                }
+                Text("Before outer")
+            }
+
+            validate {
+                Text("Before outer")
+                InlineLinear outer@{
+                    Text("Before inner")
+                    if (condition) {
+                        InlineLinear {
+                            Text("Before return")
+                            return@outer
+                        }
+                    }
+                    Text("After inner")
+                }
+                Text("Before outer")
+            }
+
+            repeat(4) {
+                condition = !condition
+                expectChanges()
+                revalidate()
+            }
+        }
+
+    @Test
+    fun test_returnConditionally_fromFunction_nonLocal() = compositionTest {
+        val text = mutableStateOf<String?>(null)
+
+        compose {
+            TextWithNonLocalReturn(text.value)
+        }
+
+        validate {
+            if (text.value != null) {
+                Text(text.value!!)
+            }
+        }
+
+        text.value = "Test"
+
+        expectChanges()
+
+        revalidate()
+    }
+
+    @Test // regression test for 274889428
+    fun test_returnConditionally_simulatedIf() = compositionTest {
+        val condition1 = mutableStateOf(true)
+        val condition2 = mutableStateOf(true)
+        val condition3 = mutableStateOf(true)
+
+        compose block@{
+            Text("A")
+            simulatedIf(condition1.value) { return@block }
+            Text("B")
+            simulatedIf(condition2.value) { return@block }
+            Text("C")
+            simulatedIf(condition3.value) { return@block }
+            Text("D")
+        }
+
+        validate block@{
+            Text("A")
+            this.simulatedIf(condition1.value) { return@block }
+            Text("B")
+            this.simulatedIf(condition2.value) { return@block }
+            Text("C")
+            this.simulatedIf(condition3.value) { return@block }
+            Text("D")
+        }
+
+        condition1.value = false
+        expectChanges()
+        revalidate()
+
+        condition2.value = false
+        expectChanges()
+        revalidate()
+
+        condition3.value = false
+        expectChanges()
+        revalidate()
+    }
+
     @Test // regression test for 267586102
     fun test_remember_in_a_loop() = compositionTest {
         var i1 = 0
@@ -3600,3 +3932,20 @@ private inline fun M2(content: @Composable () -> Unit) = M1 { content() }
 
 @Composable
 private inline fun M3(content: @Composable () -> Unit) = M2 { content() }
+
+@Composable
+private fun TextWithNonLocalReturn(text: String?) {
+    InlineWrapper {
+        if (text == null) return
+        Text(text)
+    }
+}
+
+@Composable
+private inline fun simulatedIf(condition: Boolean, block: () -> Unit) {
+    if (condition) block()
+}
+
+private inline fun MockViewValidator.simulatedIf(condition: Boolean, block: () -> Unit) {
+    if (condition) block()
+}

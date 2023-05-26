@@ -48,6 +48,16 @@ fun Linear(content: @Composable () -> Unit) {
 }
 
 @Composable
+inline fun InlineLinear(content: @Composable () -> Unit) {
+    ReusableComposeNode<View, ViewApplier>(
+        factory = { View().also { it.name = "linear" } },
+        update = { }
+    ) {
+        content()
+    }
+}
+
+@Composable
 fun Linear(
     onReuse: () -> Unit = {},
     onDeactivate: () -> Unit = {},
