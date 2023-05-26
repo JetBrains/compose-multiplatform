@@ -17,6 +17,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 import org.jetbrains.compose.desktop.application.internal.validation.validatePackageVersions
 import org.jetbrains.compose.desktop.application.tasks.*
 import org.jetbrains.compose.desktop.tasks.AbstractUnpackDefaultComposeApplicationResourcesTask
+import org.jetbrains.compose.internal.utils.*
 import org.jetbrains.compose.internal.utils.OS
 import org.jetbrains.compose.internal.utils.currentOS
 import org.jetbrains.compose.internal.utils.currentTarget
@@ -66,6 +67,11 @@ private fun JvmApplicationContext.configureCommonJvmDesktopTasks(): CommonJvmDes
         taskNameObject = "runtime"
     ) {
         jdkHome.set(app.javaHomeProvider)
+        jdkVersionProbeJar.from(
+            project.detachedComposeGradleDependency(
+                artifactId = "gradle-plugin-internal-jdk-version-probe"
+            ).excludeTransitiveDependencies()
+        )
     }
 
     val suggestRuntimeModules = tasks.register<AbstractSuggestModulesTask>(
@@ -249,9 +255,7 @@ private fun JvmApplicationContext.configureProguardTask(
     mainClass.set(app.mainClass)
     proguardVersion.set(settings.version)
     proguardFiles.from(proguardVersion.map { proguardVersion ->
-        project.configurations.detachedConfiguration(
-            project.dependencies.create("com.guardsquare:proguard-gradle:${proguardVersion}")
-        )
+        project.detachedDependency(groupId = "com.guardsquare", artifactId = "proguard-gradle", version = proguardVersion)
     })
     configurationFiles.from(settings.configurationFiles)
     // ProGuard uses -dontobfuscate option to turn off obfuscation, which is enabled by default

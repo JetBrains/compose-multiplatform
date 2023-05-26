@@ -12,8 +12,9 @@ import org.gradle.api.artifacts.UnresolvedDependency
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.ComposeBuildConfig
 import org.jetbrains.compose.experimental.dsl.ExperimentalWebApplication
-import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.experimental.web.tasks.ExperimentalUnpackSkikoWasmRuntimeTask
+import org.jetbrains.compose.internal.utils.*
+import org.jetbrains.compose.internal.utils.registerTask
 import org.jetbrains.compose.internal.utils.uppercaseFirstChar
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
 
@@ -43,8 +44,9 @@ private const val SKIKO_GROUP = "org.jetbrains.skiko"
 
 private fun skikoVersionProvider(project: Project): Provider<String> {
     val composeVersion = ComposeBuildConfig.composeVersion
-    val configurationWithSkiko = project.configurations.detachedConfiguration(
-        project.dependencies.create("org.jetbrains.compose.ui:ui-graphics:$composeVersion")
+    val configurationWithSkiko = project.detachedComposeDependency(
+        artifactId = "ui-graphics",
+        groupId = "org.jetbrains.compose.ui"
     )
     return project.provider {
         val skikoDependency = configurationWithSkiko.allDependenciesDescriptors.firstOrNull(::isSkikoDependency)

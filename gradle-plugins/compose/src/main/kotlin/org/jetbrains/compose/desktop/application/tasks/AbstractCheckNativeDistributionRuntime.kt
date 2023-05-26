@@ -5,7 +5,7 @@
 
 package org.jetbrains.compose.desktop.application.tasks
 
-import org.gradle.api.file.Directory
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
@@ -16,7 +16,6 @@ import org.jetbrains.compose.internal.utils.ioFile
 import org.jetbrains.compose.internal.utils.notNullProperty
 import org.jetbrains.compose.desktop.application.internal.ExternalToolRunner
 import org.jetbrains.compose.desktop.tasks.AbstractComposeDesktopTask
-import org.jetbrains.compose.internal.utils.clearDirs
 import java.io.File
 
 // __COMPOSE_NATIVE_DISTRIBUTIONS_MIN_JAVA_VERSION__
@@ -24,6 +23,9 @@ internal const val MIN_JAVA_RUNTIME_VERSION = 17
 
 @CacheableTask
 abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTask() {
+    @get:Classpath
+    val jdkVersionProbeJar: ConfigurableFileCollection = objects.fileCollection()
+
     @get:PathSensitive(PathSensitivity.ABSOLUTE)
     @get:InputDirectory
     val jdkHome: Property<String> = objects.notNullProperty()
@@ -33,18 +35,21 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
     @get:OutputFile
     val javaRuntimePropertiesFile: Provider<RegularFile> = taskDir.map { it.file("properties.bin") }
 
-    @get:LocalState
-    val workingDir: Provider<Directory> = taskDir.map { it.dir("localState") }
-
     private val jdkHomeFile: File
         get() = File(jdkHome.orNull ?: error("Missing jdkHome value"))
 
     private fun File.getJdkTool(toolName: String): File =
-        resolve("bin/${executableName(toolName)}").apply {
-            check(exists()) {
-                jdkDistributionProbingError("'$toolName' is missing")
-            }
-        }
+        resolve("bin/${executableName(toolName)}")
+
+    private fun ensureToolsExist(vararg tools: File) {
+        val missingTools = tools.filter { !it.exists() }.map { "'${it.name}'" }
+
+        if (missingTools.isEmpty()) return
+
+        if (missingTools.size == 1) jdkDistributionProbingError("${missingTools.single()} is missing")
+
+        jdkDistributionProbingError("${missingTools.joinToString(", ")} are missing")
+    }
 
     private fun jdkDistributionProbingError(errorMessage: String): Nothing {
         val fullErrorMessage = buildString {
@@ -60,12 +65,11 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
 
         val jdkHome = jdkHomeFile
         val javaExecutable = jdkHome.getJdkTool("java")
-        val javacExecutable = jdkHome.getJdkTool("javac")
+        val jlinkExecutable = jdkHome.getJdkTool("jlink")
+        val jpackageExecutabke = jdkHome.getJdkTool("jpackage")
+        ensureToolsExist(javaExecutable, jlinkExecutable, jpackageExecutabke)
 
-        val jvmRuntimeVersionString = getJavaRuntimeVersion(
-            javaExecutable = javaExecutable,
-            javacExecutable = javacExecutable
-        )
+        val jvmRuntimeVersionString = getJavaRuntimeVersion(javaExecutable)
 
         val jvmRuntimeVersion = jvmRuntimeVersionString?.toIntOrNull()
             ?: jdkDistributionProbingError("JDK version '$jvmRuntimeVersionString' has unexpected format")
@@ -96,64 +100,11 @@ abstract class AbstractCheckNativeDistributionRuntime : AbstractComposeDesktopTa
         JvmRuntimeProperties.writeToFile(properties, javaRuntimePropertiesFile.ioFile)
     }
 
-    private fun getJavaRuntimeVersion(
-        javaExecutable: File,
-        javacExecutable: File
-    ): String? {
-        fileOperations.clearDirs(workingDir)
-        val workingDir = workingDir.ioFile
-
-        val printJavaRuntimeClassName = "PrintJavaRuntimeVersion"
-        val printJavaRuntimeJava = workingDir.resolve("java/$printJavaRuntimeClassName.java").apply {
-            parentFile.mkdirs()
-            writeText("""
-                import java.lang.reflect.Method;
-
-                public class $printJavaRuntimeClassName {
-                    Class<Runtime> runtimeClass = Runtime.class;
-                    try {
-                        Method version = runtimeClass.getMethod("version");
-                        Object runtimeVer = version.invoke(runtimeClass);
-                        Class<? extends Object> runtimeVerClass = runtimeVer.getClass();
-                        try {
-                            int feature = (int) runtimeVerClass.getMethod("feature").invoke(runtimeVer);
-                            printVersionAndHalt((Integer.valueOf(feature)).toString());
-                        } catch (NoSuchMethodException e) {
-                            int major = (int) runtimeVerClass.getMethod("major").invoke(runtimeVer);
-                            printVersionAndHalt((Integer.valueOf(major)).toString());
-                        }
-                    } catch (Exception e) {
-                        String javaVersion = System.getProperty("java.version");
-                        String[] parts = javaVersion.split("\\.");
-                        if (parts.length > 2 && "1".equalsIgnoreCase(parts[0])) {
-                            printVersionAndHalt(parts[1]);
-                        } else {
-                            throw new IllegalStateException("Could not determine JDK version from string: '" + javaVersion + "'");
-                        }
-                    }
-
-                    private static void printVersionAndHalt(String version) {
-                        System.out.println(version);
-                        Runtime.getRuntime().exit(0);
-                    }
-                }
-            """.trimIndent())
-        }
-        val classFilesDir = workingDir.resolve("out-classes")
-        runExternalTool(
-            tool = javacExecutable,
-            args = listOf(
-                "-source", "1.8",
-                "-target", "1.8",
-                "-d", classFilesDir.absolutePath,
-                printJavaRuntimeJava.absolutePath
-            )
-        )
-
+    private fun getJavaRuntimeVersion(javaExecutable: File): String? {
         var javaRuntimeVersion: String? = null
         runExternalTool(
             tool = javaExecutable,
-            args = listOf("-cp", classFilesDir.absolutePath, printJavaRuntimeClassName),
+            args = listOf("-jar", jdkVersionProbeJar.files.single().absolutePath),
             processStdout = { stdout -> javaRuntimeVersion = stdout.trim() }
         )
         return javaRuntimeVersion

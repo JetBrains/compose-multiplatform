@@ -128,7 +128,10 @@ fun Project.configureGradlePlugin(
 }
 
 tasks.register("publishToMavenLocal") {
+    val publishToMavenLocal = this
     for (subproject in subprojects) {
-        dependsOn(subproject.tasks.named("publishToMavenLocal"))
+        subproject.plugins.withId("maven-publish") {
+            publishToMavenLocal.dependsOn("${subproject.path}:publishToMavenLocal")
+        }
     }
 }
