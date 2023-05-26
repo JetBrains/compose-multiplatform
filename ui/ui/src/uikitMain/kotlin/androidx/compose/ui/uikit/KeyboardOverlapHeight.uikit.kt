@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-import Foundation
-import SwiftUI
-import shared
+package androidx.compose.ui.uikit
 
-struct ContentView: View {
-    var body: some View {
-        ComposeView().ignoresSafeArea(.all)
-    }
-}
+import androidx.compose.runtime.*
 
-struct ComposeView: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        SwiftHelper().getViewController()
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
+/**
+ * Composition local for height that is overlapped with keyboard over Compose view.
+ */
+@InternalComposeApi
+val LocalKeyboardOverlapHeightState = staticCompositionLocalOf<State<Float>> {
+    error("CompositionLocal LocalKeyboardOverlapHeightState not present")
 }

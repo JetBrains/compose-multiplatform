@@ -18,6 +18,8 @@ package androidx.compose.ui.window
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.InternalComposeApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.createSkiaLayer
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
@@ -27,6 +29,7 @@ import androidx.compose.ui.interop.LocalUIViewController
 import androidx.compose.ui.native.ComposeLayer
 import androidx.compose.ui.platform.*
 import androidx.compose.ui.text.input.PlatformTextInputService
+import androidx.compose.ui.uikit.*
 import androidx.compose.ui.unit.*
 import kotlin.math.roundToInt
 import kotlinx.cinterop.CValue
@@ -36,7 +39,6 @@ import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.SkikoUIView
 import org.jetbrains.skiko.TextActions
 import platform.CoreGraphics.CGPointMake
-import platform.CoreGraphics.CGRectMake
 import platform.CoreGraphics.CGSize
 import platform.Foundation.*
 import platform.UIKit.*
@@ -77,10 +79,19 @@ fun ComposeUIViewController(content: @Composable () -> Unit): UIViewController =
 fun Application(
     title: String = "JetpackNativeWindow",
     content: @Composable () -> Unit = { }
-):UIViewController = ComposeUIViewController(content)
+): UIViewController = ComposeUIViewController(content)
 
+@OptIn(InternalComposeApi::class)
 @ExportObjCClass
 internal actual class ComposeWindow : UIViewController {
+
+    private val keyboardOverlapHeightState = mutableStateOf(0f)
+    private val safeAreaState = mutableStateOf(IOSInsets())
+    private val layoutMarginsState = mutableStateOf(IOSInsets())
+    private val interfaceOrientationState = mutableStateOf(
+        InterfaceOrientation.getStatusBarOrientation()
+    )
+
     @OverrideInit
     actual constructor() : super(nibName = null, bundle = null)
 
@@ -104,54 +115,57 @@ internal actual class ComposeWindow : UIViewController {
     private val keyboardVisibilityListener = object : NSObject() {
         @Suppress("unused")
         @ObjCAction
-        fun keyboardWillShow(arg: NSNotification) {
+        fun keyboardDidShow(arg: NSNotification) {
             val keyboardInfo = arg.userInfo!!["UIKeyboardFrameEndUserInfoKey"] as NSValue
             val keyboardHeight = keyboardInfo.CGRectValue().useContents { size.height }
             val screenHeight = UIScreen.mainScreen.bounds.useContents { size.height }
-            val magicMultiplier = density.density - 1 // todo magic number
-            val viewY = UIScreen.mainScreen.coordinateSpace.convertPoint(
-                point = CGPointMake(0.0, 0.0),
+
+            val composeViewBottomY = UIScreen.mainScreen.coordinateSpace.convertPoint(
+                point = CGPointMake(0.0, view.frame.useContents { size.height }),
                 fromCoordinateSpace = view.coordinateSpace
-            ).useContents { y } * magicMultiplier
-            val focused = layer.getActiveFocusRect()
-            if (focused != null) {
-                val focusedBottom = focused.bottom.value + getTopLeftOffset().y
-                val hiddenPartOfFocusedElement =
-                    focusedBottom + keyboardHeight - screenHeight - viewY
-                if (hiddenPartOfFocusedElement > 0) {
-                    // If focused element hidden by keyboard, then change UIView bounds.
-                    // Focused element will be visible
-                    val focusedTop = focused.top.value
-                    val composeOffsetY = if (hiddenPartOfFocusedElement < focusedTop) {
-                        hiddenPartOfFocusedElement
-                    } else {
-                        maxOf(focusedTop, 0f).toDouble()
-                    }
-                    view.setClipsToBounds(true)
-                    val (width, height) = getViewFrameSize()
-                    view.layer.setBounds(
-                        CGRectMake(
-                            x = 0.0,
-                            y = composeOffsetY,
-                            width = width.toDouble(),
-                            height = height.toDouble()
-                        )
-                    )
-                }
+            ).useContents { y }
+            val bottomIndent = screenHeight - composeViewBottomY
+
+            if (bottomIndent < keyboardHeight) {
+                keyboardOverlapHeightState.value = (keyboardHeight - bottomIndent).toFloat()
             }
         }
 
         @Suppress("unused")
         @ObjCAction
-        fun keyboardWillHide(arg: NSNotification) {
-            val (width, height) = getViewFrameSize()
-            view.layer.setBounds(CGRectMake(0.0, 0.0, width.toDouble(), height.toDouble()))
-        }
-
-        @Suppress("unused")
-        @ObjCAction
         fun keyboardDidHide(arg: NSNotification) {
-            view.setClipsToBounds(false)
+            keyboardOverlapHeightState.value = 0f
+        }
+    }
+
+    private val orientationListener = object : NSObject() {
+        @Suppress("UNUSED_PARAMETER")
+        @ObjCAction
+        fun orientationDidChange(arg: NSNotification) {
+            InterfaceOrientation.getStatusBarOrientation()
+            interfaceOrientationState.value = InterfaceOrientation.getStatusBarOrientation()
+        }
+    }
+
+    @Suppress("unused")
+    @ObjCAction
+    fun viewSafeAreaInsetsDidChange() {
+        // super.viewSafeAreaInsetsDidChange() // TODO: call super after Kotlin 1.8.20
+        view.safeAreaInsets.useContents {
+            safeAreaState.value = IOSInsets(
+                top = top.dp,
+                bottom = bottom.dp,
+                left = left.dp,
+                right = right.dp,
+            )
+        }
+        view.directionalLayoutMargins.useContents {
+            layoutMarginsState.value = IOSInsets(
+                top = top.dp,
+                bottom = bottom.dp,
+                left = leading.dp,
+                right = trailing.dp,
+            )
         }
     }
 
@@ -254,6 +268,10 @@ internal actual class ComposeWindow : UIViewController {
             CompositionLocalProvider(
                 LocalLayerContainer provides rootView,
                 LocalUIViewController provides this,
+                LocalKeyboardOverlapHeightState provides keyboardOverlapHeightState,
+                LocalSafeAreaState provides safeAreaState,
+                LocalLayoutMarginsState provides layoutMarginsState,
+                LocalInterfaceOrientationState provides interfaceOrientationState,
             ) {
                 content()
             }
@@ -307,40 +325,46 @@ internal actual class ComposeWindow : UIViewController {
         super.viewDidAppear(animated)
         NSNotificationCenter.defaultCenter.addObserver(
             observer = keyboardVisibilityListener,
-            selector = NSSelectorFromString("keyboardWillShow:"),
-            name = platform.UIKit.UIKeyboardWillShowNotification,
+            selector = NSSelectorFromString(keyboardVisibilityListener::keyboardDidShow.name + ":"),
+            name = UIKeyboardDidShowNotification,
             `object` = null
         )
         NSNotificationCenter.defaultCenter.addObserver(
             observer = keyboardVisibilityListener,
-            selector = NSSelectorFromString("keyboardWillHide:"),
-            name = platform.UIKit.UIKeyboardWillHideNotification,
+            selector = NSSelectorFromString(keyboardVisibilityListener::keyboardDidHide.name + ":"),
+            name = UIKeyboardDidHideNotification,
             `object` = null
         )
         NSNotificationCenter.defaultCenter.addObserver(
-            observer = keyboardVisibilityListener,
-            selector = NSSelectorFromString("keyboardDidHide:"),
-            name = platform.UIKit.UIKeyboardDidHideNotification,
+            observer = orientationListener,
+            selector = NSSelectorFromString(orientationListener::orientationDidChange.name + ":"),
+            name = UIDeviceOrientationDidChangeNotification,
             `object` = null
         )
     }
 
     // viewDidUnload() is deprecated and not called.
     override fun viewDidDisappear(animated: Boolean) {
+        // TODO call dispose() function, but check how it will works with SwiftUI interop between different screens.
         super.viewDidDisappear(animated)
         NSNotificationCenter.defaultCenter.removeObserver(
             observer = keyboardVisibilityListener,
-            name = platform.UIKit.UIKeyboardWillShowNotification,
+            name = UIKeyboardWillShowNotification,
             `object` = null
         )
         NSNotificationCenter.defaultCenter.removeObserver(
             observer = keyboardVisibilityListener,
-            name = platform.UIKit.UIKeyboardWillHideNotification,
+            name = UIKeyboardWillHideNotification,
             `object` = null
         )
         NSNotificationCenter.defaultCenter.removeObserver(
             observer = keyboardVisibilityListener,
-            name = platform.UIKit.UIKeyboardDidHideNotification,
+            name = UIKeyboardDidHideNotification,
+            `object` = null
+        )
+        NSNotificationCenter.defaultCenter.removeObserver(
+            observer = keyboardVisibilityListener,
+            name = UIDeviceOrientationDidChangeNotification,
             `object` = null
         )
     }
@@ -355,11 +379,6 @@ internal actual class ComposeWindow : UIViewController {
         content: @Composable () -> Unit
     ) {
         this.content = content
-    }
-
-    override fun viewDidUnload() {
-        super.viewDidUnload()
-        this.dispose()
     }
 
     actual fun dispose() {

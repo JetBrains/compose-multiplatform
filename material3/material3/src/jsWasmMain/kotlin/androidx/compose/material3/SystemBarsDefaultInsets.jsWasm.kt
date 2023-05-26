@@ -14,20 +14,12 @@
  * limitations under the License.
  */
 
-import Foundation
-import SwiftUI
-import shared
+package androidx.compose.material3
 
-struct ContentView: View {
-    var body: some View {
-        ComposeView().ignoresSafeArea(.all)
-    }
-}
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.Composable
 
-struct ComposeView: UIViewControllerRepresentable {
-    func makeUIViewController(context: Context) -> UIViewController {
-        SwiftHelper().getViewController()
-    }
-
-    func updateUIViewController(_ uiViewController: UIViewController, context: Context) {}
-}
+@Composable
+internal actual fun WindowInsets.Companion.systemBarsForVisualComponents(): WindowInsets =
+    WindowInsets(0.dp, 0.dp, 0.dp, 0.dp)

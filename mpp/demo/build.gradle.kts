@@ -125,6 +125,7 @@ kotlin {
              dependencies {
                 implementation(project(":compose:foundation:foundation"))
                 implementation(project(":compose:foundation:foundation-layout"))
+                implementation(project(":compose:material3:material3"))
                 implementation(project(":compose:material:material"))
                 implementation(project(":compose:mpp"))
                 implementation(project(":compose:runtime:runtime"))
