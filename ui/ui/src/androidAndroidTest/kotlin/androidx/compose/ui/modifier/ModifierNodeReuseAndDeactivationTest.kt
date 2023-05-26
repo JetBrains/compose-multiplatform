@@ -18,7 +18,9 @@
 
 package androidx.compose.ui.modifier
 
+import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ReusableComposeNode
 import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.ReusableContentHost
 import androidx.compose.runtime.getValue
@@ -32,16 +34,22 @@ import androidx.compose.ui.layout.Measurable
 import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
+import androidx.compose.ui.node.ComposeUiNode
 import androidx.compose.ui.node.DelegatingNode
 import androidx.compose.ui.node.LayoutModifierNode
+import androidx.compose.ui.node.LayoutNode
 import androidx.compose.ui.node.ModifierNodeElement
 import androidx.compose.ui.node.ObserverNode
 import androidx.compose.ui.node.observeReads
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertLeftPositionInRootIsEqualTo
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.unit.Constraints
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
 import com.google.common.truth.Truth.assertThat
+import com.google.common.truth.Truth.assertWithMessage
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -223,6 +231,54 @@ class ModifierNodeReuseAndDeactivationTest {
             // makes sure onReset is called before detach:
             assertThat(onResetCallsWhenDetached).isEqualTo(1)
             assertThat(onAttachCalls).isEqualTo(2)
+        }
+    }
+
+    // Regression test for b/275919849
+    @Test
+    fun unchangedNodesAreDetachedAndReattachedWhenReused() {
+        val nodeInstance = object : Modifier.Node() {}
+        val element = object : ModifierNodeElement<Modifier.Node>() {
+            override fun create(): Modifier.Node = nodeInstance
+            override fun hashCode(): Int = System.identityHashCode(this)
+            override fun equals(other: Any?) = (other === this)
+            override fun update(node: Modifier.Node) = nodeInstance
+        }
+
+        var active by mutableStateOf(true)
+        rule.setContent {
+            ReusableContentHost(active) {
+                // Custom Layout that measures to 1x1 pixels and only assigns the modifiers once
+                // when the node is created. Even if the modifiers aren't reassigned, they should
+                // still undergo the same lifecycle.
+                ReusableComposeNode<ComposeUiNode, Applier<Any>>(
+                    factory = {
+                        LayoutNode().apply {
+                            measurePolicy = MeasurePolicy { _, _ -> layout(1, 1) {} }
+                            modifier = element
+                        }
+                    },
+                    update = { },
+                    content = { }
+                )
+            }
+        }
+
+        rule.runOnIdle {
+            assertWithMessage("Modifier Node was not attached when being initially created")
+                .that(nodeInstance.isAttached).isTrue()
+        }
+
+        active = false
+        rule.runOnIdle {
+            assertWithMessage("Modifier Node should be detached when its LayoutNode is deactivated")
+                .that(nodeInstance.isAttached).isFalse()
+        }
+
+        active = true
+        rule.runOnIdle {
+            assertWithMessage("Modifier Node was not attached after being reactivated")
+                .that(nodeInstance.isAttached).isTrue()
         }
     }
 
@@ -499,6 +555,47 @@ class ModifierNodeReuseAndDeactivationTest {
             assertThat(receivedValue).isEqualTo(1)
         }
     }
+
+    @Test
+    fun placingChildWithReusedUnchangedModifier() {
+        // regression test for b/271430143
+        var active by mutableStateOf(true)
+        var modifier by mutableStateOf(StatelessLayoutElement1.then(StatelessLayoutElement2))
+        var childX by mutableStateOf(0)
+
+        rule.setContent {
+            ReusableContentHost(active) {
+                ReusableContent(0) {
+                    Layout(content = {
+                        Layout(
+                            modifier = modifier.testTag("child"),
+                            measurePolicy = MeasurePolicy
+                        )
+                    }) { measurables, constraints ->
+                        val placeable = measurables.first().measure(constraints)
+                        layout(placeable.width, placeable.height) {
+                            childX.toString()
+                            placeable.place(childX, 0)
+                        }
+                    }
+                }
+            }
+        }
+
+        rule.runOnIdle {
+            active = false
+        }
+
+        rule.runOnIdle {
+            active = true
+            modifier = StatelessLayoutElement1
+            // force relayout parent
+            childX = 10
+        }
+
+        rule.onNodeWithTag("child")
+            .assertLeftPositionInRootIsEqualTo(with(rule.density) { 10.toDp() })
+    }
 }
 
 @Composable
@@ -654,6 +751,44 @@ private data class ObserverModifierElement(
 
         override fun onObservedReadsChanged() {
             observe()
+        }
+    }
+}
+
+private object StatelessLayoutElement1 : ModifierNodeElement<StatelessLayoutModifier1>() {
+    override fun create() = StatelessLayoutModifier1()
+    override fun update(node: StatelessLayoutModifier1) = node
+    override fun hashCode(): Int = 241
+    override fun equals(other: Any?) = other === this
+}
+
+private class StatelessLayoutModifier1 : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
+        }
+    }
+}
+
+private object StatelessLayoutElement2 : ModifierNodeElement<StatelessLayoutModifier2>() {
+    override fun create() = StatelessLayoutModifier2()
+    override fun update(node: StatelessLayoutModifier2) = node
+    override fun hashCode(): Int = 242
+    override fun equals(other: Any?) = other === this
+}
+
+private class StatelessLayoutModifier2 : Modifier.Node(), LayoutModifierNode {
+    override fun MeasureScope.measure(
+        measurable: Measurable,
+        constraints: Constraints
+    ): MeasureResult {
+        val placeable = measurable.measure(constraints)
+        return layout(placeable.width, placeable.height) {
+            placeable.place(0, 0)
         }
     }
 }

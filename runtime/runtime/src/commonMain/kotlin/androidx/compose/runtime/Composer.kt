@@ -1680,10 +1680,31 @@ internal class ComposerImpl(
 
     override fun endToMarker(marker: Int) {
         if (marker < 0) {
+            // If the marker is negative then the marker is for the writer
             val writerLocation = -marker
-            while (writer.parent > writerLocation) end(false)
+            val writer = writer
+            while (true) {
+                val parent = writer.parent
+                if (parent <= writerLocation) break
+                end(writer.isNode(parent))
+            }
         } else {
-            while (reader.parent > marker) end(false)
+            // If the marker is positive then the marker is for the reader. However, if we are
+            // inserting then we need to close the inserting groups first.
+            if (inserting) {
+                // We might be inserting, we need to close all the groups until we are no longer
+                // inserting.
+                val writer = writer
+                while (inserting) {
+                    end(writer.isNode(writer.parent))
+                }
+            }
+            val reader = reader
+            while (true) {
+                val parent = reader.parent
+                if (parent <= marker) break
+                end(reader.isNode(parent))
+            }
         }
     }
 

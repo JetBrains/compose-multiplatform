@@ -172,6 +172,34 @@ class FocusEventCountTest(focusEventType: String) {
     }
 
     @Test
+    fun removingActiveComposable_onFocusEventIsCalledWithDefaultValue() {
+        // Arrange.
+        val focusStates = mutableListOf<FocusState>()
+        val focusRequester = FocusRequester()
+        var showBox by mutableStateOf(true)
+        rule.setFocusableContent {
+            if (showBox) {
+                Box(
+                    modifier = Modifier
+                        .onFocusEvent { focusStates.add(it) }
+                        .focusRequester(focusRequester)
+                        .focusTarget()
+                )
+            }
+        }
+        rule.runOnIdle {
+            focusRequester.requestFocus()
+            focusStates.clear()
+        }
+
+        // Act.
+        rule.runOnIdle { showBox = false }
+
+        // Assert.
+        rule.runOnIdle { assertThat(focusStates).isExactly(Inactive) }
+    }
+
+    @Test
     fun removingActiveFocusNode_onFocusEventIsCalledTwice() {
         // Arrange.
         val focusStates = mutableListOf<FocusState>()

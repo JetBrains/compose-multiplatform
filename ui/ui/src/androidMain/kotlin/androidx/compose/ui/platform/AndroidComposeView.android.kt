@@ -125,8 +125,8 @@ import androidx.compose.ui.node.Owner
 import androidx.compose.ui.node.OwnerSnapshotObserver
 import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.semantics.SemanticsModifierCore
-import androidx.compose.ui.semantics.SemanticsNode
 import androidx.compose.ui.semantics.SemanticsOwner
+import androidx.compose.ui.semantics.findClosestParentNode
 import androidx.compose.ui.semantics.outerSemantics
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.InternalTextApi
@@ -721,8 +721,12 @@ internal class AndroidComposeView(context: Context) :
                     info: AccessibilityNodeInfoCompat
                 ) {
                     super.onInitializeAccessibilityNodeInfo(host, info)
-                    var parentId = SemanticsNode(layoutNode.outerSemantics!!, false).parent!!.id
-                    if (parentId == semanticsOwner.unmergedRootSemanticsNode.id) {
+                    var parentId = layoutNode
+                        .findClosestParentNode { it.outerSemantics != null }
+                        ?.semanticsId
+                    if (parentId == null ||
+                        parentId == semanticsOwner.unmergedRootSemanticsNode.id
+                    ) {
                         parentId = AccessibilityNodeProviderCompat.HOST_VIEW_ID
                     }
                     info.setParent(thisView, parentId)
