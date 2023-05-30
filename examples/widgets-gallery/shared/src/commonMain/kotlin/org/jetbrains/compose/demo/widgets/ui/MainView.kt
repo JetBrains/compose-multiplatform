@@ -145,7 +145,7 @@ private fun WidgetsListItemViewImpl(
         }
 
         Text(
-            text = widgetsType.readableName,
+            text = widgetsType.title,
             color = textColor,
             modifier = Modifier
                 .align(Alignment.CenterVertically)
