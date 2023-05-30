@@ -13,6 +13,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
+import org.jetbrains.compose.demo.visuals.platform.exit
+import org.jetbrains.compose.demo.visuals.platform.measureTime
 import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
@@ -39,7 +42,9 @@ data class SnowFlake(
 
 data class Star(val x: Dp, val y: Dp, val color: Color, val size: Dp)
 
-fun random(): Float = Random.nextFloat()
+val random = Random(123)
+
+fun random(): Float = random.nextFloat()
 
 class DoubleRocket(val particle: Particle) {
     private val STATE_ROCKET = 0
@@ -66,12 +71,20 @@ class DoubleRocket(val particle: Particle) {
         }
     }
 
+    var numOfIterations = 1
+
     private fun reset() {
         state = STATE_ROCKET
         particle.x = 0.0
         particle.y = 1000.0
         particle.vx = 2.1
         particle.vy = -12.5
+        numOfIterations -=1
+        if (numOfIterations == 0) {
+            println((measureTime() - measureTime)/1000000)
+            exit()
+        }
+
     }
 
     private fun explode(time: Long) {
@@ -222,8 +235,11 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
     }
 }
 
+var measureTime: Long = 0
+
 @Composable
 fun NYContent() {
+    measureTime = measureTime()
     var time by remember { mutableStateOf(nanoTime()) }
     var startTime = remember { nanoTime() }
     var prevTime by remember { mutableStateOf(nanoTime()) }
@@ -240,10 +256,14 @@ fun NYContent() {
 
         LaunchedEffect(Unit) {
             while (true) {
-                withFrameNanos {
-                    prevTime = time
-                    time = it
-                }
+                prevTime = time
+                time += 10000000
+                delay(10)
+
+//                withFrameNanos {
+//                    prevTime = time
+//                    time = it
+//                }
             }
         }
 
