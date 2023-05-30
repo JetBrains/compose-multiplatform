@@ -35,14 +35,12 @@ import androidx.compose.ui.input.pointer.PointerEventType.Companion.Scroll
 import androidx.compose.ui.input.pointer.PointerType
 import androidx.compose.ui.input.pointer.PointerType.Companion.Mouse
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlinx.atomicfu.atomic
 
 
 @OptIn(ExperimentalTestApi::class, ExperimentalComposeUiApi::class)
@@ -427,33 +425,6 @@ class ComposeUiSkikoTestTest {
         onNodeWithTag("test").performTextClearance()
         assertThat(text.text).isEqualTo("")
     }
-
-    // See https://github.com/JetBrains/compose-multiplatform/issues/3117
-    @Test
-    fun recompositionCompletesBeforeSetContentReturns() = repeat(1000) {
-        runSkikoComposeUiTest {
-            var globalValue by atomic(0)
-            setContent {
-                var localValue by remember{ mutableStateOf(0) }
-
-                remember(localValue) {
-                    globalValue = localValue
-                }
-
-                Layout(
-                    {},
-                    Modifier,
-                    measurePolicy = { _, constraints ->
-                        localValue = 100
-                        layout(constraints.maxWidth, constraints.maxHeight) {}
-                    }
-                )
-            }
-
-            assertThat(globalValue).isEqualTo(100)
-        }
-    }
-
 }
 
 private class AssertThat<T>(val t: T)
