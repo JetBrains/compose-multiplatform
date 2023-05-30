@@ -1,3 +1,8 @@
 package org.jetbrains.compose.demo.visuals.platform
 
-actual fun nanoTime(): Long = System.nanoTime()
+import kotlin.system.exitProcess
+
+actual fun nanoTime(): Long = 0//System.nanoTime()
+
+actual fun measureTime() = System.nanoTime()
+actual fun exit(): Unit = exitProcess(0)
