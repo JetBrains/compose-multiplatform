@@ -256,14 +256,10 @@ fun NYContent() {
 
         LaunchedEffect(Unit) {
             while (true) {
-                prevTime = time
-                time += 10000000
-                delay(10)
-
-//                withFrameNanos {
-//                    prevTime = time
-//                    time = it
-//                }
+                withFrameNanos {
+                    prevTime = time
+                    time = it
+                }
             }
         }
 
