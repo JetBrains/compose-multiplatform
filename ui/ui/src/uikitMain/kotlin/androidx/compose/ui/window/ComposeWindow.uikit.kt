@@ -32,14 +32,12 @@ import androidx.compose.ui.text.input.PlatformTextInputService
 import androidx.compose.ui.uikit.*
 import androidx.compose.ui.unit.*
 import kotlin.math.roundToInt
-import kotlinx.cinterop.CValue
 import kotlinx.cinterop.ExportObjCClass
 import kotlinx.cinterop.ObjCAction
 import kotlinx.cinterop.useContents
 import org.jetbrains.skiko.SkikoUIView
 import org.jetbrains.skiko.TextActions
 import platform.CoreGraphics.CGPointMake
-import platform.CoreGraphics.CGSize
 import platform.Foundation.*
 import platform.UIKit.*
 import platform.darwin.NSObject
@@ -296,13 +294,6 @@ internal actual class ComposeWindow : UIViewController {
                 content()
             }
         })
-    }
-
-    override fun viewWillTransitionToSize(
-        size: CValue<CGSize>,
-        withTransitionCoordinator: UIViewControllerTransitionCoordinatorProtocol
-    ) {
-        super.viewWillTransitionToSize(size, withTransitionCoordinator)
     }
 
     override fun traitCollectionDidChange(previousTraitCollection: UITraitCollection?) {
