@@ -88,9 +88,38 @@ internal actual class ComposeWindow : UIViewController {
     private val keyboardOverlapHeightState = mutableStateOf(0f)
     private val safeAreaState = mutableStateOf(IOSInsets())
     private val layoutMarginsState = mutableStateOf(IOSInsets())
+
+    /*
+     * Initial value is arbitarily chosen to avoid propagating invalid value logic
+     * It's never the case in real usage scenario to reflect that in type system
+     */
     private val interfaceOrientationState = mutableStateOf(
-        InterfaceOrientation.getStatusBarOrientation()
+        InterfaceOrientation.Portrait
     )
+
+    /*
+     * On iOS >= 13.0 interfaceOrientation will be deduced from [UIWindowScene] of [UIWindow]
+     * to which our [ComposeWindow] is attached.
+     * It's never UIInterfaceOrientationUnknown, if accessed after owning [UIWindow] was made key and visible:
+     * https://developer.apple.com/documentation/uikit/uiwindow/1621601-makekeyandvisible?language=objc
+     */
+    private val currentInterfaceOrientation: InterfaceOrientation?
+        get() {
+            // Flag for checking which API to use
+            // Modern: https://developer.apple.com/documentation/uikit/uiwindowscene/3198088-interfaceorientation?language=objc
+            // Deprecated: https://developer.apple.com/documentation/uikit/uiapplication/1623026-statusbarorientation?language=objc
+            val supportsWindowSceneApi = NSProcessInfo.processInfo.operatingSystemVersion.useContents {
+                majorVersion >= 13
+            }
+
+            return if (supportsWindowSceneApi) {
+                view.window?.windowScene?.interfaceOrientation?.let {
+                    InterfaceOrientation.getByRawValue(it)
+                }
+            } else {
+                InterfaceOrientation.getByRawValue(UIApplication.sharedApplication.statusBarOrientation)
+            }
+        }
 
     @OverrideInit
     actual constructor() : super(nibName = null, bundle = null)
@@ -135,15 +164,6 @@ internal actual class ComposeWindow : UIViewController {
         @ObjCAction
         fun keyboardDidHide(arg: NSNotification) {
             keyboardOverlapHeightState.value = 0f
-        }
-    }
-
-    private val orientationListener = object : NSObject() {
-        @Suppress("UNUSED_PARAMETER")
-        @ObjCAction
-        fun orientationDidChange(arg: NSNotification) {
-            InterfaceOrientation.getStatusBarOrientation()
-            interfaceOrientationState.value = InterfaceOrientation.getStatusBarOrientation()
         }
     }
 
@@ -282,19 +302,6 @@ internal actual class ComposeWindow : UIViewController {
         size: CValue<CGSize>,
         withTransitionCoordinator: UIViewControllerTransitionCoordinatorProtocol
     ) {
-        layer.setDensity(density)
-        val scale = density.density
-        val width = size.useContents { width } * scale
-        val height = size.useContents { height } * scale
-        layer.setSize(width.roundToInt(), height.roundToInt())
-        layer.layer.needRedraw() // TODO: remove? the following block should be enough
-        withTransitionCoordinator.animateAlongsideTransition(animation = null) {
-            // Docs: https://developer.apple.com/documentation/uikit/uiviewcontrollertransitioncoordinator/1619295-animatealongsidetransition
-            // Request a frame once more on animation completion.
-            // Consider adding redrawImmediately() in SkiaLayer for ios to sync with current frame.
-            // This fixes an interop use case when Compose is embedded in SwiftUi.
-            layer.layer.needRedraw()
-        }
         super.viewWillTransitionToSize(size, withTransitionCoordinator)
     }
 
@@ -315,6 +322,12 @@ internal actual class ComposeWindow : UIViewController {
 
     override fun viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
+
+        // UIKit possesses all required info for layout at this point
+        currentInterfaceOrientation?.let {
+            interfaceOrientationState.value = it
+        }
+
         val (width, height) = getViewFrameSize()
         layer.setDensity(density)
         val scale = density.density
@@ -333,12 +346,6 @@ internal actual class ComposeWindow : UIViewController {
             observer = keyboardVisibilityListener,
             selector = NSSelectorFromString(keyboardVisibilityListener::keyboardDidHide.name + ":"),
             name = UIKeyboardDidHideNotification,
-            `object` = null
-        )
-        NSNotificationCenter.defaultCenter.addObserver(
-            observer = orientationListener,
-            selector = NSSelectorFromString(orientationListener::orientationDidChange.name + ":"),
-            name = UIDeviceOrientationDidChangeNotification,
             `object` = null
         )
     }
@@ -360,11 +367,6 @@ internal actual class ComposeWindow : UIViewController {
         NSNotificationCenter.defaultCenter.removeObserver(
             observer = keyboardVisibilityListener,
             name = UIKeyboardDidHideNotification,
-            `object` = null
-        )
-        NSNotificationCenter.defaultCenter.removeObserver(
-            observer = keyboardVisibilityListener,
-            name = UIDeviceOrientationDidChangeNotification,
             `object` = null
         )
     }
@@ -398,5 +400,4 @@ internal actual class ComposeWindow : UIViewController {
             )
         return topLeftPoint.useContents { DpOffset(x.dp, y.dp).toOffset(density) }
     }
-
 }

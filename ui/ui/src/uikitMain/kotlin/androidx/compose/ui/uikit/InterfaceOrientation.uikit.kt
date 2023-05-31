@@ -23,7 +23,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 import platform.UIKit.*
 
 /**
- * Wraps iOS enum statusBarOrientation()
+ * Wraps valid layout values for iOS UIInterfaceOrientation
  */
 @InternalComposeApi
 @Immutable
@@ -34,22 +34,16 @@ enum class InterfaceOrientation(private val rawValue: UIInterfaceOrientation) {
     LandscapeRight(UIInterfaceOrientationLandscapeRight);
 
     companion object {
-        fun getByRawValue(orientation: UIInterfaceOrientation): InterfaceOrientation {
+        fun getByRawValue(orientation: UIInterfaceOrientation): InterfaceOrientation? {
             return values().firstOrNull {
                 it.rawValue == orientation
-            } ?: error("Can't find orientation rawValue $orientation in enum InterfaceOrientation")
+            }
         }
-
-        /**
-         * Return iOS statusBarOrientation() wrapped with Kotlin enum [InterfaceOrientation]
-         */
-        fun getStatusBarOrientation(): InterfaceOrientation =
-            getByRawValue(UIApplication.sharedApplication().statusBarOrientation())
     }
 }
 
 /**
- * Composition local for [InterfaceOrientation] of current Application
+ * Composition local for [InterfaceOrientation]
  */
 @InternalComposeApi
 val LocalInterfaceOrientationState = staticCompositionLocalOf<State<InterfaceOrientation>> {
