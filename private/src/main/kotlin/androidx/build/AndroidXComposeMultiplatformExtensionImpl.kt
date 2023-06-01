@@ -292,11 +292,10 @@ private fun Project.publishAndroidxReference(target: KotlinTarget) {
                 (rootComponent.usages as MutableSet).add(
                     DefaultKotlinUsageContext(
                         multiplatformExtension.metadata().compilations.getByName("main"),
-                        objects.named(Usage::class.java, "kotlin-api"),
+                        KotlinUsageContext.MavenScope.COMPILE,
                         configurationName
                     )
                 )
-
             }
         }
     }
