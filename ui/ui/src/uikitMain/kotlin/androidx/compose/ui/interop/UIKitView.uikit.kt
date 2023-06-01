@@ -47,11 +47,7 @@ import platform.CoreGraphics.CGRect
 import platform.CoreGraphics.CGRectMake
 import platform.UIKit.UIColor
 import platform.UIKit.UIView
-import platform.UIKit.addSubview
 import platform.UIKit.backgroundColor
-import platform.UIKit.insertSubview
-import platform.UIKit.removeFromSuperview
-import platform.UIKit.setFrame
 import platform.darwin.dispatch_async
 import platform.darwin.dispatch_get_main_queue
 

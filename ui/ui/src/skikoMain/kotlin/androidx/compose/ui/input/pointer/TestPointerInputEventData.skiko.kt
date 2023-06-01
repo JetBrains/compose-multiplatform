@@ -16,6 +16,7 @@
 
 package androidx.compose.ui.input.pointer
 
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.InternalComposeUiApi
 import androidx.compose.ui.geometry.Offset
 
@@ -30,6 +31,7 @@ class TestPointerInputEventData(
     val position: Offset,
     val down: Boolean
 ) {
+    @OptIn(ExperimentalComposeUiApi::class)
     internal fun toPointerInputEventData() =
         PointerInputEventData(
             id,

@@ -180,6 +180,7 @@ internal class SyntheticEventSender(
         button = null
     )
 
+    @OptIn(ExperimentalComposeUiApi::class)
     private fun PointerInputEventData.copySynthetic(
         position: Offset = this.position,
         down: Boolean = this.down

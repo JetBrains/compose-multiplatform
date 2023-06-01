@@ -16,7 +16,14 @@
 
 package androidx.compose.ui.platform
 
-internal actual typealias AtomicInt = kotlin.native.concurrent.AtomicInt
+internal class AtomicIntWrapper(value_: Int) {
+
+    private val delegate = kotlin.native.concurrent.AtomicInt(value_)
+    fun addAndGet(delta: Int): Int = delegate.addAndGet(delta)
+    fun compareAndSet(expected: Int, new: Int): Boolean = delegate.compareAndSet(expected, new)
+}
+
+internal actual typealias AtomicInt = AtomicIntWrapper
 
 internal actual fun Any.nativeClass(): Any = this::class
 

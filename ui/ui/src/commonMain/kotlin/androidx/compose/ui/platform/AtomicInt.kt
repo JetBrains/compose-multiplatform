@@ -19,7 +19,7 @@ package androidx.compose.ui.platform
 // TODO(aelias): Mark the typealiases internal when https://youtrack.jetbrains.com/issue/KT-36695 is fixed.
 // Currently, they behave as internal because the actual is internal, even though the expect is public.
 
-expect class AtomicInt(value_: Int) {
+internal expect class AtomicInt(value_: Int) {
     fun addAndGet(delta: Int): Int
     fun compareAndSet(expected: Int, new: Int): Boolean
 }
