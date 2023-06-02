@@ -18,7 +18,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
-val MainScreen = Screen.List(
+val MainScreen = Screen.Selection(
     "Demo",
     Screen.Example("Example1") { Example1() },
     Screen.Example("ImageViewer") { ImageViewer() },
@@ -33,20 +33,27 @@ sealed interface Screen {
     val title: String
 
     class Example(override val title: String, val content: @Composable () -> Unit) : Screen
-    class List(override val title: String, vararg val screens: Screen) : Screen
+    class Selection(override val title: String, val screens: List<Screen>) : Screen {
+        constructor(title: String, vararg screens: Screen) : this(title, listOf(*screens))
+
+        fun mergedWith(screens: List<Screen>): Selection {
+            return Selection(title, this.screens + screens)
+        }
+    }
 }
 
 class App(
-    initialScreenName: String? = null
+    initialScreenName: String? = null,
+    extraScreens: List<Screen> = listOf()
 ) {
-    private val navigationStack: SnapshotStateList<Screen> = mutableStateListOf(MainScreen)
+    private val navigationStack: SnapshotStateList<Screen> = mutableStateListOf(MainScreen.mergedWith(extraScreens))
 
     init {
         if (initialScreenName != null) {
             var currentScreen = navigationStack.first()
             initialScreenName.split("/").forEach { target ->
-                val listScreen = currentScreen as Screen.List
-                currentScreen = listScreen.screens.find { it.title == target }!!
+                val selectionScreen = currentScreen as Screen.Selection
+                currentScreen = selectionScreen.screens.find { it.title == target }!!
                 navigationStack.add(currentScreen)
             }
         }
@@ -82,7 +89,7 @@ class App(
                     screen.content()
                 }
 
-                is Screen.List -> {
+                is Screen.Selection -> {
                     LazyColumn(Modifier.fillMaxSize()) {
                         items(screen.screens) {
                             Text(it.title, Modifier.clickable {

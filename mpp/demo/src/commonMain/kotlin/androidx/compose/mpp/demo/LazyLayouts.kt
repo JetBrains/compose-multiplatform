@@ -35,7 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlin.random.Random
 
-val LazyLayouts = Screen.List(
+val LazyLayouts = Screen.Selection(
     "LazyLayouts",
     Screen.Example("LazyColumn") { ExampleLazyColumn() },
     Screen.Example("LazyGrid") { ExampleLazyGrid() },

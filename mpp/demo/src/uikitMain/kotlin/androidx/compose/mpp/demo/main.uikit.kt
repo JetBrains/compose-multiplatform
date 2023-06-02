@@ -1,10 +1,11 @@
 // Use `xcodegen` first, then `open ./SkikoSample.xcodeproj` and then Run button in XCode.
 package androidx.compose.mpp.demo
 
-import ApplicationLayoutExamples
+import NativeModalWithNaviationExample
 import androidx.compose.runtime.*
 import androidx.compose.ui.main.defaultUIKitMain
 import androidx.compose.ui.window.ComposeUIViewController
+
 
 fun main() {
     defaultUIKitMain("ComposeDemo", ComposeUIViewController {
@@ -15,12 +16,16 @@ fun main() {
 @Composable
 fun IosDemo() {
     // You may uncomment different examples:
-//    MultiplatformDemo()
-    ApplicationLayoutExamples()
+    MultiplatformDemo()
+//    ApplicationLayoutExamples()
 }
 
 @Composable
 fun MultiplatformDemo() {
-    val app = remember { App() }
+    val app = remember {
+        App(extraScreens = listOf(
+            NativeModalWithNaviationExample
+        ))
+    }
     app.Content()
 }
