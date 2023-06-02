@@ -29,7 +29,7 @@ import kotlin.test.assertTrue
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.consumeEach
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
-import kotlinx.coroutines.test.runTest
+import androidx.compose.runtime.runTest
 import kotlinx.test.IgnoreJsTarget
 
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -572,10 +572,12 @@ class SnapshotStateListTests {
         }
     }
 
-    @Test(timeout = 10_000)
+    @Test
     @OptIn(ExperimentalCoroutinesApi::class)
     @IgnoreJsTarget // Not relevant in a single threaded environment
-    fun concurrentGlobalModifications_addAll(): Unit = runTest(UnconfinedTestDispatcher()) {
+    fun concurrentGlobalModifications_addAll() = runTest(
+        UnconfinedTestDispatcher(), timeoutMs = 10_000
+    ) {
         repeat(100) {
             val list = mutableStateListOf<Int>()
             coroutineScope {
@@ -594,10 +596,10 @@ class SnapshotStateListTests {
         }
     }
 
-    @Test(timeout = 5000)
+    @Test
     @OptIn(ExperimentalCoroutinesApi::class)
     @IgnoreJsTarget // Not relevant in a single threaded environment
-    fun concurrentMixingWriteApply_add(): Unit = runTest {
+    fun concurrentMixingWriteApply_add() = runTest(UnconfinedTestDispatcher(), timeoutMs = 5000) {
         repeat(1000) {
             val lists = Array(100) { mutableStateListOf<Int>() }.toList()
             val channel = Channel<Unit>(Channel.CONFLATED)
@@ -626,10 +628,10 @@ class SnapshotStateListTests {
         // Should only get here if the above doesn't deadlock.
     }
 
-    @Test(timeout = 5000)
+    @Test
     @OptIn(ExperimentalCoroutinesApi::class)
     @IgnoreJsTarget // Not relevant in a single threaded environment
-    fun concurrentMixingWriteApply_addAll_clear(): Unit = runTest {
+    fun concurrentMixingWriteApply_addAll_clear() = runTest(timeoutMs = 5000) {
         repeat(100) {
             val lists = Array(100) { mutableStateListOf<Int>() }.toList()
             val data = Array(100) { index -> index }.toList()
@@ -659,10 +661,10 @@ class SnapshotStateListTests {
         // Should only get here if the above doesn't deadlock.
     }
 
-    @Test(timeout = 5000)
+    @Test
     @OptIn(ExperimentalCoroutinesApi::class)
     @IgnoreJsTarget // Not relevant in a single threaded environment
-    fun concurrentMixingWriteApply_addAll_removeRange(): Unit = runTest {
+    fun concurrentMixingWriteApply_addAll_removeRange() = runTest(timeoutMs = 5000) {
         repeat(10) {
             val lists = Array(100) { mutableStateListOf<Int>() }.toList()
             val data = Array(100) { index -> index }.toList()
