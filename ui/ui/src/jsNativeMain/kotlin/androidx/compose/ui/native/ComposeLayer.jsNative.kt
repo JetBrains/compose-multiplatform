@@ -140,6 +140,8 @@ internal class ComposeLayer(
 
     fun setSize(width: Int, height: Int) {
         scene.constraints = Constraints(maxWidth = width, maxHeight = height)
+
+        layer.needRedraw()
     }
 
     fun getActiveFocusRect(): DpRect? {
