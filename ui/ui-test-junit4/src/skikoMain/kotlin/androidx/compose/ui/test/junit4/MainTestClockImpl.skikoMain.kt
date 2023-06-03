@@ -22,9 +22,11 @@ import kotlinx.coroutines.test.TestCoroutineScheduler
 @OptIn(ExperimentalCoroutinesApi::class)
 internal class MainTestClockImpl(
     testScheduler: TestCoroutineScheduler,
-    frameDelayMillis: Long
+    frameDelayMillis: Long,
+    onTimeAdvanced: (Long) -> Unit
 ) : AbstractMainTestClock(
-    testScheduler,
-    frameDelayMillis,
-    ::runOnUiThread
+    testScheduler = testScheduler,
+    frameDelayMillis = frameDelayMillis,
+    runOnUiThread = ::runOnUiThread,
+    onTimeAdvanced = onTimeAdvanced
 )

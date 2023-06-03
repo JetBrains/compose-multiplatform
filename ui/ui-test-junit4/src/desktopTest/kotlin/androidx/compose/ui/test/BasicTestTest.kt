@@ -17,10 +17,8 @@
 package androidx.compose.ui.test
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
@@ -29,6 +27,7 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.delay
 import org.junit.Rule
 
 
@@ -77,5 +76,26 @@ class BasicTestTest {
         rule.onNodeWithTag("box").performClick()
         val clockAfter = rule.mainClock.currentTime
         assertTrue(clockAfter > clockBefore, "performClick did not advance the test clock")
+    }
+
+    @Test
+    fun advancingClockRunsRecomposition() {
+        rule.mainClock.autoAdvance = false
+
+        rule.setContent {
+            var text by remember { mutableStateOf("1") }
+            Text(text, modifier = Modifier.testTag("text"))
+
+            LaunchedEffect(Unit){
+                delay(1_000)
+                text = "2"
+            }
+        }
+
+        rule.onNodeWithTag("text").assertTextEquals("1")
+        rule.mainClock.advanceTimeBy(999, ignoreFrameDuration = true)
+        rule.onNodeWithTag("text").assertTextEquals("1")
+        rule.mainClock.advanceTimeBy(1, ignoreFrameDuration = true)
+        rule.onNodeWithTag("text").assertTextEquals("2")
     }
 }

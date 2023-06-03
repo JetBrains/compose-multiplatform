@@ -146,8 +146,11 @@ class SkikoComposeUiTest(
 
     private val coroutineDispatcher = UnconfinedTestDispatcher()
     private val testScope = TestScope(coroutineDispatcher)
-    override val mainClock: MainTestClock =
-        MainTestClockImpl(coroutineDispatcher.scheduler, frameDelayMillis = 16L)
+    override val mainClock: MainTestClock = MainTestClockImpl(
+        testScheduler = coroutineDispatcher.scheduler,
+        frameDelayMillis = 16L,
+        onTimeAdvanced = ::render
+    )
     private val uncaughtExceptionHandler = UncaughtExceptionHandler()
     private val infiniteAnimationPolicy = object : InfiniteAnimationPolicy {
         override suspend fun <R> onInfiniteOperation(block: suspend () -> R): R {
@@ -179,11 +182,15 @@ class SkikoComposeUiTest(
         }
     }
 
-    private fun renderNextFrame() = runOnUiThread {
+    private fun render(timeMillis: Long) {
         scene.render(
             surface.canvas,
-            mainClock.currentTime * NanoSecondsPerMilliSecond
+            timeMillis * NanoSecondsPerMilliSecond
         )
+    }
+
+    private fun renderNextFrame() = runOnUiThread {
+        render(mainClock.currentTime)
         if (mainClock.autoAdvance) {
             mainClock.advanceTimeByFrame()
         }
