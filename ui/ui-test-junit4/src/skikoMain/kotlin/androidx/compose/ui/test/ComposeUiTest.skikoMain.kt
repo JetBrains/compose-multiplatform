@@ -220,7 +220,7 @@ class SkikoComposeUiTest(
             ++i
         }
 
-        val hasPendingMeasureOrLayout = testOwner.getRoots(true).any {
+        val hasPendingMeasureOrLayout = testOwner.roots.any {
             (it as SkiaRootForTest).hasPendingMeasureOrLayout
         }
 
@@ -325,6 +325,9 @@ class SkikoComposeUiTest(
     }
 
     private inner class DesktopTestOwner : TestOwner {
+        val roots: Set<RootForTest>
+            get() = this@SkikoComposeUiTest.scene.roots
+
         @OptIn(ExperimentalTextApi::class)
         override fun performTextInput(node: SemanticsNode, action: TextInputForTests.() -> Unit) {
             runOnIdle {
@@ -337,6 +340,7 @@ class SkikoComposeUiTest(
         }
 
         override fun getRoots(atLeastOneRootExpected: Boolean): Set<RootForTest> {
+            waitForIdle()
             return this@SkikoComposeUiTest.scene.roots
         }
 

@@ -98,4 +98,17 @@ class BasicTestTest {
         rule.mainClock.advanceTimeBy(1, ignoreFrameDuration = true)
         rule.onNodeWithTag("text").assertTextEquals("2")
     }
+
+    @Test
+    fun obtainingSemanticsNodeInteractionWaitsUntilIdle() {
+        var text by mutableStateOf("1")
+
+        rule.setContent {
+            Text(text, modifier = Modifier.testTag("text"))
+        }
+
+        rule.onNodeWithTag("text").assertTextEquals("1")
+        text = "2"
+        rule.onNodeWithTag("text").assertTextEquals("2")
+    }
 }
