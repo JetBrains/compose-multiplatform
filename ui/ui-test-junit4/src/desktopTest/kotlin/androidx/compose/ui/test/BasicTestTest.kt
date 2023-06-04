@@ -16,13 +16,18 @@
 
 package androidx.compose.ui.test
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.unit.dp
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
@@ -110,5 +115,26 @@ class BasicTestTest {
         rule.onNodeWithTag("text").assertTextEquals("1")
         text = "2"
         rule.onNodeWithTag("text").assertTextEquals("2")
+    }
+
+    @Test
+    fun testCaptureToImage() {
+        val color = Color.Green
+        rule.setContent {
+            Box(Modifier.testTag("box").size(20.dp).background(color))
+        }
+
+        val screenshot = rule.onNodeWithTag("box").captureToImage()
+
+        assertEquals(20, screenshot.width)
+        assertEquals(20, screenshot.height)
+
+        IntArray(20*20).let { buffer ->
+            screenshot.readPixels(buffer)
+            val expectedPixel = color.toArgb()
+            for (pixel in buffer) {
+                assertEquals(expectedPixel, pixel)
+            }
+        }
     }
 }

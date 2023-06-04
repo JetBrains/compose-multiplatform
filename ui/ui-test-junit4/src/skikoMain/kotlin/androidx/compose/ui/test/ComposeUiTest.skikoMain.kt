@@ -316,15 +316,19 @@ class SkikoComposeUiTest(
         return surface.makeImageSnapshot().toComposeImageBitmap()
     }
 
-    fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
-        waitForIdle()
-        val rect = fetchSemanticsNode().boundsInWindow
+    fun captureToImage(semanticsNode: SemanticsNode): ImageBitmap {
+        val rect = semanticsNode.boundsInWindow
         val iRect = IRect.makeLTRB(rect.left.toInt(), rect.top.toInt(), rect.right.toInt(), rect.bottom.toInt())
         val image = surface.makeImageSnapshot(iRect)
         return image!!.toComposeImageBitmap()
     }
 
-    private inner class DesktopTestOwner : TestOwner {
+    fun SemanticsNodeInteraction.captureToImage(): ImageBitmap {
+        return captureToImage(fetchSemanticsNode())
+    }
+
+    @OptIn(InternalComposeUiApi::class)
+    private inner class DesktopTestOwner : TestOwner, SkikoTestOwner {
         val roots: Set<RootForTest>
             get() = this@SkikoComposeUiTest.scene.roots
 
@@ -346,6 +350,9 @@ class SkikoComposeUiTest(
 
         override val mainClock get() =
             this@SkikoComposeUiTest.mainClock
+
+        override fun captureToImage(semanticsNode: SemanticsNode): ImageBitmap =
+            this@SkikoComposeUiTest.captureToImage(semanticsNode)
     }
 }
 
