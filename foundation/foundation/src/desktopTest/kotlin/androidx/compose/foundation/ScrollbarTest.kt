@@ -500,6 +500,8 @@ class ScrollbarTest {
 
     @Theory
     fun `press on track just below slider`(scrollbarProvider: ScrollbarProvider) {
+        rule.mainClock.autoAdvance = false
+
         rule.setContent(scrollbarProvider) {
             TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
         }
@@ -522,6 +524,8 @@ class ScrollbarTest {
 
     @Theory
     fun `press on the end of track outside slider`(scrollbarProvider: ScrollbarProvider) {
+        rule.mainClock.autoAdvance = false
+
         rule.setContent(scrollbarProvider) {
             TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
         }
@@ -544,6 +548,8 @@ class ScrollbarTest {
     fun `press on track outside slider then move forward`(
         scrollbarProvider: ScrollbarProvider
     ) {
+        rule.mainClock.autoAdvance = false
+
         rule.setContent(scrollbarProvider) {
             TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
         }
@@ -567,6 +573,8 @@ class ScrollbarTest {
     fun `press on track outside slider then move back`(
         scrollbarProvider: ScrollbarProvider
     ) {
+        rule.mainClock.autoAdvance = false
+
         rule.setContent(scrollbarProvider) {
             TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
         }
@@ -591,6 +599,8 @@ class ScrollbarTest {
     fun `press on track outside slider then move outside scrollbar`(
         scrollbarProvider: ScrollbarProvider
     ) {
+        rule.mainClock.autoAdvance = false
+
         rule.setContent(scrollbarProvider) {
             TestBox(size = 100.dp, childSize = 20.dp, childCount = 20, scrollbarWidth = 10.dp)
         }
