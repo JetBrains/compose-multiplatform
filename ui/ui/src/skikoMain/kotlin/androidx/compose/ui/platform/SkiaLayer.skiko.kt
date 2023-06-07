@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Canvas
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.node.OwnedLayer
 import androidx.compose.ui.unit.*
+import kotlin.math.abs
 import kotlin.math.max
 import org.jetbrains.skia.*
 
@@ -40,8 +41,7 @@ internal class SkiaLayer(
     internal val matrix = Matrix()
     private val inverseMatrix: Matrix
         get() = Matrix().apply {
-            setFrom(matrix)
-            invert()
+            matrix.invertTo(this)
         }
 
     private val pictureRecorder = PictureRecorder()
@@ -179,15 +179,28 @@ internal class SkiaLayer(
             rotateX(rotationX)
             scale(scaleX, scaleY)
         }
-        matrix *= Matrix().apply {
-            // the camera location is passed in inches, set in pt
-            val depth = cameraDistance * 72f
-            set(row = 2, column = 3, v = -1f / depth)
-            set(row = 2, column = 2, v = 0f)
+        // Perspective transform should be applied only in case of rotations to avoid
+        // multiply application in hierarchies.
+        // See Android's frameworks/base/libs/hwui/RenderProperties.cpp for reference
+        if (!rotationX.isZero() || !rotationY.isZero()) {
+            matrix *= Matrix().apply {
+                // The camera location is passed in inches, set in pt
+                val depth = cameraDistance * 72f
+                this[2, 3] = -1f / depth
+            }
         }
         matrix *= Matrix().apply {
             translate(x = pivotX + translationX, y = pivotY + translationY)
         }
+
+        // Third column and row are irrelevant for 2D space.
+        // Zeroing required to get correct inverse transformation matrix.
+        matrix[2, 0] = 0f
+        matrix[2, 1] = 0f
+        matrix[2, 3] = 0f
+        matrix[0, 2] = 0f
+        matrix[1, 2] = 0f
+        matrix[3, 2] = 0f
     }
 
     override fun invalidate() {
@@ -307,3 +320,7 @@ internal class SkiaLayer(
         )
     }
 }
+
+// Copy from Android's frameworks/base/libs/hwui/utils/MathUtils.h
+private const val NON_ZERO_EPSILON = 0.001f
+private inline fun Float.isZero(): Boolean = abs(this) <= NON_ZERO_EPSILON

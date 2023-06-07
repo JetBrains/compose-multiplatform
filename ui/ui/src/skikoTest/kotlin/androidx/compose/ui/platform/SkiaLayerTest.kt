@@ -19,14 +19,9 @@ package androidx.compose.ui.platform
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.*
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.round
+import androidx.compose.ui.unit.*
 import kotlin.math.PI
 import kotlin.math.cos
-import kotlin.math.roundToInt
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
@@ -35,42 +30,67 @@ import kotlin.test.assertTrue
 class SkiaLayerTest {
 
     private val layer = TestSkiaLayer()
-    private val cos45 = cos(PI / 4)
+    private val cos45 = cos(PI / 4).toFloat()
+
+    private val matrix get() = layer.matrix
+    private val inverseMatrix get() = Matrix().apply {
+        matrix.invertTo(this)
+    }
+
 
     @Test
     fun initial() {
-        val matrix = layer.matrix
-
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
     fun move() {
         layer.move(IntOffset(10, 20))
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
     fun resize() {
         layer.resize(IntSize(100, 10))
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
     fun resize_and_move() {
         layer.resize(IntSize(100, 10))
         layer.move(IntOffset(10, 20))
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -81,10 +101,15 @@ class SkiaLayerTest {
             translationY = 20f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(10, 20), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(110, 30), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(10f, 20f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(110f, 30f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -95,10 +120,15 @@ class SkiaLayerTest {
             translationY = 20f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(10, 20), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(110, 30), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(10f, 20f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(110f, 30f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -109,10 +139,15 @@ class SkiaLayerTest {
             scaleY = 4f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(200, 40), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(200f, 40f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -123,10 +158,15 @@ class SkiaLayerTest {
             scaleY = 4f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(-100, -30), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(-100f, -30f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -137,11 +177,16 @@ class SkiaLayerTest {
             transformOrigin = TransformOrigin(0f, 0f),
             cameraDistance = Float.MAX_VALUE
         )
-        val matrix = layer.matrix
 
-        val y = (10 * cos45).roundToInt()
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, y), matrix.map(Offset(100f, 10f)).round())
+        val y = 10 * cos45
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, y),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -152,11 +197,16 @@ class SkiaLayerTest {
             transformOrigin = TransformOrigin(1f, 1f),
             cameraDistance = Float.MAX_VALUE
         )
-        val matrix = layer.matrix
 
-        val y = 10 * (1 - cos45.toFloat())
-        assertEquals(Offset(0f, y), matrix.map(Offset(0f, 0f)))
-        assertEquals(Offset(100f, 10f), matrix.map(Offset(100f, 10f)))
+        val y = 10 * (1 - cos45)
+        assertMapping(
+            from = Offset(0f, y),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -167,11 +217,16 @@ class SkiaLayerTest {
             transformOrigin = TransformOrigin(0f, 0f),
             cameraDistance = Float.MAX_VALUE
         )
-        val matrix = layer.matrix
 
-        val x = (100 * cos45).roundToInt()
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(x, 10), matrix.map(Offset(100f, 10f)).round())
+        val x = 100 * cos45
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(x, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -182,11 +237,16 @@ class SkiaLayerTest {
             transformOrigin = TransformOrigin(1f, 1f),
             cameraDistance = Float.MAX_VALUE
         )
-        val matrix = layer.matrix
 
-        val x = (100 * (1 - cos45)).roundToInt()
-        assertEquals(IntOffset(x, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        val x = 100 * (1 - cos45)
+        assertMapping(
+            from = Offset(x, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -196,10 +256,15 @@ class SkiaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(-10, 100), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(-10f, 100f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -209,10 +274,15 @@ class SkiaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(1f, 1f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(110, -90), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100, 10), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(110f, -90f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(100f, 10f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -225,10 +295,15 @@ class SkiaLayerTest {
             scaleY = 4f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0 + 60, 0 + 7), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100 * 2 + 60, 10 * 4 + 7), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(60f, 7f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(260f, 47f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -240,10 +315,15 @@ class SkiaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0 + 60, 0 + 7), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(-10 + 60, 100 + 7), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(60f, 7f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(50f, 107f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -256,12 +336,16 @@ class SkiaLayerTest {
             transformOrigin = TransformOrigin(0f, 0f),
             cameraDistance = Float.MAX_VALUE
         )
-        val matrix = layer.matrix
 
-        val y = (10 * cos45).roundToInt()
-        val translationY = 7
-        assertEquals(IntOffset(0 + 60, 0 + translationY), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(100 + 60, y + translationY), matrix.map(Offset(100f, 10f)).round())
+        val y = 10 * cos45
+        assertMapping(
+            from = Offset(60f, 7f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(160f, 7f + y),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -274,12 +358,16 @@ class SkiaLayerTest {
             transformOrigin = TransformOrigin(0f, 0f),
             cameraDistance = Float.MAX_VALUE
         )
-        val matrix = layer.matrix
 
-        val x = (100 * cos45).roundToInt()
-        val translationX = 60
-        assertEquals(IntOffset(0 + translationX, 0 + 7), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(x + translationX, 10 + 7), matrix.map(Offset(100f, 10f)).round())
+        val x = 100 * cos45
+        assertMapping(
+            from = Offset(60f, 7f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(x + 60f, 17f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -291,10 +379,15 @@ class SkiaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0, 0), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(-10 * 4, 100 * 2), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(0f, 0f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(-40f, 200f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -308,10 +401,15 @@ class SkiaLayerTest {
             rotationZ = 90f,
             transformOrigin = TransformOrigin(0f, 0f)
         )
-        val matrix = layer.matrix
 
-        assertEquals(IntOffset(0 + 60, 0 + 7), matrix.map(Offset(0f, 0f)).round())
-        assertEquals(IntOffset(-10 * 4 + 60, 100 * 2 + 7), matrix.map(Offset(100f, 10f)).round())
+        assertMapping(
+            from = Offset(60f, 7f),
+            to = Offset(0f, 0f)
+        )
+        assertMapping(
+            from = Offset(20f, 207f),
+            to = Offset(100f, 10f)
+        )
     }
 
     @Test
@@ -371,6 +469,17 @@ class SkiaLayerTest {
         invalidateParentLayer = {},
         drawBlock = {}
     )
+
+    private fun assertMapping(from: Offset, to: Offset) {
+        assertEquals(from, matrix.map(to), 0.001f)
+        assertEquals(to, inverseMatrix.map(from), 0.001f)
+    }
+
+    private fun assertEquals(expected: Offset, actual: Offset, absoluteTolerance: Float) {
+        val message = "Expected <$expected>, actual <$actual>."
+        assertEquals(expected.x, actual.x, absoluteTolerance, message)
+        assertEquals(expected.y, actual.y, absoluteTolerance, message)
+    }
 
     private fun SkiaLayer.updateProperties(
         scaleX: Float = 1f,
