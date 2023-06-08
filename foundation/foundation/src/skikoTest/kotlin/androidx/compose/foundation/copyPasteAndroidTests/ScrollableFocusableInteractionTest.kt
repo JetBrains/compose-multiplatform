@@ -272,6 +272,10 @@ class ScrollableFocusableInteractionTest {
 
     @Test
     fun scrollFromViewportShrink_isInterrupted_byGesture() = runParametrizedTest {
+        // This test is invalid for reverseScrolling=true. See b/285846153
+        if (reverseScrolling!!)
+            return@runParametrizedTest
+
         var viewportSize by mutableStateOf(100.toDp())
 
         setContent {
@@ -319,6 +323,10 @@ class ScrollableFocusableInteractionTest {
      */
     @Test
     fun scrollsFocusedFocusableIntoView_whenViewportExpandedThenReshrunk_afterInterruption() = runParametrizedTest {
+        // This test is invalid for reverseScrolling=true. See b/285846153
+        if (reverseScrolling!!)
+            return@runParametrizedTest
+
         var viewportSize by mutableStateOf(100.toDp())
 
         setContent {
