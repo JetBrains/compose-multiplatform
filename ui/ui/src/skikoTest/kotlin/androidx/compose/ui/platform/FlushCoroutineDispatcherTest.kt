@@ -16,16 +16,13 @@
 
 package androidx.compose.ui.platform
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
-import kotlinx.coroutines.yield
 import kotlin.random.Random
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlinx.coroutines.withContext
+import kotlin.test.assertTrue
+import kotlinx.coroutines.*
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class FlushCoroutineDispatcherTest {
@@ -105,5 +102,20 @@ class FlushCoroutineDispatcherTest {
 
         assertEquals((0 until 10000).toList(), actualNumbers)
         assertFalse(dispatcher.hasTasks())
+    }
+
+    @Test
+    fun delayed_tasks_are_cancelled() = runTest {
+        val coroutineScope = CoroutineScope(Dispatchers.Unconfined)
+        val dispatcher = FlushCoroutineDispatcher(coroutineScope)
+        val job = launch(dispatcher){
+            delay(Long.MAX_VALUE/2)
+        }
+        assertTrue(dispatcher.hasTasks())
+        job.cancel()
+        assertTrue(
+            !dispatcher.hasTasks(),
+            "FlushCoroutineDispatcher has a delayed task that has been cancelled"
+        )
     }
 }
