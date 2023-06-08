@@ -1,6 +1,8 @@
 package androidx.compose.ui.interop
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import kotlinx.cinterop.ObjCAction
 import platform.CoreGraphics.CGRectMake
@@ -17,12 +19,14 @@ import platform.UIKit.UITextField
  */
 @Composable
 fun ComposeUITextField(value: String, onValueChange: (String) -> Unit, modifier: Modifier) {
+    val latestOnValueChanged by rememberUpdatedState(onValueChange)
+
     UIKitView(
         factory = {
             val textField = object : UITextField(CGRectMake(0.0, 0.0, 0.0, 0.0)) {
                 @ObjCAction
                 fun editingChanged() {
-                    onValueChange(text ?: "")
+                    latestOnValueChanged(text ?: "")
                 }
             }
             textField.addTarget(
@@ -35,13 +39,6 @@ fun ComposeUITextField(value: String, onValueChange: (String) -> Unit, modifier:
         modifier = modifier,
         update = { textField ->
             textField.text = value
-        },
-        onRelease = { textField ->
-            textField.removeTarget(
-                target = textField,
-                action = NSSelectorFromString(textField::editingChanged.name),
-                forControlEvents = UIControlEventEditingChanged
-            )
-        },
+        }
     )
 }
