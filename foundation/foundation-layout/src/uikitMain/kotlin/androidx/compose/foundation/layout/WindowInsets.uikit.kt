@@ -53,12 +53,13 @@ private val WindowInsets.Companion.layoutMargins: WindowInsets
  * An insets type representing the window of a caption bar.
  * It is useless for iOS.
  */
-val WindowInsets.Companion.captionBar get() = ZeroInsets
+actual val WindowInsets.Companion.captionBar: WindowInsets
+    get() = ZeroInsets
 
 /**
  * This [WindowInsets] represents the area with the display cutout (e.g. for camera).
  */
-val WindowInsets.Companion.displayCutout: WindowInsets
+actual val WindowInsets.Companion.displayCutout: WindowInsets
     @Composable
     @OptIn(InternalComposeApi::class)
     get() = when (LocalInterfaceOrientationState.current.value) {
@@ -74,15 +75,15 @@ val WindowInsets.Companion.displayCutout: WindowInsets
  *
  * TODO: Animation doesn't work on iOS yet
  */
-val WindowInsets.Companion.ime: WindowInsets
+actual val WindowInsets.Companion.ime: WindowInsets
     @Composable
     @OptIn(InternalComposeApi::class)
     get() = WindowInsets(bottom = LocalKeyboardOverlapHeightState.current.value.dp)
 
 /**
- * These insets represents the space where system gestures have priority over application gestures.
+ * These insets represent the space where system gestures have priority over application gestures.
  */
-val WindowInsets.Companion.mandatorySystemGestures: WindowInsets
+actual val WindowInsets.Companion.mandatorySystemGestures: WindowInsets
     @Composable
     get() = iosSafeArea.only(WindowInsetsSides.Top + WindowInsetsSides.Bottom)
 
@@ -90,14 +91,14 @@ val WindowInsets.Companion.mandatorySystemGestures: WindowInsets
  * These insets represent where system UI places navigation bars.
  * Interactive UI should avoid the navigation bars area.
  */
-val WindowInsets.Companion.navigationBars: WindowInsets
+actual val WindowInsets.Companion.navigationBars: WindowInsets
     @Composable
     get() = iosSafeArea.only(WindowInsetsSides.Bottom)
 
 /**
- * These insets represents status bar.
+ * These insets represent status bar.
  */
-val WindowInsets.Companion.statusBars: WindowInsets
+actual val WindowInsets.Companion.statusBars: WindowInsets
     @Composable
     @OptIn(InternalComposeApi::class)
     get() = when (LocalInterfaceOrientationState.current.value) {
@@ -106,26 +107,26 @@ val WindowInsets.Companion.statusBars: WindowInsets
     }
 
 /**
- * These insets represents all system bars.
+ * These insets represent all system bars.
  * Includes [statusBars], [captionBar] as well as [navigationBars], but not [ime].
  */
-val WindowInsets.Companion.systemBars: WindowInsets
+actual val WindowInsets.Companion.systemBars: WindowInsets
     @Composable
     get() = iosSafeArea
 
 /**
- * The systemGestures insets represent the area of a window where system gestures have
+ * The [systemGestures] insets represent the area of a window where system gestures have
  * priority and may consume some or all touch input, e.g. due to the system bar
  * occupying it, or it being reserved for touch-only gestures.
  */
-val WindowInsets.Companion.systemGestures: WindowInsets
+actual val WindowInsets.Companion.systemGestures: WindowInsets
     @Composable
     get() = layoutMargins // the same as iosSafeArea.add(WindowInsets(left = 16.dp, right = 16.dp))
 
 /**
  * Returns the tappable element insets.
  */
-val WindowInsets.Companion.tappableElement: WindowInsets
+actual val WindowInsets.Companion.tappableElement: WindowInsets
     @Composable
     get() = iosSafeArea.only(WindowInsetsSides.Top)
 
@@ -133,13 +134,13 @@ val WindowInsets.Companion.tappableElement: WindowInsets
  * The insets for the curved areas in a waterfall display.
  * It is useless for iOS.
  */
-val WindowInsets.Companion.waterfall: WindowInsets get() = ZeroInsets
+actual val WindowInsets.Companion.waterfall: WindowInsets get() = ZeroInsets
 
 /**
  * The insets that include areas where content may be covered by other drawn content.
  * This includes all [systemBars], [displayCutout], and [ime].
  */
-val WindowInsets.Companion.safeDrawing
+actual val WindowInsets.Companion.safeDrawing: WindowInsets
     @Composable
     get() = systemBars.union(ime).union(displayCutout)
 
@@ -147,7 +148,7 @@ val WindowInsets.Companion.safeDrawing
  * The insets that include areas where gestures may be confused with other input,
  * including [systemGestures], [mandatorySystemGestures], [waterfall], and [tappableElement].
  */
-val WindowInsets.Companion.safeGestures: WindowInsets
+actual val WindowInsets.Companion.safeGestures: WindowInsets
     @Composable
     get() = tappableElement.union(mandatorySystemGestures).union(systemGestures).union(waterfall)
 
@@ -155,7 +156,7 @@ val WindowInsets.Companion.safeGestures: WindowInsets
  * The insets that include all areas that may be drawn over or have gesture confusion,
  * including everything in [safeDrawing] and [safeGestures].
  */
-val WindowInsets.Companion.safeContent: WindowInsets
+actual val WindowInsets.Companion.safeContent: WindowInsets
     @Composable
     get() = safeDrawing.union(safeGestures)
 

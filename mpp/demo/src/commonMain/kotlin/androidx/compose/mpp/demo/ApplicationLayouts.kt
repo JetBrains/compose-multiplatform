@@ -1,3 +1,21 @@
+/*
+ * Copyright 2023 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+package androidx.compose.mpp.demo
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -47,24 +65,25 @@ val bottomState = mutableStateOf(Bottom.Empty)
 enum class Theme { SystemTheme, DarkTheme, LightTheme, }
 enum class Top { Empty, TopBarBasic, TopBarWithGradient, CollapsingTopBar, }
 enum class Bottom { Empty, Tabs, }
-enum class Insets {
-    captionBar,
-    displayCutout,
-    ime,
-    mandatorySystemGestures,
-    navigationBars,
-    statusBars,
-    systemBars,
-    systemGestures,
-    tappableElement,
-    waterfall,
-    safeDrawing,
-    safeGestures,
-    safeContent,
-}
+
+val insets = listOf(
+    WindowInsets::captionBar,
+    WindowInsets::displayCutout,
+    WindowInsets::ime,
+    WindowInsets::mandatorySystemGestures,
+    WindowInsets::navigationBars,
+    WindowInsets::statusBars,
+    WindowInsets::systemBars,
+    WindowInsets::systemGestures,
+    WindowInsets::tappableElement,
+    WindowInsets::waterfall,
+    WindowInsets::safeDrawing,
+    WindowInsets::safeGestures,
+    WindowInsets::safeContent,
+).associateBy { it.name }
 
 @Composable
-fun ApplicationLayoutExamples() {
+fun ApplicationLayouts(back: () -> Unit) {
     val isDarkTheme = when (themeState.value) {
         Theme.SystemTheme -> isSystemInDarkTheme()
         Theme.DarkTheme -> true
@@ -72,14 +91,14 @@ fun ApplicationLayoutExamples() {
     }
     Box(Modifier.fillMaxSize()) {
         MaterialTheme(colorScheme = if (isDarkTheme) darkColorScheme() else lightColorScheme()) {
-            WithScaffold()
+            WithScaffold(back)
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WithScaffold() {
+fun WithScaffold(back: () -> Unit) {
     val isScaffoldPaddingState = rememberSaveable { mutableStateOf(false) }
     val isInsetsState = rememberSaveable { mutableStateOf(false) }
     val isChatState = rememberSaveable { mutableStateOf(false) }
@@ -146,6 +165,12 @@ fun WithScaffold() {
             Modifier.fillMaxSize().windowInsetsPadding(WindowInsets.systemBars)
                 .padding(innerPadding)
         ) {
+            Text(
+                "Back",
+                Modifier.clickable { back() }
+                    .padding(2.dp).border(1.dp, Color.Blue).padding(2.dp)
+                    .background(Color.Gray)
+            )
             SwitchEnumState(
                 Top.values(),
                 topState,
@@ -281,22 +306,8 @@ fun ContentBigTextField(innerPadding: PaddingValues) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ContentInsets() = Box(Modifier.fillMaxSize()) {
-    val insetsState = rememberSaveable { mutableStateOf(Insets.ime) }
-    val current = when (insetsState.value) {
-        Insets.captionBar -> WindowInsets.captionBar
-        Insets.displayCutout -> WindowInsets.displayCutout
-        Insets.ime -> WindowInsets.ime
-        Insets.mandatorySystemGestures -> WindowInsets.mandatorySystemGestures
-        Insets.navigationBars -> WindowInsets.navigationBars
-        Insets.statusBars -> WindowInsets.statusBars
-        Insets.systemBars -> WindowInsets.systemBars
-        Insets.systemGestures -> WindowInsets.systemGestures
-        Insets.tappableElement -> WindowInsets.tappableElement
-        Insets.waterfall -> WindowInsets.waterfall
-        Insets.safeDrawing -> WindowInsets.safeDrawing
-        Insets.safeGestures -> WindowInsets.safeGestures
-        Insets.safeContent -> WindowInsets.safeContent
-    }
+    val insetsState = rememberSaveable { mutableStateOf(WindowInsets::ime.name) }
+    val current = insets[insetsState.value]?.get() ?: WindowInsets(0, 0, 0, 0)
     Box(Modifier.fillMaxSize().background(Color.Red.copy(0.5f)))
     Box(
         Modifier.fillMaxSize()
@@ -317,7 +328,7 @@ fun ContentInsets() = Box(Modifier.fillMaxSize()) {
                 .background(Color.Gray.copy(0.5f))
         )
         SwitchEnumState(
-            Insets.values(),
+            insets.keys.toTypedArray(),
             insetsState
         )
     }

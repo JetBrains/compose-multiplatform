@@ -1,6 +1,7 @@
 package androidx.compose.mpp.demo
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -26,6 +27,7 @@ val MainScreen = Screen.Selection(
     Screen.Example("TextDirection") { TextDirection() },
     Screen.Example("FontFamilies") { FontFamilies() },
     Screen.Example("LottieAnimation") { LottieAnimation() },
+    Screen.ScaffoldExample("ApplicationLayouts") { ApplicationLayouts(it) },
     Screen.Example("GraphicsLayerSettings") { GraphicsLayerSettings() },
     LazyLayouts,
 )
@@ -34,6 +36,7 @@ sealed interface Screen {
     val title: String
 
     class Example(override val title: String, val content: @Composable () -> Unit) : Screen
+    class ScaffoldExample(override val title: String, val content: @Composable (back: () -> Unit) -> Unit) : Screen
     class Selection(override val title: String, val screens: List<Screen>) : Screen {
         constructor(title: String, vararg screens: Screen) : this(title, listOf(*screens))
 
@@ -62,35 +65,19 @@ class App(
 
     @Composable
     fun Content() {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = {
-                        val title: String = if (navigationStack.size > 1) {
-                            navigationStack.drop(1).joinToString("/") { it.title }
-                        } else {
-                            navigationStack.first().title
-                        }
-                        Text(title)
-                    },
-                    navigationIcon = {
-                        if (navigationStack.size > 1) {
-                            Icon(
-                                Icons.Filled.ArrowBack,
-                                contentDescription = "Back",
-                                modifier = Modifier.clickable { navigationStack.removeLast() }
-                            )
-                        }
-                    }
-                )
-            }
-        ) {
-            when (val screen = navigationStack.last()) {
-                is Screen.Example -> {
+        when (val screen = navigationStack.last()) {
+            is Screen.Example -> {
+                ExampleScaffold {
                     screen.content()
                 }
+            }
 
-                is Screen.Selection -> {
+            is Screen.ScaffoldExample -> {
+                screen.content { navigationStack.removeLast() }
+            }
+
+            is Screen.Selection -> {
+                SelectionScaffold {
                     LazyColumn(Modifier.fillMaxSize()) {
                         items(screen.screens) {
                             Text(it.title, Modifier.clickable {
@@ -103,4 +90,41 @@ class App(
         }
     }
 
+    @Composable
+    private fun ExampleScaffold(
+        content: @Composable (PaddingValues) -> Unit
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = {
+                        val title = navigationStack.drop(1).joinToString("/") { it.title }
+                        Text(title)
+                    },
+                    navigationIcon = {
+                        Icon(
+                            Icons.Filled.ArrowBack,
+                            contentDescription = "Back",
+                            modifier = Modifier.clickable { navigationStack.removeLast() }
+                        )
+                    }
+                )
+            },
+            content = content
+        )
+    }
+
+    @Composable
+    private fun SelectionScaffold(
+        content: @Composable (PaddingValues) -> Unit
+    ) {
+        Scaffold(
+            topBar = {
+                TopAppBar(
+                    title = { Text(navigationStack.first().title) },
+                )
+            },
+            content = content
+        )
+    }
 }

@@ -2,30 +2,18 @@
 package androidx.compose.mpp.demo
 
 import NativeModalWithNaviationExample
-import androidx.compose.runtime.*
+import androidx.compose.runtime.remember
 import androidx.compose.ui.main.defaultUIKitMain
 import androidx.compose.ui.window.ComposeUIViewController
 
 
 fun main() {
     defaultUIKitMain("ComposeDemo", ComposeUIViewController {
-        IosDemo()
+        val app = remember {
+            App(extraScreens = listOf(
+                NativeModalWithNaviationExample
+            ))
+        }
+        app.Content()
     })
-}
-
-@Composable
-fun IosDemo() {
-    // You may uncomment different examples:
-    MultiplatformDemo()
-//    ApplicationLayoutExamples()
-}
-
-@Composable
-fun MultiplatformDemo() {
-    val app = remember {
-        App(extraScreens = listOf(
-            NativeModalWithNaviationExample
-        ))
-    }
-    app.Content()
 }
