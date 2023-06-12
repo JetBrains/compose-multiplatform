@@ -65,22 +65,21 @@ val bottomState = mutableStateOf(Bottom.Empty)
 enum class Theme { SystemTheme, DarkTheme, LightTheme, }
 enum class Top { Empty, TopBarBasic, TopBarWithGradient, CollapsingTopBar, }
 enum class Bottom { Empty, Tabs, }
-
-val insets = listOf(
-    WindowInsets::captionBar,
-    WindowInsets::displayCutout,
-    WindowInsets::ime,
-    WindowInsets::mandatorySystemGestures,
-    WindowInsets::navigationBars,
-    WindowInsets::statusBars,
-    WindowInsets::systemBars,
-    WindowInsets::systemGestures,
-    WindowInsets::tappableElement,
-    WindowInsets::waterfall,
-    WindowInsets::safeDrawing,
-    WindowInsets::safeGestures,
-    WindowInsets::safeContent,
-).associateBy { it.name }
+enum class Insets {
+    captionBar,
+    displayCutout,
+    ime,
+    mandatorySystemGestures,
+    navigationBars,
+    statusBars,
+    systemBars,
+    systemGestures,
+    tappableElement,
+    waterfall,
+    safeDrawing,
+    safeGestures,
+    safeContent,
+}
 
 @Composable
 fun ApplicationLayouts(back: () -> Unit) {
@@ -306,8 +305,22 @@ fun ContentBigTextField(innerPadding: PaddingValues) {
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ContentInsets() = Box(Modifier.fillMaxSize()) {
-    val insetsState = rememberSaveable { mutableStateOf(WindowInsets::ime.name) }
-    val current = insets[insetsState.value]?.get() ?: WindowInsets(0, 0, 0, 0)
+    val insetsState = rememberSaveable { mutableStateOf(Insets.ime) }
+    val current = when (insetsState.value) {
+        Insets.captionBar -> WindowInsets.captionBar
+        Insets.displayCutout -> WindowInsets.displayCutout
+        Insets.ime -> WindowInsets.ime
+        Insets.mandatorySystemGestures -> WindowInsets.mandatorySystemGestures
+        Insets.navigationBars -> WindowInsets.navigationBars
+        Insets.statusBars -> WindowInsets.statusBars
+        Insets.systemBars -> WindowInsets.systemBars
+        Insets.systemGestures -> WindowInsets.systemGestures
+        Insets.tappableElement -> WindowInsets.tappableElement
+        Insets.waterfall -> WindowInsets.waterfall
+        Insets.safeDrawing -> WindowInsets.safeDrawing
+        Insets.safeGestures -> WindowInsets.safeGestures
+        Insets.safeContent -> WindowInsets.safeContent
+    }
     Box(Modifier.fillMaxSize().background(Color.Red.copy(0.5f)))
     Box(
         Modifier.fillMaxSize()
@@ -328,7 +341,7 @@ fun ContentInsets() = Box(Modifier.fillMaxSize()) {
                 .background(Color.Gray.copy(0.5f))
         )
         SwitchEnumState(
-            insets.keys.toTypedArray(),
+            Insets.values(),
             insetsState
         )
     }
