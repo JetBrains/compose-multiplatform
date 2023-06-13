@@ -27,9 +27,11 @@ import androidx.compose.ui.node.RootForTest
 import androidx.compose.ui.platform.InfiniteAnimationPolicy
 import androidx.compose.ui.platform.SkiaRootForTest
 import androidx.compose.ui.semantics.SemanticsNode
+import androidx.compose.ui.test.junit4.*
 import androidx.compose.ui.test.junit4.MainTestClockImpl
 import androidx.compose.ui.test.junit4.UncaughtExceptionHandler
 import androidx.compose.ui.test.junit4.isOnUiThread
+import androidx.compose.ui.test.junit4.synchronized
 import androidx.compose.ui.text.ExperimentalTextApi
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.unit.Constraints
@@ -39,6 +41,7 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.roundToInt
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -67,6 +70,12 @@ fun runSkikoComposeUiTest(
         density = density
     ).runTest(block)
 }
+
+/**
+ * How often to check idling resources.
+ * Empirically checked that Android (espresso, really) tests approximately at this rate.
+ */
+private const val IDLING_RESOURCES_CHECK_INTERVAL_MS = 20L
 
 /**
  * @param effectContext The [CoroutineContext] used to run the composition. The context for
@@ -170,6 +179,8 @@ class SkikoComposeUiTest(
     private val testOwner = DesktopTestOwner()
     private val testContext = createTestContext(testOwner)
 
+    private val idlingResources = mutableSetOf<IdlingResource>()
+
     fun <R> runTest(block: SkikoComposeUiTest.() -> R): R {
         scene = runOnUiThread(::createUi)
         try {
@@ -224,7 +235,7 @@ class SkikoComposeUiTest(
             (it as SkiaRootForTest).hasPendingMeasureOrLayout
         }
 
-        return !shouldPumpTime() && !hasPendingMeasureOrLayout
+        return !shouldPumpTime() && !hasPendingMeasureOrLayout && areAllResourcesIdle()
     }
 
     override fun waitForIdle() {
@@ -234,6 +245,9 @@ class SkikoComposeUiTest(
             uncaughtExceptionHandler.throwUncaught()
             renderNextFrame()
             uncaughtExceptionHandler.throwUncaught()
+            if (!areAllResourcesIdle()) {
+                sleep(IDLING_RESOURCES_CHECK_INTERVAL_MS)
+            }
         } while (!isIdle())
     }
 
@@ -243,6 +257,9 @@ class SkikoComposeUiTest(
         while (!isIdle()) {
             renderNextFrame()
             uncaughtExceptionHandler.throwUncaught()
+            if (!areAllResourcesIdle()) {
+                delay(IDLING_RESOURCES_CHECK_INTERVAL_MS)
+            }
             yield()
         }
     }
@@ -275,11 +292,19 @@ class SkikoComposeUiTest(
     }
 
     override fun registerIdlingResource(idlingResource: IdlingResource) {
-        // TODO: implement
+        synchronized(idlingResources) {
+            idlingResources.add(idlingResource)
+        }
     }
 
     override fun unregisterIdlingResource(idlingResource: IdlingResource) {
-        // TODO: implement
+        synchronized(idlingResources) {
+            idlingResources.remove(idlingResource)
+        }
+    }
+
+    private fun areAllResourcesIdle() = synchronized(idlingResources) {
+        idlingResources.all { it.isIdleNow }
     }
 
     override fun setContent(composable: @Composable () -> Unit) {

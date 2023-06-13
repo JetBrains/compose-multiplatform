@@ -27,3 +27,10 @@ internal expect fun <T> runOnUiThread(action: () -> T): T
  * Returns if the call is made on the main thread.
  */
 internal expect fun isOnUiThread(): Boolean
+
+/**
+ * Blocks the calling thread for the given number of milliseconds.
+ *
+ * On targets that don't support this, should throw an [UnsupportedOperationException].
+ */
+internal expect fun sleep(timeMillis: Long)

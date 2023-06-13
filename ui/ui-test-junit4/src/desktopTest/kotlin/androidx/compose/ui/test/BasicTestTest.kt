@@ -32,7 +32,10 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertTrue
 import kotlinx.atomicfu.atomic
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.junit.Rule
 
 
@@ -136,5 +139,46 @@ class BasicTestTest {
                 assertEquals(expectedPixel, pixel)
             }
         }
+    }
+
+    @Test
+    fun testIdlingResource() {
+        var text by mutableStateOf("")
+        rule.setContent {
+            Text(
+                text = text,
+                modifier = Modifier.testTag("text")
+            )
+        }
+
+        var isIdle = true
+        val idlingResource = object: IdlingResource {
+            override val isIdleNow: Boolean
+                get() = isIdle
+        }
+
+        fun test(expectedValue: String) {
+            text = "first"
+            isIdle = false
+            val job = CoroutineScope(Dispatchers.Default).launch {
+                delay(1000)
+                text = "second"
+                isIdle = true
+            }
+            try {
+                rule.onNodeWithTag("text").assertTextEquals(expectedValue)
+            } finally {
+                job.cancel()
+            }
+        }
+
+        // With the idling resource registered, we expect the test to wait until the second value
+        // has been set.
+        rule.registerIdlingResource(idlingResource)
+        test(expectedValue = "second")
+
+        // Without the idling resource registered, we expect the test to see the first value
+        rule.unregisterIdlingResource(idlingResource)
+        test(expectedValue = "first")
     }
 }

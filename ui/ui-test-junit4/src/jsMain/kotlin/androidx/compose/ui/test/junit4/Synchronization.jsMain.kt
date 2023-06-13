@@ -29,3 +29,10 @@ internal actual fun <T> runOnUiThread(action: () -> T): T {
  * Returns if the call is made on the main thread.
  */
 internal actual fun isOnUiThread(): Boolean = true
+
+/**
+ * Throws an [UnsupportedOperationException].
+ */
+internal actual fun sleep(timeMillis: Long) {
+    throw UnsupportedOperationException("sleep is not supported in JS target")
+}

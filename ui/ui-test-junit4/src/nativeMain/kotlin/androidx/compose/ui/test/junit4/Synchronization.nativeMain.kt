@@ -16,13 +16,17 @@
 
 package androidx.compose.ui.test.junit4
 
+import androidx.compose.ui.test.NanoSecondsPerMilliSecond
 import kotlin.coroutines.suspendCoroutine
+import kotlinx.cinterop.cValue
 import kotlinx.coroutines.runBlocking
 import platform.Foundation.NSDate
 import platform.Foundation.NSDefaultRunLoopMode
 import platform.Foundation.NSRunLoop
 import platform.Foundation.performBlock
 import platform.Foundation.runMode
+import platform.posix.nanosleep
+import platform.posix.timespec
 
 /**
  * Runs the given action on the UI thread.
@@ -48,3 +52,15 @@ internal actual fun <T> runOnUiThread(action: () -> T): T {
  * Returns if the call is made on the main thread.
  */
 internal actual fun isOnUiThread(): Boolean = NSRunLoop.currentRunLoop === NSRunLoop.mainRunLoop
+
+/**
+ * Blocks the calling thread for [timeMillis] milliseconds.
+ */
+internal actual fun sleep(timeMillis: Long) {
+    val time = cValue<timespec> {
+        tv_sec = timeMillis / 1000
+        tv_nsec = timeMillis.mod(1000L) * NanoSecondsPerMilliSecond
+    }
+
+    nanosleep(time, null)
+}

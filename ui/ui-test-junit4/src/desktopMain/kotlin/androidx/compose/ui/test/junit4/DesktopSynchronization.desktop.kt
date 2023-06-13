@@ -45,3 +45,10 @@ internal actual fun <T> runOnUiThread(action: () -> T): T {
 internal actual fun isOnUiThread(): Boolean {
     return SwingUtilities.isEventDispatchThread()
 }
+
+/**
+ * Blocks the calling thread for [timeMillis] milliseconds.
+ */
+internal actual fun sleep(timeMillis: Long) {
+    Thread.sleep(timeMillis)
+}
