@@ -55,11 +55,11 @@ Multiplatform applications. If you target Android or Android and iOS, we recomme
 ## Where can I find documentation and tutorials?
 
 You can find the Getting Started tutorials on the [main project page](https://github.com/JetBrains/compose-multiplatform#readme) 
-and more tutorials on [this page](tutorials/README.md).
+and more tutorials on [this page](../tutorials/README.md).
 
 ## Can I play with a demo application? Where can I find it?
 
-Sure, we have [multiple examples for all platforms](examples/README.md).
+Sure, we have [multiple examples for all platforms](../examples/README.md).
 
 ## Does Compose Multiplatform come with widgets?
 
