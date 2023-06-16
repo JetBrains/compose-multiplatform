@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Surface
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.ComposeScene
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.*
 import androidx.compose.ui.graphics.Color
@@ -14,11 +15,12 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
-import org.jetbrains.compose.demo.visuals.platform.exit
 import org.jetbrains.compose.demo.visuals.platform.measureTime
 import org.jetbrains.compose.demo.visuals.platform.nanoTime
 import kotlin.math.*
 import kotlin.random.Random
+import kotlin.time.Duration
+import kotlin.time.ExperimentalTime
 
 expect fun width(): Int
 expect fun height(): Int
@@ -71,20 +73,12 @@ class DoubleRocket(val particle: Particle) {
         }
     }
 
-    var numOfIterations = 1
-
     private fun reset() {
         state = STATE_ROCKET
         particle.x = 0.0
         particle.y = 1000.0
         particle.vx = 2.1
         particle.vy = -12.5
-        numOfIterations -=1
-        if (numOfIterations == 0) {
-            println((measureTime() - measureTime)/1000000)
-            exit()
-        }
-
     }
 
     private fun explode(time: Long) {
@@ -338,3 +332,27 @@ fun snowFlakeInt(level: Int, angle: Float, shiftX: Dp, shiftY: Dp, alpha: Float)
     }
 }
 
+const val nanosPerSecond = 1E9.toLong()
+const val nanosPerFrame = (0.16 * nanosPerSecond).toLong()
+
+@OptIn(ExperimentalTime::class)
+fun measureHappyNY(
+    frameCount: Int = 1000
+): Duration {
+    val scene = ComposeScene()
+    scene.setContent {
+        NYContent()
+    }
+    val surface = org.jetbrains.skia.Surface.makeNull(width, height)
+    try {
+        return kotlin.time.measureTime {
+            var nanoTime = 0L
+            repeat(frameCount) {
+                scene.render(surface.canvas, nanoTime)
+                nanoTime += nanosPerFrame
+            }
+        }
+    } finally {
+        scene.close()
+    }
+}
