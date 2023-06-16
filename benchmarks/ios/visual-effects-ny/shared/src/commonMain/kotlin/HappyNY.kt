@@ -340,11 +340,11 @@ fun measureHappyNY(
     frameCount: Int = 1000
 ): Duration {
     val scene = ComposeScene()
-    scene.setContent {
-        NYContent()
-    }
-    val surface = org.jetbrains.skia.Surface.makeNull(width, height)
     try {
+        scene.setContent {
+            NYContent()
+        }
+        val surface = org.jetbrains.skia.Surface.makeNull(width, height)
         return kotlin.time.measureTime {
             var nanoTime = 0L
             repeat(frameCount) {
