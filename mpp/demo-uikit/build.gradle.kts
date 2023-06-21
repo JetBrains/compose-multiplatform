@@ -1,64 +1,50 @@
 import androidx.build.AndroidXComposePlugin
+import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.KotlinNativeBinaryContainer
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinNativeTarget
+import org.jetbrains.kotlin.gradle.plugin.mpp.KotlinTargetWithBinaries
 
 plugins {
     id("AndroidXPlugin")
     id("AndroidXComposePlugin")
     id("kotlin-multiplatform")
-    id("org.jetbrains.gradle.apple.applePlugin") version "222.4550-0.21"
+    id("org.jetbrains.gradle.apple.applePlugin") version "222.4550-0.22"
 }
-
-val RUN_ON_DEVICE = false
 
 AndroidXComposePlugin.applyAndConfigureKotlinPlugin(project)
-
-
-dependencies {
-
-}
 
 repositories {
     mavenLocal()
 }
 
+fun KotlinNativeBinaryContainer.configureFramework() {
+    framework {
+        baseName = "shared"
+        freeCompilerArgs += listOf(
+            "-linker-option", "-framework", "-linker-option", "Metal",
+            "-linker-option", "-framework", "-linker-option", "CoreText",
+            "-linker-option", "-framework", "-linker-option", "CoreGraphics"
+        )
+    }
+}
+
 kotlin {
-    if (System.getProperty("os.arch") == "aarch64") {
-        iosSimulatorArm64("uikitSimArm64") {
+    val isArm64Host = System.getProperty("os.arch") == "aarch64"
+    iosArm64 {
+        binaries {
+            configureFramework()
+        }
+    }
+    if (isArm64Host) {
+        iosSimulatorArm64 {
             binaries {
-                framework {
-                    baseName = "shared"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
-                }
+                configureFramework()
             }
         }
     } else {
-        iosX64("uikitX64") {
+        iosX64 {
             binaries {
-                framework {
-                    baseName = "shared"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
-                }
-            }
-        }
-    }
-    if (RUN_ON_DEVICE) {
-        iosArm64("uikitArm64") {
-            binaries {
-                framework {
-                    baseName = "shared"
-                    freeCompilerArgs += listOf(
-                        "-linker-option", "-framework", "-linker-option", "Metal",
-                        "-linker-option", "-framework", "-linker-option", "CoreText",
-                        "-linker-option", "-framework", "-linker-option", "CoreGraphics"
-                    )
-                }
+                configureFramework()
             }
         }
     }
@@ -86,13 +72,11 @@ kotlin {
         val nativeMain by creating { dependsOn(skikoMain) }
         val darwinMain by creating { dependsOn(nativeMain) }
         val uikitMain by creating { dependsOn(darwinMain) }
-        if (System.getProperty("os.arch") == "aarch64") {
-            val uikitSimArm64Main by getting { dependsOn(uikitMain) }
+        val iosArm64Main by getting { dependsOn(uikitMain) }
+        if (isArm64Host) {
+            val iosSimulatorArm64Main by getting { dependsOn(uikitMain) }
         } else {
-            val uikitX64Main by getting { dependsOn(uikitMain) }
-        }
-        if (RUN_ON_DEVICE) {
-            val uikitArm64Main by getting { dependsOn(uikitMain) }
+            val iosX64Main by getting { dependsOn(uikitMain) }
         }
     }
 }
@@ -104,10 +88,44 @@ apple {
         sceneDelegateClass = "SceneDelegate"
         launchStoryboard = "LaunchScreen"
 
+        val runOnDevice = findProperty("xcode.arch") == "arm64"
+        val projectProperties = Properties()
+        val projectPropertiesFile = rootProject.file("project.properties")
+        if (projectPropertiesFile.exists()) {
+            projectProperties.load(projectPropertiesFile.reader())
+        } else {
+            projectPropertiesFile.createNewFile()
+        }
+        val teamId = projectProperties.getProperty("TEAM_ID")
+        if (runOnDevice && teamId == null) {
+            error("Add TEAM_ID=... to file ${projectPropertiesFile.absolutePath}")
+        }
+        if (teamId != null) {
+            buildSettings.DEVELOPMENT_TEAM(teamId)
+        }
+        buildSettings.DEPLOYMENT_TARGET("15.0")
+
         // TODO: add 'CADisableMinimumFrameDurationOnPhone' set to 'YES'
 
         dependencies {
             // Here we can add additional dependencies to Swift sourceSet
         }
+    }
+}
+
+// TODO: Workaround, see https://youtrack.jetbrains.com/issue/KT-55751
+val myAttribute = Attribute.of("myOwnAttribute", String::class.java)
+// replace releaseFrameworkIosFat by the name of the first configuration that conflicts
+configurations.named("releaseFrameworkIosFat").configure {
+    attributes {
+        // put a unique attribute
+        attribute(myAttribute, "release-all")
+    }
+}
+
+// replace debugFrameworkIosFat by the name of the second configuration that conflicts
+configurations.named("debugFrameworkIosFat").configure {
+    attributes {
+        attribute(myAttribute, "debug-all")
     }
 }
