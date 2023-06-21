@@ -1,8 +1,9 @@
-name: ComposeDemo
+# this YML is to be used as a template with %@PLACEHOLDER_VALUES@% replaced with actual ones within regenerate_xcode_project.sh
+name: %@PROJECT_NAME@%
 options:
   bundleIdPrefix: org.jetbrains
 settings:
-  DEVELOPMENT_TEAM: N462MKSJ7M
+  DEVELOPMENT_TEAM: %@COMPOSE_DEMO_APPLE_TEAM_ID@%
   CODE_SIGN_IDENTITY: "iPhone Developer"
   CODE_SIGN_STYLE: Automatic
   MARKETING_VERSION: "1.0"
@@ -14,7 +15,13 @@ targets:
     platform: iOS
     deploymentTarget: "12.0"
     prebuildScripts:
-      - script: cd "$SRCROOT" && OUT_DIR=`pwd`/out  JAVA_TOOLS_JAR=/Users/jetbrains/jetpack_compose_ui/compose-jb/compose/scripts/../external/tools.jar  ALLOW_PUBLIC_REPOS=1  ANDROIDX_PROJECTS=compose ../../../gradlew  -i  -Pandroidx.compose.multiplatformEnabled=true  --no-daemon -Pkotlin.compiler.execution.strategy="in-process" -p . packForXCode
+      - script: |
+          cd "$SRCROOT"
+          export JAVA_HOME=%@JAVA_HOME@%
+          export OUT_DIR=`pwd`/../../../out
+          echo "JAVA_HOME: $JAVA_HOME"
+          echo "OUT_DIR: $OUT_DIR"
+          ../../../gradlew -i --no-daemon -p . packForXCode
         name: GradleCompile
     info:
       path: plists/Ios/Info.plist
