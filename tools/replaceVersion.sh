@@ -12,8 +12,6 @@ declare -a folders=(
     "$ROOT/ci"
     "$ROOT/html"
     "$ROOT/tutorials"
-    "$ROOT/compose/integrations/composable-test-cases"
-    "$ROOT/compose/integrations/compose-with-ktx-serialization"
 )
 
 if [ ! -z "$COMPOSE_TEMPLATES_FOLDER" ]; then
