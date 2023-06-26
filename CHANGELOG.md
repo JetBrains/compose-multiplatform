@@ -1,3 +1,31 @@
+# 1.4.1 (June 2023)
+
+## Common
+
+### Fixes
+- [Fix perspective transform usage](https://github.com/JetBrains/compose-multiplatform-core/pull/598)
+- [After each ComposeScene.render phase, send apply notifications and perform the corresponding changes](https://github.com/JetBrains/compose-multiplatform-core/pull/563)
+- [Fix awaitDragStartOnSlop to detect slop-passing on both axes](https://github.com/JetBrains/compose-multiplatform-core/pull/534)
+
+## Desktop
+
+### Fixes
+- [Fix `DesktopDropdownMenuPositionProvider` to align with the correct horizontal side of the window](https://github.com/JetBrains/compose-multiplatform-core/pull/555)
+- [Propagate LocalLayoutDirection into PopupLayout](https://github.com/JetBrains/compose-multiplatform-core/pull/562)
+- [Fix missing scrolling events](https://github.com/JetBrains/compose-multiplatform-core/pull/527)
+- [Make popups accessible on desktop](https://github.com/JetBrains/compose-multiplatform-core/pull/439)
+
+## Dependencies
+
+This version of Compose Multiplatform is based on the next Jetpack Compose libraries:
+
+- [Compiler 1.4.4](https://developer.android.com/jetpack/androidx/releases/compose-compiler#1.4.4)
+- [Runtime 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-runtime#1.4.3)
+- [UI 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-ui#1.4.3)
+- [Foundation 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-foundation#1.4.3)
+- [Material 1.4.3](https://developer.android.com/jetpack/androidx/releases/compose-material#1.4.3)
+- [Material3 1.0.1](https://developer.android.com/jetpack/androidx/releases/compose-material3#1.0.1)
+
 # 1.4.0 (April 2023)
 
 ## Common
