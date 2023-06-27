@@ -43,7 +43,7 @@ import org.junit.Rule
  * Basic tests of the testing framework itself.
  */
 @OptIn(ExperimentalTestApi::class)
-class BasicTestTest {
+class TestBasicsTest {
 
     @get:Rule
     val rule = createComposeRule()
