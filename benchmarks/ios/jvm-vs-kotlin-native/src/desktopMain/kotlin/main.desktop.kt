@@ -6,4 +6,4 @@
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 
-fun main() = runBlocking(Dispatchers.Main) {runBenchmarks()}
+fun main() = runBlocking(Dispatchers.Main) { runBenchmarks() }
