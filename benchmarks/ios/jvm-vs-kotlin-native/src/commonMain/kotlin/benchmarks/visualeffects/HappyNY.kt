@@ -199,10 +199,10 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
             SnowFlake(
                 (50 + (width - 50) * random()).dp,
                 (height * random()).dp,
-                0.1f + 0.2f * random().toFloat(),
+                0.1f + 0.2f * random(),
                 1.5 + 3 * random(),
                 (0.4f + 0.4 * random()).toFloat(),
-                60 * random().toFloat(),
+                60 * random(),
                 Random.nextInt(1, 5) - 3,
                 random() * 2 * PI
             )
@@ -221,12 +221,10 @@ fun prepareStarsAndSnowFlakes(stars: SnapshotStateList<Star>, snowFlakes: Snapsh
     }
 }
 
-var measureTime: Long = 0
-
 @Composable
 fun NYContent() {
     var time by remember { mutableStateOf(0L) }
-    var startTime = remember { 0L }
+    val startTime = remember { 0L }
     var prevTime by remember { mutableStateOf(0L) }
     val snowFlakes = remember { mutableStateListOf<SnowFlake>() }
     val stars = remember { mutableStateListOf<Star>() }
