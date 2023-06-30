@@ -7,6 +7,7 @@ package org.jetbrains.compose.internal.utils
 
 import org.gradle.api.Project
 import org.gradle.api.Task
+import org.gradle.api.tasks.TaskContainer
 import org.gradle.api.tasks.TaskProvider
 
 internal fun <T : Task> TaskProvider<T>.dependsOn(vararg dependencies: Any) {
@@ -20,3 +21,14 @@ internal inline fun <reified T : Task> Project.registerTask(
     tasks.register(name, T::class.java) { task ->
         task.fn()
     }
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T : Task> TaskContainer.registerOrConfigure(
+    taskName: String,
+    crossinline configureFn: T.() -> Unit
+): TaskProvider<T> = when (taskName) {
+    in names -> named(taskName) as TaskProvider<T>
+    else -> register(taskName, T::class.java) as TaskProvider<T>
+}.apply {
+    configure { it.configureFn() }
+}

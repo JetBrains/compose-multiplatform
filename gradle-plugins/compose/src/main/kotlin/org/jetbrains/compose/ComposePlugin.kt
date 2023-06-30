@@ -10,9 +10,6 @@ package org.jetbrains.compose
 import groovy.lang.Closure
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ComponentMetadataContext
-import org.gradle.api.artifacts.ComponentMetadataRule
-import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler
 import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.api.artifacts.dsl.RepositoryHandler
 import org.gradle.api.artifacts.repositories.MavenArtifactRepository
@@ -24,6 +21,9 @@ import org.jetbrains.compose.desktop.preview.internal.initializePreview
 import org.jetbrains.compose.experimental.dsl.ExperimentalExtension
 import org.jetbrains.compose.experimental.internal.configureExperimentalTargetsFlagsCheck
 import org.jetbrains.compose.experimental.internal.configureExperimental
+import org.jetbrains.compose.experimental.uikit.internal.configureSyncTask
+import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
+import org.jetbrains.compose.internal.mppExt
 import org.jetbrains.compose.internal.utils.currentTarget
 import org.jetbrains.compose.web.WebExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinDependencyHandler
@@ -53,7 +53,11 @@ class ComposePlugin : Plugin<Project> {
         project.afterEvaluate {
             configureDesktop(project, desktopExtension)
             project.configureExperimental(composeExtension, experimentalExtension)
-            project.configureExperimentalTargetsFlagsCheck()
+            project.plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
+                val mppExt = project.mppExt
+                project.configureExperimentalTargetsFlagsCheck(mppExt)
+                project.configureSyncTask(mppExt)
+            }
 
             project.tasks.withType(KotlinCompile::class.java).configureEach {
                 it.kotlinOptions.apply {

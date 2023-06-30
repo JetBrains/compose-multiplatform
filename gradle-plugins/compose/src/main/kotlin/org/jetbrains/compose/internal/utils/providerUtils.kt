@@ -9,6 +9,7 @@ import org.gradle.api.Task
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
+import org.gradle.api.provider.ProviderFactory
 
 internal inline fun <reified T> ObjectFactory.new(vararg params: Any): T =
     newInstance(T::class.java, *params)
@@ -28,3 +29,19 @@ internal inline fun <reified T> Provider<T>.toProperty(objects: ObjectFactory): 
 
 internal inline fun <reified T> Task.provider(noinline fn: () -> T): Provider<T> =
     project.provider(fn)
+
+internal fun ProviderFactory.findProperty(prop: String): Provider<String?> =
+    provider {
+        gradleProperty(prop).forUseAtConfigurationTimeSafe().orNull
+    }
+
+private fun Provider<String?>.forUseAtConfigurationTimeSafe(): Provider<String?> =
+    try {
+        forUseAtConfigurationTime()
+    } catch (e: NoSuchMethodError) {
+        // todo: remove once we drop support for Gradle 6.4
+        this
+    }
+
+internal fun Provider<String?>.toBooleanProvider(defaultValue: Boolean): Provider<Boolean> =
+    orElse(defaultValue.toString()).map { "true" == it }

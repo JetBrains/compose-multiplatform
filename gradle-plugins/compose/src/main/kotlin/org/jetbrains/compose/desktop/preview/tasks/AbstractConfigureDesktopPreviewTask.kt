@@ -28,10 +28,12 @@ abstract class AbstractConfigureDesktopPreviewTask : AbstractComposeDesktopTask(
     @get:Optional
     internal val jvmArgs: ListProperty<String> = objects.listProperty(String::class.java)
 
+    @get:Optional
     @get:Input
     internal val previewTarget: Provider<String> =
         project.providers.gradleProperty("compose.desktop.preview.target")
 
+    @get:Optional
     @get:Input
     internal val idePort: Provider<String>  =
         project.providers.gradleProperty("compose.desktop.preview.ide.port")

@@ -6,15 +6,12 @@
 package org.jetbrains.compose.experimental.internal
 
 import org.gradle.api.Project
-import org.jetbrains.compose.internal.KOTLIN_MPP_PLUGIN_ID
-import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinTarget
 
-internal fun Project.configureExperimentalTargetsFlagsCheck() {
-    plugins.withId(KOTLIN_MPP_PLUGIN_ID) {
-        gradle.taskGraph.whenReady {
-            checkExperimentalTargetsWithSkikoIsEnabled()
-        }
+internal fun Project.configureExperimentalTargetsFlagsCheck(mppExt: KotlinMultiplatformExtension) {
+    gradle.taskGraph.whenReady {
+        checkExperimentalTargetsWithSkikoIsEnabled(project, mppExt)
     }
 }
 
@@ -38,9 +35,11 @@ private sealed interface CheckResult {
     class Fail(val target: TargetType) : CheckResult
 }
 
-private fun Project.checkExperimentalTargetsWithSkikoIsEnabled() {
-    val mppExt = project.mppExt
-    val failedResults = mppExt.targets.map { checkTarget(it) }
+private fun checkExperimentalTargetsWithSkikoIsEnabled(
+    project: Project,
+    mppExt: KotlinMultiplatformExtension,
+) {
+    val failedResults = mppExt.targets.map { checkTarget(project, it) }
         .filterIsInstance<CheckResult.Fail>()
         .distinctBy { it.target }
 
@@ -59,7 +58,7 @@ private fun Project.checkExperimentalTargetsWithSkikoIsEnabled() {
     }
 }
 
-private fun Project.checkTarget(target: KotlinTarget): CheckResult {
+private fun checkTarget(project: Project, target: KotlinTarget): CheckResult {
     val presetName = target.preset?.name ?: return CheckResult.Success
 
     val targetType = EXPERIMENTAL_TARGETS.firstOrNull {
@@ -70,7 +69,7 @@ private fun Project.checkTarget(target: KotlinTarget): CheckResult {
         compilation.compileDependencyConfigurationName
     }
 
-    configurations.forEach { configuration ->
+    project.configurations.forEach { configuration ->
         if (configuration.isCanBeResolved && configuration.name in targetConfigurationNames) {
             val containsSkikoArtifact = configuration.resolvedConfiguration.resolvedArtifacts.any {
                 it.id.displayName.contains(SKIKO_ARTIFACT_PREFIX)
