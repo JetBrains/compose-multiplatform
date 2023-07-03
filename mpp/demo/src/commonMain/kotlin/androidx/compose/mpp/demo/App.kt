@@ -1,21 +1,17 @@
 package androidx.compose.mpp.demo
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Icon
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.snapshots.SnapshotStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
@@ -95,6 +91,10 @@ class App(
         content: @Composable (PaddingValues) -> Unit
     ) {
         Scaffold(
+            /*
+            Without using TopAppBar, this is recommended approach to apply multiplatform window insets to Material2 Scaffold (otherwise there will be empty space above top app bar - as is here)
+             */
+            modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
             topBar = {
                 TopAppBar(
                     title = {
@@ -120,8 +120,36 @@ class App(
     ) {
         Scaffold(
             topBar = {
+                /*
+                This is recommended approach of applying multiplatform window insets to Material2 Scaffold with using top app bar.
+                By that way, it is possible to fill area above top app bar with its background - as it works out of box in android development or with Material3 Scaffold
+                */
                 TopAppBar(
-                    title = { Text(navigationStack.first().title) },
+                    contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Top).union(
+                        WindowInsets(left = 20.dp)
+                    ).asPaddingValues(),
+                    content = {
+                        CompositionLocalProvider(
+                            LocalContentAlpha provides ContentAlpha.high
+                        ) {
+                            Row(
+                                Modifier.fillMaxHeight().weight(1f),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                if (navigationStack.size > 1) {
+                                    Icon(
+                                        Icons.Filled.ArrowBack,
+                                        contentDescription = "Back",
+                                        modifier = Modifier.clickable { navigationStack.removeLast() }
+                                    )
+                                    Spacer(Modifier.width(16.dp))
+                                }
+                                ProvideTextStyle(value = MaterialTheme.typography.h6) {
+                                    Text(navigationStack.first().title)
+                                }
+                            }
+                        }
+                    }
                 )
             },
             content = content
