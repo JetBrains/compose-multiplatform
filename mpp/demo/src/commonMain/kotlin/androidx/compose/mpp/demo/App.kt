@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.mpp.demo.textfield.TextFields
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateListOf
@@ -26,6 +27,7 @@ val MainScreen = Screen.Selection(
     Screen.ScaffoldExample("ApplicationLayouts") { ApplicationLayouts(it) },
     Screen.Example("GraphicsLayerSettings") { GraphicsLayerSettings() },
     LazyLayouts,
+    TextFields,
 )
 
 sealed interface Screen {
