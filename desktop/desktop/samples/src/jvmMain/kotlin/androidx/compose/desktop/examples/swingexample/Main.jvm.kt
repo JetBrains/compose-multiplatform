@@ -143,6 +143,8 @@ fun SwingComposeWindow() {
             size = IntSize(40, 40),
             action = {
                 panel.remove(composePanelBottom)
+                panel.revalidate()
+                panel.repaint()
             }
         ),
         BorderLayout.SOUTH

@@ -49,49 +49,49 @@ internal class ComposeWindowDelegate(
     // (see https://github.com/JetBrains/compose-jb/issues/1688),
     // so we nullify layer on dispose, to prevent keeping
     // big objects in memory (like the whole LayoutNode tree of the window)
-    private var _layer: ComposeLayer? = ComposeLayer(skiaLayerAnalytics)
-    private val layer
-        get() = requireNotNull(_layer) {
+    private var _bridge: WindowComposeBridge? = WindowComposeBridge(skiaLayerAnalytics)
+    private val bridge
+        get() = requireNotNull(_bridge) {
             "ComposeLayer is disposed"
         }
     internal val windowAccessible: Accessible
-        get() = layer.sceneAccessible
+        get() = bridge.sceneAccessible
     val undecoratedWindowResizer = UndecoratedWindowResizer(window)
 
     private val _pane = object : JLayeredPane() {
         override fun setBounds(x: Int, y: Int, width: Int, height: Int) {
-            layer.component.setSize(width, height)
+            bridge.component.setSize(width, height)
             super.setBounds(x, y, width, height)
         }
 
         override fun add(component: Component): Component {
             val clipComponent = ClipComponent(component)
             clipMap[component] = clipComponent
-            layer.component.clipComponents.add(clipComponent)
+            bridge.clipComponents.add(clipComponent)
             return add(component, Integer.valueOf(0))
         }
 
         override fun remove(component: Component) {
-            layer.component.clipComponents.remove(clipMap[component]!!)
+            bridge.clipComponents.remove(clipMap[component]!!)
             clipMap.remove(component)
             super.remove(component)
         }
 
         override fun addNotify() {
             super.addNotify()
-            layer.component.requestFocus()
+            bridge.component.requestFocus()
         }
 
         override fun getPreferredSize() =
-            if (isPreferredSizeSet) super.getPreferredSize() else layer.component.preferredSize
+            if (isPreferredSizeSet) super.getPreferredSize() else bridge.component.preferredSize
 
         init {
             layout = null
-            super.add(layer.component, 1)
+            super.add(bridge.component, 1)
         }
 
         fun dispose() {
-            super.remove(layer.component)
+            super.remove(bridge.component)
         }
     }
 
@@ -120,15 +120,15 @@ internal class ComposeWindowDelegate(
     }
 
     var fullscreen: Boolean
-        get() = layer.component.fullscreen
+        get() = bridge.component.fullscreen
         set(value) {
-            layer.component.fullscreen = value
+            bridge.component.fullscreen = value
         }
 
     var compositionLocalContext: CompositionLocalContext?
-        get() = layer.compositionLocalContext
+        get() = bridge.compositionLocalContext
         set(value) {
-            layer.compositionLocalContext = value
+            bridge.compositionLocalContext = value
         }
 
     fun setContent(
@@ -136,7 +136,7 @@ internal class ComposeWindowDelegate(
         onKeyEvent: (KeyEvent) -> Boolean = { false },
         content: @Composable () -> Unit
     ) {
-        layer.setContent(
+        bridge.setContent(
             onPreviewKeyEvent = onPreviewKeyEvent,
             onKeyEvent = onKeyEvent,
         ) {
@@ -165,7 +165,7 @@ internal class ComposeWindowDelegate(
                     if (it.layoutId == "UndecoratedWindowResizer") it else null
                 }
                 val resizerPlaceable = resizerMeasurable?.let {
-                    val density = layer.component.density.density
+                    val density = bridge.component.density.density
                     val resizerWidth = (window.width * density).toInt()
                     val resizerHeight = (window.height * density).toInt()
                     it.measure(
@@ -199,41 +199,41 @@ internal class ComposeWindowDelegate(
 
     fun dispose() {
         if (!isDisposed) {
-            layer.dispose()
+            bridge.dispose()
             _pane.dispose()
-            _layer = null
+            _bridge = null
             isDisposed = true
         }
     }
 
     fun onRenderApiChanged(action: () -> Unit) {
-        layer.component.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
+        bridge.component.onStateChanged(SkiaLayer.PropertyKind.Renderer) {
             action()
         }
     }
 
     @ExperimentalComposeUiApi
     var exceptionHandler: WindowExceptionHandler?
-        get() = layer.exceptionHandler
+        get() = bridge.exceptionHandler
         set(value) {
-            layer.exceptionHandler = value
+            bridge.exceptionHandler = value
         }
 
     val windowHandle: Long
-        get() = layer.component.windowHandle
+        get() = bridge.component.windowHandle
 
     val renderApi: GraphicsApi
-        get() = layer.component.renderApi
+        get() = bridge.renderApi
 
     var isTransparent: Boolean
-        get() = layer.component.transparency
+        get() = bridge.component.transparency
         set(value) {
-            if (value != layer.component.transparency) {
+            if (value != bridge.component.transparency) {
                 check(isUndecorated()) { "Transparent window should be undecorated!" }
                 check(!window.isDisplayable) {
                     "Cannot change transparency if window is already displayable."
                 }
-                layer.component.transparency = value
+                bridge.component.transparency = value
                 if (value) {
                     if (hostOs != OS.Windows) {
                         window.background = Color(0, 0, 0, 0)
@@ -245,26 +245,26 @@ internal class ComposeWindowDelegate(
         }
 
     fun addMouseListener(listener: MouseListener) {
-        layer.component.addMouseListener(listener)
+        bridge.component.addMouseListener(listener)
     }
 
     fun removeMouseListener(listener: MouseListener) {
-        layer.component.removeMouseListener(listener)
+        bridge.component.removeMouseListener(listener)
     }
 
     fun addMouseMotionListener(listener: MouseMotionListener) {
-        layer.component.addMouseMotionListener(listener)
+        bridge.component.addMouseMotionListener(listener)
     }
 
     fun removeMouseMotionListener(listener: MouseMotionListener) {
-        layer.component.removeMouseMotionListener(listener)
+        bridge.component.removeMouseMotionListener(listener)
     }
 
     fun addMouseWheelListener(listener: MouseWheelListener) {
-        layer.component.addMouseWheelListener(listener)
+        bridge.component.addMouseWheelListener(listener)
     }
 
     fun removeMouseWheelListener(listener: MouseWheelListener) {
-        layer.component.removeMouseWheelListener(listener)
+        bridge.component.removeMouseWheelListener(listener)
     }
 }
