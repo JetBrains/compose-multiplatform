@@ -96,9 +96,9 @@ fun GraphicsLayerSettings() {
 }
 
 @Composable
-private fun SliderSetting(text: String,
+fun SliderSetting(text: String,
     value: Float,
-    range: ClosedFloatingPointRange<Float>,
+    range: ClosedFloatingPointRange<Float> = 0f..1f,
     onValueChange: (Float) -> Unit) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
