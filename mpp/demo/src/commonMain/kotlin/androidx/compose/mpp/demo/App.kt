@@ -24,7 +24,7 @@ val MainScreen = Screen.Selection(
     Screen.Example("TextDirection") { TextDirection() },
     Screen.Example("FontFamilies") { FontFamilies() },
     Screen.Example("LottieAnimation") { LottieAnimation() },
-    Screen.ScaffoldExample("ApplicationLayouts") { ApplicationLayouts(it) },
+    Screen.FullscreenExample("ApplicationLayouts") { ApplicationLayouts(it) },
     Screen.Example("GraphicsLayerSettings") { GraphicsLayerSettings() },
     Screen.Example("Blending") { Blending() },
     LazyLayouts,
@@ -34,22 +34,34 @@ val MainScreen = Screen.Selection(
 sealed interface Screen {
     val title: String
 
-    class Example(override val title: String, val content: @Composable () -> Unit) : Screen
-    class ScaffoldExample(override val title: String, val content: @Composable (back: () -> Unit) -> Unit) : Screen
-    class Selection(override val title: String, val screens: List<Screen>) : Screen {
+    class Example(
+        override val title: String,
+        val content: @Composable () -> Unit
+    ) : Screen
+
+    class Selection(
+        override val title: String,
+        val screens: List<Screen>
+    ) : Screen {
         constructor(title: String, vararg screens: Screen) : this(title, listOf(*screens))
 
         fun mergedWith(screens: List<Screen>): Selection {
             return Selection(title, this.screens + screens)
         }
     }
+
+    class FullscreenExample(
+        override val title: String,
+        val content: @Composable (back: () -> Unit) -> Unit
+    ) : Screen
 }
 
 class App(
     initialScreenName: String? = null,
     extraScreens: List<Screen> = listOf()
 ) {
-    private val navigationStack: SnapshotStateList<Screen> = mutableStateListOf(MainScreen.mergedWith(extraScreens))
+    private val navigationStack: SnapshotStateList<Screen> =
+        mutableStateListOf(MainScreen.mergedWith(extraScreens))
 
     init {
         if (initialScreenName != null) {
@@ -71,10 +83,6 @@ class App(
                 }
             }
 
-            is Screen.ScaffoldExample -> {
-                screen.content { navigationStack.removeLast() }
-            }
-
             is Screen.Selection -> {
                 SelectionScaffold {
                     LazyColumn(Modifier.fillMaxSize()) {
@@ -86,22 +94,28 @@ class App(
                     }
                 }
             }
+
+            is Screen.FullscreenExample -> {
+                screen.content { navigationStack.removeLast() }
+            }
         }
     }
 
     @Composable
     private fun ExampleScaffold(
-        content: @Composable (PaddingValues) -> Unit
+        content: @Composable () -> Unit
     ) {
         Scaffold(
             /*
-            Without using TopAppBar, this is recommended approach to apply multiplatform window insets to Material2 Scaffold (otherwise there will be empty space above top app bar - as is here)
-             */
+            Without using TopAppBar, this is recommended approach to apply multiplatform window insets
+            to Material2 Scaffold (otherwise there will be empty space above top app bar - as is here)
+            */
             modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
             topBar = {
                 TopAppBar(
                     title = {
-                        val title = navigationStack.drop(1).joinToString("/") { it.title }
+                        val title = navigationStack.drop(1)
+                            .joinToString("/") { it.title }
                         Text(title)
                     },
                     navigationIcon = {
@@ -112,14 +126,19 @@ class App(
                         )
                     }
                 )
-            },
-            content = content
-        )
+            }
+        ) { innerPadding ->
+            Box(
+                Modifier.fillMaxSize().padding(innerPadding)
+            ) {
+                content()
+            }
+        }
     }
 
     @Composable
     private fun SelectionScaffold(
-        content: @Composable (PaddingValues) -> Unit
+        content: @Composable () -> Unit
     ) {
         Scaffold(
             topBar = {
@@ -128,9 +147,10 @@ class App(
                 By that way, it is possible to fill area above top app bar with its background - as it works out of box in android development or with Material3 Scaffold
                 */
                 TopAppBar(
-                    contentPadding = WindowInsets.systemBars.only(WindowInsetsSides.Top).union(
-                        WindowInsets(left = 20.dp)
-                    ).asPaddingValues(),
+                    contentPadding = WindowInsets.systemBars
+                        .only(WindowInsetsSides.Top + WindowInsetsSides.Horizontal)
+                        .union(WindowInsets(left = 20.dp))
+                        .asPaddingValues(),
                     content = {
                         CompositionLocalProvider(
                             LocalContentAlpha provides ContentAlpha.high
@@ -155,7 +175,19 @@ class App(
                     }
                 )
             },
-            content = content
-        )
+        ) { innerPadding ->
+            /*
+            In case of applying WindowInsets as content padding, it is strongly recommended to wrap
+            content of scaffold into box with these modifiers to support proper layout when device rotated
+            */
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+                    .padding(innerPadding)
+            ) {
+                content()
+            }
+        }
     }
 }
