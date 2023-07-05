@@ -93,7 +93,7 @@ compose {
 
 ### Relationship between the Jetpack Compose and Compose Multiplatform release cycles
 
-Compose Multiplatform shares a lot of code with [Jetpack Compose](https:/)/developer.android.com/jetpack/compose) for Android, a framework developed by Google.
+Compose Multiplatform shares a lot of code with [Jetpack Compose](https://developer.android.com/jetpack/compose) for Android, a framework developed by Google.
 We keep our release cycles aligned, making sure that the common part is properly tested and stabilized.
 
 When a new version of Jetpack Compose is released, we pick the release commit, use it as a base for the next [Compose Multiplatform](https://github.com/JetBrains/androidx) version, finish new platform features, stabilize all platforms, and release Compose Multiplatform.
