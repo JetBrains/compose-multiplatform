@@ -23,6 +23,22 @@ class KotlinCompatibilityTest : GradlePluginTestBase() {
     @Test
     fun testKotlinJsMpp_1_7_20() = testJsMpp("1.7.20")
 
+    @Suppress("RedundantUnitExpression")
+    @Test
+    fun testKotlinJs_shows_warning_for_androidx_compose_compiler() = testProject(
+        TestProjects.customCompilerArgs, defaultTestEnvironment.copy(
+            kotlinVersion = "1.8.22",
+            composeCompilerPlugin = "\"androidx.compose.compiler:compiler:1.4.8\"",
+            composeCompilerArgs = "\"suppressKotlinVersionCompatibilityCheck=1.8.22\""
+        )
+    ).let {
+        it.gradle(":compileKotlinJs").checks {
+            check.taskSuccessful(":compileKotlinJs")
+            check.logContains("WARNING: You are using the 'androidx.compose.compiler' compiler plugin in your Kotlin multiplatform project.")
+        }
+        Unit
+    }
+
     private fun testMpp(kotlinVersion: String) = with(
         testProject(
             TestProjects.mpp,

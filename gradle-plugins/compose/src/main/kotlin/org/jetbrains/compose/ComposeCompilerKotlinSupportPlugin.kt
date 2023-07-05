@@ -8,7 +8,7 @@ package org.jetbrains.compose
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
-import org.jetbrains.compose.internal.mppExt
+import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
@@ -26,20 +26,22 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
                     ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
             }
         }
-        warnAboutJetpackComposeCompilerUsageForNonJvm(target)
+        target.afterEvaluate {
+            warnAboutJetpackComposeCompilerUsageForNonJvm(it)
+        }
     }
 
     @Suppress("NON_EXHAUSTIVE_WHEN")
     private fun warnAboutJetpackComposeCompilerUsageForNonJvm(target: Project) {
-        val isUsingJetpackComposeCompilerPlugin =
-            composeCompilerArtifactProvider.compilerArtifact.groupId.startsWith("androidx.compose.compiler")
+        val groupId = composeCompilerArtifactProvider.compilerArtifact.groupId
+        val isUsingNonJBComposeCompiler = !groupId.startsWith("org.jetbrains.compose.compiler")
 
-        if (isUsingJetpackComposeCompilerPlugin) {
-            target.mppExt.targets.forEach {
+        if (isUsingNonJBComposeCompiler) {
+            target.mppExtOrNull?.targets?.forEach {
                 when (it.platformType) {
                     KotlinPlatformType.native,
                     KotlinPlatformType.js,
-                    KotlinPlatformType.wasm -> target.logger.warn(WARN_ABOUT_JC_COMPILER)
+                    KotlinPlatformType.wasm -> target.logger.warn(createWarningAboutNonCompatibleCompiler(groupId))
                 }
             }
         }
@@ -89,12 +91,14 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 }
 
 private const val COMPOSE_COMPILER_COMPATIBILITY_LINK =
-    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md"
+    "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#using-compose-multiplatform-compiler"
 
-private val WARN_ABOUT_JC_COMPILER = """
-    | WARNING: You are using the 'androidx.compose.compiler' plugin in your Kotlin multiplatform project.
-    | This plugin is only guaranteed to work with JVM targets (desktop or Android).
+private fun createWarningAboutNonCompatibleCompiler(currentCompilerPluginGroupId: String): String {
+    return """
+    | WARNING: You are using the '$currentCompilerPluginGroupId' compiler plugin in your Kotlin multiplatform project.
+    | This plugin is not guaranteed to work with non-JVM targets (jvm targets are: desktop or Android).
     | The usage with Kotlin/JS or Kotlin/Native targets is not supported and might cause issues.
-    | Make sure you are using compatible versions of the Compose Multiplatform Compiler and Kotlin.
+    | Make sure you are using compatible versions of the Compose Multiplatform Compiler plugin and Kotlin.
     | You can find the compatibility table here: $COMPOSE_COMPILER_COMPATIBILITY_LINK
 """.trimMargin()
+}
