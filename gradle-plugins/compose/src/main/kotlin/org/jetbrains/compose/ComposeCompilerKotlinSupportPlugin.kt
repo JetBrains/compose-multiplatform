@@ -95,6 +95,6 @@ private val WARN_ABOUT_JC_COMPILER = """
     | WARNING: You are using the 'androidx.compose.compiler' plugin in your Kotlin multiplatform project.
     | This plugin is only guaranteed to work with JVM targets (desktop or Android).
     | The usage with Kotlin/JS or Kotlin/Native targets is not supported and might cause issues.
-    | Make sure you are using compatible versions of the Jetpack Compose Compiler and Kotlin.
+    | Make sure you are using compatible versions of the Compose Multiplatform Compiler and Kotlin.
     | You can find the compatibility table here: $COMPOSE_COMPILER_COMPATIBILITY_LINK
 """.trimMargin()
