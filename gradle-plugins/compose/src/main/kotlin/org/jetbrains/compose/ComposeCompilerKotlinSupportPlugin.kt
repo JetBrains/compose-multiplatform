@@ -108,7 +108,7 @@ private const val COMPOSE_COMPILER_COMPATIBILITY_LINK =
 internal fun createWarningAboutNonCompatibleCompiler(currentCompilerPluginGroupId: String): String {
     return """
 WARNING: Usage of the Custom Compose Compiler plugin ('$currentCompilerPluginGroupId') 
-with non-JVM targets targets (Kotlin/Native, Kotlin/JS, Kotlin/WASM) is not supported.
+with non-JVM targets (Kotlin/Native, Kotlin/JS, Kotlin/WASM) is not supported.
 For more information, please visit: $COMPOSE_COMPILER_COMPATIBILITY_LINK
 """.trimMargin()
 }
