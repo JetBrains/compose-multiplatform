@@ -84,12 +84,16 @@ class TestScope : CoroutineScope by MainScope() {
      * Suspends until [element] observes any change to its html.
      */
     suspend fun waitForChanges(element: HTMLElement = root) {
-        suspendCoroutine<Unit> { continuation ->
+        suspendCancellableCoroutine<Unit> { continuation ->
             val observer = MutationObserver { _, observer ->
                 continuation.resume(Unit)
                 observer.disconnect()
             }
             observer.observe(element, MutationObserverOptions)
+
+            continuation.invokeOnCancellation {
+                observer.disconnect()
+            }
         }
     }
 
@@ -97,8 +101,14 @@ class TestScope : CoroutineScope by MainScope() {
      * Suspends until recomposition completes.
      */
     suspend fun waitForRecompositionComplete() {
-        suspendCoroutine<Unit> { continuation ->
+        suspendCancellableCoroutine<Unit> { continuation ->
             waitForRecompositionCompleteContinuation = continuation
+        }
+
+        continuation.invokeOnCancellation {
+            if (waitForRecompositionCompleteContinuation === continuation) {
+                waitForRecompositionCompleteContinuation = null
+            }
         }
     }
 }
