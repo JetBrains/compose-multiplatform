@@ -79,4 +79,54 @@ class TestsForTestUtils {
         assertEquals(true, waitForChangesContinued)
         assertEquals("<div>Hello World!</div>", root.outerHTML)
     }
+
+    @Test
+    fun waitForChanges_cancels_with_timeout() = runTest {
+
+        var cancelled = false
+
+        val job = launch {
+            try {
+                withTimeout(1000) {
+                    waitForChanges(root)
+                }
+            } catch (t: TimeoutCancellationException) {
+                cancelled = true
+                throw t
+            }
+        }
+
+        delay(100) // to check that `waitForChanges` is suspended after delay
+        assertEquals(false, cancelled)
+
+        delay(1000) // to check that `waitForChanges` is cancelled after timeout
+        assertEquals(true, cancelled)
+
+        job.join()
+    }
+
+    @Test
+    fun waitForRecompositionComplete_cancels_with_timeout() = runTest {
+
+        var cancelled = false
+
+        val job = launch {
+            try {
+                withTimeout(1000) {
+                    waitForRecompositionComplete()
+                }
+            } catch (t: TimeoutCancellationException) {
+                cancelled = true
+                throw t
+            }
+        }
+
+        delay(100) // to check that `waitForRecompositionComplete` is suspended after delay
+        assertEquals(false, cancelled)
+
+        delay(1000) // to check that `waitForRecompositionComplete` is cancelled after timeout
+        assertEquals(true, cancelled)
+
+        job.join()
+    }
 }
