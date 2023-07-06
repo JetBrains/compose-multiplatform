@@ -202,13 +202,18 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                     val (group, libraryName) = this.trim(':').split(":")
 
                     // find androidx library from libraryversions.toml by given module
-                    val androidxLibrary = extension.getLibraryGroupFromProjectPath(this)!!
+                    val androidxLibrary = extension.getLibraryGroupFromProjectPath(this)
+                        ?: error("Cannot find androidx library for module $this")
                     val atomicVersion = androidxLibrary.atomicGroupVersion
 
                     // not all libraries have atomicVersion, for such cases we will use group name
                     // e.g. CORE doesn't have atomicVersion, so we will find just a version for CORE
                     // assuming that it will exist
-                    val version = atomicVersion ?: extension.LibraryVersions[group.uppercase()]!!
+                    val version =
+                        atomicVersion ?: extension.LibraryVersions[group.uppercase()] ?: error(
+                            "Cannot find androidx library version for module $this, " +
+                                "detected library is: $androidxLibrary"
+                        )
                     "${androidxLibrary.group}:$libraryName:$version"
                 }
             )
