@@ -35,6 +35,12 @@ internal class BuildResultChecks(private val result: BuildResult) {
         }
     }
 
+    fun logDoesntContain(substring: String) {
+        if (result.output.contains(substring)) {
+            throw AssertionError("Test output contains the unexpected string: '$substring'")
+        }
+    }
+
     fun taskSuccessful(task: String) {
         taskOutcome(task, TaskOutcome.SUCCESS)
     }
