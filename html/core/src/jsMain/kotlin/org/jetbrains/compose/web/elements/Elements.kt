@@ -119,6 +119,9 @@ private val Em: ElementBuilder<HTMLElement> = ElementBuilderImplementation("em")
 private val I: ElementBuilder<HTMLElement> = ElementBuilderImplementation("i")
 private val B: ElementBuilder<HTMLElement> = ElementBuilderImplementation("b")
 private val Small: ElementBuilder<HTMLElement> = ElementBuilderImplementation("small")
+private val Sup: ElementBuilder<HTMLElement> = ElementBuilderImplementation("sup")
+private val Sub: ElementBuilder<HTMLElement> = ElementBuilderImplementation("sub")
+private val Blockquote: ElementBuilder<HTMLElement> = ElementBuilderImplementation("blockquote")
 
 private val Span: ElementBuilder<HTMLSpanElement> = ElementBuilderImplementation("span")
 
@@ -589,6 +592,24 @@ fun Small(
     attrs: AttrBuilderContext<HTMLElement>? = null,
     content: ContentBuilder<HTMLElement>? = null
 ) = TagElement(elementBuilder = Small, applyAttrs = attrs, content = content)
+
+@Composable
+fun Sup(
+    attrs: AttrBuilderContext<HTMLElement>? = null,
+    content: ContentBuilder<HTMLElement>? = null
+) = TagElement(elementBuilder = Sup, applyAttrs = attrs, content = content)
+
+@Composable
+fun Sub(
+    attrs: AttrBuilderContext<HTMLElement>? = null,
+    content: ContentBuilder<HTMLElement>? = null
+) = TagElement(elementBuilder = Sub, applyAttrs = attrs, content = content)
+
+@Composable
+fun Blockquote(
+    attrs: AttrBuilderContext<HTMLElement>? = null,
+    content: ContentBuilder<HTMLElement>? = null
+) = TagElement(elementBuilder = Blockquote, applyAttrs = attrs, content = content)
 
 @Composable
 fun Span(
