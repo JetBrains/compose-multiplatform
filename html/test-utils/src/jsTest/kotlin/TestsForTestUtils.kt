@@ -3,6 +3,8 @@ import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentRecomposeScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.withTimeout
 import org.jetbrains.compose.web.testutils.ComposeWebExperimentalTestsApi
 import org.jetbrains.compose.web.testutils.runTest
 import kotlin.test.Test
