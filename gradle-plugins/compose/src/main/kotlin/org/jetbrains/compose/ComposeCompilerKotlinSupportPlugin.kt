@@ -7,13 +7,18 @@ package org.jetbrains.compose
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
+import org.gradle.build.event.BuildEventsListenerRegistry
 import org.jetbrains.compose.internal.ComposeCompilerArtifactProvider
 import org.jetbrains.compose.internal.mppExtOrNull
 import org.jetbrains.compose.internal.webExt
 import org.jetbrains.kotlin.gradle.plugin.*
 import org.jetbrains.kotlin.gradle.targets.js.ir.KotlinJsIrTarget
+import javax.inject.Inject
 
-class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
+@Suppress("UnstableApiUsage")
+class ComposeCompilerKotlinSupportPlugin @Inject constructor(
+    @Suppress("UnstableApiUsage") private val buildEventsListenerRegistry: BuildEventsListenerRegistry
+) : KotlinCompilerPluginSupportPlugin {
     private lateinit var composeCompilerArtifactProvider: ComposeCompilerArtifactProvider
 
     override fun apply(target: Project) {
@@ -25,26 +30,33 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
                 composeExt.kotlinCompilerPlugin.orNull ?:
                     ComposeCompilerCompatibility.compilerVersionFor(target.getKotlinPluginVersion())
             }
-        }
-        target.afterEvaluate {
-            warnAboutJetpackComposeCompilerUsageForNonJvm(it)
+
+            collectUnsupportedCompilerPluginUsages(target)
         }
     }
 
-    @Suppress("NON_EXHAUSTIVE_WHEN")
-    private fun warnAboutJetpackComposeCompilerUsageForNonJvm(target: Project) {
-        val groupId = composeCompilerArtifactProvider.compilerArtifact.groupId
-        val isUsingNonJBComposeCompiler = !groupId.startsWith("org.jetbrains.compose.compiler")
+    private fun collectUnsupportedCompilerPluginUsages(target: Project) {
+        fun Project.hasNonJvmTargets(): Boolean {
+            val nonJvmTargets = setOf(KotlinPlatformType.native, KotlinPlatformType.js, KotlinPlatformType.wasm)
+            return mppExtOrNull?.targets?.any {
+                it.platformType in nonJvmTargets
+            } ?: false
+        }
 
-        if (isUsingNonJBComposeCompiler) {
-            target.mppExtOrNull?.targets?.forEach {
-                when (it.platformType) {
-                    KotlinPlatformType.native,
-                    KotlinPlatformType.js,
-                    KotlinPlatformType.wasm -> target.logger.warn(createWarningAboutNonCompatibleCompiler(groupId))
+        fun SubpluginArtifact.isNonJBComposeCompiler(): Boolean {
+            return !groupId.startsWith("org.jetbrains.compose.compiler")
+        }
+
+        val service = ComposeMultiplatformBuildService.provider(target)
+        buildEventsListenerRegistry.onTaskCompletion(service)
+
+        service.get().parameters.unsupportedCompilerPlugins.add(
+            target.provider {
+                composeCompilerArtifactProvider.compilerArtifact.takeIf {
+                    target.hasNonJvmTargets() && it.isNonJBComposeCompiler()
                 }
             }
-        }
+        )
     }
 
     override fun getCompilerPluginId(): String =
@@ -93,12 +105,10 @@ class ComposeCompilerKotlinSupportPlugin : KotlinCompilerPluginSupportPlugin {
 private const val COMPOSE_COMPILER_COMPATIBILITY_LINK =
     "https://github.com/JetBrains/compose-jb/blob/master/VERSIONING.md#using-compose-multiplatform-compiler"
 
-private fun createWarningAboutNonCompatibleCompiler(currentCompilerPluginGroupId: String): String {
+internal fun createWarningAboutNonCompatibleCompiler(currentCompilerPluginGroupId: String): String {
     return """
-    | WARNING: You are using the '$currentCompilerPluginGroupId' compiler plugin in your Kotlin multiplatform project.
-    | This plugin is not guaranteed to work with non-JVM targets (jvm targets are: desktop or Android).
-    | The usage with Kotlin/JS or Kotlin/Native targets is not supported and might cause issues.
-    | Make sure you are using compatible versions of the Compose Multiplatform Compiler plugin and Kotlin.
-    | You can find the compatibility table here: $COMPOSE_COMPILER_COMPATIBILITY_LINK
+WARNING: Usage of the Custom Compose Compiler plugin ('$currentCompilerPluginGroupId') 
+with non-JVM targets targets (Kotlin/Native, Kotlin/JS, Kotlin/WASM) is not supported.
+For more information, please visit: $COMPOSE_COMPILER_COMPATIBILITY_LINK
 """.trimMargin()
 }
