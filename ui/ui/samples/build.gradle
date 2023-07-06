@@ -29,7 +29,7 @@ dependencies {
     implementation(libs.material)
     implementation("androidx.core:core:1.5.0")
 
-    compileOnly(project(":annotation:annotation-sampled"))
+    compileOnly(androidxArtifact(":annotation:annotation-sampled"))
 
     implementation("androidx.compose.animation:animation-core:1.2.1")
     implementation("androidx.compose.foundation:foundation-layout:1.2.1")

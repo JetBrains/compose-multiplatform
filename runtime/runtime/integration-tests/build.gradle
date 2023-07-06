@@ -34,7 +34,7 @@ dependencies {
         androidTestImplementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
         androidTestImplementation(project(":compose:runtime:runtime"))
         androidTestImplementation(projectOrArtifact(":compose:test-utils"))
-        androidTestImplementation(projectOrArtifact(":activity:activity-compose"))
+        androidTestImplementation(androidxArtifact(":activity:activity-compose"))
 
         androidTestImplementation(libs.junit)
         androidTestImplementation(libs.kotlinTestJunit)
@@ -91,7 +91,7 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(projectOrArtifact(":compose:material:material"))
                 implementation(projectOrArtifact(":compose:ui:ui-test-junit4"))
                 implementation(projectOrArtifact(":compose:test-utils"))
-                implementation(projectOrArtifact(":activity:activity-compose"))
+                implementation(androidxArtifact(":activity:activity-compose"))
                 implementation(libs.testExtJunit)
                 implementation(libs.testRules)
                 implementation(libs.testRunner)

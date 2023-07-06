@@ -28,7 +28,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
 
-    compileOnly(project(":annotation:annotation-sampled"))
+    compileOnly(androidxArtifact(":annotation:annotation-sampled"))
 
     implementation("androidx.activity:activity-compose:1.5.0")
     implementation("androidx.compose.animation:animation:1.2.1")
@@ -55,14 +55,4 @@ androidx {
 
 android {
     namespace "androidx.compose.material3.samples"
-}
-
-// Workaround for https://github.com/gradle/gradle/issues/19882
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("androidx.lifecycle:lifecycle-common-java8:")).
-                using project(":lifecycle:lifecycle-common-java8")
-        substitute(module("androidx.lifecycle:lifecycle-common:")).
-                using project(":lifecycle:lifecycle-common")
-    }
 }

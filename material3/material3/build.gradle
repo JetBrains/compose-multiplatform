@@ -63,7 +63,7 @@ dependencies {
         androidTestImplementation(project(":compose:material3:material3:material3-samples"))
         androidTestImplementation(project(":compose:foundation:foundation-layout"))
         androidTestImplementation(project(":compose:test-utils"))
-        androidTestImplementation(project(":test:screenshot:screenshot"))
+        androidTestImplementation(androidxArtifact(":test:screenshot:screenshot"))
         androidTestImplementation(project(":core:core"))
         androidTestImplementation(libs.testRules)
         androidTestImplementation(libs.testRunner)
@@ -79,7 +79,7 @@ dependencies {
 
 if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
     androidXComposeMultiplatform {
-        android()
+        //android() // TODO fix
         desktop()
         darwin()
         wasm()
@@ -107,17 +107,17 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
                 implementation(project(":compose:foundation:foundation-layout"))
             }
 
-            androidMain.dependencies {
-                api("androidx.annotation:annotation:1.1.0")
-                implementation("androidx.activity:activity-compose:1.5.0")
-
-                // TODO: remove next 3 dependencies when b/202810604 is fixed
-                implementation("androidx.savedstate:savedstate-ktx:1.2.1")
-                implementation("androidx.lifecycle:lifecycle-runtime:2.6.1")
-                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
-
-                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
-            }
+//            androidMain.dependencies {
+//                api("androidx.annotation:annotation:1.1.0")
+//                implementation("androidx.activity:activity-compose:1.5.0")
+//
+//                // TODO: remove next 3 dependencies when b/202810604 is fixed
+//                implementation("androidx.savedstate:savedstate-ktx:1.2.1")
+//                implementation("androidx.lifecycle:lifecycle-runtime:2.6.1")
+//                implementation("androidx.lifecycle:lifecycle-viewmodel:2.6.1")
+//
+//                implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
+//            }
 
             skikoMain {
                 dependsOn(commonMain)
@@ -138,27 +138,27 @@ if(AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             //  need to add Robolectric (which must be kept out of androidAndroidTest), use a top
             //  level dependencies block instead:
             //  `dependencies { testImplementation(libs.robolectric) }`
-            androidTest.dependencies {
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.junit)
-                implementation(libs.truth)
-            }
-
-            androidAndroidTest.dependencies {
-                implementation(project(":compose:material3:material3:material3-samples"))
-                implementation(project(":compose:test-utils"))
-                implementation(project(':compose:foundation:foundation-layout'))
-                implementation(project(":test:screenshot:screenshot"))
-                implementation(project(":core:core"))
-                implementation(libs.testRules)
-                implementation(libs.testRunner)
-                implementation(libs.junit)
-                implementation(libs.truth)
-                implementation(libs.dexmakerMockitoInlineExtended)
-                implementation(libs.mockitoKotlin)
-                implementation(libs.testUiautomator)
-            }
+//            androidTest.dependencies {
+//                implementation(libs.testRules)
+//                implementation(libs.testRunner)
+//                implementation(libs.junit)
+//                implementation(libs.truth)
+//            }
+//
+//            androidAndroidTest.dependencies {
+//                implementation(project(":compose:material3:material3:material3-samples"))
+//                implementation(project(":compose:test-utils"))
+//                implementation(project(':compose:foundation:foundation-layout'))
+//                implementation(projectOrArtifact(":test:screenshot:screenshot"))
+//                implementation(projectOrArtifact(":core:core"))
+//                implementation(libs.testRules)
+//                implementation(libs.testRunner)
+//                implementation(libs.junit)
+//                implementation(libs.truth)
+//                implementation(libs.dexmakerMockitoInlineExtended)
+//                implementation(libs.mockitoKotlin)
+//                implementation(libs.testUiautomator)
+//            }
 
             desktopTest.dependencies {
                 implementation(project(":compose:ui:ui-test-junit4"))

@@ -28,7 +28,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
 
-    compileOnly(project(":annotation:annotation-sampled"))
+    compileOnly(androidxArtifact(":annotation:annotation-sampled"))
 
     implementation(project(":compose:ui:ui-test"))
     implementation(project(":compose:ui:ui-test-junit4"))
@@ -46,18 +46,4 @@ androidx {
 
 android {
     namespace "androidx.compose.ui.test.samples"
-}
-
-// Workaround for https://github.com/gradle/gradle/issues/19882
-configurations.all {
-    resolutionStrategy.dependencySubstitution {
-        substitute(module("androidx.lifecycle:lifecycle-common:")).
-                using project(":lifecycle:lifecycle-common")
-        substitute(module("androidx.lifecycle:lifecycle-runtime:")).
-                using project(":lifecycle:lifecycle-runtime")
-        substitute(module("androidx.lifecycle:lifecycle-runtime-ktx:")).
-                using project(":lifecycle:lifecycle-runtime-ktx")
-        substitute(module("androidx.lifecycle:lifecycle-viewmodel:")).
-                using project(":lifecycle:lifecycle-viewmodel")
-    }
 }

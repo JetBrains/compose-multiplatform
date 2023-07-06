@@ -29,7 +29,7 @@ dependencies {
     implementation project(":compose:ui:ui")
     implementation(libs.kotlinStdlib)
 
-    androidTestImplementation project(":benchmark:benchmark-junit4")
+//    androidTestImplementation project(":benchmark:benchmark-junit4")
     androidTestImplementation(libs.testRules)
 }
 

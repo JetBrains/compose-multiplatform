@@ -26,14 +26,14 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinStdlib)
-    implementation project(":core:core")
+    implementation androidxArtifact(":core:core")
     implementation project(":compose:runtime:runtime")
     implementation project(":compose:foundation:foundation-layout")
     implementation project(":compose:ui:ui")
     implementation project(":compose:material:material")
     implementation project(":compose:material3:material3")
     implementation project(":compose:material3:material3:material3-samples")
-    implementation project(":navigation:navigation-compose")
+    implementation androidxArtifact(":navigation:navigation-compose")
 }
 
 androidx {

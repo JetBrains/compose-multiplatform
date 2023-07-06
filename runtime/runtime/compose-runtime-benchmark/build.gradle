@@ -52,9 +52,9 @@ dependencies {
     androidTestImplementation(libs.kotlinStdlib)
     androidTestImplementation(libs.kotlinReflect)
     androidTestImplementation(libs.kotlinCoroutinesTest)
-    androidTestImplementation(projectOrArtifact(":benchmark:benchmark-junit4"))
+    androidTestImplementation(androidxArtifact(":benchmark:benchmark-junit4"))
     androidTestImplementation("androidx.activity:activity:1.2.0")
-    androidTestImplementation(projectOrArtifact(":activity:activity-compose"))
+    androidTestImplementation(androidxArtifact(":activity:activity-compose"))
     // old version of common-java8 conflicts with newer version, because both have
     // DefaultLifecycleEventObserver.
     // Outside of androidx this is resolved via constraint added to lifecycle-common,

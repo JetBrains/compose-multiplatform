@@ -27,7 +27,7 @@ plugins {
 dependencies {
 
     implementation(libs.kotlinStdlib)
-    compileOnly(projectOrArtifact(":annotation:annotation-sampled"))
+    compileOnly(androidxArtifact(":annotation:annotation-sampled"))
     implementation("androidx.compose.foundation:foundation:1.2.1")
     implementation("androidx.compose.material:material:1.2.1")
     implementation(projectOrArtifact(":compose:runtime:runtime-rxjava3"))

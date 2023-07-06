@@ -26,7 +26,7 @@ plugins {
 
 dependencies {
     implementation(libs.kotlinStdlib)
-    compileOnly(project(":annotation:annotation-sampled"))
+    compileOnly(androidxArtifact(":annotation:annotation-sampled"))
     implementation(project(":compose:animation:animation-core"))
     implementation("androidx.compose.runtime:runtime:1.2.1")
     implementation("androidx.compose.ui:ui:1.2.1")

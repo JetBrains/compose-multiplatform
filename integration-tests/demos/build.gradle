@@ -11,19 +11,19 @@ dependencies {
     implementation(project(":compose:foundation:foundation-layout:integration-tests:foundation-layout-demos"))
     implementation(project(":compose:foundation:foundation:integration-tests:foundation-demos"))
     implementation(project(":compose:material:material:integration-tests:material-demos"))
-    implementation(project(":compose:material3:material3:integration-tests:material3-demos"))
-    implementation(project(":navigation:navigation-compose:integration-tests:navigation-demos"))
+//    implementation(project(":compose:material3:material3:integration-tests:material3-demos"))
+//    implementation(projectOrArtifact(":navigation:navigation-compose:integration-tests:navigation-demos"))
     implementation(project(":compose:ui:ui:integration-tests:ui-demos"))
 
     implementation(libs.kotlinReflect)
     implementation(libs.kotlinStdlib)
 
-    implementation(project(":core:core-ktx"))
+    implementation(androidxArtifact(":core:core-ktx"))
     implementation(project(":compose:foundation:foundation"))
     implementation(project(":compose:foundation:foundation-layout"))
     implementation(project(":compose:integration-tests:demos:common"))
     implementation(project(":compose:material:material"))
-    implementation(project(":compose:material3:material3"))
+//    implementation(project(":compose:material3:material3"))
     implementation(project(":compose:runtime:runtime"))
     implementation(project(":compose:ui:ui"))
 

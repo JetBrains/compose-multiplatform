@@ -60,7 +60,7 @@ dependencies {
 
         androidTestImplementation(project(":compose:test-utils"))
         androidTestImplementation(project(":internal-testutils-fonts"))
-        androidTestImplementation(project(":test:screenshot:screenshot"))
+        androidTestImplementation(androidxArtifact(":test:screenshot:screenshot"))
         androidTestImplementation(project(":internal-testutils-runtime"))
         androidTestImplementation(libs.testUiautomator)
         androidTestImplementation(libs.testRules)
@@ -111,7 +111,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             }
             androidMain.dependencies {
                 api("androidx.annotation:annotation:1.1.0")
-                implementation(project(':emoji2:emoji2'))
+                implementation(androidxArtifact(':emoji2:emoji2'))
             }
 
             skikoMain {
@@ -178,7 +178,7 @@ if (AndroidXComposePlugin.isMultiplatformEnabled(project)) {
             androidAndroidTest.dependencies {
                 implementation(project(":compose:test-utils"))
                 implementation(project(":internal-testutils-fonts"))
-                implementation(project(":test:screenshot:screenshot"))
+                implementation(androidxArtifact(":test:screenshot:screenshot"))
                 implementation(project(":internal-testutils-runtime"))
                 implementation("androidx.activity:activity-compose:1.3.1")
                 implementation("androidx.core:core:1.9.0")

@@ -23,7 +23,7 @@ plugins {
 }
 
 dependencies {
-    androidTestImplementation project(":benchmark:benchmark-junit4")
+//    androidTestImplementation project(":benchmark:benchmark-junit4")
     androidTestImplementation project(":compose:benchmark-utils")
     androidTestImplementation project(":compose:runtime:runtime")
     androidTestImplementation project(":compose:foundation:foundation-layout")

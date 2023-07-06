@@ -46,7 +46,7 @@ dependencies {
         androidTestImplementation projectOrArtifact(":compose:ui:ui-test-junit4")
         androidTestImplementation projectOrArtifact(":compose:test-utils")
         androidTestImplementation "androidx.fragment:fragment:1.3.0"
-        androidTestImplementation projectOrArtifact(":activity:activity-compose")
+        androidTestImplementation androidxArtifact(":activity:activity-compose")
         androidTestImplementation(libs.testUiautomator)
         androidTestImplementation(libs.testCore)
         androidTestImplementation(libs.testRules)

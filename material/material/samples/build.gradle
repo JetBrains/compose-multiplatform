@@ -28,7 +28,7 @@ dependencies {
 
     implementation(libs.kotlinStdlib)
 
-    compileOnly(project(":annotation:annotation-sampled"))
+    compileOnly(androidxArtifact(":annotation:annotation-sampled"))
 
     implementation("androidx.compose.animation:animation:1.2.1")
     implementation("androidx.compose.foundation:foundation:1.2.1")
