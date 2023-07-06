@@ -103,11 +103,11 @@ class TestScope : CoroutineScope by MainScope() {
     suspend fun waitForRecompositionComplete() {
         suspendCancellableCoroutine<Unit> { continuation ->
             waitForRecompositionCompleteContinuation = continuation
-        }
 
-        continuation.invokeOnCancellation {
-            if (waitForRecompositionCompleteContinuation === continuation) {
-                waitForRecompositionCompleteContinuation = null
+            continuation.invokeOnCancellation {
+                if (waitForRecompositionCompleteContinuation === continuation) {
+                    waitForRecompositionCompleteContinuation = null
+                }
             }
         }
     }
