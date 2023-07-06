@@ -160,7 +160,7 @@ open class AndroidXExtension(val project: Project) {
     }
 
     // gets the library group from the project path, including special cases
-    private fun getLibraryGroupFromProjectPath(
+    fun getLibraryGroupFromProjectPath(
         projectPath: String,
         explanationBuilder: MutableList<String>? = null
     ): LibraryGroup? {

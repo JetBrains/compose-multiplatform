@@ -81,12 +81,7 @@ import org.gradle.api.tasks.testing.AbstractTestTask
 import org.gradle.api.tasks.testing.Test
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.api.tasks.testing.logging.TestLogEvent
-import org.gradle.kotlin.dsl.KotlinClosure1
-import org.gradle.kotlin.dsl.create
-import org.gradle.kotlin.dsl.extra
-import org.gradle.kotlin.dsl.findByType
-import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.register
+import org.gradle.kotlin.dsl.*
 import org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension
 import org.jetbrains.kotlin.gradle.dsl.KotlinMultiplatformExtension
 import org.jetbrains.kotlin.gradle.plugin.KotlinBasePluginWrapper
@@ -147,6 +142,11 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
         // TODO: [1.4 Update] check that it is not needed
         //   This validation is not needed for JetBrains Fork, since they usually set in a force way
 //        project.configureProjectVersionValidation(extension)
+
+        // JetBrains Fork only.
+        // extension to download latest androidx artifacts instead of depending on project modules
+        project.registerAndroidxArtifact(extension)
+
         project.registerProjectOrArtifact()
         project.addCreateLibraryBuildInfoFileTasks(extension)
 
@@ -185,6 +185,34 @@ class AndroidXImplPlugin @Inject constructor(val componentFactory: SoftwareCompo
                 )
             )
         }
+    }
+
+    /**
+     * Register task that provides androidx library name by given androidx module
+     *
+     * It works using libraryversions.toml where versions for androidx libraries are located.
+     *
+     * JetBrains Fork only.
+     */
+    private fun Project.registerAndroidxArtifact(extension: AndroidXExtension) {
+        extra.set(
+            ANDROIDX_ARTIFACT_EXT_NAME,
+            KotlinClosure1<String, Any>(
+                function = {
+                    val (group, libraryName) = this.trim(':').split(":")
+
+                    // find androidx library from libraryversions.toml by given module
+                    val androidxLibrary = extension.getLibraryGroupFromProjectPath(this)!!
+                    val atomicVersion = androidxLibrary.atomicGroupVersion
+
+                    // not all libraries have atomicVersion, for such cases we will use group name
+                    // e.g. CORE doesn't have atomicVersion, so we will find just a version for CORE
+                    // assuming that it will exist
+                    val version = atomicVersion ?: extension.LibraryVersions[group.uppercase()]!!
+                    "${androidxLibrary.group}:$libraryName:$version"
+                }
+            )
+        )
     }
 
     /**
@@ -1192,4 +1220,5 @@ fun removeLineAndColumnAttributes(baseline: String): String = baseline.replace(
     ""
 )
 
+const val ANDROIDX_ARTIFACT_EXT_NAME = "androidxArtifact"
 const val PROJECT_OR_ARTIFACT_EXT_NAME = "projectOrArtifact"

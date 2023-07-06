@@ -111,11 +111,12 @@ fun Project.configureLint(lint: Lint, extension: AndroidXExtension, isLibrary: B
         // Remove the lint and column attributes from generated lint baseline XML.
         if (task.name.startsWith("updateLintBaseline")) {
             task.doLast {
-                task.projectInputs.lintOptions.baseline.orNull?.asFile?.let { file ->
-                    if (file.exists()) {
-                        file.writeText(removeLineAndColumnAttributes(file.readText()))
-                    }
-                }
+                // isn't available in AGP 7.4.0
+//                task.projectInputs.lintOptions.baseline.orNull?.asFile?.let { file ->
+//                    if (file.exists()) {
+//                        file.writeText(removeLineAndColumnAttributes(file.readText()))
+//                    }
+//                }
             }
         }
     }
